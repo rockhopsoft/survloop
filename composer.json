@@ -1,0 +1,33 @@
+{
+    "name": "wikiworldorder/survloop",
+    "description": "SurvLoop is a Laravel-based engine for designing a database and creating a mobile-friendly user interface to fill it.",
+    "keywords": [
+    	"laravel", 
+    	"SurvLoop", 
+    	"survey", 
+    	"database designer", 
+    	"user experience", 
+    	"forms", 
+    	"mobile friendly", 
+    	"mobile first", 
+    	"branching tree",
+    	"nodes", 
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Morgan Lesko",
+            "homepage": "https://github.com/survloop",
+            "email": "mo@wikiworldorder.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "doctrine/dbal": "^2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SurvLoop\\": "src/"
+        }
+    }
+}
