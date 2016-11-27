@@ -77,12 +77,17 @@ class DatabaseLookups
 			$this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
 				->where('TreeType', 'Primary Public')
 				->first();
-			$this->treeID = $this->treeRow->TreeID;
+			if (isset($this->treeRow->TreeID))
+			{
+				$this->treeID = $this->treeRow->TreeID;
+			}
 		}
-		$this->treeName	= str_replace($this->dbRow->DbName, 
-			str_replace('_', '', $this->dbRow->DbPrefix), 
-				$this->treeRow->TreeName);
-
+		if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName))
+		{
+			$this->treeName	= str_replace($this->dbRow->DbName, 
+				str_replace('_', '', $this->dbRow->DbPrefix), 
+					$this->treeRow->TreeName);
+		}
 
 		$this->sysOpts = array( "cust-abbr" => 'survloop' );
 		

@@ -24,22 +24,18 @@ SurvLoop is a Laravel-based engine for designing a database and creating a mobil
 
 Here are instructions if you are new to Laravel, or just want step-by-step instructions on how to install its development environment, Homestead: <a href="http://wikiworldorder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/" target="_blank">WikiWorldOrder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/</a>
 
-1. Install Laravel's default user authentication:
+1. Install Laravel's default user authentication, one required package, and SurvLoop:
 
 ```
 $ php artisan make:auth
+$ composer require doctrine/dbal
+$ composer require wikiworldorder/survloop dev-master
+$ composer update
 ```
 
-2. Require the package in your `composer.json` and update your dependency with `composer update`:
+2. Edit `composer.json` to add an easier SurvLoop reference:
 
 ```
-"require": {
-...
-"doctrine/dbal": "v2.4.2",
-"wikiworldorder/survloop": "~1.0@dev",
-...
-},
-...
 "autoload": {
 	...
 	"psr-4": {
@@ -79,15 +75,6 @@ $ php artisan vendor:publish --force
 $ php artisan migrate
 $ composer dump-autoload
 $ php artisan db:seed --class=SurvLoopSeeder
-```
-
-> **Use your own models.**
-> Once you publish, it publishes the configuration file where you can define your own models which should extend to Acl models.
-
-6. Add the SurvLoopUser to your `config/auth.php`.
-
-```php
- 'model' => SurvLoop\Controllers\SurvLoopUser::class,
 ```
 
 # <a name="documentation"></a>Documentation

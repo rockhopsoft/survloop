@@ -1543,6 +1543,7 @@ class SurvLoopTree extends CoreTree
 			$this->updateCurrNode($this->REQ->input('node'));
 		}
 		$lastNode = $this->currNode();
+		if ($lastNode <= 0) return false;
 		$previouslyInLoop = (isset($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) && intVal($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) > 0 && trim($this->sessInfo->setNavName) != '');
 		
 		if ($this->hasREQ && $this->REQ->has('superHardJump')) 
