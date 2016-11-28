@@ -1,7 +1,7 @@
 
 # WikiWorldOrder/SurvLoop
 
-[![Laravel](https://img.shields.io/badge/Laravel-~5.3-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-5.3-orange.svg?style=flat-square)](http://laravel.com)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
 
 SurvLoop is a Laravel-based engine for designing a database and creating a mobile-friendly user interface to fill it.
@@ -30,19 +30,20 @@ Here are instructions if you are new to Laravel, or just want step-by-step instr
 $ php artisan make:auth
 ```
 
-* Edit `composer.json` to add requirements and an easier SurvLoop reference:
+* Update `composer.json` to add requirements and an easier SurvLoop reference:
 
 ```
 $ nano composer.json
 ```
 
 ```
+...
 "require": {
 	...
-    "wikiworldorder/survloop": "dev-master",
+    "wikiworldorder/survloop": "dev-master#55b88dac25e5a26b1a183bb6d01061f83dad1d2a",
 	...
 },
-"minimum-stability": "dev", 
+...
 "autoload": {
 	...
 	"psr-4": {
@@ -51,6 +52,7 @@ $ nano composer.json
 	}
 	...
 },
+...
 ```
 
 ```
@@ -60,15 +62,19 @@ $ composer update
 * Add the package to your application service providers in `config/app.php`.
 
 ```php
-'providers' => [
 ...
-SurvLoop\SurvLoopServiceProvider::class,
+'providers' => [
+	...
+	SurvLoop\SurvLoopServiceProvider::class,
+	...
 ],
 ...
 'aliases' => [
-...
-'SurvLoop'	=> 'WikiWorldOrder\SurvLoop\SurvLoopFacade',
+	...
+	'SurvLoop'	=> 'WikiWorldOrder\SurvLoop\SurvLoopFacade',
+	...
 ],
+...
 ```
 
 * Swap out the SurvLoop user model in `config/auth.php`.
