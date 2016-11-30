@@ -1946,7 +1946,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeign2Max' => 'N',
 			'FldValues' => 'Primary Public;Primary Public XML',
 			'FldDefault' => 'Primary Public',
-			'FldDataLength' => '20',
+			'FldDataLength' => '25',
 			'FldCharSupport' => ',Numbers,',
 			'FldKeyType' => ',',
 			'FldCompareSame' => '878800'
@@ -4309,7 +4309,7 @@ class SurvLoopSeeder extends Seeder
 			'NodePromptText' => 'Database Designer'
 		]);
 		DB::table('SL_Node')->insert([
-			'NodeID' => 8,
+			'NodeID' => 11,
 			'NodeTree' => '3',
 			'NodeParentID' => '7',
 			'NodeType' => 'Page',
@@ -4319,7 +4319,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('SL_Node')->insert([
 			'NodeID' => 9,
 			'NodeTree' => '3',
-			'NodeParentID' => '8',
+			'NodeParentID' => '11',
 			'NodeType' => 'Text',
 			'NodePromptText' => '<h2 class="slBlueDark">Welcome</h2>What kind of cool data do you want to collect and share?'
 		]);

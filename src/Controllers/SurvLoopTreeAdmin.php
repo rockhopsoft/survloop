@@ -53,10 +53,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
 			$node->nodeRow->NodeType = 'Text';
 		}
 		
-		//if ($this->debugOn) { echo '<br /><br /><br /><br />nodeIN: ' . $nodeIN . '<pre>'; print_r($node->nodeRow); echo '</pre>'; }
 		if ($this->REQ->has('sub') && $this->canEditTree)
 		{
-			//if ($this->debugOn) { echo 'nodeIN: ' . $nodeIN . '<pre>'; print_r($this->REQ->all()); echo '</pre>'; }
 			if ($this->REQ->has('deleteNode') && intVal($this->REQ->input('deleteNode')) == 1)
 			{
 				$this->treeAdminNodeDelete($node->nodeRow->NodeID);
@@ -396,7 +394,6 @@ class SurvLoopTreeAdmin extends SurvFormTree
 						if (strlen($save->NodeSaveNewVal) > 100) $save->NodeSaveNewVal = substr($save->NodeSaveNewVal, 0, 100).'...';
 						$responses = array($save->NodeSaveNewVal);
 						if ($this->allNodes[$nID]->nodeType == 'Checkbox') $responses = explode(';;', $save->NodeSaveNewVal);
-						//if ($nID == 181) { echo $row["saveNewVal"] . ' - > <pre>'; print_r($responses); echo '</pre>'; }
 						if (!isset($nodeSess[$save->NodeSaveSession]))
 						{
 							$nodeSess[$save->NodeSaveSession] = 1;
@@ -443,17 +440,15 @@ class SurvLoopTreeAdmin extends SurvFormTree
 				else
 				{ // non-branch nodes
 					$retVal .= '<span class="' . ((strlen($this->allNodes[$nID]->nodeRow->NodePromptText) > 100) ? 'f16' : 'f22') . '">' 
-					. strip_tags(str_replace('</div>', ' ', str_replace('</h1>', ' ', str_replace('</h2>', ' ', $this->allNodes[$nID]->nodeRow->NodePromptText)))) 
-					. (($this->allNodes[$nID]->isRequired()) ? ' <span class="slRedDark">*</span> ' : '') 
-					. '</span><div class="pT5">'
-					. ((sizeof($tierNode[1]) > 0) ? '<a href="#n'.$nID.'" id="adminNode'.$nID.'Expand" class="slBlueLight noUnd"><i class="fa fa-expand fa-flip-horizontal"></i></a>&nbsp;&nbsp;&nbsp;' : '');
-					//if ($nID == 106) { echo 'nodeFinalVals:<pre>'; print_r($nodeFinalVals); echo '</pre>nodeAttempts:<pre>'; print_r($nodeAttempts); echo '</pre>nodeSess:<pre>'; print_r($nodeSess); echo '</pre>'; } 
+						. strip_tags(str_replace('</div>', ' ', str_replace('</h1>', ' ', str_replace('</h2>', ' ', $this->allNodes[$nID]->nodeRow->NodePromptText)))) 
+						. (($this->allNodes[$nID]->isRequired()) ? ' <span class="slRedDark">*</span> ' : '') 
+						. '</span><div class="pT5">'
+						. ((sizeof($tierNode[1]) > 0) ? '<a href="#n'.$nID.'" id="adminNode'.$nID.'Expand" class="slBlueLight noUnd"><i class="fa fa-expand fa-flip-horizontal"></i></a>&nbsp;&nbsp;&nbsp;' : '');
 					if (sizeof($this->allNodes[$nID]->nodeResponses) > 0)
 					{
 						$retVal .= '<ul>';
 						foreach ($this->allNodes[$nID]->nodeResponseVals as $j => $res)
 						{
-							//if ($nID == 106) { echo 'nodeAttempts['.strtolower($res).']:<pre>'; print_r($nodeAttempts[strtolower($res)]); echo '</pre>'; } 
 							$stats = $this->adminResponseNodeStatsTxt(strtolower($res), $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess);
 							if ($this->allNodes[$nID]->nodeResponses[0] != '[U.S.States]' || isset($nodeFinalVals[strtolower($res)]) || isset($nodeAttempts[strtolower($res)]))
 							{

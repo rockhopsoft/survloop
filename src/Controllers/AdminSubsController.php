@@ -11,7 +11,7 @@ use SurvLoop\Controllers\AdminController;
 
 class AdminSubsController extends AdminController
 {
-	public $classExtension 		= 'AdminController';
+	public $classExtension 		= 'AdminSubsController';
 	
 	
 	public function listSubsAll(Request $request)
@@ -43,10 +43,8 @@ class AdminSubsController extends AdminController
 				. $GLOBALS["DB"]->treeRow->TreeLastPage . "')->";
 		}
 		$this->v["subsList"] = [];
-		eval("\$this->v['subsList'] = " . $GLOBALS["DB"]->abbrModelDir() 
-			. $GLOBALS["DB"]->sysOpts["cust-abbr"] . $GLOBALS["DB"]->coreTbl 
-			. "::" . $xtraWhere
-			. "orderBy('" . $this->v["subsSort"][0] 
+		eval("\$this->v['subsList'] = " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl)
+			. "::" . $xtraWhere . "orderBy('" . $this->v["subsSort"][0] 
 			. "', '" . $this->v["subsSort"][1] . "')->get();");
 		return view( 'vendor.survloop.admin.submissions-list', $this->v );
 	}

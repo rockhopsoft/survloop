@@ -103,7 +103,7 @@ class CoreTree extends SurvLoopController
 		$this->nodeTiers = $this->nodesRawOrder = $this->nodesRawIndex = array();
 		if ($this->rootID > 0)
 		{
-			$this->nodeTiers = array($this->rootID, $this->loadNodeTiersInner($this->rootID));
+			$this->nodeTiers = [$this->rootID, $this->loadNodeTiersInner($this->rootID)];
 			$this->loadRawOrder($this->nodeTiers);
 		}
 		return true;
@@ -140,14 +140,15 @@ class CoreTree extends SurvLoopController
 		{
 			foreach ($nodeTierPath as $i => $ind) $subTier = $subTier[1][$ind];
 		}
-		//if ($this->debugOn) { echo 'loadSubTierFromPath(nodeTierPath): '; print_r($nodeTierPath); echo '<br />subTier: '; print_r($subTier); echo '<br />'; }
 		return $subTier;
 	}
 	
 	protected function loadNodeSubTier($nID = -3)
 	{
-		//if ($this->debugOn) { echo 'loadNodeSubTier('.$nID.')<br />'; }
-		if ($this->hasNode($nID)) return $this->loadSubTierFromPath($this->allNodes[$nID]->nodeTierPath);
+		if ($this->hasNode($nID))
+		{
+			return $this->loadSubTierFromPath($this->allNodes[$nID]->nodeTierPath);
+		}
 		return array();
 	}
 	
@@ -181,7 +182,6 @@ class CoreTree extends SurvLoopController
 	// Locate next node in standard Pre-Order Traversal
 	protected function nextNode($nID)
 	{
-		//echo 'nextNode(' . $nID . '<br /><pre>'; print_r($this->nodesRawIndex); echo '</pre>';
 		$nodeOverride = $this->moveNextOverride($nID);
 		if ($nodeOverride > 0) return $nodeOverride;
 		
@@ -205,7 +205,6 @@ class CoreTree extends SurvLoopController
 			->where('NodeParentOrder', (1+$this->allNodes[$nID]->parentOrd))
 			->select('NodeID')
 			->first();
-		//echo 'nextNodeSibling('.$nID.'), parent: ' . $this->allNodes[$nID]->parentID . ', parentOrder: ' . $this->allNodes[$nID]->arentOrd . '<pre>'; print_r($nextSibling); echo '</pre>';
 		if ($nextSibling && isset($nextSibling->NodeID))
 		{
 			return $nextSibling->NodeID;
@@ -217,8 +216,10 @@ class CoreTree extends SurvLoopController
 	
 	protected function treeAdminNodeManip()
 	{
-		if ($this->REQ->has('manip') && $this->REQ->has('moveNode') && $this->REQ->has('moveToParent') && $this->REQ->has('moveToOrder')
-			&& $this->REQ->moveNode > 0 && $this->REQ->moveToParent > 0 && $this->REQ->moveToOrder >= 0 && isset($this->allNodes[$this->REQ->moveNode]))
+		if ($this->REQ->has('manip') && $this->REQ->has('moveNode') 
+			&& $this->REQ->has('moveToParent') && $this->REQ->has('moveToOrder')
+			&& $this->REQ->moveNode > 0 && $this->REQ->moveToParent > 0 
+			&& $this->REQ->moveToOrder >= 0 && isset($this->allNodes[$this->REQ->moveNode]))
 		{
 			$node = $this->allNodes[$this->REQ->moveNode];
 			$node->fillNodeRow();
@@ -262,9 +263,21 @@ class CoreTree extends SurvLoopController
 			{
 				foreach ($sibs as $sib)
 				{
-					if ($sib->NodeID == intVal($this->REQ->input('orderBefore'))) { $node->nodeRow->NodeParentOrder = $sib->NodeParentOrder; $foundSibling = true; }
-					if ($foundSibling) SLNode::where('NodeID', $sib->NodeID)->increment('NodeParentOrder');
-					if ($sib->NodeID == intVal($this->REQ->input('orderAfter'))) { $node->nodeRow->NodeParentOrder = (1+$sib->NodeParentOrder); $foundSibling = true; }
+					if ($sib->NodeID == intVal($this->REQ->input('orderBefore'))) 
+					{ 
+						$node->nodeRow->NodeParentOrder = $sib->NodeParentOrder; 
+						$foundSibling = true;
+					}
+					if ($foundSibling)
+					{
+						SLNode::where('NodeID', $sib->NodeID)
+							->increment('NodeParentOrder');
+					}
+					if ($sib->NodeID == intVal($this->REQ->input('orderAfter'))) 
+					{
+						$node->nodeRow->NodeParentOrder = (1+$sib->NodeParentOrder);
+						$foundSibling = true;
+					}
 				}
 			}
 		}

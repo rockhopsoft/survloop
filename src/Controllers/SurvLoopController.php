@@ -152,9 +152,7 @@ class SurvLoopController extends Controller
 		if ($baseOverride != '') $this->genCacheKey($baseOverride);
 		if ($this->REQ->has('refresh'))
 		{ 
-			//echo '<div style="padding: 100px;">refreshForget!  ' . $this->cacheKey . '</div>'; 
 			Cache::forget($this->cacheKey); 
-			//echo '<textarea>'; print_r(Cache::store('file')->get($this->cacheKey)); echo '</textarea>';
 		}
 		if (Cache::store('file')->has($this->cacheKey))
 		{
@@ -243,16 +241,19 @@ class SurvLoopController extends Controller
 	{
 		$this->admMenuData = [ "adminNav" => [], "currNavPos" => [] ];
 		$this->admMenuData["adminNav"] = $this->loadAdmMenu();
-		if ($this->classExtension == 'AdminController' 
-			&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
+		if ($GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop'
+			&& $this->classExtension == 'AdminController')
 		{
-			eval("\$CustAdmin = new App\\Http\\Controllers\\" 
-				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\" 
-				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin;");
-			if ($CustAdmin && sizeof($CustAdmin) > 0)
+			$custClass = $GLOBALS["DB"]->sysOpts["cust-abbr"] 
+				. "\\Controllers\\" . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin";
+			if (class_exists($custClass))
 			{
-				$CustAdmin->admControlInit($this->REQ);
-				$this->admMenuData["adminNav"] = $CustAdmin->loadAdmMenu();
+				eval("\$CustAdmin = new " . $custClass . ";");
+				if ($CustAdmin && sizeof($CustAdmin) > 0)
+				{
+					$CustAdmin->admControlInit($this->REQ);
+					$this->admMenuData["adminNav"] = $CustAdmin->loadAdmMenu();
+				}
 			}
 		}
 		//if (sizeof($this->CustReport) = 0) $this->admMenuData["adminNav"] = $this->loadAdmMenu();

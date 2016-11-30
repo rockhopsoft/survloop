@@ -21,31 +21,35 @@ class AdminController extends SurvLoopController
 	protected $adminNav 		= array();
 	protected $admMenuData 		= array();
 	protected $pageIsAdmin 		= true;
+	protected $admInitRun 		= false;
 	
 	protected function admControlInit(Request $request, $currPage = '')
 	{
-		$this->survLoopInit($request, $currPage, false);
-		//echo $GLOBALS["DB"]->sysOpts["cust-abbr"] . '<br />';
-		if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"])
-			&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
+		if (!$this->admInitRun)
 		{
-			eval("\$this->CustReport = new App\\Http\\Controllers\\" 
-				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\" 
-				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Report(\$request);");
-			$this->checkCurrPage();
+			$this->admInitRun = true;
+			$this->survLoopInit($request, $currPage, false);
+			if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"])
+				&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
+			{
+				eval("\$this->CustReport = new "
+					. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+					. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Report(\$request);");
+				$this->checkCurrPage();
+			}
+			list($this->v["yourUserInfo"], $this->v["yourContact"]) = $this->initPowerUser(Auth::user()->id);
+			$this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"]);
+			$this->v["belowAdmMenu"] = '';
+			$this->v["currState"] = '';
+			if (isset($this->v["yourContact"]->PrsnAddressState))
+			{
+				$this->v["currState"] = $this->v["yourContact"]->PrsnAddressState;
+			}
+			$this->loadSearchSuggestions();
+			$this->initExtra($request);
+			$this->initCustViews();
+			$this->logPageVisit();
 		}
-		list($this->v["yourUserInfo"], $this->v["yourContact"]) = $this->initPowerUser(Auth::user()->id);
-		$this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"]);
-		$this->v["belowAdmMenu"] = '';
-		$this->v["currState"] = '';
-		if (isset($this->v["yourContact"]->PrsnAddressState))
-		{
-			$this->v["currState"] = $this->v["yourContact"]->PrsnAddressState;
-		}
-		$this->loadSearchSuggestions();
-		$this->initExtra($request);
-		$this->initCustViews();
-		$this->logPageVisit();
 		return true;
 	}
 	
@@ -55,7 +59,6 @@ class AdminController extends SurvLoopController
 		{
 			$custPage = $this->CustReport->getCurrPage();
 			if (trim($custPage) != '/') $this->v["currPage"] = $custPage;
-			//echo '<br /><br /><br />checkCurrPage()... ' . $this->v["currPage"] . ' ?= ' . $this->CustReport->getCurrPage() . '<br />';
 		}
 		return true;
 	}
@@ -466,7 +469,6 @@ class AdminController extends SurvLoopController
 				$currEmail->ComEmailCustomSpots = sizeof($customSpotSplit)-1;
 			}
 			$currEmail->save();
-			//echo 'currEmail:<pre>'; print_r($currEmail); echo '</pre>';
 		}
 		return redirect('/dashboard/subs/emails');
 	}

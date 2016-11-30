@@ -180,7 +180,6 @@ class AdminTreeController extends AdminController
 		$condsRaw = $this->loadCondList();
 		if ($request->has('totalConds') && intVal($request->totalConds) > 0)
 		{
-			//echo '<pre>'; print_r($request->all()); echo '</pre>';
 			if ($condsRaw && sizeof($condsRaw) > 0)
 			{
 				foreach ($condsRaw as $i => $cond)

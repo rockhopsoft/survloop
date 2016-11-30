@@ -13,7 +13,6 @@
 
 Route::group(['middleware' => ['web']], function () {
 		
-	//Route::get('/', function () { return view( 'master'); });
 	Route::post('/', 					'SurvLoop\\Controllers\\SurvLoop@index');
 	Route::get( '/', 					'SurvLoop\\Controllers\\SurvLoop@index');
 	Route::post('/sub', 				'SurvLoop\\Controllers\\SurvLoop@index');

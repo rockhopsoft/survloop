@@ -129,10 +129,8 @@ class DatabaseLookups
 	public function loadDBFromCache(Request $request = NULL)
 	{
 		$cacheFile = '/cache/db-load-' . $this->dbID . '.php';
-		//echo 'cacheFile: ' . $cacheFile . '<br />';
 		if ((!$request || !$request->has('refresh')) && file_exists($cacheFile))
 		{
-			//require_once($cacheFile);
 			$content = Storage::get($cacheFile);
 			eval($content);
 		}
@@ -237,9 +235,9 @@ class DatabaseLookups
 	
 	
 	
-	public function abbrModelDir()
+	public function modelPath($tbl = '')
 	{
-		return "App\\Models\\" . $this->sysOpts["cust-abbr"] . "\\";
+		return "App\\Models\\" . $this->tblModels[$tbl];
 	}
 	
 	public function isCoreTbl($tblID)
@@ -343,10 +341,11 @@ class DatabaseLookups
 		{
 			foreach ($flds as $fld)
 			{
-				//echo 'getForeignOpts(opts: ' . $opts . ': ' . $fld->FldName . '<br />' . "\n";
 				$lnkMap = $this->tbl[$fld->FldForeignTable] . '::' 
-					. $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
-				$retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
+					. $this->tbl[$fld->FldTable] . ':' 
+					. $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
+				$retVal .= '<option value="' . $lnkMap . '" ' 
+					. (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
 					. $this->tbl[$fld->FldForeignTable] . ' &larr; ' 
 					. $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
 					. ' &larr; ' . $this->tbl[$fld->FldTable] . '
@@ -366,7 +365,6 @@ class DatabaseLookups
 			{
 				foreach ($flds as $fld)
 				{
-					//echo 'getForeignOpts(opts: ' . $opts . ': ' . $fld->FldName . '<br />' . "\n";
 					$lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
 						. ':' . $this->tbl[$fld->FldForeignTable] . ':';
 					$retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
@@ -394,13 +392,21 @@ class DatabaseLookups
 			->get();
 		if ($foreigns && sizeof($foreigns) == 2)
 		{
-			return [
-				$this->tbl[$foreigns[0]->FldForeignTable], 
-				$this->tblAbbr[$this->tbl[$linkTbl]] . $foreigns[0]->FldName, 
-				$this->tbl[$linkTbl], 
-				$this->tblAbbr[$this->tbl[$linkTbl]] . $foreigns[1]->FldName, 
-				$this->tbl[$foreigns[1]->FldForeignTable] 
-			];
+			if (isset($foreigns[0]->FldForeignTable)
+				&& isset($this->tbl[$foreigns[0]->FldForeignTable])
+				&& isset($foreigns[1]->FldForeignTable)
+				&& isset($this->tbl[$foreigns[1]->FldForeignTable])
+				&& isset($this->tbl[$linkTbl])
+				&& isset($this->tblAbbr[$this->tbl[$linkTbl]]) )
+			{
+				return [
+					$this->tbl[$foreigns[0]->FldForeignTable], 
+					$this->tblAbbr[$this->tbl[$linkTbl]] . $foreigns[0]->FldName, 
+					$this->tbl[$linkTbl], 
+					$this->tblAbbr[$this->tbl[$linkTbl]] . $foreigns[1]->FldName, 
+					$this->tbl[$foreigns[1]->FldForeignTable] 
+				];
+			}
 		}
 		return array();
 	}

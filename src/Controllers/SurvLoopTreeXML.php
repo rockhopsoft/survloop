@@ -45,10 +45,8 @@ class SurvLoopTreeXML extends CoreTree
 			$node->nodeRow->NodeType 			= 'XML';
 		}
 		
-		//if ($this->debugOn) { echo 'nodeIN: ' . $nodeIN . '<pre>'; print_r($node->nodeRow); echo '</pre>'; }
 		if ($this->REQ->has('sub'))
 		{
-			//if ($this->debugOn) { echo 'nodeIN: ' . $nodeIN . '<pre>'; print_r($this->REQ->all()); echo '</pre>'; }
 			if ($this->REQ->has('deleteNode') && intVal($this->REQ->input('deleteNode')) == 1)
 			{
 				$this->treeAdminNodeDelete($node->nodeRow->NodeID);

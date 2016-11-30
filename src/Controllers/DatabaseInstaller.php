@@ -348,14 +348,10 @@ class DatabaseInstaller extends AdminDBController
 		$this->admControlInit($request, '/dashboard/db/export');
 		
 		$this->v["oldTables"] = array();
-		//$chk = DB::select('SHOW TABLES');
-		//foreach ($chk as $tbl) $this->v["oldTables"][] = get_object_vars($tbl);
-		//echo '<pre>'; print_r($this->v["oldTables"]); echo '</pre>DB name?.. ' . ;
 		
 		$this->v["DbPrefix"] = $GLOBALS["DB"]->dbRow->DbPrefix;
 		$this->v["tbls"] = $this->tblQryStd();
 		
-		//echo '<br /><br /><br /><br />???? allo! request->all: '; print_r($request->all()); echo ' ????<br />';
 		$this->v["log"] = '';
 		if ($this->v["dbAllowEdits"] && $this->REQ->has('dbConfirm') && $this->REQ->input('dbConfirm') == 'install'
 			&& $this->REQ->has('createTable') && sizeof($this->REQ->input('createTable')) > 0)
@@ -365,8 +361,9 @@ class DatabaseInstaller extends AdminDBController
 			{
 				foreach ($this->REQ->input('copyData') as $copyTbl)
 				{
-					$transferData[$copyTbl] = DB::select('SELECT * FROM `' 
-						. $GLOBALS["DB"]->dbRow->DbPrefix . $GLOBALS["DB"]->tbl[$copyTbl] . '`');
+					eval("\$transferData[\$copyTbl] = " 
+						. $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]]
+						. "::get();");
 					$this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
 				}
 			}
@@ -399,8 +396,7 @@ class DatabaseInstaller extends AdminDBController
 							foreach ($flds as $fld) $newFlds[] = $fld->FldName;
 							foreach ($transferData[$copyTbl] as $oldRec) 
 							{
-								eval("\$newRec = new " . $GLOBALS["DB"]->abbrModelDir()
-									. $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]] . ";");
+								eval("\$newRec = new " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->tbl[$copyTbl]) . ";");
 								$newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
 								$newRec->created_at = $oldRec->created_at;
 								$newRec->updated_at = $oldRec->updated_at;
@@ -419,10 +415,6 @@ class DatabaseInstaller extends AdminDBController
 					}
 				}
 			}
-			//echo '<pre>'; print_r($transferData); echo '</pre>';
-			
-			//$users = DB::select('select * from users where active = ?', [1]);
-			//$this->exportMysql(true)
 		}
 		return view( 'vendor.survloop.admin.db.install', $this->v );
 	}

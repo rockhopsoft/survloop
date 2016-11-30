@@ -38,7 +38,6 @@ class SurvLoop extends Controller
 				. $this->custAbbr . "\\" . $this->custAbbr . "";
 			if (file_exists('../' . $custClass)) $class = ucfirst($custClass);
 		}
-		//echo '<br /><br /><br /><br />' . $class . '<br />'; exit;
 		eval("\$this->custLoop = new " . $class . "(\$request);");
 		return true;
 	}
@@ -149,14 +148,18 @@ class SurvLoop extends Controller
 	{
 		$this->loadAbbr();
 		$class = "SurvLoop\\Controllers\\AdminSubsController";
-		eval("\$this->custLoop = new " . $class . "(\$request);");
 		if ($this->custAbbr != 'SurvLoop')
 		{
-			$custClass = "app\\Http\\Controllers\\"
+			$custClass = "App\\Http\\Controllers\\"
 				. $this->custAbbr . "\\" . $this->custAbbr . "Admin";
-			if (file_exists('../' . $custClass)) $class = ucfirst($custClass);
+			if (class_exists($custClass)) $class = $custClass;
+			else
+			{
+				$custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Admin";
+				if (class_exists($custClass)) $class = $custClass;
+			}
 		}
-		//echo '<br /><br /><br /><br />' . $class . '<br />'; exit;
+		eval("\$this->custLoop = new " . $class . "(\$request);");
 		return true;
 	}
 	

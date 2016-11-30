@@ -119,7 +119,6 @@ class SurvLoopNode extends CoreNode
 				->orderBy('NodeParentOrder', 'asc')
 				->get();
 		}
-		//echo $this->nodeRow->responses . ' ... <pre>'; print_r($this->responses); echo '</pre>';
 		return true;
 	}
 	
@@ -153,7 +152,6 @@ class SurvLoopNode extends CoreNode
 	
 	public function getTblFld()
 	{
-		//echo $this->nodeID . ', <pre>'; print_r($this->nodeRow); echo '</pre>';
 		if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
 		return $this->splitTblFld($this->dataStore);
 	}
@@ -165,7 +163,6 @@ class SurvLoopNode extends CoreNode
 	
 	public function tierPathStr($tierPathArr = array())
 	{
-		//echo $this->nodeID . ', tierPathStr()<pre>'; print_r($this->nodeTierPath); echo '</pre>';
 		if (sizeof($tierPathArr) == 0) return implode('-', $this->nodeTierPath).'-';
 		return implode('-', $tierPathArr).'-';
 	}
@@ -173,8 +170,10 @@ class SurvLoopNode extends CoreNode
 	public function checkBranch($tierPathArr = array())
 	{
 		$tierPathStr = $this->tierPathStr($tierPathArr);
-		//if ($this->debugOn && $this->nodeID == $this->currNode()) { echo 'checkBranch? tierPathStr: ' .  $tierPathStr.', nodeTierPath: ' . $this->tierPathStr($this->nodeTierPath).'<br />'; }
-		if ($tierPathStr != '') return (strpos($this->tierPathStr($this->nodeTierPath), $tierPathStr) === 0);
+		if ($tierPathStr != '')
+		{
+			return (strpos($this->tierPathStr($this->nodeTierPath), $tierPathStr) === 0);
+		}
 		return 0;
 	}
 	
@@ -210,7 +209,6 @@ class SurvLoopNode extends CoreNode
 	
 	public function isSpecial()
 	{
-		//echo '> isInstruct? ' . (($this->isInstruct()) ? 'T' : 'F') . '<br />isPage? ' . (($this->isPage()) ? 'T' : 'F') . '<br />isBranch? ' . (($this->isBranch()) ? 'T' : 'F') . '<br />isLoopRoot? ' . (($this->isLoopRoot()) ? 'T' : 'F') . '<br />isDataManip? ' . (($this->isDataManip()) ? 'T' : 'F') . '<br /> <';
 		return ($this->isInstruct() || $this->isPage() 
 			|| $this->isBranch() || $this->isLoopRoot() 
 			|| $this->isDataManip());

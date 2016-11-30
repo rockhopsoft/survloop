@@ -44,7 +44,6 @@ class CoreNode {
 	 */
 	function __construct($nID = -3, $nRow = array(), $nCache = array())
 	{
-		//echo 'TreeNode(' . $nID . ', ' . $nRow->NodeID . ')<br />';
 		$this->nodeID = $nID;
 		if (sizeof($nCache) > 0)
 		{
@@ -136,7 +135,6 @@ class CoreNode {
 	
 	public function tierPathStr($tierPath = array())
 	{
-		//echo $this->nodeID . ', tierPathStr()<pre>'; print_r($this->nodeTierPath); echo '</pre>';
 		if (sizeof($tierPath) == 0) return implode('-', $this->nodeTierPath).'-';
 		return implode('-', $tierPath).'-';
 	}
@@ -144,7 +142,6 @@ class CoreNode {
 	public function checkBranch($tierPath = array())
 	{
 		$tierPathStr = $this->tierPathStr($tierPath);
-		//if ($this->debugOn && $this->nodeID == $this->currNode()) { echo 'checkBranch? tierPathStr: ' .  $tierPathStr.', nodeTierPath: ' . $this->tierPathStr($this->nodeTierPath).'<br />'; }
 		if ($tierPathStr != '') return (strpos($this->tierPathStr($this->nodeTierPath), $tierPathStr) === 0);
 		return 0;
 	}

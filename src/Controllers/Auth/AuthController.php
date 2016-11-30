@@ -88,7 +88,6 @@ class AuthController extends Controller
         	
         }
 		$hasUsers = User::select('id')->get();	
-    	//echo 'AuthController:create volunteer <pre>'; print_r($data); echo '</pre><pre>'; print_r($user); echo '</pre>'; exit;
     	if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1)
     	{
 			$log = new SLUsersActivity;

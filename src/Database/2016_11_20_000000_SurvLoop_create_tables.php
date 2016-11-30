@@ -133,7 +133,7 @@ class SurvLoopCreateTables extends Migration
 			//$table->foreign('TreeDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('TreeUser')->nullable();
 			//$table->foreign('TreeUser')->references('UserID')->on('SL_Users');
-			$table->string('TreeType', 20)->default('Primary Public')->nullable();
+			$table->string('TreeType', 25)->default('Primary Public')->nullable();
 			$table->string('TreeName')->nullable();
 			$table->longText('TreeDesc')->nullable();
 			$table->string('TreeRootURL')->nullable();
