@@ -353,8 +353,9 @@ class SurvLoopTree extends CoreTree
 	
 	public function currInComplaint()
 	{
-		if ($this->sessData->currSessData($this->sessInfo->SessCurrNode, $GLOBALS["DB"]->coreTbl, 
-			$GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress') == $GLOBALS["DB"]->treeRow->TreeLastPage)
+		$isLastPage = ($GLOBALS["DB"]->treeRow->TreeLastPage
+			== $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress');
+		if ($this->sessData->currSessData($this->sessInfo->SessCurrNode, $GLOBALS["DB"]->coreTbl, $isLastPage))
 		{
 			session()->forget('sessID');
 			session()->forget('coreID');
