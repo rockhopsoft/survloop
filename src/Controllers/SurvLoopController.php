@@ -83,10 +83,10 @@ class SurvLoopController extends Controller
 						'/dashboard/db/new'
 					])
 					->where('UserActUser', '=', $this->v["user"]->id)
+					->where('UserActVal', 'LIKE', '%;%')
 					->orderBy('created_at', 'desc')
 					->first();
-				if ($last && isset($last->UserActVal) 
-					&& strpos($last->UserActVal, ';') !== false)
+				if ($last && isset($last->UserActVal))
 				{
 					list($db, $tree) = explode(';', $last->UserActVal);
 					$db = intVal($db);
@@ -152,7 +152,9 @@ class SurvLoopController extends Controller
 		if ($baseOverride != '') $this->genCacheKey($baseOverride);
 		if ($this->REQ->has('refresh'))
 		{ 
+			//echo '<div style="padding: 100px;">refreshForget!  ' . $this->cacheKey . '</div>'; 
 			Cache::forget($this->cacheKey); 
+			//echo '<textarea>'; print_r(Cache::store('file')->get($this->cacheKey)); echo '</textarea>';
 		}
 		if (Cache::store('file')->has($this->cacheKey))
 		{
@@ -241,19 +243,16 @@ class SurvLoopController extends Controller
 	{
 		$this->admMenuData = [ "adminNav" => [], "currNavPos" => [] ];
 		$this->admMenuData["adminNav"] = $this->loadAdmMenu();
-		if ($GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop'
-			&& $this->classExtension == 'AdminController')
+		if ($this->classExtension == 'AdminController' 
+			&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
 		{
-			$custClass = $GLOBALS["DB"]->sysOpts["cust-abbr"] 
-				. "\\Controllers\\" . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin";
-			if (class_exists($custClass))
+			eval("\$CustAdmin = new App\\Http\\Controllers\\" 
+				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\" 
+				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin;");
+			if ($CustAdmin && sizeof($CustAdmin) > 0)
 			{
-				eval("\$CustAdmin = new " . $custClass . ";");
-				if ($CustAdmin && sizeof($CustAdmin) > 0)
-				{
-					$CustAdmin->admControlInit($this->REQ);
-					$this->admMenuData["adminNav"] = $CustAdmin->loadAdmMenu();
-				}
+				$CustAdmin->admControlInit($this->REQ);
+				$this->admMenuData["adminNav"] = $CustAdmin->loadAdmMenu();
 			}
 		}
 		//if (sizeof($this->CustReport) = 0) $this->admMenuData["adminNav"] = $this->loadAdmMenu();

@@ -91,7 +91,7 @@ $ composer update
 $ php artisan vendor:publish --force
 $ php artisan migrate
 $ composer dump-autoload
-$ php artisan db:seed --class=SurvLoopSeeder
+$ php artisan db:seed
 ```
 
 # <a name="documentation"></a>Documentation
