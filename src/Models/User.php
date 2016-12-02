@@ -1,5 +1,5 @@
 <?php 
-namespace SurvLoop\Models;
+namespace App\Models;
 
 use DB;
 
@@ -12,8 +12,8 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLUsersRoles;
+use App\Models\SLDefinitions;
+use App\Models\SLUsersRoles;
 
 use SurvLoop\Controllers\DatabaseLookups;
 

@@ -4,7 +4,7 @@ namespace SurvLoop\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-use SurvLoop\Models\SLDefinitions;
+use App\Models\SLDefinitions;
 
 class SurvLoop extends Controller
 {
@@ -34,9 +34,8 @@ class SurvLoop extends Controller
 		$class = "SurvLoop\\Controllers\\SurvFormTree";
 		if ($this->custAbbr != 'SurvLoop')
 		{
-			$custClass = "app\\Http\\Controllers\\" 
-				. $this->custAbbr . "\\" . $this->custAbbr . "";
-			if (file_exists('../' . $custClass)) $class = ucfirst($custClass);
+			$custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
+			if (class_exists($custClass)) $class = $custClass;
 		}
 		eval("\$this->custLoop = new " . $class . "(\$request);");
 		return true;
@@ -98,9 +97,8 @@ class SurvLoop extends Controller
 		$class = "SurvLoop\\Controllers\\SurvLoopReport";
 		if ($this->custAbbr != 'SurvLoop')
 		{
-			$custClass = "app\\Http\\Controllers\\" 
-				. $this->custAbbr . "\\" . $this->custAbbr . "Report";
-			if (file_exists('../' . $custClass)) $class = ucfirst($custClass);
+			$custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Report";
+			if (class_exists($custClass)) $class = $custClass;
 		}
 		eval("\$this->custLoop = new " . $class . "(\$request);");
 		return true;

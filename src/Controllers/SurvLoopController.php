@@ -11,11 +11,11 @@ use Illuminate\Routing\Controller;
 
 use SurvLoop\Controllers\DatabaseLookups;
 
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLUsersActivity;
+use App\Models\User;
+use App\Models\SLDatabases;
+use App\Models\SLDefinitions;
+use App\Models\SLTree;
+use App\Models\SLUsersActivity;
 
 class SurvLoopController extends Controller
 {
@@ -246,8 +246,8 @@ class SurvLoopController extends Controller
 		if ($this->classExtension == 'AdminController' 
 			&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
 		{
-			eval("\$CustAdmin = new App\\Http\\Controllers\\" 
-				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\" 
+			eval("\$CustAdmin = new " . $GLOBALS["DB"]->sysOpts["cust-abbr"] 
+				. "\\Controllers\\" 
 				. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin;");
 			if ($CustAdmin && sizeof($CustAdmin) > 0)
 			{

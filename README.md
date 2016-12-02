@@ -81,7 +81,7 @@ $ composer update
 
 ```php
 ...
-'model' => SurvLoop\Models\User::class,
+'model' => App\Models\User::class,
 ...
 ```
 
@@ -91,7 +91,7 @@ $ composer update
 $ php artisan vendor:publish --force
 $ php artisan migrate
 $ composer dump-autoload
-$ php artisan db:seed
+$ php artisan db:seed --class=SurvLoopSeeder
 ```
 
 # <a name="documentation"></a>Documentation

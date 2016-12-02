@@ -5,11 +5,11 @@ use Cache;
 use Auth;
 use Illuminate\Http\Request;
 
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLBusRules;
-use SurvLoop\Models\SLLogActions;
+use App\Models\SLTables;
+use App\Models\SLFields;
+use App\Models\SLDefinitions;
+use App\Models\SLBusRules;
+use App\Models\SLLogActions;
 
 use SurvLoop\Controllers\SurvLoopData;
 use SurvLoop\Controllers\DatabaseLookups;
@@ -1688,7 +1688,8 @@ class AdminDBController extends AdminController
 	
 	protected function printForeignKey($fld = array(), $tblLinks = 1, $whichway = 0)
 	{
-		if (intVal($fld->FldForeignTable) > 0 && isset($GLOBALS["DB"]->tbl[$fld->FldForeignTable])) 
+		if (intVal($fld->FldForeignTable) > 0 && isset($GLOBALS["DB"]->tbl[$fld->FldForeignTable])
+			&& isset($GLOBALS["DB"]->tbl[$fld->FldTable])) 
 		{
 			if ($whichway == 0)
 			{

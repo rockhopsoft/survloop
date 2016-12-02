@@ -4,7 +4,7 @@ namespace SurvLoop\Controllers;
 use Cache;
 use Illuminate\Http\Request;
 
-use SurvLoop\Models\SLNode;
+use App\Models\SLNode;
 
 class SurvLoopTreeXML extends CoreTree
 {

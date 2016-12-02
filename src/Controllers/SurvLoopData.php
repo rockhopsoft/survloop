@@ -1,8 +1,8 @@
 <?php
 namespace SurvLoop\Controllers;
 
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLNodeSaves;
+use App\Models\SLFields;
+use App\Models\SLNodeSaves;
 
 class SurvLoopData
 {

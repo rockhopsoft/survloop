@@ -6,10 +6,10 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
+use App\Models\User;
+use App\Models\SLDatabases;
+use App\Models\SLTree;
+use App\Models\SLNode;
 
 use SurvLoop\Controllers\SurvLoopController;
 
@@ -79,7 +79,7 @@ class AdminController extends SurvLoopController
 		return true; 
 	}
 	
-	protected function loadAdmMenu()
+	protected function loadDbTreeShortNames()
 	{
 		$treeName = ((isset($GLOBALS["DB"]->treeName)) ? $GLOBALS["DB"]->treeName : '');
 		$dbName = ((isset($GLOBALS["DB"]->dbRow->DbName)) 
@@ -89,33 +89,39 @@ class AdminController extends SurvLoopController
 			$dbName = str_replace($GLOBALS["DB"]->dbRow->DbName, 
 				str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix), $dbName);
 		}
+		return array($treeName, $dbName);
+	}
+	
+	protected function loadAdmMenu()
+	{
+		list($treeName, $dbName) = $this->loadDbTreeShortNames();
 		return [
 			['/dashboard',		'Dashboard', 									1, []], 
 			['javascript:;',	'Submissions <span class="pull-right"><i class="fa fa-star"></i></span>', 1, [
-					['/dashboard/subs/all',			'All Complete', 			1, []], 
-					['/dashboard/subs/incomplete',	'Incomplete Sessions', 		1, []], 
-					['/dashboard/subs/emails',		'Settings & Emails', 	1, []]
+				['/dashboard/subs/all',			'All Complete', 			1, []], 
+				['/dashboard/subs/incomplete',	'Incomplete Sessions', 		1, []], 
+				['/dashboard/subs/emails',		'Settings & Emails', 	1, []]
 			]], 
 			['javascript:;',	'Experience <span class="pull-right"><i class="fa fa-snowflake-o"></i></span>', 1, [
-					['/dashboard/tree/switch',		'<i>Current: ' . $treeName . '</i>', 1, []], 
-					['/dashboard/tree/map?all=1',	'Experience Map', 			1, []],
-					['/dashboard/tree/conds',		'Conditions / Filters', 	1, []],
-					['/dashboard/tree/data',		'Data Structures', 			1, []],
-					['/dashboard/tree/xmlmap',		'Data XML Map', 			1, []],
-					['/dashboard/tree/workflows',	'Workflows', 				1, []],
-					['/test" target="_blank',		'Test Experience', 			1, []],
-					['/dashboard/tree',				'Session Stats', 			1, []], 
-					['/dashboard/tree/stats?all=1',	'Response Stats', 			1, []] 
+				['/dashboard/tree/switch',		'<i>Current: ' . $treeName . '</i>', 1, []], 
+				['/dashboard/tree/map?all=1',	'Experience Map', 			1, []],
+				['/dashboard/tree/conds',		'Conditions / Filters', 	1, []],
+				['/dashboard/tree/data',		'Data Structures', 			1, []],
+				['/dashboard/tree/xmlmap',		'Data XML Map', 			1, []],
+				['/dashboard/tree/workflows',	'Workflows', 				1, []],
+				['/test" target="_blank',		'Test Experience', 			1, []],
+				['/dashboard/tree',				'Session Stats', 			1, []], 
+				['/dashboard/tree/stats?all=1',	'Response Stats', 			1, []] 
 			]], 
 			['javascript:;',	'Database <span class="pull-right"><i class="fa fa-database"></i></span>', 1, [
-					['/dashboard/db/switch',		'<i>Current: ' . $dbName . '</i>', 1, []], 
-					['/dashboard/db/all',			'Database Design', 			1, []], 
-					['/dashboard/db/bus-rules',		'Business Rules', 			1, []], 
-					['/dashboard/db/definitions',	'Definitions', 				1, []],
-					['/dashboard/db',				'Tables Overview', 			1, []], 
-					['/dashboard/db/diagrams',		'Table Diagrams', 			1, []],
-					['/dashboard/db/field-matrix',	'Field Matrix', 			1, []],
-					['/dashboard/db/export',		'Export / Install', 		1, []]
+				['/dashboard/db/switch',		'<i>Current: ' . $dbName . '</i>', 1, []], 
+				['/dashboard/db/all',			'Database Design', 			1, []], 
+				['/dashboard/db/bus-rules',		'Business Rules', 			1, []], 
+				['/dashboard/db/definitions',	'Definitions', 				1, []],
+				['/dashboard/db',				'Tables Overview', 			1, []], 
+				['/dashboard/db/diagrams',		'Table Diagrams', 			1, []],
+				['/dashboard/db/field-matrix',	'Field Matrix', 			1, []],
+				['/dashboard/db/export',		'Export / Install', 		1, []]
 			]]
 		];
 	}

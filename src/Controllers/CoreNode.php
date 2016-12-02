@@ -17,7 +17,7 @@ namespace SurvLoop\Controllers;
 
 use DB;
 
-use SurvLoop\Models\SLNode;
+use App\Models\SLNode;
 
 class CoreNode {
 	

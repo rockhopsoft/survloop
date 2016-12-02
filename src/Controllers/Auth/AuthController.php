@@ -14,8 +14,8 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 
 use SurvLoop\Controllers\DatabaseLookups;
 
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLUsersActivity;
+use App\Models\User;
+use App\Models\SLUsersActivity;
 
 class AuthController extends Controller
 {

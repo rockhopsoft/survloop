@@ -1,10 +1,10 @@
 <?php
 namespace SurvLoop\Controllers;
 
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeResponses;
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLConditionsNodes;
+use App\Models\SLNode;
+use App\Models\SLNodeResponses;
+use App\Models\SLConditions;
+use App\Models\SLConditionsNodes;
 
 use SurvLoop\Controllers\CoreNode;
 
@@ -61,7 +61,19 @@ class SurvLoopNode extends CoreNode
 					'NodeType', 'NodeDataBranch', 'NodeDataStore', 
 					'NodeResponseSet', 'NodeDefault');
 		}
-		if (sizeof($nRow) > 0)
+		$this->copyFromRow();
+		if (!isset($this->nodeRow) || sizeof($this->nodeRow) == 0)
+		{
+			$this->nodeRow = new SLNode;
+			return false;
+		}
+		//$this->fillNodeRow();
+		return true;
+	}
+	
+	protected function copyFromRow()
+	{
+		if (sizeof($this->nodeRow) > 0)
 		{
 			$this->parentID 	= $this->nodeRow->NodeParentID;
 			$this->parentOrd 	= $this->nodeRow->NodeParentOrder;
@@ -72,17 +84,12 @@ class SurvLoopNode extends CoreNode
 			$this->responseSet 	= $this->nodeRow->NodeResponseSet;
 			$this->defaultVal 	= $this->nodeRow->NodeDefault;
 		}
-		if (!isset($this->nodeRow) || sizeof($this->nodeRow) == 0)
-		{
-			$this->nodeRow = new SLNode;
-			return false;
-		}
-		//$this->fillNodeRow();
 		return true;
 	}
 	
 	public function initiateNodeRow()
 	{
+		$this->copyFromRow();
 		$this->conds = array();
 		$chk = SLConditionsNodes::where('CondNodeNodeID', $this->nodeID)
 			->get();
@@ -245,8 +252,7 @@ class SurvLoopNode extends CoreNode
 		}
 		else list($tbl, $fld) = $this->splitTblFld($this->dataStore);
 		$newVal = (intVal($this->responseSet) > 0) 
-			? intVal($this->responseSet)
-			: trim($this->defaultVal);
+			? intVal($this->responseSet) : trim($this->defaultVal);
 		return [$tbl, $fld, $newVal];
 	}
 	

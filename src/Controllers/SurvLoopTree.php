@@ -6,17 +6,17 @@ use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
-use SurvLoop\Models\User;
+use App\Models\User;
 
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeSaves;
-use SurvLoop\Models\SLNodeSavesPage;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLSess;
-use SurvLoop\Models\SLSessLoops;
+use App\Models\SLDatabases;
+use App\Models\SLDefinitions;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLNodeSaves;
+use App\Models\SLNodeSavesPage;
+use App\Models\SLFields;
+use App\Models\SLSess;
+use App\Models\SLSessLoops;
 
 use SurvLoop\Controllers\CoreTree;
 use SurvLoop\Controllers\SurvLoopNode;
@@ -229,8 +229,9 @@ class SurvLoopTree extends CoreTree
 		if ($this->sessID > 0) $this->sessInfo = SLSess::find($this->sessID);
 		elseif ($this->sessID < 0 && $this->v["user"] && $this->v["user"]->id > 0)
 		{
+			$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
 			$this->sessInfo = SLSess::where('SessUserID', $this->v["user"]->id)
-				->where('updated_at', '>', date('Y-m-d H:i:s', mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'))))
+				->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
 				->orderBy('SessID', 'desc')
 				->first();
 			if ($this->sessInfo && sizeof($this->sessInfo) > 0)
@@ -239,7 +240,10 @@ class SurvLoopTree extends CoreTree
 				$this->coreID = $this->sessInfo->SessCoreID;
 			}
 		}
-		if (!$this->sessInfo || sizeof($this->sessInfo) == 0) $this->createNewSess();
+		if (!$this->sessInfo || sizeof($this->sessInfo) == 0)
+		{
+			$this->createNewSess();
+		}
 		session()->put('sessID', $this->sessID);
 		
 		// Check for and load core record's ID
@@ -250,17 +254,24 @@ class SurvLoopTree extends CoreTree
 		}
 		if ($this->coreID <= 0)
 		{
-			if ($this->sessInfo->SessCodeID > 0) $this->coreID = $this->sessInfo->SessCodeID;
+			if ($this->sessInfo->SessCodeID > 0)
+			{
+				$this->coreID = $this->sessInfo->SessCodeID;
+			}
 			elseif ($this->v["user"] && $this->v["user"]->id > 0) 
 			{
 				$pastUserSess = SLSess::where('SessUserID', $this->v["user"]->id)
+					->where('SessCoreID', '>', '0')
 					->orderBy('SessID', 'desc')
 					->first();
-				if ($pastUserSess && isset($pastUserSess->SessCoreID)) $this->coreID = $pastUserSess->SessCoreID;
+				if ($pastUserSess && isset($pastUserSess->SessCoreID))
+				{
+					$this->coreID = $pastUserSess->SessCoreID;
+				}
 			}
 		}
 		if ($this->coreID <= 0 && trim($GLOBALS["DB"]->coreTbl) != ''
-			&& file_exists('../' . substr($GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl), 1)))
+			&& class_exists($GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl)))
 		{
 			eval("\$recObj = new " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl) . ";");
 			$recObj->save();
@@ -268,7 +279,7 @@ class SurvLoopTree extends CoreTree
 		}
 		if ($this->coreIDoverride > 0)
 		{
-			// needs permissions...
+			// should have more permission checks here...
 			$this->coreID = $this->coreIDoverride;
 		}
 		session()->put('coreID', $this->coreID);
@@ -277,7 +288,8 @@ class SurvLoopTree extends CoreTree
 		$GLOBALS["DB"]->loadSessLoops($this->sessID);
 		
 		// Initialize currNode
-		if (isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl]) && isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0])
+		if (isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl]) 
+			&& isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0])
 			&& isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0]->{ $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress' })
 			&& intVal($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0]->{ $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress' }) > 0)
 		{
@@ -1183,8 +1195,8 @@ class SurvLoopTree extends CoreTree
 				->first();
 			if ($loadNode && isset($loadNode->NodeID))
 			{
-				$loadNodeChk = SLNodeSavesPage::where('NodePageSession', $this->coreID)
-					->where('NodePageNode', $loadNode->NodeID)
+				$loadNodeChk = SLNodeSavesPage::where('PageSaveSession', $this->coreID)
+					->where('PageSaveNode', $loadNode->NodeID)
 					->get();
 				if (!$loadNodeChk || sizeof($loadNodeChk) == 0) return false;
 				// perhaps upgrade to check for loop item id first?

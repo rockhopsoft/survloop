@@ -5,9 +5,9 @@ use DB;
 use Auth;
 use Illuminate\Http\Request;
 
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
+use App\Models\User;
+use App\Models\SLTree;
+use App\Models\SLNode;
 
 use SurvLoop\Controllers\CoreNode;
 use SurvLoop\Controllers\SurvLoopController;

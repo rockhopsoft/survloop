@@ -3,9 +3,9 @@ namespace SurvLoop\Controllers;
 
 use Illuminate\Http\Request;
 
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLTree;
+use App\Models\SLDatabases;
+use App\Models\SLFields;
+use App\Models\SLTree;
 
 use SurvLoop\Controllers\AdminController;
 

@@ -37,7 +37,7 @@ class SurvLoopCreateTables extends Migration
 			$table->string('TblEng')->nullable();
 			$table->longText('TblDesc')->nullable();
 			$table->longText('TblNotes')->nullable();
-			$table->string('TblType', 20)->default('Data')->nullable();
+			$table->string('TblType', 25)->default('Data')->nullable();
 			$table->string('TblGroup', 50)->nullable();
 			$table->integer('TblOrd')->default('0')->nullable();
 			$table->integer('TblOpts')->default('1')->nullable();
@@ -72,8 +72,8 @@ class SurvLoopCreateTables extends Migration
 			$table->longText('FldValues')->nullable();
 			$table->string('FldDefault')->nullable();
 			$table->boolean('FldIsIndex')->default('0')->nullable();
-			$table->string('FldType', 20)->default('VARCHAR')->nullable();
-			$table->string('FldDataType', 20)->default('Alphanumeric')->nullable();
+			$table->string('FldType', 25)->default('VARCHAR')->nullable();
+			$table->string('FldDataType', 25)->default('Alphanumeric')->nullable();
 			$table->integer('FldDataLength')->nullable();
 			$table->integer('FldDataDecimals')->default('0')->nullable();
 			$table->string('FldCharSupport')->default(',Letters,Numbers,Keyboard,Special,')->nullable();
@@ -100,7 +100,7 @@ class SurvLoopCreateTables extends Migration
 			$table->increments('DefID');
 			$table->integer('DefDatabase')->unsigned()->nullable();
 			//$table->foreign('DefDatabase')->references('DbID')->on('SL_Databases');
-			$table->string('DefSet', 20)->default('Value Ranges')->nullable();
+			$table->string('DefSet', 25)->default('Value Ranges')->nullable();
 			$table->string('DefSubset', 50)->nullable();
 			$table->integer('DefOrder')->default('0')->nullable();
 			$table->boolean('DefIsActive')->default('1')->nullable();
@@ -368,7 +368,7 @@ class SurvLoopCreateTables extends Migration
 			//$table->foreign('LogTable')->references('TblID')->on('SL_Tables');
 			$table->integer('LogField')->unsigned()->nullable();
 			//$table->foreign('LogField')->references('FldID')->on('SL_Fields');
-			$table->string('LogAction', 20)->nullable();
+			$table->string('LogAction', 25)->nullable();
 			$table->string('LogOldName')->nullable();
 			$table->string('LogNewName')->nullable();
 			$table->timestamps();

@@ -5,20 +5,20 @@ use DB;
 use Storage;
 use Illuminate\Http\Request;
 
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeResponses;
-use SurvLoop\Models\SLDataLoop;
-use SurvLoop\Models\SLDataSubsets;
-use SurvLoop\Models\SLDataHelpers;
-use SurvLoop\Models\SLDataLinks;
-use SurvLoop\Models\SLSessLoops;
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLConditionsVals;
+use App\Models\SLDatabases;
+use App\Models\SLDefinitions;
+use App\Models\SLFields;
+use App\Models\SLTables;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLNodeResponses;
+use App\Models\SLDataLoop;
+use App\Models\SLDataSubsets;
+use App\Models\SLDataHelpers;
+use App\Models\SLDataLinks;
+use App\Models\SLSessLoops;
+use App\Models\SLConditions;
+use App\Models\SLConditionsVals;
 
 use SurvLoop\Controllers\StatesUS;
 
@@ -703,7 +703,7 @@ class DatabaseLookups
 	public function getFldResponsesByID($fldID)
 	{
 		if (intVal($fldID) <= 0) return array( "prompt" => '', "vals" => array() );
-		return $this->getFldResponses($THIS->getFullFldNameFromID($fldID));
+		return $this->getFldResponses($this->getFullFldNameFromID($fldID));
 	}
 	
 	
