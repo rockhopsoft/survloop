@@ -190,8 +190,7 @@ class DatabaseLookups
 					->where('FldTable', '>', 0)
 					->get();
 				foreach ($flds as $fld) {
-					if (isset($this->tbl[$fld->FldTable]) 
-						&& isset($this->fldTypes[ $this->tbl[$fld->FldTable] ]))
+					if (isset($this->tbl[$fld->FldTable]))
 					{
 						$cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->FldTable] . '\'][\''
 							. $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName

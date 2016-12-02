@@ -20,7 +20,7 @@
 		<span class="gry9">Here you can finish, review, or update your complaint. Volunteers also login here.</span>
 	</div>
 	<div class="col-md-6 taR pT5">
-		<a href="/auth/register" class="btn btn-default">Sign Up To<br />Volunteer</a>
+		<a href="/register" class="btn btn-default">Sign Up To<br />Volunteer</a>
 	</div>
 </div>
 

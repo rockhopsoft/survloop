@@ -351,7 +351,8 @@ class SurvFormTree extends SurvLoopTree
 			// Start normal data field checks
 			$dateStr = $timeStr = '';
 			if ($fld != '' && $fld != ($GLOBALS["DB"]->tblAbbr[$tbl].'ID') 
-				&& trim($currNodeSessData) != '')
+				&& trim($currNodeSessData) != '' 
+				&& isset($GLOBALS["DB"]->fldTypes[$tbl][$fld]))
 			{
 				// convert current session data for dates and times
 				if ($GLOBALS["DB"]->fldTypes[$tbl][$fld] == 'DATETIME')

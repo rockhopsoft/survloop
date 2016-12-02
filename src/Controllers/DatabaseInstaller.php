@@ -157,12 +157,12 @@ class DatabaseInstaller extends AdminDBController
 				"Zip Files" 		=> ''
 			];
 			
-			$modelPath = "SurvLoop\\Models\\";
-			if ($GLOBALS["DB"]->dbRow->dbName != 'SurvLoop')
+			$modelPath = "App\\Models\\";
+			/* if ($GLOBALS["DB"]->dbRow->dbName != 'SurvLoop')
 			{
 				$modelPath = "App\\Models\\" 
 					. $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\";
-			}
+			} */
 			
 			$tbls = SLTables::where('TblDatabase', $this->dbID)
 				->where('TblName', 'NOT LIKE', 'Users')

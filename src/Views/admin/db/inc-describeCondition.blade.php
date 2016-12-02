@@ -2,7 +2,9 @@
 <input type="hidden" name="condIDs[]" value="{{ $cond->CondID }}" >
 
 @if (isset($cond->CondOperator))
-	@if (trim($cond->CondOperator) == 'CUSTOM')
+	@if ($cond->CondTag == '#NodeDisabled')
+		<b class="red fPerc125">{{ $cond->CondTag }}</b>
+	@elseif (trim($cond->CondOperator) == 'CUSTOM')
 		{{ $cond->CondTag }}
 	@else
 		@if (intVal($cond->CondLoop) > 0)

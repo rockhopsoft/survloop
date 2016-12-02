@@ -29,41 +29,46 @@ class SurvLoopController extends Controller
 	protected $currPage 			= '';
 	protected $cacheKey 			= '';
 	protected $isFirstTimeOnPage 	= false;
+	protected $survInitRun 			= false;
 	
 	protected function survLoopInit(Request $request, $currPage = '', $runExtra = true)
 	{
-		if (sizeof($this->REQ) == 0) $this->REQ = $request;
-		$this->v["user"]		= Auth::user();
-		$this->v["isAll"] 		= $request->has('all');
-		$this->v["isAlt"] 		= $request->has('alt');
-		$this->v["isPrint"] 	= $request->has('print');
-		$this->v["isExcel"] 	= $request->has('excel');
-		$this->v["exportDir"] 	= 'survloop';
-		$this->v["content"]		= '';
-		
-		$this->v["currPage"] = $currPage;
-		if ($this->v["currPage"] == '') 
+		if (!$this->survInitRun)
 		{
-			$this->v["currPage"] = $_SERVER["REQUEST_URI"];
-			if (strpos($this->v["currPage"], '?') !== false) 
+			$this->survInitRun = true;
+			if (sizeof($this->REQ) == 0) $this->REQ = $request;
+			$this->v["user"]		= Auth::user();
+			$this->v["isAll"] 		= $request->has('all');
+			$this->v["isAlt"] 		= $request->has('alt');
+			$this->v["isPrint"] 	= $request->has('print');
+			$this->v["isExcel"] 	= $request->has('excel');
+			$this->v["exportDir"] 	= 'survloop';
+			$this->v["content"]		= '';
+			
+			$this->v["currPage"] = $currPage;
+			if ($this->v["currPage"] == '') 
 			{
-				$this->v["currPage"] = substr($this->v["currPage"], 0, strpos($this->v["currPage"], '?'));
+				$this->v["currPage"] = $_SERVER["REQUEST_URI"];
+				if (strpos($this->v["currPage"], '?') !== false) 
+				{
+					$this->v["currPage"] = substr($this->v["currPage"], 0, strpos($this->v["currPage"], '?'));
+				}
 			}
+			
+			if (!isset($this->v["currState"])) 		$this->v["currState"] = '';
+			if (!isset($this->v["yourUserInfo"])) 	$this->v["yourUserInfo"] = array();
+			if (!isset($this->v["yourContact"])) 	$this->v["yourContact"] = array();
+			
+			$this->loadDbLookups();
+			if ($this->coreIDoverride > 0)			$this->loadAllSessData();
+			
+			if ($runExtra) 
+			{
+				$this->initExtra($request);
+				$this->initCustViews();
+			}
+			$this->genCacheKey();
 		}
-		
-		if (!isset($this->v["currState"])) 		$this->v["currState"] = '';
-		if (!isset($this->v["yourUserInfo"])) 	$this->v["yourUserInfo"] = array();
-		if (!isset($this->v["yourContact"])) 	$this->v["yourContact"] = array();
-		
-		$this->loadDbLookups();
-		if ($this->coreIDoverride > 0)			$this->loadAllSessData();
-		
-		if ($runExtra) 
-		{
-			$this->initExtra($request);
-			$this->initCustViews();
-		}
-		$this->genCacheKey();
 		return true;
 	}
 	

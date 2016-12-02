@@ -83,16 +83,28 @@
 			<span class="f14 gry9 mL10">{{ $node->nodeRow->NodeType }}</span>
 			@if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
 			<a @if (!$REQ->has('print')) href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" target="_blank" @endif class="f20 mL10">
-			<span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>{{ $node->nodeRow->NodePromptNotes }}</a>
+			<span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>
+			{{ $node->nodeRow->NodePromptNotes }}</a>
 			<div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
-			@if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
+			@if (sizeof($node->conds) > 0) 
+				<div class="f12 slBlueDark"> 
+					@if (sizeof($node->conds) > 1) Conditions @else Condition @endif 
+					- {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}
+				</div> 
+			@endif
 			
 		@elseif ($node->isDataManip())
 		
 			<span class="slGreenDark">
 			<span class="f18">
 				{{ $node->nodeRow->NodeDataBranch }}
-				@if ($node->nodeRow->NodeType == 'Data Manip: New') New Record @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') Update Record @else Table Wrap @endif
+				@if ($node->nodeRow->NodeType == 'Data Manip: New') 
+					New Record 
+				@elseif ($node->nodeRow->NodeType == 'Data Manip: Update') 
+					Update Record 
+				@else 
+					Table Wrap 
+				@endif
 			</span>
 			{{ $node->printManipUpdate() }}
 			</span> 

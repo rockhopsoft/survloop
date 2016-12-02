@@ -627,7 +627,7 @@ class SurvLoopData
 			$recObj = $this->newDataRecord($GLOBALS["DB"]->closestLoop["obj"]->DataLoopTable, $newFld, $newVal, true);
 			$GLOBALS["DB"]->sessLoops[0]->SessLoopItemID = $GLOBALS["DB"]->closestLoop["itemID"] = $recObj->getKey();
 			$GLOBALS["DB"]->sessLoops[0]->save();
-			$this->logDataSave($nID, $GLOBALS["DB"]->closestLoop["obj"]->DataLoopTable, 'SetNavLoop', 
+			$this->logDataSave($nID, $GLOBALS["DB"]->closestLoop["obj"]->DataLoopTable, $GLOBALS["DB"]->closestLoop["itemID"], 
 				'AddingItem #' . $GLOBALS["DB"]->closestLoop["itemID"], $GLOBALS["DB"]->closestLoop["loop"]);
 			return $recObj->getKey();
 		}
@@ -771,6 +771,7 @@ class SurvLoopData
 		elseif ($action == 'update' && $fld != ($GLOBALS["DB"]->tblAbbr[$tbl].'ID'))
 		{
 			$this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
+			if ($GLOBALS["DB"]->fldTypes[$tbl][$fld] == 'INT') $newVal = intVal($newVal);
 			if (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][$itemInd]))
 			{
 				$this->dataSets[$tbl][$itemInd]->{ $fld } = $newVal;
@@ -896,7 +897,7 @@ class SurvLoopData
 		{
 			$qryWheres .= "where('NodeSaveLoopItemID', " . $GLOBALS["DB"]->closestLoop["itemID"] . ")->";
 		}
-		eval("\$nodeSave = SurvLoop\\Models\\SLNodeSaves::" . $qryWheres 
+		eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres 
 			. "orderBy('created_at', 'desc')->first();"); // select('NodeSaveNewVal')->
 		if ($nodeSave && isset($nodeSave->NodeSaveNewVal)) return $nodeSave->NodeSaveNewVal;
 		return '';

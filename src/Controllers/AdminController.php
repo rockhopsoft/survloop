@@ -29,6 +29,12 @@ class AdminController extends SurvLoopController
 		{
 			$this->admInitRun = true;
 			$this->survLoopInit($request, $currPage, false);
+			if (!$this->v["user"] || intVal($this->v["user"]->id) <= 0
+				|| !$this->v["user"]->hasRole('administrator|staff|databaser|brancher|volunteer')) 
+			{
+				echo view( 'vendor.survloop.inc-js-redirect-home', $this->v )->render();
+				exit;
+			}
 			if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"])
 				&& $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
 			{
@@ -186,6 +192,14 @@ class AdminController extends SurvLoopController
 	public function dashHome(Request $request)
 	{
 		$this->admControlInit($request, '/dashboard');
+		if (!$this->v["user"]->hasRole('administrator|staff|databaser|brancher'))
+		{
+			if ($this->v["user"]->hasRole('volunteer'))
+			{
+				return redirect('/volunteer');
+			}
+			return redirect('/');
+		}
 		$dbRow = SLDatabases::find(1);
 		$this->v["orgMission"] = $dbRow->DbMission;
 		$this->v["adminNav"] = $this->admMenuData["adminNav"];
