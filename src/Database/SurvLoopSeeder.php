@@ -623,7 +623,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeign2Max' => '0',
 			'FldValues' => 'Data;Subset;Linking;Validation',
 			'FldDefault' => 'Data',
-			'FldDataLength' => '20',
+			'FldDataLength' => '25',
 			'FldCharSupport' => ',Letters,',
 			'FldCompareSame' => '878800'
 		]);
@@ -892,7 +892,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeign2Min' => '0',
 			'FldForeign2Max' => '0',
 			'FldDefault' => 'VARCHAR',
-			'FldDataLength' => '20',
+			'FldDataLength' => '25',
 			'FldCharSupport' => ',Letters,',
 			'FldCompareSame' => '878800'
 		]);
@@ -1946,7 +1946,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeign2Max' => 'N',
 			'FldValues' => 'Primary Public;Primary Public XML',
 			'FldDefault' => 'Primary Public',
-			'FldDataLength' => '25',
+			'FldDataLength' => '30',
 			'FldCharSupport' => ',Numbers,',
 			'FldKeyType' => ',',
 			'FldCompareSame' => '878800'
