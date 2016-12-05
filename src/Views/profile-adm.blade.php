@@ -11,17 +11,17 @@
 <h2>Profile: {{ $profileUser->name }}</h2>
 <div class="fL"><table border=0 cellpadding=5 cellspacing=0 >
 <tr><td><div class="nPrompt"><label for="nameID">Name:</label></div></td>
-	<td><div class="nFld"><input type="text" name="name" id="nameID" value="{{ $profileUser->name }}"></div></td></tr>
+    <td><div class="nFld"><input type="text" name="name" id="nameID" value="{{ $profileUser->name }}"></div></td></tr>
 <tr><td><div class="nPrompt"><label for="emailID">Email:</label></div></td>
-	<td><div class="nFld"><input type="email" name="email" id="emailID" value="{{ $profileUser->email }}"></div></td></tr>
+    <td><div class="nFld"><input type="email" name="email" id="emailID" value="{{ $profileUser->email }}"></div></td></tr>
 <tr><td class="vaT"><div class="nPrompt">Roles:</td><td><div class="nFldRadio"><?php
-	foreach ($profileUser->rolesRanked as $i => $role) {
-		echo "\n".'<input type="checkbox" name="roles[]" id="role'.$i.'" value="' . $role . '" ' 
-			. (($profileUser->hasRole($role)) ? 'CHECKED' : '') . ' > <label for="role'.$i.'">' . ucfirst($role) . '</label><br />';
-	}
+    foreach ($profileUser->rolesRanked as $i => $role) {
+        echo "\n".'<input type="checkbox" name="roles[]" id="role'.$i.'" value="' . $role . '" ' 
+            . (($profileUser->hasRole($role)) ? 'CHECKED' : '') . ' > <label for="role'.$i.'">' . ucfirst($role) . '</label><br />';
+    }
 ?></div></td></tr>
 <tr><td><div class="nPrompt">Since:</div></td>
-	<td><div class="nPrompt">{{ date('F d, Y', strtotime($profileUser->created_at)) }}</div></td></tr>
+    <td><div class="nPrompt">{{ date('F d, Y', strtotime($profileUser->created_at)) }}</div></td></tr>
 </table></div>
 
 <div class="nodeGap p20"></div>

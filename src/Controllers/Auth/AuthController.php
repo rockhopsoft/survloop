@@ -32,9 +32,9 @@ class AuthController extends Controller
 
     use ThrottlesLogins, DispatchesJobs, ValidatesRequests;
     
-    protected $redirectPath 		= '/afterLogin';
-    protected $loginPath 			= '/login';
-    protected $redirectAfterLogout 	= '/login';
+    protected $redirectPath        = '/afterLogin';
+    protected $loginPath           = '/login';
+    protected $redirectAfterLogout = '/login';
 
     /**
      * Create a new authentication controller instance.
@@ -60,7 +60,7 @@ class AuthController extends Controller
             'password' => 'required|confirmed|min:6',
         ]);
         /* if ($validator->fails()) {
-        	echo $validator->messages()->toJson(); exit;
+            echo $validator->messages()->toJson(); exit;
         } */
         return $validator;
     }
@@ -73,7 +73,7 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-    	$user = User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
@@ -85,46 +85,52 @@ class AuthController extends Controller
     {
         if (session()->has('sessID') && session()->get('sessID') > 0)
         {
-        	
+            
         }
-		$hasUsers = User::select('id')->get();	
-    	if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1)
-    	{
-			$log = new SLUsersActivity;
-			$log->UserActUser = $user->id;
-    		if (!$hasUsers || sizeof($hasUsers) == 0)
-    		{
-    			$user->assignRole('administrator');
-    			$log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-    		}
-    		else
-    		{
-    			$user->assignRole('volunteer');
-    			$log->UserActCurrPage = 'NEW VOLUNTEER!';
-    		}
-			$log->save();
-    	}
-    	return redirect('/afterLogin');
+        $hasUsers = User::select('id')->get();    
+        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1)
+        {
+            $log = new SLUsersActivity;
+            $log->UserActUser = $user->id;
+            if (!$hasUsers || sizeof($hasUsers) == 0)
+            {
+                $user->assignRole('administrator');
+                $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
+            }
+            else
+            {
+                $user->assignRole('volunteer');
+                $log->UserActCurrPage = 'NEW VOLUNTEER!';
+            }
+            $log->save();
+        }
+        return redirect('/afterLogin');
     }
    
     
     /**
-	 * Get the post register / login redirect path.
-	 *
-	 * @return string
-	 */
-	public function redirectPath()
-	{
-		/*
-		// Logic that determines where to send the user
-		$user = Auth::user();
-		if ($user->hasRole('administrator|staff|databaser|brancher')) {
-			return '/dashboard';
-		} elseif ($user->hasRole('volunteer')) {
-			return '/volunteer';
-		}
-		*/
-		return '/afterLogin';
-	}
-	
+     * Get the post register / login redirect path.
+     *
+     * @return string
+     */
+    public function redirectPath()
+    {
+        /*
+        // Logic that determines where to send the user
+        $user = Auth::user();
+        if ($user->hasRole('administrator|staff|databaser|brancher')) {
+            return '/dashboard';
+        } elseif ($user->hasRole('volunteer')) {
+            return '/volunteer';
+        }
+        */
+        return '/afterLogin';
+    }
+    
+    public function getLogout()
+    {
+        Auth::logout();
+        return redirect('/');
+    }
+    
 }

@@ -6,23 +6,23 @@ use Illuminate\Database\Migrations\Migration;
 
 class {{ str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix) }}CreateTables extends Migration
 {
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-	{!! $migrationFileUp !!}
-	}
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+    {!! $migrationFileUp !!}
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-	{!! $migrationFileDown !!}
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+    {!! $migrationFileDown !!}
+    }
 }

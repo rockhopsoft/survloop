@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLNodeSavesPage extends Model
 {
-	protected $table 		= 'SL_NodeSavesPage';
-	protected $primaryKey 	= 'PageSaveID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'PageSaveSession', 
-		'PageSaveNode', 
-		'PageSaveLoopItemID', 
-	];
+    protected $table         = 'SL_NodeSavesPage';
+    protected $primaryKey     = 'PageSaveID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'PageSaveSession', 
+        'PageSaveNode', 
+        'PageSaveLoopItemID', 
+    ];
 }

@@ -5,13 +5,13 @@
 @section('content')
 
 @if (isset($fldName) && trim($fldName) != '')
-	<h1 class="fL"><i class="fa fa-database"></i> Field: {{ $tbl->TblAbbr }}{{ $fld->FldName }}</h1>
-	<div class="fR taR pT20 f20 gry6">
-		{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i>
-	</div>
-	<div class="fC"></div>
+    <h1 class="fL"><i class="fa fa-database"></i> Field: {{ $tbl->TblAbbr }}{{ $fld->FldName }}</h1>
+    <div class="fR taR pT20 f20 gry6">
+        {{ $fld->FldEng }}<br />({{ $fld->FldType }})</i>
+    </div>
+    <div class="fC"></div>
 @else
-	<h1><i class="fa fa-database"></i> Add New Field</h1>
+    <h1><i class="fa fa-database"></i> Add New Field</h1>
 @endif
 <a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-default">Back To <i>{{ $tbl->TblName }}</i></a>
 <div class="p10"></div>
@@ -27,8 +27,8 @@
 {!! $fullFldSpecs !!}
 
 @if ($fld->FldSpecType == 'Generic' && $fld->FldTable <= 0)
-	<br /><br /><input type="checkbox" style="width: 40px;" id="pushGenericID" name="pushGeneric" value="1"> 
-	<label for="pushGenericID"><span class="f16"><i class="fa fa-retweet"></i> <i>Push Generic Field Changes To All Replicas</i></span></label><br />
+    <br /><br /><input type="checkbox" style="width: 40px;" id="pushGenericID" name="pushGeneric" value="1"> 
+    <label for="pushGenericID"><span class="f16"><i class="fa fa-retweet"></i> <i>Push Generic Field Changes To All Replicas</i></span></label><br />
 @endif
 <br /><br />
 <center>
@@ -40,16 +40,16 @@
 </form></center>
 
 @if ($GLOBALS["DB"]->dbFullSpecs())
-	<div class="jumbotron">
-		<p>Hover your mouse over setting names for a bit of an explaination. 
-		These field specifications are almost completely copied from best practices in Michael J. Hernandez's
-		<a href="http://www.amazon.com/gp/product/0321884493/" target="_blank">Database Design for Mere Mortals: 
-		A Hands-On Guide to Relational Database Design (3rd Edition)</a>.</p>
-		<p>
-		Only a handful of these specifications are automatically built into the database exports, so far. 
-		For now the rest must be enforced by your custom code.
-		</p>
-	</div>
+    <div class="jumbotron">
+        <p>Hover your mouse over setting names for a bit of an explaination. 
+        These field specifications are almost completely copied from best practices in Michael J. Hernandez's
+        <a href="http://www.amazon.com/gp/product/0321884493/" target="_blank">Database Design for Mere Mortals: 
+        A Hands-On Guide to Relational Database Design (3rd Edition)</a>.</p>
+        <p>
+        Only a handful of these specifications are automatically built into the database exports, so far. 
+        For now the rest must be enforced by your custom code.
+        </p>
+    </div>
 @endif
 
 @endsection

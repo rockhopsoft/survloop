@@ -13,6 +13,6 @@ class {{ str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix) }}Seeder extends 
      */
     public function run()
     {
-	{!! $dumpOut["Seeders"] !!}
+    {!! $dumpOut["Seeders"] !!}
     }
 }

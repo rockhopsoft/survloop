@@ -6,8 +6,8 @@ use SurvLoop\Controllers\SurvFormTree;
 
 class {{ $abbr }} extends SurvFormTree
 {
-	
-	public $classExtension = '{{ $abbr }}';
-	public $treeID 			= 1;
-	
+    
+    public $classExtension = '{{ $abbr }}';
+    public $treeID             = 1;
+    
 }

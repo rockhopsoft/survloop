@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDesignTweaks extends Model
 {
-	protected $table 		= 'SL_DesignTweaks';
-	protected $primaryKey 	= 'TweakID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'TweakVersionAB', 
-		'TweakSubmissionProgress', 
-		'TweakUserID', 
-	];
+    protected $table         = 'SL_DesignTweaks';
+    protected $primaryKey     = 'TweakID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'TweakVersionAB', 
+        'TweakSubmissionProgress', 
+        'TweakUserID', 
+    ];
 }

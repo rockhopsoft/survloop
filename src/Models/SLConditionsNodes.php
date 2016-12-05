@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLConditionsNodes extends Model
 {
-	protected $table 		= 'SL_ConditionsNodes';
-	protected $primaryKey 	= 'CondNodeID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'CondNodeCondID', 
-		'CondNodeNodeID', 
-		'CondNodeLoopID', 
-	];
+    protected $table         = 'SL_ConditionsNodes';
+    protected $primaryKey     = 'CondNodeID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'CondNodeCondID', 
+        'CondNodeNodeID', 
+        'CondNodeLoopID', 
+    ];
 }

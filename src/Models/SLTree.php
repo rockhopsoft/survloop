@@ -5,20 +5,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLTree extends Model
 {
-	protected $table 		= 'SL_Tree';
-	protected $primaryKey 	= 'TreeID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'TreeDatabase', 
-		'TreeUser', 
-		'TreeType', 
-		'TreeName', 
-		'TreeDesc', 
-		'TreeRootURL', 
-		'TreeRoot', 
-		'TreeFirstPage', 
-		'TreeLastPage', 
-		'TreeCoreTable', 
-	];
+    protected $table         = 'SL_Tree';
+    protected $primaryKey     = 'TreeID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'TreeDatabase', 
+        'TreeUser', 
+        'TreeType', 
+        'TreeName', 
+        'TreeDesc', 
+        'TreeRootURL', 
+        'TreeRoot', 
+        'TreeFirstPage', 
+        'TreeLastPage', 
+        'TreeCoreTable', 
+    ];
 }

@@ -5,18 +5,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDatabases extends Model
 {
-	protected $table 		= 'SL_Databases';
-	protected $primaryKey 	= 'DbID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'DbUser', 
-		'DbPrefix', 
-		'DbName', 
-		'DbDesc', 
-		'DbMission', 
-		'DbOpts', 
-		'DbTables', 
-		'DbFields', 
-	];
+    protected $table         = 'SL_Databases';
+    protected $primaryKey     = 'DbID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'DbUser', 
+        'DbPrefix', 
+        'DbName', 
+        'DbDesc', 
+        'DbMission', 
+        'DbOpts', 
+        'DbTables', 
+        'DbFields', 
+    ];
 }

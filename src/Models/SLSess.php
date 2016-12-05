@@ -5,19 +5,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSess extends Model
 {
-	protected $table 		= 'SL_Sess';
-	protected $primaryKey 	= 'SessID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'SessUserID', 
-		'SessTree', 
-		'SessCoreID', 
-		'SessCurrNode', 
-		'SessLoopRootJustLeft', 
-		'SessAfterJumpTo', 
-		'SessZoomPref', 
-		'SessIsMobile', 
-		'SessBrowser', 
-	];
+    protected $table         = 'SL_Sess';
+    protected $primaryKey     = 'SessID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'SessUserID', 
+        'SessTree', 
+        'SessCoreID', 
+        'SessCurrNode', 
+        'SessLoopRootJustLeft', 
+        'SessAfterJumpTo', 
+        'SessZoomPref', 
+        'SessIsMobile', 
+        'SessBrowser', 
+    ];
 }

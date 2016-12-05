@@ -5,12 +5,12 @@ use SurvLoop\Controllers\AdminController;
 
 class SurvLoopAdmin extends AdminController
 {
-	public $classExtension 		= 'SurvLoopAdmin';
-	
-	public function initPowerUser($uID = -3)
-	{
-		
-		
-	}
-	
+    public $classExtension = 'SurvLoopAdmin';
+    
+    public function initPowerUser($uID = -3)
+    {
+        
+        
+    }
+    
 }

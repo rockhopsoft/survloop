@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDataSubsets extends Model
 {
-	protected $table 		= 'SL_DataSubsets';
-	protected $primaryKey 	= 'DataSubID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'DataSubTree', 
-		'DataSubTbl', 
-		'DataSubTblLnk', 
-		'DataSubSubTbl', 
-		'DataSubSubLnk', 
-		'DataSubAutoGen', 
-	];
+    protected $table         = 'SL_DataSubsets';
+    protected $primaryKey     = 'DataSubID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'DataSubTree', 
+        'DataSubTbl', 
+        'DataSubTblLnk', 
+        'DataSubSubTbl', 
+        'DataSubSubLnk', 
+        'DataSubAutoGen', 
+    ];
 }

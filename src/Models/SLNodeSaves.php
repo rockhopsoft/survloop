@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLNodeSaves extends Model
 {
-	protected $table 		= 'SL_NodeSaves';
-	protected $primaryKey 	= 'NodeSaveID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'NodeSaveSession', 
-		'NodeSaveLoopItemID', 
-		'NodeSaveNode', 
-		'NodeSaveVersionAB', 
-		'NodeSaveTblFld', 
-		'NodeSaveNewVal', 
-	];
+    protected $table         = 'SL_NodeSaves';
+    protected $primaryKey     = 'NodeSaveID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'NodeSaveSession', 
+        'NodeSaveLoopItemID', 
+        'NodeSaveNode', 
+        'NodeSaveVersionAB', 
+        'NodeSaveTblFld', 
+        'NodeSaveNewVal', 
+    ];
 }

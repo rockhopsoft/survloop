@@ -1,5 +1,11 @@
 <!-- resources/views/auth/login.blade.php -->
 
+<?php // sorry, not sure how this should be done instead
+$surv = new SurvLoop\Controllers\SurvLoop;
+$surv->loadLoop(new Illuminate\Http\Request);
+$v = $surv->custLoop->v;
+?>
+
 @extends('vendor.survloop.master')
 
 @section('content')
@@ -7,7 +13,7 @@
 <div class="p20"></div>
 
 @if (isset($errorMsg))
-	<div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
+    <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
 @endif
 
 <center><div class="halfPageWidth">
@@ -15,13 +21,13 @@
 {!! csrf_field() !!}
 <br />
 <div class="row">
-	<div class="col-md-6 pB10">
-		<h1 class="mT0">Login</h1>
-		<span class="gry9">Here you can finish, review, or update your complaint. Volunteers also login here.</span>
-	</div>
-	<div class="col-md-6 taR pT5">
-		<a href="/register" class="btn btn-default">Sign Up To<br />Volunteer</a>
-	</div>
+    <div class="col-md-6 pB10">
+        <h1 class="mT0">Login</h1>
+        <span class="gry9">Here you can finish, review, or update your complaint. Volunteers also login here.</span>
+    </div>
+    <div class="col-md-6 taR pT5">
+        <a href="/register" class="btn btn-default">Sign Up To<br />Volunteer</a>
+    </div>
 </div>
 
 <div class="nodeWrap">
@@ -37,15 +43,15 @@
 </div>
 
 <div class="row">
-	<div class="col-md-6 taL">
-		<div class="nFldRadio pT5"><label for="rememberID">
-			<input type="checkbox" name="remember" id="rememberID">
-			Remember Me
-		</label></div>
-	</div>
-	<div class="col-md-6 taR">
-		<a href="/password/email">Forgot Password?</a>
-	</div>
+    <div class="col-md-6 taL">
+        <div class="nFldRadio pT5"><label for="rememberID">
+            <input type="checkbox" name="remember" id="rememberID">
+            Remember Me
+        </label></div>
+    </div>
+    <div class="col-md-6 taR">
+        <a href="/password/email">Forgot Password?</a>
+    </div>
 </div>
 
 <center><input type="submit" class="btn btn-lg btn-primary f32" value="Login"></center>

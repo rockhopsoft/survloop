@@ -5,10 +5,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class {{ $tblClean }} extends Model
 {
-	protected $table 		= '{{ $tblName }}';
-	protected $primaryKey 	= '{{ $tbl->TblAbbr }}ID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	{!! $modelFile !!}
-	];
+    protected $table         = '{{ $tblName }}';
+    protected $primaryKey     = '{{ $tbl->TblAbbr }}ID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    {!! $modelFile !!}
+    ];
 }

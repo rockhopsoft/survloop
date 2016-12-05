@@ -5,8 +5,8 @@ use App\Http\Controllers\{{ $abbr }}\{{ $abbr }};
 
 class {{ $abbr }}Report extends {{ $abbr }}
 {
-	
-	public $classExtension 	= '{{ $abbr }}Report';
-	protected $isReport 	= true;
-	
+    
+    public $classExtension     = '{{ $abbr }}Report';
+    protected $isReport     = true;
+    
 }

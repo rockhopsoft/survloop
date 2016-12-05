@@ -1,5 +1,11 @@
 <!-- resources/views/OPC/auth/reset.blade.php -->
 
+<?php // sorry, not sure how this should be done instead
+$surv = new SurvLoop\Controllers\SurvLoop;
+$surv->loadLoop(new Illuminate\Http\Request);
+$v = $surv->custLoop->v;
+?>
+
 @extends('vendor.survloop.master')
 
 @section('content')
@@ -13,7 +19,7 @@
 @if (count($errors) > 0)
 <ul>
     @foreach ($errors->all() as $error)
-	<li>{{ $error }}</li>
+    <li>{{ $error }}</li>
     @endforeach
 </ul>
 @endif

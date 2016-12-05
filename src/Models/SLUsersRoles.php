@@ -5,12 +5,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLUsersRoles extends Model
 {
-	protected $table 		= 'SL_UsersRoles';
-	protected $primaryKey 	= 'RoleUserID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'RoleUserUID', 
-		'RoleUserRID', 
-	];
+    protected $table         = 'SL_UsersRoles';
+    protected $primaryKey     = 'RoleUserID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'RoleUserUID', 
+        'RoleUserRID', 
+    ];
 }

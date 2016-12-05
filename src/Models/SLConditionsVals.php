@@ -5,12 +5,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLConditionsVals extends Model
 {
-	protected $table 		= 'SL_ConditionsVals';
-	protected $primaryKey 	= 'CondValID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'CondValCondID', 
-		'CondValValue', 
-	];
+    protected $table         = 'SL_ConditionsVals';
+    protected $primaryKey     = 'CondValID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'CondValCondID', 
+        'CondValValue', 
+    ];
 }

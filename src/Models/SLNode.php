@@ -5,27 +5,27 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLNode extends Model
 {
-	protected $table 		= 'SL_Node';
-	protected $primaryKey 	= 'NodeID';
-	public $timestamps 		= true;
-	protected $fillable 	= 
-	[	
-		'NodeTree', 
-		'NodeParentID', 
-		'NodeParentOrder', 
-		'NodeType', 
-		'NodePrompText', 
-		'NodePromptNotes', 
-		'NodePromptAfter', 
-		'NodeInternalNotes', 
-		'NodeResponseSet', 
-		'NodeDefault', 
-		'NodeDataBranch', 
-		'NodeDataStore', 
-		'NodeTextSuggest', 
-		'NodeCharLimit', 
-		'NodeLikes', 
-		'NodeDislikes', 
-		'NodeOpts', 
-	];
+    protected $table         = 'SL_Node';
+    protected $primaryKey     = 'NodeID';
+    public $timestamps         = true;
+    protected $fillable     = 
+    [    
+        'NodeTree', 
+        'NodeParentID', 
+        'NodeParentOrder', 
+        'NodeType', 
+        'NodePrompText', 
+        'NodePromptNotes', 
+        'NodePromptAfter', 
+        'NodeInternalNotes', 
+        'NodeResponseSet', 
+        'NodeDefault', 
+        'NodeDataBranch', 
+        'NodeDataStore', 
+        'NodeTextSuggest', 
+        'NodeCharLimit', 
+        'NodeLikes', 
+        'NodeDislikes', 
+        'NodeOpts', 
+    ];
 }

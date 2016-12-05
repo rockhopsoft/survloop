@@ -1,10 +1,10 @@
 <!-- resources/views/vendor/survloop/admin/db/export-mysql.blade.php -->
 
 <h1>
-	<span class="slBlueDark"><i class="fa fa-database"></i> 
-	{{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
-	MySQL Export 
-	<nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
+    <span class="slBlueDark"><i class="fa fa-database"></i> 
+    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    MySQL Export 
+    <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
 
 <a href="/dashboard/db/export/laravel" class="btn btn-default mR10">Export for Laravel</a>
