@@ -79,8 +79,7 @@ class User extends Model implements AuthenticatableContract,
     
     public function loadRoles()
     {
-        if (sizeof($this->roles) == 0)
-        {
+        if (sizeof($this->roles) == 0) {
             $this->roles = SLDefinitions::select('DefID', 'DefSubset')
                 ->where('DefDatabase', 1)
                 ->where('DefSet', 'User Roles')
@@ -92,9 +91,10 @@ class User extends Model implements AuthenticatableContract,
                 ->where('SL_Definitions.DefSet', 'User Roles')
                 ->select('SL_Definitions.DefSubset')
                 ->get();
-            if ($chk && sizeof($chk) > 0)
-            {
-                foreach ($chk as $role) $this->SLRoles[] = $role->DefSubset;
+            if ($chk && sizeof($chk) > 0) {
+                foreach ($chk as $role) {
+                    $this->SLRoles[] = $role->DefSubset;
+                }
             }
             else $this->SLRoles[] = 'NO-ROLES';
         }
@@ -107,8 +107,7 @@ class User extends Model implements AuthenticatableContract,
         if (strpos($role, '|') === false) return in_array($role, $this->SLRoles);
         $ret = false;
         $roles = explode('|', $role);
-        foreach ($roles as $r)
-        {
+        foreach ($roles as $r) {
             if (in_array($r, $this->SLRoles)) $ret = true;
         }
         return $ret;
@@ -127,8 +126,7 @@ class User extends Model implements AuthenticatableContract,
             ->where('RoleUserRID', '=', $roleDef->DefID)
             ->where('RoleUserUID', '=', $this->id)
             ->get();
-        if (!$chk || sizeof($chk) == 0)
-        {
+        if (!$chk || sizeof($chk) == 0) {
             $newRole = new SLUsersRoles;
             $newRole->RoleUserRID = $roleDef->DefID;
             $newRole->RoleUserUID = $this->id;
@@ -141,8 +139,7 @@ class User extends Model implements AuthenticatableContract,
     public function highestPermission()
     {
         $this->loadRoles();
-        foreach ($this->roles as $role)
-        {
+        foreach ($this->roles as $role) {
             if ($this->hasRole($role->DefSubset)) return $role->DefSubset;                                             
         }
         return '';
@@ -152,10 +149,8 @@ class User extends Model implements AuthenticatableContract,
     {
         $this->loadRoles();
         $retVal = '';
-        foreach ($this->roles as $role)
-        { 
-            if ($this->hasRole($role->DefSubset))
-            {
+        foreach ($this->roles as $role) { 
+            if ($this->hasRole($role->DefSubset)) {
                 $retVal .= ', ' . ucfirst($role->DefSubset);
             }
         }

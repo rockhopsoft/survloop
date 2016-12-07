@@ -45,8 +45,7 @@ class CoreTree extends SurvLoopController
     {
         if ($req && sizeof($req) > 0) $this->REQ = $req;
         if ($treeIn > 0) $this->treeID = $treeIn;
-        elseif ($this->treeID <= 0) 
-        {
+        elseif ($this->treeID <= 0) {
             $this->tree = SLTree::orderBy('TreeID', 'asc')->first();
             $this->treeID = $this->tree->TreeID;
         }
@@ -57,8 +56,7 @@ class CoreTree extends SurvLoopController
             ->select('NodeID', 'NodeParentID', 'NodeParentOrder')
             ->get();
         $this->treeSize = sizeof($nodes);
-        foreach ($nodes as $row)
-        {
+        foreach ($nodes as $row) {
             if ($row->NodeParentID <= 0) $this->rootID = $row->NodeID;
             $this->allNodes[$row->NodeID] = $this->loadNode($row);
         }
@@ -73,8 +71,7 @@ class CoreTree extends SurvLoopController
     {
         $cache = '';
         $this->loadNodeTiers();
-        if ($this->rootID > 0)
-        {
+        if ($this->rootID > 0) {
             $cache .= '$'.'this->nodesRawOrder = [' . implode(', ', $this->nodesRawOrder) . '];' . "\n";
             $cache .= '$'.'this->nodesRawIndex = [';
             foreach ($this->nodesRawIndex as $node => $ind) $cache .= $node . ' => ' . $ind . ', ';
@@ -87,10 +84,8 @@ class CoreTree extends SurvLoopController
     public function loadNodeTiersCacheInner($tier)
     {
         $cache = '[' . $tier[0] . ', [';
-        if (sizeof($tier[1]) > 0)
-        {
-            foreach ($tier[1] as $i => $t)
-            {
+        if (sizeof($tier[1]) > 0) {
+            foreach ($tier[1] as $i => $t) {
                 if ($i > 0) $cache .= ', ';
                 $cache .= $this->loadNodeTiersCacheInner($t);
             }
@@ -101,8 +96,7 @@ class CoreTree extends SurvLoopController
     protected function loadNodeTiers()
     {
         $this->nodeTiers = $this->nodesRawOrder = $this->nodesRawIndex = array();
-        if ($this->rootID > 0)
-        {
+        if ($this->rootID > 0) {
             $this->nodeTiers = [$this->rootID, $this->loadNodeTiersInner($this->rootID)];
             $this->loadRawOrder($this->nodeTiers);
         }
@@ -112,18 +106,14 @@ class CoreTree extends SurvLoopController
     protected function loadNodeTiersInner($nodeID = -3, $tierNest = array())
     {
         $innerArr = $tmpArr = array();
-        if ($nodeID > 0 && sizeof($this->allNodes) > 0)
-        {
-            foreach ($this->allNodes as $nID => $node)
-            {
+        if ($nodeID > 0 && sizeof($this->allNodes) > 0) {
+            foreach ($this->allNodes as $nID => $node) {
                 if ($node->parentID == $nodeID) $tmpArr[$nID] = $node->parentOrd;
             }
         }
-        if (sizeof($tmpArr) > 0)
-        {
+        if (sizeof($tmpArr) > 0) {
             asort($tmpArr);
-            foreach ($tmpArr as $nID => $parentOrder)
-            {
+            foreach ($tmpArr as $nID => $parentOrder) {
                 $tmpTierNest = $tierNest;
                 $tmpTierNest[sizeof($tierNest)] = sizeof($innerArr);
                 $this->allNodes[$nID]->nodeTierPath = $tmpTierNest;
@@ -136,8 +126,7 @@ class CoreTree extends SurvLoopController
     protected function loadSubTierFromPath($nodeTierPath = array())
     {
         $subTier = $this->nodeTiers;
-        if (sizeof($subTier[1]) > 0 && sizeof($nodeTierPath) > 0)
-        {
+        if (sizeof($subTier[1]) > 0 && sizeof($nodeTierPath) > 0) {
             foreach ($nodeTierPath as $i => $ind) $subTier = $subTier[1][$ind];
         }
         return $subTier;
@@ -145,8 +134,7 @@ class CoreTree extends SurvLoopController
     
     protected function loadNodeSubTier($nID = -3)
     {
-        if ($this->hasNode($nID))
-        {
+        if ($this->hasNode($nID)) {
             return $this->loadSubTierFromPath($this->allNodes[$nID]->nodeTierPath);
         }
         return array();
@@ -160,8 +148,7 @@ class CoreTree extends SurvLoopController
         $nID = $tmpSubTier[0];
         $this->nodesRawIndex[$nID] = sizeof($this->nodesRawOrder);
         $this->nodesRawOrder[] = $nID;
-        if (sizeof($tmpSubTier[1]) > 0)
-        {
+        if (sizeof($tmpSubTier[1]) > 0) {
             foreach ($tmpSubTier[1] as $deeper) $this->loadRawOrder($deeper);
         }
         return true;
@@ -205,8 +192,7 @@ class CoreTree extends SurvLoopController
             ->where('NodeParentOrder', (1+$this->allNodes[$nID]->parentOrd))
             ->select('NodeID')
             ->first();
-        if ($nextSibling && isset($nextSibling->NodeID))
-        {
+        if ($nextSibling && isset($nextSibling->NodeID)) {
             return $nextSibling->NodeID;
         }
         return $this->nextNodeSibling($this->allNodes[$nID]->parentID);
@@ -219,8 +205,7 @@ class CoreTree extends SurvLoopController
         if ($this->REQ->has('manip') && $this->REQ->has('moveNode') 
             && $this->REQ->has('moveToParent') && $this->REQ->has('moveToOrder')
             && $this->REQ->moveNode > 0 && $this->REQ->moveToParent > 0 
-            && $this->REQ->moveToOrder >= 0 && isset($this->allNodes[$this->REQ->moveNode]))
-        {
+            && $this->REQ->moveToOrder >= 0 && isset($this->allNodes[$this->REQ->moveNode])) {
             $node = $this->allNodes[$this->REQ->moveNode];
             $node->fillNodeRow();
             SLNode::where('NodeParentID', $node->parentID)
@@ -240,41 +225,31 @@ class CoreTree extends SurvLoopController
     
     protected function treeAdminNodeNew($node)
     {
-        if ($this->REQ->input('childPlace') == 'start')
-        {
+        if ($this->REQ->input('childPlace') == 'start') {
             SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
                 ->increment('NodeParentOrder');
-        }
-        elseif ($this->REQ->input('childPlace') == 'end')
-        {
+        } elseif ($this->REQ->input('childPlace') == 'end') {
             $endNode = SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
                 ->orderBy('NodeParentOrder', 'desc')
                 ->first();
             if ($endNode) $node->nodeRow->NodeParentOrder = 1+$endNode->nodeParentOrder;
-        }
-        elseif ($this->REQ->input('orderBefore') > 0 || $this->REQ->input('orderAfter') > 0)
-        {
+        } elseif ($this->REQ->input('orderBefore') > 0 || $this->REQ->input('orderAfter') > 0) {
             $foundSibling = false;
             $sibs = SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
                 ->orderBy('NodeParentOrder', 'asc')
                 ->select('NodeID', 'NodeParentOrder')
                 ->get();
-            if (sizeof($sibs) > 0)
-            {
-                foreach ($sibs as $sib)
-                {
-                    if ($sib->NodeID == intVal($this->REQ->input('orderBefore'))) 
-                    { 
+            if (sizeof($sibs) > 0) {
+                foreach ($sibs as $sib) {
+                    if ($sib->NodeID == intVal($this->REQ->input('orderBefore'))) { 
                         $node->nodeRow->NodeParentOrder = $sib->NodeParentOrder; 
                         $foundSibling = true;
                     }
-                    if ($foundSibling)
-                    {
+                    if ($foundSibling) {
                         SLNode::where('NodeID', $sib->NodeID)
                             ->increment('NodeParentOrder');
                     }
-                    if ($sib->NodeID == intVal($this->REQ->input('orderAfter'))) 
-                    {
+                    if ($sib->NodeID == intVal($this->REQ->input('orderAfter'))) {
                         $node->nodeRow->NodeParentOrder = (1+$sib->NodeParentOrder);
                         $foundSibling = true;
                     }
@@ -287,8 +262,7 @@ class CoreTree extends SurvLoopController
     
     protected function treeAdminNodeDelete($nID)
     {
-        if (intVal($nID) > 0 && isset($this->allNodes[$nID]))
-        {
+        if (intVal($nID) > 0 && isset($this->allNodes[$nID])) {
             SLNode::where('NodeParentID', $this->allNodes[$nID]->parentID)
                 ->where('NodeParentOrder', '>', $this->allNodes[$nID]->parentOrd)
                 ->decrement('NodeParentOrder');

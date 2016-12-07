@@ -25,19 +25,15 @@ class AdminController extends SurvLoopController
     
     protected function admControlInit(Request $request, $currPage = '')
     {
-        if (!$this->admInitRun)
-        {
+        if (!$this->admInitRun) {
             $this->admInitRun = true;
             $this->survLoopInit($request, $currPage, false);
             if (!$this->v["user"] || intVal($this->v["user"]->id) <= 0
-                || !$this->v["user"]->hasRole('administrator|staff|databaser|brancher|volunteer')) 
-            {
+                || !$this->v["user"]->hasRole('administrator|staff|databaser|brancher|volunteer')) {
                 echo view( 'vendor.survloop.inc-js-redirect-home', $this->v )->render();
                 exit;
             }
-            if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"])
-                && $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop')
-            {
+            if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"]) && $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop') {
                 eval("\$this->CustReport = new "
                     . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                     . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Report(\$request);");
@@ -47,8 +43,7 @@ class AdminController extends SurvLoopController
             $this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"]);
             $this->v["belowAdmMenu"] = '';
             $this->v["currState"] = '';
-            if (isset($this->v["yourContact"]->PrsnAddressState))
-            {
+            if (isset($this->v["yourContact"]->PrsnAddressState)) {
                 $this->v["currState"] = $this->v["yourContact"]->PrsnAddressState;
             }
             $this->loadSearchSuggestions();
@@ -61,8 +56,7 @@ class AdminController extends SurvLoopController
     
     protected function checkCurrPage()
     {
-        if (sizeof($this->CustReport) > 0) 
-        {
+        if (sizeof($this->CustReport) > 0) {
             $custPage = $this->CustReport->getCurrPage();
             if (trim($custPage) != '/') $this->v["currPage"] = $custPage;
         }
@@ -88,10 +82,8 @@ class AdminController extends SurvLoopController
     protected function loadDbTreeShortNames()
     {
         $treeName = ((isset($GLOBALS["DB"]->treeName)) ? $GLOBALS["DB"]->treeName : '');
-        $dbName = ((isset($GLOBALS["DB"]->dbRow->DbName)) 
-            ? $GLOBALS["DB"]->dbRow->DbName : '');
-        if (strlen($dbName) > 20 && isset($GLOBALS["DB"]->dbRow->DbName))
-        {
+        $dbName = ((isset($GLOBALS["DB"]->dbRow->DbName)) ? $GLOBALS["DB"]->dbRow->DbName : '');
+        if (strlen($dbName) > 20 && isset($GLOBALS["DB"]->dbRow->DbName)) {
             $dbName = str_replace($GLOBALS["DB"]->dbRow->DbName, 
                 str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix), $dbName);
         }
@@ -135,36 +127,21 @@ class AdminController extends SurvLoopController
     protected function getAdmMenuLoc($currPage)
     {
         $this->admMenuData["currNavPos"] = array(0, -1, -1, -1);
-        if (sizeof($this->admMenuData["adminNav"]) > 0)
-        {
-            foreach ($this->admMenuData["adminNav"] as $i => $nav)
-            {
-                if ($nav[0] == $currPage)
-                {
+        if (sizeof($this->admMenuData["adminNav"]) > 0) {
+            foreach ($this->admMenuData["adminNav"] as $i => $nav) {
+                if ($nav[0] == $currPage) {
                     $this->admMenuData["currNavPos"] = array($i, -1, -1, -1);
-                }
-                elseif (sizeof($nav[3]) > 0)
-                {
-                    foreach ($nav[3] as $j => $nA)
-                    {
-                        if ($nA[0] == $currPage)
-                        {
+                } elseif (sizeof($nav[3]) > 0) {
+                    foreach ($nav[3] as $j => $nA) {
+                        if ($nA[0] == $currPage) {
                             $this->admMenuData["currNavPos"] = array($i, $j, -1, -1);
-                        }
-                        elseif (sizeof($nA[3]) > 0)
-                        {
-                            foreach ($nA[3] as $k => $nB)
-                            {
-                                if ($nB[0] == $currPage)
-                                {
+                        } elseif (sizeof($nA[3]) > 0) {
+                            foreach ($nA[3] as $k => $nB) {
+                                if ($nB[0] == $currPage) {
                                     $this->admMenuData["currNavPos"] = array($i, $j, $k, -1);
-                                }
-                                elseif (sizeof($nB[3]) > 0)
-                                {
-                                    foreach ($nB[3] as $l => $nC)
-                                    {
-                                        if ($nC[0] == $currPage)
-                                        {
+                                } elseif (sizeof($nB[3]) > 0) {
+                                    foreach ($nB[3] as $l => $nC) {
+                                        if ($nC[0] == $currPage) {
                                             $this->admMenuData["currNavPos"] = array($i, $j, $k, $l);
                                         }
                                     }
@@ -192,10 +169,8 @@ class AdminController extends SurvLoopController
     public function dashHome(Request $request)
     {
         $this->admControlInit($request, '/dashboard');
-        if (!$this->v["user"]->hasRole('administrator|staff|databaser|brancher'))
-        {
-            if ($this->v["user"]->hasRole('volunteer'))
-            {
+        if (!$this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+            if ($this->v["user"]->hasRole('volunteer')) {
                 return redirect('/volunteer');
             }
             return redirect('/');
@@ -211,8 +186,7 @@ class AdminController extends SurvLoopController
     public function switchDB(Request $request, $dbID = -3)
     {
         $this->admControlInit($request, '/dashboard/db/switch');
-        if ($dbID > 0)
-        {
+        if ($dbID > 0) {
             $this->switchDatabase($dbID, '/dashboard/db/switch');
             return redirect('/dashboard/db/all');
         }
@@ -225,8 +199,7 @@ class AdminController extends SurvLoopController
     public function switchTreeAdmin(Request $request, $treeID = -3)
     {
         $this->admControlInit($request, '/dashboard/tree/switch');
-        if ($treeID > 0)
-        {
+        if ($treeID > 0) {
             $this->switchTree($treeID, '/dashboard/tree/switch');
             return redirect('/dashboard/tree/map?all=1');
         }
@@ -236,10 +209,8 @@ class AdminController extends SurvLoopController
             ->orderBy('TreeName', 'asc')
             ->get();
         $this->v["myTreeNodes"] = [];
-        if ($this->v["myTrees"] && sizeof($this->v["myTrees"]) > 0)
-        {
-            foreach ($this->v["myTrees"] as $tree)
-            {
+        if ($this->v["myTrees"] && sizeof($this->v["myTrees"]) > 0) {
+            foreach ($this->v["myTrees"] as $tree) {
                 $nodes = SLNode::where('NodeTree', $tree->TreeID)
                     ->select('NodeID')
                     ->get();
@@ -279,9 +250,9 @@ class AdminController extends SurvLoopController
     {
         $this->admControlInit($request, '/dashboard/instruct');
         $instruct = new SLDefinitions;
-        $instruct->DefDatabase     = $this->dbID;
-        $instruct->DefSet         = 'Instructions';
-        $instruct->DefSubset     = $request->newSpot;
+        $instruct->DefDatabase = $this->dbID;
+        $instruct->DefSet      = 'Instructions';
+        $instruct->DefSubset   = $request->newSpot;
         $instruct->save();
         return redirect('/dashboard/instruct/'.$instruct->DefID);
     }
@@ -289,7 +260,7 @@ class AdminController extends SurvLoopController
     public function instructEditSave(Request $request)
     {
         $instruct = $this->instructLoad($request->DefID);
-        $instruct->DefSubset     = $request->DefSubset;
+        $instruct->DefSubset      = $request->DefSubset;
         $instruct->DefDescription = $request->DefDescription;
         $instruct->save();
         return redirect('/dashboard/instruct/'.$instruct->DefID);
@@ -306,38 +277,26 @@ class AdminController extends SurvLoopController
      */
     public function updateProfile(Request $request)
     {
-        if ($request->user())
-        {
+        if ($request->user()) {
             // $request->user() returns an instance of the authenticated user...
-            if ($request->user()->id == $request->uID 
-                || $request->user()->hasRole('administrator'))
-            {
+            if ($request->user()->id == $request->uID || $request->user()->hasRole('administrator')) {
                 $user = User::find($request->uID);
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->save();
-                if ($request->roles && sizeof($request->roles) > 0)
-                {
-                    foreach ($user->rolesRanked as $i => $role)
-                    {
-                        if (in_array($role, $request->roles))
-                        {
-                            if (!$user->hasRole($role))
-                            {
+                if ($request->roles && sizeof($request->roles) > 0) {
+                    foreach ($user->rolesRanked as $i => $role) {
+                        if (in_array($role, $request->roles)) {
+                            if (!$user->hasRole($role)) {
                                 $user->assignRole($role);
                             }
-                        }
-                        elseif ($user->hasRole($role))
-                        {
+                        } elseif ($user->hasRole($role)) {
                             $user->revokeRole($role);
                         }
                     }
-                }
-                else { // no roles selected, delete all that exist
-                    foreach ($user->rolesRanked as $i => $role)
-                    {
-                        if ($user->hasRole($role))
-                        {
+                } else { // no roles selected, delete all that exist
+                    foreach ($user->rolesRanked as $i => $role) {
+                        if ($user->hasRole($role)) {
                             $user->revokeRole($role);
                         }
                     }
@@ -370,10 +329,8 @@ class AdminController extends SurvLoopController
             ->where('DefSet', 'Style Settings')
             ->orderBy('DefOrder')
             ->get();
-        if ($cssRaw && sizeof($cssRaw) > 0)
-        {
-            foreach ($cssRaw as $i => $c)
-            {
+        if ($cssRaw && sizeof($cssRaw) > 0) {
+            foreach ($cssRaw as $i => $c) {
                 $cssRaw[$c->DefSubset] = $c->DefDescription;
             }
         }
@@ -424,8 +381,7 @@ class AdminController extends SurvLoopController
     protected function chkModelsFolder()
     {
         if (!file_exists('../app/Models')) mkdir('../app/Models');
-        if (!file_exists('../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"]))
-        {
+        if (!file_exists('../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"])) {
             mkdir('../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"]);
         }
         return true;
@@ -441,12 +397,9 @@ class AdminController extends SurvLoopController
         $this->v["settings"] = SLDefinitions::where('DefSet', 'Custom Settings')
             ->orderBy('DefOrder', 'asc')
             ->get();
-        if ($request->has('savingSettings') && sizeof($this->v["settings"]) > 0)
-        {
-            foreach ($this->v["settings"] as $i => $s)
-            {
-                if ($request->has('setting'.$i.'')) 
-                {
+        if ($request->has('savingSettings') && sizeof($this->v["settings"]) > 0) {
+            foreach ($this->v["settings"] as $i => $s) {
+                if ($request->has('setting'.$i.'')) {
                     $s->DefValue = $request->get('setting'.$i.'');
                     $s->save();
                 }
@@ -461,8 +414,7 @@ class AdminController extends SurvLoopController
         $this->admControlInit($request, '/dashboard/subs/emails');
         $this->v["currEmailID"] = $emailID;
         $this->v["currEmail"] = new OPCzComplaintEmails;
-        if ($emailID > 0)
-        {
+        if ($emailID > 0) {
             $this->v["currEmail"] = OPCzComplaintEmails::find($emailID);
         }
         return view( 'vendor.OPC.admin.complaints.email-form', $this->v );
@@ -470,11 +422,9 @@ class AdminController extends SurvLoopController
     
     function manageEmailsPost(Request $request, $emailID)
     {
-        if ($request->has('emailType'))
-        {
+        if ($request->has('emailType')) {
             $currEmail = new OPCzComplaintEmails;
-            if ($request->emailID > 0 && $request->emailID == $emailID)
-            {
+            if ($request->emailID > 0 && $request->emailID == $emailID) {
                 $currEmail = OPCzComplaintEmails::find($request->emailID);
             }
             $currEmail->ComEmailType     = $request->emailType;
@@ -483,8 +433,8 @@ class AdminController extends SurvLoopController
             $currEmail->ComEmailBody     = $request->emailBody;
             $currEmail->ComEmailOpts         = 1;
             $currEmail->ComEmailCustomSpots = 0;
-            if (trim($currEmail->ComEmailBody) != '' && strpos($currEmail->ComEmailBody, '[{ Evaluator Message }]') !== false)
-            {
+            if (trim($currEmail->ComEmailBody) != '' 
+                && strpos($currEmail->ComEmailBody, '[{ Evaluator Message }]') !== false) {
                 $customSpotSplit = explode('[{ Evaluator Message }]', $currEmail->ComEmailBody);
                 $currEmail->ComEmailCustomSpots = sizeof($customSpotSplit)-1;
             }

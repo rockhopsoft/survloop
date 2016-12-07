@@ -37,8 +37,7 @@ class AdminSubsController extends AdminController
             ->orderBy('FldEng', 'asc')
             ->get();
         $xtraWhere = "";
-        if ($this->v["currPage"] == '/dashboard/subs/incomplete')
-        {
+        if ($this->v["currPage"] == '/dashboard/subs/incomplete') {
             $xtraWhere = "where('" . $this->v["coreAbbr"] . "SubmissionProgress', '<>', '"
                 . $GLOBALS["DB"]->treeRow->TreeLastPage . "')->";
         }
@@ -57,15 +56,13 @@ class AdminSubsController extends AdminController
         $sysChk = SLDatabases::select('DbID')
             ->where('DbUser', '>', 0)
             ->get();
-        if (!$sysChk || sizeof($sysChk) == 0)
-        {
+        if (!$sysChk || sizeof($sysChk) == 0) {
             return redirect('/fresh/database');
         }
         $sysChk = SLTree::select('TreeID')
             ->where('TreeDatabase', '=', $GLOBALS["DB"]->dbID)
             ->get();
-        if (!$sysChk || sizeof($sysChk) == 0)
-        {
+        if (!$sysChk || sizeof($sysChk) == 0) {
             return redirect('/fresh/user-experience');
         }
         

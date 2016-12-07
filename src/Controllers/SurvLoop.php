@@ -21,8 +21,7 @@ class SurvLoop extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'cust-abbr')
             ->first();
-        if ($chk && isset($chk->DefDescription))
-        {
+        if ($chk && isset($chk->DefDescription)) {
             $this->custAbbr = trim($chk->DefDescription);
         }
         return true;
@@ -32,8 +31,7 @@ class SurvLoop extends Controller
     {
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\SurvFormTree";
-        if ($this->custAbbr != 'SurvLoop')
-        {
+        if ($this->custAbbr != 'SurvLoop') {
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
             if (class_exists($custClass)) $class = $custClass;
         }
@@ -89,14 +87,19 @@ class SurvLoop extends Controller
         return $this->custLoop->afterLogin($request);
     }
     
+    public function retrieveUpload(Request $request, $cid = -3, $upID = '')
+    {
+        $this->loadLoop($request);
+        return $this->custLoop->retrieveUpload($request, $cid, $upID);
+    }
+    
     
     
     protected function loadLoopReport(Request $request)
     {
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\SurvLoopReport";
-        if ($this->custAbbr != 'SurvLoop')
-        {
+        if ($this->custAbbr != 'SurvLoop') {
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Report";
             if (class_exists($custClass)) $class = $custClass;
         }
@@ -146,13 +149,12 @@ class SurvLoop extends Controller
     {
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\AdminSubsController";
-        if ($this->custAbbr != 'SurvLoop')
-        {
+        if ($this->custAbbr != 'SurvLoop') {
             $custClass = "App\\Http\\Controllers\\"
                 . $this->custAbbr . "\\" . $this->custAbbr . "Admin";
-            if (class_exists($custClass)) $class = $custClass;
-            else
-            {
+            if (class_exists($custClass)) {
+                $class = $custClass;
+            } else {
                 $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Admin";
                 if (class_exists($custClass)) $class = $custClass;
             }
@@ -202,7 +204,6 @@ class SurvLoop extends Controller
         $this->loadLoopAdmin($request);
         return $this->custLoop->manageEmailsForm($request);
     }
-    
     
     
 }

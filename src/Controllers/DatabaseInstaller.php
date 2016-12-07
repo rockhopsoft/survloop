@@ -26,10 +26,7 @@ class DatabaseInstaller extends AdminDBController
     
     protected function exportMysqlTbl($tbl, $installHereNow = false)
     {
-        if (!isset($this->v["export"]))
-        {
-            $this->v["export"] = $this->v["indexesEnd"] = '';
-        }
+        if (!isset($this->v["export"])) $this->v["export"] = $this->v["indexesEnd"] = '';
         if ($tbl->TblEng == 'Users') return "";
         $tblQuery = $this->exportMysqlTblCoreStart($tbl);
         $indexes = "";
@@ -38,68 +35,43 @@ class DatabaseInstaller extends AdminDBController
             ->orderBy('FldOrd', 'asc')
             ->orderBy('FldEng', 'asc')
             ->get();
-        if ($flds && sizeof($flds))
-        {
-            foreach ($flds as $fld)
-            {
+        if ($flds && sizeof($flds)) {
+            foreach ($flds as $fld) {
                 $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
-                if ($fld->FldType == 'INT')
-                {
-                    if ($fld->FldForeignTable > 0 
-                        && $GLOBALS["DB"]->tbl[$fld->FldForeignTable] == 'users')
-                    {
+                if ($fld->FldType == 'INT') {
+                    if ($fld->FldForeignTable > 0 && $GLOBALS["DB"]->tbl[$fld->FldForeignTable] == 'users') {
                         $tblQuery .= "BIGINT(20) unsigned ";
+                    } else {
+                        $tblQuery .= "INT(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 11) . ") ";
                     }
-                    else
-                    {
-                        $tblQuery .= "INT(" . (($fld->FldDataLength > 0) 
-                            ? $fld->FldDataLength : 11) . ") ";
-                    }
-                }
-                elseif ($fld->FldType == 'DOUBLE')
-                {
+                } elseif ($fld->FldType == 'DOUBLE') {
                     $tblQuery .= "DOUBLE ";
-                }
-                elseif ($fld->FldType == 'VARCHAR')
-                {
-                    if ($fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F')
-                    {
+                } elseif ($fld->FldType == 'VARCHAR') {
+                    if ($fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F') {
                         $tblQuery .= "VARCHAR(1) ";
-                    }
-                    else
-                    {
+                    } else {
                         $tblQuery .= "VARCHAR(" . (($fld->FldDataLength > 0) 
                             ? $fld->FldDataLength : 255) . ") ";
                     }
-                }
-                elseif ($fld->FldType == 'TEXT')
-                {
+                } elseif ($fld->FldType == 'TEXT') {
                     $tblQuery .= "TEXT ";
-                }
-                elseif ($fld->FldType == 'DATE')
-                {
+                } elseif ($fld->FldType == 'DATE') {
                     $tblQuery .= "DATE ";
-                }
-                elseif ($fld->FldType == 'DATETIME')
-                {
+                } elseif ($fld->FldType == 'DATETIME') {
                     $tblQuery .= "DATETIME ";
                 }
-                if ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1)
-                {
+                if ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1) {
                     $tblQuery .= "NULL ";
                 }
-                if ($fld->FldDefault && trim($fld->FldDefault) != '')
-                {
+                if ($fld->FldDefault && trim($fld->FldDefault) != '') {
                     $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
                 }
                 $tblQuery .= ", \n";
-                if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1)
-                {
+                if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
                     $indexes .= "  , KEY `" . $tbl->TblAbbr . $fld->FldName . "` "
                         . "(`" . $tbl->TblAbbr . $fld->FldName . "`) \n";
                 }
-                if (intVal($fld->FldForeignTable) > 0)
-                {
+                if (intVal($fld->FldForeignTable) > 0) {
                     list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
                     $this->v["indexesEnd"] .= "ALTER TABLE `" 
                         . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
@@ -119,10 +91,8 @@ class DatabaseInstaller extends AdminDBController
     protected function exportMysql()
     {
         $tbls = $this->tblQryStd();
-        if ($tbls && sizeof($tbls) > 0)
-        {
-            foreach ($tbls as $i => $tbl)
-            {
+        if ($tbls && sizeof($tbls) > 0) {
+            foreach ($tbls as $i => $tbl) {
                 $this->v["export"] .= $this->exportMysqlTbl($tbl);
             }
             $this->v["export"] .= $this->v["indexesEnd"]; 
@@ -133,8 +103,7 @@ class DatabaseInstaller extends AdminDBController
     public function export(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/export');
-        if (!$this->checkCache('/dashboard/db/export'))
-        {
+        if (!$this->checkCache('/dashboard/db/export')) {
             $this->exportMysql();
             $this->v["content"] = view( 'vendor.survloop.admin.db.export-mysql', $this->v )->render();
             $this->saveCache();
@@ -145,8 +114,7 @@ class DatabaseInstaller extends AdminDBController
     public function printExportLaravel(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/db/export');
-        if (!$this->checkCache('/dashboard/db/export/laravel')) 
-        {
+        if (!$this->checkCache('/dashboard/db/export/laravel')) {
             $this->chkModelsFolder();
             $this->v["fileListModel"] = [];
             $this->v["migrationFileUp"] = $this->v["migrationFileDown"] = '';
@@ -168,10 +136,8 @@ class DatabaseInstaller extends AdminDBController
                 ->where('TblName', 'NOT LIKE', 'Users')
                 ->orderBy('TblOrd')
                 ->get();
-            if ($tbls && sizeof($tbls) > 0) 
-            {
-                foreach ($tbls as $tbl) 
-                {
+            if ($tbls && sizeof($tbls) > 0) {
+                foreach ($tbls as $tbl) {
                     $indexes = "";
                     $this->v["tbl"] = $tbl;
                     $this->v["tblName"] = $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName;
@@ -187,69 +153,48 @@ class DatabaseInstaller extends AdminDBController
                         ->orderBy('FldOrd', 'asc')
                         ->orderBy('FldEng', 'asc')
                         ->get();
-                    if ($flds && sizeof($flds) > 0)
-                    {
-                        foreach ($flds as $fld)
-                        {
+                    if ($flds && sizeof($flds) > 0) {
+                        foreach ($flds as $fld) {
                             $fldName = trim($tbl->TblAbbr . $fld->FldName);
                             $this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
                             $this->v["migrationFileUp"] .=  "\n\t\t\t"."$"."table->";
-                            if (strpos($fld->FldValues, 'Def::') !== false)
-                            {
+                            if (strpos($fld->FldValues, 'Def::') !== false) {
                                 $this->v["migrationFileUp"] .=  "integer('" . $fldName . "')->unsigned()";
-                            }
-                            elseif ($fld->FldType == 'INT')
-                            {
-                                if ($fld->FldValues == '0;1')
-                                {
+                            } elseif ($fld->FldType == 'INT') {
+                                if ($fld->FldValues == '0;1') {
                                     $this->v["migrationFileUp"] .=  "boolean('" . $fldName . "')";
+                                } else {
+                                    $this->v["migrationFileUp"] .=  "integer('" . $fldName . "')";
                                 }
-                                else $this->v["migrationFileUp"] .=  "integer('" . $fldName . "')";
-                                if (intVal($fld->FldForeignTable) > 0 && intVal($fld->FldDefault) >= 0)
-                                {
+                                if (intVal($fld->FldForeignTable) > 0 && intVal($fld->FldDefault) >= 0) {
                                     $this->v["migrationFileUp"] .=  "->unsigned()";
                                 }
-                            }
-                            elseif ($fld->FldType == 'DOUBLE')
-                            {
+                            } elseif ($fld->FldType == 'DOUBLE') {
                                 $this->v["migrationFileUp"] .=  "double('" . $fldName . "')";
-                            }
-                            elseif ($fld->FldType == 'VARCHAR')
-                            {
-                                if ($fld->FldDataLength == 1 || $fld->FldValues == 'Y;N' 
-                                    || $fld->FldValues == 'M;F' || $fld->FldValues == 'Y;N;?' 
-                                    || $fld->FldValues == 'M;F;?')
-                                {
+                            } elseif ($fld->FldType == 'VARCHAR') {
+                                if ($fld->FldDataLength == 1 || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
+                                    || $fld->FldValues == 'Y;N;?' || $fld->FldValues == 'M;F;?') {
                                     $this->v["migrationFileUp"] .=  "char('" . $fldName . "', 1)";
+                                } else {
+                                    $this->v["migrationFileUp"] .=  "string('" . $fldName . "'" 
+                                        . (($fld->FldDataLength > 0) ? ", ".$fld->FldDataLength : "") . ")";
                                 }
-                                else $this->v["migrationFileUp"] .=  "string('" . $fldName . "'" 
-                                    . (($fld->FldDataLength > 0) ? ", ".$fld->FldDataLength : "") . ")";
-                            }
-                            elseif ($fld->FldType == 'TEXT')
-                            {
+                            } elseif ($fld->FldType == 'TEXT') {
                                 $this->v["migrationFileUp"] .=  "longText('" . $fldName . "')";
-                            }
-                            elseif ($fld->FldType == 'DATE')
-                            {
+                            } elseif ($fld->FldType == 'DATE') {
                                 $this->v["migrationFileUp"] .=  "date('" . $fldName . "')";
-                            }
-                            elseif ($fld->FldType == 'DATETIME')
-                            {
+                            } elseif ($fld->FldType == 'DATETIME') {
                                 $this->v["migrationFileUp"] .=  "dateTime('" . $fldName . "')";
                             }
-                            if (trim($fld->FldDefault) != '')
-                            {
+                            if (trim($fld->FldDefault) != '') {
                                 $this->v["migrationFileUp"] .=  "->default(" 
-                                    . (($fld->FldDefault == 'NULL') 
-                                        ? "NULL" : "'".$fld->FldDefault."'") . ")";
+                                    . (($fld->FldDefault == 'NULL') ? "NULL" : "'".$fld->FldDefault."'") . ")";
                             }
                             $this->v["migrationFileUp"] .=  "->nullable();";
-                            if ($fld->FldIsIndex == 1)
-                            {
+                            if ($fld->FldIsIndex == 1) {
                                 $this->v["migrationFileUp"] .= "\n\t\t"."$"."table->index('" . $fldName . "');";
                             }
-                            if (intVal($fld->FldForeignTable) > 0)
-                            {
+                            if (intVal($fld->FldForeignTable) > 0) {
                                 list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
                                 $this->v["migrationFileUp"] .= "\n\t\t\t"
                                     . "$"."table->foreign('" . $fldName . "')"
@@ -260,21 +205,18 @@ class DatabaseInstaller extends AdminDBController
                     $this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"
                         ."});"."\n\t";
                     $this->v["migrationFileDown"] .= "\t"."Schema::drop('" 
-                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
-                        . "');"."\n\t";
+                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
                     
                     $newModelFilename = '../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"] 
                         . '/' . $this->v["tblClean"] . '.php';
                     $this->v["fileListModel"][] = $newModelFilename;
                     $fullFileOut = view( 'vendor.survloop.admin.db.export-laravel-gen-model' , $this->v );
                     $this->v["dumpOut"]["Models"] .= $fullFileOut;
-                    if (file_exists($newModelFilename))
-                    {
+                    if (file_exists($newModelFilename)) {
                         $oldFile = file_get_contents($newModelFilename);
                         $endStr = 'END SurvLoop auto-generated portion of Model';
                         $endPos = strpos($oldFile, $endStr);
-                        if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile))
-                        {
+                        if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile)) {
                             $append = substr($oldFile, ($endPos+strLen($endStr)+2));
                             $fullFileOut .= "\n\n" . $append;
                         }
@@ -282,26 +224,20 @@ class DatabaseInstaller extends AdminDBController
                     file_put_contents($newModelFilename, $fullFileOut);
                     
                     eval("\$seedChk = " . $modelPath . $this->v["tblClean"] . "::get();");
-                    if ($seedChk && sizeof($seedChk) > 0)
-                    {
-                        foreach ($seedChk as $seed)
-                        {
+                    if ($seedChk && sizeof($seedChk) > 0) {
+                        foreach ($seedChk as $seed) {
                             $fldData = "\n\t\t\t'" . $tbl->TblAbbr . "ID' => " . $seed->getKey();
-                            if ($flds && sizeof($flds) > 0)
-                            {
-                                foreach ($flds as $i => $fld)
-                                {
+                            if ($flds && sizeof($flds) > 0) {
+                                foreach ($flds as $i => $fld) {
                                     $fldName = trim($tbl->TblAbbr . $fld->FldName);
                                     if (isset($seed->{$fldName}) 
-                                        && trim($seed->{$fldName}) != trim($fld->FldDefault))
-                                    {
+                                        && trim($seed->{$fldName}) != trim($fld->FldDefault)) {
                                         $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
                                             . str_replace("'", "\'", $seed->{$fldName}) . "'";
                                     }
                                 }
                             }
-                            if (trim($fldData) != '')
-                            {
+                            if (trim($fldData) != '') {
                                 $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
                                     . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
                                     . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
@@ -354,13 +290,10 @@ class DatabaseInstaller extends AdminDBController
         
         $this->v["log"] = '';
         if ($this->v["dbAllowEdits"] && $this->REQ->has('dbConfirm') && $this->REQ->input('dbConfirm') == 'install'
-            && $this->REQ->has('createTable') && sizeof($this->REQ->input('createTable')) > 0)
-        {
+            && $this->REQ->has('createTable') && sizeof($this->REQ->input('createTable')) > 0) {
             $transferData = array();
-            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0)
-            {
-                foreach ($this->REQ->input('copyData') as $copyTbl)
-                {
+            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0) {
+                foreach ($this->REQ->input('copyData') as $copyTbl) {
                     eval("\$transferData[\$copyTbl] = " 
                         . $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]]
                         . "::get();");
@@ -368,8 +301,7 @@ class DatabaseInstaller extends AdminDBController
                 }
             }
         
-            foreach ($this->REQ->input('createTable') as $createTbl)
-            {
+            foreach ($this->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
                 DB::statement('DROP TABLE IF EXISTS `' 
                     . $GLOBALS["DB"]->dbRow->DbPrefix . $GLOBALS["DB"]->tbl[$createTbl] . '`');
@@ -379,31 +311,24 @@ class DatabaseInstaller extends AdminDBController
                 $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["DB"]->tbl[$createTbl]; // $createQry;
             }
             
-            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0)
-            {
-                foreach ($this->REQ->input('copyData') as $copyTbl)
-                {
+            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0) {
+                foreach ($this->REQ->input('copyData') as $copyTbl) {
                     $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
-                    if (isset($transferData[$copyTbl]) && sizeof($transferData[$copyTbl]) > 0)
-                    {
+                    if (isset($transferData[$copyTbl]) && sizeof($transferData[$copyTbl]) > 0) {
                         $newFlds = array();
                         $flds = SLFields::where('FldTable', $copyTbl)
                             ->where('FldDatabase', $this->dbID)
                             ->get();
-                        if ($flds && sizeof($flds) > 0)
-                        {
+                        if ($flds && sizeof($flds) > 0) {
                             $tblAbbr = $GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$copyTbl]];
                             foreach ($flds as $fld) $newFlds[] = $fld->FldName;
-                            foreach ($transferData[$copyTbl] as $oldRec) 
-                            {
+                            foreach ($transferData[$copyTbl] as $oldRec) {
                                 eval("\$newRec = new " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->tbl[$copyTbl]) . ";");
                                 $newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
                                 $newRec->created_at = $oldRec->created_at;
                                 $newRec->updated_at = $oldRec->updated_at;
-                                foreach ($newFlds as $fldName)
-                                {
-                                    if (isset($oldRec->{$tblAbbr.$fldName}))
-                                    {
+                                foreach ($newFlds as $fldName) {
+                                    if (isset($oldRec->{$tblAbbr.$fldName})) {
                                         $newRec->{$tblAbbr.$fldName} = $oldRec->{$tblAbbr.$fldName};
                                     }
                                 }
@@ -422,10 +347,8 @@ class DatabaseInstaller extends AdminDBController
     
     protected function chkForeignKey($foreignKey)
     {
-        if ($foreignKey && intVal($foreignKey) > 0)
-        {
-            if ($GLOBALS["DB"]->tbl[$foreignKey] == 'users')
-            {
+        if ($foreignKey && intVal($foreignKey) > 0) {
+            if ($GLOBALS["DB"]->tbl[$foreignKey] == 'users') {
                 return ['users', 'id'];
             }
             return [

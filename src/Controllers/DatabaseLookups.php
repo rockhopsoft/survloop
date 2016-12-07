@@ -72,18 +72,15 @@ class DatabaseLookups
         $this->treeRow     = SLTree::where('TreeID', $this->treeID)
             ->where('TreeDatabase', $this->dbID)
             ->first();
-        if (!$this->treeRow || !isset($this->treeRow->TreeID))
-        {
+        if (!$this->treeRow || !isset($this->treeRow->TreeID)) {
             $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
                 ->where('TreeType', 'Primary Public')
                 ->first();
-            if (isset($this->treeRow->TreeID))
-            {
+            if (isset($this->treeRow->TreeID)) {
                 $this->treeID = $this->treeRow->TreeID;
             }
         }
-        if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName))
-        {
+        if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName)) {
             $this->treeName    = str_replace($this->dbRow->DbName, 
                 str_replace('_', '', $this->dbRow->DbPrefix), 
                     $this->treeRow->TreeName);
@@ -99,12 +96,10 @@ class DatabaseLookups
             ->where('DataLoopRoot', '>', 0)
             ->orderBy('DataLoopTable', 'asc')
             ->get();
-        foreach ($dataLoops as $row)
-        {
+        foreach ($dataLoops as $row) {
             $this->dataLoopNames[$row->DataLoopID] = $row->DataLoopPlural;
             $this->dataLoops[$row->DataLoopPlural] = $row;
-            if (!isset($this->tblLoops[$row->DataLoopTable]))
-            {
+            if (!isset($this->tblLoops[$row->DataLoopTable])) {
                 $this->tblLoops[$row->DataLoopTable] = $row->DataLoopPlural;
             }
             // what about tables with multiple loops??
@@ -129,43 +124,33 @@ class DatabaseLookups
     public function loadDBFromCache(Request $request = NULL)
     {
         $cacheFile = '/cache/db-load-' . $this->dbID . '.php';
-        if ((!$request || !$request->has('refresh')) && file_exists($cacheFile))
-        {
+        if ((!$request || !$request->has('refresh')) && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
-        }
-        else
-        {
+        } else {
             $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/DatabaseLookups.php' . "\n\n";
             $sys = SLDefinitions::where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'System Settings')
                 ->get();
-            if (!$sys || sizeof($sys) == 0)
-            {
+            if (!$sys || sizeof($sys) == 0) {
                 $sys = SLDefinitions::where('DefDatabase', 1)
                     ->where('DefSet', 'System Settings')
                     ->get();
             }
-            if ($sys && sizeof($sys) > 0)
-            {
-                foreach ($sys as $s)
-                {
+            if ($sys && sizeof($sys) > 0) {
+                foreach ($sys as $s) {
                     $cache .= '$'.'this->sysOpts[\'' . $s->DefSubset . '\'] = \''
                         . str_replace("'", "\\'", trim($s->DefDescription)) . '\';' . "\n";
                 }
             }
-            if (isset($this->dbRow->DbPrefix))
-            {
+            if (isset($this->dbRow->DbPrefix)) {
                 $coreTbl = '';
                 // Establishing database table-field lookup arrays
                 $tbls = SLTables::where('TblDatabase', $this->dbID)
                     ->orderBy('TblOrd', 'asc')
                     ->get();
-                foreach ($tbls as $tbl)
-                {
-                    if (isset($this->treeRow->TreeCoreTable) 
-                        && $tbl->TblID == $this->treeRow->TreeCoreTable)
-                    {
+                foreach ($tbls as $tbl) {
+                    if (isset($this->treeRow->TreeCoreTable) && $tbl->TblID == $this->treeRow->TreeCoreTable) {
                         $coreTbl = $tbl->TblName;
                     }
                     $cache .= '$'.'this->tbls[] = ' . $tbl->TblID . ';' . "\n"
@@ -190,8 +175,7 @@ class DatabaseLookups
                     ->where('FldTable', '>', 0)
                     ->get();
                 foreach ($flds as $fld) {
-                    if (isset($this->tbl[$fld->FldTable]))
-                    {
+                    if (isset($this->tbl[$fld->FldTable])) {
                         $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->FldTable] . '\'][\''
                             . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName
                             . '\'] = \'' . $fld->FldType . '\';' . "\n";
@@ -201,22 +185,17 @@ class DatabaseLookups
                 $this->dataLinksOn = [];
                 $linksChk = SLDataLinks::where('DataLinkTree', $this->treeID)
                     ->get();
-                if ($linksChk && sizeof($linksChk) > 0)
-                {
-                    foreach ($linksChk as $link) 
-                    {
+                if ($linksChk && sizeof($linksChk) > 0) {
+                    foreach ($linksChk as $link) {
                         $linkMap = $this->getLinkTblMap($link->DataLinkTable);
-                        if ($linkMap && sizeof($linkMap) == 5)
-                        {
+                        if ($linkMap && sizeof($linkMap) == 5) {
                             $this->dataLinksOn[$link->DataLinkTable] = $linkMap;
                         }
                     }
                 }
                 $cache .= '$'.'this->dataLinksOn = [];' . "\n";
-                if (sizeof($this->dataLinksOn) > 0)
-                {
-                    foreach ($this->dataLinksOn as $tbl => $map)
-                    {
+                if (sizeof($this->dataLinksOn) > 0) {
+                    foreach ($this->dataLinksOn as $tbl => $map) {
                         $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ '
                             . '\'' . $map[0] . '\', \'' . $map[1] . '\', '
                             . '\'' . $map[2] . '\', \'' . $map[3] . '\', '
@@ -253,8 +232,7 @@ class DatabaseLookups
     
     public function isStepLoop($loop)
     {
-        return (isset($this->dataLoops[$loop]) 
-            && intVal($this->dataLoops[$loop]->DataLoopIsStep) == 1);
+        return (isset($this->dataLoops[$loop]) && intVal($this->dataLoops[$loop]->DataLoopIsStep) == 1);
     }
     
     public function loadSessLoops($sessID)
@@ -263,12 +241,11 @@ class DatabaseLookups
             ->orderBy('SessLoopID', 'desc')
             ->get();
         $this->closestLoop = [ "loop" => '', "itemID" => -3, "obj" => [] ];
-        if ($this->sessLoops && isset($this->sessLoops[0]))
-        {
+        if ($this->sessLoops && isset($this->sessLoops[0])) {
             $this->closestLoop = [
-                "loop"         => $this->sessLoops[0]->SessLoopName,         
-                "itemID"     => $this->sessLoops[0]->SessLoopItemID,
-                "obj"         => $this->dataLoops[$this->sessLoops[0]->SessLoopName]
+                "loop"   => $this->sessLoops[0]->SessLoopName,         
+                "itemID" => $this->sessLoops[0]->SessLoopItemID,
+                "obj"    => $this->dataLoops[$this->sessLoops[0]->SessLoopName]
             ];
         }
         return $this->sessLoops;
@@ -276,12 +253,9 @@ class DatabaseLookups
     
     public function getSessLoopID($loopName)
     {
-        if (sizeof($this->sessLoops) > 0)
-        {
-            foreach ($this->sessLoops as $loop)
-            {
-                if ($loop->SessLoopName == $loopName && intVal($loop->SessLoopItemID) > 0)
-                {
+        if (sizeof($this->sessLoops) > 0) {
+            foreach ($this->sessLoops as $loop) {
+                if ($loop->SessLoopName == $loopName && intVal($loop->SessLoopItemID) > 0) {
                     return $loop->SessLoopItemID;
                 }
             }
@@ -291,10 +265,8 @@ class DatabaseLookups
     
     public function getLoopName($loopID)
     {
-        if (sizeof($this->dataLoops) > 0)
-        {
-            foreach ($this->dataLoops as $loop)
-            {
+        if (sizeof($this->dataLoops) > 0) {
+            foreach ($this->dataLoops as $loop) {
                 if ($loopID == $loop->DataLoopID) return $loop->DataLoopPlural;
             }
         }
@@ -336,10 +308,8 @@ class DatabaseLookups
             ->where('FldForeignTable',     '>', 0)
             ->orderBy('SL_Tables.TblName', 'asc')
             ->get();
-        if ($flds && sizeof($flds) > 0)
-        {
-            foreach ($flds as $fld)
-            {
+        if ($flds && sizeof($flds) > 0) {
+            foreach ($flds as $fld) {
                 $lnkMap = $this->tbl[$fld->FldForeignTable] . '::' 
                     . $this->tbl[$fld->FldTable] . ':' 
                     . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
@@ -360,10 +330,8 @@ class DatabaseLookups
                 ->where('FldForeignTable',     '>', 0)
                 ->orderBy('SL_Tables.TblName', 'asc')
                 ->get();
-            if ($flds && sizeof($flds) > 0)
-            {
-                foreach ($flds as $fld)
-                {
+            if ($flds && sizeof($flds) > 0) {
+                foreach ($flds as $fld) {
                     $lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
                         . ':' . $this->tbl[$fld->FldForeignTable] . ':';
                     $retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
@@ -389,15 +357,10 @@ class DatabaseLookups
             ->orderBy('FldOrd', 'asc')
             ->orderBy('FldEng', 'asc')
             ->get();
-        if ($foreigns && sizeof($foreigns) == 2)
-        {
-            if (isset($foreigns[0]->FldForeignTable)
-                && isset($this->tbl[$foreigns[0]->FldForeignTable])
-                && isset($foreigns[1]->FldForeignTable)
-                && isset($this->tbl[$foreigns[1]->FldForeignTable])
-                && isset($this->tbl[$linkTbl])
-                && isset($this->tblAbbr[$this->tbl[$linkTbl]]) )
-            {
+        if ($foreigns && sizeof($foreigns) == 2) {
+            if (isset($foreigns[0]->FldForeignTable) && isset($this->tbl[$foreigns[0]->FldForeignTable])
+                && isset($foreigns[1]->FldForeignTable) && isset($this->tbl[$foreigns[1]->FldForeignTable])
+                && isset($this->tbl[$linkTbl]) && isset($this->tblAbbr[$this->tbl[$linkTbl]]) ) {
                 return [
                     $this->tbl[$foreigns[0]->FldForeignTable], 
                     $this->tblAbbr[$this->tbl[$linkTbl]] . $foreigns[0]->FldName, 
@@ -434,8 +397,7 @@ class DatabaseLookups
 
     public function loadDefinitions($subset)
     {
-        if (!isset($this->defValues[$subset]))
-        {
+        if (!isset($this->defValues[$subset])) {
             $this->defValues[$subset] = SLDefinitions::where('DefSubset', $subset)
                 ->where('DefSet', 'Value Ranges')
                 ->orderBy('DefOrder', 'asc')
@@ -448,10 +410,8 @@ class DatabaseLookups
     public function getDefID($subset = '', $value = '')
     {
         $this->loadDefinitions($subset);
-        if (sizeof($this->defValues[$subset]) > 0)
-        {
-            foreach ($this->defValues[$subset] as $def)
-            {
+        if (sizeof($this->defValues[$subset]) > 0) {
+            foreach ($this->defValues[$subset] as $def) {
                 if ($def->DefValue == $value) return $def->DefID;
             }
         }
@@ -469,10 +429,8 @@ class DatabaseLookups
     public function getDefValue($subset = '', $id = '')
     {
         $this->loadDefinitions($subset);
-        if (sizeof($this->defValues[$subset]) > 0)
-        {
-            foreach ($this->defValues[$subset] as $def)
-            {
+        if (sizeof($this->defValues[$subset]) > 0) {
+            foreach ($this->defValues[$subset] as $def) {
                 if ($def->DefID == $id) return $def->DefValue;
             }
         }
@@ -482,8 +440,7 @@ class DatabaseLookups
     public function getDefSet($subset = '')
     {
         $this->loadDefinitions($subset);
-        if (sizeof($this->defValues[$subset]) > 0)
-        {
+        if (sizeof($this->defValues[$subset]) > 0) {
             return $this->defValues[$subset];
         }
         return array();
@@ -496,8 +453,7 @@ class DatabaseLookups
     {
         $retVal = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') 
             . (($disableBlank) ? ' DISABLED ' : '') . ' >' . $instruct . '</option>' . "\n";
-        foreach ($this->tblAbbr as $tblName => $tblAbbr)
-        {
+        foreach ($this->tblAbbr as $tblName => $tblAbbr) {
             $retVal .= '<option value="' . $tblName.'" ' . (($preSel == $tblName) ? 'SELECTED' : '') 
                 . ' >' . $prefix . $tblName.'</option>' . "\n";
         }
@@ -509,10 +465,8 @@ class DatabaseLookups
     {
         $retVal = '<option value="" ' 
             . ((trim($preSel) == '') ? 'SELECTED' : '') . ' ></option>' . "\n";
-        if ($keys > 0)
-        {
-            foreach ($this->tblAbbr as $tblName => $tblAbbr)
-            {
+        if ($keys > 0) {
+            foreach ($this->tblAbbr as $tblName => $tblAbbr) {
                 $retVal .= '<option value="' . $tblName.':'. $tblAbbr . 'ID" ' 
                     . (($preSel == $tblName.':'. $tblAbbr . 'ID') ? 'SELECTED' : '') 
                     . ' >' . $tblName.' : '. $tblAbbr . 'ID (primary key)</option>' . "\n";
@@ -526,8 +480,7 @@ class DatabaseLookups
             ORDER BY t.`TblName`, f.`FldName`";
         if ($keys == -1) $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "AND f.`FldForeignTable` > '0'", $qman) ) );
         else $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "", $qman) ) );
-        if ($flds && sizeof($flds) > 0)
-        {
+        if ($flds && sizeof($flds) > 0) {
             foreach ($flds as $fld) $retVal .= $this->fieldsDropdownOption($fld, $preSel);
         }
         return $retVal;
@@ -552,10 +505,8 @@ class DatabaseLookups
             ->orderBy('DefSubset', 'asc')
             ->orderBy('DefOrder', 'asc')
             ->get();
-        if ($defs && sizeof($defs) > 0)
-        {
-            foreach ($defs as $def)
-            {
+        if ($defs && sizeof($defs) > 0) {
+            foreach ($defs as $def) {
                 $retVal .= '<option value="' . $def->DefID.'" ' 
                     . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
                     . $def->DefSubset . ': ' . $def->DefValue . '</option>' . "\n";
@@ -570,13 +521,10 @@ class DatabaseLookups
     {
         $tbls = [];
         $tblID = intVal($tblIn);
-        if (strpos($tblIn, 'loop-') !== false && sizeof($THIS->dataLoops) > 0)
-        {
+        if (strpos($tblIn, 'loop-') !== false && sizeof($THIS->dataLoops) > 0) {
             $loopID = intVal(str_replace('loop-', '', $tblIn));
-            foreach ($THIS->dataLoops as $loopName => $loopRow)
-            {
-                if ($loopRow->id == $loopID)
-                {
+            foreach ($THIS->dataLoops as $loopName => $loopRow) {
+                if ($loopRow->id == $loopID) {
                     $tblID = $this->tblI[$loopRow->DataLoopTable];
                 }
             }
@@ -591,22 +539,16 @@ class DatabaseLookups
         if ($tbl1 > 0 && !in_array($tbl1, $tbls))
         {
             $tbls[] = $tbl1;
-            if (isset($this->dataSubsets) && sizeof($this->dataSubsets) > 0)
-            {
-                foreach ($this->dataSubsets as $subset)
-                {
-                    if ($tbl1 == $this->tblI[$subset->tbl])
-                    {
+            if (isset($this->dataSubsets) && sizeof($this->dataSubsets) > 0) {
+                foreach ($this->dataSubsets as $subset) {
+                    if ($tbl1 == $this->tblI[$subset->tbl]) {
                         $tbls = $this->getSubsetTables($this->tblI[$subset->subTbl], $tbls);
                     }
                 }
             }
-            if (isset($this->dataHelpers) && sizeof($this->dataHelpers) > 0)
-            {
-                foreach ($this->dataHelpers as $helper)
-                {
-                    if ($tbl1 == $this->tblI[$helper->DataHelpParentTable])
-                    {
+            if (isset($this->dataHelpers) && sizeof($this->dataHelpers) > 0) {
+                foreach ($this->dataHelpers as $helper) {
+                    if ($tbl1 == $this->tblI[$helper->DataHelpParentTable]) {
                         $tbls = $this->getSubsetTables($this->tblI[$helper->DataHelpTable], $tbls);
                     }
                 }
@@ -625,10 +567,8 @@ class DatabaseLookups
             LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
             WHERE f.`FldTable` IN ('" . implode("', '", $tbls) . "')  
             ORDER BY t.`TblName`, f.`FldName`" ) );
-        if ($flds && sizeof($flds) > 0)
-        {
-            foreach ($flds as $fld) 
-            {
+        if ($flds && sizeof($flds) > 0) {
+            foreach ($flds as $fld) {
                 if ($prevTbl != $fld->FldTable) $retVal .= '<option value=""></option>' . "\n";
                 $retVal .= $this->fieldsDropdownOption($fld, $preSel, true, $prfx) . "\n";
                 $prevTbl = $fld->FldTable;
@@ -649,8 +589,7 @@ class DatabaseLookups
             ->where('SL_Fields.FldID', $fldID)
             ->select('SL_Tables.TblName', 'SL_Tables.TblAbbr', 'SL_Fields.FldName')
             ->first();
-        if ($fld && sizeof($fld) > 0)
-        {
+        if ($fld && sizeof($fld) > 0) {
             return (($full) ? $fld->TblName . ':' : '') . $fld->TblAbbr . $fld->FldName;
         }
         return '';
@@ -662,10 +601,8 @@ class DatabaseLookups
             ->join('SL_Tables', 'SL_Fields.FldTable', '=', 'SL_Tables.TblID')
             ->select('SL_Tables.TblName', 'SL_Tables.TblAbbr', 'SL_Fields.FldName', 'SL_Fields.FldID')
             ->get();
-        if ($flds && sizeof($flds) > 0)
-        {
-            foreach ($flds as $f)
-            {
+        if ($flds && sizeof($flds) > 0) {
+            foreach ($flds as $f) {
                 $testName = $f->TblAbbr . $f->FldName; // $f->TblName . ':' . 
                 //echo 'FldName: ' . $fldName . ' ?== ' . $testName . '<br />';
                 if ($fldName == $testName) return $f->FldID;
@@ -688,8 +625,7 @@ class DatabaseLookups
     public function splitTblFld($tblFld)
     {
         $tbl = $fld = '';
-        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false)
-        {
+        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false) {
             list($tbl, $fld) = explode(':', $tblFld);
         }
         return array($tbl, $fld);
@@ -711,33 +647,25 @@ class DatabaseLookups
         $ret = array( "prompt" => '', "vals" => array() );
         $tmpVals = array( array(), array() );
         $nodes = SLNode::where('NodeDataStore', $fldName)->get();
-        if (trim($fldName) != '' && $nodes && sizeof($nodes) > 0)
-        {
-            foreach ($nodes as $n)
-            {
-                if (trim($ret["prompt"]) == '' && trim($n->NodePromptText) != '')
-                {
+        if (trim($fldName) != '' && $nodes && sizeof($nodes) > 0) {
+            foreach ($nodes as $n) {
+                if (trim($ret["prompt"]) == '' && trim($n->NodePromptText) != '') {
                     $ret["prompt"] = strip_tags($n->NodePromptText);
                 }
                 $res = SLNodeResponses::where('NodeResNode', $n->NodeID)
                     ->orderBy('NodeResOrd', 'asc')
                     ->get();
-                if ($res && sizeof($res) > 0)
-                {
-                    foreach ($res as $r)
-                    {
-                        if (!in_array($r->NodeResValue, $tmpVals[0]))
-                        {
+                if ($res && sizeof($res) > 0) {
+                    foreach ($res as $r) {
+                        if (!in_array($r->NodeResValue, $tmpVals[0])) {
                             $tmpVals[0][] = $r->NodeResValue;
                             $tmpVals[1][] = strip_tags($r->NodeResEng);
                         }
                     }
                 }
             }
-            if (sizeof($tmpVals[0]) > 0)
-            {
-                foreach ($tmpVals[0] as $i => $val)
-                {
+            if (sizeof($tmpVals[0]) > 0) {
+                foreach ($tmpVals[0] as $i => $val) {
                     $ret["vals"][] = array($val, $tmpVals[1][$i]);
                 }
             }
@@ -752,15 +680,13 @@ class DatabaseLookups
     
     public function saveEditCondition(Request $request)
     {
-        if ($request->has('oldConds') && intVal($request->oldConds) > 0)
-        {
+        if ($request->has('oldConds') && intVal($request->oldConds) > 0) {
             return SLConditions::find(intVal($request->oldConds));
         }
         
         //echo '<pre>'; print_r($request->all()); echo '</pre>';
         $cond = new SLConditions;
-        if ($request->has('condID') && intVal($request->condID) > 0) 
-        {
+        if ($request->has('condID') && intVal($request->condID) > 0) {
             $cond = SLConditions::find(intVal($request->condID));
             SLConditionsVals::where('CondValCondID', $cond->CondID)->delete();
         }
@@ -772,28 +698,22 @@ class DatabaseLookups
         $cond->CondOperator = 'CUSTOM';
         $cond->CondOperDeet = 0;
         $cond->CondField = $cond->CondTable = $cond->CondLoop = -3;
-        if ($request->has('setSelect'))
-        {
+        if ($request->has('setSelect')) {
             $tmp = trim($request->setSelect);
-            if (strpos($tmp, 'loop-') !== false)
-            {
+            if (strpos($tmp, 'loop-') !== false) {
                 $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
+            } else {
+                $cond->CondTable = $THIS->tblI[$tmp];
             }
-            else $cond->CondTable = $THIS->tblI[$tmp];
         }
-        if ($request->has('setFld'))
-        {
+        if ($request->has('setFld')) {
             $tmp = trim($request->setFld);
-            if (substr($tmp, 0, 6) == 'EXISTS')
-            {
+            if (substr($tmp, 0, 6) == 'EXISTS') {
                 $cond->CondOperator = 'EXISTS>';
                 $cond->CondOperDeet = (($tmp == 'EXISTS>1') ? 1 : 0);
-            }
-            else 
-            {
+            } else {
                 $cond->CondField = intVal($request->setFld);
-                if ($request->has('equals'))
-                {
+                if ($request->has('equals')) {
                     if ($request->equals == 'equals') $cond->CondOperator = '{';
                     else $cond->CondOperator = '}';
                 }
@@ -801,10 +721,8 @@ class DatabaseLookups
         }
         $cond->save();
         //echo '<pre>'; print_r($cond); echo '</pre>';
-        if ($request->has('vals') && sizeof($request->vals) > 0)
-        {
-            foreach ($request->vals as $val)
-            {
+        if ($request->has('vals') && sizeof($request->vals) > 0) {
+            foreach ($request->vals as $val) {
                 $tmpVal = new SLConditionsVals;
                 $tmpVal->CondValCondID     = $cond->CondID;
                 $tmpVal->CondValValue     = $val;
@@ -818,8 +736,7 @@ class DatabaseLookups
     public function fld2SchemaType($fld)
     {
         if (strpos($fld->FldValues, 'Def::') !== false) return 'xs:string';
-        switch (strtoupper(trim($fld->FldType)))
-        {
+        switch (strtoupper(trim($fld->FldType))) {
             case 'INT':            return 'xs:integer'; break;
             case 'DOUBLE':        return 'xs:double'; break;
             case 'DATE':        return 'xs:date'; break;
@@ -836,12 +753,9 @@ class DatabaseLookups
         $chk = SLFields::where('FldDatabase', 3)
             ->select('FldName', 'FldNotes')
             ->get();
-        if ($chk && sizeof($chk) > 0)
-        {
-            foreach ($chk as $f)
-            {
-                if ($f->FldNotes && trim($f->FldNotes) != '')
-                {
+        if ($chk && sizeof($chk) > 0) {
+            foreach ($chk as $f) {
+                if ($f->FldNotes && trim($f->FldNotes) != '') {
                     $this->fldAbouts[$pref . $f->FldName] = $f->FldNotes;
                 }
             }
@@ -852,8 +766,7 @@ class DatabaseLookups
     
     public function getTreeXML()
     {
-        if ($this->treeXmlID <= 0)
-        {
+        if ($this->treeXmlID <= 0) {
             $chk = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
                 ->where('TreeType', $this->treeRow->TreeType . ' XML')
                 ->first();

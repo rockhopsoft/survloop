@@ -83,22 +83,17 @@ class AuthController extends Controller
     
     public function postRegister(Request $request)
     {
-        if (session()->has('sessID') && session()->get('sessID') > 0)
-        {
+        if (session()->has('sessID') && session()->get('sessID') > 0) {
             
         }
         $hasUsers = User::select('id')->get();    
-        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1)
-        {
+        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
             $log = new SLUsersActivity;
             $log->UserActUser = $user->id;
-            if (!$hasUsers || sizeof($hasUsers) == 0)
-            {
+            if (!$hasUsers || sizeof($hasUsers) == 0) {
                 $user->assignRole('administrator');
                 $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-            }
-            else
-            {
+            } else {
                 $user->assignRole('volunteer');
                 $log->UserActCurrPage = 'NEW VOLUNTEER!';
             }

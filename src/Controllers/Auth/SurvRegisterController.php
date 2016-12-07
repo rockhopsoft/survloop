@@ -26,17 +26,13 @@ class SurvRegisterController extends RegisterController
         $survUser = User::find($user->id);
         $hasAdmins = SLUsersRoles::where('RoleUserRID', 15) // role id of 'administrator'
             ->get();
-        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1)
-        {
+        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
             $log = new SLUsersActivity;
             $log->UserActUser = $survUser->id;
-            if (!$hasAdmins || sizeof($hasAdmins) == 0)
-            {
+            if (!$hasAdmins || sizeof($hasAdmins) == 0) {
                 $survUser->assignRole('administrator');
                 $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-            }
-            else
-            {
+            } else {
                 $survUser->assignRole('volunteer');
                 $log->UserActCurrPage = 'NEW VOLUNTEER!';
             }

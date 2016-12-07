@@ -43,8 +43,7 @@ class AdminTreeController extends AdminController
     public function index(Request $request)
     {
         $this->admControlInit($request, '/dashboard/tree/map?all=1');
-        if (!$this->checkCache())
-        {
+        if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
             $this->v["content"] = view( 'vendor.survloop.admin.tree.tree', $this->v )->render();
             $this->saveCache();
@@ -58,15 +57,11 @@ class AdminTreeController extends AdminController
     public function data(Request $request)
     {
         $this->admControlInit($request, '/dashboard/tree/data');
-        if ($request->has('dataStruct'))
-        {
-            if ($request->has('delSub'))
-            {
+        if ($request->has('dataStruct')) {
+            if ($request->has('delSub')) {
                 $found = SLDataSubsets::find($request->input('delSub'))->delete();
                 if ($found && isset($found->DataSubTree)) $found->delete();
-            }
-            elseif ($request->has('newSub') && $request->has('newSubset'))
-            {
+            } elseif ($request->has('newSub') && $request->has('newSubset')) {
                 $splits = explode(':', $request->input('newSubset'));
                 $newSubset = new SLDataSubsets;
                 $newSubset->DataSubTree    = $this->treeID;
@@ -76,15 +71,10 @@ class AdminTreeController extends AdminController
                 $newSubset->DataSubSubLnk  = $splits[3];
                 $newSubset->DataSubAutoGen = $request->input('newSubAuto');
                 $newSubset->save();
-            }
-            
-            elseif ($request->has('delHelper'))
-            {
+            } elseif ($request->has('delHelper')) {
                 $found = SLDataHelpers::find($request->input('delHelper'));
                 if ($found && isset($found->DataHelpTree)) $found->delete();
-            }
-            elseif ($request->has('newHelper'))
-            {
+            } elseif ($request->has('newHelper')) {
                 $splits = explode(':', $request->input('newHelper'));
                 $valFld = str_replace($splits[2].':', '', $request->input('newHelperValue'));
                 $newHelp = new SLDataHelpers;
@@ -94,21 +84,15 @@ class AdminTreeController extends AdminController
                 $newHelp->DataHelpKeyField    = $splits[3];
                 $newHelp->DataHelpValueField  = $valFld;
                 $newHelp->save();
-            }
-            
-            elseif ($request->has('delLinkage'))
-            {
+            } elseif ($request->has('delLinkage')) {
                 $found = SLDataLinks::where('DataLinkTree', $this->treeID)
                     ->where('DataLinkTable', $request->input('delLinkage'))
                     ->first();
-                if ($found && isset($found->DataLinkTree))
-                {
+                if ($found && isset($found->DataLinkTree)) {
                     $found->delete();
                     unset($GLOBALS["DB"]->dataLinksOn[$found->DataLinkTable]);
                 }
-            }
-            elseif ($request->has('newLinkage'))
-            {
+            } elseif ($request->has('newLinkage')) {
                 $newLink = new SLDataLinks;
                 $newLink->DataLinkTree = $this->treeID;
                 $newLink->DataLinkTable = $request->input('newLinkage');
@@ -118,12 +102,9 @@ class AdminTreeController extends AdminController
             }
         }
         
-        if (!$this->checkCache() || $request->has('dataStruct')) 
-        {
-            if (sizeof($GLOBALS["DB"]->dataLoops) > 0)
-            {
-                foreach ($GLOBALS["DB"]->dataLoops as $l => $loop)
-                {
+        if (!$this->checkCache() || $request->has('dataStruct')) {
+            if (sizeof($GLOBALS["DB"]->dataLoops) > 0) {
+                foreach ($GLOBALS["DB"]->dataLoops as $l => $loop) {
                     $GLOBALS["DB"]->dataLoops[$l]->loadConds();
                 }
             }
@@ -143,8 +124,7 @@ class AdminTreeController extends AdminController
     public function treeStats(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/tree/stats?all=1');
-        if (!$this->checkCache())
-        {
+        if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTreeStats($request);
             $this->v["content"] = view( 'vendor.survloop.admin.tree.treeStats', $this->v )->render();
             $this->saveCache();
@@ -155,8 +135,7 @@ class AdminTreeController extends AdminController
     public function treeSessions(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/tree');
-        if (!$this->checkCache()) 
-        {
+        if (!$this->checkCache()) {
             $this->v["content"] = view( 'vendor.survloop.admin.tree.treeSessions', $this->v )->render();
             $this->saveCache();
         }
@@ -178,14 +157,10 @@ class AdminTreeController extends AdminController
         $this->v["filtOnly"] = 'all';
         if ($request->has('only')) $this->v["filtOnly"] = $request->get('only');
         $condsRaw = $this->loadCondList();
-        if ($request->has('totalConds') && intVal($request->totalConds) > 0)
-        {
-            if ($condsRaw && sizeof($condsRaw) > 0)
-            {
-                foreach ($condsRaw as $i => $cond)
-                {
-                    if ($request->has('CondDelete'.$i.''))
-                    {
+        if ($request->has('totalConds') && intVal($request->totalConds) > 0) {
+            if ($condsRaw && sizeof($condsRaw) > 0) {
+                foreach ($condsRaw as $i => $cond) {
+                    if ($request->has('CondDelete'.$i.'')) {
                         SLConditions::find($cond->CondID)
                             ->delete();
                         SLConditionsVals::where('CondValCondID', $cond->CondID)
@@ -194,38 +169,29 @@ class AdminTreeController extends AdminController
                     
                     $cond->CondOpts = 1;
                     
-                    $urls = (($request->has('CondArticles'.$i.'')) 
-                        ? trim($request->get('CondArticles'.$i.'')) : '');
+                    $urls = (($request->has('CondArticles'.$i.'')) ? trim($request->get('CondArticles'.$i.'')) : '');
                     $urls = str_replace(',', ' , ', str_replace('  ', ' ', str_replace('  ', ' ', $urls)));
                     $article = SLConditionsArticles::where('ArticleCondID', $cond->CondID)
                         ->first();
-                    if (trim($urls) != '')
-                    {
+                    if (trim($urls) != '') {
                         $cond->CondOpts *= 3;
-                        if (!$article || !isset($article->ArticleCondID))
-                        {
+                        if (!$article || !isset($article->ArticleCondID)) {
                             $article = new SLConditionsArticles;
                             $article->ArticleCondID = $cond->CondID;
                         }
                         $article->ArticleURL = $urls;
                         $article->save();
-                    }
-                    elseif ($article && isset($article->ArticleCondID))
-                    {
+                    } elseif ($article && isset($article->ArticleCondID)) {
                         $article->delete();
                     }
                     
-                    $cond->CondTag = (($request->has('CondTag'.$i.'')) 
-                        ? trim($request->get('CondTag'.$i.'')) : '');
-                    if (substr($cond->CondTag, 0, 1) != '#')
-                    {
+                    $cond->CondTag = (($request->has('CondTag'.$i.'')) ? trim($request->get('CondTag'.$i.'')) : '');
+                    if (substr($cond->CondTag, 0, 1) != '#') {
                         $cond->CondTag = '#' . $cond->CondTag;
                     }
-                    $cond->CondDesc = (($request->has('CondDesc'.$i.'')) 
-                        ? trim($request->get('CondDesc'.$i.'')) : '');
+                    $cond->CondDesc = (($request->has('CondDesc'.$i.'')) ? trim($request->get('CondDesc'.$i.'')) : '');
                     if ($request->has('CondPublicFilter'.$i.'') 
-                        && intVal($request->get('CondPublicFilter'.$i.'')) == 1)
-                    {
+                        && intVal($request->get('CondPublicFilter'.$i.'')) == 1) {
                         $cond->CondOpts *= 2;
                     }
                     $cond->save();
@@ -234,10 +200,8 @@ class AdminTreeController extends AdminController
         }
         $this->v["condSplits"] = $this->loadCondList();
         $this->v["condIDs"] = '';
-        if ($this->v["condSplits"] && sizeof($this->v["condSplits"]) > 0)
-        {
-            foreach ($this->v["condSplits"] as $i => $cond)
-            {
+        if ($this->v["condSplits"] && sizeof($this->v["condSplits"]) > 0) {
+            foreach ($this->v["condSplits"] as $i => $cond) {
                 $this->v["condIDs"] .= ',' . $cond->CondID;
             }
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
@@ -248,15 +212,13 @@ class AdminTreeController extends AdminController
     
     protected function getRawConds()
     {
-        if ($this->v["filtOnly"] == 'public')
-        {
+        if ($this->v["filtOnly"] == 'public') {
             return DB::select("SELECT `CondID` FROM `SL_Conditions` WHERE `CondOpts`%2 = 0 ORDER BY `CondTag`");
-        }
-        elseif ($this->v["filtOnly"] == 'articles')
-        {
+        } elseif ($this->v["filtOnly"] == 'articles') {
             return DB::select("SELECT `CondID` FROM `SL_Conditions` WHERE `CondOpts`%3 = 0 ORDER BY `CondTag`");
+        } else {
+            return SLConditions::orderBy('CondTag', 'asc')->get();
         }
-        else return SLConditions::orderBy('CondTag', 'asc')->get();
         //elseif ($this->v["filtOnly"] == 'public') $condsRaw = SLConditions::where('CondOpts', 2)->orderBy('CondTag', 'asc')->get();
         //elseif ($this->v["filtOnly"] == 'articles') $condsRaw = SLConditions::where('CondOpts', 3)->orderBy('CondTag', 'asc')->get();
     }
@@ -265,12 +227,10 @@ class AdminTreeController extends AdminController
     {
         $condsRaw = array();
         $condsTmp = $this->getRawConds();
-        if ($condsTmp && sizeof($condsTmp) > 0)
-        {
+        if ($condsTmp && sizeof($condsTmp) > 0) {
             foreach ($condsTmp as $c) $condsRaw[] = SLConditions::find($c->CondID);
         }
-        if ($condsRaw && sizeof($condsRaw) > 0)
-        {
+        if ($condsRaw && sizeof($condsRaw) > 0) {
             foreach ($condsRaw as $i => $c) $condsRaw[$i]->loadVals();
         }
         return $condsRaw;
@@ -281,19 +241,14 @@ class AdminTreeController extends AdminController
     {
         $this->v["condArticles"] = array();
         $arts = SLConditionsArticles::get();
-        if ($arts && sizeof($arts) > 0)
-        {
-            foreach ($arts as $i => $art)
-            {
-                if (!isset($this->v["condArticles"][$art->ArticleCondID]))
-                {
+        if ($arts && sizeof($arts) > 0) {
+            foreach ($arts as $i => $art) {
+                if (!isset($this->v["condArticles"][$art->ArticleCondID])) {
                     $this->v["condArticles"][$art->ArticleCondID] = array();
                 }
                 $this->v["condArticles"][$art->ArticleCondID] = array();
-                if (trim($art->ArticleURL) !== '')
-                {
-                    if (strpos($art->ArticleURL, ',') === false)
-                    {
+                if (trim($art->ArticleURL) !== '') {
+                    if (strpos($art->ArticleURL, ',') === false) {
                         $this->v["condArticles"][$art->ArticleCondID][] = $art->ArticleURL;
                     }
                     else $this->v["condArticles"][$art->ArticleCondID] = explode(',', $art->ArticleURL);
@@ -332,8 +287,7 @@ class AdminTreeController extends AdminController
     
     protected function updateSysSet($set, $val)
     {
-        if ($this->v["user"] && $this->v["user"]->hasRole('administrator'))
-        {
+        if ($this->v["user"] && $this->v["user"]->hasRole('administrator')) {
             SLDefinitions::where('DefDatabase', '=', 1)
                 ->where('DefSet', '=', 'System Settings')
                 ->where('DefSubset', '=', $set)
@@ -358,19 +312,16 @@ class AdminTreeController extends AdminController
     {
         $this->survLoopInit($request, '/fresh/database');
         $chk = SLUsersRoles::get();
-        if (!$chk || sizeof($chk) == 0)
-        {
+        if (!$chk || sizeof($chk) == 0) {
             $this->v["user"]->assignRole('administrator');
             $this->logPageVisit('NEW SYSTEM ADMINISTRATOR!');
         }
         $this->v["isFresh"] = true;
         if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator'))
-        {
+            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
             // Initialize Database Record Settings
             $db = SLDatabases::find(1);
-            if (!$db || sizeof($db) == 0)
-            {
+            if (!$db || sizeof($db) == 0) {
                 $db = new SLDatabases;
                 $db->DbID     = 1;
             }
@@ -397,8 +348,7 @@ class AdminTreeController extends AdminController
         $this->survLoopInit($request, '/dashboard/db/new');
         $this->v["isFresh"] = false;
         if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator'))
-        {
+            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
             // Initialize Database Record Settings
             $db = new SLDatabases;
             $db = $this->freshDBstore($request, $db);
@@ -415,8 +365,7 @@ class AdminTreeController extends AdminController
     protected function genDbClasses($dbPrefix)
     {
         // Generate controller files for client customization
-        if (!file_exists('../app/Http/Controllers/' . trim($dbPrefix)))
-        {
+        if (!file_exists('../app/Http/Controllers/' . trim($dbPrefix))) {
             mkdir('../app/Http/Controllers/' . trim($dbPrefix));
         }
         $fileName = '../app/Http/Controllers/' . trim($dbPrefix) 
@@ -448,8 +397,7 @@ class AdminTreeController extends AdminController
         $coreTbl = SLTables::where('TblDatabase', $GLOBALS["DB"]->dbID)
             ->where('TblEng', $tableName)
             ->first();
-        if (!$coreTbl || sizeof($coreTbl) == 0)
-        {
+        if (!$coreTbl || sizeof($coreTbl) == 0) {
             $coreTbl = new SLTables;
             $coreTbl->TblDatabase = $GLOBALS["DB"]->dbID;
             $coreTbl->TblEng      = $tableName;
@@ -462,8 +410,7 @@ class AdminTreeController extends AdminController
         $userTbl = SLTables::where('TblDatabase', $GLOBALS["DB"]->dbID)
             ->where('TblEng', 'Users')
             ->first();
-        if (!$userTbl || sizeof($userTbl) == 0)
-        {
+        if (!$userTbl || sizeof($userTbl) == 0) {
             $userTbl = new SLTables;
             $userTbl->TblDatabase = $GLOBALS["DB"]->dbID;
             $userTbl->TblEng      = 'Users';
@@ -479,8 +426,7 @@ class AdminTreeController extends AdminController
         $tree = $this->initTree($tree, $coreTbl, $userTbl, 'Primary Public');
         
         $treeXML = SLTree::find(2);
-        if (!$treeXML || sizeof($treeXML) == 0) 
-        {
+        if (!$treeXML || sizeof($treeXML) == 0) {
             $treeXML = new SLTree;
             $treeXML->TreeID = 2;
         }
@@ -498,11 +444,9 @@ class AdminTreeController extends AdminController
         $this->survLoopInit($request, '/fresh/experience');
         $this->v["isFresh"] = true;
         if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator'))
-        {
+            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
             $tree = SLTree::find(1);
-            if (!$tree || sizeof($tree) == 0) 
-            {
+            if (!$tree || sizeof($tree) == 0) {
                 $tree = new SLTree;
                 $tree->TreeID = 1;
             }
@@ -517,8 +461,7 @@ class AdminTreeController extends AdminController
         $this->survLoopInit($request, '/dashboard/tree/new');
         $this->v["isFresh"] = false;
         if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator'))
-        {
+            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
             $tree = new SLTree;
             $tree->save();
             $tree = $this->freshUXstore($request, $tree, '/dashboard/tree/new');
@@ -593,22 +536,19 @@ class AdminTreeController extends AdminController
     protected function initCoreTable($coreTbl, $userTbl)
     {
         if (!$coreTbl || sizeof($coreTbl) == 0) return false;
-        $coreFlds = [
-            [ 
+        $coreFlds = [ [ 
                 "FldType" => 'INT', 
                 "FldEng"  => 'User ID', 
                 "FldName" => 'UserID', 
                 "FldDesc" => 'Indicates the unique User ID number of the User '
                     . 'owning the data stored in this record for this Experience.' 
-            ], 
-            [ 
+            ], [ 
                 "FldType" => 'INT', 
                 "FldEng"  => 'Experience Node Progress', 
                 "FldName" => 'SubmissionProgress', 
                 "FldDesc" => 'Indicates the unique Node ID number of the last '
                     . 'Experience Node loaded during this User\'s Experience.' 
-            ], 
-            [ 
+            ], [ 
                 "FldType" => 'VARCHAR', 
                 "FldEng"  => 'A/B Testing Version', 
                 "FldName" => 'VersionAB', 
@@ -616,14 +556,12 @@ class AdminTreeController extends AdminController
                     . 'variations in effect at the time of this User\'s Experience of this Node.' 
             ]
         ];
-        foreach ($coreFlds as $f)
-        {
+        foreach ($coreFlds as $f) {
             $chk = SLFields::where('FldDatabase', $this->dbID)
                 ->where('FldTable', $coreTbl->TblID)
                 ->where('FldName', $f["FldName"])
                 ->get();
-            if (!$chk || sizeof($chk) == 0)
-            {
+            if (!$chk || sizeof($chk) == 0) {
                 $fld = new SLFields;
                 $fld->FldDatabase         = $this->dbID;
                 $fld->FldTable            = $coreTbl->TblID;
@@ -631,13 +569,11 @@ class AdminTreeController extends AdminController
                 $fld->FldName             = $f["FldName"];
                 $fld->FldDesc             = $f["FldDesc"];
                 $fld->FldType             = $f["FldType"];
-                if ($f["FldType"] == 'INT')
-                {
+                if ($f["FldType"] == 'INT') {
                     $fld->FldDataType     = 'Numeric';
                     $fld->FldCharSupport  = ',Numbers,';
                 }
-                if ($f["FldName"] == 'UserID')
-                {
+                if ($f["FldName"] == 'UserID') {
                     $fld->FldKeyType      = ',Foreign,';
                     $fld->FldForeignTable = $userTbl->TblID;
                 }
@@ -652,12 +588,10 @@ class AdminTreeController extends AdminController
     
     protected function installNewModel($tbl)
     {
-        if ($tbl && sizeof($tbl) > 0 && $tbl->TblName != 'Users')
-        {
+        if ($tbl && sizeof($tbl) > 0 && $tbl->TblName != 'Users') {
             $tblClean = str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName);
             $fields = "";
-            if ($GLOBALS["DB"]->isCoreTbl($tbl->TblID))
-            {
+            if ($GLOBALS["DB"]->isCoreTbl($tbl->TblID)) {
                 $fields = "'" . $tbl->TblAbbr . "SubmissionProgress', '" . $tbl->TblAbbr . "VersionAB'";
                 
             }
