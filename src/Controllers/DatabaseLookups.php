@@ -62,6 +62,7 @@ class DatabaseLookups
     public $states         = [];
     
     public $fldAbouts      = [];
+    public $instructs      = [];
     public $debugOn        = true;
     
     function __construct($dbID = 1, $treeID = 1, Request $request = NULL)
@@ -773,6 +774,23 @@ class DatabaseLookups
             if ($chk && sizeof($chk) > 0) $this->treeXmlID = $chk->TreeID;
         }
         return $this->treeXmlID;
+    }
+    
+    
+    public function getInstruct($spot = '')
+    {
+        if (trim($spot) == '') return '';
+        if (isset($this->instructs[$spot]) && isset($this->instructs[$spot]->DefDescription)) {
+            return $this->instructs[$spot]->DefDescription;
+        }
+        $this->instructs[$spot] = SLDefinitions::where('DefSubset', $spot)
+            ->where('DefSet', 'Instruction')
+            ->where('DefIsActive', '1')
+            ->first();
+        if (isset($this->instructs[$spot]->DefDescription)) {
+            return $this->instructs[$spot]->DefDescription;
+        }
+        return '';
     }
     
 }

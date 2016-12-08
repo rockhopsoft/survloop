@@ -30,7 +30,7 @@ class AdminController extends SurvLoopController
             $this->survLoopInit($request, $currPage, false);
             if (!$this->v["user"] || intVal($this->v["user"]->id) <= 0
                 || !$this->v["user"]->hasRole('administrator|staff|databaser|brancher|volunteer')) {
-                echo view( 'vendor.survloop.inc-js-redirect-home', $this->v )->render();
+                echo view('vendor.survloop.inc-js-redirect-home', $this->v)->render();
                 exit;
             }
             if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"]) && $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop') {
@@ -92,36 +92,146 @@ class AdminController extends SurvLoopController
     
     protected function loadAdmMenu()
     {
-        list($treeName, $dbName) = $this->loadDbTreeShortNames();
+        list($treeMenu, $dbMenu) = $this->loadAdmMenuBasics();
         return [
-            ['/dashboard',        'Dashboard',                                        1, []], 
-            ['javascript:;',    'Submissions <span class="pull-right"><i class="fa fa-star"></i></span>', 1, [
-                ['/dashboard/subs/all',          'All Complete',                      1, []], 
-                ['/dashboard/subs/incomplete',   'Incomplete Sessions',               1, []], 
-                ['/dashboard/subs/emails',       'Settings & Emails',                 1, []]
-            ]], 
-            ['javascript:;',    'Experience <span class="pull-right"><i class="fa fa-snowflake-o"></i></span>', 1, [
-                ['/dashboard/tree/switch',       '<i>Current: ' . $treeName . '</i>', 1, []], 
-                ['/dashboard/tree/map?all=1',    'Experience Map',                    1, []],
-                ['/dashboard/tree/conds',        'Conditions / Filters',              1, []],
-                ['/dashboard/tree/data',         'Data Structures',                   1, []],
-                ['/dashboard/tree/xmlmap',       'Data XML Map',                      1, []],
-                ['/dashboard/tree/workflows',    'Workflows',                         1, []],
-                ['/test" target="_blank',        'Test Experience',                   1, []],
-                ['/dashboard/tree',              'Session Stats',                     1, []], 
-                ['/dashboard/tree/stats?all=1',  'Response Stats',                    1, []] 
-            ]], 
-            ['javascript:;',    'Database <span class="pull-right"><i class="fa fa-database"></i></span>', 1, [
-                ['/dashboard/db/switch',         '<i>Current: ' . $dbName . '</i>',   1, []], 
-                ['/dashboard/db/all',            'Database Design',                   1, []], 
-                ['/dashboard/db/bus-rules',      'Business Rules',                    1, []], 
-                ['/dashboard/db/definitions',    'Definitions',                       1, []],
-                ['/dashboard/db',                'Tables Overview',                   1, []], 
-                ['/dashboard/db/diagrams',       'Table Diagrams',                    1, []],
-                ['/dashboard/db/field-matrix',   'Field Matrix',                      1, []],
-                ['/dashboard/db/export',         'Export / Install',                  1, []]
-            ]]
+            [
+                '/dashboard',
+                'Dashboard',
+                1,
+                []
+            ], [
+                'javascript:;',
+                'Submissions <span class="pull-right"><i class="fa fa-star"></i></span>',
+                1,
+                [
+                    [
+                        '/dashboard/subs/all',
+                        'All Complete',
+                        1,
+                        []
+                    ], [
+                        '/dashboard/subs/incomplete',
+                        'Incomplete Sessions',
+                        1,
+                        []
+                    ], [
+                        '/dashboard/subs/emails',
+                        'Settings & Emails',
+                        1,
+                        []
+                    ]
+                ]
+            ], 
+            $treeMenu,
+            $dbMenu
         ];
+    }
+    
+    protected function loadAdmMenuBasics()
+    {
+        list($treeName, $dbName) = $this->loadDbTreeShortNames();
+        $treeMenu = [
+            'javascript:;',
+            'Experience <span class="pull-right"><i class="fa fa-snowflake-o"></i></span>',
+            1,
+            [
+                [
+                    '/dashboard/tree/switch',
+                    '<i>Current: ' . $treeName . '</i>',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree/map?all=1',
+                    'Experience Map',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree/conds',
+                    'Conditions / Filters',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree/data',
+                    'Data Structures',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree/xmlmap',
+                    'Data XML Map',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree/workflows',
+                    'Workflows',
+                    1,
+                    []
+                ], [
+                    '/test" target="_blank',
+                    'Test Experience',
+                    1,
+                    []
+                ], [
+                    '/dashboard/tree',
+                    'Session Stats',
+                    1,
+                    []
+                ],  [
+                    '/dashboard/tree/stats?all=1',
+                    'Response Stats',
+                    1,
+                    []
+                ]
+            ]
+        ];
+        $dbMenu = [
+            'javascript:;',
+            'Database <span class="pull-right"><i class="fa fa-database"></i></span>',
+            1,
+            [
+                [
+                    '/dashboard/db/switch',
+                    '<i>Current: ' . $dbName . '</i>',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/all',
+                    'Database Design',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/bus-rules',
+                    'Business Rules',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/definitions',
+                    'Definitions',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db',
+                    'Tables Overview',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/diagrams',
+                    'Table Diagrams',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/field-matrix',
+                    'Field Matrix',
+                    1,
+                    []
+                ], [
+                    '/dashboard/db/export',
+                    'Export / Install',
+                    1,
+                    []
+                ]
+            ]
+        ];
+        return [$treeMenu, $dbMenu];
     }
     
     protected function getAdmMenuLoc($currPage)
@@ -178,7 +288,7 @@ class AdminController extends SurvLoopController
         $dbRow = SLDatabases::find(1);
         $this->v["orgMission"] = $dbRow->DbMission;
         $this->v["adminNav"] = $this->admMenuData["adminNav"];
-        return view( 'vendor.survloop.admin.dashboard', $this->v );
+        return view('vendor.survloop.admin.dashboard', $this->v);
     }
     
     
@@ -193,7 +303,7 @@ class AdminController extends SurvLoopController
         $this->v["myDbs"] = SLDatabases::orderBy('DbName', 'asc')
             //->whereIn('DbUser', [ 0, $this->v["user"]->id ])
             ->get();
-        return view( 'vendor.survloop.admin.db.switch', $this->v );
+        return view('vendor.survloop.admin.db.switch', $this->v);
     }
     
     public function switchTreeAdmin(Request $request, $treeID = -3)
@@ -217,7 +327,7 @@ class AdminController extends SurvLoopController
                 $this->v["myTreeNodes"][$tree->TreeID] = sizeof($nodes);
             }
         }
-        return view( 'vendor.survloop.admin.tree.switch', $this->v );
+        return view('vendor.survloop.admin.tree.switch', $this->v);
     }
     
     
@@ -228,7 +338,7 @@ class AdminController extends SurvLoopController
         $this->v["instructRows"] = SLDefinitions::where('DefSet', 'Instructions')
             ->orderBy('DefSubset')
             ->get();
-        return view( 'vendor.survloop.instructs', $this->v );
+        return view('vendor.survloop.instructs', $this->v);
     }
     
     protected function instructLoad($instID)
@@ -243,7 +353,7 @@ class AdminController extends SurvLoopController
     {
         $this->admControlInit($request, '/dashboard/instruct');
         $this->v["instructRow"] = $this->instructLoad($instID);
-        return view( 'vendor.survloop.admin.volun.instructEdit', $this->v );
+        return view('vendor.survloop.admin.volun.instructEdit', $this->v);
     }
     
     public function instructNew(Request $request)
@@ -314,7 +424,7 @@ class AdminController extends SurvLoopController
             "currAdmPage" => '',
             "user" => Auth::user()
         ];
-        return view( 'profile', $data );
+        return view('profile', $data );
     }
     
     
@@ -336,7 +446,7 @@ class AdminController extends SurvLoopController
         }
         Storage::put(
             public_path()."/survloop/sys.css", 
-            view( 'vendor/survloop/inc-custom-css', [ "css" => $css ])->render()
+            view('vendor/survloop/inc-custom-css', [ "css" => $css ])->render()
         );
         return ;
     }
@@ -406,7 +516,7 @@ class AdminController extends SurvLoopController
             }
         }
         $this->v["emailList"] = OPCzComplaintEmails::orderBy('ComEmailName', 'asc')->orderBy('ComEmailType', 'asc')->get();
-        return view( 'vendor.OPC.admin.complaints.email-manage', $this->v );
+        return view('vendor.OPC.admin.complaints.email-manage', $this->v);
     }
     
     function manageEmailsForm(Request $request, $emailID = -3)
@@ -417,7 +527,7 @@ class AdminController extends SurvLoopController
         if ($emailID > 0) {
             $this->v["currEmail"] = OPCzComplaintEmails::find($emailID);
         }
-        return view( 'vendor.OPC.admin.complaints.email-form', $this->v );
+        return view('vendor.OPC.admin.complaints.email-form', $this->v);
     }
     
     function manageEmailsPost(Request $request, $emailID)

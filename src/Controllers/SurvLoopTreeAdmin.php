@@ -218,7 +218,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             $currLoopItems = str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet);
         }
         $branch = ((isset($node->nodeRow->NodeDataBranch)) ? $node->nodeRow->NodeDataBranch : '');
-        return view( 'vendor.survloop.admin.tree.node-edit', [
+        return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 
             "treeID"         => $this->treeID, 
             "node"           => $node, 
@@ -275,7 +275,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
-                    return view( 'vendor.survloop.admin.tree.node-print-basic', [
+                    return view('vendor.survloop.admin.tree.node-print-basic', [
                         "canEditTree"    => $this->canEditTree, 
                         "REQ"            => $this->REQ, 
                         "nID"            => $tierNode[0], 
@@ -299,7 +299,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if ($this->REQ->has('dataStruct')) {
             
         }
-        return view( 'vendor.survloop.admin.tree.node-print-wrap', [
+        return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint"     => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"         => $this->canEditTree
         ])->render();

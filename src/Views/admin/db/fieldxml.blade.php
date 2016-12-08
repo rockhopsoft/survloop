@@ -52,9 +52,9 @@ function saveXmlSetting(FldID, newSetting) {
                 <b>{{ $fld->FldEng }}</b><br />
                 <div class="f10">{{ $FldDataTypes[$fld->FldType][1] }}
                 @if (intVal($fld->FldForeignTable) > 0) 
-                    - <i class="fa fa-link"></i>{!! view( 'vendor.survloop.admin.db.inc-getTblName', [
+                    - <i class="fa fa-link"></i>{!! view('vendor.survloop.admin.db.inc-getTblName', [
                         "id" => $fld->FldForeignTable, "link" => 0, "xtraTxt" => ' ID', "xtraLnk" => ''
-                    ] )->render() !!}
+                    ])->render() !!}
                 @endif
                 </div>
             </td>

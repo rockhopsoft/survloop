@@ -34,7 +34,7 @@ class AdminDBController extends AdminController
         $this->dbTitle = '<span class="f40 red">' . $GLOBALS["DB"]->dbRow->DbName . '&nbsp;</span>';
         $this->dbSubTitle = '<span class="f14 red">' . $GLOBALS["DB"]->dbRow->DbDesc . '</span>';
         $this->v["dbAllowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
-        $this->v["mission"] = view( 'vendor.survloop.inc-mission-statement', 
+        $this->v["mission"] = view('vendor.survloop.inc-mission-statement', 
             array("DbMission" => $GLOBALS["DB"]->dbRow->DbMission));
         if (trim($this->v["currPage"]) == '') $this->v["currPage"] = '/dashboard/db';
         $this->v["help"] = '<span class="f10 gryA">?</span>&nbsp;&nbsp;&nbsp;';
@@ -201,7 +201,7 @@ class AdminDBController extends AdminController
     public function printOverview()
     {
         $this->loadTblGroups();
-        return view( 'vendor.survloop.admin.db.overview', $this->v );
+        return view('vendor.survloop.admin.db.overview', $this->v);
     }
     
     public function full(Request $request)
@@ -227,7 +227,7 @@ class AdminDBController extends AdminController
                     }
                 }
             }
-            $this->v["innerTable"] = view( 'vendor.survloop.admin.db.full-innerTable', $this->v );
+            $this->v["innerTable"] = view('vendor.survloop.admin.db.full-innerTable', $this->v);
             // this shouldn't be needed, why is it happening?..
             //$this->v["innerTable"] = str_replace('&lt;', '<', str_replace('&gt;', '>', 
             //    str_replace('"&quot;', '"', str_replace('&quot;"', '"', $this->v["innerTable"]))));
@@ -246,10 +246,10 @@ class AdminDBController extends AdminController
                     }
                 }
             }
-            $this->v["content"] = view( 'vendor.survloop.admin.db.full', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.full', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function viewTable(Request $request, $tblName)
@@ -273,7 +273,7 @@ class AdminDBController extends AdminController
             }
         }
         $this->v["basicTblFlds"] = $this->printBasicTblFlds($this->v["tbl"]->TblID, 1, $this->v["flds"]);
-        return view( 'vendor.survloop.admin.db.tableView', $this->v );
+        return view('vendor.survloop.admin.db.tableView', $this->v);
     }
     
     public function printEditTable($tblName = '')
@@ -313,7 +313,7 @@ class AdminDBController extends AdminController
             return $this->printViewTable($this->v["tbl"]->TblName);
         }
         
-        return view( 'vendor.survloop.admin.db.tableEdit', $this->v );
+        return view('vendor.survloop.admin.db.tableEdit', $this->v);
     }
     
     
@@ -457,7 +457,7 @@ class AdminDBController extends AdminController
         
         $this->v["fld"] = $fld;
         $this->v["fullFldSpecs"] = $this->fullFldSpecs($this->v["fld"], $this->v["dbAllowEdits"]);
-        return view( 'vendor.survloop.admin.db.fieldEdit', $this->v );
+        return view('vendor.survloop.admin.db.fieldEdit', $this->v);
     }
     
     protected function fullFldSpecs($fld = array(), $edit = false)
@@ -477,7 +477,7 @@ class AdminDBController extends AdminController
             $this->v["defSet"] = trim(str_replace('Def::', '', str_replace('DefX::', '', $fld->FldValues)));
         }
         $GLOBALS["DB"]->loadFldAbout();
-        return view( 'vendor.survloop.admin.db.fieldSpecifications', $this->v );
+        return view('vendor.survloop.admin.db.fieldSpecifications', $this->v);
     }
     
     public function businessRules(Request $request)
@@ -497,7 +497,7 @@ class AdminDBController extends AdminController
                 $this->v["ruleTbls"][] = $this->tblListID2Link($rule->RuleTables);
             }
         }
-        return view( 'vendor.survloop.admin.db.rules', $this->v );
+        return view('vendor.survloop.admin.db.rules', $this->v);
     }
 
     public function ajaxTblSelector($rT = '')
@@ -520,7 +520,7 @@ class AdminDBController extends AdminController
                 $this->v["tblList"][$i][1] = $this->getTblName($tbl, 1, '', ' target="_blank"');
             }
         }
-        return view( 'vendor.survloop.admin.db.ajaxTblFldSelectorT', $this->v );
+        return view('vendor.survloop.admin.db.ajaxTblFldSelectorT', $this->v);
     }
 
     public function ajaxFldSelector($rF = '')
@@ -544,7 +544,7 @@ class AdminDBController extends AdminController
                 $this->getTblName($fld->FldTable, 1, '', ' target="_blank"') . ':&nbsp;' . $fld->FldName
             ];
         }
-        return view( 'vendor.survloop.admin.db.ajaxTblFldSelectorF', $this->v );
+        return view('vendor.survloop.admin.db.ajaxTblFldSelectorF', $this->v);
     }
     
     
@@ -566,7 +566,7 @@ class AdminDBController extends AdminController
                 $this->v["defSets"][$def->DefSubset][] = $def;
             }
         }
-        return view( 'vendor.survloop.admin.db.definitions', $this->v );
+        return view('vendor.survloop.admin.db.definitions', $this->v);
     }
     
     public function defAdd(Request $request, $set = '')
@@ -627,7 +627,7 @@ class AdminDBController extends AdminController
             ->where('DefDatabase', $this->dbID)
             ->orderBy('DefSubset')
             ->get();
-        return view( 'vendor.survloop.admin.db.defEdit', $this->v );
+        return view('vendor.survloop.admin.db.defEdit', $this->v);
     }
     
     public function ruleAdd(Request $request)
@@ -695,7 +695,7 @@ class AdminDBController extends AdminController
             else $this->v["saveBtn"] = '<input type="submit" value="Save Rule Changes" class="btn btn-primary" >';
         }
         $GLOBALS["DB"]->loadFldAbout();
-        return view( 'vendor.survloop.admin.db.ruleSpecifications', $this->v );
+        return view('vendor.survloop.admin.db.ruleSpecifications', $this->v);
     }
     
     
@@ -726,8 +726,8 @@ class AdminDBController extends AdminController
                 $sorts[] = array($def->DefID, $def->DefValue);
             }
         }
-        $this->v["sortable"] = view( 'vendor.survloop.inc-sortable', ['sortTitle' => $sortTitle, 'submitURL' => $submitURL, 'sorts' => $sorts] );
-        return view( 'vendor.survloop.admin.db.defSort', $this->v );
+        $this->v["sortable"] = view('vendor.survloop.inc-sortable', ['sortTitle' => $sortTitle, 'submitURL' => $submitURL, 'sorts' => $sorts] );
+        return view('vendor.survloop.admin.db.defSort', $this->v);
     }
     
     public function tblSort(Request $request)
@@ -769,12 +769,12 @@ class AdminDBController extends AdminController
                 ];
             }
         }
-        $this->v["sortable"] = view( 'vendor.survloop.inc-sortable', [
+        $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
             'sorts' => $sorts
         ]);
-        return view( 'vendor.survloop.admin.db.tableSort', $this->v );
+        return view('vendor.survloop.admin.db.tableSort', $this->v);
     }
     
     public function fldSort(Request $request, $tblName = '') 
@@ -822,12 +822,12 @@ class AdminDBController extends AdminController
                 ];
             }
         }
-        $this->v["sortable"] = view( 'vendor.survloop.inc-sortable', [
+        $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
             'sorts' => $sorts
         ]);
-        return view( 'vendor.survloop.admin.db.fieldSort', $this->v );
+        return view('vendor.survloop.admin.db.fieldSort', $this->v);
     }
     
     public function fieldDescs(Request $request, $view = '')
@@ -913,7 +913,7 @@ class AdminDBController extends AdminController
                 }
             }
         }
-        return view( 'vendor.survloop.admin.db.fieldDescs', $this->v );
+        return view('vendor.survloop.admin.db.fieldDescs', $this->v);
     }
     
     public function fieldXML(Request $request)
@@ -934,7 +934,7 @@ class AdminDBController extends AdminController
                 ->get();
         }
         //echo '<pre>'; print_r($this->v["tblFldLists"]); echo '</pre>';
-        return view( 'vendor.survloop.admin.db.fieldxml', $this->v );
+        return view('vendor.survloop.admin.db.fieldxml', $this->v);
     }
     
     public function fieldXMLsave(Request $request)
@@ -1093,10 +1093,10 @@ class AdminDBController extends AdminController
                     $this->v["printMatrix"] .= '</table>';
                 }
             }
-            $this->v["content"] = view( 'vendor.survloop.admin.db.diagrams', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.diagrams', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     // http://www.html5canvastutorials.com/tutorials/
@@ -1133,8 +1133,10 @@ class AdminDBController extends AdminController
                 if ($sizeMax <= 0) $sizeMax = 1;
                 $this->v["tables"][$i][1] = 43*($this->v["tables"][$i][1]/$sizeMax);
                 if ($this->v["tables"][$i][1] <= 10) $this->v["tables"][$i][1] = 10;
-                $this->v["tables"][$i][2] = round($mainCircleCenter[0]+(sin(deg2rad(360*$i/sizeof($this->v["tables"])))*(0.46*$this->v["canvasDimensions"][1])));
-                $this->v["tables"][$i][3] = round($mainCircleCenter[1]-(cos(deg2rad(360*$i/sizeof($this->v["tables"])))*(0.46*$this->v["canvasDimensions"][1])));
+                $rad = deg2rad(360*$i/sizeof($this->v["tables"]));
+                $dim = 0.46*$this->v["canvasDimensions"][1];
+                $this->v["tables"][$i][2] = round($mainCircleCenter[0]+(sin($rad)*$dim));
+                $this->v["tables"][$i][3] = round($mainCircleCenter[1]-(cos($rad)*$dim));
             }
             $this->v["keyLines"] = array();
             $foreignFlds = SLFields::select('FldTable', 'FldForeignTable')
@@ -1148,22 +1150,26 @@ class AdminDBController extends AdminController
                         $errors .= '<br />add line, missing FldTable tblLookup[' . $fld->FldTable . ']';
                     } elseif (!isset($tableLookup[$fld->FldForeignTable])) {
                         $errors .= '<br />add line, missing FldForeignTable tblLookup[' . $fld->FldForeignTable . ']';
+                    } else {
+                        $this->v["keyLines"][] = [
+                            $tableLookup[$fld->FldTable], 
+                            $tableLookup[$fld->FldForeignTable]
+                        ];
                     }
-                    else $this->v["keyLines"][] = [$tableLookup[$fld->FldTable], $tableLookup[$fld->FldForeignTable]];
                 }
             }
-            $this->v["content"] = view( 'vendor.survloop.admin.db.network-map', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.network-map', $this->v)->render();
             $this->saveCache();
         }
         $this->v["hideWrap"] = true;
-        return view( 'vendor.survloop.master-print', $this->v );
+        return view('vendor.survloop.master-print', $this->v);
     }
     
     public function addTable(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/all');
         return $this->printEditTable('');
-        return view( 'vendor.survloop.admin.db.overview', $this->v );
+        return view('vendor.survloop.admin.db.overview', $this->v);
     }
     
     public function editTable(Request $request, $tblName)
@@ -1254,10 +1260,10 @@ class AdminDBController extends AdminController
                 exit;
             }
             
-            $this->v["content"] = view( 'vendor.survloop.admin.db.field-matrix', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.field-matrix', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function tblSelector(Request $request, $rT = '')
@@ -1275,16 +1281,16 @@ class AdminDBController extends AdminController
     public function getSetFlds(Request $request, $rSet = '')
     {
         $this->loadLookups();
-        return view( 'vendor.survloop.admin.db.inc-getTblsFldsDropOpts', [ "rSet" => $rSet ] );
+        return view('vendor.survloop.admin.db.inc-getTblsFldsDropOpts', [ "rSet" => $rSet ]);
     }
     
     public function getSetFldVals(Request $request, $fldID = '')
     {
         $this->loadLookups();
         $sessData = new SurvLoopData;
-        return view( 'vendor.survloop.admin.db.inc-getTblsFldVals', [ 
-            "FldID"     => $fldID,
-            "values"     => $GLOBALS["DB"]->getFldResponsesByID($fldID)
+        return view('vendor.survloop.admin.db.inc-getTblsFldVals', [ 
+            "FldID"  => $fldID,
+            "values" => $GLOBALS["DB"]->getFldResponsesByID($fldID)
         ]);
     }
     
@@ -1322,8 +1328,7 @@ class AdminDBController extends AdminController
                 if (!isset($this->v["tblForeigns"][$fld->FldForeignTable])) {
                     $this->v["tblForeigns"][$fld->FldForeignTable] = '';
                 }
-                $this->v["tblForeigns"][$fld->FldForeignTable] .= ', ' 
-                    . $this->printForeignKey($fld, 2, 1);
+                $this->v["tblForeigns"][$fld->FldForeignTable] .= ', ' . $this->printForeignKey($fld, 2, 1);
             }
             foreach ($this->v["tblForeigns"] as $tID => $foreigns) {
                 $this->v["tblForeigns"][$tID] = trim(substr($foreigns, 1));
@@ -1342,9 +1347,7 @@ class AdminDBController extends AdminController
                 if (sizeof($tblList) > 0) {
                     foreach ($tblList as $i => $tbl) {
                         $tbl = intVal($tbl);
-                        if (!isset($this->v["tblRules"][$tbl])) {
-                            $this->v["tblRules"][$tbl] = [];
-                        }
+                        if (!isset($this->v["tblRules"][$tbl])) $this->v["tblRules"][$tbl] = [];
                         $this->v["tblRules"][$tbl][] = $rule;
                     }
                 }
@@ -1364,9 +1367,7 @@ class AdminDBController extends AdminController
             ->get();
         if ($defs && sizeof($defs) > 0) {
             foreach ($defs as $def) {
-                if (!isset($this->v["defDeets"][$def->DefSubset])) {
-                    $this->v["defDeets"][$def->DefSubset] = [''];
-                }
+                if (!isset($this->v["defDeets"][$def->DefSubset])) $this->v["defDeets"][$def->DefSubset] = [''];
                 $this->v["defDeets"][$def->DefSubset][0] .= ';' . $def->DefValue;
                 $this->v["defDeets"][$def->DefSubset][] = $def->DefValue;
             }
@@ -1386,7 +1387,7 @@ class AdminDBController extends AdminController
     
     protected function getTblName($id = -3, $link = 1, $xtraTxt = '', $xtraLnk = '')
     {
-        return view( 'vendor.survloop.admin.db.inc-getTblName', [
+        return view('vendor.survloop.admin.db.inc-getTblName', [
             "id" => $id, 
             "link" => $link, 
             "xtraTxt" => $xtraTxt, 
@@ -1415,7 +1416,7 @@ class AdminDBController extends AdminController
     {
         $this->v["presel"] = $presel;
         $this->v["blankDefTxt"] = $blankDefTxt;
-        return view( 'vendor.survloop.admin.db.inc-getTblDropOpts', $this->v );
+        return view('vendor.survloop.admin.db.inc-getTblDropOpts', $this->v);
     }
     
     protected function getFldDropOpts($tbl = -3, $presel = -3, $blankDefTxt = '(select field)')
@@ -1458,7 +1459,7 @@ class AdminDBController extends AdminController
     {
         $this->v["presel"] = $presel;
         if (sizeof($this->v["dbFldGenerics"]) == 0) $this->loadGenerics();
-        return view( 'vendor.survloop.admin.db.inc-getFldGenericOpts', $this->v );
+        return view('vendor.survloop.admin.db.inc-getFldGenericOpts', $this->v);
     }
     
     protected function printDbStats()
@@ -1473,7 +1474,7 @@ class AdminDBController extends AdminController
         {
             $this->v["tbl"] = $tbl;
             $this->v["foreignKeyTbls"] = $foreignKeyTbls;
-            return view( 'vendor.survloop.admin.db.inc-tblDesc', $this->v );
+            return view('vendor.survloop.admin.db.inc-tblDesc', $this->v);
         }
         return '';
     }
@@ -1494,7 +1495,7 @@ class AdminDBController extends AdminController
                 }
             }
         }
-        return view( 'vendor.survloop.admin.db.inc-basicTblFlds', $this->v );
+        return view('vendor.survloop.admin.db.inc-basicTblFlds', $this->v);
     }
     
     protected function printBasicTblFldRow($fld = array(), $tblID = -3, $tblLinks = 1)
@@ -1513,7 +1514,7 @@ class AdminDBController extends AdminController
         else $this->v["FldValues"] = str_replace(';', ' ; ', $this->v["FldValues"]);
         $this->v["fldForeignPrint"] = $this->printForeignKey($fld, $tblLinks);
         $this->v["fldGenerics"] = $this->printFldGenerics($fld, $tblLinks);
-        return view( 'vendor.survloop.admin.db.inc-basicTblFldRow', $this->v );
+        return view('vendor.survloop.admin.db.inc-basicTblFldRow', $this->v);
     }
     
     protected function printForeignKey($fld = array(), $tblLinks = 1, $whichway = 0)

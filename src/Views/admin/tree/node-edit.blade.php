@@ -600,12 +600,12 @@
                                 <a id="cond{{ $i }}delUndo" href="javascript:void(0)" class="condDelBtnUndo f10 mL20">Undo</a> 
                             </div>
                             {{ $cond->CondTag }}
-                            <span class="f10 mL10">{!! view( 'vendor.survloop.admin.db.inc-describeCondition', [ "cond" => $cond, "i" => $i ])->render() !!}</span>
+                            <span class="f10 mL10">{!! view('vendor.survloop.admin.db.inc-describeCondition', [ "cond" => $cond, "i" => $i ])->render() !!}</span>
                         </div>
                     @endforeach
                 @endif
                 
-                {!! view( 'vendor.survloop.admin.db.inc-addCondition', [])->render() !!}
+                {!! view('vendor.survloop.admin.db.inc-addCondition', [])->render() !!}
                 
             </div>
         </div>

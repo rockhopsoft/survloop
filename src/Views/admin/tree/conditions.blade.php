@@ -11,7 +11,7 @@
         <form name="nodeEditor" method="post" action="/dashboard/tree/conds" >
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="addNewCond" value="1">
-        {!! view( 'vendor.survloop.admin.db.inc-addCondition', [ "newOnly" => true ])->render() !!}
+        {!! view('vendor.survloop.admin.db.inc-addCondition', [ "newOnly" => true ])->render() !!}
         </form>
     </div>
     <div class="col-md-4 taR p20">
@@ -79,7 +79,7 @@
             </div>
         </td>
         <td>
-            {!! view( 'vendor.survloop.admin.db.inc-describeCondition', [ "cond" => $cond, "i" => $i ])->render() !!}
+            {!! view('vendor.survloop.admin.db.inc-describeCondition', [ "cond" => $cond, "i" => $i ])->render() !!}
             <div class="f10">
                 <a href="javascript:void(0)" onClick="alert('(coming soon)');" class="f10 mR5">Edit</a> - 
                 <a href="javascript:void(0)" id="condDelBtn{{ $i }}" class="condDelBtn f10 mL5">Delete</a>

@@ -90,7 +90,7 @@
                 
                 @if ($isAll && $fld->FldID > 0) 
                     <div id="fldSpec{{ $fld->FldID }}" class="disBlo p20 m20">
-                        {!! view( 'vendor.survloop.admin.db.fieldSpecifications', [ 
+                        {!! view('vendor.survloop.admin.db.fieldSpecifications', [ 
                             "fld"             => $fld, 
                             "fldSfx"        => $fld->FldID,
                             "FldDataTypes"    => $FldDataTypes,
@@ -99,7 +99,7 @@
                             "chkDis"        => ' disabled ',
                             "defSet"        => ((strpos($fld->FldValues, 'Def::') !== false || strpos($fld->FldValues, 'DefX::') !== false) 
                                 ? trim(str_replace('Def::', '', str_replace('DefX::', '', $fld->FldValues))) : '')
-                        ] )->render() !!}
+                        ])->render() !!}
                     </div>
                 @else 
                     <div id="fldSpec{{ $fld->FldID }}" class="disNon p20 m20"></div>

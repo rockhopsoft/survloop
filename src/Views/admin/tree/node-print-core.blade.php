@@ -24,7 +24,7 @@
     <span class="f18 mR10">{{ strip_tags($node->nodeRow->NodePromptText) }}</span> 
     
     <div class="editXml">
-        <nobr>{!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr>
+        <nobr>{!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr>
     </div>
     
     @if (!$REQ->has('print'))

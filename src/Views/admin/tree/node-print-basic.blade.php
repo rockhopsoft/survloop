@@ -65,8 +65,8 @@
         
             <span class="f26 mR10 slBlueDark opac80"><b>{{ $node->nodeRow->NodePromptText }}</b></span>
             <span class="f14 gry9"> @if ($nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node @else Branch @endif </span>
-            @if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
-            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
+            @if (!$REQ->has('print')) {!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
+            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
             
         @elseif ($node->isPage())
         
@@ -74,14 +74,14 @@
             <span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>{{ $node->nodeRow->NodePromptNotes }}
             </a>
             <span class="f14 gry9">{{ $node->nodeRow->NodeType }}</span>
-            @if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
-            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
+            @if (!$REQ->has('print')) {!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
+            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
             
         @elseif ($node->isLoopRoot())
         
             <span class="slBlueDark f30">{{ $node->nodeRow->NodeDataBranch }}</span> 
             <span class="f14 gry9 mL10">{{ $node->nodeRow->NodeType }}</span>
-            @if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
+            @if (!$REQ->has('print')) {!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
             <a @if (!$REQ->has('print')) href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" target="_blank" @endif class="f20 mL10">
             <span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>
             {{ $node->nodeRow->NodePromptNotes }}</a>
@@ -89,7 +89,7 @@
             @if (sizeof($node->conds) > 0) 
                 <div class="f12 slBlueDark"> 
                     @if (sizeof($node->conds) > 1) Conditions @else Condition @endif 
-                    - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}
+                    - {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}
                 </div> 
             @endif
             
@@ -108,8 +108,8 @@
             </span>
             {{ $node->printManipUpdate() }}
             </span> 
-            @if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
-            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
+            @if (!$REQ->has('print')) {!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!} @endif
+            @if (sizeof($node->conds) > 0) <div class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</div> @endif
             
         @else
         
@@ -121,19 +121,19 @@
             @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
             @if (!$REQ->has('alt'))
                 <nobr><span class="f14 @if ($node->isDataManip()) gryA ital @else gry9 @endif ">{{ $node->nodeRow->NodeType }}</span>
-                @if (!$REQ->has('print')) {!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr> @endif
+                @if (!$REQ->has('print')) {!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr> @endif
             @else
                 
-                @if (!$REQ->has('print')) <nobr>{!! view( 'vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr> @endif
+                @if (!$REQ->has('print')) <nobr>{!! view('vendor.survloop.admin.tree.node-print-admBtns', ["nID" => $nID, "canEditTree" => $canEditTree])->render() !!}</nobr> @endif
                 <div class="row">
                     <div class="col-md-6 gry9">
                         @if (trim($node->nodeRow->NodePromptNotes) != '') <i>{{ strip_tags($node->nodeRow->NodePromptNotes) }}</i><br /> @endif
-                        @if (sizeof($node->conds) > 0) <span class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</span><br /> @endif
+                        @if (sizeof($node->conds) > 0) <span class="f12 slBlueDark"> @if (sizeof($node->conds) > 1) Conditions @else Condition @endif - {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $node->conds ])->render() !!}</span><br /> @endif
                         <div class=" @if ($node->isLoopRoot()) f18 bld slBlueDark @else f14 @endif ">
                             {{ $node->nodeRow->NodeType }}
                             @if ($node->isLoopRoot())
                                 @if (sizeof($GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]->conds) > 0) 
-                                    {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "node" => $GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch] ])->render() !!}
+                                    {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "node" => $GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch] ])->render() !!}
                                 @endif
                                 <span class="f14 gry6"><i class="fa fa-refresh"></i></span>
                             @endif

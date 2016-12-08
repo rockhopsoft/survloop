@@ -109,7 +109,7 @@ class SurvLoopController extends Controller
         } else {
             $view = 'vendor.survloop.' . $view;
         }
-        return view( $view, $this->v )->render();
+        return view( $view, $this->v)->render();
     }
     
     protected function setCurrPage($currPage = '')
@@ -228,7 +228,7 @@ class SurvLoopController extends Controller
     {
         $this->survLoopInit($request, '/fresh/creator');
         $GLOBALS["DB"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">Create Admin Account</h2>';
-        return view( 'vendor.survloop.auth.register', [
+        return view('vendor.survloop.auth.register', [
             "content" => '<div class="jumbotron mBn20"><center>
                 <h1>SurvLoop Installed!</h1><p><i>ALL OUR DATA ARE BELONG</i></p>
             </center></div>'
@@ -255,7 +255,7 @@ class SurvLoopController extends Controller
             $this->getAdmMenuLoc($currPage);
         }
         $this->tweakAdmMenu($currPage);
-        return view( 'vendor.survloop.admin.admin-menu', $this->admMenuData);
+        return view('vendor.survloop.admin.admin-menu', $this->admMenuData);
     }
 
     

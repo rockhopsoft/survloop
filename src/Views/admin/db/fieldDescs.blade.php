@@ -81,9 +81,9 @@ function submitFldDescChanges() { document.FldDescForm.submit(); setTimeout("doc
                 <div class="f10">
                     {{ $FldDataTypes[$fld->FldType][1] }}
                     @if (intVal($fld->FldForeignTable) > 0) 
-                        - <i class="fa fa-link"></i>{!! view( 'vendor.survloop.admin.db.inc-getTblName', [
+                        - <i class="fa fa-link"></i>{!! view('vendor.survloop.admin.db.inc-getTblName', [
                             "id" => $fld->FldForeignTable, "link" => 0, "xtraTxt" => ' ID', "xtraLnk" => ''
-                        ] )->render() !!}
+                        ])->render() !!}
                     @endif
                     @if (trim($fld->FldValues) != '' || trim($tblFldVals[$fld->FldID]) != '')
                         - <span class="f8"><i>{{ $tblFldVals[$fld->FldID] }}</i></span>

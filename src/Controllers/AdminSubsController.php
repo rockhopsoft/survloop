@@ -45,7 +45,7 @@ class AdminSubsController extends AdminController
         eval("\$this->v['subsList'] = " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl)
             . "::" . $xtraWhere . "orderBy('" . $this->v["subsSort"][0] 
             . "', '" . $this->v["subsSort"][1] . "')->get();");
-        return view( 'vendor.survloop.admin.submissions-list', $this->v );
+        return view('vendor.survloop.admin.submissions-list', $this->v);
     }
     
     

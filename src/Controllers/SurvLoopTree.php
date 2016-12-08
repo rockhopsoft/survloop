@@ -186,10 +186,10 @@ class SurvLoopTree extends CoreTree
         return true;
     }
     
-    protected function loadAllSessData()
+    protected function loadAllSessData($coreID = -3)
     {
         $this->loadsessInfo();
-        $this->loadSessionData();
+        $this->loadSessionData($coreID);
         $this->loadExtra();
         $this->loadSessionDataSaves();
         $this->runLoopConditions();
@@ -284,7 +284,7 @@ class SurvLoopTree extends CoreTree
     {
         session()->forget('sessID');
         session()->forget('coreID');
-        redirect('/auth/logout');
+        redirect('/logout');
     }
 
     public function afterLogin(Request $request)
@@ -403,7 +403,7 @@ class SurvLoopTree extends CoreTree
             $this->v["dataSets"]           = $this->sessData->dataSets;
             $this->v["currNodeDataBranch"] = $this->currNodeDataBranch;
             $this->v["REQ"]                = $this->REQ;
-            return view( 'vendor.survloop.inc-var-dump', $this->v )->render();
+            return view('vendor.survloop.inc-var-dump', $this->v)->render();
         }
         return '';
     }
@@ -541,7 +541,7 @@ class SurvLoopTree extends CoreTree
         }
         if (isset($this->majorSections[$this->currMajorSection][1]) > 0) {
             $this->pageAJAX .= '$(".snLabel").click(function() { $("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
-            return view( 'vendor.survloop.inc-progress-bar', [
+            return view('vendor.survloop.inc-progress-bar', [
                 "allNodes"                 => $this->allNodes, 
                 "majorSections"         => $this->majorSections, 
                 "minorSections"         => $this->minorSections, 
@@ -1200,7 +1200,7 @@ class SurvLoopTree extends CoreTree
     {
         $this->loadXmlMapTree($request);
         $this->v["nestedNodes"] = $this->genXmlSchemaNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers);
-        $view = view( 'vendor.survloop.admin.tree.xml-schema', $this->v )->render();
+        $view = view('vendor.survloop.admin.tree.xml-schema', $this->v)->render();
         return Response::make($view, '200')->header('Content-Type', 'text/xml');
     }
     
@@ -1224,7 +1224,7 @@ class SurvLoopTree extends CoreTree
         for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
             $v["kids"] .= $this->genXmlSchemaNode($nodeTiers[1][$i][0], $nodeTiers[1][$i]);
         }
-        return view( 'vendor.survloop.admin.tree.xml-schema-node', $v )->render();
+        return view('vendor.survloop.admin.tree.xml-schema-node', $v )->render();
     }
     
     public function genXmlReport(Request $request)
@@ -1236,7 +1236,7 @@ class SurvLoopTree extends CoreTree
         }    
         $nextRec = $this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0];
         $this->v["nestedNodes"] = $this->genXmlReportNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers, $nextRec);
-        $view = view( 'vendor.survloop.admin.tree.xml-report', $this->v )->render();
+        $view = view('vendor.survloop.admin.tree.xml-report', $this->v)->render();
         return Response::make($view, '200')->header('Content-Type', 'text/xml');
     }
     
@@ -1317,7 +1317,7 @@ class SurvLoopTree extends CoreTree
                 }
             }
         }
-        return view( 'vendor.survloop.admin.tree.xml-report-node', $v )->render();
+        return view('vendor.survloop.admin.tree.xml-report-node', $v )->render();
     }
     
     public function runAjaxChecks(Request $request) {
@@ -1436,7 +1436,7 @@ class SurvLoopTree extends CoreTree
         }
         
         if (!$this->hasREQ || (!$this->REQ->has('ajax') && !$this->REQ->has('frame'))) {
-            $ret .= '</div>' . view( 'vendor.survloop.inc-hold-sess', [])->render();
+            $ret .= '</div>' . view('vendor.survloop.inc-hold-sess', [])->render();
         }
         return $ret;
     }
@@ -1466,8 +1466,8 @@ class SurvLoopTree extends CoreTree
             return redirect('/volunteer');
         } elseif (!session()->has('sessID')) {
             if ($GLOBALS["DB"]->sysOpts["test-mode"] == 'On' && $type != 'testRun') {
-                $this->v["content"] = $this->loadCustView( 'beta-testing-coming-soon');
-                return view( 'vendor.survloop.master', $this->v );
+                $this->v["content"] = $this->loadCustView('beta-testing-coming-soon');
+                return view('vendor.survloop.master', $this->v);
             }
         }
         
@@ -1489,7 +1489,7 @@ class SurvLoopTree extends CoreTree
         
         if ($type == 'testRun') return redirect('/');
         
-        return view( 'vendor.survloop.master', $this->v );
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function loadNodeURL(Request $request, $nodeSlug)
@@ -1510,16 +1510,16 @@ class SurvLoopTree extends CoreTree
     public function byID(Request $request, $coreID, $ComSlug = '')
     {
         $this->survLoopInit($request, '/report/'.$coreID);
-        $this->loadSessionData($coreID);
+        $this->loadAllSessData($coreID);
         $this->v["hasFbWidget"] = true;
         $this->v["content"] = $this->printFullReport();
-        return view( 'vendor.survloop.master', $this->v );
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function xmlByID(Request $request, $coreID, $ComSlug = '')
     {
         $this->survLoopInit($request, '/report/'.$coreID);
-        $this->loadSessionData($coreID);
+        $this->loadAllSessData($coreID);
         return $this->genXmlReport($request);
     }
     
@@ -1540,7 +1540,7 @@ class SurvLoopTree extends CoreTree
     {
         if ($cid <= 0) return '';
         $this->survLoopInit($request, '');
-        $this->loadSessionData($cid);
+        $this->loadAllSessData($cid);
         return $this->retrieveUploadFile($upID);
     }
     

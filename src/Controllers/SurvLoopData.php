@@ -8,32 +8,32 @@ class SurvLoopData
 {
     protected $coreID       = -3;
     protected $privacy      = 'public';
-    protected $id2ind       = array();
+    protected $id2ind       = [];
     protected $loaded       = false;
     
     // These are collections of all this session's records for each table
-    public $dataSets        = array();
+    public $dataSets        = [];
     
     // Lookup arrays mapping this record to others by table an ID
-    public $kidMap          = array();
-    public $parentMap       = array();
-    public $linkMap         = array(); // obsolete? i think so
+    public $kidMap          = [];
+    public $parentMap       = [];
+    public $linkMap         = []; // obsolete? i think so
     
     // Tree node's current data structure nested position
-    public $dataBranches    = array();
+    public $dataBranches    = [];
     
     // Tree node's which capture multiple-response checkboxes
-    public $checkboxNodes   = array();
+    public $checkboxNodes   = [];
 
     // These are the IDs the items within a table's dataSet which are in a loop collection
-    public $loopItemIDs     = array();
+    public $loopItemIDs     = [];
     
     public $loopTblID       = -3;
-    public $loopItemIDsDone = array();
+    public $loopItemIDsDone = [];
     public $loopItemsNextID = -3;
     
     
-    public function loadCore($coreID = -3, $dataBranches = array(), $checkboxNodes = array(), $privacy = 'public')
+    public function loadCore($coreID = -3, $dataBranches = [], $checkboxNodes = [], $privacy = 'public')
     {
         $this->coreID        = $coreID;
         $this->dataBranches  = $dataBranches;
@@ -46,7 +46,7 @@ class SurvLoopData
     
     public function refreshDataSets()
     {
-        $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = array();
+        $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = [];
         $this->loadData($GLOBALS["DB"]->coreTbl, $this->coreID);
         return true;
     }
@@ -55,16 +55,16 @@ class SurvLoopData
     {
         $setInd = 0;
         if (!isset($this->dataSets[$tbl])) {
-            $this->dataSets[$tbl] = $this->id2ind[$tbl] = array();
+            $this->dataSets[$tbl] = $this->id2ind[$tbl] = [];
         } else {
             $setInd = sizeof($this->dataSets[$tbl]);
         }
         return $setInd;
     }
                                                                                             
-    public function loadData($tbl, $rowID, $recObj = array())
+    public function loadData($tbl, $rowID, $recObj = [])
     {
-        $subObj = array();
+        $subObj = [];
         if (trim($tbl) != '' && $rowID > 0) {
             if (!$recObj || sizeof($recObj) == 0) {
                 $recObj = $this->dataFind($tbl, $rowID);
@@ -80,7 +80,7 @@ class SurvLoopData
                 if (isset($GLOBALS["DB"]->dataSubsets) && sizeof($GLOBALS["DB"]->dataSubsets) > 0) {
                     foreach ($GLOBALS["DB"]->dataSubsets as $subset) {
                         if ($subset->DataSubTbl == $tbl) {
-                            $subObjs = array();
+                            $subObjs = [];
                             if (trim($subset->DataSubTblLnk) != '' 
                                 && intVal($recObj->{ $subset->DataSubTblLnk }) > 0) {
                                 $subObjs = $this->dataFind($subset->DataSubSubTbl, 
@@ -225,7 +225,7 @@ class SurvLoopData
         return $recObj;
     }
     
-    public function newDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = array(), $forceAdd = false)
+    public function newDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
     {
         if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal, true);
         $recObj = $this->checkNewDataRecordSimple($tbl, $fld, $newVal, $linkages, $forceAdd);
@@ -266,7 +266,7 @@ class SurvLoopData
         return $recObj;
     }
     
-    public function checkNewDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = array(), $forceAdd = false)
+    public function checkNewDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
     {
         if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal, true);
         if (sizeof($linkages["outgoing"]) > 0) {
@@ -276,7 +276,7 @@ class SurvLoopData
         return [];
     }
     
-    public function checkNewDataRecord($tbl = '', $fld = '', $newVal = -3, $linkages = array(), $forceAdd = false)
+    public function checkNewDataRecord($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
     {
         $recObj = [];
         if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal);
@@ -378,7 +378,7 @@ class SurvLoopData
     
     public function getLoopRows($loopName)
     {
-        $rows = array();
+        $rows = [];
         if (isset($this->loopItemIDs[$loopName]) && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $itemID) {
                 $rows[] = $this->getRowById($GLOBALS["DB"]->dataLoops[$loopName]->DataLoopTable, $itemID);
@@ -406,7 +406,7 @@ class SurvLoopData
     public function leaveCurrLoop()
     {
         $this->loopTblID = $this->loopItemsNextID = -3;
-        $this->loopItemIDsDone = array();
+        $this->loopItemIDsDone = [];
         return true;
     }
     
@@ -428,9 +428,9 @@ class SurvLoopData
     protected function addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $tbl2ID, $tbl2Ind = -3, $lnkTbl = '')
     {
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
-            if (!isset($this->kidMap[$tbl1]))           $this->kidMap[$tbl1] = array();
+            if (!isset($this->kidMap[$tbl1]))           $this->kidMap[$tbl1] = [];
             if (!isset($this->kidMap[$tbl1][$tbl2]))    $this->kidMap[$tbl1][$tbl2] = [ "id" => [], "ind" => [] ];
-            if (!isset($this->parentMap[$tbl2]))        $this->parentMap[$tbl2] = array();
+            if (!isset($this->parentMap[$tbl2]))        $this->parentMap[$tbl2] = [];
             if (!isset($this->parentMap[$tbl2][$tbl1])) $this->parentMap[$tbl2][$tbl1] = [ "id" => [], "ind" => [] ];
             
             if ($tbl2Ind < 0) { // !presuming it's about to be loaded
@@ -464,7 +464,7 @@ class SurvLoopData
     
     public function getChildRows($tbl1, $tbl1ID, $tbl2)
     {
-        $retArr = array();
+        $retArr = [];
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0 
             && isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
             && isset($this->kidMap[$tbl1][$tbl2]["id"][$tbl1ID])
@@ -488,7 +488,7 @@ class SurvLoopData
     
     protected function getAllTableIDs($tbl)
     {
-        $tmpIDs = array();
+        $tmpIDs = [];
         if (isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0) {
             foreach ($this->dataSets[$tbl] as $recObj) $tmpIDs[] = $recObj->getKey();
         }
@@ -501,7 +501,7 @@ class SurvLoopData
         if (trim($fld) == '') {
             list($tbl, $fld) = $GLOBALS["DB"]->splitTblFld($GLOBALS["DB"]->dataLoops[$loopName]->DataLoopDoneFld);
         }
-        $this->loopItemIDsDone = $saves = array();
+        $this->loopItemIDsDone = $saves = [];
         $saves = SLNodeSaves::where('NodeSaveSession', $this->coreID)
             ->where('NodeSaveTblFld', 'LIKE', $tbl.':'.$fld)
             ->get();
@@ -685,7 +685,7 @@ class SurvLoopData
         return $newVal;
     }
     
-    public function currSessDataCheckbox($nID, $tbl, $fld = '', $action = 'get', $newVals = array())
+    public function currSessDataCheckbox($nID, $tbl, $fld = '', $action = 'get', $newVals = [])
     {
         $helpInfo = $this->getCheckboxHelperInfo($tbl, $fld);
         if ($action == 'get') {
@@ -781,7 +781,7 @@ class SurvLoopData
         return '';
     }
     
-    public function parseCondition($cond = array(), $recObj = array(), $nID = -3)
+    public function parseCondition($cond = [], $recObj = [], $nID = -3)
     {
         $passed = true;
         if ($cond && isset($cond->CondDatabase) && $cond->CondOperator != 'CUSTOM') {

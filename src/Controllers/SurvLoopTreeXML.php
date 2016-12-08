@@ -74,7 +74,7 @@ class SurvLoopTreeXML extends CoreTree
             exit;
         }
         
-        return view( 'vendor.survloop.admin.tree.node-edit-xmlmap', [
+        return view('vendor.survloop.admin.tree.node-edit-xmlmap', [
             "canEditTree" => $this->canEditTree, 
             "treeID"      => $this->treeID, 
             "node"        => $node, 
@@ -95,7 +95,7 @@ class SurvLoopTreeXML extends CoreTree
                         $childrenPrints .= $this->adminBasicPrintNode($next, $tierDepth);
                     }
                 }
-                return view( 'vendor.survloop.admin.tree.node-print-core', [
+                return view('vendor.survloop.admin.tree.node-print-core', [
                     "canEditTree"    => $this->canEditTree, 
                     "REQ"            => $this->REQ, 
                     "nID"            => $tierNode[0], 
@@ -114,7 +114,7 @@ class SurvLoopTreeXML extends CoreTree
         $this->loadTree();
         $this->initExtra($request);
         $this->treeAdminNodeManip();
-        return view( 'vendor.survloop.admin.tree.node-print-wrap', [
+        return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"     => $this->canEditTree
         ])->render();

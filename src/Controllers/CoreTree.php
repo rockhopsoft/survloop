@@ -65,7 +65,7 @@ class CoreTree extends SurvLoopController
         return true;
     }
     
-    protected function loadAllSessData() { }
+    protected function loadAllSessData($coreID = -3) { }
     
     public function loadNodeTiersCache()
     {

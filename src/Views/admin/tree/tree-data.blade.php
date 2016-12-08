@@ -34,7 +34,7 @@
                 <td><a href="#n{{ $loop->DataLoopRoot }}">{{ $loop->DataLoopPlural }}</a> <small class="f12 gry9">({{ $loop->DataLoopSingular }})</small></td>
                 <td><a href="/dashboard/db/table/{{ $loop->DataLoopTable }}" target="_blank">
                 @if (sizeof($loop->conds) > 0) 
-                    {!! view( 'vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $loop->conds ])->render() !!}
+                    {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $loop->conds ])->render() !!}
                 @else
                     {{ $loop->DataLoopTable }}
                 @endif

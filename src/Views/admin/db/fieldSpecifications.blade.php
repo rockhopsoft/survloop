@@ -44,10 +44,10 @@
                     <label for="FldTableID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldTable'] }}">Parent Table {!! $help !!}</label>
                     @if ($edit)
                         <select id="FldTableID" name="FldTable" autocomplete="off" class="form-control" >
-                        {!! view( 'vendor.survloop.admin.db.inc-getTblDropOpts', [ "presel" => $fld->FldTable ]) !!}
+                        {!! view('vendor.survloop.admin.db.inc-getTblDropOpts', [ "presel" => $fld->FldTable ]) !!}
                         </select>
                     @else
-                        {!! view( 'vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldTable, 'link' => 0 ]) !!}
+                        {!! view('vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldTable, 'link' => 0 ]) !!}
                     @endif
                 </fieldset>
                 
@@ -72,7 +72,7 @@
                     @else
                         <nobr><select name="FldSpecSource" id="FldSpecSourceID" class="form-control" >
                             <option value="">(load generic field)</option>
-                            {!! view( 'vendor.survloop.admin.db.inc-getFldGenericOpts', [
+                            {!! view('vendor.survloop.admin.db.inc-getFldGenericOpts', [
                                 "presel" => $fld->FldSpecSource, 
                                 "dbFldGenerics" => ((isset($dbFldGenerics)) ? $dbFldGenerics : array()) 
                             ]) !!}
@@ -94,13 +94,13 @@
                     @if ($edit)
                         <select id="FldForeignTableID" name="FldForeignTable" style="width: 300px;" class="form-control" 
                             onChange="if (this.value != '') { document.getElementById('FldTypeID').value='INT'; }"  >
-                        {!! view( 'vendor.survloop.admin.db.inc-getTblDropOpts', [
+                        {!! view('vendor.survloop.admin.db.inc-getTblDropOpts', [
                             "presel" => $fld->FldForeignTable, 
                             "blankDefTxt" => '(foreign table)'
                         ]) !!}
                         </select>
                     @else
-                        {!! view( 'vendor.survloop.admin.db.inc-getTblName', [
+                        {!! view('vendor.survloop.admin.db.inc-getTblName', [
                             "id" => $fld->FldForeignTable, 
                             "link" => 1, 
                             "xtraTxt" => '<i class="fa fa-link"></i>'
@@ -338,7 +338,7 @@
                                 @if ($edit)
                                     <select id="FldForeignTableID" name="FldForeignTable" class="form-control" 
                                         onChange="if (this.value != '') { document.getElementById('FldTypeID').value='INT'; }" >
-                                        {!! view( 'vendor.survloop.admin.db.inc-getTblDropOpts', [ 
+                                        {!! view('vendor.survloop.admin.db.inc-getTblDropOpts', [ 
                                             "presel" => $fld->FldForeignTable ]) !!}
                                     </select>
                                 @elseif ($fld->FldForeignTable > 0 
@@ -361,9 +361,9 @@
                                 <nobr>( 
                                 @if ($edit)
                                     <label for="FldForeign2MinID">min:</label> <select id="FldForeign2MinID" name="FldForeign2Min" style="width: 70px;">
-                                    {!! view( 'vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeign2Min)) ) !!}
+                                    {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeign2Min)) ) !!}
                                     </select>, <label for="FldForeign2MaxID">max:</label> <select id="FldForeign2MaxID" name="FldForeign2Max" style="width: 70px;">
-                                    {!! view( 'vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeign2Max)) ) !!}
+                                    {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeign2Max)) ) !!}
                                     </select>
                                 @else
                                     min: {{ $fld->FldForeign2Min }}, max: {{ $fld->FldForeign2Max }}
@@ -371,18 +371,18 @@
                                  )</nobr>
                             </div>
                             <div data-toggle="tooltip" data-placement="top" title="Degree of Participation B-A: How many 
-                                {{ view( 'vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldTable, 'link' => 0 ]) }}
+                                {{ view('vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldTable, 'link' => 0 ]) }}
                                 records can be associated with a single record from 
-                                {{ view( 'vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldForeignTable, 'link' => 0 ]) }} ?">
+                                {{ view('vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldForeignTable, 'link' => 0 ]) }} ?">
                                 <i># of these records to one foreign record:</i>
                             </div>
                             <div class="pB20">
                             @if ($edit)
                                 <nobr>( <label for="FldForeignMin">min:</label> <select id="FldForeignMinID" name="FldForeignMin" style="width: 70px;">
-                                {!! view( 'vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMin)) ) !!}
+                                {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMin)) ) !!}
                                 </select>, 
                                 <label for="FldForeignMax">max:</label> <select id="FldForeignMaxID" name="FldForeignMax" style="width: 70px;">
-                                {!! view( 'vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMax)) ) !!}
+                                {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMax)) ) !!}
                                 </select></nobr>
                             @else
                                 <nobr>( min: {{ $fld->FldForeignMin }}, max: {{ $fld->FldForeignMax }} )</span></nobr>

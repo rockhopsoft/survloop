@@ -7,7 +7,7 @@
 
     @forelse ($adminNav as $i => $nav)
         @if (isset($nav[0]))
-            @if (sizeof($nav[3]) <= 1)
+            @if (!isset($nav[3]) || sizeof($nav[3]) <= 1)
                 <a href="{!! $nav[0] !!}" class="list-group-item  
                 @if ($currNavPos[0] == $i) active @endif
                 primeNav" data-parent="#menu" @if ($nav[2]%3 == 0) target="_blank" @endif >{!! $nav[1] !!}</a>
@@ -20,7 +20,7 @@
                 ">
                 @foreach ($nav[3] as $j => $nA)
                 
-                    @if (sizeof($nA[3]) == 0)
+                    @if (!isset($nA[3]) || sizeof($nA[3]) == 0)
                         <a href="{!! $nA[0] !!}" data-parent="#menu" class="list-group-item 
                         @if ($currNavPos[0] == $i && $currNavPos[1] == $j) active @endif
                         " @if ($nav[2]%3 == 0) target="_blank" @endif ><i class="fa fa-chevron-right"></i> {!! $nA[1] !!}
@@ -43,7 +43,7 @@
                         @foreach ($nA[3] as $k => $nB)
                 
                 
-                            @if (sizeof($nB[3]) == 0)
+                            @if (!isset($nB[3]) || sizeof($nB[3]) == 0)
                                 <a href="{!! $nB[0] !!}" class="list-group-item 
                                 @if ($currNavPos[0] == $i && $currNavPos[1] == $j && $currNavPos[2] == $k) active @endif
                                 " data-parent="#menu" @if ($nav[2]%3 == 0) target="_blank" @endif >

@@ -105,10 +105,10 @@ class DatabaseInstaller extends AdminDBController
         $this->admControlInit($request, '/dashboard/db/export');
         if (!$this->checkCache('/dashboard/db/export')) {
             $this->exportMysql();
-            $this->v["content"] = view( 'vendor.survloop.admin.db.export-mysql', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function printExportLaravel(Request $request) 
@@ -210,7 +210,7 @@ class DatabaseInstaller extends AdminDBController
                     $newModelFilename = '../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"] 
                         . '/' . $this->v["tblClean"] . '.php';
                     $this->v["fileListModel"][] = $newModelFilename;
-                    $fullFileOut = view( 'vendor.survloop.admin.db.export-laravel-gen-model' , $this->v );
+                    $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
                     $this->v["dumpOut"]["Models"] .= $fullFileOut;
                     if (file_exists($newModelFilename)) {
                         $oldFile = file_get_contents($newModelFilename);
@@ -251,14 +251,14 @@ class DatabaseInstaller extends AdminDBController
             $newMigFilename = '../database/migrations/'
                 . $this->v["dateStamp"] . '_' . $GLOBALS["DB"]->dbRow->DbPrefix 
                 . 'create_tables.php';
-            $fullFileOut = view( 'vendor.survloop.admin.db.export-laravel-gen-migration' , $this->v );
+            $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-migration' , $this->v);
             file_put_contents($newMigFilename, $fullFileOut);
             $this->v["dumpOut"]["Migrations"] .= $fullFileOut;
 
             $newSeedFilename = '../database/seeds/'
                 . str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix) 
                 . 'Seeder.php';
-            $fullFileOut = view( 'vendor.survloop.admin.db.export-laravel-gen-seeder' , $this->v );
+            $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-seeder' , $this->v);
             file_put_contents($newSeedFilename, $fullFileOut);
             
             /* NOT MVP!
@@ -273,10 +273,10 @@ class DatabaseInstaller extends AdminDBController
             //$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__.$this->v["exportDir"]."/SurvLoop2Laravel-Export-".date("Y-m-d").".zip"));
             */
             
-            $this->v["content"] = view( 'vendor.survloop.admin.db.export-laravel', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.db.export-laravel', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function autoInstallDatabase(Request $request) 
@@ -341,7 +341,7 @@ class DatabaseInstaller extends AdminDBController
                 }
             }
         }
-        return view( 'vendor.survloop.admin.db.install', $this->v );
+        return view('vendor.survloop.admin.db.install', $this->v);
     }
     
     

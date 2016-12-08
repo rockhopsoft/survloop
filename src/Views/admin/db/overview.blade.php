@@ -58,6 +58,6 @@
     No tables yet.
 @endforelse
 
-{!! view( 'vendor.survloop.admin.db.acknowledgments') !!}
+{!! view('vendor.survloop.admin.db.acknowledgments') !!}
 
 @endsection

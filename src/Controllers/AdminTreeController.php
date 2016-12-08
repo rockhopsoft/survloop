@@ -45,12 +45,12 @@ class AdminTreeController extends AdminController
         $this->admControlInit($request, '/dashboard/tree/map?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
-            $this->v["content"] = view( 'vendor.survloop.admin.tree.tree', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.tree', $this->v)->render();
             $this->saveCache();
         }
-        $treeAbout = view( 'vendor.survloop.admin.tree.tree-about', [ "showAbout" => false ])->render();
+        $treeAbout = view('vendor.survloop.admin.tree.tree-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     
@@ -108,17 +108,17 @@ class AdminTreeController extends AdminController
                     $GLOBALS["DB"]->dataLoops[$l]->loadConds();
                 }
             }
-            $this->v["content"] = view( 'vendor.survloop.admin.tree.tree-data', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.tree-data', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function nodeEdit(Request $request, $nID) 
     {
         $this->admControlInit($request, '/dashboard/tree/map?all=1');
         $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, '/dashboard/tree/map?all=1');
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
     public function treeStats(Request $request) 
@@ -126,26 +126,26 @@ class AdminTreeController extends AdminController
         $this->admControlInit($request, '/dashboard/tree/stats?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTreeStats($request);
-            $this->v["content"] = view( 'vendor.survloop.admin.tree.treeStats', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.treeStats', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
 
     public function treeSessions(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/tree');
         if (!$this->checkCache()) {
-            $this->v["content"] = view( 'vendor.survloop.admin.tree.treeSessions', $this->v )->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.treeSessions', $this->v)->render();
             $this->saveCache();
         }
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
 
     public function workflows(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/tree/workflows');
-        return view( 'vendor.survloop.admin.tree.workflows', $this->v );
+        return view('vendor.survloop.admin.tree.workflows', $this->v);
     }
     
     public function conditions(Request $request) 
@@ -207,7 +207,7 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
-        return view( 'vendor.survloop.admin.tree.conditions', $this->v );
+        return view('vendor.survloop.admin.tree.conditions', $this->v);
     }
     
     protected function getRawConds()
@@ -267,7 +267,7 @@ class AdminTreeController extends AdminController
         $xmlmap = new SurvLoopTreeXML;
         $xmlmap->loadTree($GLOBALS["DB"]->getTreeXML(), $request);
         $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
-        return view( 'vendor.survloop.admin.tree.xmlmap', $this->v );
+        return view('vendor.survloop.admin.tree.xmlmap', $this->v);
     }
     
     public function xmlNodeEdit(Request $request, $nID = -3)
@@ -276,7 +276,7 @@ class AdminTreeController extends AdminController
         $xmlmap = new SurvLoopTreeXML;
         $xmlmap->loadTree($GLOBALS["DB"]->getTreeXML(), $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
-        return view( 'vendor.survloop.admin.admin', $this->v );
+        return view('vendor.survloop.admin.admin', $this->v);
     }
     
 
@@ -340,7 +340,7 @@ class AdminTreeController extends AdminController
             
             return redirect('/dashboard/tree/new');
         }
-        return view( 'vendor.survloop.admin.fresh-install-setup-db', $this->v );
+        return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);
     }
 
     public function newDB(Request $request)
@@ -359,7 +359,7 @@ class AdminTreeController extends AdminController
             
             return redirect('/dashboard/tree/new');
         }
-        return view( 'vendor.survloop.admin.fresh-install-setup-db', $this->v );
+        return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);
     }
 
     protected function genDbClasses($dbPrefix)
@@ -372,19 +372,19 @@ class AdminTreeController extends AdminController
             . '/' . trim($dbPrefix) . '.php';
         
         $file = "<"."?"."php\n" 
-            . view( 'vendor.survloop.admin.fresh-install-class-core', [
+            . view('vendor.survloop.admin.fresh-install-class-core', [
                 "abbr" => trim($dbPrefix)
             ])->render();
         file_put_contents($fileName, $file);
         
         $file = "<"."?"."php\n" 
-            . view( 'vendor.survloop.admin.fresh-install-class-report', [
+            . view('vendor.survloop.admin.fresh-install-class-report', [
                 "abbr" => trim($dbPrefix)
             ])->render();
         file_put_contents(str_replace('.php', 'Report.php', $fileName), $file);
         
         $file = "<"."?"."php\n" 
-            . view( 'vendor.survloop.admin.fresh-install-class-admin', [
+            . view('vendor.survloop.admin.fresh-install-class-admin', [
                 "abbr" => trim($dbPrefix)
             ])->render();
         file_put_contents(str_replace('.php', 'Admin.php', $fileName), $file);
@@ -453,7 +453,7 @@ class AdminTreeController extends AdminController
             $tree = $this->freshUXstore($request, $tree, '/fresh/experience');
             return redirect('/dashboard/tree/map?all=1');
         }
-        return view( 'vendor.survloop.admin.fresh-install-setup-ux', $this->v );
+        return view('vendor.survloop.admin.fresh-install-setup-ux', $this->v);
     }
     
     public function newTree(Request $request)
@@ -467,7 +467,7 @@ class AdminTreeController extends AdminController
             $tree = $this->freshUXstore($request, $tree, '/dashboard/tree/new');
             return redirect('/dashboard/tree/map?all=1');
         }
-        return view( 'vendor.survloop.admin.fresh-install-setup-ux', $this->v );
+        return view('vendor.survloop.admin.fresh-install-setup-ux', $this->v);
     }
     
     protected function initTree($tree, $coreTbl, $userTbl, $type = 'Public')
@@ -595,7 +595,7 @@ class AdminTreeController extends AdminController
                 $fields = "'" . $tbl->TblAbbr . "SubmissionProgress', '" . $tbl->TblAbbr . "VersionAB'";
                 
             }
-            $model = view( 'vendor.survloop.admin.db.export-laravel-gen-model' , [
+            $model = view('vendor.survloop.admin.db.export-laravel-gen-model' , [
                 "tblClean"  => $tblClean,
                 "tblName"   => $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName,
                 "tbl"       => $tbl,
@@ -614,6 +614,7 @@ class AdminTreeController extends AdminController
             . "  `" . $tbl->TblAbbr . "UserID` bigint(20) unsigned NULL, \n"
             . "  `" . $tbl->TblAbbr . "SubmissionProgress` int(11) NULL , \n"
             . "  `" . $tbl->TblAbbr . "ABtests` varchar(255) NULL , \n"
+            . "  `" . $tbl->TblAbbr . "UniqueStr` varchar(50) NULL , \n"
             . $this->exportMysqlTblCoreFinish($tbl);
         return DB::statement($tblQry);
     }
