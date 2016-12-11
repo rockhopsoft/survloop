@@ -218,7 +218,7 @@ class CoreTree extends SurvLoopController
             $node->nodeRow->NodeParentOrder = $this->REQ->moveToOrder;
             $node->nodeRow->save();
             $this->loadTree();
-            $this->initExtra($request);
+            $this->initExtra($this->REQ);
         }
         return true;
     }

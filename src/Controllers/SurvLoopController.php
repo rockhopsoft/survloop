@@ -151,9 +151,7 @@ class SurvLoopController extends Controller
     {
         if ($baseOverride != '') $this->genCacheKey($baseOverride);
         if ($this->REQ->has('refresh')) { 
-            //echo '<div style="padding: 100px;">refreshForget!  ' . $this->cacheKey . '</div>'; 
             Cache::forget($this->cacheKey); 
-            //echo '<textarea>'; print_r(Cache::store('file')->get($this->cacheKey)); echo '</textarea>';
         }
         if (Cache::store('file')->has($this->cacheKey)) {
             $this->v["content"] = Cache::store('file')->get($this->cacheKey);

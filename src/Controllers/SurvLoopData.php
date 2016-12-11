@@ -679,7 +679,6 @@ class SurvLoopData
                 return $newVal;
             } else {
                 //$GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl . '][' . $itemInd . '] for ' . $fld . '<br />';
-                //echo '<pre>'; print_r($this->dataSets); echo '</pre>';
             }
         }
         return $newVal;

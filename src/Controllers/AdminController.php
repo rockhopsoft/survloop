@@ -34,8 +34,7 @@ class AdminController extends SurvLoopController
                 exit;
             }
             if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"]) && $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-                eval("\$this->CustReport = new "
-                    . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+                eval("\$this->CustReport = new " . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                     . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Report(\$request);");
                 $this->checkCurrPage();
             }
@@ -234,24 +233,33 @@ class AdminController extends SurvLoopController
         return [$treeMenu, $dbMenu];
     }
     
+    protected function admMenuCmpPage($menuLnk, $currPage)
+    {
+        if ($menuLnk == $currPage) return true;
+        if (strpos($menuLnk, '?') !== false) {
+            if ($currPage == substr($menuLnk, 0, strpos($menuLnk, '?'))) return true;
+        }
+        return false;
+    }
+    
     protected function getAdmMenuLoc($currPage)
     {
         $this->admMenuData["currNavPos"] = array(0, -1, -1, -1);
         if (sizeof($this->admMenuData["adminNav"]) > 0) {
             foreach ($this->admMenuData["adminNav"] as $i => $nav) {
-                if ($nav[0] == $currPage) {
+                if ($this->admMenuCmpPage($nav[0], $currPage)) {
                     $this->admMenuData["currNavPos"] = array($i, -1, -1, -1);
                 } elseif (sizeof($nav[3]) > 0) {
                     foreach ($nav[3] as $j => $nA) {
-                        if ($nA[0] == $currPage) {
+                        if ($this->admMenuCmpPage($nA[0], $currPage)) {
                             $this->admMenuData["currNavPos"] = array($i, $j, -1, -1);
                         } elseif (sizeof($nA[3]) > 0) {
                             foreach ($nA[3] as $k => $nB) {
-                                if ($nB[0] == $currPage) {
+                                if ($this->admMenuCmpPage($nB[0], $currPage)) {
                                     $this->admMenuData["currNavPos"] = array($i, $j, $k, -1);
                                 } elseif (sizeof($nB[3]) > 0) {
                                     foreach ($nB[3] as $l => $nC) {
-                                        if ($nC[0] == $currPage) {
+                                        if ($this->admMenuCmpPage($nC[0], $currPage)) {
                                             $this->admMenuData["currNavPos"] = array($i, $j, $k, $l);
                                         }
                                     }

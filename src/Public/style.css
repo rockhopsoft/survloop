@@ -38,6 +38,10 @@ body {
 
 .navbar {
 	min-height: 50px;
+	background: #000;
+}
+.navbar-inverse {
+	background: #000;
 }
 .navbar-toggle {
 	padding: 9px 10px;
@@ -50,13 +54,21 @@ body {
 #logoLrg, #logoMed, #logoSm {
 	display: inline;
 	margin-top: -10px;
+	margin-left: -25px;
 }
 #logoLrg img, #logoMed img, #logoSm img {
 	height: 40px;
 }
-#logoMed, #logoSm { display: none; }
-#logoSm { margin-top: -13px; margin-bottom: -5px; }
-#logoSm img { height: 30px; }
+#logoMed, #logoSm {
+    display: none;
+}
+#logoSm {
+    margin-top: -13px;
+    margin-bottom: -5px;
+}
+#logoSm img {
+    height: 30px;
+}
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	font-size: 32px;
 }

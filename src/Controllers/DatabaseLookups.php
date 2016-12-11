@@ -605,7 +605,6 @@ class DatabaseLookups
         if ($flds && sizeof($flds) > 0) {
             foreach ($flds as $f) {
                 $testName = $f->TblAbbr . $f->FldName; // $f->TblName . ':' . 
-                //echo 'FldName: ' . $fldName . ' ?== ' . $testName . '<br />';
                 if ($fldName == $testName) return $f->FldID;
             }
         }
@@ -653,7 +652,7 @@ class DatabaseLookups
                 if (trim($ret["prompt"]) == '' && trim($n->NodePromptText) != '') {
                     $ret["prompt"] = strip_tags($n->NodePromptText);
                 }
-                $res = SLNodeResponses::where('NodeResNode', $n->NodeID)
+                $res = SLNodeResponses::where('NodeResNode', intVal($n->NodeID))
                     ->orderBy('NodeResOrd', 'asc')
                     ->get();
                 if ($res && sizeof($res) > 0) {
@@ -685,7 +684,6 @@ class DatabaseLookups
             return SLConditions::find(intVal($request->oldConds));
         }
         
-        //echo '<pre>'; print_r($request->all()); echo '</pre>';
         $cond = new SLConditions;
         if ($request->has('condID') && intVal($request->condID) > 0) {
             $cond = SLConditions::find(intVal($request->condID));
@@ -721,14 +719,12 @@ class DatabaseLookups
             }
         }
         $cond->save();
-        //echo '<pre>'; print_r($cond); echo '</pre>';
         if ($request->has('vals') && sizeof($request->vals) > 0) {
             foreach ($request->vals as $val) {
                 $tmpVal = new SLConditionsVals;
                 $tmpVal->CondValCondID     = $cond->CondID;
                 $tmpVal->CondValValue     = $val;
                 $tmpVal->save();
-                //echo '<pre>'; print_r($tmpVal); echo '</pre>';
             }
         }
         return $cond;

@@ -169,9 +169,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             }
                         }
                     }
-                    $this->saveNewResponses($node, $newResponses, $resLimit);
                 }
                 $node->nodeRow->save();
+                $node->nodeID = $node->nodeRow->nodeID;
+                $this->saveNewResponses($node, $newResponses, $resLimit);
                 
                 if ($this->REQ->has('condIDs') && sizeof($this->REQ->condIDs) > 0) {
                     foreach ($this->REQ->condIDs as $condID) {
@@ -241,7 +242,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             if (isset($newResponses[$i])) {
                 if (!isset($node->responses[$i])) {
                     $node->responses[$i] = new SLNodeResponses;
-                    $node->responses[$i]->NodeResNode = $node->nodeID;
+                    $node->responses[$i]->NodeResNode = intVal($node->nodeID);
                 }
                 $node->responses[$i]->NodeResOrd      = $i;
                 $node->responses[$i]->NodeResEng      = $newResponses[$i]["eng"];

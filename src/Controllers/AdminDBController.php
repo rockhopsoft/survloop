@@ -659,7 +659,6 @@ class AdminDBController extends AdminController
         
         if ($this->REQ->has('ruleEditForm') && $this->v["dbAllowEdits"]) {
             $this->cacheFlush();
-            //echo 'ruleID: ' . $ruleID . '<pre>'; print_r($this->v["rule"]); echo '</pre>';
             $this->v["rule"]->RuleStatement = $this->REQ->RuleStatement;
             $this->v["rule"]->RuleConstraint = $this->REQ->RuleConstraint;
             $this->v["rule"]->RuleAction = $this->REQ->RuleAction;
@@ -682,7 +681,6 @@ class AdminDBController extends AdminController
                 $this->v["rule"]->RuleType *= intVal($this->REQ->RuleType57);
             }
             $this->v["rule"]->save();
-            //echo '<br /><br />saving: <pre>'; print_r($this->v["rule"]); echo '</pre>';
         }
         
         $this->v["tblTxt"] = ((isset($this->v["rule"])) ? $this->tblListID2Link($this->v["rule"]->RuleTables) : '');
@@ -933,7 +931,6 @@ class AdminDBController extends AdminController
                 ->orderBy('FldEng', 'asc')
                 ->get();
         }
-        //echo '<pre>'; print_r($this->v["tblFldLists"]); echo '</pre>';
         return view('vendor.survloop.admin.db.fieldxml', $this->v);
     }
     
