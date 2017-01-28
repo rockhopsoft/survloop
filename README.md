@@ -100,6 +100,7 @@ $ php artisan db:seed --class=SurvLoopSeeder
 
 # <a name="documentation"></a>Documentation
 
+Once installed, documentation of this system's database design can be found at /dashboard/db/all . This system's user experience design for data entry can be found at /dashboard/tree/map?all=1&alt=1 .
 
 
 # <a name="roadmap"></a>Roadmap

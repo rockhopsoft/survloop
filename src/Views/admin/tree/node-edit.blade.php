@@ -476,14 +476,12 @@
                             </label>
                             <label>
                                 <b>Entered Loop Items:</b> 
-                                <select name="responseLoopItems" class="form-control disIn" style="width: 200px;" autocomplete="off" >
+                                <select name="responseLoopItems" class="form-control disIn" style="width: 200px;" 
+                                    autocomplete="off" >
                                     <option value="" @if ($currLoopItems == '') SELECTED @endif ></option>
-                                    @forelse ($GLOBALS["DB"]->dataLoops as $loop)
-                                        @if (isset($loop->DataLoopPlural))
-                                            <option value="{{ $loop->DataLoopPlural }}" 
-                                                @if ($currLoopItems == $loop->DataLoopPlural) SELECTED @endif 
-                                                >{{ $loop->DataLoopPlural }}</option>
-                                        @endif
+                                    @forelse ($GLOBALS["DB"]->dataLoops as $plural => $loop)
+                                        <option value="{{ $plural }}" @if ($currLoopItems == $plural) SELECTED @endif 
+                                            >{{ $plural }}</option>
                                     @empty
                                     @endforelse
                                 </select>

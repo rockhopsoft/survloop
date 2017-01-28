@@ -584,7 +584,8 @@ class SurvFormTree extends SurvLoopTree
             } elseif ($curr->nodeType == 'Feet Inches') {
                 $this->pageFldList[] = 'n' . $nID . 'fldFeetID'; 
                 $this->pageFldList[] = 'n' . $nID . 'fldInchID';
-                $feet = floor($currNodeSessData/12); $inch = intVal($currNodeSessData)%12;
+                $feet = ($currNodeSessData > 0) ? floor($currNodeSessData/12) : 0; 
+                $inch = ($currNodeSessData > 0) ? intVal($currNodeSessData)%12 : 0;
                 $ret .= str_replace('<label for="n' . $nID . 'FldID">', '<label for="n' . $nID 
                     . 'fldFeetID"><label for="n' . $nID . 'fldInchID">', 
                     str_replace('</label>', '</label></label>', $nodePrompt)) 
@@ -680,7 +681,7 @@ class SurvFormTree extends SurvLoopTree
         if ($curr->isPage() || $curr->isLoopRoot()) { // then wrap completed page in form
             $ret = $this->printNodePublicFormStart($nID) . $ret . '
             <div id="pageBtns" class="w100 pT10">
-                <div id="formErrorMsg" class="w100 taR slRedDark" ></div>
+                <div id="formErrorMsg" class="w100 taR slRedDark fPerc125" ></div>
                 ' . $this->nodePrintButton($nID, $tmpSubTier, $promptNotesSpecial) . '
             </div>
             ' . $this->printNodePublicFormEnd($nID, $promptNotesSpecial)

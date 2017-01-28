@@ -109,14 +109,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         if (trim($this->REQ->input('manipMore' . $i . 'Store')) != '') {
                             if (!isset($node->dataManips[$i])) {
                                 $node->dataManips[$i] = new SLNode;
-                                $node->dataManips[$i]->NodeTree         = $this->treeID;
-                                $node->dataManips[$i]->NodeType         = 'Data Manip: Update';
-                                $node->dataManips[$i]->NodeParentID     = $node->nodeID;
-                                $node->dataManips[$i]->NodeParentOrder     = $i;
+                                $node->dataManips[$i]->NodeTree        = $this->treeID;
+                                $node->dataManips[$i]->NodeType        = 'Data Manip: Update';
+                                $node->dataManips[$i]->NodeParentID    = $node->nodeID;
+                                $node->dataManips[$i]->NodeParentOrder = $i;
                             }
-                            $node->dataManips[$i]->NodeDataStore         = trim($this->REQ->input('manipMore' . $i . 'Store'));
-                            $node->dataManips[$i]->NodeDefault             = trim($this->REQ->input('manipMore' . $i . 'Val'));
-                            $node->dataManips[$i]->NodeResponseSet         = trim($this->REQ->input('manipMore' . $i . 'Set'));
+                            $node->dataManips[$i]->NodeDataStore = trim($this->REQ->input('manipMore' . $i . 'Store'));
+                            $node->dataManips[$i]->NodeDefault = trim($this->REQ->input('manipMore' . $i . 'Val'));
+                            $node->dataManips[$i]->NodeResponseSet = trim($this->REQ->input('manipMore' . $i . 'Set'));
                             $node->dataManips[$i]->save();
                         } else {
                             if (isset($node->dataManips[$i])) $node->dataManips[$i]->delete();
@@ -124,7 +124,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 } else { // other normal response node
                     $node->nodeRow->NodeType = trim($this->REQ->input('nodeTypeQ'));
-                    $opts = array(5, 11, 13, 17, 23);
+                    $opts = [5, 11, 13, 17, 23];
                     foreach ($opts as $o) {
                         if ($this->REQ->has('opts'.$o.'') && intVal($this->REQ->input('opts'.$o.'')) == $o) {
                             if ($node->nodeRow->NodeOpts%$o > 0) $node->nodeRow->NodeOpts *= $o;
@@ -169,10 +169,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             }
                         }
                     }
+                    $node->nodeRow->save();
+                    $node->nodeID = $node->nodeRow->NodeID;
+                    $this->saveNewResponses($node, $newResponses, $resLimit);
                 }
                 $node->nodeRow->save();
-                $node->nodeID = $node->nodeRow->nodeID;
-                $this->saveNewResponses($node, $newResponses, $resLimit);
                 
                 if ($this->REQ->has('condIDs') && sizeof($this->REQ->condIDs) > 0) {
                     foreach ($this->REQ->condIDs as $condID) {
@@ -242,7 +243,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             if (isset($newResponses[$i])) {
                 if (!isset($node->responses[$i])) {
                     $node->responses[$i] = new SLNodeResponses;
-                    $node->responses[$i]->NodeResNode = intVal($node->nodeID);
+                    $node->responses[$i]->NodeResNode = $node->nodeID;
                 }
                 $node->responses[$i]->NodeResOrd      = $i;
                 $node->responses[$i]->NodeResEng      = $newResponses[$i]["eng"];
@@ -275,6 +276,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         $childrenPrints .= $this->adminBasicPrintNode($next, $tierDepth);
                     }
                 }
+                $conditionList = (sizeof($this->allNodes[$tierNode[0]]->conds) == 0) ? ''
+                    : '<div class="f12 slBlueDark">Condition' 
+                        . ((sizeof($this->allNodes[$tierNode[0]]->conds) > 1) ? 's' : '') . ' - '
+                        . view('vendor.survloop.admin.tree.node-list-conditions', [
+                            "conds" => $this->allNodes[$tierNode[0]]->conds
+                        ])->render() . '</div>';
                 if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
                     return view('vendor.survloop.admin.tree.node-print-basic', [
                         "canEditTree"    => $this->canEditTree, 
@@ -283,7 +290,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         "node"           => $this->allNodes[$tierNode[0]], 
                         "tierNode"       => $tierNode, 
                         "tierDepth"      => $tierDepth, 
-                        "childrenPrints" => $childrenPrints
+                        "childrenPrints" => $childrenPrints,
+                        "conditionList"  => $conditionList
                     ])->render();
                 }
             }

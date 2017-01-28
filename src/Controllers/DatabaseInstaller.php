@@ -19,8 +19,8 @@ class DatabaseInstaller extends AdminDBController
     protected function tweakAdmMenu($currPage = '')
     {
         $this->v["dateStamp"] = date("Y_m_d_His");
-        $this->v["zipFileMig"] = $this->v["exportDir"].'/'.$this->v["dateStamp"].'_LaravelMigrations.zip';
-        $this->v["zipFileModel"] = $this->v["exportDir"].'/'.$this->v["dateStamp"].'_LaravelModels.zip';
+        $this->v["zipFileMig"] = $this->v["exportDir"] . '/' . $this->v["dateStamp"] . '_LaravelMigrations.zip';
+        $this->v["zipFileModel"] = $this->v["exportDir"] . '/' . $this->v["dateStamp"] . '_LaravelModels.zip';
         return true;
     }
     
@@ -60,11 +60,13 @@ class DatabaseInstaller extends AdminDBController
                 } elseif ($fld->FldType == 'DATETIME') {
                     $tblQuery .= "DATETIME ";
                 }
-                if ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1) {
+                if (($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1)
+                    || ($fld->FldDefault && trim($fld->FldDefault) == 'NULL')) {
                     $tblQuery .= "NULL ";
                 }
                 if ($fld->FldDefault && trim($fld->FldDefault) != '') {
-                    $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
+                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
+                    else $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
                 }
                 $tblQuery .= ", \n";
                 if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
@@ -119,10 +121,10 @@ class DatabaseInstaller extends AdminDBController
             $this->v["fileListModel"] = [];
             $this->v["migrationFileUp"] = $this->v["migrationFileDown"] = '';
             $this->v["dumpOut"] = [
-                "Models"             => '', 
-                "Migrations"         => '', 
-                "Seeders"             => '', 
-                "Zip Files"         => ''
+                "Models"     => '', 
+                "Migrations" => '', 
+                "Seeders"    => '', 
+                "Zip Files"  => ''
             ];
             
             $modelPath = "App\\Models\\";
@@ -223,24 +225,26 @@ class DatabaseInstaller extends AdminDBController
                     }
                     file_put_contents($newModelFilename, $fullFileOut);
                     
-                    eval("\$seedChk = " . $modelPath . $this->v["tblClean"] . "::get();");
-                    if ($seedChk && sizeof($seedChk) > 0) {
-                        foreach ($seedChk as $seed) {
-                            $fldData = "\n\t\t\t'" . $tbl->TblAbbr . "ID' => " . $seed->getKey();
-                            if ($flds && sizeof($flds) > 0) {
-                                foreach ($flds as $i => $fld) {
-                                    $fldName = trim($tbl->TblAbbr . $fld->FldName);
-                                    if (isset($seed->{$fldName}) 
-                                        && trim($seed->{$fldName}) != trim($fld->FldDefault)) {
-                                        $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
-                                            . str_replace("'", "\'", $seed->{$fldName}) . "'";
+                    if (file_exists('../app/Models/' . $this->v["tblClean"] . '.php')) {
+                        eval("\$seedChk = " . $modelPath . $this->v["tblClean"] . "::get();");
+                        if ($seedChk && sizeof($seedChk) > 0) {
+                            foreach ($seedChk as $seed) {
+                                $fldData = "\n\t\t\t'" . $tbl->TblAbbr . "ID' => " . $seed->getKey();
+                                if ($flds && sizeof($flds) > 0) {
+                                    foreach ($flds as $i => $fld) {
+                                        $fldName = trim($tbl->TblAbbr . $fld->FldName);
+                                        if (isset($seed->{$fldName}) 
+                                            && trim($seed->{$fldName}) != trim($fld->FldDefault)) {
+                                            $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
+                                                . str_replace("'", "\'", $seed->{$fldName}) . "'";
+                                        }
                                     }
                                 }
-                            }
-                            if (trim($fldData) != '') {
-                                $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
-                                    . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
-                                    . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
+                                if (trim($fldData) != '') {
+                                    $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
+                                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
+                                        . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
+                                }
                             }
                         }
                     }
@@ -294,10 +298,12 @@ class DatabaseInstaller extends AdminDBController
             $transferData = array();
             if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0) {
                 foreach ($this->REQ->input('copyData') as $copyTbl) {
-                    eval("\$transferData[\$copyTbl] = " 
-                        . $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]]
-                        . "::get();");
-                    $this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
+                    if (file_exists('../app/Models/' . $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]])) {
+                        eval("\$transferData[\$copyTbl] = " 
+                            . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->tbl[$copyTbl])
+                            . "::get();");
+                        $this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
+                    }
                 }
             }
         

@@ -5,7 +5,9 @@
     <div class="col-md-8">
         <select id="setFldID" name="setFld" class="form-control f20">
             <option value="" SELECTED ></option>
-            <option value="EXISTS" > - If at least one record exists in this data set, then this condition clears.</option>
+            <option value="EXISTS=0" > - If zeros records exist in this data set, then this condition clears.</option>
+            <option value="EXISTS=1" > - If exactly one record exists in this data set, then this condition clears.</option>
+            <option value="EXISTS>0" > - If one or more records exist in this data set, then this condition clears.</option>
             <option value="EXISTS>1" > - If more than one record exists in this data set, then this condition clears.</option>
             <option value="" DISABLED ></option>
             <option value="" DISABLED >------------------</option>

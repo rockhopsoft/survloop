@@ -391,7 +391,6 @@ class DatabaseLookups
     
     protected function getDataSetRow($loopName)
     {
-        //if ($this->debugOn) echo 'getDataSetRow('.$tbl.', '.$set.')<br />';
         if ($loopName == '' || !isset($this->dataLoops[$loopName])) return array();
         return $this->dataLoops[$loopName];
     }
@@ -522,9 +521,9 @@ class DatabaseLookups
     {
         $tbls = [];
         $tblID = intVal($tblIn);
-        if (strpos($tblIn, 'loop-') !== false && sizeof($THIS->dataLoops) > 0) {
+        if (strpos($tblIn, 'loop-') !== false && sizeof($this->dataLoops) > 0) {
             $loopID = intVal(str_replace('loop-', '', $tblIn));
-            foreach ($THIS->dataLoops as $loopName => $loopRow) {
+            foreach ($this->dataLoops as $loopName => $loopRow) {
                 if ($loopRow->id == $loopID) {
                     $tblID = $this->tblI[$loopRow->DataLoopTable];
                 }
@@ -605,6 +604,7 @@ class DatabaseLookups
         if ($flds && sizeof($flds) > 0) {
             foreach ($flds as $f) {
                 $testName = $f->TblAbbr . $f->FldName; // $f->TblName . ':' . 
+                //echo 'FldName: ' . $fldName . ' ?== ' . $testName . '<br />';
                 if ($fldName == $testName) return $f->FldID;
             }
         }
@@ -652,7 +652,7 @@ class DatabaseLookups
                 if (trim($ret["prompt"]) == '' && trim($n->NodePromptText) != '') {
                     $ret["prompt"] = strip_tags($n->NodePromptText);
                 }
-                $res = SLNodeResponses::where('NodeResNode', intVal($n->NodeID))
+                $res = SLNodeResponses::where('NodeResNode', $n->NodeID)
                     ->orderBy('NodeResOrd', 'asc')
                     ->get();
                 if ($res && sizeof($res) > 0) {
@@ -683,7 +683,6 @@ class DatabaseLookups
         if ($request->has('oldConds') && intVal($request->oldConds) > 0) {
             return SLConditions::find(intVal($request->oldConds));
         }
-        
         $cond = new SLConditions;
         if ($request->has('condID') && intVal($request->condID) > 0) {
             $cond = SLConditions::find(intVal($request->condID));
@@ -692,24 +691,24 @@ class DatabaseLookups
         else $cond->CondDatabase = $this->dbID;
         $cond->CondTag = (($request->has('condHash')) ? $request->condHash : '#');
         if (substr($cond->CondTag, 0, 1) != '#') $cond->CondTag = '#' . $cond->CondTag;
-        $cond->CondDesc = (($request->has('condName')) ? $request->condDesc : '#');
+        $cond->CondDesc = (($request->has('condDesc')) ? $request->condDesc : '');
         $cond->CondOpts = 1;
         $cond->CondOperator = 'CUSTOM';
         $cond->CondOperDeet = 0;
-        $cond->CondField = $cond->CondTable = $cond->CondLoop = -3;
+        $cond->CondField = $cond->CondTable = $cond->CondLoop = 0;
         if ($request->has('setSelect')) {
             $tmp = trim($request->setSelect);
             if (strpos($tmp, 'loop-') !== false) {
                 $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
             } else {
-                $cond->CondTable = $THIS->tblI[$tmp];
+                $cond->CondTable = intVal($this->tblI[$tmp]);
             }
         }
         if ($request->has('setFld')) {
             $tmp = trim($request->setFld);
             if (substr($tmp, 0, 6) == 'EXISTS') {
-                $cond->CondOperator = 'EXISTS>';
-                $cond->CondOperDeet = (($tmp == 'EXISTS>1') ? 1 : 0);
+                $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
+                $cond->CondOperDeet = intVal(substr($tmp, 7));
             } else {
                 $cond->CondField = intVal($request->setFld);
                 if ($request->has('equals')) {

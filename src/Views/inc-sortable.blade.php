@@ -18,7 +18,9 @@
 $(function() { 
     $("#sortable").sortable({
         axis: "y",
-        update: function (event, ui) { document.getElementById("hidFrameID").src="{{ $submitURL }}&"+$(this).sortable("serialize"); }
+        update: function (event, ui) {
+            document.getElementById("hidFrameID").src="{{ $submitURL }}&"+$(this).sortable("serialize");
+        }
     });
     $("#sortable").disableSelection(); 
 });

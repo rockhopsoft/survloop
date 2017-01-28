@@ -199,10 +199,10 @@ class SurvLoop extends Controller
         return $this->custLoop->manageEmails($request);
     }
     
-    public function manageEmailsForm(Request $request)
+    public function manageEmailsForm(Request $request, $emailID = -3)
     {
         $this->loadLoopAdmin($request);
-        return $this->custLoop->manageEmailsForm($request);
+        return $this->custLoop->manageEmailsForm($request, $emailID);
     }
     
     

@@ -96,7 +96,7 @@ class SurvLoopNode extends CoreNode
         }
         $this->hasShowKids = false;
         if (sizeof($this->nodeRow) > 0) {
-            $this->responses = SLNodeResponses::where('NodeResNode', intVal($this->nodeID))
+            $this->responses = SLNodeResponses::where('NodeResNode', $this->nodeID)
                 ->orderBy('NodeResOrd', 'asc')
                 ->get();
             if (sizeof($this->responses) > 0) {

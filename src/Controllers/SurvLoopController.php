@@ -33,7 +33,7 @@ class SurvLoopController extends Controller
     
     protected function survLoopInit(Request $request, $currPage = '', $runExtra = true)
     {
-        if (!$this->survInitRun) {
+        if (!$this->survInitRun || !isset($GLOBALS["DB"])) {
             $this->survInitRun = true;
             if (sizeof($this->REQ) == 0) $this->REQ = $request;
             $this->v["user"]      = Auth::user();
@@ -45,7 +45,7 @@ class SurvLoopController extends Controller
             $this->v["content"]   = '';
             
             $this->v["currPage"] = $currPage;
-            if ($this->v["currPage"] == '') {
+            if (trim($this->v["currPage"]) == '') {
                 $this->v["currPage"] = $_SERVER["REQUEST_URI"];
                 if (strpos($this->v["currPage"], '?') !== false) {
                     $this->v["currPage"] = substr($this->v["currPage"], 0, strpos($this->v["currPage"], '?'));
@@ -72,17 +72,17 @@ class SurvLoopController extends Controller
     {
         if (!isset($GLOBALS["DB"])) {
             $db = $tree = 1;
-            if (isset($this->v["user"]) && $this->v["user"]->id > 0) {
-                $last = SLUsersActivity::whereIn('UserActCurrPage', [
-                        '/fresh/database', 
-                        '/fresh/user-experience', 
-                        '/dashboard/tree/switch', 
-                        '/dashboard/tree/new', 
-                        '/dashboard/db/switch', 
-                        '/dashboard/db/new'
-                    ])
-                    ->where('UserActUser', '=', $this->v["user"]->id)
+            if (isset($this->v["user"]) && intVal($this->v["user"]->id) > 0) {
+                $last = SLUsersActivity::where('UserActUser', '=', $this->v["user"]->id)
                     ->where('UserActVal', 'LIKE', '%;%')
+                    ->where(function ($query) {
+                        $query->where(  'UserActCurrPage', 'LIKE', '/fresh/database%')
+                              ->orWhere('UserActCurrPage', 'LIKE', '/fresh/user-experience%')
+                              ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/switch%')
+                              ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/new%')
+                              ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/db/switch%')
+                              ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/db/new%');
+                    })
                     ->orderBy('created_at', 'desc')
                     ->first();
                 if ($last && isset($last->UserActVal)) {
@@ -151,7 +151,9 @@ class SurvLoopController extends Controller
     {
         if ($baseOverride != '') $this->genCacheKey($baseOverride);
         if ($this->REQ->has('refresh')) { 
+            //echo '<div style="padding: 100px;">refreshForget!  ' . $this->cacheKey . '</div>'; 
             Cache::forget($this->cacheKey); 
+            //echo '<textarea>'; print_r(Cache::store('file')->get($this->cacheKey)); echo '</textarea>';
         }
         if (Cache::store('file')->has($this->cacheKey)) {
             $this->v["content"] = Cache::store('file')->get($this->cacheKey);
@@ -181,7 +183,8 @@ class SurvLoopController extends Controller
     {
         $log = new SLUsersActivity;
         $log->UserActUser = Auth::user()->id;
-        $log->UserActCurrPage = $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
+        $log->UserActCurrPage = $_SERVER["REQUEST_URI"];
+        if (strlen($log->UserActCurrPage) > 255) $log->UserActCurrPage = substr($log->UserActCurrPage, 0, 255);
         $log->UserActVal = $val;
         $log->save();
         return true;
@@ -243,7 +246,7 @@ class SurvLoopController extends Controller
             eval("\$CustAdmin = new " . $GLOBALS["DB"]->sysOpts["cust-abbr"] 
                 . "\\Controllers\\" . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Admin;");
             if ($CustAdmin && sizeof($CustAdmin) > 0) {
-                $CustAdmin->admControlInit($this->REQ);
+                $CustAdmin->admControlInit($this->REQ, $currPage);
                 $this->admMenuData["adminNav"] = $CustAdmin->loadAdmMenu();
             }
         }

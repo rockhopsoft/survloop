@@ -14,7 +14,13 @@
         @endif
         : {{ $GLOBALS["DB"]->getFullFldNameFromID($cond->CondField, false) }}
         
-        @if (trim($cond->CondOperator) == 'EXISTS>')
+        @if (trim($cond->CondOperator) == 'EXISTS=')
+            @if ($cond->CondOperDeet == 0)
+                <i>zero records exist</i>
+            @else
+                <i>exactly {{ $cond->CondOperDeet }} @if ($cond->CondOperDeet == 1) record exists @else records exist @endif </i>
+            @endif
+        @elseif (trim($cond->CondOperator) == 'EXISTS>')
             @if ($cond->CondOperDeet == 0)
                 <i>at least one record exists</i>
             @elseif ($cond->CondOperDeet > 0)

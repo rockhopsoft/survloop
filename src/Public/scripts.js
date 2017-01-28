@@ -1,5 +1,8 @@
 var allFldList = new Array();
-function addFld(fld) { allFldList[allFldList.length] = fld; return true; }
+function addFld(fld) {
+	allFldList[allFldList.length] = fld;
+	return true;
+}
 function blurAllFlds() {
 	for (var i=0; i<allFldList.length; i++) {
 		if (document.getElementById(allFldList[i])) document.getElementById(allFldList[i]).blur();

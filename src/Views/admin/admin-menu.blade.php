@@ -6,7 +6,6 @@
     <div class="panel list-group">
 
     @forelse ($adminNav as $i => $nav)
-    
         @if (isset($nav[0]))
             @if (!isset($nav[3]) || sizeof($nav[3]) <= 1)
                 <a href="{!! $nav[0] !!}" class="list-group-item  
@@ -43,6 +42,7 @@
                         ">
                         @foreach ($nA[3] as $k => $nB)
                 
+                
                             @if (!isset($nB[3]) || sizeof($nB[3]) == 0)
                                 <a href="{!! $nB[0] !!}" class="list-group-item 
                                 @if ($currNavPos[0] == $i && $currNavPos[1] == $j && $currNavPos[2] == $k) active @endif
@@ -76,10 +76,12 @@
                                 @endforeach
                                 </div>
                             @endif
+                            
                         
                         @endforeach
                         </div>
                     @endif
+                
                 
                 @endforeach
                 </div>

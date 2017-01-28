@@ -8,8 +8,11 @@ use Illuminate\Routing\Controller;
 
 use App\Models\User;
 use App\Models\SLDatabases;
+use App\Models\SLDefinitions;
 use App\Models\SLTree;
 use App\Models\SLNode;
+
+use App\Models\OPzComplaintEmails;
 
 use SurvLoop\Controllers\SurvLoopController;
 
@@ -34,8 +37,9 @@ class AdminController extends SurvLoopController
                 exit;
             }
             if (isset($GLOBALS["DB"]->sysOpts["cust-abbr"]) && $GLOBALS["DB"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-                eval("\$this->CustReport = new " . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+                eval("\$this->CustReport = new ". $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                     . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "Report(\$request);");
+                $this->CustReport->survLoopInit($request, $this->v["currPage"]);
                 $this->checkCurrPage();
             }
             list($this->v["yourUserInfo"], $this->v["yourContact"]) = $this->initPowerUser(Auth::user()->id);
@@ -55,10 +59,10 @@ class AdminController extends SurvLoopController
     
     protected function checkCurrPage()
     {
-        if (sizeof($this->CustReport) > 0) {
+        /* if (sizeof($this->CustReport) > 0) {
             $custPage = $this->CustReport->getCurrPage();
             if (trim($custPage) != '/') $this->v["currPage"] = $custPage;
-        }
+        } */
         return true;
     }
     
@@ -233,33 +237,24 @@ class AdminController extends SurvLoopController
         return [$treeMenu, $dbMenu];
     }
     
-    protected function admMenuCmpPage($menuLnk, $currPage)
-    {
-        if ($menuLnk == $currPage) return true;
-        if (strpos($menuLnk, '?') !== false) {
-            if ($currPage == substr($menuLnk, 0, strpos($menuLnk, '?'))) return true;
-        }
-        return false;
-    }
-    
     protected function getAdmMenuLoc($currPage)
     {
         $this->admMenuData["currNavPos"] = array(0, -1, -1, -1);
         if (sizeof($this->admMenuData["adminNav"]) > 0) {
             foreach ($this->admMenuData["adminNav"] as $i => $nav) {
-                if ($this->admMenuCmpPage($nav[0], $currPage)) {
+                if ($nav[0] == $currPage) {
                     $this->admMenuData["currNavPos"] = array($i, -1, -1, -1);
                 } elseif (sizeof($nav[3]) > 0) {
                     foreach ($nav[3] as $j => $nA) {
-                        if ($this->admMenuCmpPage($nA[0], $currPage)) {
+                        if ($nA[0] == $currPage) {
                             $this->admMenuData["currNavPos"] = array($i, $j, -1, -1);
                         } elseif (sizeof($nA[3]) > 0) {
                             foreach ($nA[3] as $k => $nB) {
-                                if ($this->admMenuCmpPage($nB[0], $currPage)) {
+                                if ($nB[0] == $currPage) {
                                     $this->admMenuData["currNavPos"] = array($i, $j, $k, -1);
                                 } elseif (sizeof($nB[3]) > 0) {
                                     foreach ($nB[3] as $l => $nC) {
-                                        if ($this->admMenuCmpPage($nC[0], $currPage)) {
+                                        if ($nC[0] == $currPage) {
                                             $this->admMenuData["currNavPos"] = array($i, $j, $k, $l);
                                         }
                                     }
@@ -523,27 +518,27 @@ class AdminController extends SurvLoopController
                 }
             }
         }
-        $this->v["emailList"] = OPCzComplaintEmails::orderBy('ComEmailName', 'asc')->orderBy('ComEmailType', 'asc')->get();
-        return view('vendor.OPC.admin.complaints.email-manage', $this->v);
+        $this->v["emailList"] = OPzComplaintEmails::orderBy('ComEmailName', 'asc')
+        	->orderBy('ComEmailType', 'asc')
+        	->get();
+        return view('vendor.openpolice.admin.complaints.email-manage', $this->v);
     }
     
     function manageEmailsForm(Request $request, $emailID = -3)
     {
         $this->admControlInit($request, '/dashboard/subs/emails');
         $this->v["currEmailID"] = $emailID;
-        $this->v["currEmail"] = new OPCzComplaintEmails;
-        if ($emailID > 0) {
-            $this->v["currEmail"] = OPCzComplaintEmails::find($emailID);
-        }
-        return view('vendor.OPC.admin.complaints.email-form', $this->v);
+        $this->v["currEmail"] = new OPzComplaintEmails;
+        if ($emailID > 0) $this->v["currEmail"] = OPzComplaintEmails::find($emailID);
+        return view('vendor.openpolice.admin.complaints.email-form', $this->v);
     }
     
     function manageEmailsPost(Request $request, $emailID)
     {
         if ($request->has('emailType')) {
-            $currEmail = new OPCzComplaintEmails;
+            $currEmail = new OPzComplaintEmails;
             if ($request->emailID > 0 && $request->emailID == $emailID) {
-                $currEmail = OPCzComplaintEmails::find($request->emailID);
+                $currEmail = OPzComplaintEmails::find($request->emailID);
             }
             $currEmail->ComEmailType     = $request->emailType;
             $currEmail->ComEmailName     = $request->emailName;

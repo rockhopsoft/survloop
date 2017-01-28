@@ -38,9 +38,8 @@ body {
 
 .navbar {
 	min-height: 50px;
-	background: #000;
 }
-.navbar-inverse {
+.navbar, .navbar-inverse {
 	background: #000;
 }
 .navbar-toggle {
@@ -54,21 +53,13 @@ body {
 #logoLrg, #logoMed, #logoSm {
 	display: inline;
 	margin-top: -10px;
-	margin-left: -25px;
 }
 #logoLrg img, #logoMed img, #logoSm img {
 	height: 40px;
 }
-#logoMed, #logoSm {
-    display: none;
-}
-#logoSm {
-    margin-top: -13px;
-    margin-bottom: -5px;
-}
-#logoSm img {
-    height: 30px;
-}
+#logoMed, #logoSm { display: none; }
+#logoSm { margin-top: -13px; margin-bottom: -5px; }
+#logoSm img { height: 30px; }
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	font-size: 32px;
 }
@@ -106,15 +97,15 @@ body {
 	-moz-border-radius: 8px; border-radius: 8px;
 }
 .nodeWrap .nodeSidenote {
+	font-size: 16px;
 	color: #888;
 	font-style: italic;
 	margin-bottom: 10px;
 	margin-top: -5px;
 }
 .nodeWrapError {
-	border-right: 4px #ec2327 solid;
-	border-top: 1px #f38c5f dotted;
-	border-bottom: 1px #f38c5f dotted;
+	padding: 10px 10px;
+	border: 3px #ec2327 dashed;
 }
 .nodeWrapError small.red {
 	color: #000;
@@ -125,7 +116,7 @@ body {
 }
 .nPrompt h1, .nPrompt h2 {
 	margin-top: -5px;
-	margin-bottom: 5px;
+	margin-bottom: 15px;
 	color: #000;
 }
 .nPromptHeader {
@@ -341,8 +332,10 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 
 .basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
 .basicTier5, .basicTier6, .basicTier7, .basicTier8, .basicTier9 {
-	margin: 0px 15px -1px 30px;
-	padding: 5px 5px 10px 10px;
+	/* padding: 5px 5px 10px 10px;
+	margin: 0px 15px -1px 30px; */
+    padding: 10px 5px 10px 5px;
+    margin: 0px 5px 0px 5px;
 	-moz-border-radius: 20px; border-radius: 20px;
 }
 .basicTier1 { border-left: 3px #63c6ff solid; }
@@ -653,12 +646,6 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 	input.nFormBtnSub, input.nFormBtnBack { font-size: 20px; }
 	.nKids { padding-left: 20px; }
 	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
-	
-	.basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
-	.basicTier5, .basicTier6, .basicTier7, .basicTier8, .basicTier9 {
-		padding: 10px 3px 20px 3px;
-		margin: 0px 3px 0px 3px;
-	}
 }
 @media screen and (max-width: 480px) {
 	#logoLrg { display: none; }

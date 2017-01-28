@@ -679,6 +679,7 @@ class SurvLoopData
                 return $newVal;
             } else {
                 //$GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl . '][' . $itemInd . '] for ' . $fld . '<br />';
+                //echo '<pre>'; print_r($this->dataSets); echo '</pre>';
             }
         }
         return $newVal;
@@ -784,19 +785,40 @@ class SurvLoopData
     {
         $passed = true;
         if ($cond && isset($cond->CondDatabase) && $cond->CondOperator != 'CUSTOM') {
-            $tblName = $GLOBALS["DB"]->tbl[$cond->CondTable];
             $loopName = ((intVal($cond->CondLoop) > 0) ? $GLOBALS["DB"]->dataLoopNames[$cond->CondLoop] : '');
+            if (intVal($cond->CondTable) <= 0 && trim($loopName) != '' && isset($GLOBALS["DB"]->dataLoops[$loopName])) {
+                $tblName = $GLOBALS["DB"]->dataLoops[$loopName]->DataLoopTable;
+            } else {
+                $tblName = $GLOBALS["DB"]->tbl[$cond->CondTable];
+            }
             //if ($tbl != $setTbl) list($setTbl, $setSet, $loopItemID) = $this->getDataSetTblTranslate($set, $tbl, $loopItemID);
-            if ($cond->CondOperator == 'EXISTS>') {
+            if ($cond->CondOperator == 'EXISTS=') {
+                if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
+                    && !isset($this->loopItemIDs[$loopName]))) {
+                    if (intVal($cond->CondOperDeet) == 0) {
+                        $passed = true;
+                    } else {
+                        $passed = false;
+                    }
+                } else {
+                    $existCnt = sizeof($this->dataSets[$tblName]);
+                    if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
+                    $passed = ($existCnt == intVal($cond->CondOperDeet));
+                }
+            } elseif ($cond->CondOperator == 'EXISTS>') {
                 if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
                     && !isset($this->loopItemIDs[$loopName]))) {
                     $passed = false;
                 } else {
                     $existCnt = sizeof($this->dataSets[$tblName]);
                     if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
-                    if (intVal($cond->CondOperDeet) == 0) $passed = ($existCnt > 0);
-                    elseif ($cond->CondOperDeet > 0)      $passed = ($existCnt > intVal($cond->CondOperDeet));
-                    elseif ($cond->CondOperDeet < 0)      $passed = ($existCnt < ((-1)*intVal($cond->CondOperDeet)));
+                    if (intVal($cond->CondOperDeet) == 0) {
+                        $passed = ($existCnt > 0);
+                    } elseif ($cond->CondOperDeet > 0) {
+                        $passed = ($existCnt > intVal($cond->CondOperDeet));
+                    } elseif ($cond->CondOperDeet < 0) {
+                        $passed = ($existCnt < ((-1)*intVal($cond->CondOperDeet)));
+                    }
                 }
             } elseif (intVal($cond->CondField) > 0) {
                 $fldName = $GLOBALS["DB"]->getFullFldNameFromID($cond->CondField, false);
@@ -808,11 +830,9 @@ class SurvLoopData
                 }
                 if (trim($currSessData) != '') {
                     if ($cond->CondOperator == '{') {
-                        $passed = (in_array($currSessData, $cond->condVals)); 
-                        // ($chk && sizeof($chk) > 0);   // show node if these values
+                        $passed = (in_array($currSessData, $cond->condVals));
                     } elseif ($cond->CondOperator == '}') {
-                        $passed = (!in_array($currSessData, $cond->condVals)); 
-                        // (!$chk || sizeof($chk) == 0); // skip node if these values
+                        $passed = (!in_array($currSessData, $cond->condVals));
                     }
                 } else {
                     if ($cond->CondOperator == '{') {
