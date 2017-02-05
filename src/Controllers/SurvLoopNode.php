@@ -133,6 +133,12 @@ class SurvLoopNode extends CoreNode
             && intVal($this->responses[$ind]->NodeResShowKids) == 1);
     }
     
+    public function indexMutEx($ind = '')
+    {
+        return (sizeof($this->responses) > 0 && isset($this->responses[$ind]) 
+            && intVal($this->responses[$ind]->NodeResMutEx) == 1);
+    }
+    
     public function splitTblFld($tblFld)
     {
         $tbl = $fld = '';
@@ -223,6 +229,8 @@ class SurvLoopNode extends CoreNode
     {
         return ($this->nodeOpts%$this->primeOpts["OnPrevLine"] == 0);
     }
+    
+    
     
     public function getManipUpdate()
     {

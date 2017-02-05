@@ -5,8 +5,9 @@
     @if ($cond->CondTag == '#NodeDisabled')
         <b class="red fPerc125">{{ $cond->CondTag }}</b>
     @elseif (trim($cond->CondOperator) == 'CUSTOM')
-        {{ $cond->CondTag }}
+        {{ $cond->CondTag }} Condition
     @else
+        {{ $cond->CondTag }} Condition <span class="dbColor">(
         @if (intVal($cond->CondLoop) > 0)
             {{ $GLOBALS["DB"]->getLoopName($cond->CondLoop) }}
         @else 
@@ -40,9 +41,9 @@
                 @endforeach
             @else
                 @if ($cond->CondOperator == '{')
-                    <span class="gry9">is in (</span> 
+                    <span class="gry9">is in {</span> 
                 @elseif ($cond->CondOperator == '}')
-                    <span class="gry9">is not in (</span>
+                    <span class="gry9">is not in {</span>
                 @endif
                 @foreach ($cond->condVals as $i => $val)
                     @if ($i > 0) , @endif
@@ -50,8 +51,9 @@
                         @if (trim($valInfo[0]) == trim($val)) {{ $valInfo[1] }} @endif 
                     @endforeach
                 @endforeach
-                <span class="gry9">)</span>
+                <span class="gry9">}</span>
             @endif
         @endif
+        )</span>
     @endif
 @endif

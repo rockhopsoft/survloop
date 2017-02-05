@@ -295,4 +295,21 @@ class SurvLoopController extends Controller
         return false;
     }
     
+    protected function loadLoopReportClass()
+    {
+        $class = "SurvLoop\\Controllers\\SurvLoopReport";
+        $chk = SLDefinitions::select('DefDescription')
+            ->where('DefDatabase', $this->dbID)
+            ->where('DefSet', 'System Settings')
+            ->where('DefSubset', 'cust-abbr')
+            ->first();
+        if ($chk && isset($chk->DefDescription)) {
+            $custClass = trim($chk->DefDescription) . "\\Controllers\\" . trim($chk->DefDescription) . "Report";
+            if (class_exists($custClass)) $class = $custClass;
+        }
+        return $class;
+    }
+    
+    
+    
 }

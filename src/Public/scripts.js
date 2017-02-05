@@ -82,9 +82,45 @@ function reqFormFldRadio(nID, maxOpts) {
 	else setFormLabelBlack(nID);
 	return true;
 }
+
 function reqFormFldDate(nID) {
-	//alert(document.getElementById('n'+nID+'fldYearID').value+'-'+document.getElementById('n'+nID+'fldMonthID').value+'-'+document.getElementById('n'+nID+'fldDayID').value);
-	if (document.getElementById('n'+nID+'fldYearID').value == '00' || document.getElementById('n'+nID+'fldMonthID').value == '00' || document.getElementById('n'+nID+'fldDayID').value == '00') {
+	if (document.getElementById('n'+nID+'fldYearID').value == '00' 
+	    || document.getElementById('n'+nID+'fldMonthID').value == '00' 
+	    || document.getElementById('n'+nID+'fldDayID').value == '00') {
+		setFormLabelRed(nID);
+		totFormErrors++;
+	}
+	else setFormLabelBlack(nID);
+	return true;
+}
+
+function reqFormFldDateLimit(nID, future, today) {
+    if (future == 0) return true;
+    var todayYear = parseInt(today.substring(0, 4));
+    var todayMonth = parseInt(today.substring(5, 7));
+    var todayDay = parseInt(today.substring(8, 10));
+	var userYear = parseInt(document.getElementById('n'+nID+'fldYearID').value);
+    var userMonth = parseInt(document.getElementById('n'+nID+'fldMonthID').value);
+    var userDay = parseInt(document.getElementById('n'+nID+'fldDayID').value);
+    var validDate = true;
+	if (future < 0) { // the past is valid
+	    if (userYear > todayYear) validDate = false;
+	    else if (userYear == todayYear) {
+            if (userMonth > todayMonth) validDate = false;
+            else if (userMonth == todayMonth) {
+                if (userDay > todayDay) validDate = false;
+	        }
+	    }
+	} else { // the future is valid
+	    if (userYear < todayYear) validDate = false;
+	    else if (userYear == todayYear) {
+            if (userMonth < todayMonth) validDate = false;
+            else if (userMonth == todayMonth) {
+                if (userDay < todayDay) validDate = false;
+	        }
+	    }
+	}
+	if (!validDate) {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -132,11 +168,32 @@ function formRequireGender(nID) {
 	return reqFormFldRadio(nID, 3);
 }
 
-function wordCountKeyUp(nID) {
+function focusNodeID(nID) {
+    var fldID = 'n'+nID+'FldID';
+    if (!document.getElementById(fldID)) {
+        fldID = 'n'+nID+'fld0';
+        if (!document.getElementById(fldID)) {
+            fldID = 'n'+nID+'fldMonthID';
+            if (!document.getElementById(fldID)) {
+                fldID = 'n'+nID+'fldHrID';
+                if (!document.getElementById(fldID)) {
+                    fldID = 'n'+nID+'fldFeetID';
+                    if (!document.getElementById(fldID)) {
+                        fldID = '';
+                    }
+                }
+            }
+        }
+    }
+    if (fldID != '') document.getElementById(fldID).focus();
+    return true;
+}
+
+function wordCountKeyUp(nID, limit) {
 	if (document.getElementById("n"+nID+"FldID") && document.getElementById("wordCnt"+nID+"")) {
 	  var cnt = getWordCnt(document.getElementById("n"+nID+"FldID"));
 	  var cntWords = "<span class=\'slRedLight\'>"+cnt+"</span>";
-	  if (cnt >= 200 && cnt <= 400) cntWords = "<span class=\'slBlueLight\'>"+cnt+"</span>";
+	  if (cnt < limit) cntWords = "<span class=\'slBlueLight\'>"+cnt+"</span>";
 	  document.getElementById("wordCnt"+nID+"").innerHTML=cntWords;
 	}
 	return true;
@@ -149,8 +206,45 @@ function nFldHP(nID) {
 	return true;
 }
 
+var nodeResTot = new Array();
+function addResTot(nID, tot) {
+    nodeResTot[nID] = tot;
+    return true;
+}
 
+var nodeMutEx = new Array();
+function addMutEx(nID, response) {
+    if (!nodeMutEx[nID]) nodeMutEx[nID] = new Array();
+    nodeMutEx[nID][nodeMutEx[nID].length] = response;
+    return true;
+}
 
+function checkMutEx(nID, response) {
+    if (nID > 0 && response > 0 && nodeMutEx[nID] && nodeMutEx[nID].length > 0) {
+        var hasMutEx = false;
+        var clickedMutEx = false;
+        for (var i=0; i<nodeMutEx[nID].length; i++) {
+            if (nodeMutEx[nID][i] == response) {
+                if (document.getElementById('n'+nID+'fld'+response+'').checked) {
+                    clickedMutEx = true;
+                    for (var j=0; j<nodeResTot[nID]; j++) {
+                        if (j != response) {
+                            document.getElementById('n'+nID+'fld'+j+'').checked = false;
+                        }
+                    }
+                }
+            }
+        }
+        if (!clickedMutEx) {
+            for (var i=0; i<nodeMutEx[nID].length; i++) {
+                if (nodeMutEx[nID][i] != response && document.getElementById('n'+nID+'fld'+response+'').checked) {
+                    document.getElementById('n'+nID+'fld'+nodeMutEx[nID][i]+'').checked = false;
+                }
+            }
+        }
+    }
+    return true;
+}
 
 
 // used by form generator child reveal responsiveness:

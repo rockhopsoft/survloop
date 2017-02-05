@@ -129,15 +129,16 @@ class SurvLoopTree extends CoreTree
                     $cacheNode = '$'.'this->allNodes[' . $row->NodeID . '] = '
                         . 'new SurvLoop\\Controllers\\SurvLoopNode(' 
                         . $row->NodeID . ', [], ['
-                        . '"pID" => '         . intVal($row->NodeParentID)     . ', '
-                        . '"pOrd" => '         . intVal($row->NodeParentOrder) . ', '
-                        . '"opts" => '         . intVal($row->NodeOpts)         . ', '
-                        . '"type" => \''     . $row->NodeType                 . '\', '
-                        . '"branch" => \''     . $row->NodeDataBranch             . '\', '
-                        . '"store" => \''     . $row->NodeDataStore             . '\', '
-                        . '"set" => \''     . $row->NodeResponseSet         . '\', '
-                        . '"def" => \''     . $row->NodeDefault             . '\''
+                        . '"pID" => '     . intVal($row->NodeParentID)    . ', '
+                        . '"pOrd" => '    . intVal($row->NodeParentOrder) . ', '
+                        . '"opts" => '    . intVal($row->NodeOpts)        . ', '
+                        . '"type" => "'   . $row->NodeType                . '", '
+                        . '"branch" => "' . $row->NodeDataBranch          . '", '
+                        . '"store" => "'  . $row->NodeDataStore           . '", '
+                        . '"set" => "'    . $row->NodeResponseSet         . '", '
+                        . '"def" => "'    . $row->NodeDefault             . '"'
                         . ']);' . "\n";
+                    //echo '???? <br />' . $cacheNode . '<br />';
                     eval($cacheNode);
                     $cache .= $cacheNode;
                 }
@@ -1423,7 +1424,8 @@ class SurvLoopTree extends CoreTree
         
         $ret .= $this->pushCurrNodeURL($this->currNode())
             . '<div id="treeWrap">' . "\n" 
-                . $this->loadProgBar() . "\n" 
+                . (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0) // Check Is Not An Exit Page
+                    ? $this->loadProgBar() : '') . "\n" 
                 . '<a name="maincontent" id="maincontent"></a>' . "\n";
         
                 $this->getPrintSpecs($this->currNode(), $this->currNodeSubTier);
@@ -1556,7 +1558,15 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
-    
+    public function previewReportPubPri()
+    {
+        eval("\$treeClassReport = new " . $this->loadLoopReportClass() . "(\$this->REQ, \$this->coreID);");
+        $treeClassReport->loadSessionData($this->coreID);
+        $treeClassReport->hideDisclaim = true;
+        $previewPublic = $treeClassReport->printFullReport('Public');
+        $previewPrivate = $treeClassReport->printFullReport('Investigate');
+        return [$previewPublic, $previewPrivate];
+    }
     
     
 }

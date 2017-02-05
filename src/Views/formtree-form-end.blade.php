@@ -28,7 +28,8 @@ function checkNodeForm() {
     clearFormErrs();
     return true; 
 }
-function checkNodeUp() {
+function checkNodeUp(nID, response) {
+    checkMutEx(nID, response);
     if (hasAttemptedSubmit) checkNodeForm();
     return true;
 }
@@ -75,10 +76,15 @@ $(function() {
         return runFormSub();
     });
     $(document).on("click", ".nFormLnkEdit", function() {
-        //alert('nFormLnkEdit clicked');
         var upID = getUpID( $(this).attr("id") );
-        $("#up"+upID+"Info").slideToggle("fast");
-        $("#up"+upID+"InfoEdit").slideToggle("fast");
+        if (document.getElementById("up"+upID+"Info").style.display == 'none') {
+            document.getElementById("up"+upID+"Info").style.display = 'block';
+            document.getElementById("up"+upID+"InfoEdit").style.display = 'none';
+        }
+        else {
+            document.getElementById("up"+upID+"Info").style.display = 'none';
+            document.getElementById("up"+upID+"InfoEdit").style.display = 'block';
+        }
         document.getElementById("up"+upID+"EditVisibID").value="1";
         return true;
     });

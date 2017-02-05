@@ -53,6 +53,14 @@
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noNodeID') === false)
             <a href="/dashboard/tree/map/node/{{ $nID }}" class="btn btn-xs btn-default circleBtn1">#{{ $nID }}</a> 
         @endif
+        <span class="gry9 mR10">
+            @if ($node->isPage() && $node->nodeRow->NodeOpts%29 == 0)
+                <span class="red"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
+            @elseif ($node->isBranch() && $nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node
+            @elseif ($node->isBranch()) Branch
+            @elseif (!$node->isDataManip()) {{ $node->nodeRow->NodeType }}
+            @endif
+        </span>
         @if ($node->isBranch())
             <span class="slBlueDark f26 opac80" title="Branch Title"><i class="fa fa-share-alt"></i>
         @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
@@ -68,32 +76,25 @@
         
         @if ($node->isBranch())
         
-            <span class="f26 mR10 slBlueDark opac80"><b>{{ $node->nodeRow->NodePromptText }}</b></span>
-            <span class="f14 gry9">
-                @if ($nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node @else Branch @endif
-            </span>
+            <span class="f26 slBlueDark opac80"><b>{{ $node->nodeRow->NodePromptText }}</b></span>
             {!! $conditionList !!}
             
         @elseif ($node->isPage())
         
             <a @if (!$REQ->has('print')) 
                 href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" 
-                target="_blank" @endif class="f20 mR20">
-            <span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>
-                {{ $node->nodeRow->NodePromptNotes }}
+                target="_blank" @endif class="f20">
+                /{{ $node->nodeRow->NodePromptNotes }}
             </a>
-            <span class="f14 gry9">{{ $node->nodeRow->NodeType }}</span>
             {!! $conditionList !!}
             
         @elseif ($node->isLoopRoot())
         
             <span class="slBlueDark f30">{{ $node->nodeRow->NodeDataBranch }}</span> 
-            <span class="f14 gry9 mL10">{{ $node->nodeRow->NodeType }}</span>
             <a @if (!$REQ->has('print')) 
                 href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" 
-                target="_blank" @endif class="f20 mL10">
-            <span class="f14">{{ str_replace('https://', '', $GLOBALS['DB']->treeRow->TreeRootURL) }}/u/</span>
-            {{ $node->nodeRow->NodePromptNotes }}</a>
+                target="_blank" @endif class="f20">
+                /{{ $node->nodeRow->NodePromptNotes }}</a>
             <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
             {!! $conditionList !!}
             
@@ -124,8 +125,6 @@
             @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
             @if (!$REQ->has('alt'))
             
-                <span class="f14 @if ($node->isDataManip()) gryA ital @else gry9 @endif "
-                    >{{ $node->nodeRow->NodeType }}</span>
                 {!! $conditionList !!}
                 
             @else
@@ -137,7 +136,6 @@
                         @endif
                         {!! $conditionList !!}
                         <div class=" @if ($node->isLoopRoot()) f18 bld slBlueDark @else f14 @endif ">
-                            {{ $node->nodeRow->NodeType }}
                             @if ($node->isLoopRoot())
                                 @if (sizeof($GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]->conds) > 0) 
                                     {!! view('vendor.survloop.admin.tree.node-list-conditions', [

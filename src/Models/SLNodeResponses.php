@@ -15,5 +15,6 @@ class SLNodeResponses extends Model
         'NodeResEng', 
         'NodeResValue', 
         'NodeResShowKids', 
+        'NodeResMutEx'
     ];
 }

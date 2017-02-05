@@ -177,9 +177,10 @@ class SurvLoopCreateTables extends Migration
             $table->integer('NodeResNode')->unsigned()->nullable();
             //$table->foreign('NodeResNode')->references('NodeID')->on('SL_Node');
             $table->integer('NodeResOrd')->default('0')->nullable();
-            $table->string('NodeResEng')->nullable();
+            $table->longText('NodeResEng')->nullable();
             $table->string('NodeResValue')->nullable();
             $table->boolean('NodeResShowKids')->default('0')->nullable();
+            $table->boolean('NodeResMutEx')->default('0')->nullable();
             $table->timestamps();
         });
         Schema::create('SL_Conditions', function(Blueprint $table)

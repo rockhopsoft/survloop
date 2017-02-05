@@ -85,6 +85,7 @@ class StatesUS
     
     public function getState($abbr = '')
     {
+        if ($abbr == '') return '';
         if ($abbr == 'US') return 'Federal';
         return $this->stateList[$abbr];
     }
