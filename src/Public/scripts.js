@@ -28,20 +28,36 @@ var totFormErrors = 0;
 var formErrorsEng = '';
 
 function setFormErrs() {
-	if (document.getElementById('formErrorMsg')) document.getElementById('formErrorMsg').innerHTML = '<i class="fa fa-arrow-up"></i> Please complete all required fields. '+formErrorsEng;
+	if (document.getElementById('formErrorMsg')) {
+	    document.getElementById('formErrorMsg').innerHTML = '<h2>Please complete all required fields. <i class="fa fa-arrow-up"></i>'+formErrorsEng+'</h2>';
+	    document.getElementById('formErrorMsg').style.display = 'block';
+	}
 	return true;
 }
 function clearFormErrs() {
-	if (document.getElementById('formErrorMsg')) document.getElementById('formErrorMsg').innerHTML = '';
+	if (document.getElementById('formErrorMsg')) {
+	    document.getElementById('formErrorMsg').innerHTML = '';
+	    document.getElementById('formErrorMsg').style.display = 'none';
+	}
 	return true;
 }
 
 function setFormLabelBlack(nID) {
-	if (document.getElementById('node'+nID+'')) 		document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrapError', 'nodeWrap');
+	if (document.getElementById('node'+nID+'')) {
+	    document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrapError', 'nodeWrap');
+	}
 	return true;
 }
+
+var firstNodeError = 0;
 function setFormLabelRed(nID) {
-	if (document.getElementById('node'+nID+'')) 		document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrap', 'nodeWrapError').replace('nodeWrapErrorError', 'nodeWrapError');
+    if (firstNodeError <= 0) {
+        firstNodeError = nID;
+        window.location='#n'+nID+'';
+    }
+	if (document.getElementById('node'+nID+'')) {
+	    document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrap', 'nodeWrapError').replace('nodeWrapErrorError', 'nodeWrapError');
+	}
 	return true;
 }
 
@@ -83,10 +99,14 @@ function reqFormFldRadio(nID, maxOpts) {
 	return true;
 }
 
+function checkFldDate(nID) {
+    return (document.getElementById('n'+nID+'fldYearID').value != '00' 
+	    && document.getElementById('n'+nID+'fldMonthID').value != '00' 
+	    && document.getElementById('n'+nID+'fldDayID').value != '00');
+}
+
 function reqFormFldDate(nID) {
-	if (document.getElementById('n'+nID+'fldYearID').value == '00' 
-	    || document.getElementById('n'+nID+'fldMonthID').value == '00' 
-	    || document.getElementById('n'+nID+'fldDayID').value == '00') {
+	if (!checkFldDate(nID)) {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -94,32 +114,36 @@ function reqFormFldDate(nID) {
 	return true;
 }
 
-function reqFormFldDateLimit(nID, future, today) {
+function reqFormFldDateLimit(nID, future, today, optional) {
     if (future == 0) return true;
-    var todayYear = parseInt(today.substring(0, 4));
-    var todayMonth = parseInt(today.substring(5, 7));
-    var todayDay = parseInt(today.substring(8, 10));
-	var userYear = parseInt(document.getElementById('n'+nID+'fldYearID').value);
-    var userMonth = parseInt(document.getElementById('n'+nID+'fldMonthID').value);
-    var userDay = parseInt(document.getElementById('n'+nID+'fldDayID').value);
-    var validDate = true;
-	if (future < 0) { // the past is valid
-	    if (userYear > todayYear) validDate = false;
-	    else if (userYear == todayYear) {
-            if (userMonth > todayMonth) validDate = false;
-            else if (userMonth == todayMonth) {
-                if (userDay > todayDay) validDate = false;
-	        }
-	    }
-	} else { // the future is valid
-	    if (userYear < todayYear) validDate = false;
-	    else if (userYear == todayYear) {
-            if (userMonth < todayMonth) validDate = false;
-            else if (userMonth == todayMonth) {
-                if (userDay < todayDay) validDate = false;
-	        }
-	    }
-	}
+    validDate = true;
+    if (optional == 1 && !checkFldDate(nID)) { }
+    else if (checkFldDate(nID)) {
+        var todayYear = parseInt(today.substring(0, 4));
+        var todayMonth = parseInt(today.substring(5, 7));
+        var todayDay = parseInt(today.substring(8, 10));
+        var userYear = parseInt(document.getElementById('n'+nID+'fldYearID').value);
+        var userMonth = parseInt(document.getElementById('n'+nID+'fldMonthID').value);
+        var userDay = parseInt(document.getElementById('n'+nID+'fldDayID').value);
+        if (future < 0) { // the past is valid
+            if (userYear > todayYear) validDate = false;
+            else if (userYear == todayYear) {
+                if (userMonth > todayMonth) validDate = false;
+                else if (userMonth == todayMonth) {
+                    if (userDay > todayDay) validDate = false;
+                }
+            }
+        } else { // the future is valid
+            if (userYear < todayYear) validDate = false;
+            else if (userYear == todayYear) {
+                if (userMonth < todayMonth) validDate = false;
+                else if (userMonth == todayMonth) {
+                    if (userDay < todayDay) validDate = false;
+                }
+            }
+        }
+    }
+    else validDate = false;
 	if (!validDate) {
 		setFormLabelRed(nID);
 		totFormErrors++;
@@ -166,6 +190,32 @@ function formRequireGender(nID) {
 		return reqFormFldRadio(nID, 4);  // we also have 'Not Sure'
 	}
 	return reqFormFldRadio(nID, 3);
+}
+
+function checkNodeUp(nID, response, isMobile) {
+    checkMutEx(nID, response);
+    if (isMobile == 1) checkFingerClass(nID);
+    if (hasAttemptedSubmit) checkNodeForm();
+    return true;
+}
+
+function formKeyUpOther(nID, j) {
+    if (document.getElementById('n'+nID+'fldOtherID').value.trim() != '') {
+        document.getElementById('n'+nID+'fld'+j+'').checked=true;
+        checkFingerClass(nID);
+    }
+    return true;
+}
+
+function formClickGender(nID) {
+    if (document.getElementById('n'+nID+'fldOtherID')) {
+        if ((document.getElementById('n'+nID+'fld0') && document.getElementById('n'+nID+'fld0').checked)
+            || (document.getElementById('n'+nID+'fld1') && document.getElementById('n'+nID+'fld1').checked)
+            || (document.getElementById('n'+nID+'fld3') && document.getElementById('n'+nID+'fld3').checked)) {
+            document.getElementById('n'+nID+'fldOtherID').value = '';
+        }
+    }
+    return true;
 }
 
 function focusNodeID(nID) {
@@ -216,6 +266,19 @@ var nodeMutEx = new Array();
 function addMutEx(nID, response) {
     if (!nodeMutEx[nID]) nodeMutEx[nID] = new Array();
     nodeMutEx[nID][nodeMutEx[nID].length] = response;
+    return true;
+}
+
+function checkFingerClass(nID) {
+    for (var j=0; j<nodeResTot[nID]; j++) {
+        if (document.getElementById('n'+nID+'fld'+j+'lab') 
+            && document.getElementById('n'+nID+'fld'+j+'')) {
+            if (document.getElementById('n'+nID+'fld'+j+'').checked) {
+                document.getElementById('n'+nID+'fld'+j+'lab').className = 'fingerAct';
+            }
+            else document.getElementById('n'+nID+'fld'+j+'lab').className = 'finger';
+        }
+    }
     return true;
 }
 
@@ -297,6 +360,18 @@ function reqUploadTitle(nID) {
 	return true;
 }
 
+function checkAjaxLoad() {
+    if (document.getElementById('ajaxWrapLoad')) {
+        if (document.getElementById('ajaxWrapLoad').style.display != 'none') {
+            if (document.getElementById('postNodeForm') || document.getElementById('footerLinks')) {
+                document.getElementById('ajaxWrapLoad').style.display = 'none';
+            }
+            setTimeout("checkAjaxLoad()", 50);
+        }
+    }
+    return true;
+}
+setTimeout("checkAjaxLoad()", 100);
 
 var main = function(){
 	if (document.getElementById('fixedHeader')) {
@@ -315,8 +390,8 @@ $(document).ready(main);
 $(function() {
 	
 	$(document).on("click", ".upTypeBtn", function() {
-		var nID = $(this).attr("name").replace("up", "").replace("Type", "");
-		if (document.getElementById("up"+nID+"Type0") && document.getElementById("up"+nID+"Type0").checked) { // (Video)
+		var nID = $(this).attr("name").replace("n", "").replace("fld", "");
+		if (document.getElementById("n"+nID+"fld0") && document.getElementById("n"+nID+"fld0").checked) { // (Video)
 			$("#up"+nID+"FormFile").slideUp("fast");
 			$("#up"+nID+"FormVideo").slideDown("fast");
 		}

@@ -35,12 +35,19 @@ class SurvLoopData
     
     public function loadCore($coreID = -3, $dataBranches = [], $checkboxNodes = [], $privacy = 'public')
     {
-        $this->coreID        = $coreID;
+        $this->setCoreID($coreID);
         $this->dataBranches  = $dataBranches;
         $this->checkboxNodes = $checkboxNodes;
         $this->privacy       = $privacy;
         $this->refreshDataSets();
         $this->loaded = true;
+        return true;
+    }
+    
+    
+    public function setCoreID($coreID = -3)
+    {
+        $this->coreID = $coreID;
         return true;
     }
     
@@ -179,7 +186,7 @@ class SurvLoopData
             foreach ($flds as $fldKey) {
                 $foreignTbl = $GLOBALS["DB"]->tbl[$fldKey->FldForeignTable];
                 if ($fldKey->FldForeignTable == $GLOBALS["DB"]->treeRow->TreeCoreTable) {
-                    $linkages["outgoing"][] = [$GLOBALS["DB"]->tblAbbr[$tbl].$fldKey->FldName, $this->coreID];
+                    $linkages["outgoing"][] = [$GLOBALS["DB"]->tblAbbr[$tbl] . $fldKey->FldName, $this->coreID];
                 } else { // not the special Core case, so find an ancestor
                     list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
                     if ($loopID > 0) {
@@ -221,25 +228,32 @@ class SurvLoopData
         foreach ($linkages["outgoing"] as $i => $link) {
             $eval .= "where('" . $link[0] . "', '" . $link[1] . "')->";
         }
-        eval("\$recObj = " . $GLOBALS["DB"]->modelPath($tbl) . "::" . $eval . "first();");
+        $eval = "\$recObj = " . $GLOBALS["DB"]->modelPath($tbl) . "::" . $eval . "first();";
+        eval($eval);
+        return $recObj;
+    }
+    
+    public function newDataRecordInner($tbl = '', $linkages = [])
+    {
+        eval("\$recObj = new " . $GLOBALS["DB"]->modelPath($tbl) . ";");
+        if (sizeof($linkages["outgoing"]) > 0) {
+            foreach ($linkages["outgoing"] as $i => $link) {
+                $recObj->{ $link[0] } = $link[1];
+            }
+        }
+        $recObj->save();
+        $setInd = $this->initDataSet($tbl);
+        $this->dataSets[$tbl][$setInd] = $recObj;
+        $this->id2ind[$tbl][$recObj->getKey()] = $setInd;
         return $recObj;
     }
     
     public function newDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
     {
         if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal, true);
-        $recObj = $this->checkNewDataRecordSimple($tbl, $fld, $newVal, $linkages, $forceAdd);
+        $recObj = $this->checkNewDataRecord($tbl, $fld, $newVal, $linkages, $forceAdd);
         if (!$recObj || sizeof($recObj) == 0 || $forceAdd) {
-            eval("\$recObj = new " . $GLOBALS["DB"]->modelPath($tbl) . ";");
-            if (sizeof($linkages["outgoing"]) > 0) {
-                foreach ($linkages["outgoing"] as $i => $link) {
-                    $recObj->{ $link[0] } = $link[1];
-                }
-            }
-            $recObj->save();
-            $setInd = $this->initDataSet($tbl);
-            $this->dataSets[$tbl][$setInd] = $recObj;
-            $this->id2ind[$tbl][$recObj->getKey()] = $setInd;
+            $recObj = $this->newDataRecordInner($tbl, $linkages);
         }
         return $recObj;
     }
@@ -266,21 +280,14 @@ class SurvLoopData
         return $recObj;
     }
     
-    public function checkNewDataRecordSimple($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
-    {
-        if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal, true);
-        if (sizeof($linkages["outgoing"]) > 0) {
-            $recObj = $this->findRecLinkOutgoing($tbl, $linkages);
-            if ($recObj && sizeof($recObj) > 0) return $recObj;
-        }
-        return [];
-    }
-    
     public function checkNewDataRecord($tbl = '', $fld = '', $newVal = -3, $linkages = [], $forceAdd = false)
     {
         $recObj = [];
         if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal);
-        if (sizeof($linkages["incoming"]) > 0) {
+        if (sizeof($linkages["outgoing"]) > 0) {
+            $recObj = $this->findRecLinkOutgoing($tbl, $linkages);
+        }
+        if ((!$recObj || sizeof($recObj) == 0) && sizeof($linkages["incoming"]) > 0) {
             foreach ($linkages["incoming"] as $link) {
                 $incomingInd = $this->getRowInd($link[0], intVal($link[2]));
                 if (isset($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }) 
@@ -290,8 +297,8 @@ class SurvLoopData
                 }
             }
         }
-        if (!$recObj || sizeof($recObj) == 0) {
-            $recObj = $this->checkNewDataRecordSimple($tbl, $fld, $newVal, $linkages, $forceAdd);
+        if ((!$recObj || sizeof($recObj) == 0) && $forceAdd) {
+            $recObj = $this->newDataRecordInner($tbl, $linkages);
         }
         return $recObj;
     }
@@ -529,7 +536,9 @@ class SurvLoopData
         if (intVal($GLOBALS["DB"]->closestLoop["obj"]->DataLoopAutoGen) == 1) {
             // auto-generate new record in the standard way
             $newFld = $newVal = '';
-            $GLOBALS["DB"]->closestLoop["obj"]->loadConds();
+            if (isset($GLOBALS["DB"]->closestLoop["obj"]->DataLoopTree)) {
+                $GLOBALS["DB"]->closestLoop["obj"]->loadConds();
+            }
             if (sizeof($GLOBALS["DB"]->closestLoop["obj"]->conds) > 0) {
                 if ($GLOBALS["DB"]->closestLoop["obj"]->conds 
                     && sizeof($GLOBALS["DB"]->closestLoop["obj"]->conds) > 0) {
@@ -569,9 +578,9 @@ class SurvLoopData
         if (!$foundBranch) {
             if (intVal($itemID) <= 0) $itemID = $this->sessChildIDFromParent($tbl);
             $this->dataBranches[] = [
-                "branch"     => $tbl,
-                "loop"         => '',
-                "itemID"    => $itemID
+                "branch" => $tbl,
+                "loop"   => '',
+                "itemID" => $itemID
             ];
         }
         return true;
@@ -599,8 +608,7 @@ class SurvLoopData
                 list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $this->dataBranches[$i]);
             }
         }
-        if (intVal($itemID) <= 0 && !$hasParentDataManip)
-        {
+        if (intVal($itemID) <= 0 && !$hasParentDataManip) {
             $itemID = $this->sessChildIDFromParent($tbl);
             if ($itemID > 0) {
                 $itemInd = $this->getRowInd($tbl, $itemID);
@@ -695,7 +703,8 @@ class SurvLoopData
             // check for newly submitted responses...
             if (sizeof($newVals) > 0) {
                 foreach ($newVals as $i => $val) {
-                    if (!in_array($val, $helpInfo["pastVals"])) {
+                    if (!in_array($val, $helpInfo["pastVals"]) && isset($helpInfo["link"]->DataHelpTable)) {
+                        //echo '<pre>'; print_r($helpInfo); echo '</pre>' . $tbl . ', ' . $fld . ', DataHelpTable: ' . $helpInfo["link"]->DataHelpTable . '<br />';
                         eval("\$newObj = new " . $GLOBALS["DB"]->modelPath($helpInfo["link"]->DataHelpTable) . ";");
                         $newObj->{ $helpInfo["link"]->DataHelpKeyField }   = $helpInfo["parentID"];
                         $newObj->{ $helpInfo["link"]->DataHelpValueField } = $val;

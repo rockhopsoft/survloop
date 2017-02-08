@@ -23,6 +23,7 @@ class SurvLoopServiceProvider extends ServiceProvider
               __DIR__.'/Views'         => base_path('resources/views/vendor/survloop'),
               __DIR__.'/Views/auth'     => base_path('resources/views/auth'),
               __DIR__.'/Public'         => base_path('public/survloop'),
+              __DIR__.'/Models'         => base_path('app/Models/SurvLoop'),
               __DIR__.'/Models'         => base_path('app/Models'),
               __DIR__.'/Database/' . $migFile 
                   => base_path('database/migrations/' . $migFile),

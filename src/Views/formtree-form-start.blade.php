@@ -1,6 +1,9 @@
 <!-- resources/views/vendor/survloop/formtree-form-start.blade.php -->
 
-<form id="postNodeForm" name="postNode" method="post" @if (sizeof($pageHasUpload) > 0) enctype="multipart/form-data" @endif >
+<form id="postNodeForm" name="postNode" method="post" 
+    @if (sizeof($pageHasUpload) > 0) enctype="multipart/form-data" @endif 
+    @if ($hasRegisterNode) action="/register" target="_parent" @endif
+    >
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="ajax" value="1">
 <input type="hidden" name="node" id="nodeID" value="{{ $nID }}">

@@ -340,6 +340,7 @@ class SurvLoopTree extends CoreTree
     // returns array of DataBranch tables, [0] being the closest related to the current node's data
     protected function loadNodeDataBranch($nID = -3)
     {
+        $this->sessData->setCoreID($this->coreID); // not sure why this is needed
         $nIDtmp = $nID;
         $parents = array($nID);
         while ($this->hasNode($nIDtmp)) {
@@ -348,13 +349,15 @@ class SurvLoopTree extends CoreTree
         }
         $this->sessData->dataBranches = [];
         $this->sessData->dataBranches[] = [
-            "branch"     => $GLOBALS["DB"]->coreTbl, 
-            "loop"         => '', 
-            "itemID"     => $this->coreID 
+            "branch" => $GLOBALS["DB"]->coreTbl, 
+            "loop"   => '', 
+            "itemID" => $this->coreID 
         ];
         if (sizeof($parents) > 1) {
             for ($i = (sizeof($parents)-2); $i >= 0; $i--) {
-                if (trim($this->allNodes[$parents[$i]]->dataBranch) != '') {
+                if ($this->allNodes[$parents[$i]]->nodeType == 'Data Manip: New') {
+                    $this->loadManipBranch($parents[$i], true);
+                } elseif (trim($this->allNodes[$parents[$i]]->dataBranch) != '') {
                     $nBranch = $this->allNodes[$parents[$i]]->dataBranch;
                     $addBranch = $addLoop = '';
                     $itemID = -3;
@@ -364,14 +367,15 @@ class SurvLoopTree extends CoreTree
                         $itemID = $GLOBALS["DB"]->getSessLoopID($nBranch);
                     } else {
                         $addBranch = $nBranch;
-                        list($itemInd, $itemID) = $this->sessData->currSessDataPos($nBranch);
+                        list($itemInd, $itemID) = $this->sessData->currSessDataPos($nBranch, 
+                            $this->allNodes[$parents[$i]]->isDataManip());
                     }
                     $foundBranch = false; // $this->sessData->chkDataBranch($addBranch, $dataBranch);
                     if (!$foundBranch) {
                         $this->sessData->dataBranches[] = [
-                            "branch"     => $addBranch,
-                            "loop"         => $addLoop,
-                            "itemID"    => $itemID
+                            "branch" => $addBranch,
+                            "loop"   => $addLoop,
+                            "itemID" => $itemID
                         ];
                     }
                 }
@@ -390,7 +394,7 @@ class SurvLoopTree extends CoreTree
     
     public function sessDump($lastNode = -3)
     {
-        if ($this->debugOn && false) {
+        if ($this->debugOn && true) {
             $userName = (($this->v["user"]) ? $this->v["user"]->name : '');
             ob_start();
             print_r($this->REQ->all());
@@ -456,7 +460,15 @@ class SurvLoopTree extends CoreTree
         return true;
     }
     
-    protected function loadSessionDataSavesExceptions($nID) { return false; }
+    protected function loadSessionDataSavesExceptions($nID)
+    {
+        return false;
+    }
+    
+    protected function isAnonyLogin()
+    {
+        return false;
+    }
     
     protected function fldToLog($fldName)
     {
@@ -653,7 +665,9 @@ class SurvLoopTree extends CoreTree
         $this->sessData->loopItemIDs = [];
         if (isset($GLOBALS["DB"]->dataLoops) && sizeof($GLOBALS["DB"]->dataLoops) > 0) {
             foreach ($GLOBALS["DB"]->dataLoops as $loopName => $loop) {
-                $GLOBALS["DB"]->dataLoops[$loopName]->loadConds();
+                if (isset($GLOBALS["DB"]->dataLoops[$loopName]->DataLoopTree)) {
+                    $GLOBALS["DB"]->dataLoops[$loopName]->loadConds();
+                }
             }
             foreach ($GLOBALS["DB"]->dataLoops as $loopName => $loop) {
                 $this->sessData->loopItemIDs[$loop->DataLoopPlural] = $sortable = [];
@@ -752,14 +766,14 @@ class SurvLoopTree extends CoreTree
         return true;
     }
     
-    protected function loadManipBranch($nID)
+    protected function loadManipBranch($nID, $force = false)
     {
         if (in_array($this->allNodes[$nID]->nodeType, ['Data Manip: New', 'Data Manip: Wrap'])) { // Data Manip: Update
             list($tbl, $fld, $newVal) = $this->allNodes[$nID]->getManipUpdate();
             if ($this->allNodes[$nID]->nodeType == 'Data Manip: Wrap') {
                 $tbl = $this->allNodes[$nID]->dataBranch;
             }
-            $manipBranchRow = $this->sessData->checkNewDataRecord($tbl, $fld, $newVal);
+            $manipBranchRow = $this->sessData->checkNewDataRecord($tbl, $fld, $newVal, [], $force);
             if ($manipBranchRow && sizeof($manipBranchRow) > 0) {
                 $this->sessData->startTmpDataBranch($tbl, $manipBranchRow->getKey());
             }
@@ -1030,7 +1044,8 @@ class SurvLoopTree extends CoreTree
                                 if ($skipRoot) {
                                     $this->pushCurrNodeVisit($newNode);
                                     if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
-                                        $this->settingTheLoop($loop->DataLoopPlural, $this->sessData->loopItemIDs[$loop->DataLoopPlural][0]);
+                                        $this->settingTheLoop($loop->DataLoopPlural, 
+                                            $this->sessData->loopItemIDs[$loop->DataLoopPlural][0]);
                                     }
                                 } else {
                                     $this->updateCurrNode($loop->DataLoopRoot);
@@ -1086,6 +1101,16 @@ class SurvLoopTree extends CoreTree
     {
         $this->urlSlug = $slug;
         return true;
+    }
+    
+    public function currNodeURL()
+    {
+        $curr = $this->currNode();
+        if ($this->allNodes[$curr] && $this->allNodes[$curr]->isPage()
+            && trim($this->allNodes[$curr]->nodeRow->NodePromptNotes) != '') {
+            return '/u/' . $this->allNodes[$curr]->nodeRow->NodePromptNotes;
+        }
+        return '';
     }
     
     public function pullNewNodeURL()
@@ -1422,6 +1447,14 @@ class SurvLoopTree extends CoreTree
             //$this->loadAllSessData();
         }
         
+        if ($this->hasREQ && $this->REQ->has('step')) {
+            $newNodeURL = $this->currNodeURL();
+            if ($newNodeURL != '') {
+                echo '<script type="text/javascript"> window.location="' . $newNodeURL . '"; </script>';
+                exit;
+            }
+        }
+        
         $ret .= $this->pushCurrNodeURL($this->currNode())
             . '<div id="treeWrap">' . "\n" 
                 . (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0) // Check Is Not An Exit Page
@@ -1432,10 +1465,11 @@ class SurvLoopTree extends CoreTree
                 $ret .= $this->printNodePublic($this->currNode(), $this->currNodeSubTier) . "\n"
             . '</div> <!-- end treeWrap -->' . "\n";
         
-        if ($this->debugOn) $ret .= $this->sessDump($lastNode);
         if (trim($GLOBALS["errors"]) != '') {
             $ret .= '<center><div class="p20 gryA">' . $GLOBALS["errors"] . '</div></center>';
         }
+        
+        if ($this->debugOn) $ret .= $this->sessDump($lastNode);
         
         if (!$this->hasREQ || (!$this->REQ->has('ajax') && !$this->REQ->has('frame'))) {
             $ret .= '</div>' . view('vendor.survloop.inc-hold-sess', [])->render();
@@ -1490,6 +1524,7 @@ class SurvLoopTree extends CoreTree
         $this->v["currInComplaint"] = $this->currInComplaint();
         
         if ($type == 'testRun') return redirect('/');
+        $this->v["footOver"] = '';
         
         return view('vendor.survloop.master', $this->v);
     }

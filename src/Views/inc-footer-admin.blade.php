@@ -11,7 +11,7 @@
             >{{ $GLOBALS['DB']->sysOpts['site-name'] }}</a> <br />under the
         <a href="{{ $GLOBALS['DB']->sysOpts['app-license-url'] }}" target="_blank" 
             >{{ $GLOBALS['DB']->sysOpts['app-license'] }}</a>, {{ date("Y") }}.
-        &nbsp;&nbsp;&nbsp;<nobr><span class="gry9 ">Powered by</span>
+        <br /><nobr><span class="gry9 ">Powered by</span>
         <a href="https://databasingmodels.com/" target="_blank" class="f18">SurvLoop</a></nobr></i>
     </div>
 </div>

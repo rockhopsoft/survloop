@@ -20,7 +20,7 @@ class SurvLoopNode extends CoreNode
         "Required"         => 5, 
         "OneLineResponses" => 17, 
         "OneLiner"         => 11, 
-        "OnPrevLine"       => 13
+        "RequiredInLine"   => 13
     ];
     
     // maybe initialize this way to lighten the tree's load?...
@@ -223,11 +223,6 @@ class SurvLoopNode extends CoreNode
     public function isOneLineResponses()
     {
         return ($this->nodeOpts%$this->primeOpts["OneLineResponses"] == 0);
-    }
-    
-    public function isOnPrevLine()
-    {
-        return ($this->nodeOpts%$this->primeOpts["OnPrevLine"] == 0);
     }
     
     

@@ -723,7 +723,6 @@ class AdminDBController extends AdminController
         if (!$this->v["dbAllowEdits"]) return $this->printOverview();
         $this->v["subset"] = urldecode($subset);
         if ($this->REQ->has('saveOrder')) {
-            echo '<br /><br /><br />saveOrder<br />';
             $this->cacheFlush();
             if ($this->REQ->has('item') && sizeof($this->REQ->input('item')) > 0) {
                 foreach ($this->REQ->input('item') as $i => $value) {

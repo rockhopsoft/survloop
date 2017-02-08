@@ -311,15 +311,20 @@ class DatabaseLookups
             ->get();
         if ($flds && sizeof($flds) > 0) {
             foreach ($flds as $fld) {
-                $lnkMap = $this->tbl[$fld->FldForeignTable] . '::' 
-                    . $this->tbl[$fld->FldTable] . ':' 
-                    . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
-                $retVal .= '<option value="' . $lnkMap . '" ' 
-                    . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
-                    . $this->tbl[$fld->FldForeignTable] . ' &larr; ' 
-                    . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
-                    . ' &larr; ' . $this->tbl[$fld->FldTable] . '
-                    </option>' . "\n";
+                if (isset($this->tbl[$fld->FldTable]) && isset($this->tbl[$fld->FldForeignTable])) {
+                    $lnkMap = $this->tbl[$fld->FldForeignTable] . '::' 
+                        . $this->tbl[$fld->FldTable] . ':' 
+                        . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
+                    $retVal .= '<option value="' . $lnkMap . '" ' 
+                        . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
+                        . $this->tbl[$fld->FldForeignTable] . ' &larr; ' 
+                        . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
+                        . ' &larr; ' . $this->tbl[$fld->FldTable] . '
+                        </option>' . "\n";
+                } else {
+                    $retVal .= '<option value="">** Warning ** not found: ' 
+                        . $fld->FldTable . ' * ' . $fld->FldForeignTable . '</option>';
+                }
             }
         }
         if ($opts == 'Subset')

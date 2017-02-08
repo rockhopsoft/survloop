@@ -7,7 +7,7 @@
     @elseif (trim($cond->CondOperator) == 'CUSTOM')
         {{ $cond->CondTag }} Condition
     @else
-        {{ $cond->CondTag }} Condition <span class="dbColor">(
+        {{ $cond->CondTag }} Condition <span class="slGreenDark fPerc80">(
         @if (intVal($cond->CondLoop) > 0)
             {{ $GLOBALS["DB"]->getLoopName($cond->CondLoop) }}
         @else 

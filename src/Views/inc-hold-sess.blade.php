@@ -1,5 +1,6 @@
 <!-- Stored in resources/views/survloop/inc-hold-sess.blade.php -->
 
+
 <script type="text/javascript">
     holdSess = 1;
     $(function() {

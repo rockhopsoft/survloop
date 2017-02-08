@@ -53,14 +53,7 @@
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noNodeID') === false)
             <a href="/dashboard/tree/map/node/{{ $nID }}" class="btn btn-xs btn-default circleBtn1">#{{ $nID }}</a> 
         @endif
-        <span class="gry9 mR10">
-            @if ($node->isPage() && $node->nodeRow->NodeOpts%29 == 0)
-                <span class="red"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
-            @elseif ($node->isBranch() && $nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node
-            @elseif ($node->isBranch()) Branch
-            @elseif (!$node->isDataManip()) {{ $node->nodeRow->NodeType }}
-            @endif
-        </span>
+        
         @if ($node->isBranch())
             <span class="slBlueDark f26 opac80" title="Branch Title"><i class="fa fa-share-alt"></i>
         @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
@@ -77,7 +70,6 @@
         @if ($node->isBranch())
         
             <span class="f26 slBlueDark opac80"><b>{{ $node->nodeRow->NodePromptText }}</b></span>
-            {!! $conditionList !!}
             
         @elseif ($node->isPage())
         
@@ -86,7 +78,6 @@
                 target="_blank" @endif class="f20">
                 /{{ $node->nodeRow->NodePromptNotes }}
             </a>
-            {!! $conditionList !!}
             
         @elseif ($node->isLoopRoot())
         
@@ -96,7 +87,6 @@
                 target="_blank" @endif class="f20">
                 /{{ $node->nodeRow->NodePromptNotes }}</a>
             <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
-            {!! $conditionList !!}
             
         @elseif ($node->isDataManip())
         
@@ -112,29 +102,24 @@
                 @endif
             </span>
             {{ $node->printManipUpdate() }}
-            </span> 
-            {!! $conditionList !!}
+            </span>
             
         @else
         
-            <span class="f18 mR10 
+            <span class="f16 mR10 
             @if ($node->nodeRow->NodeType == 'Spambot Honey Pot') gryA @endif
             @if ($node->isDataManip()) slGreenDark ital @endif
             @if ($node->isLoopRoot()) slBlueDark opac50 @endif
             ">{{ $node->nodeRow->NodePromptText }}</span> 
             @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
-            @if (!$REQ->has('alt'))
             
-                {!! $conditionList !!}
-                
-            @else
+            @if ($REQ->has('alt'))
                 
                 <div class="row">
                     <div class="col-md-6 gry9">
                         @if (trim($node->nodeRow->NodePromptNotes) != '') 
                             <i>{{ strip_tags($node->nodeRow->NodePromptNotes) }}</i><br />
                         @endif
-                        {!! $conditionList !!}
                         <div class=" @if ($node->isLoopRoot()) f18 bld slBlueDark @else f14 @endif ">
                             @if ($node->isLoopRoot())
                                 @if (sizeof($GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]->conds) > 0) 
@@ -148,7 +133,6 @@
                         </div>
                         @if (!$REQ->has('alt'))
                             <span class="f12">
-                            @if ($node->isOnPrevLine()) <span class="gry9">(on previous line)</span> @endif
                             @if ($node->isOneLiner()) <span class="gry9">(on one line)</span> @endif
                             @if ($node->isOneLineResponses()) <span class="gry9">(responses on one line)</span> @endif
                             </span>
@@ -197,6 +181,15 @@
                 <i class="fa fa-code-fork fa-flip-vertical mL5 mT5 f22 blk" 
                     title="Children displayed only with certain responses"></i>
             @endif
+            <span class="gry9 mL10">
+                @if ($node->isPage() && $node->nodeRow->NodeOpts%29 == 0)
+                    <span class="red"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
+                @elseif ($node->isBranch() && $nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node
+                @elseif ($node->isBranch()) Branch
+                @elseif (!$node->isDataManip()) {{ $node->nodeRow->NodeType }}
+                @endif
+            </span>
+            {!! $conditionList !!}
         </div>
         @if (!$REQ->has('print'))
             <div id="addChild{{ $nID }}" class="disNon 

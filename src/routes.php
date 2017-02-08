@@ -52,7 +52,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/register',               'SurvLoop\Controllers\Auth\SurvRegisterController@register');
     Route::post('/afterLogin',             'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/afterLogin',             'SurvLoop\\Controllers\\SurvLoop@afterLogin');
-    Route::get( '/logout',                 'SurvLoop\Controllers\Auth\AuthController@getLogout');
+    Route::get( '/logout',                 'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');
+    Route::get( '/chkEmail',               'SurvLoop\\Controllers\\SurvLoop@chkEmail');
     
     /*
     // Authentication routes...

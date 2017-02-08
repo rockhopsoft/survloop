@@ -50,6 +50,11 @@ body {
 	margin-bottom: 0px;
 }
 
+#footerLinks {
+    width: 100%;
+    display: block;
+}
+
 #logoLrg, #logoMed, #logoSm {
 	display: inline;
 	margin-top: -10px;
@@ -61,7 +66,7 @@ body {
 #logoSm { margin-top: -13px; margin-bottom: -5px; }
 #logoSm img { height: 30px; }
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
-	font-size: 32px;
+	font-size: 32pt;
 }
 #logoTxt {
 	padding-left: 10px;
@@ -76,67 +81,112 @@ body {
 
 
 #ajaxWrapLoad {
+    display: block;
 	width: 100%;
-	height: 600px;
 	text-align: center;
-	padding: 80px 0px 0px 0px;
+	padding: 80px 0px 80px 0px;
 	color: #63c6ff;
-	font-size: 48px;
+	font-size: 48pt;
 }
 
 
+.pageGap {
+	width: 100%;
+	padding-top: 10px;
+	clear: both;
+}
 .nodeGap {
 	width: 100%;
-	padding: 10px;
+	padding: 20px;
 	clear: both;
+}
+.nodeAnchor {
+    width: 1px;
+    height: 1px;
+    margin-bottom: -1px;
+    position: relative;
+}
+.nodeAnchor a {
+    position: absolute;
+    top: -40px;
 }
 .nodeWrap, .nodeWrapError {
 	background: #FFF;
 	display: block;
-	padding: 5px 0px;
+	padding: 0px;
 	-moz-border-radius: 8px; border-radius: 8px;
 }
 .nodeWrap .nodeSidenote {
-	font-size: 16px;
+	font-size: 16pt;
 	color: #888;
-	margin-bottom: 10px;
-	margin-top: -5px;
 }
 .nodeWrapError {
-	padding: 20px 10px 20px 10px;
+	padding: 10px 5px 10px 5px;
 	border: 3px #ec2327 solid;
 }
-.nPrompt, .nPromptInstr, .nFld {
+.nPrompt, .nFld, .nFldFing {
 	display: block;
-	padding-bottom: 10px;
+	color: #444;
 }
-.nPrompt h1, .nPrompt h2 {
-	margin-top: -5px;
-	margin-bottom: 15px;
+.nFldFing {
+    /* padding-left: 20px; */
+}
+.nPrompt h1, .nPrompt h2, .nPrompt h3, .nFld h1, .nFld h2, .nFld h3, 
+.nPrompt p, .nPrompt div {
+    padding: 0px;
+    margin: 0px;
+    font-style: normal;
+    font-weight: 200;
+}
+.nPrompt h1, .nPrompt h2, .nPrompt h3 {
 	color: #000;
+}
+.nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, .nPrompt h3.slBlueDark {
+	color: #2b3493;
+}
+.nPrompt h1, .nPrompt .jumbotron h1 { font-size: 36pt; }
+.nPrompt h2, .nPrompt .jumbotron h2 { font-size: 30pt; }
+.nPrompt h3, .nPrompt .jumbotron h3 { font-size: 26pt; }
+.nPrompt p, .nPrompt ul, .nodeWrap .nodeSidenote {
+    margin-top: 15px;
+}
+.nFld {
+    margin-top: 20px;
+}
+.nPrompt ul, .nPrompt ol {
+    padding: 0px 0px 0px 20px;
+    margin: 20px 0px 0px 20px;
+}
+.nPrompt ul li, .nPrompt ol li {
+    padding: 0px 0px 0px 0px;
+    margin: 10px 0px 0px 0px;
 }
 .nPromptHeader {
-	color: #000;
+	color: #000;                  
 	font-size: 130%;
-	padding-bottom: 10px;
-}
-.nPromptInstr {
-	font-size: 22px;
-	line-height: 34px;
-	color: #333;
 }
 .nPrompt {
-	font-size: 20px;
-	color: #666;
+	font-size: 20pt;
+}
+label {
+    margin: 0px;
 }
 .nPrompt label {
-	margin-bottom: -5px;
+}
+.nodeWrap .jumbotron, .nPrompt .jumbotron {
+    padding: 30px 40px 30px 40px;
+}
+.nPrompt .jumbotron p, .nPrompt .jumbotron h1, .nPrompt .jumbotron h2, .nPrompt .jumbotron h3 {
+    padding: 0px 0px 20px 0px;
 }
 .nFld input, .nFld select, .nFld textarea, 
 .nFld label, .nFld .radio label, .nFld .checkbox label {
+	font-size: 20pt;
+	line-height: 30px;
 	color: #000;
-	font-size: 20px;
-	line-height: 34px;
+}
+.nFld input, .nFld select, .nFld textarea {
+	color: #2b3493;
 }
 .nFld input, .nFld select {
 	padding-top: 0px;
@@ -145,14 +195,14 @@ body {
 .nFld input.dateFld {
 	width: 130px;
 }
-.nFld select.timeDrop {
-	width: 100px;
+.nFld select.timeDrop, .nFld select.form-control.timeDrop {
+	width: 95px;
 }
-.nFld select.tinyDrop {
+.nFld select.tinyDrop, .nFld select.form-control.tinyDrop {
 	width: 60px;
 }
 .timeWrap {
-	font-size: 20px;
+	font-size: 20pt;
 }
 .timeWrap input {
 	width: 60px;
@@ -163,17 +213,91 @@ input.dateVal, input.dateDef {
 input.dateDef {
 	color: #999;
 }
+input.otherGender {
+    width: 400px;
+}
 .nodeSub {
 	width: 100%;
 }
 .nodeSub .btn-lg {
-	font-size: 28px;
+	font-size: 28pt;
 	
 }
 
+label.finger, label.fingerAct {
+    cursor: pointer;
+    width: 100%;
+    border: 1px #CCC solid;
+    -moz-border-radius: 20px; border-radius: 20px;
+    padding: 10px 20px;
+    margin: 3px 0px 3px 0px;
+	font-size: 20pt;
+    line-height: 30px;
+    background: #FFF;
+}
+.finger:hover, input.finger:hover+label {
+    border: 1px #63c6ff solid;
+    background: #FAFAFA;
+}
+label.fingerAct, label.fingerAct:active, input.fingerAct:active+label, 
+label.fingerAct:hover, input.fingerAct:hover+label, label.finger:active, input.finger:active+label {
+    border: 1px #63c6ff solid;
+    background: #edf8ff;
+    color: #2b3493;
+}
+label.finger input {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+
+input.fingerTxt, input.form-control.fingerTxt, 
+textarea.fingerTxt, textarea.form-control.fingerTxt, 
+select.fingerTxt, select.form-control.fingerTxt {
+    cursor: pointer;
+    width: 100%;
+    border: 1px #63c6ff solid;
+    -moz-border-radius: 5px; border-radius: 5px;
+    padding: 15px 10px;
+    margin: 3px 0px 3px 0px;
+	font-size: 20pt;
+    line-height: 30px;
+}
+
 .nKids {
-	padding-top: 20px;
-	padding-left: 40px;
+
+}
+
+#pageBtns {
+    width: 100%;
+}
+#formErrorMsg {
+    display: none;
+    width: 100%;
+    text-align: center;
+    background: #ec2327;
+    padding: 10px 20px;
+    margin: -30px 0px 20px 0px;
+	-moz-border-radius: 5px; border-radius: 5px;
+}
+#formErrorMsg, #formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
+    color: #FFF;
+}
+#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
+    margin: 0px;
+    padding: 0px;
+}
+
+a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
+.nPrompt a.nFldBtn, .nPrompt a.nFldBtn:link, .nPrompt a.nFldBtn:active, .nPrompt a.nFldBtn:visited, .nPrompt a.nFldBtn:hover {
+    width: 100%;
+    font-size: 125%;
+    white-space: normal;
+}
+
+
+.nFormNext {
+    white-space: normal;
 }
 
 
@@ -181,7 +305,7 @@ input.dateDef {
 	list-style-type: none; 
 	margin: 0; padding: 0; 
 	text-align: left; 
-	width: 95%; 
+	width: 100%; 
 	cursor: move; 
 }
 #sortable li, #sortable li.sortOn, #sortable li.sortOff { 
@@ -189,7 +313,7 @@ input.dateDef {
 	border-bottom: 1px #63c6ff solid; 
 	background: #FAFAFA; 
 	color: #2b3493; 
-	font-size: 22px; 
+	font-size: 20pt; 
 	padding: 12px;
 	margin: 1px 0px;
 	width: 100%; 
@@ -199,12 +323,12 @@ input.dateDef {
 	background: #def3ff; 
 }
 @media screen and (max-width: 768px) {
-	#sortable li { font-size: 14px; }
+	#sortable li { font-size: 14pt; }
 }
 
 
 a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, a.facebookShareBig:hover {
-	font-size: 26px;
+	font-size: 26pt;
 	font-weight: 500;
 	padding: 10px;
 	margin: 10px;
@@ -225,7 +349,6 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 
 
 .wrapLoopItem {
-	margin: 20px 0px 0px 20px;
 }
 .wrapItemOff {
 	display: none;
@@ -238,18 +361,26 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 
 
 .uploadWrap {
-	padding: 20px;
+	padding: 10px 20px;
 	border: 1px #63c6ff dotted;
 	-moz-border-radius: 20px; border-radius: 20px;
 }
 .uploadWrap .uploadTypes {
 	width: 100%;
-	margin-bottom: 20px;
-	border-bottom: 1px #63c6ff dotted;
+}
+.uploadWrap hr {
+    border: 0px;
+    border-top: 1px #63c6ff dotted;
+}
+.uploadedWrap {
+	border: 2px #63c6ff solid;
+    -moz-border-radius: 20px; border-radius: 20px;
+    margin-bottom: 10px;
 }
 
 
-.allegation, a.allegation:link, a.allegation:visited, a.allegation:active, a.allegation:hover {
+.allegation, h1.allegation, h2.allegation, h3.allegation, h4.allegation, 
+a.allegation:link, a.allegation:visited, a.allegation:active, a.allegation:hover {
 	color: #ec2327;
 	font-size: bold;
 	/* text-shadow: 0px -1px 0px #f38c5f; */
@@ -300,7 +431,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	clear: both;
 	width: 100%;
 	color: #2b3493;
-	font-size: 22px;
+	font-size: 20pt;
 	padding: 10px 0px 10px 0px;
 	margin-top: 40px;
 	border-top: 1px #2b3493 solid;
@@ -395,7 +526,7 @@ table.detailList tr td, table.detailList tr th {
 	font-size: 10pt;
 }
 table.detailList tr th {
-	font-size: 14px;
+	font-size: 14pt;
 	font-weight: bold;
 }
 table.detailList tr td {
@@ -407,7 +538,7 @@ table.detailList tr td {
 	padding: 20px;
 	border: 1px #63c6ff dotted;
 	-moz-border-radius: 20px; border-radius: 20px;
-	font-size: 16px;
+	font-size: 16pt;
 	line-height: 28px;
 }
 ol.volunChecklist {
@@ -415,7 +546,7 @@ ol.volunChecklist {
 }
 ol.volunChecklist li {
 	position: relative;
-	font-size: 16px;
+	font-size: 16pt;
 	line-height: 28px;
 	padding-bottom: 25px;
 }
@@ -447,7 +578,7 @@ table.complaintTbl tr td.botBrd {
 .newStar {
 	display: inline;
 	margin-right: 5px;
-	font-size: 10px;
+	font-size: 10pt;
 	padding: 3px 3px 1px 3px;
 	background: #ffe400;
 	border: 1px #000 solid;
@@ -471,7 +602,7 @@ table.complaintTbl tr td.botBrd {
 	width: 100%;
 	background: none;
 }
-#fixedHeader h2 {
+#fixedHeader h1, #fixedHeader h2 {
 	margin: 0px;
 }
 .fixed, #fixedHeader.fixed {
@@ -525,7 +656,7 @@ label { font-weight: normal; }
 .stepNum2, .nav-pills.nav-wizard > li .stepNum2, 
 .stepNum2active, .nav-pills.nav-wizard > li .stepNum2active, 
 .stepNum2complete, .nav-pills.nav-wizard > li .stepNum2complete {
-	font-size: 20px;
+	font-size: 20pt;
 	text-align: center;
 	-moz-border-radius: 30px; border-radius: 30px;
 	width: 30px;
@@ -568,11 +699,11 @@ label { font-weight: normal; }
   border-bottom-left-radius: 4px
 }
 #adminMenu .list-group.panel > .list-group-item .list-group-submenu {
-  margin-left:20px;
+  margin-left: 20px;
 }
 #adminMenu .list-group.panel > .list-group-item.primeNav {
 	font-weight: bold;
-	font-size: 18px;
+	font-size: 18pt;
 }
 
 
@@ -631,45 +762,63 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 }
 @media screen and (max-width: 768px) {
 	
-	h1 { font-size: 28px; }
-	h2 { font-size: 24px; }
-	h3 { font-size: 20px; }
-	h4 { font-size: 18px; }
+	h1 { font-size: 28pt; }
+	h2 { font-size: 24pt; }
+	h3 { font-size: 20pt; }
+	h4 { font-size: 18pt; }
 	.nPromptHeader { font-size: 160%; }
-	.nPromptInstr { font-size: 16px; line-height: 26px; }
-	.nPrompt { font-size: 18px; line-height: 26px; }
-	.nFld, .nFld input, .nFld select, .nFld textarea, .nFld label { font-size: 18px; }
-	input.nFormBtnSub, input.nFormBtnBack { font-size: 20px; }
-	.nKids { padding-left: 20px; }
+	.nPrompt, .nFld, .nFld input, .nFld select, .nFld textarea, .nFld label,
+	input.fingerTxt, input.form-control.fingerTxt, textarea.fingerTxt, textarea.form-control.fingerTxt, 
+	select.fingerTxt, select.form-control.fingerTxt {
+	    font-size: 18pt; line-height: 26px;
+	}
+	input.nFormBtnSub, input.nFormBtnBack { font-size: 20pt; }
+	.nKids { padding-left: 0px; }
 	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
+	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
+	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
+    .nPrompt h1, .nPrompt .jumbotron h1 { font-size: 28pt; }
+    .nPrompt h2, .nPrompt .jumbotron h2 { font-size: 24pt; }
+    .nPrompt h3, .nPrompt .jumbotron h3 { font-size: 20pt; }
+    input.otherGender { width: 280px; }
+    
 }
 @media screen and (max-width: 480px) {
 	#logoLrg { display: none; }
 	#logoMed { display: none; }
 	#logoSm { display: inline; }
-	#logoTxt { padding-left: 0px; margin-top: -9px; margin-left: -5px; margin-bottom: -9px; font-size: 28px; }
-	
-	.navbar {
-		min-height: 28px;
+	#logoTxt {
+	    padding-left: 0px;
+	    margin-top: -9px;
+	    margin-left: -5px;
+	    margin-bottom: -9px;
+	    font-size: 28pt; 
 	}
+	
+    .navbar { min-height: 28px; }
 	.navbar-toggle {
-		font-size: 16px;
+		font-size: 16pt;
 		padding: 2px 6px;
 		margin: 2px 10px 2px 0px;
 	}
 	#headBar { margin-bottom: -20px; }
 	
-	.nodeSub .btn-lg { font-size: 18px; }
-	.deptLoad { font-size: 18px; }
+	.nodeSub .btn-lg { font-size: 18pt; }
+	.deptLoad { font-size: 18pt; }
 	
 	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
 	.jumbotron { padding: 20px; }
+	
+    .nPrompt h1, .nPrompt .jumbotron h1 { font-size: 24pt; }
+    .nPrompt h2, .nPrompt .jumbotron h2 { font-size: 20pt; }
+    .nPrompt h3, .nPrompt .jumbotron h3 { font-size: 16pt; }
+    
 }
 
 
 
 .scoreLabel {
-	font-size: 20px;
+	font-size: 20pt;
 	color: #2b3493;
 }
 
@@ -685,33 +834,40 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 	overflow:hidden;
 }
 
+.prevBox {
+    width: 100%;
+    height: 200px;
+	overflow:auto;
+	padding: 0px;
+}
+
 .form-control {
-	font-size: 16px;
+	font-size: 16pt;
 	height: 45px;
 }
 .form-control.f20, .form-control.f22, .form-control.f24, .form-control.f26 {
 	height: 60px;
 }
 
-.f8, table tr td.f8, i.f8, a.f8:link, a.f8:active, a.f8:visited, a.f8:hover, input.f8 , select.f8 , textarea.f8 { font-size: 8px; }
-.f9, table tr td.f9, i.f9, a.f9:link, a.f9:active, a.f9:visited, a.f9:hover, input.f9 , select.f9 , textarea.f9 { font-size: 9px; }
-.f10, table tr td.f10, i.f10, a.f10:link, a.f10:active, a.f10:visited, a.f10:hover, input.f10 , select.f10 , textarea.f10 { font-size: 10px; }
-.f11, table tr td.f11, i.f11, a.f11:link, a.f11:active, a.f11:visited, a.f11:hover, input.f11 , select.f11 , textarea.f11 { font-size: 11px; }
-.f12, table tr td.f12, i.f12, a.f12:link, a.f12:active, a.f12:visited, a.f12:hover, input.f12 , select.f12 , textarea.f12 { font-size: 12px; }
-.f13, table tr td.f13, i.f13, a.f13:link, a.f13:active, a.f13:visited, a.f13:hover, input.f13 , select.f13 , textarea.f13 { font-size: 13px; }
-.f14, table tr td.f14, i.f14, a.f14:link, a.f14:active, a.f14:visited, a.f14:hover, input.f14 , select.f14 , textarea.f14 { font-size: 14px; }
-.f16, table tr td.f16, i.f16, a.f16:link, a.f16:active, a.f16:visited, a.f16:hover, input.f16 , select.f16 , textarea.f16 { font-size: 16px; }
-.f18, table tr td.f18, i.f18, a.f18:link, a.f18:active, a.f18:visited, a.f18:hover, input.f18 , select.f18 , textarea.f18 { font-size: 18px; }
-.f20, table tr td.f20, i.f20, a.f20:link, a.f20:active, a.f20:visited, a.f20:hover, input.f20 , select.f20 , textarea.f20 { font-size: 20px; }
-.f22, table tr td.f22, i.f22, a.f22:link, a.f22:active, a.f22:visited, a.f22:hover, input.f22 , select.f22 , textarea.f22 { font-size: 22px; }
-.f24, table tr td.f24, i.f24, a.f24:link, a.f24:active, a.f24:visited, a.f24:hover, input.f24 , select.f24 , textarea.f24 { font-size: 24px; }
-.f26, table tr td.f26, i.f26, a.f26:link, a.f26:active, a.f26:visited, a.f26:hover, input.f26 , select.f26 , textarea.f26 { font-size: 26px; }
-.f28, table tr td.f28, i.f28, a.f28:link, a.f28:active, a.f28:visited, a.f28:hover, input.f28 , select.f28 , textarea.f28 { font-size: 28px; }
-.f30, table tr td.f30, i.f30, a.f30:link, a.f30:active, a.f30:visited, a.f30:hover, input.f30 , select.f30 , textarea.f30 { font-size: 30px; }
-.f32, table tr td.f32, i.f32, a.f32:link, a.f32:active, a.f32:visited, a.f32:hover, input.f32 , select.f32 , textarea.f32 { font-size: 32px; }
-.f36, table tr td.f36, i.f36, a.f36:link, a.f36:active, a.f36:visited, a.f36:hover, input.f36 , select.f36 , textarea.f36 { font-size: 36px; }
-.f48, table tr td.f48, i.f48, a.f48:link, a.f48:active, a.f48:visited, a.f48:hover, input.f48 , select.f48 , textarea.f48 { font-size: 48px; }
-.f60, table tr td.f60, i.f60, a.f60:link, a.f60:active, a.f60:visited, a.f60:hover, input.f60 , select.f60 , textarea.f60 { font-size: 60px; }
+.f8, table tr td.f8, i.f8, a.f8:link, a.f8:active, a.f8:visited, a.f8:hover, input.f8 , select.f8 , textarea.f8 { font-size: 8pt; }
+.f9, table tr td.f9, i.f9, a.f9:link, a.f9:active, a.f9:visited, a.f9:hover, input.f9 , select.f9 , textarea.f9 { font-size: 9pt; }
+.f10, table tr td.f10, i.f10, a.f10:link, a.f10:active, a.f10:visited, a.f10:hover, input.f10 , select.f10 , textarea.f10 { font-size: 10pt; }
+.f11, table tr td.f11, i.f11, a.f11:link, a.f11:active, a.f11:visited, a.f11:hover, input.f11 , select.f11 , textarea.f11 { font-size: 11pt; }
+.f12, table tr td.f12, i.f12, a.f12:link, a.f12:active, a.f12:visited, a.f12:hover, input.f12 , select.f12 , textarea.f12 { font-size: 12pt; }
+.f13, table tr td.f13, i.f13, a.f13:link, a.f13:active, a.f13:visited, a.f13:hover, input.f13 , select.f13 , textarea.f13 { font-size: 13pt; }
+.f14, table tr td.f14, i.f14, a.f14:link, a.f14:active, a.f14:visited, a.f14:hover, input.f14 , select.f14 , textarea.f14 { font-size: 14pt; }
+.f16, table tr td.f16, i.f16, a.f16:link, a.f16:active, a.f16:visited, a.f16:hover, input.f16 , select.f16 , textarea.f16 { font-size: 16pt; }
+.f18, table tr td.f18, i.f18, a.f18:link, a.f18:active, a.f18:visited, a.f18:hover, input.f18 , select.f18 , textarea.f18 { font-size: 18pt; }
+.f20, table tr td.f20, i.f20, a.f20:link, a.f20:active, a.f20:visited, a.f20:hover, input.f20 , select.f20 , textarea.f20 { font-size: 20pt; }
+.f22, table tr td.f22, i.f22, a.f22:link, a.f22:active, a.f22:visited, a.f22:hover, input.f22 , select.f22 , textarea.f22 { font-size: 22pt; }
+.f24, table tr td.f24, i.f24, a.f24:link, a.f24:active, a.f24:visited, a.f24:hover, input.f24 , select.f24 , textarea.f24 { font-size: 24pt; }
+.f26, table tr td.f26, i.f26, a.f26:link, a.f26:active, a.f26:visited, a.f26:hover, input.f26 , select.f26 , textarea.f26 { font-size: 26pt; }
+.f28, table tr td.f28, i.f28, a.f28:link, a.f28:active, a.f28:visited, a.f28:hover, input.f28 , select.f28 , textarea.f28 { font-size: 28pt; }
+.f30, table tr td.f30, i.f30, a.f30:link, a.f30:active, a.f30:visited, a.f30:hover, input.f30 , select.f30 , textarea.f30 { font-size: 30pt; }
+.f32, table tr td.f32, i.f32, a.f32:link, a.f32:active, a.f32:visited, a.f32:hover, input.f32 , select.f32 , textarea.f32 { font-size: 32pt; }
+.f36, table tr td.f36, i.f36, a.f36:link, a.f36:active, a.f36:visited, a.f36:hover, input.f36 , select.f36 , textarea.f36 { font-size: 36pt; }
+.f48, table tr td.f48, i.f48, a.f48:link, a.f48:active, a.f48:visited, a.f48:hover, input.f48 , select.f48 , textarea.f48 { font-size: 48pt; }
+.f60, table tr td.f60, i.f60, a.f60:link, a.f60:active, a.f60:visited, a.f60:hover, input.f60 , select.f60 , textarea.f60 { font-size: 60pt; }
 
 .fPerc66 { font-size: 66%; }
 .fPerc80 { font-size: 80%; }
@@ -806,6 +962,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 
 .p5, table tr td.p5 { padding: 5px; } .pL5, table tr td.pL5 { padding-left: 5px; } .pR5, table tr td.pR5 { padding-right: 5px; } .pT5, table tr td.pT5 { padding-top: 5px; } .pB5, table tr td.pB5 { padding-bottom: 5px; } .p5, table tr td.p5 { padding: 5px; }
 .p10, table tr td.p10 { padding: 10px; } .pL10, table tr td.pL10 { padding-left: 10px; } .pR10, table tr td.pR10 { padding-right: 10px; } .pT10, table tr td.pT10 { padding-top: 10px; } .pB10, table tr td.pB10 { padding-bottom: 10px; } .p10, table tr td.p10 { padding: 10px; }
+.p15, table tr td.p15 { padding: 15px; } .pL15, table tr td.pL15 { padding-left: 15px; } .pR15, table tr td.pR15 { padding-right: 15px; } .pT15, table tr td.pT15 { padding-top: 15px; } .pB15, table tr td.pB15 { padding-bottom: 15px; } .p15, table tr td.p15 { padding: 15px; }
 .p20, table tr td.p20 { padding: 20px; } .pL20, table tr td.pL20 { padding-left: 20px; } .pR20, table tr td.pR20 { padding-right: 20px; } .pT20, table tr td.pT20 { padding-top: 20px; } .pB20, table tr td.pB20 { padding-bottom: 20px; } .p20, table tr td.p20 { padding: 20px; }
 .p40, table tr td.p40 { padding: 40px; } .pL40, table tr td.pL40 { padding-left: 40px; } .pR40, table tr td.pR40 { padding-right: 40px; } .pT40, table tr td.pT40 { padding-top: 40px; } .pB40, table tr td.pB40 { padding-bottom: 40px; } .p40, table tr td.p40 { padding: 40px; }
 
@@ -831,7 +988,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 
 .blk { color: #000; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: #fff; }
-.red, .redDrk { color: #ec2327; }
+.red, .redDrk, h1.red, h2.red, h3.red { color: #ec2327; }
 .gry4 { color: #444; }
 .gry6 { color: #666; }
 .gry9 { color: #999; }

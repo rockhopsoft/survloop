@@ -143,9 +143,17 @@
                     ){!! $node->nodeRow->NodePromptText !!}@endif</textarea>
 
             <label class="w100 pT20">
-                <a id="extraHTMLbtn2" href="javascript:void(0)" class="f12"
+                <a id="extraHTMLbtn2" href="javascript:void(0)" class="f12 fL"
                     >+ HTML/JS/CSS Extras After Instruction</a> 
-                <div id="extraHTML2" class="w100 @if (isset($node->nodeRow->NodePromptAfter) 
+                
+                <label for="opts37IDB" class="fR taR">
+                    <input type="checkbox" name="opts37B" id="opts37IDB" value="37" class="mTn20" autocomplete="off" 
+                        @if ($node->nodeRow->NodeOpts%37 == 0) CHECKED @endif 
+                        > Wrap node in 
+                        <a href="http://getbootstrap.com/examples/jumbotron-narrow/" target="_blank">jumbotron</a>
+                </label>
+                    
+                <div id="extraHTML2" class="w100 fC @if (isset($node->nodeRow->NodePromptAfter) 
                     && trim($node->nodeRow->NodePromptAfter) != '') disBlo @else disNon @endif ">
                     <textarea name="instrPromptAfter" class="form-control" style="width: 100%; height: 60px;" 
                         autocomplete="off">@if (isset($node->nodeRow->NodePromptAfter)
@@ -496,7 +504,7 @@
                 </div>
                 <div class="col-md-4">
                     <label class="w100 f18">
-                        <h3>Store User Response Here: </h3>
+                        <h3>Store User Response: </h3>
                         <select name="nodeDataStore" class="form-control form-control-lg f22 w100" autocomplete="off" >
                             {!! $GLOBALS["DB"]->fieldsDropdown(isset($node->nodeRow->NodeDataStore) 
                                 ? trim($node->nodeRow->NodeDataStore) : '') !!}
@@ -509,7 +517,7 @@
                     <label for="opts5ID" class="red fPerc125">
                         <input type="checkbox" name="opts5" id="opts5ID" value="5" autocomplete="off" 
                             @if ($node->isRequired()) CHECKED @endif 
-                            > User Response Required
+                            onClick="return changeRequiredType();"> User Response Required
                     </label>
                     <div id="resNotWrdCnt" class="gry9 mT10 mB10 @if (isset($node->nodeRow->NodeType) && 
                         in_array($node->nodeRow->NodeType, ['Long Text'])) disBlo 
@@ -593,52 +601,50 @@
             <div id="resOpts" class=" @if (isset($node->nodeRow->NodeType) && in_array($node->nodeRow->NodeType, 
                 ['Radio', 'Checkbox', 'Drop Down', 'Other/Custom'])) disBlo @else disNon @endif ">
                 <h3>Response Options Provided To User:</h3>
-                <div class="jumbotron" style="padding: 10px;">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h4><label class="disBlo mB10"><input type="radio" name="responseListType" value="manual" 
-                                @if ($currDefinition == '' && $currLoopItems == '') CHECKED @endif
-                                onClick="changeResponseListType();"
-                                id="resListTypeManual"> Manually type options below</label>
-                            <label class="disBlo"><input type="radio" name="responseListType" value="auto" 
-                                @if ($currDefinition != '' || $currLoopItems != '') CHECKED @endif
-                                onClick="changeResponseListType();"
-                                id="resListTypeAuto"> Automatically pull from a system list</label></h4>
-                            <label>
-                            <div id="changeResListType" class="disNon">
-                                <i class="gry9">&uarr; Please click "Save" below to apply these changes. &rarr;</i>
-                            </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h4><label class="disBlo mB10"><input type="radio" name="responseListType" value="manual" 
+                            @if ($currDefinition == '' && $currLoopItems == '') CHECKED @endif
+                            onClick="changeResponseListType();"
+                            id="resListTypeManual"> Manually type options below</label>
+                        <label class="disBlo"><input type="radio" name="responseListType" value="auto" 
+                            @if ($currDefinition != '' || $currLoopItems != '') CHECKED @endif
+                            onClick="changeResponseListType();"
+                            id="resListTypeAuto"> Automatically pull from a system list</label></h4>
+                        <label>
+                        <div id="changeResListType" class="disNon">
+                            <i class="gry9">&uarr; Please click "Save" below to apply these changes. &rarr;</i>
                         </div>
-                        <div class="col-md-8">
-                            
-                            <div id="responseOptLists" class="row
-                                @if ($currDefinition != '' || $currLoopItems != '') disBlo @else disNon @endif">
-                                <div class="col-md-6">
-                                    <h4 class="m0">Definition Set:</h4>
-                                    <select name="responseDefinition" class="form-control" autocomplete="off" 
-                                        onChange="changeResponseListType();">
-                                        <option value="" @if ($currDefinition == '') SELECTED @endif ></option>
-                                        @forelse ($defs as $def)
-                                            <option value="{{ $def->DefSubset }}" 
-                                                @if ($currDefinition == $def->DefSubset) SELECTED @endif 
-                                                >{{ $def->DefSubset }}</option>
-                                        @empty
-                                        @endforelse
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <h4 class="m0">Entered Loop Items:</h4>
-                                    <select name="responseLoopItems" class="form-control" autocomplete="off" 
-                                        onChange="changeResponseListType();">
-                                        <option value="" @if ($currLoopItems == '') SELECTED @endif ></option>
-                                        @forelse ($GLOBALS["DB"]->dataLoops as $plural => $loop)
-                                            <option value="{{ $plural }}"
-                                                @if ($currLoopItems == $plural) SELECTED @endif 
-                                                >{{ $plural }}</option>
-                                        @empty
-                                        @endforelse
-                                    </select>
-                                </div>
+                    </div>
+                    <div class="col-md-8">
+                        
+                        <div id="responseOptLists" class="row
+                            @if ($currDefinition != '' || $currLoopItems != '') disBlo @else disNon @endif">
+                            <div class="col-md-6">
+                                <h4 class="m0">Definition Set:</h4>
+                                <select name="responseDefinition" class="form-control" autocomplete="off" 
+                                    onChange="changeResponseListType();">
+                                    <option value="" @if ($currDefinition == '') SELECTED @endif ></option>
+                                    @forelse ($defs as $def)
+                                        <option value="{{ $def->DefSubset }}" 
+                                            @if ($currDefinition == $def->DefSubset) SELECTED @endif 
+                                            >{{ $def->DefSubset }}</option>
+                                    @empty
+                                    @endforelse
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="m0">Entered Loop Items:</h4>
+                                <select name="responseLoopItems" class="form-control" autocomplete="off" 
+                                    onChange="changeResponseListType();">
+                                    <option value="" @if ($currLoopItems == '') SELECTED @endif ></option>
+                                    @forelse ($GLOBALS["DB"]->dataLoops as $plural => $loop)
+                                        <option value="{{ $plural }}"
+                                            @if ($currLoopItems == $plural) SELECTED @endif 
+                                            >{{ $plural }}</option>
+                                    @empty
+                                    @endforelse
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -737,40 +743,74 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
+                    <h4><label class="disBlo mB10"><input type="radio" name="changeResponseMobile" value="mobile" 
+                        @if ($node->nodeRow->NodeOpts%2 > 0) CHECKED @endif
+                        onClick="changeResponseMobileType();" autocomplete="off" 
+                        id="responseCheckTypeFat"> Mobile default</label>
+                    <label class="disBlo"><input type="radio" name="changeResponseMobile" value="desktop" 
+                        @if ($node->nodeRow->NodeOpts%2 == 0) CHECKED @endif
+                        onClick="changeResponseMobileType();" autocomplete="off" 
+                        id="responseCheckTypeDesk"> Desktop options</label></h4>
+                    <label>
+                    <div id="changeResListType" class="disNon">
+                        <i class="gry9">&uarr; Please click "Save" below to apply these changes. &rarr;</i>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div id="responseCheckOpts" 
+                        class="row @if ($node->nodeRow->NodeOpts%2 == 0) disBlo @else disNon @endif ">
+                        <div class="col-md-6">
+                            <div class="checkbox">
+                                <label for="opts11ID">
+                                    <input type="checkbox" name="opts11" id="opts11ID" value="11" autocomplete="off" 
+                                    @if ($node->isOneLiner()) CHECKED @endif 
+                                    onClick="if (document.getElementById('opts11ID').checked) {
+                                        document.getElementById('opts17ID').checked = true; }" 
+                                    > Node Q&A On One Line
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="responseOneLine" class="checkbox @if (isset($node->nodeRow->NodeType) && 
+                                in_array($node->nodeRow->NodeType, ['Radio', 'Checkbox'])) disBlo @else disNon @endif ">
+                                <label for="opts17ID">
+                                    <input type="checkbox" name="opts17" id="opts17ID" value="17" autocomplete="off" 
+                                        @if ($node->isOneLineResponses()) CHECKED @endif 
+                                        onClick="if (!document.getElementById('opts17ID').checked) {
+                                        document.getElementById('opts11ID').checked = false; }" 
+                                        > Responses On One Line
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <label for="opts37ID" class="mL20">
+                    <input type="checkbox" name="opts37" id="opts37ID" value="37" class="mTn20" autocomplete="off" 
+                        @if ($node->nodeRow->NodeOpts%37 == 0) CHECKED @endif 
+                        > Wrap node in 
+                        <a href="http://getbootstrap.com/examples/jumbotron-narrow/" target="_blank">jumbotron</a>
+                </label>
+            </div>
+            <div class="col-md-6">
+                <div id="responseReqOpts" 
+                    class="pL10 mTn20 @if ($node->isRequired()) disBlo @else disNon @endif ">
                     <div class="checkbox">
                         <label for="opts13ID">
                             <input type="checkbox" name="opts13" id="opts13ID" value="13" autocomplete="off" 
-                            @if ($node->isOnPrevLine()) CHECKED @endif 
-                            > Node Shares Previous Node's Line
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="checkbox">
-                        <label for="opts11ID">
-                            <input type="checkbox" name="opts11" id="opts11ID" value="11" autocomplete="off" 
-                            @if ($node->isOneLiner()) CHECKED @endif 
-                            onClick="if (document.getElementById('opts11ID').checked) {
-                                document.getElementById('opts17ID').checked = true; }" 
-                            > Node Q&A On One Line
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div id="responseOneLine" class="checkbox @if (isset($node->nodeRow->NodeType) 
-                        && in_array($node->nodeRow->NodeType, ['Radio', 'Checkbox'])) disBlo @else disNon @endif ">
-                        <label for="opts17ID">
-                            <input type="checkbox" name="opts17" id="opts17ID" value="17" autocomplete="off" 
-                            @if ($node->isOneLineResponses()) CHECKED @endif 
-                            onClick="if (!document.getElementById('opts17ID').checked) {
-                                document.getElementById('opts11ID').checked = false; }" 
-                            > Responses On One Line
+                            @if ($node->nodeRow->NodeOpts%13 == 0) CHECKED @endif 
+                            > <span class="red">*Required</span> displayed on it's own separate line
                         </label>
                     </div>
                 </div>
             </div>
         </div>
+
     </div> <!-- end Node Layout panel -->
 
 </div> <!-- end hasResponse -->
@@ -944,6 +984,26 @@ function changeResponseListType() {
         return true;
     }
     document.getElementById('responseOptLists').style.display = 'block';
+    return true;
+}
+
+function changeRequiredType() {
+    if (!document.getElementById('responseReqOpts')) return false;
+    if (document.getElementById('opts5ID') && document.getElementById('opts5ID').checked) {
+        document.getElementById('responseReqOpts').style.display = 'block';
+        return true;
+    }
+    document.getElementById('responseReqOpts').style.display = 'none';
+    return true;
+}
+
+function changeResponseMobileType() {
+    if (!document.getElementById('responseCheckOpts')) return false;
+    if (document.getElementById('responseCheckTypeFat') && document.getElementById('responseCheckTypeFat').checked) {
+        document.getElementById('responseCheckOpts').style.display = 'none';
+        return true;
+    }
+    document.getElementById('responseCheckOpts').style.display = 'block';
     return true;
 }
 

@@ -27,7 +27,7 @@
         @forelse ($GLOBALS["DB"]->dataLoops as $loop)
             <tr>
                 <td class="taC">
-                @if ($loop->DataLoopRoot > 0)
+                @if (intVal($loop->DataLoopRoot) > 0)
                     <a href="#n{{ $loop->DataLoopRoot }}">{{ $loop->DataLoopRoot }}</a>
                 @endif
                 </td>

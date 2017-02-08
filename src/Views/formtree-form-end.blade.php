@@ -20,26 +20,25 @@ function checkNodeForm() {
     if (document.getElementById("stepID").value == "back") return true;
     hasAttemptedSubmit = true;
     totFormErrors=0; formErrorsEng = "";
-{!! $pageJSvalid !!}
+    {!! $pageJSvalid !!}
     if (totFormErrors > 0) {
         setFormErrs();
         return false;
     }
     clearFormErrs();
+    firstNodeError = 0;
     return true; 
-}
-function checkNodeUp(nID, response) {
-    checkMutEx(nID, response);
-    if (hasAttemptedSubmit) checkNodeForm();
-    return true;
 }
 
 $(function() {
         
     function runFormSub() {
+    @if ($hasRegisterNode) 
+        document.postNode.submit();
+    @else 
         blurAllFlds();
         var formData = new FormData(document.getElementById("postNodeForm"));
-        document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container f48"><i class="fa fa-spinner fa-pulse"></i></div>';
+        document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container"><i class="fa fa-spinner fa-pulse"></i></div>';
         window.scrollTo(0, 0);
         $.ajax({
             url: "/sub", 
@@ -56,6 +55,7 @@ $(function() {
             }
         });
         resetCheckForm();
+    @endif
         return false;
     }
     
@@ -135,7 +135,8 @@ $(function() {
 
     $(document).on("click", "a.navJump", function() {
         document.getElementById("jumpToID").value = $(this).attr("id").replace("jump", "");
-        @if (isset($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) && intVal($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) > 0)
+        @if (isset($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) 
+            && intVal($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) > 0)
             document.getElementById("stepID").value="exitLoopJump";
         @endif
         return runFormSub();
@@ -146,3 +147,5 @@ $(function() {
 });
 </script>
 </form>
+
+{!! $GLOBALS["DB"]->sysOpts["footer-master"] !!}

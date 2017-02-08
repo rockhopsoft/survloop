@@ -113,7 +113,10 @@
 
 </div>
 
-@if (isset($GLOBALS["DB"]->sysOpts) && isset($GLOBALS["DB"]->sysOpts["footer-master"])) {!! $GLOBALS["DB"]->sysOpts["footer-master"] !!} @endif
+@if (isset($footOver)) {!! $footOver !!}
+@elseif (isset($GLOBALS["DB"]->sysOpts) && isset($GLOBALS["DB"]->sysOpts["footer-master"]))
+    {!! $GLOBALS["DB"]->sysOpts["footer-master"] !!}
+@endif
 
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" ></iframe></div>
 

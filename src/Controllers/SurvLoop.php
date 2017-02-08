@@ -131,6 +131,12 @@ class SurvLoop extends Controller
         return $this->custLoop->genXmlSchema($request);
     }
     
+    public function chkEmail(Request $request)
+    {
+        $this->loadLoop($request);
+        return $this->custLoop->chkEmail($request);
+    }
+    
     
     public function freshUser(Request $request)
     {

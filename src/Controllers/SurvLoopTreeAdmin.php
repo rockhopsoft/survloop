@@ -57,9 +57,15 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
                 
                 if (intVal($node->nodeRow->NodeOpts) <= 1) $node->nodeRow->NodeOpts = 1;
-                $opts = [5, 11, 13, 17, 23, 29, 31];
+                if ($this->REQ->changeResponseMobile == 'desktop') {
+                    if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
+                }
+                elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37];
+                $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
-                    if ($this->REQ->has('opts'.$o.'') && intVal($this->REQ->input('opts'.$o.'')) == $o) {
+                    if ($this->REQ->has('opts'.$o.'') && intVal($this->REQ->input('opts'.$o.'')) == $o
+                        && (!in_array($o, $optsDesktop) || $node->nodeRow->NodeOpts%2 == 0)) {
                         if ($node->nodeRow->NodeOpts%$o > 0) $node->nodeRow->NodeOpts *= $o;
                     } elseif ($node->nodeRow->NodeOpts%$o == 0) {
                         $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/$o;
@@ -81,6 +87,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $node->nodeRow->NodeType        = 'Instructions';
                     $node->nodeRow->NodePromptText  = trim($this->REQ->input('nodeInstruct'));
                     $node->nodeRow->NodePromptAfter  = trim($this->REQ->input('instrPromptAfter'));
+                    if ($this->REQ->has('opts37B') && intVal($this->REQ->input('opts37B')) == 37) {
+                        if ($node->nodeRow->NodeOpts%37 > 0) $node->nodeRow->NodeOpts *= 37;
+                    } elseif ($node->nodeRow->NodeOpts%37 == 0) {
+                        $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/37;
+                    }
                 } elseif ($this->REQ->nodeType == 'page') {
                     $node->nodeRow->NodeType        = 'Page';
                     $node->nodeRow->NodePromptNotes = trim($this->REQ->input('nodeSlug'));
@@ -291,10 +302,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 $conditionList = (sizeof($this->allNodes[$tierNode[0]]->conds) == 0) ? ''
-                    : '<div class="slBlueDark pT5 pB5">' 
+                    : '<span class="slBlueDark mL10">' 
                         . view('vendor.survloop.admin.tree.node-list-conditions', [
                             "conds" => $this->allNodes[$tierNode[0]]->conds
-                        ])->render() . '</div>';
+                        ])->render() . '</span>';
                 if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
                     return view('vendor.survloop.admin.tree.node-print-basic', [
                         "canEditTree"    => $this->canEditTree, 
