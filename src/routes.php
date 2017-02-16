@@ -18,10 +18,13 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/sub',                    'SurvLoop\\Controllers\\SurvLoop@index');
     
     Route::get( '/ajax',                   'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::get( '/sortLoop',               'SurvLoop\\Controllers\\SurvLoop@sortLoop');
     Route::get( '/holdSess',               'SurvLoop\\Controllers\\SurvLoop@holdSess');
     Route::get( '/test',                   'SurvLoop\\Controllers\\SurvLoop@testRun');
     Route::get( '/restart',                'SurvLoop\\Controllers\\SurvLoop@restartSess');
     Route::get( '/sessDump',               'SurvLoop\\Controllers\\SurvLoop@sessDump');
+    Route::get( '/switch/{cid}',           'SurvLoop\\Controllers\\SurvLoop@switchSess');
+    Route::get( '/delSess/{cid}',          'SurvLoop\\Controllers\\SurvLoop@delSess');
     
     Route::post('/u/{nodeSlug}',           'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{nodeSlug}',           'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');

@@ -100,6 +100,11 @@ body {
 	padding: 20px;
 	clear: both;
 }
+.nodeHalfGap {
+	width: 100%;
+	height: 20px;
+	clear: both;
+}
 .nodeAnchor {
     width: 1px;
     height: 1px;
@@ -165,7 +170,7 @@ body {
 	color: #000;                  
 	font-size: 130%;
 }
-.nPrompt {
+.nPrompt, .nFld {
 	font-size: 20pt;
 }
 label {
@@ -187,6 +192,7 @@ label {
 }
 .nFld input, .nFld select, .nFld textarea {
 	color: #2b3493;
+	height: auto;
 }
 .nFld input, .nFld select {
 	padding-top: 0px;
@@ -223,6 +229,7 @@ input.otherGender {
 	font-size: 28pt;
 	
 }
+
 
 label.finger, label.fingerAct {
     cursor: pointer;
@@ -296,7 +303,7 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 }
 
 
-.nFormNext {
+.nFormNext, a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover, {
     white-space: normal;
 }
 
@@ -322,8 +329,17 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 #sortable li.sortOn { 
 	background: #def3ff; 
 }
+#sortable li i, #sortable li.sortOn i, #sortable li.sortOff i { 
+    margin: 0px 20px;
+}
 @media screen and (max-width: 768px) {
-	#sortable li { font-size: 14pt; }
+    #sortable li, #sortable li.sortOn, #sortable li.sortOff {
+        font-size: 14pt;
+        padding: 10px 5px;
+    }
+    #sortable li i, #sortable li.sortOn i, #sortable li.sortOff i { 
+        margin: 0px 10px;
+    }
 }
 
 
@@ -613,6 +629,7 @@ table.complaintTbl tr td.botBrd {
 	padding-top: 10px;
 	padding-bottom: 5px;
 	top: 47px;
+	border-bottom: 1px #edf8ff solid;
 }
 
 
@@ -780,7 +797,7 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
     .nPrompt h1, .nPrompt .jumbotron h1 { font-size: 28pt; }
     .nPrompt h2, .nPrompt .jumbotron h2 { font-size: 24pt; }
     .nPrompt h3, .nPrompt .jumbotron h3 { font-size: 20pt; }
-    input.otherGender { width: 280px; }
+    input.otherGender { width: 240px; }
     
 }
 @media screen and (max-width: 480px) {
@@ -945,6 +962,11 @@ a.overUnd:hover { text-decoration: underline; }
 .unJust, table tr td.unJust { text-align: left; }
 a.undL, a.undL:visited, a.undL:active, a.undL:hover { text-decoration: underline; }
 
+a.noPoint, a.noPoint:link, a.noPoint:visited, a.noPoint:active, a.noPoint:hover,
+a.btn.noPoint, a.btn.noPoint:link, a.btn.noPoint:visited, a.btn.noPoint:active, a.btn.noPoint:hover {
+    cursor: default;
+}
+
 /* Can Be Read Like... margin Left 5, margin Bottom negative 5 */
 h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .m0 { margin: 0px; } .mL0 { margin-left: 0px; } .mR0 { margin-right: 0px; } .mT0 { margin-top: 0px; } .mB0 { margin-bottom: 0px; }
@@ -1005,6 +1027,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .brdRed { border: 1px #ec2327 solid; }
 .brdBlk { border: 1px #000 solid; }
 .brdA { border: 1px #AAA solid; }
+.brdC { border: 1px #CCC solid; }
 
 .brdTop, table tr.brdTop td, table tr.brdTop th { border-top: 1px #63c6ff solid; }
 .brdBot, table tr.brdBot td, table tr.brdBot th { border-bottom: 1px #63c6ff solid; }
@@ -1027,6 +1050,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .bgGrn { background: #c3ffe1; }
 .bgYel { background: #fffdc3; }
 .bgRed { background: #ffd2c9; }
+.bgNone, textarea.bgNone { background: none; }
 
 
 .slBlueLight, a.slBlueLight:link, a.slBlueLight:visited, a.slBlueLight:active, a.slBlueLight:hover {

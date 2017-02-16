@@ -29,6 +29,8 @@ class SurvLoopServiceProvider extends ServiceProvider
                   => base_path('database/migrations/' . $migFile),
               __DIR__.'/Database/SurvLoopSeeder.php' 
                   => base_path('database/seeds/SurvLoopSeeder.php'),
+              __DIR__.'/Database/ZipCodeSeeder.php' 
+                  => base_path('database/seeds/ZipCodeSeeder.php'),
         ]);
         //$this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
     }

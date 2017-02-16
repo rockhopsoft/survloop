@@ -24,11 +24,7 @@
         @if ($REQ->has('start') && intVal($REQ->input('start')) > 0) 
             value="start"
         @else 
-            @if ($REQ->has('end') && intVal($REQ->input('end')) > 0)
-                value="end"
-            @else
-                value=""
-            @endif
+            @if ($REQ->has('end') && intVal($REQ->input('end')) > 0) value="end" @else value="" @endif
         @endif
         >
     <input type="hidden" name="orderBefore" 
@@ -53,76 +49,45 @@
             @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
                 <a href="/dashboard/tree/map?all=1#n{{ $node->nodeRow->NodeID }}" 
                     class="btn btn-xs btn-default pull-right">Back to Form-Tree Map</a>
-                <h2 class="disIn"><span class="slBlueDark fPerc125 mR20">
-                    #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
+                <h1 class="disIn slBlueDark"><i class="fa fa-cube mR5" aria-hidden="true"></i> 
+                    Editing Node #{{ $node->nodeRow->NodeID }}</h1>
             @else 
                 <a href="/dashboard/tree/map?all=1" class="btn btn-xs btn-default pull-right">Back to Form-Tree Map</a>
-                <h2 class="disIn">Adding Node</h2>
+                <h1 class="disIn slBlueDark"><i class="fa fa-cube mR5" aria-hidden="true"></i> Adding Node</h1>
             @endif
         </div>
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-1 taC pT5">
-                <h3 class="m0 slBlueDark">Node Type</h3>
+            <div class="col-md-6">
+                <h2 class="mT0 slBlueDark">Node Type</h2>
+                <select name="nodeType" id="nodeTypeID" class="form-control" autocomplete="off" 
+                    onChange="return changeNodeType(this.value);" >
+                    <option value="question" @if (!$node->isSpecial()) SELECTED @endif 
+                        > Question Prompting User Response</option>
+                    <option value="instruct" @if ($node->isInstruct()) SELECTED @endif 
+                        >Instruction Without Response</option>
+                    <option value="page" @if ($node->isPage()) SELECTED @endif 
+                        >Start of New Page</option>
+                    <option value="branch" @if ($node->isBranch()) SELECTED @endif 
+                        >Just A Branch Title</option>
+                    <option value="loop" @if ($node->isLoopRoot()) SELECTED @endif 
+                        >Root Node of Data Loop: Multiple Pages</option>
+                    <option value="cycle" @if ($node->isLoopCycle()) SELECTED @endif 
+                        >Root Node of Data Loop: Within A Page</option>
+                    <option value="sort" @if ($node->isLoopSort()) SELECTED @endif 
+                        >Sort Data Loop Items</option>
+                    <option value="data" @if ($node->isDataManip()) SELECTED @endif 
+                        >Data Manipulation</option>
+                </select>
             </div>
-            <div class="col-md-3">
-                <div class="radio">
-                    <label for="typeQuestion">
-                        <input type="radio" name="nodeType" id="typeQuestion" value="question" autocomplete="off" 
-                        @if (!$node->isSpecial()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Question Prompting User Response
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="typeInstruct">
-                        <input type="radio" name="nodeType" id="typeInstruct" value="instruct" autocomplete="off" 
-                        @if ($node->isInstruct()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Instruction Without Response
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="typePage">
-                        <input type="radio" name="nodeType" id="typePage" value="page" autocomplete="off"
-                        @if ($node->isPage()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Start of New Page<br />
-                    </label>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="radio">
-                    <label for="typeLoop">
-                        <input type="radio" name="nodeType" id="typeLoop" value="loop" autocomplete="off" 
-                        @if ($node->isLoopRoot()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Root Node of a Data Loop
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="typeData">
-                        <input type="radio" name="nodeType" id="typeData" value="data" autocomplete="off" 
-                        @if ($node->isDataManip()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Data Manipulation
-                    </label>
-                </div>
-                <div class="radio">
-                    <label for="typeBranch">
-                        <input type="radio" name="nodeType" id="typeBranch" value="branch" autocomplete="off" 
-                        @if ($node->isBranch()) CHECKED @endif 
-                        onClick="return changeNodeType(this.value);"> Just A Branch Title<br />
-                    </label>
-                </div>
-            </div>
-            
-            <div class="col-md-5">
+            <div class="col-md-6 slGreenDark">
                 <label>
-                    <b class="fPerc125 slGreenDark"><i class="fa fa-database mR5"></i> Data Family</b>
-                    <div><small class="slGreenDark opac50">
-                        All of node's families' data storage fields can be related to this table's data:
-                    </small></div>
-                    <select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off"
-                        class="form-control slGreenDark" >
-                    {!! $dataBranchDrop !!}
-                    </select>
+                <h2 class="mT0 slGreenDark"><i class="fa fa-database mR5"></i> Data Family</h2>
+                <select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off" class="form-control slGreenDark">
+                {!! $dataBranchDrop !!}
+                </select>
+                All of node's families' data storage fields can be related to this table's data.
                 </label>
             </div>
         </div>
@@ -224,86 +189,156 @@
             </div>
         </div>
         <div class="panel-body">
-            <div class="row f16">
-                <div class="col-md-4">
-                    <label>
-                        <input type="radio" name="stepLoop" id="stepLoopN" value="0" autocomplete="off" 
-                        @if (!$node->isStepLoop()) CHECKED @endif 
-                        > <span class="mL5 bld">Standard Loop Behavior</span><br />
-                    </label>
-                    <div id="stdLoopOpts" class="pL20 @if (!$node->isStepLoop()) disBlo @else disNon @endif ">
-                        <label for="stdLoopAutoID" class="w100">
-                            <input type="checkbox" name="stdLoopAuto" id="stdLoopAutoID" value="1" autocomplete="off" 
-                            @if (isset($node->nodeRow->NodeDataBranch) && trim($node->nodeRow->NodeDataBranch) != '' 
-                                && isset($GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]) 
-                                && isset($GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopAutoGen)
-                                && $GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopAutoGen == 1) 
-                                CHECKED
-                            @endif > Auto-Generate <small class="gry6">New Loop Items
-                            <div class="pL20">When User Clicks "Add" Button</div></small>
-                        </label>
-                    </div>
-                    <div class="pL20"><small class="gry9"><i>
-                        From this root page, users can add records to the set until
-                        they choose to move on or reach the loop's limits.
-                    </i></small></div>
-                    <div class="p10"></div>
-                    <label>
-                        <input type="radio" name="stepLoop" id="stepLoopY" value="1" autocomplete="off" 
-                        @if ($node->isStepLoop()) CHECKED @endif 
-                        > <span class="mL5 bld">Step-Through Behavior</span><br />
-                    </label>
-                    <div id="stepLoopOpts" class="pL20 @if ($node->isStepLoop()) disBlo @else disNon @endif ">
-                        Field Marking A Finished Loop Item (Step)<br />
-                        <select name="stepLoopDoneField" id="stepLoopDoneFieldID" class="form-control" 
-                            autocomplete="off" >
-                            @if ($node->isStepLoop())
-                                {!! $GLOBALS["DB"]->fieldsDropdown(trim($GLOBALS["DB"]
-                                    ->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopDoneFld)) !!}
-                            @else
-                                {!! $GLOBALS["DB"]->fieldsDropdown() !!}
-                            @endif
-                        </select>
-                    </div>
-                    <div class="pL20"><small class="gry9"><i>
-                        All items in this data set are added elsewhere beforehand.
-                        Then the user is stepped through them one by one.
-                    </i></small></div>
+            <label class="nPrompt pB20">
+                <input type="radio" name="stepLoop" id="stepLoopN" value="0" autocomplete="off" 
+                @if (!$node->isStepLoop()) CHECKED @endif 
+                > <h3 class="disIn mL5 fPerc125 bld">Standard Loop Behavior</h3>
+                <div class="gry9 f14">
+                    From this root page, users can add records to the set until
+                    they choose to move on or reach the loop's limits.
                 </div>
-                <div class="col-md-8">
-                    <div class="row mB20">
-                        <div class="col-md-5">
-                            <div><label for="nodeDataLoopID"><b>Loop Name</b></label></div>
-                            <select name="nodeDataLoop" id="nodeDataLoopID" class="form-control" autocomplete="off" >
-                                <option value="" @if (!isset($node->nodeRow->NodeDataBranch) 
-                                    || $node->nodeRow->NodeDataBranch == "") SELECTED @endif ></option>
-                                @forelse ($GLOBALS["DB"]->dataLoops as $setPlural => $setInfo)
-                                    <option @if (isset($node->nodeRow->NodeDataBranch) 
-                                        && $node->nodeRow->NodeDataBranch == $setPlural) SELECTED @endif 
-                                        value="{{ $setPlural }}" >{{ $setPlural }}</option>
-                                @empty
-                                @endforelse
-                            </select>
-                        </div>
-                        <div class="col-md-7">
-                            <div>
-                                <label for="loopSlugID"><b>Root Page URL</b></label> 
-                                <span class="gry9 f12 mL20">
-                                    @if (isset($GLOBALS["DB"]->treeRow->TreeRootURL))
-                                        {{ $GLOBALS["DB"]->treeRow->TreeRootURL }}/u/
-                                    @endif
-                                </span>
-                            </div>
-                            <input type="text" name="loopSlug" id="loopSlugID" class="form-control" autocomplete="off" 
-                                value="@if (isset($node->nodeRow->NodePromptNotes)
-                                    ){!! $node->nodeRow->NodePromptNotes !!}@endif" >
-                        </div>
-                    </div>
-                    <label for="nodeLoopInstructID"><b>Root Page Instructions</b>
-                    <small class="mL20">(text/HTML)</small></label>
-                    <textarea name="nodeLoopInstruct" id="nodeLoopInstructID" class="form-control" 
-                        style="height: 100px;" autocomplete="off" >@if (isset($node->nodeRow->NodePromptText)
-                            ){!! $node->nodeRow->NodePromptText !!}@endif</textarea>
+            </label>
+            <label class="nPrompt pB20">
+                <input type="radio" name="stepLoop" id="stepLoopY" value="1" autocomplete="off" 
+                @if ($node->isStepLoop()) CHECKED @endif 
+                > <h3 class="disIn mL5 fPerc125 bld">Step-Through Behavior</h3>
+                <div class="gry9 f14">
+                    All items in this data set are added elsewhere beforehand.
+                    Then the user is stepped through them one by one.
+                </div>
+            </label>
+            
+            <div class="row mT20">
+                <div class="col-md-6">
+                    <label class="nPrompt pB20">
+                        <h3 class="disIn mT0">Root Page URL</h3> 
+                        <span class="gry9 f12 mL20">
+                            @if (isset($GLOBALS["DB"]->treeRow->TreeRootURL))
+                                {{ $GLOBALS["DB"]->treeRow->TreeRootURL }}/u/
+                            @endif
+                        </span>
+                        <input type="text" name="loopSlug" id="loopSlugID" class="form-control" autocomplete="off" 
+                            value="@if (isset($node->nodeRow->NodePromptNotes)
+                                ){!! $node->nodeRow->NodePromptNotes !!}@endif" >
+                    </label>
+                </div>
+                <div class="col-md-6 slGreenDark">
+                    <label class="nPrompt">
+                        <h3 class="m0 mB5"><span class="slGreenDark">Loop Name</span></h3>
+                        <select name="nodeDataLoop" id="nodeDataLoopID" class="form-control w100 slGreenDark" 
+                            autocomplete="off" >
+                            <option value="" @if (!isset($node->nodeRow->NodeDataBranch) 
+                                || $node->nodeRow->NodeDataBranch == "") SELECTED @endif ></option>
+                            @forelse ($GLOBALS["DB"]->dataLoops as $setPlural => $setInfo)
+                                <option @if (isset($node->nodeRow->NodeDataBranch) 
+                                    && $node->nodeRow->NodeDataBranch == $setPlural) SELECTED @endif 
+                                    value="{{ $setPlural }}" >{{ $setPlural }}</option>
+                            @empty
+                            @endforelse
+                        </select>
+                    </label>
+                </div>
+            </div>
+            
+            <label class="nPrompt pB20">
+                <h3 class="disIn mT0">Root Page Instructions</h3>
+                <small class="mL20 gry9">(text/HTML)</small>
+                <textarea name="nodeLoopInstruct" id="nodeLoopInstructID" class="form-control" 
+                    style="height: 100px;" autocomplete="off" >@if (isset($node->nodeRow->NodePromptText)
+                        ){!! $node->nodeRow->NodePromptText !!}@endif</textarea>
+            </label>
+            
+            <div id="stdLoopOpts" class="w100 pB20 @if (!$node->isStepLoop()) disBlo @else disNon @endif ">
+                <label class="nPrompt">
+                    <h3>
+                    <input type="checkbox" name="stdLoopAuto" id="stdLoopAutoID" value="1" autocomplete="off" 
+                    @if (isset($node->nodeRow->NodeDataBranch) && trim($node->nodeRow->NodeDataBranch) != '' 
+                        && isset($GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]) 
+                        && isset($GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopAutoGen)
+                        && $GLOBALS["DB"]->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopAutoGen == 1) 
+                        CHECKED
+                    @endif > Auto-Generate new loop items when user clicks "Add" button</h3>
+                </label>
+            </div>
+            <div id="stepLoopOpts" class="w100 pB20 @if ($node->isStepLoop()) disBlo @else disNon @endif ">
+                <label class="nPrompt">
+                    <h3>Field Marking A Finished Loop Item (Step)</h3>
+                    <select name="stepLoopDoneField" id="stepLoopDoneFieldID" class="form-control" autocomplete="off" >
+                        @if ($node->isStepLoop())
+                            {!! $GLOBALS["DB"]->fieldsDropdown(trim($GLOBALS["DB"]
+                                ->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopDoneFld)) !!}
+                        @else
+                            {!! $GLOBALS["DB"]->fieldsDropdown() !!}
+                        @endif
+                    </select>
+                </label>
+            </div>
+                    
+        </div>
+    </div>
+</div>
+
+<div id="hasCycle" class=" @if ($node->isLoopCycle()) disBlo @else disNon @endif ">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h3 class="m0">Data Loop Cycle's Options</h3>
+            </div>
+        </div>
+        <div class="panel-body">
+            <label class="nPrompt">
+                <h3 class="m0 mB5"><span class="slGreenDark">Loop To Cycle Through</span></h3>
+                <select name="nodeDataCycle" id="nodeDataCycleID" class="form-control w100 slGreenDark" 
+                    autocomplete="off" >
+                    <option value="" @if (!isset($node->nodeRow->NodeResponseSet) 
+                        || $node->nodeRow->NodeResponseSet == "") SELECTED @endif ></option>
+                    @forelse ($GLOBALS["DB"]->dataLoops as $setPlural => $setInfo)
+                        <option @if (isset($node->nodeRow->NodeResponseSet) 
+                            && $node->nodeRow->NodeResponseSet == 'LoopItems::' . $setPlural) SELECTED @endif 
+                            value="{{ $setPlural }}" >{{ $setPlural }}</option>
+                    @empty
+                    @endforelse
+                </select>
+            </label>
+        </div>
+    </div>
+</div>
+
+<div id="hasSort" class=" @if ($node->isLoopSort()) disBlo @else disNon @endif ">
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <h3 class="m0">Data Loop Sorting Options</h3>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row slGreenDark">
+                <div class="col-md-6 pR20">
+                    <label class="nPrompt">
+                        <h3 class="m0 mB5"><span class="slGreenDark">Data Loop:</span></h3>
+                        <select name="nodeDataSort" id="nodeDataSortID" class="form-control w100 slGreenDark" 
+                            autocomplete="off" >
+                            <option value="" @if (!isset($node->nodeRow->NodeResponseSet) 
+                                || $node->nodeRow->NodeResponseSet == "") SELECTED @endif ></option>
+                            @forelse ($GLOBALS["DB"]->dataLoops as $setPlural => $setInfo)
+                                <option @if (isset($node->nodeRow->NodeResponseSet) 
+                                    && $node->nodeRow->NodeResponseSet == 'LoopItems::' . $setPlural) SELECTED @endif 
+                                    value="{{ $setPlural }}" >{{ $setPlural }}</option>
+                            @empty
+                            @endforelse
+                        </select>
+                    </label>
+                </div>
+                <div class="col-md-6">
+                    <label class="nPrompt">
+                        <h3 class="m0 mB5"><span class="slGreenDark">Loop Sorting Field:</span></h3>
+                        <select name="DataStoreSort" id="DataStoreSortID" class="form-control" autocomplete="off" 
+                            onClick="return checkData();" >
+                            {!! $GLOBALS["DB"]->fieldsDropdown((isset($node->nodeRow->NodeDataStore)) 
+                                ? trim($node->nodeRow->NodeDataStore) : '') !!}
+                        </select>
+                        <i class="f12">*Must be integer field within Data Loop's Table.</i>
+                    </label>
                 </div>
             </div>
         </div>
@@ -542,6 +577,13 @@
                     <div id="resCanAuto" class="gry9 @if (isset($node->nodeRow->NodeType) && 
                         in_array($node->nodeRow->NodeType, ['Text'])) disBlo 
                         @else disNon @endif ">
+                        <label class="mT10 mB10">
+                            <label for="opts41ID">
+                                <input type="checkbox" name="opts41" id="opts41ID" value="41" autocomplete="off" 
+                                    @if ($node->nodeRow->NodeOpts%41 == 0) CHECKED @endif 
+                                    > Echo Response To Div
+                            </label>
+                        </label>
                         <label>
                             Autofill Suggestions: 
                             <select name="nodeTextSuggest" id="nodeTextSuggestID" class="form-control disIn" 
@@ -622,8 +664,8 @@
                             @if ($currDefinition != '' || $currLoopItems != '') disBlo @else disNon @endif">
                             <div class="col-md-6">
                                 <h4 class="m0">Definition Set:</h4>
-                                <select name="responseDefinition" class="form-control" autocomplete="off" 
-                                    onChange="changeResponseListType();">
+                                <select name="responseDefinition" id="responseDefinitionID" class="form-control" 
+                                    onChange="changeResponseListType();" autocomplete="off">
                                     <option value="" @if ($currDefinition == '') SELECTED @endif ></option>
                                     @forelse ($defs as $def)
                                         <option value="{{ $def->DefSubset }}" 
@@ -635,8 +677,8 @@
                             </div>
                             <div class="col-md-6">
                                 <h4 class="m0">Entered Loop Items:</h4>
-                                <select name="responseLoopItems" class="form-control" autocomplete="off" 
-                                    onChange="changeResponseListType();">
+                                <select name="responseLoopItems" id="responseLoopItemsID" class="form-control" 
+                                    onChange="changeResponseListType();" autocomplete="off">
                                     <option value="" @if ($currLoopItems == '') SELECTED @endif ></option>
                                     @forelse ($GLOBALS["DB"]->dataLoops as $plural => $loop)
                                         <option value="{{ $plural }}"
@@ -910,15 +952,18 @@ $(document).ready(function(){
 function changeNodeType(newType) {
     document.getElementById('hasPage').style.display='none';
     document.getElementById('hasLoop').style.display='none';
+    document.getElementById('hasCycle').style.display='none';
     document.getElementById('hasBranch').style.display='none';
     document.getElementById('hasInstruct').style.display='none';
     document.getElementById('hasDataManip').style.display='none';
-    if (newType == 'branch' || newType == 'data' || newType == 'loop' || newType == 'page' || newType == 'instruct') {
+    if (newType == 'branch' || newType == 'data' || newType == 'loop' || newType == 'sort' || newType == 'cycle' || newType == 'page' || newType == 'instruct') {
         document.getElementById('hasResponse').style.display='none';
         if  (newType == 'instruct') document.getElementById('hasInstruct').style.display='block';
         else if (newType == 'data') document.getElementById('hasDataManip').style.display='block';
         else if (newType == 'branch') document.getElementById('hasBranch').style.display='block';
         else if (newType == 'loop') document.getElementById('hasLoop').style.display='block';
+        else if (newType == 'cycle') document.getElementById('hasCycle').style.display='block';
+        else if (newType == 'sort') document.getElementById('hasSort').style.display='block';
         else if (newType == 'page') document.getElementById('hasPage').style.display='block';
     }
     else document.getElementById('hasResponse').style.display='block';
@@ -981,6 +1026,8 @@ function changeResponseListType() {
     document.getElementById('changeResListType').style.display = 'block';
     if (document.getElementById('resListTypeManual') && document.getElementById('resListTypeManual').checked) {
         document.getElementById('responseOptLists').style.display = 'none';
+        document.getElementById('responseDefinitionID').value='';
+        document.getElementById('responseLoopItemsID').value='';
         return true;
     }
     document.getElementById('responseOptLists').style.display = 'block';

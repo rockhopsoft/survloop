@@ -25,22 +25,26 @@ $v = $surv->custLoop->v;
 @endif
 
 <div class="nodeWrap">
-<div class="nPrompt"><label for="emailID">Email:</label></div>
-<div class="nFld"><input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control"></div>
+    <div class="nPrompt"><label for="emailID">Email:</label></div>
+    <div class="nFld">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control fingerTxt">
+    </div>
 </div>
 
 <div class="nodeGap"></div>
 
 <div class="nodeWrap">
 <div class="nPrompt"><label for="password">Password:</label></div>
-<div class="nFld"><input id="password" name="password" type="password" class="form-control"></div>
+<div class="nFld"><input id="password" name="password" type="password" class="form-control fingerTxt"></div>
 </div>
 
 <div class="nodeGap"></div>
 
 <div class="nodeWrap">
-<div class="nPrompt"><label for="password_confirmation">Confirm Password:</label></div>
-<div class="nFld"><input id="password_confirmation" name="password_confirmation" type="password" class="form-control"></div>
+    <div class="nPrompt"><label for="password_confirmation">Confirm Password:</label></div>
+    <div class="nFld">
+        <input id="password_confirmation" name="password_confirmation" type="password" class="form-control fingerTxt">
+    </div>
 </div>
 
 <center><input type="submit" class="nFormBtnSub" style="font-size: 150%; float: none;" value="Reset Password"></center>

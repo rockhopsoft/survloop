@@ -24,33 +24,36 @@
                 <th>Min</th>
                 <th>Max <span class="f12 gry9">(Warn At)</span></th>
             </tr>
-        @forelse ($GLOBALS["DB"]->dataLoops as $loop)
+        @forelse ($GLOBALS["DB"]->dataLoops as $loopPlural => $loopRow)
             <tr>
                 <td class="taC">
-                @if (intVal($loop->DataLoopRoot) > 0)
-                    <a href="#n{{ $loop->DataLoopRoot }}">{{ $loop->DataLoopRoot }}</a>
+                @if (intVal($loopRow->DataLoopRoot) > 0)
+                    <a href="#n{{ $loopRow->DataLoopRoot }}">{{ $loopRow->DataLoopRoot }}</a>
                 @endif
                 </td>
-                <td><a href="#n{{ $loop->DataLoopRoot }}">{{ $loop->DataLoopPlural }}</a> <small class="f12 gry9">({{ $loop->DataLoopSingular }})</small></td>
-                <td><a href="/dashboard/db/table/{{ $loop->DataLoopTable }}" target="_blank">
-                @if (sizeof($loop->conds) > 0) 
-                    {!! view('vendor.survloop.admin.tree.node-list-conditions', [ "conds" => $loop->conds ])->render() !!}
+                <td><a href="#n{{ $loopRow->DataLoopRoot }}">{{ $loopRow->DataLoopPlural }}</a> 
+                    <small class="f12 gry9">({{ $loopRow->DataLoopSingular }})</small></td>
+                <td><a href="/dashboard/db/table/{{ $loopRow->DataLoopTable }}" target="_blank">
+                @if (sizeof($loopRow->conds) > 0) 
+                    {!! view('vendor.survloop.admin.tree.node-list-conditions', [
+                        "conds" => $loopRow->conds
+                    ])->render() !!}
                 @else
-                    {{ $loop->DataLoopTable }}
+                    {{ $loopRow->DataLoopTable }}
                 @endif
                 </a></td>
                 <td>
-                    @if ($loop->DataLoopMinLimit > 0)
-                        <span class="gry9">{{ $loop->DataLoopMinLimit }}</span>
+                    @if ($loopRow->DataLoopMinLimit > 0)
+                        <span class="gry9">{{ $loopRow->DataLoopMinLimit }}</span>
                     @else
                         -
                     @endif
                 </td>
                 <td>
-                    @if ($loop->DataLoopMaxLimit > 0)
-                        {{ $loop->DataLoopMaxLimit }} 
-                        @if ($loop->DataLoopWarnLimit > 0)
-                            <span class="gry9">({{ $loop->DataLoopWarnLimit }})</span>
+                    @if ($loopRow->DataLoopMaxLimit > 0)
+                        {{ $loopRow->DataLoopMaxLimit }} 
+                        @if ($loopRow->DataLoopWarnLimit > 0)
+                            <span class="gry9">({{ $loopRow->DataLoopWarnLimit }})</span>
                         @endif
                     @else
                         -

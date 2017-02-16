@@ -31,6 +31,7 @@ class DatabaseLookups
     public $treeRow        = [];
     public $treeName       = '';
     public $coreTbl        = '';
+    public $coreTblUserFld = '';
     public $treeXmlID      = -3;
     
     public $sysOpts        = [];
@@ -67,27 +68,24 @@ class DatabaseLookups
     
     function __construct($dbID = 1, $treeID = 1, Request $request = NULL)
     {
-        $this->dbID     = $dbID;
-        $this->dbRow     = SLDatabases::find($this->dbID);
-        $this->treeID     = $treeID;
-        $this->treeRow     = SLTree::where('TreeID', $this->treeID)
+        $this->dbID    = $dbID;
+        $this->dbRow   = SLDatabases::find($this->dbID);
+        $this->treeID  = $treeID;
+        $this->treeRow = SLTree::where('TreeID', $this->treeID)
             ->where('TreeDatabase', $this->dbID)
             ->first();
         if (!$this->treeRow || !isset($this->treeRow->TreeID)) {
             $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
                 ->where('TreeType', 'Primary Public')
                 ->first();
-            if (isset($this->treeRow->TreeID)) {
-                $this->treeID = $this->treeRow->TreeID;
-            }
+            if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
         }
         if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName)) {
-            $this->treeName    = str_replace($this->dbRow->DbName, 
-                str_replace('_', '', $this->dbRow->DbPrefix), 
-                    $this->treeRow->TreeName);
+            $this->treeName = str_replace($this->dbRow->DbName, str_replace('_', '', $this->dbRow->DbPrefix), 
+                $this->treeRow->TreeName);
         }
 
-        $this->sysOpts = array( "cust-abbr" => 'survloop' );
+        $this->sysOpts = ["cust-abbr" => 'survloop'];
         
         $this->loadDBFromCache($request);
         
@@ -153,6 +151,7 @@ class DatabaseLookups
                 foreach ($tbls as $tbl) {
                     if (isset($this->treeRow->TreeCoreTable) && $tbl->TblID == $this->treeRow->TreeCoreTable) {
                         $coreTbl = $tbl->TblName;
+                        $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
                     }
                     $cache .= '$'.'this->tbls[] = ' . $tbl->TblID . ';' . "\n"
                         . '$'.'this->tblI[\'' . $tbl->TblName . '\'] = ' . intVal($tbl->TblID) . ';' . "\n"
@@ -206,8 +205,11 @@ class DatabaseLookups
             } // end if (isset($this->dbRow->DbPrefix))
 
             eval($cache);
+            $this->getCoreTblUserFld();
+            $cache2 = '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
+            eval($cache2);
             if (file_exists($cacheFile)) Storage::delete($cacheFile);
-            Storage::put($cacheFile, $cache);
+            Storage::put($cacheFile, $cache . $cache2);
         }
         return true;
     }
@@ -225,6 +227,25 @@ class DatabaseLookups
         return ($tblID == $this->treeRow->TreeCoreTable);
     }
     
+    public function getCoreTblUserFld()
+    {
+        if (!isset($this->coreTblUserFld) || trim($this->coreTblUserFld) == '') {
+            $coreTblID = $this->tblI[$this->coreTbl];
+            $userTbl = SLTables::where('TblDatabase', $this->dbID)
+                ->where('TblName', 'Users')
+                ->first();
+            if ($userTbl && isset($userTbl->TblID)) {
+                $keyFld = SLFields::where('FldTable', $coreTblID)
+                    ->where('FldForeignTable', $userTbl->TblID)
+                    ->first();
+                if ($keyFld && isset($keyFld->FldName)) {
+                    $this->coreTblUserFld = $userTbl->TblAbbr . $keyFld->FldName;
+                }
+            }
+        }
+        return $this->coreTblUserFld;
+    }
+    
     public function dbFullSpecs()
     {
         return ($this->dbRow->DbOpts%3 > 0);
@@ -236,20 +257,57 @@ class DatabaseLookups
         return (isset($this->dataLoops[$loop]) && intVal($this->dataLoops[$loop]->DataLoopIsStep) == 1);
     }
     
+    public function setClosestLoop($loop = '', $itemID = -3, $obj = [])
+    {
+        $this->closestLoop = [ "loop" => $loop, "itemID" => $itemID, "obj" => $obj ];
+        return true;
+    }
+    
+    public function chkClosestLoop()
+    {
+        if ($this->sessLoops && isset($this->sessLoops[0])) {
+            $loop = $this->sessLoops[0]->SessLoopName;
+            $this->setClosestLoop($loop, $this->sessLoops[0]->SessLoopItemID, $this->dataLoops[$loop]);
+        }
+        return true;
+    }
+    
     public function loadSessLoops($sessID)
     {
         $this->sessLoops = SLSessLoops::where('SessLoopSessID', $sessID)
             ->orderBy('SessLoopID', 'desc')
             ->get();
-        $this->closestLoop = [ "loop" => '', "itemID" => -3, "obj" => [] ];
-        if ($this->sessLoops && isset($this->sessLoops[0])) {
-            $this->closestLoop = [
-                "loop"   => $this->sessLoops[0]->SessLoopName,         
-                "itemID" => $this->sessLoops[0]->SessLoopItemID,
-                "obj"    => $this->dataLoops[$this->sessLoops[0]->SessLoopName]
-            ];
-        }
+        $this->setClosestLoop();
+        $this->chkClosestLoop();
         return $this->sessLoops;
+    }
+    
+    public function fakeSessLoopCycle($loop, $itemID)
+    {
+        /// add fake to [0] position, then reset closest
+        $tmpLoops = $this->sessLoops;
+        $this->sessLoops[0] = new SLSessLoops;
+        $this->sessLoops[0]->SessLoopName = $loop;
+        $this->sessLoops[0]->SessLoopItemID = $itemID;
+        if (sizeof($tmpLoops) > 0) {
+            foreach ($tmpLoops as $l) $this->sessLoops[] = $l;
+        }
+        $this->setClosestLoop($loop, $itemID, $this->dataLoops[$loop]);
+        return true;
+    }
+    
+    public function removeFakeSessLoopCycle($loop, $itemID)
+    {
+        $tmpLoops = $this->sessLoops;
+        if (sizeof($tmpLoops) > 0) {
+            foreach ($tmpLoops as $i => $l) {
+                if ($l->SessLoopName != $loop || $l->SessLoopItemID != $itemID) {
+                    $this->sessLoops[] = $l;
+                }
+            }
+        }
+        $this->chkClosestLoop();
+        return true;
     }
     
     public function getSessLoopID($loopName)
@@ -272,6 +330,34 @@ class DatabaseLookups
             }
         }
         return '';
+    }
+    
+    public function getLoopSingular($loopName)
+    {
+        if (isset($this->dataLoops[$loopName])) {
+            return $this->dataLoops[$loopName]->DataLoopSingular;
+        }
+        return '';
+    }
+    
+    public function getLoopTable($loopName)
+    {
+        if (isset($this->dataLoops[$loopName])) {
+            return $this->dataLoops[$loopName]->DataLoopTable;
+        }
+        return '';
+    }
+    
+    public function loadLoopConds()
+    {
+        if (isset($this->dataLoops) && sizeof($this->dataLoops) > 0) {
+            foreach ($this->dataLoops as $loopName => $loop) {
+                if (isset($this->dataLoops[$loopName]->DataLoopTree)) {
+                    $this->dataLoops[$loopName]->loadLoopConds();
+                }
+            }
+        }
+        return true;
     }
     
     
@@ -305,7 +391,7 @@ class DatabaseLookups
         $flds = SLFields::select('SL_Fields.FldTable', 'SL_Fields.FldName', 'SL_Fields.FldForeignTable')
             ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Fields.FldForeignTable')
             ->where('FldDatabase',         $this->dbID)
-            ->where('FldTable',         '>', 0)
+            ->where('FldTable',            '>', 0)
             ->where('FldForeignTable',     '>', 0)
             ->orderBy('SL_Tables.TblName', 'asc')
             ->get();
@@ -456,10 +542,15 @@ class DatabaseLookups
     
     public function tablesDropdown($preSel = '', $instruct = '', $prefix = '', $disableBlank = false)
     {
+        $loopTbl = '';
+        if (trim($preSel) != '' && isset($this->dataLoops[$preSel])) {
+            $loopTbl = $this->dataLoops[$preSel]->DataLoopTable;
+        }
         $retVal = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') 
             . (($disableBlank) ? ' DISABLED ' : '') . ' >' . $instruct . '</option>' . "\n";
         foreach ($this->tblAbbr as $tblName => $tblAbbr) {
-            $retVal .= '<option value="' . $tblName.'" ' . (($preSel == $tblName) ? 'SELECTED' : '') 
+            $retVal .= '<option value="' . $tblName.'" ' 
+                . (($preSel == $tblName || $loopTbl == $tblName) ? 'SELECTED' : '') 
                 . ' >' . $prefix . $tblName.'</option>' . "\n";
         }
         return $retVal;

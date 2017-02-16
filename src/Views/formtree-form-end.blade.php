@@ -15,7 +15,6 @@ setTimeout("checkFullPage()", 10);
 
 {!! $pageJSextra !!}
 
-var hasAttemptedSubmit = false;
 function checkNodeForm() {
     if (document.getElementById("stepID").value == "back") return true;
     hasAttemptedSubmit = true;
@@ -145,7 +144,24 @@ $(function() {
     {!! $pageAJAX !!}
 
 });
+
+setTimeout("hasAttemptedSubmit = false", 10);
+
+@if ($hasFixedHeader)
+    var mainFixed = function(){
+        if (document.getElementById('fixedHeader')) {
+            var fixer = $('#fixedHeader');
+            var scrollMin = 100;
+            if ($(window).width() <= 480) scrollMin = 30;
+            if ($(this).scrollTop() >= scrollMin) fixer.addClass('fixed');
+            $(document).scroll(function(){
+                if ($(this).scrollTop() >= scrollMin) fixer.addClass('fixed');
+                else fixer.removeClass('fixed');
+            });
+        }
+    }
+    $(document).ready(mainFixed);
+@endif
+
 </script>
 </form>
-
-{!! $GLOBALS["DB"]->sysOpts["footer-master"] !!}

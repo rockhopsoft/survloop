@@ -57,12 +57,17 @@
         @if ($node->isBranch())
             <span class="slBlueDark f26 opac80" title="Branch Title"><i class="fa fa-share-alt"></i>
         @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
-            <span class="gryA f22 opac50" title="Only visible to robots"><i class="fa fa-bug fa-rotate-90"></i>
+            <span class="gryA f22 opac50" title="Only Visible to Robots"><i class="fa fa-bug fa-rotate-90"></i>
         @elseif ($node->isLoopRoot())
             <span class="slBlueDark f30" title="Start of a New Page, Root of a Data Loop"><i class="fa fa-refresh"></i>
+        @elseif ($node->isLoopCycle())
+            <span class="slBlueDark f20" title="Data Loop within a Page"><i class="fa fa-refresh"></i>
+        @elseif ($node->isLoopSort())
+            <span class="slBlueDark f20" title="Sort Data Loop Items"><i class="fa fa-sort"></i>
         @elseif ($node->isDataManip())
-            <span class="slBlueDark f30" title="Data Manipulation"><i class="fa fa-database slGreenDark f22"></i>
-        @elseif ($node->isPage()) 
+            <span class="slGreenDark @if ($node->parentID > 0) f16 @else f26 @endif " 
+                title="Data Manipulation"><i class="fa fa-database slGreenDark"></i>
+        @elseif ($node->isPage())
             <span class="slBlueDark f30" title="Start of a New Page"><i class="fa fa-file-text-o"></i>
         @endif
         </span> 
@@ -88,10 +93,22 @@
                 /{{ $node->nodeRow->NodePromptNotes }}</a>
             <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
             
+        @elseif ($node->isLoopCycle())
+        
+            <span class="slBlueDark f20">Repeat Child Nodes For Each 
+                {{ $GLOBALS["DB"]->getLoopSingular(str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet)) }}
+            </span>
+            <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
+            
+        @elseif ($node->isLoopSort())
+            
+            <span class="slBlueDark f20">Sort Loop Items:  
+                {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}
+            </span>
+            
         @elseif ($node->isDataManip())
         
-            <span class="slGreenDark">
-            <span class="f18">
+            <span class="slGreenDark @if ($node->parentID > 0) f16 @else f26 @endif ">
                 {{ $node->nodeRow->NodeDataBranch }}
                 @if ($node->nodeRow->NodeType == 'Data Manip: New') 
                     New Record 
@@ -100,8 +117,6 @@
                 @else 
                     Table Wrap 
                 @endif
-            </span>
-            {{ $node->printManipUpdate() }}
             </span>
             
         @else
@@ -186,9 +201,14 @@
                     <span class="red"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
                 @elseif ($node->isBranch() && $nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node
                 @elseif ($node->isBranch()) Branch
+                @elseif ($node->isLoopRoot()) Loop Root Multiple Pages
+                @elseif ($node->isLoopCycle()) Loop Root Within A Page
                 @elseif (!$node->isDataManip()) {{ $node->nodeRow->NodeType }}
                 @endif
             </span>
+            @if ($node->isDataManip())
+                <span class="slGreenDark">{!! substr($node->printManipUpdate(), 2) !!}</span>
+            @endif
             {!! $conditionList !!}
         </div>
         @if (!$REQ->has('print'))

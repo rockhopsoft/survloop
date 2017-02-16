@@ -115,6 +115,7 @@ class DatabaseInstaller extends AdminDBController
     
     public function printExportLaravel(Request $request) 
     {
+        ini_set('max_execution_time', 180);
         $this->admControlInit($request, '/dashboard/db/export');
         if (!$this->checkCache('/dashboard/db/export/laravel')) {
             $this->chkModelsFolder();

@@ -63,6 +63,12 @@ class SurvLoop extends Controller
         return $this->custLoop->ajaxChecks($request);
     }
     
+    public function sortLoop(Request $request)
+    {
+        $this->loadLoop($request);
+        return $this->custLoop->sortLoop($request);
+    }
+    
     public function holdSess(Request $request)
     {
         $this->loadLoop($request);
@@ -79,6 +85,18 @@ class SurvLoop extends Controller
     {
         $this->loadLoop($request);
         return $this->custLoop->sessDump();
+    }
+    
+    public function switchSess(Request $request, $cid)
+    {
+        $this->loadLoop($request);
+        return $this->custLoop->switchSess($request, $cid);
+    }
+    
+    public function delSess(Request $request, $cid)
+    {
+        $this->loadLoop($request);
+        return $this->custLoop->delSess($request, $cid);
     }
     
     public function afterLogin(Request $request)

@@ -51,7 +51,7 @@
   </head>
 <body>
 @if (!isset($hideWrap) || !$hideWrap)
-    <div id="headBar"><center><a href="https://OpenPoliceComplaints.org" id="headLogoLong"><img src="/images/Flex_Open_1LineBox_v3.svg" border=0 ></a></center></div>
+    <div id="headBar"><center><a href="https://openpolice.org" id="headLogoLong"><img src="/images/Flex_Open_1LineBox_v3.svg" border=0 ></a></center></div>
 @endif
 
 <div id="printBodyWrap">

@@ -13,6 +13,7 @@ class SurvLoopNode extends CoreNode
     public $conds         = array();
     public $responses     = array();
     public $hasShowKids   = false;
+    public $hasPageParent = false;
     
     public $dataManips    = array();
     
@@ -184,6 +185,16 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeType == 'Loop Root');
     }
     
+    public function isLoopCycle()
+    {
+        return ($this->nodeType == 'Loop Cycle');
+    }
+    
+    public function isLoopSort()
+    {
+        return ($this->nodeType == 'Loop Sort');
+    }
+    
     public function isStepLoop()
     {
         return ($this->isLoopRoot() && $GLOBALS["DB"]->isStepLoop($this->dataBranch));
@@ -207,7 +218,7 @@ class SurvLoopNode extends CoreNode
     public function isSpecial()
     {
         return ($this->isInstruct() || $this->isPage()  || $this->isBranch() 
-            || $this->isLoopRoot() || $this->isDataManip());
+            || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip());
     }
     
     public function isRequired()
@@ -246,7 +257,6 @@ class SurvLoopNode extends CoreNode
         if (!$this->isDataManip() || $this->nodeType == 'Data Manip: Wrap') return '';
         $manipUpdate = $this->getManipUpdate();
         if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') return '';
-        $ret = '';
         $ret = ' , ' . $manipUpdate[1] . ' = ';
         if (isset($this->responseSet) && intVal($this->responseSet) > 0) {
             $ret .= $GLOBALS["DB"]->getDefValById(intVal($this->responseSet));

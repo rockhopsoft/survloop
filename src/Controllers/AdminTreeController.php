@@ -103,14 +103,6 @@ class AdminTreeController extends AdminController
         }
         
         if (!$this->checkCache() || $request->has('dataStruct')) {
-            if (sizeof($GLOBALS["DB"]->dataLoops) > 0) {
-                foreach ($GLOBALS["DB"]->dataLoops as $l => $loop) {
-                    if (isset($GLOBALS["DB"]->dataLoops[$l]->DataLoopTree)) {
-                        $GLOBALS["DB"]->dataLoops[$l]->loadConds();
-                    }
-                }
-            }
-            //echo '<pre>'; print_r($GLOBALS["DB"]->dataLoops); echo '</pre>';
             $this->v["content"] = view('vendor.survloop.admin.tree.tree-data', $this->v)->render();
             $this->saveCache();
         }

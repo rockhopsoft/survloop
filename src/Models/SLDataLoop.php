@@ -4,10 +4,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDataLoop extends Model
 {
-    protected $table         = 'SL_DataLoop';
-    protected $primaryKey     = 'DataLoopID';
-    public $timestamps         = true;
-    protected $fillable     = 
+    protected $table      = 'SL_DataLoop';
+    protected $primaryKey = 'DataLoopID';
+    public $timestamps    = true;
+    protected $fillable   = 
     [    
         'DataLoopTree', 
         'DataLoopRoot', 
@@ -24,9 +24,9 @@ class SLDataLoop extends Model
     ];
     
     
-    public $conds = array();
+    public $conds = [];
     
-    public function loadConds()
+    public function loadLoopConds()
     {
         $this->conds = array();
         $getConds = SLConditionsNodes::where('CondNodeLoopID', $this->DataLoopID)

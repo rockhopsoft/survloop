@@ -24,8 +24,14 @@ function resetCheckForm() {
 	return true;
 }
 
+var hasAttemptedSubmit = false;
 var totFormErrors = 0;
 var formErrorsEng = '';
+
+function chkFormCheck() {
+    if (hasAttemptedSubmit) return checkNodeForm();
+    return false;
+}
 
 function setFormErrs() {
 	if (document.getElementById('formErrorMsg')) {
@@ -100,7 +106,7 @@ function reqFormFldRadio(nID, maxOpts) {
 }
 
 function checkFldDate(nID) {
-    return (document.getElementById('n'+nID+'fldYearID').value != '00' 
+    return (document.getElementById('n'+nID+'fldYearID').value != '0000' 
 	    && document.getElementById('n'+nID+'fldMonthID').value != '00' 
 	    && document.getElementById('n'+nID+'fldDayID').value != '00');
 }
@@ -114,7 +120,25 @@ function reqFormFldDate(nID) {
 	return true;
 }
 
+function reqFormFldDateAndLimit(nID, future, today, optional) {
+	if (!checkFldDate(nID) || !chkFormFldDateLimit(nID, future, today, optional)) {
+		setFormLabelRed(nID);
+		totFormErrors++;
+	}
+	else setFormLabelBlack(nID);
+	return true;
+}
+
 function reqFormFldDateLimit(nID, future, today, optional) {
+	if (!chkFormFldDateLimit(nID, future, today, optional)) {
+		setFormLabelRed(nID);
+		totFormErrors++;
+	}
+	else setFormLabelBlack(nID);
+	return true;
+}
+
+function chkFormFldDateLimit(nID, future, today, optional) {
     if (future == 0) return true;
     validDate = true;
     if (optional == 1 && !checkFldDate(nID)) { }
@@ -144,12 +168,7 @@ function reqFormFldDateLimit(nID, future, today, optional) {
         }
     }
     else validDate = false;
-	if (!validDate) {
-		setFormLabelRed(nID);
-		totFormErrors++;
-	}
-	else setFormLabelBlack(nID);
-	return true;
+    return validDate;
 }
 
 function charLimit(nID, limit) {
@@ -161,19 +180,22 @@ function charLimit(nID, limit) {
 	return true;
 }
 
-function dateChange(nID) {
+function formDateChange(nID) {
 	document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'fldYearID').value+'-'+document.getElementById('n'+nID+'fldMonthID').value+'-'+document.getElementById('n'+nID+'fldDayID').value;
+	chkFormCheck();
 	return true;
 }
 
 function dateKeyUp(nID, which) {
 	document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'fldMonthID').value+'/'+document.getElementById('n'+nID+'fldDayID').value+'/'+document.getElementById('n'+nID+'fldYearID').value;
+	chkFormCheck();
 	return true;
 }
 
 
 function formChangeFeetInches(nID) {
 	if (document.getElementById('n'+nID+'FldID')) document.getElementById('n'+nID+'FldID').value = (12*parseInt(document.getElementById('n'+nID+'fldFeetID').value))+parseInt(document.getElementById('n'+nID+'fldInchID').value);
+	chkFormCheck();
 	return true;
 }
 function formRequireFeetInches(nID) {
@@ -195,7 +217,7 @@ function formRequireGender(nID) {
 function checkNodeUp(nID, response, isMobile) {
     checkMutEx(nID, response);
     if (isMobile == 1) checkFingerClass(nID);
-    if (hasAttemptedSubmit) checkNodeForm();
+	chkFormCheck();
     return true;
 }
 
@@ -204,6 +226,7 @@ function formKeyUpOther(nID, j) {
         document.getElementById('n'+nID+'fld'+j+'').checked=true;
         checkFingerClass(nID);
     }
+	chkFormCheck();
     return true;
 }
 
@@ -215,6 +238,7 @@ function formClickGender(nID) {
             document.getElementById('n'+nID+'fldOtherID').value = '';
         }
     }
+	chkFormCheck();
     return true;
 }
 
@@ -310,9 +334,18 @@ function checkMutEx(nID, response) {
 }
 
 
+function copyNodeResponse(fldID, dest) {
+    if (document.getElementById(fldID) && document.getElementById(dest)) {
+        document.getElementById(dest).innerHTML=document.getElementById(fldID).value;
+        return true;
+    }
+    return false;
+}
+
 // used by form generator child reveal responsiveness:
 var nodeKidList = new Array();
 var conditionNodes = new Array();
+
 function kidsVisible(nID, onOff, isFirst) {
 	if (!isFirst && conditionNodes[nID]) return true;
 	isFirst = false;
@@ -324,6 +357,7 @@ function kidsVisible(nID, onOff, isFirst) {
 	}
 	return true;
 }
+
 function setNodeVisib(nID, onOff) {
 	if (document.getElementById("n"+nID+"VisibleID")) {
 		if (onOff) document.getElementById("n"+nID+"VisibleID").value=1;
@@ -372,20 +406,6 @@ function checkAjaxLoad() {
     return true;
 }
 setTimeout("checkAjaxLoad()", 100);
-
-var main = function(){
-	if (document.getElementById('fixedHeader')) {
-		var fixer = $('#fixedHeader');
-		var scrollMin = 100;
-		if ($(window).width() <= 480) scrollMin = 30;
-		if ($(this).scrollTop() >= scrollMin) fixer.addClass('fixed');
-		$(document).scroll(function(){
-			if ($(this).scrollTop() >= scrollMin) fixer.addClass('fixed');
-			else fixer.removeClass('fixed');
-		});
-	}
-}
-$(document).ready(main);
 
 $(function() {
 	
@@ -436,7 +456,6 @@ function showRightSide() {
 
 var holdSess = 0;
 function holdSession() {
-	//alert('?');
 	if (holdSess > 0 && document.getElementById('hidFrameID')) {
 		document.getElementById('hidFrameID').src='/holdSess';
 		setTimeout("holdSession()", (5*60000));

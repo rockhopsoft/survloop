@@ -7,7 +7,7 @@
 
     <script type="text/javascript">
     function anonymousLogin() {
-        document.getElementById('emailID').value='anonymous.{{ $coreID }}@openpolicecomplaints.org';
+        document.getElementById('emailID').value='anonymous.{{ $coreID }}@openpolice.org';
         document.getElementById('password').value='{{ $anonyPass }}';
         document.getElementById('password_confirmation').value='{{ $anonyPass }}';
         document.postNode.submit();
@@ -23,10 +23,13 @@
 
 <div id="node001" class="nodeWrap">
     <div id="nLabel001" class="nPrompt">
-        <label for="emailID">Email:</label> <span class="slRedDark f12">*required</span>
+        <label for="emailID">
+            <h2 class="disIn">Email:</h2> <span class="slRedDark">*required</span>
+        </label>
     </div>
     <div class="nFld">
-        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" 
+            class="form-control{{ $inputMobileCls }}">
     </div>
     
     <div id="emailWarning" class="disNon">
@@ -49,19 +52,24 @@
 
 <div id="node002" class="nodeWrap">
 <div id="nLabel002" class="nPrompt">
-    <label for="password">Password: </label>
-    <span class="slRedDark f12">*required, <i>6 character minimum</i></span>
+    <label for="password">
+        <h2 class="disIn">Password:</h2> <span class="slRedDark">*required, 6 character minimum</span>
+    </label>
 </div>
-<div class="nFld"><input id="password" name="password" type="password" class="form-control"></div>
+<div class="nFld">
+    <input id="password" name="password" type="password" class="form-control{{ $inputMobileCls }}">
+</div>
 </div>
 <div class="nodeGap"></div>
 <div id="node003" class="nodeWrap">
     <div id="nLabel003" class="nPrompt">
-        <label for="password_confirmation">Confirm Password:</label> 
-        <span class="slRedDark f12">*required</span>
+        <label for="password_confirmation">
+            <h2 class="disIn">Confirm Password:</h2> <span class="slRedDark">*required</span>
+        </label>
     </div>
     <div class="nFld">
-        <input id="password_confirmation" name="password_confirmation" type="password" class="form-control">
+        <input id="password_confirmation" name="password_confirmation" type="password" 
+            class="form-control{{ $inputMobileCls }}">
     </div>
 </div>
 

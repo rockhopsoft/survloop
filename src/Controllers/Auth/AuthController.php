@@ -110,21 +110,14 @@ class AuthController extends Controller
      */
     public function redirectPath()
     {
-        /*
-        // Logic that determines where to send the user
-        $user = Auth::user();
-        if ($user->hasRole('administrator|staff|databaser|brancher')) {
-            return '/dashboard';
-        } elseif ($user->hasRole('volunteer')) {
-            return '/volunteer';
-        }
-        */
         return '/afterLogin';
     }
     
     public function getLogout()
     {
         Auth::logout();
+        session()->put('sessID', -3);
+        session()->put('coreID', -3);
         return redirect('/');
     }
     

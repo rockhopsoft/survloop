@@ -21,8 +21,13 @@ class SurvLoopController extends Controller
 {
     protected $dbID              = 1;
     protected $treeID            = 1;
+    
     protected $coreID            = -3;
     protected $coreIDoverride    = -3;
+    protected $coreIncompletes   = [];
+    protected $sessID            = -3;
+    protected $sessInfo          = [];
+    protected $sessLoops         = [];
     
     public $v                    = array(); // contains data to be shares with views 
     protected $REQ               = array(); // class copy of Laravel's (Request $request)
@@ -112,6 +117,11 @@ class SurvLoopController extends Controller
         return view( $view, $this->v)->render();
     }
     
+    public function getCoreID()
+    {
+        return $this->coreID;
+    }
+    
     protected function setCurrPage($currPage = '')
     {
         $this->v["currPage"] = $currPage;
@@ -150,10 +160,8 @@ class SurvLoopController extends Controller
     protected function checkCache($baseOverride = '')
     {
         if ($baseOverride != '') $this->genCacheKey($baseOverride);
-        if ($this->REQ->has('refresh')) { 
-            //echo '<div style="padding: 100px;">refreshForget!  ' . $this->cacheKey . '</div>'; 
+        if ($this->REQ->has('refresh')) {
             Cache::forget($this->cacheKey); 
-            //echo '<textarea>'; print_r(Cache::store('file')->get($this->cacheKey)); echo '</textarea>';
         }
         if (Cache::store('file')->has($this->cacheKey)) {
             $this->v["content"] = Cache::store('file')->get($this->cacheKey);
@@ -309,7 +317,5 @@ class SurvLoopController extends Controller
         }
         return $class;
     }
-    
-    
     
 }

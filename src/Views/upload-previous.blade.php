@@ -43,14 +43,14 @@
                     @endif
                     
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 pT10">
                     
                     <div id="up{{ $upRow->id }}Info" class="disBlo fL">
-                        <h3>{{  $upRow->title }}</h3> 
-                        <p class="fPerc125"> @if (trim($upRow->desc) != '') {{ $upRow->desc }} @endif </p>
-                        <div class="gry9 pT10">
-                            {{ $GLOBALS["DB"]->getDefValById($upRow->type) }}, 
+                        <h2>{{  $upRow->title }}</h2> 
+                        @if (trim($upRow->desc) != '') <div class="fPerc125">{{ $upRow->desc }}</div> @endif
+                        <div class="gry9 pT5">
                             @if ($upRow->privacy == 'Open') Public @else Private @endif
+                            {{ $GLOBALS["DB"]->getDefValById($upRow->type) }}
                         </div>
                         {!! $upDeets[$i]["fileLnk"] !!}
                     </div>
@@ -61,10 +61,10 @@
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditTitleID">Title:</label></div>
                         <div class="nFld"><input type="text" class="form-control" name="up{{ $upRow->id }}EditTitle" 
                             id="up{{ $upRow->id }}EditTitleID" value="{{ $upRow->title }}"></div>
-                        <div class="nodeGap"></div>
+                        <?php /* <div class="nodeGap"></div>
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditDescID">Description:</label></div>
                         <div class="nFld"><input type="text" name="up{{ $upRow->id }}EditDesc" class="form-control" 
-                            id="up{{ $upRow->id }}EditDescID" value="{{ $upRow->desc }}"></div>
+                            id="up{{ $upRow->id }}EditDescID" value="{{ $upRow->desc }}"></div> */ ?>
                         <div class="nodeGap"></div>
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditTypeID">Type:</label></div>
                         <div class="nFld"><select name="up{{ $upRow->id }}EditType" id="up{{ $upRow->id }}EditTypeID" 

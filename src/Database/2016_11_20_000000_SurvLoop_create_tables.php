@@ -374,6 +374,17 @@ class SurvLoopCreateTables extends Migration
             $table->string('LogNewName')->nullable();
             $table->timestamps();
         });
+        Schema::create('SL_Zips', function(Blueprint $table)
+		{
+			$table->increments('ZipID');
+			$table->string('ZipZip', 10)->nullable();
+			$table->string('ZipLat')->nullable();
+			$table->string('ZipLong')->nullable();
+			$table->string('ZipCity')->nullable();
+			$table->string('ZipState', 5)->nullable();
+			$table->string('ZipCounty')->nullable();
+			$table->timestamps();
+		});
     
     }
 
@@ -408,6 +419,7 @@ class SurvLoopCreateTables extends Migration
         Schema::drop('SL_UsersRoles');
         Schema::drop('SL_UsersActivity');
         Schema::drop('SL_LogActions');
+        Schema::drop('SL_Zips');
     
     }
 }

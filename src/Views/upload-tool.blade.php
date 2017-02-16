@@ -40,11 +40,11 @@
                     <input type="text" id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" class="form-control">
                 </div>
             </div>
-            <div class="nodeGap"></div>
+            <?php /* <div class="nodeGap"></div>
             <div class="nPrompt"><label for="up{{ $nID }}DescID">Upload Description:</label></div>
             <div class="nFld">
                 <input type="text" id="up{{ $nID }}DescID" name="up{{ $nID }}Desc" value="" class="form-control">
-            </div>
+            </div> */ ?>
             <div class="nodeGap"></div>
             <div class="nPrompt"><label for="up{{ $nID }}VidID">Upload Privacy:</label></div> 
             <div class="nFld">
@@ -57,9 +57,8 @@
                 <span class="fPerc80 red">Be sure to set privacy to "private" for any documents which may contain 
                 private information like addresses, phone numbers, emails, social security numbers, etc.</span>
             </div>
-            <div class="nodeGap"></div>
-            <input type="submit" value="Upload Evidence" class="btn btn-lg btn-primary w100" 
-                id="nFormUpload" style="color: #FFF; font-size: 18pt; padding: 10px;">
+            <input type="submit" value="Upload More Evidence" class="btn btn-lg btn-default w100 fPerc125" 
+                id="nFormUpload" style="padding: 15px;">
         </div>
         
         <hr>

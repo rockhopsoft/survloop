@@ -840,7 +840,7 @@ class AdminDBController extends AdminController
                 $sorts[] = [
                     $fld->FldID, 
                     $fld->FldEng . ' <span style="font-size: 10px;">' 
-                        . (($fld->FldForeignTable) ? '<i class="fa fa-link"></i>' : '') . '</span>'
+                        . ((intVal($fld->FldForeignTable) > 0) ? '<i class="fa fa-link"></i>' : '') . '</span>'
                         . '<div class="fR"><i><span class="gry9" style="font-size: 12px;">'
                         . '<span style="font-size: 8px;">('.$fld->FldType.')</span> '
                         . $fld->FldName . '</span></i></div><div class="fC"></div>'
@@ -1171,9 +1171,9 @@ class AdminDBController extends AdminController
             if ($foreignFlds && sizeof($foreignFlds) > 0) {
                 foreach ($foreignFlds as $fld) {
                     if (!isset($tableLookup[$fld->FldTable])) {
-                        $errors .= '<br />add line, missing FldTable tblLookup[' . $fld->FldTable . ']';
+                        $this->v["errors"] .= '<br />add line, missing FldTable tblLookup[' . $fld->FldTable . ']';
                     } elseif (!isset($tableLookup[$fld->FldForeignTable])) {
-                        $errors .= '<br />add line, missing FldForeignTable tblLookup[' . $fld->FldForeignTable . ']';
+                        $this->v["errors"] .= '<br />add line, missing FldForeignTable tblLookup[' . $fld->FldForeignTable . ']';
                     } else {
                         $this->v["keyLines"][] = [
                             $tableLookup[$fld->FldTable], 
