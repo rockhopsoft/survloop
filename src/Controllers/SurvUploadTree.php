@@ -25,7 +25,7 @@ class SurvUploadTree extends SurvLoopTree
     protected function checkRandStr($tbl, $fld, $str)
     {
         $modelObj = array();
-        eval("\$modelObj = " . $GLOBALS["DB"]->modelPath($tbl) . "::where('" . $fld . "', '" . $str . "')->get();");
+        eval("\$modelObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::where('" . $fld . "', '" . $str . "')->get();");
         return (!$modelObj || sizeof($modelObj) <= 0);
     }
     
@@ -44,11 +44,12 @@ class SurvUploadTree extends SurvLoopTree
     protected function loadUploadTypes()
     {
         if (sizeof($this->uploadTypes) > 0) return $this->uploadTypes;
-        if (isset($GLOBALS["DB"]->sysOpts["upload-types"])) {
-            $this->uploadTypes = $GLOBALS["DB"]->getDefSet($GLOBALS["DB"]->sysOpts["upload-types"]);
+        $upType = "tree-" . $GLOBALS["SL"]->treeID . "-upload-types";
+        if (isset($GLOBALS["SL"]->sysOpts[$upType])) {
+            $this->uploadTypes = $GLOBALS["SL"]->getDefSet($GLOBALS["SL"]->sysOpts[$upType]);
         }
         if (sizeof($this->uploadTypes) == 0) {
-            $this->uploadTypes = $GLOBALS["DB"]->getDefSet('Upload Types');
+            $this->uploadTypes = $GLOBALS["SL"]->getDefSet('Upload Types');
         }
         return $this->uploadTypes;
     }
@@ -67,8 +68,8 @@ class SurvUploadTree extends SurvLoopTree
     
     protected function getUploadFolder($nID = -3)
     {
-        $coreRow = $this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0];
-        $coreAbbr = $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl];
+        $coreRow = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];
+        $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
         $fold = '../storage/app/up/evidence/' . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) 
             . '/' . $coreRow->{ $coreAbbr . 'UniqueStr' } . '/';
         return $fold;
@@ -161,15 +162,21 @@ class SurvUploadTree extends SurvLoopTree
         $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID').value == 1) reqUploadTitle(" 
             . $nID . ");\n";
         $this->pageJSextra .= "addResTot(" . $nID . ", 4);\n";
-        $ret = ((!$this->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
+        $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
             . view('vendor.survloop.upload-tool', [
                 "nID"            => $nID,
                 "uploadTypes"    => $this->uploadTypes,
+                "uploadWarn"     => $this->uploadWarning($nID),
                 "isPublic"       => $this->isPublic(), 
                 "getPrevUploads" => $this->getPrevUploads($nID, true)
             ])->render() 
-            . ((!$this->REQ->has('ajax')) ? '</div>' : '');
+            . ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '</div>' : '');
         return $ret;
+    }
+    
+    protected function uploadWarning($nID)
+    {
+        return '';
     }
     
     protected function loadPrevUploadDeets($nID = -3)
@@ -189,16 +196,17 @@ class SurvUploadTree extends SurvLoopTree
                 $this->upDeets[$i]["filename"] = $upRow->storeFile . '.' . $this->upDeets[$i]["ext"];
                 $this->upDeets[$i]["file"]     = $this->getUploadFolder($nID) . $upRow->storeFile 
                     . '.' . $this->upDeets[$i]["ext"];
-                $this->upDeets[$i]["filePub"]  = '/up/' . $this->coreID . '/' . $upRow->storeFile 
-                    . '.' . $this->upDeets[$i]["ext"];
+                $this->upDeets[$i]["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->coreID 
+                    . '/' . $upRow->storeFile . '.' . $this->upDeets[$i]["ext"];
                 $this->upDeets[$i]["fileOrig"] = $upRow->upFile;
                 $this->upDeets[$i]["fileLnk"]  = '<a href="' . $this->upDeets[$i]["filePub"] 
                     . '" target="_blank">' . $upRow->upFile . '</a>';
                 $this->upDeets[$i]["youtube"]  = '';
                 $this->upDeets[$i]["vimeo"]    = '';
-                $vidTypeID = $GLOBALS["DB"]->getDefID($GLOBALS["DB"]->sysOpts["upload-types"], 'Video');
-                if ($this->REQ->has('step') && $this->REQ->step == 'uploadDel' 
-                    && $this->REQ->has('alt') && intVal($this->REQ->alt) == $upRow->id) {
+                $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                    . "-upload-types"], 'Video');
+                if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->step == 'uploadDel' 
+                    && $GLOBALS["SL"]->REQ->has('alt') && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->id) {
                     if (file_exists($this->upDeets[$i]["file"]) && trim($upRow->type) != $vidTypeID) {
                         unlink($this->upDeets[$i]["file"]);
                     }
@@ -239,7 +247,8 @@ class SurvUploadTree extends SurvLoopTree
             "uploads"     => $this->uploads, 
             "upDeets"     => $this->upDeets, 
             "uploadTypes" => $this->uploadTypes, 
-            "vidTypeID"   => $GLOBALS["DB"]->getDefID($GLOBALS["DB"]->sysOpts["upload-types"], 'Video'),
+            "vidTypeID"   => $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                . "-upload-types"], 'Video'),
             "v"           => $this->v
         ])->render();
     }
@@ -248,28 +257,29 @@ class SurvUploadTree extends SurvLoopTree
     {
         $ret = '';
         $this->loadPrevUploadDeets($nID);
-        $vidTypeID = $GLOBALS["DB"]->getDefID($GLOBALS["DB"]->sysOpts["upload-types"], 'Video');
+        $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+            . "-upload-types"], 'Video');
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                if ($this->REQ->has('up'.$upRow->id.'EditVisib') 
-                    && intVal($this->REQ->input('up'.$upRow->id.'EditVisib')) == 1) {
+                if ($GLOBALS["SL"]->REQ->has('up'.$upRow->id.'EditVisib') 
+                    && intVal($GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditVisib')) == 1) {
                     $upArr = [ 
                         'id'      => $upRow->id, 
-                        'title'   => $this->REQ->input('up'.$upRow->id.'EditTitle'), 
-                        //'desc'    => $this->REQ->input('up'.$upRow->id.'EditDesc'), 
-                        'type'    => $this->REQ->input('up'.$upRow->id.'EditType'), 
-                        'privacy' => $this->REQ->input('up'.$upRow->id.'EditPrivacy')
+                        'title'   => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditTitle'), 
+                        //'desc'    => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditDesc'), 
+                        'type'    => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditType'), 
+                        'privacy' => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditPrivacy')
                     ];
                     $ret .= ' ' . $this->updateUploadRecord($nID, $upArr);
                 }
             }
         }
-        if ($this->REQ->has('step') && $this->REQ->has('n' . $nID . 'fld')) {
+        if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
             $upArr = [
-                'type'      => $this->REQ->input('n' . $nID . 'fld'), 
-                'title'     => $this->REQ->input('up' . $nID . 'Title'), 
-                //'desc'      => $this->REQ->input('up' . $nID . 'Desc'), 
-                'privacy'   => $this->REQ->input('up' . $nID . 'Privacy'), 
+                'type'      => $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld'), 
+                'title'     => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title'), 
+                //'desc'      => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc'), 
+                'privacy'   => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy'), 
                 'upFile'    => '', 
                 'extension' => '', 
                 'mimetype'  => '', 
@@ -278,19 +288,19 @@ class SurvUploadTree extends SurvLoopTree
                 'video'     => '', 
                 'vidDur'    => -1
             ];
-            if ($this->REQ->has('up' . $nID . 'Vid') && $this->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
-                $upArr["video"] = $this->REQ->input('up' . $nID . 'Vid');
+            if ($GLOBALS["SL"]->REQ->has('up' . $nID . 'Vid') && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
+                $upArr["video"] = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
                 $upArr["vidDur"] = $this->getYoutubeDuration($upArr["video"]);
                 $this->storeUploadRecord($nID, $upArr, $this->upLinks);
-            } elseif ($this->REQ->hasFile('up' . $nID . 'File')) { // file upload
-                $upArr["upFile"]    = $this->REQ->file('up' . $nID . 'File')->getClientOriginalName();
-                $upArr["extension"] = $this->REQ->file('up' . $nID . 'File')->getClientOriginalExtension();
-                $upArr["mimetype"]  = $this->REQ->file('up' . $nID . 'File')->getMimeType();
-                $upArr["size"]      = $this->REQ->file('up' . $nID . 'File')->getSize();
+            } elseif ($GLOBALS["SL"]->REQ->hasFile('up' . $nID . 'File')) { // file upload
+                $upArr["upFile"]    = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalName();
+                $upArr["extension"] = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalExtension();
+                $upArr["mimetype"]  = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getMimeType();
+                $upArr["size"]      = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getSize();
                 if (in_array($upArr["extension"], array("gif", "jpeg", "jpg", "png", "pdf")) 
                     && in_array($upArr["mimetype"], array("image/gif", "image/jpeg", "image/jpg", "image/pjpeg", 
                         "image/x-png", "image/png", "application/pdf"))) {
-                    if (!$this->REQ->file('up' . $nID . 'File')->isValid()) {
+                    if (!$GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->isValid()) {
                         $ret .= '<div class="slRedDark">Upload Error.' 
                             . /* $_FILES["up" . $nID . "File"]["error"] . */ '</div>';
                     } else {
@@ -300,7 +310,7 @@ class SurvUploadTree extends SurvLoopTree
                         $filename = $upArr["storeFile"] . '.' . $upArr["extension"];
                         if ($this->debugOn || true) { $ret .= "saving as filename: " . $upFold.$filename . "<br>"; }
                         if (file_exists($upFold.$filename)) Storage::delete($upFold.$filename);
-                        $this->REQ->file('up' . $nID . 'File')->move($upFold, $filename);
+                        $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->move($upFold, $filename);
                         $this->storeUploadRecord($nID, $upArr, $this->upLinks);
                     }
                 } else {

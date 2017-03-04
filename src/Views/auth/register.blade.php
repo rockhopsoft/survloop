@@ -19,16 +19,16 @@ $v = $surv->custLoop->v;
                 <div class="panel-heading">
                     <div class="row m0">
                         <div class="col-md-9 pB10">
-                            @if (isset($GLOBALS["DB"]->sysOpts["signup-instruct"]) 
-                                && trim($GLOBALS["DB"]->sysOpts["signup-instruct"]) != '')
-                                {!! $GLOBALS["DB"]->sysOpts["signup-instruct"] !!}
+                            @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
+                                && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
+                                {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
                             @else
                                 <h1 class="m0">Sign Up</h1>
                             @endif
                         </div>
                         <div class="col-md-3 taR pT5">
-                            @if (!isset($GLOBALS["DB"]->sysOpts["signup-instruct"]) 
-                                || trim($GLOBALS["DB"]->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
+                            @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
+                                || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
                                 <a href="/login" class="btn btn-default">Login</a>
                             @endif
                         </div>
@@ -41,7 +41,7 @@ $v = $surv->custLoop->v;
 
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
                             <label for="name" class="col-md-4 control-label">
-                                <span class="nPrompt">Name</span>
+                                <span class="nPrompt">Username</span>
                             </label>
                             
                             <div class="col-md-6">

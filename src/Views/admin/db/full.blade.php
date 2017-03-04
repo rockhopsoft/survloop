@@ -2,55 +2,53 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     Full Database Design 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
 
 @if (!$isPrint)
-    <a href="/dashboard/db/all?print=1" target="_blank" class="btn btn-xs btn-default mR10"><i class="fa fa-print"></i> Print This Overview</a>
+    <a href="/dashboard/db/all?print=1" target="_blank" class="btn btn-md btn-default mR10"
+        ><i class="fa fa-print"></i> Print This Overview</a>
     
-    <a class="btn btn-xs btn-default mR10" 
+    <a class="btn btn-md btn-default mR10" 
         @if ($onlyKeys)
-            @if ($isAll)
-                href="/dashboard/db/all?all=1"
-            @else
-                href="/dashboard/db/all"
-            @endif
+            @if ($isAll) href="/dashboard/db/all?all=1" @else href="/dashboard/db/all" @endif
             >Show More Than Just Foreign Keys
         @else
-            @if ($isAll)
-                href="/dashboard/db/all?all=1&onlyKeys=1"
-            @else
-                href="/dashboard/db/all?onlyKeys=1"
-            @endif
+            @if ($isAll) href="/dashboard/db/all?all=1&onlyKeys=1" @else href="/dashboard/db/all?onlyKeys=1" @endif
             >Show Only Foreign Keys
         @endif
     </a>
     
-    <a class="btn btn-xs btn-default" 
+    <a class="btn btn-md btn-default mR10" 
         @if ($isAll)
-            @if ($onlyKeys)
-                href="/dashboard/db/all?onlyKeys=1"
-            @else
-                href="/dashboard/db/all"
-            @endif
+            @if ($onlyKeys) href="/dashboard/db/all?onlyKeys=1" @else href="/dashboard/db/all" @endif
             >Hide
         @else
-            @if ($onlyKeys)
-                href="/dashboard/db/all?all=1&onlyKeys=1"
-            @else
-                href="/dashboard/db/all?all=1"
-            @endif
+            @if ($onlyKeys) href="/dashboard/db/all?all=1&onlyKeys=1" @else href="/dashboard/db/all?all=1" @endif
             >Show
         @endif
      All Full Field Specs</a>
+    <div class="pT10">
+        <a href="/dashboard/db/addTable" class="btn btn-xs btn-default mR10"><i class="fa fa-plus"></i> Add a New Table</a>
+        <a href="/dashboard/db/bus-rules" target="_blank" class="btn btn-xs btn-default mR10">Business Rules</a>
+        <a href="/dashboard/db/diagrams" target="_blank" class="btn btn-xs btn-default mR10">Tables Diagrams</a>
+        <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-xs btn-default mR10">Field Matrix</a>
+        <a href="/dashboard/db/export" target="_blank" class="btn btn-xs btn-default mR10">Export / Install</a>
+        <a href="/dashboard/db/sortTable" class="btn btn-xs btn-default mR10">Re-Order Tables</a>
+        <a href="/dashboard/db/fieldDescs" class="btn btn-xs btn-default mR10">Field Descriptions</a>
+        <a href="/dashboard/db/fieldXML" class="btn btn-xs btn-default mR10">Field XML Settings</a>
+    </div>
+    
 @else
+
     All specifications for database designs and user experience (form tree map) are made available
-    by <a href="{{ $GLOBALS['DB']->sysOpts['logo-url'] }}" target="_blanK" 
-        >{{ $GLOBALS['DB']->sysOpts['site-name'] }}</a> under the
-    <a href="{{ $GLOBALS['DB']->sysOpts['app-license-url'] }}" target="_blank" 
-    >{{ $GLOBALS['DB']->sysOpts['app-license'] }}</a>.
+    by <a href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" target="_blanK" 
+        >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a> under the
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-license-url'] }}" target="_blank" 
+    >{{ $GLOBALS['SL']->sysOpts['app-license'] }}</a>.
+    
 @endif
 
 <div class="clearfix p5"></div>

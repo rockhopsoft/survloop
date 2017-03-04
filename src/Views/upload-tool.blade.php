@@ -54,8 +54,7 @@
                 </select>
             </div>
             <div class="nodeSidenote">
-                <span class="fPerc80 red">Be sure to set privacy to "private" for any documents which may contain 
-                private information like addresses, phone numbers, emails, social security numbers, etc.</span>
+                {!! $uploadWarn !!}
             </div>
             <input type="submit" value="Upload More Evidence" class="btn btn-lg btn-default w100 fPerc125" 
                 id="nFormUpload" style="padding: 15px;">

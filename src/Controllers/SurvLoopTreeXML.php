@@ -13,11 +13,11 @@ class SurvLoopTreeXML extends CoreTree
     
     protected function initExtra(Request $request)
     {
-        if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["DB"]->treeRow->TreeCoreTable) > 0) {
+        if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) > 0) {
             $newRoot = new SLNode;
             $newRoot->NodeTree        = $this->treeID;
-            $newRoot->NodePromptNotes = $GLOBALS["DB"]->treeRow->TreeCoreTable;
-            $newRoot->NodePromptText  = $GLOBALS["DB"]->coreTbl;
+            $newRoot->NodePromptNotes = $GLOBALS["SL"]->treeRow->TreeCoreTable;
+            $newRoot->NodePromptText  = $GLOBALS["SL"]->coreTbl;
             $newRoot->save();
         }
         $this->canEditTree = true;
@@ -38,25 +38,26 @@ class SurvLoopTreeXML extends CoreTree
         }
         if ($nodeIN <= 0 || !$node || sizeof($node) == 0) {
             $node = $this->loadNode();
-            $node->nodeRow->NodeParentID    = $this->REQ->nodeParentID;
+            $node->nodeRow->NodeParentID    = $GLOBALS["SL"]->REQ->nodeParentID;
             $node->nodeRow->NodeParentOrder = 0;
             $node->nodeRow->NodeOpts        = 1;
             $node->nodeRow->NodeType        = 'XML';
         }
         
-        if ($this->REQ->has('sub')) {
-            if ($this->REQ->has('deleteNode') && intVal($this->REQ->input('deleteNode')) == 1) {
+        if ($GLOBALS["SL"]->REQ->has('sub')) {
+            if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
                 if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
                 if (intVal($node->nodeRow->NodeOpts) < 1) $node->nodeRow->NodeOpts = 1;
-                if ($this->REQ->xmlNodeType == 'dataWrap') {
-                    $node->nodeRow->NodePromptText  = trim($this->REQ->wrapPromptText);
+                if ($GLOBALS["SL"]->REQ->xmlNodeType == 'dataWrap') {
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->wrapPromptText);
                     $node->nodeRow->NodePromptNotes = 0;
                 } else {
                     $opts = array(5, 7, 11);
                     foreach ($opts as $o) {
-                        if ($this->REQ->has('opts'.$o.'') && intVal($this->REQ->input('opts'.$o.'')) == $o) {
+                        if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') 
+                            && intVal($GLOBALS["SL"]->REQ->input('opts'.$o.'')) == $o) {
                             if ($node->nodeRow->NodeOpts%$o > 0) {
                                 $node->nodeRow->NodeOpts *= $o;
                             }
@@ -64,8 +65,8 @@ class SurvLoopTreeXML extends CoreTree
                             $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/$o;
                         }
                     }
-                    $node->nodeRow->NodePromptText  = trim($this->REQ->input('nodePromptText'));
-                    $node->nodeRow->NodePromptNotes = $GLOBALS["DB"]->tblI[$node->nodeRow->NodePromptText];
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('nodePromptText'));
+                    $node->nodeRow->NodePromptNotes = $GLOBALS["SL"]->tblI[$node->nodeRow->NodePromptText];
                 }
                 $node->nodeRow->save();
             }
@@ -98,6 +99,7 @@ class SurvLoopTreeXML extends CoreTree
                 return view('vendor.survloop.admin.tree.node-print-core', [
                     "canEditTree"    => $this->canEditTree, 
                     "REQ"            => $this->REQ, 
+                    "rootID"         => $this->rootID, 
                     "nID"            => $tierNode[0], 
                     "node"           => $this->allNodes[$tierNode[0]], 
                     "tierNode"       => $tierNode, 

@@ -12,7 +12,20 @@
 <script type="text/javascript"> $(function() {
     $(document).on("click", ".adminNodeExpand", function() {
         var nID = $(this).attr("id").replace("adminNode", "").replace("Expand", "");
-        $("#nodeKids"+nID+"").slideToggle("fast"); return true;
+        $("#nodeKids"+nID+"").slideToggle("fast");
+        window.location='#n'+nID+'';
+        return true;
+    });
+    $(document).on("click", ".adminNodeShowBtns", function() {
+        var nID = $(this).attr("id").replace("showBtns", "");
+        if (document.getElementById("showBtns"+nID+"") && document.getElementById("nodeBtns"+nID+"")) {
+            if (document.getElementById("nodeBtns"+nID+"").style.display=='inline') {
+                document.getElementById("nodeBtns"+nID+"").style.display='none';
+            } else {
+                document.getElementById("nodeBtns"+nID+"").style.display='inline';
+            }
+        }
+        return true;
     });
     $(document).on("click", ".adminNodeShowAdds", function() {
         var nID = $(this).attr("id").replace("showAdds", "");

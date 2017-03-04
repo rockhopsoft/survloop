@@ -3,9 +3,11 @@
 <div id="footerLinks">
     <center>
     <div class="w50"><hr></div>
-    <nobr><a href="{{ $GLOBALS['DB']->sysOpts['logo-url'] }}" class="f18">{{ $GLOBALS['DB']->sysOpts['site-name'] }}</a></nobr><br />
-    <nobr><span class="gry9 f14">powered by</span>&nbsp;&nbsp;&nbsp;
-    <a href="https://databasingmodels.com/" target="_blank" class="f18">SurvLoop</a></nobr>
+    <nobr><a href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" class="f20"
+        >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a></nobr>
+    <div class="mT5 f12 gryA">is powered by the 
+    <a href="http://SurvLoop.org/" target="_blank" class="f12">SurvLoop</a>
+    open data engine.</div>
     <br /><br />
     </center>
 </div>

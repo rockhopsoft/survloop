@@ -1,7 +1,7 @@
 /* resources/views/vendor/survloop/formtree-looproot-ajax.blade.php */
 
 var currItemCnt = {{ $loopSize }};
-var maxItemCnt = {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopMaxLimit }};
+var maxItemCnt = {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopMaxLimit }};
 $("#nFormAdd").click(function() {
     document.getElementById("loopItemID").value="-37";
     return runFormSub();

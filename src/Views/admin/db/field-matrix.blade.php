@@ -2,7 +2,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     @if ($isAlt) Field Matrix (in English) @else Field Matrix (in Geek) @endif
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>

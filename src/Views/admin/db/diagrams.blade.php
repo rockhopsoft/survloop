@@ -2,7 +2,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     Table Diagrams 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
@@ -14,8 +14,8 @@
     <div class="container">
         <a name="dia{{ $dia->DefID }}"></a>
         <br /><br /><hr><b>{{ $dia->DefSubset }}</b>
-        <a href="/images/diagrams/{{ $GLOBALS['DB']->dbID }}-{{ $dia->DefID }}.png" target="_blank"
-        ><img src="/images/diagrams/{{ $GLOBALS['DB']->dbID }}-{{ $dia->DefID }}.png" border=0 width=80% ></a>
+        <a href="/images/diagrams/{{ $GLOBALS['SL']->dbID }}-{{ $dia->DefID }}.png" target="_blank"
+        ><img src="/images/diagrams/{{ $GLOBALS['SL']->dbID }}-{{ $dia->DefID }}.png" border=0 width=80% ></a>
     </div>
 @empty
 @endforelse

@@ -28,44 +28,31 @@ class AdminSubsController extends AdminController
     
     protected function printSubsListing(Request $request)
     {
-        $this->v["coreAbbr"] = $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl];
+        $this->v["coreAbbr"] = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
         $this->v["subsSort"] = ['created_at', 'desc'];
         $this->v["coreFlds"] = SLFields::select('FldName', 'FldEng', 'FldForeignTable')
             ->where('FldDatabase', $this->dbID)
-            ->where('FldTable', $GLOBALS["DB"]->treeRow->TreeCoreTable)
+            ->where('FldTable', $GLOBALS["SL"]->treeRow->TreeCoreTable)
             ->orderBy('FldOrd', 'asc')
             ->orderBy('FldEng', 'asc')
             ->get();
         $xtraWhere = "";
         if ($this->v["currPage"] == '/dashboard/subs/incomplete') {
             $xtraWhere = "where('" . $this->v["coreAbbr"] . "SubmissionProgress', '<>', '"
-                . $GLOBALS["DB"]->treeRow->TreeLastPage . "')->";
+                . $GLOBALS["SL"]->treeRow->TreeLastPage . "')->";
         }
         $this->v["subsList"] = [];
-        eval("\$this->v['subsList'] = " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl)
+        eval("\$this->v['subsList'] = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
             . "::" . $xtraWhere . "orderBy('" . $this->v["subsSort"][0] 
             . "', '" . $this->v["subsSort"][1] . "')->get();");
         return view('vendor.survloop.admin.submissions-list', $this->v);
     }
     
-    
     public function dashboardDefault(Request $request)
     {
         $this->survLoopInit($request, '/dashboard');
-        // Check For Basic System Setup First
-        $sysChk = SLDatabases::select('DbID')
-            ->where('DbUser', '>', 0)
-            ->get();
-        if (!$sysChk || sizeof($sysChk) == 0) {
-            return redirect('/fresh/database');
-        }
-        $sysChk = SLTree::select('TreeID')
-            ->where('TreeDatabase', '=', $GLOBALS["DB"]->dbID)
-            ->get();
-        if (!$sysChk || sizeof($sysChk) == 0) {
-            return redirect('/fresh/user-experience');
-        }
-        
+        $chk = $this->checkSystemInit();
+        if (trim($chk) != '') return $chk;
         return $this->index($request);
     }
     

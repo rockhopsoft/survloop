@@ -136,7 +136,7 @@ class SurvLoopCreateTables extends Migration
             $table->string('TreeType', 30)->default('Primary Public')->nullable();
             $table->string('TreeName')->nullable();
             $table->longText('TreeDesc')->nullable();
-            $table->string('TreeRootURL')->nullable();
+            $table->string('TreeSlug')->nullable();
             $table->integer('TreeRoot')->nullable();
             //$table->foreign('TreeRoot')->references('NodeID')->on('SL_Node');
             $table->integer('TreeFirstPage')->nullable();
@@ -145,6 +145,7 @@ class SurvLoopCreateTables extends Migration
             //$table->foreign('TreeLastPage')->references('NodeID')->on('SL_Node');
             $table->integer('TreeCoreTable')->nullable();
             //$table->foreign('TreeCoreTable')->references('TblID')->on('SL_Tables');
+            $table->integer('TreeOpts')->default(1)->nullable();
             $table->timestamps();
         });
         Schema::create('SL_Node', function(Blueprint $table)

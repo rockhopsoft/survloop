@@ -13,7 +13,7 @@
             <option value="" DISABLED >------------------</option>
             <option value="" DISABLED >OR select a field below to clear this condition based on the user's response</option>
             <option value="" DISABLED >------------------</option>
-            {!! $GLOBALS["DB"]->getAllSetTblFldDrops($rSet) !!}
+            {!! $GLOBALS['SL']->getAllSetTblFldDrops($rSet) !!}
         </select>
     </div>
 </div>

@@ -76,7 +76,7 @@
             <div class="col-md-6">
                 <div id="xmlDataTbl" class=" @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disNon @else disBlo @endif ">
                     <select name="nodePromptText" id="nodePromptTextID" class="form-control">
-                        {!! $GLOBALS["DB"]->tablesDropdown($node->nodeRow->NodePromptText) !!}
+                        {!! $GLOBALS['SL']->tablesDropdown($node->nodeRow->NodePromptText) !!}
                     </select>
                     <div class="p10"></div>
                     <label class="mR20 mL20">

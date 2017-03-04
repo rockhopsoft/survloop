@@ -3,7 +3,9 @@
 <div class="row mB20">
     <div class="col-md-7">
         <h1><i class="fa fa-snowflake-o"></i> Tree's Use of Database Design</nobr></h1>
-        <h2 class="slBlueDark"><i>Core Table: {{ $GLOBALS["DB"]->coreTbl }}</i></h2>
+        <h2 class="slBlueDark"><i>Core Table: 
+            @if (isset($GLOBALS['SL']->coreTbl)) {{ $GLOBALS['SL']->coreTbl }} @endif
+        </i></h2>
     </div>
     <div class="col-md-5">
         <div class="gry9 p10">
@@ -24,7 +26,7 @@
                 <th>Min</th>
                 <th>Max <span class="f12 gry9">(Warn At)</span></th>
             </tr>
-        @forelse ($GLOBALS["DB"]->dataLoops as $loopPlural => $loopRow)
+        @forelse ($GLOBALS['SL']->dataLoops as $loopPlural => $loopRow)
             <tr>
                 <td class="taC">
                 @if (intVal($loopRow->DataLoopRoot) > 0)
@@ -85,7 +87,7 @@
                 <th>Child Table</th>
                 <th colspan=2 class="gry6 f12">Child Creation</th>
             </tr>
-        @forelse ($GLOBALS["DB"]->dataSubsets as $link)
+        @forelse ($GLOBALS['SL']->dataSubsets as $link)
             <tr>
                 <td><a href="/dashboard/db/table/{{ $link->DataSubTbl }}" target="_blank">{{ $link->DataSubTbl }}</a></td>
                 @if (isset($link->DataSubTblLnk) && trim($link->DataSubTblLnk) != '')
@@ -115,7 +117,7 @@
             <tr>
                 <td colspan=3 >
                     <select name="newSubset" class="form-control">
-                    {!! $GLOBALS["DB"]->getForeignOpts() !!}
+                    {!! $GLOBALS['SL']->getForeignOpts() !!}
                     </select>
                 </td>
                 <td>
@@ -152,7 +154,7 @@
                 <th>Helper Table</th>
                 <th colspan=2 >Helper Field Storing Checkbox Responses</th>
             </tr>
-        @forelse ($GLOBALS["DB"]->dataHelpers as $link)
+        @forelse ($GLOBALS['SL']->dataHelpers as $link)
             <tr>
                 <td><a href="/dashboard/db/table/{{ $link->DataHelpParentTable }}" target="_blank">{{ $link->DataHelpParentTable }}</a></td>
                 <td class="gry9"><nobr><i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $link->DataHelpKeyField }}</nobr></td>
@@ -168,12 +170,12 @@
             <tr>
                 <td colspan=3 >
                     <select name="newHelper" class="form-control">
-                    {!! $GLOBALS["DB"]->getForeignOpts('', 'Helper') !!}
+                    {!! $GLOBALS['SL']->getForeignOpts('', 'Helper') !!}
                     </select>
                 </td>
                 <td>
                     <select name="newHelperValue" class="form-control">
-                    {!! $GLOBALS["DB"]->fieldsDropdown('', 0) !!}
+                    {!! $GLOBALS['SL']->fieldsDropdown('', 0) !!}
                     </select>
                 </td>
                 <td><a href="javascript:void(0)" class="btn btn-xs btn-primary" onClick="document.addNewHelper.submit();"><i class="fa fa-plus"></i></a></td>
@@ -205,7 +207,7 @@
                 <th class="taR">Key</th>
                 <th colspan=2 >Table 2</th>
             </tr>
-        @forelse ($GLOBALS["DB"]->dataLinksOn as $tblID => $linkMap)
+        @forelse ($GLOBALS['SL']->dataLinksOn as $tblID => $linkMap)
             <tr>
                 <td><a href="/dashboard/db/table/{{ $linkMap[0] }}" target="_blank">{{ $linkMap[0] }}</a></td>
                 <td class="taL gry9"><i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $linkMap[1] }}</td>
@@ -223,7 +225,7 @@
                 <td colspan=5 >
                     <select name="newLinkage" class="form-control">
                     <option value="" SELECTED ></option>
-                    @forelse ($GLOBALS["DB"]->getLinkingTables() as $tbl)
+                    @forelse ($GLOBALS['SL']->getLinkingTables() as $tbl)
                         <option value="{{ $tbl->TblID }}">{{ $tbl->TblName }}</option>
                     @empty
                     @endforelse

@@ -50,7 +50,7 @@
                         @if (trim($upRow->desc) != '') <div class="fPerc125">{{ $upRow->desc }}</div> @endif
                         <div class="gry9 pT5">
                             @if ($upRow->privacy == 'Open') Public @else Private @endif
-                            {{ $GLOBALS["DB"]->getDefValById($upRow->type) }}
+                            {{ $GLOBALS['SL']->getDefValById($upRow->type) }}
                         </div>
                         {!! $upDeets[$i]["fileLnk"] !!}
                     </div>

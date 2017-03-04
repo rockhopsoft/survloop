@@ -39,7 +39,7 @@
 <br /><br />
 </form></center>
 
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
     <div class="jumbotron">
         <p>Hover your mouse over setting names for a bit of an explaination. 
         These field specifications are almost completely copied from best practices in Michael J. Hernandez's

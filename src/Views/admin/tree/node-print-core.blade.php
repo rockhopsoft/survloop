@@ -42,7 +42,7 @@
     @endif
     @if (sizeof($tierNode[1]) > 0)
         <div id="nodeKids{{ $nID }}" class=" @if (session()->get('adminOverOpts')%2 == 0 
-            || $nID == $GLOBALS['DB']->treeRow->TreeRoot) disBlo @else disNon @endif">
+            || $nID == $rootID) disBlo @else disNon @endif">
         
             {!! $childrenPrints !!}
             

@@ -73,7 +73,7 @@ class CoreTree extends SurvLoopController
         return true;
     }
     
-    protected function loadAllSessData($coreID = -3) { }
+    protected function loadAllSessData($coreTbl = '', $coreID = -3) { }
     
     public function loadNodeTiersCache()
     {
@@ -113,6 +113,9 @@ class CoreTree extends SurvLoopController
     
     protected function loadNodeTiersInner($nodeID = -3, $tierNest = array())
     {
+        
+        /// THE XML TREE IS JUST BROKEN :( No parent id 755
+        
         $innerArr = $tmpArr = array();
         if ($nodeID > 0 && sizeof($this->allNodes) > 0) {
             foreach ($this->allNodes as $nID => $node) {
@@ -177,10 +180,11 @@ class CoreTree extends SurvLoopController
     // Locate next node in standard Pre-Order Traversal
     protected function nextNode($nID)
     {
+        if ($nID <= 0) return -3;
         $nodeOverride = $this->moveNextOverride($nID);
         if ($nodeOverride > 0) return $nodeOverride;
         
-        //if ($nID == $GLOBALS["DB"]->treeRow->TreeLastPage) return -37;
+        //if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage) return -37;
         $nextNodeInd = $this->nodesRawIndex[$nID]+1;
         if (!isset($this->nodesRawOrder[$nextNodeInd])) return -3;
         $nextNodeID = $this->nodesRawOrder[$nextNodeInd];
@@ -210,20 +214,20 @@ class CoreTree extends SurvLoopController
     
     protected function treeAdminNodeManip()
     {
-        if ($this->REQ->has('manip') && $this->REQ->has('moveNode') 
-            && $this->REQ->has('moveToParent') && $this->REQ->has('moveToOrder')
-            && $this->REQ->moveNode > 0 && $this->REQ->moveToParent > 0 
-            && $this->REQ->moveToOrder >= 0 && isset($this->allNodes[$this->REQ->moveNode])) {
-            $node = $this->allNodes[$this->REQ->moveNode];
+        if ($GLOBALS["SL"]->REQ->has('manip') && $GLOBALS["SL"]->REQ->has('moveNode') 
+            && $GLOBALS["SL"]->REQ->has('moveToParent') && $GLOBALS["SL"]->REQ->has('moveToOrder')
+            && $GLOBALS["SL"]->REQ->moveNode > 0 && $GLOBALS["SL"]->REQ->moveToParent > 0 
+            && $GLOBALS["SL"]->REQ->moveToOrder >= 0 && isset($this->allNodes[$GLOBALS["SL"]->REQ->moveNode])) {
+            $node = $this->allNodes[$GLOBALS["SL"]->REQ->moveNode];
             $node->fillNodeRow();
             SLNode::where('NodeParentID', $node->parentID)
                 ->where('NodeParentOrder', '>', $node->parentOrd)
                 ->decrement('NodeParentOrder');
-            SLNode::where('NodeParentID', $this->REQ->moveToParent)
-                ->where('NodeParentOrder', '>=', $this->REQ->moveToOrder)
+            SLNode::where('NodeParentID', $GLOBALS["SL"]->REQ->moveToParent)
+                ->where('NodeParentOrder', '>=', $GLOBALS["SL"]->REQ->moveToOrder)
                 ->increment('NodeParentOrder');
-            $node->nodeRow->NodeParentID = $this->REQ->moveToParent;
-            $node->nodeRow->NodeParentOrder = $this->REQ->moveToOrder;
+            $node->nodeRow->NodeParentID = $GLOBALS["SL"]->REQ->moveToParent;
+            $node->nodeRow->NodeParentOrder = $GLOBALS["SL"]->REQ->moveToOrder;
             $node->nodeRow->save();
             $this->loadTree();
             $this->initExtra($this->REQ);
@@ -233,23 +237,23 @@ class CoreTree extends SurvLoopController
     
     protected function treeAdminNodeNew($node)
     {
-        if ($this->REQ->input('childPlace') == 'start') {
-            SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
+        if ($GLOBALS["SL"]->REQ->input('childPlace') == 'start') {
+            SLNode::where('NodeParentID', $GLOBALS["SL"]->REQ->input('nodeParentID'))
                 ->increment('NodeParentOrder');
-        } elseif ($this->REQ->input('childPlace') == 'end') {
-            $endNode = SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
+        } elseif ($GLOBALS["SL"]->REQ->input('childPlace') == 'end') {
+            $endNode = SLNode::where('NodeParentID', $GLOBALS["SL"]->REQ->input('nodeParentID'))
                 ->orderBy('NodeParentOrder', 'desc')
                 ->first();
             if ($endNode) $node->nodeRow->NodeParentOrder = 1+$endNode->nodeParentOrder;
-        } elseif ($this->REQ->input('orderBefore') > 0 || $this->REQ->input('orderAfter') > 0) {
+        } elseif ($GLOBALS["SL"]->REQ->input('orderBefore') > 0 || $GLOBALS["SL"]->REQ->input('orderAfter') > 0) {
             $foundSibling = false;
-            $sibs = SLNode::where('NodeParentID', $this->REQ->input('nodeParentID'))
+            $sibs = SLNode::where('NodeParentID', $GLOBALS["SL"]->REQ->input('nodeParentID'))
                 ->orderBy('NodeParentOrder', 'asc')
                 ->select('NodeID', 'NodeParentOrder')
                 ->get();
             if (sizeof($sibs) > 0) {
                 foreach ($sibs as $sib) {
-                    if ($sib->NodeID == intVal($this->REQ->input('orderBefore'))) { 
+                    if ($sib->NodeID == intVal($GLOBALS["SL"]->REQ->input('orderBefore'))) { 
                         $node->nodeRow->NodeParentOrder = $sib->NodeParentOrder; 
                         $foundSibling = true;
                     }
@@ -257,13 +261,14 @@ class CoreTree extends SurvLoopController
                         SLNode::where('NodeID', $sib->NodeID)
                             ->increment('NodeParentOrder');
                     }
-                    if ($sib->NodeID == intVal($this->REQ->input('orderAfter'))) {
+                    if ($sib->NodeID == intVal($GLOBALS["SL"]->REQ->input('orderAfter'))) {
                         $node->nodeRow->NodeParentOrder = (1+$sib->NodeParentOrder);
                         $foundSibling = true;
                     }
                 }
             }
         }
+        $node->nodeRow->NodeTree = $this->treeID;
         $node->nodeRow->save();
         return $node;
     }
@@ -274,7 +279,7 @@ class CoreTree extends SurvLoopController
             SLNode::where('NodeParentID', $this->allNodes[$nID]->parentID)
                 ->where('NodeParentOrder', '>', $this->allNodes[$nID]->parentOrd)
                 ->decrement('NodeParentOrder');
-            $this->allNodes[$nID]->nodeRow->delete();
+            SLNode::find($nID)->delete();
         }
         return true;
     }
@@ -307,11 +312,15 @@ class CoreTree extends SurvLoopController
     // Some More Generalized Session Processes
     *****************/
     
-    protected function loadsessInfo()
+    protected function loadSessInfo($coreTbl)
     {
         if (!isset($this->v["currPage"])) $this->survLoopInit($this->REQ); // not sure why this 
-        if (session()->has('sessID')) $this->sessID = session()->get('sessID');
-        if (session()->has('coreID')) $this->coreID = session()->get('coreID');
+        if (session()->has('sessID' . $GLOBALS["SL"]->sessTree)) {
+            $this->sessID = session()->get('sessID' . $GLOBALS["SL"]->sessTree);
+        }
+        if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)) {
+            $this->coreID = session()->get('coreID' . $GLOBALS["SL"]->sessTree);
+        }
         if ($this->sessID > 0) {
             $this->sessInfo = SLSess::find($this->sessID);
         } elseif ($this->sessID < 0 && $this->v["user"] && $this->v["user"]->id > 0) {
@@ -322,14 +331,18 @@ class CoreTree extends SurvLoopController
                 ->orderBy('updated_at', 'desc')
                 ->first();
             if ($this->sessInfo && sizeof($this->sessInfo) > 0) {
-                $this->sessID = $this->sessInfo->SessID;
-                $this->coreID = $this->sessInfo->SessCoreID;
+                if ($this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
+                    $this->sessID = $this->sessInfo->SessID;
+                    $this->coreID = $this->sessInfo->SessCoreID;
+                } else {
+                    $this->sessInfo = [];
+                }
             }
         }
         if (!$this->sessInfo || sizeof($this->sessInfo) == 0) {
             $this->createNewSess();
         }
-        session()->put('sessID', $this->sessID);
+        session()->put('sessID' . $GLOBALS["SL"]->sessTree, $this->sessID);
         
         // Check for and load core record's ID
         if ($this->coreID <= 0 && $this->sessInfo && isset($this->sessInfo->SessCoreID) 
@@ -350,40 +363,64 @@ class CoreTree extends SurvLoopController
                 }
             }
         }
-        if ($this->coreID <= 0 && trim($GLOBALS["DB"]->coreTbl) != ''
-            && class_exists($GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl))) {
-            eval("\$recObj = new " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl) . ";");
+        $modelPath = $GLOBALS["SL"]->modelPath($coreTbl);
+        if ($this->coreID <= 0 && trim($coreTbl) != '' && trim($modelPath) != '') {
+            eval("\$recObj = new " . $modelPath . ";");
             $recObj->save();
             $this->coreID = $recObj->getKey();
+            $this->sessInfo->SessCurrNode = $this->rootID;
         }
         if ($this->coreIDoverride > 0) {
             // should have more permission checks here...
             $this->coreID = $this->coreIDoverride;
         }
-        session()->put('coreID', $this->coreID);
+        session()->put('coreID' . $GLOBALS["SL"]->sessTree, $this->coreID);
         $this->sessInfo->SessCoreID = $this->coreID;
+        $this->sessInfo->SessTree = $this->treeID;
         if ((!isset($this->sessInfo->SessUserID) || intVal($this->sessInfo->SessUserID) <= 0) 
             && isset($this->v["user"]->id) && intVal($this->v["user"]->id) > 0) {
             $this->sessInfo->SessUserID = $this->v["user"]->id;
         }
+        $chkNode = SLNode::where('NodeID', $this->sessInfo->SessCurrNode)
+            ->where('NodeTree', $this->treeID)
+            ->first();
+        if (!$chkNode || sizeof($chkNode) == 0) {
+            $nodeSave = DB::table('SL_NodeSavesPage')
+                ->join('SL_Node', 'SL_Node.NodeID', '=', 'SL_NodeSavesPage.PageSaveNode')
+                ->where('SL_NodeSavesPage.PageSaveSession', $this->coreID)
+                ->where('SL_Node.NodeTree', $this->treeID)
+                ->select('SL_NodeSavesPage.*')
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            if ($nodeSave && isset($nodeSave->PageSaveNode)) {
+                $this->sessInfo->SessUserID = $nodeSave->PageSaveNode;
+            } elseif (isset($GLOBALS["SL"]->treeRow->TreeRoot)) {
+                $this->sessInfo->SessCurrNode = $GLOBALS["SL"]->treeRow->TreeRoot;
+            }
+        }
         $this->sessInfo->save();
+        $this->updateCurrNode($this->sessInfo->SessCurrNode);
         
-        $GLOBALS["DB"]->loadSessLoops($this->sessID);
+        $GLOBALS["SL"]->loadSessLoops($this->sessID);
         
         // Initialize currNode
-        $subFld = $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress';
-        if (isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl]) 
-            && isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0])
-            && isset($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0]->{ $subFld })
-            && intVal($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0]->{ $subFld }) > 0) {
-            $this->updateCurrNode($this->sessData->dataSets[$GLOBALS["DB"]->coreTbl][0]->{ $subFld });
-        } elseif (isset($this->sessInfo->SessCurrNode) && intVal($this->sessInfo->SessCurrNode) > 0) {
-            $this->updateCurrNode($this->sessInfo->SessCurrNode);
-        } else {
-            $this->updateCurrNode($this->rootID);
-        }
+        if ($coreTbl > 0 && isset($GLOBALS["SL"]->tblAbbr[$coreTbl])) {
+			$subFld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'SubmissionProgress';
+			if (isset($this->sessData->dataSets[$coreTbl]) 
+				&& isset($this->sessData->dataSets[$coreTbl][0])
+				&& isset($this->sessData->dataSets[$coreTbl][0]->{ $subFld })
+				&& intVal($this->sessData->dataSets[$coreTbl][0]->{ $subFld }) > 0) {
+				$this->updateCurrNode($this->sessData->dataSets[$coreTbl][0]->{ $subFld });
+			} elseif (isset($this->sessInfo->SessCurrNode) && intVal($this->sessInfo->SessCurrNode) > 0) {
+				$this->updateCurrNode($this->sessInfo->SessCurrNode);
+			} else {
+				$this->updateCurrNode($this->rootID);
+			}
+		}
         return true;
     }
+    
+    protected function recordIsEditable($coreTbl, $coreID, $coreRec = []) { return true; }
     
     protected function createNewSess()
     {
@@ -392,15 +429,27 @@ class CoreTree extends SurvLoopController
         $this->sessInfo->SessTree = $this->treeID;
         $this->sessInfo->save();
         $this->sessID = $this->sessInfo->getKey();
-        session()->put('sessID', $this->sessID);
+        session()->put('sessID' . $GLOBALS["SL"]->sessTree, $this->sessID);
         return $this->sessID;
     }
     
     public function restartSess(Request $request)
     {
-        session()->forget('sessID');
-        session()->forget('coreID');
-        redirect('/logout');
+        $trees = SLTree::get();
+        if ($trees && sizeof($trees) > 0) {
+            foreach ($trees as $tree) {
+                SLSess::where('SessID', session()->get('sessID' . $tree->TreeID))
+                    ->where('SessTree', $tree->TreeID)
+                    ->delete();
+                session()->forget('sessID' . $tree->TreeID);
+                session()->forget('coreID' . $tree->TreeID);
+            }
+        }
+        session()->forget('sessIDPage');
+        session()->forget('coreIDPage');
+        session()->flush();
+        $request->session()->flush();
+        $this->redir('/logout', true);
     }
     
     public function chkSess($cid)
@@ -417,43 +466,45 @@ class CoreTree extends SurvLoopController
         $this->survLoopInit($request);
         $session = $this->chkSess($cid);
         if ($session && isset($session->SessID)) {
-            session()->set('sessID', $session->SessID);
-            session()->set('coreID', $cid);
+            session()->put('sessID' . $GLOBALS["SL"]->sessTree, $session->SessID);
+            session()->put('coreID' . $GLOBALS["SL"]->sessTree, $cid);
             $this->sessInfo = $session;
             $this->sessID = $session->SessID;
             $this->coreID = $cid;
         }
-        return redirect('/afterLogin');
+        return $this->redir('/afterLogin');
     }
 
     public function afterLogin(Request $request)
     {
         $this->survLoopInit($request, '');
         if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff')) {
-            return redirect('/dashboard');
+            return $this->redir('/dashboard');
         } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer')) {
-            return redirect('/volunteer');
+            return $this->redir('/volunteer');
         } else {
-            $this->loadsessInfo();
-            if (!session()->has('coreID') || $this->coreID <= 0) {
+            $this->loadSessInfo($GLOBALS["SL"]->coreTbl);
+            if (!session()->has('coreID' . $GLOBALS["SL"]->sessTree) || $this->coreID <= 0) {
                 $this->coreID = $this->findUserCoreID();
-                if ($this->coreID > 0) session()->put('coreID', $this->coreID);
+                if ($this->coreID > 0) {
+                    session()->put('coreID' . $GLOBALS["SL"]->sessTree, $this->coreID);
+                }
             }
             if (isset($this->sessInfo->SessCurrNode) && intVal($this->sessInfo->SessCurrNode) > 0) {
                 $this->loadTree();
                 $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
-                if (trim($nodeURL) != '') return redirect($nodeURL);
+                if (trim($nodeURL) != '') return $this->redir($nodeURL);
             }
         }
-        return redirect('/');
+        return $this->redir('/');
     }
 
     public function findUserCoreID()
     {
         $this->coreIncompletes = [];
-        if (isset($this->v["user"]) && isset($this->v["user"]->id)) {
-            eval("\$incompletes = " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->coreTbl)
-                . "::where('" . $GLOBALS["DB"]->coreTblUserFld . "', " . $this->v["user"]->id . ")"
+        if (isset($this->v["user"]) && isset($this->v["user"]->id) && intVal($this->v["user"]->id) > 0) {
+            eval("\$incompletes = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+                . "::where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["user"]->id . ")"
                 . "->orderBy('created_at', 'desc')->get();");
             if ($incompletes && sizeof($incompletes) > 0) {
                 foreach ($incompletes as $i => $row) {
@@ -468,18 +519,20 @@ class CoreTree extends SurvLoopController
     public function multiRecordCheck()
     {
         $this->v["multipleRecords"] = '';
-        $coreID = $this->findUserCoreID();
-        if (!$this->coreIncompletes || sizeof($this->coreIncompletes) <= 1 || $coreID <= 0) return '';
-        $this->v["multipleRecords"] = $this->multiRecordCheckIntro();
-        foreach ($this->coreIncompletes as $i => $coreRow) {
-            $this->v["multipleRecords"] .= $this->multiRecordCheckRow($i, $coreRow);
-        }
-        if (trim($this->v["multipleRecords"]) != '') {
-            $this->v["multipleRecords"] = '<div class="nodeGap"></div><div class="brdDrk round5 p20">' 
-                . $this->v["multipleRecords"] . '</div>';
-            if (!$this->REQ->session()->has('multiRecordCheck')) {
-                $GLOBALS["errors"] .= $this->v["multipleRecords"];
-                $this->REQ->session()->put('multiRecordCheck', date('Y-m-d H:i:s'));
+        if (trim($GLOBALS["SL"]->coreTbl) != '') {
+            $coreID = $this->findUserCoreID();
+            if (!$this->coreIncompletes || sizeof($this->coreIncompletes) <= 1 || $coreID <= 0) return '';
+            $this->v["multipleRecords"] = $this->multiRecordCheckIntro();
+            foreach ($this->coreIncompletes as $i => $coreRow) {
+                $this->v["multipleRecords"] .= $this->multiRecordCheckRow($i, $coreRow);
+            }
+            if (trim($this->v["multipleRecords"]) != '') {
+                $this->v["multipleRecords"] = '<div class="nodeGap"></div><div class="brdDrk round5 p20">' 
+                    . $this->v["multipleRecords"] . '</div>';
+                if (!session()->has('multiRecordCheck')) {
+                    $GLOBALS["errors"] .= $this->v["multipleRecords"];
+                    session()->put('multiRecordCheck', date('Y-m-d H:i:s'));
+                }
             }
         }
         return $this->v["multipleRecords"];
@@ -492,31 +545,34 @@ class CoreTree extends SurvLoopController
     
     public function multiRecordCheckRow($i, $coreRecord)
     {
-        $ret = '<div class="row mT10 mB20">
-            <div class="col-md-4">
-                <a class="disBlo btn btn-lg nFldBtn mB5 pB0 btn-default taL ';
-                if ($coreRecord[0] == $this->coreID) {
-                    $ret .= 'noPoint slBlueDark" href="javascript:;"><h2 class="mT10"><b>Current: <nobr>' 
-                        . $GLOBALS["DB"]->sysOpts['core-record-singular'] . ' #' 
-                        . $coreRecord[0] . '</nobr></b></h3>';
-                } else {
-                    $ret .= '" href="/switch/' . $coreRecord[0] . '"><h3 class="mT10">Switch To: <nobr>'
-                        . $GLOBALS["DB"]->sysOpts['core-record-singular'] . ' #' 
-                        . $coreRecord[0] . '</nobr></h3>';
-                }
-                $ret .= '</a>
-                <div class="mB5 fPerc125">Started ' . date('M j, Y', strtotime($coreRecord[1]->created_at)) . '</div>
+        $ret = '';
+        if ($this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreRecord->getKey(), $coreRecord)) {
+            $ret = '<div class="row mT10 mB20">
+                <div class="col-md-4">
+                    <a class="disBlo btn btn-lg nFldBtn mB5 pB0 btn-default taL ';
+                    if ($coreRecord[0] == $this->coreID) {
+                        $ret .= 'noPoint slBlueDark" href="javascript:;"><h2 class="mT10"><b>Current: <nobr>' 
+                            . $GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'] . ' #' 
+                            . $coreRecord[0] . '</nobr></b></h3>';
+                    } else {
+                        $ret .= '" href="/switch/' . $coreRecord[0] . '"><h3 class="mT10">Switch To: <nobr>'
+                            . $GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'] . ' #' 
+                            . $coreRecord[0] . '</nobr></h3>';
+                    }
+                    $ret .= '</a>
+                    <div class="mB5 fPerc125">Started ' . date('M j, Y', strtotime($coreRecord[1]->created_at)) . '</div>
+                </div>
+                <div class="col-md-8">
+                    ' . $this->multiRecordCheckRowSummary($coreRecord) . '
+                    <div class="fR">
+                        <a href="javascript:;" class="red" onClick="if (confirm(\'' . $this->multiRecordCheckDelWarn() 
+                        . '\')) { window.location=\'/delSess/' . $coreRecord[0] 
+                        . '\'; }">Delete <i class="fa fa-minus-circle" aria-hidden="true"></i></a>
+                    </div><div class="fC"></div>
+                </div>
             </div>
-            <div class="col-md-8">
-                ' . $this->multiRecordCheckRowSummary($coreRecord) . '
-                <div class="fR">
-                    <a href="javascript:;" class="red" onClick="if (confirm(\'' . $this->multiRecordCheckDelWarn() 
-                    . '\')) { window.location=\'/delSess/' . $coreRecord[0] 
-                    . '\'; }">Delete <i class="fa fa-minus-circle" aria-hidden="true"></i></a>
-                </div><div class="fC"></div>
-            </div>
-        </div>
-        <div class="p5"></div>';
+            <div class="p5"></div>';
+        }
         return $ret;
     }
     
@@ -534,9 +590,9 @@ class CoreTree extends SurvLoopController
     {
         $this->survLoopInit($request);
         if ($this->isCoreOwner($coreID)) {
-            if ($coreID != $this->coreID) $this->sessData->loadCore($coreID);
+            if ($coreID != $this->coreID) $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $coreID);
             $this->sessData->deleteEntireCore();
-            if ($coreID != $this->coreID) $this->sessData->loadCore($this->coreID);
+            if ($coreID != $this->coreID) $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $this->coreID);
             $sess = SLSess::where('SessUserID', $this->v["user"]->id)
                 ->where('SessTree', $this->treeID)
                 ->where('SessCoreID', $coreID)
@@ -547,13 +603,13 @@ class CoreTree extends SurvLoopController
                 SLSess::find($sess->SessID)
                     ->delete();
             }
-            if ($coreID != session()->get('coreID')) {
-                session()->forget('sessID');
-                session()->forget('coreID');
-                return redirect('/');
+            if ($coreID != session()->get('coreID' . $GLOBALS["SL"]->sessTree)) {
+                session()->forget('sessID' . $GLOBALS["SL"]->sessTree);
+                session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
+                return $this->redir('/');
             }
         }
-        return redirect('/');
+        return $this->redir('/');
     }
     
     public function holdSess(Request $request)
@@ -595,7 +651,22 @@ class CoreTree extends SurvLoopController
     // Updates currNode after running checking if this is a branch node
     protected function updateCurrNodeNB($newCurrNode = -3, $direction = 'next')
     {
-        return $this->updateCurrNode($this->getNextNonBranch($newCurrNode, $direction));
+        $new = $this->getNextNonBranch($newCurrNode, $direction);
+        /* if ($new == -37 && $GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 && $new == $this->currNode()) {
+            $this->leavingTheLoop('', true);
+            return $GLOBALS["SL"]->treeRow->TreeRoot;
+        } */
+        return $this->updateCurrNode($new);
+    }
+    
+    protected function getNextNonBranch($nID, $direction = 'next')
+    {
+        return $nID;
+    }
+    
+    protected function leavingTheLoop($name = '', $justClearID = false)
+    {
+        return true;
     }
     
     // Updates currNode without checking if this is a branch node
@@ -604,9 +675,9 @@ class CoreTree extends SurvLoopController
         if ($nID > 0) {
             $this->sessInfo->SessCurrNode = $nID;
             $this->sessInfo->save();
-            if (isset($GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl])) {
-                $this->sessData->currSessData($nID, $GLOBALS["DB"]->coreTbl, 
-                    $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->coreTbl] . 'SubmissionProgress', 'update', $nID);
+            if (isset($GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl])) {
+                $this->sessData->currSessData($nID, $GLOBALS["SL"]->coreTbl, 
+                    $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'SubmissionProgress', 'update', $nID);
             }
             $this->currNodeSubTier = $this->loadNodeSubTier($nID);
             $this->currNodeDataBranch = $this->loadNodeDataBranch($nID);
@@ -620,7 +691,7 @@ class CoreTree extends SurvLoopController
     {
         $newID = $this->jumpToNodeCustom($nID);
         if ($newID <= 0) { // nothing custom happened, check standard maneuvers
-            if (intVal($this->REQ->jumpTo) > 0) $newID = intVal($this->REQ->jumpTo);
+            if (intVal($GLOBALS["SL"]->REQ->jumpTo) > 0) $newID = intVal($GLOBALS["SL"]->REQ->jumpTo);
         }
         return $newID;
     }
@@ -631,8 +702,8 @@ class CoreTree extends SurvLoopController
     {
         $jumpID = $this->nodePrintJumpToCustom($nID);
         if ($jumpID <= 0) {
-            if ($this->hasREQ && $this->REQ->has('afterJumpTo') && intVal($this->REQ->afterJumpTo) > 0) {
-                $jumpID = intVal($this->REQ->afterJumpTo);
+            if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('afterJumpTo') && intVal($GLOBALS["SL"]->REQ->afterJumpTo) > 0) {
+                $jumpID = intVal($GLOBALS["SL"]->REQ->afterJumpTo);
             } elseif (isset($this->sessInfo->SessAfterJumpTo) && intVal($this->sessInfo->SessAfterJumpTo) > 0) {
                 $jumpID = $this->sessInfo->SessAfterJumpTo; 
                 $this->sessInfo->SessAfterJumpTo = -3; // reset this after using it

@@ -16,6 +16,7 @@ use SurvLoop\Controllers\DatabaseLookups;
 
 use App\Models\User;
 use App\Models\SLUsersActivity;
+use App\Models\SLDefinitions;
 
 class AuthController extends Controller
 {
@@ -32,8 +33,8 @@ class AuthController extends Controller
 
     use ThrottlesLogins, DispatchesJobs, ValidatesRequests;
     
-    protected $redirectPath        = '/afterLogin';
     protected $loginPath           = '/login';
+    protected $redirectPath        = '/afterLogin';
     protected $redirectAfterLogout = '/login';
 
     /**
@@ -43,6 +44,10 @@ class AuthController extends Controller
      */
     public function __construct()
     {
+        $this->loadDomain();
+        $this->loginPath           = $this->domainPath . '/login';
+        $this->redirectPath        = $this->domainPath . '/afterLogin';
+        $this->redirectAfterLogout = $this->domainPath . '/login';
         $this->middleware('guest', ['except' => 'getLogout']);
     }
 
@@ -94,12 +99,12 @@ class AuthController extends Controller
                 $user->assignRole('administrator');
                 $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
             } else {
-                $user->assignRole('volunteer');
-                $log->UserActCurrPage = 'NEW VOLUNTEER!';
+                /* $user->assignRole('volunteer'); */
+                $log->UserActCurrPage = 'NEW USER!';
             }
             $log->save();
         }
-        return redirect('/afterLogin');
+        return redirect($this->domainPath . '/afterLogin');
     }
    
     
@@ -110,15 +115,27 @@ class AuthController extends Controller
      */
     public function redirectPath()
     {
-        return '/afterLogin';
+        return $this->domainPath . '/afterLogin';
     }
     
     public function getLogout()
     {
         Auth::logout();
-        session()->put('sessID', -3);
-        session()->put('coreID', -3);
-        return redirect('/');
+        return redirect($this->domainPath . '/');
+    }
+    
+    
+    protected function loadDomain()
+    {
+        $appUrl = SLDefinitions::select('DefDescription')
+            ->where('DefDatabase', 1)
+            ->where('DefSet', 'System Settings')
+            ->where('DefSubset', 'app-url')
+            ->first();
+        if ($appUrl && isset($appUrl->DefDescription)) {
+            $this->domainPath = $appUrl->DefDescription;
+        }
+        return $this->domainPath;
     }
     
 }

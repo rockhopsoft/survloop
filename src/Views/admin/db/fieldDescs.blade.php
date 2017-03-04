@@ -60,7 +60,7 @@ function submitFldDescChanges() { document.FldDescForm.submit(); setTimeout("doc
 @forelse ($tblFldLists as $tblID => $flds)
     @if ($flds && sizeof($flds) > 0)
         <tr><td colspan=5 class="p20 headerBrkRow f20" >
-            Table: <b>{{ $GLOBALS["DB"]->tblEng[$tblID] }}</b> 
+            Table: <b>{{ $GLOBALS['SL']->tblEng[$tblID] }}</b> 
             ({{ number_format(sizeof($flds)) }} {{ $fldLabel }})
         </td></tr>
         <tr>
@@ -73,10 +73,10 @@ function submitFldDescChanges() { document.FldDescForm.submit(); setTimeout("doc
         @foreach ($flds as $cnt => $fld)
             
             <tr @if ((1+$cnt)%2 == 0) class="row2" @endif >
-            <td><a href="/dashboard/db/field/{{ $GLOBALS['DB']->tblAbbr[$GLOBALS['DB']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
+            <td><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
                 class="f14"><i class="fa fa-pencil"></i></a></td>
             <td class="w15">
-                <span class="f8"><i>{{ $GLOBALS["DB"]->tblEng[$fld->FldTable] }}</i></span><br />
+                <span class="f8"><i>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}</i></span><br />
                 <b>{{ $fld->FldEng }}</b><br />
                 <div class="f10">
                     {{ $FldDataTypes[$fld->FldType][1] }}

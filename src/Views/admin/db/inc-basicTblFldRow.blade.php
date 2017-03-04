@@ -6,8 +6,8 @@
             
                 @if ($tblLinks > 0 && $dbAllowEdits && !$isPrint)
                     <a 
-                    @if ($fld->FldTable > 0 && isset($GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$fld->FldTable]])) 
-                        href="/dashboard/db/field/{{ $GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}"
+                    @if ($fld->FldTable > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]])) 
+                        href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}"
                     @else
                         href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                     @endif
@@ -57,8 +57,8 @@
             </div>
             <div class="col-md-3 taR gry6">
             
-                @if ($tblID > 0 && isset($GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$tblID]]) && isset($fld->FldName))
-                    <div>{{ $GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$tblID]] }}{{ $fld->FldName }}</div>
+                @if ($tblID > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]]) && isset($fld->FldName))
+                    <div>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] }}{{ $fld->FldName }}</div>
                 @endif
                 @if (strpos($fld->FldKeyType, 'Primary') !== false)
                     @if ($fld->FldKeyStruct == 'Composite') Composite, @endif

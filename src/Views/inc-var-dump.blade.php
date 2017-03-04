@@ -8,7 +8,7 @@
 <div id="debugPop" class="brdDrk p20 mB10 round20 w100 disNon taL">
     <center>
     <div class="f22 bld">lastNode: {{ $lastNode }} -> currNode: {{ $currNode }}</div>
-    <div class="f14 pL10 pB20"><i>complaintID: {{ $coreID }}, @if ($user) {{ $user->name }} @endif , 
+    <div class="f14 pL10 pB20"><i>coreID: {{ $coreID }}, @if ($user) userID: {{ $user->id }}, {{ $user->name }} @endif , 
         @if (isset($dataSets["Complaints"])) {{ $dataSets["Complaints"][0]->ComAwardMedallion }} @endif
         </i></div>
     </center>
@@ -29,7 +29,7 @@
             @empty
             @endforelse
             </table>
-            POST/GET Requests:<pre>{!! print_r($REQ->all()) !!}</pre>
+            POST/GET Requests:<pre>{!! $requestDeets !!}</pre>
         </div>
         <div class="col-md-6">
             <table border=0 class="table table-striped" >
@@ -40,7 +40,7 @@
             <tr><td>loopRootJustLeft</td><td>{{ $sessInfo->SessLoopRootJustLeft }}</td></tr>
             <tr><td>afterJumpTo</td><td>{{ $sessInfo->SessAfterJumpTo }}</td></tr>
             <tr><th colspan=2 >sessLoops:</th></tr>
-            @forelse ($GLOBALS["DB"]->sessLoops as $sessLoop)
+            @forelse ($GLOBALS['SL']->sessLoops as $sessLoop)
                 <tr><td>{{ $sessLoop->SessLoopName }}</td><td>{{ $sessLoop->SessLoopItemID }}</td></tr>
             @empty
             @endforelse

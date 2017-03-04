@@ -20,7 +20,7 @@
     @forelse ($tblFlds as $i => $fld)
         @if ($fld->FldOpts%13 > 0)
             <xs:element name="{{ $tblAbbr . $fld->FldName }}" 
-                @if (!$tblFldEnum[$fld->FldID]) type="{{ $GLOBALS['DB']->fld2SchemaType($fld) }}" @endif
+                @if (!$tblFldEnum[$fld->FldID]) type="{{ $GLOBALS['SL']->fld2SchemaType($fld) }}" @endif
                 @if (!isset($fld->FldRequired) || intVal($fld->FldRequired) == 0) minOccurs="0" @endif >
                 <xs:annotation>
                     <xs:appinfo>{{ htmlspecialchars($fld->FldEng) }}</xs:appinfo>

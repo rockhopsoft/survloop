@@ -19,7 +19,7 @@
     @if ($currNodeSessData == $res[0]) CHECKED @endif ></div> {{ $res[1] }}</nobr>
     @if ($res[0] == 'O')
         <input type="text" name="n{{ $nID }}fldOther" id="n{{ $nID }}fldOtherID" value="{{ $currSessDataOther }}" 
-            class="form-control disIn otherGender" onKeyUp="formKeyUpOther({{ $nID }}, {{ $j }});">
+            class="form-control disIn otherFld" onKeyUp="formKeyUpOther({{ $nID }}, {{ $j }});">
     @endif
     </label>
 @endforeach

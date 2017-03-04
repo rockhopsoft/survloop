@@ -83,7 +83,7 @@ class SurvLoopNode extends CoreNode
     public function initiateNodeRow()
     {
         $this->copyFromRow();
-        $this->conds = array();
+        $this->conds = [];
         $chk = SLConditionsNodes::where('CondNodeNodeID', $this->nodeID)
             ->get();
         if ($chk && sizeof($chk) > 0) {
@@ -197,7 +197,7 @@ class SurvLoopNode extends CoreNode
     
     public function isStepLoop()
     {
-        return ($this->isLoopRoot() && $GLOBALS["DB"]->isStepLoop($this->dataBranch));
+        return ($this->isLoopRoot() && $GLOBALS["SL"]->isStepLoop($this->dataBranch));
     }
     
     public function isDataManip()
@@ -215,9 +215,14 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeType == 'Instructions');
     }
     
+    public function isInstructRaw()
+    {
+        return ($this->nodeType == 'Instructions Raw');
+    }
+    
     public function isSpecial()
     {
-        return ($this->isInstruct() || $this->isPage()  || $this->isBranch() 
+        return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
             || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip());
     }
     
@@ -259,7 +264,7 @@ class SurvLoopNode extends CoreNode
         if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') return '';
         $ret = ' , ' . $manipUpdate[1] . ' = ';
         if (isset($this->responseSet) && intVal($this->responseSet) > 0) {
-            $ret .= $GLOBALS["DB"]->getDefValById(intVal($this->responseSet));
+            $ret .= $GLOBALS["SL"]->getDefValById(intVal($this->responseSet));
         } else {
             $ret .= $manipUpdate[2];
         }

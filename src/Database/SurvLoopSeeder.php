@@ -3471,6 +3471,27 @@ class SurvLoopSeeder extends Seeder
             'FldOpts' => '13'
         ]);
         DB::table('SL_Fields')->insert([
+            'FldID' => 193,
+            'FldDatabase' => '3',
+            'FldTable' => '20',
+            'FldOrd' => '3',
+            'FldSpecSource' => '0',
+            'FldName' => 'TreeID',
+            'FldEng' => 'Tree ID',
+            'FldDesc' => 'Indicates the unique ID number of the User Experience Tree which this loop relates to.',
+            'FldForeignTable' => 5,
+            'FldForeignMin' => 'N',
+            'FldForeignMax' => 'N',
+            'FldForeign2Min' => 'N',
+            'FldForeign2Max' => 'N',
+            'FldType' => 'INT',
+            'FldDataType' => 'Numeric',
+            'FldDataLength' => '0',
+            'FldCharSupport' => ',Numbers,',
+            'FldKeyType' => ',Foreign,',
+            'FldOpts' => '1'
+        ]);
+        DB::table('SL_Fields')->insert([
             'FldID' => 166,
             'FldDatabase' => '3',
             'FldTable' => '17',

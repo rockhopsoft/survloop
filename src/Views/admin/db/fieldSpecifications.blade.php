@@ -3,11 +3,11 @@
 <div class="fieldSpecs panel panel-info">
     <div class="panel-heading"><h3 class="panel-title">
         @if (isset($fld->FldName))
-            <b>{{ $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> 
+            <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> 
         @else
             <b>New Field</b> 
         @endif
-        @if ($GLOBALS["DB"]->dbFullSpecs()) General Elements @endif
+        @if ($GLOBALS['SL']->dbFullSpecs()) General Elements @endif
     </h3></div>
     <div class="panel-body">
         
@@ -15,22 +15,22 @@
             <div class="col-md-6">
             
                 <fieldset class="form-group">
-                    <label for="FldNameID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldName'] }}">Field Name {!! $help !!}</label>
-                    {!! $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->tbl[$fld->FldTable]] !!}
+                    <label for="FldNameID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldName'] }}">Field Name {!! $help !!}</label>
+                    {!! $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] !!}
                     @if ($edit) <input type="text" id="FldNameID" name="FldName" value="{{ $fld->FldName }}" class="form-control" > 
                     @else {{ $fld->FldName }} 
                     @endif
                 </fieldset>
                 <fieldset class="form-group">
-                    <label for="FldEngID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldEng'] }}">Label {!! $help !!}</label>
+                    <label for="FldEngID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldEng'] }}">Label {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldEngID" name="FldEng" value="{{ $fld->FldEng }}" class="form-control" > 
                     @else {{ $fld->FldEng }} 
                     @endif
                 </fieldset>
                 
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
                 <fieldset class="form-group">
-                    <label for="FldAliasID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldAlias'] }}">Alias(es) {!! $help !!}</label>
+                    <label for="FldAliasID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldAlias'] }}">Alias(es) {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldAliasID" name="FldAlias" value="{{ $fld->FldAlias }}" class="form-control" > 
                     @else {{ $fld->FldAlias }} 
                     @endif
@@ -41,7 +41,7 @@
             <div class="col-md-6">
             
                 <fieldset class="form-group">
-                    <label for="FldTableID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldTable'] }}">Parent Table {!! $help !!}</label>
+                    <label for="FldTableID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldTable'] }}">Parent Table {!! $help !!}</label>
                     @if ($edit)
                         <select id="FldTableID" name="FldTable" autocomplete="off" class="form-control" >
                         {!! view('vendor.survloop.admin.db.inc-getTblDropOpts', [ "presel" => $fld->FldTable ]) !!}
@@ -51,10 +51,10 @@
                     @endif
                 </fieldset>
                 
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
             
                 <fieldset class="form-group">
-                    <label for="FldSpecTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldSpecType'] }}">Specification Type {!! $help !!}</label>
+                    <label for="FldSpecTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldSpecType'] }}">Specification Type {!! $help !!}</label>
                     @if ($edit)
                         <select name="FldSpecType" id="FldSpecTypeID" class="form-control" >
                             <option value="Unique" @if ($fld->FldSpecType == 'Unique' || $fld->FldSpecType == '') SELECTED @endif {{ $chkDis }} >Unique</option>
@@ -66,7 +66,7 @@
                     @endif
                 </fieldset>
                 <fieldset class="formFldSpecSourceIDgroup">
-                    <label for="FldSpecSourceID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldSpecSource'] }}">Source Specification {!! $help !!}</label>
+                    <label for="FldSpecSourceID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldSpecSource'] }}">Source Specification {!! $help !!}</label>
                     @if (!$edit) 
                         @if ($fld->FldSpecSource > 0) <span class="f8"><i>#{{ $fld->FldSpecSource }}</i></span> @endif
                     @else
@@ -115,7 +115,7 @@
         <div class="row">
             <div class="col-md-12">
                 <fieldset class="form-group">
-                    <label for="FldDescID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDesc'] }}">Description {!! $help !!}</label>
+                    <label for="FldDescID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDesc'] }}">Description {!! $help !!}</label>
                     @if ($edit) <textarea id="FldDescID" name="FldDesc" rows="2" class="form-control">{{ $fld->FldDesc }}</textarea> 
                     @else {{ $fld->FldDesc }} 
                     @endif
@@ -125,7 +125,7 @@
         <div class="row">
             <div class="col-md-12">
                 <fieldset class="form-group">
-                    <label for="FldNotesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldNotes'] }}">Memo {!! $help !!}</label>
+                    <label for="FldNotesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldNotes'] }}">Memo {!! $help !!}</label>
                     @if ($edit) <textarea id="FldNotesID" name="FldNotes" rows="2" class="form-control">{{ $fld->FldNotes }}</textarea>
                     @else {{ $fld->FldNotes }} 
                     @endif
@@ -133,7 +133,7 @@
             </div>
         </div>
             
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
     
     </div>
 </div>
@@ -141,7 +141,7 @@
 
 <div class="panel panel-info">
     <div class="panel-heading"><h3 class="panel-title">
-        <b>{{ $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Physical Elements
+        <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Physical Elements
     </h3></div>
     <div class="panel-body">
     
@@ -149,7 +149,7 @@
             <div class="col-md-6">
             
                 <fieldset class="form-group">
-                    <label for="FldDataTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDataType'] }}">Data Type {!! $help !!}</label>
+                    <label for="FldDataTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDataType'] }}">Data Type {!! $help !!}</label>
                     @if ($edit)
                         <select id="FldDataTypeID" name="FldDataType" class="form-control" >
                             <option value="Alphanumeric" @if ($fld->FldDataType == 'Alphanumeric') SELECTED @endif >Alphanumeric</option>
@@ -161,13 +161,13 @@
                     @endif
                 </fieldset>
                 <fieldset class="form-group">
-                    <label for="FldDataLengthID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDataLength'] }}">Length {!! $help !!}</label>
+                    <label for="FldDataLengthID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDataLength'] }}">Length {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDataLengthID" name="FldDataLength" value="{{ $fld->FldDataLength }}" class="form-control" > 
                     @else {{ $fld->FldDataLength }} 
                     @endif
                 </fieldset>
                 <fieldset class="form-group">
-                    <label for="FldDataDecimalsID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDataDecimals'] }}">Decimal Places {!! $help !!}</label>
+                    <label for="FldDataDecimalsID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDataDecimals'] }}">Decimal Places {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDataDecimalsID" name="FldDataDecimals" value="{{ $fld->FldDataDecimals }}" class="form-control" > 
                     @else {{ $fld->FldDataDecimals }} 
                     @endif
@@ -176,7 +176,7 @@
             </div>
             <div class="col-md-6">
                 
-                <div class="row" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldCharSupport'] }}">
+                <div class="row" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldCharSupport'] }}">
                     <b>Character Support</b> {!! $help !!}
                 </div>
                 <div class="row">
@@ -220,7 +220,7 @@
         <div class="row">
             <div class="col-md-6">
                 <fieldset class="form-group">
-                    <label for="FldInputMaskID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldInputMask'] }}">Input Mask {!! $help !!}</label>
+                    <label for="FldInputMaskID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldInputMask'] }}">Input Mask {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldInputMaskID" name="FldInputMask" value="{{ $fld->FldInputMask }}" class="form-control" > 
                     @else {{ $fld->FldInputMask }} 
                     @endif
@@ -228,7 +228,7 @@
             </div>
             <div class="col-md-6">
                 <fieldset class="form-group">
-                    <label for="FldDisplayFormatID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDisplayFormat'] }}">Display Format {!! $help !!}</label>
+                    <label for="FldDisplayFormatID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDisplayFormat'] }}">Display Format {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDisplayFormatID" name="FldDisplayFormat" value="{{ $fld->FldDisplayFormat }}" class="form-control" > 
                     @else {{ $fld->FldDisplayFormat }} 
                     @endif
@@ -241,7 +241,7 @@
         <div class="row">
             <div class="col-md-12">
                 <fieldset class="form-group">
-                    <label for="FldTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldType'] }}">MySQL Type {!! $help !!}</label>
+                    <label for="FldTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldType'] }}">MySQL Type {!! $help !!}</label>
                     @if ($edit)
                         <select id="FldTypeID" name="FldType" class="form-control" >
                         @foreach ($FldDataTypes as $type => $eng) {
@@ -257,14 +257,14 @@
             </div>
         </div>
         
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
     
     </div>
 </div>
     
 <div class="panel panel-info">
     <div class="panel-heading"><h3 class="panel-title">
-        <b>{{ $GLOBALS["DB"]->tblAbbr[$GLOBALS["DB"]->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Logical Elements
+        <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Logical Elements
     </h3></div>
     <div class="panel-body">
     
@@ -273,7 +273,7 @@
                 
                 <div class="row">
                     <div class="col-md-12">
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldKeyType'] }}">
+                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyType'] }}">
                             <b>Key Type</b> {!! $help !!}
                         </div>
                         <div class="checkbox-inline">
@@ -310,7 +310,7 @@
                 
                 <div class="row">
                     <div class="col-md-12">
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldKeyStruct'] }}">
+                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyStruct'] }}">
                             <b>Key Structure</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -342,18 +342,18 @@
                                             "presel" => $fld->FldForeignTable ]) !!}
                                     </select>
                                 @elseif ($fld->FldForeignTable > 0 
-                                    && isset($GLOBALS["DB"]->tbl[$fld->FldForeignTable]))
-                                    {!! $GLOBALS["DB"]->tblEng[$fld->FldForeignTable] !!}
+                                    && isset($GLOBALS['SL']->tbl[$fld->FldForeignTable]))
+                                    {!! $GLOBALS['SL']->tblEng[$fld->FldForeignTable] !!}
                                 @endif
                             </fieldset>
                             <div class="mTn5" data-toggle="tooltip" data-placement="top" 
                                 title="Degree of Participation A-B: How many 
-                                @if ($fld->FldForeignTable > 0 && isset($GLOBALS['DB']->tbl[$fld->FldForeignTable])) 
-                                    {{ $GLOBALS['DB']->tblEng[$fld->FldForeignTable] }} @else Other Table 
+                                @if ($fld->FldForeignTable > 0 && isset($GLOBALS['SL']->tbl[$fld->FldForeignTable])) 
+                                    {{ $GLOBALS['SL']->tblEng[$fld->FldForeignTable] }} @else Other Table 
                                 @endif
                                 records can be associated with a single record from 
-                                @if ($fld->FldTable > 0 && isset($GLOBALS['DB']->tbl[$fld->FldTable])) 
-                                    {{ $GLOBALS['DB']->tblEng[$fld->FldTable] }}? @else This Table? 
+                                @if ($fld->FldTable > 0 && isset($GLOBALS['SL']->tbl[$fld->FldTable])) 
+                                    {{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}? @else This Table? 
                                 @endif ">
                                 <i># of foreign records to one of these records:</i>
                             </div>
@@ -397,7 +397,7 @@
             
                 <div class="row">
                     <div class="col-md-12">
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldRequired'] }}">
+                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldRequired'] }}">
                             <b>Required Value</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -418,7 +418,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldNullSupport'] }}">
+                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldNullSupport'] }}">
                             <b>Null Support</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -439,7 +439,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldKeyStruct'] }}">
+                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyStruct'] }}">
                             <b>FldUnique</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -460,7 +460,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldIsIndex'] }}">
+                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsIndex'] }}">
                             <b>Index Support</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -485,7 +485,7 @@
             
                 <div class="row">
                     <div class="col-md-12">
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldEditRule'] }}">
+                        <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldEditRule'] }}">
                             <b>Edit Rule</b> {!! $help !!}
                         </div>
                         <div class="radio">
@@ -524,7 +524,7 @@
                             </label>
                         </div>
                         
-                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldValuesEnteredBy'] }}">
+                        <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValuesEnteredBy'] }}">
                             <b>Values Entered By</b> {!! $help !!}
                         </div>
                         <div class="radio-inline">
@@ -552,7 +552,7 @@
         <div class="row">
             <div class="col-md-12">
                 <fieldset class="form-group">
-                    <label for="FldDefaultID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldDefault'] }}">Default Value {!! $help !!}</label>
+                    <label for="FldDefaultID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDefault'] }}">Default Value {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDefaultID" name="FldDefault" value="{{ $fld->FldDefault }}" class="form-control" > 
                     @else {{ $fld->FldDefault }} 
                     @endif
@@ -561,14 +561,14 @@
         </div>
         <div class="row">
         @if (!$edit)
-            <div class="col-md-12" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldValues'] }}">
+            <div class="col-md-12" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValues'] }}">
                 Range of Values {!! $help !!}
                 @if ($defSet == '') {{ $fld->FldValues }} @elseif (isset($dbDefOpts[$defSet])) {{ $dbDefOpts[$defSet][0] }} <i>({{ $fld->FldValues }})</i> @endif
             </div>
         @else
             <div class="col-md-8">
                 <fieldset class="form-group">
-                    <label for="FldValuesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['DB']->fldAbouts['FldValues'] }}">Range of Values {!! $help !!}</label>
+                    <label for="FldValuesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValues'] }}">Range of Values {!! $help !!}</label>
                     <input type="text" id="FldValuesID" name="FldValues" class="form-control" style="color: @if ($defSet == '') #000 @else #999 @endif ;" 
                     @if ($defSet == '') value="{{ $fld->FldValues }}" @elseif (isset($dbDefOpts[$defSet])) value="{{ $dbDefOpts[$defSet][0] }}" DISABLED @endif >
                 </fieldset>
@@ -588,11 +588,11 @@
         @endif
         </div>
             
-@if ($GLOBALS["DB"]->dbFullSpecs())
+@if ($GLOBALS['SL']->dbFullSpecs())
     
         <div class="row mT20">
             <div class="col-md-12">
-                <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['DB']->fldAbouts['FldCompareSame'] }}">
+                <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['SL']->fldAbouts['FldCompareSame'] }}">
                     <b>Comparisons Allowed</b> {!! $help !!}
                 </div>
             </div>
@@ -828,7 +828,7 @@
         
         <div class="row mT20">
             <div class="col-md-12">
-                <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['DB']->fldAbouts['FldOperateSame'] }}">
+                <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['SL']->fldAbouts['FldOperateSame'] }}">
                     <b>Operations Allowed</b> {!! $help !!}
                 </div>
             </div>

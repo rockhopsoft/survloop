@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     <nobr>Fields XML Options</nobr>
 </h1>
 <a href="/dashboard/db/all" class="btn btn-xs btn-default">All Database Details</a>
@@ -40,15 +40,15 @@ function saveXmlSetting(FldID, newSetting) {
     @if ($tblFldLists[$tbl->TblID] && sizeof($tblFldLists[$tbl->TblID]) > 0)
     
         <tr><td colspan=4 class="p20 headerBrkRow f20" >
-            Table: <b>{!! $GLOBALS["DB"]->tblEng[$tbl->TblID] !!}</b> 
+            Table: <b>{!! $GLOBALS['SL']->tblEng[$tbl->TblID] !!}</b> 
             ({{ number_format(sizeof($tblFldLists[$tbl->TblID])) }})
         </td></tr>
         @foreach ($tblFldLists[$tbl->TblID] as $cnt => $fld)
             <tr @if ($cnt%2 == 0) class="row2" @endif >
-            <td><a href="/dashboard/db/field/{{ $GLOBALS['DB']->tblAbbr[$GLOBALS['DB']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
+            <td><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
                 class="f14"><i class="fa fa-pencil"></i></a></td>
             <td class="w40 pB10">
-                <span class="f8"><i>{{ $GLOBALS["DB"]->tblEng[$fld->FldTable] }}</i></span><br />
+                <span class="f8"><i>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}</i></span><br />
                 <b>{{ $fld->FldEng }}</b><br />
                 <div class="f10">{{ $FldDataTypes[$fld->FldType][1] }}
                 @if (intVal($fld->FldForeignTable) > 0) 

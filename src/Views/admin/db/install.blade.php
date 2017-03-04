@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     Database Installation Process 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
@@ -32,7 +32,7 @@
         </tr>
         @forelse ($tbls as $i => $tbl)
             <tr>
-                <td>{{ $GLOBALS["DB"]->dbRow->DbPrefix }}{{ $tbl->TblName }}</td>
+                <td>{{ $GLOBALS['SL']->dbRow->DbPrefix }}{{ $tbl->TblName }}</td>
                 <td>
                     @if ($tbl->TblName != 'Users')
                         <input type="checkbox" name="createTable[]" value="{{ $tbl->TblID }}" CHECKED >

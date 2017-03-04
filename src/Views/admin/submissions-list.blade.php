@@ -36,7 +36,7 @@
         @foreach ($coreFlds as $i => $fld)
             <td>
                 @if ($fld->FldForeignTable > 0)
-                    {{ $GLOBALS["DB"]->tbl[$fld->FldForeignTable] }} #
+                    {{ $GLOBALS['SL']->tbl[$fld->FldForeignTable] }} #
                 @endif
                 {{ $sub->{ $coreAbbr.$fld->FldName } }}
             </td>

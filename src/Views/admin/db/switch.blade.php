@@ -8,10 +8,10 @@
 <hr>
 
 @forelse ($myDbs as $db)
-    <div class="p10 @if ($GLOBALS['DB']->dbID == $db->DbID) row2 @endif ">
+    <div class="p10 @if ($GLOBALS['SL']->dbID == $db->DbID) row2 @endif ">
         <div class="row">
             <div class="col-md-9">
-                <h1 class=" @if ($GLOBALS['DB']->dbID == $db->DbID) slBlueDark @endif " >{{ $db->DbName }}</h1>
+                <h1 class=" @if ($GLOBALS['SL']->dbID == $db->DbID) slBlueDark @endif " >{{ $db->DbName }}</h1>
                 <div class="nPrompt">
                     <p><b>{{ $db->DbDesc }}</b></p>
                     @if (trim($db->DbMission) != '') 
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="col-md-3 pT20">
-                @if ($GLOBALS["DB"]->dbID == $db->DbID)
+                @if ($GLOBALS['SL']->dbID == $db->DbID)
                     <a href="javascript:void(0)" class="btn btn-lg btn-primary w100" DISABLED 
                         ><i class="fa fa-database mR5" aria-hidden="true"></i> Current Database<br />Being Designed</a>
                 @else

@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     @if ($defID > 0) 
         Edit Definition <span class="f16">{{ $def->DefSubset }}: {{ $def->DefValue }}</span> 
     @else
@@ -30,15 +30,19 @@
 <div class="row mT20">
     <div class="col-md-6">
         <label for="defSubsetID">Part of Set:</label>
-        <select id="defSubsetID" name="defSubset" onChange="return chkSubset(this.value);" autocomplete="off" class="form-control">
+        <select id="defSubsetID" name="defSubset" autocomplete="off" class="form-control"
+            onChange="return chkSubset(this.value);" >
             <option value="" @if ($def->DefSubset == '') SELECTED @endif ></option><option value="_">New Set</option>
             @if ($subList && sizeof($subList) > 0)
                 @foreach ($subList as $set) {
-                    <option value="{{ $set->DefSubset }}" @if ($set->DefSubset == $def->DefSubset) SELECTED @endif >{{ $set->DefSubset }}</option>
+                    <option value="{{ $set->DefSubset }}" @if ($set->DefSubset == $def->DefSubset) SELECTED @endif 
+                    	>{{ $set->DefSubset }}</option>
                 @endforeach
             @endif
         </select>
-        <div id="newSubsetDiv" class="disNon pL20 mL20">New Set: <input type="text" name="newSubset" value="" class="form-control"></div>
+        <div id="newSubsetDiv" class="disNon pL20 mL20">
+        	New Set: <input type="text" name="newSubset" value="" class="form-control">
+        </div>
     
         <label for="defValueID" class="mT20">Definition Value:</label>
         <input type="text" id="defValueID" name="defValue" value="{{ $def->DefValue }}" class="form-control">
@@ -47,11 +51,13 @@
         <textarea id="defDescriptionID" name="defDescription" class="form-control">{{ $def->DefDescription }}</textarea>
         
         <center><div class="p10"></div>
-        <input type="submit" class="btn btn-lg btn-primary f30" value=" @if (trim($subset) != '') Add Value @else Save Changes @endif " >
+        <input type="submit" class="btn btn-lg btn-primary f30" 
+            value=" @if (trim($subset) != '') Add Value @else Save Changes @endif " >
         </center>
     </div>
     <div class="col-md-6 p20 taR red ">
-        <input type="checkbox" name="deleteDef" id="deleteDefID" value="1"> <label for="deleteDefID">Delete Definition</label>
+        <input type="checkbox" name="deleteDef" id="deleteDefID" value="1">
+        <label for="deleteDefID">Delete Definition</label>
     </div>
 </div>
 

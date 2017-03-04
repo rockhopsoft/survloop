@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <h1 class="page-header">Dashboard</h1>
         <i>Overview of recent activity and statistics coming soon!</i>
         <br /><br />
@@ -16,44 +16,33 @@
         <li class="mB20"><a href="/dashboard/db/all" class="f22">Entire Database Design</a></li>
         </ul>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-6">
         <div class="jumbotron taC">
-            <h2>{{ $GLOBALS["DB"]->dbRow->DbName }} Mission</h2>
+            <h2>{{ $GLOBALS['SL']->dbRow->DbName }} Mission</h2>
             <p class="pB20">{!! $orgMission !!}</p>
         </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6">
-        <div class="row">
-            @for ($i=0; $i<sizeof($adminNav)-2; $i++)
-                @if ($i > 0)
-                    <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
+        
+        <div class="pL20">
+            @for ($i=0; $i<sizeof($adminNav); $i++)
+                <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
+                @if (sizeof($adminNav[$i][3]) > 0)
                     <ul>
-                    @if (sizeof($adminNav[$i][3]) > 0)
-                        @foreach ($adminNav[$i][3] as $link)
-                            <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a></li>
-                        @endforeach
-                    @endif
+                    @foreach ($adminNav[$i][3] as $link)
+                        <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a>
+                            @if (sizeof($link[3]) > 0)
+                                <ul>
+                                @foreach ($link[3] as $link2)
+                                    <li><a href="{{ $link2[0] }}" class="f16">{!! $link2[1] !!}</a></li>
+                                @endforeach
+                                </ul>
+                            @endif
+                        </li>
+                    @endforeach
                     </ul>
                 @endif
             @endfor
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="row">
-            @for ($i=sizeof($adminNav)-2; $i<sizeof($adminNav); $i++)
-                <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
-                <ul>
-                @if (sizeof($adminNav[$i][3]) > 0)
-                    @foreach ($adminNav[$i][3] as $link)
-                        <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a></li>
-                    @endforeach
-                @endif
-                </ul>
-            @endfor
-        </div>
+        
     </div>
 </div>
 

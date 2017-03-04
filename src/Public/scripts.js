@@ -76,6 +76,14 @@ function reqFormEmail(FldName) {
 	return true;
 }
 
+function reqFormTxt(fldID, nID) {
+	if (document.getElementById(fldID) && document.getElementById(fldID).value.trim() == '') {
+		setFormLabelRed(nID);
+		totFormErrors++;
+	}
+	else setFormLabelBlack(nID);
+	return true;
+}
 function reqFormFld(nID) {
 	if (document.getElementById('n'+nID+'FldID') && document.getElementById('n'+nID+'FldID').value.trim() == '') {
 		setFormLabelRed(nID);
@@ -438,6 +446,19 @@ $(function() {
 		document.getElementById("navMobBurger2").style.display='none';
 		$("#navMobFull").slideUp("fast");
 	});
+	
+	
+    $(document).on("click", ".nodeShowCond", function() {
+        var nID = $(this).attr("id").replace("showCond", "");
+        if (document.getElementById("condDeets"+nID+"")) {
+            if (document.getElementById("condDeets"+nID+"").style.display=='inline') {
+                document.getElementById("condDeets"+nID+"").style.display='none';
+            } else {
+                document.getElementById("condDeets"+nID+"").style.display='inline';
+            }
+        }
+        return true;
+    });
 	
 });
 

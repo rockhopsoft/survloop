@@ -4,7 +4,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class {{ str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix) }}CreateTables extends Migration
+class {{ str_replace('_', '', $GLOBALS['SL']->dbRow->DbPrefix) }}CreateTables extends Migration
 {
     /**
      * Run the migrations.

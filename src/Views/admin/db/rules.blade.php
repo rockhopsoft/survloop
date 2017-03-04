@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     Business Rules 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>

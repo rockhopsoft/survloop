@@ -5,6 +5,7 @@ use Cache;
 use Illuminate\Http\Request;
 
 use App\Models\SLDefinitions;
+use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeResponses;
@@ -25,7 +26,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
         foreach ($this->allNodes as $nID => $nodeObj) {
             $this->allNodes[$nID]->fillNodeRow();
         }
-        $this->canEditTree = $this->v["user"]->hasRole('administrator|brancher');
+        $this->canEditTree = false;
+    	if ($this->v["user"] && isset($this->v["user"]->id)) {
+    		$this->canEditTree = $this->v["user"]->hasRole('administrator|brancher');
+    	}
         return true;
     }
     
@@ -33,38 +37,40 @@ class SurvLoopTreeAdmin extends SurvFormTree
     {
         $this->survLoopInit($request, $currPage);
         $resLimit = 20;
-        $node = array();
+        $node = [];
         if ($nodeIN > 0) {
-            if (sizeof($this->allNodes) > 0 && isset($this->allNodes[$nodeIN])) {
-                $node = $this->allNodes[$nodeIN];
-            } else {
-                $node = $this->loadNode(SLNode::find($nodeIN));
-            }
+            $node = $this->loadNode(SLNode::find($nodeIN));
             $node->fillNodeRow($nodeIN);
         }
         if ($nodeIN <= 0 || !$node || sizeof($node) == 0) {
             $node = $this->loadNode();
-            $node->nodeRow->NodeParentID    = $this->REQ->nodeParentID;
+            $node->nodeRow->NodeTree        = $GLOBALS["SL"]->treeID;
+            $node->nodeRow->NodeParentID    = $GLOBALS["SL"]->REQ->nodeParentID;
             $node->nodeRow->NodeParentOrder = 0;
             $node->nodeRow->NodeOpts        = 1;
-            $node->nodeRow->NodeType        = 'Text';
+            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+                $node->nodeRow->NodeType    = 'Instructions';
+            } else {
+                $node->nodeRow->NodeType    = 'Text';
+            }
+            $node->nodeType = $node->nodeRow->NodeType;
         }
         
-        if ($this->REQ->has('sub') && $this->canEditTree) {
-            if ($this->REQ->has('deleteNode') && intVal($this->REQ->input('deleteNode')) == 1) {
+        if ($GLOBALS["SL"]->REQ->has('sub') && $this->canEditTree) {
+            if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
                 if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
                 
                 if (intVal($node->nodeRow->NodeOpts) <= 1) $node->nodeRow->NodeOpts = 1;
-                if ($this->REQ->changeResponseMobile == 'desktop') {
+                if ($GLOBALS["SL"]->REQ->changeResponseMobile == 'desktop') {
                     if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
                 }
                 elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
-                    if ($this->REQ->has('opts'.$o.'') && intVal($this->REQ->input('opts'.$o.'')) == $o
+                    if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->input('opts'.$o.'')) == $o
                         && (!in_array($o, $optsDesktop) || $node->nodeRow->NodeOpts%2 == 0)) {
                         if ($node->nodeRow->NodeOpts%$o > 0) $node->nodeRow->NodeOpts *= $o;
                     } elseif ($node->nodeRow->NodeOpts%$o == 0) {
@@ -72,69 +78,76 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 
-                $node->nodeRow->NodePromptText      = trim($this->REQ->input('nodePromptText'));
-                $node->nodeRow->NodePromptNotes     = trim($this->REQ->input('nodePromptNotes'));
-                $node->nodeRow->NodePromptAfter     = trim($this->REQ->input('nodePromptAfter'));
-                $node->nodeRow->NodeInternalNotes   = trim($this->REQ->input('nodeInternalNotes'));
-                $node->nodeRow->NodeCharLimit       = intVal($this->REQ->input('nodeCharLimit'));
-                $node->nodeRow->NodeTextSuggest     = trim($this->REQ->input('nodeTextSuggest'));
-                $node->nodeRow->NodeDataBranch      = trim($this->REQ->input('nodeDataBranch'));
-                $node->nodeRow->NodeDataStore       = trim($this->REQ->input('nodeDataStore'));
-                if ($this->REQ->nodeType == 'branch') {
+                $node->nodeRow->NodePromptText      = trim($GLOBALS["SL"]->REQ->input('nodePromptText'));
+                $node->nodeRow->NodePromptNotes     = trim($GLOBALS["SL"]->REQ->input('nodePromptNotes'));
+                $node->nodeRow->NodePromptAfter     = trim($GLOBALS["SL"]->REQ->input('nodePromptAfter'));
+                $node->nodeRow->NodeInternalNotes   = trim($GLOBALS["SL"]->REQ->input('nodeInternalNotes'));
+                $node->nodeRow->NodeCharLimit       = intVal($GLOBALS["SL"]->REQ->input('nodeCharLimit'));
+                $node->nodeRow->NodeTextSuggest     = trim($GLOBALS["SL"]->REQ->input('nodeTextSuggest'));
+                $node->nodeRow->NodeDataBranch      = trim($GLOBALS["SL"]->REQ->input('nodeDataBranch'));
+                $node->nodeRow->NodeDataStore       = trim($GLOBALS["SL"]->REQ->input('nodeDataStore'));
+                if (($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeParentID <= 0)
+                    || $GLOBALS["SL"]->REQ->nodeType == 'page') {
+                    $node->nodeRow->NodeType        = 'Page';
+                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->input('nodeSlug'));
+                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->input('pageFocusField'));
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'branch') {
                     $node->nodeRow->NodeType = 'Branch Title';
-                    $node->nodeRow->NodePromptText  = trim($this->REQ->input('branchTitle'));
-                } elseif ($this->REQ->nodeType == 'instruct') {
-                    $node->nodeRow->NodeType        = 'Instructions';
-                    $node->nodeRow->NodePromptText  = trim($this->REQ->input('nodeInstruct'));
-                    $node->nodeRow->NodePromptAfter = trim($this->REQ->input('instrPromptAfter'));
-                    if ($this->REQ->has('opts37B') && intVal($this->REQ->input('opts37B')) == 37) {
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('branchTitle'));
+                } elseif (in_array($GLOBALS["SL"]->REQ->nodeType, ['instruct', 'instructRaw'])) {
+                    $node->nodeRow->NodeType        = 'Instructions' 
+                        . (($GLOBALS["SL"]->REQ->nodeType == 'instructRaw') ? ' Raw' : '');
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('nodeInstruct'));
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->input('instrPromptAfter'));
+                    if ($GLOBALS["SL"]->REQ->has('opts37B') && intVal($GLOBALS["SL"]->REQ->input('opts37B')) == 37) {
                         if ($node->nodeRow->NodeOpts%37 > 0) $node->nodeRow->NodeOpts *= 37;
                     } elseif ($node->nodeRow->NodeOpts%37 == 0) {
                         $node->nodeRow->NodeOpts    = $node->nodeRow->NodeOpts/37;
                     }
-                } elseif ($this->REQ->nodeType == 'page') {
-                    $node->nodeRow->NodeType        = 'Page';
-                    $node->nodeRow->NodePromptNotes = trim($this->REQ->input('nodeSlug'));
-                    $node->nodeRow->NodeCharLimit   = intVal($this->REQ->input('pageFocusField'));
-                } elseif ($this->REQ->nodeType == 'loop') {
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'loop') {
                     $node->nodeRow->NodeType        = 'Loop Root';
-                    $node->nodeRow->NodePromptText  = trim($this->REQ->input('nodeLoopInstruct'));
-                    $node->nodeRow->NodePromptNotes = trim($this->REQ->input('loopSlug'));
-                    $node->nodeRow->NodeDataBranch  = $loop = trim($this->REQ->input('nodeDataLoop'));
-                    if (!isset($GLOBALS["DB"]->dataLoops[$loop])) {
-                        $GLOBALS["DB"]->dataLoops[$loop] = new SLDataLoop;
-                        $GLOBALS["DB"]->dataLoops[$loop]->DataLoopTree = $this->treeID;
-                        $GLOBALS["DB"]->dataLoops[$loop]->DataLoopRoot = $node->nodeRow->NodeID;
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('nodeLoopInstruct'));
+                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->input('loopSlug'));
+                    $node->nodeRow->NodeDataBranch  = $loop = trim($GLOBALS["SL"]->REQ->input('nodeDataLoop'));
+                    if (!isset($GLOBALS["SL"]->dataLoops[$loop])) {
+                        $GLOBALS["SL"]->dataLoops[$loop] = new SLDataLoop;
+                        $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTree = $this->treeID;
+                        $GLOBALS["SL"]->dataLoops[$loop]->DataLoopRoot = $node->nodeRow->NodeID;
+                    } elseif (trim($GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable) != ''
+                        && isset($GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable])) {
+                        $node->nodeRow->NodeDataStore = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable . ':' 
+                            . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable] . 'ID';
                     }
-                    $GLOBALS["DB"]->dataLoops[$loop]->DataLoopIsStep = 0;
-                    $GLOBALS["DB"]->dataLoops[$loop]->DataLoopAutoGen = 1;
-                    $GLOBALS["DB"]->dataLoops[$loop]->DataLoopDoneFld = '';
-                    if ($this->REQ->has('stepLoop') && intVal($this->REQ->input('stepLoop')) == 1) {
-                        $GLOBALS["DB"]->dataLoops[$loop]->DataLoopIsStep = 1;
-                        $GLOBALS["DB"]->dataLoops[$loop]->DataLoopAutoGen = 0;
-                        if ($this->REQ->has('stepLoopDoneField') 
-                            && trim($this->REQ->input('stepLoopDoneField')) != '') {
-                            $GLOBALS["DB"]->dataLoops[$loop]->DataLoopDoneFld 
-                                = trim($this->REQ->input('stepLoopDoneField'));
+                    $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 0;
+                    $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 1;
+                    $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld = '';
+                    if ($GLOBALS["SL"]->REQ->has('stepLoop') && intVal($GLOBALS["SL"]->REQ->input('stepLoop')) == 1) {
+                        $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 1;
+                        $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
+                        if ($GLOBALS["SL"]->REQ->has('stepLoopDoneField') 
+                            && trim($GLOBALS["SL"]->REQ->input('stepLoopDoneField')) != '') {
+                            $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld 
+                                = trim($GLOBALS["SL"]->REQ->input('stepLoopDoneField'));
                         }
-                    } elseif (!$this->REQ->has('stdLoopAuto') || intVal($this->REQ->input('stdLoopAuto')) == 0) {
-                        $GLOBALS["DB"]->dataLoops[$loop]->DataLoopAutoGen = 0;
+                    } elseif (!$GLOBALS["SL"]->REQ->has('stdLoopAuto') 
+                        || intVal($GLOBALS["SL"]->REQ->input('stdLoopAuto')) == 0) {
+                        $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
                     }
-                    $GLOBALS["DB"]->dataLoops[$loop]->save();
-                } elseif ($this->REQ->nodeType == 'cycle') {
+                    $GLOBALS["SL"]->dataLoops[$loop]->save();
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'cycle') {
                     $node->nodeRow->NodeType        = 'Loop Cycle';
-                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($this->REQ->input('nodeDataCycle'));
-                } elseif ($this->REQ->nodeType == 'sort') {
+                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->input('nodeDataCycle'));
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'sort') {
                     $node->nodeRow->NodeType        = 'Loop Sort';
-                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($this->REQ->input('nodeDataSort'));
-                    $node->nodeRow->NodeDataStore   = trim($this->REQ->input('DataStoreSort'));
-                } elseif ($this->REQ->nodeType == 'data') {
-                    $node->nodeRow->NodeType        = 'Data Manip: ' . $this->REQ->input('dataManipType');
-                    $node->nodeRow->NodeDataStore   = trim($this->REQ->input('manipMoreStore'));
-                    $node->nodeRow->NodeDefault     = trim($this->REQ->input('manipMoreVal'));
-                    $node->nodeRow->NodeResponseSet = trim($this->REQ->input('manipMoreSet'));
+                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->input('nodeDataSort'));
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->input('DataStoreSort'));
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'data') {
+                    $node->nodeRow->NodeType        = 'Data Manip: ' . $GLOBALS["SL"]->REQ->input('dataManipType');
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->input('manipMoreStore'));
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->input('manipMoreVal'));
+                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->input('manipMoreSet'));
                     for ($i=0; $i < $resLimit; $i++) {
-                        if (trim($this->REQ->input('manipMore' . $i . 'Store')) != '') {
+                        if (trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Store')) != '') {
                             if (!isset($node->dataManips[$i])) {
                                 $node->dataManips[$i] = new SLNode;
                                 $node->dataManips[$i]->NodeTree        = $this->treeID;
@@ -142,24 +155,29 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                 $node->dataManips[$i]->NodeParentID    = $node->nodeID;
                                 $node->dataManips[$i]->NodeParentOrder = $i;
                             }
-                            $node->dataManips[$i]->NodeDataStore = trim($this->REQ->input('manipMore' . $i . 'Store'));
-                            $node->dataManips[$i]->NodeDefault = trim($this->REQ->input('manipMore' . $i . 'Val'));
-                            $node->dataManips[$i]->NodeResponseSet = trim($this->REQ->input('manipMore' . $i . 'Set'));
+                            $node->dataManips[$i]->NodeDataStore 
+                                = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Store'));
+                            $node->dataManips[$i]->NodeDefault 
+                                = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Val'));
+                            $node->dataManips[$i]->NodeResponseSet 
+                                = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Set'));
                             $node->dataManips[$i]->save();
                         } else {
                             if (isset($node->dataManips[$i])) $node->dataManips[$i]->delete();
                         }
                     }
                 } else { // other normal response node
-                    $node->nodeRow->NodeType = trim($this->REQ->input('nodeTypeQ'));
+                    $node->nodeRow->NodeType = trim($GLOBALS["SL"]->REQ->input('nodeTypeQ'));
                     $newResponses = array();
-                    if (trim($this->REQ->input('responseListType')) == 'auto') {
-                        if (trim($this->REQ->input('responseLoopItems')) != '') {
-                            $node->nodeRow->NodeResponseSet = 'LoopItems::'.$this->REQ->input('responseLoopItems');
-                        } elseif (trim($this->REQ->input('responseDefinition')) != '') {
-                            $node->nodeRow->NodeResponseSet = 'Definition::'.$this->REQ->input('responseDefinition');
+                    if (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto') {
+                        if (trim($GLOBALS["SL"]->REQ->input('responseLoopItems')) != '') {
+                            $node->nodeRow->NodeResponseSet 
+                                = 'LoopItems::'.$GLOBALS["SL"]->REQ->input('responseLoopItems');
+                        } elseif (trim($GLOBALS["SL"]->REQ->input('responseDefinition')) != '') {
+                            $node->nodeRow->NodeResponseSet 
+                                = 'Definition::'.$GLOBALS["SL"]->REQ->input('responseDefinition');
                             $defs = SLDefinitions::where('DefSet', 'Value Ranges')
-                                ->where('DefSubset', $this->REQ->input('responseDefinition'))
+                                ->where('DefSubset', $GLOBALS["SL"]->REQ->input('responseDefinition'))
                                 ->orderBy('DefOrder', 'asc')
                                 ->get();
                             if ($defs && sizeof($defs) > 0) {
@@ -167,10 +185,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                     $newResponses[] = [
                                         "eng"   => $def->DefValue,
                                         "value" => $def->DefID, 
-                                        "kids"  => (($this->REQ->has('response'.$i.'ShowKids')) 
-                                            ? intVal($this->REQ->input('response'.$i.'ShowKids')) : 0),
-                                        "mutEx" => (($this->REQ->has('response'.$i.'MutEx')) 
-                                            ? intVal($this->REQ->input('response'.$i.'MutEx')) : 0)
+                                        "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'ShowKids')) : 0),
+                                        "mutEx" => (($GLOBALS["SL"]->REQ->has('response'.$i.'MutEx')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'MutEx')) : 0)
                                     ];
                                 }
                             }
@@ -178,51 +196,85 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     } else {
                         $node->nodeRow->NodeResponseSet = '';
                         for ($i=0; $i < 20; $i++) {
-                            if ($this->REQ->has('response'.$i.'') && trim($this->REQ->input('response'.$i.'')) != '') {
+                            if ($GLOBALS["SL"]->REQ->has('response'.$i.'') 
+                                && trim($GLOBALS["SL"]->REQ->input('response'.$i.'')) != '') {
                                 $newResponses[] = [
-                                    "eng"   => trim($this->REQ->input('response'.$i.'')),
-                                    "value" => ((trim($this->REQ->input('response'.$i.'Val')) != '') 
-                                        ? trim($this->REQ->input('response'.$i.'Val')) 
-                                        : trim($this->REQ->input('response'.$i.''))), 
-                                    "kids"  => (($this->REQ->has('response'.$i.'ShowKids')) 
-                                        ? intVal($this->REQ->input('response'.$i.'ShowKids')) : 0),
-                                    "mutEx" => (($this->REQ->has('response'.$i.'MutEx')) 
-                                        ? intVal($this->REQ->input('response'.$i.'MutEx')) : 0)
+                                    "eng"   => trim($GLOBALS["SL"]->REQ->input('response'.$i.'')),
+                                    "value" => ((trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) != '') 
+                                        ? trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) 
+                                        : trim($GLOBALS["SL"]->REQ->input('response'.$i.''))), 
+                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'ShowKids')) : 0),
+                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response'.$i.'MutEx')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'MutEx')) : 0)
                                 ];
                             }
                         }
+                    }
+                    if (in_array($GLOBALS["SL"]->REQ->nodeTypeQ, ['Date', 'Date Picker', 'Date Time'])) {
+                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->input('dateOptRestrict'));
+                    }
+                    if ($GLOBALS["SL"]->REQ->nodeTypeQ == 'Big Button') {
+                        $node->nodeRow->NodeDefault   = trim($GLOBALS["SL"]->REQ->input('bigBtnText'));
+                        $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->input('bigBtnJS'));
                     }
                     $node->nodeRow->save();
                     $node->nodeID = $node->nodeRow->NodeID;
                     $this->saveNewResponses($node, $newResponses, $resLimit);
                 }
-                if (in_array($this->REQ->nodeTypeQ, ['Date', 'Date Picker', 'Date Time'])) {
-                    $node->nodeRow->NodeCharLimit = intVal($this->REQ->input('dateOptRestrict'));
-                }
-                if ($this->REQ->nodeTypeQ == 'Big Button') {
-                    $node->nodeRow->NodeDefault   = trim($this->REQ->input('bigBtnText'));
-                    $node->nodeRow->NodeDataStore = trim($this->REQ->input('bigBtnJS'));
-                }
+                $node->nodeRow->NodeTree = $this->treeID;
                 $node->nodeRow->save();
                 
-                if ($this->REQ->has('condIDs') && sizeof($this->REQ->condIDs) > 0) {
-                    foreach ($this->REQ->condIDs as $condID) {
-                        if ($this->REQ->has('delCond'.$condID.'') && $this->REQ->get('delCond'.$condID.'') == 'Y') {
+                if ($node->nodeRow->NodeParentID <= 0) {
+                    if (isset($node->nodeRow->NodeDataBranch) 
+                    && isset($GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch])
+                    && (!isset($GLOBALS["SL"]->treeRow->coreTbl) || intVal($GLOBALS["SL"]->treeRow->coreTbl) <= 0)) {
+                        $GLOBALS["SL"]->treeRow->TreeCoreTable = $GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch];
+                        $GLOBALS["SL"]->treeRow->save();
+                    }
+                    if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeType == 'Page') {
+                        if ($GLOBALS["SL"]->REQ->has('homepage') 
+                            && intVal($GLOBALS["SL"]->REQ->input('homepage')) == 7) {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%7 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 7;
+                        } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%7 == 0) {
+                            $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/7;
+                        }
+                        if ($GLOBALS["SL"]->REQ->has('adminPage') 
+                            && intVal($GLOBALS["SL"]->REQ->input('adminPage')) == 3) {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%3 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 3;
+                        } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0) {
+                            $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/3;
+                        }
+                        $GLOBALS["SL"]->treeRow->TreeSlug      = trim($GLOBALS["SL"]->REQ->input('nodeSlug'));
+                        $GLOBALS["SL"]->treeRow->TreeFirstPage = $node->nodeRow->NodeID;
+                        $GLOBALS["SL"]->treeRow->TreeLastPage  = $node->nodeRow->NodeID;
+                        $GLOBALS["SL"]->treeRow->save();
+                    }
+                }
+                if ($GLOBALS["SL"]->REQ->has('condIDs') && sizeof($GLOBALS["SL"]->REQ->condIDs) > 0) {
+                    foreach ($GLOBALS["SL"]->REQ->condIDs as $condID) {
+                        if ($GLOBALS["SL"]->REQ->has('delCond'.$condID.'') 
+                            && $GLOBALS["SL"]->REQ->get('delCond'.$condID.'') == 'Y') {
                             SLConditionsNodes::where('CondNodeCondID', $condID)
                                 ->where('CondNodeNodeID', $node->nodeID)
                                 ->delete();
                         }
                     }
                 }
-                if (($this->REQ->has('oldConds') && intVal($this->REQ->oldConds) > 0) 
-                    || ($this->REQ->has('condHash') && trim($this->REQ->condHash) != '')) {
-                    $newCond = $GLOBALS["DB"]->saveEditCondition($this->REQ);
+                if (($GLOBALS["SL"]->REQ->has('oldConds') && intVal($GLOBALS["SL"]->REQ->oldConds) > 0) 
+                    || ($GLOBALS["SL"]->REQ->has('condHash') && trim($GLOBALS["SL"]->REQ->condHash) != '')) {
+                    $newCond = $GLOBALS["SL"]->saveEditCondition($this->REQ);
                     $newLink = new SLConditionsNodes;
                     $newLink->CondNodeCondID = $newCond->CondID;
                     $newLink->CondNodeNodeID = $node->nodeID;
+                    if ($GLOBALS["SL"]->REQ->has('oldCondInverse')
+                        && intVal($GLOBALS["SL"]->REQ->oldCondInverse) == 1) {
+                        $newLink->CondNodeLoopID = -1;
+                    }
                     $newLink->save();
                 }
                 
+                $this->updateTreeEnds();
                 $this->updateLoopRoots();
                 $this->updateBranchUrls();
             }
@@ -236,9 +288,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 '.dashboard.tree'
             ];
             foreach ($treeCaches as $cache) Cache::forget($cache);
-            echo '<script type="text/javascript"> setTimeout("window.location=\'/dashboard/tree/map?all=1&refresh=1#n'
-                . $node->nodeRow->NodeID . '\'", 5); </script>';
-            exit;
+            $redir = '/dashboard/tree/map?all=1&refresh=1#n' . $node->nodeRow->NodeID;
+            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?refresh=1#n' . $node->nodeRow->NodeID;
+            }
+            return $this->redir($redir, true);
         }
         
         $defs = SLDefinitions::where('DefSet', 'Value Ranges')
@@ -254,7 +308,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
             && strpos($node->nodeRow->NodeResponseSet, 'LoopItems::') !== false) {
             $currLoopItems = str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet);
         }
+        $nodeTypeSel = (($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
+            && $node->nodeRow->NodeID == $GLOBALS["SL"]->treeRow->TreeRoot) ? ' DISABLED ' : '');
         $branch = ((isset($node->nodeRow->NodeDataBranch)) ? $node->nodeRow->NodeDataBranch : '');
+        if ($node->isInstruct()) $this->v["needsWsyiwyg"] = true;
         return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 
             "treeID"         => $this->treeID, 
@@ -265,10 +322,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "REQ"            => $this->REQ, 
             "resLimit"       => $resLimit, 
             "defs"           => $defs,
-            "dataBranchDrop" => $GLOBALS["DB"]->tablesDropdown($branch, 
+            "nodeTypeSel"    => $nodeTypeSel, 
+            "dataBranchDrop" => $GLOBALS["SL"]->tablesDropdown($branch, 
                 'select database table to create deeper or more explicit data linkages')
         ]);
-        
     }
     
     
@@ -299,13 +356,13 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
             if ($this->hasNode($tierNode[0])) {
                 $this->allNodes[$tierNode[0]]->fillNodeRow();
-                $tmp = $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText;
-                $styPos = strpos($tmp, '<style>');
+                $nodePromptText = $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText;
+                $styPos = strpos($nodePromptText, '<style>');
                 if ($styPos !== false) {
-                    $styPosEnd = strpos($tmp, '</style>', $styPos);
-                    $tmp = substr($tmp, 0, $styPos) . substr($tmp, 8+$styPosEnd);
+                    $styPosEnd = strpos($nodePromptText, '</style>', $styPos);
+                    $nodePromptText = substr($nodePromptText, 0, $styPos) . substr($nodePromptText, 8+$styPosEnd);
                 }
-                $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText = strip_tags($tmp);
+                $nodePromptText = strip_tags($nodePromptText);
                 $childrenPrints = '';
                 if (sizeof($tierNode[1]) > 0) { 
                     foreach ($tierNode[1] as $next) {
@@ -315,18 +372,34 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 $conditionList = (sizeof($this->allNodes[$tierNode[0]]->conds) == 0) ? ''
                     : '<span class="slBlueDark mL10">' 
                         . view('vendor.survloop.admin.tree.node-list-conditions', [
-                            "conds" => $this->allNodes[$tierNode[0]]->conds
+                            "conds"      => $this->allNodes[$tierNode[0]]->conds,
+                            "nID"        => $tierNode[0],
+                            "hideDeets"  => true
                         ])->render() . '</span>';
-                if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
-                    return view('vendor.survloop.admin.tree.node-print-basic', [
-                        "canEditTree"    => $this->canEditTree, 
-                        "REQ"            => $this->REQ, 
+                $nodeBtns = view('vendor.survloop.admin.tree.node-print-basic-btns', [
                         "nID"            => $tierNode[0], 
                         "node"           => $this->allNodes[$tierNode[0]], 
                         "tierNode"       => $tierNode, 
+                        "canEditTree"    => $this->canEditTree, 
+                        "isPrint"        => $this->v["isPrint"],
+                        "isAlt"          => $this->v["isAlt"]
+                    ])->render();
+                if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
+                    return view('vendor.survloop.admin.tree.node-print-basic', [
+                        "rootID"         => $this->rootID, 
+                        "nID"            => $tierNode[0], 
+                        "node"           => $this->allNodes[$tierNode[0]], 
+                        "nodePromptText" => $nodePromptText,
+                        "tierNode"       => $tierNode, 
                         "tierDepth"      => $tierDepth, 
                         "childrenPrints" => $childrenPrints,
-                        "conditionList"  => $conditionList
+                        "conditionList"  => $conditionList,
+                        "nodeBtns"       => $nodeBtns,
+                        "REQ"            => $this->REQ,
+                        "canEditTree"    => $this->canEditTree, 
+                        "isPrint"        => $this->v["isPrint"],
+                        "isAll"          => $this->v["isAll"],
+                        "isAlt"          => $this->v["isAlt"]
                     ])->render();
                 }
             }
@@ -334,24 +407,33 @@ class SurvLoopTreeAdmin extends SurvFormTree
         return '';
     }
     
-    public function adminPrintFullTree(Request $request)
+    public function adminPrintFullTree(Request $request, $pubPrint = false)
     {
+        if ($pubPrint) {
+            $this->v["isPrint"] = $this->v["isAll"] = $this->v["isAlt"] = true;
+        }
         $this->loadTree();
         $this->initExtra($request);
+        if ($pubPrint) $this->v["isPrint"] = true;
         $this->checkTreeSessOpts();
         $this->treeAdminNodeManip();
-        if ($this->REQ->has('dataStruct')) {
+        if ($GLOBALS["SL"]->REQ->has('dataStruct')) {
             
+        }
+        if ($pubPrint) {
+            return $this->adminBasicPrintNode($this->nodeTiers, -1);
         }
         return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint"     => $this->adminBasicPrintNode($this->nodeTiers, -1), 
-            "canEditTree"         => $this->canEditTree
+            "canEditTree"         => $this->canEditTree,
+            "isPrint"             => $this->v["isPrint"]
         ])->render();
     }
     
     
     
-    protected function adminResponseNodeStatsTxt($res, $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess)
+    protected function adminResponseNodeStatsTxt($res, $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, 
+        $nodeSess)
     {
         $stats = '<span class="gry6">';
         if (isset($nodeFinalVals[$res])) {
@@ -412,7 +494,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 if ($this->allNodes[$nID]->nodeType == 'U.S. States') {
-                    foreach ($GLOBALS["DB"]->states->stateList as $abbr => $name) {
+                    foreach ($GLOBALS["SL"]->states->stateList as $abbr => $name) {
                         $ind = sizeof($this->allNodes[$nID]->responses);
                         $this->allNodes[$nID]->responses[$ind] = new SLNodeResponses;
                         $this->allNodes[$nID]->responses[$ind]->NodeResValue = $abbr;
@@ -423,7 +505,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 }
                 
                 $nodeAJAX = '';
-                $retVal .= '<a name="n'.$nID.'"></a><div class="basicTier' 
+                $retVal .= '<a name="n' . $nID . '"></a><div class="basicTier' 
                     . (($tierDepth < 10) ? $tierDepth : 9) . '">';
                 if (!$this->allNodes[$nID]->isPage()) {
                     $retVal .= '<span class="slBlueDark f22" title="(on parent\'s page)">'
@@ -441,8 +523,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 {
                     $retVal .= '<span class="f20"><span class="gry9"><i class="fa fa-share-alt"></i> <i>' 
                     . (($nID == $this->rootID) ? 'Tree Root Node' : 'Section Branch') . ':</i></span> <b>' 
-                    . $this->allNodes[$nID]->nodeRow->NodePromptText . '</b></span>'
-                    . '<div class="pT5"><a href="#n'.$nID.'" id="adminNode'.$nID.'Expand" class="adminNodeExpand '
+                    . $this->allNodes[$nID]->nodeRow->NodePromptText . '</b></span><div class="pT5"><a href="#n' 
+                    . $nID . '" id="adminNode' . $nID . 'Expand" class="adminNodeExpand '
                     . 'slBlueLight noUnd"><i class="fa fa-expand fa-flip-horizontal"></i></a></div>';
                 }
                 else
@@ -452,7 +534,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         str_replace('</h2>', ' ', $this->allNodes[$nID]->nodeRow->NodePromptText)))) 
                         . (($this->allNodes[$nID]->isRequired()) ? ' <span class="slRedDark">*</span> ' : '') 
                         . '</span><div class="pT5">'
-                        . ((sizeof($tierNode[1]) > 0) ? '<a href="#n'.$nID.'" id="adminNode' . $nID . 'Expand" '
+                        . ((sizeof($tierNode[1]) > 0) ? '<a href="#n' . $nID . '" id="adminNode' . $nID . 'Expand" '
                             . 'class="slBlueLight noUnd"><i class="fa fa-expand fa-flip-horizontal"'
                             . '></i></a>&nbsp;&nbsp;&nbsp;' : '');
                     if (sizeof($this->allNodes[$nID]->nodeResponses) > 0) {
@@ -480,12 +562,16 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         arsort($nodeFinalVals);
                         $j=0;
                         foreach ($nodeFinalVals as $res => $cnt) {
-                            $retVal .= '<li class="mT5 mB20"><span class="f18"><b>' . ((trim($res) != '') ? strip_tags($res) : '<span class="gry9"><i>(empty)</i></span>') . '</b></span><br />' 
-                                . $this->adminResponseNodeStatsTxt(strtolower($res), $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess) . '</li>';
+                            $retVal .= '<li class="mT5 mB20"><span class="f18"><b>' 
+                                . ((trim($res) != '') ? strip_tags($res) : '<span class="gry9"><i>(empty)</i></span>') 
+                                . '</b></span><br />' . $this->adminResponseNodeStatsTxt(strtolower($res), 
+                                $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess) . '</li>';
                             if ($j == 9) {
-                                $retVal .= '<li><a name="n'.$nID.'more"></a><a href="#n'.$nID.'more" id="show'.$nID.'Response'.$j.'Stats">show more</a></li></ul></div>
-                                <div id="more'.$nID.'Response'.$j.'Stats" class="disNon"><ul>';
-                                $nodeAJAX .= '$("#show'.$nID.'Response'.$j.'Stats").click(function(){ $("#more'.$nID.'Response'.$j.'Stats").slideToggle("fast"); }); ' . "\n";
+                                $retVal .= '<li><a name="n' . $nID . 'more"></a><a href="#n' . $nID . 'more" id="show' 
+                                    . $nID . 'Response'.$j.'Stats">show more</a></li></ul></div>
+                                    <div id="more' . $nID . 'Response'.$j.'Stats" class="disNon"><ul>';
+                                $nodeAJAX .= '$("#show' . $nID . 'Response'.$j.'Stats").click(function(){ $("#more' 
+                                    . $nID . 'Response'.$j.'Stats").slideToggle("fast"); }); ' . "\n";
                             }
                             $j++;
                         }
@@ -500,7 +586,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $retVal .= '</div>';
                 }
                 $retVal .= '</div><script type="text/javascript"> $(document).ready(function(){ 
-                $("#adminNode'.$nID.'Expand").click(function(){ $("#nodeKids' . $nID . '").slideToggle("fast"); }); 
+                $("#adminNode' . $nID . 'Expand").click(function(){ $("#nodeKids' . $nID . '").slideToggle("fast"); }); 
                 ' . $nodeAJAX . '
                 }); </script>';
             }
@@ -520,7 +606,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     public function checkTreeSessOpts()
     {
         if (!session()->has('adminOverOpts')) session()->put('adminOverOpts', 2);
-        if ($this->REQ->has('all')) {
+        if ($GLOBALS["SL"]->REQ->has('all')) {
             if (session()->get('adminOverOpts')%2 > 0) {
                 session()->put('adminOverOpts', (2*session()->get('adminOverOpts')));
             }
@@ -542,7 +628,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             if ($this->hasNode($nID)) {
                 $indent = ''; for ($i=0; $i<$tierDepth; $i++) $indent .= ' - ';
                 $nodeName = $this->allNodes[$nID]->nodeRow->NodePromptText;
-                $retVal .= '<option value="'.$nID.'" ' . ((intVal($preSel) == $nID) ? 'SELECTED' : '') . ' >' 
+                $retVal .= '<option value="' . $nID . '" ' . ((intVal($preSel) == $nID) ? 'SELECTED' : '') . ' >' 
                     . $indent . ((strlen($nodeName) > 70) ? substr($nodeName, 0, 70).'...' : $nodeName) . '</option>';
                 if (sizeof($tierNode[1]) > 0) {
                     foreach ($tierNode[1] as $next) {
@@ -562,6 +648,19 @@ class SurvLoopTreeAdmin extends SurvFormTree
         </select>';
     }
     
+    protected function updateTreeEnds()
+    {
+        $GLOBALS["SL"]->treeRow->TreeFirstPage = $GLOBALS["SL"]->treeRow->TreeLastPage = -3;
+        foreach ($this->nodesRawOrder as $nID) {
+            if (isset($this->allNodes[$nID]) 
+                && ($this->allNodes[$nID]->isPage() || $this->allNodes[$nID]->isLoopRoot())) {
+                if ($GLOBALS["SL"]->treeRow->TreeFirstPage <= 0) $GLOBALS["SL"]->treeRow->TreeFirstPage = $nID;
+                $GLOBALS["SL"]->treeRow->TreeLastPage = $nID;
+            }
+        }
+        $GLOBALS["SL"]->treeRow->save();
+        return true;
+    }
     
     protected function updateLoopRoots()
     {

@@ -12,7 +12,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>: Definitions (Value Ranges)
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Definitions (Value Ranges)
 </h1>
 
 <div class="fC"></div>
@@ -29,6 +29,7 @@
 
 @foreach ($defSets as $subset => $setDefs)
     @if ($setDefs && sizeof($setDefs) > 0)
+        <a name="{{ str_replace(' ', '', $subset) }}"></a>
         <div class="row mT20 mB20 row2">
             <div class="col-md-3 pL10" >
                 <h1 class="mT0">{{ $subset }}</h1>

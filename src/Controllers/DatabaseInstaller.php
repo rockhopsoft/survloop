@@ -27,7 +27,7 @@ class DatabaseInstaller extends AdminDBController
     protected function exportMysqlTbl($tbl, $installHereNow = false)
     {
         if (!isset($this->v["export"])) $this->v["export"] = $this->v["indexesEnd"] = '';
-        if ($tbl->TblEng == 'Users') return "";
+        if (strtolower($tbl->TblEng) == 'Users') return "";
         $tblQuery = $this->exportMysqlTblCoreStart($tbl);
         $indexes = "";
         $flds = SLFields::where('FldTable', $tbl->TblID)
@@ -39,7 +39,8 @@ class DatabaseInstaller extends AdminDBController
             foreach ($flds as $fld) {
                 $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
                 if ($fld->FldType == 'INT') {
-                    if ($fld->FldForeignTable > 0 && $GLOBALS["DB"]->tbl[$fld->FldForeignTable] == 'users') {
+                    if (intVal($fld->FldForeignTable) > 0 
+                        && strtolower($GLOBALS["SL"]->tbl[$fld->FldForeignTable]) == 'users') {
                         $tblQuery .= "BIGINT(20) unsigned ";
                     } else {
                         $tblQuery .= "INT(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 11) . ") ";
@@ -76,7 +77,7 @@ class DatabaseInstaller extends AdminDBController
                 if (intVal($fld->FldForeignTable) > 0) {
                     list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
                     $this->v["indexesEnd"] .= "ALTER TABLE `" 
-                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
+                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
                         . "` ADD FOREIGN KEY (`" . $tbl->TblAbbr . $fld->FldName . "`) "
                         . "REFERENCES `" . $forTbl . "` (`" . $forID . "`); \n";
                 }
@@ -104,7 +105,7 @@ class DatabaseInstaller extends AdminDBController
     
     public function export(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/export');
+        $this->admControlInit($request, '/dashboard/db/all');
         if (!$this->checkCache('/dashboard/db/export')) {
             $this->exportMysql();
             $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
@@ -116,8 +117,8 @@ class DatabaseInstaller extends AdminDBController
     public function printExportLaravel(Request $request) 
     {
         ini_set('max_execution_time', 180);
-        $this->admControlInit($request, '/dashboard/db/export');
-        if (!$this->checkCache('/dashboard/db/export/laravel')) {
+        $this->admControlInit($request, '/dashboard/db/all');
+        if (!$this->checkCache('/dashboard/db/export/laravel') && !$request->has('refresh')) {
             $this->chkModelsFolder();
             $this->v["fileListModel"] = [];
             $this->v["migrationFileUp"] = $this->v["migrationFileDown"] = '';
@@ -129,28 +130,26 @@ class DatabaseInstaller extends AdminDBController
             ];
             
             $modelPath = "App\\Models\\";
-            /* if ($GLOBALS["DB"]->dbRow->dbName != 'SurvLoop')
-            {
+            /* if ($GLOBALS["SL"]->dbRow->dbName != 'SurvLoop') {
                 $modelPath = "App\\Models\\" 
-                    . $GLOBALS["DB"]->sysOpts["cust-abbr"] . "\\";
+                    . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\";
             } */
             
             $tbls = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', 'NOT LIKE', 'Users')
+                ->where('TblName', 'NOT LIKE', 'users')
                 ->orderBy('TblOrd')
                 ->get();
             if ($tbls && sizeof($tbls) > 0) {
                 foreach ($tbls as $tbl) {
                     $indexes = "";
                     $this->v["tbl"] = $tbl;
-                    $this->v["tblName"] = $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName;
+                    $this->v["tblName"] = $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName;
                     $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-                    $this->v["migrationFileUp"] .= "\t"."Schema::create('" 
-                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
-                        . "', function(Blueprint $"."table)"
-                        ."\n\t\t"."{"."\n\t\t\t"
+                    $this->v["migrationFileUp"] .= "\t"."Schema::create('" . $GLOBALS["SL"]->dbRow->DbPrefix 
+                        . $tbl->TblName . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
                         ."$"."table->increments('" . $tbl->TblAbbr . "ID');";
-                    $this->v["modelFile"] = '';
+                    $this->v["modelFile"] = ''; // also happens in DatabaseLookups->chkTblModel($tbl)
                     $flds = SLFields::where('FldTable', $tbl->TblID)
                         ->where('FldDatabase', $this->dbID)
                         ->orderBy('FldOrd', 'asc')
@@ -208,9 +207,9 @@ class DatabaseInstaller extends AdminDBController
                     $this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"
                         ."});"."\n\t";
                     $this->v["migrationFileDown"] .= "\t"."Schema::drop('" 
-                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
+                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
                     
-                    $newModelFilename = '../app/Models/' . $GLOBALS["DB"]->sysOpts["cust-abbr"] 
+                    $newModelFilename = '../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                         . '/' . $this->v["tblClean"] . '.php';
                     $this->v["fileListModel"][] = $newModelFilename;
                     $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
@@ -225,6 +224,8 @@ class DatabaseInstaller extends AdminDBController
                         }
                     }
                     file_put_contents($newModelFilename, $fullFileOut);
+                    copy($newModelFilename, str_replace('/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/', 
+                        '/Models/', $newModelFilename));
                     
                     if (file_exists('../app/Models/' . $this->v["tblClean"] . '.php')) {
                         eval("\$seedChk = " . $modelPath . $this->v["tblClean"] . "::get();");
@@ -243,7 +244,7 @@ class DatabaseInstaller extends AdminDBController
                                 }
                                 if (trim($fldData) != '') {
                                     $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
-                                        . $GLOBALS["DB"]->dbRow->DbPrefix . $tbl->TblName 
+                                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
                                         . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
                                 }
                             }
@@ -254,14 +255,14 @@ class DatabaseInstaller extends AdminDBController
             
             
             $newMigFilename = '../database/migrations/'
-                . $this->v["dateStamp"] . '_' . $GLOBALS["DB"]->dbRow->DbPrefix 
+                . $this->v["dateStamp"] . '_' . $GLOBALS["SL"]->dbRow->DbPrefix 
                 . 'create_tables.php';
             $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-migration' , $this->v);
             file_put_contents($newMigFilename, $fullFileOut);
             $this->v["dumpOut"]["Migrations"] .= $fullFileOut;
 
             $newSeedFilename = '../database/seeds/'
-                . str_replace('_', '', $GLOBALS["DB"]->dbRow->DbPrefix) 
+                . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
                 . 'Seeder.php';
             $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-seeder' , $this->v);
             file_put_contents($newSeedFilename, $fullFileOut);
@@ -286,51 +287,51 @@ class DatabaseInstaller extends AdminDBController
     
     public function autoInstallDatabase(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/db/export');
+        $this->admControlInit($request, '/dashboard/db/all');
         
         $this->v["oldTables"] = array();
         
-        $this->v["DbPrefix"] = $GLOBALS["DB"]->dbRow->DbPrefix;
+        $this->v["DbPrefix"] = $GLOBALS["SL"]->dbRow->DbPrefix;
         $this->v["tbls"] = $this->tblQryStd();
         
         $this->v["log"] = '';
-        if ($this->v["dbAllowEdits"] && $this->REQ->has('dbConfirm') && $this->REQ->input('dbConfirm') == 'install'
-            && $this->REQ->has('createTable') && sizeof($this->REQ->input('createTable')) > 0) {
+        if ($this->v["dbAllowEdits"] && $GLOBALS["SL"]->REQ->has('dbConfirm') && $GLOBALS["SL"]->REQ->input('dbConfirm') == 'install'
+            && $GLOBALS["SL"]->REQ->has('createTable') && sizeof($GLOBALS["SL"]->REQ->input('createTable')) > 0) {
             $transferData = array();
-            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0) {
-                foreach ($this->REQ->input('copyData') as $copyTbl) {
-                    if (file_exists('../app/Models/' . $GLOBALS["DB"]->tblModels[$GLOBALS["DB"]->tbl[$copyTbl]])) {
+            if ($GLOBALS["SL"]->REQ->has('copyData') && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
+                foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
+                    if (file_exists('../app/Models/' . $GLOBALS["SL"]->tblModels[$GLOBALS["SL"]->tbl[$copyTbl]])) {
                         eval("\$transferData[\$copyTbl] = " 
-                            . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->tbl[$copyTbl])
+                            . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl])
                             . "::get();");
-                        $this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
+                        $this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
                     }
                 }
             }
         
-            foreach ($this->REQ->input('createTable') as $createTbl) {
+            foreach ($GLOBALS["SL"]->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
                 DB::statement('DROP TABLE IF EXISTS `' 
-                    . $GLOBALS["DB"]->dbRow->DbPrefix . $GLOBALS["DB"]->tbl[$createTbl] . '`');
+                    . $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$createTbl] . '`');
                 $createQry = $this->exportMysqlTbl($tbl, true);
                 echo $createQry . '<br />';
                 DB::statement($createQry);
-                $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["DB"]->tbl[$createTbl]; // $createQry;
+                $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["SL"]->tbl[$createTbl]; // $createQry;
             }
             
-            if ($this->REQ->has('copyData') && sizeof($this->REQ->input('copyData')) > 0) {
-                foreach ($this->REQ->input('copyData') as $copyTbl) {
-                    $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["DB"]->tbl[$copyTbl];
+            if ($GLOBALS["SL"]->REQ->has('copyData') && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
+                foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
+                    $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
                     if (isset($transferData[$copyTbl]) && sizeof($transferData[$copyTbl]) > 0) {
                         $newFlds = array();
                         $flds = SLFields::where('FldTable', $copyTbl)
                             ->where('FldDatabase', $this->dbID)
                             ->get();
                         if ($flds && sizeof($flds) > 0) {
-                            $tblAbbr = $GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$copyTbl]];
+                            $tblAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$copyTbl]];
                             foreach ($flds as $fld) $newFlds[] = $fld->FldName;
                             foreach ($transferData[$copyTbl] as $oldRec) {
-                                eval("\$newRec = new " . $GLOBALS["DB"]->modelPath($GLOBALS["DB"]->tbl[$copyTbl]) . ";");
+                                eval("\$newRec = new " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl]) . ";");
                                 $newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
                                 $newRec->created_at = $oldRec->created_at;
                                 $newRec->updated_at = $oldRec->updated_at;
@@ -355,16 +356,57 @@ class DatabaseInstaller extends AdminDBController
     protected function chkForeignKey($foreignKey)
     {
         if ($foreignKey && intVal($foreignKey) > 0) {
-            if ($GLOBALS["DB"]->tbl[$foreignKey] == 'users') {
+            if (strtolower($GLOBALS["SL"]->tbl[$foreignKey]) == 'users') {
                 return ['users', 'id'];
             }
             return [
-                $GLOBALS["DB"]->dbRow->DbPrefix . $GLOBALS["DB"]->tbl[$foreignKey], 
-                $GLOBALS["DB"]->tblAbbr[$GLOBALS['DB']->tbl[$foreignKey]] . "ID"
+                $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$foreignKey], 
+                $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$foreignKey]] . "ID"
             ];
         }
         return ['', ''];
     }
+    
+    // for emergency cases with questionable database access, this should only be temporarily included
+    public function manualMySql(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/db/all');
+        if ($this->v["user"]->id == 1) { // && in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1'])) {
+    		$this->v["manualMySql"] = 'Connected successfully<br />';
+            $db = mysqli_connect(env('DB_HOST', 'localhost'), env('DB_USERNAME', 'homestead'), 
+                env('DB_PASSWORD', 'secret'), env('DB_DATABASE', 'homestead'));
+            if ($db->connect_error) $this->v["manualMySql"] = "Connection failed: " . $db->connect_error . '<br />';
+    		$this->v["lastSql"] = '';
+    		$this->v["lastResults"] = [];
+    		if ($request->has('mys') && trim($request->mys) != '') {
+    		    $this->v["lastSql"] = trim($request->mys);
+    		    $this->v["manualMySql"] .= '<b>Statements submitted...</b><br />';
+    		    $statements = $this->mexplode(';', $request->mys);
+    		    foreach ($statements as $sql) {
+    		        $cnt = 0;
+    		        if (trim($sql) != '') {
+                        ob_start();
+                        $res = mysqli_query($db, $sql);
+                        $errorCatch = ob_get_contents();
+                        ob_end_clean();
+                        $this->v["lastResults"][$cnt][0] = $sql;
+                        $this->v["lastResults"][$cnt][1] = $errorCatch;
+                        if ($res && sizeof($res) > 0) {
+                            ob_start();
+                            print_r($res);
+                            $this->v["lastResults"][$cnt][2] = ob_get_contents();
+                            ob_end_clean();
+                        }
+                        $cnt++;
+                    }
+                }
+    		}
+    		mysqli_close($db);
+    		return view('vendor.survloop.admin.db.manualMySql', $this->v);
+    	}
+        return $this->redir('/dashboard/db/export');
+    }
+    
     
     
 }

@@ -11,12 +11,12 @@
                         @if (strpos($ico, 'gryC') !== false) gryC @else slBlueLight @endif ">{!! $ico !!}</a>
                 @endif
                 @if (strtolower(strip_tags($itemLabel)) == 'you')
-                    {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: You</h2></div>
+                    {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: You</h2></div>
                 @else
-                    @if ($itemLabel == $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular . ' #' . (1+$setIndex))
+                    @if ($itemLabel == $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular . ' #' . (1+$setIndex))
                         {!! $itemLabel !!}
                     @else
-                        {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}:
+                        {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}:
                         {!! $itemLabel !!}
                     @endif
                     </h2></div>
@@ -27,12 +27,12 @@
             @else
                 <div class="fL"><h2 class="m0">
                 @if (strtolower(strip_tags($itemLabel)) == 'you')
-                    {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: You</h2></div>
+                    {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: You</h2></div>
                 @else
-                    @if ($itemLabel == $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular . ' #' . (1+$setIndex))
+                    @if ($itemLabel == $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular . ' #' . (1+$setIndex))
                         {!! $itemLabel !!}
                     @else
-                        {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: 
+                        {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular }} #{{ (1+$setIndex) }}: 
                         {!! $itemLabel !!}</h2>
                     @endif
                     </h2></div>
@@ -54,7 +54,7 @@
     </div>
     @if (!$node->isStepLoop())
         <div id="wrapItem{{ $itemID }}Off" class="wrapItemOff brdA round20 mB20">
-            <i class="mR20 fL">Deleted: {{ $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular }} 
+            <i class="mR20 fL">Deleted: {{ $GLOBALS['SL']->closestLoop["obj"]->DataLoopSingular }} 
                 #{{ (1+$setIndex) }}: {!! $itemLabel !!}</i> 
             <a href="javascript:;" id="unDelLoopItem{{ $itemID }}" class="unDelLoopItem nFormLnkEdit mL20 fR"
                 ><i class="fa fa-undo"></i> Undo</a>

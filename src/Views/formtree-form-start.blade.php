@@ -6,9 +6,12 @@
     >
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="ajax" value="1">
+<input type="hidden" name="tree" id="treeID" value="{{ $GLOBALS['SL']->treeID }}">
+<input type="hidden" name="treeSlug" id="treeSlugID" value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}">
 <input type="hidden" name="node" id="nodeID" value="{{ $nID }}">
-<input type="hidden" name="loop" id="loopID" value="{{ $GLOBALS['DB']->closestLoop['loop'] }}">
-<input type="hidden" name="loopItem" id="loopItemID" value="{{ $GLOBALS['DB']->closestLoop['itemID'] }}">
+<input type="hidden" name="nodeSlug" id="nodeSlugID" value="{{ $nSlug }}">
+<input type="hidden" name="loop" id="loopID" value="{{ $GLOBALS['SL']->closestLoop['loop'] }}">
+<input type="hidden" name="loopItem" id="loopItemID" value="{{ $GLOBALS['SL']->closestLoop['itemID'] }}">
 <input type="hidden" name="step" id="stepID" value="next">
 <input type="hidden" name="alt" id="altID" value="-3">
 <input type="hidden" name="jumpTo" id="jumpToID" value="{{ $nodePrintJumpTo }}">

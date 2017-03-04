@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/db/network-map.blade.php -->
 
-<div><b>All {{ sizeof($GLOBALS["DB"]->tbls) }} Tables with Primary/Foreign Key Linkages:</b></div>
+<div><b>All {{ sizeof($GLOBALS['SL']->tbls) }} Tables with Primary/Foreign Key Linkages:</b></div>
 <canvas id="myCanvas" width="{{ $canvasDimensions[0] }}" height="{{ $canvasDimensions[1] }}"></canvas>
 <script>
 var canvas = document.getElementById("myCanvas");

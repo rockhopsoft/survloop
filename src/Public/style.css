@@ -1,36 +1,12 @@
-/* arabic */
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Cairo'), local('Cairo-Regular'), url(/survloop/fonts/cairo-arabic.woff2) format('woff2');
-  unicode-range: U+0600-06FF, U+200C-200E, U+2010-2011, U+FB50-FDFF, U+FE80-FEFC;
-}
-/* latin-ext */
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Cairo'), local('Cairo-Regular'), url(/survloop/fonts/cairo-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
-}
-/* latin */
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Cairo'), local('Cairo-Regular'), url(/survloop/fonts/cairo-latin.woff2) format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
-}
-
-
 body, p, div, table tr td, table tr th, input, textarea, select {
-	font-family: 'Cairo', sans-serif;
+    font-family: Helvetica,Arial,sans-serif;
+    font-style: normal;
+    font-weight: 200;
 }
 b, h1, h2, h3, h4, h5, h6 {
-	font-family: 'Cairo', sans-serif;
+    font-family: Helvetica,Arial,sans-serif;
+    font-weight: 200;
 }
-
 
 body {
 	margin: 0px; padding: 0px;
@@ -90,7 +66,12 @@ body {
 }
 
 
-.pageGap {
+.pageTopGap {
+	width: 100%;
+	padding-top: 20px;
+	clear: both;
+}
+.pageBotGap {
 	width: 100%;
 	padding-top: 10px;
 	clear: both;
@@ -140,6 +121,10 @@ body {
 .nPrompt p, .nPrompt div {
     padding: 0px;
     margin: 0px;
+}
+.nPrompt h1, .nPrompt h2, .nPrompt h3, .nFld h1, .nFld h2, .nFld h3, 
+.nPrompt p, .nPrompt div, .nFld, .nFld input, .nFld select, .nFld textarea, 
+.nFld label, .nFld .radio label, .nFld .checkbox label {
     font-style: normal;
     font-weight: 200;
 }
@@ -149,9 +134,9 @@ body {
 .nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, .nPrompt h3.slBlueDark {
 	color: #2b3493;
 }
-.nPrompt h1, .nPrompt .jumbotron h1 { font-size: 36pt; }
+/* .nPrompt h1, .nPrompt .jumbotron h1 { font-size: 36pt; }
 .nPrompt h2, .nPrompt .jumbotron h2 { font-size: 30pt; }
-.nPrompt h3, .nPrompt .jumbotron h3 { font-size: 26pt; }
+.nPrompt h3, .nPrompt .jumbotron h3 { font-size: 26pt; } */
 .nPrompt p, .nPrompt ul, .nodeWrap .nodeSidenote {
     margin-top: 15px;
 }
@@ -165,6 +150,9 @@ body {
 .nPrompt ul li, .nPrompt ol li {
     padding: 0px 0px 0px 0px;
     margin: 10px 0px 0px 0px;
+}
+.nPrompt ul {
+    list-style-image: url("/survloop/dot.png");
 }
 .nPromptHeader {
 	color: #000;                  
@@ -187,7 +175,6 @@ label {
 .nFld input, .nFld select, .nFld textarea, 
 .nFld label, .nFld .radio label, .nFld .checkbox label {
 	font-size: 20pt;
-	line-height: 30px;
 	color: #000;
 }
 .nFld input, .nFld select, .nFld textarea {
@@ -219,7 +206,7 @@ input.dateVal, input.dateDef {
 input.dateDef {
 	color: #999;
 }
-input.otherGender {
+input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
     width: 400px;
 }
 .nodeSub {
@@ -229,7 +216,9 @@ input.otherGender {
 	font-size: 28pt;
 	
 }
-
+.nodeWrap.w100 label, .nodeWrap.w100 .nPrompt, .nodeWrap.w100 .nPrompt label {
+    width: 100%;
+}
 
 label.finger, label.fingerAct {
     cursor: pointer;
@@ -239,7 +228,6 @@ label.finger, label.fingerAct {
     padding: 10px 20px;
     margin: 3px 0px 3px 0px;
 	font-size: 20pt;
-    line-height: 30px;
     background: #FFF;
 }
 .finger:hover, input.finger:hover+label {
@@ -258,9 +246,8 @@ label.finger input {
 }
 
 
-input.fingerTxt, input.form-control.fingerTxt, 
-textarea.fingerTxt, textarea.form-control.fingerTxt, 
-select.fingerTxt, select.form-control.fingerTxt {
+input.fingerTxt, input.form-control.fingerTxt, .nFld input.form-control.fingerTxt, 
+textarea.fingerTxt, textarea.form-control.fingerTxt, .nFld textarea.form-control.fingerTxt {
     cursor: pointer;
     width: 100%;
     border: 1px #63c6ff solid;
@@ -268,7 +255,13 @@ select.fingerTxt, select.form-control.fingerTxt {
     padding: 15px 10px;
     margin: 3px 0px 3px 0px;
 	font-size: 20pt;
-    line-height: 30px;
+	line-height: 1.42857143;
+}
+select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.fingerTxt {
+    border: 1px #63c6ff solid;
+    -moz-border-radius: 5px; border-radius: 5px;
+    padding: 15px 10px;
+    height: 62px;
 }
 
 .nKids {
@@ -301,7 +294,6 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
     font-size: 125%;
     white-space: normal;
 }
-
 
 .nFormNext, a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover, {
     white-space: normal;
@@ -431,7 +423,7 @@ a.allegation:link, a.allegation:visited, a.allegation:active, a.allegation:hover
 	box-shadow: 0px 0px 5px #FFF;
 	-moz-border-radius: 5px; border-radius: 5px;
 }
-.bodyClick div input {
+.bodyClick div input {             
 	width: 20px; 
 	margin: 0px;
 }
@@ -443,28 +435,43 @@ a.allegation:link, a.allegation:visited, a.allegation:active, a.allegation:hover
 	padding: 25px 15px 5px 15px;
 	-moz-border-radius: 20px; border-radius: 20px;
 }
-.reportSectHead {
+.slReport {
+    font-size: 14pt;
+}
+.reportSectHead, .reportSectHead2, 
+.slReport .reportSectHead, .slReport .reportSectHead2 {
 	clear: both;
 	width: 100%;
 	color: #2b3493;
-	font-size: 20pt;
+	font-size: 18pt;
 	padding: 10px 0px 10px 0px;
-	margin-top: 40px;
 	border-top: 1px #2b3493 solid;
 }
-.reportBlock {
+.reportSectHead2, .slReport .reportSectHead2 {
+	font-size: 20pt;
+	border-bottom: 1px #2b3493 solid;
+}
+.reportBlock, .slReport .reportBlock {
 	display: block;
 	width: 100%;
-	padding: 10px 0px 20px 0px;
-	border-top: 1px #63c6ff dotted;
+	margin-bottom: 40px;
 }
-.reportBlock div span, .reportBlock div table tr td span {
+.reportBlock div span, .reportBlock table tr td span, 
+.slReport .reportBlock div span, .slReport .reportBlock table tr td span {
 	color: #999;
 }
-.reportBlock div table.table tr td {
-	border-top: 0px none; 
-	width: 50%; 
-	padding: 5px;
+.reportMiniBlockLabel, .slReport .reportMiniBlockLabel {
+    display: block;
+    width: 100%;
+    color: #2b3493;
+    font-size: 18pt;
+    font-weight: bold;
+}
+.reportMiniBlockDeets, .slReport .reportMiniBlockDeets {
+    display: block;
+    width: 100%;
+    font-size: 16pt;
+    padding-bottom: 20px;
 }
 
 
@@ -719,7 +726,7 @@ label { font-weight: normal; }
   margin-left: 20px;
 }
 #adminMenu .list-group.panel > .list-group-item.primeNav {
-	font-weight: bold;
+	font-weight: normal;
 	font-size: 18pt;
 }
 
@@ -784,11 +791,10 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 	h3 { font-size: 20pt; }
 	h4 { font-size: 18pt; }
 	.nPromptHeader { font-size: 160%; }
+	.nPrompt { font-size: 18pt; }
 	.nPrompt, .nFld, .nFld input, .nFld select, .nFld textarea, .nFld label,
 	input.fingerTxt, input.form-control.fingerTxt, textarea.fingerTxt, textarea.form-control.fingerTxt, 
-	select.fingerTxt, select.form-control.fingerTxt {
-	    font-size: 18pt; line-height: 26px;
-	}
+	select.fingerTxt, select.form-control.fingerTxt { font-size: 14pt; }
 	input.nFormBtnSub, input.nFormBtnBack { font-size: 20pt; }
 	.nKids { padding-left: 0px; }
 	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
@@ -1010,7 +1016,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 
 .blk { color: #000; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: #fff; }
-.red, .redDrk, h1.red, h2.red, h3.red { color: #ec2327; }
+.red, .redDrk, h1.red, h2.red, h3.red, label .red { color: #ec2327; font-weight: 100; }
 .gry4 { color: #444; }
 .gry6 { color: #666; }
 .gry9 { color: #999; }
@@ -1028,6 +1034,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .brdBlk { border: 1px #000 solid; }
 .brdA { border: 1px #AAA solid; }
 .brdC { border: 1px #CCC solid; }
+.brdEdash { border: 1px #EEE dashed; }
 
 .brdTop, table tr.brdTop td, table tr.brdTop th { border-top: 1px #63c6ff solid; }
 .brdBot, table tr.brdBot td, table tr.brdBot th { border-bottom: 1px #63c6ff solid; }
@@ -1086,4 +1093,11 @@ a.navbar-brand:hover {
 
 .slShade, a.slShade:link, a.slShade:visited, a.slShade:active, a.slShade:hover {
 	text-shadow: 0px 2px 2px #edf8ff;
+}
+
+.slFaintHover, a.slFaintHover:link, a.slFaintHover:visited, a.slFaintHover:active, a.slFaintHover:hover {
+	color: #CCC;
+}
+a.slFaintHover:hover {
+	color: #63c6ff;
 }

@@ -23,12 +23,15 @@ $v = $surv->custLoop->v;
 <div class="row">
     <div class="col-md-6 pB10">
         <h1 class="mT0">Login</h1>
-        <span class="gry9">Here you can finish, review, or update your complaint. Volunteers also login here.</span>
     </div>
     <div class="col-md-6 taR pT5">
-        <a href="/register" class="btn btn-default">Sign Up To<br />Volunteer</a>
+        <a href="/register" class="btn btn-default">Sign Up</a>
     </div>
 </div>
+@if (!isset($GLOBALS['SL']->sysOpts["login-instruct"]) 
+    || trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
+    <div class="nPrompt mB20">{!! $GLOBALS['SL']->sysOpts["login-instruct"] !!}</div>
+@endif
 
 <div class="nodeWrap">
     <div class="nPrompt"><label for="emailID">Email:</label></div>

@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     @if (isset($tbl->TblEng) && trim($tbl->TblEng) != '') 
         Edit Table: {{ $tbl->TblEng }}
     @else

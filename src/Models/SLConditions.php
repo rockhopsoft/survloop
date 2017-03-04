@@ -37,7 +37,7 @@ class SLConditions extends Model
             foreach ($chk as $v) $this->condVals[] = trim($v->CondValValue);
         }
         
-        $this->condFldResponses = $GLOBALS["DB"]->getFldResponsesByID($this->CondField);
+        $this->condFldResponses = $GLOBALS["SL"]->getFldResponsesByID($this->CondField);
         
         if (sizeof($this->condVals) > 0)
         {
@@ -50,7 +50,7 @@ class SLConditions extends Model
             }
             foreach ($this->condVals as $j => $val)
             {
-                $def = $GLOBALS["DB"]->getDefValById(intVal($val));
+                $def = $GLOBALS["SL"]->getDefValById(intVal($val));
                 $found = false;
                 foreach ($this->condFldResponses["vals"] as $k => $valInfo) 
                 {
@@ -77,7 +77,7 @@ class SLConditions extends Model
     
     public function tblName()
     {
-        return $GLOBALS["DB"]->tbl[$this->CondTable];
+        return $GLOBALS["SL"]->tbl[$this->CondTable];
     }
     
 }

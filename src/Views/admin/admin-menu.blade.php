@@ -23,7 +23,8 @@
                     @if (!isset($nA[3]) || sizeof($nA[3]) == 0)
                         <a href="{!! $nA[0] !!}" data-parent="#menu" class="list-group-item 
                         @if ($currNavPos[0] == $i && $currNavPos[1] == $j) active @endif
-                        " @if ($nav[2]%3 == 0) target="_blank" @endif ><i class="fa fa-chevron-right"></i> {!! $nA[1] !!}
+                        " @if ($nav[2]%3 == 0) target="_blank" @endif ><?php /* <i class="fa fa-chevron-right"></i>*/ ?>
+                        {!! $nA[1] !!}
                         @if ($currNavPos[0] == $i && $currNavPos[1] == $j && $currNavPos[3] < 0)
                             <span class="pull-right mL20"><i class="fa fa-chevron-right"></i></span>
                         @endif
@@ -32,13 +33,13 @@
                         <a href="{!! $nA[0] !!}" data-parent="#menu" data-toggle="collapse" class="list-group-item 
                         @if ($currNavPos[0] == $i && $currNavPos[1] == $j) active @endif
                         " data-target="#subB{{ $j }}" @if ($nav[2]%3 == 0) target="_blank" @endif >
-                        <i class="fa fa-chevron-right"></i> {!! $nA[1] !!}
+                        <?php /* <i class="fa fa-chevron-right"></i> */ ?> {!! $nA[1] !!}
                         @if ($currNavPos[0] == $i && $currNavPos[1] == $j && $currNavPos[2] < 0)
                             <span class="pull-right mL20"><i class="fa fa-chevron-right"></i></span>
                         @endif
                         </a>
                         <div id="subB{{ $j }}" class="sublinks 
-                        @if ($currNavPos[0] != $i || $currNavPos[1] != $j) collapse @endif
+                        <?php /* @if ($currNavPos[0] != $i || $currNavPos[1] != $j) collapse @endif */ ?>
                         ">
                         @foreach ($nA[3] as $k => $nB)
                 
@@ -62,7 +63,7 @@
                                 @endif
                                 </a>
                                 <div id="subC{{ $k }}" class="sublinks 
-                                @if ($currNavPos[0] != $i || $currNavPos[1] != $j || $currNavPos[2] != $k) collapse @endif
+                                <?php /* @if ($currNavPos[0] != $i || $currNavPos[1] != $j || $currNavPos[2] != $k) collapse @endif */ ?>
                                 ">
                                 @foreach ($nB[3] as $l => $nC)
                                     <a class="list-group-item small 

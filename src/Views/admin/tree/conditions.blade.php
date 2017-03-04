@@ -33,14 +33,14 @@
 <input type="hidden" name="CondList" value="{{ $condIDs }}">
 
 
-<table class="table table-striped f18">
+<table class="table table-striped">
 <tr><th class="w33">Hash Tag, Description</th><th class="w33">Options</th><th class="w33">Condition (Raw)</th></tr>
 @forelse ($condSplits as $i => $cond)
     <input type="hidden" name="CondID{{ $i }}" value="{{ $cond->CondID }}">
     <tr>
         <td>
-            <input type="text" name="CondTag{{ $i }}" value="{{ $cond->CondTag }}" class="form-control f22 mB5">
-            <input type="text" name="CondDesc{{ $i }}" value="{{ $cond->CondDesc }}" class="form-control f14">
+            <input type="text" name="CondTag{{ $i }}" value="{{ $cond->CondTag }}" class="form-control f18 mB5">
+            <input type="text" name="CondDesc{{ $i }}" value="{{ $cond->CondDesc }}" class="form-control f12">
         </td>
         <td>
             <div class="row">
@@ -79,7 +79,10 @@
             </div>
         </td>
         <td>
-            {!! view('vendor.survloop.admin.db.inc-describeCondition', [ "cond" => $cond, "i" => $i ])->render() !!}
+            {!! view('vendor.survloop.admin.db.inc-describeCondition', [
+                "cond" => $cond, 
+                "i" => $i 
+            ])->render() !!}
             <div class="f10">
                 <a href="javascript:void(0)" onClick="alert('(coming soon)');" class="f10 mR5">Edit</a> - 
                 <a href="javascript:void(0)" id="condDelBtn{{ $i }}" class="condDelBtn f10 mL5">Delete</a>

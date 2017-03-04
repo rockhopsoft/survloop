@@ -24,7 +24,7 @@
 <div id="node001" class="nodeWrap">
     <div id="nLabel001" class="nPrompt">
         <label for="emailID">
-            <h2 class="disIn">Email:</h2> <span class="slRedDark">*required</span>
+            <h2 class="disIn">Email:</h2> <span class="red">*required</span>
         </label>
     </div>
     <div class="nFld">
@@ -53,7 +53,7 @@
 <div id="node002" class="nodeWrap">
 <div id="nLabel002" class="nPrompt">
     <label for="password">
-        <h2 class="disIn">Password:</h2> <span class="slRedDark">*required, 6 character minimum</span>
+        <h2 class="disIn">Password:</h2> <span class="red">*required, 6 character minimum</span>
     </label>
 </div>
 <div class="nFld">
@@ -64,7 +64,7 @@
 <div id="node003" class="nodeWrap">
     <div id="nLabel003" class="nPrompt">
         <label for="password_confirmation">
-            <h2 class="disIn">Confirm Password:</h2> <span class="slRedDark">*required</span>
+            <h2 class="disIn">Confirm Password:</h2> <span class="red">*required</span>
         </label>
     </div>
     <div class="nFld">

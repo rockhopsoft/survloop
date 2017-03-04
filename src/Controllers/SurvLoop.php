@@ -4,6 +4,8 @@ namespace SurvLoop\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
+use App\Models\SLNode;
+use App\Models\SLTree;
 use App\Models\SLDefinitions;
 
 class SurvLoop extends Controller
@@ -11,8 +13,10 @@ class SurvLoop extends Controller
     
     public $classExtension = 'SurvLoop';
     public $custAbbr       = 'SurvLoop';
-    public $custLoop       = array();
+    public $custLoop       = [];
+    public $dbID           = 1;
     public $treeID         = 1;
+    public $domainPath     = 'http://homestead.app';
     
     protected function loadAbbr()
     {
@@ -27,6 +31,72 @@ class SurvLoop extends Controller
         return true;
     }
     
+    protected function loadDomain()
+    {
+        $appUrl = SLDefinitions::select('DefDescription')
+            ->where('DefDatabase', 1)
+            ->where('DefSet', 'System Settings')
+            ->where('DefSubset', 'app-url')
+            ->first();
+        if ($appUrl && isset($appUrl->DefDescription)) {
+            $this->domainPath = $appUrl->DefDescription;
+        }
+        return $this->domainPath;
+    }
+    
+    protected function loadTreeByID($request, $treeID = -3)
+    {
+        if (intVal($treeID) > 0) {
+            $tree = SLTree::find($treeID);
+            if ($tree && isset($tree->TreeOpts)) {
+                if ($tree->TreeOpts%3 > 0 
+                    || (Auth::user() && Auth::user()->hasRole('administrator|staff|databaser|brancher|volunteer'))) {
+                    $this->syncDataTrees($request, $tree->TreeDatabase, $treeID);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    protected function loadTreeBySlug($request, $treeSlug = '', $page = false)
+    {
+        if (trim($treeSlug) != '') {
+            $urlTrees = [];
+            if (!$page) {
+                $urlTrees = SLTree::where('TreeSlug', $treeSlug)
+                    ->where('TreeType', 'Primary Public')
+                    ->orderBy('TreeID', 'asc')
+                    ->get();
+            } else {
+                $urlTrees = SLTree::where('TreeSlug', $treeSlug)
+                    ->where('TreeType', 'Page')
+                    ->orderBy('TreeID', 'asc')
+                    ->get();
+            }
+            if ($urlTrees && sizeof($urlTrees) > 0) {
+                foreach ($urlTrees as $urlTree) {
+                    if ($urlTree && isset($urlTree->TreeOpts)) {
+                        if ($urlTree->TreeOpts%3 > 0) {
+                            $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
+                            return true;
+                        } else { // maybe this admin tree has a public XML Tree
+                            $xmlChk = SLTree::where('TreeSlug', $urlTree->TreeSlug)
+                                ->where('TreeType', 'Primary Public XML')
+                                ->orderBy('TreeID', 'asc')
+                                ->first();
+                            if ($xmlChk && isset($xmlChk->TreeOpts) && $xmlChk->TreeOpts%3 > 0) {
+                                $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
     public function loadLoop(Request $request)
     {
         $this->loadAbbr();
@@ -35,20 +105,76 @@ class SurvLoop extends Controller
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
             if (class_exists($custClass)) $class = $custClass;
         }
-        eval("\$this->custLoop = new " . $class . "(\$request);");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ");");
         return true;
     }
     
     public function index(Request $request, $type = '', $val = '')
     {
+        if ($request->has('step') && $request->has('tree') && intVal($request->tree) > 0) {
+            $this->loadTreeByID($request, $request->tree);
+        }
         $this->loadLoop($request);
         return $this->custLoop->index($request, $type, $val);
     }
     
-    public function loadNodeURL(Request $request, $nodeSlug)
+    public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
     {
-        $this->loadLoop($request);
-        return $this->custLoop->loadNodeURL($request, $nodeSlug);
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoop($request);
+            return $this->custLoop->loadNodeURL($request, $nodeSlug);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
+    public function loadNodeTreeURL(Request $request, $treeSlug = '')
+    {
+        $this->loadDomain();
+        if (trim($treeSlug) != '') {
+            $urlTrees = SLTree::where('TreeSlug', $treeSlug)
+                ->get();
+            if ($urlTrees && sizeof($urlTrees) > 0) {
+                foreach ($urlTrees as $urlTree) {
+                    if ($urlTree && isset($urlTree->TreeOpts) && $urlTree->TreeOpts%3 > 0) {
+                        $rootNode = SLNode::find($urlTree->TreeFirstPage);
+                        if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
+                            $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes;
+                            return redirect($this->domainPath . $redir);
+                        }
+                    }
+                }
+            }
+        }
+        return redirect($this->domainPath . '/');
+    }
+    
+    public function loadPageURL(Request $request, $pageSlug = '')
+    {
+        if ($this->loadTreeBySlug($request, $pageSlug, true)) {
+            $this->loadLoop($request);
+            return $this->custLoop->index($request);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
+    public function loadPageHome(Request $request)
+    {
+        $this->loadDomain();
+        $urlTrees = SLTree::where('TreeType', 'Page')
+            ->get();
+        if ($urlTrees && sizeof($urlTrees) > 0) {
+            foreach ($urlTrees as $urlTree) {
+                if (isset($urlTree->TreeOpts) && $urlTree->TreeOpts%7 == 0) {
+                    $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
+                    $this->loadLoop($request);
+                    return $this->custLoop->index($request);
+                }
+            }
+        }
+        return $this->index($request);
+        //return redirect($this->domainPath . '/');
     }
     
     public function testRun(Request $request)
@@ -105,10 +231,14 @@ class SurvLoop extends Controller
         return $this->custLoop->afterLogin($request);
     }
     
-    public function retrieveUpload(Request $request, $cid = -3, $upID = '')
+    public function retrieveUpload(Request $request, $treeID = -3, $cid = -3, $upID = '')
     {
-        $this->loadLoop($request);
-        return $this->custLoop->retrieveUpload($request, $cid, $upID);
+        if ($this->loadTreeByID($request, $treeID)) {
+            $this->loadLoop($request);
+            return $this->custLoop->retrieveUpload($request, $cid, $upID);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
     }
     
     
@@ -121,32 +251,58 @@ class SurvLoop extends Controller
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Report";
             if (class_exists($custClass)) $class = $custClass;
         }
-        eval("\$this->custLoop = new " . $class . "(\$request);");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ");");
         return true;
     }
     
-    public function byID(Request $request, $coreID, $ComSlug = '')
+    public function byID(Request $request, $treeSlug, $cid, $ComSlug = '')
     {
-        $this->loadLoopReport($request);
-        return $this->custLoop->byID($request, $coreID, $ComSlug);
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoopReport($request);
+            return $this->custLoop->byID($request, $cid, $ComSlug);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
     }
     
-    public function xmlByID(Request $request, $coreID, $ComSlug = '')
+    public function xmlAll(Request $request, $treeSlug = '')
     {
-        $this->loadLoopReport($request);
-        return $this->custLoop->xmlByID($request, $coreID, $ComSlug);
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoopReport($request);
+            return $this->custLoop->xmlAll($request);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
     }
     
-    public function getXmlExample(Request $request)
+    public function xmlByID(Request $request, $treeSlug, $cid)
     {
-        $this->loadLoopReport($request);
-        return $this->custLoop->getXmlExample($request);
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoopReport($request);
+            return $this->custLoop->xmlByID($request, $cid);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
     }
     
-    public function genXmlSchema(Request $request)
+    public function getXmlExample(Request $request, $treeSlug = '')
     {
-        $this->loadLoopReport($request);
-        return $this->custLoop->genXmlSchema($request);
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoopReport($request);
+            return $this->custLoop->getXmlExample($request);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
+    public function genXmlSchema(Request $request, $treeSlug = '')
+    {
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoopReport($request);
+            return $this->custLoop->genXmlSchema($request);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
     }
     
     public function chkEmail(Request $request)
@@ -174,8 +330,7 @@ class SurvLoop extends Controller
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\AdminSubsController";
         if ($this->custAbbr != 'SurvLoop') {
-            $custClass = "App\\Http\\Controllers\\"
-                . $this->custAbbr . "\\" . $this->custAbbr . "Admin";
+            $custClass = "App\\Http\\Controllers\\" . $this->custAbbr . "\\" . $this->custAbbr . "Admin";
             if (class_exists($custClass)) {
                 $class = $custClass;
             } else {
@@ -183,7 +338,7 @@ class SurvLoop extends Controller
                 if (class_exists($custClass)) $class = $custClass;
             }
         }
-        eval("\$this->custLoop = new " . $class . "(\$request);");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ");");
         return true;
     }
     
@@ -229,5 +384,12 @@ class SurvLoop extends Controller
         return $this->custLoop->manageEmailsForm($request, $emailID);
     }
     
+    protected function syncDataTrees(Request $request, $dbID, $treeID)
+    {
+        $this->dbID = $dbID;
+        $this->treeID = $treeID;
+        $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeID, $treeID);
+        return true;
+    }
     
 }

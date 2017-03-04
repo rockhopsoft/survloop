@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS["DB"]->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
     Database Overview 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
@@ -17,11 +17,13 @@
     <a href="/dashboard/db/sortTable" class="btn btn-xs btn-default mR10"><i class="fa fa-sort-amount-asc"></i> Re-Order Tables</a>
     <a href="/dashboard/db/fieldDescs" class="btn btn-xs btn-default mR10"><i class="fa fa-pencil"></i> Field Descriptions</a>
     <a href="/dashboard/db/fieldXML" class="btn btn-xs btn-default mR10"><i class="fa fa-pencil"></i> Field XML Settings</a>
-@endif
+    <a href="/dashboard/db/diagrams" target="_blank" class="btn btn-xs btn-default mR10">Tables Diagrams</a>
+    <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-xs btn-default mR10">Field Matrix</a>
+@endif                                                                   
 
 <div class="pL10 pT10 fPerc125">
     <i>Mission:</i><br />
-    {!! $GLOBALS["DB"]->dbRow->DbMission !!}
+    {!! $GLOBALS['SL']->dbRow->DbMission !!}
 </div>
 
 <div class="row pT10 pB10">

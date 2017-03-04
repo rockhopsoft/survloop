@@ -45,10 +45,10 @@ class CoreNode {
     public function loadNodeCache($nID = -3, $nCache = array())
     {
         if (sizeof($nCache) > 0) {
-            if (isset($nCache["pID"]))        $this->parentID     = $nCache["pID"];
-            if (isset($nCache["pOrd"]))        $this->parentOrd     = $nCache["pOrd"];
-            if (isset($nCache["opts"]))        $this->nodeOpts     = $nCache["opts"];
-            if (isset($nCache["type"]))        $this->nodeType     = $nCache["type"];
+            if (isset($nCache["pID"]))  $this->parentID  = $nCache["pID"];
+            if (isset($nCache["pOrd"])) $this->parentOrd = $nCache["pOrd"];
+            if (isset($nCache["opts"])) $this->nodeOpts  = $nCache["opts"];
+            if (isset($nCache["type"])) $this->nodeType  = $nCache["type"];
         }
         return true;
     }
@@ -66,10 +66,10 @@ class CoreNode {
                 ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeOpts', 'NodeType');
         }
         if (!$this->nodeRow || sizeof($this->nodeRow) == 0) $this->nodeRow = new SLNode;
-        $this->parentID     = $this->nodeRow->NodeParentID;
-        $this->parentOrd     = $this->nodeRow->NodeParentOrder;
-        $this->nodeOpts     = $this->nodeRow->NodeOpts;
-        $this->nodeType     = $this->nodeRow->NodeType;
+        $this->parentID  = $this->nodeRow->NodeParentID;
+        $this->parentOrd = $this->nodeRow->NodeParentOrder;
+        $this->nodeOpts  = $this->nodeRow->NodeOpts;
+        $this->nodeType  = $this->nodeRow->NodeType;
         if (!isset($this->nodeRow) || sizeof($this->nodeRow) == 0) {
             $this->nodeRow = new SLNode;
             return false;

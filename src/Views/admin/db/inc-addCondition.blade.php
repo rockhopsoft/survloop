@@ -7,15 +7,18 @@
         <b class="slBlueDark f22"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Condition:</b>
         
         @if (!isset($newOnly) || !$newOnly)
-            <select id="oldCondsID" name="oldConds" class="form-control">
+            <select id="oldCondsID" name="oldConds" class="form-control mT20">
                 <option value="0">Select a condition</option>
                 <option value="-37">Create a new condition</option>
                 <option value="0" disabled ></option>
-                @forelse ($GLOBALS["DB"]->getCondList() as $cond)
+                @forelse ($GLOBALS['SL']->getCondList() as $cond)
                     <option value="{{ $cond->CondID }}">{{ $cond->CondTag }} - {{ $cond->CondDesc }}</option>
                 @empty
                 @endforelse
             </select>
+            <label class="mT20">
+                <input type="checkbox" name="oldCondInverse" value="1" autocomplete=off > Opposite of this condition
+            </label>
         @endif
         
         <div id="createNewCond" class=" @if (!isset($newOnly) || !$newOnly) disNon @else disBlo @endif ">
@@ -26,18 +29,39 @@
                 <div class="col-md-8">
                     <select id="setSelectID" name="setSelect" class="form-control f20" autocomplete=off >
                         <option value="" SELECTED ></option>
-                        <option value=""  DISABLED >SurvLoops:</option>
-                        @forelse ($GLOBALS["DB"]->dataLoops as $loopName => $loopRow)
+                        <option value="" DISABLED >SurvLoops:</option>
+                        @forelse ($GLOBALS['SL']->dataLoops as $loopName => $loopRow)
                             <option value="loop-{{ $loopRow->DataLoopID }}"> - {{ $loopName }}</option>
                         @empty
                         @endforelse
                         <option value="" DISABLED ></option>
-                        {!! $GLOBALS["DB"]->tablesDropdown('12345', 'Database Tables:', ' - ', true) !!}
+                        {!! $GLOBALS['SL']->tablesDropdown('12345', 'Database Tables:', ' - ', true) !!}
+                        <option value="" DISABLED ></option>
+                        <option value="url-parameters">URL Parameters (eg. /url/?parameter=value)</option>
+                        <option value="" DISABLED ></option>
                     </select>
                 </div>
             </div>
-            <div id="fldSelect" ></div>
+            <div id="fldSelect"></div>
             <div id="valSelect" class="p20" ></div>
+            <div id="urlParams mT10">
+                <div class="row">
+                    <div class="col-md-4 f20">
+                        Parameter:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="paramNameID" name="paramName" class="form-control f16" autocomplete=off >
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 f20">
+                        Value:
+                    </div>
+                    <div class="col-md-8">
+                        <input type="text" id="paramValID" name="paramVal" class="form-control f16" autocomplete=off >
+                    </div>
+                </div>
+            </div>
             <div id="nameIt" class="disBlo">
                 <div class="row">
                     <div class="col-md-4 f24">
@@ -73,8 +97,14 @@
         });
         $("#setSelectID").change(function() {
             //alert("/dashboard/db/ajax/getSetFlds/"+encodeURIComponent(document.getElementById("setSelectID").value)+"");
-            $("#fldSelect").load("/dashboard/db/ajax/getSetFlds/"+encodeURIComponent(document.getElementById("setSelectID").value)+"");
-            document.getElementById("valSelect").innerHTML = '';
+            if (document.getElementById("setSelectID").value == 'url-parameters') {
+                document.getElementById("urlParams").style.display = 'block';
+            } else {
+                document.getElementById("urlParams").style.display = 'none';
+                var fldVal = encodeURIComponent(document.getElementById("setSelectID").value);
+                $("#fldSelect").load("/dashboard/db/ajax/getSetFlds/"+fldVal+"");
+                document.getElementById("valSelect").innerHTML = '';
+            }
             //document.getElementById("nameIt").style.display = 'none';
         });
         $("#addCondLnk").click(function() { 

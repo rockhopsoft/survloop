@@ -2,5 +2,5 @@
 
 <div class="jumbotron" >
     <h2>Mission Statement:</h2>
-    <p>{!! $GLOBALS["DB"]->dbRow->DbMission !!}</p>
+    <p>{!! $GLOBALS['SL']->dbRow->DbMission !!}</p>
 </div>

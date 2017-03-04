@@ -3,7 +3,13 @@
 <script type="text/javascript">
 
 function checkFullPage() {
-    if (!document.getElementById('fullPageChk')) window.location = '/u/{{ $pageURL }}';
+    if (!document.getElementById('fullPageChk')) {
+        @if ($GLOBALS['SL']->treeIsAdmin)
+            window.location = '/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $pageURL }}';
+        @else
+            window.location = '/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $pageURL }}';
+        @endif
+    }
     return true;
 }
 setTimeout("checkFullPage()", 10);
@@ -40,7 +46,11 @@ $(function() {
         document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container"><i class="fa fa-spinner fa-pulse"></i></div>';
         window.scrollTo(0, 0);
         $.ajax({
-            url: "/sub", 
+        @if ($GLOBALS['SL']->treeIsAdmin)
+            url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/sub", 
+        @else
+            url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sub", 
+        @endif
             type: "POST", 
             data: formData, 
             contentType: false,
@@ -105,7 +115,7 @@ $(function() {
     function exitLoop(whichWay) {
         if (checkNodeForm()) {
             document.getElementById("stepID").value="exitLoop"+whichWay;
-            document.getElementById("jumpToID").value="{{ intVal($GLOBALS['DB']->closestLoop['obj']->DataLoopRoot) }}";
+            document.getElementById("jumpToID").value="{{ intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) }}";
             runFormSub();
         }
         return false;
@@ -134,8 +144,8 @@ $(function() {
 
     $(document).on("click", "a.navJump", function() {
         document.getElementById("jumpToID").value = $(this).attr("id").replace("jump", "");
-        @if (isset($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) 
-            && intVal($GLOBALS["DB"]->closestLoop["obj"]->DataLoopRoot) > 0)
+        @if (isset($GLOBALS['SL']->closestLoop["obj"]->DataLoopRoot) 
+            && intVal($GLOBALS['SL']->closestLoop["obj"]->DataLoopRoot) > 0)
             document.getElementById("stepID").value="exitLoopJump";
         @endif
         return runFormSub();

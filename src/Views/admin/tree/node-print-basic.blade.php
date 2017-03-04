@@ -5,7 +5,7 @@
 
     <div class="relDiv"><a name="n{{ $nID }}" class="absDiv" style="top: -60px;"></a></div>
     
-    @if ($canEditTree && $node->nodeRow->NodeParentID > 0 && !$REQ->has('print'))
+    @if ($canEditTree && $node->nodeRow->NodeParentID > 0 && !$isPrint)
         <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
@@ -34,9 +34,9 @@
             @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
                 <div class="pull-right pT5 pL5 pR10 slGreenDark">
                     @if ($node->nodeRow->NodeParentID <= 0)
-                        <b>{{ $GLOBALS['DB']->coreTbl }}</b>
-                    @elseif ($node->isLoopRoot() && isset($GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch])) 
-                        {{ $GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopTable }}
+                        <b>{{ $GLOBALS['SL']->coreTbl }}</b>
+                    @elseif ($node->isLoopRoot() && isset($GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch])) 
+                        {{ $GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopTable }}
                     @else
                         {{ $node->nodeRow->NodeDataBranch }}
                     @endif
@@ -44,7 +44,7 @@
                 </div>
             @endif
             @if (trim($node->nodeRow->NodeDataStore) != '' && strpos($node->nodeRow->NodeDataStore, ':') !== false)
-                <div class="pull-right taR pT5 slGreenDark opac33 f10 lH10">
+                <div class="pull-right taR pT5 slGreenDark opac50 f10 lH16">
                     <i>{!! str_replace(':', '</i><br />', $node->nodeRow->NodeDataStore) !!}
                 </div>
             @endif
@@ -72,146 +72,149 @@
         @endif
         </span> 
         
-        @if ($node->isBranch())
-        
-            <span class="f26 slBlueDark opac80"><b>{{ $node->nodeRow->NodePromptText }}</b></span>
+        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page' && ($node->isInstruct() || $node->isInstructRaw()))
             
-        @elseif ($node->isPage())
-        
-            <a @if (!$REQ->has('print')) 
-                href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" 
-                target="_blank" @endif class="f20">
-                /{{ $node->nodeRow->NodePromptNotes }}
-            </a>
-            
-        @elseif ($node->isLoopRoot())
-        
-            <span class="slBlueDark f30">{{ $node->nodeRow->NodeDataBranch }}</span> 
-            <a @if (!$REQ->has('print')) 
-                href="{{ $GLOBALS['DB']->treeRow->TreeRootURL }}/u/{{ $node->nodeRow->NodePromptNotes }}" 
-                target="_blank" @endif class="f20">
-                /{{ $node->nodeRow->NodePromptNotes }}</a>
-            <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
-            
-        @elseif ($node->isLoopCycle())
-        
-            <span class="slBlueDark f20">Repeat Child Nodes For Each 
-                {{ $GLOBALS["DB"]->getLoopSingular(str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet)) }}
-            </span>
-            <div class="f18">{{ $node->nodeRow->NodePromptText }}</div>
-            
-        @elseif ($node->isLoopSort())
-            
-            <span class="slBlueDark f20">Sort Loop Items:  
-                {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}
-            </span>
-            
-        @elseif ($node->isDataManip())
-        
-            <span class="slGreenDark @if ($node->parentID > 0) f16 @else f26 @endif ">
-                {{ $node->nodeRow->NodeDataBranch }}
-                @if ($node->nodeRow->NodeType == 'Data Manip: New') 
-                    New Record 
-                @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') 
-                    Update Record 
-                @else 
-                    Table Wrap 
-                @endif
-            </span>
-            
-        @else
-        
-            <span class="f16 mR10 
-            @if ($node->nodeRow->NodeType == 'Spambot Honey Pot') gryA @endif
-            @if ($node->isDataManip()) slGreenDark ital @endif
-            @if ($node->isLoopRoot()) slBlueDark opac50 @endif
-            ">{{ $node->nodeRow->NodePromptText }}</span> 
-            @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
-            
-            @if ($REQ->has('alt'))
-                
-                <div class="row">
-                    <div class="col-md-6 gry9">
-                        @if (trim($node->nodeRow->NodePromptNotes) != '') 
-                            <i>{{ strip_tags($node->nodeRow->NodePromptNotes) }}</i><br />
-                        @endif
-                        <div class=" @if ($node->isLoopRoot()) f18 bld slBlueDark @else f14 @endif ">
-                            @if ($node->isLoopRoot())
-                                @if (sizeof($GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]->conds) > 0) 
-                                    {!! view('vendor.survloop.admin.tree.node-list-conditions', [
-                                        "node" => $GLOBALS['DB']->dataLoops[$node->nodeRow->NodeDataBranch]
-                                    ])->render() !!}
-                                @endif
-                                <span class="f14 gry6"><i class="fa fa-refresh"></i></span>
-                            @endif
-                            @if ($node->isRequired()) <span class="slRedDark">*required</span> @endif
-                        </div>
-                        @if (!$REQ->has('alt'))
-                            <span class="f12">
-                            @if ($node->isOneLiner()) <span class="gry9">(on one line)</span> @endif
-                            @if ($node->isOneLineResponses()) <span class="gry9">(responses on one line)</span> @endif
-                            </span>
-                        @endif
-                        </i>
-                        @if (!$REQ->has('alt'))
-                            @if (trim($node->nodeRow->NodeInternalNotes) != '') 
-                                <div class="gry9 f10 p5 pL20"><i>{{ $node->nodeRow->NodeInternalNotes }}</i></div>
-                            @endif
-                        @endif
-                    </div>
-                    <div class="col-md-6">
-                        @if (sizeof($node->responses) > 0)
-                            <ul>
-                            @foreach ($node->responses as $j => $res)
-                                @if ($node->indexShowsKid($j))
-                                    <li class="mT5 mB5"><b>{{ strip_tags($res->NodeResEng) }} 
-                                    <i class="fa fa-code-fork fa-flip-vertical" 
-                                        title="Children displayed if selected"></i></b></li>
-                                @else
-                                    <li class="mT5 mB5">{{ strip_tags($res->NodeResEng) }}</li>
-                                @endif
-                            @endforeach
-                            </ul>
-                        @endif
-                    </div>
-                </div>
-                
-            @endif
-        @endif
-        
-        <div class="fC">
-            @if (!$REQ->has('print')) 
-                @if (sizeof($tierNode[1]) > 0)
-                    <a href="#n{{ $nID }}" id="adminNode{{ $nID }}Expand" class="slBlueLight noUnd"
-                        ><i class="fa fa-expand fa-flip-horizontal"></i></a> 
-                @endif
-                @if ($canEditTree)
-                    <a href="javascript:void(0)" id="showAdds{{ $nID }}" 
-                        class="adminNodeShowAdds slBlueLight mL5"><i class="fa fa-plus-square-o"></i></a>
-                    <a href="javascript:void(0)" id="showMove{{ $nID }}" 
-                        class="adminNodeShowMove slBlueLight mL5 f12"><i class="fa fa-arrows-alt"></i></a>
-                @endif
-            @endif
-            @if ($node->hasShowKids && !$REQ->has('alt'))
-                <i class="fa fa-code-fork fa-flip-vertical mL5 mT5 f22 blk" 
-                    title="Children displayed only with certain responses"></i>
-            @endif
             <span class="gry9 mL10">
-                @if ($node->isPage() && $node->nodeRow->NodeOpts%29 == 0)
-                    <span class="red"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
-                @elseif ($node->isBranch() && $nID == $GLOBALS['DB']->treeRow->TreeRoot) Tree's Root Node
-                @elseif ($node->isBranch()) Branch
-                @elseif ($node->isLoopRoot()) Loop Root Multiple Pages
-                @elseif ($node->isLoopCycle()) Loop Root Within A Page
-                @elseif (!$node->isDataManip()) {{ $node->nodeRow->NodeType }}
-                @endif
+            @if ($node->isInstruct()) Content Chunk, WYSIWYG @else Content Chunk, Hard-Coded @endif
             </span>
+            {!! $conditionList !!}
+            {!! $nodeBtns !!}
+            <div class="nPrompt brdEdash round10 p5 mT5">{!! $node->nodeRow->NodePromptText !!}</div>
+            {!! $node->nodeRow->NodePromptAfter !!}
+        
+        @else 
+        
+            @if ($node->isBranch())
+            
+                <span class="slBlueDark mL5 opac80 f26"><b>{{ $nodePromptText }}</b></span>
+                <span class="gry9 mL10">Branch</span>
+                
+            @elseif ($node->isPage())
+            
+                <a target="_blank" class="f20 mL5"
+                    @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+                        @if ($GLOBALS['SL']->treeIsAdmin)
+                            href="{{ $GLOBALS['SL']->sysOpts["app-url"] }}/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
+                            >/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}</a>
+                        @else
+                            href="{{ $GLOBALS['SL']->sysOpts["app-url"] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
+                            >/{{ $GLOBALS['SL']->treeRow->TreeSlug }}
+                        @endif
+                    @else
+                        @if ($GLOBALS['SL']->treeIsAdmin)
+                            href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}" 
+                            >/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}</a>
+                        @else
+                            href="/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}" 
+                            >/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}
+                        @endif
+                    @endif
+                </a>
+                @if ($node->nodeRow->NodeOpts%29 == 0)
+                    <span class="red mL10"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Page</span>
+                @else 
+                    <span class="gry9 mL10">Page</span>
+                @endif
+                
+            @elseif ($node->isLoopRoot())
+            
+                <span class="slBlueDark mL5 f30">{{ $node->nodeRow->NodeDataBranch }}</span> 
+                <a target="_blank" class="f20 mL10"
+                    @if ($GLOBALS['SL']->treeIsAdmin)
+                        href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}" 
+                        >/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}</a>
+                    @else
+                        href="/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}" 
+                        >/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $node->nodeRow->NodePromptNotes }}</a>
+                    @endif
+                <span class="f18 mL10">{{ $nodePromptText }}</span>
+                <span class="gry9 mL10">SurvLoop Pages</span>
+                
+            @elseif ($node->isLoopCycle())
+            
+                <span class="slBlueDark mL5 f20">Repeat Child Nodes For Each 
+                    {{ $GLOBALS['SL']->getLoopSingular(str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet)) }}
+                </span>
+                <div class="f18 mL10">{{ $nodePromptText }}</div>
+                <span class="gry9 mL10">SurvLoop Questions</span>
+                
+            @elseif ($node->isLoopSort())
+                
+                <span class="slBlueDark mL5 f20">Sort Loop Items:  
+                    {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}
+                </span>
+                <span class="gry9 mL10">Sort Tool</span>
+                
+            @elseif ($node->isDataManip())
+            
+                <span class="slGreenDark mL5 @if ($node->parentID > 0) f16 @else f26 @endif ">
+                    {{ $node->nodeRow->NodeDataBranch }}
+                    @if ($node->nodeRow->NodeType == 'Data Manip: New') 
+                        New Record 
+                    @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') 
+                        Update Record 
+                    @else 
+                        Table Wrap 
+                    @endif
+                </span>
+                
+            @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
+            
+                <span class="f16 mL5 gryA">{{ $nodePromptText }}</span>
+                <span class="gryA mL10">Spambot Honey Pot (Only Visible to Robots)</span>
+            
+            @else
+            
+                @if (trim($nodePromptText) != '')
+                    <span class="f16 mL5 
+                        @if ($node->isDataManip()) slGreenDark ital @endif
+                        @if ($node->isLoopRoot()) slBlueDark opac50 @endif
+                        ">{{ $nodePromptText }}</span> 
+                @endif
+                @if ($node->nodeRow->NodeType == 'Big Button') 
+                    <span class="f16 slBlueDark mL5">[ {{ $node->nodeRow->NodeDefault }} ]</span>
+                @endif
+                <span class="gry9 mL10">{{ $node->nodeRow->NodeType }}</span>
+                
+                @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
+                
+                @if ($isAlt)
+                    
+                    @if (sizeof($node->responses) > 0)
+                        <div class="f16 gry6">
+                        @foreach ($node->responses as $j => $res)
+                            <nobr><i class="fa fa-circle-o gryA mL20" style="font-size: 10pt;" aria-hidden="true"></i>
+                            @if ($node->indexShowsKid($j))
+                                <i class="fa fa-code-fork fa-flip-vertical" 
+                                    title="Children displayed if selected"></i> 
+                            @endif
+                            {{ strip_tags($res->NodeResEng) }}</nobr>
+                        @endforeach
+                        </div>
+                    @endif
+                    <div class="gry9 f12">
+                        @if ($node->isOneLiner()) <span class="mL10">(on one line)</span> @endif
+                        @if ($node->isOneLineResponses()) <span class="mL10">(responses on one line)</span> @endif
+                        @if (trim($node->nodeRow->NodePromptNotes) != '') 
+                            <div>{{ strip_tags($node->nodeRow->NodePromptNotes) }}</div>
+                        @endif
+                        @if (trim($node->nodeRow->NodeInternalNotes) != '') 
+                            <div><i>{{ $node->nodeRow->NodeInternalNotes }}</i></div>
+                        @endif
+                    </div>
+                    
+                @endif
+            @endif
+        
             @if ($node->isDataManip())
-                <span class="slGreenDark">{!! substr($node->printManipUpdate(), 2) !!}</span>
+                <span class="slGreenDark mL10">{!! substr($node->printManipUpdate(), 2) !!}</span>
             @endif
             {!! $conditionList !!}
-        </div>
-        @if (!$REQ->has('print'))
+            {!! $nodeBtns !!}
+        
+        @endif
+        
+        @if (!$isPrint)
             <div id="addChild{{ $nID }}" class="disNon 
                 @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif "
                 ><span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
@@ -221,14 +224,13 @@
         @endif
         @if (sizeof($tierNode[1]) > 0)
             <div id="nodeKids{{ $nID }}" class=" 
-                @if (session()->get('adminOverOpts')%2 == 0 || $nID == $GLOBALS['DB']->treeRow->TreeRoot) disBlo 
-                @else disNon 
-                @endif">
+                @if (session()->get('adminOverOpts')%2 == 0 || $nID == $rootID 
+                    || $isPrint) disBlo @else disNon @endif">
             
                 {!! $childrenPrints !!}
                 
             </div>
-            @if (!$REQ->has('print'))
+            @if (!$isPrint)
                 <div id="addChild{{ $nID }}B" class="disNon 
                     @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
                     <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
@@ -236,7 +238,7 @@
                         ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
                 </div>
             @endif
-        @elseif (!$REQ->has('print'))
+        @elseif (!$isPrint)
             <div class="nodeMover disNon pT5 pB5 
                 @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
                 <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
@@ -248,7 +250,7 @@
         
     </div> <!-- end nPrintWrap{{ $nID }} -->
     
-    @if ($node->nodeRow->NodeParentID > 0 && !$REQ->has('print')) 
+    @if ($node->nodeRow->NodeParentID > 0 && !$isPrint) 
         <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 

@@ -15,10 +15,11 @@ class SLTree extends Model
         'TreeType', 
         'TreeName', 
         'TreeDesc', 
-        'TreeRootURL', 
+        'TreeSlug', 
         'TreeRoot', 
         'TreeFirstPage', 
         'TreeLastPage', 
-        'TreeCoreTable', 
+        'TreeCoreTable',
+        'TreeOpts',
     ];
 }

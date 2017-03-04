@@ -19,6 +19,7 @@ use App\Models\SLDataLinks;
 use App\Models\SLSessLoops;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
+use App\Models\SLConditionsNodes;
 
 use SurvLoop\Controllers\StatesUS;
 
@@ -30,10 +31,14 @@ class DatabaseLookups
     public $treeID         = 1;
     public $treeRow        = [];
     public $treeName       = '';
+    public $treeIsAdmin    = false;
+    public $xmlTree        = [];
     public $coreTbl        = '';
     public $coreTblUserFld = '';
     public $treeXmlID      = -3;
+    public $treeOverride   = -3;
     
+    public $REQ            = [];
     public $sysOpts        = [];
     public $userRoles      = [];
     
@@ -44,6 +49,7 @@ class DatabaseLookups
     public $tblAbbr        = [];
     public $tblOpts        = [];
     public $fldTypes       = [];
+    public $fldOthers      = [];
     public $defValues      = [];
     
     public $foreignKeysIn  = [];
@@ -56,9 +62,11 @@ class DatabaseLookups
     public $dataLinksOn    = [];
     
     // User's position within potentially nested loops
+    public $sessTree       = 'Page';
     public $sessLoops      = [];
     public $closestLoop    = [];
     public $tblLoops       = [];
+    public $nodeCondInvert = [];
     
     public $states         = [];
     
@@ -66,23 +74,41 @@ class DatabaseLookups
     public $instructs      = [];
     public $debugOn        = true;
     
-    function __construct($dbID = 1, $treeID = 1, Request $request = NULL)
+    function __construct(Request $request = NULL, $dbID = 1, $treeID = 1, $treeOverride = -3)
     {
-        $this->dbID    = $dbID;
+        //echo '<br /><br /><br />__construct, ' . $dbID . ', ' . $treeID . ', ' . $treeOverride . '<br />';
+        $this->REQ = $request;
+        if ($treeOverride > 0) $this->treeOverride = $treeOverride;
+        if ($treeOverride > 0 || $this->treeOverride <= 0) {
+            $this->dbID    = $dbID;
+        }
         $this->dbRow   = SLDatabases::find($this->dbID);
-        $this->treeID  = $treeID;
+        if (($treeOverride > 0 || $this->treeOverride <= 0) && $dbID == 1 
+            && (!isset($this->dbRow) || sizeof($this->dbRow) == 0)) {
+        	$this->dbID = 3;
+        	$this->dbRow = SLDatabases::find($this->dbID);
+        }
+        if ($treeOverride > 0 || $this->treeOverride <= 0) {
+            $this->treeID  = $treeID;
+        }
         $this->treeRow = SLTree::where('TreeID', $this->treeID)
             ->where('TreeDatabase', $this->dbID)
             ->first();
-        if (!$this->treeRow || !isset($this->treeRow->TreeID)) {
+        if (($treeOverride > 0 || $this->treeOverride <= 0) && (!$this->treeRow || !isset($this->treeRow->TreeID))) {
             $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
                 ->where('TreeType', 'Primary Public')
+                ->orderBy('TreeID', 'asc')
                 ->first();
             if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
+        }
+        $this->treeIsAdmin = false;
+        if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts > 1 && $this->treeRow->TreeOpts%3 == 0) {
+            $this->treeIsAdmin = true;
         }
         if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName)) {
             $this->treeName = str_replace($this->dbRow->DbName, str_replace('_', '', $this->dbRow->DbPrefix), 
                 $this->treeRow->TreeName);
+            if ($this->treeRow->TreeType != 'Page') $this->sessTree = $this->treeRow->TreeID;
         }
 
         $this->sysOpts = ["cust-abbr" => 'survloop'];
@@ -120,14 +146,39 @@ class DatabaseLookups
     }
     
     
+    public function hasTreeOverride()
+    {
+        return ($this->treeOverride > 0);
+    }
+    
+    
     public function loadDBFromCache(Request $request = NULL)
     {
-        $cacheFile = '/cache/db-load-' . $this->dbID . '.php';
+        $cacheFile = '/cache/db-load-' . $this->dbID . '-' . $this->treeID . '.php';
         if ((!$request || !$request->has('refresh')) && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
             $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/DatabaseLookups.php' . "\n\n";
+            
+            if ($this->treeRow->TreeRoot > 0) {
+                $chk = SLConditionsNodes::select('SL_ConditionsNodes.CondNodeID')
+                    ->join('SL_Conditions', 'SL_Conditions.CondID', '=', 'SL_ConditionsNodes.CondNodeCondID')
+                    ->where('SL_Conditions.CondTag', '#IsAdmin')
+                    ->where('SL_ConditionsNodes.CondNodeNodeID', $this->treeRow->TreeRoot)
+                    ->first();
+                if ($chk && isset($chk->CondNodeID)) {
+                    if ($this->treeRow->TreeOpts%3 > 0) {
+                        $this->treeRow->TreeOpts *= 3;
+                        $this->treeRow->save();
+                    }
+                    $cache .= '$'.'this->treeIsAdmin = true;' . "\n";
+                } elseif ($this->treeRow->TreeOpts%3 == 0) {
+                    $this->treeRow->TreeOpts = $this->treeRow->TreeOpts/3;
+                    $this->treeRow->save();
+                }
+            }
+
             $sys = SLDefinitions::where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'System Settings')
                 ->get();
@@ -163,22 +214,41 @@ class DatabaseLookups
                         . '$'.'this->fldTypes[\'' . $tbl->TblName . '\'][\'' . $tbl->TblAbbr . 'ID\'] = \'INT\';' . "\n"
                         . '$'.'this->tblModels[\'' . $tbl->TblName . '\'] = \'' 
                         . str_replace('_', '', $this->dbRow->DbPrefix . $tbl->TblName) . '\';' . "\n";
-                    
+                    if ($tbl->TblID == $this->treeRow->TreeCoreTable) {
+                    	$coreType = '$'.'this->fldTypes[\'' . $tbl->TblName . '\'][\'' . $tbl->TblAbbr;
+                        $cache .= $coreType . 'UserID\'] = \'INT\';' . "\n"
+                        	. $coreType . 'SubmissionProgress\'] = \'INT\';' . "\n"
+                        	. $coreType . 'TreeVersion\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'VersionAB\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'UniqueStr\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'IPaddy\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'IsMobile\'] = \'INT\';' . "\n";
+                    }
                     // temporarily loading for the sake of cache creation...
                     $this->tbl[$tbl->TblID] = $tbl->TblName;
                     $this->tblAbbr[$tbl->TblName] = $tbl->TblAbbr;
                 }
                 $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
                 
+                $fldNames = [];
                 $flds = SLFields::select()
                     ->where('FldDatabase', $this->dbID)
                     ->where('FldTable', '>', 0)
+                    ->orderBy('FldOrd', 'asc')
                     ->get();
                 foreach ($flds as $fld) {
                     if (isset($this->tbl[$fld->FldTable])) {
-                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->FldTable] . '\'][\''
-                            . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName
+                        $fldName = $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
+                        $fldNames[] = $fldName;
+                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->FldTable] . '\'][\'' . $fldName 
                             . '\'] = \'' . $fld->FldType . '\';' . "\n";
+                        $othFld = '';
+                        if (strtolower(substr($fldName, strlen($fldName)-5)) == 'other') {
+                            $othFld = substr($fldName, 0, strlen($fldName)-5);
+                        }
+                        if (trim($othFld) != '' && in_array($othFld, $fldNames)) {
+                            $cache .= '$'.'this->fldOthers[\'' . $fldName . '\'] = ' . $fld->FldID . ';' . "\n";
+                        }
                     }
                 }
                 
@@ -196,29 +266,98 @@ class DatabaseLookups
                 $cache .= '$'.'this->dataLinksOn = [];' . "\n";
                 if (sizeof($this->dataLinksOn) > 0) {
                     foreach ($this->dataLinksOn as $tbl => $map) {
-                        $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ '
-                            . '\'' . $map[0] . '\', \'' . $map[1] . '\', '
-                            . '\'' . $map[2] . '\', \'' . $map[3] . '\', '
-                            . '\'' . $map[4] . '\' ];' . "\n";
+                        $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ \'' . $map[0] . '\', \'' . $map[1] 
+                            . '\', \'' . $map[2] . '\', \'' . $map[3] . '\', \'' . $map[4] . '\' ];' . "\n";
+                    }
+                }
+                
+                $cache .= '$'.'this->nodeCondInvert = [];' . "\n";
+                $inv = SLConditionsNodes::where('CondNodeNodeID', '>', 0)
+                    ->where('CondNodeLoopID', '<', 0)
+                    ->get();
+                if ($inv && sizeof($inv) > 0) {
+                    foreach ($inv as $invert) {
+                        if (!isset($this->nodeCondInvert[$invert["CondNodeNodeID"]])) {
+                            $cache .= '$'.'this->nodeCondInvert[' . $invert["CondNodeNodeID"] . '] = [];' . "\n";
+                            $this->nodeCondInvert[$invert["CondNodeNodeID"]] = [];
+                        }
+                        if (!isset($this->nodeCondInvert[$invert["CondNodeNodeID"]][$invert["CondNodeCondID"]])) {
+                            $cache .= '$'.'this->nodeCondInvert[' . $invert["CondNodeNodeID"] . '][' 
+                                . $invert["CondNodeCondID"] . '] = true;' . "\n";
+                            $this->nodeCondInvert[$invert["CondNodeNodeID"]][$invert["CondNodeCondID"]] = true;
+                        }
                     }
                 }
             } // end if (isset($this->dbRow->DbPrefix))
 
             eval($cache);
+            
             $this->getCoreTblUserFld();
             $cache2 = '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
+            $xmlTree = SLTree::where('TreeSlug', $this->treeRow->TreeSlug)
+                ->where('TreeDatabase', $this->treeRow->TreeDatabase)
+                ->where('TreeType', 'Primary Public XML')
+                ->orderBy('TreeID', 'asc')
+                ->first();
+            if ($xmlTree && isset($xmlTree->TreeRoot)) {
+                $cache2 .= '$'.'this->xmlTree = [ '
+                    . '"id" => '        . $xmlTree->TreeID . ', '
+                    . '"root" => '      . $xmlTree->TreeRoot . ', '
+                    . '"coreTblID" => ' . $xmlTree->TreeCoreTable . ', '
+                    . '"coreTbl" => "'  . $this->tbl[$xmlTree->TreeCoreTable] . '", '
+                    . '"opts" => '      . $xmlTree->TreeOpts
+                . ' ];' . "\n";
+            }
             eval($cache2);
+            
             if (file_exists($cacheFile)) Storage::delete($cacheFile);
             Storage::put($cacheFile, $cache . $cache2);
         }
         return true;
     }
     
-    
-    
-    public function modelPath($tbl = '')
+    public function modelPath($tbl = '', $forceFile = true)
     {
-        return "App\\Models\\" . $this->tblModels[$tbl];
+        if (isset($this->tblModels[$tbl])) {
+            $path = "App\\Models\\" . $this->tblModels[$tbl];
+            $this->chkTblModel($tbl, $path, $forceFile);
+            return $path;
+        }
+        return '';
+    }
+    
+    public function chkTblModel($tbl, $path, $forceFile = true)
+    {
+        if (in_array(strtolower(trim($tbl)), ['', 'uers'])) return false;
+        $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
+        if (!file_exists($modelFilename) || $forceFile) { // copied from DatabaseInstaller...
+            $modelFile = '';
+            $tbl = SLTables::where('TblDatabase', $this->dbID)
+                ->where('TblName', $tbl)
+                ->first();
+            $flds = SLFields::where('FldDatabase', $this->dbID)
+                ->where('FldTable', $tbl->TblID)
+                ->orderBy('FldOrd', 'asc')
+                ->orderBy('FldEng', 'asc')
+                ->get();
+            if ($flds && sizeof($flds) > 0) {
+                foreach ($flds as $fld) {
+                    $modelFile .= "\n\t\t'" . $tbl->TblAbbr . $fld->FldName . "', ";
+                }
+            }                                      
+            $tblName = $this->dbRow->DbPrefix . $tbl->TblName;
+            $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , [
+                "modelFile" => $modelFile, 
+                "tbl"       => $tbl,
+                "tblName"   => $tblName,
+                "tblClean"  => str_replace('_', '', $tblName)
+            ]);
+            if (is_writable($modelFilename)) {
+                if (file_exists($modelFilename)) unlink($modelFilename);
+                file_put_contents($modelFilename, $fullFileOut);
+            }
+        }
+        return true;
     }
     
     public function isCoreTbl($tblID)
@@ -229,17 +368,18 @@ class DatabaseLookups
     
     public function getCoreTblUserFld()
     {
-        if (!isset($this->coreTblUserFld) || trim($this->coreTblUserFld) == '') {
+        if ((!isset($this->coreTblUserFld) || trim($this->coreTblUserFld) == '') 
+        	&& isset($this->tblI[$this->coreTbl])) {
             $coreTblID = $this->tblI[$this->coreTbl];
             $userTbl = SLTables::where('TblDatabase', $this->dbID)
-                ->where('TblName', 'Users')
+                ->whereIn('TblName', ['users', 'Users'])
                 ->first();
             if ($userTbl && isset($userTbl->TblID)) {
                 $keyFld = SLFields::where('FldTable', $coreTblID)
                     ->where('FldForeignTable', $userTbl->TblID)
                     ->first();
                 if ($keyFld && isset($keyFld->FldName)) {
-                    $this->coreTblUserFld = $userTbl->TblAbbr . $keyFld->FldName;
+                    $this->coreTblUserFld = $this->tblAbbr[$this->coreTbl] . $keyFld->FldName;
                 }
             }
         }
@@ -267,7 +407,9 @@ class DatabaseLookups
     {
         if ($this->sessLoops && isset($this->sessLoops[0])) {
             $loop = $this->sessLoops[0]->SessLoopName;
-            $this->setClosestLoop($loop, $this->sessLoops[0]->SessLoopItemID, $this->dataLoops[$loop]);
+            if (isset($this->dataLoops[$loop])) {
+                $this->setClosestLoop($loop, $this->sessLoops[0]->SessLoopItemID, $this->dataLoops[$loop]);
+            }
         }
         return true;
     }
@@ -363,7 +505,7 @@ class DatabaseLookups
     
     public function fldForeignKeyTbl($tbl, $fld)
     {
-        if (trim($tbl) == '' || trim($fld) == '') return '';
+        if (trim($tbl) == '' || trim($fld) == '' || !isset($this->tblI[$tbl])) return '';
         $fld = SLFields::select('FldForeignTable')
             ->where('FldTable', $this->tblI[$tbl])
             ->whereIn('FldName', [$fld, str_replace($this->tblAbbr[$tbl], '', $fld)])
@@ -424,13 +566,15 @@ class DatabaseLookups
                 ->get();
             if ($flds && sizeof($flds) > 0) {
                 foreach ($flds as $fld) {
-                    $lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
-                        . ':' . $this->tbl[$fld->FldForeignTable] . ':';
-                    $retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
-                        . $this->tbl[$fld->FldTable] . ' &rarr; ' 
-                        . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
-                        . ' &rarr; ' . $this->tbl[$fld->FldForeignTable] . '
-                        </option>' . "\n";
+                    if (isset($this->tbl[$fld->FldTable]) && isset($this->tbl[$fld->FldForeignTable])) {
+                        $lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
+                            . ':' . $this->tbl[$fld->FldForeignTable] . ':';
+                        $retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
+                            . $this->tbl[$fld->FldTable] . ' &rarr; ' 
+                            . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
+                            . ' &rarr; ' . $this->tbl[$fld->FldForeignTable] . '
+                            </option>' . "\n";
+                    }
                 }
             }
         }
@@ -572,7 +716,7 @@ class DatabaseLookups
         $qman = "SELECT t.`TblName`, t.`TblAbbr`, f.`FldName`, f.`FldType`, f.`FldForeignTable` 
             FROM `SL_Fields` f 
             LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
-            WHERE f.`FldTable` > '0' [[EXTRA]] 
+            WHERE f.`FldTable` > '0' [[EXTRA]] AND f.`FldDatabase` LIKE '" . $this->dbID . "' 
             ORDER BY t.`TblName`, f.`FldName`";
         if ($keys == -1) $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "AND f.`FldForeignTable` > '0'", $qman) ) );
         else $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "", $qman) ) );
@@ -771,7 +915,9 @@ class DatabaseLookups
     
     public function getCondList()
     {
-        return SLConditions::orderBy('CondTag')->get();
+        return SLConditions::whereIn('CondDatabase', [0, $this->dbID])
+            ->orderBy('CondTag')
+            ->get();
     }
     
     public function saveEditCondition(Request $request)
@@ -785,22 +931,28 @@ class DatabaseLookups
             SLConditionsVals::where('CondValCondID', $cond->CondID)->delete();
         }
         else $cond->CondDatabase = $this->dbID;
-        $cond->CondTag = (($request->has('condHash')) ? $request->condHash : '#');
-        if (substr($cond->CondTag, 0, 1) != '#') $cond->CondTag = '#' . $cond->CondTag;
-        $cond->CondDesc = (($request->has('condDesc')) ? $request->condDesc : '');
-        $cond->CondOpts = 1;
+        $cond->CondTag      = (($request->has('condHash')) ? $request->condHash : '#');
+        if (substr($cond->CondTag, 0, 1) != '#') {
+            $cond->CondTag  = '#' . $cond->CondTag;
+        }
+        $cond->CondDesc     = (($request->has('condDesc')) ? $request->condDesc : '');
+        $cond->CondOpts     = 1;
         $cond->CondOperator = 'CUSTOM';
         $cond->CondOperDeet = 0;
         $cond->CondField = $cond->CondTable = $cond->CondLoop = 0;
         if ($request->has('setSelect')) {
             $tmp = trim($request->setSelect);
-            if (strpos($tmp, 'loop-') !== false) {
+            if ($tmp == 'url-parameters') {
+                $cond->CondOperator = 'URL-PARAM';
+            } elseif (strpos($tmp, 'loop-') !== false) {
                 $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
             } else {
                 $cond->CondTable = intVal($this->tblI[$tmp]);
             }
         }
-        if ($request->has('setFld')) {
+        if ($cond->CondOperator == 'URL-PARAM') {
+            $cond->CondOperDeet = $request->paramName;
+        } elseif ($request->has('setFld')) {
             $tmp = trim($request->setFld);
             if (substr($tmp, 0, 6) == 'EXISTS') {
                 $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
@@ -814,11 +966,16 @@ class DatabaseLookups
             }
         }
         $cond->save();
-        if ($request->has('vals') && sizeof($request->vals) > 0) {
+        if ($cond->CondOperator == 'URL-PARAM') {
+            $tmpVal = new SLConditionsVals;
+            $tmpVal->CondValCondID = $cond->CondID;
+            $tmpVal->CondValValue  = $request->paramVal;
+            $tmpVal->save();
+        } elseif ($request->has('vals') && sizeof($request->vals) > 0) {
             foreach ($request->vals as $val) {
                 $tmpVal = new SLConditionsVals;
-                $tmpVal->CondValCondID     = $cond->CondID;
-                $tmpVal->CondValValue     = $val;
+                $tmpVal->CondValCondID = $cond->CondID;
+                $tmpVal->CondValValue  = $val;
                 $tmpVal->save();
             }
         }
@@ -856,17 +1013,6 @@ class DatabaseLookups
     }
     
     
-    public function getTreeXML()
-    {
-        if ($this->treeXmlID <= 0) {
-            $chk = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
-                ->where('TreeType', $this->treeRow->TreeType . ' XML')
-                ->first();
-            if ($chk && sizeof($chk) > 0) $this->treeXmlID = $chk->TreeID;
-        }
-        return $this->treeXmlID;
-    }
-    
     
     public function getInstruct($spot = '')
     {
@@ -883,5 +1029,7 @@ class DatabaseLookups
         }
         return '';
     }
+    
+    
     
 }

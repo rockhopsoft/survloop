@@ -23,7 +23,7 @@ class SurvFormTree extends SurvUploadTree
     ];
     
     public $nodeSpecialTypes = [
-        'Instructions', 'Page', 'Branch Title', 'Loop Root', 'Loop Cycle', 'Loop Sort', 
+        'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 'Loop Cycle', 'Loop Sort', 
         'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap'
     ];
     
@@ -68,6 +68,7 @@ class SurvFormTree extends SurvUploadTree
     { 
         $ret = $this->customNodePrintButton($nID, $promptNotesSpecial);
         if ($ret != '') return $ret;
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') return '';
         
         // else print standard button variations
         $ret .= '<div class="fC"></div><div class="nodeSub">';
@@ -83,8 +84,8 @@ class SurvFormTree extends SurvUploadTree
                 $nextLabel = $this->nextBtnOverride;
             }
             $itemCnt = 0;
-            if (isset($this->sessData->loopItemIDs[$GLOBALS["DB"]->closestLoop["loop"]])) {
-                $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["DB"]->closestLoop["loop"]]);
+            if (isset($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]])) {
+                $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]]);
             }
             if ($this->allNodes[$nID]->isStepLoop() && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
                 $ret .= '<a href="javascript:;" class="fR btn btn-lg btn-primary nFormNext" id="nFormNext" 
@@ -94,7 +95,7 @@ class SurvFormTree extends SurvUploadTree
                     . '" class="fR btn btn-lg btn-primary nFormNext" id="nFormNext">';
             }
         }
-        if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["DB"]->treeRow->TreeFirstPage != $nID) {
+        if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID) {
             $ret .= '<input type="button" value="Back" class="fL btn btn-lg btn-default" id="nFormBack">';
         }
         $ret .= '<div class="clearfix p5"></div></div>';
@@ -105,6 +106,7 @@ class SurvFormTree extends SurvUploadTree
     {
         return view('vendor.survloop.formtree-form-start', [
             "nID"             => $nID, 
+            "nSlug"           => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
             "pageHasUpload"   => $this->pageHasUpload, 
             "nodePrintJumpTo" => $this->nodePrintJumpTo($nID), 
             "zoomPref"        => ((isset($this->sessInfo->SessZoomPref)) ? intVal($this->sessInfo->SessZoomPref) : 0), 
@@ -167,11 +169,12 @@ class SurvFormTree extends SurvUploadTree
     protected function swapLabels($nID = -3, $str = '', $itemID = -3, $itemInd = -3)
     {
         if (trim($str) == '') return '';
-        $str  = $this->customLabels($nID, $str);
+        $str = $this->customLabels($nID, $str);
+        $str = str_replace('[[DOMAIN]]', $GLOBALS["SL"]->sysOpts["app-url"], $str);
         if ($itemID > 0 && $itemInd >= 0) {
             if (strpos($str, '[LoopItemLabel]') !== false) {
-                $label = $this->getLoopItemLabel($GLOBALS["DB"]->closestLoop["loop"], 
-                    $this->sessData->getRowById($GLOBALS["DB"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
+                $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
+                    $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
                 $str = str_replace('[LoopItemLabel]', '<span class="slBlueDark"><b>' . $label . '</b></span>', $str);
             }
             $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark"><b>' . (1+$itemInd) . '</b></span>', $str);
@@ -189,10 +192,10 @@ class SurvFormTree extends SurvUploadTree
                 $str = $strPre . '<span class="slBlueDark"><b>' . $label . '</b></span>' . $strPost;
             }
         }
-        if (strpos($str, '{!! $previewPrivate !!}') !== false || strpos($str, '{!! $previewPublic !!}') !== false) {
+        if (strpos($str, '[[PreviewPrivate]]') !== false || strpos($str, '[[PreviewPublic]]') !== false) {
             list($previewPublic, $previewPrivate) = $this->previewReportPubPri();
-            $str = trim(str_replace('{!! $previewPublic !!}', $previewPublic, 
-                str_replace('{!! $previewPrivate !!}', $previewPrivate, $str)));
+            $str = trim(str_replace('[[PreviewPublic]]', $previewPublic, 
+                str_replace('[[PreviewPrivate]]', $previewPrivate, $str)));
         }
         return $this->cleanLabel($str);
     }
@@ -241,9 +244,9 @@ class SurvFormTree extends SurvUploadTree
         $this->allNodes[$nID]->fillNodeRow($nID);
         $curr = $this->allNodes[$nID];
         list($tbl, $fld) = $curr->getTblFld();
-        $fldForeignTbl = $GLOBALS["DB"]->fldForeignKeyTbl($tbl, $fld);
-        if (($curr->isPage() || $curr->isInstruct()) && isset($GLOBALS['DB']->closestLoop['obj']->DataLoopTable)) {
-            $tbl = $GLOBALS['DB']->closestLoop['obj']->DataLoopTable;
+        $fldForeignTbl = $GLOBALS["SL"]->fldForeignKeyTbl($tbl, $fld);
+        if (($curr->isPage() || $curr->isInstruct()) && isset($GLOBALS['SL']->closestLoop['obj']->DataLoopTable)) {
+            $tbl = $GLOBALS['SL']->closestLoop['obj']->DataLoopTable;
         }
         if ($tbl == '' && $this->hasCycleAncestor($nID) && trim($this->currLoopCycle[1]) != '') {
             $tbl = $this->currLoopCycle[0];
@@ -260,10 +263,10 @@ class SurvFormTree extends SurvUploadTree
                 $itemInd, $itemID);
         } else { // not LoopCycle logic
             list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl, $hasParentDataManip);
-            if (trim($GLOBALS['DB']->closestLoop['loop']) != '' 
+            if (trim($GLOBALS['SL']->closestLoop['loop']) != '' 
                 && $tbl == $this->sessData->isCheckboxHelperTable($tbl)) {
                 // In this context, relevant item index is item's index with the loop, not the table's whole data set
-                $itemInd = $this->sessData->getLoopIndFromID($GLOBALS['DB']->closestLoop['loop'], $itemID);
+                $itemInd = $this->sessData->getLoopIndFromID($GLOBALS['SL']->closestLoop['loop'], $itemID);
             }
             $currNodeSessData = $this->sessData->currSessData($nID, $tbl, $fld, 'get', '', $hasParentDataManip);
         }
@@ -279,7 +282,7 @@ class SurvFormTree extends SurvUploadTree
         // check for extra custom PHP code stored with the node; check for standardized techniques
         $nodeOverrides = $this->printNodeSessDataOverride($nID, $tmpSubTier, $currNodeSessData);
         if (sizeof($nodeOverrides) > 1) $currNodeSessData = $nodeOverrides;
-        elseif (sizeof($nodeOverrides) == 1) $currNodeSessData = $nodeOverrides[0];
+        elseif (sizeof($nodeOverrides) == 1 && isset($nodeOverrides[0])) $currNodeSessData = $nodeOverrides[0];
         
         $showKidsResponded = true;
         if (sizeof($tmpSubTier[1]) > 0) {
@@ -321,13 +324,14 @@ class SurvFormTree extends SurvUploadTree
             }
         }
         
+        if ($curr->isRequired()) $this->pageHasReqs++;
+        
         $ret = $this->customNodePrint($nID, $tmpSubTier);
         if ($ret != '') return $visibilityField . $ret;
         $ret .= $visibilityField;
         // else print standard node output...
         
         // check for extra custom HTML/JS/CSS code stored with the node; check for standardized techniques
-        if ($curr->isRequired()) $this->pageHasReqs++;
         $onKeyUp = ' checkNodeUp(\'' . $nIDtxt . '\', -1, 0); ';
         if (trim($curr->nodeRow->NodePromptAfter) != '') {
             if (stripos($curr->nodeRow->NodePromptAfter, '/'.'* formAJAX *'.'/') !== false) {
@@ -347,7 +351,7 @@ class SurvFormTree extends SurvUploadTree
         if (intVal($curr->nodeRow->NodeCharLimit) > 0 && $curr->nodeRow->NodeOpts%31 > 0 
             && $curr->nodeType != 'Uploads') {
             $onKeyUp .= ' charLimit(\'' . $nIDtxt . '\', ' . $curr->nodeRow->NodeCharLimit . '); ';
-            $charLimit = "\n".'<div id="charLimit' . $nID . 'Msg" class="slRedDark f12 opac33"></div>';
+            $charLimit = "\n" . '<div id="charLimit' . $nID . 'Msg" class="slRedDark f12 opac33"></div>';
             $this->pageJSextra .= 'setTimeout("charLimit(\'' . $nIDtxt . '\', ' 
                 . $curr->nodeRow->NodeCharLimit . ')", 50);' . "\n";
         }
@@ -380,13 +384,20 @@ class SurvFormTree extends SurvUploadTree
         if (strpos($nodePromptText, 'fixedHeader') !== false) $this->v["hasFixedHeader"] = true;
         
         $nodePrompt = '';
-        if (trim($nodePromptText) != '') {
-            $nodePrompt = "\n".'<div id="nLabel' . $nIDtxt . '" class="nPrompt"><label for="n' . $nIDtxt . 'FldID">'
+        if (strpos($curr->nodeRow->NodePromptText, '[[PreviewPrivate]]') !== false 
+            || strpos($curr->nodeRow->NodePromptText, '[[PreviewPublic]]') !== false) {
+            $nodePrompt = $nodePromptText;
+        } elseif (trim($nodePromptText) != '') {
+            $nodePrompt = "\n" . '<div id="nLabel' . $nIDtxt . '" class="nPrompt"><label for="n' . $nIDtxt . 'FldID">'
                 . $nodePromptText . '</label></div>' . "\n";
         }
         
+        if ($curr->isPage()) $ret .= '<div class="pageTopGap"></div>';
+        
         $ret .= '<div class="fC"></div><div class="nodeAnchor"><a name="n' . $nIDtxt 
-            . '"></a></div><div id="node' . $nIDtxt . '" class="nodeWrap">' . "\n";
+            . '"></a></div><div id="node' . $nIDtxt . '" class="nodeWrap'
+            . (($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
+                && ($curr->isInstruct() || $curr->isInstructRaw())) ? ' w100' : '') . '">' . "\n";
         
         // check for if we're at the root of a Loop Root, we've got special handling
         if ($curr->isLoopRoot()) {
@@ -399,18 +410,18 @@ class SurvFormTree extends SurvUploadTree
             $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
             $loopCycle = $this->sessData->getLoopRows($loop);
             if (sizeof($tmpSubTier[1]) > 0 && $loopCycle && sizeof($loopCycle) > 0) {
-                $this->currLoopCycle[0] = $GLOBALS["DB"]->getLoopTable($loop);
+                $this->currLoopCycle[0] = $GLOBALS["SL"]->getLoopTable($loop);
                 foreach ($loopCycle as $i => $loopItem) {
                     $this->currLoopCycle[1] = 'cyc' . $i;
                     $this->currLoopCycle[2] = $loopItem->getKey();
                     $this->sessData->startTmpDataBranch($tbl, $loopItem->getKey());
-                    $GLOBALS["DB"]->fakeSessLoopCycle($loop, $loopItem->getKey());
+                    $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
                     foreach ($tmpSubTier[1] as $childNode) {
                         if (!$this->allNodes[$childNode[0]]->isPage()) {
                             $ret .= $this->printNodePublic($childNode[0], $childNode, $currVisib);
                         }
                     }
-                    $GLOBALS["DB"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
+                    $GLOBALS["SL"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
                     $this->sessData->endTmpDataBranch($tbl);
                     $this->currLoopCycle[1] = '';
                     $this->currLoopCycle[2] = -3;
@@ -427,14 +438,14 @@ class SurvFormTree extends SurvUploadTree
                     var url = "/sortLoop/?n=' . $nID . '&"+$(this).sortable("serialize")+"";
                     document.getElementById("hidFrameID").src=url;
                 } }); $("#sortable").disableSelection();';
-                $ret .= '<div class="nFld"><ul id="sortable">' . "\n";
+                $ret .= '<div class="nFld">' . $this->sortableStart($nID) . '<ul id="sortable">' . "\n";
                 foreach ($loopCycle as $i => $loopItem) {
                     $ret .= '<li id="item-' . $loopItem->getKey() . '" class="sortOff" onMouseOver="'
                         . 'this.className=\'sortOn\';" onMouseOut="this.className=\'sortOff\';">'
                         . '<span><i class="fa fa-sort slBlueLight"></i></span> ' 
                         . $this->getLoopItemLabel($loop, $loopItem, $i) . '</li>' . "\n";
                 }
-                $ret .= '</ul></div>' . "\n";
+                $ret .= '</ul>' . $this->sortableEnd($nID) . '</div>' . "\n";
             }
             
         } elseif ($curr->isDataManip()) {
@@ -445,14 +456,14 @@ class SurvFormTree extends SurvUploadTree
             
             // Start normal data field checks
             $dateStr = $timeStr = '';
-            if ($fld != '' && $fld != ($GLOBALS["DB"]->tblAbbr[$tbl] . 'ID') 
-                && trim($currNodeSessData) != '' && isset($GLOBALS["DB"]->fldTypes[$tbl][$fld])) {
+            if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID') 
+                && trim($currNodeSessData) != '' && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])) {
                 // convert current session data for dates and times
-                if ($GLOBALS["DB"]->fldTypes[$tbl][$fld] == 'DATETIME') {
+                if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATETIME') {
                     list($dateStr, $timeStr) = explode(' ', $currNodeSessData);
                     $dateStr = $this->cleanDateVal($dateStr);
                     if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
-                } elseif ($GLOBALS["DB"]->fldTypes[$tbl][$fld] == 'DATE') {
+                } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATE') {
                     $dateStr = $this->cleanDateVal($currNodeSessData);
                     if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
                 }
@@ -484,9 +495,11 @@ class SurvFormTree extends SurvUploadTree
                     
             } elseif ($curr->nodeType == 'Big Button') {
                 
-                $btn = '<div class="nFld"><a class="btn btn-lg btn-primary nFldBtn nFormNext" id="nBtn' . $nIDtxt 
-                    . '" ' . ((trim($curr->nodeRow->NodeDataStore) != '') 
-                        ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '') 
+                $btn = '<div class="nFld"><a id="nBtn' . $nIDtxt . '" class="btn btn-lg btn-' 
+                    . (($curr->nodeRow->NodeOpts%47 == 0) ? 'default' : 'primary') . ' nFldBtn' 
+                    . (($curr->nodeRow->NodeOpts%43 == 0) ? '' : ' nFormNext') . '" ' 
+                    . ((trim($curr->nodeRow->NodeDataStore) != '')
+                        ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '')
                     . ' >' . $curr->nodeRow->NodeDefault . '</a></div>' . "\n";
                 $lastDivPos = strrpos($nodePrompt, "</div>\n            </label></div>");
                 if (strpos($nodePrompt, 'jumbotron') > 0 && $lastDivPos > 0) {
@@ -498,6 +511,20 @@ class SurvFormTree extends SurvUploadTree
                 } else {
                     $ret .= $nodePrompt . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
                         . 'FldID" value="' . $currNodeSessData . '">' . $btn . "\n"; 
+                }
+                if ($curr->nodeRow->NodeOpts%43 == 0) {
+                    $curr->hasShowKids = true;
+                    $showKidsResponded = false;
+                    $this->pageAJAX .= '$(document).on("click", "#nBtn' . $nIDtxt . '", function() { '
+                        . 'if (document.getElementById("node' . $nIDtxt . 'kids")) { '
+                            . 'if (document.getElementById("node' . $nIDtxt . 'kids").style.display=="none") { '
+                                . '$("#node' . $nIDtxt . 'kids").slideDown("50"); '
+                                . 'kidsVisible("' . $nIDtxt . '", true, true); '
+                            . '} else { '
+                                . '$("#node' . $nIDtxt . 'kids").slideUp("50"); '
+                                . 'kidsVisible("' . $nIDtxt . '", false, true); '
+                            . '} '
+                        . '} });' . "\n";
                 }
                 
             } elseif ($curr->nodeType == 'User Sign Up') {
@@ -526,17 +553,17 @@ class SurvFormTree extends SurvUploadTree
                             : "reqFormFld('" . $nIDtxt . "');\n");
                 }
                 if ($curr->nodeType == 'Spambot Honey Pot') {
-                    $this->pageJSextra .= "\n".'nFldHP("' . $nIDtxt . '");';
+                    $this->pageJSextra .= "\n" . 'nFldHP("' . $nIDtxt . '");';
                 }
                 if (trim($curr->nodeRow->NodeTextSuggest) != '') {
                     $this->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).autocomplete({ source: [';
-                    foreach ($GLOBALS["DB"]->getDefSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
+                    foreach ($GLOBALS["SL"]->getDefSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
                         $this->pageAJAX .= (($i > 0) ? ',' : '') . ' "' . $def->DefValue . '"';
                     }
                     $this->pageAJAX .= ' ] });' . "\n";
                 }
                 if ($curr->nodeRow->NodeOpts%41 == 0) { // copy input to extra div
-                    $this->pageJSextra .= "\n".'setTimeout("copyNodeResponse(\'n' . $nIDtxt . 'FldID\', \'nodeEcho' 
+                    $this->pageJSextra .= "\n" . 'setTimeout("copyNodeResponse(\'n' . $nIDtxt . 'FldID\', \'nodeEcho' 
                         . $nIDtxt . '\')", 50);';
                     $this->pageAJAX .= '$("#n' . $nIDtxt . 'FldID").keyup(function() { copyNodeResponse(\'n' 
                         . $nIDtxt . 'FldID\', \'nodeEcho' . $nIDtxt . '\'); });' . "\n";
@@ -573,7 +600,7 @@ class SurvFormTree extends SurvUploadTree
                 
                 $curr = $this->checkResponses($curr, $fldForeignTbl);
                 if (sizeof($curr->responses) > 0 || $curr->nodeType == 'U.S. States') {
-                    $ret .= $nodePrompt . "\n".'<div class="nFld' . $isOneLinerFld . '">
+                    $ret .= $nodePrompt . "\n" . '<div class="nFld' . $isOneLinerFld . '">
                         <select name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" class="form-control' 
                         . $this->inputMobileCls($nID) . (($isOneLinerFld != '') ? ' w33' : '') 
                         . '" onChange="checkNodeUp(\'' . $nIDtxt . '\', -1, 0);" >
@@ -583,7 +610,7 @@ class SurvFormTree extends SurvUploadTree
                             . 'FldID").click(function(){ var foundKidResponse = false;' . "\n";
                     }
                     if ($curr->nodeType == 'U.S. States') {
-                        $ret .= $GLOBALS["DB"]->states->stateDrop($currNodeSessData);
+                        $ret .= $GLOBALS["SL"]->states->stateDrop($currNodeSessData);
                     }
                     else { 
                         foreach ($curr->responses as $j => $res) {
@@ -597,7 +624,7 @@ class SurvFormTree extends SurvUploadTree
                         }
                     }
                     if ($curr->hasShowKids) {
-                        $this->pageAJAX .= "\n".'if (foundKidResponse) { $("#node' . $nIDtxt 
+                        $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
                             . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } else { $("#node' 
                             . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' . $nIDtxt 
                             . '", false, true); }' . "\n" . ' }); ' . "\n";
@@ -609,7 +636,7 @@ class SurvFormTree extends SurvUploadTree
                     $ret .= '</select></div>' . "\n"; 
                 }
                 
-            } elseif (in_array($curr->nodeType, array('Radio', 'Checkbox'))) {
+            } elseif (in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
                 
                 $curr = $this->checkResponses($curr, $fldForeignTbl);
                 if (sizeof($curr->responses) > 0) {
@@ -624,37 +651,58 @@ class SurvFormTree extends SurvUploadTree
                         $this->pageAJAX .= '$(".n' . $nIDtxt 
                             . 'fldCls").click(function(){ var foundKidResponse = false;' . "\n";
                     }
-                    $this->pageJSextra .= "\n".'addResTot("' . $nIDtxt . '", ' . sizeof($curr->responses) . ');';
+                    $this->pageJSextra .= "\n" . 'addResTot("' . $nIDtxt . '", ' . sizeof($curr->responses) . ');';
+                    $fldHasOther = false;
                     foreach ($curr->responses as $j => $res) {
+                        if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:']) 
+                            && isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
+                            && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
+                            $fldHasOther = true;
+                        }
+                    }
+                    foreach ($curr->responses as $j => $res) {
+                        $otherFld = ['', '', '', ''];
+                        if ($fldHasOther && in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:'])) {
+                            $otherFld[0] = $fld . 'Other';
+                            $otherFld[1] = $this->sessData->currSessData($nID, $tbl, $otherFld[0], 'get', '', 
+                                $hasParentDataManip);
+                            $otherFld[2] = '<input type="text" name="n' . $nID . 'fldOther" id="n' . $nID 
+                                . 'fldOtherID" value="' . $otherFld[1] . '" class="form-control disIn otherFld mL10" 
+                                onKeyUp="formKeyUpOther(' . $nID . ', ' . $j . ');">';
+                            echo 'otherData: ' . $otherFld[0] . ', ' . $otherFld[1] . '<br />';
+                        }
+                        
                         if ($curr->nodeType == 'Checkbox' && $curr->indexMutEx($j)) {
-                            $this->pageJSextra .= "\n".'addMutEx("' . $nIDtxt . '", ' . $j . ');';
+                            $this->pageJSextra .= "\n" . 'addMutEx("' . $nIDtxt . '", ' . $j . ');';
                         }
                         $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                         $resNameCheck = '';
                         $boxChecked = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr->nodeType);
                         if ($curr->nodeType == 'Radio') {
                             $resNameCheck = 'name="n' . $nIDtxt . 'fld" ' . (($boxChecked) ? 'CHECKED' : '');
+                            if ($fldHasOther && $otherFld[1] == '') {
+                                $otherFld[3] = ' document.getElementById(\'n' . $nID . 'fldOtherID\').value=\'\'; ';
+                            }
                         } else {
                             $resNameCheck = 'name="n' . $nIDtxt . 'fld[]" ' . (($boxChecked) ? 'CHECKED' : '');
                         }
+                        
                         if ($mobileCheckbox) {
                             $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt . 'fld' . $j 
                                 . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') . '">
                                 <div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
                                 . '" value="' . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" ' 
                                 . $resNameCheck . $respKids . ' autocomplete="off" onClick="checkNodeUp(\'' 
-                                . $nIDtxt . '\', ' . $j . ', 1);" ></div> ' . $res->NodeResEng . '
-                            </label>' . "\n";
+                                . $nIDtxt . '\', ' . $j . ', 1);' . $otherFld[3] . '" ></div> ' . $res->NodeResEng 
+                                . $otherFld[2] . '</label>' . "\n";
                         } else {
                             $ret .= '<div class="' . $isOneLinerFld . '">' . ((strlen($res) < 40) ? '<nobr>' : '') . '
-                                <label for="n' . $nIDtxt . 'fld' . $j . '" class="mR10">
-                                    <div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j . '" value="' 
-                                    . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" '
-                                    . $resNameCheck . $respKids . ' autocomplete="off" onClick="checkNodeUp(\'' 
-                                        . $nIDtxt . '\', ' . $j . ', 0);" ></div> ' . $res->NodeResEng . '
-                                </label>
-                                ' . ((strlen($res) < 40) ? '</nobr>' : '') . '
-                            </div>' . "\n";
+                                <label for="n' . $nIDtxt . 'fld' . $j . '" class="mR10"><div class="disIn mR5">
+                                <input id="n' . $nIDtxt . 'fld' . $j . '" value="' . $res->NodeResValue . '" type="' 
+                                . strtolower($curr->nodeType) . '" ' . $resNameCheck . $respKids 
+                                . ' autocomplete="off" onClick="checkNodeUp(\'' . $nIDtxt . '\', ' . $j . ', 0);' 
+                                . $otherFld[3] . '" ></div> ' . $res->NodeResEng . $otherFld[2] . '</label>' 
+                                . ((strlen($res) < 40) ? '</nobr>' : '') . '</div>' . "\n";
                         }
                         if ($curr->hasShowKids && intVal($res->NodeResShowKids) == 1) {
                             $this->pageAJAX .= 'if (document.getElementById("n' . $nIDtxt . 'fld' . $j 
@@ -662,10 +710,10 @@ class SurvFormTree extends SurvUploadTree
                         }
                     }
                     if ($curr->hasShowKids) {
-                        $this->pageAJAX .= "\n".'if (foundKidResponse) { $("#node' . $nIDtxt 
+                        $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
                             . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } ' . "\n"
                             . 'else { $("#node' . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' 
-                            . $nIDtxt . '", false, true); }' . "\n".' }); ' . "\n";
+                            . $nIDtxt . '", false, true); }' . "\n" . ' }); ' . "\n";
                     }
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
@@ -772,7 +820,7 @@ class SurvFormTree extends SurvUploadTree
                     "currSessDataOther" => $currSessDataOther
                 ])->render();
                 $genderSuggest = '';
-                foreach ($GLOBALS["DB"]->getDefSet('Gender Identity') as $i => $gen) {
+                foreach ($GLOBALS["SL"]->getDefSet('Gender Identity') as $i => $gen) {
                     if (!in_array($gen->DefValue, ['Female', 'Male', 'Other', 'Not sure'])) {
                         $genderSuggest .= ', "' . $gen->DefValue . '"';
                     }
@@ -803,10 +851,11 @@ class SurvFormTree extends SurvUploadTree
             $ret .= $this->printSpecial($nID, $promptNotesSpecial, $currNodeSessData);
         }
         
-        if ($curr->isPage()) $ret .= '<div class="pageGap"></div>';
         if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '</div> <!-- end jumbotron -->' . "\n";
-        $ret .= "\n".'</div> <!-- end #node' . $nIDtxt . ' -->' . "\n";
-        if (!$curr->isLoopRoot() && !$curr->isLoopCycle() && !$curr->isPage() && !$curr->isDataManip()) {
+        $ret .= "\n" . '</div> <!-- end #node' . $nIDtxt . ' -->' . "\n";
+        if ($curr->isPage()) $ret .= '<div class="pageBotGap"></div>';
+        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' 
+            && !$curr->isLoopRoot() && !$curr->isLoopCycle() && !$curr->isPage() && !$curr->isDataManip()) {
             if ($this->isNodeJustH1($nodePromptText)) $ret .= '<div class="nodeHalfGap"></div>';
             else $ret .= '<div class="nodeGap"></div>';
         }
@@ -820,8 +869,8 @@ class SurvFormTree extends SurvUploadTree
             } 
         }
         if (trim($retKids) != '' && $curr->hasShowKids) { // then displaying children on page is conditional
-            $ret .= "\n".'<div id="node' . $nIDtxt . 'kids" class="dis' . (($showKidsResponded) ? 'Blo' : 'Non') 
-                . ' nKids">' . $retKids . '</div>' . "\n";
+            $ret .= "\n" . '<div id="node' . $nIDtxt . 'kids" class="nKids" style="display: ' 
+                . (($showKidsResponded) ? 'block' : 'none') . ';">' . $retKids . '</div>' . "\n";
         } else {
             $ret .= $retKids;
         }
@@ -866,6 +915,9 @@ class SurvFormTree extends SurvUploadTree
     protected function postNodePublic($nID = -3, $tmpSubTier = array())
     {
         if (!$this->checkNodeConditions($nID)) return '';
+        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])) {
+            $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->update(["updated_at" => date("Y-m-d H:i:s")]);
+        }
         $this->allNodes[$nID]->fillNodeRow($nID);
         $curr = $this->allNodes[$nID];
         if ($curr->isLoopSort()) { // actual storage happens with with each change /loopSort/
@@ -882,10 +934,10 @@ class SurvFormTree extends SurvUploadTree
         if (sizeof($tmpSubTier) == 0) {
             $tmpSubTier = $this->loadNodeSubTier($nID);
             // then we're at the page's root, so let's check this once
-            if ($this->REQ->has('delItem') && sizeof($this->REQ->input('delItem')) > 0) {
-                foreach ($this->REQ->input('delItem') as $delID) {
-                    $loopTable = $GLOBALS["DB"]->closestLoop["obj"]->DataLoopTable;
-                    $this->sessData->deleteDataItem($this->REQ->node, $loopTable, $delID);
+            if ($GLOBALS["SL"]->REQ->has('delItem') && sizeof($GLOBALS["SL"]->REQ->input('delItem')) > 0) {
+                foreach ($GLOBALS["SL"]->REQ->input('delItem') as $delID) {
+                    $loopTable = $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable;
+                    $this->sessData->deleteDataItem($GLOBALS["SL"]->REQ->node, $loopTable, $delID);
                 }
             }
         }
@@ -894,16 +946,16 @@ class SurvFormTree extends SurvUploadTree
         $hasParentDataManip = $this->hasParentDataManip($nID);
         
         if (!$this->postNodePublicCustom($nID, $tmpSubTier)) { // then run standard post
-            if ($this->REQ->has('loop')) {
-                $this->settingTheLoop(trim($this->REQ->input('loop')), intVal($this->REQ->loopItem));
+            if ($GLOBALS["SL"]->REQ->has('loop')) {
+                $this->settingTheLoop(trim($GLOBALS["SL"]->REQ->input('loop')), intVal($GLOBALS["SL"]->REQ->loopItem));
             }
             if ($curr->nodeType == 'Uploads') {
                 $ret .= $this->postUploadTool($nID);
             } elseif ($curr->isDataManip()) {
-                if ($this->REQ->has('dataManip' . $nID . '') 
-                    && intVal($this->REQ->input('dataManip' . $nID . '')) == 1) {
-                    if ($this->REQ->has('n' . $nID . 'Visible') 
-                        && intVal($this->REQ->input('n' . $nID . 'Visible')) == 1) {
+                if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
+                    && intVal($GLOBALS["SL"]->REQ->input('dataManip' . $nID . '')) == 1) {
+                    if ($GLOBALS["SL"]->REQ->has('n' . $nID . 'Visible') 
+                        && intVal($GLOBALS["SL"]->REQ->input('n' . $nID . 'Visible')) == 1) {
                         $this->runDataManip($nID);
                     } else {
                         $this->reverseDataManip($nID);
@@ -911,17 +963,19 @@ class SurvFormTree extends SurvUploadTree
                 }
             } elseif (strpos($curr->dataStore, ':') !== false) {
                 list($tbl, $fld) = $curr->getTblFld();
-                if ($this->REQ->has('loopItem') && intVal($this->REQ->loopItem) == -37) {
+                if ($GLOBALS["SL"]->REQ->has('loopItem') && intVal($GLOBALS["SL"]->REQ->loopItem) == -37) {
                     // signal from previous form to start a new row in the current set
                     $this->newLoopItem($nID);
                     //$this->updateCurrNode($this->nextNode($this->currNode()));
                 } elseif (!$curr->isInstruct() && $tbl != '' && $fld != '') {
-                    $newVal = (($this->REQ->has('n' . $nID . 'fld')) ? $this->REQ->input('n' . $nID . 'fld') : '');
+                    $newVal = (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') : '');
                     if ($curr->nodeType == 'Checkbox') {
                         $this->sessData->currSessDataCheckbox($nID, $tbl, $fld, 'update', 
-                            (($this->REQ->has('n' . $nID . 'fld')) ? $this->REQ->input('n' . $nID . 'fld') : []));
+                            (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') : []));
                     } else {
-                        if (in_array($curr->nodeType, array('Date', 'Date Picker'))) {
+                        if ($curr->nodeType == 'Text:Number') {
+                            if (!$GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) { $newVal = 0; }
+                        } elseif (in_array($curr->nodeType, array('Date', 'Date Picker'))) {
                             $newVal = date("Y-m-d", strtotime($newVal));
                         } elseif ($curr->nodeType == 'Date Time') {
                             $newVal = date("Y-m-d", strtotime($newVal)) . ' ' . $this->postFormTimeStr($nID);
@@ -929,12 +983,20 @@ class SurvFormTree extends SurvUploadTree
                             $newVal = md5($newVal);
                         }
                         $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal, $hasParentDataManip);
-                        if (in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
-                            $this->sessData->currSessData($nID, $tbl, $fld.'Other', 'update', 
-                                (($this->REQ->has('n' . $nID . 'fldOther')) 
-                                    ? $this->REQ->input('n' . $nID . 'fldOther') 
-                                    : ''), $hasParentDataManip);
+                    }
+                    $fldHasOther = false;
+                    foreach ($curr->responses as $j => $res) {
+                        if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:']) 
+                            && isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
+                            && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
+                            $fldHasOther = true;
                         }
+                    }
+                    if ($fldHasOther && in_array($curr->nodeType, ['Checkbox', 'Radio', 'Gender', 'Gender Not Sure'])) {
+                        $this->sessData->currSessData($nID, $tbl, $fld . 'Other', 'update', 
+                            (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fldOther')) 
+                                ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fldOther') 
+                                : ''), $hasParentDataManip);
                     }
                 }
             }
@@ -962,10 +1024,10 @@ class SurvFormTree extends SurvUploadTree
             if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->isLoopSort()) {
                 $this->allNodes[$nID]->fillNodeRow();
                 $loop = str_replace('LoopItems::', '', $this->allNodes[$nID]->nodeRow->NodeResponseSet);
-                $loopTbl = $GLOBALS["DB"]->dataLoops[$loop]->DataLoopTable;
+                $loopTbl = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable;
                 $sortFld = str_replace($loopTbl . ':', '', $this->allNodes[$nID]->nodeRow->NodeDataStore);
-                foreach ($this->REQ->input('item') as $i => $value) {
-                    eval("\$recObj = " . $GLOBALS["DB"]->modelPath($loopTbl) . "::find(" . $value . ");");
+                foreach ($GLOBALS["SL"]->REQ->input('item') as $i => $value) {
+                    eval("\$recObj = " . $GLOBALS["SL"]->modelPath($loopTbl) . "::find(" . $value . ");");
                     $recObj->{ $sortFld } = $i;
                     $recObj->save();
                 }
@@ -1041,8 +1103,8 @@ class SurvFormTree extends SurvUploadTree
             && isset($this->sessData->dataSets[$fldForeignTbl]) 
             && sizeof($this->sessData->dataSets[$fldForeignTbl]) > 0) {
             foreach ($this->sessData->dataSets[$fldForeignTbl] as $i => $row) {
-                $loop = ((isset($GLOBALS["DB"]->tblLoops[$fldForeignTbl])) 
-                    ? $GLOBALS["DB"]->tblLoops[$fldForeignTbl] : $fldForeignTbl);
+                $loop = ((isset($GLOBALS["SL"]->tblLoops[$fldForeignTbl])) 
+                    ? $GLOBALS["SL"]->tblLoops[$fldForeignTbl] : $fldForeignTbl);
                 // what about tables with multiple loops??
                 $curr->responses[$i] = new SLNodeResponses;
                 $curr->responses[$i]->NodeResValue = $row->getKey();
@@ -1077,37 +1139,41 @@ class SurvFormTree extends SurvUploadTree
             if ($this->sessData->loopItemsNextID > 0) {
                 $this->loopItemsCustBtn = '<a href="javascript:;" class="fR btn btn-lg btn-primary" '
                     . 'id="nFormNextStepItem"><i class="fa fa-arrow-circle-o-right"></i> Next ' 
-                    . $GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular . ' Details</a>';
+                    . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopSingular . ' Details</a>';
                 $this->pageAJAX .= '$("#nFormNextStepItem").click(function() { document.getElementById("loopItemID")'
                     . '.value="' . $this->sessData->loopItemsNextID . '"; document.getElementById("jumpToID")'
                     . '.value="-3"; document.getElementById("stepID").value="next"; return runFormSub(); });' . "\n";
             }
         }
         
-        $labelFirstLet = substr(strtolower($GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular), 0, 1);
+        $labelFirstLet = substr(strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopSingular), 0, 1);
         $limitTxt = '';
-        if ($GLOBALS["DB"]->closestLoop["obj"]->DataLoopMaxLimit > 0 
+        if ($GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit > 0 
             && isset($this->sessData->loopItemIDs[$loopName])
             && sizeof($this->sessData->loopItemIDs[$loopName]) 
-                > $GLOBALS["DB"]->closestLoop["obj"]->DataLoopWarnLimit) {
+                > $GLOBALS["SL"]->closestLoop["obj"]->DataLoopWarnLimit) {
             $limitTxt .= '<div class="gry6 pT20 fPerc125">Limit of ' 
-                . $GLOBALS["DB"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
-                . $GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural . '</div>';
+                . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
+                . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . '</div>';
         }
         $ret = '<h3 class="gry9">';
             if ($this->allNodes[$nID]->isStepLoop()) {
-                $ret .= $GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural . ' to add details for:' . "\n";
+                $ret .= $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . ' to add details for:' . "\n";
             } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == 0) {
-                $ret .= '<i>No ' . strtolower($GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural) 
+                $ret .= '<i>No ' . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
                     . ' added yet.</i>' . "\n";
             } else {
-                /* $ret .= 'Current ' . strtolower($GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural) 
+                /* $ret .= 'Current ' . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
                     . ' added:' . "\n"; */
             }
         $ret .= '</h3>' . "\n";
         if (sizeof($this->sessData->loopItemIDs[$loopName]) > 0) {
+            if (!$this->allNodes[$nID]->isStepLoop() && sizeof($this->sessData->loopItemIDs[$loopName]) > 10) {
+                $ret .= '<div class="mTn10 mB20">' . $this->printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet) 
+                    . '</div>';
+            }
             foreach ($this->sessData->loopItemIDs[$loopName] as $setIndex => $loopItem) {
-                $tbl = $GLOBALS["DB"]->dataLoops[$loopName]->DataLoopTable;
+                $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
                 $ret .= $this->printSetLoopNavRow($nID, 
                     $this->sessData->getRowById($tbl, $loopItem), 
                     $setIndex
@@ -1120,25 +1186,29 @@ class SurvFormTree extends SurvUploadTree
             return runFormSub();
         });' . "\n";
         if (!$this->allNodes[$nID]->isStepLoop()) {
-            $ret .= '<button type="button" id="nFormAdd" class="btn btn-lg btn-default mT20 w100 '
-                . ((sizeof($this->sessData->loopItemIDs[$loopName]) 
-                    < $GLOBALS["DB"]->closestLoop["obj"]->DataLoopMaxLimit) ? 'disBlo' : 'disNon')
-                . '"><i class="fa fa-plus-circle"></i> Add '
-                . ((sizeof($this->sessData->loopItemIDs[$loopName]) == 0) 
-                    ? 'a'.((in_array($labelFirstLet, array('a', 'e', 'i', 'o', 'u'))) ? 'n' : '') 
-                        : 'another') . ' ' 
-                . strtolower($GLOBALS["DB"]->closestLoop["obj"]->DataLoopSingular) . '</button>' 
+            $ret .= $this->printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
                 . $limitTxt . '<div class="p20"></div>' . "\n";
             $this->pageAJAX .= view('vendor.survloop.formtree-looproot-ajax', [
                 "loopSize" => sizeof($this->sessData->loopItemIDs[$loopName])
             ])->render();
         }
         /* if (!$this->allNodes[$nID]->isStepLoop()) {
-            $this->nextBtnOverride = 'Done Adding ' . $GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural;
+            $this->nextBtnOverride = 'Done Adding ' . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural;
         } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == sizeof($this->sessData->loopItemIDsDone)) {
-            $this->nextBtnOverride = 'Done With ' . $GLOBALS["DB"]->closestLoop["obj"]->DataLoopPlural;
+            $this->nextBtnOverride = 'Done With ' . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural;
         } */
         return $ret;
+    }
+    
+    protected function printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
+    {
+        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-default mT20 w100 fPerc125 '
+            . (($GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit == 0 || 
+                sizeof($this->sessData->loopItemIDs[$loopName]) < $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit) 
+                ? 'disBlo' : 'disNon')
+            . '"><i class="fa fa-plus-circle"></i> Add ' . ((sizeof($this->sessData->loopItemIDs[$loopName]) == 0) 
+                ? 'a'.((in_array($labelFirstLet, array('a', 'e', 'i', 'o', 'u'))) ? 'n' : '') : 'another') . ' ' 
+            . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopSingular) . '</button>' ;
     }
     
     protected function printSetLoopNavRowCustom($nID, $loopItem, $setIndex)
@@ -1150,7 +1220,7 @@ class SurvFormTree extends SurvUploadTree
     {
         $ret = $this->printSetLoopNavRowCustom($nID, $loopItem, $setIndex);
         if ($ret != '') return $ret;
-        $itemLabel = $this->getLoopItemLabel($GLOBALS["DB"]->closestLoop["loop"], $loopItem, $setIndex);
+        $itemLabel = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], $loopItem, $setIndex);
         $ico = '';
         if ($this->allNodes[$nID]->isStepLoop()) {
             if ($this->sessData->loopItemsNextID > 0 && $this->sessData->loopItemsNextID == $loopItem->getKey()) {
@@ -1224,9 +1294,9 @@ class SurvFormTree extends SurvUploadTree
     
     protected function postFormTimeStr($nID)
     {
-        $hr = intVal($this->REQ->input('n' . $nID . 'fldHr'));
-        if ($this->REQ->input('n' . $nID . 'fldPM') == 'PM' && $hr < 12) $hr += 12;
-        $min = intVal($this->REQ->input('n' . $nID . 'fldMin'));
+        $hr = intVal($GLOBALS["SL"]->REQ->input('n' . $nID . 'fldHr'));
+        if ($GLOBALS["SL"]->REQ->input('n' . $nID . 'fldPM') == 'PM' && $hr < 12) $hr += 12;
+        $min = intVal($GLOBALS["SL"]->REQ->input('n' . $nID . 'fldMin'));
         return ((intVal($hr) < 10) ? '0' : '') . $hr . ':' . ((intVal($min) < 10) ? '0' : '') . $min . ':00';
     }
     
@@ -1258,13 +1328,35 @@ class SurvFormTree extends SurvUploadTree
     public function chkEmail()
     {
         $ret = '';
-        if ($this->REQ->has('email') && trim($this->REQ->email) != '') {
-            $chk = User::where('email', 'LIKE', $this->REQ->email)->get();
+        if ($GLOBALS["SL"]->REQ->has('email') && trim($GLOBALS["SL"]->REQ->email) != '') {
+            $chk = User::where('email', 'LIKE', $GLOBALS["SL"]->REQ->email)->get();
             if ($chk && sizeof($chk) > 0) {
                 $ret .= 'found';
             }
         }
         return $ret;
+    }
+    
+    public function limitWordCount($str, $wordLimit)
+    {
+        $ret = '';
+        $words = $this->mexplode(' ', $str);
+        if (sizeof($words) > 0) {
+            foreach ($words as $i => $w) {
+                if ($i < $wordLimit) $ret .= ' ' . $w;
+            }
+        }
+        return trim($ret);
+    }
+    
+    public function sortableStart($nID)
+    {
+        return '';
+    }
+    
+    public function sortableEnd($nID)
+    {
+        return '';
     }
     
 } // end of SurvFormTree class

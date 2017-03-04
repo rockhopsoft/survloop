@@ -117,9 +117,9 @@ class User extends Model implements AuthenticatableContract,
     {
         $this->loadRoles();
         $roleDef = SLDefinitions::select('DefID')
-            ->where('DefDatabase',     1)
-            ->where('DefSet',         'User Roles')
-            ->where('DefSubset',     $role)
+            ->where('DefDatabase', 1)
+            ->where('DefSet', 'User Roles')
+            ->where('DefSubset', $role)
             ->orderBy('DefOrder')
             ->first();
         $chk = SLUsersRoles::select('RoleUserID')

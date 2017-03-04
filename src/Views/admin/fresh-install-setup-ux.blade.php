@@ -27,10 +27,10 @@ But for now, <br />please focus on the data you want to collect when visitors la
         <span class="gry9 fPerc66">(eg. "SurvLoop Main")</span>
     </label></div>
     <div class="nFld"><input id="TreeNameID" name="TreeName" type="text" class="form-control"
-        @if ($isFresh && isset($GLOBALS["DB"]->sysOpts["site-name"])) 
-            value="{{ $GLOBALS["DB"]->sysOpts["site-name"] }} Main" 
-        @elseif (isset($GLOBALS["DB"]->dbRow->DbName)) 
-            value="{{ $GLOBALS["DB"]->dbRow->DbName }} Main" 
+        @if ($isFresh && isset($GLOBALS['SL']->sysOpts["site-name"])) 
+            value="{{ $GLOBALS['SL']->sysOpts["site-name"] }} Main" 
+        @elseif (isset($GLOBALS['SL']->dbRow->DbName)) 
+            value="{{ $GLOBALS['SL']->dbRow->DbName }} Main" 
         @endif ></div>
 </div>
 
