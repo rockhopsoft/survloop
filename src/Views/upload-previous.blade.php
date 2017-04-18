@@ -1,7 +1,7 @@
 <!-- Stored in resources/views/survloop/upload-previous.blade.php -->
 
 @if (!$uploads || sizeof($uploads) == 0) 
-    <h3><span class="gry9">Nothing uploaded here.</span></h3>
+    <h3><span class="slGrey">Nothing uploaded here.</span></h3>
 @else
     <h2 style="margin-top: 0px;"><i class="fa fa-cloud-upload"></i> Uploaded:</h2>
     @foreach ($uploads as $i => $upRow)
@@ -32,7 +32,7 @@
                         @else 
                             <div class="w100 disBlo BGblueLight vaM" style="height: {{ (2+$height) }}px;">
                                 <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
-                                    class="disBlo w100 taC vaM fPerc125 wht" style="height: {{ $height }}px;"
+                                    class="disBlo w100 taC vaM fPerc133 wht" style="height: {{ $height }}px;"
                                     ><div class="f60 wht"><i class="fa fa-file-pdf-o"></i></div>
                                     @if (strlen($upRow->upFile) > 40) <h4 class="wht">{{ $upRow->upFile }}</h4>
                                     @else <h3 class="wht">{{ $upRow->upFile }}</h3>
@@ -47,8 +47,8 @@
                     
                     <div id="up{{ $upRow->id }}Info" class="disBlo fL">
                         <h2>{{  $upRow->title }}</h2> 
-                        @if (trim($upRow->desc) != '') <div class="fPerc125">{{ $upRow->desc }}</div> @endif
-                        <div class="gry9 pT5">
+                        @if (trim($upRow->desc) != '') <div class="fPerc133">{{ $upRow->desc }}</div> @endif
+                        <div class="slGrey pT5">
                             @if ($upRow->privacy == 'Open') Public @else Private @endif
                             {{ $GLOBALS['SL']->getDefValById($upRow->type) }}
                         </div>
@@ -59,16 +59,16 @@
                         <input type="hidden" name="up{{ $upRow->id }}EditVisib" id="up{{ $upRow->id }}EditVisibID" 
                             value="0">
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditTitleID">Title:</label></div>
-                        <div class="nFld"><input type="text" class="form-control" name="up{{ $upRow->id }}EditTitle" 
+                        <div class="nFld"><input type="text" class="form-control input-lg" name="up{{ $upRow->id }}EditTitle" 
                             id="up{{ $upRow->id }}EditTitleID" value="{{ $upRow->title }}"></div>
                         <?php /* <div class="nodeGap"></div>
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditDescID">Description:</label></div>
-                        <div class="nFld"><input type="text" name="up{{ $upRow->id }}EditDesc" class="form-control" 
+                        <div class="nFld"><input type="text" name="up{{ $upRow->id }}EditDesc" class="form-control input-lg" 
                             id="up{{ $upRow->id }}EditDescID" value="{{ $upRow->desc }}"></div> */ ?>
                         <div class="nodeGap"></div>
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditTypeID">Type:</label></div>
                         <div class="nFld"><select name="up{{ $upRow->id }}EditType" id="up{{ $upRow->id }}EditTypeID" 
-                            class="form-control">
+                            class="form-control input-lg">
                                 @foreach ($uploadTypes as $i => $ty)
                                     <option value="{{ $ty->DefID }}" 
                                         @if ($ty->DefID == $upRow->type) SELECTED @endif 
@@ -78,7 +78,7 @@
                         <div class="nodeGap"></div>
                         <div class="nPrompt"><label for="up{{ $upRow->id }}EditPrivacyID">Privacy:</label></div>
                         <div class="nFld"><select name="up{{ $upRow->id }}EditPrivacy" 
-                            id="up{{ $upRow->id }}EditPrivacyID" class="form-control">
+                            id="up{{ $upRow->id }}EditPrivacyID" class="form-control input-lg">
                             <option value="Public" @if ($upRow->privacy == 'Public') SELECTED @endif 
                                 >Public: Visible to whole world</option>
                             <option value="Private" @if ($upRow->privacy != 'Public') SELECTED @endif 

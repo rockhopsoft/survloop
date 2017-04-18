@@ -11,7 +11,7 @@ A <span class="slBlueDark">User Experience</span> is like one survey, a simple s
 or an entire series of interactions which must be<br />customized for every special snowflake visitor.
 </p>
 <p>
-<span class="gry9 fPerc66">Some databases collect information from more than one person, at more than one time. 
+<span class="slGrey fPerc66">Some databases collect information from more than one person, at more than one time. 
 But for now, <br />please focus on the data you want to collect when visitors land on your main website.</span>
 </p>
 </center></div>
@@ -24,7 +24,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
 <div class="nodeWrap">
     <div class="nPrompt"><label for="nameID">
         <b><span class="slBlueDark">User Experience</span> Name</b>: 
-        <span class="gry9 fPerc66">(eg. "SurvLoop Main")</span>
+        <span class="slGrey fPerc66">(eg. "SurvLoop Main")</span>
     </label></div>
     <div class="nFld"><input id="TreeNameID" name="TreeName" type="text" class="form-control"
         @if ($isFresh && isset($GLOBALS['SL']->sysOpts["site-name"])) 
@@ -37,7 +37,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
 <div class="nodeGap"></div>
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="nameID"><b>Describe This Experience</b>: <span class="gry9 fPerc66">(eg. "Visitors can design their own database.")</span></label></div>
+    <div class="nPrompt"><label for="nameID"><b>Describe This Experience</b>: <span class="slGrey fPerc66">(eg. "Visitors can design their own database.")</span></label></div>
     <div class="nFld"><input id="TreeDescID" name="TreeDesc" type="text" class="form-control"></div>
 </div>
 
@@ -48,7 +48,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
     <b><span class="slBlueDark">Core Data Table</span> Name</b>:<br />
     Please create a table that will store the <b>core records</b> of your database. 
     These are the backbone which most other information will be related to. 
-    <div class="gry9 fPerc66">(eg. "Surveys", "Submissions", "Orders", "Signups", "Inquiries", "Complaints", 
+    <div class="slGrey fPerc66">(eg. "Surveys", "Submissions", "Orders", "Signups", "Inquiries", "Complaints", 
         "Audits", "Annual Compliance Reviews", "Studies", "Penguins", "Memes", "Imaginary Things")</div>
     </label></div>
     <div class="nFld"><input id="TreeTableID" name="TreeTable" type="text" class="form-control"></div>
@@ -56,7 +56,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
 
 <div class="nodeGap"></div>
 
-<center><input type="submit" class="btn btn-lg btn-primary mT20 f32" value="Create Experience"></center>
+<center><input type="submit" class="btn btn-xl btn-primary mT20" value="Create Experience"></center>
 
 <div class="nodeGap"></div>
 </form></div></center>

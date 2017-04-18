@@ -180,11 +180,13 @@ function chkFormFldDateLimit(nID, future, today, optional) {
 }
 
 function charLimit(nID, limit) {
-	if (document.getElementById('n'+nID+'FldID').value.length > limit) {
-		document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'FldID').value.substring(0, limit);
-	}
-	var charRemain = limit-document.getElementById('n'+nID+'FldID').value.length;
-	document.getElementById('charLimit'+nID+'Msg').innerHTML = limit+' Character Limit: '+charRemain+' Remaining';
+    if (document.getElementById('n'+nID+'FldID')) {
+        if (document.getElementById('n'+nID+'FldID').value.length > limit) {
+            document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'FldID').value.substring(0, limit);
+        }
+        var charRemain = limit-document.getElementById('n'+nID+'FldID').value.length;
+        document.getElementById('charLimit'+nID+'Msg').innerHTML = limit+' Character Limit: '+charRemain+' Remaining';
+    }
 	return true;
 }
 
@@ -350,6 +352,45 @@ function copyNodeResponse(fldID, dest) {
     return false;
 }
 
+var nodeTags = new Array();
+var nodeTagList = new Array();
+function addTagOpt(nID, tagID, tagText, preSel) {
+    if (!nodeTags[nID]) nodeTags[nID] = new Array();
+    if (!nodeTags[nID][tagID]) nodeTags[nID][tagID] = new Array(tagText, preSel);
+    if (!nodeTagList[nID]) nodeTagList[nID] = new Array();
+    nodeTagList[nID][nodeTagList[nID].length] = tagID;
+    return true;
+}
+function selectTag(nID, tagID) {
+    if (nodeTags[nID] && nodeTags[nID][tagID]) nodeTags[nID][tagID][1] = 1;
+    updateTagList(nID);
+    return true;
+}
+function deselectTag(nID, tagID) {
+    if (nodeTags[nID] && nodeTags[nID][tagID]) nodeTags[nID][tagID][1] = 0;
+    updateTagList(nID);
+    return false;
+}
+function printTag(nID, tagID, tagText) {
+    return '<a onClick="return deselectTag('+nID+', '+tagID+');" class="btn btn-primary" href="javascript:;">'+tagText+'<i class="fa fa-times" aria-hidden="true"></i></a> ';
+}
+function updateTagList(nID) {
+    var tagIDs = ',';
+    var tagHtml = '';
+    if (nodeTags[nID] && nodeTagList[nID]) {
+        for (var i=0; i<nodeTagList[nID].length; i++) {
+            var tagID = nodeTagList[nID][i];
+            if (nodeTags[nID][tagID] && nodeTags[nID][tagID][1] == 1 && tagIDs.indexOf(','+tagID+',') < 0) {
+                tagIDs += tagID+',';
+                tagHtml += printTag(nID, tagID, nodeTags[nID][tagID][0]);
+            }
+        }
+    }
+    if (document.getElementById('n'+nID+'tagIDsID')) document.getElementById('n'+nID+'tagIDsID').value=tagIDs;
+    if (document.getElementById('n'+nID+'tags')) document.getElementById('n'+nID+'tags').innerHTML=tagHtml;
+    return true;
+}
+
 // used by form generator child reveal responsiveness:
 var nodeKidList = new Array();
 var conditionNodes = new Array();
@@ -390,7 +431,6 @@ function ajaxSearchExpandResults() {
 
 
 
-
 function reqUploadTitle(nID) {
 	var labelID = parseInt('100'+nID+'');
 	/* if ((document.getElementById('up'+nID+'FileID').value != "" || document.getElementById('up'+nID+'VidID') != "")
@@ -417,7 +457,7 @@ setTimeout("checkAjaxLoad()", 100);
 
 $(function() {
 	
-	$(document).on("click", ".upTypeBtn", function() {
+    $(document).on("click", ".upTypeBtn", function() {
 		var nID = $(this).attr("name").replace("n", "").replace("fld", "");
 		if (document.getElementById("n"+nID+"fld0") && document.getElementById("n"+nID+"fld0").checked) { // (Video)
 			$("#up"+nID+"FormFile").slideUp("fast");
@@ -435,6 +475,9 @@ $(function() {
 	$(document).on("click", ".navDeskMaj", function() {
 		var majInd = $(this).attr("id").replace("maj", "");
 		$("#minorNav"+majInd+"").slideToggle("fast");
+	});
+	$(document).on("click", "#navBurger", function() {
+		$("#headBar").slideToggle("fast");
 	});
 	$(document).on("click", "#navMobBurger1", function() {
 		document.getElementById("navMobBurger1").style.display='none';
@@ -459,9 +502,74 @@ $(function() {
         }
         return true;
     });
+    
+    function runSearch(nID, treeID) {
+        var sURL = '/search?t='+treeID+'&s='+encodeURIComponent(document.getElementById('searchBar'+nID+'t'+treeID).value);
+        //alert(sURL);
+        window.location.replace(sURL);
+        return false;
+    }
+	$(document).on("click", ".searchBarBtn", function() {
+        var nID = $(this).attr("id").replace("searchTxt", "").split("t");
+        return runSearch(nID[0], nID[1]);
+	});
+	$(document).on("keyup", ".searchBar", function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            var nID = $(this).attr("id").replace("searchBar", "").split("t");
+            return runSearch(nID[0], nID[1]);
+        }
+    });
 	
 });
 
+var progressPerc = 0;
+var treeMajorSects = new Array();
+var treeMinorSects = new Array();
+var navLogin = new Array();
+function setNavItem(navTxt, navLink) {
+    navLogin[navLogin.length] = new Array(0, navTxt, navLink);
+    return true;
+}
+function printHeadBar(percIn) {
+    progressPerc = percIn;
+    if (document.getElementById('progWrap')) document.getElementById('progWrap').innerHTML = getProgBar();
+    if (document.getElementById('headBar')) document.getElementById('headBar').innerHTML = getTreeNav();
+    return true;
+}
+function getProgBar() {
+    return '<div class="progress progress-striped active"><div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="'+progressPerc+'" aria-valuemin="0" aria-valuemax="100" style="width:'+progressPerc+'%"><span class="sr-only">'+progressPerc+'% Complete</span></div></div>';
+}
+var layoutOpts = new Array(12, 12, 6, 4, 3, 2, 2);
+function getTreeNav() {
+    var ret = '<div id="slNavMain" class="row">';
+    var colWidth = layoutOpts[(treeMajorSects.length+1)];
+    var navSect = '';
+    for (var nav=0; nav<navLogin.length; nav++) navSect += printNav(navLogin[nav], -3);
+    ret += '<div class="col-md-' + colWidth + '">' + printNavBlock('Welcome', navSect) + '</div>';
+    for (var maj=0; maj<treeMajorSects.length; maj++) {
+        var majSect = '';
+        for (var min=0; min<treeMinorSects[maj].length; min++) majSect += printNav(treeMinorSects[maj][min], min);
+        var majTitle = treeMajorSects[maj][1];
+        if (treeMajorSects.length > 1) majTitle = (1+maj) + '. ' + majTitle;
+        ret += '<div class="col-md-' + colWidth + '">' + printNavBlock(majTitle, majSect) + '</div>';
+    }
+    return ret + '</div>';
+}
+function printNav(navRow, navInd) {
+    var ret = '<a class="list-group-item';
+    if (navRow[3] != 'none') ret += ' ' + navRow[3];
+    ret += '" href="';
+    if (navRow[3] == 'disabled') ret += 'javascript:;';
+    else ret += navRow[2];
+    ret += '">';
+    if (treeMajorSects.length == 1 && navInd >= 0) ret += (1+navInd) + '. ';
+    ret += navRow[1] + '</a>';
+    return ret;
+}
+function printNavBlock(blockTitle, blockBody) {
+    return '<div class="panel panel-info"><div class="panel-heading"><h3 class="panel-title">'+blockTitle+'</h3></div><div class="panel-body"><div class="list-group">'+blockBody+'</div></div></div>';
+}
 
 function hideRightSide() {
 	if (document.getElementById("mainBody")) document.getElementById("mainBody").className="col-md-10";

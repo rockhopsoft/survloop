@@ -1,6 +1,7 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -44,12 +45,21 @@ class SurvLoop extends Controller
         return $this->domainPath;
     }
     
-    protected function loadTreeByID($request, $treeID = -3)
+    protected function syncDataTrees(Request $request, $dbID, $treeID)
+    {
+        $this->dbID = $dbID;
+        $this->treeID = $treeID;
+        $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
+        $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $dbID, $treeID, $treeID);
+        return true;
+    }
+    
+    protected function loadTreeByID($request, $treeID = -3, $skipChk = false)
     {
         if (intVal($treeID) > 0) {
             $tree = SLTree::find($treeID);
             if ($tree && isset($tree->TreeOpts)) {
-                if ($tree->TreeOpts%3 > 0 
+                if ($skipChk || $tree->TreeOpts%3 > 0 
                     || (Auth::user() && Auth::user()->hasRole('administrator|staff|databaser|brancher|volunteer'))) {
                     $this->syncDataTrees($request, $tree->TreeDatabase, $treeID);
                     return true;
@@ -97,7 +107,7 @@ class SurvLoop extends Controller
         return false;
     }
     
-    public function loadLoop(Request $request)
+    public function loadLoop(Request $request, $skipSessLoad = false)
     {
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\SurvFormTree";
@@ -105,7 +115,8 @@ class SurvLoop extends Controller
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
             if (class_exists($custClass)) $class = $custClass;
         }
-        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ");");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " 
+            . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
         return true;
     }
     
@@ -166,7 +177,7 @@ class SurvLoop extends Controller
             ->get();
         if ($urlTrees && sizeof($urlTrees) > 0) {
             foreach ($urlTrees as $urlTree) {
-                if (isset($urlTree->TreeOpts) && $urlTree->TreeOpts%7 == 0) {
+                if (isset($urlTree->TreeOpts) && $urlTree->TreeOpts%7 == 0 && $urlTree->TreeOpts%3 > 0) {
                     $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
                     $this->loadLoop($request);
                     return $this->custLoop->index($request);
@@ -183,10 +194,10 @@ class SurvLoop extends Controller
         return $this->custLoop->testRun($request);
     }
     
-    public function ajaxChecks(Request $request)
+    public function ajaxChecks(Request $request, $type = '')
     {
         $this->loadLoop($request);
-        return $this->custLoop->ajaxChecks($request);
+        return $this->custLoop->ajaxChecks($request, $type);
     }
     
     public function sortLoop(Request $request)
@@ -243,7 +254,7 @@ class SurvLoop extends Controller
     
     
     
-    protected function loadLoopReport(Request $request)
+    protected function loadLoopReport(Request $request, $skipSessLoad = false)
     {
         $this->loadAbbr();
         $class = "SurvLoop\\Controllers\\SurvLoopReport";
@@ -251,7 +262,8 @@ class SurvLoop extends Controller
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "Report";
             if (class_exists($custClass)) $class = $custClass;
         }
-        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ");");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " 
+            . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
         return true;
     }
     
@@ -348,16 +360,28 @@ class SurvLoop extends Controller
         return $this->custLoop->dashboardDefault($request);
     }
     
+    public function userManagePost(Request $request)
+    {
+        $this->loadLoopAdmin($request);
+        return $this->custLoop->userManagePost($request);
+    }
+    
+    public function userManage(Request $request)
+    {
+        $this->loadLoopAdmin($request);
+        return $this->custLoop->userManage($request);
+    }
+    
     public function updateProfile(Request $request)
     {
         $this->loadLoopAdmin($request);
         return $this->custLoop->updateProfile($request);
     }
     
-    public function showProfile(Request $request)
+    public function adminProfile(Request $request)
     {
         $this->loadLoopAdmin($request);
-        return $this->custLoop->showProfile($request);
+        return $this->custLoop->adminProfile($request);
     }
     
     public function listSubsAll(Request $request)
@@ -372,6 +396,13 @@ class SurvLoop extends Controller
         return $this->custLoop->listSubsIncomplete($request);
     }
     
+    public function printSubView(Request $request, $treeID = 1, $cid = -3)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopAdmin($request);
+        return $this->custLoop->printSubView($request, $cid);
+    }
+    
     public function manageEmails(Request $request)
     {
         $this->loadLoopAdmin($request);
@@ -384,12 +415,54 @@ class SurvLoop extends Controller
         return $this->custLoop->manageEmailsForm($request, $emailID);
     }
     
-    protected function syncDataTrees(Request $request, $dbID, $treeID)
+    // SurvLoop Widgets
+    
+    public function ajaxMultiRecordCheck(Request $request, $treeID = 1)
     {
-        $this->dbID = $dbID;
-        $this->treeID = $treeID;
-        $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeID, $treeID);
-        return true;
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoop($request, true);
+        return $this->custLoop->multiRecordCheck(true);
     }
+    
+    public function ajaxRecordFulls(Request $request, $treeID = 1)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->printReports($request);
+    }
+    
+    public function ajaxRecordPreviews(Request $request, $treeID = 1)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->printReports($request, false);
+    }
+    
+    public function ajaxEmojiTag(Request $request, $treeID = 1, $recID = -3, $defID = -3)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->ajaxEmojiTag($request, $recID, $defID);
+    }
+    
+    public function searchBar(Request $request, $treeID = 1)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->searchBar();
+    }
+    
+    public function searchResults(Request $request, $treeID = 1, $ajax = 0)
+    {
+        $this->loadTreeByID($request, $treeID, true);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->searchResults($request, $ajax);
+    }
+    
+    public function searchResultsAjax(Request $request, $treeID = 1)
+    {
+        return $this->searchResults($request, $treeID, 1);
+    }
+    
     
 }

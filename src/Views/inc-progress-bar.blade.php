@@ -23,19 +23,15 @@
         @endforelse
         </ul>
     </div>
-    <div class="clearfix pT5 pL5 pR5 w100">
-        <div class="w100" style="border-bottom: 1px #428bca solid;"></div>
-    </div>
-    
     @forelse ($majorSections as $maj => $majSect)
         @if (sizeof($minorSections[$maj]) > 0)
-            <div id="minorNav{{ $maj }}" class="pT5 pB5 @if ($maj == $currMajorSection) disBlo @else disNon @endif ">
+            <div id="minorNav{{ $maj }}" class="pT10 disNon">
                 <div class="subNav">
                     <div class="row">
                         <div class="col-md-1 snLabel relDiv">
                             <div class=" @if ($maj == $currMajorSection) stepNum2active 
                                 @elseif (in_array($maj, $sessMajorsTouched)) stepNum2complete @else stepNum2 @endif 
-                                ">{{ (1+$maj) }}</div>
+                                ">{{ (1+$maj) }}:</div>
                         </div>
                         <div class="col-md-11">
                             <ul class="nav nav-pills nav-justified nav-wizard">
@@ -73,8 +69,6 @@
         @endif
     @empty
     @endforelse
-
-    <div class="p10"></div>
     
 </div> <!-- end of desktop navigation -->
 

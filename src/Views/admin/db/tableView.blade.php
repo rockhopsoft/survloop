@@ -1,17 +1,12 @@
 <!-- resources/views/vendor/survloop/admin/db/tableView.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
-<h1 class="fL"><i class="fa fa-database"></i> Table: {{ $tbl->TblEng }}</h1>
-<div class="fR taR pT20 f20 gry6">
-    <b>{{ $tbl->TblName }}</b> 
-    ({{ $tbl->TblAbbr }}) 
-    <div class="gry6"><i>{{ $tbl->TblType }}</i></div>
-</div>
+<h3><i class="fa fa-database"></i> Table: {{ $tbl->TblEng }}</h3>
+<h4 class="pull-right">{{ $tbl->TblName }} ({{ $tbl->TblAbbr }}) {{ $tbl->TblType }}</h4>
 <div class="fC"></div>
-
 
 @if (!$isPrint)
     <a href="/admin/db?print=1" target="_blank" class="btn btn-xs btn-default mR10"
@@ -28,15 +23,14 @@
 
 <div class="clearfix p5"></div>
 
-<div class="pB10 f14">{!! $tbl->TblDesc !!}</div>
+<div class="pB10">{!! $tbl->TblDesc !!}</div>
 @if (trim($tbl->TblNotes) != '')
-    <div class="pB10 f14 gry6"><i>Notes: {!! $tbl->TblNotes !!}</i></div>
+    <div class="pB10"><i>Notes: {!! $tbl->TblNotes !!}</i></div>
 @endif
 @if ($rules && sizeof($rules) > 0)
     @foreach ($rules as $rule)
         <div class="pB10">
-            <a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" 
-                target="_blank" class="gry6 f12"><i class="fa fa-university"></i> 
+            <a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" target="_blank"><i class="fa fa-university"></i> 
                 <i>{!! $rule->RuleStatement !!}</i></a>
         </div>
     @endforeach

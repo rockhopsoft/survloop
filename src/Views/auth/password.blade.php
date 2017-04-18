@@ -26,7 +26,7 @@ $v = $surv->custLoop->v;
 <div class="nodeWrap">
     <div class="nPrompt"><label for="emailID">Email:</label></div>
     <div class="nFld">
-        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control fingerTxt">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control input-lg">
     </div>
 </div>
 

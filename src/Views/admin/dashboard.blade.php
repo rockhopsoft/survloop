@@ -1,20 +1,14 @@
 <!-- Stored in resources/views/survloop/admin/dashboard.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
 <div class="row">
     <div class="col-md-6">
-        <h1 class="page-header">Dashboard</h1>
-        <i>Overview of recent activity and statistics coming soon!</i>
-        <br /><br />
-        <div class="f18 mB20">For now, the most interesting things in this admin area are...</div>
-        <ul>
-        <li class="mB20"><a href="/dashboard/subs" class="f22">New Submissions</a></li>
-        <li class="mB20"><a href="/dashboard/tree/map?all=1" class="f22">Map of Entire Complaint Submission Process</a></li>
-        <li class="mB20"><a href="/dashboard/db/all" class="f22">Entire Database Design</a></li>
-        </ul>
+        <h1 class="mB0 slBlueDark">Dashboard</h1>
+        <hr class="mBn10">
+        @if (isset($dashpage) && trim($dashpage) != '') {!! $dashpage !!} @endif
     </div>
     <div class="col-md-6">
         <div class="jumbotron taC">

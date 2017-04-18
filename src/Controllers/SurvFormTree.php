@@ -13,32 +13,32 @@ use App\Models\SLNodeResponses;
 class SurvFormTree extends SurvUploadTree
 {
     
-    public $classExtension   = 'SurvFormTree';
+    public $classExtension      = 'SurvFormTree';
 
-    public $nodeTypes        = [ 
+    public $nodeTypes           = [ 
         'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number', 'Email', 'Password', 
         'Date', 'Date Picker', 'Date Time', 'Time', 'Gender', 'Gender Not Sure', 'Feet Inches', 
-        'U.S. States', 'Hidden Field', 'Big Button', 'User Sign Up',
+        'U.S. States', 'Countries', 'Hidden Field', 'Big Button', 'User Sign Up',
         'Spambot Honey Pot', 'Uploads', 'Other/Custom' 
     ];
     
-    public $nodeSpecialTypes = [
+    public $nodeSpecialTypes    = [
         'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 'Loop Cycle', 'Loop Sort', 
-        'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap'
+        'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap',
+        'Search', 'Search Results', 'Search Featured', 
+        'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons',
+        'Layout Row', 'Layout Column'
     ];
     
-    protected $pageJSnode    = '';
-    protected $pageJSextra   = '';
-    protected $pageJSvalid   = '';
-    protected $pageAJAX      = '';
-    protected $pageHasUpload = [];
-    protected $pageHasReqs   = '';
-    protected $pageFldList   = [];
-    protected $page1stVisib  = '';
-    protected $newLoopItem   = -3;
-    protected $currLoopCycle = ['', '', -3];
+    protected $pageJSnode       = '';
+    protected $pageHasUpload    = [];
+    protected $pageHasReqs      = '';
+    protected $pageFldList      = [];
+    protected $page1stVisib     = '';
+    protected $newLoopItem      = -3;
+    protected $currLoopCycle    = ['', '', -3];
     
-    protected $nextBtnOverride = '';
+    protected $nextBtnOverride  = '';
     protected $loopItemsCustBtn = '';
     
     protected function getNodeCurrSessData($nID)
@@ -95,8 +95,9 @@ class SurvFormTree extends SurvUploadTree
                     . '" class="fR btn btn-lg btn-primary nFormNext" id="nFormNext">';
             }
         }
-        if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID) {
-            $ret .= '<input type="button" value="Back" class="fL btn btn-lg btn-default" id="nFormBack">';
+        if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID
+            && ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0)) {
+            $ret .= '<input type="button" value="Back" class="fL nFormBack btn btn-lg btn-default" id="nFormBack">';
         }
         $ret .= '<div class="clearfix p5"></div></div>';
         return $ret; 
@@ -104,37 +105,46 @@ class SurvFormTree extends SurvUploadTree
     
     protected function printNodePublicFormStart($nID)
     {
-        return view('vendor.survloop.formtree-form-start', [
-            "nID"             => $nID, 
-            "nSlug"           => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
-            "pageHasUpload"   => $this->pageHasUpload, 
-            "nodePrintJumpTo" => $this->nodePrintJumpTo($nID), 
-            "zoomPref"        => ((isset($this->sessInfo->SessZoomPref)) ? intVal($this->sessInfo->SessZoomPref) : 0), 
-            "hasRegisterNode" => (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"])
-        ])->render();
+        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
+            return view('vendor.survloop.formtree-form-start', [
+                "nID"             => $nID, 
+                "nSlug"           => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
+                "pageHasUpload"   => $this->pageHasUpload, 
+                "nodePrintJumpTo" => $this->nodePrintJumpTo($nID), 
+                "zoomPref"        => ((isset($this->sessInfo->SessZoomPref)) ? intVal($this->sessInfo->SessZoomPref) : 0), 
+                "hasRegisterNode" => (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"])
+            ])->render();
+        }
+        return '';
     }
     
     protected function printNodePublicFormEnd($nID, $promptNotesSpecial = '')
     {
-        $loopRootJustLeft = -3;
-        if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
-            $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
-            $this->sessInfo->SessLoopRootJustLeft = -3;
-            $this->sessInfo->save();
+        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
+            $loopRootJustLeft = -3;
+            if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
+                $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
+                $this->sessInfo->SessLoopRootJustLeft = -3;
+                $this->sessInfo->save();
+            }
+            $spinner = json_encode($this->loadCustView('inc-spinner'));
+            $spinner = substr($spinner, 1, strlen($spinner)-2);
+            return view('vendor.survloop.formtree-form-end', [
+                "nID"              => $nID, 
+                "isLoopRoot"       => $this->allNodes[$nID]->isLoopRoot(), 
+                "pageURL"          => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
+                "pageHasUpload"    => $this->pageHasUpload, 
+                "pageFldList"      => $this->pageFldList, 
+                "pageJSextra"      => $this->pageJSextra, 
+                "pageJSvalid"      => $this->pageJSvalid, 
+                "pageAJAX"         => $this->pageAJAX, 
+                "loopRootJustLeft" => $loopRootJustLeft, 
+                "hasFixedHeader"   => $this->v["hasFixedHeader"], 
+                "hasRegisterNode"  => (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"]),
+                "spinner"          => $spinner
+            ])->render();
         }
-        return view('vendor.survloop.formtree-form-end', [
-            "nID"              => $nID, 
-            "isLoopRoot"       => $this->allNodes[$nID]->isLoopRoot(), 
-            "pageURL"          => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
-            "pageHasUpload"    => $this->pageHasUpload, 
-            "pageFldList"      => $this->pageFldList, 
-            "pageJSextra"      => $this->pageJSextra, 
-            "pageJSvalid"      => $this->pageJSvalid, 
-            "pageAJAX"         => $this->pageAJAX, 
-            "loopRootJustLeft" => $loopRootJustLeft, 
-            "hasFixedHeader"   => $this->v["hasFixedHeader"], 
-            "hasRegisterNode"  => (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"])
-        ])->render();
+        return '';
     }
     
     private $pageNodes = array();
@@ -142,6 +152,7 @@ class SurvFormTree extends SurvUploadTree
     
     protected function getPrintableNodeList($nID = -3, $tmpSubTier = array())
     {
+        if (!isset($this->allNodes[$nID])) return false;
         if (sizeof($tmpSubTier) == 0) $tmpSubTier = $this->loadNodeSubTier($nID);
         $this->pageNodes[] = $this->allNodes[$nID];
         if (sizeof($tmpSubTier[1]) > 0) {
@@ -170,6 +181,9 @@ class SurvFormTree extends SurvUploadTree
     {
         if (trim($str) == '') return '';
         $str = $this->customLabels($nID, $str);
+        $str = $GLOBALS["SL"]->swapBlurbs($str);
+        $str = str_replace('[[nID]]', $nID, $str);
+        $str = str_replace('[[coreID]]', $this->coreID, $str);
         $str = str_replace('[[DOMAIN]]', $GLOBALS["SL"]->sysOpts["app-url"], $str);
         if ($itemID > 0 && $itemInd >= 0) {
             if (strpos($str, '[LoopItemLabel]') !== false) {
@@ -193,7 +207,7 @@ class SurvFormTree extends SurvUploadTree
             }
         }
         if (strpos($str, '[[PreviewPrivate]]') !== false || strpos($str, '[[PreviewPublic]]') !== false) {
-            list($previewPublic, $previewPrivate) = $this->previewReportPubPri();
+            list($previewPublic, $previewPrivate) = $this->previewReportPubPri(true);
             $str = trim(str_replace('[[PreviewPublic]]', $previewPublic, 
                 str_replace('[[PreviewPrivate]]', $previewPrivate, $str)));
         }
@@ -271,6 +285,9 @@ class SurvFormTree extends SurvUploadTree
             $currNodeSessData = $this->sessData->currSessData($nID, $tbl, $fld, 'get', '', $hasParentDataManip);
         }
         if ($itemID <= 0) $currNodeSessData = ''; // override false profit ;-P
+        if ($currNodeSessData == '' && trim($curr->nodeRow->NodeDefault) != '') {
+            $currNodeSessData = $curr->nodeRow->NodeDefault;
+        }
         
         // print the button, and form initialization which only happens once per page
         if ($curr->isPage() || $curr->isLoopRoot()) {
@@ -286,6 +303,15 @@ class SurvFormTree extends SurvUploadTree
         
         $showKidsResponded = true;
         if (sizeof($tmpSubTier[1]) > 0) {
+            if ($curr->nodeType == 'Countries') {
+                $nxtNode = $this->nextNode($nID);
+                if ($nxtNode > 0 && isset($this->allNodes[$nxtNode])) {
+                    if ($this->allNodes[$nxtNode]->nodeType == 'U.S. States') {
+                        $curr->hasShowKids = true;
+                        $curr->responses = $GLOBALS["SL"]->states->getCountryResponses($nID, ['United States']);
+                    }
+                }
+            }
             if ($curr->hasShowKids && sizeof($curr->responses) > 0) { // then displaying children on page is conditional
                 $showKidsResponded = false;
                 if ($currNodeSessData != '') {
@@ -304,6 +330,16 @@ class SurvFormTree extends SurvUploadTree
         } else {
             $this->pageAJAX .= 'nodeKidList[' . $nID . '] = new Array();' . "\n";
         }
+        if (sizeof($curr->responses) == 3 && $curr->responses[1]->NodeResValue == '...') {
+            $start = intVal($curr->responses[0]->NodeResValue);
+            $finish = intVal($curr->responses[2]->NodeResValue);
+            $curr->responses = [];
+            if ($start < $finish) {
+                for ($i=$start; $i<=$finish; $i++) $curr->responses[] = $curr->genTmpNodeRes($i);
+            } else {
+                for ($i=$start; $i>=$finish; $i--) $curr->responses[] = $curr->genTmpNodeRes($i);
+            }
+        }
         
         $nIDtxt = trim($nID . trim($this->currLoopCycle[1]));
         $visibilityField = '<input type="hidden" name="n' . $nIDtxt . 'Visible" id="n' . $nIDtxt . 'VisibleID" value="'
@@ -319,7 +355,7 @@ class SurvFormTree extends SurvUploadTree
             } elseif (in_array($curr->nodeType, ['Feet Inches'])) {
                 $this->page1stVisib = 'n' . $nID . 'fldFeetID';
             } elseif (in_array($curr->nodeType, ['Drop Down', 'Text', 'Long Text', 'Text:Number', 
-                'Email', 'Password', 'U.S. States'])) {
+                'Email', 'Password', 'U.S. States', 'Countries'])) {
                 $this->page1stVisib = 'n' . $nID . 'FldID';
             }
         }
@@ -333,7 +369,7 @@ class SurvFormTree extends SurvUploadTree
         
         // check for extra custom HTML/JS/CSS code stored with the node; check for standardized techniques
         $onKeyUp = ' checkNodeUp(\'' . $nIDtxt . '\', -1, 0); ';
-        if (trim($curr->nodeRow->NodePromptAfter) != '') {
+        if (trim($curr->nodeRow->NodePromptAfter) != '' && !$curr->isWidget()) {
             if (stripos($curr->nodeRow->NodePromptAfter, '/'.'* formAJAX *'.'/') !== false) {
                 $this->pageAJAX .= $curr->nodeRow->NodePromptAfter;
             } else {
@@ -375,8 +411,7 @@ class SurvFormTree extends SurvUploadTree
         $nodePromptText  = $this->swapLabels($nID, $curr->nodeRow->NodePromptText, $itemID, $itemInd);
         $nodePromptNotes = $this->swapLabels($nID, $curr->nodeRow->NodePromptNotes, $itemID, $itemInd);
         if (trim($nodePromptNotes) != '' && !$curr->isLoopRoot()) {
-            $nodePromptText .= '<div class="nodeSidenote" id="nLabel' . $nIDtxt . 'notes">' 
-                . $nodePromptNotes . '</div>' . "\n";
+            $nodePromptText .= '<h5 id="nLabel' . $nIDtxt . 'notes">' . $nodePromptNotes . '</h5>' . "\n";
         }
         if ($curr->isRequired() && $curr->nodeType != 'Hidden Field') {
             $nodePromptText = $this->addPromptTextRequired($curr, $nodePromptText);
@@ -392,472 +427,575 @@ class SurvFormTree extends SurvUploadTree
                 . $nodePromptText . '</label></div>' . "\n";
         }
         
-        if ($curr->isPage()) $ret .= '<div class="pageTopGap"></div>';
+        if ($curr->nodeType == 'Layout Column') {
+            $ret .= '<div class="col-md-' . $curr->nodeRow->NodeCharLimit . '">';
+        }
+        
+        if ($curr->isPage() || $curr->isLoopRoot()) $ret .= '<div class="pageTopGap"></div>';
         
         $ret .= '<div class="fC"></div><div class="nodeAnchor"><a name="n' . $nIDtxt 
             . '"></a></div><div id="node' . $nIDtxt . '" class="nodeWrap'
             . (($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
                 && ($curr->isInstruct() || $curr->isInstructRaw())) ? ' w100' : '') . '">' . "\n";
         
-        // check for if we're at the root of a Loop Root, we've got special handling
-        if ($curr->isLoopRoot()) {
+        // write the start of the main node wrapper
+        if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '<div class="jumbotron">';
             
-            $ret .= $nodePrompt . $this->printSetLoopNav($nID, $curr->dataBranch);
+        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' && !$curr->isPage() 
+            && !$curr->isLoopRoot() && !$curr->isLoopCycle() && !$curr->isDataManip()) {
+            $ret .= '<div class="nodeHalfGap"></div>';
+        }
+        
+        
+        if (!$curr->isLayout() && !$curr->isBranch()) {
+            
+            // check for if we're at the root of a Loop Root, we've got special handling
+            if ($curr->isLoopRoot()) {
                 
-        } elseif ($curr->isLoopCycle()) {
-            
-            list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
-            $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
-            $loopCycle = $this->sessData->getLoopRows($loop);
-            if (sizeof($tmpSubTier[1]) > 0 && $loopCycle && sizeof($loopCycle) > 0) {
-                $this->currLoopCycle[0] = $GLOBALS["SL"]->getLoopTable($loop);
-                foreach ($loopCycle as $i => $loopItem) {
-                    $this->currLoopCycle[1] = 'cyc' . $i;
-                    $this->currLoopCycle[2] = $loopItem->getKey();
-                    $this->sessData->startTmpDataBranch($tbl, $loopItem->getKey());
-                    $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
-                    foreach ($tmpSubTier[1] as $childNode) {
-                        if (!$this->allNodes[$childNode[0]]->isPage()) {
-                            $ret .= $this->printNodePublic($childNode[0], $childNode, $currVisib);
-                        }
-                    }
-                    $GLOBALS["SL"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
-                    $this->sessData->endTmpDataBranch($tbl);
-                    $this->currLoopCycle[1] = '';
-                    $this->currLoopCycle[2] = -3;
-                }
-                $this->currLoopCycle[0] = '';
-            }
-            
-        } elseif ($curr->isLoopSort()) {
-            
-            $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
-            $loopCycle = $this->sessData->getLoopRows($loop);
-            if ($loopCycle && sizeof($loopCycle) > 0) {
-                $this->pageAJAX .= '$("#sortable").sortable({ axis: "y", update: function (event, ui) {
-                    var url = "/sortLoop/?n=' . $nID . '&"+$(this).sortable("serialize")+"";
-                    document.getElementById("hidFrameID").src=url;
-                } }); $("#sortable").disableSelection();';
-                $ret .= '<div class="nFld">' . $this->sortableStart($nID) . '<ul id="sortable">' . "\n";
-                foreach ($loopCycle as $i => $loopItem) {
-                    $ret .= '<li id="item-' . $loopItem->getKey() . '" class="sortOff" onMouseOver="'
-                        . 'this.className=\'sortOn\';" onMouseOut="this.className=\'sortOff\';">'
-                        . '<span><i class="fa fa-sort slBlueLight"></i></span> ' 
-                        . $this->getLoopItemLabel($loop, $loopItem, $i) . '</li>' . "\n";
-                }
-                $ret .= '</ul>' . $this->sortableEnd($nID) . '</div>' . "\n";
-            }
-            
-        } elseif ($curr->isDataManip()) {
-            
-            $ret .= '<input type="hidden" name="dataManip' . $nIDtxt . '" value="1">';
-            
-        } elseif (!$curr->isPage()) { // otherwise, the main Node printer...
-            
-            // Start normal data field checks
-            $dateStr = $timeStr = '';
-            if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID') 
-                && trim($currNodeSessData) != '' && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])) {
-                // convert current session data for dates and times
-                if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATETIME') {
-                    list($dateStr, $timeStr) = explode(' ', $currNodeSessData);
-                    $dateStr = $this->cleanDateVal($dateStr);
-                    if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
-                } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATE') {
-                    $dateStr = $this->cleanDateVal($currNodeSessData);
-                    if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
-                }
-                if ($dateStr == '12/31/1969') $dateStr = '';
-            } // end normal data field checks
-            
-            $mobileCheckbox = ($curr->nodeRow->NodeOpts%2 > 0);
-            
-            // check if this field's label and field is to be printed on the same line
-            $isOneLiner = $isOneLinerFld = '';
-            if ($curr->isOneLiner()) $isOneLiner = ' disIn mR20';
-            elseif ($curr->isOneLiner() || $curr->isOneLineResponses()) $isOneLinerFld = ' disIn mR20';
-            if (trim($isOneLiner) != '') {
-                $nodePrompt = str_replace('class="nPrompt"', 'class="nPrompt' . $isOneLiner . '"', $nodePrompt);
-            }
-            
-            // write the start of the main node wrapper
-            if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '<div class="jumbotron">';
-            
-            if (!in_array($curr->nodeType, ['Radio', 'Checkbox', 'Instructions', 'Other/Custom'])) {
-                $this->pageFldList[] = 'n' . $nID . 'FldID';
-            }
-            
-            // print out each of the various field types
-            if ($curr->nodeType == 'Hidden Field') {
-                
-                $ret .= $nodePrompt . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
-                    . 'FldID" value="' . $currNodeSessData . '">' . "\n"; 
+                $ret .= $nodePrompt . $this->printSetLoopNav($nID, $curr->dataBranch);
                     
-            } elseif ($curr->nodeType == 'Big Button') {
+            } elseif ($curr->isLoopCycle()) {
                 
-                $btn = '<div class="nFld"><a id="nBtn' . $nIDtxt . '" class="btn btn-lg btn-' 
-                    . (($curr->nodeRow->NodeOpts%47 == 0) ? 'default' : 'primary') . ' nFldBtn' 
-                    . (($curr->nodeRow->NodeOpts%43 == 0) ? '' : ' nFormNext') . '" ' 
-                    . ((trim($curr->nodeRow->NodeDataStore) != '')
-                        ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '')
-                    . ' >' . $curr->nodeRow->NodeDefault . '</a></div>' . "\n";
-                $lastDivPos = strrpos($nodePrompt, "</div>\n            </label></div>");
-                if (strpos($nodePrompt, 'jumbotron') > 0 && $lastDivPos > 0) {
-                    $ret .= substr($nodePrompt, 0, $lastDivPos) 
-                        . '<center>' . $btn . '</center>' 
-                        . substr($nodePrompt, $lastDivPos) 
-                        . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
-                        . 'FldID" value="' . $currNodeSessData . '">' . "\n"; 
-                } else {
-                    $ret .= $nodePrompt . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
-                        . 'FldID" value="' . $currNodeSessData . '">' . $btn . "\n"; 
-                }
-                if ($curr->nodeRow->NodeOpts%43 == 0) {
-                    $curr->hasShowKids = true;
-                    $showKidsResponded = false;
-                    $this->pageAJAX .= '$(document).on("click", "#nBtn' . $nIDtxt . '", function() { '
-                        . 'if (document.getElementById("node' . $nIDtxt . 'kids")) { '
-                            . 'if (document.getElementById("node' . $nIDtxt . 'kids").style.display=="none") { '
-                                . '$("#node' . $nIDtxt . 'kids").slideDown("50"); '
-                                . 'kidsVisible("' . $nIDtxt . '", true, true); '
-                            . '} else { '
-                                . '$("#node' . $nIDtxt . 'kids").slideUp("50"); '
-                                . 'kidsVisible("' . $nIDtxt . '", false, true); '
-                            . '} '
-                        . '} });' . "\n";
-                }
-                
-            } elseif ($curr->nodeType == 'User Sign Up') {
-                
-                $this->v["hasRegisterNode"] = true;
-                $this->pageJSvalid .= view('vendor.survloop.auth.register-node-jsValid')->render();
-                $ret .= view('vendor.survloop.auth.register-node', [
-                    "coreID"         => $this->coreID, 
-                    "anonyLogin"     => $this->isAnonyLogin(), 
-                    "anonyPass"      => uniqid(),
-                    "currAdmPage"    => '', 
-                    "user"           => Auth::user(),
-                    "inputMobileCls" => $this->inputMobileCls($nID)
-                ])->render();
-                
-            } elseif (in_array($curr->nodeType, array('Text', 'Email', 'Text:Number', 'Spambot Honey Pot'))) {
-                
-                $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input class="form-control' 
-                    . $this->inputMobileCls($nID) . '" type="' . (($curr->nodeType == 'Email') ? 'email' 
-                        : (($curr->nodeType == 'Text:Number') ? 'number' : 'text'))
-                    . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
-                    . '" ' . $onKeyUp . ' ></div>' . $charLimit . "\n"; 
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt . "VisibleID').value == 1) " 
-                        . (($curr->nodeType == 'Email') ? "reqFormFldEmail('" . $nIDtxt . "');\n" 
-                            : "reqFormFld('" . $nIDtxt . "');\n");
-                }
-                if ($curr->nodeType == 'Spambot Honey Pot') {
-                    $this->pageJSextra .= "\n" . 'nFldHP("' . $nIDtxt . '");';
-                }
-                if (trim($curr->nodeRow->NodeTextSuggest) != '') {
-                    $this->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).autocomplete({ source: [';
-                    foreach ($GLOBALS["SL"]->getDefSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
-                        $this->pageAJAX .= (($i > 0) ? ',' : '') . ' "' . $def->DefValue . '"';
-                    }
-                    $this->pageAJAX .= ' ] });' . "\n";
-                }
-                if ($curr->nodeRow->NodeOpts%41 == 0) { // copy input to extra div
-                    $this->pageJSextra .= "\n" . 'setTimeout("copyNodeResponse(\'n' . $nIDtxt . 'FldID\', \'nodeEcho' 
-                        . $nIDtxt . '\')", 50);';
-                    $this->pageAJAX .= '$("#n' . $nIDtxt . 'FldID").keyup(function() { copyNodeResponse(\'n' 
-                        . $nIDtxt . 'FldID\', \'nodeEcho' . $nIDtxt . '\'); });' . "\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Long Text') {
-                
-                $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">
-                    <textarea class="form-control' . $this->inputMobileCls($nID) . '" name="n' . $nIDtxt 
-                    . 'fld" id="n' . $nIDtxt . 'FldID" ' . $onKeyUp . ' >' . $currNodeSessData 
-                    . '</textarea></div>' . $charLimit . "\n";
-                if ($curr->nodeRow->NodeOpts%31 == 0) {
-                    $ret .= '<div class="fR gry9 p0 m0">
-                        <i>word count: <div id="wordCnt' . $nID . '" class="disIn"></div></i>
-                    </div><div class="fC"></div>';
-                }
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Password') {
-                
-                $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input type="password" name="n' 
-                    . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="" ' . $onKeyUp 
-                    . ' autocomplete="off" class="form-control' . $this->inputMobileCls($nID) 
-                    . '" ></div>' . $charLimit . "\n"; 
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Drop Down' || $curr->nodeType == 'U.S. States') {
-                
-                $curr = $this->checkResponses($curr, $fldForeignTbl);
-                if (sizeof($curr->responses) > 0 || $curr->nodeType == 'U.S. States') {
-                    $ret .= $nodePrompt . "\n" . '<div class="nFld' . $isOneLinerFld . '">
-                        <select name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" class="form-control' 
-                        . $this->inputMobileCls($nID) . (($isOneLinerFld != '') ? ' w33' : '') 
-                        . '" onChange="checkNodeUp(\'' . $nIDtxt . '\', -1, 0);" >
-                        <option value="" ' . ((trim($currNodeSessData) == '') ? 'SELECTED' : '') . ' ></option>' . "\n"; 
-                    if ($curr->hasShowKids) {
-                        $this->pageAJAX .= '$("#n' . $nIDtxt 
-                            . 'FldID").click(function(){ var foundKidResponse = false;' . "\n";
-                    }
-                    if ($curr->nodeType == 'U.S. States') {
-                        $ret .= $GLOBALS["SL"]->states->stateDrop($currNodeSessData);
-                    }
-                    else { 
-                        foreach ($curr->responses as $j => $res) {
-                            $select = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr->nodeType);
-                            $ret .= '<option value="' . $res->NodeResValue . '" ' . (($select) ? 'SELECTED' : '') 
-                                . ' >' . $res->NodeResEng . '</option>' . "\n"; 
-                            if ($curr->hasShowKids && intVal($res->NodeResShowKids) == 1) {
-                                $this->pageAJAX .= 'if (document.getElementById("n' . $nIDtxt . 'fld' . $j 
-                                    . '").value == "' . $res->NodeResValue . '") foundKidResponse = true;' . "\n";
+                list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
+                $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+                $loopCycle = $this->sessData->getLoopRows($loop);
+                if (sizeof($tmpSubTier[1]) > 0 && $loopCycle && sizeof($loopCycle) > 0) {
+                    $this->currLoopCycle[0] = $GLOBALS["SL"]->getLoopTable($loop);
+                    foreach ($loopCycle as $i => $loopItem) {
+                        $this->currLoopCycle[1] = 'cyc' . $i;
+                        $this->currLoopCycle[2] = $loopItem->getKey();
+                        $this->sessData->startTmpDataBranch($tbl, $loopItem->getKey());
+                        $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
+                        foreach ($tmpSubTier[1] as $childNode) {
+                            if (!$this->allNodes[$childNode[0]]->isPage()) {
+                                $ret .= $this->printNodePublic($childNode[0], $childNode, $currVisib);
                             }
                         }
+                        $GLOBALS["SL"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
+                        $this->sessData->endTmpDataBranch($tbl);
+                        $this->currLoopCycle[1] = '';
+                        $this->currLoopCycle[2] = -3;
                     }
-                    if ($curr->hasShowKids) {
-                        $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
-                            . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } else { $("#node' 
-                            . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' . $nIDtxt 
-                            . '", false, true); }' . "\n" . ' }); ' . "\n";
+                    $this->currLoopCycle[0] = '';
+                }
+                
+            } elseif ($curr->isLoopSort()) {
+                
+                $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+                $loopCycle = $this->sessData->getLoopRows($loop);
+                if ($loopCycle && sizeof($loopCycle) > 0) {
+                    $this->v["needsJqUi"] = true;
+                    $this->pageAJAX .= '$("#sortable").sortable({ axis: "y", update: function (event, ui) {
+                        var url = "/sortLoop/?n=' . $nID . '&"+$(this).sortable("serialize")+"";
+                        document.getElementById("hidFrameID").src=url;
+                    } }); $("#sortable").disableSelection();';
+                    $ret .= '<div class="nFld">' . $this->sortableStart($nID) . '<ul id="sortable">' . "\n";
+                    foreach ($loopCycle as $i => $loopItem) {
+                        $ret .= '<li id="item-' . $loopItem->getKey() . '" class="sortOff" onMouseOver="'
+                            . 'this.className=\'sortOn\';" onMouseOut="this.className=\'sortOff\';">'
+                            . '<span><i class="fa fa-sort slBlueLight"></i></span> ' 
+                            . $this->getLoopItemLabel($loop, $loopItem, $i) . '</li>' . "\n";
+                    }
+                    $ret .= '</ul>' . $this->sortableEnd($nID) . '</div>' . "\n";
+                }
+                
+            } elseif ($curr->isDataManip()) {
+                
+                $ret .= '<input type="hidden" name="dataManip' . $nIDtxt . '" value="1">';
+                
+                
+            } elseif ($curr->nodeType == 'Back Next Buttons') {
+                
+                    $ret .= view('vendor.survloop.inc-extra-back-next-buttons', [])->render();
+                
+            } elseif (in_array($curr->nodeType, ['Search', 'Search Results', 'Search Featured', 
+                'Records Full', 'Record Previews', 'Incomplete Sess Check'])) {
+            
+                if (intVal($curr->nodeRow->NodeResponseSet) > 0) {
+                    $widgetTreeID = $curr->nodeRow->NodeResponseSet;
+                    $widgetLimit  = intVal($curr->nodeRow->NodeCharLimit);
+                    if ($curr->nodeType == 'Search') {
+                        $ret .= $this->printSearchBar('', $widgetTreeID, 
+                            trim($curr->nodeRow->NodePromptText), trim($curr->nodeRow->NodePromptAfter), $nID, 0);
+                    } else {
+                        $loadURL = 'records-full/' . $widgetTreeID;
+                        $search = (($GLOBALS["SL"]->REQ->has('s')) ? $GLOBALS["SL"]->REQ->get('s') : '');
+                        if ($curr->nodeType == 'Search Featured') {
+                            $ret .= $this->searchResultsFeatured($search, $widgetTreeID);
+                        } else { 
+                            if ($curr->nodeType == 'Search Results') {
+                                $this->getSearchFilts($GLOBALS["SL"]->REQ);
+                                $loadURL = '/search-results/' . $widgetTreeID . '?s=' . urlencode($search) . $this->searchFiltsURL();
+                                $curr->nodeRow->NodePromptText = str_replace('[[search]]', $search, 
+                                    $curr->nodeRow->NodePromptText);
+                                $curr->nodeRow->NodePromptAfter = str_replace('[[search]]', $search, 
+                                    $curr->nodeRow->NodePromptAfter);
+                            } else {
+                                if ($curr->nodeType == 'Record Previews') {
+                                    $loadURL = '/record-prevs/' . $widgetTreeID; 
+                                } elseif ($curr->nodeType == 'Incomplete Sess Check') {
+                                    $loadURL = '/record-check/' . $widgetTreeID;
+                                }
+                                $loadURL .= '?limit=' . $widgetLimit;
+                            }
+                            $spinner = '';
+                            if ($curr->nodeType != 'Incomplete Sess Check') {
+                                $spinner = $this->loadCustView('inc-spinner');
+                            }
+                            $ret .= view('vendor.survloop.inc-node-ajax-load', [
+                                "nID"     => $nID, 
+                                "treeID"  => $curr->nodeRow->NodeResponseSet, 
+                                "load"    => $loadURL,
+                                "pre"     => trim($curr->nodeRow->NodePromptText),
+                                "post"    => trim($curr->nodeRow->NodePromptAfter),
+                                "spinner" => $spinner
+                            ])->render();
+                        }
+                    }
+                }
+                
+            } elseif (!$curr->isPage()) { // otherwise, the main Node printer...
+                
+                // Start normal data field checks
+                $dateStr = $timeStr = '';
+                if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID') 
+                    && trim($currNodeSessData) != '' && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])) {
+                    // convert current session data for dates and times
+                    if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATETIME') {
+                        list($dateStr, $timeStr) = explode(' ', $currNodeSessData);
+                        $dateStr = $this->cleanDateVal($dateStr);
+                        if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
+                    } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATE') {
+                        $dateStr = $this->cleanDateVal($currNodeSessData);
+                        if (trim($dateStr) != '') $dateStr = date("m/d/Y", strtotime($dateStr));
+                    }
+                    if ($dateStr == '12/31/1969') $dateStr = '';
+                } // end normal data field checks
+                
+                $mobileCheckbox = ($curr->nodeRow->NodeOpts%2 > 0);
+                
+                // check if this field's label and field is to be printed on the same line
+                $isOneLiner = $isOneLinerFld = '';
+                if ($curr->isOneLiner()) $isOneLiner = ' disIn mR20';
+                elseif ($curr->isOneLiner() || $curr->isOneLineResponses()) $isOneLinerFld = ' disIn mR20';
+                if (trim($isOneLiner) != '') {
+                    $nodePrompt = str_replace('class="nPrompt"', 'class="nPrompt' . $isOneLiner . '"', $nodePrompt);
+                }
+                
+                if (!in_array($curr->nodeType, ['Radio', 'Checkbox', 'Instructions', 'Other/Custom'])) {
+                    $this->pageFldList[] = 'n' . $nID . 'FldID';
+                }
+                
+                // print out each of the various field types
+                if ($curr->nodeType == 'Hidden Field') {
+                    
+                    $ret .= $nodePrompt . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
+                        . 'FldID" value="' . $currNodeSessData . '">' . "\n"; 
+                        
+                } elseif ($curr->nodeType == 'Big Button') {
+                    
+                    $btn = '<div class="nFld"><a id="nBtn' . $nIDtxt . '" class="btn btn-lg btn-' 
+                        . (($curr->nodeRow->NodeOpts%47 == 0) ? 'default' : 'primary') . ' nFldBtn' 
+                        . (($curr->nodeRow->NodeOpts%43 == 0) ? '' : ' nFormNext') . '" ' 
+                        . ((trim($curr->nodeRow->NodeDataStore) != '')
+                            ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '')
+                        . ' >' . $curr->nodeRow->NodeDefault . '</a></div>' . "\n";
+                    $lastDivPos = strrpos($nodePrompt, "</div>\n            </label></div>");
+                    if (strpos($nodePrompt, 'jumbotron') > 0 && $lastDivPos > 0) {
+                        $ret .= substr($nodePrompt, 0, $lastDivPos) 
+                            . '<center>' . $btn . '</center>' 
+                            . substr($nodePrompt, $lastDivPos) 
+                            . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
+                            . 'FldID" value="' . $currNodeSessData . '">' . "\n"; 
+                    } else {
+                        $ret .= $nodePrompt . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
+                            . 'FldID" value="' . $currNodeSessData . '">' . $btn . "\n"; 
+                    }
+                    if ($curr->nodeRow->NodeOpts%43 == 0) {
+                        $curr->hasShowKids = true;
+                        $showKidsResponded = false;
+                        $this->pageAJAX .= '$(document).on("click", "#nBtn' . $nIDtxt . '", function() { '
+                            . 'if (document.getElementById("node' . $nIDtxt . 'kids")) { '
+                                . 'if (document.getElementById("node' . $nIDtxt . 'kids").style.display=="none") { '
+                                    . '$("#node' . $nIDtxt . 'kids").slideDown("50"); '
+                                    . 'kidsVisible("' . $nIDtxt . '", true, true); '
+                                . '} else { '
+                                    . '$("#node' . $nIDtxt . 'kids").slideUp("50"); '
+                                    . 'kidsVisible("' . $nIDtxt . '", false, true); '
+                                . '} '
+                            . '} });' . "\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'User Sign Up') {
+                    
+                    $this->v["hasRegisterNode"] = true;
+                    $this->pageJSvalid .= view('vendor.survloop.auth.register-node-jsValid', [
+                        "coreID"         => $this->coreID
+                    ])->render();
+                    $ret .= view('vendor.survloop.auth.register-node', [
+                        "coreID"         => $this->coreID, 
+                        "anonyLogin"     => $this->isAnonyLogin(), 
+                        "anonyPass"      => uniqid(),
+                        "currAdmPage"    => '', 
+                        "user"           => Auth::user(),
+                        "inputMobileCls" => $this->inputMobileCls($nID)
+                    ])->render();
+                    
+                } elseif (in_array($curr->nodeType, array('Text', 'Email', 'Text:Number', 'Spambot Honey Pot'))) {
+                    
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld 
+                        . '"><input class="form-control input-lg" type="' . (($curr->nodeType == 'Email') ? 'email' 
+                            : (($curr->nodeType == 'Text:Number') ? 'number' : 'text'))
+                        . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
+                        . '" ' . $onKeyUp . ' ></div>' . $charLimit . "\n"; 
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt . "VisibleID').value == 1) " 
+                            . (($curr->nodeType == 'Email') ? "reqFormFldEmail('" . $nIDtxt . "');\n" 
+                                : "reqFormFld('" . $nIDtxt . "');\n");
+                    }
+                    if ($curr->nodeType == 'Spambot Honey Pot') {
+                        $this->pageJSextra .= "\n" . 'nFldHP("' . $nIDtxt . '");';
+                    }
+                    if (trim($curr->nodeRow->NodeTextSuggest) != '') {
+                        $this->v["needsJqUi"] = true;
+                        $this->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).autocomplete({ source: [';
+                        foreach ($GLOBALS["SL"]->getDefSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
+                            $this->pageAJAX .= (($i > 0) ? ',' : '') . ' "' . json_encode($def->DefValue) . '"';
+                        }
+                        $this->pageAJAX .= ' ] });' . "\n";
+                    }
+                    if ($curr->nodeRow->NodeOpts%41 == 0) { // copy input to extra div
+                        $this->pageJSextra .= "\n" . 'setTimeout("copyNodeResponse(\'n' . $nIDtxt . 'FldID\', \'nodeEcho' 
+                            . $nIDtxt . '\')", 50);';
+                        $this->pageAJAX .= '$("#n' . $nIDtxt . 'FldID").keyup(function() { copyNodeResponse(\'n' 
+                            . $nIDtxt . 'FldID\', \'nodeEcho' . $nIDtxt . '\'); });' . "\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Long Text') {
+                    
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">
+                        <textarea class="form-control input-lg" name="n' . $nIDtxt 
+                        . 'fld" id="n' . $nIDtxt . 'FldID" ' . $onKeyUp . ' >' . $currNodeSessData 
+                        . '</textarea></div>' . $charLimit . "\n";
+                    if ($curr->nodeRow->NodeOpts%31 == 0) {
+                        $ret .= '<div class="fR slGrey p0 m0">
+                            <i>word count: <div id="wordCnt' . $nID . '" class="disIn"></div></i>
+                        </div><div class="fC"></div>';
                     }
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
                             . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
                     }
-                    $ret .= '</select></div>' . "\n"; 
-                }
-                
-            } elseif (in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
-                
-                $curr = $this->checkResponses($curr, $fldForeignTbl);
-                if (sizeof($curr->responses) > 0) {
-                    $ret .= (($curr->isOneLiner()) ? '<div class="pB20">' : '') 
-                        . str_replace('<label for="n' . $nIDtxt . 'FldID">', '', 
-                            str_replace('</label>', '', $nodePrompt));
-                    if ($mobileCheckbox) $ret .= '<div class="nFld" style="margin-top: 20px;">' . "\n";
-                    else $ret .= '<div class="nFld' . $isOneLiner . ' pB0 mBn5">' . "\n";
-                    $respKids = (($curr->hasShowKids) ? ' class="n' . $nIDtxt . 'fldCls" ' : ''); 
-                        // onClick="return check' . $nID . 'Kids();"
-                    if ($curr->hasShowKids) {
-                        $this->pageAJAX .= '$(".n' . $nIDtxt 
-                            . 'fldCls").click(function(){ var foundKidResponse = false;' . "\n";
-                    }
-                    $this->pageJSextra .= "\n" . 'addResTot("' . $nIDtxt . '", ' . sizeof($curr->responses) . ');';
-                    $fldHasOther = false;
-                    foreach ($curr->responses as $j => $res) {
-                        if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:']) 
-                            && isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
-                            && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
-                            $fldHasOther = true;
-                        }
-                    }
-                    foreach ($curr->responses as $j => $res) {
-                        $otherFld = ['', '', '', ''];
-                        if ($fldHasOther && in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:'])) {
-                            $otherFld[0] = $fld . 'Other';
-                            $otherFld[1] = $this->sessData->currSessData($nID, $tbl, $otherFld[0], 'get', '', 
-                                $hasParentDataManip);
-                            $otherFld[2] = '<input type="text" name="n' . $nID . 'fldOther" id="n' . $nID 
-                                . 'fldOtherID" value="' . $otherFld[1] . '" class="form-control disIn otherFld mL10" 
-                                onKeyUp="formKeyUpOther(' . $nID . ', ' . $j . ');">';
-                            echo 'otherData: ' . $otherFld[0] . ', ' . $otherFld[1] . '<br />';
-                        }
-                        
-                        if ($curr->nodeType == 'Checkbox' && $curr->indexMutEx($j)) {
-                            $this->pageJSextra .= "\n" . 'addMutEx("' . $nIDtxt . '", ' . $j . ');';
-                        }
-                        $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
-                        $resNameCheck = '';
-                        $boxChecked = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr->nodeType);
-                        if ($curr->nodeType == 'Radio') {
-                            $resNameCheck = 'name="n' . $nIDtxt . 'fld" ' . (($boxChecked) ? 'CHECKED' : '');
-                            if ($fldHasOther && $otherFld[1] == '') {
-                                $otherFld[3] = ' document.getElementById(\'n' . $nID . 'fldOtherID\').value=\'\'; ';
-                            }
-                        } else {
-                            $resNameCheck = 'name="n' . $nIDtxt . 'fld[]" ' . (($boxChecked) ? 'CHECKED' : '');
-                        }
-                        
-                        if ($mobileCheckbox) {
-                            $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt . 'fld' . $j 
-                                . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') . '">
-                                <div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
-                                . '" value="' . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" ' 
-                                . $resNameCheck . $respKids . ' autocomplete="off" onClick="checkNodeUp(\'' 
-                                . $nIDtxt . '\', ' . $j . ', 1);' . $otherFld[3] . '" ></div> ' . $res->NodeResEng 
-                                . $otherFld[2] . '</label>' . "\n";
-                        } else {
-                            $ret .= '<div class="' . $isOneLinerFld . '">' . ((strlen($res) < 40) ? '<nobr>' : '') . '
-                                <label for="n' . $nIDtxt . 'fld' . $j . '" class="mR10"><div class="disIn mR5">
-                                <input id="n' . $nIDtxt . 'fld' . $j . '" value="' . $res->NodeResValue . '" type="' 
-                                . strtolower($curr->nodeType) . '" ' . $resNameCheck . $respKids 
-                                . ' autocomplete="off" onClick="checkNodeUp(\'' . $nIDtxt . '\', ' . $j . ', 0);' 
-                                . $otherFld[3] . '" ></div> ' . $res->NodeResEng . $otherFld[2] . '</label>' 
-                                . ((strlen($res) < 40) ? '</nobr>' : '') . '</div>' . "\n";
-                        }
-                        if ($curr->hasShowKids && intVal($res->NodeResShowKids) == 1) {
-                            $this->pageAJAX .= 'if (document.getElementById("n' . $nIDtxt . 'fld' . $j 
-                                . '").checked) foundKidResponse = true;' . "\n";
-                        }
-                    }
-                    if ($curr->hasShowKids) {
-                        $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
-                            . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } ' . "\n"
-                            . 'else { $("#node' . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' 
-                            . $nIDtxt . '", false, true); }' . "\n" . ' }); ' . "\n";
-                    }
+                    
+                } elseif ($curr->nodeType == 'Password') {
+                    
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input type="password" name="n' 
+                        . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="" ' . $onKeyUp 
+                        . ' autocomplete="off" class="form-control input-lg" ></div>' . $charLimit . "\n"; 
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                            . "VisibleID').value == 1) reqFormFldRadio('" . $nIDtxt . "', " 
-                            . sizeof($curr->responses) . ");\n";
+                            . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
                     }
-                    $ret .= '</div>' . (($curr->isOneLiner()) ? '</div>' : '') . "\n"; 
-                }
-                
-            } elseif ($curr->nodeType == 'Date') {
-                
-                $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">' 
-                    . $this->formDate($nIDtxt, $dateStr) . '</div>' . "\n";
-                if ($this->nodeHasDateRestriction($curr->nodeRow)) { // then enforce time validation
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt
-                        . "VisibleID').value == 1) reqFormFldDate" 
-                        . (($curr->isRequired()) ? "And" : "") . "Limit('" . $nIDtxt . "', " 
-                        . $curr->nodeRow->NodeCharLimit . ", '" . date("Y-m-d") . "', 1);\n";
-                } elseif ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) reqFormFldDate('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Date Picker') {
-                
-                $this->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).datepicker({ maxDate: "+0d" });' . "\n";
-                $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input name="n' . $nIDtxt . 'fld" id="n' 
-                    . $nIDtxt . 'FldID" value="' . $dateStr . '" ' . $onKeyUp 
-                    . ' type="text" class="dateFld form-control' . $this->inputMobileCls($nID) . '" ></div>' . "\n";
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Time') {
-                
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldHrID'; 
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldMinID';
-                $ret .= str_replace('<label for="n' . $nIDtxt . 'FldID">', '<label for="n' . $nIDtxt 
-                    . 'fldHrID"><label for="n' . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt . 'fldPMID">', 
-                    str_replace('</label>', '</label></label></label>', $nodePrompt)) 
-                    . '<div class="nFld' . $isOneLinerFld . '">' . $this->formTime($nIDtxt, $timeStr) . '</div>' . "\n";
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Date Time') {
-                
-                $ret .= view('vendor.survloop.formtree-form-datetime', [
-                    "nID"            => $nIDtxt,
-                    "dateStr"        => $dateStr,
-                    "onKeyUp"        => $onKeyUp,
-                    "isOneLinerFld"  => $isOneLinerFld,
-                    "inputMobileCls" => $this->inputMobileCls($nID),
-                    "formTime"       => $this->formTime($nID, $timeStr),
-                    "nodePrompt"     => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
-                        '<label for="n' . $nIDtxt . 'FldID"><label for="n' . $nIDtxt . 'fldHrID"><label for="n' 
-                        . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt . 'fldPMID">', 
-                        str_replace('</label>', '</label></label></label></label>', $nodePrompt))
-                ])->render();
-                $this->pageFldList[] = 'n' . $nIDtxt . 'FldID'; 
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldHrID'; 
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldMinID';
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt
-                        . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif ($curr->nodeType == 'Feet Inches') {
-                
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldFeetID'; 
-                $this->pageFldList[] = 'n' . $nIDtxt . 'fldInchID';
-                $feet = ($currNodeSessData > 0) ? floor($currNodeSessData/12) : 0; 
-                $inch = ($currNodeSessData > 0) ? intVal($currNodeSessData)%12 : 0;
-                $ret .= view('vendor.survloop.formtree-form-feetinch', [
-                    "nID"              => $nIDtxt,
-                    "feet"             => $feet,
-                    "inch"             => $inch,
-                    "isOneLinerFld"    => $isOneLinerFld,
-                    "currNodeSessData" => $currNodeSessData,
-                    "inputMobileCls"   => $this->inputMobileCls($nID),
-                    "nodePrompt"       => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
-                        '<label for="n' . $nIDtxt . 'fldFeetID"><label for="n' . $nIDtxt . 'fldInchID">', 
-                        str_replace('</label>', '</label></label>', $nodePrompt))
-                ])->render();
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) formRequireFeetInches('" . $nIDtxt . "');\n";
-                }
-                
-            } elseif (in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
-                
-                $currSessDataOther = $this->sessData->currSessData($nID, $tbl, $fld . 'Other');
-                $coreResponses = [ ["F", "Female"], ["M", "Male"], ["O", "Other: "] ];
-                if ($curr->nodeType == 'Gender Not Sure') $coreResponses[] = ["?", "Not Sure"];
-                foreach ($coreResponses as $j => $res) $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
-                $ret .= view('vendor.survloop.formtree-form-gender', [
-                    "nID"               => $nIDtxt,
-                    "nodeRow"           => $curr->nodeRow,
-                    "isOneLinerFld"     => $isOneLinerFld,
-                    "coreResponses"     => $coreResponses,
-                    "currNodeSessData"  => $currNodeSessData,
-                    "currSessDataOther" => $currSessDataOther
-                ])->render();
-                $genderSuggest = '';
-                foreach ($GLOBALS["SL"]->getDefSet('Gender Identity') as $i => $gen) {
-                    if (!in_array($gen->DefValue, ['Female', 'Male', 'Other', 'Not sure'])) {
-                        $genderSuggest .= ', "' . $gen->DefValue . '"';
+                    
+                } elseif (in_array($curr->nodeType, ['Drop Down', 'U.S. States', 'Countries'])) {
+                    
+                    $curr = $this->checkResponses($curr, $fldForeignTbl);
+                    if (sizeof($curr->responses) > 0 || in_array($curr->nodeType, ['U.S. States', 'Countries'])) {
+                        $ret .= $nodePrompt . "\n" . '<div class="nFld' . $isOneLinerFld . '">
+                            <select name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" class="form-control input-lg' 
+                            . (($isOneLinerFld != '') ? ' w33' : '') 
+                            . '" onChange="checkNodeUp(\'' . $nIDtxt . '\', -1, 0);' 
+                            . (($curr->isDropdownTagger()) ? ' selectTag(' . $nID . ', this.value); this.value=\'\';' : '') 
+                            . '" ><option class="slGrey" value="" ' 
+                            . ((trim($currNodeSessData) == '' || $curr->isDropdownTagger()) ? 'SELECTED' : '') . ' >'
+                            . ((isset($curr->nodeRow->NodeTextSuggest)) ? $curr->nodeRow->NodeTextSuggest : '') 
+                            . '</option>' . "\n"; 
+                        if ($curr->hasShowKids) {
+                            $this->pageAJAX .= '$("#n' . $nIDtxt 
+                                . 'FldID").change(function(){ var foundKidResponse = false;' . "\n";
+                        }
+                        if ($curr->nodeType == 'U.S. States') {
+                            $ret .= $GLOBALS["SL"]->states->stateDrop($currNodeSessData);
+                        }
+                        else { 
+                            foreach ($curr->responses as $j => $res) {
+                                $select = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr->nodeType);
+                                if ($curr->isDropdownTagger()) {
+                                    $this->pageJSextra .= "\n" . 'addTagOpt(' . $nID . ', ' . $res->NodeResValue 
+                                        . ', ' . json_encode($res->NodeResEng) . ', ' . (($select) ? 1 : 0) . ');';
+                                }
+                                $ret .= '<option value="' . $res->NodeResValue . '" ' 
+                                    . (($select && !$curr->isDropdownTagger()) ? 'SELECTED' : '') 
+                                    . ' >' . $res->NodeResEng . '</option>' . "\n"; 
+                                if ($curr->hasShowKids && intVal($res->NodeResShowKids) == 1) {
+                                    $this->pageAJAX .= 'if (document.getElementById("n' . $nIDtxt . 'FldID").value == "' 
+                                        . $res->NodeResValue . '") foundKidResponse = true;' . "\n";
+                                }
+                            }
+                        }
+                        if ($curr->hasShowKids) {
+                            $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
+                                . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } else { $("#node' 
+                                . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' . $nIDtxt 
+                                . '", false, true); }' . "\n" . ' }); ' . "\n";
+                        }
+                        if ($curr->isRequired()) {
+                            $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                                . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
+                        }
+                        $ret .= '</select></div>' . "\n"; 
+                        if ($curr->isDropdownTagger()) {
+                            $ret .= '<input type="hidden" name="n' . $nID . 'tagIDs" id="n' . $nID . 'tagIDsID" value=",">'
+                                . '<div id="n' . $nID . 'tags" class="slTagList"></div>';
+                            $this->pageJSextra .= "\n" . 'setTimeout("updateTagList(' . $nID . ')", 50);';
+                        }
                     }
-                }
-                $this->pageAJAX .= '$( "#n' . $nIDtxt . 'fldOtherID" ).autocomplete({ source: [' 
-                    . substr($genderSuggest, 1) . '] });' . "\n";
-                $this->pageJSextra .= 'nodeResTot[' . $nID . '] = ' . sizeof($coreResponses) . ';' . "\n";
-                if ($curr->isRequired()) {
-                    $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
-                        . "VisibleID').value == 1) formRequireGender(" . $nIDtxt . ");\n";
-                }
+                    
+                } elseif (in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
+                    
+                    $curr = $this->checkResponses($curr, $fldForeignTbl);
+                    if ($curr->nodeType == 'Radio') {
+                        $ret .= '<input type="hidden" name="n' . $nID . 'radioCurr" id="n' . $nID 
+                            . 'radioCurrID" value="' . $currNodeSessData . '">';
+                        $this->pageJSextra .= "\n" . 'addRadioNode("' . $nIDtxt . '");';
+                    }
+                    if (sizeof($curr->responses) > 0) {
+                        $ret .= (($curr->isOneLiner()) ? '<div class="pB20">' : '') 
+                            . str_replace('<label for="n' . $nIDtxt . 'FldID">', '', 
+                                str_replace('</label>', '', $nodePrompt))
+                            . '<div class="nFld';
+                        if ($mobileCheckbox) $ret .= '" style="margin-top: 20px;">' . "\n";
+                        else $ret .= $isOneLiner . ' pB0 mBn5">' . "\n";
+                        $respKids = (($curr->hasShowKids) ? ' class="n' . $nIDtxt . 'fldCls" ' : ''); 
+                            // onClick="return check' . $nID . 'Kids();"
+                        if ($curr->hasShowKids) {
+                            $this->pageAJAX .= '$(".n' . $nIDtxt 
+                                . 'fldCls").click(function(){ var foundKidResponse = false;' . "\n";
+                        }
+                        $this->pageJSextra .= "\n" . 'addResTot("' . $nIDtxt . '", ' . sizeof($curr->responses) . ');';
+                        $fldHasOther = false;
+                        foreach ($curr->responses as $j => $res) {
+                            if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:']) 
+                                && isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
+                                && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
+                                $fldHasOther = true;
+                            }
+                        }
+                        if ($curr->nodeRow->NodeOpts%61 == 0) {
+                            $ret .= '<div class="row">';
+                            $mobileCheckbox = true;
+                        }
+                        foreach ($curr->responses as $j => $res) {
+                            $otherFld = ['', '', '', ''];
+                            if ($fldHasOther 
+                                && in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:'])) {
+                                $otherFld[0] = $fld . 'Other';
+                                $otherFld[1] = $this->sessData->currSessData($nID, $tbl, $otherFld[0], 'get', '', 
+                                    $hasParentDataManip);
+                                $otherFld[2] = '<input type="text" name="n' . $nID . 'fldOther" id="n' . $nID 
+                                    . 'fldOtherID" class="form-control input-lg disIn otherFld mL10" value="' 
+                                    . $otherFld[1] . '" onKeyUp="formKeyUpOther(' . $nID . ', ' . $j . ');">';
+                            }
+                            
+                            if ($curr->nodeType == 'Checkbox' && $curr->indexMutEx($j)) {
+                                $this->pageJSextra .= "\n" . 'addMutEx("' . $nIDtxt . '", ' . $j . ');';
+                            }
+                            $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
+                            $resNameCheck = '';
+                            $boxChecked 
+                                = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr->nodeType);
+                            if ($curr->nodeType == 'Radio') {
+                                $resNameCheck = 'name="n' . $nIDtxt . 'fld" ' . (($boxChecked) ? 'CHECKED' : '');
+                                if ($fldHasOther && $otherFld[1] == '') {
+                                    $otherFld[3] = ' document.getElementById(\'n' . $nID . 'fldOtherID\').value=\'\'; ';
+                                }
+                            } else {
+                                $resNameCheck = 'name="n' . $nIDtxt . 'fld[]" ' . (($boxChecked) ? 'CHECKED' : '');
+                            }
+                            
+                            if ($curr->nodeRow->NodeOpts%61 == 0) {
+                                $ret .= '<div class="col-md-' . $this->getColsWidth(sizeof($curr->responses)) . '">';
+                            }
+                            if ($mobileCheckbox) {
+                                $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt . 'fld' . $j 
+                                    . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') . '">
+                                    <div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
+                                    . '" value="' . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" ' 
+                                    . $resNameCheck . $respKids . ' autocomplete="off" onClick="checkNodeUp(\'' 
+                                    . $nIDtxt . '\', ' . $j . ', 1);' . $otherFld[3] . '" ></div> ' 
+                                    . $res->NodeResEng . ' ' . $otherFld[2] . '</label>' . "\n";
+                            } else {
+                                $ret .= '<div class="' . $isOneLinerFld . '">' . ((strlen($res) < 40) ? '<nobr>' : '') 
+                                    . '<label for="n' . $nIDtxt . 'fld' . $j . '" class="mR10"><div class="disIn mR5">
+                                    <input id="n' . $nIDtxt . 'fld' . $j . '" value="' . $res->NodeResValue . '" type="' 
+                                    . strtolower($curr->nodeType) . '" ' . $resNameCheck . $respKids 
+                                    . ' autocomplete="off" onClick="checkNodeUp(\'' . $nIDtxt . '\', ' . $j . ', 0);' 
+                                    . $otherFld[3] . '" ></div> ' . $res->NodeResEng . ' ' 
+                                    . $otherFld[2] . '</label>' . ((strlen($res) < 40) ? '</nobr>' : '') 
+                                    . '</div>' . "\n";
+                            }
+                            if ($curr->nodeRow->NodeOpts%61 == 0) {
+                                $ret .= '</div> <!-- end col -->' . "\n";
+                            }
+                            if ($curr->hasShowKids && intVal($res->NodeResShowKids) == 1) {
+                                $this->pageAJAX .= 'if (document.getElementById("n' . $nIDtxt . 'fld' . $j 
+                                    . '").checked) foundKidResponse = true;' . "\n";
+                            }
+                        }
+                        if ($curr->hasShowKids) {
+                            $this->pageAJAX .= "\n" . 'if (foundKidResponse) { $("#node' . $nIDtxt 
+                                . 'kids").slideDown("50"); kidsVisible("' . $nIDtxt . '", true, true); } ' . "\n"
+                                . 'else { $("#node' . $nIDtxt . 'kids").slideUp("50"); kidsVisible("' 
+                                . $nIDtxt . '", false, true); }' . "\n" . ' }); ' . "\n";
+                        }
+                        if ($curr->isRequired()) {
+                            $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                                . "VisibleID').value == 1) reqFormFldRadio('" . $nIDtxt . "', " 
+                                . sizeof($curr->responses) . ");\n";
+                        }
+                        
+                        if ($curr->nodeRow->NodeOpts%61 == 0) {
+                            $ret .= '</div> <!-- end row -->';
+                        }
+                        
+                        $ret .= '</div>' . (($curr->isOneLiner()) ? '</div>' : '') . "\n"; 
+                    }
+                    
+                } elseif ($curr->nodeType == 'Date') {
+                    
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">' 
+                        . $this->formDate($nIDtxt, $dateStr) . '</div>' . "\n";
+                    if ($this->nodeHasDateRestriction($curr->nodeRow)) { // then enforce time validation
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt
+                            . "VisibleID').value == 1) reqFormFldDate" 
+                            . (($curr->isRequired()) ? "And" : "") . "Limit('" . $nIDtxt . "', " 
+                            . $curr->nodeRow->NodeCharLimit . ", '" . date("Y-m-d") . "', 1);\n";
+                    } elseif ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                            . "VisibleID').value == 1) reqFormFldDate('" . $nIDtxt . "');\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Date Picker') {
+                    
+                    $this->v["needsJqUi"] = true;
+                    $this->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).datepicker({ maxDate: "+0d" });' . "\n";
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input name="n' . $nIDtxt . 'fld" id="n' 
+                        . $nIDtxt . 'FldID" value="' . $dateStr . '" ' . $onKeyUp 
+                        . ' type="text" class="dateFld form-control input-lg" ></div>' . "\n";
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                            . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Time') {
+                    
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldHrID'; 
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldMinID';
+                    $ret .= str_replace('<label for="n' . $nIDtxt . 'FldID">', '<label for="n' . $nIDtxt 
+                        . 'fldHrID"><label for="n' . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt . 'fldPMID">', 
+                        str_replace('</label>', '</label></label></label>', $nodePrompt)) 
+                        . '<div class="nFld' . $isOneLinerFld . '">' . $this->formTime($nIDtxt, $timeStr) . '</div>' . "\n";
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                            . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Date Time') {
+                    
+                    $ret .= view('vendor.survloop.formtree-form-datetime', [
+                        "nID"            => $nIDtxt,
+                        "dateStr"        => $dateStr,
+                        "onKeyUp"        => $onKeyUp,
+                        "isOneLinerFld"  => $isOneLinerFld,
+                        "inputMobileCls" => $this->inputMobileCls($nID),
+                        "formTime"       => $this->formTime($nID, $timeStr),
+                        "nodePrompt"     => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
+                            '<label for="n' . $nIDtxt . 'FldID"><label for="n' . $nIDtxt . 'fldHrID"><label for="n' 
+                            . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt . 'fldPMID">', 
+                            str_replace('</label>', '</label></label></label></label>', $nodePrompt))
+                    ])->render();
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'FldID'; 
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldHrID'; 
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldMinID';
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt
+                            . "VisibleID').value == 1) reqFormFld('" . $nIDtxt . "');\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Feet Inches') {
+                    
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldFeetID'; 
+                    $this->pageFldList[] = 'n' . $nIDtxt . 'fldInchID';
+                    $feet = ($currNodeSessData > 0) ? floor($currNodeSessData/12) : 0; 
+                    $inch = ($currNodeSessData > 0) ? intVal($currNodeSessData)%12 : 0;
+                    $ret .= view('vendor.survloop.formtree-form-feetinch', [
+                        "nID"              => $nIDtxt,
+                        "feet"             => $feet,
+                        "inch"             => $inch,
+                        "isOneLinerFld"    => $isOneLinerFld,
+                        "currNodeSessData" => $currNodeSessData,
+                        "inputMobileCls"   => $this->inputMobileCls($nID),
+                        "nodePrompt"       => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
+                            '<label for="n' . $nIDtxt . 'fldFeetID"><label for="n' . $nIDtxt . 'fldInchID">', 
+                            str_replace('</label>', '</label></label>', $nodePrompt))
+                    ])->render();
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                            . "VisibleID').value == 1) formRequireFeetInches('" . $nIDtxt . "');\n";
+                    }
+                    
+                } elseif (in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
+                    
+                    $currSessDataOther = $this->sessData->currSessData($nID, $tbl, $fld . 'Other');
+                    $coreResponses = [ ["F", "Female"], ["M", "Male"], ["O", "Other: "] ];
+                    if ($curr->nodeType == 'Gender Not Sure') $coreResponses[] = ["?", "Not Sure"];
+                    foreach ($coreResponses as $j => $res) $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
+                    $ret .= view('vendor.survloop.formtree-form-gender', [
+                        "nID"               => $nIDtxt,
+                        "nodeRow"           => $curr->nodeRow,
+                        "isOneLinerFld"     => $isOneLinerFld,
+                        "coreResponses"     => $coreResponses,
+                        "currNodeSessData"  => $currNodeSessData,
+                        "currSessDataOther" => $currSessDataOther
+                    ])->render();
+                    $genderSuggest = '';
+                    foreach ($GLOBALS["SL"]->getDefSet('Gender Identity') as $i => $gen) {
+                        if (!in_array($gen->DefValue, ['Female', 'Male', 'Other', 'Not sure'])) {
+                            $genderSuggest .= ', "' . $gen->DefValue . '"';
+                        }
+                    }
+                    $this->v["needsJqUi"] = true;
+                    $this->pageAJAX .= '$( "#n' . $nIDtxt . 'fldOtherID" ).autocomplete({ source: [' 
+                        . substr($genderSuggest, 1) . '] });' . "\n";
+                    $this->pageJSextra .= 'nodeResTot[' . $nID . '] = ' . sizeof($coreResponses) . ';' . "\n";
+                    if ($curr->isRequired()) {
+                        $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
+                            . "VisibleID').value == 1) formRequireGender(" . $nIDtxt . ");\n";
+                    }
+                    
+                } elseif ($curr->nodeType == 'Uploads') {
+                    
+                    $this->pageHasUpload[] = $nID;
+                    $ret .= $nodePrompt . '<div class="nFld">' . $this->uploadTool($nID) . '</div>';
+                    
+                } else { // instruction only
+                    
+                    $ret .= "\n" . $nodePrompt . "\n";
+                    
+                } // end all node input field types
                 
-            } elseif ($curr->nodeType == 'Uploads') {
                 
-                $this->pageHasUpload[] = $nID;
-                $ret .= $nodePrompt . '<div class="nFld">' . $this->uploadTool($nID) . '</div>';
-                
-            } else { // instruction only
-                
-                $ret .= "\n" . $nodePrompt . "\n";
-                
-            } // end all node input field types
+            } // end default Node printer
             
+            if (trim($promptNotesSpecial) != '') {
+                $ret .= $this->printSpecial($nID, $promptNotesSpecial, $currNodeSessData);
+            }
             
-        } // end default Node printer
-        
-        if (trim($promptNotesSpecial) != '') {
-            $ret .= $this->printSpecial($nID, $promptNotesSpecial, $currNodeSessData);
-        }
-        
-        if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '</div> <!-- end jumbotron -->' . "\n";
-        $ret .= "\n" . '</div> <!-- end #node' . $nIDtxt . ' -->' . "\n";
-        if ($curr->isPage()) $ret .= '<div class="pageBotGap"></div>';
+        } // end non-Layout node processing
+
         if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' 
             && !$curr->isLoopRoot() && !$curr->isLoopCycle() && !$curr->isPage() && !$curr->isDataManip()) {
-            if ($this->isNodeJustH1($nodePromptText)) $ret .= '<div class="nodeHalfGap"></div>';
-            else $ret .= '<div class="nodeGap"></div>';
+            $ret .= '<div class="nodeHalfGap"></div>';
         }
         
         $retKids = '';
@@ -868,11 +1006,22 @@ class SurvFormTree extends SurvUploadTree
                 }
             } 
         }
+        if ($curr->nodeType == 'Layout Row') {
+                $retKids = '<div class="row">' . $retKids . '</div>';
+        }
         if (trim($retKids) != '' && $curr->hasShowKids) { // then displaying children on page is conditional
             $ret .= "\n" . '<div id="node' . $nIDtxt . 'kids" class="nKids" style="display: ' 
                 . (($showKidsResponded) ? 'block' : 'none') . ';">' . $retKids . '</div>' . "\n";
         } else {
             $ret .= $retKids;
+        }
+        
+        if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '</div> <!-- end jumbotron -->' . "\n";
+        $ret .= "\n" . '</div> <!-- end #node' . $nIDtxt . ' -->' . "\n";
+        if ($curr->isPage() || $curr->isLoopRoot()) $ret .= '<div class="pageBotGap"></div>';
+        
+        if ($curr->nodeType == 'Layout Column') {
+            $ret .= '</div>';
         }
         
         if (substr($curr->nodeType, 0, 11) == 'Data Manip:') $this->closeManipBranch($nID);
@@ -968,10 +1117,18 @@ class SurvFormTree extends SurvUploadTree
                     $this->newLoopItem($nID);
                     //$this->updateCurrNode($this->nextNode($this->currNode()));
                 } elseif (!$curr->isInstruct() && $tbl != '' && $fld != '') {
-                    $newVal = (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') : '');
-                    if ($curr->nodeType == 'Checkbox') {
-                        $this->sessData->currSessDataCheckbox($nID, $tbl, $fld, 'update', 
-                            (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') : []));
+                    $newVal = (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) 
+                        ? $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') : '');
+                    if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
+                        $input = [];
+                        if ($curr->nodeType == 'Checkbox') {
+                            if ($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
+                                $input = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
+                            }
+                        } elseif ($GLOBALS["SL"]->REQ->has('n' . $nID . 'tagIDs')) { // $curr->isDropdownTagger()
+                            $input = $this->mexplode(',', $GLOBALS["SL"]->REQ->get('n' . $nID . 'tagIDs'));
+                        }
+                        $this->sessData->currSessDataCheckbox($nID, $tbl, $fld, 'update', $input);
                     } else {
                         if ($curr->nodeType == 'Text:Number') {
                             if (!$GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) { $newVal = 0; }
@@ -1152,11 +1309,11 @@ class SurvFormTree extends SurvUploadTree
             && isset($this->sessData->loopItemIDs[$loopName])
             && sizeof($this->sessData->loopItemIDs[$loopName]) 
                 > $GLOBALS["SL"]->closestLoop["obj"]->DataLoopWarnLimit) {
-            $limitTxt .= '<div class="gry6 pT20 fPerc125">Limit of ' 
+            $limitTxt .= '<div class="gry6 pT20 fPerc133">Limit of ' 
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . '</div>';
         }
-        $ret = '<h3 class="gry9">';
+        $ret = '<h3 class="slGrey">';
             if ($this->allNodes[$nID]->isStepLoop()) {
                 $ret .= $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . ' to add details for:' . "\n";
             } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == 0) {
@@ -1202,7 +1359,7 @@ class SurvFormTree extends SurvUploadTree
     
     protected function printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
     {
-        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-default mT20 w100 fPerc125 '
+        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-default mT20 w100 fPerc133 '
             . (($GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit == 0 || 
                 sizeof($this->sessData->loopItemIDs[$loopName]) < $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit) 
                 ? 'disBlo' : 'disNon')

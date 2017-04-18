@@ -12,9 +12,9 @@
                         href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                     @endif
                         ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> 
-                        <b class="fPerc125">{{ $fld->FldEng }}</b></a>
+                        <b class="fPerc133">{{ $fld->FldEng }}</b></a>
                 @else 
-                    <b class="fPerc125">{{ $fld->FldEng }}</b>
+                    <b class="fPerc133">{{ $fld->FldEng }}</b>
                 @endif
                 <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:void(0)" 
                     ></a>
@@ -49,7 +49,7 @@
                         @endif
                     @endif
                     @if (trim($fld->FldDefault) != '')
-                        <i class="gry9 mL10">( default value: {{ $fld->FldDefault }} )</i>
+                        <i class="slGrey mL10">( default value: {{ $fld->FldDefault }} )</i>
                     @endif
                     </div>
                 @endif

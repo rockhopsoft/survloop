@@ -115,6 +115,17 @@ class SurvLoopNode extends CoreNode
         return true;
     }
     
+    public function genTmpNodeRes($value)
+    {
+        $res = new SLNodeResponses;
+        $res->NodeResNode     = $this->nodeID;
+        $res->NodeResEng      = $value;
+        $res->NodeResValue    = $value;
+        $res->NodeResOrd      = sizeof($this->responses);
+        $res->NodeResShowKids = 0;
+        return $res;
+    }
+    
     public function valueShowsKid($responseVal = '')
     {
         if (sizeof($this->responses) > 0) {
@@ -223,7 +234,19 @@ class SurvLoopNode extends CoreNode
     public function isSpecial()
     {
         return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
-            || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip());
+            || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip()
+            || $this->isWidget());
+    }
+    
+    public function isWidget()
+    {
+        return (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 
+            'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons']));
+    }
+    
+    public function isLayout()
+    {
+        return (in_array($this->nodeType, ['Layout Row', 'Layout Column']));
     }
     
     public function isRequired()
@@ -241,6 +264,10 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeOpts%$this->primeOpts["OneLineResponses"] == 0);
     }
     
+    public function isDropdownTagger()
+    {
+        return ($this->nodeType == 'Drop Down' && $this->nodeRow->NodeOpts%53 == 0);
+    }
     
     
     public function getManipUpdate()

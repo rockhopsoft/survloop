@@ -21,13 +21,15 @@ use App\Models\SLUsersActivity;
 
 class SurvLoopController extends Controller
 {
+    public $custAbbr             = 'SurvLoop';
+    
     protected $dbID              = 1;
     protected $treeID            = 1;
     protected $treeFromURL       = false;
     
     protected $coreID            = -3;
     protected $coreIDoverride    = -3;
-    protected $coreIncompletes   = [];
+    public $coreIncompletes      = [];
     protected $sessID            = -3;
     protected $sessInfo          = [];
     protected $sessLoops         = [];
@@ -39,18 +41,31 @@ class SurvLoopController extends Controller
     protected $isFirstTimeOnPage = false;
     protected $survInitRun       = false;
     
+    protected $extraTree         = [];
+    
     protected function survLoopInit(Request $request, $currPage = '', $runExtra = true)
     {
         if (!$this->survInitRun) {
             $this->survInitRun = true;
             if (sizeof($this->REQ) == 0) $this->REQ = $request;
-            $this->v["user"]      = Auth::user();
-            $this->v["isAll"]     = $request->has('all');
-            $this->v["isAlt"]     = $request->has('alt');
-            $this->v["isPrint"]   = $request->has('print');
-            $this->v["isExcel"]   = $request->has('excel');
-            $this->v["exportDir"] = 'survloop';
-            $this->v["content"]   = '';
+            $this->v["user"]        = Auth::user();
+            $this->v["isAdmin"]     = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
+            $this->v["isAll"]       = $request->has('all');
+            $this->v["isAlt"]       = $request->has('alt');
+            $this->v["isPrint"]     = $request->has('print');
+            $this->v["isExcel"]     = $request->has('excel');
+            $this->v["exportDir"]   = 'survloop';
+            $this->v["content"]     = '';
+            $this->v["pageJSextra"] = '';
+            $this->v["pageJStop"]   = (($this->v["user"] && $this->v["user"]->hasRole('administrator')) 
+                ? 'setNavItem("Admin Dashboard", "/dashboard"); ' : '') . $this->extraNavItems();
+            if (isset($this->v["user"]) && isset($this->v["user"]->id) && $this->v["user"]->id > 0) {
+                $this->v["pageJStop"] .= 'setNavItem("Hi, ' . $this->v["user"]->printCasualUsername(false) 
+                    . '", "/profile/' . $this->v["user"]->id . '"); ';
+                $this->v["pageJStop"] .= 'setNavItem("Logout", "/logout"); ';
+            } else {
+                $this->v["pageJStop"] .= 'setNavItem("Login", "/login"); setNavItem("Sign Up", "/register"); ';
+            }
             
             if (!isset($this->v["currPage"])) $this->v["currPage"] = $currPage;
             if (trim($this->v["currPage"]) == '') {
@@ -73,6 +88,7 @@ class SurvLoopController extends Controller
                 $this->initCustViews();
             }
             $this->genCacheKey();
+            $GLOBALS["SL"]->pageJStop .= $this->v["pageJStop"];
         }
         return true;
     }
@@ -130,7 +146,10 @@ class SurvLoopController extends Controller
                     }
                 }
             }
-            $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID);
+            if (!isset($this->v["isAdmin"])) {
+                $this->v["isAdmin"] = (Auth::user() && Auth::user()->hasRole('administrator'));
+            }
+            $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID);
         }
         return true;
     }
@@ -143,7 +162,9 @@ class SurvLoopController extends Controller
             if ($tree && isset($tree->TreeDatabase)) {
                 $this->treeID = $tree->TreeID;
                 $this->dbID = $tree->TreeDatabase;
-                $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
+                $isAdmin = ((isset($this->v["isAdmin"])) ? $this->v["isAdmin"]
+                    : (Auth::user() && Auth::user()->hasRole('administrator')));
+                $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
             }
         }
         return true;
@@ -160,7 +181,7 @@ class SurvLoopController extends Controller
         } else {
             $view = 'vendor.survloop.' . $view;
         }
-        return view( $view, $this->v)->render();
+        return view($view, $this->v)->render();
     }
     
     // Check For Basic System Setup First
@@ -207,11 +228,19 @@ class SurvLoopController extends Controller
         return ((isset($this->v["currPage"])) ? $this->v["currPage"] : '/');
     }
     
-    protected function initExtra(Request $request) { return true; }
+    protected function initExtra(Request $request)
+    {
+        return true;
+    }
+    
+    protected function extraNavItems()
+    {
+        return true;
+    }
     
     protected function initCustViews()
     {
-        $views = ['nav-public', 'nav-admin', 'footer-master', 'footer-admin'];
+        $views = ['footer-master', 'footer-admin'];
         foreach ($views as $view) {
             $GLOBALS["SL"]->sysOpts[$view] = $this->loadCustView('inc-' . $view);
         }
@@ -275,23 +304,19 @@ class SurvLoopController extends Controller
     
     // a few utilities...
     
-    function prepExplode($delim, $str)
-    {
-        if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
-        if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
-        return $str;
-    }
-    
     function mexplode($delim, $str)
     {
-        $retArr = array();
-        if (strpos($str, $delim) === false) {
-            $retArr[0] = $str;
-        } else {
-            $str = $this->prepExplode($delim, $str);
-            $retArr = explode($delim, $str);
+        $ret = [];
+        if (trim(str_replace($delim, '', $str)) != '') {
+            if (strpos($str, $delim) === false) {
+                $ret[] = $str;
+            } else {
+                if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
+                if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
+                $ret = explode($delim, $str);
+            }
         }
-        return $retArr;
+        return $ret;
     }
     
     public function slugify($text)
@@ -367,7 +392,8 @@ class SurvLoopController extends Controller
                     ->where('TreeType', 'Primary Public')
                     ->first();
                 if ($treeRow && isset($treeRow->TreeID)) {
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeRow->TreeID, $treeID);
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], 
+                        $dbID, $treeRow->TreeID, $treeRow->TreeID);
                     $this->logPageVisit($currPage, $dbID . ';' . $treeRow->TreeID);
                 }
             }
@@ -383,7 +409,7 @@ class SurvLoopController extends Controller
                 //->where('TreeDatabase', $GLOBALS["SL"]->dbID)
                 ->first();
             if ($treeRow && isset($treeRow->TreeID)) {
-                $GLOBALS["SL"] = new DatabaseLookups($request, $treeRow->TreeDatabase, $treeID, $treeID);
+                $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $treeRow->TreeDatabase, $treeID, $treeID);
                 $this->logPageVisit($currPage, $treeRow->TreeDatabase . ';' . $treeID);
             }
             return true;
@@ -475,5 +501,44 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    
+    public function scriptsJsXtra()
+    {
+        return $this->loadCustView('inc-scripts-js-xtra');
+    }
+    
+    public function scriptsJqueryXtra()
+    {
+        return $this->loadCustView('inc-scripts-jquery-xtra');
+    }
+    
+    public function scriptsJqueryXtraSearch()
+    {
+        return $this->loadCustView('inc-scripts-jquery-xtra-search');
+    }
+    
+    
+    protected function loadExtraTree()
+    {
+        $this->extraTree = new BrandedTree;
+        //...
+    }
+    
+    public function getColsWidth($sizeof)
+    {
+        $colW = 12;
+        if ($sizeof == 2) {
+            $colW = 6;
+        } elseif ($sizeof == 3) {
+            $colW = 4;
+        } elseif ($sizeof == 4) {
+            $colW = 3;
+        } elseif (in_array($sizeof, [5, 6])) {
+            $colW = 2;
+        } elseif (in_array($sizeof, [7, 8, 9, 10, 11, 12])) {
+            $colW = 1;
+        }
+        return $colW;
+    }
     
 }

@@ -43,7 +43,7 @@ $(function() {
     @else 
         blurAllFlds();
         var formData = new FormData(document.getElementById("postNodeForm"));
-        document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container"><i class="fa fa-spinner fa-pulse"></i></div>';
+        document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container">{!! $spinner !!}</div>';
         window.scrollTo(0, 0);
         $.ajax({
         @if ($GLOBALS['SL']->treeIsAdmin)
@@ -121,7 +121,7 @@ $(function() {
         return false;
     }
     $(".nFormNext").click(function() { return exitLoop(""); });
-    $("#nFormBack").click(function() { return exitLoop("Back"); });
+    $(".nFormBack").click(function() { return exitLoop("Back"); });
     
 @else
 
@@ -132,7 +132,7 @@ $(function() {
         }
         return false;
     });
-    $("#nFormBack").click(function() {
+    $(".nFormBack").click(function() {
         document.getElementById("stepID").value="back";
     @if ($loopRootJustLeft > 0)
         document.getElementById("jumpToID").value="{{ $loopRootJustLeft }}";
@@ -161,7 +161,7 @@ setTimeout("hasAttemptedSubmit = false", 10);
     var mainFixed = function(){
         if (document.getElementById('fixedHeader')) {
             var fixer = $('#fixedHeader');
-            var scrollMin = 100;
+            var scrollMin = 40;
             if ($(window).width() <= 480) scrollMin = 30;
             if ($(this).scrollTop() >= scrollMin) fixer.addClass('fixed');
             $(document).scroll(function(){

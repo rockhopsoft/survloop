@@ -198,7 +198,7 @@ class AdminDBController extends AdminController
     
     protected function isPrintView()
     {
-        return (($GLOBALS["SL"]->REQ->has('print')) ? 'vendor.survloop.admin.db.dbprint' : 'vendor.survloop.admin.admin');
+        return (($GLOBALS["SL"]->REQ->has('print')) ? 'vendor.survloop.admin.db.dbprint' : 'vendor.survloop.master');
     }
     
     public function index(Request $request)
@@ -266,7 +266,7 @@ class AdminDBController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.db.full', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function adminPrintFullDBPublic(Request $request, $dbPrefix = '')
@@ -287,7 +287,7 @@ class AdminDBController extends AdminController
                             }
                         }
                     }
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -295,8 +295,8 @@ class AdminDBController extends AdminController
         $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
             "sysOpts" => $GLOBALS["SL"]->sysOpts
         ])->render();
-        $this->v["content"] = '<div class="pL20"><h1>' 
-            . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specifications</h1>' 
+        $this->v["content"] = '<div class="pL20"><h2>' 
+            . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specifications</h2>' 
             . $this->v["IPlegal"] . '</div><div class="p20">' . $this->full($request, true) . '</div>';
         //echo 'adminPrintFullDBPublic(' . $dbPrefix . '<pre>'; print_r($db); echo '</pre>'; exit;
         return view('vendor.survloop.master-print', $this->v);
@@ -809,6 +809,7 @@ class AdminDBController extends AdminController
                 $sorts[] = array($def->DefID, $def->DefValue);
             }
         }
+        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle,
             'submitURL' => $submitURL,
@@ -837,7 +838,7 @@ class AdminDBController extends AdminController
         $sortTitle = '<a href="/dashboard/db/table/sort" style="font-size: 26px;"><b>All Tables</b></a>
             <div class="f12 slBlueDark">
                 Table Name <span class="f10">Type</span>
-                <div class="disIn gry9" style="margin-left: 50px;"><i>Table Group</i></div>
+                <div class="disIn slGrey" style="margin-left: 50px;"><i>Table Group</i></div>
             </div>';
         $submitURL = '/dashboard/db/sortTable?saveOrder=1';
         $tbls = SLTables::select('TblID', 'TblEng', 'TblType', 'TblGroup')
@@ -850,11 +851,12 @@ class AdminDBController extends AdminController
                 $sorts[] = [
                     $tbl->TblID, 
                     $tbl->TblEng . ' <span style="font-size: 10px;">' . $tbl->TblType . '</span><div class="fR"><i>'
-                        . '<span class="gry9" style="font-size: 12px;">' . $tbl->TblGroup 
+                        . '<span class="slGrey" style="font-size: 12px;">' . $tbl->TblGroup 
                         . '</span></i></div><div class="fC"></div>'
                 ];
             }
         }
+        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
@@ -902,12 +904,13 @@ class AdminDBController extends AdminController
                     $fld->FldID, 
                     $fld->FldEng . ' <span style="font-size: 10px;">' 
                         . ((intVal($fld->FldForeignTable) > 0) ? '<i class="fa fa-link"></i>' : '') . '</span>'
-                        . '<div class="fR"><i><span class="gry9" style="font-size: 12px;">'
+                        . '<div class="fR"><i><span class="slGrey" style="font-size: 12px;">'
                         . '<span style="font-size: 8px;">('.$fld->FldType.')</span> '
                         . $fld->FldName . '</span></i></div><div class="fC"></div>'
                 ];
             }
         }
+        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
@@ -1181,7 +1184,7 @@ class AdminDBController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.db.diagrams', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     // http://www.html5canvastutorials.com/tutorials/
@@ -1348,7 +1351,7 @@ class AdminDBController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.db.field-matrix', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function tblSelector(Request $request, $rT = '')
@@ -1555,8 +1558,7 @@ class AdminDBController extends AdminController
     
     protected function printBasicTblDesc($tbl, $foreignKeyTbls = '')
     {
-        if ($tbl && sizeof($tbl) > 0)
-        {
+        if ($tbl && sizeof($tbl) > 0) {
             $this->v["tbl"] = $tbl;
             $this->v["foreignKeyTbls"] = $foreignKeyTbls;
             return view('vendor.survloop.admin.db.inc-tblDesc', $this->v);
@@ -1614,11 +1616,10 @@ class AdminDBController extends AdminController
                     . $this->getTblName($fld->FldTable, 0) . ' record. ' 
                     . $fld->FldForeignMin . ' to ' . $fld->FldForeignMax . ' ' 
                     . $this->getTblName($fld->FldTable, 0) . ' records can be related to a single ' 
-                    . $this->getTblName($fld->FldForeignTable, 0) . ' record." >'
+                    . $this->getTblName($fld->FldForeignTable, 0) . ' record." class="label label-primary mB5" >'
                     . '<i class="fa fa-link"></i> ' . $GLOBALS["SL"]->tblEng[$fld->FldForeignTable] 
-                    . ' <span class="f8">(' 
-                    . $fld->FldForeign2Min . ',' . $fld->FldForeign2Max . ')-(' 
-                    . $fld->FldForeignMin . ',' . $fld->FldForeignMax . ')</span></a>';
+                    . ' (' . $fld->FldForeign2Min . ',' . $fld->FldForeign2Max . ')-(' 
+                    . $fld->FldForeignMin . ',' . $fld->FldForeignMax . ')</a>';
             } else {
                 return '<a href="/dashboard/db/table/' . $GLOBALS["SL"]->tbl[$fld->FldTable] 
                     . '" data-toggle="tooltip" data-placement="top" title="Degree of Participation: '
@@ -1627,11 +1628,10 @@ class AdminDBController extends AdminController
                     . $this->getTblName($fld->FldForeignTable, 0) . ' record. ' 
                     . $fld->FldForeign2Min . ' to ' . $fld->FldForeign2Max . ' ' 
                     . $this->getTblName($fld->FldForeignTable, 0) . ' records can be related to a single ' 
-                    . $this->getTblName($fld->FldTable, 0) . ' record." >'
+                    . $this->getTblName($fld->FldTable, 0) . ' record." class="label label-primary mB5" >'
                     . '<i class="fa fa-link"></i> ' . $GLOBALS["SL"]->tblEng[$fld->FldTable] 
-                    . ' <span class="f8">(' 
-                    . $fld->FldForeignMin . ',' . $fld->FldForeignMax . ')-(' 
-                    . $fld->FldForeign2Min . ',' . $fld->FldForeign2Max . ')</span></a>';
+                    . ' (' . $fld->FldForeignMin . ',' . $fld->FldForeignMax . ')-(' 
+                    . $fld->FldForeign2Min . ',' . $fld->FldForeign2Max . ')</a>';
             }
         }
         return '';

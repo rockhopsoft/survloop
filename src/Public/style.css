@@ -200,12 +200,6 @@ label {
 .timeWrap input {
 	width: 60px;
 }
-input.dateVal, input.dateDef {
-	color: #000;
-}
-input.dateDef {
-	color: #999;
-}
 input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
     width: 400px;
 }
@@ -267,6 +261,45 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
 .nKids {
 
 }
+
+
+.slTagList {
+    margin-top: 20px;
+    line-height: 55px;
+}
+.slTagWrap {
+    display: inline;
+    padding-right: 20px;
+    margin-bottom: 20px;
+    overflow: visible;
+}
+.slTag, .slTagBig {
+    display: inline;
+    white-space: nowrap;
+    font-size: 16pt;
+    padding: 8px 0px 8px 10px;
+    color: #2b3493;
+    background: #edf8ff;
+    border: 1px #2b3493 solid;
+    -moz-border-radius: 10px; border-radius: 10px;
+    overflow: visible;
+}
+.slTag a:link, .slTag a:active, .slTag a:visited, .slTag a:hover, 
+.slTagBig a:link, .slTagBig a:active, .slTagBig a:visited, .slTagBig a:hover {
+    font-size: 16pt;
+    color: #2b3493;
+    padding: 0px 10px;
+    margin-left: 10px;
+    border-left: 1px #2b3493 dotted;
+}
+.slTagBig {
+    font-size: 20pt;
+    padding: 12px 0px 12px 10px;
+}
+.slTagBig a:link, .slTagBig a:active, .slTagBig a:visited, .slTagBig a:hover {
+    font-size: 20pt;
+}
+
 
 #pageBtns {
     width: 100%;

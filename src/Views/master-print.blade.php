@@ -38,6 +38,13 @@
     <link href="/survloop/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/survloop/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
     
+    @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
+        {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
+    @endif
+    @section('headCode')
+            
+    @show
+    
     <script type="text/javascript" src="/survloop/scripts-lib.js"></script>
     <script type="text/javascript" src="/survloop/scripts.js"></script>
     <link rel="stylesheet" type="text/css" href="/survloop/style.css">
@@ -46,9 +53,6 @@
     <link rel="stylesheet" type="text/css" href="/survloop/sys.css">
     @endif
     
-    @section('headCode')
-            
-    @show
   </head>
 <body>
 <script src="/survloop/bootstrap/js/bootstrap.min.js"></script>

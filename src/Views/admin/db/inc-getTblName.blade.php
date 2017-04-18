@@ -2,7 +2,7 @@
     @if (!isset($link) || $link == 1)
         <a href="/dashboard/db/table/{!! $GLOBALS['SL']->tbl[$id] !!}"
         @if (isset($xtraLnk)) {!! $xtraLnk !!} @endif
-        > {!! $GLOBALS['SL']->tblEng[$id] !!}
+        class="label label-primary"> {!! $GLOBALS['SL']->tblEng[$id] !!}
         @if (isset($xtraTxt)) {!! $xtraTxt !!} @endif
         </a>
     @elseif ($link <= 0)
@@ -11,7 +11,7 @@
     @else
         <a href="#tbl{{ $id }}" 
         @if (isset($xtraLnk)) {!! $xtraLnk !!} @endif
-        >{!! $GLOBALS['SL']->tblEng[$id] !!}
+        class="label label-primary">{!! $GLOBALS['SL']->tblEng[$id] !!}
         @if (isset($xtraTxt)) {!! $xtraTxt !!} @endif
         </a>
     @endif

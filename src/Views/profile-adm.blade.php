@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/profileAdm.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 <div class="fC p20"></div>

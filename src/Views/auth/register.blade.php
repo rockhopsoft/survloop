@@ -1,120 +1,137 @@
-<!-- resources/views/vendor/survloop/auth/register.blade.php -->
-
 <?php // sorry, not sure how this should be done instead
 $surv = new SurvLoop\Controllers\SurvLoop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
 ?>
-
 @extends('vendor.survloop.master')
 
 @section('content')
+<!-- resources/views/vendor/survloop/auth/register.blade.php -->
 
-<div class="p20"></div>
+<div class="p10"></div>
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row m0">
-                        <div class="col-md-9 pB10">
-                            @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
-                                && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
-                                {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
-                            @else
-                                <h1 class="m0">Sign Up</h1>
-                            @endif
-                        </div>
-                        <div class="col-md-3 taR pT5">
-                            @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
-                                || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
-                                <a href="/login" class="btn btn-default">Login</a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal" role="form" method="POST" action="{{ url('/register') }}">
-                    <input type="hidden" name="newVolunteer" value="1" >
-                        {{ csrf_field() }}
+<center><div class="halfPageWidth">
+<form method="POST" action="{{ url('/register') }}">
+{!! csrf_field() !!}
 
-                        <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                            <label for="name" class="col-md-4 control-label">
-                                <span class="nPrompt">Username</span>
-                            </label>
-                            
-                            <div class="col-md-6">
-                                <input id="name" type="text" class="form-control" fingerTxt name="name" 
-                                    value="{{ old('name') }}" required autofocus >
-
-                                @if ($errors->has('name'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('name') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">
-                                <span class="nPrompt">E-Mail Address</span>
-                            </label>
-                            
-                            <div class="col-md-6">
-                                <input id="email" type="email" class="form-control fingerTxt" 
-                                    name="email" value="{{ old('email') }}" required>
-
-                                @if ($errors->has('email'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('email') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <label for="password" class="col-md-4 control-label">
-                                <span class="nPrompt">Password</span>
-                            </label>
-                           
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control fingerTxt" 
-                                    name="password" required >
-
-                                @if ($errors->has('password'))
-                                    <span class="help-block">
-                                        <strong>{{ $errors->first('password') }}</strong>
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password-confirm" class="col-md-4 control-label">
-                                <span class="nPrompt">Confirm Password</span>
-                            </label>
-                            
-                            <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control fingerTxt" 
-                                    name="password_confirmation" required >
-                            </div>
-                        </div>
-
-                        <div class="form-group taC">
-                            <button type="submit" class="btn btn-primary f32">
-                                Register
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-md-6">
+        @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
+            && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
+            {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
+        @else
+            <h1 class="mT0">Sign Up</h1>
+        @endif
+    </div>
+    <div class="col-md-6 taR pT20">
+        @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
+            || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
+            <a href="/login" class="btn btn-default">Login</a>
+        @endif
     </div>
 </div>
 
-<div class="nodeGap"></div>
+<div class="nodeAnchor"><a name="n004"></a></div>
+@if (!isset($GLOBALS['SL']->sysOpts["login-instruct"]) || trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
+    <h4 class="mB20">{!! $GLOBALS['SL']->sysOpts["login-instruct"] !!}</h4>
+@endif
 
-</form></div></center>
+@if (isset($errorMsg))
+    <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
+@endif
+
+<div id="node004" class="nodeWrap form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+    <div id="nLabel004" class="nPrompt"><label for="nameID">
+        Username: 
+        @if ($GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
+            <span class="red">*required</span>
+        @endif
+    </label></div>
+    <div class="nFld mT0">
+        <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
+        @if ($errors->has('name'))
+            <span class="help-block">
+                <strong>{{ $errors->first('name') }}</strong>
+            </span>
+        @endif
+    </div>
+</div>
+
+<div class="nodeAnchor"><a name="n001"></a></div>
+<div class="nodeHalfGap"></div>
+
+<div id="node001" class="nodeWrap form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+    <div id="nLabel001" class="nPrompt"><label for="emailID">
+        Email:
+        @if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
+            || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off')
+            <span class="red">*required</span>
+        @endif
+    </label></div>
+    <div class="nFld mT0">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
+        @if ($errors->has('email'))
+            <span class="help-block">
+                <strong>{{ $errors->first('email') }}</strong>
+            </span>
+        @endif
+    </div>
+</div>
+
+<div class="nodeAnchor"><a name="n002"></a></div>
+<div class="nodeHalfGap"></div>
+
+<div id="node002" class="nodeWrap form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+    <div id="nLabel002" class="nPrompt"><label for="password">
+        Password: <span class="red">*required</span>
+    </label></div>
+    <div class="nFld mT0">
+        <input id="password" name="password" value="" type="password" class="form-control">
+        @if ($errors->has('password'))
+            <span class="help-block">
+                <strong>{{ $errors->first('password') }}</strong>
+            </span>
+        @endif
+    </div>
+</div>
+
+<div class="nodeAnchor"><a name="n003"></a></div>
+<div class="nodeHalfGap"></div>
+
+<div id="node003" class="nodeWrap">
+    <div id="nLabel003" class="nPrompt"><label for="password-confirm">
+        Confirm Password: <span class="red">*required</span>
+    </label></div>
+    <div class="nFld mT0">
+        <input id="password_confirmation" name="password_confirmation" value="" type="password" 
+            class="form-control">
+    </div>
+</div>
+
+<div class="nodeHalfGap"></div>
+
+<label><input type="checkbox" name="newVolunteer" value="1" > Volunteer</label>
+
+<center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"
+    onClick="return checkNodeForm();"></center>
+
+<div class="nodeHalfGap"></div>
+</form>
+</div></center>
+
+<script type="text/javascript">
+function checkNodeForm() {
+    hasAttemptedSubmit = true;
+    totFormErrors=0; formErrorsEng = "";
+    {!! view('vendor.survloop.auth.register-node-jsValid', [ "coreID" => -3 ])->render() !!}
+    if (totFormErrors > 0) {
+        setFormErrs();
+        return false;
+    }
+    clearFormErrs();
+    firstNodeError = 0;
+    return true;
+}
+</script>
 
 @endsection

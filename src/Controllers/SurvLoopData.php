@@ -1,6 +1,7 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use Auth;
 use App\Models\SLFields;
 use App\Models\SLNodeSaves;
 
@@ -56,7 +57,9 @@ class SurvLoopData
     {
         $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = [];
         $this->loadData($this->coreTbl, $this->coreID);
-        
+        /* if (Auth::user() && Auth::user()->id) {
+            $this->loadData('users', Auth::user()->id);
+        } */
         // check for data needed for root data loop which isn't connected to the core record
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
             eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" . $isBigSurvLoop[1] 
@@ -717,6 +720,11 @@ class SurvLoopData
                 foreach ($newVals as $i => $val) {
                     if (!in_array($val, $this->helpInfo[$tblFld]["pastVals"]) 
                         && isset($this->helpInfo[$tblFld]["link"]->DataHelpTable)) {
+                        if ($this->helpInfo[$tblFld]["parentID"] <= 0 
+                            && $this->helpInfo[$tblFld]["link"]->DataHelpParentTable == 'users') {
+                            $this->helpInfo[$tblFld]["parentID"] = ((Auth::user() && Auth::user()->id) 
+                                ? Auth::user() && Auth::user()->id : -3);
+                        }
                         eval("\$newObj = new " 
                             . $GLOBALS["SL"]->modelPath($this->helpInfo[$tblFld]["link"]->DataHelpTable) . ";");
                         $newObj->{ $this->helpInfo[$tblFld]["link"]->DataHelpKeyField } 
@@ -742,7 +750,7 @@ class SurvLoopData
     public function getCheckboxHelperInfo($tbl, $fld)
     {
         $tblFld = $tbl . '-' . $fld;
-        if (!isset($this->helpInfo[$tblFld])) {
+        if (!isset($this->helpInfo[$tblFld]) || $this->helpInfo[$tblFld]["parentID"] < 0) {
             $this->helpInfo[$tblFld] = [
                 "link"        => [],
                 "parentID"    => -3,
@@ -801,7 +809,7 @@ class SurvLoopData
     public function logDataSave($nID = -3, $tbl = '', $itemID = -3, $fld = '', $newVal = '')
     {
         $nodeSave = new SLNodeSaves;
-        $nodeSave->NodeSaveSession    = $this->coreID;
+        $nodeSave->NodeSaveSession    = ((intVal($this->coreID) > 0) ? $this->coreID : 0);
         $nodeSave->NodeSaveNode       = $nID;
         $nodeSave->NodeSaveTblFld     = $tbl . ':' . $fld;
         $nodeSave->NodeSaveLoopItemID = $itemID;

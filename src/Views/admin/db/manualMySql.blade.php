@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/db/manualMySql.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
@@ -9,7 +9,7 @@
 @if (isset($lastSql) && trim($lastSql) != '')
 	<div class="brd round20 p20">
 	    <h2 class="mT0">Full Query...</h2>
-	    <textarea class="w100 gry9 f10" style="height: 80px;">{!! $lastSql !!}</textarea>
+	    <textarea class="w100 slGrey f10" style="height: 80px;">{!! $lastSql !!}</textarea>
 	    <h2>Query Results...</h2>
 	    @forelse ($lastResults as $sql)
 	        @if (trim($sql[1]) == '')

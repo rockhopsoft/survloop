@@ -48,12 +48,22 @@
             >Data XML Map</a>
         <a class="btn btn-default pull-right mL10" id="adminAboutTog" href="/dashboard/tree/data"
             >Tree Data Structures</a>
-            
-        A user experience is created as a tree filled with branching nodes. Click an ID# to edit any node. 
-        Click <i class="fa fa-expand fa-flip-horizontal slBlueLight"></i> to show or hide all the node's children.
-        Click <i class="fa fa fa-dot-circle-o gryA"></i> to add new nodes, or to move a node. 
-        <a id="adminAboutTog" href="javascript:void(0)">Read more about these branching trees.</a>
+        <span class="slGrey">
+            A user experience is created as a tree filled with branching nodes. Click an ID# to edit any node. 
+            Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
+            Click <i class="fa fa fa-dot-circle-o"></i> to add new nodes, or to move a node. 
+            <a id="adminAboutTog" href="javascript:void(0)">Read more about these branching trees.</a>
+        </span>
     </div>
+@endif
+
+@if ($GLOBALS['SL']->treeIsAdmin)
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
+        class="f20">{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ 
+        $GLOBALS['SL']->treeRow->TreeSlug }}</a>
+@else                                                              
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
+        class="f20">{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}
 @endif
 
 {!! $printTree !!}

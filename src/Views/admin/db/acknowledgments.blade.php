@@ -5,7 +5,7 @@
 <div id="acknows" class="jumbotron mT20">
     <a href="http://www.amazon.com/gp/product/0321884493/" target="_blank"><img src="/survloop/hernandez.png" 
         border=0 width=16% hspace=5 align=right ></a> 
-    <h1>Acknowledgments</h1>
+    <h2>Acknowledgments</h2>
     <p>
         Since its inception, the emerging database design tools have been striving to rely upon 
         best-practice recommendations presented in <a href="http://www.amazon.com/gp/product/0321884493/" 

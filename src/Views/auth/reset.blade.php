@@ -27,7 +27,7 @@ $v = $surv->custLoop->v;
 <div class="nodeWrap">
     <div class="nPrompt"><label for="emailID">Email:</label></div>
     <div class="nFld">
-        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control fingerTxt">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control input-lg">
     </div>
 </div>
 
@@ -35,7 +35,7 @@ $v = $surv->custLoop->v;
 
 <div class="nodeWrap">
 <div class="nPrompt"><label for="password">Password:</label></div>
-<div class="nFld"><input id="password" name="password" type="password" class="form-control fingerTxt"></div>
+<div class="nFld"><input id="password" name="password" type="password" class="form-control input-lg"></div>
 </div>
 
 <div class="nodeGap"></div>
@@ -43,7 +43,7 @@ $v = $surv->custLoop->v;
 <div class="nodeWrap">
     <div class="nPrompt"><label for="password_confirmation">Confirm Password:</label></div>
     <div class="nFld">
-        <input id="password_confirmation" name="password_confirmation" type="password" class="form-control fingerTxt">
+        <input id="password_confirmation" name="password_confirmation" type="password" class="form-control input-lg">
     </div>
 </div>
 

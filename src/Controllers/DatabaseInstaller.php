@@ -111,7 +111,7 @@ class DatabaseInstaller extends AdminDBController
             $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function printExportLaravel(Request $request) 
@@ -224,8 +224,12 @@ class DatabaseInstaller extends AdminDBController
                         }
                     }
                     file_put_contents($newModelFilename, $fullFileOut);
-                    copy($newModelFilename, str_replace('/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/', 
-                        '/Models/', $newModelFilename));
+                    try {
+                        copy($newModelFilename, str_replace('/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/', 
+                            '/Models/', $newModelFilename));
+                    } catch (Exception $e) {
+                        //echo 'Caught exception: ',  $e->getMessage(), "\n";
+                    }
                     
                     if (file_exists('../app/Models/' . $this->v["tblClean"] . '.php')) {
                         eval("\$seedChk = " . $modelPath . $this->v["tblClean"] . "::get();");
@@ -282,7 +286,7 @@ class DatabaseInstaller extends AdminDBController
             $this->v["content"] = view('vendor.survloop.admin.db.export-laravel', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function autoInstallDatabase(Request $request) 
@@ -311,38 +315,42 @@ class DatabaseInstaller extends AdminDBController
         
             foreach ($GLOBALS["SL"]->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
-                DB::statement('DROP TABLE IF EXISTS `' 
-                    . $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$createTbl] . '`');
-                $createQry = $this->exportMysqlTbl($tbl, true);
-                echo $createQry . '<br />';
-                DB::statement($createQry);
-                $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["SL"]->tbl[$createTbl]; // $createQry;
+                if (!in_array($GLOBALS["SL"]->tbl[$createTbl], ['users', 'Users'])) {
+                    DB::statement('DROP TABLE IF EXISTS `' 
+                        . $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$createTbl] . '`');
+                    $createQry = $this->exportMysqlTbl($tbl, true);
+                    echo $createQry . '<br />';
+                    DB::statement($createQry);
+                    $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["SL"]->tbl[$createTbl]; // $createQry;
+                }
             }
             
             if ($GLOBALS["SL"]->REQ->has('copyData') && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
                 foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
-                    $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
-                    if (isset($transferData[$copyTbl]) && sizeof($transferData[$copyTbl]) > 0) {
-                        $newFlds = array();
-                        $flds = SLFields::where('FldTable', $copyTbl)
-                            ->where('FldDatabase', $this->dbID)
-                            ->get();
-                        if ($flds && sizeof($flds) > 0) {
-                            $tblAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$copyTbl]];
-                            foreach ($flds as $fld) $newFlds[] = $fld->FldName;
-                            foreach ($transferData[$copyTbl] as $oldRec) {
-                                eval("\$newRec = new " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl]) . ";");
-                                $newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
-                                $newRec->created_at = $oldRec->created_at;
-                                $newRec->updated_at = $oldRec->updated_at;
-                                foreach ($newFlds as $fldName) {
-                                    if (isset($oldRec->{$tblAbbr.$fldName})) {
-                                        $newRec->{$tblAbbr.$fldName} = $oldRec->{$tblAbbr.$fldName};
+                    if (!in_array($GLOBALS["SL"]->tbl[$createTbl], ['users', 'Users'])) {
+                        $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
+                        if (isset($transferData[$copyTbl]) && sizeof($transferData[$copyTbl]) > 0) {
+                            $newFlds = array();
+                            $flds = SLFields::where('FldTable', $copyTbl)
+                                ->where('FldDatabase', $this->dbID)
+                                ->get();
+                            if ($flds && sizeof($flds) > 0) {
+                                $tblAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$copyTbl]];
+                                foreach ($flds as $fld) $newFlds[] = $fld->FldName;
+                                foreach ($transferData[$copyTbl] as $oldRec) {
+                                    eval("\$newRec = new " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl]) . ";");
+                                    $newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
+                                    $newRec->created_at = $oldRec->created_at;
+                                    $newRec->updated_at = $oldRec->updated_at;
+                                    foreach ($newFlds as $fldName) {
+                                        if (isset($oldRec->{$tblAbbr.$fldName})) {
+                                            $newRec->{$tblAbbr.$fldName} = $oldRec->{$tblAbbr.$fldName};
+                                        }
                                     }
+                                    $newRec->save();
+                                    $this->v["log"] .= '<br />transferring ' . $tblAbbr 
+                                        . ' record: ' . $newRec->{$tblAbbr.'ID'};
                                 }
-                                $newRec->save();
-                                $this->v["log"] .= '<br />transferring ' . $tblAbbr 
-                                    . ' record: ' . $newRec->{$tblAbbr.'ID'};
                             }
                         }
                     }

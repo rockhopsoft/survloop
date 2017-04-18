@@ -6,7 +6,7 @@
 @forelse($sorts as $sort)
     <li id="item-{{ $sort[0] }}">
         <div class="col-md-11 taL"><i class="fa fa-ellipsis-v slBlueLight mR20"></i> {!! $sort[1] !!}</div>
-        <div class="col-md-1 taR gry9"></div>
+        <div class="col-md-1 taR slGrey"></div>
         <div class="clearfix"></div>
     </li>
 @empty

@@ -7,7 +7,7 @@
         <span style="margin-right: -4px;">NOT</span>
     @endif
     @if ($cond->CondTag == '#NodeDisabled')
-        <b class="red fPerc125">{{ $cond->CondTag }}</b>
+        <b class="red fPerc133">{{ $cond->CondTag }}</b>
     @elseif (trim($cond->CondOperator) == 'CUSTOM')
         {{ $cond->CondTag }} Condition
     @else
@@ -49,18 +49,18 @@
             @elseif (sizeof($cond->condVals) > 0)
                 @if (sizeof($cond->condVals) == 1)
                     @if ($cond->CondOperator == '{')
-                        <span class="gry9">is</span>  
+                        <span class="slGrey">is</span>  
                     @elseif ($cond->CondOperator == '}')
-                        <span class="gry9">is not</span> 
+                        <span class="slGrey">is not</span> 
                     @endif
                     @foreach ($cond->condFldResponses["vals"] as $j => $valInfo)
                         @if (trim($valInfo[0]) == trim($cond->condVals[0])) {{ $valInfo[1] }} @endif 
                     @endforeach
                 @else
                     @if ($cond->CondOperator == '{')
-                        <span class="gry9">is in {</span> 
+                        <span class="slGrey">is in {</span> 
                     @elseif ($cond->CondOperator == '}')
-                        <span class="gry9">is not in {</span>
+                        <span class="slGrey">is not in {</span>
                     @endif
                     @foreach ($cond->condVals as $i => $val)
                         @if ($i > 0) , @endif
@@ -68,7 +68,7 @@
                             @if (trim($valInfo[0]) == trim($val)) {{ $valInfo[1] }} @endif 
                         @endforeach
                     @endforeach
-                    <span class="gry9">}</span>
+                    <span class="slGrey">}</span>
                 @endif
             @endif
         @endif

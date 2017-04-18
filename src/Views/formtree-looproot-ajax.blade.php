@@ -24,7 +24,7 @@ $(".unDelLoopItem").click(function() {
 });
 function updateCnt(addCnt) {
     currItemCnt += addCnt;
-    if (currItemCnt < maxItemCnt) document.getElementById("nFormAdd").style.display="block";
+    if (maxItemCnt <= 0 || currItemCnt < maxItemCnt) document.getElementById("nFormAdd").style.display="block";
     else document.getElementById("nFormAdd").style.display="none";
     return true;
 }

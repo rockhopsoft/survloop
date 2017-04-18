@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/db/rules.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
@@ -28,7 +28,7 @@
         @if ($dbAllowEdits) Edit @else View @endif
         </a></div>
         <div class="col-md-7 p10"><h2 class="mT0">{!! $rule->RuleStatement !!}</h2>
-            <div class="p5 gry9">{{ $rule->RuleConstraint }}</div></div>
+            <div class="p5 slGrey">{{ $rule->RuleConstraint }}</div></div>
         <div class="col-md-3 p10">
         @if (isset($ruleTbls[$cnt]) != '' && trim($ruleTbls[$cnt]) != ',')
             {!! $ruleTbls[$cnt] !!}

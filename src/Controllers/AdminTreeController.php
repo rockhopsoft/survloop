@@ -2,6 +2,7 @@
 namespace SurvLoop\Controllers;
 
 use DB;
+use Auth;
 use Storage;
 use Illuminate\Http\Request;
 
@@ -90,20 +91,21 @@ class AdminTreeController extends AdminController
                 $newCond->CondOperator = 'CUSTOM';
                 $newCond->save();
             }
+            session()->put('chkCoreTbls', 1);
         }
         if (!isset($GLOBALS["SL"]->treeRow->TreeRoot) || $GLOBALS["SL"]->treeRow->TreeRoot <= 0) {
             $newRoot = new SLNode;
-            $newRoot->NodeTree            = $this->treeID;
-            $newRoot->NodeParentID        = -3;
+            $newRoot->NodeTree           = $this->treeID;
+            $newRoot->NodeParentID       = -3;
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $newRoot->NodeType        = 'Page';
-                $newRoot->NodeDataBranch  = $GLOBALS["SL"]->coreTbl;
+                $newRoot->NodeType       = 'Page';
+                $newRoot->NodeDataBranch = $GLOBALS["SL"]->coreTbl;
                 if (isset($GLOBALS["SL"]->treeRow->TreeSlug) && trim($GLOBALS["SL"]->treeRow->TreeSlug) != '') {
                     $newRoot->NodePromptNotes = $GLOBALS["SL"]->treeRow->TreeSlug;
                 } else {
                     $newRoot->NodePromptNotes = $this->slugify($GLOBALS["SL"]->treeRow->TreeName);
                 }
-                $newRoot->NodeCharLimit   = -1;
+                $newRoot->NodeCharLimit  = -1;
             } else {
                 $newRoot->NodeType = 'Data Manip: New';
                 $newRoot->NodeDataBranch = $GLOBALS["SL"]->coreTbl;
@@ -150,7 +152,7 @@ class AdminTreeController extends AdminController
         }
         $treeAbout = view('vendor.survloop.admin.tree.tree-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function adminPrintFullTreePublic(Request $request, $treeSlug = '')
@@ -163,7 +165,7 @@ class AdminTreeController extends AdminController
                 if ($t->TreeOpts%3 > 0) { // no admin trees made public [for now]
                     $this->treeID = $t->TreeID;
                     $this->dbID = $t->TreeDatabase;
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -172,8 +174,8 @@ class AdminTreeController extends AdminController
             $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
                 "sysOpts" => $GLOBALS["SL"]->sysOpts
             ])->render();
-            $this->v["content"] = '<div class="pL20"><h1>Core Specifications of ' 
-                . $GLOBALS["SL"]->treeRow->TreeName . ' User Experience</h1>' 
+            $this->v["content"] = '<div class="pL20"><h2>Core Specifications of ' 
+                . $GLOBALS["SL"]->treeRow->TreeName . ' User Experience</h2>' 
                 . $this->v["IPlegal"] . '</div><div class="pT20">' 
                 . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true) . '</div>';
             $this->saveCache();
@@ -187,7 +189,8 @@ class AdminTreeController extends AdminController
         if (!$tree || !isset($tree->TreeName)) return $this->redir('/dashboard/pages/list');
         $this->treeID = $treeID;
         $this->dbID = $tree->TreeDatabase;
-        $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
+        $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
+        $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
         $this->admControlInit($request, '/dashboard/pages/list');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
@@ -196,7 +199,7 @@ class AdminTreeController extends AdminController
         }
         $treeAbout = view('vendor.survloop.admin.tree.page-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function pagesList(Request $request)
@@ -212,21 +215,28 @@ class AdminTreeController extends AdminController
             if ($tree->TreeSlug == '') $tree->TreeSlug = $this->slugify($request->newPageName);
             $tree->TreeOpts = 1;
             if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
-                $tree->TreeOpts *= 7;
+                $tree->TreeOpts *= 3;
             }
             $tree->save();
             return $this->redir('/dashboard/page/' . $tree->TreeID);
         }
+        if ($request->has('sublurb')) {
+            $blurb = $this->blurbNew($request);
+            if ($blurb > 0) return $this->redir('/dashboard/blurbs/' . $blurb);
+        }
         $this->v["myPages"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
             ->where('TreeType', 'LIKE', 'Page')
             ->orderBy('TreeName', 'asc')
+            ->get();
+        $this->v["blurbRows"] = SLDefinitions::where('DefSet', 'Blurbs')
+            ->orderBy('DefSubset')
             ->get();
         return view('vendor.survloop.admin.tree.pages', $this->v);
     }
     
     public function data(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/tree/data');
+        $this->admControlInit($request, '/dashboard/tree/map?all=1');
         if ($request->has('dataStruct')) {
             if ($request->has('delSub')) {
                 $found = SLDataSubsets::find($request->input('delSub'))->delete();
@@ -276,7 +286,7 @@ class AdminTreeController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.tree.tree-data', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function nodeEdit(Request $request, $nID) 
@@ -295,7 +305,7 @@ class AdminTreeController extends AdminController
         if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function treeStats(Request $request) 
@@ -306,7 +316,7 @@ class AdminTreeController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.tree.treeStats', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
 
     public function treeSessions(Request $request) 
@@ -316,7 +326,7 @@ class AdminTreeController extends AdminController
             $this->v["content"] = view('vendor.survloop.admin.tree.treeSessions', $this->v)->render();
             $this->saveCache();
         }
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
 
     public function workflows(Request $request) 
@@ -453,7 +463,7 @@ class AdminTreeController extends AdminController
         $xmlmap = new SurvLoopTreeXML;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
-        return view('vendor.survloop.admin.admin', $this->v);
+        return view('vendor.survloop.master', $this->v);
     }
     
 
@@ -481,7 +491,7 @@ class AdminTreeController extends AdminController
         $db->DbDesc    = trim($request->DbDesc);
         $db->DbMission = trim($request->DbMission);
         $db->save();
-        $GLOBALS["SL"] = new DatabaseLookups($request, $db->dbID, -3);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $db->dbID, -3);
         return $db;
     }
     
@@ -606,7 +616,7 @@ class AdminTreeController extends AdminController
         
         $this->installNewCoreTable($coreTbl);
         
-        $GLOBALS["SL"] = new DatabaseLookups($request, $GLOBALS["SL"]->dbID, $tree->TreeID);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $GLOBALS["SL"]->dbID, $tree->TreeID);
         return true;
     }
     

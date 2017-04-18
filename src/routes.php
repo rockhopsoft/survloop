@@ -18,6 +18,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/sub',           'SurvLoop\\Controllers\\SurvLoop@index');
     
     Route::get( '/ajax',          'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::get( '/ajax/{type}',   'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
     Route::get( '/sortLoop',      'SurvLoop\\Controllers\\SurvLoop@sortLoop');
     Route::get( '/holdSess',      'SurvLoop\\Controllers\\SurvLoop@holdSess');
     Route::get( '/restart',       'SurvLoop\\Controllers\\SurvLoop@restartSess');
@@ -36,7 +37,18 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
     Route::get( '/up/{treeID}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
+
+    Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
+    Route::get( '/search-results/{treeID}',  'SurvLoop\\Controllers\\SurvLoop@searchResultsAjax');
     
+    Route::get( '/records-full/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordFulls');
+    Route::get( '/record-prevs/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordPreviews');
+    Route::get( '/record-check/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxMultiRecordCheck');
+    
+    Route::get( '/ajax-emoji-tag/{treeID}/{recID}/{defID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxEmojiTag');
+    
+    Route::get( '/{treeSlug}-read/{cid}/{ComSlug}',   'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
     Route::get( '/{treeSlug}-report/{cid}/{ComSlug}', 'SurvLoop\\Controllers\\SurvLoop@byID');
     Route::get( '/{treeSlug}-report/{cid}',           'SurvLoop\\Controllers\\SurvLoop@byID');
     
@@ -49,23 +61,23 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/xml-example',                 'SurvLoop\\Controllers\\SurvLoop@getXmlExample');
     Route::get( '/xml-schema',                  'SurvLoop\\Controllers\\SurvLoop@genXmlSchema');
     
-    Route::get( '/fresh/creator',           'SurvLoop\\Controllers\\AdminTreeController@freshUser');
-    Route::post('/fresh/database',          'SurvLoop\\Controllers\\AdminTreeController@freshDB');
-    Route::get( '/fresh/database',          'SurvLoop\\Controllers\\AdminTreeController@freshDB');
-    Route::post('/fresh/user-experience',   'SurvLoop\\Controllers\\AdminTreeController@freshUX');
-    Route::get( '/fresh/user-experience',   'SurvLoop\\Controllers\\AdminTreeController@freshUX');
+    Route::get( '/fresh/creator',         'SurvLoop\\Controllers\\AdminTreeController@freshUser');
+    Route::post('/fresh/database',        'SurvLoop\\Controllers\\AdminTreeController@freshDB');
+    Route::get( '/fresh/database',        'SurvLoop\\Controllers\\AdminTreeController@freshDB');
+    Route::post('/fresh/user-experience', 'SurvLoop\\Controllers\\AdminTreeController@freshUX');
+    Route::get( '/fresh/user-experience', 'SurvLoop\\Controllers\\AdminTreeController@freshUX');
     
     
     ///////////////////////////////////////////////////////////
     
-    Route::post('/register',               'SurvLoop\Controllers\Auth\SurvRegisterController@register');
-    Route::post('/afterLogin',             'SurvLoop\\Controllers\\SurvLoop@afterLogin');
-    Route::get( '/afterLogin',             'SurvLoop\\Controllers\\SurvLoop@afterLogin');
-    Route::get( '/logout',                 'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');
-    Route::get( '/chkEmail',               'SurvLoop\\Controllers\\SurvLoop@chkEmail');
+    Route::post('/register',   'SurvLoop\Controllers\Auth\SurvRegisterController@register');
+    Route::post('/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
+    Route::get( '/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
+    Route::get( '/logout',     'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');
+    Route::get( '/chkEmail',   'SurvLoop\\Controllers\\SurvLoop@chkEmail');
     
     // Authentication routes...
-    //Route::post('/login',                  'SurvLoop\Controllers\Auth\AuthController@postLogin');
+    Route::post('/login',                  'SurvLoop\Controllers\Auth\AuthController@postLogin');
     //Route::get( '/login',                  'SurvLoop\Controllers\Auth\AuthController@getLogin');
     
     // Registration routes...
@@ -114,16 +126,6 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => 'auth'
     ]);
     
-    Route::post('/dashboard/user/{uid}',     [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@updateProfile',     
-        'middleware' => 'auth'
-    ]);
-    
-    Route::get( '/dashboard/user/{uid}',     [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@showProfile',             
-        'middleware' => 'auth'
-    ]);
-    
     
     
     
@@ -138,32 +140,70 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::get('/dashboard/subs/unpublished', [
+        'uses'       => 'SurvLoop\Controllers\SurvLoop@listUnpublished',    
+        'middleware' => ['auth']
+    ]);
+    
     Route::get('/dashboard/subs/incomplete', [
         'uses'       => 'SurvLoop\Controllers\SurvLoop@listSubsIncomplete',    
         'middleware' => ['auth']
     ]);
     
-    
-    Route::post('/dashboard/subs/emails', [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@manageEmails', 
+    Route::post('/dashboard/subs/{treeID}/{cid}', [
+        'uses'       => 'SurvLoop\Controllers\SurvLoop@printSubView',    
+        'middleware' => ['auth']
+    ]);
+    Route::get('/dashboard/subs/{treeID}/{cid}', [
+        'uses'       => 'SurvLoop\Controllers\SurvLoop@printSubView',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs/emails', [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@manageEmails', 
+    
+    Route::post('/dashboard/emails', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@manageEmails', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/subs/email/{emailID}', [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@manageEmailsPost', 
+    Route::get('/dashboard/emails', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@manageEmails', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs/email/{emailID}', [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@manageEmailsForm', 
+    Route::post('/dashboard/email/{emailID}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@manageEmailsPost', 
         'middleware' => ['auth']
     ]);
     
+    Route::get('/dashboard/email/{emailID}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@manageEmailsForm', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/blurbs/{blurbID}', [
+        'uses' => 'SurvLoop\Controllers\AdminController@blurbEditSave', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/blurbs/{blurbID}', [
+        'uses' => 'SurvLoop\Controllers\AdminController@blurbEdit', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/users/email', [
+        'uses' => 'SurvLoop\Controllers\AdminController@userEmailing', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/users', [
+        'uses' => 'SurvLoop\Controllers\SurvLoop@userManagePost', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/users', [
+        'uses' => 'SurvLoop\Controllers\SurvLoop@userManage', 
+        'middleware' => ['auth']
+    ]);
     
     
     ///////////////////////////////////////////////////////////

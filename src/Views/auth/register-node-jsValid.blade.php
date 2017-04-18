@@ -1,12 +1,24 @@
 /* resources/views/auth/register-node-jsValid.blade.php */
 
-if (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')
-{
-    setFormLabelRed('001'); 
-    totFormErrors++;
-}
-else
-{
+@if (isset($GLOBALS["SL"]->sysOpts["user-name-ask"]) && $GLOBALS["SL"]->sysOpts["user-name-ask"] == 'On'
+    && $GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
+    if (document.getElementById('nameID').value.trim() == '') {
+        setFormLabelRed('004');
+        totFormErrors++;
+    } else {
+        setFormLabelBlack('004');
+    }
+@endif
+
+@if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off')
+    if (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '') {
+        setFormLabelRed('001'); 
+        totFormErrors++;
+    } else {
+@else
+    if (reqFormEmail('emailID') && document.getElementById('emailID').value.trim() != '') {
+@endif
+@if ($coreID > 0)
     document.getElementById('emailWarning').style.display='none';
     $.ajax({
         url: "/chkEmail?"+$("#emailID").serialize(),
@@ -33,6 +45,7 @@ else
             }
         }
     });
+@endif
 }
 if (document.getElementById('password') && document.getElementById('password_confirmation'))
 {
@@ -50,3 +63,13 @@ if (document.getElementById('password') && document.getElementById('password_con
         setFormLabelBlack('003');
     }
 }
+
+@if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
+    if (totFormErrors == 0 && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
+        @if ($coreID > 0)
+            document.getElementById('emailID').value = 'no.{{ $coreID }}.email@noemail.org';
+        @else
+            document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
+        @endif
+    }
+@endif

@@ -5,7 +5,7 @@ $formURL = (($ruleID <= 0) ? '/dashboard/db/bus-rules/add' : '/dashboard/db/bus-
 $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
 ?>
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
@@ -35,20 +35,20 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     <div class="panel-body">
         <fieldset class="form-group">
             <label for="RuleStatementID" data-toggle="tooltip" data-placement="top" 
-                title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="f10 gry9">?</span></label>
+                title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="f10 slGrey">?</span></label>
             <textarea class="form-control" id="RuleStatementID" name="RuleStatement" 
                 rows="2" ' . $chkDis . '>{{ $rule->RuleStatement }}</textarea>
         </fieldset>
         <fieldset class="form-group">
             <label for="RuleConstraintID" data-toggle="tooltip" data-placement="top" 
-                title="{{ $GLOBALS['SL']->fldAbouts['FldConstraint'] }}">Constraint <span class="f10 gry9">?</span></label>
+                title="{{ $GLOBALS['SL']->fldAbouts['FldConstraint'] }}">Constraint <span class="f10 slGrey">?</span></label>
             <textarea class="form-control" id="RuleConstraintID" name="RuleConstraint" 
                 rows="2" ' . $chkDis . '>{{ $rule->RuleConstraint }}</textarea>
         </fieldset>
         <div class="row">
             <div class="col-md-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsAppOrient'] }}"
-                    ><b>Type</b> <span class="f10 gry9">?</span></span>
+                    ><b>Type</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="radio" name="RuleType" id="rT2" value="2" {{ $chkDis }} 
@@ -66,7 +66,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             </div>
             <div class="col-md-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsRelation'] }}"
-                    ><b>Category</b> <span class="f10 gry9">?</span></span>
+                    ><b>Category</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="radio" name="RuleType57" id="rT5" value="5" {{ $chkDis }} 
@@ -84,7 +84,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             </div>
             <div class="col-md-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldTestOn'] }}"
-                    ><b>Test On</b> <span class="f10 gry9">?</span></span>
+                    ><b>Test On</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleTestOn[]" id="rT11" value="11" {{ $chkDis }} 
@@ -114,7 +114,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
 <div class="panel panel-info">
     <div class="panel-heading" data-toggle="tooltip" data-placement="top" 
         title="{{ $GLOBALS['SL']->fldAbouts['FldFields'] }}">
-        <h3 class="panel-title">Structures Affected <span class="f10 gry9">?</span></h3>
+        <h3 class="panel-title">Structures Affected <span class="f10 slGrey">?</span></h3>
     </div>
     <div class="panel-body">
         <div class="row pB20">

@@ -51,8 +51,10 @@
     <div class="panel-heading">
         <div class="panel-title">
             @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-                <a href="/dashboard/tree/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" class="btn btn-xs btn-default pull-right">Back to XML Map</a>
-                <h2 class="disIn"><span class="slBlueDark fPerc125 mR20">#{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
+                <a href="/dashboard/tree/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
+                    class="btn btn-xs btn-default pull-right">Back to XML Map</a>
+                <h2 class="disIn"><span class="fPerc133 mR20">
+                    #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
             @else 
                 <a href="/dashboard/tree/xmlmap?all=1" class="btn btn-xs btn-default pull-right">Back to XML Map</a>
                 <h2 class="disIn">Adding Node</h2>

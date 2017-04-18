@@ -68,7 +68,7 @@ class User extends Model implements AuthenticatableContract,
      *
      * @var array
      */
-    protected $roles = [];
+    public $roles = [];
     
     /**
      * The names of SurvLoop Roles held by this user.
@@ -132,6 +132,28 @@ class User extends Model implements AuthenticatableContract,
             $newRole->RoleUserUID = $this->id;
             $newRole->save();
             $this->SLRoles[] = $role;
+        }
+        return true;
+    }
+    
+    public function revokeRole($role)
+    {
+        $this->loadRoles();
+        $roleDef = SLDefinitions::select('DefID')
+            ->where('DefDatabase', 1)
+            ->where('DefSet', 'User Roles')
+            ->where('DefSubset', $role)
+            ->orderBy('DefOrder')
+            ->first();
+        $chk = SLUsersRoles::where('RoleUserRID', '=', $roleDef->DefID)
+            ->where('RoleUserUID', '=', $this->id)
+            ->delete();
+        if (sizeof($this->SLRoles) > 0) {
+            $roles = $this->SLRoles;
+            $this->SLRoles = [];
+            foreach ($roles as $r) {
+                if ($r != $role) $this->SLRoles[] = $r;
+            }
         }
         return true;
     }

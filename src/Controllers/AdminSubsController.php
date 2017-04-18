@@ -14,9 +14,23 @@ class AdminSubsController extends AdminController
     public $classExtension = 'AdminSubsController';
     
     
+    public function dashboardDefault(Request $request)
+    {
+        $this->survLoopInit($request, '/dashboard');
+        $chk = $this->checkSystemInit();
+        if (trim($chk) != '') return $chk;
+        return $this->index($request);
+    }
+    
     public function listSubsAll(Request $request)
     {
         $this->admControlInit($request, '/dashboard/subs/all');
+        return $this->printSubsListing($request);
+    }
+    
+    public function listUnpublished(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/subs/unpublished');
         return $this->printSubsListing($request);
     }
     
@@ -28,6 +42,8 @@ class AdminSubsController extends AdminController
     
     protected function printSubsListing(Request $request)
     {
+        $this->v["currPageTitle"] = 'All Completed Submissions';
+        if ($this->v["currPage"] == '/dashboard/subs/incomplete') $this->v["currPageTitle"] = 'All Incomplete Submissions';
         $this->v["coreAbbr"] = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
         $this->v["subsSort"] = ['created_at', 'desc'];
         $this->v["coreFlds"] = SLFields::select('FldName', 'FldEng', 'FldForeignTable')
@@ -48,12 +64,36 @@ class AdminSubsController extends AdminController
         return view('vendor.survloop.admin.submissions-list', $this->v);
     }
     
-    public function dashboardDefault(Request $request)
+    protected function filterSubsListingOK($row = [])
     {
-        $this->survLoopInit($request, '/dashboard');
-        $chk = $this->checkSystemInit();
-        if (trim($chk) != '') return $chk;
-        return $this->index($request);
+        return true;
+    }
+    
+    public function printSubView(Request $request, $cid, $viewType = 'view') 
+    {
+        $this->v["cID"] = $this->coreID = $cid;
+        $currPage = '/dashboard/subs/' . $GLOBALS["SL"]->treeID . '/' . $cid 
+            . (($viewType == 'view') ? '' : '/'.$viewType);
+        $this->admControlInit($request, $currPage);
+        $this->CustReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+        if ($request->has('sub')) {
+            $this->processAdminReviewTools($request);
+            $this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"]);
+        }
+        $this->v["viewType"] = $viewType;
+        $this->v["coreRec"] = $this->CustReport->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];
+        $this->v["content"] = $this->printAdminReviewTools() . $this->CustReport->printAdminReport($cid, $viewType);
+        return view('vendor.survloop.master', $this->v);
+    }
+    
+    protected function printAdminReviewTools()
+    {
+        return '';
+    }
+    
+    protected function processAdminReviewTools(Request $request)
+    {
+        return true;
     }
     
 }

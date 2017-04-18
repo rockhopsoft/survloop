@@ -25,7 +25,7 @@ use SurvLoop\Controllers\StatesUS;
 
 class DatabaseLookups
 {
-    
+    public $isAdmin        = false;
     public $dbID           = 1;
     public $dbRow          = [];
     public $treeID         = 1;
@@ -41,6 +41,7 @@ class DatabaseLookups
     public $REQ            = [];
     public $sysOpts        = [];
     public $userRoles      = [];
+    public $pageJStop      = '';
     
     public $tblModels      = [];
     public $tbls           = [];
@@ -71,12 +72,16 @@ class DatabaseLookups
     public $states         = [];
     
     public $fldAbouts      = [];
-    public $instructs      = [];
+    public $blurbs         = [];
     public $debugOn        = true;
     
-    function __construct(Request $request = NULL, $dbID = 1, $treeID = 1, $treeOverride = -3)
+    public $sysTree        = [ "forms" => [ "pub" => [], "adm" => [] ], "pages" => [ "pub" => [], "adm" => [] ] ];
+    public $treeMojis      = [];
+    
+    function __construct(Request $request = NULL, $isAdmin = false, $dbID = 1, $treeID = 1, $treeOverride = -3)
     {
         //echo '<br /><br /><br />__construct, ' . $dbID . ', ' . $treeID . ', ' . $treeOverride . '<br />';
+        $this->isAdmin = $isAdmin;
         $this->REQ = $request;
         if ($treeOverride > 0) $this->treeOverride = $treeOverride;
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
@@ -111,7 +116,7 @@ class DatabaseLookups
             if ($this->treeRow->TreeType != 'Page') $this->sessTree = $this->treeRow->TreeID;
         }
 
-        $this->sysOpts = ["cust-abbr" => 'survloop'];
+        $this->sysOpts = ["cust-abbr" => 'SurvLoop'];
         
         $this->loadDBFromCache($request);
         
@@ -173,15 +178,12 @@ class DatabaseLookups
                         $this->treeRow->save();
                     }
                     $cache .= '$'.'this->treeIsAdmin = true;' . "\n";
-                } elseif ($this->treeRow->TreeOpts%3 == 0) {
-                    $this->treeRow->TreeOpts = $this->treeRow->TreeOpts/3;
-                    $this->treeRow->save();
                 }
             }
 
-            $sys = SLDefinitions::where('DefDatabase', $this->dbID)
+            $sys = []; /* SLDefinitions::where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'System Settings')
-                ->get();
+                ->get(); */
             if (!$sys || sizeof($sys) == 0) {
                 $sys = SLDefinitions::where('DefDatabase', 1)
                     ->where('DefSet', 'System Settings')
@@ -318,6 +320,7 @@ class DatabaseLookups
     
     public function modelPath($tbl = '', $forceFile = true)
     {
+        if ($tbl == 'users') return "App\\Models\\User";
         if (isset($this->tblModels[$tbl])) {
             $path = "App\\Models\\" . $this->tblModels[$tbl];
             $this->chkTblModel($tbl, $path, $forceFile);
@@ -330,7 +333,7 @@ class DatabaseLookups
     {
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) return false;
         $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
-        if (!file_exists($modelFilename) || $forceFile) { // copied from DatabaseInstaller...
+        if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) { // copied from DatabaseInstaller...
             $modelFile = '';
             $tbl = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', $tbl)
@@ -513,6 +516,14 @@ class DatabaseLookups
             ->first();
         if ($fld && sizeof($fld) > 0) return $this->tbl[$fld->FldForeignTable];
         return '';
+    }
+    
+    public function getForeignLnkName($tbl1, $tbl2 = '')
+    {
+        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
+            return '';
+        }
+        return $this->getForeignLnk($this->tblI[$tbl1], $this->tblI[$tbl2]);
     }
     
     public function getForeignLnk($tbl1, $tbl2 = -3)
@@ -1013,23 +1024,147 @@ class DatabaseLookups
     }
     
     
-    
-    public function getInstruct($spot = '')
+    protected function loadBlurbNames()
     {
-        if (trim($spot) == '') return '';
-        if (isset($this->instructs[$spot]) && isset($this->instructs[$spot]->DefDescription)) {
-            return $this->instructs[$spot]->DefDescription;
+        if (sizeof($this->blurbs) == 0) {
+            $defs = SLDefinitions::select('DefSubset')
+                ->where('DefDatabase', $this->dbID)
+                ->where('DefSet', 'Blurbs')
+                ->get();
+            if ($defs && sizeof($defs) > 0) {
+                foreach ($defs as $def) $this->blurbs[] = $def->DefSubset;
+            }
         }
-        $this->instructs[$spot] = SLDefinitions::where('DefSubset', $spot)
-            ->where('DefSet', 'Instruction')
-            ->where('DefIsActive', '1')
-            ->first();
-        if (isset($this->instructs[$spot]->DefDescription)) {
-            return $this->instructs[$spot]->DefDescription;
+        return $this->blurbs;
+    }
+    
+    public function swapBlurbs($str)
+    {
+        $this->loadBlurbNames();
+        if (trim($str) != '' && $this->blurbs && sizeof($this->blurbs) > 0) {
+            $changesMade = true;
+            while ($changesMade) {
+                $changesMade = false;
+                foreach ($this->blurbs as $b) {
+                    if (strpos($str, '{{' . $b . '}}') !== false) {
+                        $blurb = $this->getBlurb($b);
+                        $str = str_replace('{{' . $b . '}}', $blurb, $str);
+                        $changesMade = true;
+                    }
+                    if (strpos($str, '{{' . str_replace('&', '&amp;', $b) . '}}') !== false) {
+                        $blurb = $this->getBlurb($b);
+                        $str = str_replace('{{' . str_replace('&', '&amp;', $b) . '}}', $blurb, $str);
+                        $changesMade = true;
+                    }
+                }
+            }
         }
+        return $str;
+    }
+    
+    public function getBlurbAndSwap($blurbName = '', $blurbID = -3)
+    {
+        return $this->swapBlurbs($this->getBlurb($blurbName, $blurbID));
+    }
+    
+    public function getBlurb($blurbName = '', $blurbID = -3)
+    {
+        $def = [];
+        if ($blurbID > 0) $def = SLDefinitions::find($blurbID);
+        else {
+            $def = SLDefinitions::where('DefSubset', $blurbName)
+                ->where('DefDatabase', $this->dbID)
+                ->where('DefSet', 'Blurbs')
+                ->first();
+        }
+        if ($def && isset($def->DefDescription)) return $def->DefDescription;
         return '';
     }
     
+    public function addToHeadCore($js)
+    {
+        if (!isset($this->sysOpts['header-code'])) $this->sysOpts['header-code'] = '';
+        $this->sysOpts['header-code'] .= $js;
+        return true;
+    }
+    
+    public function loadSysTrees($type = 'forms')
+    {
+        if (!isset($this->sysTree[$type]) || !isset($this->sysTree[$type]["pub"]) 
+            || sizeof($this->sysTree[$type]["pub"]) == 0) {
+            $treeType = 'Primary Public';
+            if ($type == 'pages') $treeType = 'Page';
+            $trees = SLTree::where('TreeType', $treeType)
+                ->orderBy('TreeName', 'asc')
+                ->select('TreeID', 'TreeName', 'TreeOpts')
+                ->get();
+            if ($trees && sizeof($trees) > 0) {
+                foreach ($trees as $i => $tree) {
+                    $pubType = (($tree->TreeOpts%3 == 0) ? 'adm' : 'pub');
+                    $this->sysTree[$type][$pubType][] = [$tree->TreeID, $tree->TreeName];
+                }
+            }
+        }
+        return true;
+    }
+    
+    public function sysTreesDrop($preSel = -3, $type = 'forms', $pubPri = 'pub')
+    {
+        $this->loadSysTrees($type);
+        $ret = '';
+        if (in_array($pubPri, ['pub', 'all']) && sizeof($this->sysTree[$type]['pub']) > 0) {
+            foreach ($this->sysTree[$type]['pub'] as $tree) {
+                $ret .= '<option value="' . $tree[0] . '" ' . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
+                    . $tree[1] . (($type == 'page') ? ' (Page)' : '') . '</option>';
+            }
+        }
+        if (in_array($pubPri, ['adm', 'all']) && sizeof($this->sysTree[$type]['adm']) > 0) {
+            foreach ($this->sysTree[$type]['adm'] as $tree) {
+                $ret .= '<option value="' . $tree[0] . '" ' . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
+                    . $tree[1] . ' (' . (($type == 'page') ? 'Page, ' : '') . 'Admin)</option>';
+            }
+        }
+        return $ret;
+    }
+    
+    public function loadTreeMojis()
+    {
+        if (sizeof($this->treeMojis) == 0) {
+            $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+                ->where('DefSet', 'Tree Settings')
+                ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-%')
+                ->orderBy('DefOrder', 'asc')
+                ->get();
+            if ($chk && sizeof($chk) > 0) {
+                foreach ($chk as $set) {
+                    $setting = str_replace('tree-' . $this->treeID . '-', '', $set->DefSubset);
+                    if (!isset($this->treeMojis[$setting])) $this->treeMojis[$setting] = [];
+                    if ($setting == 'emojis') {
+                        $names = explode(';', $set->DefValue);
+                        $this->treeMojis[$setting][] = [
+                            "id"     => $set->DefID,
+                            "verb"   => $names[0],
+                            "plural" => $names[1], 
+                            "html"   => $set->DefDescription
+                        ];
+                    } else {
+                        $this->treeMojis[$setting][] = $set->DefDescription;
+                    }
+                }
+            }
+        }
+        return $this->treeMojis;
+    }
+    
+    public function getEmojiName($defID = -3)
+    {
+        if ($defID > 0 && sizeof($this->treeMojis["emojis"]) > 0) {
+            foreach ($this->treeMojis["emojis"] as $emo) {
+                if ($emo["id"] == $defID) return $emo["verb"];
+            }
+        }
+        return '';
+    }
     
     
 }

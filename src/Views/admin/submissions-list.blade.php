@@ -1,17 +1,10 @@
 <!-- Stored in resources/views/vendor/survloop/admin/submissions-list.blade.php -->
 
-@extends('vendor.survloop.admin.admin')
+@extends('vendor.survloop.master')
 
 @section('content')
 
-<h1>
-    <i class="fa fa-star"></i> 
-    @if ($currPage == '/dashboard/subs/incomplete')
-        All Incomplete Submissions
-    @else
-        All Completed Submissions
-    @endif
-</h1>
+<h1><i class="fa fa-star"></i> {{ $currPageTitle }}</h1>
 
 <div class="p5"></div>
 
@@ -43,7 +36,7 @@
         @endforeach
     </tr>
 @empty
-    <tr><td colspan=6 ><i>No experience submissions found in this filter</i></td></tr>
+    <tr><td colspan=6 ><i>No submissions found in this filter</i></td></tr>
 @endforelse
 </table>
 

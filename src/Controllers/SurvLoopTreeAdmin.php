@@ -36,7 +36,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     public function adminNodeEdit($nodeIN, Request $request, $currPage = '') 
     {
         $this->survLoopInit($request, $currPage);
-        $resLimit = 20;
+        $resLimit = 60;
         $node = [];
         if ($nodeIN > 0) {
             $node = $this->loadNode(SLNode::find($nodeIN));
@@ -67,7 +67,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
                 }
                 elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->input('opts'.$o.'')) == $o
@@ -82,6 +82,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 $node->nodeRow->NodePromptNotes     = trim($GLOBALS["SL"]->REQ->input('nodePromptNotes'));
                 $node->nodeRow->NodePromptAfter     = trim($GLOBALS["SL"]->REQ->input('nodePromptAfter'));
                 $node->nodeRow->NodeInternalNotes   = trim($GLOBALS["SL"]->REQ->input('nodeInternalNotes'));
+                $node->nodeRow->NodeDefault         = trim($GLOBALS["SL"]->REQ->input('nodeDefault'));
                 $node->nodeRow->NodeCharLimit       = intVal($GLOBALS["SL"]->REQ->input('nodeCharLimit'));
                 $node->nodeRow->NodeTextSuggest     = trim($GLOBALS["SL"]->REQ->input('nodeTextSuggest'));
                 $node->nodeRow->NodeDataBranch      = trim($GLOBALS["SL"]->REQ->input('nodeDataBranch'));
@@ -166,8 +167,24 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             if (isset($node->dataManips[$i])) $node->dataManips[$i]->delete();
                         }
                     }
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'survWidget') {
+                    $node->nodeRow->NodeType        = $GLOBALS["SL"]->REQ->nodeSurvWidgetType;
+                    $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->nodeSurvWidgetTree;
+                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->nodeSurvWidgetLimit);
+                    $node->nodeRow->NodePromptText  = $GLOBALS["SL"]->REQ->nodeSurvWidgetPre;
+                    $node->nodeRow->NodePromptAfter = $GLOBALS["SL"]->REQ->nodeSurvWidgetPost;
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'layout') {
+                    $node->nodeRow->NodeType        = $GLOBALS["SL"]->REQ->nodeLayoutType;
+                    if ($node->nodeRow->NodeType == 'Layout Row') {
+                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->nodeLayoutLimitRow);
+                    } elseif ($node->nodeRow->NodeType == 'Layout Column') {
+                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->nodeLayoutLimitCol);
+                    }
                 } else { // other normal response node
                     $node->nodeRow->NodeType = trim($GLOBALS["SL"]->REQ->input('nodeTypeQ'));
+                    if ($node->nodeRow->NodeType == 'Drop Down') {
+                        $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->dropDownSuggest);
+                    }
                     $newResponses = array();
                     if (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto') {
                         if (trim($GLOBALS["SL"]->REQ->input('responseLoopItems')) != '') {
@@ -234,18 +251,18 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                     if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeType == 'Page') {
                         if ($GLOBALS["SL"]->REQ->has('homepage') 
-                            && intVal($GLOBALS["SL"]->REQ->input('homepage')) == 7) {
+                            && intVal($GLOBALS["SL"]->REQ->homepage) == 7) {
                             if ($GLOBALS["SL"]->treeRow->TreeOpts%7 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 7;
                         } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%7 == 0) {
                             $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/7;
                         }
                         if ($GLOBALS["SL"]->REQ->has('adminPage') 
-                            && intVal($GLOBALS["SL"]->REQ->input('adminPage')) == 3) {
+                            && intVal($GLOBALS["SL"]->REQ->adminPage) == 3) {
                             if ($GLOBALS["SL"]->treeRow->TreeOpts%3 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 3;
                         } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0) {
                             $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/3;
                         }
-                        $GLOBALS["SL"]->treeRow->TreeSlug      = trim($GLOBALS["SL"]->REQ->input('nodeSlug'));
+                        $GLOBALS["SL"]->treeRow->TreeSlug      = trim($GLOBALS["SL"]->REQ->nodeSlug);
                         $GLOBALS["SL"]->treeRow->TreeFirstPage = $node->nodeRow->NodeID;
                         $GLOBALS["SL"]->treeRow->TreeLastPage  = $node->nodeRow->NodeID;
                         $GLOBALS["SL"]->treeRow->save();
@@ -274,6 +291,24 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $newLink->save();
                 }
                 
+                if ($node->nodeRow->NodeType == 'Layout Row' && $nodeIN <= 0) { // new row, so create default columns
+                    if ($node->nodeRow->NodeCharLimit > 0) {
+                        $colW = $this->getColsWidth($node->nodeRow->NodeCharLimit);
+                        $evenTot = $node->nodeRow->NodeCharLimit*$colW;
+                        for ($c=0; $c<$node->nodeRow->NodeCharLimit; $c++) {
+                            $colNode = $this->loadNode();
+                            $colNode->nodeRow->NodeTree        = $GLOBALS["SL"]->treeID;
+                            $colNode->nodeRow->NodeParentID    = $node->nodeRow->NodeID;
+                            $colNode->nodeRow->NodeParentOrder = $c;
+                            $colNode->nodeRow->NodeOpts        = 1;
+                            $colNode->nodeRow->NodeType        = 'Layout Column';
+                            $colNode->nodeRow->NodeCharLimit   = $colW;
+                            if ($c == 0 && $evenTot < 12) $colNode->nodeRow->NodeCharLimit += (12-$evenTot);
+                            $colNode->nodeRow->save();
+                        }
+                    }
+                }
+                
                 $this->updateTreeEnds();
                 $this->updateLoopRoots();
                 $this->updateBranchUrls();
@@ -290,7 +325,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             foreach ($treeCaches as $cache) Cache::forget($cache);
             $redir = '/dashboard/tree/map?all=1&refresh=1#n' . $node->nodeRow->NodeID;
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?refresh=1#n' . $node->nodeRow->NodeID;
+                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?all=1&refresh=1#n' . $node->nodeRow->NodeID;
             }
             return $this->redir($redir, true);
         }
@@ -329,7 +364,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     }
     
     
-    public function saveNewResponses($node, $newResponses, $resLimit = 20)
+    public function saveNewResponses($node, $newResponses, $resLimit = 60)
     {
         for ($i=0; $i < $resLimit; $i++) {
             if (isset($newResponses[$i])) {
@@ -521,7 +556,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     . '</span><i class="fa fa-chevron-right"></i></span> ';
                 if ($this->allNodes[$nID]->isBranch())
                 {
-                    $retVal .= '<span class="f20"><span class="gry9"><i class="fa fa-share-alt"></i> <i>' 
+                    $retVal .= '<span class="f20"><span class="slGrey"><i class="fa fa-share-alt"></i> <i>' 
                     . (($nID == $this->rootID) ? 'Tree Root Node' : 'Section Branch') . ':</i></span> <b>' 
                     . $this->allNodes[$nID]->nodeRow->NodePromptText . '</b></span><div class="pT5"><a href="#n' 
                     . $nID . '" id="adminNode' . $nID . 'Expand" class="adminNodeExpand '
@@ -563,7 +598,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         $j=0;
                         foreach ($nodeFinalVals as $res => $cnt) {
                             $retVal .= '<li class="mT5 mB20"><span class="f18"><b>' 
-                                . ((trim($res) != '') ? strip_tags($res) : '<span class="gry9"><i>(empty)</i></span>') 
+                                . ((trim($res) != '') ? strip_tags($res) : '<span class="slGrey"><i>(empty)</i></span>') 
                                 . '</b></span><br />' . $this->adminResponseNodeStatsTxt(strtolower($res), 
                                 $nodeFinalCnt, $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess) . '</li>';
                             if ($j == 9) {

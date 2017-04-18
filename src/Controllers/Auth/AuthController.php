@@ -36,7 +36,7 @@ class AuthController extends Controller
     protected $loginPath           = '/login';
     protected $redirectPath        = '/afterLogin';
     protected $redirectAfterLogout = '/login';
-
+    
     /**
      * Create a new authentication controller instance.
      *
@@ -50,7 +50,7 @@ class AuthController extends Controller
         $this->redirectAfterLogout = $this->domainPath . '/login';
         $this->middleware('guest', ['except' => 'getLogout']);
     }
-
+    
     /**
      * Get a validator for an incoming registration request.
      *
@@ -60,7 +60,7 @@ class AuthController extends Controller
     protected function validator(array $data)
     {
         $validator = Validator::make($data, [
-            'name' => 'required|max:255',
+            'name' => 'required|max:50|unique:users',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
@@ -106,7 +106,20 @@ class AuthController extends Controller
         }
         return redirect($this->domainPath . '/afterLogin');
     }
-   
+    
+    public function postLogin(Request $request)
+    {
+        if (Auth::attempt(['name' => $request->email, 'password' => $request->password])) {
+            return redirect($this->redirectPath);
+        } elseif (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return redirect($this->redirectPath);
+        }
+        return view('auth.login', [
+            "errorMsg" => 'That combination of password with that username or email did not work.' 
+        ]);
+        //return $this->getLogin($request);
+        //return redirect($this->loginPath . '?error=1');
+    }
     
     /**
      * Get the post register / login redirect path.
@@ -124,7 +137,6 @@ class AuthController extends Controller
         return redirect($this->domainPath . '/');
     }
     
-    
     protected function loadDomain()
     {
         $appUrl = SLDefinitions::select('DefDescription')
@@ -137,5 +149,6 @@ class AuthController extends Controller
         }
         return $this->domainPath;
     }
+
     
 }
