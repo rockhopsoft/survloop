@@ -70,18 +70,25 @@ class SurvLoopTreeXML extends CoreTree
                 }
                 $node->nodeRow->save();
             }
-            $redir = '/dashboard/tree/xmlmap?all=1&refresh=1#n' . $node->nodeRow->NodeID;
+            $redir = '/dashboard/tree-' . $GLOBALS["SL"]->treeID . '/xmlmap?all=1&refresh=1#n' . $node->nodeRow->NodeID;
             echo '<script type="text/javascript"> setTimeout("window.location=\'' . $redir . '\'", 5); </script>';
             exit;
         }
-        
+        $GLOBALS["SL"]->pageAJAX .= '$(".xmlDataChng").click(function(){ 
+            if (document.getElementById("xmlNodeTypeTbl").checked) {
+                $("#xmlDataTbl").slideDown("fast"); 
+                $("#xmlDataWrap").slideUp("fast"); 
+            } else {
+                $("#xmlDataTbl").slideUp("fast"); 
+                $("#xmlDataWrap").slideDown("fast"); 
+            }
+        });';
         return view('vendor.survloop.admin.tree.node-edit-xmlmap', [
             "canEditTree" => $this->canEditTree, 
             "treeID"      => $this->treeID, 
             "node"        => $node, 
             "REQ"         => $this->REQ
         ]);
-        
     }
     
     protected function adminBasicPrintNode($tierNode = array(), $tierDepth = 0)
@@ -116,6 +123,9 @@ class SurvLoopTreeXML extends CoreTree
         $this->loadTree();
         $this->initExtra($request);
         $this->treeAdminNodeManip();
+        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
+            "canEditTree"     => $this->canEditTree
+        ])->render();
         return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"     => $this->canEditTree

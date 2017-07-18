@@ -8,6 +8,15 @@
         margin: 8px 3px 0px 3px;
     }
     </style>
+@else
+    <ul class="nav nav-tabs mT10" role="tablist">
+    <li role="presentation" class="active">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Full Map of Tree</a></li>
+    <li role="presentation">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/data">Tree Data Structures</a></li>
+    <li role="presentation">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap">Data Export XML Map</a></li>
+    </ul>
 @endif
 <h1 class="slBlueDark">
     @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
@@ -15,12 +24,12 @@
         @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Page:</nobr>
     @else
         <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif
-        @if ($GLOBALS['SL']->treeIsAdmin) Admin @else User @endif Experience:</nobr>
+        @if ($GLOBALS['SL']->treeIsAdmin) Admin @else User @endif Form Tree:</nobr>
     @endif
     {{ $GLOBALS['SL']->treeName }}
 </h1>
 @if ($isPrint) 
-    <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Experience</nobr></h2> 
+    <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
     {{ $IPlegal }}
 @endif
 
@@ -28,26 +37,22 @@
     <div class="mB20">
         @if ($isAll)
             <a class="btn btn-primary pull-right mL10" 
-                @if ($isAlt) href="/dashboard/tree/map?alt=1" @else href="/dashboard/tree/map" @endif
+                @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?alt=1" @else href="/dashboard/tree/map" @endif
                 ><i class="fa fa-expand fa-flip-horizontal"></i> Collapse Tree</a>
         @else
             <a class="btn btn-primary pull-right mL10" 
-                @if ($isAlt) href="/dashboard/tree/map?all=1&alt=1" @else href="/dashboard/tree/map?all=1" @endif
+                @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" @else href="/dashboard/tree/map?all=1" @endif
                 ><i class="fa fa-expand fa-flip-horizontal"></i> Expand Tree</a>
         @endif
         @if ($isAlt)
             <a class="btn btn-default pull-right mL10" 
-                @if ($isAll) href="/dashboard/tree/map?all=1" @else href="/dashboard/tree/map" @endif
+                @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1" @else href="/dashboard/tree/map" @endif
                 ><i class="fa fa-align-left"></i> Hide Details</a>
         @else
             <a class="btn btn-default pull-right mL10" 
-                @if ($isAll) href="/dashboard/tree/map?all=1&alt=1" @else href="/dashboard/tree/map?alt=1" @endif
+                @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" @else href="/dashboard/tree/map?alt=1" @endif
                 ><i class="fa fa-align-left"></i> Show Details</a>
         @endif
-        <a class="btn btn-default pull-right mL10" id="adminAboutTog" href="/dashboard/tree/xmlmap"
-            >Data XML Map</a>
-        <a class="btn btn-default pull-right mL10" id="adminAboutTog" href="/dashboard/tree/data"
-            >Tree Data Structures</a>
         <span class="slGrey">
             A user experience is created as a tree filled with branching nodes. Click an ID# to edit any node. 
             Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.

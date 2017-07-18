@@ -39,10 +39,22 @@
 <input type="hidden" name="changedFLds" id="changedFLdsID" value=",">
 <input type="hidden" name="changedFLdsGen" id="changedFLdsGenID" value=",">
 <script type="text/javascript">
-function logFldDescChange(FldID) { if (document.getElementById("changedFLdsID").value.indexOf(","+FldID+",") < 0) document.getElementById("changedFLdsID").value += FldID+","; }
-function submitFldDescChanges() { document.FldDescForm.submit(); setTimeout("document.getElementById('changedFLdsID').value=','", 1000); setTimeout("document.getElementById('changedFLdsGenID').value=','", 1000); }
+function logFldDescChange(FldID) {
+    if (document.getElementById("changedFLdsID").value.indexOf(","+FldID+",") < 0) {
+        document.getElementById("changedFLdsID").value += FldID+",";
+    }
+}
+function submitFldDescChanges() {
+    document.FldDescForm.submit();
+    setTimeout("document.getElementById('changedFLdsID').value=','", 1000);
+    setTimeout("document.getElementById('changedFLdsGenID').value=','", 1000);
+}
 @if ($FldDescsView == 'generics')
-    function logFldGenDescChange(FldID) { if (document.getElementById("changedFLdsGenID").value.indexOf(","+FldID+",") < 0) document.getElementById("changedFLdsGenID").value += FldID+","; }
+    function logFldGenDescChange(FldID) {
+        if (document.getElementById("changedFLdsGenID").value.indexOf(","+FldID+",") < 0) {
+            document.getElementById("changedFLdsGenID").value += FldID+",";
+        }
+    }
     </script><span class="red">*</span> <b>WARNING:</b> Saving changes to Generic field descriptions here will push those changes to all copies of the field (its Replicas).<br /><br />
 @else 
     </script>

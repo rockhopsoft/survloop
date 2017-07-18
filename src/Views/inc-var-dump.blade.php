@@ -81,12 +81,3 @@
     </div>
     dataSets: <pre>{!! print_r($sessData->dataSets) !!}</pre>
 </div>
-<script type="text/javascript"> $(function() {
-    $("#debugPopBtn").click(function() { $("#debugPop").slideToggle("fast"); });
-    $("#debugPopBtn2").click(function() { $("#debugPop2").slideToggle("slow"); });
-    $(".dataB").click(function() {
-        var dbInd = $(this).attr("id").replace("dataB", "");
-        $("#dataBranch"+dbInd+"").slideToggle("fast");
-    });
-    
-}); </script> <style> ul li span { color: #AAA; } </style>

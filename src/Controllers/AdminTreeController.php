@@ -19,9 +19,12 @@ use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsArticles;
 use App\Models\SLUsersRoles;
+use App\Models\SLSess;
+use App\Models\SLNodeSavesPage;
 
 use SurvLoop\Controllers\SurvLoopTreeAdmin;
 use SurvLoop\Controllers\SurvLoopTreeXML;
+use SurvLoop\Controllers\SurvLoopInstaller;
 
 class AdminTreeController extends AdminController
 {
@@ -81,15 +84,25 @@ class AdminTreeController extends AdminController
                 $newCond->save();
             }
             $chk = SLConditions::where('CondDatabase', 0)
-                ->where('CondTag', '#NotLoggedIn')
+                ->where('CondTag', '#IsLoggedIn')
                 ->get();
             if (!$chk || sizeof($chk) == 0) {
                 $newCond = new SLConditions;
                 $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#NotLoggedIn';
+                $newCond->CondTag = '#IsLoggedIn';
+                $newCond->CondDesc = 'Complainant is currently logged into the system.';
+                $newCond->CondOperator = 'CUSTOM';
+                $newCond->save();
+                $newCond = new SLConditions;
+                $newCond->CondDatabase = 0;
+                $newCond->CondTag = '#IsNotLoggedIn';
                 $newCond->CondDesc = 'Complainant is not currently logged into the system.';
                 $newCond->CondOperator = 'CUSTOM';
                 $newCond->save();
+            }
+            $trees = SLTree::where('TreeType', 'Page')->get();
+            if ($trees && sizeof($trees) > 0) {
+                foreach ($trees as $tree) $this->v["treeClassAdmin"]->updateTreeOpts($tree->TreeID);
             }
             session()->put('chkCoreTbls', 1);
         }
@@ -139,9 +152,10 @@ class AdminTreeController extends AdminController
         return $this->loadTreesPagesBelowAdmMenu();
     }
     
-    public function index(Request $request)
+    public function index(Request $request, $treeID = -3)
     {
-        $this->admControlInit($request, '/dashboard/tree/map?all=1');
+        $this->treeID = $treeID;
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
             $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
@@ -165,7 +179,8 @@ class AdminTreeController extends AdminController
                 if ($t->TreeOpts%3 > 0) { // no admin trees made public [for now]
                     $this->treeID = $t->TreeID;
                     $this->dbID = $t->TreeDatabase;
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID, $this->treeID);
+                    $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -180,7 +195,8 @@ class AdminTreeController extends AdminController
                 . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true) . '</div>';
             $this->saveCache();
         }
-        return view('vendor.survloop.master-print', $this->v);
+        $this->v["isPrint"] = true;
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function indexPage(Request $request, $treeID)
@@ -189,8 +205,7 @@ class AdminTreeController extends AdminController
         if (!$tree || !isset($tree->TreeName)) return $this->redir('/dashboard/pages/list');
         $this->treeID = $treeID;
         $this->dbID = $tree->TreeDatabase;
-        $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
-        $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $this->isUserAdmin(), $this->dbID, $this->treeID, $this->treeID);
         $this->admControlInit($request, '/dashboard/pages/list');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
@@ -218,7 +233,7 @@ class AdminTreeController extends AdminController
                 $tree->TreeOpts *= 3;
             }
             $tree->save();
-            return $this->redir('/dashboard/page/' . $tree->TreeID);
+            return $this->redir('/dashboard/page/' . $tree->TreeID . '?all=1&refresh=1');
         }
         if ($request->has('sublurb')) {
             $blurb = $this->blurbNew($request);
@@ -231,12 +246,31 @@ class AdminTreeController extends AdminController
         $this->v["blurbRows"] = SLDefinitions::where('DefSet', 'Blurbs')
             ->orderBy('DefSubset')
             ->get();
+        $this->v["autopages"] = [ "contact" => false ];
+        if ($this->v["myPages"] && sizeof($this->v["myPages"]) > 0) {
+            foreach ($this->v["myPages"] as $page) {
+                if ($page->TreeOpts%19 == 0) $this->v["autopages"]["contact"] = true;
+            }
+        }
+        $GLOBALS["SL"]->pageAJAX .= '
+            $(document).on("click", "#newPage", function() { $("#newPageForm").slideToggle("fast"); });
+            $(document).on("click", "#newBlurb", function() { $("#newBlurbForm").slideToggle("fast"); });';
         return view('vendor.survloop.admin.tree.pages', $this->v);
     }
     
-    public function data(Request $request)
+    public function autoAddPages(Request $request, $addPageType = '')
     {
-        $this->admControlInit($request, '/dashboard/tree/map?all=1');
+        if ($addPageType == 'contact') {
+            $survInst = new SurvLoopInstaller;
+            $survInst->installPageContact();
+        }
+        return $this->pagesList($request);
+    }
+    
+    public function data(Request $request, $treeID = -3)
+    {
+        $this->treeID = $treeID;
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         if ($request->has('dataStruct')) {
             if ($request->has('delSub')) {
                 $found = SLDataSubsets::find($request->input('delSub'))->delete();
@@ -257,13 +291,15 @@ class AdminTreeController extends AdminController
             } elseif ($request->has('newHelper')) {
                 $splits = explode(':', $request->input('newHelper'));
                 $valFld = str_replace($splits[2].':', '', $request->input('newHelperValue'));
-                $newHelp = new SLDataHelpers;
-                $newHelp->DataHelpTree        = $this->treeID;
-                $newHelp->DataHelpParentTable = $splits[0];
-                $newHelp->DataHelpTable       = $splits[2];
-                $newHelp->DataHelpKeyField    = $splits[3];
-                $newHelp->DataHelpValueField  = $valFld;
-                $newHelp->save();
+                if (isset($splits[2])) {
+                    $newHelp = new SLDataHelpers;
+                    $newHelp->DataHelpTree        = $this->treeID;
+                    $newHelp->DataHelpParentTable = $splits[0];
+                    $newHelp->DataHelpTable       = $splits[2];
+                    $newHelp->DataHelpKeyField    = $splits[3];
+                    $newHelp->DataHelpValueField  = $valFld;
+                    $newHelp->save();
+                }
             } elseif ($request->has('delLinkage')) {
                 $found = SLDataLinks::where('DataLinkTree', $this->treeID)
                     ->where('DataLinkTable', $request->input('delLinkage'))
@@ -289,18 +325,18 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
     
-    public function nodeEdit(Request $request, $nID) 
+    public function nodeEdit(Request $request, $treeID = -3, $nID = -3) 
     {
         $node = [];
         if ($nID > 0) {
             $this->loadDbFromNode($request, $nID);
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $this->v["currPage"] = '/dashboard/pages/list';
         } elseif ($request->has('parent') && intVal($request->get('parent')) > 0) {
             $this->loadDbFromNode($request, $request->get('parent'));
         } elseif ($request->has('nodeParentID') && intVal($request->nodeParentID) > 0) {
             $this->loadDbFromNode($request, $request->nodeParentID);
         }
-        $this->admControlInit($request, '/dashboard/tree/map?all=1');
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $this->v["currPage"] = '/dashboard/pages/list';
         $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $this->v["currPage"]);
         if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
@@ -308,9 +344,10 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
     
-    public function treeStats(Request $request) 
+    public function treeStats(Request $request, $treeID = -3) 
     {
-        $this->admControlInit($request, '/dashboard/tree/stats?all=1');
+        $this->treeID = $treeID;
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/stats?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTreeStats($request);
             $this->v["content"] = view('vendor.survloop.admin.tree.treeStats', $this->v)->render();
@@ -319,10 +356,116 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
 
-    public function treeSessions(Request $request) 
+    public function treeSessions(Request $request, $treeID = -3) 
     {
-        $this->admControlInit($request, '/dashboard/tree');
+        $this->treeID = $treeID;
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/sessions');
         if (!$this->checkCache()) {
+            $this->CustReport->loadTree($this->treeID, $request);
+            $this->v["last100ids"] = [];
+            eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::"
+                . $this->CustReport->treeSessionsWhereExtra()
+                . "orderBy('created_at', 'desc')->limit(500)->get();");
+            if ($chk && sizeof($chk) > 0) {
+                $dayold = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-1, date("Y"));
+                foreach ($chk as $row) {
+                    if (sizeof($this->v["last100ids"]) < 100) {
+                        if ($this->CustReport->chkCoreRecEmpty($row->getKey(), $row)) {
+                            if (strtotime($row->created_at) < $dayold) {
+                                eval("\$del = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+                                    . "::find(" . $row->getKey() . ")->delete();");
+                            }
+                        } else {
+                            $this->v["last100ids"][] = [
+                                "id"   => $row->getKey(), 
+                                "node" => $row->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
+                                            . 'SubmissionProgress' },
+                                "date" => strtotime($row->created_at)
+                            ];
+                        }
+                    }
+                }
+            }
+            //echo '<pre>'; print_r($this->v["last100ids"]); echo '</pre>';
+            $nodeTots = $lines = [];
+            if (sizeof($this->v["last100ids"]) > 0) {
+                foreach ($this->v["last100ids"] as $rec) {
+                    $perc = $this->CustReport->rawOrderPercent($rec["node"]);
+                    //echo 'node: ' . $rec["node"] . ', perc: ' . $perc . '<br />';
+                    if (!isset($nodeTots[$perc])) {
+                        $chk = SLNode::find($rec["node"]);
+                        if ($chk && isset($chk->NodePromptNotes)) {
+                            $nodeTots[$perc] = [
+                                "tot"  => 1,
+                                "node" => $rec["node"],
+                                "url"  => $chk->NodePromptNotes
+                            ];
+                        }
+                    } else {
+                        $nodeTots[$perc]["tot"]++;
+                    }
+                }
+                ksort($nodeTots);
+                //echo '<pre>'; print_r($nodeTots); echo '</pre>';
+                $lines[0] = [
+                    "label"    => 'Last Page Visited', 
+                    "brdColor" => '#2b3493', 
+                    "dotColor" => 'rgba(75,192,192,1)', 
+                    "data"     => [], 
+                ];
+                if (sizeof($nodeTots) > 0) {
+                    foreach ($nodeTots as $perc => $node) {
+                        $lines[0]["data"][] = $node["tot"];
+                    }
+                }
+            }
+            $this->v["axisLabels"] = [];
+            if (sizeof($nodeTots) > 0) {
+                foreach ($nodeTots as $perc => $node) {
+                    $this->v["axisLabels"][] = '/' . $node["url"] . ' ' . $node["node"];
+                }
+            }
+            $this->v["dataLines"] = '';
+            if (sizeof($lines) > 0) {
+                foreach ($lines as $l) {
+                    $this->v["dataLines"] .= view('vendor.survloop.graph-data-line', $l)->render();
+                }
+            }
+            $this->v["printRawSessions"] = $this->v["nodeUrls"] = $rawSessions = [];
+            if (sizeof($this->v["last100ids"]) > 0) {
+                foreach ($this->v["last100ids"] as $rec) {
+                    $rawSessions[$rec["id"]] = [ "date" => $rec["date"], "pages" => [] ];
+                    $pages = SLNodeSavesPage::where('PageSaveSession', $rec["id"])
+                        ->orderBy('created_at', 'asc')
+                        ->get();
+                    if ($pages && sizeof($pages) > 0) {
+                        foreach ($pages as $i => $p) {
+                            if (!isset($this->v["nodeUrls"][$p->PageSaveNode])) {
+                                $chk = SLNode::find($p->PageSaveNode);
+                                if ($chk && isset($chk->NodePromptNotes)) {
+                                    $this->v["nodeUrls"][$p->PageSaveNode] = $chk->NodePromptNotes;
+                                }
+                            }
+                            $time = 0;
+                            if ($i > 0) {
+                                $prevDate = $rawSessions[$rec["id"]]["pages"][$i-1]["date"];
+                                $time = (strtotime($p->created_at)-strtotime($prevDate))/60;
+                            }
+                            $rawSessions[$rec["id"]]["pages"][] = [
+                                "node" => $p->PageSaveNode, 
+                                "date" => $p->created_at, 
+                                "time" => $time
+                            ];
+                        }
+                    }
+                    $this->v["printRawSessions"][] = view('vendor.survloop.admin.tree.tree-sessions-one', [
+                        "recID"    => $rec["id"],
+                        "session"  => $rawSessions[$rec["id"]],
+                        "nodeUrls" => $this->v["nodeUrls"]
+                    ])->render();
+                }
+            }
+            //echo '<pre>'; print_r($this->v["last100ids"]); echo '</pre>';
             $this->v["content"] = view('vendor.survloop.admin.tree.treeSessions', $this->v)->render();
             $this->saveCache();
         }
@@ -331,13 +474,13 @@ class AdminTreeController extends AdminController
 
     public function workflows(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/tree/workflows');
+        $this->admControlInit($request, '/dashboard/db/workflows');
         return view('vendor.survloop.admin.tree.workflows', $this->v);
     }
     
     public function conditions(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/tree/conds');
+        $this->admControlInit($request, '/dashboard/db/conds');
         
         if ($request->has('addNewCond')) $GLOBALS["SL"]->saveEditCondition($request);
         
@@ -394,6 +537,7 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
+        $this->addCondEditorAjax();
         return view('vendor.survloop.admin.tree.conditions', $this->v);
     }
     
@@ -448,18 +592,24 @@ class AdminTreeController extends AdminController
     
     
     
-    public function xmlmap(Request $request)
+    public function xmlmap(Request $request, $treeID = -3)
     {
-        $this->admControlInit($request, '/dashboard/tree/map?all=1');
+        $this->treeID = $treeID;
+        $this->switchTree($treeID, '/dashboard/tree/switch', $request);
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         $xmlmap = new SurvLoopTreeXML;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
         $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
+        $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", function() {
+            $(".editXml").css("display","inline"); });';
         return view('vendor.survloop.admin.tree.xmlmap', $this->v);
     }
     
-    public function xmlNodeEdit(Request $request, $nID = -3)
+    public function xmlNodeEdit(Request $request, $treeID = -3, $nID = -3)
     {
-        $this->admControlInit($request, '/dashboard/tree/map?all=1');
+        $this->treeID = $treeID;
+        $this->switchTree($treeID, '/dashboard/tree/switch', $request);
+        $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         $xmlmap = new SurvLoopTreeXML;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
@@ -632,7 +782,7 @@ class AdminTreeController extends AdminController
                 $tree->TreeID = 1;
             }
             $tree = $this->freshUXstore($request, $tree, '/fresh/experience');
-            return $this->redir('/dashboard/tree/map?all=1');
+            return $this->redir('/dashboard/tree-' . $tree->TreeID . '/map?all=1');
         }
         return view('vendor.survloop.admin.fresh-install-setup-ux', $this->v);
     }
@@ -646,7 +796,7 @@ class AdminTreeController extends AdminController
             $tree = new SLTree;
             $tree->save();
             $tree = $this->freshUXstore($request, $tree, '/dashboard/tree/new');
-            return $this->redir('/dashboard/tree/map?all=1');
+            return $this->redir('/dashboard/tree-' . $tree->TreeID . '/map?all=1');
         }
         return view('vendor.survloop.admin.fresh-install-setup-ux', $this->v);
     }

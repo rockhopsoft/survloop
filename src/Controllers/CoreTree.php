@@ -313,23 +313,15 @@ class CoreTree extends SurvLoopController
     protected function loadSessInfo($coreTbl)
     {
         if (!isset($this->v["currPage"])) $this->survLoopInit($this->REQ); // not sure why this 
-        //echo '<pre>'; print_r(session()->all()); echo '</pre>';
-        if (session()->has('sessID' . $GLOBALS["SL"]->sessTree)) {
-            $this->sessID = intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree));
-        }
-        if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)) {
-            $this->coreID = intVal(session()->get('coreID' . $GLOBALS["SL"]->sessTree));
-        }
-        if ($this->sessID > 0) {
-            $this->sessInfo = SLSess::find($this->sessID);
-        } elseif ($this->sessID < 0 && $this->v["user"] && $this->v["user"]->id > 0) {
-            $recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
+        //$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
+        if (isset($this->v) && isset($this->v["user"]) && isset($this->v["user"]->id)) {
             $this->sessInfo = SLSess::where('SessUserID', $this->v["user"]->id)
                 ->where('SessTree', $this->treeID)
-                ->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
+                ->where('SessCoreID', '>', 0)
+                //->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
                 ->orderBy('updated_at', 'desc')
                 ->first();
-            if ($this->sessInfo && sizeof($this->sessInfo) > 0) {
+            if ($this->sessInfo && isset($this->sessInfo->SessID)) {
                 if ($this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
                     $this->sessID = $this->sessInfo->SessID;
                     $this->coreID = $this->sessInfo->SessCoreID;
@@ -337,11 +329,20 @@ class CoreTree extends SurvLoopController
                     $this->sessInfo = [];
                 }
             }
+        } else {
+            if (session()->has('sessID' . $GLOBALS["SL"]->sessTree)) {
+                $this->sessID = intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree));
+            }
+            if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)) {
+                $this->coreID = intVal(session()->get('coreID' . $GLOBALS["SL"]->sessTree));
+            }
+            if ($this->sessID > 0) $this->sessInfo = SLSess::find($this->sessID);
         }
         if (!$this->sessInfo || sizeof($this->sessInfo) == 0) {
             $this->createNewSess();
         }
         session()->put('sessID' . $GLOBALS["SL"]->sessTree, $this->sessID);
+        session()->put('coreID' . $GLOBALS["SL"]->sessTree, $this->coreID);
         
         // Check for and load core record's ID
         if ($this->coreID <= 0 && $this->sessInfo && isset($this->sessInfo->SessCoreID) 
@@ -378,7 +379,7 @@ class CoreTree extends SurvLoopController
             $this->coreID = $this->coreIDoverride;
         }
         session()->put('coreID' . $GLOBALS["SL"]->sessTree, $this->coreID);
-        $this->sessInfo->SessCoreID = $this->coreID;
+        if ($this->coreID > 0) $this->sessInfo->SessCoreID = $this->coreID;
         $this->sessInfo->SessTree = $this->treeID;
         if ((!isset($this->sessInfo->SessUserID) || intVal($this->sessInfo->SessUserID) <= 0) 
             && isset($this->v["user"]->id) && intVal($this->v["user"]->id) > 0) {
@@ -402,6 +403,7 @@ class CoreTree extends SurvLoopController
             }
         }
         $this->sessInfo->save();
+        session()->put('lastTree', $GLOBALS["SL"]->sessTree);
         $this->chkIfCoreIsEditable();
         $this->updateCurrNode($this->sessInfo->SessCurrNode);
         
@@ -429,14 +431,17 @@ class CoreTree extends SurvLoopController
         if ($coreID <= 0) $coreID = $this->coreID;
         if ($coreRec && sizeof($coreRec) > 0
             && isset($this->v["user"]->id) && intVal($this->v["user"]->id) > 0) {
-            $lnkFld = $GLOBALS["SL"]->getForeignLnkName($GLOBALS["SL"]->coreTbl, 'users');
-            if (trim($lnkFld) != '') {
-                $lnkFld = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . $lnkFld;
-                $coreRec->{ $lnkFld } = $this->v["user"]->id;
+            if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
+                $coreRec->{ $GLOBALS["SL"]->coreTblUserFld } = $this->v["user"]->id;
                 $coreRec->save();
             }
         }
         return $coreRec;
+    }
+    
+    public function chkCoreRecEmpty($coreID = -3, $coreRec = [])
+    {
+        return false;
     }
     
     // Check that core record is actually in-progress (editable)
@@ -444,7 +449,8 @@ class CoreTree extends SurvLoopController
     {
         if ($coreID <= 0) $coreID = $this->coreID;
         if ($coreID > 0) {
-            if (!$this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreID, $coreRec)) {
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%11 > 0 // Tree allows record edits
+                && !$this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreID, $coreRec)) {
                 session()->forget('coreID' . $this->treeID);
                 session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
                 if (isset($this->sessInfo->SessCoreID)) {
@@ -460,6 +466,16 @@ class CoreTree extends SurvLoopController
     }
     
     protected function recordIsEditable($coreTbl, $coreID, $coreRec = [])
+    {
+        return true;
+    }
+    
+    protected function recordIsIncomplete($coreTbl, $coreID, $coreRec = [])
+    {
+        return true;
+    }
+    
+    public function recordIsPublished($coreTbl, $coreID, $coreRec = [])
     {
         return true;
     }
@@ -519,11 +535,34 @@ class CoreTree extends SurvLoopController
         $this->survLoopInit($request);
         $session = $this->chkSess($cid);
         if ($session && isset($session->SessID)) {
-            session()->put('sessID' . $GLOBALS["SL"]->sessTree, $session->SessID);
-            session()->put('coreID' . $GLOBALS["SL"]->sessTree, $cid);
             $this->sessInfo = $session;
             $this->sessID = $session->SessID;
             $this->coreID = $cid;
+        }
+        if (!$this->sessInfo || !isset($this->sessInfo->SessTree)) {
+            $this->sessInfo = new SLSess;
+            $this->sessInfo->SessUserID = $this->v["user"]->id;
+            $this->sessInfo->SessTree = $this->treeID;
+            $this->sessInfo->SessCoreID = $cid;
+            $this->sessInfo->save();
+        }
+        if ($request->has('fromthe') && $request->get('fromthe') == 'top') {
+            $this->sessInfo->SessCurrNode = $GLOBALS["SL"]->treeRow->TreeFirstPage;
+            $this->sessInfo->save();
+        }
+        if ($request->has('fromnode') && intVal($request->get('fromnode')) > 0) {
+            $this->sessInfo->SessCurrNode = intVal($request->get('fromnode'));
+            $this->sessInfo->save();
+        }
+        session()->put('sessID' . $GLOBALS["SL"]->sessTree, $this->sessInfo->SessID);
+        session()->put('coreID' . $GLOBALS["SL"]->sessTree, $cid);
+        if ($this->sessInfo->SessCurrNode > 0) {
+            $nodeRow = SLNode::find($this->sessInfo->SessCurrNode);
+            if ($nodeRow && isset($nodeRow->NodePromptNotes) && trim($nodeRow->NodePromptNotes) != '') {
+                return $this->redir('/u/' . $GLOBALS['SL']->treeRow->TreeSlug . '/' . $nodeRow->NodePromptNotes, true);
+            } else {
+                return $this->redir('/start/' . $GLOBALS["SL"]->treeRow->TreeSlug, true);
+            }
         }
         return $this->redir('/afterLogin');
     }
@@ -533,9 +572,28 @@ class CoreTree extends SurvLoopController
         $this->survLoopInit($request, '');
         if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff')) {
             return $this->redir('/dashboard');
-        } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer')) {
-            return $this->redir('/volunteer');
         } else {
+            if (mktime(date("H"), date("i"), date("s")-30, date('n'), date('j'), date('Y'))
+                < strtotime($this->v["user"]->created_at)) { // signed up in the past 30 seconds
+                if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)) {
+                    eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+                        . "::find(" . session()->get('coreID' . $GLOBALS["SL"]->sessTree) . ");");
+                    if ($chkRec && sizeof($chkRec) > 0) {
+                        if (!isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) 
+                            || intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) <= 0) {
+                            $chkRec->update([ $GLOBALS["SL"]->coreTblUserFld => $this->v["user"]->id ]);
+                        }
+                    }
+                }
+                if (session()->has('sessID' . $GLOBALS["SL"]->sessTree)) {
+                    $chkRec = SLSess::find(session()->get('sessID' . $GLOBALS["SL"]->sessTree));
+                    if ($chkRec && isset($chkRec->SessTree)) {
+                        if (!isset($chkRec->SessUserID) || intVal($chkRec->SessUserID) <= 0) {
+                            $chkRec->update([ 'SessUserID' => $this->v["user"]->id ]);
+                        }
+                    }
+                }
+            }
             $this->loadSessInfo($GLOBALS["SL"]->coreTbl);
             if (!session()->has('coreID' . $GLOBALS["SL"]->sessTree) || $this->coreID <= 0) {
                 $this->coreID = $this->findUserCoreID();
@@ -548,6 +606,7 @@ class CoreTree extends SurvLoopController
                 $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
                 if (trim($nodeURL) != '') return $this->redir($nodeURL);
             }
+            return $this->redir('/my-profile');
         }
         return $this->redir('/');
     }
@@ -561,7 +620,7 @@ class CoreTree extends SurvLoopController
                 . "->orderBy('created_at', 'desc')->get();");
             if ($incompletes && sizeof($incompletes) > 0) {
                 foreach ($incompletes as $i => $row) {
-                    if ($this->recordIsEditable($GLOBALS["SL"]->coreTbl, $row->getKey(), $row)) {
+                    if ($this->recordIsIncomplete($GLOBALS["SL"]->coreTbl, $row->getKey(), $row)) {
                         $this->coreIncompletes[] = [$row->getKey(), $row];
                     }
                 }
@@ -586,7 +645,10 @@ class CoreTree extends SurvLoopController
             if (trim($this->v["multipleRecords"]) != '') {
                 $this->v["multipleRecords"] = '<div class="nodeGap"></div>'
                     . $this->multiRecordCheckIntro(sizeof($this->coreIncompletes))
-                    . '<div class="brdDrk round5 p10">' . $this->v["multipleRecords"] . '</div>';
+                    . '<div id="unfinishedList" class="disNon brdDrk round5 p10 mTn10"><div class="p10"></div>'
+                    . $this->v["multipleRecords"] . '</div>';
+                $GLOBALS["SL"]->pageAJAX .= '$("#unfinishedBtn").click(function() { '
+                    . '$("#unfinishedList").slideToggle("fast"); });';
                 /* if (!session()->has('multiRecordCheck')) {
                     $GLOBALS["errors"] .= $this->v["multipleRecords"];
                     session()->put('multiRecordCheck', date('Y-m-d H:i:s'));
@@ -598,50 +660,38 @@ class CoreTree extends SurvLoopController
     
     public function multiRecordCheckIntro($cnt = 1)
     {
-        return '<h3 class="mT0 mB20 slBlueDark">You Have ' 
-            . (($cnt == 1) ? 'An Unfinished Session' : 'Unfinished Sessions') . ':</h3>';
+        return '<a id="unfinishedBtn" class="btn btn-lg btn-primary w100" href="javascript:;">' 
+            . $this->v["user"]->name . ', You Have ' 
+            . (($cnt == 1) ? 'An Unfinished Session' : 'Unfinished Sessions') . '</a>';
     }
     
     public function multiRecordCheckRow($i, $coreRecord)
     {
-        $ret = '';
         if ($this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreRecord[1]->getKey(), $coreRecord[1])) {
-            $ret = '<div class="row mT10 mB20">
-                <div class="col-md-8">
-                    <a class="disBlo btn btn-lg nFldBtn mB5 pB0 btn-default taL ';
-                    $recName = '';
-                    if (isset($GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'])) {
-                        $recName = $GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'];
-                    }
-                    if ($coreRecord[0] == $this->coreID) {
-                        $ret .= 'noPoint slBlueDark" disabled href="javascript:;"><h5 class="mT10"><b>Current: <nobr>' 
-                            . $GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'] 
-                            . ' #' . $coreRecord[0] . '</nobr></b></h5>';
-                    } else {
-                        $ret .= '" href="/switch/' . $coreRecord[0] . '"><h5 class="mT10">Switch To: <nobr>'
-                            . $GLOBALS["SL"]->sysOpts['tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular'] 
-                            . ' #' . $coreRecord[0] . '</nobr></h5>';
-                    }
-                    $ret .= '<div class="mB5">Started ' 
-                        . date('M j, Y, g:ia', strtotime($coreRecord[1]->created_at)) . '</div></a>
-                </div>
-                <div class="col-md-4">
-                    ' . $this->multiRecordCheckRowSummary($coreRecord) . '
-                    <div class="fR">
-                        <a href="javascript:;" class="red" onClick="if (confirm(\'' . $this->multiRecordCheckDelWarn() 
-                        . '\')) { window.location=\'/delSess/' . $coreRecord[0] 
-                        . '\'; }">Delete <i class="fa fa-minus-circle" aria-hidden="true"></i></a>
-                    </div><div class="fC"></div>
-                </div>
-            </div>
-            <div class="p5"></div>';
+            return view('vendor.survloop.unfinished-record-row', [
+                "tree"     => $this->treeID,
+                "cID"      => $coreRecord[1]->getKey(),
+                "title"    => $this->multiRecordCheckRowTitle($coreRecord), 
+                "desc"     => $this->multiRecordCheckRowSummary($coreRecord),
+                "warning"  => $this->multiRecordCheckDelWarn()
+            ])->render();
         }
-        return $ret;
+        return '';
+    }
+    
+    public function multiRecordCheckRowTitle($coreRecord)
+    {
+        $recSingVar = 'tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular';
+        $recName = ' #' . $coreRecord[1]->getKey();
+        if (isset($GLOBALS["SL"]->sysOpts[$recSingVar])) {
+            $recName = $GLOBALS["SL"]->sysOpts[$recSingVar] . $recName;
+        }
+        return trim($recName);
     }
     
     public function multiRecordCheckRowSummary($coreRecord)
     {
-        return '';
+        return 'Started ' . date('M j, Y, g:ia', strtotime($coreRecord[1]->created_at));
     }
     
     public function multiRecordCheckDelWarn()
@@ -649,10 +699,26 @@ class CoreTree extends SurvLoopController
         return 'Are you sure you want to delete this session? Deleting it CANNOT be undone.';
     }
     
+    public function deactivateSess($treeID = 1)
+    {
+        if ($this->sessInfo->SessTree == $treeID) {
+            $this->sessInfo->SessCurrNode = -86; // all outta this
+            $this->sessInfo->save();
+        }
+        if ($this->v["user"] && isset($this->v["user"]->id)) {
+            SLSess::where('SessUserID', $this->v["user"]->id)
+                ->where('SessTree', $treeID)
+                ->update(['SessCurrNode' => -86]); // ->where('SessCoreID', $coreID)
+        }
+        session()->forget('sessID' . $treeID);
+        session()->forget('coreID' . $treeID);
+        return true;
+    }
+    
     public function delSess(Request $request, $coreID)
     {
         $this->survLoopInit($request);
-        if ($this->isCoreOwner($coreID)) {
+        if ($this->isCoreOwner($coreID) || ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff'))) {
             if ($coreID != $this->coreID) $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $coreID);
             $this->sessData->deleteEntireCore();
             if ($coreID != $this->coreID) $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $this->coreID);
@@ -666,17 +732,23 @@ class CoreTree extends SurvLoopController
                 SLSess::find($sess->SessID)
                     ->delete();
             }
-            if ($coreID != session()->get('coreID' . $GLOBALS["SL"]->sessTree)) {
+            if ($coreID == session()->get('coreID' . $GLOBALS["SL"]->sessTree)) {
                 session()->forget('sessID' . $GLOBALS["SL"]->sessTree);
                 session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
             }
+            session()->put('sessMsg', $this->delSessMsg($coreID));
             $newCoreID = $this->findUserCoreID();
             if ($this->coreIncompletes && sizeof($this->coreIncompletes) == 1 && $newCoreID > 0) {
                 $this->createNewSess();
                 $this->setSessCore($newCoreID);
             }
         }
-        return $this->redir('/');
+        return $this->redir('/my-profile');
+    }
+    
+    public function delSessMsg($coreID)
+    {
+        return 'You have deleted #' . $coreID . '.';
     }
     
     public function holdSess(Request $request)
@@ -693,6 +765,18 @@ class CoreTree extends SurvLoopController
             ->where('SessCoreID', $coreID)
             ->get();
         if ($chk && sizeof($chk) > 0) return true;
+        if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
+            eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                . "::where('" . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . "ID', " . $coreID . ")"
+                . "->where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["user"]->id . ")"
+                . "->first();");
+            if ($chk && sizeof($chk) > 0) return true;
+        }
+        return $this->isCoreOwnerAlt($coreID);
+    }
+    
+    protected function isCoreOwnerAlt($coreID = -3)
+    {
         return false;
     }
     
@@ -784,5 +868,64 @@ class CoreTree extends SurvLoopController
     {
         return '';
     }
-       
+    
+    
+    /**
+     * Update the user's profile.
+     *
+     * @param  Request  $request
+     * @return Response
+     */
+    public function updateProfile(Request $request)
+    {
+        if ($request->user()) {
+            // $request->user() returns an instance of the authenticated user...
+            if ($request->user()->id == $request->uID || $request->user()->hasRole('administrator')) {
+                $user = User::find($request->uID);
+                $user->name = $request->name;
+                $user->email = $request->email;
+                $user->save();
+                if ($request->roles && sizeof($request->roles) > 0) {
+                    foreach ($user->rolesRanked as $i => $role) {
+                        if (in_array($role, $request->roles)) {
+                            if (!$user->hasRole($role)) {
+                                $user->assignRole($role);
+                            }
+                        } elseif ($user->hasRole($role)) {
+                            $user->revokeRole($role);
+                        }
+                    }
+                } else { // no roles selected, delete all that exist
+                    foreach ($user->rolesRanked as $i => $role) {
+                        if ($user->hasRole($role)) {
+                            $user->revokeRole($role);
+                        }
+                    }
+                }
+            }
+        }
+        return $this->redir('/dashboard/user/'.$request->uID);
+    }
+    
+    public function setCurrUserProfile($uname = '')
+    {
+        if (trim($uname) != '') {
+            $this->v["profileUser"] = User::where('name', 'LIKE', urldecode($uname))->first();
+            if ($this->v["profileUser"] && isset($this->v["profileUser"]->id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public function showProfileBasics() 
+    {
+        if ($this->v["profileUser"] && isset($this->v["profileUser"]->id)) {
+            $this->v["canEdit"] = ($this->v["user"] 
+                && ($this->v["user"]->hasRole('administrator') || $this->v["user"]->id == $this->v["profileUser"]->id));
+            return view('vendor.survloop.profile', $this->v);
+        }
+        return '<div><i>User not found.</i></div>';
+    }
+    
 }

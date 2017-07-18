@@ -1,23 +1,23 @@
-<!-- resources/views/auth/login.blade.php -->
 <?php // sorry, not sure how this should be done instead
 $surv = new SurvLoop\Controllers\SurvLoop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
-?>
-@extends('vendor.survloop.master')
+?>@extends('vendor.survloop.master')
 
 @section('content')
+<!-- resources/views/auth/login.blade.php -->
+<form method="POST" action="/login">
+{!! csrf_field() !!}
+
+<div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
 <div class="p10"></div>
 
-<center><div class="halfPageWidth">
-<form method="POST" action="/login">
-{!! csrf_field() !!}
-<div class="row">
+<div class="row loginTitles">
     <div class="col-md-6">
         <h1 class="mT0">Login</h1>
     </div>
-    <div class="col-md-6 taR pT20">
+    <div class="col-md-6 taR pT5">
         <a href="/register" class="btn btn-default">Sign Up</a>
     </div>
 </div>
@@ -65,13 +65,14 @@ $v = $surv->custLoop->v;
 <div class="nFldRadio fL"><label for="rememberID">
     <input type="checkbox" name="remember" id="rememberID"> Remember Me
 </label></div>
-<a href="/password/email" class="fR">Forgot Password?</a>
+<a href="/password/reset" class="fR">Forgot your username or password?</a>
 <div class="fC"></div>
 
 <center><input type="submit" class="btn btn-xl btn-primary mT20" value="Login"></center>
 
 <div class="nodeHalfGap"></div>
-</form>
-</div></center>
 
+</div></center></div>
+
+</form>
 @endsection

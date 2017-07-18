@@ -1,5 +1,20 @@
 /* generated from resources/views/vendor/survloop/scripts-js.blade.php */
 
+@if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+    function chkLogoResize() {
+        if (!document.getElementById('slLogoImg')) return false;
+        if (window.innerWidth <= 480) {
+            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}';
+        } else if (window.innerWidth <= 768) {
+            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-md'] }}';
+        } else {
+            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}';
+        }
+    }
+    window.onresize = function() { chkLogoResize(); }
+    chkLogoResize();
+@endif
+
 var allFldList = new Array();
 function addFld(fld) {
 	allFldList[allFldList.length] = fld;
@@ -15,7 +30,7 @@ function blurAllFlds() {
 var foundForm = true;
 function checkForm() {
 	if (!foundForm) {
-		if (document.getElementById('postNodeForm')) foundForm = true;
+		if (document.getElementById("postNodeForm")) foundForm = true;
 		else setTimeout("checkForm()", 10000);
 	}
 	return true;
@@ -28,7 +43,7 @@ function resetCheckForm() {
 
 var hasAttemptedSubmit = false;
 var totFormErrors = 0;
-var formErrorsEng = '';
+var formErrorsEng = "";
 
 function chkFormCheck() {
     if (hasAttemptedSubmit) return checkNodeForm();
@@ -36,23 +51,23 @@ function chkFormCheck() {
 }
 
 function setFormErrs() {
-	if (document.getElementById('formErrorMsg')) {
-	    document.getElementById('formErrorMsg').innerHTML = '<h2>Please complete all required fields. <i class="fa fa-arrow-up"></i>'+formErrorsEng+'</h2>';
-	    document.getElementById('formErrorMsg').style.display = 'block';
+	if (document.getElementById("formErrorMsg")) {
+	    document.getElementById("formErrorMsg").innerHTML = "<h2>Please complete all required fields. <i class=\"fa fa-arrow-up\"></i>"+formErrorsEng+"</h2>";
+	    document.getElementById("formErrorMsg").style.display = "block";
 	}
 	return true;
 }
 function clearFormErrs() {
-	if (document.getElementById('formErrorMsg')) {
-	    document.getElementById('formErrorMsg').innerHTML = '';
-	    document.getElementById('formErrorMsg').style.display = 'none';
+	if (document.getElementById("formErrorMsg")) {
+	    document.getElementById("formErrorMsg").innerHTML = "";
+	    document.getElementById("formErrorMsg").style.display = "none";
 	}
 	return true;
 }
 
 function setFormLabelBlack(nID) {
-	if (document.getElementById('node'+nID+'')) {
-	    document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrapError', 'nodeWrap');
+	if (document.getElementById("node"+nID+"")) {
+	    document.getElementById("node"+nID+"").className=document.getElementById("node"+nID+"").className.replace("nodeWrapError", "nodeWrap");
 	}
 	return true;
 }
@@ -61,17 +76,17 @@ var firstNodeError = 0;
 function setFormLabelRed(nID) {
     if (firstNodeError <= 0) {
         firstNodeError = nID;
-        window.location='#n'+nID+'';
+        window.location="#n"+nID+"";
     }
-	if (document.getElementById('node'+nID+'')) {
-	    document.getElementById('node'+nID+'').className=document.getElementById('node'+nID+'').className.replace('nodeWrap', 'nodeWrapError').replace('nodeWrapErrorError', 'nodeWrapError');
+	if (document.getElementById("node"+nID+"")) {
+	    document.getElementById("node"+nID+"").className=document.getElementById("node"+nID+"").className.replace("nodeWrap", "nodeWrapError").replace("nodeWrapErrorError", "nodeWrapError");
 	}
 	return true;
 }
 
 function reqFormEmail(FldName) {
 	if (document.getElementById(FldName)) {
-		if (document.getElementById(FldName).value.trim() == '') return false;
+		if (document.getElementById(FldName).value.trim() == "") return false;
 		var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
 		if (!re.test(document.getElementById(FldName).value)) return false;
 	}
@@ -79,7 +94,7 @@ function reqFormEmail(FldName) {
 }
 
 function reqFormTxt(fldID, nID) {
-	if (document.getElementById(fldID) && document.getElementById(fldID).value.trim() == '') {
+	if (document.getElementById(fldID) && document.getElementById(fldID).value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -87,7 +102,7 @@ function reqFormTxt(fldID, nID) {
 	return true;
 }
 function reqFormFld(nID) {
-	if (document.getElementById('n'+nID+'FldID') && document.getElementById('n'+nID+'FldID').value.trim() == '') {
+	if (document.getElementById("n"+nID+"FldID") && document.getElementById("n"+nID+"FldID").value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -95,7 +110,7 @@ function reqFormFld(nID) {
 	return true;
 }
 function reqFormFldEmail(nID) {
-	if (!reqFormEmail('n'+nID+'FldID')) {
+	if (!reqFormEmail("n"+nID+"FldID")) {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -105,7 +120,7 @@ function reqFormFldEmail(nID) {
 function reqFormFldRadio(nID, maxOpts) {
 	var foundCheck = false;
 	for (var j=0; j<maxOpts; j++) {
-		if (document.getElementById('n'+nID+'fld'+j+'') && document.getElementById('n'+nID+'fld'+j+'').checked) foundCheck = true;
+		if (document.getElementById("n"+nID+"fld"+j+"") && document.getElementById("n"+nID+"fld"+j+"").checked) foundCheck = true;
 	}
 	if (!foundCheck) {
 		setFormLabelRed(nID);
@@ -127,13 +142,14 @@ function chkIsRadioNode(nID) {
     return false;
 }
 function runRadioClick(nID, response) {
-    if (document.getElementById('n'+nID+'fld'+response+'') && document.getElementById('n'+nID+'radioCurrID')) {
-        if (document.getElementById('n'+nID+'fld'+response+'').value != document.getElementById('n'+nID+'radioCurrID').value) {
-            document.getElementById('n'+nID+'radioCurrID').value = document.getElementById('n'+nID+'fld'+response+'').value;
+    if (document.getElementById("n"+nID+"fld"+response+"") && document.getElementById("n"+nID+"radioCurrID")) {
+        if (document.getElementById("n"+nID+"fld"+response+"").value != document.getElementById("n"+nID+"radioCurrID").value) {
+            document.getElementById("n"+nID+"radioCurrID").value = document.getElementById("n"+nID+"fld"+response+"").value;
         } else {
-            document.getElementById('n'+nID+'fld'+response+'').checked = false;
-            document.getElementById('n'+nID+'radioCurrID').value = '';
+            document.getElementById("n"+nID+"fld"+response+"").checked = false;
+            document.getElementById("n"+nID+"radioCurrID").value = "";
             checkFingerClass(nID);
+            chkFormCheck();
         }
     }
     return true;
@@ -141,9 +157,9 @@ function runRadioClick(nID, response) {
 
 
 function checkFldDate(nID) {
-    return (document.getElementById('n'+nID+'fldYearID').value != '0000' 
-	    && document.getElementById('n'+nID+'fldMonthID').value != '00' 
-	    && document.getElementById('n'+nID+'fldDayID').value != '00');
+    return (document.getElementById("n"+nID+"fldYearID").value != "0000" 
+	    && document.getElementById("n"+nID+"fldMonthID").value != "00" 
+	    && document.getElementById("n"+nID+"fldDayID").value != "00");
 }
 
 function reqFormFldDate(nID) {
@@ -181,9 +197,9 @@ function chkFormFldDateLimit(nID, future, today, optional) {
         var todayYear = parseInt(today.substring(0, 4));
         var todayMonth = parseInt(today.substring(5, 7));
         var todayDay = parseInt(today.substring(8, 10));
-        var userYear = parseInt(document.getElementById('n'+nID+'fldYearID').value);
-        var userMonth = parseInt(document.getElementById('n'+nID+'fldMonthID').value);
-        var userDay = parseInt(document.getElementById('n'+nID+'fldDayID').value);
+        var userYear = parseInt(document.getElementById("n"+nID+"fldYearID").value);
+        var userMonth = parseInt(document.getElementById("n"+nID+"fldMonthID").value);
+        var userDay = parseInt(document.getElementById("n"+nID+"fldDayID").value);
         if (future < 0) { // the past is valid
             if (userYear > todayYear) validDate = false;
             else if (userYear == todayYear) {
@@ -207,36 +223,36 @@ function chkFormFldDateLimit(nID, future, today, optional) {
 }
 
 function charLimit(nID, limit) {
-    if (document.getElementById('n'+nID+'FldID')) {
-        if (document.getElementById('n'+nID+'FldID').value.length > limit) {
-            document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'FldID').value.substring(0, limit);
+    if (document.getElementById("n"+nID+"FldID")) {
+        if (document.getElementById("n"+nID+"FldID").value.length > limit) {
+            document.getElementById("n"+nID+"FldID").value = document.getElementById("n"+nID+"FldID").value.substring(0, limit);
         }
-        var charRemain = limit-document.getElementById('n'+nID+'FldID').value.length;
-        document.getElementById('charLimit'+nID+'Msg').innerHTML = limit+' Character Limit: '+charRemain+' Remaining';
+        var charRemain = limit-document.getElementById("n"+nID+"FldID").value.length;
+        document.getElementById("charLimit"+nID+"Msg").innerHTML = limit+" Character Limit: "+charRemain+" Remaining";
     }
 	return true;
 }
 
 function formDateChange(nID) {
-	document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'fldYearID').value+'-'+document.getElementById('n'+nID+'fldMonthID').value+'-'+document.getElementById('n'+nID+'fldDayID').value;
+	document.getElementById("n"+nID+"FldID").value = document.getElementById("n"+nID+"fldYearID").value+"-"+document.getElementById("n"+nID+"fldMonthID").value+"-"+document.getElementById("n"+nID+"fldDayID").value;
 	chkFormCheck();
 	return true;
 }
 
 function dateKeyUp(nID, which) {
-	document.getElementById('n'+nID+'FldID').value = document.getElementById('n'+nID+'fldMonthID').value+'/'+document.getElementById('n'+nID+'fldDayID').value+'/'+document.getElementById('n'+nID+'fldYearID').value;
+	document.getElementById("n"+nID+"FldID").value = document.getElementById("n"+nID+"fldMonthID").value+"/"+document.getElementById("n"+nID+"fldDayID").value+"/"+document.getElementById("n"+nID+"fldYearID").value;
 	chkFormCheck();
 	return true;
 }
 
 
 function formChangeFeetInches(nID) {
-	if (document.getElementById('n'+nID+'FldID')) document.getElementById('n'+nID+'FldID').value = (12*parseInt(document.getElementById('n'+nID+'fldFeetID').value))+parseInt(document.getElementById('n'+nID+'fldInchID').value);
+	if (document.getElementById("n"+nID+"FldID")) document.getElementById("n"+nID+"FldID").value = (12*parseInt(document.getElementById("n"+nID+"fldFeetID").value))+parseInt(document.getElementById("n"+nID+"fldInchID").value);
 	chkFormCheck();
 	return true;
 }
 function formRequireFeetInches(nID) {
-	if (document.getElementById('n'+nID+'fldFeetID').value.trim() == '' || document.getElementById('n'+nID+'fldInchID').value.trim() == '') {
+	if (document.getElementById("n"+nID+"fldFeetID").value.trim() == "" || document.getElementById("n"+nID+"fldInchID").value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
 	}
@@ -245,8 +261,8 @@ function formRequireFeetInches(nID) {
 }
 
 function formRequireGender(nID) {
-	if (document.getElementById('n'+nID+'fld2') && document.getElementById('n'+nID+'fld2').value == '?') {
-		return reqFormFldRadio(nID, 4);  // we also have 'Not Sure'
+	if (document.getElementById("n"+nID+"fld2") && document.getElementById("n"+nID+"fld2").value == "?") {
+		return reqFormFldRadio(nID, 4);  // we also have "Not Sure"
 	}
 	return reqFormFldRadio(nID, 3);
 }
@@ -254,14 +270,14 @@ function formRequireGender(nID) {
 function checkNodeUp(nID, response, isMobile) {
     checkMutEx(nID, response);
     if (isMobile == 1) checkFingerClass(nID);
-    if (chkIsRadioNode(nID)) return setTimeout("runRadioClick('"+nID+"', '"+response+"')", 10);
+    if (chkIsRadioNode(nID)) setTimeout("runRadioClick('"+nID+"', '"+response+"')", 10);
 	chkFormCheck();
     return true;
 }
 
 function formKeyUpOther(nID, j) {
-    if (document.getElementById('n'+nID+'fldOtherID').value.trim() != '') {
-        document.getElementById('n'+nID+'fld'+j+'').checked=true;
+    if (document.getElementById("n"+nID+"fldOtherID").value.trim() != "") {
+        document.getElementById("n"+nID+"fld"+j+"").checked=true;
         checkFingerClass(nID);
     }
 	chkFormCheck();
@@ -269,11 +285,11 @@ function formKeyUpOther(nID, j) {
 }
 
 function formClickGender(nID) {
-    if (document.getElementById('n'+nID+'fldOtherID')) {
-        if ((document.getElementById('n'+nID+'fld0') && document.getElementById('n'+nID+'fld0').checked)
-            || (document.getElementById('n'+nID+'fld1') && document.getElementById('n'+nID+'fld1').checked)
-            || (document.getElementById('n'+nID+'fld3') && document.getElementById('n'+nID+'fld3').checked)) {
-            document.getElementById('n'+nID+'fldOtherID').value = '';
+    if (document.getElementById("n"+nID+"fldOtherID")) {
+        if ((document.getElementById("n"+nID+"fld0") && document.getElementById("n"+nID+"fld0").checked)
+            || (document.getElementById("n"+nID+"fld1") && document.getElementById("n"+nID+"fld1").checked)
+            || (document.getElementById("n"+nID+"fld3") && document.getElementById("n"+nID+"fld3").checked)) {
+            document.getElementById("n"+nID+"fldOtherID").value = "";
         }
     }
 	chkFormCheck();
@@ -281,39 +297,44 @@ function formClickGender(nID) {
 }
 
 function focusNodeID(nID) {
-    var fldID = 'n'+nID+'FldID';
+    var fldID = "n"+nID+"FldID";
     if (!document.getElementById(fldID)) {
-        fldID = 'n'+nID+'fld0';
+        fldID = "n"+nID+"fld0";
         if (!document.getElementById(fldID)) {
-            fldID = 'n'+nID+'fldMonthID';
+            fldID = "n"+nID+"fldMonthID";
             if (!document.getElementById(fldID)) {
-                fldID = 'n'+nID+'fldHrID';
+                fldID = "n"+nID+"fldHrID";
                 if (!document.getElementById(fldID)) {
-                    fldID = 'n'+nID+'fldFeetID';
+                    fldID = "n"+nID+"fldFeetID";
                     if (!document.getElementById(fldID)) {
-                        fldID = '';
+                        fldID = "";
                     }
                 }
             }
         }
     }
-    if (fldID != '') document.getElementById(fldID).focus();
+    if (fldID != "") document.getElementById(fldID).focus();
     return true;
 }
 
 function wordCountKeyUp(nID, limit) {
-	if (document.getElementById("n"+nID+"FldID") && document.getElementById("wordCnt"+nID+"")) {
-	  var cnt = getWordCnt(document.getElementById("n"+nID+"FldID"));
-	  var cntWords = "<span class=\'slRedLight\'>"+cnt+"</span>";
-	  if (cnt < limit) cntWords = "<span class=\'slBlueLight\'>"+cnt+"</span>";
-	  document.getElementById("wordCnt"+nID+"").innerHTML=cntWords;
-	}
-	return true;
-}
-
-function nFldHP(nID) {
-	if (document.getElementById('node'+nID+'')) {
-		document.getElementById('node'+nID+'').style.display='none';
+	if (document.getElementById("n"+nID+"FldID")) {
+	    var words = new Array();
+	    if (document.getElementById("n"+nID+"FldID").value.trim() != "") {
+	        words = document.getElementById("n"+nID+"FldID").value.trim().split(" ");
+        }
+	    if (limit > 0 && limit < 10000000000 && words.length > limit) {
+	        var newLimited = "";
+	        for (var i = 0; i < limit; i++) {
+	            newLimited += " " + words[i];
+	        }
+	        document.getElementById("n"+nID+"FldID").value = newLimited.trim();
+	    }
+	    if (document.getElementById("wordCnt"+nID+"")) {
+            var cntWords = "<span class=\"slRedLight\">"+words.length+"</span>";
+            if (words.length < limit) cntWords = "<span class=\"slBlueDark\">"+words.length+"</span>";
+            document.getElementById("wordCnt"+nID+"").innerHTML=cntWords;
+        }
 	}
 	return true;
 }
@@ -333,12 +354,12 @@ function addMutEx(nID, response) {
 
 function checkFingerClass(nID) {
     for (var j=0; j<nodeResTot[nID]; j++) {
-        if (document.getElementById('n'+nID+'fld'+j+'lab') 
-            && document.getElementById('n'+nID+'fld'+j+'')) {
-            if (document.getElementById('n'+nID+'fld'+j+'').checked) {
-                document.getElementById('n'+nID+'fld'+j+'lab').className = 'fingerAct';
+        if (document.getElementById("n"+nID+"fld"+j+"lab") 
+            && document.getElementById("n"+nID+"fld"+j+"")) {
+            if (document.getElementById("n"+nID+"fld"+j+"").checked) {
+                document.getElementById("n"+nID+"fld"+j+"lab").className = "fingerAct";
             }
-            else document.getElementById('n'+nID+'fld'+j+'lab').className = 'finger';
+            else document.getElementById("n"+nID+"fld"+j+"lab").className = "finger";
         }
     }
     return true;
@@ -350,11 +371,11 @@ function checkMutEx(nID, response) {
         var clickedMutEx = false;
         for (var i=0; i<nodeMutEx[nID].length; i++) {
             if (nodeMutEx[nID][i] == response) {
-                if (document.getElementById('n'+nID+'fld'+response+'').checked) {
+                if (document.getElementById("n"+nID+"fld"+response+"").checked) {
                     clickedMutEx = true;
                     for (var j=0; j<nodeResTot[nID]; j++) {
                         if (j != response) {
-                            document.getElementById('n'+nID+'fld'+j+'').checked = false;
+                            document.getElementById("n"+nID+"fld"+j+"").checked = false;
                         }
                     }
                 }
@@ -362,8 +383,8 @@ function checkMutEx(nID, response) {
         }
         if (!clickedMutEx) {
             for (var i=0; i<nodeMutEx[nID].length; i++) {
-                if (nodeMutEx[nID][i] != response && document.getElementById('n'+nID+'fld'+response+'').checked) {
-                    document.getElementById('n'+nID+'fld'+nodeMutEx[nID][i]+'').checked = false;
+                if (nodeMutEx[nID][i] != response && document.getElementById("n"+nID+"fld"+response+"").checked) {
+                    document.getElementById("n"+nID+"fld"+nodeMutEx[nID][i]+"").checked = false;
                 }
             }
         }
@@ -400,22 +421,22 @@ function deselectTag(nID, tagID) {
     return false;
 }
 function printTag(nID, tagID, tagText) {
-    return '<a onClick="return deselectTag('+nID+', '+tagID+');" class="btn btn-primary" href="javascript:;">'+tagText+'<i class="fa fa-times" aria-hidden="true"></i></a> ';
+    return "<a onClick=\"return deselectTag("+nID+", "+tagID+");\" class=\"btn btn-primary\" href=\"javascript:;\">"+tagText+"<i class=\"fa fa-times\" aria-hidden=\"true\"></i></a> ";
 }
 function updateTagList(nID) {
-    var tagIDs = ',';
-    var tagHtml = '';
+    var tagIDs = ",";
+    var tagHtml = "";
     if (nodeTags[nID] && nodeTagList[nID]) {
         for (var i=0; i<nodeTagList[nID].length; i++) {
             var tagID = nodeTagList[nID][i];
-            if (nodeTags[nID][tagID] && nodeTags[nID][tagID][1] == 1 && tagIDs.indexOf(','+tagID+',') < 0) {
-                tagIDs += tagID+',';
+            if (nodeTags[nID][tagID] && nodeTags[nID][tagID][1] == 1 && tagIDs.indexOf(","+tagID+",") < 0) {
+                tagIDs += tagID+",";
                 tagHtml += printTag(nID, tagID, nodeTags[nID][tagID][0]);
             }
         }
     }
-    if (document.getElementById('n'+nID+'tagIDsID')) document.getElementById('n'+nID+'tagIDsID').value=tagIDs;
-    if (document.getElementById('n'+nID+'tags')) document.getElementById('n'+nID+'tags').innerHTML=tagHtml;
+    if (document.getElementById("n"+nID+"tagIDsID")) document.getElementById("n"+nID+"tagIDsID").value=tagIDs;
+    if (document.getElementById("n"+nID+"tags")) document.getElementById("n"+nID+"tags").innerHTML=tagHtml;
     return true;
 }
 
@@ -444,25 +465,16 @@ function setNodeVisib(nID, onOff) {
 }
 
 
-function getWordCnt(strIn) {
-	if (strIn.value.trim() == '') return 0;
-	return strIn.value.trim().split(' ').length;
-}
-
-
 function ajaxSearchExpandResults() {
-	if (document.getElementById('ajaxSearchResults').className=='ajaxSearch') document.getElementById('ajaxSearchResults').className='ajaxSearchExpand';
-	else document.getElementById('ajaxSearchResults').className='ajaxSearch';
+	if (document.getElementById("ajaxSearchResults").className=="ajaxSearch") document.getElementById("ajaxSearchResults").className="ajaxSearchExpand";
+	else document.getElementById("ajaxSearchResults").className="ajaxSearch";
 	return true;
 }
 
-
-
-
 function reqUploadTitle(nID) {
-	var labelID = parseInt('100'+nID+'');
-	/* if ((document.getElementById('up'+nID+'FileID').value != "" || document.getElementById('up'+nID+'VidID') != "")
-		&& document.getElementById('up'+nID+'TitleID').value.trim() == '') {
+	var labelID = parseInt("100"+nID+"");
+	/* if ((document.getElementById("up"+nID+"FileID").value != "" || document.getElementById("up"+nID+"VidID") != "")
+		&& document.getElementById("up"+nID+"TitleID").value.trim() == "") {
 		setFormLabelRed(labelID);
 		totFormErrors++;
 	}
@@ -471,10 +483,10 @@ function reqUploadTitle(nID) {
 }
 
 function checkAjaxLoad() {
-    if (document.getElementById('ajaxWrapLoad')) {
-        if (document.getElementById('ajaxWrapLoad').style.display != 'none') {
-            if (document.getElementById('postNodeForm') || document.getElementById('footerLinks')) {
-                document.getElementById('ajaxWrapLoad').style.display = 'none';
+    if (document.getElementById("ajaxWrapLoad")) {
+        if (document.getElementById("ajaxWrapLoad").style.display != "none") {
+            if (document.getElementById("postNodeForm") || document.getElementById("footerLinks")) {
+                document.getElementById("ajaxWrapLoad").style.display = "none";
             }
             setTimeout("checkAjaxLoad()", 50);
         }
@@ -484,17 +496,20 @@ function checkAjaxLoad() {
 setTimeout("checkAjaxLoad()", 100);
 
 function runSearch(nID, treeID) {
-    var sURL = '/search?t='+treeID;
+    var sURL = "/search?t="+treeID;
     @if (isset($jqueryXtraSrch)) {!! $jqueryXtraSrch !!} @endif
-    if (document.getElementById('searchBar'+nID+'t'+treeID)) {
-        sURL += '&s='+encodeURIComponent(document.getElementById('searchBar'+nID+'t'+treeID).value);
+    if (document.getElementById("searchBar"+nID+"t"+treeID)) {
+        sURL += "&s="+encodeURIComponent(document.getElementById("searchBar"+nID+"t"+treeID).value);
+    }
+    if (document.getElementById("advUrlID")) {
+        sURL += document.getElementById("advUrlID").value;
     }
     //alert(sURL);
     window.location.replace(sURL);
     return false;
 }
 
-$(function() {
+$(document).ready(function(){
 	
     $(document).on("click", ".upTypeBtn", function() {
 		var nID = $(this).attr("name").replace("n", "").replace("fld", "");
@@ -509,34 +524,46 @@ $(function() {
 		$("#up"+nID+"Info").slideDown("fast");
 		return true;
 	});
-	$('[data-toggle="tooltip"]').tooltip();
+	/* $("[data-toggle=\"tooltip\"]").tooltip(); */
 	
 	$(document).on("click", ".navDeskMaj", function() {
 		var majInd = $(this).attr("id").replace("maj", "");
-		$("#minorNav"+majInd+"").slideToggle("fast");
+		for (var i=0; i < treeMajorSects.length; i++) {
+		    if (i != majInd && document.getElementById("minorNav"+i+"") 
+		        && document.getElementById("majSect"+i+"Vert2")) {
+		        document.getElementById("minorNav"+i+"").style.display = 'none';
+		        document.getElementById("majSect"+i+"Vert2").style.display = 'none';
+            }
+		}
+		if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
+		    if (document.getElementById("minorNav"+majInd+"").style.display == 'block') {
+		        document.getElementById("minorNav"+majInd+"").style.display = 'none';
+		        document.getElementById("majSect"+majInd+"Vert2").style.display = 'none';
+            } else {
+		        document.getElementById("minorNav"+majInd+"").style.display = 'block';
+		        document.getElementById("majSect"+majInd+"Vert2").style.display = 'block';
+            }
+        }
 	});
-	$(document).on("click", "#navBurger", function() {
-		$("#headBar").slideToggle("fast");
-	});
+	
 	$(document).on("click", "#navMobBurger1", function() {
-		document.getElementById("navMobBurger1").style.display='none';
-		document.getElementById("navMobBurger2").style.display='inline';
+		document.getElementById("navMobBurger1").style.display="none";
+		document.getElementById("navMobBurger2").style.display="inline";
 		$("#navMobFull").slideDown("fast");
 	});
 	$(document).on("click", "#navMobBurger2", function() {
-		document.getElementById("navMobBurger1").style.display='inline';
-		document.getElementById("navMobBurger2").style.display='none';
+		document.getElementById("navMobBurger1").style.display="inline";
+		document.getElementById("navMobBurger2").style.display="none";
 		$("#navMobFull").slideUp("fast");
 	});
 	
-	
-    $(document).on("click", ".nodeShowCond", function() {
+	$(document).on("click", ".nodeShowCond", function() {
         var nID = $(this).attr("id").replace("showCond", "");
         if (document.getElementById("condDeets"+nID+"")) {
-            if (document.getElementById("condDeets"+nID+"").style.display=='inline') {
-                document.getElementById("condDeets"+nID+"").style.display='none';
+            if (document.getElementById("condDeets"+nID+"").style.display=="inline") {
+                document.getElementById("condDeets"+nID+"").style.display="none";
             } else {
-                document.getElementById("condDeets"+nID+"").style.display='inline';
+                document.getElementById("condDeets"+nID+"").style.display="inline";
             }
         }
         return true;
@@ -555,11 +582,11 @@ $(function() {
     });
     
     $(document).on("click", ".dialogOpen", function() {
-	    if (document.getElementById('dialogBody') && document.getElementById('dialogTitle')) {
-            document.getElementById('dialogBody').innerHTML={!! json_encode($spinner) !!};
+	    if (document.getElementById("dialogBody") && document.getElementById("dialogTitle")) {
+            document.getElementById("dialogBody").innerHTML={!! json_encode($spinner) !!};
             var src = $(this).attr("href");
             var title = $(this).attr("title");
-            document.getElementById('dialogTitle').innerHTML=title;
+            document.getElementById("dialogTitle").innerHTML=title;
             $("#dialogBody").load(src);
             $("#nondialog").fadeOut(300);
             $("#dialog").fadeIn(300);
@@ -571,18 +598,106 @@ $(function() {
 		$("#nondialog").fadeIn(300);
 	});
 	
+	function showColorList(fldName) {
+	    if (document.getElementById(""+fldName+"ID") && document.getElementById("colorPick"+fldName+"")) {
+	        if (document.getElementById("colorPick"+fldName+"").innerHTML == "") {
+                var src = "/ajax/color-pick?fldName="+fldName+"&preSel="+document.getElementById(""+fldName+"ID").value.replace("#", "")+"";
+                $("#colorPick"+fldName+"").load(src);
+            } else {
+                $("#colorPick"+fldName+"").slideDown("fast");
+            }
+        }
+        return true;
+	}
+    $(document).on("click", ".colorPickFld", function() {
+        return showColorList($(this).attr("name"));
+	});
+    $(document).on("click", ".colorPickFldSwatch", function() {
+        return showColorList($(this).attr("id").replace("ColorSwatch", ""));
+	});
+	function setColorFld(fldName, val) {
+	    if (document.getElementById(""+fldName+"ID") && document.getElementById("colorPick"+fldName+"")) {
+	        document.getElementById(""+fldName+"ID").value = val;
+	        document.getElementById(""+fldName+"ColorSwatch").style.backgroundColor = val;
+            $("#colorPick"+fldName+"").slideUp("fast");
+        }
+        return true;
+	}
+    $(document).on("click", ".colorPickRadio", function() {
+        setColorFld($(this).attr("name").replace("Radio", ""), $(this).val());
+		return true;
+	});
+    $(document).on("click", ".colorPickFldSwatchBtn", function() {
+        var colorArr = $(this).attr("id").split("ColorSwatch");
+        if (document.getElementById(""+colorArr[0]+"CustomID")) {
+            return setColorFld(colorArr[0], "#"+colorArr[1]+"");
+        }
+		return true;
+	});
+	function setColorToCustom(fldName) {
+        if (document.getElementById(""+fldName+"CustomID")) {
+            return setColorFld(fldName, document.getElementById(""+fldName+"CustomID").value);
+        }
+        return true;
+	}
+    $(document).on("click", ".colorPickCustomBtn", function() {
+        var fldName = $(this).attr("id").replace("SetCustomColor", "");
+		return setColorToCustom(fldName);
+	});
+    $(document).on("keyup", ".colorPickCustomFld", function(e) {
+        var fldName = $(this).attr("name").replace("Custom", "");
+        if (document.getElementById(""+fldName+"CustomColor")) {
+            document.getElementById(""+fldName+"CustomColor").style.backgroundColor = $(this).val();
+        }
+        if (e.keyCode == 13) {
+            var fldName = $(this).attr("name").replace("Custom", "");
+            setColorToCustom(fldName);
+            e.preventDefault();
+            return false;
+        }
+		return true;
+	});
+	
+	if (document.getElementById('tblSelect')) {
+        //alert("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+" - /dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
+        $("#tblSelect").load("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+"");
+        $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
+    }
+	
     @if (isset($jqueryXtra)) {!! $jqueryXtra !!} @endif
 	
 });
 
+function openNav() {
+    document.getElementById("mySidenav").style.width = "300px";
+    document.getElementById("main").style.marginRight = "300px";
+    document.getElementById("navBurger").style.display = "none";
+    document.getElementById("navBurgerClose").style.display = "block";
+}
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("navBurgerClose").style.marginRight = "0";
+    document.getElementById("navBurger").style.display = "block";
+    document.getElementById("navBurgerClose").style.display = "none";
+}
+function toggleNav() {
+    if (document.getElementById("mySidenav").style.width == "300px") return closeNav();
+    return openNav();
+} 
+
+
 var progressPerc = 0;
 var treeMajorSects = new Array();
 var treeMinorSects = new Array();
+var treeMajorSectsDisabled = new Array();
 var navLogin = new Array();
 function setNavItem(navTxt, navLink) {
     var found = false;
-    for (var i=0; i<navLogin.length; i++) {
-        if (navLogin[i][1] == navTxt && navLogin[i][2] == navLink) found = true;
+    if (!navLogin) return true;
+    if (navLogin && navLogin.length > 0) {
+        for (var i=0; i<navLogin.length; i++) {
+            if (navLogin[i][1] == navTxt && navLogin[i][2] == navLink) found = true;
+        }
     }
     if (!found) navLogin[navLogin.length] = new Array(0, navTxt, navLink);
     return true;
@@ -590,43 +705,24 @@ function setNavItem(navTxt, navLink) {
 function printHeadBar(percIn) {
     if (percIn > 0) {
         progressPerc = percIn;
-        if (document.getElementById('progWrap')) document.getElementById('progWrap').innerHTML = getProgBar();
+        if (document.getElementById("progWrap")) document.getElementById("progWrap").innerHTML = getProgBar();
     }
-    if (document.getElementById('headBar')) document.getElementById('headBar').innerHTML = getTreeNav();
+    if (document.getElementById("mySidenav")) document.getElementById("mySidenav").innerHTML = getTreeNav();
     return true;
 }
 function getProgBar() {
-    return '<div class="progress progress-striped active"><div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="'+progressPerc+'" aria-valuemin="0" aria-valuemax="100" style="width:'+progressPerc+'%"><span class="sr-only">'+progressPerc+'% Complete</span></div></div>';
+    return "<div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
 }
-var layoutOpts = new Array(12, 12, 6, 4, 3, 2, 2);
 function getTreeNav() {
-    var ret = '<div id="slNavMain" class="row">';
-    var colWidth = layoutOpts[(treeMajorSects.length+1)];
-    var navSect = '';
-    for (var nav=0; nav<navLogin.length; nav++) navSect += printNav(navLogin[nav], -3);
-    ret += '<div class="col-md-' + colWidth + '">' + printNavBlock('Welcome', navSect) + '</div>';
-    for (var maj=0; maj<treeMajorSects.length; maj++) {
-        var majSect = '';
-        for (var min=0; min<treeMinorSects[maj].length; min++) majSect += printNav(treeMinorSects[maj][min], min);
-        var majTitle = treeMajorSects[maj][1];
-        if (treeMajorSects.length > 1) majTitle = (1+maj) + '. ' + majTitle;
-        ret += '<div class="col-md-' + colWidth + '">' + printNavBlock(majTitle, majSect) + '</div>';
+    var ret = "<ul class=\"nav nav-sidebar\">";
+    if (undefined === treeMajorSects) return ret + "</ul>";
+    var navSect = "";
+    if (navLogin) {
+        for (var nav=0; nav < navLogin.length; nav++) {
+            ret += "<li><a href=\"" + navLogin[nav][2] + "\">" + navLogin[nav][1] + "</a></li>";
+        }
     }
-    return ret + '</div>';
-}
-function printNav(navRow, navInd) {
-    var ret = '<a class="list-group-item';
-    if (navRow[3] != 'none') ret += ' ' + navRow[3];
-    ret += '" href="';
-    if (navRow[3] == 'disabled') ret += 'javascript:;';
-    else ret += navRow[2];
-    ret += '">';
-    if (treeMajorSects.length == 1 && navInd >= 0) ret += (1+navInd) + '. ';
-    ret += navRow[1] + '</a>';
-    return ret;
-}
-function printNavBlock(blockTitle, blockBody) {
-    return '<div class="panel panel-info"><div class="panel-heading"><h3 class="panel-title">'+blockTitle+'</h3></div><div class="panel-body"><div class="list-group">'+blockBody+'</div></div></div>';
+    return ret + "</ul>";
 }
 
 function hideRightSide() {
@@ -643,8 +739,8 @@ function showRightSide() {
 
 var holdSess = 0;
 function holdSession() {
-	if (holdSess > 0 && document.getElementById('hidFrameID')) {
-		document.getElementById('hidFrameID').src='/holdSess';
+	if (holdSess > 0 && document.getElementById("hidFrameID")) {
+		document.getElementById("hidFrameID").src="/holdSess";
 		setTimeout("holdSession()", (5*60000));
 	}
 	return true;

@@ -2,19 +2,18 @@
 $surv = new SurvLoop\Controllers\SurvLoop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
-?>
-@extends('vendor.survloop.master')
+?>@extends('vendor.survloop.master')
 
 @section('content')
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
-
-<div class="p10"></div>
-
-<center><div class="halfPageWidth">
 <form method="POST" action="{{ url('/register') }}">
 {!! csrf_field() !!}
 
-<div class="row">
+<div class="w100"><center><div id="treeWrap" class="treeWrapForm">
+
+<div class="p10"></div>
+
+<div class="row loginTitles">
     <div class="col-md-6">
         @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
             && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
@@ -23,7 +22,7 @@ $v = $surv->custLoop->v;
             <h1 class="mT0">Sign Up</h1>
         @endif
     </div>
-    <div class="col-md-6 taR pT20">
+    <div class="col-md-6 taR pT5">
         @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
             || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
             <a href="/login" class="btn btn-default">Login</a>
@@ -40,7 +39,7 @@ $v = $surv->custLoop->v;
     <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
 @endif
 
-<div id="node004" class="nodeWrap form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+<div id="node004" class="nodeWrap{{ $errors->has('name') ? 'Error' : '' }}">
     <div id="nLabel004" class="nPrompt"><label for="nameID">
         Username: 
         @if ($GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
@@ -60,7 +59,7 @@ $v = $surv->custLoop->v;
 <div class="nodeAnchor"><a name="n001"></a></div>
 <div class="nodeHalfGap"></div>
 
-<div id="node001" class="nodeWrap form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+<div id="node001" class="nodeWrap{{ $errors->has('email') ? 'Error' : '' }}">
     <div id="nLabel001" class="nPrompt"><label for="emailID">
         Email:
         @if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
@@ -75,13 +74,17 @@ $v = $surv->custLoop->v;
                 <strong>{{ $errors->first('email') }}</strong>
             </span>
         @endif
+        @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
+            && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
+            * Currently, you will only be able reset a lost password with an email address.
+        @endif
     </div>
 </div>
 
 <div class="nodeAnchor"><a name="n002"></a></div>
 <div class="nodeHalfGap"></div>
 
-<div id="node002" class="nodeWrap form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+<div id="node002" class="nodeWrap{{ $errors->has('password') ? 'Error' : '' }}">
     <div id="nLabel002" class="nPrompt"><label for="password">
         Password: <span class="red">*required</span>
     </label></div>
@@ -116,8 +119,10 @@ $v = $surv->custLoop->v;
     onClick="return checkNodeForm();"></center>
 
 <div class="nodeHalfGap"></div>
+
+</div></center></div>
+
 </form>
-</div></center>
 
 <script type="text/javascript">
 function checkNodeForm() {

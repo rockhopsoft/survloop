@@ -13,15 +13,3 @@
     No values found.
 @endforelse
 </ul></div></center>
-
-<script type="text/javascript">
-$(function() { 
-    $("#sortable").sortable({
-        axis: "y",
-        update: function (event, ui) {
-            document.getElementById("hidFrameID").src="{{ $submitURL }}&"+$(this).sortable("serialize");
-        }
-    });
-    $("#sortable").disableSelection(); 
-});
-</script>

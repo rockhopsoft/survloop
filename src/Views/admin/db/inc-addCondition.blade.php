@@ -88,28 +88,4 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript"> 
-    $(document).ready(function(){
-        $("#oldCondsID").change(function() {
-            if (document.getElementById("oldCondsID").value >= 0) $("#createNewCond").slideUp('fast');
-            else $("#createNewCond").slideDown('fast');
-                
-        });
-        $("#setSelectID").change(function() {
-            //alert("/dashboard/db/ajax/getSetFlds/"+encodeURIComponent(document.getElementById("setSelectID").value)+"");
-            if (document.getElementById("setSelectID").value == 'url-parameters') {
-                if (document.getElementById("urlParams")) document.getElementById("urlParams").style.display = 'block';
-            } else {
-                if (document.getElementById("urlParams")) document.getElementById("urlParams").style.display = 'none';
-                var fldVal = encodeURIComponent(document.getElementById("setSelectID").value);
-                $("#fldSelect").load("/dashboard/db/ajax/getSetFlds/"+fldVal+"");
-                document.getElementById("valSelect").innerHTML = '';
-            }
-            //document.getElementById("nameIt").style.display = 'none';
-        });
-        $("#addCondLnk").click(function() { 
-            $("#addCond").slideToggle('fast');
-        });
-    });
-    </script>
 </div>

@@ -4,13 +4,10 @@ namespace SurvLoop\Controllers;
 use DB;
 use Auth;
 use Cache;
-use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\QueryException;
-
-use SurvLoop\Controllers\DatabaseLookups;
 
 use App\Models\User;
 use App\Models\SLDatabases;
@@ -18,6 +15,8 @@ use App\Models\SLDefinitions;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLUsersActivity;
+
+use SurvLoop\Controllers\DatabaseLookups;
 
 class SurvLoopController extends Controller
 {
@@ -55,17 +54,8 @@ class SurvLoopController extends Controller
             $this->v["isPrint"]     = $request->has('print');
             $this->v["isExcel"]     = $request->has('excel');
             $this->v["exportDir"]   = 'survloop';
+            $this->v["hasContain"]  = false;
             $this->v["content"]     = '';
-            $this->v["pageJSextra"] = '';
-            $this->v["pageJStop"]   = (($this->v["user"] && $this->v["user"]->hasRole('administrator')) 
-                ? 'setNavItem("Admin Dashboard", "/dashboard"); ' : '') . $this->extraNavItems();
-            if (isset($this->v["user"]) && isset($this->v["user"]->id) && $this->v["user"]->id > 0) {
-                $this->v["pageJStop"] .= 'setNavItem("Hi, ' . $this->v["user"]->printCasualUsername(false) 
-                    . '", "/profile/' . $this->v["user"]->id . '"); ';
-                $this->v["pageJStop"] .= 'setNavItem("Logout", "/logout"); ';
-            } else {
-                $this->v["pageJStop"] .= 'setNavItem("Login", "/login"); setNavItem("Sign Up", "/register"); ';
-            }
             
             if (!isset($this->v["currPage"])) $this->v["currPage"] = $currPage;
             if (trim($this->v["currPage"]) == '') {
@@ -75,12 +65,21 @@ class SurvLoopController extends Controller
                 }
             }
             
-            if (!isset($this->v["currState"]))    $this->v["currState"] = '';
-            if (!isset($this->v["yourUserInfo"])) $this->v["yourUserInfo"] = array();
-            if (!isset($this->v["yourContact"]))  $this->v["yourContact"] = array();
+            if (!isset($this->v["currState"]))    $this->v["currState"]    = '';
+            if (!isset($this->v["yourUserInfo"])) $this->v["yourUserInfo"] = [];
+            if (!isset($this->v["yourContact"]))  $this->v["yourContact"]  = [];
             
             $this->loadDbLookups($request);
             if ($this->coreIDoverride > 0) $this->loadAllSessData();
+
+            $GLOBALS["SL"]->pageJAVA .= (($this->v["user"] && $this->v["user"]->hasRole('administrator')) 
+                ? 'setNavItem("Admin Dashboard", "/dashboard"); ' : '') . $this->extraNavItems();
+            if (isset($this->v["user"]) && isset($this->v["user"]->id) && $this->v["user"]->id > 0) {
+                $GLOBALS["SL"]->pageJAVA .= 'setNavItem("My Profile", "/my-profile"); '
+                    . 'setNavItem("Logout", "/logout"); ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= 'setNavItem("Login", "/login"); setNavItem("Sign Up", "/register"); ';
+            }
             
             if ($runExtra) {
                 $this->initExtra($request);
@@ -88,7 +87,6 @@ class SurvLoopController extends Controller
                 $this->initCustViews();
             }
             $this->genCacheKey();
-            $GLOBALS["SL"]->pageJStop .= $this->v["pageJStop"];
         }
         return true;
     }
@@ -146,12 +144,15 @@ class SurvLoopController extends Controller
                     }
                 }
             }
-            if (!isset($this->v["isAdmin"])) {
-                $this->v["isAdmin"] = (Auth::user() && Auth::user()->hasRole('administrator'));
-            }
+            if (!isset($this->v["isAdmin"])) $this->v["isAdmin"] = $this->isUserAdmin();
             $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID);
         }
         return true;
+    }
+    
+    protected function isUserAdmin()
+    {
+        return (Auth::user() && Auth::user()->hasRole('administrator'));
     }
     
     protected function loadDbFromNode(Request $request, $nID)
@@ -162,8 +163,7 @@ class SurvLoopController extends Controller
             if ($tree && isset($tree->TreeDatabase)) {
                 $this->treeID = $tree->TreeID;
                 $this->dbID = $tree->TreeDatabase;
-                $isAdmin = ((isset($this->v["isAdmin"])) ? $this->v["isAdmin"]
-                    : (Auth::user() && Auth::user()->hasRole('administrator')));
+                $isAdmin = ((isset($this->v["isAdmin"])) ? $this->v["isAdmin"] : $this->isUserAdmin());
                 $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
             }
         }
@@ -173,11 +173,11 @@ class SurvLoopController extends Controller
     protected function loadCustView($view)
     {
         if (file_exists(base_path('resources/views/vendor/' 
-            . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/' . $view . '.blade.php'))) {
-            $view = 'vendor.' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.' . $view;
-        } elseif (file_exists(base_path('resources/views/vendor/' 
             . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '/' . $view . '.blade.php'))) {
             $view = 'vendor.' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '.' . $view;
+        } elseif (file_exists(base_path('resources/views/vendor/' 
+            . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/' . $view . '.blade.php'))) {
+            $view = 'vendor.' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.' . $view;
         } else {
             $view = 'vendor.survloop.' . $view;
         }
@@ -235,7 +235,7 @@ class SurvLoopController extends Controller
     
     protected function extraNavItems()
     {
-        return true;
+        return '';
     }
     
     protected function initCustViews()
@@ -243,6 +243,13 @@ class SurvLoopController extends Controller
         $views = ['footer-master', 'footer-admin'];
         foreach ($views as $view) {
             $GLOBALS["SL"]->sysOpts[$view] = $this->loadCustView('inc-' . $view);
+        }
+        $chk = SLDefinitions::where('DefDatabase', 1)
+            ->where('DefSet', 'Blurbs')
+            ->where('DefSubset', 'Footer')
+            ->first();
+        if ($chk && isset($chk->DefDescription) && trim($chk->DefDescription) != '') {
+            $GLOBALS["SL"]->sysOpts['footer-master'] = $chk->DefDescription;
         }
         return true;
     }
@@ -304,21 +311,6 @@ class SurvLoopController extends Controller
     
     // a few utilities...
     
-    function mexplode($delim, $str)
-    {
-        $ret = [];
-        if (trim(str_replace($delim, '', $str)) != '') {
-            if (strpos($str, $delim) === false) {
-                $ret[] = $str;
-            } else {
-                if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
-                if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
-                $ret = explode($delim, $str);
-            }
-        }
-        return $ret;
-    }
-    
     public function slugify($text)
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
@@ -357,6 +349,29 @@ class SurvLoopController extends Controller
         ]);
     }
     
+    
+    protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
+    {
+        $eval = "\$recs = App\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
+            . implode("', '", $filtIn) . "' ])->orderBy('created_at', 'desc')->get();";
+        eval($eval);
+        echo $eval . '<br />';
+        $this->v["recs"] = $recs;
+        return true;
+    }
+    
+    protected function getRecFiltTots($tblMdl = '', $filtFld = '', $filts = [], $idFld = '')
+    {
+        $this->v["recTots"] = [];
+        if (sizeof($filts) > 0) {
+            foreach ($filts as $filt) {
+                eval("\$totChk = App\\Models\\" . $tblMdl . "::where('" . $filtFld . "', '" . $filt 
+                    . "')->select('" . $idFld . "')->get();");
+                $this->v["recTots"][$filt] = sizeof($totChk);
+            }
+        }
+        return true;
+    }
     
     
     protected function getAdmMenu($currPage = '')
@@ -409,7 +424,7 @@ class SurvLoopController extends Controller
                 //->where('TreeDatabase', $GLOBALS["SL"]->dbID)
                 ->first();
             if ($treeRow && isset($treeRow->TreeID)) {
-                $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $treeRow->TreeDatabase, $treeID, $treeID);
+                $GLOBALS["SL"] = new DatabaseLookups($request, $this->isUserAdmin(), $treeRow->TreeDatabase, $treeID, $treeID);
                 $this->logPageVisit($currPage, $treeRow->TreeDatabase . ';' . $treeID);
             }
             return true;
@@ -431,6 +446,29 @@ class SurvLoopController extends Controller
         }
         return $class;
     }
+    
+    
+    public function extractJava($str = '', $nID = -3)
+    {
+        if (trim($str) == '') return '';
+        $str = str_replace('</ script>', '</script>', $str);
+        $orig = $str;
+        $tag1start = strpos($str, '<script');
+        if ($tag1start !== false) {
+            $tag1end = strpos($str, '>', $tag1start);
+            if ($tag1end !== false) {
+                $tag2 = strpos($str, '</script>', $tag1end);
+                if ($tag2 !== false) {
+                    $GLOBALS["SL"]->pageJAVA .= (($nID > 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
+                        . substr($str, ($tag1end+1), ($tag2-$tag1end-1))
+                        . (($nID > 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
+                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
+                }
+            }
+        }
+        return $str;
+    }
+    
     
     public function isMobile()
     {
@@ -463,19 +501,27 @@ class SurvLoopController extends Controller
         $redir = $path;
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
             $redir = $GLOBALS["SL"]->sysOpts["app-url"] . $path;
-        }
-        $appUrl = SLDefinitions::where('DefDatabase', 1)
-            ->where('DefSet', 'System Settings')
-            ->where('DefSubset', 'app-url')
-            ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) {
-            $redir = $appUrl->DefDescription . $path;
+        } else {
+            $appUrl = SLDefinitions::where('DefDatabase', 1)
+                ->where('DefSet', 'System Settings')
+                ->where('DefSubset', 'app-url')
+                ->first();
+            if ($appUrl && isset($appUrl->DefDescription)) {
+                $redir = $appUrl->DefDescription . $path;
+            }
         }
         if (!$js) return redirect($redir);
         else {
             echo '<script type="text/javascript"> window.location=\'' . $redir . '\'; </script>';
             exit;
         }
+    }
+    
+    protected function setNotif($msg = '', $type = 'info')
+    {
+        session()->put('sessMsg',     $msg);
+        session()->put('sessMsgType', 'alert-' . $type);
+        return true;
     }
     
     

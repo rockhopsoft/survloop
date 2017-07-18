@@ -133,13 +133,6 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             <div class="col-md-9">
             @if ($dbAllowEdits) 
                 <div id="fldSelect"><input type="hidden" name="RuleFields" id="RuleFieldsID" value="{{ $rule->RuleFields }}"></div>
-                <script type="text/javascript"> 
-                //alert("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+" - /dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
-                $(document).ready(function(){
-                $("#tblSelect").load("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+"");
-                $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
-                }); 
-                </script>
             @else
                 {{ $fldTxt }}
             @endif

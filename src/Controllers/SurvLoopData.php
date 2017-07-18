@@ -448,10 +448,12 @@ class SurvLoopData
                 $tbl2Ind = (isset($this->dataSets[$tbl2])) ? sizeof($this->dataSets[$tbl2]) : 0;
             }
             
-            $this->kidMap[$tbl1][$tbl2]["id" ][$tbl1ID]     = $tbl2ID;
-            $this->kidMap[$tbl1][$tbl2]["ind"][$tbl1Ind]    = $tbl2Ind;
-            $this->parentMap[$tbl2][$tbl1]["id" ][$tbl2ID]  = $tbl1ID;
-            $this->parentMap[$tbl2][$tbl1]["ind"][$tbl2Ind] = $tbl1Ind;
+            if ($tbl1ID > 0 && $tbl2ID > 0) {
+                $this->kidMap[$tbl1][$tbl2]["id" ][$tbl1ID]     = $tbl2ID;
+                $this->kidMap[$tbl1][$tbl2]["ind"][$tbl1Ind]    = $tbl2Ind;
+                $this->parentMap[$tbl2][$tbl1]["id" ][$tbl2ID]  = $tbl1ID;
+                $this->parentMap[$tbl2][$tbl1]["ind"][$tbl2Ind] = $tbl1Ind;
+            }
         }
         return false;
     }
@@ -514,7 +516,7 @@ class SurvLoopData
         }
         $this->loopItemIDsDone = $saves = [];
         $saves = SLNodeSaves::where('NodeSaveSession', $this->coreID)
-            ->where('NodeSaveTblFld', 'LIKE', $tbl.':'.$fld)
+            ->where('NodeSaveTblFld', 'LIKE', $tbl . ':' . $fld)
             ->get();
         if ($saves && sizeof($saves) > 0) {
             foreach ($saves as $save) {

@@ -1,13 +1,19 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use DB;
 use Auth;
+use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\File\File;
 
 use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
+
+use SurvLoop\Controllers\SurvLoopInstaller;
 
 class SurvLoop extends Controller
 {
@@ -18,6 +24,8 @@ class SurvLoop extends Controller
     public $dbID           = 1;
     public $treeID         = 1;
     public $domainPath     = 'http://homestead.app';
+    public $cacheKey       = '';
+    public $pageContent    = '';
     
     protected function loadAbbr()
     {
@@ -69,8 +77,9 @@ class SurvLoop extends Controller
         return false;
     }
     
-    protected function loadTreeBySlug($request, $treeSlug = '', $page = false)
+    protected function loadTreeBySlug(Request $request, $treeSlug = '', $page = false)
     {
+        if ($this->topCheckCache($request)) return $this->pageContent;
         if (trim($treeSlug) != '') {
             $urlTrees = [];
             if (!$page) {
@@ -164,7 +173,11 @@ class SurvLoop extends Controller
     {
         if ($this->loadTreeBySlug($request, $pageSlug, true)) {
             $this->loadLoop($request);
-            return $this->custLoop->index($request);
+            $this->pageContent = $this->custLoop->index($request);
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0) { // then simple page which can be cached
+                $this->topSaveCache();
+            }
+            return $this->pageContent;
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -172,20 +185,26 @@ class SurvLoop extends Controller
     
     public function loadPageHome(Request $request)
     {
+        if ($this->topCheckCache($request)) return $this->pageContent;
         $this->loadDomain();
-        $urlTrees = SLTree::where('TreeType', 'Page')
-            ->get();
-        if ($urlTrees && sizeof($urlTrees) > 0) {
-            foreach ($urlTrees as $urlTree) {
-                if (isset($urlTree->TreeOpts) && $urlTree->TreeOpts%7 == 0 && $urlTree->TreeOpts%3 > 0) {
-                    $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
-                    $this->loadLoop($request);
-                    return $this->custLoop->index($request);
-                }
+        $urlTree = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
+        if ($urlTree && sizeof($urlTree) > 0 && isset($urlTree[0]->TreeOpts)) { //  && isset($urlTree[0]->TreeOpts)
+            $this->syncDataTrees($request, $urlTree[0]->TreeDatabase, $urlTree[0]->TreeID);
+            $this->loadLoop($request);
+            $this->pageContent = $this->custLoop->index($request);
+            if ($urlTree[0]->TreeOpts%29 > 0) { // then simple page which can be cached
+                $this->topSaveCache();
             }
+            return $this->pageContent;
         }
-        return $this->index($request);
-        //return redirect($this->domainPath . '/');
+        
+        // else Home Page not found, so let's quickly create one
+        $installer = new SurvLoopInstaller;
+        $urlTree = $installer->installPageHome();
+        $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
+        $this->loadLoop($request);
+        return $this->custLoop->index($request);
     }
     
     public function testRun(Request $request)
@@ -200,10 +219,41 @@ class SurvLoop extends Controller
         return $this->custLoop->ajaxChecks($request, $type);
     }
     
+    public function ajaxChecksAdmin(Request $request, $type = '')
+    {
+        $this->loadLoopAdmin($request);
+        return $this->custLoop->ajaxChecksAdmin($request, $type);
+    }
+    
     public function sortLoop(Request $request)
     {
         $this->loadLoop($request);
         return $this->custLoop->sortLoop($request);
+    }
+    
+    public function showProfile(Request $request, $uname = '')
+    {
+        $profileTree = SLTree::where('TreeSlug', 'my-profile')
+            ->where('TreeOpts', 23) // special page for managing member profiles
+            ->where('TreeType', 'Page')
+            ->first();
+        if ($profileTree && isset($profileTree->TreeID)) {
+            $this->syncDataTrees($request, $profileTree->TreeDatabase, $profileTree->TreeID);
+            $this->loadLoop($request);
+            $this->custLoop->setCurrUserProfile($uname);
+            return $this->custLoop->index($request);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+
+    public function showMyProfile(Request $request)
+    {
+        $this->loadDomain();
+        if (Auth::user() && isset(Auth::user()->name)) {
+            return redirect($this->domainPath . '/profile/' . urlencode(Auth::user()->name));
+        }
+        return redirect($this->domainPath . '/');
     }
     
     public function holdSess(Request $request)
@@ -224,27 +274,35 @@ class SurvLoop extends Controller
         return $this->custLoop->sessDump();
     }
     
-    public function switchSess(Request $request, $cid)
+    public function switchSess(Request $request, $treeID, $cid)
     {
+        $this->loadTreeByID($request, $treeID);
         $this->loadLoop($request);
         return $this->custLoop->switchSess($request, $cid);
     }
     
-    public function delSess(Request $request, $cid)
+    public function delSess(Request $request, $treeID, $cid)
     {
+        $this->loadTreeByID($request, $treeID);
         $this->loadLoop($request);
         return $this->custLoop->delSess($request, $cid);
     }
     
     public function afterLogin(Request $request)
     {
+        if (session()->has('lastTree')) {
+            $tree = SLTree::find(session()->get('lastTree'));
+            if ($tree && isset($tree->TreeDatabase)) {
+                $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+            }
+        }
         $this->loadLoop($request);
         return $this->custLoop->afterLogin($request);
     }
     
-    public function retrieveUpload(Request $request, $treeID = -3, $cid = -3, $upID = '')
+    public function retrieveUpload(Request $request, $treeSlug = '', $cid = -3, $upID = '')
     {
-        if ($this->loadTreeByID($request, $treeID)) {
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->retrieveUpload($request, $cid, $upID);
         }
@@ -384,6 +442,12 @@ class SurvLoop extends Controller
         return $this->custLoop->adminProfile($request);
     }
     
+    public function systemsCheck(Request $request)
+    {
+        $this->loadLoopAdmin($request);
+        return $this->custLoop->systemsCheck($request);
+    }
+    
     public function listSubsAll(Request $request)
     {
         $this->loadLoopAdmin($request);
@@ -462,6 +526,64 @@ class SurvLoop extends Controller
     public function searchResultsAjax(Request $request, $treeID = 1)
     {
         return $this->searchResults($request, $treeID, 1);
+    }
+    
+    public function getUploadFile(Request $request, $abbr, $file)
+    {
+        $filename = '../storage/app/up/' . $abbr . '/' . $file;
+        $handler = new File($filename);
+        $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
+        $lifetime = 86400; // One day in seconds
+        $header_etag = md5($file_time . $filename);
+        $header_last_modified = gmdate('r', $file_time);
+        $headers = array(
+            'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Last-Modified'       => $header_last_modified,
+            'Cache-Control'       => 'must-revalidate',
+            'Expires'             => gmdate('r', $file_time + $lifetime),
+            'Pragma'              => 'public',
+            'Etag'                => $header_etag
+        );
+        
+        // Is the resource cached?
+        $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
+            && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_last_modified);
+        $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
+            && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
+        if (($h1 || $h2) && !$request->has('refresh')) {
+            return Response::make('', 304, $headers); 
+        }
+        // File (image) is cached by the browser, so we don't have to send it again
+        
+        $headers = array_merge($headers, [
+            'Content-Type'   => $handler->getMimeType(),
+            'Content-Length' => $handler->getSize()
+        ]);
+        return Response::make(file_get_contents($filename), 200, $headers);
+    }
+    
+    protected function topGenCacheKey()
+    {
+        $this->cacheKey = '/cache/page-' . substr($_SERVER["REQUEST_URI"], 1) . '.html';
+        return $this->cacheKey;
+    }
+    
+    protected function topCheckCache(Request $request)
+    {
+        $this->topGenCacheKey();
+        if ($request->has('refresh') && file_exists($this->cacheKey)) Storage::delete($this->cacheKey);
+        if (file_exists($this->cacheKey)) {
+            $this->pageContent = Storage::get($this->cacheKey);
+            return true;
+        }
+        return false;
+    }
+    
+    protected function topSaveCache()
+    {
+        if (trim($this->cacheKey) == '') $this->topGenCacheKey();
+        Storage::put($this->cacheKey, $this->pageContent);
+        return true;
     }
     
     

@@ -216,7 +216,7 @@ class DatabaseInstaller extends AdminDBController
                     $this->v["dumpOut"]["Models"] .= $fullFileOut;
                     if (file_exists($newModelFilename)) {
                         $oldFile = file_get_contents($newModelFilename);
-                        $endStr = 'END SurvLoop auto-generated portion of Model';
+                        $endStr = '// END SurvLoop auto-generated portion of Model';
                         $endPos = strpos($oldFile, $endStr);
                         if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile)) {
                             $append = substr($oldFile, ($endPos+strLen($endStr)+2));
@@ -389,7 +389,7 @@ class DatabaseInstaller extends AdminDBController
     		if ($request->has('mys') && trim($request->mys) != '') {
     		    $this->v["lastSql"] = trim($request->mys);
     		    $this->v["manualMySql"] .= '<b>Statements submitted...</b><br />';
-    		    $statements = $this->mexplode(';', $request->mys);
+    		    $statements = $GLOBALS["SL"]->mexplode(';', $request->mys);
     		    foreach ($statements as $sql) {
     		        $cnt = 0;
     		        if (trim($sql) != '') {

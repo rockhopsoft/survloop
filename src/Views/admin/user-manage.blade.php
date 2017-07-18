@@ -18,18 +18,19 @@
 
 <tr>
     <th>Name</th>
+    <th>Email</th>
     <th class="taC">Volunteer</th>
     <th class="taC">Evaluators</th>
     <th class="taC">Brancher</th>
     <th class="taC">Databaser</th>
     <th class="taC">Admin</th>
-    <th>Email</th>
 </tr>
 
 @foreach ($printVoluns as $userSet)
     @forelse ($userSet as $volun)
         <tr>
             <td><b>{!! $volun->printUsername(true, '/dashboard/users/') !!}</b></td>
+            <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="volunteer" @if ($volun->hasRole('volunteer')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
@@ -40,7 +41,6 @@
                 value="databaser" {{ $disableAdmin }} @if ($volun->hasRole('databaser')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="administrator" {{ $disableAdmin }} @if ($volun->hasRole('administrator')) CHECKED @endif ></td>
-            <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a></td>
         </tr>
     @empty
     @endforelse

@@ -13,25 +13,7 @@
             <option value="" DISABLED >------------------</option>
             <option value="" DISABLED >OR select a field below to clear this condition based on the user's response</option>
             <option value="" DISABLED >------------------</option>
-            {!! $GLOBALS['SL']->getAllSetTblFldDrops($rSet) !!}
+            @if (isset($setOptions)) {!! $setOptions !!} @endif
         </select>
     </div>
 </div>
-<script type="text/javascript"> 
-$(document).ready(function(){
-    $("#setFldID").change(function() {
-        if (document.getElementById("setFldID").value == '') {
-            document.getElementById("valSelect").innerHTML = '';
-            document.getElementById("nameIt").style.display = 'none';
-        }
-        else if (document.getElementById("setFldID").value == 'EXISTS' || document.getElementById("setFldID").value == 'EXISTS>1') {
-            document.getElementById("nameIt").style.display = 'block';
-        }
-        else {    
-            //alert("/dashboard/db/ajax/getSetFldVals/"+encodeURIComponent(document.getElementById("setFldID").value)+"");
-            $("#valSelect").load("/dashboard/db/ajax/getSetFldVals/"+encodeURIComponent(document.getElementById("setFldID").value)+"");
-            document.getElementById("nameIt").style.display = 'block';
-        }
-    });
-});
-</script>

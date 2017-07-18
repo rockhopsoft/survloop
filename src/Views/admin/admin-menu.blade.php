@@ -30,7 +30,7 @@
                         " data-target="#subB{{ $j }}" @if ($nav[2]%3 == 0) target="_blank" @endif >
                         <?php /* <i class="fa fa-chevron-right"></i> */ ?> {!! $nA[1] !!}</a>
                         <div id="subB{{ $j }}" class="sublinks 
-                        <?php /* @if ($currNavPos[0] != $i || $currNavPos[1] != $j) collapse @endif */ ?>
+                        @if ($currNavPos[0] != $i || $currNavPos[1] != $j) collapse @endif
                         ">
                         @foreach ($nA[3] as $k => $nB)
                 

@@ -46,16 +46,6 @@
             </div>
         </div>
         <a href="javascript:void(0)" id="addValResponse" class="disBlo" >Add A Response Option</a>
-        <script type="text/javascript">
-        $(document).ready(function(){
-            var openResponses = 0;
-            $("#addValResponse").click(function() { 
-                openResponses++;
-                $("#valsOpenDiv"+openResponses+"").slideDown('fast');
-                if (openResponses == 9) $("#addValResponse").slideUp('fast');
-            });
-        });
-        </script>
     </div>
 @endif
 

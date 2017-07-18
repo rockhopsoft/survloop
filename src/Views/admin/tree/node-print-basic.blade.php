@@ -13,7 +13,7 @@
         <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/tree/map/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
+            <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
         </div>
         @if ($node->nodeRow->NodeParentOrder == 0)
@@ -55,26 +55,28 @@
         @endif
         
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noNodeID') === false)
-            <a href="/dashboard/tree/map/node/{{ $nID }}" class="btn btn-xs btn-default circleBtn1">#{{ $nID }}</a> 
+            <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
+                class="btn btn-xs btn-default circleBtn1">#{{ $nID }}</a>
         @endif
         
         @if ($node->isBranch())
-            <span class="slBlueDark f26 opac80" title="Branch Title"><i class="fa fa-share-alt"></i>
+            <span class="slBlueDark mL10 f26 opac80" title="Branch Title"><i class="fa fa-share-alt"></i>
         @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
-            <span class="gryA f22 opac50" title="Only Visible to Robots"><i class="fa fa-bug fa-rotate-90"></i>
+            <span class="gryA mL10 f22 opac50" title="Only Visible to Robots"><i class="fa fa-bug fa-rotate-90"></i>
         @elseif ($node->isLoopRoot())
-            <span class="slBlueDark f30" title="Start of a New Page, Root of a Data Loop"><i class="fa fa-refresh"></i>
+            <span class="slBlueDark mL10 f30" title="Start of a New Page, Root of a Data Loop"
+                ><i class="fa fa-refresh"></i>
         @elseif ($node->isLoopCycle())
-            <span class="slBlueDark f20" title="Data Loop within a Page"><i class="fa fa-refresh"></i>
+            <span class="slBlueDark mL10 f20" title="Data Loop within a Page"><i class="fa fa-refresh"></i>
         @elseif ($node->isLoopSort())
-            <span class="slBlueDark f20" title="Sort Data Loop Items"><i class="fa fa-sort"></i>
+            <span class="slBlueDark mL10 f20" title="Sort Data Loop Items"><i class="fa fa-sort"></i>
         @elseif ($node->isDataManip())
-            <span class="slGreenDark @if ($node->parentID > 0) f16 @else f26 @endif " 
+            <span class="slGreenDark mL10 @if ($node->parentID > 0) f16 @else f26 @endif " 
                 title="Data Manipulation"><i class="fa fa-database slGreenDark"></i>
         @elseif ($node->isPage())
-            <span class="slBlueDark f30" title="Start of a New Page"><i class="fa fa-file-text-o"></i>
+            <span class="slBlueDark mL10 f30" title="Start of a New Page"><i class="fa fa-file-text-o"></i>
         @endif
-        </span> 
+        </span>
         
         @if ($node->isLayout())
         
@@ -137,6 +139,9 @@
                     @else 
                         <span class="slGrey mL10">Page</span>
                     @endif
+                    @if (trim($node->nodeRow->NodeTextSuggest) != '')
+                        <span class="slGrey mL10">(Has Hero Image)</span>
+                    @endif
                     
                 @elseif ($node->isLoopRoot())
                 
@@ -169,14 +174,16 @@
                     
                 @elseif ($node->isDataManip())
                 
-                    <span class="slGreenDark mL5 @if ($node->parentID > 0) f16 @else f26 @endif ">
+                    <span class="slGreenDark mL10 @if ($node->parentID > 0) f16 @else f26 @endif ">
                         {{ $node->nodeRow->NodeDataBranch }}
                         @if ($node->nodeRow->NodeType == 'Data Manip: New') 
                             New Record 
                         @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') 
                             Update Record 
-                        @else 
+                        @elseif ($node->nodeRow->NodeType == 'Data Manip: Wrap') 
                             Table Wrap 
+                        @else 
+                            Close User Session
                         @endif
                     </span>
                     
@@ -193,10 +200,14 @@
                             @if ($node->isLoopRoot()) slBlueDark @endif
                             ">{{ $nodePromptText }}</span> 
                     @endif
-                    @if ($node->nodeRow->NodeType == 'Big Button') 
-                        <span class="f16 slBlueDark mL5">[ {{ $node->nodeRow->NodeDefault }} ]</span>
-                    @endif
                     <span class="slGrey mL10">{{ $node->nodeRow->NodeType }}</span>
+                    @if ($node->nodeRow->NodeType == 'Big Button') 
+                        @if ($node->nodeRow->NodeResponseSet == 'HTML')
+                            {!! $node->nodeRow->NodeDefault !!}
+                        @else
+                           <span class="f16 slBlueDark mL5">{!! $node->nodeRow->NodeDefault !!}</span>
+                        @endif
+                    @endif
                     
                     @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
                     
@@ -233,6 +244,11 @@
                 @endif
                 {!! $conditionList !!}
                 {!! $nodeBtns !!}
+                
+                @if ($node->isPage() && trim($node->nodeRow->NodeTextSuggest) != '')
+                    <div class="brdEdash round10 p5 mT5">
+                    <img class="heroImg" src="{{ $node->nodeRow->NodeTextSuggest }}" border=0 ></div>
+                @endif
             
             @endif
             
@@ -242,7 +258,7 @@
             <div id="addChild{{ $nID }}" class="disNon 
                 @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif "
                 ><span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-                <a href="/dashboard/tree/map/node/-37/?parent={{ $nID }}&start=1"
+                <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&start=1"
                     ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
             </div>
         @endif
@@ -260,7 +276,7 @@
                 <div id="addChild{{ $nID }}B" class="disNon 
                     @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
                     <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-                    <a href="/dashboard/tree/map/node/-37/?parent={{ $nID }}&end=1"
+                    <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&end=1"
                         ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
                 </div>
             @endif
@@ -280,7 +296,7 @@
         <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/tree/map/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
+            <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
         </div>
         <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">

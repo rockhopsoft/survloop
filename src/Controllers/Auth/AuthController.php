@@ -134,6 +134,7 @@ class AuthController extends Controller
     public function getLogout()
     {
         Auth::logout();
+        session()->flush();
         return redirect($this->domainPath . '/');
     }
     

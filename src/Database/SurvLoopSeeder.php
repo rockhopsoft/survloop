@@ -4277,7 +4277,7 @@ class SurvLoopSeeder extends Seeder
             'DefSubset' => 'SurvLoop Definition Types',
             'DefOrder' => '3',
             'DefValue' => 'Instructions',
-            'DefDescription' => 'Each definition which is an Instruction represents one blurb, used somewhere in the system, which can be edited by system administrators.'
+            'DefDescription' => 'Each definition which is an Instruction represents one excerpt, used somewhere in the system, which can be edited by system administrators.'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 48,

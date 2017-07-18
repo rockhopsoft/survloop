@@ -20,6 +20,7 @@ use App\Models\SLSessLoops;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsNodes;
+use App\Models\SLEmails;
 
 use SurvLoop\Controllers\StatesUS;
 
@@ -41,7 +42,9 @@ class DatabaseLookups
     public $REQ            = [];
     public $sysOpts        = [];
     public $userRoles      = [];
-    public $pageJStop      = '';
+    public $pageSCRIPTS = '';
+    public $pageJAVA      = '';
+    public $pageAJAX       = '';
     
     public $tblModels      = [];
     public $tbls           = [];
@@ -73,10 +76,11 @@ class DatabaseLookups
     
     public $fldAbouts      = [];
     public $blurbs         = [];
+    public $emaBlurbs      = [];
     public $debugOn        = true;
     
     public $sysTree        = [ "forms" => [ "pub" => [], "adm" => [] ], "pages" => [ "pub" => [], "adm" => [] ] ];
-    public $treeMojis      = [];
+    public $treeSettings   = [];
     
     function __construct(Request $request = NULL, $isAdmin = false, $dbID = 1, $treeID = 1, $treeOverride = -3)
     {
@@ -85,9 +89,9 @@ class DatabaseLookups
         $this->REQ = $request;
         if ($treeOverride > 0) $this->treeOverride = $treeOverride;
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
-            $this->dbID    = $dbID;
+            $this->dbID = $dbID;
         }
-        $this->dbRow   = SLDatabases::find($this->dbID);
+        $this->dbRow = SLDatabases::find($this->dbID);
         if (($treeOverride > 0 || $this->treeOverride <= 0) && $dbID == 1 
             && (!isset($this->dbRow) || sizeof($this->dbRow) == 0)) {
         	$this->dbID = 3;
@@ -120,6 +124,8 @@ class DatabaseLookups
         
         $this->loadDBFromCache($request);
         
+        $this->loadTreeMojis();
+        
         $this->dataLoops = [];
         $this->dataLoopNames = [];
         $dataLoops = SLDataLoop::where('DataLoopTree', $this->treeID)
@@ -150,12 +156,15 @@ class DatabaseLookups
         return true;
     }
     
+    public function urlRoot()
+    {
+        return str_replace('https://', '', str_replace('http://', '', $this->sysOpts["app-url"]));
+    }
     
     public function hasTreeOverride()
     {
         return ($this->treeOverride > 0);
     }
-    
     
     public function loadDBFromCache(Request $request = NULL)
     {
@@ -296,19 +305,34 @@ class DatabaseLookups
             
             $this->getCoreTblUserFld();
             $cache2 = '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
-            $xmlTree = SLTree::where('TreeSlug', $this->treeRow->TreeSlug)
-                ->where('TreeDatabase', $this->treeRow->TreeDatabase)
-                ->where('TreeType', 'Primary Public XML')
-                ->orderBy('TreeID', 'asc')
-                ->first();
-            if ($xmlTree && isset($xmlTree->TreeRoot)) {
-                $cache2 .= '$'.'this->xmlTree = [ '
-                    . '"id" => '        . $xmlTree->TreeID . ', '
-                    . '"root" => '      . $xmlTree->TreeRoot . ', '
-                    . '"coreTblID" => ' . $xmlTree->TreeCoreTable . ', '
-                    . '"coreTbl" => "'  . $this->tbl[$xmlTree->TreeCoreTable] . '", '
-                    . '"opts" => '      . $xmlTree->TreeOpts
-                . ' ];' . "\n";
+            if ($this->treeRow->TreeType == 'Primary Public') {
+                $xmlTree = SLTree::where('TreeSlug', $this->treeRow->TreeSlug)
+                    ->where('TreeDatabase', $this->treeRow->TreeDatabase)
+                    ->where('TreeType', 'Primary Public XML')
+                    ->orderBy('TreeID', 'asc')
+                    ->first();
+                if ($xmlTree && isset($xmlTree->TreeID)) {
+                    if (!isset($xmlTree->TreeRoot) || intVal($xmlTree->TreeRoot) <= 0) {
+                        if (intVal($xmlTree->TreeCoreTable) > 0) {
+                            $xmlRootNode = new SLNode;
+                            $xmlRootNode->NodeTree        = $xmlTree->TreeID;
+                            $xmlRootNode->NodeParentID    = -3;
+                            $xmlRootNode->NodeType        = 'XML';
+                            $xmlRootNode->NodePromptText  = $this->tbl[$xmlTree->TreeCoreTable];
+                            $xmlRootNode->NodePromptNotes = $xmlTree->TreeCoreTable;
+                            $xmlRootNode->save();
+                            $xmlTree->TreeRoot = $xmlRootNode->NodeID;
+                            $xmlTree->save();
+                        }
+                    }
+                    $cache2 .= '$'.'this->xmlTree = [ '
+                        . '"id" => '        . $xmlTree->TreeID . ', '
+                        . '"root" => '      . $xmlTree->TreeRoot . ', '
+                        . '"coreTblID" => ' . $xmlTree->TreeCoreTable . ', '
+                        . '"coreTbl" => "'  . $this->tbl[$xmlTree->TreeCoreTable] . '", '
+                        . '"opts" => '      . $xmlTree->TreeOpts
+                    . ' ];' . "\n";
+                }
             }
             eval($cache2);
             
@@ -318,7 +342,7 @@ class DatabaseLookups
         return true;
     }
     
-    public function modelPath($tbl = '', $forceFile = true)
+    public function modelPath($tbl = '', $forceFile = false)
     {
         if ($tbl == 'users') return "App\\Models\\User";
         if (isset($this->tblModels[$tbl])) {
@@ -329,7 +353,7 @@ class DatabaseLookups
         return '';
     }
     
-    public function chkTblModel($tbl, $path, $forceFile = true)
+    public function chkTblModel($tbl, $path, $forceFile = false)
     {
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) return false;
         $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
@@ -596,7 +620,7 @@ class DatabaseLookups
     // returns array(Table 1, Foreign Key 1, Linking Table, Foreign Key 2, Table 2)
     public function getLinkTblMap($linkTbl = -3)
     {
-        if ($linkTbl <= 0) return array();
+        if ($linkTbl <= 0) return [];
         $foreigns = SLFields::select('FldName', 'FldForeignTable')
             ->where('FldDatabase', $this->dbID)
             ->where('FldTable', $linkTbl)
@@ -617,7 +641,7 @@ class DatabaseLookups
                 ];
             }
         }
-        return array();
+        return [];
     }
     
     /* public function getLnkTbls($tbl1ID)
@@ -637,7 +661,7 @@ class DatabaseLookups
     
     protected function getDataSetRow($loopName)
     {
-        if ($loopName == '' || !isset($this->dataLoops[$loopName])) return array();
+        if ($loopName == '' || !isset($this->dataLoops[$loopName])) return [];
         return $this->dataLoops[$loopName];
     }
 
@@ -689,7 +713,7 @@ class DatabaseLookups
         if (sizeof($this->defValues[$subset]) > 0) {
             return $this->defValues[$subset];
         }
-        return array();
+        return [];
     }
     
     
@@ -771,29 +795,30 @@ class DatabaseLookups
     public function getAllSetTables($tblIn = '')
     {
         $tbls = [];
-        $tblID = intVal($tblIn);
+        $tblID = -3;
         if (strpos($tblIn, 'loop-') !== false && sizeof($this->dataLoops) > 0) {
             $loopID = intVal(str_replace('loop-', '', $tblIn));
             foreach ($this->dataLoops as $loopName => $loopRow) {
-                if ($loopRow->id == $loopID) {
+                if ($loopRow->id == $loopID && isset($this->tblI[$loopRow->DataLoopTable])) {
                     $tblID = $this->tblI[$loopRow->DataLoopTable];
                 }
             }
+        } elseif (isset($this->tblI[$tblIn])) {
+            $tblID = $this->tblI[$tblIn];
         }
-        else $tblID = $this->tblI[$tblIn];
         $tbls = $this->getSubsetTables($tblID, $tbls);
         return $tbls;
     }
     
-    public function getSubsetTables($tbl1 = -3, $tbls = array())
+    public function getSubsetTables($tbl1 = -3, $tbls = [])
     {
         if ($tbl1 > 0 && !in_array($tbl1, $tbls))
         {
             $tbls[] = $tbl1;
             if (isset($this->dataSubsets) && sizeof($this->dataSubsets) > 0) {
                 foreach ($this->dataSubsets as $subset) {
-                    if ($tbl1 == $this->tblI[$subset->tbl]) {
-                        $tbls = $this->getSubsetTables($this->tblI[$subset->subTbl], $tbls);
+                    if ($tbl1 == $this->tblI[$subset->DataSubTbl]) {
+                        $tbls = $this->getSubsetTables($this->tblI[$subset->DataSubSubTbl], $tbls);
                     }
                 }
             }
@@ -808,7 +833,7 @@ class DatabaseLookups
         return $tbls;
     }
     
-    public function fieldsTblsDropdown($tbls = array(), $preSel = '', $prfx = '')
+    public function fieldsTblsDropdown($tbls = [], $preSel = '', $prfx = '')
     {
         $retVal = '';
         $prevTbl = -3;
@@ -867,9 +892,17 @@ class DatabaseLookups
     // just wanted this utility global to easily call from anywhere including views
     function urlPreview($url)
     {
+        $url = urlClean($url);
+        if (strpos($url, '/') !== false) $url = substr($url, 0, strpos($url, '/'));
+        return $url;
+    }
+    
+    function urlClean($url)
+    {
         $url = str_replace('http://', '', str_replace('https://', '', 
             str_replace('http://www.', '', str_replace('https://www.', '', $url))));
-        if (strpos($url, '/') !== false) $url = substr($url, 0, strpos($url, '/'));
+        $pos = strrpos($url, '/');
+        if ($pos !== false && $pos == strlen($url)-1) $url = substr($url, 0, $pos);
         return $url;
     }
 
@@ -888,15 +921,15 @@ class DatabaseLookups
     
     public function getFldResponsesByID($fldID)
     {
-        if (intVal($fldID) <= 0) return array( "prompt" => '', "vals" => array() );
+        if (intVal($fldID) <= 0) return array( "prompt" => '', "vals" => [] );
         return $this->getFldResponses($this->getFullFldNameFromID($fldID));
     }
     
     
     public function getFldResponses($fldName)
     {
-        $ret = array( "prompt" => '', "vals" => array() );
-        $tmpVals = array( array(), array() );
+        $ret = array( "prompt" => '', "vals" => [] );
+        $tmpVals = array( [], [] );
         $nodes = SLNode::where('NodeDataStore', $fldName)->get();
         if (trim($fldName) != '' && $nodes && sizeof($nodes) > 0) {
             foreach ($nodes as $n) {
@@ -1081,6 +1114,53 @@ class DatabaseLookups
         return '';
     }
     
+    
+    protected function loadEmailBlurbNames()
+    {
+        if (sizeof($this->emaBlurbs) == 0) {
+            $emas = SLEmails::select('EmailName')
+                ->where('EmailTree', $this->treeID)
+                ->where('EmailType', 'Blurb')
+                ->get();
+            if ($emas && sizeof($emas) > 0) {
+                foreach ($emas as $e) $this->emaBlurbs[] = $e->EmailName;
+            }
+        }
+        return $this->emaBlurbs;
+    }
+    
+    public function swapEmailBlurbs($str)
+    {
+        $this->loadEmailBlurbNames();
+        if (trim($str) != '' && $this->emaBlurbs && sizeof($this->emaBlurbs) > 0) {
+            $changesMade = true;
+            while ($changesMade) {
+                $changesMade = false;
+                foreach ($this->emaBlurbs as $b) {
+                    if (strpos($str, '[{ ' . $b . ' }]') !== false) {
+                        $blurb = $this->getEmailBlurb($b);
+                        $str = str_replace('[{ ' . $b . ' }]', $blurb, $str);
+                        $changesMade = true;
+                    }
+                    if (strpos($str, '[{ ' . str_replace('&', '&amp;', $b) . ' }]') !== false) {
+                        $blurb = $this->getEmailBlurb($b);
+                        $str = str_replace('[{ ' . str_replace('&', '&amp;', $b) . ' }]', $blurb, $str);
+                        $changesMade = true;
+                    }
+                }
+            }
+        }
+        return $str;
+    }
+    
+    public function getEmailBlurb($blurbName)
+    {
+        $ema = SLEmails::where('EmailName', $blurbName)->first();
+        if ($ema && isset($ema->EmailBody)) return $ema->EmailBody;
+        return '';
+    }
+    
+    
     public function addToHeadCore($js)
     {
         if (!isset($this->sysOpts['header-code'])) $this->sysOpts['header-code'] = '';
@@ -1129,7 +1209,7 @@ class DatabaseLookups
     
     public function loadTreeMojis()
     {
-        if (sizeof($this->treeMojis) == 0) {
+        if (sizeof($this->treeSettings) == 0) {
             $chk = SLDefinitions::where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'Tree Settings')
                 ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-%')
@@ -1138,33 +1218,99 @@ class DatabaseLookups
             if ($chk && sizeof($chk) > 0) {
                 foreach ($chk as $set) {
                     $setting = str_replace('tree-' . $this->treeID . '-', '', $set->DefSubset);
-                    if (!isset($this->treeMojis[$setting])) $this->treeMojis[$setting] = [];
+                    if (!isset($this->treeSettings[$setting])) $this->treeSettings[$setting] = [];
                     if ($setting == 'emojis') {
                         $names = explode(';', $set->DefValue);
-                        $this->treeMojis[$setting][] = [
+                        $this->treeSettings[$setting][] = [
                             "id"     => $set->DefID,
+                            "admin"  => ($set->DefIsActive%7 == 0),
                             "verb"   => $names[0],
                             "plural" => $names[1], 
                             "html"   => $set->DefDescription
                         ];
                     } else {
-                        $this->treeMojis[$setting][] = $set->DefDescription;
+                        $this->treeSettings[$setting][] = $set->DefDescription;
                     }
                 }
             }
         }
-        return $this->treeMojis;
+        return $this->treeSettings;
     }
     
     public function getEmojiName($defID = -3)
     {
-        if ($defID > 0 && sizeof($this->treeMojis["emojis"]) > 0) {
-            foreach ($this->treeMojis["emojis"] as $emo) {
+        if ($defID > 0 && sizeof($this->treeSettings["emojis"]) > 0) {
+            foreach ($this->treeSettings["emojis"] as $emo) {
                 if ($emo["id"] == $defID) return $emo["verb"];
             }
         }
         return '';
     }
     
+    public function getSysStyles()
+    {
+        return SLDefinitions::where('DefDatabase', 1)
+            ->where('DefSet', 'Style Settings')
+            ->orderBy('DefOrder')
+            ->get();
+    }
+    
+    
+    
+    
+    
+    public function mexplode($delim, $str)
+    {
+        $ret = [];
+        if (trim(str_replace($delim, '', $str)) != '') {
+            if (strpos($str, $delim) === false) {
+                $ret[] = $str;
+            } else {
+                if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
+                if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
+                $ret = explode($delim, $str);
+            }
+        }
+        return $ret;
+    }
+    
+    
+    public function swapURLwrap($url, $printHttp = true)
+    {
+        $urlPrint = str_replace('mailto:', '', $url);
+        if (!$printHttp) $urlPrint = str_replace('http://', '', str_replace('https://', '', $urlPrint));
+        return '<a href="' . $url . '" target="_blank">' . $urlPrint . '</a>'; 
+    }
+    
+    public function sortArrByKey($arr, $key, $ord = 'asc')
+    {
+        if (sizeof($arr) < 2) return $arr;
+        $arrCopy = $arrOrig = $arr;
+        $arr = [];
+        for ($i = 0; $i < sizeof($arrOrig); $i++) {
+            if (sizeof($arrCopy) == 1) {
+                $arr[] = $arrCopy[0];
+            } else {
+                $nextInd = -1;
+                for ($j = 0; $j < sizeof($arrCopy); $j++) {
+                    if ($nextInd < 0) {
+                        $nextInd = $j;
+                    } elseif ($ord == 'asc') {
+                        if ($arrCopy[$j][$key] < $arrCopy[$nextInd][$key]) $nextInd = $j;
+                    } else {
+                        if ($arrCopy[$j][$key] > $arrCopy[$nextInd][$key]) $nextInd = $j;
+                    }
+                }
+                $arr[] = $arrCopy[$nextInd];
+                array_splice($arrCopy, $nextInd, 1);
+            }
+        }
+        return $arr;
+    }
+    
+    public function mapsURL($addy)
+    {
+        return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
+    }
     
 }

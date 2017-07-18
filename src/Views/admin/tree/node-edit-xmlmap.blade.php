@@ -6,14 +6,14 @@
 
 <form name="nodeEditor" method="post" 
     @if (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-        action="/dashboard/tree/xmlmap/node/{{ $node->nodeRow->NodeID }}"
+        action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->NodeID }}"
     @else
-        action="/dashboard/tree/xmlmap/node/-3"
+        action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-3"
     @endif
     >
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="sub" value="1">
-<input type="hidden" name="treeID" value="{{ $treeID }}">
+<input type="hidden" name="treeID" value="{{ $GLOBALS['SL']->treeID }}">
 <input type="hidden" name="nodeParentID" 
     @if ($REQ->has('parent') && intVal($REQ->input('parent')) > 0) 
         value="{{ $REQ->input('parent') }}"
@@ -25,11 +25,7 @@
     @if ($REQ->has('start') && intVal($REQ->input('start')) > 0) 
         value="start"
     @else 
-        @if ($REQ->has('end') && intVal($REQ->input('end')) > 0)
-            value="end"
-        @else
-            value=""
-        @endif
+        @if ($REQ->has('end') && intVal($REQ->input('end')) > 0) value="end" @else value="" @endif
     @endif
     >
 <input type="hidden" name="orderBefore" 
@@ -51,12 +47,13 @@
     <div class="panel-heading">
         <div class="panel-title">
             @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-                <a href="/dashboard/tree/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
-                    class="btn btn-xs btn-default pull-right">Back to XML Map</a>
+                <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
+                    class="pull-right">Back to XML Map</a>
                 <h2 class="disIn"><span class="fPerc133 mR20">
                     #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
             @else 
-                <a href="/dashboard/tree/xmlmap?all=1" class="btn btn-xs btn-default pull-right">Back to XML Map</a>
+                <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="pull-right"
+                    >Back to XML Map</a>
                 <h2 class="disIn">Adding Node</h2>
             @endif
         </div>
@@ -107,27 +104,7 @@
         </div>
     </div>
 </div>
-
-
 @if ($node->nodeRow->NodeID > 0)
     <br /><input type="checkbox" name="deleteNode" id="deleteNodeID" value="1" > <label for="deleteNodeID">Delete This Node</label><br />
 @endif
-
 </form>
-
-<script type="text/javascript">
-$(document).ready(function(){
-    $(".xmlDataChng").click(function(){ 
-        if (document.getElementById('xmlNodeTypeTbl').checked)
-        {
-            $("#xmlDataTbl").slideDown("fast"); 
-            $("#xmlDataWrap").slideUp("fast"); 
-        }
-        else
-        {
-            $("#xmlDataTbl").slideUp("fast"); 
-            $("#xmlDataWrap").slideDown("fast"); 
-        }
-    });
-});
-</script>

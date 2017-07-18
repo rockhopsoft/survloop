@@ -10,12 +10,14 @@ use SurvLoop\Controllers\CoreNode;
 
 class SurvLoopNode extends CoreNode
 {
-    public $conds         = array();
-    public $responses     = array();
+    public $conds         = [];
+    public $responses     = [];
     public $hasShowKids   = false;
     public $hasPageParent = false;
     
-    public $dataManips    = array();
+    public $dataManips    = [];
+    public $colors        = [];
+    public $extraOpts     = [];
     
     public $primeOpts     = [
         "Required"         => 5, 
@@ -25,7 +27,7 @@ class SurvLoopNode extends CoreNode
     ];
     
     // maybe initialize this way to lighten the tree's load?...
-    public function loadNodeCache($nID = -3, $nCache = array())
+    public function loadNodeCache($nID = -3, $nCache = [])
     {
         if (sizeof($nCache) > 0) {
             if (isset($nCache["pID"]))    $this->parentID    = $nCache["pID"];
@@ -40,9 +42,9 @@ class SurvLoopNode extends CoreNode
         return true;
     }
     
-    public function loadNodeRow($nID = -3, $nRow = array())
+    public function loadNodeRow($nID = -3, $nRow = [])
     {
-        $this->nodeRow = array();
+        $this->nodeRow = [];
         if (sizeof($nRow) > 0) {
             $this->nodeRow = $nRow;
         } elseif ($nID > 0) {
@@ -112,6 +114,16 @@ class SurvLoopNode extends CoreNode
                 ->orderBy('NodeParentOrder', 'asc')
                 ->get();
         }
+        if ($this->nodeType == 'Send Email') {
+            $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"] = $this->extraOpts["emailBCC"] = [];
+            if (strpos($this->nodeRow->NodePromptAfter, '::CC::') !== false) {
+                list($to, $ccs) = explode('::CC::', $this->nodeRow->NodePromptAfter);
+                list($cc, $bcc) = explode('::BCC::', $ccs);
+                $this->extraOpts["emailTo"]  = $GLOBALS["SL"]->mexplode(',', str_replace('::TO::', '', $to));
+                $this->extraOpts["emailCC"]  = $GLOBALS["SL"]->mexplode(',', $cc);
+                $this->extraOpts["emailBCC"] = $GLOBALS["SL"]->mexplode(',', $bcc);
+            }
+        }
         return true;
     }
     
@@ -171,13 +183,13 @@ class SurvLoopNode extends CoreNode
         return substr(strip_tags($this->nodeRow->NodePromptText), 0, 20);
     }
     
-    public function tierPathStr($tierPathArr = array())
+    public function tierPathStr($tierPathArr = [])
     {
         if (sizeof($tierPathArr) == 0) return implode('-', $this->nodeTierPath).'-';
         return implode('-', $tierPathArr).'-';
     }
     
-    public function checkBranch($tierPathArr = array())
+    public function checkBranch($tierPathArr = [])
     {
         $tierPathStr = $this->tierPathStr($tierPathArr);
         if ($tierPathStr != '') {
@@ -231,22 +243,51 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeType == 'Instructions Raw');
     }
     
+    public function isBigButt()
+    {
+        return ($this->nodeType == 'Big Button'); 
+    }
+    
+    public function isHeroImg()
+    {
+        return ($this->nodeType == 'Hero Image');
+    }
+    
     public function isSpecial()
     {
         return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
             || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip()
-            || $this->isWidget());
+            || $this->isWidget() || $this->isBigButt() || $this->isHeroImg());
     }
     
     public function isWidget()
     {
-        return (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 
-            'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons']));
+        return (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 'Member Profile Basics', 
+            'Record Full', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons', 'Send Email']));
     }
     
     public function isLayout()
     {
-        return (in_array($this->nodeType, ['Layout Row', 'Layout Column']));
+        return (in_array($this->nodeType, ['Page Block', 'Layout Row', 'Layout Column']));
+    }
+    
+    public function canBePageBlock()
+    {
+        return ($this->isLayout() || $this->isInstruct() || $this->isInstructRaw());
+    }
+    
+    public function isPageBlock()
+    {
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $this->parentID == $GLOBALS["SL"]->treeRow->TreeRoot) {
+            $this->loadPageBlockColors();
+            return true;
+        }
+        return false;
+    }
+    
+    public function isPageBlockSkinny()
+    {
+        return ($this->isPageBlock() && $this->nodeRow->NodeOpts%67 == 0);
     }
     
     public function isRequired()
@@ -302,6 +343,17 @@ class SurvLoopNode extends CoreNode
             }
         }
         return $ret;
+    }
+    
+    public function loadPageBlockColors()
+    {
+        if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '') {
+            $colors = explode(';;', $this->nodeRow->NodeDefault);
+            if (isset($colors[0])) $this->colors["blockBG"]   = $colors[0];
+            if (isset($colors[1])) $this->colors["blockText"] = $colors[1];
+            if (isset($colors[2])) $this->colors["blockLink"] = $colors[2];
+        }
+        return true;
     }
     
 }

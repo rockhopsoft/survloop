@@ -12,8 +12,8 @@ use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
 use App\Models\SLTree;
 use App\Models\SLNode;
-
-use App\Models\OPzComplaintEmails;
+use App\Models\SLContact;
+use App\Models\SLEmails;
 
 use SurvLoop\Controllers\SurvLoopReport;
 use SurvLoop\Controllers\SurvLoopController;
@@ -114,11 +114,11 @@ class AdminController extends SurvLoopController
             ->orderBy('TreeID', 'asc')
             ->get();
         if ($trees && sizeof($trees) > 0) {
-            $ret .= '<i class="fPerc133">Trees:</i><br />';
+            $ret .= '<i class="fPerc133">Form Trees:</i><br />';
             foreach ($trees as $tree) {
                 if ($this->treeID == $tree->TreeID) {
-                    $ret .= '<a href="/dashboard/tree/map?all=1" class="fPerc133"><b>' . $tree->TreeName 
-                        . '</b> <i class="fa fa-pencil" aria-hidden="true"></i></a><br />';
+                    $ret .= '<a href="/dashboard/tree-' . $tree->TreeID . '/map?all=1" class="fPerc133"><b>' 
+                        . $tree->TreeName . '</b> <i class="fa fa-pencil" aria-hidden="true"></i></a><br />';
                 } else {
                     $ret .= '<a href="/dashboard/tree/switch/' . $tree->TreeID . '">' . $tree->TreeName . '</a><br />';
                 }
@@ -126,31 +126,43 @@ class AdminController extends SurvLoopController
         }
         $trees = SLTree::where('TreeDatabase', $this->dbID)
             ->where('TreeType', 'Page')
-            ->orderBy('TreeID', 'asc')
+            ->orderBy('TreeName', 'asc')
             ->get();
+        $admPages = '';
         if ($trees && sizeof($trees) > 0) {
             $ret .= '<br /><i class="fPerc133">Site Pages:</i><br />';
             foreach ($trees as $tree) {
+                $curr = '<a href="/dashboard/page/' . $tree->TreeID . '?all=1&refresh=1">' 
+                    . $tree->TreeName . '</a><br />';
                 if ($this->treeID == $tree->TreeID) {
-                    $ret .= '<a href="/dashboard/page/' . $tree->TreeID . '?all=1" class="fPerc133"><b>' 
+                    $curr = '<a href="/dashboard/page/' . $tree->TreeID . '?all=1&refresh=1" class="fPerc133"><b>' 
                         . $tree->TreeName . '</b> <i class="fa fa-pencil" aria-hidden="true"></i></a><br />';
-                } else {
-                    $ret .= '<a href="/dashboard/page/' . $tree->TreeID . '?all=1">' . $tree->TreeName . '</a><br />';
                 }
+                if ($tree->TreeOpts%3 == 0) $admPages .= $curr;
+                else $ret .= $curr;
             }
+        }
+        if (trim($admPages) != '') {
+            $ret .= '<br /><i class="fPerc133">Admin Pages:</i><br />' . $admPages;
         }
         return $ret . '<br />';
     }
     
     protected function loadDbTreeShortNames()
     {
-        $treeName = ((isset($GLOBALS["SL"]->treeName)) ? $GLOBALS["SL"]->treeName : '');
         $dbName = ((isset($GLOBALS["SL"]->dbRow->DbName)) ? $GLOBALS["SL"]->dbRow->DbName : '');
         if (strlen($dbName) > 20 && isset($GLOBALS["SL"]->dbRow->DbName)) {
             $dbName = str_replace($GLOBALS["SL"]->dbRow->DbName, 
                 str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix), $dbName);
         }
-        return array($treeName, $dbName);
+        $treeID = $GLOBALS["SL"]->treeRow->TreeID;
+        $treeName = ((isset($GLOBALS["SL"]->treeName)) ? $GLOBALS["SL"]->treeName : '');
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            $tree = SLTree::find(1);
+            $treeID = $tree->TreeID;
+            $treeName = 'Tree: ' . $tree->TreeName;
+        }
+        return [ $treeID, $treeName, $dbName ];
     }
     
     protected function loadAdmMenu()
@@ -162,22 +174,9 @@ class AdminController extends SurvLoopController
                 '<i class="fa fa-star mR5"></i> Submissions',
                 1,
                 [
-                    [
-                        '/dashboard/subs/all',
-                        'All Complete',
-                        1,
-                        []
-                    ], [
-                        '/dashboard/subs/incomplete',
-                        'Incomplete Sessions',
-                        1,
-                        []
-                    ], [
-                        '/dashboard/emails',
-                        'Settings & Emails',
-                        1,
-                        []
-                    ]
+                    $this->admMenuLnk('/dashboard/subs/all',        'All Complete'), 
+                    $this->admMenuLnk('/dashboard/subs/incomplete', 'Incomplete Sessions'), 
+                    $this->admMenuLnk('/dashboard/emails',          'Manage Email Templates')
                 ]
             ], 
             $treeMenu
@@ -186,88 +185,54 @@ class AdminController extends SurvLoopController
     
     protected function loadAdmMenuBasics()
     {
-        list($treeName, $dbName) = $this->loadDbTreeShortNames();
-        $treeLabel = 'Tree: ' . $treeName;
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $treeLabel = 'Trees';
+        list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
         $treeMenu = [
             'javascript:;',
             '<i class="fa fa-snowflake-o mR5"></i> Systems',
             1,
             [
-                [
-                    '/dashboard/tree/switch',
-                    '<i class="fa fa-snowflake-o"></i> <b>' . $treeLabel . '</b>',
-                    1,
-                    []
-                ], [
-                    '/dashboard/db/switch',
-                    '<i class="fa fa-database"></i> <b>Database: ' . $dbName . '</b>',
-                    1,
-                    []
-                ], [
-                    '/dashboard/pages/list',
-                    '<i class="fa fa-newspaper-o"></i> Pages & Blurbs',
-                    1,
-                    []
-                ], [
-                    '/dashboard/users',
-                    '<i class="fa fa-users"></i> Users',
-                    1,
-                    []
-                ], [
-                    '/dashboard/settings',
-                    '<i class="fa fa-cogs"></i> Settings',
-                    1,
-                    []
-                ]
+                $this->admMenuLnk('/dashboard/pages/list',    '<i class="fa fa-newspaper-o mR5"></i> Pages & Content'), 
+                $this->admMenuLnk('javascript:;', '<i class="fa fa-snowflake-o mR5"></i> <b>' . $treeLabel . '</b>', [
+                    $this->admMenuLnk('/dashboard/tree-' . $treeID . '/map?all=1', 'Form Tree Map'), 
+                    $this->admMenuLnk('/dashboard/tree-' . $treeID . '/sessions',  'Tree Session Stats'), 
+                    $this->admMenuLnk('/dashboard/tree-' . $treeID . '/stats?all=1',     'Node Response Stats')
+                ]), 
+                $this->admMenuLnk('javascript:;', '<i class="fa fa-database mR5"></i> <b>Database: ' . $dbName . '</b>', [
+                    $this->admMenuLnk('/dashboard/db',             'Database Overview'), 
+                    $this->admMenuLnk('/dashboard/db/all',         'Database Design'), 
+                    $this->admMenuLnk('/dashboard/db/definitions', 'Definitions'),
+                    $this->admMenuLnk('/dashboard/db/conds',       'Conditions / Filters'), 
+                    $this->admMenuLnk('/dashboard/db/workflows',   'Workflows')
+                ]), 
+                $this->admMenuLnk('/dashboard/users',         '<i class="fa fa-users mR5"></i> Users'), 
+                $this->admMenuLnkContact(), 
+                $this->admMenuLnk('/dashboard/systems-check', '<i class="fa fa-heartbeat mR5"></i> Check'), 
+                $this->admMenuLnk('/dashboard/settings',      '<i class="fa fa-cogs mR5"></i> Settings')
             ]
         ];
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' || in_array($this->v["currPage"], ['/dashboard/pages/list'])
-            || strpos($this->v["currPage"], '/dashboard/blurbs') !== false ) {
-        } else {
-            $treeMenu[3][0][3] = [
-                [
-                    '/dashboard/tree/map?all=1',
-                    'Experience Map',
-                    1,
-                    []
-                ], [
-                    '/dashboard/tree/conds',
-                    'Conditions / Filters',
-                    1,
-                    []
-                ], [
-                    '/dashboard/tree',
-                    'Tree Stats',
-                    1,
-                    []
-                ], [
-                    '/dashboard/tree/workflows',
-                    'Workflows',
-                    1,
-                    []
-                ]
-            ];
-            $treeMenu[3][1][3] = [
-                [
-                    '/dashboard/db',
-                    'Database Overview',
-                    1,
-                    []
-                ], [
-                    '/dashboard/db/all',
-                    'Database Design',
-                    1,
-                    []
-                ], [
-                    '/dashboard/db/definitions',
-                    'Definitions',
-                    1,
-                    []
-                ]
-            ];
-        }
         return $treeMenu;
+    }
+    
+    protected function admMenuLnk($url = '', $text = '', $children = [], $opt = 1)
+    {
+        return [ $url, $text, $opt, $children ];
+    }
+    
+    protected function admMenuLnkContact($icon = true)
+    {
+        $cnt = $this->admMenuLnkContactCnt();
+        $lnk = (($icon) ? '<i class="fa fa-envelope-o mR5" aria-hidden="true"></i> ' : '')
+            . (($cnt > 0) ? '<span id="contactPush" class="label label-danger mR5">' . $cnt . '</span> ' : '') 
+            . ' Contact Form';
+        return [ '/dashboard/contact', $lnk, 1, [] ];
+    }
+    
+    protected function admMenuLnkContactCnt()
+    {
+        $chk = SLContact::where('ContFlag', 'Unread')
+            ->select('ContID')
+            ->get();
+        return sizeof($chk);
     }
     
     protected function getAdmMenuLoc($currPage)
@@ -453,9 +418,7 @@ class AdminController extends SurvLoopController
     {
         $this->dbID = $dbID;
         $this->treeID = $treeID;
-        if (!isset($this->v["isAdmin"])) {
-            $this->v["isAdmin"] = (Auth::user() && Auth::user()->hasRole('administrator'));
-        }
+        if (!isset($this->v["isAdmin"])) $this->v["isAdmin"] = $this->isUserAdmin();
         $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $dbID, $treeID, $treeID);
         return true;
     }
@@ -479,8 +442,10 @@ class AdminController extends SurvLoopController
         $this->admControlInit($request, '/dashboard/tree/switch');
         if ($treeID > 0) {
             $this->switchTree($treeID, '/dashboard/tree/switch', $request);
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') return $this->redir('/dashboard/page/map?all=1');
-            return $this->redir('/dashboard/tree/map?all=1');
+            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+                return $this->redir('/dashboard/page/' . $treeID . '?all=1&refresh=1');
+            }
+            return $this->redir('/dashboard/tree-' . $treeID . '/map?all=1');
         }
         $this->v["myTrees"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
             ->where('TreeType', 'NOT LIKE', 'Primary Public XML')
@@ -504,80 +469,87 @@ class AdminController extends SurvLoopController
     {
         $this->admControlInit($request, '/dashboard/settings');
         $this->v["settingsList"] = [
-            'site-name'       => 'Installation/Site Name (for general reference, in English)', 
-            'cust-abbr'       => 'Installation Abbreviation (eg. "SiteAbrv", for files and folder names, '
-                                    . 'no spaces or special characters)', 
-            'app-url'         => 'Primary Application URL (eg. "http://myapp.com")', 
-            'logo-url'        => 'URL Linked To Logo (optionally different than app url)', 
-            'meta-title'      => 'SEO Default Meta Title', 
-            'meta-desc'       => 'SEO Default Meta Description', 
-            'meta-keywords'   => 'SEO Default Meta Keywords', 
-            'meta-img'        => 'SEO Default Meta Social Media Sharing Image', 
-            'logo-img-lrg'    => 'Image Filename for Large Logo (eg. "/siteabrv/logo-large.png")', 
-            'logo-img-md'     => 'Image Filename for Medium Logo (eg. "/siteabrv/logo-medium.png")', 
-            'logo-img-sm'     => 'Image Filename for Small Logo (eg. "/siteabrv/logo-small.png")', 
-            'shortcut-icon'   => 'Image Filename for Shortcut Icon (eg. "/siteabrv/ico.png")', 
-            'google-analytic' => 'Google Analytics Tracking ID (eg. "UA-23427655-1")', 
-            'show-logo-title' => 'Print Site Name Next To Logo ("On" or "Off")', 
-            'parent-company'  => 'Parent Company of This Installation (www)', 
-            'parent-website'  => 'Parent Company\'s Website URL (www)', 
-            'login-instruct'  => 'User Login Instructions (HTML)', 
-            'signup-instruct' => 'New User Sign Up Instructions (HTML)', 
-            'users-create-db' => 'Allow Users To Create Their Own Databases ("On" or "Off")', 
-            'app-license'     => 'License Info (eg. "Creative Commons Attribution-ShareAlike License")', 
-            'app-license-url' => 'License Info URL (eg. "http://creativecommons.org/licenses/by-sa/3.0/")', 
-            'app-license-img' => 'License Info Image (eg. "/survloop/creative-commons-by-sa-88x31.png")',
-            'header-code'     => '<pre> < head > Header Code < / head > </pre> (HTML)'
+            'site-name'       => ['Installation/Site Name', 'for general reference, in English'], 
+            'cust-abbr'       => ['Installation Abbreviation', 'eg. "SiteAbrv", for files and folder names, '
+                                    . 'no spaces or special characters'], 
+            'app-url'         => ['Primary Application URL', 'eg. "http://myapp.com"'], 
+            'logo-url'        => ['URL Linked To Logo', 'optionally different than app url'], 
+            'meta-title'      => ['SEO Default Meta Title', ''], 
+            'meta-desc'       => ['SEO Default Meta Description', ''], 
+            'meta-keywords'   => ['SEO Default Meta Keywords', ''], 
+            'meta-img'        => ['SEO Default Meta Social Media Sharing Image', ''], 
+            'logo-img-lrg'    => ['Image Large Logo', 'eg. "/siteabrv/logo-large.png"'], 
+            'logo-img-md'     => ['Image Medium Logo', 'eg. "/siteabrv/logo-medium.png"'], 
+            'logo-img-sm'     => ['Image Small Logo', 'eg. "/siteabrv/logo-small.png"'], 
+            'shortcut-icon'   => ['Image Shortcut Icon', 'eg. "/siteabrv/ico.png"'], 
+            'google-analytic' => ['Google Analytics Tracking ID', 'eg. "UA-23427655-1"'], 
+            'show-logo-title' => ['Print Site Name Next To Logo', '"On" or "Off"'], 
+            //'users-create-db' => ['Users Can Create Databases', '"On" or "Off"'], 
+            'parent-company'  => ['Parent Company of This Installation', 'www'], 
+            'parent-website'  => ['Parent Company\'s Website URL', 'www'], 
+            'login-instruct'  => ['User Login Instructions', 'HTML'], 
+            'signup-instruct' => ['New User Sign Up Instructions', 'HTML'], 
+            'app-license'     => ['License Info', 'eg. "Creative Commons Attribution-ShareAlike License"'], 
+            'app-license-url' => ['License Info URL', 'eg. "http://creativecommons.org/licenses/by-sa/3.0/"'], 
+            'app-license-img' => ['License Info Image', 'eg. "/survloop/creative-commons-by-sa-88x31.png"'],
+            'header-code'     => ['< head > Header Code < / head >', 'HTML']
         ];
         $this->v["stylesList"] = [
-            'font-main'         => 'Universal Font Family (eg. "Helvetica,Arial,sans-serif")', 
-            'color-main-text'   => 'Text Color '
-                                    . '<span style="color: #333;">(eg. "#333")</span>', 
-            'color-main-grey'   => 'Grey Color (less prominant than above Text Color) '
-                                    . '<span style="color: #999;">(eg. "#999")</span>', 
-            'color-main-bg'     => 'Background Color '
-                                    . '<span style="color: #000;">(eg. "#000")</span>', 
-            'color-nav-bg'      => 'Navigation Background Color '
-                                    . '<span style="color: #000;">(eg. "#000")</span>', 
-            'color-nav-text'    => 'Navigation Text Color '
-                                    . '<span style="color: #FFF; text-shadow: 1px 1px 1px #999;">(eg. "#FFF")</span>', 
-            'color-main-on'     => 'Primary Color: On '
-                                    . '<span style="color: #2b3493;">(eg. "#2b3493")</span>', 
-            'color-main-off'    => 'Primary Color: Off '
-                                    . '<span style="color: #53f1eb;">(eg. "#53f1eb")</span>', 
-            'color-main-faint'  => 'Primary Color: Faint '
-                                    . '<span style="color: #edf8ff;">(eg. "#edf8ff")</span>', 
-            'color-success-on'  => 'Success Color: On ' // or ? #29B76F
-                                    . '<span style="color: #006D36;">(eg. "#006D36")</span>', 
-            'color-success-off' => 'Success Color: Off '
-                                    . '<span style="color: #29B76F;">(eg. "#29B76F")</span>', 
-            'color-info-on'     => 'Info Color: On '
-                                    . '<span style="color: #5bc0de;">(eg. "#5bc0de")</span>', 
-            'color-info-off'    => 'Info Color: Off '
-                                    . '<span style="color: #2aabd2;">(eg. "#2aabd2")</span>', 
-            'color-warn-on'     => 'Warning Color: On '
-                                    . '<span style="color: #f0ad4e;">(eg. "#f0ad4e")</span>', 
-            'color-warn-off'    => 'Warning Color: Off '
-                                    . '<span style="color: #eb9316;">(eg. "#eb9316")</span>', 
-            'color-danger-on'   => 'Danger Color: On '
-                                    . '<span style="color: #ec2327;">(eg. "#ec2327")</span>', 
-            'color-danger-off'  => 'Danger Color: Off '
-                                    . '<span style="color: #f38c5f;">(eg. "#f38c5f")</span>', 
-            'color-line-hr'     => 'Horizontal Rule Color '
-                                    . '<span style="color: #999;">(eg. "#999")</span>', 
-            'color-field-bg'    => 'Form Field Background Color '
-                                    . '<span style="color: #FFF; text-shadow: 1px 1px 1px #999;">(eg. "#FFF")</span>', 
-            'color-logo'        => 'Primary Logo Color '
-                                    . '<span style="color: #53f1eb;">(eg. "#53f1eb")</span>'
+            'font-main'         => ['Universal Font Family', 'eg. "Helvetica,Arial,sans-serif"'], 
+            'color-main-text'   => ['Text Color', '<span style="color: #333;">eg. "#333"</span>'], 
+            'color-main-link'   => ['Link Color', '<span style="color: #2b3493;">eg. "#2b3493"</span>'], 
+            'color-main-grey'   => ['Grey Color (less prominant than above Text Color)', 
+                                    '<span style="color: #999;">eg. "#999"</span>'], 
+            'color-main-bg'     => ['Background Color', 
+                                    '<span style="color: #000;">eg. "#000"</span>'], 
+            'color-nav-bg'      => ['Navigation Background Color', 
+                                    '<span style="color: #000;">eg. "#000"</span>'], 
+            'color-nav-text'    => ['Navigation Text Color', 
+                                    '<span style="color: #FFF;">eg. "#FFF"</span>'], 
+            'color-main-on'     => ['Primary Color: On', 
+                                    '<span style="color: #2b3493;">eg. "#2b3493"</span>'], 
+            'color-main-off'    => ['Primary Color: Off', 
+                                    '<span style="color: #53f1eb;">eg. "#53f1eb"</span>'], 
+            'color-main-faint'  => ['Primary Color: Faint', 
+                                    '<span style="color: #edf8ff;">eg. "#edf8ff"</span>'], 
+            'color-success-on'  => ['Success Color: On', // or ? #29B76F
+                                    '<span style="color: #006D36;">eg. "#006D36"</span>'], 
+            'color-success-off' => ['Success Color: Off', 
+                                    '<span style="color: #29B76F;">eg. "#29B76F"</span>'], 
+            'color-info-on'     => ['Info Color: On', 
+                                    '<span style="color: #5bc0de;">eg. "#5bc0de"</span>'], 
+            'color-info-off'    => ['Info Color: Off', 
+                                    '<span style="color: #2aabd2;">eg. "#2aabd2"</span>'], 
+            'color-warn-on'     => ['Warning Color: On', 
+                                    '<span style="color: #f0ad4e;">eg. "#f0ad4e"</span>'], 
+            'color-warn-off'    => ['Warning Color: Off', 
+                                    '<span style="color: #eb9316;">eg. "#eb9316"</span>'], 
+            'color-danger-on'   => ['Danger Color: On', 
+                                    '<span style="color: #ec2327;">eg. "#ec2327"</span>'], 
+            'color-danger-off'  => ['Danger Color: Off', 
+                                    '<span style="color: #f38c5f;">eg. "#f38c5f"</span>'], 
+            'color-line-hr'     => ['Horizontal Rule Color', 
+                                    '<span style="color: #999;">eg. "#999"</span>'], 
+            'color-field-bg'    => ['Form Field Background Color', 
+                                    '<span style="color: #FFF;">eg. "#FFF"</span>'], 
+            'color-logo'        => ['Primary Logo Color', 
+                                    '<span style="color: #53f1eb;">eg. "#53f1eb"</span>']
         ];
         $this->v["sysStyles"] = SLDefinitions::where('DefDatabase', 1)
             ->where('DefSet', 'Style Settings')
-            ->orderBy('DefOrder')
+            ->orderBy('DefOrder')    
             ->get();
         $this->v["custCSS"] = SLDefinitions::where('DefDatabase', 1)
                 ->where('DefSet', 'Style CSS')
                 ->where('DefSubset', 'main')
                 ->first();
+        $this->v["custCSSemail"] = SLDefinitions::where('DefDatabase', 1)
+                ->where('DefSet', 'Style CSS')
+                ->where('DefSubset', 'email')
+                ->first();
+        $this->v["rawSettings"] = SLDefinitions::where('DefSet', 'Custom Settings')
+            ->orderBy('DefOrder', 'asc')
+            ->get();
         if ($request->has('sub')) {
             foreach ($GLOBALS["SL"]->sysOpts as $opt => $val) {
                 if (isset($this->v["settingsList"][$opt]) && $request->has('sys-' . $opt)) {
@@ -596,7 +568,15 @@ class AdminController extends SurvLoopController
             }
             $this->v["custCSS"]->DefDescription = trim($request->get('sys-cust-css'));
             $this->v["custCSS"]->save();
+            $this->v["custCSSemail"]->DefDescription = trim($request->get('sys-cust-css-email'));
+            $this->v["custCSSemail"]->save();
             $this->getCSS($request);
+            foreach ($this->v["rawSettings"] as $i => $s) {
+                if ($request->has('setting'.$i.'')) {
+                    $s->DefValue = $request->get('setting'.$i.'');
+                    $s->save();
+                }
+            }
         }
         return view('vendor.survloop.admin.systemsettings', $this->v);
     }
@@ -615,6 +595,10 @@ class AdminController extends SurvLoopController
         $this->admControlInit($request, '/dashboard/pages/list');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
+        if ($this->v["blurbRow"]->DefIsActive <= 0 || $this->v["blurbRow"]->DefIsActive%3 != 0) {
+            $GLOBALS["SL"]->pageJAVA .= 'CKEDITOR.replace( "DefDescriptionID", {
+                customConfig: "/survloop/ckeditor-config.js" } );';
+        }
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
     
@@ -636,60 +620,12 @@ class AdminController extends SurvLoopController
         $blurb = $this->blurbLoad($request->DefID);
         $blurb->DefSubset      = $request->DefSubset;
         $blurb->DefDescription = $request->DefDescription;
+        $blurb->DefIsActive = 1;
+        if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) $blurb->DefIsActive *= 3;
         $blurb->save();
         return $this->redir('/dashboard/blurbs/' . $blurb->DefID);
     }
     
-    
-    
-    
-    /**
-     * Update the user's profile.
-     *
-     * @param  Request  $request
-     * @return Response
-     */
-    public function updateProfile(Request $request)
-    {
-        if ($request->user()) {
-            // $request->user() returns an instance of the authenticated user...
-            if ($request->user()->id == $request->uID || $request->user()->hasRole('administrator')) {
-                $user = User::find($request->uID);
-                $user->name = $request->name;
-                $user->email = $request->email;
-                $user->save();
-                if ($request->roles && sizeof($request->roles) > 0) {
-                    foreach ($user->rolesRanked as $i => $role) {
-                        if (in_array($role, $request->roles)) {
-                            if (!$user->hasRole($role)) {
-                                $user->assignRole($role);
-                            }
-                        } elseif ($user->hasRole($role)) {
-                            $user->revokeRole($role);
-                        }
-                    }
-                } else { // no roles selected, delete all that exist
-                    foreach ($user->rolesRanked as $i => $role) {
-                        if ($user->hasRole($role)) {
-                            $user->revokeRole($role);
-                        }
-                    }
-                }
-            }
-        }
-        return $this->redir('/dashboard/user/'.$request->uID);
-    }
-    
-    public function showProfile($uid) 
-    {
-        $user = User::find($uid);
-        $data = [
-            'profileUser' => $user,
-            "currAdmPage" => '',
-            "user" => Auth::user()
-        ];
-        return view('profile', $data );
-    }
     
     public function getCSS(Request $request)
     {
@@ -708,7 +644,10 @@ class AdminController extends SurvLoopController
             ->first();
         $css["raw"] = (($custCSS && isset($custCSS->DefDescription)) ? $custCSS->DefDescription : '');
         $syscss = view('vendor.survloop.styles-css', [ "css" => $css ])->render();
-        file_put_contents("../public/" . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . "/sys.css", $syscss);
+        file_put_contents("../storage/app/sys.css", $syscss);
+        
+        file_put_contents("../storage/app/sys.min.css", $syscss);
+        
         
         $scriptsjs = view('vendor.survloop.scripts-js', [
             "jsXtra"         => $this->scriptsJsXtra(),
@@ -716,7 +655,13 @@ class AdminController extends SurvLoopController
             "jqueryXtraSrch" => $this->scriptsJqueryXtraSearch(), 
             "spinner"        => $this->loadCustView('inc-spinner')
         ])->render();
-        file_put_contents("../public/" . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . "/sys.js", $scriptsjs);
+        file_put_contents("../storage/app/sys.js", $scriptsjs);
+        
+        file_put_contents("../storage/app/sys.min.js", $scriptsjs);
+        
+        $log = SLDefinitions::where('DefSet', 'System Settings')
+            ->where('DefSubset', 'log-css-reload')
+            ->update([ 'DefDescription' => time() ]);
         return ':)';
     }
     
@@ -823,20 +768,12 @@ class AdminController extends SurvLoopController
     function manageEmails(Request $request)
     {
         $this->admControlInit($request, '/dashboard/emails');
-        $this->v["settings"] = SLDefinitions::where('DefSet', 'Custom Settings')
-            ->orderBy('DefOrder', 'asc')
-            ->get();
-        if ($request->has('savingSettings') && sizeof($this->v["settings"]) > 0) {
-            foreach ($this->v["settings"] as $i => $s) {
-                if ($request->has('setting'.$i.'')) {
-                    $s->DefValue = $request->get('setting'.$i.'');
-                    $s->save();
-                }
-            }
-        }
-        $this->v["emailList"] = OPzComplaintEmails::orderBy('ComEmailName', 'asc')
-        	->orderBy('ComEmailType', 'asc')
+        $this->v["emailList"] = SLEmails::orderBy('EmailName', 'asc')
+        	->orderBy('EmailType', 'asc')
         	->get();
+        $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "a.emailLnk", function() {
+            $("#emailBody"+$(this).attr("id").replace("showEmail", "")).slideToggle("fast"); });
+        $(document).on("click", "#showAll", function() { $(".emailBody").slideToggle("fast"); }); ';
         return view('vendor.survloop.admin.email-manage', $this->v);
     }
     
@@ -844,35 +781,66 @@ class AdminController extends SurvLoopController
     {
         $this->admControlInit($request, '/dashboard/emails');
         $this->v["currEmailID"] = $emailID;
-        $this->v["currEmail"] = new OPzComplaintEmails;
-        if ($emailID > 0) $this->v["currEmail"] = OPzComplaintEmails::find($emailID);
+        $this->v["currEmail"] = new SLEmails;
+        if ($emailID > 0) $this->v["currEmail"] = SLEmails::find($emailID);
+        $this->v["needsWsyiwyg"] = true;
+        $GLOBALS["SL"]->pageJAVA .= 'CKEDITOR.replace( "emailBodyID", {
+            customConfig: "/survloop/ckeditor-config.js" } );';
         return view('vendor.survloop.admin.email-form', $this->v);
     }
     
     function manageEmailsPost(Request $request, $emailID)
     {
         if ($request->has('emailType')) {
-            $currEmail = new OPzComplaintEmails;
+            $currEmail = new SLEmails;
             if ($request->emailID > 0 && $request->emailID == $emailID) {
-                $currEmail = OPzComplaintEmails::find($request->emailID);
+                $currEmail = SLEmails::find($request->emailID);
             }
-            $currEmail->ComEmailType     = $request->emailType;
-            $currEmail->ComEmailName     = $request->emailName;
-            $currEmail->ComEmailSubject = $request->emailSubject;
-            $currEmail->ComEmailBody     = $request->emailBody;
-            $currEmail->ComEmailOpts         = 1;
-            $currEmail->ComEmailCustomSpots = 0;
-            if (trim($currEmail->ComEmailBody) != '' 
-                && strpos($currEmail->ComEmailBody, '[{ Evaluator Message }]') !== false) {
-                $customSpotSplit = explode('[{ Evaluator Message }]', $currEmail->ComEmailBody);
-                $currEmail->ComEmailCustomSpots = sizeof($customSpotSplit)-1;
+            $currEmail->EmailType    = $request->emailType;
+            $currEmail->EmailName    = $request->emailName;
+            $currEmail->EmailSubject = $request->emailSubject;
+            $currEmail->EmailBody    = $request->emailBody;
+            $currEmail->EmailOpts         = 1;
+            $currEmail->EmailCustomSpots = 0;
+            if (trim($currEmail->EmailBody) != '' 
+                && strpos($currEmail->EmailBody, '[{ Custom Writing Spot }]') !== false) {
+                $customSpotSplit = explode('[{ Custom Writing Spot }]', $currEmail->EmailBody);
+                $currEmail->EmailCustomSpots = sizeof($customSpotSplit)-1;
             }
             $currEmail->save();
         }
         return $this->redir('/dashboard/emails');
     }
     
-    
+    public function manageContact(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/contact');
+        $status = [''];
+        $this->v["recs"] = [];
+        $this->getRecFiltTots('SLContact', 'ContFlag', ['Unread', 'Read', 'Trash'], 'ContID');
+        $this->v["filtStatus"] = 'unread';
+        if ($request->has('tab')) $this->v["filtStatus"] = trim($request->get('tab'));
+        if (in_array($this->v["filtStatus"], ['', 'unread'])) {
+            $this->v["recs"] = SLContact::where('ContFlag', 'Unread')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif ($this->v["filtStatus"] == 'all') {
+            $this->v["recs"] = SLContact::whereIn('ContFlag', ['Read', 'Unread'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif ($this->v["filtStatus"] == 'trash') {
+            $this->v["recs"] = SLContact::where('ContFlag', 'Trash')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+        $this->v["currPageTitle"] = 'Contact Form Messages';
+        $GLOBALS["SL"]->pageAJAX .= '$(".changeContStatus").change(function(){
+            var cID = $(this).attr( "name" ).replace( "ContFlag", "" );
+            var postUrl = "/ajadm/contact?tab={{ $filtStatus }}&cid="+cID+"&status="+$(this).val();
+            $( "#wrapItem"+cID+"" ).load( postUrl );
+        });';
+        return view('vendor.survloop.admin.contact', $this->v);
+    }
     
     public function postNodeURL(Request $request)
     {
@@ -882,6 +850,69 @@ class AdminController extends SurvLoopController
             echo '<div class="pT20">' . $this->CustReport->loadNodeURL($request, $request->nodeSlug) . '</div>';
         }
         exit;
+    }
+    
+    public function ajaxChecksAdmin(Request $request, $type = '')
+    {
+        $this->admControlInit($request, '/ajadm/' . $type);
+        
+        $newStatus = (($request->has('status')) ? trim($request->get('status')) : '');
+        if ($type == 'contact') {
+            $cID = (($request->has('cid')) ? $request->get('cid') : -3);
+            $cRow = (($cID > 0) ? SLContact::find($cID) : []);
+            if ($cID > 0 && isset($cRow->ContID) && $newStatus != '') {
+                $cRow->ContFlag = $newStatus;
+                $cRow->save();
+            }
+            if ($cID > 0 && isset($cRow->ContID)) {
+                $currTab = (($request->has('tab')) ? trim($request->get('tab')) : 'unread');
+                $newRow = (($currTab == 'unread' && $newStatus != 'Unread')
+                    || ($currTab == 'all' && $newStatus == 'Trash')) 
+                    || ($currTab == 'trash' && $newStatus != 'Trash')
+                    ? '<div class="col-md-12"><i>Message moved.</i></div>' 
+                    : view('vendor.survloop.admin.contact-row', [ "contact" => $cRow ])->render();
+                return $newRow . '<script type="text/javascript"> $(document).ready(function(){
+                    setTimeout( function() {
+                        var tabLnk = "/ajadm/contact-tabs?tab=' . $currTab . '";
+                        $( "#pageTabs" ).load( tabLnk );
+                        $( "#contactPush" ).load( "/ajadm/contact-push" );
+                    }, 100);
+                }); </script>';
+            }
+        } elseif ($type == 'contact-tabs') {
+            $this->getRecFiltTots('SLContact', 'ContFlag', ['Unread', 'Read', 'Trash'], 'ContID');
+            return view('vendor.survloop.admin.contact-tabs', [
+                "filtStatus" => (($request->has('tab')) ? $request->get('tab') : 'unread'),
+                "recTots"    => $this->v["recTots"]
+            ])->render();
+        } elseif ($type == 'contact-push') {
+            return $this->admMenuLnkContactCnt();
+        }
+        return $this->CustReport->ajaxChecks($request, $type);
+    }
+    
+    
+    
+    public function systemsCheck(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/systems-check');
+        if ($request->has('testEmail') && intVal($request->get('testEmail')) == 1) {
+            $this->v["testResults"] = '';
+            if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1) {
+                
+            }
+            return view('vendor.survloop.admin.systems-check-email', $this->v);
+        }
+        $tree1 = SLTree::find(1);
+        $this->v["sysChks"] = [];
+        $this->v["sysChks"][] = ['Home',         '/'];
+        $this->v["sysChks"][] = ['Survey Start', '/start/' . $tree1->TreeSlug . ''];
+        $this->v["sysChks"][] = ['Search Empty', '/search-results/1?s='];
+        $this->v["sysChks"][] = ['Search Test',  '/search-results/1?s=testing'];
+        $this->v["sysChks"][] = ['XML-Example',  '/' . $tree1->TreeSlug . '-xml-example'];
+        $this->v["sysChks"][] = ['XML-All',      '/' . $tree1->TreeSlug . '-xml-all'];
+        $this->v["sysChks"][] = ['XML-Schema',   '/' . $tree1->TreeSlug . '-xml-schema'];
+        return view('vendor.survloop.admin.systems-check', $this->v);
     }
     
     

@@ -96,7 +96,7 @@ class AdminDBController extends AdminController
             ->get();
         if ($busRules && sizeof($busRules) > 0) {
             foreach ($busRules as $rule) {
-                $fldList = $this->mexplode(',', $rule->RuleFields);
+                $fldList = $GLOBALS["SL"]->mexplode(',', $rule->RuleFields);
                 if (sizeof($fldList) > 0) {
                     foreach ($fldList as $fldID) {
                         $this->v["dbBusRulesFld"][intVal($fldID)] = array($rule->ruleID, $rule->RuleStatement);
@@ -196,11 +196,6 @@ class AdminDBController extends AdminController
     *** Main Pages Called by Routes
     ******************************************************/
     
-    protected function isPrintView()
-    {
-        return (($GLOBALS["SL"]->REQ->has('print')) ? 'vendor.survloop.admin.db.dbprint' : 'vendor.survloop.master');
-    }
-    
     public function index(Request $request)
     {
         $this->admControlInit($request);
@@ -287,7 +282,8 @@ class AdminDBController extends AdminController
                             }
                         }
                     }
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID, $this->treeID);
+                    $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -299,7 +295,8 @@ class AdminDBController extends AdminController
             . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specifications</h2>' 
             . $this->v["IPlegal"] . '</div><div class="p20">' . $this->full($request, true) . '</div>';
         //echo 'adminPrintFullDBPublic(' . $dbPrefix . '<pre>'; print_r($db); echo '</pre>'; exit;
-        return view('vendor.survloop.master-print', $this->v);
+        $this->v["isPrint"] = true;
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function viewTable(Request $request, $tblName)
@@ -592,7 +589,7 @@ class AdminDBController extends AdminController
             $rT = str_replace(','.$GLOBALS["SL"]->REQ->delT.',', ',', $rT);
         }
         $this->v["rT"] = trim($rT);
-        $this->v["tblList"] = $this->mexplode(',', $this->v["rT"]);
+        $this->v["tblList"] = $GLOBALS["SL"]->mexplode(',', $this->v["rT"]);
         if (sizeof($this->v["tblList"]) > 0) {
             foreach ($this->v["tblList"] as $i => $tbl) {
                 $this->v["tblList"][$i] = array(intVal(trim($tbl)));
@@ -809,10 +806,16 @@ class AdminDBController extends AdminController
                 $sorts[] = array($def->DefID, $def->DefValue);
             }
         }
+        $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({
+            axis: "y",
+            update: function (event, ui) {
+                document.getElementById("hidFrameID").src="' . $submitURL . '&"+$(this).sortable("serialize");
+            }
+        });
+        $("#sortable").disableSelection(); ';
         $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
             'sortTitle' => $sortTitle,
-            'submitURL' => $submitURL,
             'sorts' => $sorts
             ]);
         return view('vendor.survloop.admin.db.defSort', $this->v);
@@ -1054,7 +1057,7 @@ class AdminDBController extends AdminController
         if (!$this->v["dbAllowEdits"]) exit;
         $this->cacheFlush();
         if ($GLOBALS["SL"]->REQ->has('changedFLds') && $GLOBALS["SL"]->REQ->changedFLds != '' && $GLOBALS["SL"]->REQ->changedFLds != ',') {
-            $flds = $this->mexplode(',', $GLOBALS["SL"]->REQ->changedFLds);
+            $flds = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->changedFLds);
             if (sizeof($flds) > 0) {
                 foreach ($flds as $f) {
                     if (intVal($f) > 0) {
@@ -1068,7 +1071,7 @@ class AdminDBController extends AdminController
         }
         if ($GLOBALS["SL"]->REQ->has('changedFLdsGen') 
             && $GLOBALS["SL"]->REQ->changedFLdsGen != '' && $GLOBALS["SL"]->REQ->changedFLdsGen != ',') {
-            $flds = $this->mexplode(',', $GLOBALS["SL"]->REQ->changedFLdsGen);
+            $flds = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->changedFLdsGen);
             if (sizeof($flds) > 0) {
                 foreach ($flds as $f) {
                     if (intVal($f) > 0) {
@@ -1250,7 +1253,8 @@ class AdminDBController extends AdminController
             $this->saveCache();
         }
         $this->v["hideWrap"] = true;
-        return view('vendor.survloop.master-print', $this->v);
+        $this->v["isPrint"] = true;
+        return view('vendor.survloop.master', $this->v);
     }
     
     public function addTable(Request $request)
@@ -1369,7 +1373,9 @@ class AdminDBController extends AdminController
     public function getSetFlds(Request $request, $rSet = '')
     {
         $this->admControlInit($request);
-        return view('vendor.survloop.admin.db.inc-getTblsFldsDropOpts', [ "rSet" => $rSet ]);
+        return view('vendor.survloop.admin.db.inc-getTblsFldsDropOpts', [
+            "setOptions" => $GLOBALS["SL"]->getAllSetTblFldDrops($rSet)
+        ]);
     }
     
     public function getSetFldVals(Request $request, $fldID = '')
@@ -1431,7 +1437,7 @@ class AdminDBController extends AdminController
         $rules = SLBusRules::where('RuleDatabase', $this->dbID)->get();
         if ($rules && sizeof($rules) > 0) {
             foreach ($rules as $rule) {
-                $tblList = $this->mexplode(',', $rule->RuleTables);
+                $tblList = $GLOBALS["SL"]->mexplode(',', $rule->RuleTables);
                 if (sizeof($tblList) > 0) {
                     foreach ($tblList as $i => $tbl) {
                         $tbl = intVal($tbl);
@@ -1671,7 +1677,7 @@ class AdminDBController extends AdminController
     function getFldArr($RuleFields = '') 
     {
         return SLFields::select('FldID', 'FldTable', 'FldName')
-            ->whereIn('FldID', $this->mexplode(',', $RuleFields))
+            ->whereIn('FldID', $GLOBALS["SL"]->mexplode(',', $RuleFields))
             ->orderBy('FldTable', 'asc')
             ->orderBy('FldOrd', 'asc')
             ->orderBy('FldEng', 'asc')
@@ -1682,7 +1688,7 @@ class AdminDBController extends AdminController
     {
         $tblList = '';
         if (trim($tblcommas) != '' && trim($tblcommas) != ',') {
-            $tblArr = $this->mexplode(',', str_replace(',,', ',', $tblcommas));
+            $tblArr = $GLOBALS["SL"]->mexplode(',', str_replace(',,', ',', $tblcommas));
             if (sizeof($tblArr) > 0) {
                 foreach ($tblArr as $i => $tblID) {
                     if (intVal($tblID) > 0) {

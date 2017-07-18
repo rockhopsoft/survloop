@@ -7,63 +7,42 @@
     <meta name="description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
     <meta name="keywords" content="{{ $GLOBALS['SL']->sysOpts['meta-keywords'] }}" />
     
+    <link rel="shortcut icon" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}{{ $GLOBALS['SL']->sysOpts['shortcut-icon'] }}" />
+    <link rel="image_src" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
+    
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}" />
     <meta property="og:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
     <meta property="og:url" content="https://{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
     <meta property="og:site_name" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}" />
+    <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
     
     <meta name="twitter:card" content="summary"/>
     <meta name="twitter:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}"/>
     <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
     <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
 
-    <link rel="shortcut icon" href="{{ $GLOBALS['SL']->sysOpts['shortcut-icon'] }}" />
-    <link rel="image_src" href="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
 @endif
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-2.1.4.min.js"></script>
+
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/survloop/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
 @if ((isset($needsJqUi) && $needsJqUi) || true)
     <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-ui-1.11.4/jquery-ui.css">
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-ui-1.11.4/jquery-ui.min.js"></script>
 @endif
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-@if (isset($needsNavWizard) && $needsNavWizard)
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/nav-wizard.bootstrap.css" rel="stylesheet">
-@endif
-    <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/font-awesome/css/font-awesome.min.css">
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
-@endif
-    <script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js"></script>
-@if (file_exists(public_path() . '/' . strtolower($GLOBALS['SL']->sysOpts['cust-abbr']) . '/sys.js'))
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ 
-        strtolower($GLOBALS['SL']->sysOpts['cust-abbr']) }}/sys.js"></script>
-@else
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/sys.js"></script>
-@endif
+    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/sys.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
+
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
     {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
 @endif
 @section('headCode')
 @show
-@if (file_exists(public_path() . '/' . strtolower($GLOBALS['SL']->sysOpts['cust-abbr']) . '/sys.css'))
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ 
-        strtolower($GLOBALS['SL']->sysOpts['cust-abbr']) }}/sys.css">
-@else
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/sys.css">
-@endif
 </head>
 <body>
-<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/js/bootstrap.min.js"></script>
-@if (isset($pageJStop) && trim($pageJStop) != '')
-    <script type="text/javascript"> {!! $pageJStop !!} </script>
-@endif
-@if (isset($GLOBALS['SL']->pageJStop) && trim($GLOBALS['SL']->pageJStop) != '')
-    <script type="text/javascript"> {!! $GLOBALS['SL']->pageJStop !!} setTimeout("printHeadBar(0)", 1); </script>
-@endif
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 @if (isset($hasFbWidget) && $hasFbWidget)
@@ -79,27 +58,24 @@
 @if (isset($bodyTopCode))
     {!! $bodyTopCode !!}
 @endif
-<nav class="navbar navbar-inverse navbar-fixed-top">
+
+
+@if (!isset($isPrint) || !$isPrint)
+
+<div id="mySidenav">
+    @if (isset($headBar) && trim($headBar) != '') {!! $headBar !!} @endif
+</div>
+<div id="main">
+
+<nav id="myNavBar" class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
-            <a id="logoLrg" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
+            <a id="slLogo" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
                 @if (file_exists(substr($GLOBALS['SL']->sysOpts['logo-img-lrg'], 1))) 
-                    ><img src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
-                    alt="Link back to main website" title="Link back to main website" >
+                    ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
+                    alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" 
+                    title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" >
                 @else style="margin-top: 0px;"><b class="slBlueLight">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</b> 
-                @endif </a>
-            <a id="logoMed" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-                @if (file_exists(substr($GLOBALS['SL']->sysOpts['logo-img-md'], 1))) 
-                    ><img src="{{ $GLOBALS['SL']->sysOpts['logo-img-md'] }}" class="disIn" border=0 
-                    alt="Link back to main website" title="Link back to main website" >
-                @else style="margin-top: 0px;"><b class="slBlueLight">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</b> 
-                @endif </a>
-            <a id="logoSm" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-                @if (file_exists(substr($GLOBALS['SL']->sysOpts['logo-img-sm'], 1))) 
-                    ><img src="{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}" border=0 
-                    alt="Link back to main website" title="Link back to main website" >
-                @else 
-                    style="margin-top: 0px;"><b class="slBlueLight">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</b> 
                 @endif </a>
         @endif
         @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
@@ -107,17 +83,15 @@
             <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="pull-left"
                 >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
         @endif
-        <div id="slNavLeft" class="pull-left"></div>
-        <a id="navBurger" href="#top" title="Login to pick up where you left off." 
-            class="pull-right"><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <a id="navBurger" href="#top" title="Show Navigation Menu" class="pull-right disBlo" onClick="toggleNav();"
+            ><i class="fa fa-bars" aria-hidden="true"></i></a>
+        <a id="navBurgerClose" class="pull-right disNon" onclick="closeNav()" href="javascript:void(0)" 
+            ><i class="fa fa-times" aria-hidden="true"></i></a>
         @if (isset($user) && isset($user->id) && $user->id > 0)
-            <a class="pull-right slNavLnk" href="/logout">Logout, 
-            @if (strpos($user->name, 'Session#') === false)
-                {{ $user->name }}
-            @else
-                {{ substr($user->email, 0, strpos($user->email, '@')) }}
-            @endif
-            </a>
+            <a class="pull-right slNavLnk" href="/my-profile">
+                @if (strpos($user->name, 'Session#') === false) {{ $user->name }}
+                @else {{ substr($user->email, 0, strpos($user->email, '@')) }}
+                @endif </a>
             @if ($user->hasRole('administrator'))
                 <a class="pull-right slNavLnk" href="/dashboard" title="Admin Dashboard">Dashboard</a>
             @endif
@@ -130,20 +104,31 @@
 </nav>
 <div class="clearfix"></div>
 <div id="headGap"><img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.gif" border=0 ></div>
-<div id="headBar">@if (isset($headBar) && trim($headBar) != '') {!! $headBar !!} @endif</div>
 
-<div id="dialog">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 id="dialogTitle" class="panel-title"></h2>
-            <a class="dialogClose btn btn-sm btn-default" href="javascript:;"
-                ><i class="fa fa-times" aria-hidden="true"></i></a>
-            <div class="fC"></div>
+<noscript><div class="alert alert-dismissible alert-warning">
+    <b>Warning: It looks like you have Javascript disabled. {{ $GLOBALS['SL']->sysOpts['site-name'] }} 
+    requires Javascript to give you the best possible experience.</b>
+</div></noscript>
+
+@if (session()->has('sessMsg'))
+    @if (trim(session()->get('sessMsg')) != '')
+        <div class="alert alert-dismissible w100 mB10
+            @if (session()->has('sessMsgType') && trim(session()->get('sessMsgType')) != '')
+                {!! session()->get('sessMsgType') !!}
+            @else alert-info @endif ">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            {!! session()->get('sessMsg') !!}
         </div>
-        <div class="panel-body"><div id="dialogBody"></div></div>
-    </div>
-</div>
+    @endif
+    <?php
+    session()->forget('sessMsg');
+    session()->forget('sessMsgType');
+    ?>
+@endif
+
 <div id="nondialog">
+    
+@endif <?php /* end not print */ ?>
 
 @if (isset($admMenu) || isset($belowAdmMenu))
     
@@ -162,7 +147,7 @@
                     href="javascript:void(0)"><i class="fa fa-bars"></i></a>
             </div>
             <script type="text/javascript">
-                $(function() {
+                $(document).ready(function(){
                     $( document ).ready(function() {
                         $("#leftSide").removeClass('col-md-2');
                         $("#leftSide").addClass('disNon');
@@ -197,26 +182,15 @@
                         <input type="text" class="form-control" placeholder="Search...">
                     <div class="disNon"></form></div>
                     <div id="leftSideWrap"
-                        @if (isset($admMenuHideable) && $admMenuHideable)
-                            class="pT20 mT5"
-                        @else
-                            class="mT10"
-                        @endif
-                        >
+                        @if (isset($admMenuHideable) && $admMenuHideable) class="pT20 mT5" @else class="mT10" @endif >
                         <div id="adminMenu" class="row">
-                        
                             @if (isset($admMenu)) {!! $admMenu !!} @endif
-                            
                         </div>
                         <div id="adminMenuExtra">
-                            
                             @yield('belowAdmMenu')
                             @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
-                            
                         </div>
-                        
                     </div>
-                
                 </div>
                 <div id="mainBody" class="col-md-10">
     @endif
@@ -246,7 +220,9 @@
 
 @else
 
-    <div id="bodyContain" class="container">
+    @if (!isset($hasContain) || !$hasContain)
+        <div id="bodyContain" class="container">
+    @endif
     
         @yield('complaintNav')
         
@@ -256,49 +232,67 @@
         
         @yield('content')
     
-    </div>
+    @if (!isset($hasContain) || !$hasContain) </div> @endif
     
 @endif
 
+@if (!isset($isPrint) || !$isPrint)
+
 </div> <!-- end nondialog -->
+<div id="dialog">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h2 id="dialogTitle" class="panel-title"></h2>
+            <a class="dialogClose btn btn-sm btn-default" href="javascript:;"
+                ><i class="fa fa-times" aria-hidden="true"></i></a>
+            <div class="fC"></div>
+        </div>
+        <div class="panel-body"><div id="dialogBody"></div></div>
+    </div>
+</div>
+
+@endif <?php /* end not print */ ?>
 
 @if (!isset($admMenu) && !isset($belowAdmMenu)) 
-    @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!}
-    <?php /* moved to part of the form/page output process
-    @elseif (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-master"]))
-        {!! $GLOBALS['SL']->sysOpts["footer-master"] !!}
-    */ ?>
-    @endif
+    @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
 @endif
 
-<div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" ></iframe></div>
+</div> <!-- end #main (non-offcanvas-menu) -->
 
-<script type="text/javascript">
-@if (isset($pageJSextra) && trim($pageJSextra) != '')
-    {!! $pageJSextra !!}
+<div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
+
+<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+
+<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-2.1.4.min.js"></script>
+@if ((isset($needsJqUi) && $needsJqUi) || true)
+<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}/survloop/jquery-ui-1.11.4/jquery-ui.min.js" type="text/javascript"></script>
 @endif
-
+<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/js/bootstrap.min.js"></script>
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    $(document).ready(function() {
-        $('#summernote').summernote({
-            height: 400,                 // set editor height
-            minHeight: null,             // set minimum height of editor
-            maxHeight: null,             // set maximum height of editor
-            focus: true                  // set focus to editable area after initializing summernote
-        });
-        $('.note-codable').on('blur', function() {
-            if ($('#summernote').summernote('codeview.isActivated')) {
-                $('#summernote').summernote('codeview.deactivate');
-            }
-        });
-    });
+<script src="//cdn.ckeditor.com/4.7.1/standard/ckeditor.js"></script>
+<!--- <script src="//cdn.ckeditor.com/4.7.1/full/ckeditor.js"></script> --->
+@endif
+<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js" type="text/javascript"></script>
+<script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}/sys.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+@if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
+    {!! $GLOBALS['SL']->pageSCRIPTS !!}
+@endif
+<script id="dynamicJS" type="text/javascript">
+@if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
+    {!! $GLOBALS['SL']->pageJAVA !!} setTimeout("printHeadBar(0)", 1);
+@endif
+@if (isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')
+    $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
 @endif
 </script>
+
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 @endif
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["google-analytic"])
-    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.app') === false)
+    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.app') === false && !isset($admMenu))
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

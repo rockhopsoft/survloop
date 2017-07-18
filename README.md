@@ -50,10 +50,11 @@ development environment, Homestead:
 <a href="http://wikiworldorder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/" target="_blank">
     WikiWorldOrder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/</a>.
 
-* Install Laravel's default user authentication, one required package, and SurvLoop:
+* Install Laravel's default user authentication, notifications, and SurvLoop:
 
 ```
 $ php artisan make:auth
+$ php artisan vendor:publish --tag=laravel-notifications
 ```
 
 * Update `composer.json` to add requirements and an easier SurvLoop reference:
@@ -88,6 +89,8 @@ $ composer update
 * Add the package to your application service providers in `config/app.php`.
 
 ```php
+...
+    'name' => 'SurvLoop',
 ...
 'providers' => [
 	...

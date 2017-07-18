@@ -24,6 +24,7 @@
         ><i class="fa fa-pencil"></i> Field XML Settings</a>
     <a href="/dashboard/db/diagrams" target="_blank" class="btn btn-xs btn-default mR10">Tables Diagrams</a>
     <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-xs btn-default mR10">Field Matrix</a>
+    <a href="/dashboard/db/switch" class="btn btn-xs btn-default mR10">Switch Database</a>
 @endif
 
 <div class="fC pT20 pL15">

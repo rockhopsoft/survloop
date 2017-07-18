@@ -1,5 +1,8 @@
 /* generated from resources/views/vendor/survloop/styles-css.blade.php */
 
+html, body {
+    height: 100%
+}
 body, p, div, table tr td, table tr th, input, textarea, select {
     font-family: {!! $css["font-main"] !!};
     font-style: normal;
@@ -7,11 +10,12 @@ body, p, div, table tr td, table tr th, input, textarea, select {
 }
 b, h1, h2, h3, h4, h5, h6 {
     font-family: {!! $css["font-main"] !!};
-    font-weight: 200;
+    font-weight: 400;
 }
 
 body {
-	margin: 0px; padding: 0px;
+	margin: 0px;
+	padding: 0px;
     background: {!! $css["color-main-bg"] !!};
 }
 
@@ -22,34 +26,87 @@ body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h
     line-height: 1.42857143;
 }
 
-.note-editor.note-frame .note-editing-area .note-editable, 
-#summernote .note-editor.note-frame .note-editing-area .note-editable {
-    background: {!! $css["color-main-bg"] !!};
-    color: {!! $css["color-main-text"] !!};
+a:link, a:visited, a:active, a:hover {
+    color: {!! $css["color-main-link"] !!};
 }
+
 
 .navbar {
     height: 56px;
 	min-height: 56px;
 	max-height: 56px;
-	padding-top: 2px;
+	padding-top: 3px;
 	overflow: hidden;
-	color: {!! $css["color-main-off"] !!};
+	color: {!! $css["color-nav-text"] !!};
 	background: {!! $css["color-nav-bg"] !!};
-    border-bottom: 1px {!! $css["color-line-hr"] !!} solid;
+    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
 }
-#navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
-    font-size: 14pt;
-    padding: 5px 10px;
-    margin: 7px 0px 0px 10px;
-    border: 1px {!! $css["color-main-on"] !!} solid;
-    -moz-border-radius: 6px; border-radius: 6px;
+#navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
+#navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
+    font-size: 18pt;
+    width: 41px;
+    height: 41px;
+    -moz-border-radius: 20px; border-radius: 20px;
+    padding-top: 4px;
+    margin: 5px 0px 0px 10px;
+    text-align: center;
+	color: {!! $css["color-nav-text"] !!};
+	border: 1px {!! $css["color-main-grey"] !!} solid;
+	box-shadow: 0px 0px 5px {!! $css["color-main-off"] !!};
 }
+#navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
+    padding-top: 3px;
+}
+@-moz-document url-prefix() {
+    #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
+        padding-top: 3px;
+    }
+    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
+        padding-top: 2px;
+    }
+}
+
+#mySidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    background: {!! $css["color-main-faint"] !!};
+    border-left: 2px {!! $css["color-main-off"] !!} solid;
+    overflow-x: hidden;
+    padding-top: 60px;
+    transition: 0.5s;
+}
+#mySidenav a {
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 14px;
+    color: {!! $css["color-main-link"] !!};
+    display: block;
+    transition: 0.3s
+}
+#mySidenav a:hover, .offcanvas a:focus{
+    color: {!! $css["color-main-on"] !!};
+    background: {!! $css["color-main-bg"] !!};
+}
+#main {
+    transition: margin-right .5s;
+    width: 100%;
+    height: 100%;
+}
+@media screen and (max-height: 450px) {
+    #mySidenav {padding-top: 15px;}
+    #mySidenav a {font-size: 18px;}
+} 
+
 a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
 .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
     display: block;
     padding: 15px 15px;
     margin-right: 10px;
+	color: {!! $css["color-nav-text"] !!};
 }
 
 #headGap {
@@ -78,7 +135,6 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 }
 #slNavMain {
     margin-top: -4px;
-	background: {!! $css["color-main-faint"] !!};
 }
 #slNavMain .panel-body, #slNavMain div .panel .panel-body {
     padding: 5px 0px 0px 0px;
@@ -91,7 +147,7 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     color: {!! $css["color-main-text"] !!};
     background-color: {!! $css["color-main-faint"] !!};
 }
-    
+
 #dialog {
     display: none;
     width: 100%;
@@ -111,37 +167,43 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 #nondialog {
     display: block;
     width: 100%;
+    height: 100%;
 }
 
 #footerLinks {
-    width: 100%;
     display: block;
+    max-width: 730px;
+    margin: 40px 15px 20px 15px;
+}
+#footerLinks .footerSocial a img, 
+a.socialIco:link, a.socialIco:visited, a.socialIco:active, a.socialIco:hover, 
+a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialIco:hover img {
+    height: 40px;
+    margin: 5px;
+	-moz-border-radius: 5px; border-radius: 5px;
+}
+#footerLinks p, #footerLinks div div p, #footerLinks p h3, #footerLinks div div p h3, #footerLinks div div h3 {
+    margin: 0px;
 }
 
-#logoLrg {
+#slLogo {
     display: block;
-    margin: 1px 0px 0px 0px;
+    margin-top: 2px;
 }
-#logoMed {
-    display: none;
-    margin: 3px 0px 0px 0px;
-}
-#logoMed img, #logoLrg img {
+#slLogoImg {
     height: 46px;
+    margin-top: 0px;
 }
-#logoSm {
-    display: none;
-    margin: 1px 0px 0px 0px;
-}
-#logoSm img {
-    height: 30px;
-}
+
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	font-size: 32pt;
 }
 #logoTxt {
 	padding-left: 10px;
 	margin-top: -2px;
+}
+#headLogoLong img {
+    height: 50px;
 }
 
 .halfPageWidth {
@@ -151,6 +213,9 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 }
 
 
+#ajaxWrap {
+    height: 100%;
+}
 #ajaxWrapLoad {
     display: block;
 	width: 100%;
@@ -196,6 +261,7 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 	display: block;
 	padding: 0px;
 	-moz-border-radius: 8px; border-radius: 8px;
+	overflow: visible;
 }
 .nodeWrapError {
 	padding: 10px 5px 10px 5px;
@@ -272,7 +338,7 @@ label, .nPrompt label {
 }
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
     border: 1px solid {!! $css["color-main-grey"] !!};
-    background: {!! $css["color-main-text"] !!};
+    background: {!! $css["color-main-bg"] !!};
     color: {!! $css["color-main-on"] !!};
 }
 .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
@@ -285,6 +351,15 @@ label, .nPrompt label {
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-text"] !!};
 }
+.ui-datepicker-prev.ui-corner-all.ui-state-hover.ui-datepicker-prev-hover {
+    border: 1px solid {!! $css["color-main-text"] !!};
+    background: {!! $css["color-main-faint"] !!};
+    color: {!! $css["color-main-text"] !!};
+}
+/* .ui-datepicker-prev.ui-corner-all.ui-state-hover.ui-datepicker-prev-hover .ui-icon.ui-icon-circle-triangle-w {
+    background: {!! $css["color-main-on"] !!};
+} */
+
 
 input.nFormBtnSub, input.nFormBtnBack {
     font-size: 26pt;
@@ -375,8 +450,17 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 .nFormNext, a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover, {
     white-space: normal;
 }
-.btn.btn-lg, .btn.btn-md {
+.btn.btn-xl, .btn.btn-lg, .btn.btn-md {
     white-space: normal;
+}
+
+
+.subNote, .nPrompt .subNote {
+    margin-top: 10px;
+}
+.subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p {
+	font-size: 14px;
+	color: {!! $css["color-main-grey"] !!};
 }
 
 
@@ -483,11 +567,11 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	color: {!! $css["color-main-on"] !!};
 	font-size: 18pt;
 	padding: 10px 0px 10px 0px;
-	border-top: 1px {!! $css["color-main-on"] !!} solid;
+	/* border-top: 1px {!! $css["color-main-on"] !!} solid; */
 }
 .reportSectHead2, .slReport .reportSectHead2 {
 	font-size: 20pt;
-	border-bottom: 1px {!! $css["color-main-on"] !!} solid;
+	/* border-bottom: 1px {!! $css["color-main-on"] !!} solid; */
 }
 .reportBlock, .slReport .reportBlock {
 	display: block;
@@ -503,12 +587,12 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     width: 100%;
     color: {!! $css["color-main-on"] !!};
     font-size: 18pt;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 .reportMiniBlockDeets, .slReport .reportMiniBlockDeets {
     display: block;
     width: 100%;
-    font-size: 16pt;
+    font-size: 12pt;
     padding-bottom: 20px;
 }
 
@@ -543,6 +627,8 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     margin-left: -2px;
     margin-right: -2px;
 }
+
+
 
 .basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
 .basicTier5, .basicTier6, .basicTier7, .basicTier8, .basicTier9 {
@@ -621,13 +707,16 @@ table.detailList tr td {
 	border-top: 1px {!! $css["color-main-off"] !!} solid;
 }
 
-#treeWrap {
+#treeWrap, .treeWrapForm {
+    display: block;
 	position: relative;
-	margin: 0px;
     text-align: left;
+    margin: 0px;
 }
 .treeWrapForm {
-    max-width: 700px;
+    max-width: 730px;
+    padding-right: 15px;
+    padding-left: 15px;
 }
 #fixedHeader {
 	position: relative;
@@ -658,57 +747,54 @@ table.detailList tr td {
 
 label { font-weight: normal; }
 
-.nav-pills.nav-wizard > li.completed .nav-arrow {
-  border-color: transparent transparent transparent {!! $css["color-main-faint"] !!};
+
+.stepNum {
+	display: block;
+	font-size: 12pt;                                      
+	padding-top: 2px;
+	margin-bottom: 5px;
+	height: 30px;
+	width: 30px;
+	-moz-border-radius: 15px; border-radius: 15px;
+	color: {!! $css["color-main-off"] !!};
+	background: {!! $css["color-main-faint"] !!};
+	border: 1px {!! $css["color-main-off"] !!} solid;
 }
-.nav-pills.nav-wizard > li.completed .nav-wedge {
-  border-color: {!! $css["color-main-faint"] !!} {!! $css["color-main-faint"] !!} {!! $css["color-main-faint"] !!} transparent;
+.stepNum i {
+    margin-top: 4px;
 }
-.nav-pills.nav-wizard > li.completed a {
-  background-color: {!! $css["color-main-faint"] !!};
-  font-weight: bold;
+.navVertLine, .navVertLine2 {
+    width: 1px;
+    height: 15px;
+    margin: 10px 0px 7px 0px;
+    border-left: 1px {!! $css["color-main-off"] !!} solid;
 }
-.nav-pills.nav-wizard > li.completed a:hover {
-  color: {!! $css["color-main-text"] !!};
+.navVertLine2 {
+    height: 30px;
 }
-.nav-pills.nav-wizard > li.active a {
-  font-weight: bold;
+.navDeskMaj.completed .stepNum {
+	color: {!! $css["color-main-off"] !!};
+	background: {!! $css["color-main-bg"] !!};
+	border: 1px {!! $css["color-main-off"] !!} solid;
+}
+.navDeskMaj.active .stepNum {
+	color: {!! $css["color-main-on"] !!};
+	background: {!! $css["color-main-faint"] !!};
+	border: 1px {!! $css["color-main-on"] !!} solid;
+	box-shadow: 0px 0px 2px {!! $css["color-main-faint"] !!};
+}
+.navDeskMaj.active .navVertLine, .navDeskMaj.completed .navVertLine, 
+.navDeskMaj.active .navVertLine2, .navDeskMaj.completed .navVertLine2 {
+	border-left: 1px {!! $css["color-main-on"] !!} solid;
+}
+.minorNavWrap {
+    display: none;
+    border-top: 1px {!! $css["color-main-text"] !!} solid;
+    padding-top: 20px;
+    margin-top: -8px;
+    -moz-border-radius: 20px; border-radius: 20px;
 }
 
-.stepNum, .nav-pills.nav-wizard > li .stepNum {
-	display: inline;
-	font-size: 10pt;
-	line-height: 8px;
-	padding: 0px 5px;
-	margin-right: 3px;
-	-moz-border-radius: 8px; border-radius: 8px;
-	border: 1px {!! $css["color-main-on"] !!} solid;
-}
-.nav-pills.nav-wizard > li.active .stepNum {
-	border: 1px {!! $css["color-main-bg"] !!} solid;
-}
-.stepNum2, .nav-pills.nav-wizard > li .stepNum2, 
-.stepNum2active, .nav-pills.nav-wizard > li .stepNum2active, 
-.stepNum2complete, .nav-pills.nav-wizard > li .stepNum2complete {
-	font-size: 14pt;
-	text-align: center;
-	-moz-border-radius: 8px; border-radius: 8px;
-	width: 30px;
-	margin-top: 7px;
-	padding-left: 1px;
-	color: {!! $css["color-main-on"] !!};
-	background: {!! $css["color-main-faint"] !!};
-	border: 1px {!! $css["color-main-on"] !!} solid;
-	cursor: pointer;
-}
-.stepNum2active, .nav-pills.nav-wizard > li .stepNum2active { 
-	color: {!! $css["color-main-bg"] !!};
-	background: {!! $css["color-main-on"] !!};
-}
-.stepNum2complete, .nav-pills.nav-wizard > li .stepNum2complete {
-	color: {!! $css["color-main-on"] !!};
-	background: {!! $css["color-main-faint"] !!};
-}
 
 .panel-info > .panel-heading {
     color: {!! $css["color-main-bg"] !!};
@@ -730,11 +816,11 @@ label { font-weight: normal; }
 .pagination>.active>a, .pagination>.active>span, .pagination>.active>a:hover, .pagination>.active>span:hover, .pagination>.active>a:focus, .pagination>.active>span:focus { z-index: 2; color: {!! $css["color-main-bg"] !!}; background-color: {!! $css["color-main-off"] !!}; border-color: {!! $css["color-main-on"] !!}; cursor: default } 
 .pagination>.disabled>span, .pagination>.disabled>span:hover, .pagination>.disabled>span:focus, .pagination>.disabled>a, .pagination>.disabled>a:hover, .pagination>.disabled>a:focus { color: #777; background-color: {!! $css["color-main-bg"] !!}; border-color: {!! $css["color-main-faint"] !!}; cursor: not-allowed } 
 .pagination-lg>li>a, .pagination-lg>li>span { padding: 10px 16px; font-size: 18px } 
-.pagination-lg>li:first-child>a, .pagination-lg>li:first-child>span { border-bottom-right-radius: 6px; border-top-right-radius: 6px } 
-.pagination-lg>li:last-child>a, .pagination-lg>li:last-child>span { border-bottom-left-radius: 6px; border-top-left-radius: 6px } 
+.pagination-lg>li:first-child>a, .pagination-lg>li:first-child>span { border-bottom-right-radius: 6px; border-top-right-radius: 6px; } 
+.pagination-lg>li:last-child>a, .pagination-lg>li:last-child>span { border-bottom-left-radius: 6px; border-top-left-radius: 6px; } 
 .pagination-sm>li>a, .pagination-sm>li>span { padding: 5px 10px; font-size: 12px } 
-.pagination-sm>li:first-child>a, .pagination-sm>li:first-child>span { border-bottom-right-radius: 3px; border-top-rightt-radius: 3px } 
-.pagination-sm>li:last-child>a, .pagination-sm>li:last-child>span { border-bottom-left-radius: 3px; border-top-left-radius: 3px }
+.pagination-sm>li:first-child>a, .pagination-sm>li:first-child>span { border-bottom-right-radius: 3px; border-top-rightt-radius: 3px; } 
+.pagination-sm>li:last-child>a, .pagination-sm>li:last-child>span { border-bottom-left-radius: 3px; border-top-left-radius: 3px; }
 
 .btn-group-xl > .btn, .btn-xl {
     padding: 15px 20px;
@@ -823,52 +909,166 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 
 
 
+
+.heroImgWrap {
+    width: 100%;
+    height: 50%;
+}
+.heroImg {
+    width: 100%;
+    height: 100%;
+    background-image:url('/survloop/spacer.gif');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+}
+.heroImg .heroAction {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+}
+.heroImg .heroAction .heroActionInner {
+    margin-left: -50px;
+    margin-right: -50px;
+}
+.heroImg .heroAction .heroActionInner h1 {
+    font-size: 42px;
+    margin-top: -20px;
+	color: {!! $css["color-main-on"] !!};
+    text-shadow: 0px 0px 3px {!! $css["color-main-bg"] !!};
+    line-height: 1.214285715;
+}
+.heroImg .heroAction .heroActionInner h4 {
+    font-size: 24px;
+	color: {!! $css["color-main-on"] !!};
+    text-shadow: 0px 0px 3px {!! $css["color-main-bg"] !!};
+    line-height: 1.214285715;
+}
+.heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover, 
+.heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover, 
+.heroActionInner a:link, .heroActionInner a:visited, .heroActionInner a:active, .heroActionInner a:hover, 
+.heroActionInner a.btn-primary:link, .heroActionInner a.btn-primary:visited, .heroActionInner a.btn-primary:active, .heroActionInner a.btn-primary:hover {
+    font-size: 38px;
+    box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!};
+}
+
+.imgTmb {
+    width: 150px;
+    height: 150px;
+}
+
+.responsive-video, .nPrompt .responsive-video {
+    width: 100%;
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 60px; overflow: hidden;
+}
+.responsive-video iframe, .nPrompt .responsive-video iframe,
+.responsive-video object, .nPrompt .responsive-video object,
+.responsive-video embed, .nPrompt .responsive-video embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
 @media screen and (max-width: 1200px) {
+    
+    .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 50px; }
+    .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
+        font-size: 28px;
+        padding: 7px 14px;
+    }
+    
 }
 @media screen and (max-width: 992px) {
-	#logoMed, #logoSm { display: none; }
-	#logoLrg { display: block; }
-	
+    
 	#navDesktop { display: none; }
 	#navMobile { display: block; }
+	
+    .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 36px; margin-top: -20px; }
+    .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
+        font-size: 26px;
+        padding: 5px 10px;
+    }
+    
 }
 @media screen and (max-width: 768px) {
 	
-	#logoLrg, #logoSm { display: none; }
-	#logoMed { display: block; }
+	#slLogoImg { height: 36px; margin-top: 6px; }
 	input.nFormBtnSub, input.nFormBtnBack { font-size: 20pt; }
 	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
 	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
     input.otherGender { width: 240px; }
     
-    /* .nPrompt h1 { font-size: 45px; }
-    .nPrompt h2 { font-size: 34px; }
-    .nPrompt h3 { font-size: 24px; }
-    .nPrompt h4 { font-size: 20px; }
-    .nPrompt h5 { font-size: 16px; }
-    .nPrompt h6 { font-size: 14px; } */
+    .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
+        font-size: 24px; margin-top: -30px; line-height: 1.1071428575; letter-spacing: -0.02em;
+    }
+    .heroImg .heroAction h4, .heroImg .heroAction .heroActionInner h4 {
+        font-size: 16px; line-height: 1.1071428575; letter-spacing: -0.02em;
+    }
+    .heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover {
+        font-size: 24px;
+    }
+    
+    @media screen and (max-height: 460px) {
+        .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
+            margin-top: 0px;
+        }
+    }
+    @media screen and (max-height: 300px) {
+        .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
+            margin-top: 30px;
+            font-size: 20px;
+        }
+        .heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover {
+            font-size: 12px;
+        }
+    }
     
 }
 @media screen and (max-width: 480px) {
-	#logoLrg, #logoMed { display: none; }
-	#logoSm { display: block; }
+    
+	#slLogoImg { height: 30px; margin-top: 8px; margin-left: -5px; }
 	#logoTxt {
 	    font-size: 28pt; 
 	    padding-left: 0px;
 	    margin-top: -9px 0px -9px -5px;
 	}
 	
-	#headGap, #headGap img { height: 38px; }
-    .navbar { min-height: 32px; height: 38px; padding-top: 2px; }
-    #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
+    #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
+    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
         font-size: 12pt;
-        padding: 2px 6px;
-        margin: 1px 0px 0px 5px;
+        width: 32px;
+        height: 32px;
+        -moz-border-radius: 16px; border-radius: 16px;
+        padding-top: 4px;
+        margin: 9px 0px 0px 8px;
     }
+    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
+        padding-top: 3px;
+    }
+    /* @-moz-document url-prefix() {
+        #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
+            padding-top: 3px;
+        }
+        #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
+            padding-top: 2px;
+        }
+    } */
+
     a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
     .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
-        padding: 5px 5px;
+        padding: 15px 5px 15px 5px;
         margin-right: 5px;
     }
 	
@@ -893,6 +1093,21 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
 	.jumbotron { padding: 20px; }
 	
+    @media screen and ( max-height: 600px ){
+        .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 24px; margin-top: 0px; }
+        .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+    }
+    @media screen and ( max-height: 300px ){
+        .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 18px; margin-top: 0px; }
+        .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
+            font-size: 14px;
+            padding: 3px 6px;
+        }
+    }
+    
 }
 
 
@@ -920,6 +1135,8 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	overflow:auto;
 	padding: 0px;
 }
+
+
 
 .f8, table tr td.f8, i.f8, a.f8:link, a.f8:active, a.f8:visited, a.f8:hover, input.f8 , select.f8 , textarea.f8 { font-size: 8pt; }
 .f9, table tr td.f9, i.f9, a.f9:link, a.f9:active, a.f9:visited, a.f9:hover, input.f9 , select.f9 , textarea.f9 { font-size: 9pt; }
@@ -1022,6 +1239,9 @@ a.noPoint, a.noPoint:link, a.noPoint:visited, a.noPoint:active, a.noPoint:hover,
 a.btn.noPoint, a.btn.noPoint:link, a.btn.noPoint:visited, a.btn.noPoint:active, a.btn.noPoint:hover {
     cursor: default;
 }
+.cursorPoint {
+    cursor: pointer;
+}
 
 /* Can Be Read Like... margin Left 5, margin Bottom negative 5 */
 h1.m0, h2.m0, h3.m0 { margin: 0px; }
@@ -1049,6 +1269,9 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .round15 { -moz-border-radius: 15px; border-radius: 15px; }
 .round20 { -moz-border-radius: 20px; border-radius: 20px; }
 .round30 { -moz-border-radius: 30px; border-radius: 30px; }
+
+.tmbRound { width: 150px; height: 150px; -moz-border-radius: 75px; border-radius: 75px; }
+.bigTmbRound { width: 175px; height: 175px; -moz-border-radius: 87px; border-radius: 87px; }
 
 .opac1 { opacity:0.01; filter:alpha(opacity=1); }
 .opac10 { opacity:0.10; filter:alpha(opacity=10); }
@@ -1082,13 +1305,16 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .ital { font-style: italic; }
 
 .brd { border: 1px {!! $css["color-main-off"] !!} solid; }
+.brdDash { border: 1px {!! $css["color-main-off"] !!} dashed; }
 .brdDrk { border: 1px {!! $css["color-main-on"] !!} solid; }
 .brdLgt { border: 1px {!! $css["color-main-off"] !!} solid; }
 .brdRed { border: 1px {!! $css["color-danger-on"] !!} solid; }
+.brdRedLgt { border: 1px {!! $css["color-danger-off"] !!} solid; }
 .brdBlk { border: 1px {!! $css["color-main-text"] !!} solid; }
 .brdA { border: 1px #AAA solid; }
 .brdC { border: 1px #CCC solid; }
 .brdEdash { border: 1px #EEE dashed; }
+.brdRedLgtLft { border-left: 1px {!! $css["color-danger-off"] !!} solid; }
 
 .brdTop, table tr.brdTop td, table tr.brdTop th { border-top: 1px {!! $css["color-main-off"] !!} solid; }
 .brdBot, table tr.brdBot td, table tr.brdBot th { border-bottom: 1px {!! $css["color-main-off"] !!} solid; }
@@ -1138,7 +1364,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 	color: {!! $css["color-success-off"] !!};
 }
 
-.slGrey {
+.slGrey, .slGray {
     color: {!! $css["color-main-grey"] !!};
 }
 .infoOn {
@@ -1155,14 +1381,17 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 }
 
 a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
-	color: {!! $css["color-main-off"] !!};
-}
-a.navbar-brand:hover {
-	color: {!! $css["color-main-bg"] !!};
+	color: {!! $css["color-nav-text"] !!};
 }
 
 .slShade, a.slShade:link, a.slShade:visited, a.slShade:active, a.slShade:hover {
-	text-shadow: 0px 2px 2px {!! $css["color-main-faint"] !!};
+	text-shadow: -1px 1px 0px {!! $css["color-main-text"] !!};
+}
+.slShadeLight, a.slShadeLight:link, a.slShadeLight:visited, a.slShadeLight:active, a.slShadeLight:hover {
+	text-shadow: -1px 1px 0px {!! $css["color-main-off"] !!};
+}
+.slBoxShade, a.slBoxShade:link, a.slBoxShade:visited, a.slBoxShade:active, a.slBoxShade:hover {
+	box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!};
 }
 
 .slFaintHover, a.slFaintHover:link, a.slFaintHover:visited, a.slFaintHover:active, a.slFaintHover:hover {

@@ -11,4 +11,7 @@ class {{ $tblClean }} extends Model
     protected $fillable   = 
     [    {!! $modelFile !!}
     ];
+    
+    // END SurvLoop auto-generated portion of Model
+    
 }

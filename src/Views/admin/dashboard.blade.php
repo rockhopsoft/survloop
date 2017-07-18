@@ -4,40 +4,35 @@
 
 @section('content')
 
-<div class="row">
-    <div class="col-md-6">
-        <h1 class="mB0 slBlueDark">Dashboard</h1>
-        <hr class="mBn10">
-        @if (isset($dashpage) && trim($dashpage) != '') {!! $dashpage !!} @endif
+@if (isset($dashpage) && trim($dashpage) != '') {!! $dashpage !!} @endif
+
+<hr>
+<h3 class="mT20 mB0">Full Admin Menu</h3>
+@for ($i=0; $i < sizeof($adminNav); $i++)
+    <div class="fL pR20">
+        <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
+        @if (sizeof($adminNav[$i][3]) > 0)
+            <ul class="m0">
+            @foreach ($adminNav[$i][3] as $link)
+                <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a>
+                    @if (sizeof($link[3]) > 0)
+                        <ul>
+                        @foreach ($link[3] as $link2)
+                            <li><a href="{{ $link2[0] }}" class="f16">{!! $link2[1] !!}</a></li>
+                        @endforeach
+                        </ul>
+                    @endif
+                </li>
+            @endforeach
+            </ul>
+        @endif
     </div>
-    <div class="col-md-6">
-        <div class="jumbotron taC">
-            <h2>{{ $GLOBALS['SL']->dbRow->DbName }} Mission</h2>
-            <p class="pB20">{!! $orgMission !!}</p>
-        </div>
+@endfor
+<div class="fC"></div>
         
-        <div class="pL20">
-            @for ($i=0; $i<sizeof($adminNav); $i++)
-                <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
-                @if (sizeof($adminNav[$i][3]) > 0)
-                    <ul>
-                    @foreach ($adminNav[$i][3] as $link)
-                        <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a>
-                            @if (sizeof($link[3]) > 0)
-                                <ul>
-                                @foreach ($link[3] as $link2)
-                                    <li><a href="{{ $link2[0] }}" class="f16">{!! $link2[1] !!}</a></li>
-                                @endforeach
-                                </ul>
-                            @endif
-                        </li>
-                    @endforeach
-                    </ul>
-                @endif
-            @endfor
-        </div>
-        
-    </div>
+<div class="jumbotron mT20">
+    <h3>{{ $GLOBALS['SL']->dbRow->DbName }} Mission</h3>
+    <p>{!! $orgMission !!}</p>
 </div>
 
 

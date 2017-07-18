@@ -35,7 +35,7 @@
             </label>
         </div>
         <div class="nFld mT0">
-            <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control input-lg">
+            <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
         </div>
     </div>
     <div class="nodeGap"></div>
@@ -52,8 +52,12 @@
         </label>
     </div>
     <div class="nFld mT0">
-        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control input-lg">
+        <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
     </div>
+    @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
+        && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
+        * Currently, you will only be able reset a lost password with an email address.
+    @endif
     
     <div id="emailWarning" class="disNon">
         <div class="alert alert-danger mT20 w100" role="alert">
@@ -79,8 +83,8 @@
         Password <span class="red">*required, 6 character minimum</span>
     </label>
 </div>
-<div class="nFld">
-    <input id="password" name="password" type="password" class="form-control input-lg">
+<div class="nFld mT0">
+    <input id="password" name="password" type="password" class="form-control">
 </div>
 </div>
 <div class="nodeGap"></div>
@@ -92,7 +96,7 @@
     </div>
     <div class="nFld mT0">
         <input id="password_confirmation" name="password_confirmation" type="password" 
-            class="form-control input-lg">
+            class="form-control">
     </div>
 </div>
 

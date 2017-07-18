@@ -95,7 +95,6 @@ class SurvUploadTree extends SurvLoopTree
         return array();
     }
     
-
     public function retrieveUploadFile($upID = '')
     {
         if (!$this->isPublic() && !$this->isAdminUser() && !$this->isCoreOwner()) {
@@ -148,8 +147,8 @@ class SurvUploadTree extends SurvLoopTree
         // File (image) is cached by the browser, so we don't have to send it again
         
         $headers = array_merge($headers, [
-            'Content-Type'             => $handler->getMimeType(),
-            'Content-Length'         => $handler->getSize()
+            'Content-Type'   => $handler->getMimeType(),
+            'Content-Length' => $handler->getSize()
         ]);
         return Response::make(file_get_contents($up["file"]), 200, $headers);
     }
@@ -157,11 +156,11 @@ class SurvUploadTree extends SurvLoopTree
     protected function uploadTool($nID)
     {
         $this->loadUploadTypes();
-        $this->pageAJAX .= 'window.refreshUpload = function () { $("#uploadAjax").load("?ajax=1&upNode=' 
+        $GLOBALS["SL"]->pageAJAX .= 'window.refreshUpload = function () { $("#uploadAjax").load("?ajax=1&upNode=' 
             . $nID . '"); }' . "\n";
         $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID').value == 1) reqUploadTitle(" 
             . $nID . ");\n";
-        $this->pageJSextra .= "addResTot(" . $nID . ", 4);\n";
+        $GLOBALS["SL"]->pageJAVA .= "addResTot(" . $nID . ", 4);\n";
         $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
             . view('vendor.survloop.upload-tool', [
                 "nID"            => $nID,
@@ -233,17 +232,23 @@ class SurvUploadTree extends SurvLoopTree
         return true;
     }
     
+    protected function prepPrevUploads($nID)
+    {
+        $this->uploads = [];
+        $this->loadUploadTypes();
+        $this->loadPrevUploadDeets($nID);
+        //? $upSet = $this->getUploadSet($nID);
+        return true;
+    }
+    
     protected function getPrevUploads($nID, $edit = false)
     {
-        $this->loadUploadTypes();
-        $height = 160; $width = 330;
-        $this->loadPrevUploadDeets($nID);
-        $upSet = $this->getUploadSet($nID);
+        $this->prepPrevUploads($nID);
         return view('vendor.survloop.upload-previous', [
             "nID"         => $nID,
             "REQ"         => $this->REQ,
-            "height"      => $height,          
-            "width"       => $width,
+            "height"      => 160,          
+            "width"       => 330,
             "uploads"     => $this->uploads, 
             "upDeets"     => $this->upDeets, 
             "uploadTypes" => $this->uploadTypes, 
@@ -251,6 +256,45 @@ class SurvUploadTree extends SurvLoopTree
                 . "-upload-types"], 'Video'),
             "v"           => $this->v
         ])->render();
+    }
+    
+    protected function getUploads($nID, $isAdmin = false, $isOwner = false)
+    {
+        $this->prepPrevUploads($nID);
+        if (!$this->uploads || sizeof($this->uploads) == 0) return [];
+        $ups = [];
+        if (isset($this->uploads) && sizeof($this->uploads) > 0) {
+            foreach ($this->uploads as $i => $upRow) {
+                $ups[] = view('vendor.survloop.uploads-print', [
+                    "nID"         => $nID,
+                    "REQ"         => $this->REQ,
+                    "height"      => 160,
+                    "width"       => 330,
+                    "upRow"       => $upRow, 
+                    "upDeets"     => $this->upDeets[$i], 
+                    "uploadTypes" => $this->uploadTypes, 
+                    "vidTypeID"   => $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                        . "-upload-types"], 'Video'),
+                    "v"           => $this->v,
+                    "isAdmin"     => $isAdmin,
+                    "isOwner"     => $isOwner
+                ])->render();
+            }
+        }
+        return $ups;
+    }
+    
+    protected function getUploadsList($list = [], $isAdmin = false, $isOwner = false)
+    {
+        $uploads = [];
+        if ($list && sizeof($list) == 0) return [];
+        foreach ($list as $nID) {
+            $tmp = $this->getUploads($nID, $isAdmin, $isOwner);
+            if (sizeof($tmp) > 0) {
+                foreach ($tmp as $up) $uploads[] = $up;
+            }
+        }
+        return $uploads;
     }
     
     protected function postUploadTool($nID)

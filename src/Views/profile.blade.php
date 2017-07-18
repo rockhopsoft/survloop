@@ -1,16 +1,24 @@
 <!-- resources/views/vendor/survloop/profile.blade.php -->
-
-@extends('vendor.survloop.master')
-
-@section('content')
-<h2>{{ $profileUser->name }}: Profile</h2>
-<div class="fL"><table border=0 cellpadding=5 cellspacing=0 >
-<tr><td>Name:</td><td>{{ $profileUser->name }}</td></tr>
-<tr><td>Email:</td><td>{{ $profileUser->email }}</td></tr>
-<tr><td>Roles:</td><td>{{ $profileUser->listRoles() }}</td></tr>
-<tr><td>Since:</td><td>{{ $profileUser->created_at }}</td></tr>
-</table></div>
-<div class="fC"></div>
-
-<div class="p20"></div><div class="p20"></div>
-@endsection
+<div class="row mT20 mB20">
+    @if (isset($GLOBALS['SL']->sysOpts['avatar-empty']))
+        <div class="col-md-2 pT20">
+            <a href="/profile/{{ urlencode($profileUser->name) }}"
+                ><img id="profilePic" class="imgTmb" src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0 ></a>
+        </div>
+        <div class="col-md-6">
+    @else
+        <div class="col-md-8">
+    @endif
+        <a href="/profile/{{ urlencode($profileUser->name) }}"><h1 class="slBlueDark">{{ $profileUser->name }}</h1></a>
+        Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}
+    </div>
+    <div class="col-md-4">
+        @if ($canEdit)
+            <table class="table mT20" >
+            <tr><td>Email:</td><td>{{ $profileUser->email }}</td></tr>
+            <tr><td>Roles:</td><td>{{ $profileUser->listRoles() }}</td></tr>
+            </table>
+        @endif
+    </div>
+</div>
+<style> #unfinishedList { display: block; } </style>

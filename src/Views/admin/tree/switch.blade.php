@@ -17,14 +17,13 @@
             <a href="/dashboard/tree/switch/{{ $tree->TreeID }}" class="btn btn-lg btn-primary pull-right"
                 ><i class="fa fa-arrow-left mR5" aria-hidden="true"></i> Design This User Experience</a>
         @endif
-        <h2 class="mT0 @if ($GLOBALS['SL']->treeID == $tree->TreeID) slBlueDark @endif " 
-            >{{ $tree->TreeName }}</h2>
+        <h2 class="mT0 @if ($GLOBALS['SL']->treeID == $tree->TreeID) slBlueDark @endif ">{{ $tree->TreeName }}</h2>
         @if (isset($tree->TreeDesc)) <p><b>{{ $tree->TreeDesc }}</b></p> @endif
         <a id="treeEdit{{ $tree->TreeID }}btn" class="treeEditbtn" href="javascript:;"
             ><i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i></a>
         {{ $myTreeNodes[$tree->TreeID] }} Nodes
         @if ($tree->TreeType == 'Primary Public' && $GLOBALS['SL']->treeID == $tree->TreeID) 
-            - <a href="/dashboard/tree/xmlmap">XML Map for data sharing</a>
+            - <a href="/dashboard/tree-{{ $tree->TreeID }}/xmlmap">XML Map for data sharing</a>
         @endif
         <br />Tree URL: 
         @if ($GLOBALS['SL']->treeIsAdmin)

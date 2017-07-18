@@ -8,24 +8,24 @@
     <div class="col-md-8 pB10">
         <h1><i class="fa fa-snowflake-o"></i> Filters / Conditions</h1>
         
-        <form name="nodeEditor" method="post" action="/dashboard/tree/conds" >
+        <form name="nodeEditor" method="post" action="/dashboard/db/conds" >
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="addNewCond" value="1">
         {!! view('vendor.survloop.admin.db.inc-addCondition', [ "newOnly" => true ])->render() !!}
         </form>
     </div>
     <div class="col-md-4 taR p20">
-        <a href="/dashboard/tree/conds" class="btn btn-xs mL10 @if ($filtOnly == 'all') btn-primary @else btn-default @endif ">All Filters</a>
-        <a href="/dashboard/tree/conds?only=public" class="btn btn-xs mL10 @if ($filtOnly == 'public') btn-primary @else btn-default @endif ">Public Only</a>
-        <a href="/dashboard/tree/conds?only=articles" class="btn btn-xs mL10 @if ($filtOnly == 'articles') btn-primary @else btn-default @endif ">Articles Only</a>
+        <a href="/dashboard/db/conds" class="btn btn-xs mL10 @if ($filtOnly == 'all') btn-primary @else btn-default @endif ">All Filters</a>
+        <a href="/dashboard/db/conds?only=public" class="btn btn-xs mL10 @if ($filtOnly == 'public') btn-primary @else btn-default @endif ">Public Only</a>
+        <a href="/dashboard/db/conds?only=articles" class="btn btn-xs mL10 @if ($filtOnly == 'articles') btn-primary @else btn-default @endif ">Articles Only</a>
     </div>
 </div>
 
 <i>Make any edits needed below, and click the save button at the bottom. Multiple articles can be separated by commas.</i>
 
 <form name="nodeEditor" method="post" 
-    @if ($filtOnly == 'all') action="/dashboard/tree/conds"
-    @else action="/dashboard/tree/conds?only={{ $filtOnly }}"
+    @if ($filtOnly == 'all') action="/dashboard/db/conds"
+    @else action="/dashboard/db/conds?only={{ $filtOnly }}"
     @endif
     >
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -100,26 +100,7 @@
 
 <br />
 <center><input type="submit" value="Save All Changes" class="btn btn-lg btn-primary" ></center>
-
 </form>
-
-<script type="text/javascript">
-$(function() {
-    $(document).on("click", "#addNewCond", function() {
-        $("#newCond").slideToggle("fast");
-    });
-    $(document).on("click", ".condDelBtn", function() {
-        var i = $(this).attr("id").replace("condDelBtn", "");
-        $("#condDel"+i+"").slideToggle("fast");
-    });
-    $(document).on("click", ".hasArticleBox", function() {
-        var i = $(this).attr("id").replace("CondHasArticleID", "");
-        if (document.getElementById('CondHasArticleID'+i+'').checked) $("#condArticle"+i+"").slideDown("fast");
-        else $("#condArticle"+i+"").slideUp("fast");
-        return true;
-    });
-});
-</script>
 
 <div class="p20"></div><div class="p20"></div>
 @endsection

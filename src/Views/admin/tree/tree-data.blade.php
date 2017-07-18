@@ -1,23 +1,35 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree-data.blade.php -->
 
-<h2 class="slBlueDark"><i class="fa fa-snowflake-o"></i> Tree's Use of Database Design</nobr></h2>
-<p>
-    <i>The Tree's Datadesign</i>: 
-    This area manages which parts of the entire database are actually accessed by this tree.
-    This tracks the linkages which are needed for this form-tree to properly save it's data.
-    More tools will also come to craft the cleanly organized API for raw completed data...
-</p>
-<h4 class="slBlueDark"><i>Core Table: 
-    @if (isset($GLOBALS['SL']->coreTbl)) {{ $GLOBALS['SL']->coreTbl }} @endif
-</i></h4>
 
+<ul class="nav nav-tabs mT10" role="tablist">
+    <li role="presentation">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Full Map of Tree</a></li>
+    <li role="presentation" class="active">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/data">Tree Data Structures</a></li>
+    <li role="presentation">
+        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap">Data Export XML Map</a></li>
+</ul>
+
+<h2 class="slBlueDark"><i class="fa fa-snowflake-o"></i> 
+    {{ $GLOBALS['SL']->treeName }}: Tree's Use of Database Design</nobr></h2>
 <div class="nodeHalfGap"></div>
+<div class="row">
+    <div class="col-md-6">
+        This area manages which parts of the entire database are actually accessed by this tree.
+        This tracks the linkages which are needed for this form-tree to properly save it's data.
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-4">
+        <h4 class="m0">Tree's Core Data Table:</h4><h3 class="m0 slBlueDark">
+            @if (isset($GLOBALS['SL']->coreTbl)) {{ $GLOBALS['SL']->coreTbl }} @endif </h3>
+    </div>
+</div>
 
 <h2>SurvLoops</h2>
 <p>
 <i>Loop</i>: The group of records which the end user may provide between <i>Min</i> and <i>Max</i> records 
 in the <i>Table</i>. This data loop plays out for the end user within its family's <i>Root Node</i>. 
-New loops can be added by editing any node in the <a href="/dashboard/tree/map?all=1">Tree Map</a>.
+New loops can be added by editing any node in the <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Tree Map</a>.
 </p>
 <table class="table table-striped">
     <tr>
@@ -61,7 +73,7 @@ New loops can be added by editing any node in the <a href="/dashboard/tree/map?a
 @endforelse
 </table>
 
-<div class="nodeGap"></div>
+<div class="nodeHalfGap"></div>
 
 <h2>Data Subsets</h2>
 <p>
@@ -124,7 +136,7 @@ New loops can be added by editing any node in the <a href="/dashboard/tree/map?a
     </form>
 </table>
 
-<div class="nodeGap"></div>
+<div class="nodeHalfGap"></div>
 
 <h2>Data Helpers</h2>
 <p>
@@ -175,7 +187,7 @@ basic core-table-to-loop-table relations.
     </form>
 </table>
 
-<div class="nodeGap"></div>
+<div class="nodeHalfGap"></div>
 
 <h2>Data Linkages</h2>
 <p>
