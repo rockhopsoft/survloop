@@ -15,7 +15,12 @@
     <div class="col-md-4">
         @if ($canEdit)
             <table class="table mT20" >
-            <tr><td>Email:</td><td>{{ $profileUser->email }}</td></tr>
+            <tr><td>Email:</td><td>{{ $profileUser->email }}
+                @if ($profileUser->hasVerifiedEmail())
+                    <nobr><span class="slGrey"><i class="fa fa-check-circle-o mL10" aria-hidden="true"></i> 
+                        verified</span></nobr>
+                @endif
+            </td></tr>
             <tr><td>Roles:</td><td>{{ $profileUser->listRoles() }}</td></tr>
             </table>
         @endif

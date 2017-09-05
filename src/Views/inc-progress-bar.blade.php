@@ -35,7 +35,7 @@
                         @if (sizeof($minorSections[$maj]) == 5) <div class="col-md-1"></div> @endif
                         @forelse ($minorSections[$maj] as $min => $minSect)
                             <div class="col-md-{{ floor(12/sizeof($minorSections[$maj])) }}">
-                                <a data-toggle="tab" href="javascript:void(0)" id="maj{{ $maj }}" class="navDeskMaj
+                                <a id="maj{{ $maj }}" class="navDeskMin
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) active 
                                     @elseif (in_array($min, $sessMinorsTouched[$maj])) completed 
                                     @endif "

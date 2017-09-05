@@ -13,13 +13,13 @@ b, h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
 }
 
-body {
+body, .slBg {
 	margin: 0px;
 	padding: 0px;
     background: {!! $css["color-main-bg"] !!};
 }
 
-body, p {
+body, p, .slTxt {
     color: {!! $css["color-main-text"] !!};
 }
 body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
@@ -29,7 +29,6 @@ body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h
 a:link, a:visited, a:active, a:hover {
     color: {!! $css["color-main-link"] !!};
 }
-
 
 .navbar {
     height: 56px;
@@ -73,23 +72,26 @@ a:link, a:visited, a:active, a:hover {
     z-index: 1;
     top: 0;
     right: 0;
-    background: {!! $css["color-main-faint"] !!};
-    border-left: 2px {!! $css["color-main-off"] !!} solid;
+    border-left: 0px none;
     overflow-x: hidden;
-    padding-top: 60px;
+    padding-top: 56px;
     transition: 0.5s;
+	color: {!! $css["color-nav-text"] !!};
+    background: {!! $css["color-main-faint"] !!};
+    border-left: 0px none;
+    box-shadow: none;
 }
 #mySidenav a {
     padding: 10px 20px;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 18px;
     color: {!! $css["color-main-link"] !!};
     display: block;
     transition: 0.3s
 }
-#mySidenav a:hover, .offcanvas a:focus{
-    color: {!! $css["color-main-on"] !!};
-    background: {!! $css["color-main-bg"] !!};
+#mySidenav a:hover {
+	color: {!! $css["color-nav-text"] !!};
+	background: {!! $css["color-nav-bg"] !!};
 }
 #main {
     transition: margin-right .5s;
@@ -368,6 +370,12 @@ input.nFormBtnSub, input.nFormBtnBack {
 input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
     width: 400px;
 }
+.form-control.input-xs {
+    height: 23px;
+    padding: 0px 3px;
+    margin: 0px;
+    font-size: 10pt;
+}
 .nodeSub, .nodeWrap.w100 label, .nodeWrap.w100 .nPrompt, .nodeWrap.w100 .nPrompt label {
     width: 100%;
 }
@@ -558,7 +566,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	-moz-border-radius: 20px; border-radius: 20px;
 }
 .slReport {
-    font-size: 14pt;
+    font-size: 12pt;
 }
 .reportSectHead, .reportSectHead2, 
 .slReport .reportSectHead, .slReport .reportSectHead2 {
@@ -578,7 +586,11 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	width: 100%;
 	margin-bottom: 40px;
 }
-.reportBlock div span, .reportBlock table tr td span, 
+.reportBlock .row {
+    margin: 0px 5px;
+    padding: 10px 0px;
+}
+.reportBlock div span, .reportBlock div div span, .reportBlock div div div span, .reportBlock table tr td span, 
 .slReport .reportBlock div span, .slReport .reportBlock table tr td span {
 	color: {!! $css["color-main-grey"] !!};
 }
@@ -592,7 +604,6 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 .reportMiniBlockDeets, .slReport .reportMiniBlockDeets {
     display: block;
     width: 100%;
-    font-size: 12pt;
     padding-bottom: 20px;
 }
 
@@ -667,15 +678,30 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     color: {!! $css["color-success-on"] !!};
 }
 
-.circleBtn1 {
-	color: {!! $css["color-main-on"] !!};
-	opacity:0.50; filter:alpha(opacity=50);
+.circleBtn1, .circleBtn0, .circleBtn2 {
 	text-align: center;
 	width: 34px;
 	height: 34px;
+	font-size: 18px;
 	-moz-border-radius: 17px; border-radius: 17px;
-	padding: 7px 3px 0px 3px;
-	margin: -8px 5px 0px 0px;
+	padding: 3px 1px 0px 1px;
+	margin: -10px 0px 0px 0px;
+}
+.circleBtn0 {
+	width: 50px;
+	height: 50px;
+	font-size: 25px;
+	-moz-border-radius: 25px; border-radius: 25px;
+	padding: 5px 1px 0px 1px;
+	margin: -15px 0px 0px 0px;
+}
+.circleBtn2 {
+	width: 20px;
+	height: 20px;
+	font-size: 10px;
+	-moz-border-radius: 10px; border-radius: 10px;
+	padding: 2px 1px 0 1px;
+	margin: -4px 0px 0px 0px;
 }
 
 
@@ -772,19 +798,21 @@ label { font-weight: normal; }
 .navVertLine2 {
     height: 30px;
 }
-.navDeskMaj.completed .stepNum {
+.navDeskMaj.completed .stepNum, .navDeskMin.completed .stepNum {
 	color: {!! $css["color-main-off"] !!};
 	background: {!! $css["color-main-bg"] !!};
 	border: 1px {!! $css["color-main-off"] !!} solid;
 }
-.navDeskMaj.active .stepNum {
+.navDeskMaj.active .stepNum, .navDeskMin.active .stepNum {
 	color: {!! $css["color-main-on"] !!};
 	background: {!! $css["color-main-faint"] !!};
 	border: 1px {!! $css["color-main-on"] !!} solid;
 	box-shadow: 0px 0px 2px {!! $css["color-main-faint"] !!};
 }
 .navDeskMaj.active .navVertLine, .navDeskMaj.completed .navVertLine, 
-.navDeskMaj.active .navVertLine2, .navDeskMaj.completed .navVertLine2 {
+.navDeskMaj.active .navVertLine2, .navDeskMaj.completed .navVertLine2
+.navDeskMin.active .navVertLine, .navDeskMin.completed .navVertLine, 
+.navDeskMin.active .navVertLine2, .navDeskMin.completed .navVertLine2 {
 	border-left: 1px {!! $css["color-main-on"] !!} solid;
 }
 .minorNavWrap {
@@ -910,52 +938,6 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 
 
 
-.heroImgWrap {
-    width: 100%;
-    height: 50%;
-}
-.heroImg {
-    width: 100%;
-    height: 100%;
-    background-image:url('/survloop/spacer.gif');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    position: relative;
-}
-.heroImg .heroAction {
-    text-align: center;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-}
-.heroImg .heroAction .heroActionInner {
-    margin-left: -50px;
-    margin-right: -50px;
-}
-.heroImg .heroAction .heroActionInner h1 {
-    font-size: 42px;
-    margin-top: -20px;
-	color: {!! $css["color-main-on"] !!};
-    text-shadow: 0px 0px 3px {!! $css["color-main-bg"] !!};
-    line-height: 1.214285715;
-}
-.heroImg .heroAction .heroActionInner h4 {
-    font-size: 24px;
-	color: {!! $css["color-main-on"] !!};
-    text-shadow: 0px 0px 3px {!! $css["color-main-bg"] !!};
-    line-height: 1.214285715;
-}
-.heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover, 
-.heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover, 
-.heroActionInner a:link, .heroActionInner a:visited, .heroActionInner a:active, .heroActionInner a:hover, 
-.heroActionInner a.btn-primary:link, .heroActionInner a.btn-primary:visited, .heroActionInner a.btn-primary:active, .heroActionInner a.btn-primary:hover {
-    font-size: 38px;
-    box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!};
-}
-
 .imgTmb {
     width: 150px;
     height: 150px;
@@ -981,24 +963,12 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 
 
 @media screen and (max-width: 1200px) {
-    
-    .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 50px; }
-    .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
-        font-size: 28px;
-        padding: 7px 14px;
-    }
-    
+        
 }
 @media screen and (max-width: 992px) {
     
 	#navDesktop { display: none; }
 	#navMobile { display: block; }
-	
-    .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 36px; margin-top: -20px; }
-    .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
-        font-size: 26px;
-        padding: 5px 10px;
-    }
     
 }
 @media screen and (max-width: 768px) {
@@ -1009,31 +979,6 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
 	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
     input.otherGender { width: 240px; }
-    
-    .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
-        font-size: 24px; margin-top: -30px; line-height: 1.1071428575; letter-spacing: -0.02em;
-    }
-    .heroImg .heroAction h4, .heroImg .heroAction .heroActionInner h4 {
-        font-size: 16px; line-height: 1.1071428575; letter-spacing: -0.02em;
-    }
-    .heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover {
-        font-size: 24px;
-    }
-    
-    @media screen and (max-height: 460px) {
-        .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
-            margin-top: 0px;
-        }
-    }
-    @media screen and (max-height: 300px) {
-        .heroImg .heroAction h1, .heroImg .heroAction .heroActionInner h1 {
-            margin-top: 30px;
-            font-size: 20px;
-        }
-        .heroImg .heroAction .heroActionInner a:link, .heroImg .heroAction .heroActionInner a:visited, .heroImg .heroAction .heroActionInner a:active, .heroImg .heroAction .heroActionInner a:hover {
-            font-size: 12px;
-        }
-    }
     
 }
 @media screen and (max-width: 480px) {
@@ -1093,21 +1038,6 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
 	.jumbotron { padding: 20px; }
 	
-    @media screen and ( max-height: 600px ){
-        .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 24px; margin-top: 0px; }
-        .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
-            font-size: 16px;
-            padding: 5px 10px;
-        }
-    }
-    @media screen and ( max-height: 300px ){
-        .heroImg .heroAction h1, .heroImg .heroAction h1 { font-size: 18px; margin-top: 0px; }
-        .heroImg .heroAction a:link, .heroImg .heroAction a:visited, .heroImg .heroAction a:active, .heroImg .heroAction a:hover {
-            font-size: 14px;
-            padding: 3px 6px;
-        }
-    }
-    
 }
 
 
@@ -1248,6 +1178,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .m0 { margin: 0px; } .mL0 { margin-left: 0px; } .mR0 { margin-right: 0px; } .mT0 { margin-top: 0px; } .mB0 { margin-bottom: 0px; }
 .m5 { margin: 5px; } .mL5 { margin-left: 5px; } .mR5 { margin-right: 5px; } .mT5 { margin-top: 5px; } .mB5 { margin-bottom: 5px; }
 .m10 { margin: 10px; } .mL10 { margin-left: 10px; } .mR10 { margin-right: 10px; } .mT10 { margin-top: 10px; } .mB10 { margin-bottom: 10px; }
+.m15 { margin: 15px; } .mL15 { margin-left: 15px; } .mR10 { margin-right: 15px; } .mT10 { margin-top: 15px; } .mB10 { margin-bottom: 15px; }
 .m20 { margin: 20px; } .mL20 { margin-left: 20px; } .mR20 { margin-right: 20px; } .mT20 { margin-top: 20px; } .mB20 { margin-bottom: 20px; }
 .m40 { margin: 40px; } .mL40 { margin-left: 40px; } .mR40 { margin-right: 40px; } .mT40 { margin-top: 40px; } .mB40 { margin-bottom: 40px; }
 .mLn5 { margin-left: -5px; } .mRn5 { margin-right: -5px; } .mTn5 { margin-top: -5px; } .mBn5 { margin-bottom: -5px; }
@@ -1290,6 +1221,11 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
+a.label, a.label:link, a.label:visited, a.label:active, a.label:hover, 
+a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:visited, a.label.label-primary:hover {
+    color: {!! $css["color-main-bg"] !!};
+}
+
 .blk { color: {!! $css["color-main-text"] !!}; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: {!! $css["color-main-bg"] !!}; }
 .red, .redDrk, h1.red, h2.red, h3.red, label .red { color: {!! $css["color-danger-on"] !!}; font-weight: 100; }
@@ -1306,6 +1242,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 
 .brd { border: 1px {!! $css["color-main-off"] !!} solid; }
 .brdDash { border: 1px {!! $css["color-main-off"] !!} dashed; }
+.brdDashGrey { border: 1px {!! $css["color-main-grey"] !!} dashed; }
 .brdDrk { border: 1px {!! $css["color-main-on"] !!} solid; }
 .brdLgt { border: 1px {!! $css["color-main-off"] !!} solid; }
 .brdRed { border: 1px {!! $css["color-danger-on"] !!} solid; }
@@ -1364,7 +1301,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 	color: {!! $css["color-success-off"] !!};
 }
 
-.slGrey, .slGray {
+.slGrey, a.slGray:link, a.slGray:active, a.slGray:visited, a.slGray:hover {
     color: {!! $css["color-main-grey"] !!};
 }
 .infoOn {

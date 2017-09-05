@@ -57,9 +57,13 @@ class SurvLoop extends Controller
     {
         $this->dbID = $dbID;
         $this->treeID = $treeID;
-        $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
-        $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $dbID, $treeID, $treeID);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $this->isAdmin(), $dbID, $treeID, $treeID);
         return true;
+    }
+    
+    protected function isAdmin()
+    {
+        return (Auth::user() && Auth::user()->hasRole('administrator'));
     }
     
     protected function loadTreeByID($request, $treeID = -3, $skipChk = false)
@@ -68,7 +72,7 @@ class SurvLoop extends Controller
             $tree = SLTree::find($treeID);
             if ($tree && isset($tree->TreeOpts)) {
                 if ($skipChk || $tree->TreeOpts%3 > 0 
-                    || (Auth::user() && Auth::user()->hasRole('administrator|staff|databaser|brancher|volunteer'))) {
+                    || (Auth::user() && Auth::user()->hasRole('administrator|staff|databaser|volunteer'))) {
                     $this->syncDataTrees($request, $tree->TreeDatabase, $treeID);
                     return true;
                 }
@@ -79,7 +83,10 @@ class SurvLoop extends Controller
     
     protected function loadTreeBySlug(Request $request, $treeSlug = '', $page = false)
     {
-        if ($this->topCheckCache($request)) return $this->pageContent;
+        if ($this->topCheckCache($request) && (!$request->has('edit') || intVal($request->get('edit')) != 1 
+            || !$this->isAdmin())) {
+            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
+        }
         if (trim($treeSlug) != '') {
             $urlTrees = [];
             if (!$page) {
@@ -96,6 +103,11 @@ class SurvLoop extends Controller
             if ($urlTrees && sizeof($urlTrees) > 0) {
                 foreach ($urlTrees as $urlTree) {
                     if ($urlTree && isset($urlTree->TreeOpts)) {
+                        if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
+                            echo '<script type="text/javascript"> window.location="/dashboard/page/' 
+                                . $urlTree->TreeID . '?all=1&refresh=1"; </script>';
+                            exit;
+                        }
                         if ($urlTree->TreeOpts%3 > 0) {
                             $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
                             return true;
@@ -138,6 +150,12 @@ class SurvLoop extends Controller
         return $this->custLoop->index($request, $type, $val);
     }
     
+    public function processEmailConfirmToken(Request $request, $token = '', $tokenB = '')
+    { 
+        $this->loadLoop($request);
+        return $this->custLoop->processEmailConfirmToken($request, $token, $tokenB);
+    }
+    
     public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
@@ -159,7 +177,7 @@ class SurvLoop extends Controller
                     if ($urlTree && isset($urlTree->TreeOpts) && $urlTree->TreeOpts%3 > 0) {
                         $rootNode = SLNode::find($urlTree->TreeFirstPage);
                         if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes;
+                            $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1';
                             return redirect($this->domainPath . $redir);
                         }
                     }
@@ -177,7 +195,7 @@ class SurvLoop extends Controller
             if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0) { // then simple page which can be cached
                 $this->topSaveCache();
             }
-            return $this->pageContent;
+            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -185,18 +203,25 @@ class SurvLoop extends Controller
     
     public function loadPageHome(Request $request)
     {
-        if ($this->topCheckCache($request)) return $this->pageContent;
+        if ($this->topCheckCache($request)) {
+            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
+        }
         $this->loadDomain();
         $urlTree = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
             . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
         if ($urlTree && sizeof($urlTree) > 0 && isset($urlTree[0]->TreeOpts)) { //  && isset($urlTree[0]->TreeOpts)
+            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
+                echo '<script type="text/javascript"> window.location="/dashboard/page/' 
+                    . $urlTree[0]->TreeID . '?all=1&refresh=1"; </script>';
+                exit;
+            }
             $this->syncDataTrees($request, $urlTree[0]->TreeDatabase, $urlTree[0]->TreeID);
             $this->loadLoop($request);
             $this->pageContent = $this->custLoop->index($request);
             if ($urlTree[0]->TreeOpts%29 > 0) { // then simple page which can be cached
                 $this->topSaveCache();
             }
-            return $this->pageContent;
+            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
         }
         
         // else Home Page not found, so let's quickly create one
@@ -205,6 +230,18 @@ class SurvLoop extends Controller
         $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
         $this->loadLoop($request);
         return $this->custLoop->index($request);
+    }
+    
+    protected function addAdmCodeToPage($pageContent)
+    {
+        $extra = '';
+        if (Auth::user() && isset(Auth::user()->id) && Auth::user()->hasRole('administrator')) {
+            $extra .= ' addTopNavItem("<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>", "?edit=1"); ';
+        }
+        if (trim($extra) != '') {
+            $extra = '<script type="text/javascript"> ' . $extra . ' </script>';
+        }
+        return str_replace("</body>", $extra . "\n</body>", $pageContent);
     }
     
     public function testRun(Request $request)
@@ -333,6 +370,36 @@ class SurvLoop extends Controller
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
+    }
+    
+    public function fullByID(Request $request, $treeSlug, $cid, $ComSlug = '')
+    {
+        $GLOBALS["fullAccess"] = true;
+        return $this->byID($request, $treeSlug, $cid, $ComSlug = '');
+    }
+        
+    public function pdfByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["isPrintPDF"] = true;
+        return $this->byID($request, $treeSlug, $cid);
+    }
+    
+    public function fullPdfByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["fullAccess"] = true;
+        return $this->pdfByID($request, $treeSlug, $cid);
+    }
+    
+    public function fullXmlByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["fullAccess"] = true;
+        return $this->xmlByID($request, $treeSlug, $cid);
+    }
+    
+    public function tokenByID(Request $request, $treeSlug, $cid, $token)
+    {
+        $GLOBALS["idToken"] = trim($token);
+        return $this->byID($request, $treeSlug, $cid);
     }
     
     public function xmlAll(Request $request, $treeSlug = '')
@@ -584,6 +651,28 @@ class SurvLoop extends Controller
         if (trim($this->cacheKey) == '') $this->topGenCacheKey();
         Storage::put($this->cacheKey, $this->pageContent);
         return true;
+    }
+    
+    
+    public function jsLoadMenu(Request $request)
+    {
+        $ret = '';
+        if (Auth::user() && isset(Auth::user()->id)) {
+            $userName = Auth::user()->name;
+            if (strpos($userName, 'Session#') !== false) {
+                $userName = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
+            }
+            $ret .= "addTopNavItem('" . $userName . "', '/my-profile\" id=\"loginLnk'); ";
+            if (Auth::user()->hasRole('administrator')) {
+                $ret .= 'addTopNavItem("Dashboard", "/dashboard"); ';
+                $ret .= 'addSideNavItem("Admin Dashboard", "/dashboard"); ';
+            }
+            $ret .= 'addSideNavItem("My Profile", "/my-profile"); addSideNavItem("Logout", "/logout"); ';
+        } else {
+            $ret .= "addTopNavItem('Sign Up', '/register\" id=\"loginLnk'); addTopNavItem('Login', '/login'); ";
+            $ret .= 'addSideNavItem("Login", "/login"); addSideNavItem("Sign Up", "/register"); ';
+        }
+        return '<script type="text/javascript"> ' . $ret . ' </script>';
     }
     
     

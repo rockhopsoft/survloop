@@ -6,13 +6,15 @@ $(document).on("click", ".adminNodeExpand", function() {
     window.location='#n'+nID+'';
     return true;
 });
-$(document).on("click", ".adminNodeShowBtns", function() {
+$(document).on("click", ".circleBtn", function() {
     var nID = $(this).attr("id").replace("showBtns", "");
     if (document.getElementById("showBtns"+nID+"") && document.getElementById("nodeBtns"+nID+"")) {
         if (document.getElementById("nodeBtns"+nID+"").style.display=='inline') {
             document.getElementById("nodeBtns"+nID+"").style.display='none';
+            document.getElementById("nodeBtns"+nID+"edit").className='slGrey';
         } else {
             document.getElementById("nodeBtns"+nID+"").style.display='inline';
+            document.getElementById("nodeBtns"+nID+"edit").className='slBlueDark';
         }
     }
     return true;

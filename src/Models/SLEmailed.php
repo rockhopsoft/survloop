@@ -13,10 +13,11 @@ class SLEmailed extends Model
         'EmailedTree', 
         'EmailedRecID', 
         'EmailedEmailID', 
-        'EmailedDate', 
         'EmailedTo', 
+        'EmailedToUser', 
         'EmailedFromUser', 
-        'EmailedCustomSpots', 
+        'EmailedSubject', 
+        'EmailedBody', 
         'EmailedOpts',  
     ];
     

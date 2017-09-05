@@ -12,7 +12,6 @@ class SLEmails extends Model
     protected $fillable = [
         'EmailTree', 
         'EmailType', 
-        'EmailCustomSpots', 
         'EmailName', 
         'EmailSubject', 
         'EmailBody', 

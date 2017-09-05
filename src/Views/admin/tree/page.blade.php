@@ -42,10 +42,10 @@
     <a class="btn btn-default pull-right mL10" href="/dashboard/pages/list"
         ><i class="fa fa-newspaper-o"></i> List of Pages</a>
     <span class="slGrey">
-        A user experience is created as a tree filled with branching nodes. Click an ID# to edit any node. 
+        A page is also created as a tree filled with branching nodes. 
+        Click any node's button (with the icons) to edit, add new nodes, or to move a node. 
         Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
-        Click <i class="fa fa fa-dot-circle-o"></i> to add new nodes, or to move a node. 
-        <a id="adminAboutTog" href="javascript:void(0)">Read more about pages.</a>
+        <a class="adminAboutTog" href="javascript:void(0)">Read more about pages.</a>
     </span>
 </div>
 

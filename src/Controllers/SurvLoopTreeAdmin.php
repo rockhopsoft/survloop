@@ -32,7 +32,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
         }
         $this->canEditTree = false;
     	if ($this->v["user"] && isset($this->v["user"]->id)) {
-    		$this->canEditTree = $this->v["user"]->hasRole('administrator|brancher');
+    		$this->canEditTree = $this->v["user"]->hasRole('administrator|databaser');
     	}
         return true;
     }
@@ -59,6 +59,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             }
             $node->nodeType = $node->nodeRow->NodeType;
         }
+        //echo '<pre>'; print_r($node->dataManips); echo '</pre>';
         if ($GLOBALS["SL"]->REQ->has('sub') && $this->canEditTree) {
             if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
@@ -145,8 +146,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                     $GLOBALS["SL"]->dataLoops[$loop]->save();
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'cycle') {
+                    $loop = trim($GLOBALS["SL"]->REQ->input('nodeDataCycle'));
                     $node->nodeRow->NodeType        = 'Loop Cycle';
-                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->input('nodeDataCycle'));
+                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . $loop;
+                    if (trim($node->nodeRow->NodeDataBranch) == '' && $loop != '') {
+                        $node->nodeRow->NodeDataBranch = $GLOBALS["SL"]->getLoopTable($loop);
+                    }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'sort') {
                     $node->nodeRow->NodeType        = 'Loop Sort';
                     $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->input('nodeDataSort'));
@@ -214,11 +219,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->dropDownSuggest);
                     }
                     $newResponses = array();
-                    if (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto') {
-                        if (trim($GLOBALS["SL"]->REQ->input('responseLoopItems')) != '') {
-                            $node->nodeRow->NodeResponseSet 
-                                = 'LoopItems::'.$GLOBALS["SL"]->REQ->input('responseLoopItems');
-                        } elseif (trim($GLOBALS["SL"]->REQ->input('responseDefinition')) != '') {
+                    if (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-def') {
+                        if (trim($GLOBALS["SL"]->REQ->input('responseDefinition')) != '') {
                             $node->nodeRow->NodeResponseSet 
                                 = 'Definition::'.$GLOBALS["SL"]->REQ->input('responseDefinition');
                             $defs = SLDefinitions::where('DefSet', 'Value Ranges')
@@ -238,6 +240,15 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                 }
                             }
                         }
+                    } elseif (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-loop') {
+                        if (trim($GLOBALS["SL"]->REQ->input('responseLoopItems')) != '') {
+                            $node->nodeRow->NodeResponseSet 
+                                = 'LoopItems::'.$GLOBALS["SL"]->REQ->input('responseLoopItems');
+                        }
+                    } elseif (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-tbl') {
+                        if (trim($GLOBALS["SL"]->REQ->input('responseTables')) != '') {
+                            $node->nodeRow->NodeResponseSet = 'Table::'.$GLOBALS["SL"]->REQ->input('responseTables');
+                        }
                     } else {
                         $node->nodeRow->NodeResponseSet = '';
                         for ($i=0; $i < 20; $i++) {
@@ -248,8 +259,9 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                     "value" => ((trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) != '') 
                                         ? trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) 
                                         : trim($GLOBALS["SL"]->REQ->input('response'.$i.''))), 
-                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'ShowKids')) : 0),
+                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')
+                                        && $GLOBALS["SL"]->REQ->has('kidForkSel'.$i.'')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->input('kidForkSel'.$i.'')) : 0),
                                     "mutEx" => (($GLOBALS["SL"]->REQ->has('response'.$i.'MutEx')) 
                                         ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'MutEx')) : 0)
                                 ];
@@ -266,7 +278,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 if (in_array($GLOBALS["SL"]->REQ->nodeType, ['instruct', 'instructRaw', 'layout'])
                     && $node->nodeRow->NodeOpts%71 == 0) {
                     $node->nodeRow->NodeDefault = $GLOBALS["SL"]->REQ->get('blockBG') . ';;' 
-                        . $GLOBALS["SL"]->REQ->get('blockText') . ';;' . $GLOBALS["SL"]->REQ->get('blockLink');
+                        . $GLOBALS["SL"]->REQ->get('blockText') . ';;' 
+                        . $GLOBALS["SL"]->REQ->get('blockLink') . ';;' 
+                        . $GLOBALS["SL"]->REQ->get('blockImg') . ';;' 
+                        . $GLOBALS["SL"]->REQ->get('blockImgType') . ';;' 
+                        . (($GLOBALS["SL"]->REQ->has('blockImgFix') && $GLOBALS["SL"]->REQ->get('blockImgFix') == 'Y') 
+                            ? 'Y' : 'N') . ';;'
+                        . $GLOBALS["SL"]->REQ->get('blockAlign') . ';;'
+                        . $GLOBALS["SL"]->REQ->get('blockHeight');
                 }
                 $node->nodeRow->NodeTree = $this->treeID;
                 $node->nodeRow->save();
@@ -309,7 +328,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 if (($GLOBALS["SL"]->REQ->has('oldConds') && intVal($GLOBALS["SL"]->REQ->oldConds) > 0) 
-                    || ($GLOBALS["SL"]->REQ->has('condHash') && trim($GLOBALS["SL"]->REQ->condHash) != '')) {
+                    || ($GLOBALS["SL"]->REQ->has('condHash') && trim($GLOBALS["SL"]->REQ->condHash) != ''
+                        && trim($GLOBALS["SL"]->REQ->condHash) != '#')) {
                     $newCond = $GLOBALS["SL"]->saveEditCondition($this->REQ);
                     $newLink = new SLConditionsNodes;
                     $newLink->CondNodeCondID = $newCond->CondID;
@@ -366,13 +386,15 @@ class SurvLoopTreeAdmin extends SurvFormTree
             ->distinct()
             ->orderBy('DefSubset', 'asc')
             ->get();
-        $currDefinition = $currLoopItems = '';
-        if (isset($node->nodeRow->NodeResponseSet) 
-            && strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
-            $currDefinition = str_replace('Definition::', '', $node->nodeRow->NodeResponseSet);
-        } elseif (isset($node->nodeRow->NodeResponseSet) 
-            && strpos($node->nodeRow->NodeResponseSet, 'LoopItems::') !== false) {
-            $currLoopItems = str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet);
+        $currDefinition = $currLoopItems = $currTblRecs = '';
+        if (isset($node->nodeRow->NodeResponseSet)) {
+            if (strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
+                $currDefinition = str_replace('Definition::', '', $node->nodeRow->NodeResponseSet);
+            } elseif (strpos($node->nodeRow->NodeResponseSet, 'LoopItems::') !== false) {
+                $currLoopItems = str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet);
+            } elseif (strpos($node->nodeRow->NodeResponseSet, 'Table::') !== false) {
+                $currTblRecs = str_replace('Table::', '', $node->nodeRow->NodeResponseSet);
+            }
         }
         $nodeTypeSel = (($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
             && $node->nodeRow->NodeID == $GLOBALS["SL"]->treeRow->TreeRoot) ? ' DISABLED ' : '');
@@ -386,7 +408,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             ->get();
         if ($chk && sizeof($chk) > 0) {
             foreach ($chk as $u) {
-                if ($u->hasRole('administrator|staff|brancher|databaser')) {
+                if ($u->hasRole('administrator|staff|databaser')) {
                     $emailUsers["admin"][] = [$u->id, $u->email, $u->name];
                 } elseif ($u->hasRole('volunteer')) {
                     $emailUsers["volun"][] = [$u->id, $u->email, $u->name];
@@ -408,19 +430,25 @@ class SurvLoopTreeAdmin extends SurvFormTree
             ->select('TreeID', 'TreeName')
             ->orderBy('TreeName', 'asc')
             ->get();
+        $childNodes = SLNode::where('NodeParentID', $node->nodeRow->NodeID)
+            ->orderBy('NodeParentOrder', 'asc')
+            ->get();
         $this->addCondEditorAjax();
         if ($node->isInstruct()) $this->v["needsWsyiwyg"] = true;
         $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.admin.tree.node-edit-java', [
             "node"           => $node, 
             "resLimit"       => $resLimit
             ])->render();
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-edit-ajax', [])->render();
+        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-edit-ajax', [
+            "node"           => $node
+            ])->render();
         return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 
             "treeID"         => $this->treeID, 
             "node"           => $node, 
             "currDefinition" => $currDefinition, 
             "currLoopItems"  => $currLoopItems, 
+            "currTblRecs"    => $currTblRecs, 
             "nodeTypes"      => $this->nodeTypes, 
             "REQ"            => $this->REQ, 
             "resLimit"       => $resLimit, 
@@ -429,6 +457,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "widgetEmail"    => $widgetEmail,
             "emailList"      => $emailList,
             "treeList"       => $treeList,
+            "childNodes"     => $childNodes,
             "dataBranchDrop" => $GLOBALS["SL"]->tablesDropdown($branch, 
                 'select database table to create deeper or more explicit data linkages')
         ]);
@@ -476,7 +505,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 $conditionList = (sizeof($this->allNodes[$tierNode[0]]->conds) == 0) ? ''
-                    : '<span class="slBlueDark mL10">' 
+                    : '<span class="slGreenDark mL10"><i class="fa fa-filter" aria-hidden="true"></i>' 
                         . view('vendor.survloop.admin.tree.node-list-conditions', [
                             "conds"      => $this->allNodes[$tierNode[0]]->conds,
                             "nID"        => $tierNode[0],
@@ -505,7 +534,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         "canEditTree"    => $this->canEditTree, 
                         "isPrint"        => $this->v["isPrint"],
                         "isAll"          => $this->v["isAll"],
-                        "isAlt"          => $this->v["isAlt"]
+                        "isAlt"          => $this->v["isAlt"],
+                        "instructPrint"  => (($this->allNodes[$tierNode[0]]->isInstruct() 
+                            || $this->allNodes[$tierNode[0]]->isInstructRaw()) 
+                            ? $this->printNodePublic($tierNode[0]) : '')
                     ])->render();
                 }
             }
@@ -529,14 +561,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if ($pubPrint) {
             return $this->adminBasicPrintNode($this->nodeTiers, -1);
         }
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
-            "canEditTree"     => $this->canEditTree
-        ])->render();
         return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint"     => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"         => $this->canEditTree,
             "isPrint"             => $this->v["isPrint"]
-        ])->render();
+            ])->render() . '<script type="text/javascript"> $(document).ready(function(){ ' 
+            . view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
+                "canEditTree"         => $this->canEditTree
+            ])->render() . ' }); </script>';
     }
     
     

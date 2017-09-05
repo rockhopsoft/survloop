@@ -5,6 +5,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
+use App\Models\SLFields;
 
 use SurvLoop\Controllers\CoreNode;
 
@@ -103,10 +104,8 @@ class SurvLoopNode extends CoreNode
                 ->orderBy('NodeResOrd', 'asc')
                 ->get();
             if (sizeof($this->responses) > 0) {
-                foreach ($this->responses as $res) {
-                    if (intVal($res->NodeResShowKids) == 1) {
-                        $this->hasShowKids = true;
-                    }
+                foreach ($this->responses as $j => $res) {
+                    if (intVal($res->NodeResShowKids) > 0) $this->hasShowKids = true;
                 }
             }
             $this->dataManips = SLNode::where('NodeParentID', $this->nodeID)
@@ -124,6 +123,7 @@ class SurvLoopNode extends CoreNode
                 $this->extraOpts["emailBCC"] = $GLOBALS["SL"]->mexplode(',', $bcc);
             }
         }
+        $this->isPageBlock();
         return true;
     }
     
@@ -143,7 +143,7 @@ class SurvLoopNode extends CoreNode
         if (sizeof($this->responses) > 0) {
             foreach ($this->responses as $res) {
                 if ($res->NodeResValue == $responseVal) {
-                    if (intVal($res->NodeResShowKids) == 1) return true;
+                    if (intVal($res->NodeResShowKids) > 0) return true;
                     return false;
                 }
             }
@@ -154,7 +154,14 @@ class SurvLoopNode extends CoreNode
     public function indexShowsKid($ind = '')
     {
         return (sizeof($this->responses) > 0 && isset($this->responses[$ind]) 
-            && intVal($this->responses[$ind]->NodeResShowKids) == 1);
+            && intVal($this->responses[$ind]->NodeResShowKids) > 0);
+    }
+    
+    public function indexShowsKidNode($ind = '')
+    {
+        if (sizeof($this->responses) == 0 || !isset($this->responses[$ind])
+            || !isset($this->responses[$ind]->NodeResShowKids)) return -3;
+        return intVal($this->responses[$ind]->NodeResShowKids);
     }
     
     public function indexMutEx($ind = '')
@@ -176,6 +183,19 @@ class SurvLoopNode extends CoreNode
     {
         if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
         return $this->splitTblFld($this->dataStore);
+    }
+    
+    public function getTblFldID()
+    {
+        list($tbl, $fld) = $this->getTblFld();
+        if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
+            $fldRow = SLFields::select('FldID')
+                ->where('FldTable', $this->tblI[$tbl])
+                ->whereIn('FldName', [$fld, str_replace($this->tblAbbr[$tbl], '', $fld)])
+                ->first();
+            if ($fldRow && isset($fldRow->FldID)) return $fldRow->FldID;
+        }
+        return -3;
     }
     
     public function nodePreview()
@@ -349,9 +369,14 @@ class SurvLoopNode extends CoreNode
     {
         if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '') {
             $colors = explode(';;', $this->nodeRow->NodeDefault);
-            if (isset($colors[0])) $this->colors["blockBG"]   = $colors[0];
-            if (isset($colors[1])) $this->colors["blockText"] = $colors[1];
-            if (isset($colors[2])) $this->colors["blockLink"] = $colors[2];
+            if (isset($colors[0])) $this->colors["blockBG"]      = $colors[0];
+            if (isset($colors[1])) $this->colors["blockText"]    = $colors[1];
+            if (isset($colors[2])) $this->colors["blockLink"]    = $colors[2];
+            if (isset($colors[3])) $this->colors["blockImg"]     = $colors[3];
+            if (isset($colors[4])) $this->colors["blockImgType"] = $colors[4];
+            if (isset($colors[5])) $this->colors["blockImgFix"]  = $colors[5];
+            if (isset($colors[6])) $this->colors["blockAlign"]   = $colors[6];
+            if (isset($colors[7])) $this->colors["blockHeight"]  = $colors[7];
         }
         return true;
     }

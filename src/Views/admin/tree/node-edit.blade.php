@@ -64,13 +64,40 @@
         <div id="hasInstruct" class="mTn20 
             @if ($node->isInstruct() || $node->isInstructRaw()) disBlo @else disNon @endif ">
             <div class="nFld w100">
-                <textarea name="nodeInstruct" id="nodeInstructID" 
-                    @if ($node->isInstruct()) class="nPrompt" style="height: 450px;"
-                    @else class="form-control w100" style="height: 250px; font-family: Courier New;"
-                    @endif autocomplete="off" >@if (isset($node->nodeRow->NodePromptText) ){!! 
-                        $node->nodeRow->NodePromptText !!}@endif</textarea>
+                @if ($node->isInstruct()) 
+                    <textarea name="nodeInstruct" id="nodeInstructID" class="form-control w100" autocomplete="off"
+                        style="height: 450px; font-family: Courier New;">@if (isset($node->nodeRow->NodePromptText)){!! 
+                            $node->nodeRow->NodePromptText !!}@endif</textarea>
+                    <script>tinymce.init({ selector:'#nodeInstructID' });</script>
+                    <?php /* <style> #tinymce {
+                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') text-align: center; 
+                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') text-align: right; 
+                        @endif
+                    } </style> */ ?>
+                    <?php /* <div name="nodeInstruct" id="nodeInstructID" class="brdDashGrey nPrompt 
+                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') taC 
+                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') taR 
+                        @endif " autocomplete="off"
+                        style="height: 450px; width: 100%; overflow: auto;" 
+                        >@if (isset($node->nodeRow->NodePromptText)){!! 
+                            $node->nodeRow->NodePromptText !!}@endif</div>
+                    <style> .ql-editor, #nodeInstructID .ql-editor {
+                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') text-align: center; 
+                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') text-align: right; 
+                        @endif
+                    } </style> */ ?>
+                            
+                    <?php /* <trix-editor input="nodeInstructID" class="nPrompt 
+                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') taC 
+                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') taR 
+                        @endif " ></trix-editor> */ ?>
+                @else
+                    <textarea name="nodeInstruct" id="nodeInstructID" class="form-control w100" autocomplete="off"
+                        style="height: 250px; font-family: Courier New;">@if (isset($node->nodeRow->NodePromptText)){!! 
+                            $node->nodeRow->NodePromptText !!}@endif</textarea>
+                @endif
             </div>
-            <label class="w100 pT20">
+            <label class="w100 pT10 pB10">
                 <a id="extraHTMLbtn2" href="javascript:void(0)" class="f12 fL">+ HTML/JS/CSS Extras</a> 
                 <div id="extraHTML2" class="w100 fC @if (isset($node->nodeRow->NodePromptAfter) 
                     && trim($node->nodeRow->NodePromptAfter) != '') disBlo @else disNon @endif ">
@@ -82,6 +109,129 @@
                 </div>
             </label>
         </div>
+        
+        @if ($node->isPageBlock() || ($GLOBALS['SL']->treeRow->TreeType == 'Page' && $GLOBALS['SL']->REQ->has('parent') 
+            && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot))
+            <div id="isPageBlock" class=" @if ($node->canBePageBlock()) disBlo @else disNon @endif ">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <div class="panel-title">
+                            <h4 class="m0">Page Block Options</h4>
+                        </div>
+                    </div>
+                    <div class="panel-body" style="padding: 0px;">
+                        <div id="pageBlock" class="slBg slTxt p20">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <select name="opts67" id="opts67ID" class="form-control input-lg mB20" autocomplete="off">
+                                        <option value="1" @if ($node->nodeRow->NodeOpts%67 > 0) SELECTED @endif >Full Content Width</option>
+                                        <option value="67" @if ($node->nodeRow->NodeOpts%67 == 0) SELECTED @endif >Skinny Content Width</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="blockHeight" id="blockHeightID" class="form-control input-lg mB20" 
+                                        autocomplete="off">
+                                        <option value="auto" @if (!isset($node->colors["blockHeight"]) 
+                                            || $node->colors["blockHeight"] == 'auto') SELECTED @endif 
+                                            >Auto Height, Default Padding</option>
+                                        <option value="h100" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h100') SELECTED @endif 
+                                            >Full Screen Height</option>
+                                        <option value="h75" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h75') SELECTED @endif 
+                                            >75% Screen Height</option>
+                                        <option value="h66" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h66') SELECTED @endif 
+                                            >66% Screen Height</option>
+                                        <option value="h50" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h50') SELECTED @endif 
+                                            >50% Screen Height</option>
+                                        <option value="h33" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h33') SELECTED @endif 
+                                            >33% Screen Height</option>
+                                        <option value="h25" @if (isset($node->colors["blockHeight"]) 
+                                            && $node->colors["blockHeight"] == 'h25') SELECTED @endif 
+                                            >25% Screen Height</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <select name="blockAlign" id="blockAlignID" class="form-control input-lg mB20" 
+                                        autocomplete="off">
+                                        <option value="left" @if (!isset($node->colors["blockAlign"]) 
+                                            || $node->colors["blockAlign"] == 'left') SELECTED @endif 
+                                            >Align Left</option>
+                                        <option value="center" @if (isset($node->colors["blockAlign"]) 
+                                            && $node->colors["blockAlign"] == 'center') SELECTED @endif 
+                                            >Align Center</option>
+                                        <option value="right" @if (isset($node->colors["blockAlign"]) 
+                                            && $node->colors["blockAlign"] == 'right') SELECTED @endif 
+                                            >Align Right</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label class="mT10 mB10"><input type="checkbox" name="opts71" id="opts71ID" value="71" 
+                                autocomplete="off" onClick="return checkPageBlock();" 
+                                @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
+                                > <span class="fPerc133">Background</span></label>
+                            <div id="pageBlockOpts" class="pT5 
+                                @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <label for="blockBGID"><h4 class="m0">Background Color</h4></label>
+                                        {!! view('vendor.survloop.inc-color-picker', [
+                                            'fldName' => 'blockBG',
+                                            'preSel'  => ((isset($node->colors["blockBG"])) 
+                                                ? $node->colors["blockBG"] : '#000')
+                                        ])->render() !!}
+                                        <label for="blockTextID"><h4 class="m0">Text Color</h4></label>
+                                        {!! view('vendor.survloop.inc-color-picker', [
+                                            'fldName' => 'blockText',
+                                            'preSel'  => ((isset($node->colors["blockText"])) 
+                                                ? $node->colors["blockText"] : '#DDD')
+                                        ])->render() !!}
+                                        <label for="blockLinkID"><h4 id="blockLinkh4" class="m0 slTxt"
+                                            >Link Color</h4></label>
+                                        {!! view('vendor.survloop.inc-color-picker', [
+                                            'fldName' => 'blockLink',
+                                            'preSel'  => ((isset($node->colors["blockLink"])) 
+                                                ? $node->colors["blockLink"] : '#FFF')
+                                        ])->render() !!}
+                                    </div>
+                                    <div class="col-md-1"></div>
+                                    <div class="col-md-6">
+                                        <label for="blockImgID"><h4 class="m0">Background Image</h4></label>
+                                        <input type="text" class="form-control input-lg w100 mB20 mR20"
+                                            id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
+                                                ? $node->colors['blockImg'] : '') }}">
+                                        <div class="disIn mL10 mR10"><label class="disIn">
+                                            <input type="radio" name="blockImgType" id="blockImgTypeA" 
+                                                value="w100" class="mR5" autocomplete="off" onClick="return checkPageBlock();"
+                                                @if (!isset($node->colors["blockImgType"]) 
+                                                    || $node->colors["blockImgType"] == 'w100') CHECKED @endif 
+                                                    > Full-Width Image
+                                        </label></div>
+                                        <div class="disIn mL10 mR10"><label class="disIn">
+                                            <input type="radio" name="blockImgType" id="blockImgTypeB" autocomplete="off" 
+                                                value="tiles" class="mR5" onClick="return checkPageBlock();"
+                                                @if (isset($node->colors["blockImgType"]) 
+                                                    && $node->colors["blockImgType"] == 'tiles') CHECKED @endif 
+                                                    > Tiled Image
+                                        </label></div>
+                                        <label class="disBlo mT10 mL10 mR10">
+                                            <input type="checkbox" name="blockImgFix" id="blockImgFixID" autocomplete="off"
+                                                value="Y" class="mR5" onClick="return checkPageBlock();"
+                                                @if (isset($node->colors["blockImgFix"]) 
+                                                    && $node->colors["blockImgFix"] == 'Y') CHECKED @endif 
+                                                    > Fixed Position
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
         
         <div id="hasPage" class=" @if ($node->isPage()) disBlo @else disNon @endif ">
             <div class="panel panel-info">
@@ -441,11 +591,13 @@
                         <div class="row pT5 pB10">
                             <div class="col-md-5 f14">
                                 <label class="w100">
-                                    <div class="nFld mT0"><select name="manipMoreStore" id="manipMoreStoreID"
+                                    <div class="nFld mT0">
+                                        <select name="manipMoreStore" id="manipMoreStoreID"
                                         class="form-control input-lg" autocomplete="off" onClick="return checkData();" >
                                         {!! $GLOBALS['SL']->fieldsDropdown((isset($node->nodeRow->NodeDataStore)) 
                                             ? trim($node->nodeRow->NodeDataStore) : '') !!}
-                                    </select></div>
+                                        </select>
+                                    </div>
                                 </label>
                             </div>
                             <div class="col-md-1 taC">
@@ -480,9 +632,7 @@
                                                 onClick="return checkData();" >
                                             @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeDataStore))
                                                 {!! $GLOBALS['SL']->fieldsDropdown($node->dataManips[$i]->NodeDataStore) !!}
-                                            @else
-                                                {!! $GLOBALS['SL']->fieldsDropdown() !!}
-                                            @endif
+                                            @else {!! $GLOBALS['SL']->fieldsDropdown() !!} @endif
                                             </select>
                                         </div>
                                     </div>
@@ -495,9 +645,7 @@
                                                 class="form-control input-lg" @if (isset($node->dataManips[$i]) 
                                                     && isset($node->dataManips[$i]->NodeDefault))
                                                     value="{!! $node->dataManips[$i]->NodeDefault !!}"
-                                                @else
-                                                    value=""
-                                                @endif >
+                                                @else value="" @endif >
                                         </div>
                                     </div>
                                     <div class="col-md-1 taC">
@@ -509,9 +657,7 @@
                                                 class="form-control input-lg" autocomplete="off" >
                                                 @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeResponseSet))
                                                     {!! $GLOBALS['SL']->allDefsDropdown($node->dataManips[$i]->NodeResponseSet) !!}
-                                                @else
-                                                    {!! $GLOBALS['SL']->allDefsDropdown() !!}
-                                                @endif
+                                                @else {!! $GLOBALS['SL']->allDefsDropdown() !!} @endif
                                             </select>
                                         </div>
                                     </div>
@@ -777,60 +923,69 @@
                         ['Radio', 'Checkbox', 'Drop Down', 'Other/Custom'])) disBlo @else disNon @endif ">
                         <h4>Response Options Provided To User:</h4>
                         <div class="row mB20">
-                            <div class="col-md-4">
+                            <div class="col-md-6 nFld mT0">
                                 <select name="responseListType" id="responseListTypeID" class="form-control input-lg"
                                     onChange="changeResponseListType();" autocomplete="off" >
-                                    <option value="manual" 
-                                        @if ($currDefinition == '' && $currLoopItems == '') SELECTED @endif
-                                        > Manually type options below</option>
-                                    <option value="auto" 
-                                        @if ($currDefinition != '' || $currLoopItems != '') SELECTED @endif
-                                        > Automatically pull from a system list</option>
+                                    <option value="manual" @if ($currDefinition == '' && $currLoopItems == '' 
+                                        && $currTblRecs == '') SELECTED @endif > Manually type options below</option>
+                                    <option value="auto-def" @if ($currDefinition != '') SELECTED @endif
+                                        > Pull from Definition Set</option>
+                                    <option value="auto-loop" @if ($currLoopItems != '') SELECTED @endif
+                                        > Pull from Entered Loop Items</option>
+                                    <option value="auto-tbl" @if ($currTblRecs != '') SELECTED @endif
+                                        > Pull from Entered Table Records</option>
                                 <select>
                             </div>
-                            <div class="col-md-8">
-                                <div id="responseOptLists" class="
-                                    @if ($currDefinition != '' || $currLoopItems != '') disBlo @else disNon @endif">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="pull-right"><i>- or -</i></div>
-                                            <h4 class="m0">Definition Set:</h4>
-                                            <div class="nFld mT0">
-                                                <select name="responseDefinition" id="responseDefinitionID" 
-                                                    class="form-control input-lg" onChange="changeResponseListType();" 
-                                                    autocomplete="off">
-                                                    <option value="" @if ($currDefinition == '') SELECTED @endif 
-                                                        > - </option>
-                                                    @forelse ($defs as $def)
-                                                        <option value="{{ $def->DefSubset }}" 
-                                                            @if ($currDefinition == $def->DefSubset) SELECTED @endif 
-                                                            >{{ $def->DefSubset }}</option>
-                                                    @empty
-                                                    @endforelse
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <h4 class="m0">Entered Loop Items:</h4>
-                                            <div class="nFld mT0">
-                                                <select name="responseLoopItems" id="responseLoopItemsID" 
-                                                    class="form-control input-lg" onChange="changeResponseListType();" 
-                                                    autocomplete="off">
-                                                    <option value="" @if ($currLoopItems == '') SELECTED @endif 
-                                                        > - </option>
-                                                    @forelse ($GLOBALS['SL']->dataLoops as $plural => $loop)
-                                                        <option value="{{ $plural }}"
-                                                            @if ($currLoopItems == $plural) SELECTED @endif 
-                                                            >{{ $plural }}</option>
-                                                    @empty
-                                                    @endforelse
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <center><div class="mT10"><i class="slGrey">
-                                        &uarr; Please click "Save" below to apply changes to auto-lists. &uarr;
-                                    </i></div></center>
+                            <div class="col-md-6">
+                                <div id="responseOptDefs" class="nFld mT0
+                                    @if ($currDefinition != '') disBlo @else disNon @endif">
+                                    <select name="responseDefinition" id="responseDefinitionID" 
+                                        class="form-control input-lg" onChange="changeResponseListType();" 
+                                        autocomplete="off">
+                                        <option value="" @if ($currDefinition == '') SELECTED @endif 
+                                            > Select Definition Set... </option>
+                                        @forelse ($defs as $def)
+                                            @if (trim($def->DefSubset) != '')
+                                                <option value="{{ $def->DefSubset }}" 
+                                                    @if ($currDefinition == $def->DefSubset) SELECTED @endif 
+                                                    >{{ $def->DefSubset }}</option>
+                                            @endif
+                                        @empty
+                                        @endforelse
+                                    </select>
+                                </div>
+                                <div id="responseOptLoops" class="nFld mT0
+                                    @if ($currLoopItems != '') disBlo @else disNon @endif">
+                                    <select name="responseLoopItems" id="responseLoopItemsID" 
+                                        class="form-control input-lg" onChange="changeResponseListType();" 
+                                        autocomplete="off">
+                                        <option value="" @if ($currLoopItems == '') SELECTED @endif 
+                                            > Select Loop... </option>
+                                        @forelse ($GLOBALS['SL']->dataLoops as $plural => $loop)
+                                            <option value="{{ $plural }}"
+                                                @if ($currLoopItems == $plural) SELECTED @endif 
+                                                >{{ $plural }}</option>
+                                        @empty
+                                        @endforelse
+                                    </select>
+                                </div>
+                                <div id="responseOptTbls" class="nFld mT0
+                                    @if ($currTblRecs != '') disBlo @else disNon @endif">
+                                    <select name="responseTables" id="responseTablesID" 
+                                        class="form-control input-lg" onChange="changeResponseListType();" 
+                                        autocomplete="off">
+                                        <option value="" @if ($currTblRecs == '') SELECTED @endif 
+                                            > Select Data Table... </option>
+                                        @forelse ($GLOBALS['SL']->tbl as $tID => $tblName)
+                                            <option value="{{ $tblName }}"
+                                                @if ($currTblRecs == $tblName) SELECTED @endif >
+                                                @if ($GLOBALS['SL']->tblEng[$tID] != $tblName)
+                                                    {{ $GLOBALS['SL']->tblEng[$tID] }} ({{ $tblName }})
+                                                @else {{ $GLOBALS['SL']->tblEng[$tID] }} @endif
+                                                </option>
+                                        @empty
+                                        @endforelse
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -870,17 +1025,39 @@
                                     <div class="row mT5">
                                         <div class="col-md-6">
                                             <label class="mL5">
-                                                <input type="checkbox" name="response{{ $r }}ShowKids" value="1" 
+                                                <input type="checkbox"  value="1" class="showKidBox" autocomplete="off"
+                                                    name="response{{ $r }}ShowKids" id="r{{ $r }}showKID"
                                                     @if ($node->indexShowsKid($r)) CHECKED @endif >
                                                     <i title="Children displayed only with certain responses"
-                                                    class="fa fa-code-fork fa-flip-vertical mL10 fPerc133"></i>
+                                                    class="fa fa-code-fork fa-flip-vertical mL5 fPerc133"></i>
                                             </label>
+                                            <div id="kidFork{{ $r }}" class="mL5 
+                                                @if ($node->indexShowsKid($r)) disIn @else disNon @endif ">
+                                                @if (isset($childNodes) && sizeof($childNodes) > 0)
+                                                    @if (sizeof($childNodes) == 1)
+                                                        #{{ $childNodes[0]->NodeID }}
+                                                        <input type="hidden" name="kidForkSel{{ $r }}" 
+                                                            value="{{ $childNodes[0]->NodeID }}">
+                                                    @else
+                                                        <select name="kidForkSel{{ $r }}" autocomplete="off"
+                                                            class="form-control input-xs disIn" style="width: 70px;">
+                                                        @foreach ($childNodes as $k => $kidNode)
+                                                            <option value="{{ $kidNode->NodeID }}"
+                                                                @if ($node->indexShowsKidNode($r) == $kidNode->NodeID) 
+                                                                SELECTED @endif >#{{ $kidNode->NodeID }}</option>
+                                                        @endforeach
+                                                        </select>
+                                                    @endif
+                                                @else
+                                                    <input type="hidden" name="kidForkSel{{ $r }}" value="1000000000">
+                                                @endif
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label id="resMutEx{{ $r }}" class="mL5 @if (isset($node->nodeRow->NodeType) 
-                                                && $node->nodeRow->NodeType == 'Checkbox')) disBlo @else disNon @endif "><nobr>
-                                                <input type="checkbox" name="response{{ $r }}MutEx" value="1" autocomplete="off" 
-                                                    @if ($node->indexMutEx($r)) CHECKED @endif >
+                                            <label id="resMutEx{{ $r }}" class="mL5 @if (isset($node->nodeRow->NodeType)
+                                                && $node->nodeRow->NodeType == 'Checkbox')) disBlo @else disNon @endif "
+                                                ><nobr><input type="checkbox" name="response{{ $r }}MutEx" value="1" 
+                                                    @if ($node->indexMutEx($r)) CHECKED @endif autocomplete="off" >
                                                     <i class="fa fa-circle-o mL10 mR0 fPerc133"></i> 
                                                     <i class="fa fa-circle mLn5 fPerc133"></i></nobr>
                                             </label>
@@ -1249,9 +1426,7 @@
                             </div>
                             {{ $cond->CondTag }}
                             <span class="f10 mL10">{!! view('vendor.survloop.admin.db.inc-describeCondition', [
-                                "nID"  => $node->nodeID, 
-                                "cond" => $cond,
-                                "i" => $i
+                                "nID"  => $node->nodeID, "cond" => $cond, "i" => $i
                             ])->render() !!}</span>
                         </div>
                     @endforeach
@@ -1351,56 +1526,8 @@
             
         </div> <!-- end hasResponseLayout -->
         
-        @if ($node->isPageBlock() || ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
-            && $GLOBALS['SL']->REQ->has('parent') 
-            && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot))
-            <div id="isPageBlock" class=" @if ($node->canBePageBlock()) disBlo @else disNon @endif ">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            <h4 class="m0">Page Block Options</h4>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <select name="opts67" id="opts67ID" class="form-control input-lg mB20" autocomplete="off">
-                            <option value="1" @if ($node->nodeRow->NodeOpts%67 > 0) SELECTED @endif >Full Content Width</option>
-                            <option value="67" @if ($node->nodeRow->NodeOpts%67 == 0) SELECTED @endif >Skinny Content Width</option>
-                        </select>
-                        <label><input type="checkbox" name="opts71" id="opts71ID" value="71" autocomplete="off" 
-                            @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif onClick="return checkPageBlock();"
-                            > <span class="fPerc133">Full-Screen-Width Background Color Styles</span></label>
-                        <div id="pageBlockOpts" class="
-                            @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
-                            <div id="pageBlockPreview" class="taC mT10 mB10" 
-                                style="background: #FFF; color: #000; padding: 10px 20px;">
-                                <h4>Text Color</h4>
-                                <a id="pageBlockPreviewLink" href="javascript:;" style="color: #0000FF;">Link Color</a>
-                            </div>
-                            <div class="pR10 mR5">
-                                <label for="blockBGID"><h4 class="m0">Background Color</h4></label>
-                                {!! view('vendor.survloop.inc-color-picker', [
-                                    'fldName' => 'blockBG',
-                                    'preSel'  => ((isset($node->colors["blockBG"])) ? $node->colors["blockBG"] : '#000')
-                                ])->render() !!}
-                                <label for="blockTextID"><h4 class="m0">Text Color</h4></label>
-                                {!! view('vendor.survloop.inc-color-picker', [
-                                    'fldName' => 'blockText',
-                                    'preSel'  => ((isset($node->colors["blockText"])) ? $node->colors["blockText"] : '#DDD')
-                                ])->render() !!}
-                                <label for="blockLinkID"><h4 class="m0">Link Color</h4></label>
-                                {!! view('vendor.survloop.inc-color-picker', [
-                                    'fldName' => 'blockLink',
-                                    'preSel'  => ((isset($node->colors["blockLink"])) ? $node->colors["blockLink"] : '#FFF')
-                                ])->render() !!}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-        
         <label class="w100 pB20">
-            <a id="internalNotesBtn" href="javascript:void(0)" class="f12">Internal Notes</a> 
+            <a id="internalNotesBtn" href="javascript:void(0)" class="f12">+ Internal Notes</a> 
             <div id="internalNotes" class=" @if (isset($node->nodeRow->NodeInternalNotes) 
                 && trim($node->nodeRow->NodeInternalNotes) != '') disBlo @else disNon @endif ">
                 <div class="nFld mT0"><textarea name="nodeInternalNotes" autocomplete="off" 

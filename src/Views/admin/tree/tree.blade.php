@@ -50,14 +50,15 @@
                 ><i class="fa fa-align-left"></i> Hide Details</a>
         @else
             <a class="btn btn-default pull-right mL10" 
-                @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" @else href="/dashboard/tree/map?alt=1" @endif
+                @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
+                @else href="/dashboard/tree/map?alt=1" @endif
                 ><i class="fa fa-align-left"></i> Show Details</a>
         @endif
         <span class="slGrey">
-            A user experience is created as a tree filled with branching nodes. Click an ID# to edit any node. 
+            A user experience is created as a tree filled with branching nodes. 
+            Click any node's button (with the icons) to edit, add new nodes, or to move a node. 
             Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
-            Click <i class="fa fa fa-dot-circle-o"></i> to add new nodes, or to move a node. 
-            <a id="adminAboutTog" href="javascript:void(0)">Read more about these branching trees.</a>
+            <a class="adminAboutTog" href="javascript:void(0)">Read more about these branching trees.</a>
         </span>
     </div>
 @endif

@@ -1,7 +1,9 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-java.blade.php */
-@if ($node->isInstruct()) 
-    CKEDITOR.replace( 'nodeInstructID', { customConfig: '/survloop/ckeditor-config.js' } );
-@endif
+<?php /* @if ($node->isInstruct()) 
+    var trixElement = document.querySelector("trix-editor");
+    trixElement.editor.setSelectedRange([0, 0]);
+    trixElement.editor.insertHTML("{!! preg_replace("/\r|\n/", "", addslashes($node->nodeRow->NodePromptText)) !!}");
+@endif */ ?>
 function changeNodeType(newType) {
     document.getElementById('hasPage').style.display='none';
     document.getElementById('hasLoop').style.display='none';
@@ -94,14 +96,28 @@ function changeResponseType(newType) {
 }
 
 function changeResponseListType() {
-    if (!document.getElementById('responseOptLists')) return false;
-    if (document.getElementById('responseListTypeID') && document.getElementById('responseListTypeID').value == 'manual') {
-        document.getElementById('responseOptLists').style.display = 'none';
-        document.getElementById('responseDefinitionID').value='';
-        document.getElementById('responseLoopItemsID').value='';
-        return true;
+    if (document.getElementById('responseListTypeID')) {
+        if (document.getElementById('responseListTypeID').value == 'manual') {
+            document.getElementById('responseOptDefs').style.display = 'none';
+            document.getElementById('responseOptLoops').style.display = 'none';
+            document.getElementById('responseOptTbls').style.display = 'none';
+            document.getElementById('responseDefinitionID').value='';
+            document.getElementById('responseLoopItemsID').value='';
+            document.getElementById('responseTablesID').value='';
+        } else if (document.getElementById('responseListTypeID').value == 'auto-def') {
+            document.getElementById('responseOptDefs').style.display = 'block';
+            document.getElementById('responseOptLoops').style.display = 'none';
+            document.getElementById('responseOptTbls').style.display = 'none';
+        } else if (document.getElementById('responseListTypeID').value == 'auto-loop') {
+            document.getElementById('responseOptDefs').style.display = 'none';
+            document.getElementById('responseOptLoops').style.display = 'block';
+            document.getElementById('responseOptTbls').style.display = 'none';
+        } else if (document.getElementById('responseListTypeID').value == 'auto-tbl') {
+            document.getElementById('responseOptDefs').style.display = 'none';
+            document.getElementById('responseOptLoops').style.display = 'none';
+            document.getElementById('responseOptTbls').style.display = 'block';
+        }
     }
-    document.getElementById('responseOptLists').style.display = 'block';
     return true;
 }
 
@@ -213,11 +229,27 @@ function checkPageBlock() {
     return true;
 }
 function previewPageBlock() {
-    if (document.getElementById('pageBlockPreview') && document.getElementById('blockBGID')
+    if (document.getElementById('pageBlock') && document.getElementById('blockBGID')
         && document.getElementById('blockTextID') && document.getElementById('blockLinkID')) {
-        document.getElementById('pageBlockPreview').style.background=document.getElementById('blockBGID').value;
-        document.getElementById('pageBlockPreview').style.color=document.getElementById('blockTextID').value;
-        document.getElementById('pageBlockPreviewLink').style.color=document.getElementById('blockLinkID').value;
+        if (document.getElementById('blockImgID') && document.getElementById('blockImgID').value.trim() != '') {
+            document.getElementById('pageBlock').style.backgroundImage = "url('"+document.getElementById('blockImgID').value+"')";
+            if (document.getElementById('blockImgTypeB') && document.getElementById('blockImgTypeB').checked) {
+                document.getElementById('pageBlock').style.backgroundSize = "auto";
+                document.getElementById('pageBlock').style.backgroundRepeat = "repeat";
+            } else {
+                document.getElementById('pageBlock').style.backgroundSize = "100%";
+                document.getElementById('pageBlock').style.backgroundRepeat = "no-repeat";
+            }
+            if (document.getElementById('blockImgFixID') && document.getElementById('blockImgFixID').checked) {
+                document.getElementById('pageBlock').style.backgroundAttachment = "fixed";
+            } else {
+                document.getElementById('pageBlock').style.backgroundAttachment = "scroll";
+            }
+        } else {
+            document.getElementById('pageBlock').style.background=document.getElementById('blockBGID').value;
+        }
+        document.getElementById('pageBlock').style.color=document.getElementById('blockTextID').value;
+        document.getElementById('blockLinkh4').style.color=document.getElementById('blockLinkID').value;
         setTimeout("previewPageBlock()", 1000);
     }
     return true;

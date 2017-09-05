@@ -26,5 +26,4 @@
 </div>
 
 <div class="adminFootBuff"></div>
-
 @endsection

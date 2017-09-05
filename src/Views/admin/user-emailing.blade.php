@@ -12,8 +12,8 @@
     <tr><th>
         @if ($i == 0) Administrators
         @elseif ($i == 1) Databasers
-        @elseif ($i == 2) Branchers
-        @elseif ($i == 3) Evaluators
+        @elseif ($i == 2) Evaluators
+        @elseif ($i == 3) Third Party
         @elseif ($i == 4) Volunteers
         @endif
     </th><td>

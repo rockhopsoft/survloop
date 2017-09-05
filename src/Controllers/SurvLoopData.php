@@ -34,12 +34,11 @@ class SurvLoopData
     public $loopTblID       = -3;
     public $loopItemIDsDone = [];
     public $loopItemsNextID = -3;
-    
-    
-    public function loadCore($coreTbl, $coreID = -3, $dataBranches = [], $checkboxNodes = [], $isBigSurvLoop = [])
+                
+    public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvLoop = [], $dataBranches = [])
     {
         $this->setCoreID($coreTbl, $coreID);
-        $this->dataBranches  = $dataBranches;
+        if (sizeof($dataBranches) > 0) $this->dataBranches  = $dataBranches;
         $this->checkboxNodes = $checkboxNodes;
         $this->refreshDataSets($isBigSurvLoop);
         $this->loaded = true;
@@ -55,7 +54,7 @@ class SurvLoopData
     
     public function refreshDataSets($isBigSurvLoop = [])
     {
-        $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = [];
+        $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = $this->helpInfo = [];
         $this->loadData($this->coreTbl, $this->coreID);
         /* if (Auth::user() && Auth::user()->id) {
             $this->loadData('users', Auth::user()->id);
@@ -186,7 +185,7 @@ class SurvLoopData
     
     
     
-    protected function getRecordLinks($tbl = '', $extraOutFld = '', $extraOutVal = -3, $skipIncoming = false)
+    protected function getRecordLinks($tbl = '', $extraOutFld = '', $extraOutVal = -3, $skipIncoming = true)
     {
         $linkages = [ "outgoing" => [], "incoming" => [] ];
         if (trim($extraOutFld) != '') $linkages["outgoing"][] = [$extraOutFld, $extraOutVal];
@@ -376,6 +375,7 @@ class SurvLoopData
     
     public function getRowById($tbl, $rowID)
     {
+        if ($rowID <= 0) return [];
         $rowInd = $this->getRowInd($tbl, $rowID);
         if ($rowInd >= 0) return $this->dataSets[$tbl][$rowInd];
         return [];
@@ -497,6 +497,11 @@ class SurvLoopData
         }
         return -3;
     }
+    
+    public function sessChildRowFromParent($tbl2)
+    {
+        return $this->getRowById($tbl2, $this->sessChildIDFromParent($tbl2));
+    }
 
     
     protected function getAllTableIDs($tbl)
@@ -598,7 +603,7 @@ class SurvLoopData
         $this->dataBranches = [];
         if (sizeof($oldTmp) > 0) {
             foreach ($oldTmp as $b) {
-                if ($tbl == $b["branch"]) $this->dataBranches[] = $b;
+                if ($tbl != $b["branch"]) $this->dataBranches[] = $b;
             }
         }
         return true;
@@ -610,7 +615,12 @@ class SurvLoopData
         if ($tbl == $this->coreTbl) return [0, $this->coreID];
         $itemID = $itemInd = -3;
         $tblNew = $this->isCheckboxHelperTable($tbl);
-        $tbl = $tblNew;
+        for ($i=(sizeof($this->dataBranches)-1); $i>=0; $i--) {
+            if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
+                list($itemInd, $itemID) = $this->currSessDataPosBranch($tblNew, $this->dataBranches[$i]);
+                if (intVal($itemID) > 0) return [$itemInd, $itemID];
+            }
+        }
         for ($i=(sizeof($this->dataBranches)-1); $i>=0; $i--) {
             if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
                 list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $this->dataBranches[$i]);
@@ -686,6 +696,7 @@ class SurvLoopData
             }
         }
         if ($itemInd < 0 || $itemID <= 0) list($itemInd, $itemID) = $this->currSessDataPos($tbl, $hasParentDataManip);
+        //if ($action == 'update' && $fld != 'ComSubmissionProgress') { echo '<br /><br /><br />currSessData(nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', hasParentDataManip: ' . (($hasParentDataManip) ? 'true' : 'false') . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->dataBranches); echo '</pre>'; }
         if ($itemInd < 0 || $itemID <= 0) return '';
         if ($action == 'get') {
             if ($this->dataFieldExists($tbl, $itemInd, $fld)) {
@@ -714,7 +725,8 @@ class SurvLoopData
             return $this->currSessData($nID, $tbl, $fld, $action, ';' . implode(';;', $newVals) . ';');
         }
         if ($action == 'get') {
-            return ((sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) ? ';'.implode(';;', $this->helpInfo[$tblFld]["pastVals"]).';' : '');
+            return ((sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) 
+                ? ';' . implode(';;', $this->helpInfo[$tblFld]["pastVals"]) . ';' : '');
         } elseif ($action == 'update') {
             $this->logDataSave($nID, $tbl, $this->helpInfo[$tblFld]["parentID"], $fld, $newVals);
             // check for newly submitted responses...
@@ -846,76 +858,71 @@ class SurvLoopData
     {
         $passed = true;
         if ($cond && isset($cond->CondDatabase) && $cond->CondOperator != 'CUSTOM') {
-            if ($cond->CondOperator == 'URL-PARAM') {
-                if (trim($cond->CondOperDeet) == '' || !$GLOBALS["SL"]->REQ->has($cond->CondOperDeet) 
-                    || trim($GLOBALS["SL"]->REQ->get($cond->CondOperDeet)) != trim($cond->condFldResponses["vals"][0][1])) {
-                    $passed = false;
-                }
+            $cond->loadVals();
+            $loopName = ((intVal($cond->CondLoop) > 0) ? $GLOBALS["SL"]->dataLoopNames[$cond->CondLoop] : '');
+            if (intVal($cond->CondTable) <= 0 && trim($loopName) != '' 
+                && isset($GLOBALS["SL"]->dataLoops[$loopName])) {
+                $tblName = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
             } else {
-                $loopName = ((intVal($cond->CondLoop) > 0) ? $GLOBALS["SL"]->dataLoopNames[$cond->CondLoop] : '');
-                if (intVal($cond->CondTable) <= 0 && trim($loopName) != '' && isset($GLOBALS["SL"]->dataLoops[$loopName])) {
-                    $tblName = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
+                $tblName = $GLOBALS["SL"]->tbl[$cond->CondTable];
+            }
+//if ($tbl != $setTbl) list($setTbl, $setSet, $loopItemID) = $this->getDataSetTblTranslate($set, $tbl, $loopItemID);
+            if ($cond->CondOperator == 'EXISTS=') {
+                if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
+                    && !isset($this->loopItemIDs[$loopName]))) {
+                    if (intVal($cond->CondOperDeet) == 0) $passed = true;
+                    else $passed = false;
                 } else {
-                    $tblName = $GLOBALS["SL"]->tbl[$cond->CondTable];
+                    $existCnt = sizeof($this->dataSets[$tblName]);
+                    if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
+                    $passed = ($existCnt == intVal($cond->CondOperDeet));
                 }
-                //if ($tbl != $setTbl) list($setTbl, $setSet, $loopItemID) = $this->getDataSetTblTranslate($set, $tbl, $loopItemID);
-                if ($cond->CondOperator == 'EXISTS=') {
-                    if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
-                        && !isset($this->loopItemIDs[$loopName]))) {
-                        if (intVal($cond->CondOperDeet) == 0) {
-                            $passed = true;
-                        } else {
-                            $passed = false;
+            } elseif ($cond->CondOperator == 'EXISTS>') {
+                if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
+                    && !isset($this->loopItemIDs[$loopName]))) {
+                    $passed = false;
+                } else {
+                    $existCnt = sizeof($this->dataSets[$tblName]);
+                    if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
+                    if (intVal($cond->CondOperDeet) == 0) {
+                        $passed = ($existCnt > 0);
+                    } elseif ($cond->CondOperDeet > 0) {
+                        $passed = ($existCnt > intVal($cond->CondOperDeet));
+                    } elseif ($cond->CondOperDeet < 0) {
+                        $passed = ($existCnt < ((-1)*intVal($cond->CondOperDeet)));
+                    }
+                }
+            } elseif (intVal($cond->CondField) > 0) {
+                $fldName = $GLOBALS["SL"]->getFullFldNameFromID($cond->CondField, false);
+                $currSessData = '';
+                if ($recObj && $recObj->getKey() > 0) {
+                    $currSessData = $recObj->{ $fldName };
+                } elseif ($nID > 0) {
+                    $currSessData = $this->currSessData($nID, $tblName, $fldName);
+                } else { // not a node, but general filter of entire core record's data set
+                    if (isset($this->dataSets[$tblName]) && sizeof($this->dataSets[$tblName]) > 0) {
+                        foreach ($this->dataSets[$tblName] as $ind => $row) {
+                            if (isset($row->{ $fldName }) && trim($row->{ $fldName }) != '') {
+                                $currSessData = $row->{ $fldName };
+                            }
                         }
                     } else {
-                        $existCnt = sizeof($this->dataSets[$tblName]);
-                        if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
-                        $passed = ($existCnt == intVal($cond->CondOperDeet));
-                    }
-                } elseif ($cond->CondOperator == 'EXISTS>') {
-                    if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
-                        && !isset($this->loopItemIDs[$loopName]))) {
                         $passed = false;
-                    } else {
-                        $existCnt = sizeof($this->dataSets[$tblName]);
-                        if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
-                        if (intVal($cond->CondOperDeet) == 0) {
-                            $passed = ($existCnt > 0);
-                        } elseif ($cond->CondOperDeet > 0) {
-                            $passed = ($existCnt > intVal($cond->CondOperDeet));
-                        } elseif ($cond->CondOperDeet < 0) {
-                            $passed = ($existCnt < ((-1)*intVal($cond->CondOperDeet)));
-                        }
                     }
-                } elseif (intVal($cond->CondField) > 0) {
-                    $fldName = $GLOBALS["SL"]->getFullFldNameFromID($cond->CondField, false);
-                    $currSessData = '';
-                    if ($recObj && $recObj->getKey() > 0) {
-                        $currSessData = $recObj->{ $fldName };
-                    } else {
-                        $currSessData = $this->currSessData($nID, $tblName, $fldName);
+                }
+                if (trim($currSessData) != '') {
+                    if ($cond->CondOperator == '{') {
+                        $passed = (in_array($currSessData, $cond->condVals));
+                    } elseif ($cond->CondOperator == '}') {
+                        $passed = (!in_array($currSessData, $cond->condVals));
                     }
-                    if (trim($currSessData) != '') {
-                        if ($cond->CondOperator == '{') {
-                            $passed = (in_array($currSessData, $cond->condVals));
-                        } elseif ($cond->CondOperator == '}') {
-                            $passed = (!in_array($currSessData, $cond->condVals));
-                        }
-                    } else {
-                        if ($cond->CondOperator == '{') {
-                            $passed = false;
-                        } elseif ($cond->CondOperator == '}') {
-                            $passed = true;
-                        }
-                    }
+                } else {
+                    if ($cond->CondOperator == '{')     $passed = false;
+                    elseif ($cond->CondOperator == '}') $passed = true;
                 }
             }
         }
-        // This is where all the condition-inversion is applied
-        if ($nID > 0 && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
-            && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->CondID])) {
-            $passed = !$passed;
-        }
+        //echo 'parseCondition(' . $cond->CondTag . ' = ' . (($passed) ? 'true' : 'false') . '<br />';
         return $passed;
     }
     

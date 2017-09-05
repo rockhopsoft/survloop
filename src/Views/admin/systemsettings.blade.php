@@ -19,10 +19,10 @@
                 <div class="mB20 mT10 w100"><label class="w100">
                     <h4 class="fL m0">{!! $settingsList[$opt][0] !!}</h4>
                     @if (trim($settingsList[$opt][1]) != '')
-                        <div class="fR pT5 slGrey">{!! $settingsList[$opt][1] !!}</div>
+                        <div class="fR pT5 slGrey">eg. "{!! $settingsList[$opt][1] !!}"</div>
                     @endif
                     <div class="fC"></div>
-                    <textarea name="sys-{{ $opt }}" class="form-control w100" style="
+                    <textarea name="sys-{{ $opt }}" class="form-control w100" autocomplete="off" style="
                     @if (strpos($settingsList[$opt][0], 'Header Code') !== false) height: 200px; 
                     @else height: 75px; @endif font-family: Courier New; ">{!! $val !!}</textarea>
                 </label></div>
@@ -59,18 +59,20 @@
             @if (isset($stylesList[$opt->DefSubset]))
                 @if ($opt->DefSubset == 'font-main') 
                     <div class="mB20 mT10 w100"><label class="w100">
-                        <h4 class="fL m0">{!! $stylesList[$opt->DefSubset][0] !!}</h4>
-                        @if (trim($stylesList[$opt->DefSubset][1]) != '')
-                            <div class="fR pT5 slGrey">{!! $stylesList[$opt->DefSubset][1] !!}</div>
+                        <h4 class="fL m0">{!! $stylesList[$opt->DefSubset][1] !!}</h4>
+                        @if (trim($stylesList[$opt->DefSubset][0]) != '')
+                            <div class="fR pT5 slGrey">eg. "{!! $stylesList[$opt->DefSubset][0] !!}"</div>
                         @endif
                         <input type="text" name="sty-{{ $opt->DefSubset }}" class="form-control"
                             value="{!! $opt->DefDescription !!}">
                     </label></div>
                 @else
                     <div class="mB20 mT10 w100"><label class="w100">
-                        <h4 class="fL m0">{!! $stylesList[$opt->DefSubset][0] !!}</h4>
-                        @if (trim($stylesList[$opt->DefSubset][1]) != '')
-                            <div class="fR pT5 slGrey slShadeLight">{!! $stylesList[$opt->DefSubset][1] !!}</div>
+                        <h4 class="fL m0">{!! $stylesList[$opt->DefSubset][1] !!}</h4>
+                        @if (trim($stylesList[$opt->DefSubset][0]) != '')
+                            <div class="fR pT5 slGrey slShadeLight"><span style="color: {!! 
+                                $stylesList[$opt->DefSubset][0] !!};">eg. "{!! $stylesList[$opt->DefSubset][0] 
+                                !!}"</span></div>
                         @endif
                         </label>
                         {!! view('vendor.survloop.inc-color-picker', [
@@ -84,12 +86,12 @@
         @endforelse
         <div class="mB20"><label class="w100">
             <h2>Open-Ended Custom CSS:</h2>
-            <textarea name="sys-cust-css" class="form-control" 
+            <textarea name="sys-cust-css" class="form-control" autocomplete="off"
                 style="height: 400px; font-family: Courier New;">{!! $custCSS->DefDescription !!}</textarea>
         </label></div>
         <div class="mB20"><label class="w100">
             <h4>Open-Ended Custom CSS for Emails:</h4>
-            <textarea name="sys-cust-css-email" class="form-control" 
+            <textarea name="sys-cust-css-email" class="form-control" autocomplete="off" 
                 style="height: 200px; font-family: Courier New;">{!! $custCSSemail->DefDescription !!}</textarea>
         </label></div>
     </div>

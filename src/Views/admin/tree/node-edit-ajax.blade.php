@@ -1,4 +1,17 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-ajax.blade.php */
+<?php /* @if ($node->isInstruct()) 
+var quill = new Quill('#nodeInstructID', {
+  modules: {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline'],
+      ['image', 'code-block']
+    ]
+  },
+  placeholder: 'Compose an epic...',
+  theme: 'snow'  // or 'bubble'
+});
+@endif */ ?>
 
 $("#specialFuncsBtn").click(function(){ $("#specialFuncs").slideToggle("fast"); });
 $("#extraSmallBtn").click(function() { $("#extraSmall").slideToggle("fast"); });
@@ -21,4 +34,15 @@ $(document).on("click", "a.condDelBtnUndo", function() {
     document.getElementById("cond"+cond+"delBtn").style.display="block";
     document.getElementById("cond"+cond+"delWrap").style.display="none";
     document.getElementById("delCond"+cond+"ID").value="N";
+});
+
+$(document).on("click", ".showKidBox", function() {
+    var r = $(this).attr("id").replace("r", "").replace("showKID", "");
+    if (document.getElementById("kidFork"+r+"")) {
+        if (document.getElementById("r"+r+"showKID") && document.getElementById("r"+r+"showKID").checked) {
+            document.getElementById("kidFork"+r+"").style.display="inline";
+        } else {
+            document.getElementById("kidFork"+r+"").style.display="none";
+        }
+    }
 });

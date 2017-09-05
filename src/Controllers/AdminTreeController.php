@@ -32,7 +32,7 @@ class AdminTreeController extends AdminController
     protected function initExtra(Request $request)
     {
     	if ($this->v["user"] && isset($this->v["user"]->id)) {
-    		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|brancher');
+    		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
         }
         $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) 
             ? session()->get('adminOverOpts') : '');
@@ -55,51 +55,12 @@ class AdminTreeController extends AdminController
                     $this->initCoreTable($coreTbl, $userTbl);
                 }
             }
-            $chk = SLConditions::where('CondDatabase', 0)
-                ->where('CondTag', '#IsAdmin')
-                ->get();
-            if (!$chk || sizeof($chk) == 0) {
-                $newCond = new SLConditions;
-                $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#IsAdmin';
-                $newCond->CondDesc = 'The user is currently logged in as an administrator.';
-                $newCond->CondOperator = 'CUSTOM';
-                $newCond->save();
-                $newCond = new SLConditions;
-                $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#IsNotAdmin';
-                $newCond->CondDesc = 'The user is not currently logged in as an administrator.';
-                $newCond->CondOperator = 'CUSTOM';
-                $newCond->save();
-            }
-            $chk = SLConditions::where('CondDatabase', 0)
-                ->where('CondTag', '#NodeDisabled')
-                ->get();
-            if (!$chk || sizeof($chk) == 0) {
-                $newCond = new SLConditions;
-                $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#NodeDisabled';
-                $newCond->CondDesc = 'This node is not active (for the public).';
-                $newCond->CondOperator = 'CUSTOM';
-                $newCond->save();
-            }
-            $chk = SLConditions::where('CondDatabase', 0)
-                ->where('CondTag', '#IsLoggedIn')
-                ->get();
-            if (!$chk || sizeof($chk) == 0) {
-                $newCond = new SLConditions;
-                $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#IsLoggedIn';
-                $newCond->CondDesc = 'Complainant is currently logged into the system.';
-                $newCond->CondOperator = 'CUSTOM';
-                $newCond->save();
-                $newCond = new SLConditions;
-                $newCond->CondDatabase = 0;
-                $newCond->CondTag = '#IsNotLoggedIn';
-                $newCond->CondDesc = 'Complainant is not currently logged into the system.';
-                $newCond->CondOperator = 'CUSTOM';
-                $newCond->save();
-            }
+            $this->allStdCondition('#IsAdmin', 'The user is currently logged in as an administrator.');
+            $this->allStdCondition('#IsNotAdmin', 'The user is not currently logged in as an administrator.');
+            $this->allStdCondition('#NodeDisabled', 'This node is not active (for the public).');
+            $this->allStdCondition('#IsLoggedIn', 'Complainant is currently logged into the system.');
+            $this->allStdCondition('#IsNotLoggedIn', 'Complainant is not currently logged into the system.');
+            $this->allStdCondition('#EmailVerified', 'Current user\'s email address has been verified.');
             $trees = SLTree::where('TreeType', 'Page')->get();
             if ($trees && sizeof($trees) > 0) {
                 foreach ($trees as $tree) $this->v["treeClassAdmin"]->updateTreeOpts($tree->TreeID);
@@ -142,6 +103,22 @@ class AdminTreeController extends AdminController
             }
         }
         set_time_limit(180);
+        return true;
+    }
+    
+    protected function allStdCondition($tag, $desc)
+    {
+        $chk = SLConditions::where('CondDatabase', 0)
+            ->where('CondTag', $tag)
+            ->get();
+        if (!$chk || sizeof($chk) == 0) {
+            $newCond = new SLConditions;
+            $newCond->CondDatabase = 0;
+            $newCond->CondTag = $tag;
+            $newCond->CondDesc = $desc;
+            $newCond->CondOperator = 'CUSTOM';
+            $newCond->save();
+        }
         return true;
     }
     
@@ -272,8 +249,8 @@ class AdminTreeController extends AdminController
         $this->treeID = $treeID;
         $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         if ($request->has('dataStruct')) {
-            if ($request->has('delSub')) {
-                $found = SLDataSubsets::find($request->input('delSub'))->delete();
+            if ($request->has('delSub') && intVal($request->input('delSub')) > 0) {
+                $found = SLDataSubsets::find($request->input('delSub'));
                 if ($found && isset($found->DataSubTree)) $found->delete();
             } elseif ($request->has('newSub') && $request->has('newSubset')) {
                 $splits = explode(':', $request->input('newSubset'));
@@ -495,39 +472,13 @@ class AdminTreeController extends AdminController
                             ->delete();
                         SLConditionsVals::where('CondValCondID', $cond->CondID)
                             ->delete();
+                        SLConditionsArticles::where('ArticleCondID', $cond->CondID)
+                            ->delete();
                     }
-                    
-                    $cond->CondOpts = 1;
-                    
-                    $urls = (($request->has('CondArticles'.$i.'')) ? trim($request->get('CondArticles'.$i.'')) : '');
-                    $urls = str_replace(',', ' , ', str_replace('  ', ' ', str_replace('  ', ' ', $urls)));
-                    $article = SLConditionsArticles::where('ArticleCondID', $cond->CondID)
-                        ->first();
-                    if (trim($urls) != '') {
-                        $cond->CondOpts *= 3;
-                        if (!$article || !isset($article->ArticleCondID)) {
-                            $article = new SLConditionsArticles;
-                            $article->ArticleCondID = $cond->CondID;
-                        }
-                        $article->ArticleURL = $urls;
-                        $article->save();
-                    } elseif ($article && isset($article->ArticleCondID)) {
-                        $article->delete();
-                    }
-                    
-                    $cond->CondTag = (($request->has('CondTag'.$i.'')) ? trim($request->get('CondTag'.$i.'')) : '');
-                    if (substr($cond->CondTag, 0, 1) != '#') {
-                        $cond->CondTag = '#' . $cond->CondTag;
-                    }
-                    $cond->CondDesc = (($request->has('CondDesc'.$i.'')) ? trim($request->get('CondDesc'.$i.'')) : '');
-                    if ($request->has('CondPublicFilter'.$i.'') 
-                        && intVal($request->get('CondPublicFilter'.$i.'')) == 1) {
-                        $cond->CondOpts *= 2;
-                    }
-                    $cond->save();
                 }
             }
         }
+
         $this->v["condSplits"] = $this->loadCondList();
         $this->v["condIDs"] = '';
         if ($this->v["condSplits"] && sizeof($this->v["condSplits"]) > 0) {
@@ -537,8 +488,29 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
-        $this->addCondEditorAjax();
+        $this->CustReport->addCondEditorAjax();
         return view('vendor.survloop.admin.tree.conditions', $this->v);
+    }
+    
+    public function condEdit(Request $request, $cid = -3) 
+    {
+        $this->admControlInit($request, '/dashboard/db/conds/edit/');
+        $this->v["cond"] = SLConditions::find($cid);
+        if ($this->v["cond"] && isset($this->v["cond"]->CondTag)) {
+            if ($request->has('editCond') && intVal($request->get('editCond')) == 1) {
+                $GLOBALS["SL"]->saveEditCondition($request);
+                $this->v["cond"] = SLConditions::find($cid);
+            }
+            $this->v["cond"]->loadVals();
+            $this->loadCondArticles($cid);
+            $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.db.inc-addCondition-ajax', [
+                "newOnly"      => false,
+                "cond"         => $this->v["cond"],
+                "condArticles" => $this->v["condArticles"]
+            ])->render();
+            return view('vendor.survloop.admin.db.inc-condition-edit', $this->v);
+        }
+        return $this->redir('/dashboard/db/conds');
     }
     
     protected function getRawConds()
@@ -568,21 +540,21 @@ class AdminTreeController extends AdminController
     }
     
     
-    public function loadCondArticles()
+    public function loadCondArticles($cid = -3)
     {
-        $this->v["condArticles"] = array();
-        $arts = SLConditionsArticles::get();
+        $this->v["condArticles"] = $arts = [];
+        if ($cid > 0) $arts = SLConditionsArticles::where('ArticleCondID', $cid)->get();
+        else $arts = SLConditionsArticles::get();
         if ($arts && sizeof($arts) > 0) {
             foreach ($arts as $i => $art) {
                 if (!isset($this->v["condArticles"][$art->ArticleCondID])) {
-                    $this->v["condArticles"][$art->ArticleCondID] = array();
+                    $this->v["condArticles"][$art->ArticleCondID] = [];
                 }
-                $this->v["condArticles"][$art->ArticleCondID] = array();
                 if (trim($art->ArticleURL) !== '') {
-                    if (strpos($art->ArticleURL, ',') === false) {
-                        $this->v["condArticles"][$art->ArticleCondID][] = $art->ArticleURL;
-                    }
-                    else $this->v["condArticles"][$art->ArticleCondID] = explode(',', $art->ArticleURL);
+                    $this->v["condArticles"][$art->ArticleCondID][] = [
+                        trim($art->ArticleTitle), 
+                        trim($art->ArticleURL)
+                    ];
                 }
             }
         }

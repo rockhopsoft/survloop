@@ -20,6 +20,7 @@ use App\Models\SLSessLoops;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsNodes;
+use App\Models\SLConditionsArticles;
 use App\Models\SLEmails;
 
 use SurvLoop\Controllers\StatesUS;
@@ -42,8 +43,8 @@ class DatabaseLookups
     public $REQ            = [];
     public $sysOpts        = [];
     public $userRoles      = [];
-    public $pageSCRIPTS = '';
-    public $pageJAVA      = '';
+    public $pageSCRIPTS    = '';
+    public $pageJAVA       = '';
     public $pageAJAX       = '';
     
     public $tblModels      = [];
@@ -55,6 +56,7 @@ class DatabaseLookups
     public $fldTypes       = [];
     public $fldOthers      = [];
     public $defValues      = [];
+    public $condTags       = [];
     
     public $foreignKeysIn  = [];
     public $foreignKeysOut = [];
@@ -77,10 +79,11 @@ class DatabaseLookups
     public $fldAbouts      = [];
     public $blurbs         = [];
     public $emaBlurbs      = [];
-    public $debugOn        = true;
+    public $debugOn        = false;
     
     public $sysTree        = [ "forms" => [ "pub" => [], "adm" => [] ], "pages" => [ "pub" => [], "adm" => [] ] ];
     public $treeSettings   = [];
+    public $x              = [];
     
     function __construct(Request $request = NULL, $isAdmin = false, $dbID = 1, $treeID = 1, $treeOverride = -3)
     {
@@ -350,6 +353,7 @@ class DatabaseLookups
             $this->chkTblModel($tbl, $path, $forceFile);
             return $path;
         }
+        if (file_exists('../app/Models/SL' . $tbl . '.php')) return "App\\Models\\SL" . $this->tblModels[$tbl];
         return '';
     }
     
@@ -563,7 +567,7 @@ class DatabaseLookups
     
     public function getForeignOpts($preSel = '', $opts = 'Subset')
     {
-        $retVal = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') . ' >parent - field - child</option>
+        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') . ' >parent - field - child</option>
         <option value=""></option>' . "\n";
         $flds = SLFields::select('SL_Fields.FldTable', 'SL_Fields.FldName', 'SL_Fields.FldForeignTable')
             ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Fields.FldForeignTable')
@@ -578,14 +582,14 @@ class DatabaseLookups
                     $lnkMap = $this->tbl[$fld->FldForeignTable] . '::' 
                         . $this->tbl[$fld->FldTable] . ':' 
                         . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
-                    $retVal .= '<option value="' . $lnkMap . '" ' 
+                    $ret .= '<option value="' . $lnkMap . '" ' 
                         . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
                         . $this->tbl[$fld->FldForeignTable] . ' &larr; ' 
                         . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
                         . ' &larr; ' . $this->tbl[$fld->FldTable] . '
                         </option>' . "\n";
                 } else {
-                    $retVal .= '<option value="">** Warning ** not found: ' 
+                    $ret .= '<option value="">** Warning ** not found: ' 
                         . $fld->FldTable . ' * ' . $fld->FldForeignTable . '</option>';
                 }
             }
@@ -604,7 +608,7 @@ class DatabaseLookups
                     if (isset($this->tbl[$fld->FldTable]) && isset($this->tbl[$fld->FldForeignTable])) {
                         $lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
                             . ':' . $this->tbl[$fld->FldForeignTable] . ':';
-                        $retVal .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
+                        $ret .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
                             . $this->tbl[$fld->FldTable] . ' &rarr; ' 
                             . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
                             . ' &rarr; ' . $this->tbl[$fld->FldForeignTable] . '
@@ -613,7 +617,7 @@ class DatabaseLookups
                 }
             }
         }
-        return $retVal;
+        return $ret;
     }
     
     
@@ -668,7 +672,8 @@ class DatabaseLookups
     public function loadDefinitions($subset)
     {
         if (!isset($this->defValues[$subset])) {
-            $this->defValues[$subset] = SLDefinitions::where('DefSubset', $subset)
+            $this->defValues[$subset] = SLDefinitions::where('DefDatabase', $this->dbID)
+                ->where('DefSubset', $subset)
                 ->where('DefSet', 'Value Ranges')
                 ->orderBy('DefOrder', 'asc')
                 ->select('DefID', 'DefValue')
@@ -716,6 +721,17 @@ class DatabaseLookups
         return [];
     }
     
+    public function getDefDesc($subset = '', $val = '')
+    {
+        $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+            ->where('DefSet', 'Value Ranges')
+            ->where('DefSubset', $subset)
+            ->where('DefValue', $val)
+            ->first();
+        if ($chk && isset($chk->DefDescription)) return $chk->DefDescription;
+        return '';
+    }
+    
     
     
     
@@ -725,55 +741,62 @@ class DatabaseLookups
         if (trim($preSel) != '' && isset($this->dataLoops[$preSel])) {
             $loopTbl = $this->dataLoops[$preSel]->DataLoopTable;
         }
-        $retVal = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') 
+        $ret = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') 
             . (($disableBlank) ? ' DISABLED ' : '') . ' >' . $instruct . '</option>' . "\n";
         foreach ($this->tblAbbr as $tblName => $tblAbbr) {
-            $retVal .= '<option value="' . $tblName.'" ' 
-                . (($preSel == $tblName || $loopTbl == $tblName) ? 'SELECTED' : '') 
+            $ret .= '<option value="' . $tblName.'" ' 
+                . (($preSel == $tblName || $preSel == $this->tblI[$tblName] || $loopTbl == $tblName) ? 'SELECTED' : '')
                 . ' >' . $prefix . $tblName.'</option>' . "\n";
         }
-        return $retVal;
+        return $ret;
     }
     
     // if $keys is 0 don't include primary keys; if $keys is 1 show primary keys; if $keys is -1 show only foreign keys; 
     public function fieldsDropdown($preSel = '', $keys = 2)
     {
-        $retVal = '<option value="" ' 
-            . ((trim($preSel) == '') ? 'SELECTED' : '') . ' ></option>' . "\n";
+        $ret = '<option value="" ' . ((trim($preSel) == '') ? 'SELECTED' : '') . ' ></option>' . "\n";
         if ($keys > 0) {
             foreach ($this->tblAbbr as $tblName => $tblAbbr) {
-                $retVal .= '<option value="' . $tblName.':'. $tblAbbr . 'ID" ' 
+                $ret .= '<option value="' . $tblName.':'. $tblAbbr . 'ID" ' 
                     . (($preSel == $tblName.':'. $tblAbbr . 'ID') ? 'SELECTED' : '') 
                     . ' >' . $tblName.' : '. $tblAbbr . 'ID (primary key)</option>' . "\n";
             }
         }
         $flds = [];
-        $qman = "SELECT t.`TblName`, t.`TblAbbr`, f.`FldName`, f.`FldType`, f.`FldForeignTable` 
-            FROM `SL_Fields` f 
-            LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
-            WHERE f.`FldTable` > '0' [[EXTRA]] AND f.`FldDatabase` LIKE '" . $this->dbID . "' 
-            ORDER BY t.`TblName`, f.`FldName`";
-        if ($keys == -1) $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "AND f.`FldForeignTable` > '0'", $qman) ) );
-        else $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "", $qman) ) );
-        if ($flds && sizeof($flds) > 0) {
-            foreach ($flds as $fld) $retVal .= $this->fieldsDropdownOption($fld, $preSel);
+        $qman = "SELECT t.`TblName`, t.`TblAbbr`, f.`FldID`, f.`FldName`, f.`FldType`, f.`FldForeignTable` 
+            FROM `SL_Fields` f LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
+            WHERE f.`FldTable` > '0' AND t.`TblName` IS NOT NULL AND f.`FldDatabase` LIKE '" . $this->dbID . "' 
+            [[EXTRA]] ORDER BY t.`TblName`, f.`FldName`";
+        if ($keys == -1) {
+            $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "AND f.`FldForeignTable` > '0'", $qman) ) );
+        } else {
+            $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "", $qman) ) );
         }
-        return $retVal;
+        if ($flds && sizeof($flds) > 0) {
+            foreach ($flds as $fld) $ret .= $this->fieldsDropdownOption($fld, $preSel);
+        }
+        return $ret;
     }
     
     public function fieldsDropdownOption($fld, $preSel = '', $valID = false, $prfx = '')
     {
-        return  '<option value="' . (($valID) ? $fld->FldID 
-                : $fld->TblName . ':' . $fld->TblAbbr . $fld->FldName) . '" ' 
-            . (($preSel == $fld->TblName.':'. $fld->TblAbbr . $fld->FldName) ? 'SELECTED' : '') 
-            . ' >' . $prfx . $fld->TblName.' : '. $fld->TblAbbr . $fld->FldName 
-            . ' ('. (($fld->FldForeignTable > 0) ? 'foreign key' 
-                : strtolower($fld->FldType)) . ')</option>' . "\n";
+        if (!isset($fld->FldID)) return '';
+        if ($valID) {
+            return '<option value="' . $fld->FldID . '"' . ((intVal($preSel) != 0 && intVal($preSel) == $fld->FldID) 
+                    ? ' SELECTED' : '') . ' >' . $prfx . $fld->TblName.' : '. $fld->TblAbbr . $fld->FldName 
+                . ' ('. (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) . ')</option>' . "\n";
+        } else {
+            $fldStr = $fld->TblName . ':' . $fld->TblAbbr . $fld->FldName;
+            return '<option value="' . $fldStr . '"' . ((trim($preSel) == $fldStr) ? ' SELECTED' : '') . ' >' . $prfx 
+                . $fldStr . ' ('. (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) 
+                . ')</option>' . "\n";
+        }
+        return '';
     }
     
     public function allDefsDropdown($preSel = '')
     {
-        $retVal = '<option value="" ' 
+        $ret = '<option value="" ' 
             . (($preSel == "") ? 'SELECTED' : '') . ' ></option>' . "\n";
         $defs = SLDefinitions::select('DefSubset', 'DefID', 'DefValue')
             ->where('DefSet', 'Value Ranges')
@@ -782,12 +805,12 @@ class DatabaseLookups
             ->get();
         if ($defs && sizeof($defs) > 0) {
             foreach ($defs as $def) {
-                $retVal .= '<option value="' . $def->DefID.'" ' 
+                $ret .= '<option value="' . $def->DefID.'" ' 
                     . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
                     . $def->DefSubset . ': ' . $def->DefValue . '</option>' . "\n";
             }
         }
-        return $retVal;
+        return $ret;
     }
     
     
@@ -805,6 +828,8 @@ class DatabaseLookups
             }
         } elseif (isset($this->tblI[$tblIn])) {
             $tblID = $this->tblI[$tblIn];
+        } elseif (isset($this->tbl[$tblIn])) {
+            $tblID = intVal($tblIn);
         }
         $tbls = $this->getSubsetTables($tblID, $tbls);
         return $tbls;
@@ -835,22 +860,21 @@ class DatabaseLookups
     
     public function fieldsTblsDropdown($tbls = [], $preSel = '', $prfx = '')
     {
-        $retVal = '';
+        $ret = '';
         $prevTbl = -3;
         $flds = DB::select( DB::raw( "SELECT t.`TblName`, t.`TblAbbr`, 
                 f.`FldID`, f.`FldName`, f.`FldType`, f.`FldForeignTable`, f.`FldTable` 
-            FROM `SL_Fields` f 
-            LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
+            FROM `SL_Fields` f LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
             WHERE f.`FldTable` IN ('" . implode("', '", $tbls) . "')  
             ORDER BY t.`TblName`, f.`FldName`" ) );
         if ($flds && sizeof($flds) > 0) {
             foreach ($flds as $fld) {
-                if ($prevTbl != $fld->FldTable) $retVal .= '<option value=""></option>' . "\n";
-                $retVal .= $this->fieldsDropdownOption($fld, $preSel, true, $prfx) . "\n";
+                if ($prevTbl != $fld->FldTable) $ret .= '<option value=""></option>' . "\n";
+                $ret .= $this->fieldsDropdownOption($fld, $preSel, true, $prfx) . "\n";
                 $prevTbl = $fld->FldTable;
             }
         }
-        return $retVal;
+        return $ret;
     }
     
     public function getAllSetTblFldDrops($tblIn = '', $preSel = '')
@@ -957,6 +981,27 @@ class DatabaseLookups
         return $ret;
     }
     
+    public function getCondLookup()
+    {
+        if (sizeof($this->condTags) == 0) {
+            $chk = SLConditions::whereIn('CondDatabase', [0, $this->dbID])
+                ->orderBy('CondTag')
+                ->get();
+            if ($chk && sizeof($chk) > 0) {
+                foreach ($chk as $i => $c) {
+                    $this->condTags[$c->CondID] = $c->CondTag;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public function getCondByID($id)
+    {
+        $this->getCondLookup();
+        return ((isset($this->condTags[intVal($id)])) ? $this->condTags[intVal($id)] : '');
+    }
+    
     public function getCondList()
     {
         return SLConditions::whereIn('CondDatabase', [0, $this->dbID])
@@ -980,49 +1025,114 @@ class DatabaseLookups
             $cond->CondTag  = '#' . $cond->CondTag;
         }
         $cond->CondDesc     = (($request->has('condDesc')) ? $request->condDesc : '');
-        $cond->CondOpts     = 1;
         $cond->CondOperator = 'CUSTOM';
         $cond->CondOperDeet = 0;
         $cond->CondField = $cond->CondTable = $cond->CondLoop = 0;
-        if ($request->has('setSelect')) {
-            $tmp = trim($request->setSelect);
-            if ($tmp == 'url-parameters') {
-                $cond->CondOperator = 'URL-PARAM';
-            } elseif (strpos($tmp, 'loop-') !== false) {
-                $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
-            } else {
-                $cond->CondTable = intVal($this->tblI[$tmp]);
+        $cond->CondOpts     = 1;
+        
+        if ($request->has('condType') && $request->condType == 'complex') {
+            $cond->CondOperator = 'COMPLEX';
+            $cond->save();
+            if ($request->has('multConds') && sizeof($request->multConds) > 0) {
+                foreach ($request->multConds as $val) {
+                    $chk = SLConditionsVals::where('CondValCondID', $cond->CondID)
+                        ->where('CondValValue', $val)
+                        ->get();
+                    if (!$chk | sizeof($chk) == 0) {
+                        $tmpVal = new SLConditionsVals;
+                        $tmpVal->CondValCondID    = $cond->CondID;
+                        $tmpVal->CondValValue     = $val;
+                        if ($request->has('multCondsNot') && in_array($val, $request->multCondsNot)) {
+                            $tmpVal->CondValValue = (-1*$val);
+                        }
+                        $tmpVal->save();
+                    }
+                }
+            }
+        } else {
+            if ($request->has('setSelect')) {
+                $tmp = trim($request->setSelect);
+                if ($tmp == 'url-parameters') {
+                    $cond->CondOperator = 'URL-PARAM';
+                } elseif (strpos($tmp, 'loop-') !== false) {
+                    $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
+                } else {
+                    $cond->CondTable = intVal($this->tblI[$tmp]);
+                }
+            }
+            if ($cond->CondOperator == 'URL-PARAM') {
+                $cond->CondOperDeet = $request->paramName;
+            } elseif ($request->has('setFld')) {
+                $tmp = trim($request->setFld);
+                if (substr($tmp, 0, 6) == 'EXISTS') {
+                    $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
+                    $cond->CondOperDeet = intVal(substr($tmp, 7));
+                } else {
+                    $cond->CondField = intVal($request->setFld);
+                    if ($request->has('equals')) {
+                        if ($request->get('equals') == 'equals') $cond->CondOperator = '{';
+                        else $cond->CondOperator = '}';
+                    }
+                }
+            }
+            $cond->save();
+            if ($cond->CondOperator == 'URL-PARAM') {
+                $tmpVal = new SLConditionsVals;
+                $tmpVal->CondValCondID = $cond->CondID;
+                $tmpVal->CondValValue  = $request->paramVal;
+                $tmpVal->save();
+            } elseif ($request->has('vals') && sizeof($request->vals) > 0) {
+                foreach ($request->vals as $val) {
+                    $tmpVal = new SLConditionsVals;
+                    $tmpVal->CondValCondID = $cond->CondID;
+                    $tmpVal->CondValValue  = $val;
+                    $tmpVal->save();
+                }
             }
         }
-        if ($cond->CondOperator == 'URL-PARAM') {
-            $cond->CondOperDeet = $request->paramName;
-        } elseif ($request->has('setFld')) {
-            $tmp = trim($request->setFld);
-            if (substr($tmp, 0, 6) == 'EXISTS') {
-                $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
-                $cond->CondOperDeet = intVal(substr($tmp, 7));
-            } else {
-                $cond->CondField = intVal($request->setFld);
-                if ($request->has('equals')) {
-                    if ($request->equals == 'equals') $cond->CondOperator = '{';
-                    else $cond->CondOperator = '}';
+        
+        if ($request->has('CondPublicFilter') && intVal($request->get('CondPublicFilter')) == 1) {
+            $cond->CondOpts *= 2;
+        }
+        $artsIn = [];
+        for ($j=0; $j < 10; $j++) {
+            if ($request->has('condArtUrl' . $j . '') && trim($request->get('condArtUrl' . $j . '')) != '') {
+                $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
+                if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != '') {
+                    $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
+                }
+            }
+        }
+        $articles = SLConditionsArticles::where('ArticleCondID', $cond->CondID)
+            ->get();
+        if (sizeof($artsIn) == 0) {
+            SLConditionsArticles::where('ArticleCondID', $cond->CondID)
+                ->delete();
+        } else {
+            $cond->CondOpts *= 3;
+            foreach ($artsIn as $j => $a) {
+                $foundArt = false;
+                if ($articles && sizeof($articles) > 0) {
+                    foreach ($articles as $chk) {
+                        if ($chk->ArticleURL == $a[1]) {
+                            if ($chk->ArticleTitle != $a[0]) {
+                                $chk->ArticleTitle = $a[0];
+                                $chk->save();
+                            }
+                            $foundArt = true;
+                        }
+                    }
+                }
+                if (!$foundArt) {
+                    $newArt = new SLConditionsArticles;
+                    $newArt->ArticleCondID = $cond->CondID;
+                    $newArt->ArticleTitle = $a[0];
+                    $newArt->ArticleURL = $a[1];
+                    $newArt->save();
                 }
             }
         }
         $cond->save();
-        if ($cond->CondOperator == 'URL-PARAM') {
-            $tmpVal = new SLConditionsVals;
-            $tmpVal->CondValCondID = $cond->CondID;
-            $tmpVal->CondValValue  = $request->paramVal;
-            $tmpVal->save();
-        } elseif ($request->has('vals') && sizeof($request->vals) > 0) {
-            foreach ($request->vals as $val) {
-                $tmpVal = new SLConditionsVals;
-                $tmpVal->CondValCondID = $cond->CondID;
-                $tmpVal->CondValValue  = $val;
-                $tmpVal->save();
-            }
-        }
         return $cond;
     }
     
@@ -1160,6 +1270,13 @@ class DatabaseLookups
         return '';
     }
     
+    public function getEmailSubj($emaID)
+    {
+        $ema = SLEmails::find($emaID);
+        if ($ema && isset($ema->EmailSubject)) return $ema->EmailSubject;
+        return '';
+    }
+    
     
     public function addToHeadCore($js)
     {
@@ -1274,7 +1391,6 @@ class DatabaseLookups
         return $ret;
     }
     
-    
     public function swapURLwrap($url, $printHttp = true)
     {
         $urlPrint = str_replace('mailto:', '', $url);
@@ -1311,6 +1427,64 @@ class DatabaseLookups
     public function mapsURL($addy)
     {
         return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
+    }
+    
+    public function getYoutubeID($url)
+    {
+        $ret = '';
+        $pos = strpos($url, 'v=');
+        if ($pos > 0) {
+            $ret = substr($url, (2+$pos));
+            $pos = strpos($ret, '&');
+            if ($pos > 0) $ret = substr($ret, 0, $pos);
+        }
+        return $ret;
+    }
+    
+    public function swapSessMsg($page = '')
+    {
+        return str_replace('<!-- SessMsg -->', $this->getSessMsg(), $page);
+    }
+    
+    public function getSessMsg()
+    {
+        $ret = '';
+        if (session()->has('sessMsg')) {
+            if (trim(session()->get('sessMsg')) != '') {
+                $ret .= '<div class="alert alert-dismissible w100 mB10 '
+                    . ((session()->has('sessMsgType') && trim(session()->get('sessMsgType')) != '')
+                        ? session()->get('sessMsgType') : ' alert-info') . ' ">'
+                    . '<button type="button" class="close" data-dismiss="alert">×</button>' . session()->get('sessMsg')
+                . '</div>';
+            }
+            session()->forget('sessMsg');
+            session()->forget('sessMsgType');
+        }
+        return $ret;
+    }
+    
+    public function tblHasPublicID($tbl = '')
+    {
+        if (trim($tbl) == '') $tbl = $this->coreTbl;
+        if (isset($this->tblI[$tbl])) {
+            $chk = SLFields::where('FldTable', $this->tblI[$tbl])
+                ->where('FldName', 'PublicID')
+                ->first();
+            if ($chk && isset($chk->FldID)) return true;
+        }
+        return false;
+    }
+    
+    public function chkInPublicID($pubID = -3, $tbl = '')
+    {
+        if (trim($tbl) == '') $tbl = $this->coreTbl;
+        if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) return $pubID;
+        $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
+        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" . $pubIdFld . "', '" . $pubID . "')->first();");
+        if ($idChk && isset($idChk->{ $this->tblAbbr[$tbl] . 'ID' })) {
+            return $idChk->getKey();
+        }
+        return $pubID;
     }
     
 }

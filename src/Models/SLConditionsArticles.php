@@ -12,5 +12,6 @@ class SLConditionsArticles extends Model
     [    
         'ArticleCondID', 
         'ArticleURL', 
+        'ArticleTitle', 
     ];
 }

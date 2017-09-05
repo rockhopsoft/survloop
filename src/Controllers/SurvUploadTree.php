@@ -6,13 +6,13 @@ use Storage;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
 
-use App\Models\User;       
+use App\Models\User;
+use App\Models\SLUploads;
 use App\Models\SLNodeResponses;
 
 class SurvUploadTree extends SurvLoopTree
 {
     public $uploadTypes      = array();
-    protected $upLinks       = array();
     protected $uploads       = array();
     protected $upDeets       = array();
     
@@ -77,22 +77,32 @@ class SurvUploadTree extends SurvLoopTree
     
     protected function getUploadFile($nID)
     {
-        return $this->getRandStr('Evidence', 'EvidStoredFile', 30);
+        return $this->getRandStr('Uploads', 'UpStoredFile', 30);
     }
     
-    protected function getUploadLinks($nID)
+    protected function prevUploadList($nID = -3)
     {
-        return array();
-    }
-    
-    protected function getUploadSet($nID)
-    {
-        return '+';
-    }
-    
-    protected function prevUploadList($nID)
-    {
-        return array();
+        if ($nID <= 0 || !isset($this->allNodes[$nID])) {
+            return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+                ->where('UpCoreID', $this->coreID)
+                ->orderBy('created_at', 'asc')
+                ->get();
+        } else {
+            $fldID = $this->allNodes[$nID]->getTblFldID();
+            if ($fldID > 0) {
+                list($tbl, $fld) = $this->getTblFld();
+                list($linkRecInd, $linkRecID) = $this->currSessDataPos($tbl);
+                if ($linkRecID > 0) {
+                    return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+                        ->where('UpCoreID', $this->coreID)
+                        ->where('UpLinkFldID', $fldID)
+                        ->where('UpLinkRecID', $linkRecID)
+                        ->orderBy('created_at', 'asc')
+                        ->get();
+                }
+            }
+        }
+        return [];
     }
     
     public function retrieveUploadFile($upID = '')
@@ -126,19 +136,18 @@ class SurvUploadTree extends SurvLoopTree
         $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
         $lifetime = 86400; // One day in seconds
         $header_etag = md5($file_time . $up["file"]);
-        $header_last_modified = gmdate('r', $file_time);
+        $header_modified = gmdate('r', $file_time);
         $headers = array(
             'Content-Disposition' => 'inline; filename="' . $this->coreID . '-' . (1+$up["ind"]) 
                                         . '-' . $up["fileOrig"] . '"',
-            'Last-Modified'       => $header_last_modified,
+            'Last-Modified'       => $header_modified,
             'Cache-Control'       => 'must-revalidate',
             'Expires'             => gmdate('r', $file_time + $lifetime),
             'Pragma'              => 'public',
             'Etag'                => $header_etag
         );
         // Is the resource cached?
-        $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
-            && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_last_modified);
+        $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
         $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
             && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
         if ($h1 || $h2) {
@@ -180,49 +189,48 @@ class SurvUploadTree extends SurvLoopTree
     
     protected function loadPrevUploadDeets($nID = -3)
     {
-        $this->upLinks = $this->getUploadLinks($nID);
-        $this->uploads = $this->prevUploadList($nID, $this->upLinks);
-        $this->upDeets = array();
+        $this->uploads = $this->prevUploadList($nID);
+        $this->upDeets = [];
         if ($this->uploads && sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
                 $this->upDeets[$i]["ind"]         = $i;
-                $this->upDeets[$i]["privacy"]     = $upRow->privacy;
+                $this->upDeets[$i]["privacy"]     = $upRow->UpPrivacy;
                 $this->upDeets[$i]["ext"] = '';
-                if (trim($upRow->upFile) != '') {
-                    $tmpExt = explode(".", $upRow->upFile);
+                if (trim($upRow->UpUploadFile) != '') {
+                    $tmpExt = explode(".", $upRow->UpUploadFile);
                     $this->upDeets[$i]["ext"] = $tmpExt[(sizeof($tmpExt)-1)];
                 }
-                $this->upDeets[$i]["filename"] = $upRow->storeFile . '.' . $this->upDeets[$i]["ext"];
-                $this->upDeets[$i]["file"]     = $this->getUploadFolder($nID) . $upRow->storeFile 
+                $this->upDeets[$i]["filename"] = $upRow->UpStoredFile . '.' . $this->upDeets[$i]["ext"];
+                $this->upDeets[$i]["file"]     = $this->getUploadFolder($nID) . $upRow->UpStoredFile 
                     . '.' . $this->upDeets[$i]["ext"];
                 $this->upDeets[$i]["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->coreID 
-                    . '/' . $upRow->storeFile . '.' . $this->upDeets[$i]["ext"];
-                $this->upDeets[$i]["fileOrig"] = $upRow->upFile;
+                    . '/' . $upRow->UpStoredFile . '.' . $this->upDeets[$i]["ext"];
+                $this->upDeets[$i]["fileOrig"] = $upRow->UpUploadFile;
                 $this->upDeets[$i]["fileLnk"]  = '<a href="' . $this->upDeets[$i]["filePub"] 
-                    . '" target="_blank">' . $upRow->upFile . '</a>';
+                    . '" target="_blank">' . $upRow->UpUploadFile . '</a>';
                 $this->upDeets[$i]["youtube"]  = '';
                 $this->upDeets[$i]["vimeo"]    = '';
                 $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
                     . "-upload-types"], 'Video');
                 if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->step == 'uploadDel' 
-                    && $GLOBALS["SL"]->REQ->has('alt') && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->id) {
+                    && $GLOBALS["SL"]->REQ->has('alt') && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->UpID) {
                     if (file_exists($this->upDeets[$i]["file"]) && trim($upRow->type) != $vidTypeID) {
                         unlink($this->upDeets[$i]["file"]);
                     }
-                    $this->sessData->deleteDataItem($nID, 'Evidence', $upRow->id);
+                    $this->sessData->deleteDataItem($nID, 'Evidence', $upRow->UpID);
                 } else {
                     if (trim($upRow->type) == $vidTypeID) {
-                        if (stripos($upRow->video, 'youtube') !== false 
-                            || stripos($upRow->video, 'youtu.be') !== false) {
-                            $this->upDeets[$i]["youtube"] = $this->getYoutubeID($upRow->video);
-                            $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->video . '" target="_blank">youtube/' 
-                                . $this->upDeets[$i]["youtube"] . '</a>';
-                        } elseif (stripos($upRow->video, 'vimeo.com') !== false) {
-                            $this->upDeets[$i]["vimeo"] = $this->getVimeoID($upRow->video);
-                            $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->video . '" target="_blank">vimeo/' 
-                                . $this->upDeets[$i]["vimeo"] . '</a>';
+                        if (stripos($upRow->UpVideoLink, 'youtube') !== false 
+                            || stripos($upRow->UpVideoLink, 'youtu.be') !== false) {
+                            $this->upDeets[$i]["youtube"] = $this->getYoutubeID($upRow->UpVideoLink);
+                            $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
+                                . '" target="_blank">youtube/' . $this->upDeets[$i]["youtube"] . '</a>';
+                        } elseif (stripos($upRow->UpVideoLink, 'vimeo.com') !== false) {
+                            $this->upDeets[$i]["vimeo"] = $this->getVimeoID($upRow->UpVideoLink);
+                            $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
+                                . '" target="_blank">vimeo/' . $this->upDeets[$i]["vimeo"] . '</a>';
                         }
-                    } elseif (!file_exists($this->upDeets[$i]["file"]))  {
+                    } elseif (!file_exists($this->upDeets[$i]["file"])) {
                         $this->upDeets[$i]["fileLnk"] .= ' &nbsp;&nbsp;<span class="slRedDark"
                             ><i class="fa fa-exclamation-triangle"></i> <i>File Not Found</i></span>';
                     }
@@ -284,19 +292,6 @@ class SurvUploadTree extends SurvLoopTree
         return $ups;
     }
     
-    protected function getUploadsList($list = [], $isAdmin = false, $isOwner = false)
-    {
-        $uploads = [];
-        if ($list && sizeof($list) == 0) return [];
-        foreach ($list as $nID) {
-            $tmp = $this->getUploads($nID, $isAdmin, $isOwner);
-            if (sizeof($tmp) > 0) {
-                foreach ($tmp as $up) $uploads[] = $up;
-            }
-        }
-        return $uploads;
-    }
-    
     protected function postUploadTool($nID)
     {
         $ret = '';
@@ -305,44 +300,45 @@ class SurvUploadTree extends SurvLoopTree
             . "-upload-types"], 'Video');
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                if ($GLOBALS["SL"]->REQ->has('up'.$upRow->id.'EditVisib') 
-                    && intVal($GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditVisib')) == 1) {
-                    $upArr = [ 
-                        'id'      => $upRow->id, 
-                        'title'   => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditTitle'), 
-                        //'desc'    => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditDesc'), 
-                        'type'    => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditType'), 
-                        'privacy' => $GLOBALS["SL"]->REQ->input('up'.$upRow->id.'EditPrivacy')
-                    ];
-                    $ret .= ' ' . $this->updateUploadRecord($nID, $upArr);
+                if ($GLOBALS["SL"]->REQ->has('up' . $upRow->UpID . 'EditVisib') 
+                    && intVal($GLOBALS["SL"]->REQ->input('up' . $upRow->UpID . 'EditVisib')) == 1) {
+                    $upRow = SLUploads::find($upRow->UpID);
+                    if ($upRow && sizeof($upRow) > 0) {
+                        $upRow->UpType    = $GLOBALS["SL"]->REQ->input('up'.$upRow->UpID.'EditType');
+                        $upRow->UpPrivacy = $GLOBALS["SL"]->REQ->input('up'.$upRow->UpID.'EditPrivacy');
+                        $upRow->UpTitle   = $GLOBALS["SL"]->REQ->input('up'.$upRow->UpID.'EditTitle');
+                        //$upRow->UpDesc  = $GLOBALS["SL"]->REQ->input('up'.$upRow->UpID.'EditDesc');
+                        $upRow->save();
+                    }
                 }
             }
         }
         if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
-            $upArr = [
-                'type'      => $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld'), 
-                'title'     => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title'), 
-                //'desc'      => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc'), 
-                'privacy'   => $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy'), 
-                'upFile'    => '', 
-                'extension' => '', 
-                'mimetype'  => '', 
-                'size'      => 0, 
-                'storeFile' => '', 
-                'video'     => '', 
-                'vidDur'    => -1
-            ];
-            if ($GLOBALS["SL"]->REQ->has('up' . $nID . 'Vid') && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
-                $upArr["video"] = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
-                $upArr["vidDur"] = $this->getYoutubeDuration($upArr["video"]);
-                $this->storeUploadRecord($nID, $upArr, $this->upLinks);
+            $upRow = new SLUploads;
+            $upRow->UpTreeID        = $GLOBALS["SL"]->treeID;
+            $upRow->UpCoreID        = $this->coreID;
+            $upRow->UpLinkFldID     = $this->allNodes[$nID]->getTblFldID();
+            $upRow->UpLinkRecID     = -3;
+            if ($upRow->UpLinkFldID > 0) {
+                list($tbl, $fld) = $this->getTblFld();
+                list($loopInd, $loopID) = $this->currSessDataPos($tbl);
+                if ($loopID > 0) $upRow->UpLinkRecID = $loopID;
+            }
+            $upRow->UpType    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
+            $upRow->UpPrivacy = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy');
+            $upRow->UpTitle   = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title');
+            //$upRow->UpDesc  = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc');
+            if ($GLOBALS["SL"]->REQ->has('up' . $nID . 'Vid') 
+                && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
+                $upRow->UpVideoLink     = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
+                $upRow->UpVideoDuration = $this->getYoutubeDuration($upRow->UpVideoLink);
             } elseif ($GLOBALS["SL"]->REQ->hasFile('up' . $nID . 'File')) { // file upload
-                $upArr["upFile"]    = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalName();
-                $upArr["extension"] = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalExtension();
-                $upArr["mimetype"]  = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getMimeType();
-                $upArr["size"]      = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getSize();
-                if (in_array($upArr["extension"], array("gif", "jpeg", "jpg", "png", "pdf")) 
-                    && in_array($upArr["mimetype"], array("image/gif", "image/jpeg", "image/jpg", "image/pjpeg", 
+                $upRow->UpUploadFile    = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalName();
+                $extension = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getClientOriginalExtension();
+                $mimetype  = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getMimeType();
+                $size      = $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->getSize();
+                if (in_array($extension, array("gif", "jpeg", "jpg", "png", "pdf")) 
+                    && in_array($mimetype, array("image/gif", "image/jpeg", "image/jpg", "image/pjpeg", 
                         "image/x-png", "image/png", "application/pdf"))) {
                     if (!$GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->isValid()) {
                         $ret .= '<div class="slRedDark">Upload Error.' 
@@ -350,25 +346,20 @@ class SurvUploadTree extends SurvLoopTree
                     } else {
                         $upFold = $this->getUploadFolder($nID);
                         $this->mkNewFolder($upFold);
-                        $upArr["storeFile"] = $this->getUploadFile($nID);
-                        $filename = $upArr["storeFile"] . '.' . $upArr["extension"];
-                        if ($this->debugOn || true) { $ret .= "saving as filename: " . $upFold.$filename . "<br>"; }
-                        if (file_exists($upFold.$filename)) Storage::delete($upFold.$filename);
+                        $upRow->UpStoredFile = $this->getUploadFile($nID);
+                        $filename = $upRow->UpStoredFile . '.' . $extension;
+                        if ($this->debugOn || true) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
+                        if (file_exists($upFold . $filename)) Storage::delete($upFold . $filename);
                         $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->move($upFold, $filename);
-                        $this->storeUploadRecord($nID, $upArr, $this->upLinks);
                     }
                 } else {
                     $ret .= '<div class="slRedDark">Invalid file. Please check the format and try again.</div>';
                 }
             }
+            $upRow->save();
         }
         return $ret;
     }
-    
-    // $upArr = array('type' => '', 'title' => '', 'desc' => '', 'privacy' => '', 'upFile' => '', 
-    // 'storeFile' => '', 'video' => '', 'vidDur' => 0);
-    protected function storeUploadRecord($nID, $upArr, $upLinks) { return true; }
-    protected function updateUploadRecord($nID, $upArr) { return true; }
     
     protected function mkNewFolder($fold)
     {
@@ -386,7 +377,7 @@ class SurvUploadTree extends SurvLoopTree
     protected function getYoutubeDuration($vidURL)
     {
         if (stripos($vidURL, 'youtube') !== false) {
-
+            
         }
         return -1;
     }

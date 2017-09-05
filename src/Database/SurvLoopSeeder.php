@@ -3984,35 +3984,35 @@ class SurvLoopSeeder extends Seeder
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'meta-img',
-            'DefDescription' => '/survloop/meta-img.png'
+            'DefDescription' => '/survloop/uploads/meta-img.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 9,
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'logo-img-lrg',
-            'DefDescription' => '/survloop/survloop.png'
+            'DefDescription' => '/survloop/uploads/survloop.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 10,
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'logo-img-md',
-            'DefDescription' => '/survloop/survloop.png'
+            'DefDescription' => '/survloop/uploads/survloop.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 11,
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'logo-img-sm',
-            'DefDescription' => '/survloop/survloop.png'
+            'DefDescription' => '/survloop/uploads/survloop.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 12,
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'shortcut-icon',
-            'DefDescription' => '/survloop/survloop-ico.png'
+            'DefDescription' => '/survloop/uploads/survloop-ico.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 13,
@@ -4175,7 +4175,7 @@ class SurvLoopSeeder extends Seeder
             'DefDatabase' => '1',
             'DefSet' => 'System Settings',
             'DefSubset' => 'app-license-img',
-            'DefDescription' => '/survloop/creative-commons-by-sa-88x31.png'
+            'DefDescription' => '/survloop/uploads/creative-commons-by-sa-88x31.png'
         ]);
         DB::table('SL_Definitions')->insert([
             'DefID' => 35,

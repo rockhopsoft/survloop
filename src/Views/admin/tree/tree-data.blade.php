@@ -162,7 +162,7 @@ basic core-table-to-loop-table relations.
         <td><a href="/dashboard/db/table/{{ $link->DataHelpTable }}" target="_blank"
             >{{ $link->DataHelpTable }}</a></td>
         <td>{{ $link->DataHelpValueField }}</td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->id }}" class="f10 slRedDark"
+        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->DataHelpID }}" class="f10 slRedDark"
             ><i class="fa fa-times"></i></a></td>
     </tr>
 @empty

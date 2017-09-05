@@ -13,5 +13,6 @@ class SLDesignTweaks extends Model
         'TweakVersionAB', 
         'TweakSubmissionProgress', 
         'TweakUserID', 
+        'TweakIPaddy', 
     ];
 }

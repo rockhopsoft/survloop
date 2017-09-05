@@ -27,7 +27,6 @@ class CoreTree extends SurvLoopController
     public $nodeTiers             = array();
     public $nodesRawOrder         = array();
     public $nodesRawIndex         = array();
-    protected $currNodeDataBranch = [];
     protected $currNodeSubTier    = [];
     
     public $sessData              = [];
@@ -49,14 +48,26 @@ class CoreTree extends SurvLoopController
         return ( $nID > 0 && isset($this->allNodes[$nID]) );
     }
     
+    protected function loadTreeStart($treeIn = -3, Request $request = NULL)
+    {
+        if ($request && sizeof($request) > 0) $this->REQ = $request;
+        if ($treeIn > 0) {
+            $this->treeID = $treeIn;
+        } elseif ($this->treeID <= 0) {
+            if (intVal($GLOBALS["SL"]->treeID) > 0) {
+                $this->treeID = $GLOBALS["SL"]->treeID;
+            } else {
+                $this->tree = SLTree::orderBy('TreeID', 'asc')
+                    ->first();
+                $this->treeID = $this->tree->TreeID;
+            }
+        }
+        return $this->treeID;
+    }
+    
     public function loadTree($treeIn = -3, Request $req = NULL, $loadFull = false)
     {
-        if ($req && sizeof($req) > 0) $this->REQ = $req;
-        if ($treeIn > 0) $this->treeID = $treeIn;
-        elseif ($this->treeID <= 0) {
-            $this->tree = SLTree::orderBy('TreeID', 'asc')->first();
-            $this->treeID = $this->tree->TreeID;
-        }
+        $this->loadTreeStart($treeIn, $req);
         $nodes = array();
         if ($loadFull) $nodes = SLNode::where('NodeTree', $this->treeID)
             ->get();
@@ -181,6 +192,7 @@ class CoreTree extends SurvLoopController
     protected function nextNode($nID)
     {
         if ($nID <= 0 || !isset($this->nodesRawIndex[$nID])) return -3;
+        $this->runCurrNode($nID);
         $nodeOverride = $this->moveNextOverride($nID);
         if ($nodeOverride > 0) return $nodeOverride;
         
@@ -189,6 +201,11 @@ class CoreTree extends SurvLoopController
         if (!isset($this->nodesRawOrder[$nextNodeInd])) return -3;
         $nextNodeID = $this->nodesRawOrder[$nextNodeInd];
         return $nextNodeID;
+    }
+    
+    protected function runCurrNode($nID)
+    {
+        return true;
     }
 
     // Locate the next node, outside this node's descendants
@@ -397,7 +414,7 @@ class CoreTree extends SurvLoopController
                 ->orderBy('updated_at', 'desc')
                 ->first();
             if ($nodeSave && isset($nodeSave->PageSaveNode)) {
-                $this->sessInfo->SessUserID = $nodeSave->PageSaveNode;
+                $this->sessInfo->SessCurrNode = $nodeSave->PageSaveNode;
             } elseif (isset($GLOBALS["SL"]->treeRow->TreeRoot)) {
                 $this->sessInfo->SessCurrNode = $GLOBALS["SL"]->treeRow->TreeRoot;
             }
@@ -523,6 +540,7 @@ class CoreTree extends SurvLoopController
     
     public function chkSess($cid)
     {
+        if (!$this->v["user"] || !isset($this->v["user"]->id)) return false;
         return SLSess::where('SessCoreID', $cid)
             ->where('SessTree', $this->treeID)
             ->where('SessUserID', $this->v["user"]->id)
@@ -530,9 +548,29 @@ class CoreTree extends SurvLoopController
             ->first();
     }
     
+    public function newSessRow($treeID, $cid)
+    {
+        $this->sessInfo = new SLSess;
+        $this->sessInfo->SessUserID = $this->v["user"]->id;
+        $this->sessInfo->SessTree = $treeID;
+        $this->sessInfo->SessCoreID = $cid;
+        $this->sessInfo->save();
+        $this->sessID = $this->sessInfo->SessID;
+        return $this->sessInfo;
+    }
+    
     public function switchSess($request, $cid)
     {
         $this->survLoopInit($request);
+        if (!$cid || intVal($cid) <= 0) return $this->redir('/my-profile');
+        $ownerUser = -3;
+        eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+            . "::find(" . session()->get('coreID' . $GLOBALS["SL"]->sessTree) . ");");
+        if (!$chkRec || sizeof($chkRec) == 0) return $this->redir('/my-profile');
+        if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
+            $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
+            if ($ownerUser != $this->v["user"]->id) return $this->redir('/my-profile');
+        }
         $session = $this->chkSess($cid);
         if ($session && isset($session->SessID)) {
             $this->sessInfo = $session;
@@ -540,41 +578,40 @@ class CoreTree extends SurvLoopController
             $this->coreID = $cid;
         }
         if (!$this->sessInfo || !isset($this->sessInfo->SessTree)) {
-            $this->sessInfo = new SLSess;
-            $this->sessInfo->SessUserID = $this->v["user"]->id;
-            $this->sessInfo->SessTree = $this->treeID;
-            $this->sessInfo->SessCoreID = $cid;
-            $this->sessInfo->save();
+            $this->newSessRow($this->treeID, $cid);
         }
         if ($request->has('fromthe') && $request->get('fromthe') == 'top') {
             $this->sessInfo->SessCurrNode = $GLOBALS["SL"]->treeRow->TreeFirstPage;
-            $this->sessInfo->save();
-        }
-        if ($request->has('fromnode') && intVal($request->get('fromnode')) > 0) {
+        } elseif ($request->has('fromnode') && intVal($request->get('fromnode')) > 0) {
             $this->sessInfo->SessCurrNode = intVal($request->get('fromnode'));
-            $this->sessInfo->save();
+        } elseif (!isset($this->sessInfo->SessCurrNode) || intVal($this->sessInfo->SessCurrNode) <= 0) {
+            $nodeFld = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'SubmissionProgress';
+            if (isset($chkRec->{ $nodeFld }) && intVal($chkRec->{ $nodeFld }) > 0) {
+                $this->sessInfo->SessCurrNode = intVal($chkRec->{ $nodeFld });
+            }
         }
+        $this->sessInfo->save();
         session()->put('sessID' . $GLOBALS["SL"]->sessTree, $this->sessInfo->SessID);
         session()->put('coreID' . $GLOBALS["SL"]->sessTree, $cid);
         if ($this->sessInfo->SessCurrNode > 0) {
             $nodeRow = SLNode::find($this->sessInfo->SessCurrNode);
             if ($nodeRow && isset($nodeRow->NodePromptNotes) && trim($nodeRow->NodePromptNotes) != '') {
                 return $this->redir('/u/' . $GLOBALS['SL']->treeRow->TreeSlug . '/' . $nodeRow->NodePromptNotes, true);
-            } else {
-                return $this->redir('/start/' . $GLOBALS["SL"]->treeRow->TreeSlug, true);
             }
         }
-        return $this->redir('/afterLogin');
+        return $this->redir('/start/' . $GLOBALS["SL"]->treeRow->TreeSlug, true);
+        //return $this->redir('/afterLogin');
     }
 
     public function afterLogin(Request $request)
     {
         $this->survLoopInit($request, '');
         if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff')) {
-            return $this->redir('/dashboard');
+            return redirect()->intended('dashboard');
+            //return $this->redir('/dashboard');
         } else {
-            if (mktime(date("H"), date("i"), date("s")-30, date('n'), date('j'), date('Y'))
-                < strtotime($this->v["user"]->created_at)) { // signed up in the past 30 seconds
+            if (mktime(date("H"), date("i")-1, date("s"), date('n'), date('j'), date('Y'))
+                < strtotime($this->v["user"]->created_at)) { // signed up in the past minute
                 if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)) {
                     eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
                         . "::find(" . session()->get('coreID' . $GLOBALS["SL"]->sessTree) . ");");
@@ -606,9 +643,11 @@ class CoreTree extends SurvLoopController
                 $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
                 if (trim($nodeURL) != '') return $this->redir($nodeURL);
             }
-            return $this->redir('/my-profile');
+            return redirect()->intended('my-profile');
+            //return $this->redir('/my-profile');
         }
-        return $this->redir('/');
+        return redirect()->intended('/home');
+        //return $this->redir('/');
     }
 
     public function findUserCoreID()
@@ -831,7 +870,7 @@ class CoreTree extends SurvLoopController
                     $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'SubmissionProgress', 'update', $nID);
             }
             $this->currNodeSubTier = $this->loadNodeSubTier($nID);
-            $this->currNodeDataBranch = $this->loadNodeDataBranch($nID);
+            $this->loadNodeDataBranch($nID);
         }
         return true;
     }
@@ -926,6 +965,15 @@ class CoreTree extends SurvLoopController
             return view('vendor.survloop.profile', $this->v);
         }
         return '<div><i>User not found.</i></div>';
+    }
+    
+    public function genNewCorePubID($tbl = '')
+    {
+        if (trim($tbl) == '') $tbl = $GLOBALS["SL"]->coreTbl;
+        $pubIdFld = $GLOBALS["SL"]->tblAbbr[$tbl] . 'PublicID';
+        eval("\$idChk = " . $GLOBALS["SL"]->modelPath($tbl) . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
+        if (!$idChk || !isset($idChk->{ $pubIdFld }) || intVal($idChk->{ $pubIdFld }) <= 0) return 1;
+        return (1+intVal($idChk->{ $pubIdFld }));
     }
     
 }

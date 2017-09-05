@@ -424,14 +424,14 @@
                         <div class="radio-inline">
                             <label class="nobld">
                                 <input type="radio" name="FldNullSupport{{ $fldSfx }}" value="1" {{ $chkDis }} 
-                                @if ($fld->FldNullSupport == 1) CHECKED @endif
+                                @if (!isset($fld->FldNullSupport) || $fld->FldNullSupport == 1) CHECKED @endif
                                 > Nulls Allowed
                             </label>
                         </div>
                         <div class="radio-inline">
                             <label class="nobld">
                                 <input type="radio" name="FldNullSupport{{ $fldSfx }}" value="0" {{ $chkDis }} 
-                                @if ($fld->FldNullSupport == 0) CHECKED @endif 
+                                @if (isset($fld->FldNullSupport) && $fld->FldNullSupport == 0) CHECKED @endif 
                                 > No Nulls
                             </label>
                         </div>

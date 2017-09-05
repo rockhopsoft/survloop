@@ -42,6 +42,7 @@ XML included an automatically generated schema, eg.<br />
 
 * php: >=5.6.4
 * <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.3.*
+* <a href="https://packagist.org/packages/matthiasmullie/minify" target="_blank">matthiasmullie/minify</a>: 1.3.*
 
 # <a name="getting-started"></a>Getting Started
 

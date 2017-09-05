@@ -1,5 +1,6 @@
 /* generated from resources/views/vendor/survloop/scripts-js.blade.php */
 
+var heroActions = new Array();
 @if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
     function chkLogoResize() {
         if (!document.getElementById('slLogoImg')) return false;
@@ -9,6 +10,11 @@
             document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-md'] }}';
         } else {
             document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}';
+        }
+        for (var h=0; h < heroActions.length; h++) {
+            if (document.getElementById("heroAction"+heroActions[h]+"")) {
+                document.getElementById("heroAction"+heroActions[h]+"").style.width = window.innerWidth;
+            }
         }
     }
     window.onresize = function() { chkLogoResize(); }
@@ -441,26 +447,34 @@ function updateTagList(nID) {
 }
 
 // used by form generator child reveal responsiveness:
+var nodeList = new Array();
+var nodeParents = new Array();
 var nodeKidList = new Array();
+var nodeSffxs = new Array("");
 var conditionNodes = new Array();
-
-function kidsVisible(nID, onOff, isFirst) {
-	if (!isFirst && conditionNodes[nID]) return true;
-	isFirst = false;
+function kidsVisible(nID, nSffx, onOff) {
+    setNodeVisib(nID, nSffx, onOff);
 	if (nodeKidList[nID] && nodeKidList[nID].length > 0) {
 		for (var k=0; k < nodeKidList[nID].length; k++) {
-			setNodeVisib(nodeKidList[nID][k], onOff);
-			kidsVisible(nodeKidList[nID][k], onOff, isFirst);
+			kidsVisible(nodeKidList[nID][k], nSffx, onOff);
 		}
 	}
 	return true;
 }
-
-function setNodeVisib(nID, onOff) {
-	if (document.getElementById("n"+nID+"VisibleID")) {
-		if (onOff) document.getElementById("n"+nID+"VisibleID").value=1;
-		else document.getElementById("n"+nID+"VisibleID").value=0;
+function setNodeVisib(nID, nSffx, onOff) {
+	if (document.getElementById("n"+nID+nSffx+"VisibleID")) {
+		if (onOff) document.getElementById("n"+nID+nSffx+"VisibleID").value=1;
+		else document.getElementById("n"+nID+nSffx+"VisibleID").value=0;
 	}
+	return true;
+}
+function chkNodeParentVisib(nID) {
+    /* for (var s=0; s < nodeSffxs.length; s++) {
+        if (nodeParents[nID] && document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID") && document.getElementById("n"+nodeParents[nID]+nodeSffxs[s]+"VisibleID")) {
+            if (onOff) document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID").value=1;
+            else document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID").value=0;
+        }
+    } */
 	return true;
 }
 
@@ -663,43 +677,54 @@ $(document).ready(function(){
         $("#tblSelect").load("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+"");
         $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
     }
+    
+    if (!document.getElementById('loginLnk')) $("#headClear").load("/js-load-menu");
+    
+    $(document).on("click", ".adminAboutTog", function() {
+        if (document.getElementById('adminAbout')) {
+            $("#adminAbout").slideToggle('slow');
+        }
+	});
 	
     @if (isset($jqueryXtra)) {!! $jqueryXtra !!} @endif
 	
 });
 
 function openNav() {
+    document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-off"] !!} solid";
+    document.getElementById("mySidenav").style.boxShadow = "0px 0px 60px {!! $css["color-main-grey"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
     document.getElementById("main").style.marginRight = "300px";
     document.getElementById("navBurger").style.display = "none";
     document.getElementById("navBurgerClose").style.display = "block";
 }
 function closeNav() {
+    document.getElementById("mySidenav").style.borderLeft = "0px none";
+    document.getElementById("mySidenav").style.boxShadow = "none";
     document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("navBurgerClose").style.marginRight = "0";
+    document.getElementById("main").style.marginRight = "0";
     document.getElementById("navBurger").style.display = "block";
     document.getElementById("navBurgerClose").style.display = "none";
 }
 function toggleNav() {
     if (document.getElementById("mySidenav").style.width == "300px") return closeNav();
     return openNav();
-} 
-
+}
 
 var progressPerc = 0;
 var treeMajorSects = new Array();
 var treeMinorSects = new Array();
 var treeMajorSectsDisabled = new Array();
-var navLogin = new Array();
-function setNavItem(navTxt, navLink) {
-    var found = false;
-    if (!navLogin) return true;
-    if (navLogin && navLogin.length > 0) {
-        for (var i=0; i<navLogin.length; i++) {
-            if (navLogin[i][1] == navTxt && navLogin[i][2] == navLink) found = true;
-        }
+function addTopNavItem(navTxt, navLink) {
+    if (document.getElementById("myNavBarIn")) {
+        document.getElementById("myNavBarIn").innerHTML += "<a class=\"pull-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
     }
-    if (!found) navLogin[navLogin.length] = new Array(0, navTxt, navLink);
+    return true;
+}
+function addSideNavItem(navTxt, navLink) {
+    if (document.getElementById("mySideUL")) {
+        document.getElementById("mySideUL").innerHTML += "<li><a href=\""+navLink+"\">"+navTxt+"</a></li>";
+    }
     return true;
 }
 function printHeadBar(percIn) {
@@ -707,22 +732,10 @@ function printHeadBar(percIn) {
         progressPerc = percIn;
         if (document.getElementById("progWrap")) document.getElementById("progWrap").innerHTML = getProgBar();
     }
-    if (document.getElementById("mySidenav")) document.getElementById("mySidenav").innerHTML = getTreeNav();
     return true;
 }
 function getProgBar() {
     return "<div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
-}
-function getTreeNav() {
-    var ret = "<ul class=\"nav nav-sidebar\">";
-    if (undefined === treeMajorSects) return ret + "</ul>";
-    var navSect = "";
-    if (navLogin) {
-        for (var nav=0; nav < navLogin.length; nav++) {
-            ret += "<li><a href=\"" + navLogin[nav][2] + "\">" + navLogin[nav][1] + "</a></li>";
-        }
-    }
-    return ret + "</ul>";
 }
 
 function hideRightSide() {
@@ -736,15 +749,5 @@ function showRightSide() {
 	return true;
 }
 
-
-var holdSess = 0;
-function holdSession() {
-	if (holdSess > 0 && document.getElementById("hidFrameID")) {
-		document.getElementById("hidFrameID").src="/holdSess";
-		setTimeout("holdSession()", (5*60000));
-	}
-	return true;
-}
-setTimeout("holdSession()", (5*60000));
 
 @if (isset($jsXtra)) {!! $jsXtra !!} @endif

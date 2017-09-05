@@ -4,11 +4,14 @@
         <div class="reportSectHead">{!! $blockName !!}</div>
     @endif
     @if (isset($deets) && sizeof($deets) > 0)
-        <table class="table">
         @foreach ($deets as $i => $deet) 
-            @if (!isset($deet[1])) <tr><td colspan=2 >{!! $deet[0] !!}</td></tr>
-            @else <tr><td><span>{!! $deet[0] !!}</span></td><td>{!! $deet[1] !!}</td></tr> @endif
+            <div class="row @if ($i%2 == 0) row2 @endif " >
+            @if (!isset($deet[1])) <div class="col-md-12">{!! $deet[0] !!}</div>
+            @else
+                <div class="col-md-6"><span>{!! $deet[0] !!}</span></div>
+                <div class="col-md-6">{!! $deet[1] !!}</div>
+            @endif
+            </div>
         @endforeach
-        </table>
     @endif
 </div>

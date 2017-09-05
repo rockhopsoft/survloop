@@ -18,10 +18,10 @@
 
 <tr>
     <th>Name</th>
-    <th>Email</th>
+    <th>Email <span class="slGrey mL10">[<i class="fa fa-check-circle-o" aria-hidden="true"></i> verified]</span></th>
     <th class="taC">Volunteer</th>
+    <th class="taC">Third Party</th>
     <th class="taC">Evaluators</th>
-    <th class="taC">Brancher</th>
     <th class="taC">Databaser</th>
     <th class="taC">Admin</th>
 </tr>
@@ -30,13 +30,17 @@
     @forelse ($userSet as $volun)
         <tr>
             <td><b>{!! $volun->printUsername(true, '/dashboard/users/') !!}</b></td>
-            <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a></td>
+            <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a>
+                @if ($volun->hasVerifiedEmail())
+                    <span class="slGrey"><i class="fa fa-check-circle-o mL10" aria-hidden="true"></i></span>
+                @endif
+            </td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="volunteer" @if ($volun->hasRole('volunteer')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
-                value="staff" {{ $disableAdmin }} @if ($volun->hasRole('staff')) CHECKED @endif ></td>
+                value="thirdparty" {{ $disableAdmin }} @if ($volun->hasRole('thirdparty')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
-                value="brancher" {{ $disableAdmin }} @if ($volun->hasRole('brancher')) CHECKED @endif ></td>
+                value="staff" {{ $disableAdmin }} @if ($volun->hasRole('staff')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="databaser" {{ $disableAdmin }} @if ($volun->hasRole('databaser')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 

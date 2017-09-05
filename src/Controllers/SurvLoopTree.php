@@ -7,6 +7,8 @@ use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 
+use MatthiasMullie\Minify;
+
 use App\Models\User;
 
 use App\Models\SLDatabases;
@@ -15,12 +17,15 @@ use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
+use App\Models\SLNodeResponses;
 use App\Models\SLFields;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
 use App\Models\SLSessEmojis;
 use App\Models\SLSearchRecDump;
 use App\Models\SLContact;
+use App\Models\SLConditions;
+use App\Models\SLConditionsArticles;
 
 use SurvLoop\Controllers\CoreTree;
 use SurvLoop\Controllers\SurvLoopData;
@@ -75,6 +80,9 @@ class SurvLoopTree extends CoreTree
     public $advSearchUrlSffx      = '';
     public $advSearchBarJS        = '';
     
+    // kidMaps[nodeID][kidNodeID][] = [ responseInd, responseValue ]
+    public $kidMaps               = [];
+    
     protected function loadNode($nodeRow = [])
     {
         if ($nodeRow && isset($nodeRow->NodeID) && $nodeRow->NodeID > 0) {
@@ -105,7 +113,8 @@ class SurvLoopTree extends CoreTree
         $this->coreIDoverride = -3;
         if ($sessIn > 0) $this->coreIDoverride = $sessIn;
         $this->REQ = $request;
-        if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->REQ->has('node') && intVal($GLOBALS["SL"]->REQ->node) > 0) {
+        if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('tree') 
+            && intVal($GLOBALS["SL"]->REQ->get('tree')) > 0) {
             $this->hasREQ = true;
             $this->REQstep = $GLOBALS["SL"]->REQ->get('step');
         }
@@ -132,11 +141,13 @@ class SurvLoopTree extends CoreTree
             eval($content);
         } else {
             $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/SurvLoopTree.php' . "\n\n";
+            $nodeIDs = [];
             $nodes = SLNode::where('NodeTree', $this->treeID)
                 ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeType', 'NodeOpts', 
                     'NodeDataBranch', 'NodeDataStore', 'NodeResponseSet', 'NodeDefault')
                 ->get();
             foreach ($nodes as $row) {
+                $nodeIDs[] = $row->NodeID;
                 if ($row->NodeParentID <= 0) {
                     $rootID = $row->NodeID;
                     $cache .= '$'.'this->rootID = ' . $row->NodeID . ';' . "\n";
@@ -179,6 +190,24 @@ class SurvLoopTree extends CoreTree
                     $cache .= $cacheNode;
                 }
             }
+            $this->kidMaps = [];
+            $responses = SLNodeResponses::whereIn('NodeResNode', $nodeIDs)
+                ->where('NodeResShowKids', '>', 0)
+                ->get();
+            if (sizeof($responses) > 0) {
+                foreach ($responses as $j => $res) {
+                    if (!isset($this->kidMaps[$res->NodeResNode])) {
+                        $this->kidMaps[$res->NodeResNode] = [];
+                        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '] = [];' . "\n";
+                    }
+                    if (!isset($this->kidMaps[$res->NodeResNode][intVal($res->NodeResShowKids)])) {
+                        $this->kidMaps[$res->NodeResNode][intVal($res->NodeResShowKids)] = [];
+                        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' . $res->NodeResShowKids . '] = [];' . "\n";
+                    }
+                    $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' . $res->NodeResShowKids . '][] = [ ' 
+                        . $res->NodeResOrd . ', "' . $res->NodeResValue . '" ];' . "\n";
+                }
+            }
             $cache .= '$'.'this->treeSize = sizeof($'.'this->allNodes);' . "\n";
             
             $this->allNodes = [];
@@ -192,6 +221,29 @@ class SurvLoopTree extends CoreTree
             Storage::put($cacheFile, $cache . $cache2 . $cache3);
         }
         return true;
+    }
+    
+    // returns 1 if nID is a conditional kid, and is true
+    // returns 0 if nID is not a conditional kid
+    // returns -1 if nID is a conditional kid, and is false
+    protected function chkKidMapTrue($nID)
+    {
+        $found = false;
+        if (sizeof($this->kidMaps) > 0) {
+            foreach ($this->kidMaps as $parent => $kids) {
+                if (sizeof($kids) > 0) {
+                    foreach ($kids as $nKid => $ress) {
+                        if ($nID == $nKid && sizeof($ress) > 0) {
+                            $found = true;
+                            foreach ($ress as $cnt => $res) {
+                                if (isset($res[2]) && $res[2]) return 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return (($found) ? -1 : 0);
     }
     
     public function loadNodePageTiersCache()
@@ -230,19 +282,9 @@ class SurvLoopTree extends CoreTree
         return true;
     }
     
-    public function loadTree($treeIn = -3, Request $req = NULL, $loadFull = false)
+    public function loadTree($treeIn = -3, Request $request = NULL, $loadFull = false)
     {
-        if ($treeIn > 0) {
-            $this->treeID = $treeIn;
-        } elseif ($this->treeID <= 0) {
-            if (intVal($GLOBALS["SL"]->treeID) > 0) {
-                $this->treeID = $GLOBALS["SL"]->treeID;
-            } else {
-                $this->tree = SLTree::orderBy('TreeID', 'asc')
-                    ->first();
-                $this->treeID = $this->tree->TreeID;
-            }
-        }
+        $this->loadTreeStart($treeIn, $request);
         $this->loadTreeFromCache();
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl);
         return true;
@@ -324,12 +366,11 @@ class SurvLoopTree extends CoreTree
             $nIDtmp = $this->allNodes[$nIDtmp]->getParent();
             if (intVal($nIDtmp) > 0) $parents[] = $nIDtmp;
         }
-        $this->sessData->dataBranches = [];
-        $this->sessData->dataBranches[] = [
+        $this->sessData->dataBranches = [ [
             "branch" => $GLOBALS["SL"]->coreTbl, 
             "loop"   => '', 
             "itemID" => $this->coreID 
-        ];
+        ] ];
         if (sizeof($parents) > 1) {
             for ($i = (sizeof($parents)-2); $i >= 0; $i--) {
                 if ($this->allNodes[$parents[$i]]->nodeType == 'Data Manip: New') {
@@ -419,16 +460,14 @@ class SurvLoopTree extends CoreTree
             $this->v["sessInfo"]           = $this->sessInfo;
             $this->v["sessData"]           = $this->sessData;
             $this->v["dataSets"]           = $this->sessData->dataSets;
-            $this->v["currNodeDataBranch"] = $this->currNodeDataBranch;
+            $this->v["currNodeDataBranch"] = $this->sessData->dataBranches;
             $this->v["REQ"]                = $this->REQ;
-            $GLOBALS['SL']->pageJAVA .= '$(document).ready(function(){
-                $("#debugPopBtn").click(function() { $("#debugPop").slideToggle("fast"); });
+            $GLOBALS['SL']->pageAJAX .= '$("#debugPopBtn").click(function() { $("#debugPop").slideToggle("fast"); });
                 $("#debugPopBtn2").click(function() { $("#debugPop2").slideToggle("slow"); });
                 $(".dataB").click(function() {
                     var dbInd = $(this).attr("id").replace("dataB", "");
                     $("#dataBranch"+dbInd+"").slideToggle("fast");
-                });
-            });';
+                }); ';
             return view('vendor.survloop.inc-var-dump', $this->v)->render();
         }
         return '';
@@ -443,12 +482,9 @@ class SurvLoopTree extends CoreTree
     public function loadSessionData($coreTbl, $coreID = -3)
     {
         if ($coreID > 0) $this->coreID = $coreID;
-        $this->sessData->loadCore($coreTbl, $this->coreID, $this->currNodeDataBranch, $this->checkboxNodes, 
-            $this->isBigSurvLoop);
-        return true;
+        $this->sessData->loadCore($coreTbl, $this->coreID, $this->checkboxNodes, $this->isBigSurvLoop);
+        return true;                 
     }
-    
-    
     
     protected function loadSessionDataSaves()
     {
@@ -623,7 +659,7 @@ class SurvLoopTree extends CoreTree
     
     protected function createProgBarJs()
     {
-        $jsFileName = '../storage/app' . $this->getProgBarJsFilename();
+        $jsFileName = '../storage/app/sys' . $this->getProgBarJsFilename();
         if (!file_exists($jsFileName) || $GLOBALS["SL"]->REQ->has('refresh')) {
             if (file_exists($jsFileName)) unlink($jsFileName);
             $jsOut = view('vendor.survloop.inc-tree-javascript', [
@@ -724,19 +760,57 @@ class SurvLoopTree extends CoreTree
                             }
                         } elseif (trim($cond->CondTag) == '#IsAdmin') {
                             if (!$this->v["user"] || !isset($this->v["user"]->id) || intVal($this->v["user"]->id) <= 0 
-                                || !$this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+                                || !$this->v["user"]->hasRole('administrator|staff|databaser')) {
                                 $retTF = false;
                             }
                         } elseif (trim($cond->CondTag) == '#IsNotAdmin') {
                             if ($this->v["user"] && isset($this->v["user"]->id) && intVal($this->v["user"]->id) > 0 
-                                && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+                                && $this->v["user"]->hasRole('administrator|staff|databaser')) {
+                                $retTF = false;
+                            }
+                        } elseif (trim($cond->CondTag) == '#EmailVerified') {
+                            if (!$this->v["user"] || !isset($this->v["user"]->id) || 
+                                !$this->v["user"]->hasVerifiedEmail()) {
                                 $retTF = false;
                             }
                         } elseif (!$this->checkNodeConditionsCustom($nID, trim($cond->CondTag))) {
                             $retTF = false;
                         }
+                    } elseif ($cond->CondOperator == 'URL-PARAM') {
+                        if (trim($cond->CondOperDeet) == '') $retTF = false;
+                        elseif (!$GLOBALS["SL"]->REQ->has($cond->CondOperDeet) 
+                            || trim($GLOBALS["SL"]->REQ->get($cond->CondOperDeet)) 
+                                != trim($cond->condFldResponses["vals"][0][1])) {
+                            $retTF = false;
+                        }
+                    } elseif ($cond->CondOperator == 'COMPLEX') {
+                        $cond->loadVals();
+                        if (isset($cond->condVals) && sizeof($cond->condVals) > 0) {
+                            foreach ($cond->condVals as $i => $val) {
+                                if ($val > 0) {
+                                    $subCond = SLConditions::find($val);
+                                    if ($subCond && isset($subCond->CondOperator)) {
+                                        if (!$this->sessData->parseCondition($subCond, $recObj, $nID)) {
+                                            $retTF = false;
+                                        }
+                                    }
+                                } else { // opposite
+                                    $subCond = SLConditions::find(-1*$val);
+                                    if ($subCond && isset($subCond->CondOperator)) {
+                                        if ($this->sessData->parseCondition($subCond, $recObj, $nID)) {
+                                            $retTF = false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     } elseif (!$this->sessData->parseCondition($cond, $recObj, $nID)) {
                         $retTF = false; 
+                    }
+                    // This is where all the condition-inversion is applied
+                    if ($nID > 0 && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
+                        && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->CondID])) {
+                        $retTF = !$retTF;
                     }
                 }
             }
@@ -772,6 +846,41 @@ class SurvLoopTree extends CoreTree
             }
         }
         return true;
+    }
+    
+    // Setting the second parameter to false alternatively returns an array of individual conditions
+    public function loadRelatedArticles()
+    {
+        $this->v["articles"] = $artCondIDs = [];
+        $this->v["allUrls"] = [ "txt" => [], "vid" => [] ];
+        $allArticles = SLConditionsArticles::get();
+        if ($allArticles && sizeof($allArticles) > 0) {
+            foreach ($allArticles as $i => $a) $artCondIDs[] = $a->ArticleCondID;
+            $allConds = SLConditions::whereIn('CondID', $artCondIDs)->get();
+            if ($allConds && sizeof($allConds) > 0) {
+                foreach ($allConds as $i => $c) {
+                    if ($this->parseConditions([$c])) {
+                        $artLnks = [];
+                        foreach ($allArticles as $i => $a) {
+                            if ($a->ArticleCondID == $c->CondID) {
+                                $artLnks[] = [$a->ArticleTitle, $a->ArticleURL];
+                                $set = ((strpos(strtolower($a->ArticleURL), 'youtube.com') !== false) ? 'vid' : 'txt');
+                                $found = false;
+                                if (sizeof($this->v["allUrls"][$set]) > 0) {
+                                    foreach ($this->v["allUrls"][$set] as $url) {
+                                        if ($url[1] == $a->ArticleURL) $found = true;
+                                    }
+                                }
+                                if (!$found) $this->v["allUrls"][$set][] = [$a->ArticleTitle, $a->ArticleURL];
+                            }
+                        }
+                        $this->v["articles"][] = [$c, $artLnks];
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
     }
     
     public function addCondEditorAjax()
@@ -818,12 +927,20 @@ class SurvLoopTree extends CoreTree
         return $clear;
     }
     
+    protected function runCurrNode($nID)
+    {
+        if ($nID == $GLOBALS["SL"]->treeRow->TreeRoot) $this->runDataManip($nID);
+        return true;
+    }
+    
     protected function runDataManip($nID)
     {
+        //echo '<br /><br /><br />runDataManip(' . $nID . ', tbl: ' . $tbl . ', ' . $newObj->getKey() . '<br />';
         if ($this->allNodes[$nID]->isDataManip()) {
             list($tbl, $fld, $newVal) = $this->allNodes[$nID]->getManipUpdate();
             if ($this->allNodes[$nID]->nodeType == 'Data Manip: New') {
                 $newObj = $this->sessData->newDataRecord($tbl, $fld, $newVal);
+                $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal);
                 $manipUpdates = SLNode::where('NodeTree', $this->treeID)
                     ->where('NodeType', 'Data Manip: Update')
                     ->where('NodeParentID', $nID)
@@ -835,6 +952,7 @@ class SurvLoopTree extends CoreTree
                         $this->sessData->currSessData($nodeRow->NodeID, $tbl, $fld, 'update', $newVal);
                     }
                 }
+                //echo '<br /><br /><br />runDataManip(' . $nID . ', tbl: ' . $tbl . ', ' . $newObj->getKey() . '<br />';
                 $this->sessData->startTmpDataBranch($tbl, $newObj->getKey());
                 //$this->loadAllSessData($GLOBALS["SL"]->coreTbl);
             } elseif ($this->allNodes[$nID]->nodeType == 'Data Manip: Update') {
@@ -865,9 +983,18 @@ class SurvLoopTree extends CoreTree
                 $tbl = $this->allNodes[$nID]->dataBranch;
             }
         }
-        if ($this->allNodes[$nID]->isLoopCycle() 
-            && isset($GLOBALS["SL"]->dataLoops[$this->allNodes[$nID]->dataBranch])) {
-            $tbl = $GLOBALS["SL"]->dataLoops[$this->allNodes[$nID]->dataBranch]->DataLoopTable;
+        if ($this->allNodes[$nID]->isLoopCycle()) {
+            $loop = '';
+            if (isset($this->allNodes[$nID]->nodeRow->NodeResponseSet) 
+                && strpos($this->allNodes[$nID]->nodeRow->NodeResponseSet, 'LoopItems:') === 0) {
+                $loop = trim(str_replace('LoopItems:', '', $this->allNodes[$nID]->nodeRow->NodeResponseSet));
+            }
+            if ($loop != '' && isset($GLOBALS["SL"]->dataLoops[$loop]) 
+                && isset($GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable)) {
+                $tbl = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable;
+            } elseif (isset($this->allNodes[$nID]->dataBranch) && trim($this->allNodes[$nID]->dataBranch) != '') {
+                $tbl = $this->allNodes[$nID]->dataBranch;
+            }
         }
         return [$tbl, $fld, $newVal];
     }
@@ -875,6 +1002,7 @@ class SurvLoopTree extends CoreTree
     protected function loadManipBranch($nID, $force = false)
     {
         list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
+        //echo '<br /><br /><br />loadManipBranch(' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', val: ' . $newVal . '<br />';
         if ($tbl != '') {
             $manipBranchRow = $this->sessData->checkNewDataRecord($tbl, $fld, $newVal, []);
             if ((!$manipBranchRow || sizeof($manipBranchRow) == 0) && $force) {
@@ -884,12 +1012,14 @@ class SurvLoopTree extends CoreTree
                 $this->sessData->startTmpDataBranch($tbl, $manipBranchRow->getKey());
             }
         }
+        //echo '<pre>'; print_r($this->sessData->dataBranches); echo '</pre>';
         return true;
     }
     
     protected function closeManipBranch($nID)
     {
         list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
+        //echo '<br /><br /><br />closeManipBranch(' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', val: ' . $newVal . '<br />';
         if ($tbl != '') $this->sessData->endTmpDataBranch($tbl);
         return true;
     }
@@ -1012,18 +1142,23 @@ class SurvLoopTree extends CoreTree
     
     protected function checkLoopsPostProcessing($newNode, $prevNode)
     {
+//echo '<br /><br /><br />checkLoopsPostProcessing(' . $newNode . ', ' . $prevNode . ' -- curr: ' . $this->currNode() . '<br />';
         $currLoops = [];
         $backToRoot = false;
+        if ($newNode <= 0) $newNode = $this->nextNode($prevNode);
         // First, are we leaving one of our current loops?..
+//echo 'sessLoops: <pre>'; print_r($GLOBALS["SL"]->sessLoops); echo '</pre>';
         if ($GLOBALS["SL"]->sessLoops && sizeof($GLOBALS["SL"]->sessLoops) > 0) {
             foreach ($GLOBALS["SL"]->sessLoops as $sessLoop) {
                 if (isset($GLOBALS["SL"]->dataLoops[$sessLoop->SessLoopName])) {
+//echo 'dataLoops[' . $sessLoop->SessLoopName . '<br />';
                     $currLoops[$sessLoop->SessLoopName] = $sessLoop->SessLoopItemID;
                     $loop = $GLOBALS["SL"]->dataLoops[$sessLoop->SessLoopName];
                     if ($this->allNodes[$prevNode]->checkBranch($this->allNodes[$loop->DataLoopRoot]->nodeTierPath)
-                        && !$this->allNodes[$newNode]->checkBranch($this->allNodes[$loop->DataLoopRoot]->nodeTierPath)) {
+                        && !$this->allNodes[$newNode]->checkBranch($this->allNodes[$loop->DataLoopRoot]->nodeTierPath)){
                         // Then we are now trying to leave this loop
-                        if (in_array($this->REQstep, ['back', 'exitLoopBack'])) { // Then leaving the loop backwards, always allowed
+                        if (in_array($this->REQstep, ['back', 'exitLoopBack'])) { 
+                            // Then leaving the loop backwards, always allowed
                             $this->leavingTheLoop($loop->DataLoopPlural);
                         } else { // Check for conditions before moving leaving forward
                             if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
@@ -1031,7 +1166,8 @@ class SurvLoopTree extends CoreTree
                                     $backToRoot = true;
                                 }
                             } elseif (intVal($loop->DataLoopMaxLimit) == 0 
-                                || sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) < $loop->DataLoopMaxLimit) {
+                                || sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) 
+                                    < $loop->DataLoopMaxLimit) {
                                 // Then sure, we can add another item to this loop, back at the root node
                                 $backToRoot = true;
                             }
@@ -1070,6 +1206,7 @@ class SurvLoopTree extends CoreTree
             }
         }
         
+//echo 'backToRoot: ' . (($backToRoot) ? 'true' : 'false') . ', dataLoops: ' . sizeof($GLOBALS["SL"]->dataLoops) . '<br />currLoops: <pre>'; print_r($currLoops); echo '</pre>';
         // If we haven't already tried to leave our loop, nor returned back to its root node...
         if (!$backToRoot && $GLOBALS["SL"]->dataLoops && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             foreach ($GLOBALS["SL"]->dataLoops as $loop) {
@@ -1078,12 +1215,19 @@ class SurvLoopTree extends CoreTree
                     $path = $this->allNodes[$loop->DataLoopRoot]->nodeTierPath;
                     if (!$this->allNodes[$prevNode]->checkBranch($path)
                         && $this->allNodes[$newNode]->checkBranch($path)) {
+//echo '!checkBranch(' . $prevNode . ', checkBranch(' . $newNode . '<br />';
                         // Then we have just entered this loop from outside
                         if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop() 
                             && (!isset($this->sessData->loopItemIDs[$loop->DataLoopPlural]) 
                                 || sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) == 0)) {
+//echo 'no loopItemIDs(' . $loop->DataLoopPlural . '<br />';
                             $this->leavingTheLoop($loop->DataLoopPlural);
-                            $this->updateCurrNodeNB($this->nextNodeSibling($newNode));
+                            if (isset($this->REQstep) && in_array($this->REQstep, ['back', 'exitLoopBack'])) {
+                                $prevRoot = $this->getNextNonBranch($this->prevNode($loop->DataLoopRoot), 'prev');
+                                $this->updateCurrNodeNB($prevRoot);
+                            } else {
+                                $this->updateCurrNodeNB($this->nextNodeSibling($newNode));
+                            }
                         } else { // This loop is active
                             $skipRoot = false;
                             if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
@@ -1135,6 +1279,7 @@ class SurvLoopTree extends CoreTree
             return $this->checkLoopsPostProcessing($this->currNode(), $newNode);
         }
         */
+//echo '<br /><br /><br />end checkLoopsPostProcessing(' . $newNode . ', ' . $prevNode . ' -- now curr: ' . $this->currNode() . '<br />loopItemIDs: <pre>'; print_r($this->sessData->loopItemIDs); echo '</pre>';
         return true;
     }
     
@@ -1168,7 +1313,7 @@ class SurvLoopTree extends CoreTree
     
     public function pushCurrNodeVisit($nID)
     {
-        if (intVal($this->coreID) > 0 && $nID > 0) {
+        if (intVal($this->coreID) > 0 && $nID > 0 && !$GLOBALS["SL"]->REQ->has('preview')) {
             $pagsSave = new SLNodeSavesPage;
             $pagsSave->PageSaveSession = $this->coreID;
             $pagsSave->PageSaveNode    = $nID;
@@ -1208,10 +1353,12 @@ class SurvLoopTree extends CoreTree
                 })
                 ->first();
             if ($loadNode && isset($loadNode->NodeID)) {
-                $loadNodeChk = SLNodeSavesPage::where('PageSaveSession', $this->coreID)
-                    ->where('PageSaveNode', $loadNode->NodeID)
-                    ->get();
-                if (!$loadNodeChk || sizeof($loadNodeChk) == 0) return false;
+                if (!$GLOBALS["SL"]->REQ->has('preview')) {
+                    $loadNodeChk = SLNodeSavesPage::where('PageSaveSession', $this->coreID)
+                        ->where('PageSaveNode', $loadNode->NodeID)
+                        ->get();
+                    if (!$loadNodeChk || sizeof($loadNodeChk) == 0) return false;
+                }
                 // perhaps upgrade to check for loop item id first?
                 //$this->leavingTheLoop();
                 $prevNode = $this->currNode();
@@ -1259,6 +1406,11 @@ class SurvLoopTree extends CoreTree
     XML OUTPUT
     
     ******************************************************************************************************/
+    
+    protected function maxUserView()
+    {
+        return true;
+    }
     
     private function loadXmlMapTree(Request $request)
     {
@@ -1378,7 +1530,9 @@ class SurvLoopTree extends CoreTree
         $v["recFlds"] = [];
         if (sizeof($v["tblFlds"]) > 0) {
             foreach ($v["tblFlds"] as $i => $fld) {
-                $v["recFlds"][$fld->FldID] = $this->genXmlFormatVal($rec, $fld, $v["tblAbbr"]);
+                //if (!$this->checkValEmpty($fld->FldType, $rec->{ $v["tblAbbr"] . $fld->FldName })) {
+                    $v["recFlds"][$fld->FldID] = $this->genXmlFormatVal($rec, $fld, $v["tblAbbr"]);
+                //}
             }
         }
         $v["kids"] = '';
@@ -1392,10 +1546,14 @@ class SurvLoopTree extends CoreTree
                     }
                     foreach ($kidRows as $j => $kid) {
                         if (isset($v["tblHelpFld"][$help]->FldName)) {
-                            $v["kids"] .= '<' . $v["tblHelpFld"][$help]->FldName . '>' 
-                                . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], 
-                                    $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]])
-                            . '</' . $v["tblHelpFld"][$help]->FldName . '>' . "\n";
+                            //if (!$this->checkValEmpty($kid, 
+                            //    $rec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]] 
+                            //        . $v["tblHelpFld"][$help] })) {
+                                $v["kids"] .= '<' . $v["tblHelpFld"][$help]->FldName . '>' 
+                                    . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], 
+                                        $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]])
+                                . '</' . $v["tblHelpFld"][$help]->FldName . '>' . "\n";
+                            //}
                         }
                     }
                     if (intVal($nextV["tblID"]) > 0 && $nextV["TblOpts"]%5 > 0) {
@@ -1427,30 +1585,48 @@ class SurvLoopTree extends CoreTree
     {
         $val = false;
         if (isset($fld->FldOpts) && $fld->FldOpts%13 > 0 && isset($rec->{ $abbr . $fld->FldName })) {
-            $val = $rec->{ $abbr . $fld->FldName };
-            if (strpos($fld->FldValues, 'Def::') !== false) {
-                if (intVal($val) > 0) {
-                    $val = $GLOBALS["SL"]->getDefValue(str_replace('Def::', '', $fld->FldValues), $val);
-                } else {
-                    $val = false;
-                }
-            } else { // not pulling values from a definition set
-                if (in_array($fld->FldType, array('INT', 'DOUBLE'))) {
-                    if (intVal($val) == 0) $val = false;
-                } elseif (in_array($fld->FldType, array('VARCHAR', 'TEXT'))) {
-                    if (trim($val) == '') {
-                        $val = false;
-                    } else {
-                        if ($val != htmlspecialchars($val, ENT_XML1, 'UTF-8')) {
-                            $val = '<![CDATA[' . $val . ']]>'; // !in_array($val, array('Y', 'N', '?'))
+            if ($this->v["view"] == 'Investigate' || $fld->FldOpts%11 > 0) {
+                if ($this->v["view"] != 'Anon' || $fld->FldOpts%7 > 0) {
+                    $val = $rec->{ $abbr . $fld->FldName };
+                    if (strpos($fld->FldValues, 'Def::') !== false) {
+                        if (intVal($val) > 0) {
+                            $val = $GLOBALS["SL"]->getDefValue(str_replace('Def::', '', $fld->FldValues), $val);
+                        } else {
+                            $val = false;
+                        }
+                    } else { // not pulling values from a definition set
+                        if (in_array($fld->FldType, array('INT', 'DOUBLE'))) {
+                            if (intVal($val) == 0) $val = false;
+                        } elseif (in_array($fld->FldType, array('VARCHAR', 'TEXT'))) {
+                            if (trim($val) == '') {
+                                $val = false;
+                            } else {
+                                if ($val != htmlspecialchars($val, ENT_XML1, 'UTF-8')) {
+                                    $val = '<![CDATA[' . $val . ']]>'; // !in_array($val, array('Y', 'N', '?'))
+                                }
+                            }
+                        } elseif ($fld->FldType == 'DATETIME') {
+                            if ($val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00') return '';
+                            $val = str_replace(' ', 'T', $val);
+                        } elseif ($fld->FldType == 'DATE') {
+                            if ($val == '0000-00-00' || $val == '1970-01-01') return '';
                         }
                     }
-                } elseif ($fld->FldType == 'DATETIME') {
-                    $val = str_replace(' ', 'T', $val);
                 }
             }
         }
         return $val;
+    }
+    
+    public function checkValEmpty($fldType, $val)
+    {
+        $val = trim($val);
+        if ($fldType == 'DATE' && ($val == '' || $val == '0000-00-00' || $val == '1970-01-01')) {
+            return true;
+        } elseif ($fldType == 'DATETIME' && ($val == '' || $val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00')) {
+            return true;
+        }
+        return false;
     }
     
     
@@ -1531,6 +1707,7 @@ class SurvLoopTree extends CoreTree
     public function byID(Request $request, $coreID, $ComSlug = '', $skipWrap = false)
     {
         $this->survLoopInit($request, '/report/' . $coreID);
+        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         $this->v["hasFbWidget"] = true;
         $this->v["content"] = $this->printFullReport();
@@ -1577,8 +1754,7 @@ class SurvLoopTree extends CoreTree
         }
         if ($full) {
             return '<div class="reportWrap">' . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) . '</div>';
-        }
-        else {
+        } else {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
             return '<div class="reportPreview">' . $this->printPreviewReport() . '</div>';
         }
@@ -1613,12 +1789,19 @@ class SurvLoopTree extends CoreTree
     public function xmlByID(Request $request, $coreID, $ComSlug = '')
     {
         $this->survLoopInit($request, '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-report-xml/' . $coreID);
+        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         } else { // XML core table is different from main tree
             $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
+        }
+        $this->maxUserView();
+        $this->xmlMapTree->v["view"] = $this->v["view"];
+        if (isset($GLOBALS["fullAccess"]) && $GLOBALS["fullAccess"] && $this->v["view"] != 'Investigate') {
+            $this->v["content"] = $this->errorDeniedFullXml();
+            return view('vendor.survloop.master', $this->v);
         }
         return $this->genXmlReport($request);
     }
@@ -2135,7 +2318,7 @@ class SurvLoopTree extends CoreTree
         
         // Basic System Is Setup, Check for User Intercept From Index
         if ($GLOBALS["SL"]->treeIsAdmin) {
-            if (!isset($this->v["user"]->id) || !$this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+            if (!isset($this->v["user"]->id) || !$this->v["user"]->hasRole('administrator|staff|databaser')) {
                 return $this->redir('/login');
             }
         }
@@ -2186,7 +2369,6 @@ class SurvLoopTree extends CoreTree
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '<div id="ajaxWrap">';
         }
-        
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('node') && $GLOBALS["SL"]->REQ->input('node') > 0) {
             $this->updateCurrNode($GLOBALS["SL"]->REQ->input('node'));
         }
@@ -2245,6 +2427,10 @@ class SurvLoopTree extends CoreTree
             }
         } elseif (trim($this->urlSlug) != '') {
             $this->pullNewNodeURL();
+            if ($this->currNode() == $GLOBALS["SL"]->treeRow->TreeFirstPage 
+                && $GLOBALS["SL"]->REQ->has('start') && intVal($GLOBALS["SL"]->REQ->get('start')) == 1) {
+                $this->runDataManip($GLOBALS["SL"]->treeRow->TreeRoot);
+            }
         }
         
         if (!$this->isStepUpload()) {
@@ -2272,7 +2458,7 @@ class SurvLoopTree extends CoreTree
         $this->multiRecordCheck();
         $this->getPrintSpecs($this->currNode(), $this->currNodeSubTier);
         
-        
+        $this->v["nodeKidFunks"] = '';
         if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
             $ret .= '<center><div class="treeWrapForm">';
         }
@@ -2286,19 +2472,33 @@ class SurvLoopTree extends CoreTree
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             if (!$GLOBALS["SL"]->treeIsAdmin) $ret .= $this->printNodePageFoot();
         } else {
+            if (isset($GLOBALS["SL"]->treeSettings["footer"]) && isset($GLOBALS["SL"]->treeSettings["footer"][0]) 
+                && trim($GLOBALS["SL"]->treeSettings["footer"][0]) != '') {
+                $ret .= $GLOBALS["SL"]->treeSettings["footer"][0];
+            }
             $ret .= '</div></center>';
         }
+        $GLOBALS["SL"]->pageAJAX .= 'function checkAllNodeKids() { ' . $this->v["nodeKidFunks"] 
+            /* . ' if (nodeList && nodeList.length > 0) { for (var i=0; i < nodeList.length; i++) { '
+            . 'chkNodeParentVisib(nodeList[i]); } } ' */
+            . '} setTimeout(function() { checkAllNodeKids(); }, 1);' . "\n";
         
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '</div>';
         } else {
             // replace page-based JS stuff
-            $ret .= $GLOBALS['SL']->pageSCRIPTS . '<script type="text/javascript">
-            if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();
-            if (document.getElementById("treeJS")) document.getElementById("treeJS").remove();
-            ' . $GLOBALS["SL"]->pageJAVA . ' setTimeout("printHeadBar(0)", 1);
-            $'.'(document).ready(function(){ ' . $GLOBALS["SL"]->pageAJAX . ' }); 
-            </script>';
+            $tmpFile = '../storage/app/dynamicJava-' . rand(100000000,1000000000) . '.js';
+            $java = 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();
+                if (document.getElementById("treeJS")) document.getElementById("treeJS").remove();'
+                . ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') 
+                ? $GLOBALS['SL']->pageJAVA : '')
+                . ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '') 
+                ? ' $(document).ready(function(){ ' . $GLOBALS['SL']->pageAJAX . ' }); ' : '');
+            file_put_contents($tmpFile, $java);
+            $minifier = new Minify\JS($tmpFile);
+            unlink($tmpFile);
+            $ret .= $GLOBALS['SL']->pageSCRIPTS . '<script type="text/javascript">' 
+                . $minifier->minify() . '</script>';
         }
         return $ret;
     }
@@ -2307,5 +2507,21 @@ class SurvLoopTree extends CoreTree
     {
         
     }
+    
+    protected function errorDeniedFullPdf()
+    {
+        return '<br /><br /><center><h3>You are trying to access the complete details of a record which '
+            . 'requires you to <a href="/login">login</a> as the owner, or an otherwise authorized user. '
+            . '<br /><br />The public version of this complaint can be found here:<br />'
+            . '<a href="/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-read/' . $this->coreID . '">' 
+            . $GLOBALS["SL"]->sysOpts["app-url"] . '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-read/' . $this->coreID 
+            . '</a></h3></center>';
+    }
+    
+    protected function errorDeniedFullXml()
+    {
+        return $this->errorDeniedFullPdf();
+    }
+    
     
 }

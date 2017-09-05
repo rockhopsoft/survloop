@@ -12,9 +12,14 @@ use Illuminate\Database\QueryException;
 use App\Models\User;
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
-use App\Models\SLTree;
+use App\Models\SLEmailed;
 use App\Models\SLNode;
+use App\Models\SLTree;
+use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
+
+use Illuminate\Support\Facades\Mail;
+use SurvLoop\Controllers\EmailController;
 
 use SurvLoop\Controllers\DatabaseLookups;
 
@@ -53,9 +58,13 @@ class SurvLoopController extends Controller
             $this->v["isAlt"]       = $request->has('alt');
             $this->v["isPrint"]     = $request->has('print');
             $this->v["isExcel"]     = $request->has('excel');
+            $this->v["isDash"]      = false;
             $this->v["exportDir"]   = 'survloop';
             $this->v["hasContain"]  = false;
             $this->v["content"]     = '';
+            $this->v["isOwner"]     = false;
+            $this->v["view"]        = 'Public';
+            if (!isset($GLOBALS["isPrintPDF"])) $GLOBALS["isPrintPDF"] = false;
             
             if (!isset($this->v["currPage"])) $this->v["currPage"] = $currPage;
             if (trim($this->v["currPage"]) == '') {
@@ -69,17 +78,9 @@ class SurvLoopController extends Controller
             if (!isset($this->v["yourUserInfo"])) $this->v["yourUserInfo"] = [];
             if (!isset($this->v["yourContact"]))  $this->v["yourContact"]  = [];
             
+            $this->loadNavMenu();
             $this->loadDbLookups($request);
             if ($this->coreIDoverride > 0) $this->loadAllSessData();
-
-            $GLOBALS["SL"]->pageJAVA .= (($this->v["user"] && $this->v["user"]->hasRole('administrator')) 
-                ? 'setNavItem("Admin Dashboard", "/dashboard"); ' : '') . $this->extraNavItems();
-            if (isset($this->v["user"]) && isset($this->v["user"]->id) && $this->v["user"]->id > 0) {
-                $GLOBALS["SL"]->pageJAVA .= 'setNavItem("My Profile", "/my-profile"); '
-                    . 'setNavItem("Logout", "/logout"); ';
-            } else {
-                $GLOBALS["SL"]->pageJAVA .= 'setNavItem("Login", "/login"); setNavItem("Sign Up", "/register"); ';
-            }
             
             if ($runExtra) {
                 $this->initExtra($request);
@@ -307,6 +308,25 @@ class SurvLoopController extends Controller
         $log->save();
         return true;
     }
+    
+    
+    public function sendEmail($emaContent, $emaSubject, $emaTo, $emaCC = [], $emaBCC = [])
+    {
+        $mailStr = "Illuminate\\Support\\Facades\\Mail::to('" . $emaTo[0][0] . "')";
+        foreach ($emaTo as $i => $eTo) {
+            if ($i > 0) $mailStr .= "->to('" . $eTo[0] . "')";
+        }
+        if (sizeof($emaCC) > 0) {
+            foreach ($emaCC as $eTo) $mailStr .= "->cc('" . $eTo[0] . "')";
+        }
+        if (sizeof($emaBCC) > 0) {
+            foreach ($emaBCC as $eTo) $mailStr .= "->bcc('" . $eTo[0] . "')";
+        }
+        $mailStr .= "->send(new SurvLoop\\Controllers\\EmailController(\$emaSubject, \$emaContent));";
+        eval($mailStr);
+        return true;
+    }
+    
     
     
     // a few utilities...
@@ -564,10 +584,20 @@ class SurvLoopController extends Controller
     }
     
     
-    protected function loadExtraTree()
+    protected function loadNavMenu()
     {
-        $this->extraTree = new BrandedTree;
-        //...
+        $settings = SLDefinitions::where('DefSet', 'Menu Settings')
+            ->where('DefSubset', 'main-navigation')
+            ->where('DefDatabase', 1)
+            ->orderBy('DefOrder', 'asc')
+            ->get();
+        $this->v["navMenu"] = [];
+        if ($settings && sizeof($settings) > 0) {
+            foreach ($settings as $s) {
+                $this->v["navMenu"][] = [$s->DefValue, $s->DefDescription];
+            }
+        }
+        return true;
     }
     
     public function getColsWidth($sizeof)
@@ -586,5 +616,138 @@ class SurvLoopController extends Controller
         }
         return $colW;
     }
+    
+    public function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+    
+    
+    protected function createToken($type, $treeID = -3, $coreID = -3, $userID = -3)
+    {
+        if ($userID <= 0 && Auth::user() && isset(Auth::user()->id)) $userID = Auth::user()->id;
+        if ($type == 'Confirm Email') {
+            if ($userID > 0) {
+                $tokRow = SLTokens::where('TokType', $type)
+                    ->where('TokUserID', $userID)
+                    ->first();
+                if (!$tokRow || !isset($tokRow->TokTokToken)) {
+                    $tokRow = new SLTokens;
+                    $tokRow->TokType = $type;
+                    $tokRow->TokUserID = $userID;
+                }
+                $tokRow->TokTokToken = $this->generateRandomString(50);
+                $tokRow->save();
+                return $tokRow->TokTokToken;
+            }
+        } elseif ($type == 'Sensitive') {
+            $token = $this->chkBasicToken($type, $treeID, $coreID, $userID);
+            if (trim($token) != '') return $token;
+            $tokRow = $this->makeBasicToken($type, $treeID, $coreID, $userID);
+            return $tokRow->TokTokToken;
+        } elseif ($type == 'MFA') {
+            $token = $this->chkBasicToken($type, $treeID, $coreID, $userID);
+            if (trim($token) != '') {
+                $tokRow = SLTokens::where('TokType', $type)
+                    ->where('TokTreeID', $treeID)
+                    ->where('TokCoreID', $coreID)
+                    ->where('TokUserID', $userID)
+                    ->first();
+                if ($tokRow && isset($tokRow->TokTokToken)) {
+                    $tokRow->TokTokToken = $this->genTokenStr($type);
+                    $tokRow->save();
+                    return $tokRow->TokTokToken;
+                }
+            }
+            $tokRow = $this->makeBasicToken($type, $treeID, $coreID, $userID);
+            return $tokRow->TokTokToken;
+        }
+        return '';
+    }
+    
+    protected function chkBasicToken($type, $treeID = -3, $coreID = -3, $userID = -3)
+    {
+        $tokRow = SLTokens::where('TokType', $type)
+            ->where('TokTreeID', $treeID)
+            ->where('TokCoreID', $coreID)
+            ->where('TokUserID', $userID)
+            ->first();
+        if ($tokRow && isset($tokRow->TokTokToken)) return $tokRow->TokTokToken;
+        return '';
+    }
+    
+    protected function makeBasicToken($type, $treeID = -3, $coreID = -3, $userID = -3, $strlen = 50, $delim = '-')
+    {
+        $tokRow = new SLTokens;
+        $tokRow->TokType = $type;
+        $tokRow->TokTreeID = $treeID;
+        $tokRow->TokCoreID = $coreID;
+        $tokRow->TokUserID = $userID;
+        $tokRow->TokTokToken = $this->genTokenStr($type);
+        $tokRow->save();
+        return $tokRow;
+    }
+    
+    protected function genTokenStr($type, $strlen = 50, $delim = '-')
+    {
+        if ($type == 'MFA') $strlen = 12;
+        $token = $this->generateRandomString($strlen);
+        if ($type == 'MFA') {
+            $token = substr($token, 0, floor(strlen($token)/3)) . $delim 
+                . substr($token, floor(strlen($token)/3), floor(strlen($token)/3)) . $delim
+                . substr($token, floor(strlen($token)*2/3));
+        }
+        return $token;
+    }
+    
+    public function tokenExpireDate($type = 'Confirm Email')
+    {
+        $hrs = 24*7;
+        if ($type == 'Confirm Email') $hrs = 24*28;
+        return date("Y-m-d H:i:s", 
+            mktime(intVal(date('H'))-$hrs, date('i'), date('s'), date('m'), date('d'), date('Y')));
+    }
+    
+    protected function sendNewEmailSimple($body, $subject, $emailTo = '', 
+        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    {
+        $emaTo = [];
+        if (is_array($emailTo)) {
+            $emaTo = $emailTo;
+            $emailTo = $emailTo[1] . ' <' . $emailTo[0] . '>';
+        }
+        elseif (trim($emailTo) != '') {
+            $emaUsr = User::where('email', $emailTo)->first();
+            if ($emaUsr && isset($emaUsr->name)) $emaTo[] = [$emailTo, $emaUsr->name];
+        }
+        if ($GLOBALS["SL"]->sysOpts["app-url"] == 'http://homestead.app') {
+            echo '<div class="container"><h2>' . $subject . '</h2>' . $body . '<hr><hr></div>';
+        } else {
+            $this->sendEmail($body, $subject, $emaTo);
+        }
+        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+    }
+    
+    protected function logEmailSent($body, $subject, $emailTo = '', 
+        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    {
+        $emailRec = new SLEmailed;
+        $emailRec->EmailedEmailID  = $emailID;
+        $emailRec->EmailedTree     = $treeID;
+        $emailRec->EmailedRecID    = $coreID;
+        $emailRec->EmailedTo       = $emailTo;
+        $emailRec->EmailedToUser   = $userTo;
+        $emailRec->EmailedFromUser = Auth::user()->id;
+        $emailRec->save();
+        $emailRec->update([ "EmailedSubject" => $subject, "EmailedBody" => $body ]);
+        $emailRec->save();
+        return true;
+    }
+    
     
 }

@@ -138,6 +138,7 @@ class DatabaseInstaller extends AdminDBController
             $tbls = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', 'NOT LIKE', 'Users')
                 ->where('TblName', 'NOT LIKE', 'users')
+                ->where('TblName', 'NOT LIKE', 'Zips')
                 ->orderBy('TblOrd')
                 ->get();
             if ($tbls && sizeof($tbls) > 0) {
@@ -363,7 +364,7 @@ class DatabaseInstaller extends AdminDBController
     
     protected function chkForeignKey($foreignKey)
     {
-        if ($foreignKey && intVal($foreignKey) > 0) {
+        if ($foreignKey && intVal($foreignKey) > 0 && isset($GLOBALS["SL"]->tbl[$foreignKey])) {
             if (strtolower($GLOBALS["SL"]->tbl[$foreignKey]) == 'users') {
                 return ['users', 'id'];
             }

@@ -1383,7 +1383,7 @@ class AdminDBController extends AdminController
         $this->admControlInit($request);
         $sessData = new SurvLoopData;
         return view('vendor.survloop.admin.db.inc-getTblsFldVals', [ 
-            "FldID"  => $fldID,
+            "fldID"  => $fldID,
             "values" => $GLOBALS["SL"]->getFldResponsesByID($fldID)
         ]);
     }

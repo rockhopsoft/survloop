@@ -12,29 +12,29 @@
             This means you can use conditional login on chunks of content within each page, and more safely
             integrate many widgets on one page.
         </div>
+        <table class="table table-striped">
         @forelse ($myPages as $tree)
-            <div class="pB10">
-                <a href="/dashboard/page/{{ $tree->TreeID }}?all=1&refresh=1" class="btn btn-default fL"
+            <tr><td class="w50">
+                <a href="/dashboard/page/{{ $tree->TreeID }}?all=1&refresh=1" class="fPerc133"
                     ><i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i> {{ $tree->TreeName }}</a>
-                    @if ($tree->TreeDesc) <div class="disIn mL20 slGrey">{{ $tree->TreeDesc }}</div> @endif
-                <div class="fR mT10">
-                    @if ($tree->TreeOpts%3 == 0)
-                        @if ($tree->TreeOpts%7 == 0)
-                            <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard">/dashboard</a>
-                        @else
-                            <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ $tree->TreeSlug }}" 
-                                >/dash/{{ $tree->TreeSlug }}</a>
-                        @endif
+            </td><td class="w50">
+                @if ($tree->TreeOpts%3 == 0)
+                    @if ($tree->TreeOpts%7 == 0)
+                        <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard" target="_blank">/dashboard</a>
                     @else
-                        <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $tree->TreeSlug }}"
-                            >/{{ $tree->TreeSlug }}</a>
+                        <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ $tree->TreeSlug }}" target="_blank" 
+                            >/dash/{{ $tree->TreeSlug }}</a>
                     @endif
-                </div>
-                <div class="fC"></div>
-            </div>
+                @else
+                    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $tree->TreeSlug }}" target="_blank"
+                        >/{{ $tree->TreeSlug }}</a>
+                @endif
+                @if ($tree->TreeDesc) <div class="slGrey">{{ $tree->TreeDesc }}</div> @endif
+            </td></tr>
         @empty
-            <i>No pages found.</i>
+            <tr><td colspan=2 ><i>No pages found.</i></td></tr>
         @endforelse
+        </table>
         <div class="mT20 mB10"><a href="javascript:;" id="newPage" class="btn btn-xs btn-default"
             ><i class="fa fa-plus" aria-hidden="true"></i> Create A New Page</a>
         </div>
@@ -75,13 +75,15 @@
             Excerpts are useful for chunks of content, small or large, which need to appear the same way in multiple 
             places through the system. Excerpts can be including in any node via "<?= '{'.'{Excerpt Name}'.'}' ?>".
         </div>
+        <table class="table table-striped">
         @forelse($blurbRows as $blurb)
-            <a href="/dashboard/blurbs/{{ $blurb->DefID }}" class="btn btn-default">
-            <i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i> {{ $blurb->DefSubset }}</a>
-            <br /><br />
+            <tr><td><a href="/dashboard/blurbs/{{ $blurb->DefID }}" class="fPerc133">
+                <i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i> {{ $blurb->DefSubset }}</a>
+            </td></tr>
         @empty
-            <i>No excerpts/instructions found.</i>
+            <tr><td><i>No excerpts/instructions found.</i></td></tr>
         @endforelse
+        </table>
         <div class="mT20 mB10"><a href="javascript:;" id="newBlurb" class="btn btn-xs btn-default"
                 ><i class="fa fa-plus mR5" aria-hidden="true"></i> Create A New Excerpt</a>
         </div>

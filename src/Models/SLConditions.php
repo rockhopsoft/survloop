@@ -29,41 +29,33 @@ class SLConditions extends Model
     
     public function loadVals()
     {
-        $this->condVals = array();
+        $this->condVals = [];
         $chk = SLConditionsVals::where('CondValCondID', $this->CondID)
             ->get();
-        if ($chk && sizeof($chk) > 0)
-        {
+        if ($chk && sizeof($chk) > 0) {
             foreach ($chk as $v) $this->condVals[] = trim($v->CondValValue);
         }
         
         $this->condFldResponses = $GLOBALS["SL"]->getFldResponsesByID($this->CondField);
         
-        if (sizeof($this->condVals) > 0)
-        {
-            if (sizeof($this->condFldResponses["vals"]) == 0)
-            {
-                foreach ($this->condVals as $j => $val)
-                {
+        if (sizeof($this->condVals) > 0) {
+            if (sizeof($this->condFldResponses["vals"]) == 0) {
+                foreach ($this->condVals as $j => $val) {
                     $this->condFldResponses["vals"][] = array($val, $val);
                 }
             }
-            foreach ($this->condVals as $j => $val)
-            {
+            foreach ($this->condVals as $j => $val) {
                 $def = $GLOBALS["SL"]->getDefValById(intVal($val));
                 $found = false;
-                foreach ($this->condFldResponses["vals"] as $k => $valInfo) 
-                {
-                    if ($valInfo[0] == $val) 
-                    {
+                foreach ($this->condFldResponses["vals"] as $k => $valInfo) {
+                    if ($valInfo[0] == $val) {
                         $found = true;
-                        if (strlen($valInfo[1]) > 40)
-                        {
+                        if (strlen($valInfo[1]) > 40) {
                             if ($def != '') $this->condFldResponses["vals"][$k][1] = $def;
                             else $this->condFldResponses["vals"][$k][1] = $val;
                         }
-                        if ($def != '' && $this->condFldResponses["vals"][$k][0] == $this->condFldResponses["vals"][$k][1])
-                        {
+                        if ($this->condFldResponses["vals"][$k][0] == $this->condFldResponses["vals"][$k][1]
+                            && $def != '') {
                             $this->condFldResponses["vals"][$k][1] = $def;
                         }
                     }

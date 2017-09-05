@@ -30,32 +30,6 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/switch/{treeID}/{cid}',  'SurvLoop\\Controllers\\SurvLoop@switchSess');
     Route::get( '/delSess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@delSess');
     
-    Route::get('/sys.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get('/sys.min.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys.min.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get('/sys.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get('/sys.min.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get('/tree-{treeID}.js', function($treeID) {
-        $response = Response::make(file_get_contents('../storage/app/tree-' . $treeID . '.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    
     Route::get('/{abbr}/uploads/{file}', 'SurvLoop\\Controllers\\SurvLoop@getUploadFile');
     
     // main survey process for primary database, primary tree
@@ -78,8 +52,22 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/ajax-emoji-tag/{treeID}/{recID}/{defID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxEmojiTag');
     
+    Route::post('/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
+    Route::get( '/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
+    Route::post('/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{treeSlug}-read/{cid}/pdf/full',     'SurvLoop\\Controllers\\SurvLoop@fullPdfByID');
+    Route::get( '/{treeSlug}-read/{cid}/xml/full',     'SurvLoop\\Controllers\\SurvLoop@fullXmlByID');
+    
+    Route::get( '/{treeSlug}-read/{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
+    Route::get( '/{treeSlug}-read/{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-read/{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
     Route::get( '/{treeSlug}-read/{cid}/{ComSlug}',   'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::post('/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
     Route::get( '/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}-report/{cid}/pdf',       'SurvLoop\\Controllers\\SurvLoop@pdfByID');
+    Route::get( '/{treeSlug}-report/{cid}/xml',       'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-report/{cid}/json',      'SurvLoop\\Controllers\\SurvLoop@xmlByID');
     Route::get( '/{treeSlug}-report/{cid}/{ComSlug}', 'SurvLoop\\Controllers\\SurvLoop@byID');
     Route::get( '/{treeSlug}-report/{cid}',           'SurvLoop\\Controllers\\SurvLoop@byID');
     
@@ -121,6 +109,46 @@ Route::group(['middleware' => ['web']], function () {
     // Password reset routes...
     //Route::post('/password/reset',         'SurvLoop\Controllers\Auth\PasswordController@postReset');
     //Route::get( '/password/reset/{token}', 'SurvLoop\Controllers\Auth\PasswordController@getReset');
+
+    Route::get( '/email-confirm/{token}/{tokenB}', 'SurvLoop\\Controllers\\SurvLoop@processEmailConfirmToken');
+    
+    Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
+    
+    Route::get('/sys.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/sys.min.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/sys-all.min.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/sys.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/sys.min.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/sys-all.min.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/tree-{treeID}.js', function($treeID) {
+        $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
     
     
     ///////////////////////////////////////////////////////////
@@ -369,6 +397,16 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/dashboard/pages/menus', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@navMenus', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/pages/menus', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@navMenus', 
+        'middleware' => ['auth']
+    ]);
+    
     
     
     
@@ -593,6 +631,16 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/dashboard/db/conds/edit/{cid}', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@condEdit', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/db/conds/edit/{cid}', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@condEdit', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::get('/dashboard/db/export', [
         'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@export', 
         'middleware' => ['auth']
@@ -643,8 +691,8 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/css-reload', 'SurvLoop\\Controllers\\AdminController@getCSS');
-    
+    Route::get('/dashboard/css-reload',  'SurvLoop\\Controllers\\AdminController@getCSS');
+    Route::get('/dashboard/run-updates', 'SurvLoop\\Controllers\\AdminController@runDatabaseUpdate');
     
     
     // survey process for any admin tree
@@ -669,5 +717,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/dash/{pageSlug}', 'SurvLoop\\Controllers\\AdminController@loadPageURL');
     Route::get( '/dash/{pageSlug}', 'SurvLoop\\Controllers\\AdminController@loadPageURL');
     
+    Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{desiredFile}', function ($desiredFile) {
+        return redirect('/survloop/jquery-ui-1.12.1/images/' . $desiredFile);
+    });
 
 });    

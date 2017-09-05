@@ -10,7 +10,7 @@ https://creativecommons.org/licenses/by-sa/3.0/
 
 {{ $GLOBALS['SL']->sysOpts['logo-url'] }}
 
-XML Example: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/xml/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/schema
+XML Example: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example
 
 This XML was auto-generated from the SurvLoop engine, built on Laravel,
 resources/views/survloop/admin/tree/xml-schema.blade.php

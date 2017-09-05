@@ -179,5 +179,13 @@ class User extends Model implements AuthenticatableContract,
         return $retVal;
     }
     
+    public function hasVerifiedEmail()
+    {
+        $chk = SLUsersRoles::select('RoleUserID')
+            ->where('RoleUserRID', '=', -37)
+            ->where('RoleUserUID', '=', $this->id)
+            ->first();
+        return ($chk && isset($chk->RoleUserID));
+    }
     
 }
