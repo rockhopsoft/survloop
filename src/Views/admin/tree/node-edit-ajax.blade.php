@@ -46,3 +46,17 @@ $(document).on("click", ".showKidBox", function() {
         }
     }
 });
+
+$(document).on("click", ".sprdTblType", function() {
+    if (document.getElementById("spreadTblDefs")) {
+        if (document.getElementById("spreadTblTypB").checked) {
+            document.getElementById("spreadTblDefs").style.display="block";
+            document.getElementById("spreadTblOpen").style.display="none";
+            document.getElementById("resOpts").style.display="block";
+        } else {
+            document.getElementById("spreadTblDefs").style.display="none";
+            document.getElementById("spreadTblOpen").style.display="block";
+            document.getElementById("resOpts").style.display="none";
+        }
+    }
+});

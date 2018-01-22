@@ -1,6 +1,8 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use App\Models\SLZips;
+use App\Models\SLZipAshrae;
 use App\Models\SLNodeResponses;
 
 class StatesUS
@@ -72,7 +74,7 @@ class StatesUS
     public function stateDrop($state = '', $fed = false)
     {
         $this->loadStates();
-        $retVal = '<option value="" ' . (($state == '') ? 'SELECTED' : '') . ' ></option>';
+        $retVal = ''; // '<option value="" ' . (($state == '') ? 'SELECTED' : '') . ' ></option>';
         if ($fed) $retVal .= '<option value="US" ' . (($state == 'US') ? 'SELECTED' : '') . ' >Federal</option>';
         foreach ($this->stateList as $abbr => $name) {
             $retVal .= '<option value="' . $abbr . '" ' . (($state == $abbr) ? 'SELECTED' : '') 
@@ -342,6 +344,36 @@ class StatesUS
             $ret[] = $res;
         }
         return $ret;
+    }
+    
+    
+    public function getZipRow($zip = '')
+    {
+        if (trim($zip) == '') return [];
+        if (strlen($zip) > 5) $zip = substr($zip, 0, 5);
+        return SLZips::where('ZipZip', $zip)
+            ->first();
+    }
+    
+    public function getZipCity($zip = '')
+    {
+        $zipRow = $this->getZipRow($zip);
+        if ($zipRow && isset($zipRow->ZipCity)) {
+            return $zipRow->ZipCity;
+        }
+        return '';
+    }
+    
+    public function getAshrae($zipRow = [])
+    {
+        if (isset($zipRow->ZipState) 
+            && !in_array($zipRow->ZipState, ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'])) {
+            $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
+                ->where('AshrCounty', $zipRow->ZipCounty)
+                ->first();
+            if ($ashrae && isset($ashrae->AshrZone)) return $ashrae->AshrZone;
+        }
+        return '';   
     }
     
 }

@@ -16,7 +16,7 @@
                 @else 
                     <b class="fPerc133">{{ $fld->FldEng }}</b>
                 @endif
-                <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:void(0)" 
+                <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;" 
                     ></a>
                 @if ($fld->FldSpecType == 'Replica') 
                     <span class="gry6 f8" data-toggle="tooltip" data-placement="top" 

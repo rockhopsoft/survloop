@@ -11,8 +11,8 @@
         <h2 class="fR slBlueDark mR10"><i class="fa fa-level-up" aria-hidden="true"></i></h2>
         <div class="fC"></div>
         
-        <form name="updateNavMenu" action="/dashboard/pages/menus?sub=1" method="post" >
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <form name="mainPageForm" action="/dashboard/pages/menus?sub=1" method="post" >
+        <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <div class="row slGrey">
             <div class="col-md-6">Menu Link Text</div>
             <div class="col-md-6">Link To URL</div>

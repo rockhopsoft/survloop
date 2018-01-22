@@ -1,4 +1,4 @@
-<?php // sorry, not sure how this should be done instead
+<?php // not sure how this should be done instead
 $surv = new SurvLoop\Controllers\SurvLoop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
@@ -6,12 +6,13 @@ $v = $surv->custLoop->v;
 
 @section('content')
 <!-- resources/views/auth/login.blade.php -->
-<form method="POST" action="/login">
-{!! csrf_field() !!}
+<form name="mainPageForm" method="POST" action="/login">
+<input type="hidden" id="isLoginID" name="isLogin" value="1">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
-<div class="p10"></div>
+<div class="p20"></div>
 
 <div class="row loginTitles">
     <div class="col-md-6">
@@ -31,7 +32,7 @@ $v = $surv->custLoop->v;
     <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
 @endif
 @if (isset($GLOBALS['SL']->REQ) && $GLOBALS['SL']->REQ->has('error'))
-    <div class="alert alert-danger" role="alert">{!! $GLOBALS['SL']->REQ->get('error') !!}a sdfasdf</div>
+    <div class="alert alert-danger" role="alert">{!! $GLOBALS['SL']->REQ->get('error') !!}</div>
 @endif
 
 <div class="nodeWrap form-group">

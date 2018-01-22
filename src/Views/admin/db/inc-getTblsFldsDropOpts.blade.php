@@ -19,7 +19,8 @@
                 > - If more than one record exists in this data set, then this condition clears.</option>
             <option value="" DISABLED ></option>
             <option value="" DISABLED >------------------</option>
-            <option value="" DISABLED >OR select a field below to clear this condition based on the user's response</option>
+            <option value="" DISABLED 
+                >OR select a field below to clear this condition based on the user's response</option>
             <option value="" DISABLED >------------------</option>
             @if (isset($setOptions)) {!! $setOptions !!} @endif
         </select>

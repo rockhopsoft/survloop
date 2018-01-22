@@ -42,8 +42,8 @@ class AdminSubsController extends AdminController
     
     protected function printSubsListing(Request $request)
     {
-        $this->v["currPageTitle"] = 'All Completed Submissions';
-        if ($this->v["currPage"] == '/dashboard/subs/incomplete') $this->v["currPageTitle"] = 'All Incomplete Submissions';
+        $this->v["currPage"][1] = 'All Completed Submissions';
+        if ($this->v["currPage"][0] == '/dashboard/subs/incomplete') $this->v["currPage"][1] = 'All Incomplete Submissions';
         $this->v["coreAbbr"] = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
         $this->v["subsSort"] = ['created_at', 'desc'];
         $this->v["coreFlds"] = SLFields::select('FldName', 'FldEng', 'FldForeignTable')
@@ -53,7 +53,7 @@ class AdminSubsController extends AdminController
             ->orderBy('FldEng', 'asc')
             ->get();
         $xtraWhere = "";
-        if ($this->v["currPage"] == '/dashboard/subs/incomplete') {
+        if ($this->v["currPage"][0] == '/dashboard/subs/incomplete') {
             $xtraWhere = "where('" . $this->v["coreAbbr"] . "SubmissionProgress', '<>', '"
                 . $GLOBALS["SL"]->treeRow->TreeLastPage . "')->";
         }
@@ -78,7 +78,7 @@ class AdminSubsController extends AdminController
         $this->CustReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
         if ($request->has('sub')) {
             $this->processAdminReviewTools($request);
-            $this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"]);
+            $this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"][0]);
         }
         $this->v["viewType"] = $viewType;
         $this->v["coreRec"] = $this->CustReport->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];

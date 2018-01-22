@@ -28,11 +28,11 @@ class CoreNode {
     public $responseSet   = '';
     public $defaultVal    = '';
     
-    public $nodeRow       = array();
+    public $nodeRow       = [];
     public $nodeRowFilled = false;
-    public $nodeTierPath  = array();
+    public $nodeTierPath  = [];
     
-    function __construct($nID = -3, $nRow = array(), $nCache = array())
+    function __construct($nID = -3, $nRow = [], $nCache = [])
     {
         $this->nodeID = $nID;
         if (sizeof($nCache) > 0) {
@@ -42,7 +42,7 @@ class CoreNode {
         return true;
     }
     
-    public function loadNodeCache($nID = -3, $nCache = array())
+    public function loadNodeCache($nID = -3, $nCache = [])
     {
         if (sizeof($nCache) > 0) {
             if (isset($nCache["pID"]))  $this->parentID  = $nCache["pID"];
@@ -53,7 +53,7 @@ class CoreNode {
         return true;
     }
     
-    public function loadNodeRow($nID = -3, $nRow = array())
+    public function loadNodeRow($nID = -3, $nRow = [])
     {
         $this->nodeRow = [];
         if ($nRow && sizeof($nRow) > 0) {
@@ -88,7 +88,7 @@ class CoreNode {
         ];
     }
     
-    public function fillNodeRow($nID = -3, $nRow = array())
+    public function fillNodeRow($nID = -3, $nRow = [])
     {
         if ($nID <= 0 && $this->nodeID > 0) $nID = $this->nodeID;
         if (!$this->nodeRowFilled) {
@@ -111,13 +111,13 @@ class CoreNode {
         return number_format($this->nodeID);
     }
     
-    public function tierPathStr($tierPath = array())
+    public function tierPathStr($tierPath = [])
     {
         if (sizeof($tierPath) == 0) return implode('-', $this->nodeTierPath).'-';
         return implode('-', $tierPath).'-';
     }
     
-    public function checkBranch($tierPath = array())
+    public function checkBranch($tierPath = [])
     {
         $tierPathStr = $this->tierPathStr($tierPath);
         if ($tierPathStr != '') {

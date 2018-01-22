@@ -3,8 +3,8 @@
 @extends('vendor.survloop.master')
 
 @section('content')
-<form name="editInstruct" action="/dashboard/blurbs/{{ $blurbRow->DefID }}" method="post">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/blurbs/{{ $blurbRow->DefID }}" method="post">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="DefID" value="{{ $blurbRow->DefID }}">
 <div class="row">
     <div class="col-md-8">

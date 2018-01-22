@@ -17,8 +17,8 @@
 <div class="clearfix p20"></div>
 
 @if ($dbAllowEdits)
-    <form name="runInstall" action="/dashboard/db/install" method="post" onSubmit="if (confirm('ARE YOU SURE?! Did you ask Morgan?')) { return true; } else { return false; }">
-    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <form name="mainPageForm" action="/dashboard/db/install" method="post" onSubmit="if (confirm('ARE YOU SURE?! Did you ask Morgan?')) { return true; } else { return false; }">
+    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <input type="hidden" name="dbConfirm" value="install">
 @endif
 

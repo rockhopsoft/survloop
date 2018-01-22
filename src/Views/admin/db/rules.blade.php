@@ -36,7 +36,7 @@
         </div>
         <div class="col-md-1 p10">
         @if ($dbAllowEdits) 
-            <a class="red" href="javascript:void(0)" 
+            <a class="red" href="javascript:;" 
                 onClick="if (confirm('Are you sure you want to delete this rule?')) window.location='?delRule={{ $rule->RuleID }}';" 
                 >Delete</a>
         @endif

@@ -36,7 +36,7 @@ class AdminTreeController extends AdminController
         }
         $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) 
             ? session()->get('adminOverOpts') : '');
-        if (trim($this->v["currPage"]) == '') $this->v["currPage"] = '/dashboard/tree';
+        if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/tree';
         
         $this->v["treeClassAdmin"] = new SurvLoopTreeAdmin($this->REQ);
         $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $this->REQ);
@@ -68,42 +68,49 @@ class AdminTreeController extends AdminController
             session()->put('chkCoreTbls', 1);
         }
         if (!isset($GLOBALS["SL"]->treeRow->TreeRoot) || $GLOBALS["SL"]->treeRow->TreeRoot <= 0) {
-            $newRoot = new SLNode;
-            $newRoot->NodeTree           = $this->treeID;
-            $newRoot->NodeParentID       = -3;
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $newRoot->NodeType       = 'Page';
-                $newRoot->NodeDataBranch = $GLOBALS["SL"]->coreTbl;
-                if (isset($GLOBALS["SL"]->treeRow->TreeSlug) && trim($GLOBALS["SL"]->treeRow->TreeSlug) != '') {
-                    $newRoot->NodePromptNotes = $GLOBALS["SL"]->treeRow->TreeSlug;
-                } else {
-                    $newRoot->NodePromptNotes = $this->slugify($GLOBALS["SL"]->treeRow->TreeName);
-                }
-                $newRoot->NodeCharLimit  = -1;
-            } else {
-                $newRoot->NodeType = 'Data Manip: New';
-                $newRoot->NodeDataBranch = $GLOBALS["SL"]->coreTbl;
-            }
-            $newRoot->save();
-            $GLOBALS["SL"]->treeRow->TreeRoot = $newRoot->NodeID;
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $GLOBALS["SL"]->treeRow->TreeFirstPage = $newRoot->NodeID;
-                $GLOBALS["SL"]->treeRow->TreeLastPage = $newRoot->NodeID;
-            }
-            $GLOBALS["SL"]->treeRow->save();
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $firstReal = new SLNode;
-                $firstReal->NodeTree       = $this->treeID;
-                $firstReal->NodeParentID   = $newRoot->NodeID;
-                $firstReal->NodeType       = 'Instructions';
-                $firstReal->NodePromptText = '<h2>Welcome to ' . $GLOBALS["SL"]->treeRow->TreeName . '.</h2>' . "\n"
-                    . '<p>Edit this node to fill in your page! This node could be your entire page, '
-                    . 'or just one little component.</p>';
-                $firstReal->save();
-            }
+            $this->createRootNode($GLOBALS["SL"]->treeRow);
         }
         set_time_limit(180);
         return true;
+    }
+    
+    protected function createRootNode($treeRow)
+    {
+        $newRoot = new SLNode;
+        $newRoot->NodeTree     = $treeRow->TreeID;
+        $newRoot->NodeParentID = -3;
+        $coreTbl = ((intVal($treeRow->TreeCoreTable) > 0 && isset($GLOBALS["SL"]->tbl[$treeRow->TreeCoreTable])) 
+            ? $GLOBALS["SL"]->tbl[$treeRow->TreeCoreTable] : '');
+        if ($treeRow->TreeType == 'Page') {
+            $newRoot->NodeType = 'Page';
+            $newRoot->NodeDataBranch = $coreTbl;
+            if (isset($treeRow->TreeSlug) && trim($treeRow->TreeSlug) != '') {
+                $newRoot->NodePromptNotes = $treeRow->TreeSlug;
+            } else {
+                $newRoot->NodePromptNotes = $this->slugify($treeRow->TreeName);
+            }
+            $newRoot->NodeCharLimit = -1;
+        } else {
+            $newRoot->NodeType = 'Data Manip: New';
+            $newRoot->NodeDataBranch = $coreTbl;
+        }
+        $newRoot->save();
+        $treeRow->TreeRoot = $newRoot->NodeID;
+        if ($treeRow->TreeType == 'Page') {
+            $treeRow->TreeFirstPage = $treeRow->TreeLastPage = $newRoot->NodeID;
+        }
+        $treeRow->save();
+        if ($treeRow->TreeType == 'Page') {
+            $firstReal = new SLNode;
+            $firstReal->NodeTree       = $treeRow->TreeID;
+            $firstReal->NodeParentID   = $newRoot->NodeID;
+            $firstReal->NodeType       = 'Instructions';
+            $firstReal->NodePromptText = '<h2>Welcome to ' . $treeRow->TreeName . '.</h2>' . "\n"
+                . '<p>Edit this node to fill in your page! This node could be your entire page, '
+                . 'or just one little component.</p>';
+            $firstReal->save();
+        }
+        return $newRoot;
     }
     
     protected function allStdCondition($tag, $desc)
@@ -135,7 +142,7 @@ class AdminTreeController extends AdminController
         $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
-            $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
+            $this->v["ipLegal"] = view('vendor.survloop.dbdesign-legal', [
                 "sysOpts" => $GLOBALS["SL"]->sysOpts
             ])->render();
             $this->v["content"] = view('vendor.survloop.admin.tree.tree', $this->v)->render();
@@ -163,13 +170,12 @@ class AdminTreeController extends AdminController
         }
         $this->survLoopInit($request, '/tree/' . $treeSlug);
         if (!$this->checkCache()) {
-            $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
-                "sysOpts" => $GLOBALS["SL"]->sysOpts
-            ])->render();
-            $this->v["content"] = '<div class="pL20"><h2>Core Specifications of ' 
-                . $GLOBALS["SL"]->treeRow->TreeName . ' User Experience</h2>' 
-                . $this->v["IPlegal"] . '</div><div class="pT20">' 
-                . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true) . '</div>';
+            $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
+            $this->v["content"] = '<div class="row"><div class="col-md-4">' 
+                . view('vendor.survloop.logo-print', [ "sysOpts" => $GLOBALS["SL"]->sysOpts, "w100" => true ])->render()
+                . '</div><div class="col-md-8">' . view('vendor.survloop.print-tree-map-desc', [])->render() 
+                . '</div></div><div class="p10"></div>' . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true)
+                . view('vendor.survloop.dbdesign-legal', ["sysOpts" => $GLOBALS["SL"]->sysOpts ])->render();
             $this->saveCache();
         }
         $this->v["isPrint"] = true;
@@ -206,10 +212,19 @@ class AdminTreeController extends AdminController
             $tree->TreeSlug = trim($request->newPageSlug);
             if ($tree->TreeSlug == '') $tree->TreeSlug = $this->slugify($request->newPageName);
             $tree->TreeOpts = 1;
-            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
-                $tree->TreeOpts *= 3;
-            }
+            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) $tree->TreeOpts *= 3;
+            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) $tree->TreeOpts *= 13;
             $tree->save();
+            if ($tree->TreeOpts%13 == 0 && $request->has('reportPageTree') && intVal($request->reportPageTree) > 0) {
+                $chkTree = SLTree::find($request->reportPageTree);
+                if ($chkTree && isset($chkTree->TreeID)) {
+                    $tree->update([ 'TreeCoreTable' => $chkTree->TreeCoreTable ]);
+                    $newRoot = $this->createRootNode($tree);
+                    if ($newRoot && isset($newRoot->NodeID)) {
+                        $newRoot->update([ 'NodeResponseSet' => $request->reportPageTree ]);
+                    }
+                }
+            }
             return $this->redir('/dashboard/page/' . $tree->TreeID . '?all=1&refresh=1');
         }
         if ($request->has('sublurb')) {
@@ -313,8 +328,8 @@ class AdminTreeController extends AdminController
             $this->loadDbFromNode($request, $request->nodeParentID);
         }
         $this->admControlInit($request, '/dashboard/tree-' . $treeID . '/map?all=1');
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $this->v["currPage"] = '/dashboard/pages/list';
-        $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $this->v["currPage"]);
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $this->v["currPage"][0] = '/dashboard/pages/list';
+        $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $this->v["currPage"][0]);
         if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
         }

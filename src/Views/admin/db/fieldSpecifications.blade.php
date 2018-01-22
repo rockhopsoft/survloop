@@ -78,10 +78,10 @@
                             ]) !!}
                         </select>
                         <a onClick="if (document.getElementById('FldSpecSourceID').value != '') window.location='{{ $FldSpecSourceJSlnk }}&loadGeneric='+document.getElementById('FldSpecSourceID').value+'';" 
-                            href="javascript:void(0)" class="f11"><span class="f8"><i class="fa fa-upload"></i></span>Load</a></nobr><br /><br />
+                            href="javascript:;" class="f11"><span class="f8"><i class="fa fa-upload"></i></span>Load</a></nobr><br /><br />
                         <input type="hidden" id="saveGenericID" name="saveGeneric" value="0">
                         @if ($fld->FldSpecType != 'Generic' || $fld->FldTable > 0)
-                            <a href="javascript:void(0)" onClick="saveGeneric();" class="f10"><i class="fa fa-floppy-o"></i> Save Copy As Generic Field</a>
+                            <a href="javascript:;" onClick="saveGeneric();" class="f10"><i class="fa fa-floppy-o"></i> Save Copy As Generic Field</a>
                         @endif
                         <div id="generState" class="disIn"></div>
                     @endif

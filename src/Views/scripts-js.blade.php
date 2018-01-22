@@ -1,5 +1,41 @@
 /* generated from resources/views/vendor/survloop/scripts-js.blade.php */
 
+var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
+var defMetaImg = '{{ $GLOBALS['SL']->sysOpts['meta-img'] }}';
+
+var treeList = new Array();
+@forelse ($GLOBALS["SL"]->getTreeList() as $i => $t)
+    treeList[{{ $i }}] = [ {{ $t[0] }}, "{{ str_replace('"', '\\"', $t[1]) }}", "{{ $t[2] }}", "{{ $t[3] }}" ];
+@empty
+@endforelse
+function getTreeCoreTbl(treeID) {
+    if (treeID > 0) {
+        for (var i = 0; i < treeList.length; i++) {
+            if (treeList[i][0] == treeID) return treeList[i][3];
+        }
+    }
+    return "";
+}
+var treeListChk = new Array(); // when [0] is changed, reload field drops [1], [2]...
+
+function slugOnBlur(obj, dest) {
+    if (obj.value.trim() != '' && document.getElementById(dest) && document.getElementById(dest).value.trim() == '') {
+        document.getElementById(dest).value = slugify(obj.value);
+    }
+    return true;
+}
+function slugify(string) {
+  return string.toString().trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "").replace(/\-\-+/g, "-")
+    .replace(/^-+/, "").replace(/-+$/, "");
+}
+
+var currPage = new Array();
+function setCurrPage(title, url) {
+    currPage[0] = title;
+    currPage[1] = url;
+    return true;
+}
+
 var heroActions = new Array();
 @if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
     function chkLogoResize() {
@@ -27,10 +63,18 @@ function addFld(fld) {
 	return true;
 }
 function blurAllFlds() {
-	for (var i=0; i<allFldList.length; i++) {
+	for (var i=0; i < allFldList.length; i++) {
 		if (document.getElementById(allFldList[i])) document.getElementById(allFldList[i]).blur();
 	}
 	return true;
+}
+
+function copyClip(divID) {
+    if (document.getElementById(divID)) {
+        document.getElementById(divID).select();
+        document.execCommand("Copy");
+    }
+    return true;
 }
 
 var foundForm = true;
@@ -82,7 +126,8 @@ var firstNodeError = 0;
 function setFormLabelRed(nID) {
     if (firstNodeError <= 0) {
         firstNodeError = nID;
-        window.location="#n"+nID+"";
+        scrollTo(document.getElementById("#n"+nID+""));
+        //window.location="#n"+nID+"";
     }
 	if (document.getElementById("node"+nID+"")) {
 	    document.getElementById("node"+nID+"").className=document.getElementById("node"+nID+"").className.replace("nodeWrap", "nodeWrapError").replace("nodeWrapErrorError", "nodeWrapError");
@@ -103,36 +148,49 @@ function reqFormTxt(fldID, nID) {
 	if (document.getElementById(fldID) && document.getElementById(fldID).value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 function reqFormFld(nID) {
 	if (document.getElementById("n"+nID+"FldID") && document.getElementById("n"+nID+"FldID").value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 function reqFormFldEmail(nID) {
 	if (!reqFormEmail("n"+nID+"FldID")) {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
+	return true;
+}
+function reqFormFldGreater(nID, min) {
+	if (document.getElementById("n"+nID+"FldID") && (document.getElementById("n"+nID+"FldID").value.trim() == "" || Number.parseFloat(document.getElementById("n"+nID+"FldID").value) < Number.parseFloat(min))) {
+		setFormLabelRed(nID);
+		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
+	}
 	return true;
 }
 function reqFormFldRadio(nID, maxOpts) {
 	var foundCheck = false;
-	for (var j=0; j<maxOpts; j++) {
+	for (var j=0; j < maxOpts; j++) {
 		if (document.getElementById("n"+nID+"fld"+j+"") && document.getElementById("n"+nID+"fld"+j+"").checked) foundCheck = true;
 	}
 	if (!foundCheck) {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 
@@ -142,7 +200,7 @@ function addRadioNode(nID) {
     return true;
 }
 function chkIsRadioNode(nID) {
-    for (var i=0; i<radioNodes.length; i++) {
+    for (var i=0; i < radioNodes.length; i++) {
         if (radioNodes[i] == nID) return true;
     }
     return false;
@@ -172,8 +230,9 @@ function reqFormFldDate(nID) {
 	if (!checkFldDate(nID)) {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 
@@ -181,8 +240,9 @@ function reqFormFldDateAndLimit(nID, future, today, optional) {
 	if (!checkFldDate(nID) || !chkFormFldDateLimit(nID, future, today, optional)) {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 
@@ -190,16 +250,17 @@ function reqFormFldDateLimit(nID, future, today, optional) {
 	if (!chkFormFldDateLimit(nID, future, today, optional)) {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 
 function chkFormFldDateLimit(nID, future, today, optional) {
     if (future == 0) return true;
     validDate = true;
-    if (optional == 1 && !checkFldDate(nID)) { }
-    else if (checkFldDate(nID)) {
+    if (optional == 1 && !checkFldDate(nID)) {
+    } else if (checkFldDate(nID)) {
         var todayYear = parseInt(today.substring(0, 4));
         var todayMonth = parseInt(today.substring(5, 7));
         var todayDay = parseInt(today.substring(8, 10));
@@ -207,24 +268,29 @@ function chkFormFldDateLimit(nID, future, today, optional) {
         var userMonth = parseInt(document.getElementById("n"+nID+"fldMonthID").value);
         var userDay = parseInt(document.getElementById("n"+nID+"fldDayID").value);
         if (future < 0) { // the past is valid
-            if (userYear > todayYear) validDate = false;
-            else if (userYear == todayYear) {
-                if (userMonth > todayMonth) validDate = false;
-                else if (userMonth == todayMonth) {
+            if (userYear > todayYear) {
+                validDate = false;
+            } else if (userYear == todayYear) {
+                if (userMonth > todayMonth) {
+                    validDate = false;
+                } else if (userMonth == todayMonth) {
                     if (userDay > todayDay) validDate = false;
                 }
             }
         } else { // the future is valid
-            if (userYear < todayYear) validDate = false;
-            else if (userYear == todayYear) {
-                if (userMonth < todayMonth) validDate = false;
-                else if (userMonth == todayMonth) {
+            if (userYear < todayYear) {
+                validDate = false;
+            } else if (userYear == todayYear) {
+                if (userMonth < todayMonth) {
+                    validDate = false;
+                } else if (userMonth == todayMonth) {
                     if (userDay < todayDay) validDate = false;
                 }
             }
         }
+    } else {
+        validDate = false;
     }
-    else validDate = false;
     return validDate;
 }
 
@@ -261,8 +327,9 @@ function formRequireFeetInches(nID) {
 	if (document.getElementById("n"+nID+"fldFeetID").value.trim() == "" || document.getElementById("n"+nID+"fldInchID").value.trim() == "") {
 		setFormLabelRed(nID);
 		totFormErrors++;
+	} else {
+	    setFormLabelBlack(nID);
 	}
-	else setFormLabelBlack(nID);
 	return true;
 }
 
@@ -271,6 +338,17 @@ function formRequireGender(nID) {
 		return reqFormFldRadio(nID, 4);  // we also have "Not Sure"
 	}
 	return reqFormFldRadio(nID, 3);
+}
+
+var graphs = new Array();
+function addGraph(nID, nIDtxt, baseurl) {
+    graphs[graphs.length] = [ nID, nIDtxt, baseurl ];
+    return true;
+}
+var graphFlds = new Array();
+function addGraphFld(nID, nIDtxt, fld, parent) {
+    graphFlds[graphFlds.length] = [ nID, nIDtxt, parent, fld, "" ];
+    return true;
 }
 
 function checkNodeUp(nID, response, isMobile) {
@@ -282,7 +360,7 @@ function checkNodeUp(nID, response, isMobile) {
 }
 
 function formKeyUpOther(nID, j) {
-    if (document.getElementById("n"+nID+"fldOtherID").value.trim() != "") {
+    if (document.getElementById("n"+nID+"fldOtherID"+j+"").value.trim() != "") {
         document.getElementById("n"+nID+"fld"+j+"").checked=true;
         checkFingerClass(nID);
     }
@@ -299,6 +377,39 @@ function formClickGender(nID) {
         }
     }
 	chkFormCheck();
+    return true;
+}
+
+var gryFlds = new Array();
+function addGryFld(fldID, defaultTxt) {
+    
+}
+function fldGryTxtKeyUp(fldID, defaultTxt) {
+    if (document.getElementById(fldID)) {
+        if (document.getElementById(fldID).value.trim() == '') {
+            document.getElementById(fldID).value = defaultTxt;
+            document.getElementById(fldID).className = "form-control slGrey";
+        } else if (document.getElementById(fldID).value == defaultTxt 
+            || document.getElementById(fldID).value.replace("'", "").replace('"', '') == defaultTxt) {
+            document.getElementById(fldID).className = "form-control slGrey";
+        } else {
+            document.getElementById(fldID).className = "form-control";
+        }
+    }
+    return true;
+}
+function fldGryTxtFocus(fldID, defaultTxt) {
+    if (document.getElementById(fldID)) {
+        if (document.getElementById(fldID).value.trim() == '') {
+            document.getElementById(fldID).value = defaultTxt;
+            document.getElementById(fldID).className = "form-control slGrey";
+        } else if (document.getElementById(fldID).value == defaultTxt 
+            || document.getElementById(fldID).value.replace("'", "").replace('"', '') == defaultTxt) {
+            document.getElementById(fldID).className = "form-control slGrey";
+        } else {
+            document.getElementById(fldID).className = "form-control";
+        }
+    }
     return true;
 }
 
@@ -323,6 +434,31 @@ function focusNodeID(nID) {
     return true;
 }
 
+function charCountKeyUp(nID) {
+	if (document.getElementById("n"+nID+"FldID")) {
+	    var count = 0;
+	    if (document.getElementById("n"+nID+"FldID").value.trim() != "") {
+	        count = document.getElementById("n"+nID+"FldID").value.trim().length;
+        }
+	    if (document.getElementById("wordCnt"+nID+"")) {
+            document.getElementById("wordCnt"+nID+"").innerHTML=count;
+        }
+	}
+	return true;
+}
+function keywordCountKeyUp(nID) {
+	if (document.getElementById("n"+nID+"FldID")) {
+	    var keywords = new Array();
+	    if (document.getElementById("n"+nID+"FldID").value.trim() != "") {
+	        keywords = document.getElementById("n"+nID+"FldID").value.trim().split(",");
+        }
+	    if (document.getElementById("keywordCnt"+nID+"")) {
+            document.getElementById("keywordCnt"+nID+"").innerHTML=keywords.length;
+        }
+	}
+	return true;
+}
+
 function wordCountKeyUp(nID, limit) {
 	if (document.getElementById("n"+nID+"FldID")) {
 	    var words = new Array();
@@ -345,6 +481,21 @@ function wordCountKeyUp(nID, limit) {
 	return true;
 }
 
+function checkMin(nID, minVal) {
+	if (document.getElementById("n"+nID+"FldID")) {
+	    var currVal = document.getElementById("n"+nID+"FldID");
+	    if (currVal.value.trim() != '' && currVal.value < minVal) currVal.value = minVal;
+	}
+    return true;
+}
+function checkMax(nID, maxVal) {
+	if (document.getElementById("n"+nID+"FldID")) {
+	    var currVal = document.getElementById("n"+nID+"FldID");
+	    if (currVal.value.trim() != '' && currVal.value > maxVal) currVal.value = maxVal;
+	}
+    return true;
+}
+
 var nodeResTot = new Array();
 function addResTot(nID, tot) {
     nodeResTot[nID] = tot;
@@ -359,13 +510,13 @@ function addMutEx(nID, response) {
 }
 
 function checkFingerClass(nID) {
-    for (var j=0; j<nodeResTot[nID]; j++) {
-        if (document.getElementById("n"+nID+"fld"+j+"lab") 
-            && document.getElementById("n"+nID+"fld"+j+"")) {
+    for (var j = 0; j < nodeResTot[nID]; j++) {
+        if (document.getElementById("n"+nID+"fld"+j+"lab") && document.getElementById("n"+nID+"fld"+j+"")) {
             if (document.getElementById("n"+nID+"fld"+j+"").checked) {
                 document.getElementById("n"+nID+"fld"+j+"lab").className = "fingerAct";
+            } else {
+                document.getElementById("n"+nID+"fld"+j+"lab").className = "finger";
             }
-            else document.getElementById("n"+nID+"fld"+j+"lab").className = "finger";
         }
     }
     return true;
@@ -375,11 +526,11 @@ function checkMutEx(nID, response) {
     if (nID > 0 && response > 0 && nodeMutEx[nID] && nodeMutEx[nID].length > 0) {
         var hasMutEx = false;
         var clickedMutEx = false;
-        for (var i=0; i<nodeMutEx[nID].length; i++) {
+        for (var i = 0; i < nodeMutEx[nID].length; i++) {
             if (nodeMutEx[nID][i] == response) {
                 if (document.getElementById("n"+nID+"fld"+response+"").checked) {
                     clickedMutEx = true;
-                    for (var j=0; j<nodeResTot[nID]; j++) {
+                    for (var j=0; j < nodeResTot[nID]; j++) {
                         if (j != response) {
                             document.getElementById("n"+nID+"fld"+j+"").checked = false;
                         }
@@ -388,7 +539,7 @@ function checkMutEx(nID, response) {
             }
         }
         if (!clickedMutEx) {
-            for (var i=0; i<nodeMutEx[nID].length; i++) {
+            for (var i=0; i < nodeMutEx[nID].length; i++) {
                 if (nodeMutEx[nID][i] != response && document.getElementById("n"+nID+"fld"+response+"").checked) {
                     document.getElementById("n"+nID+"fld"+nodeMutEx[nID][i]+"").checked = false;
                 }
@@ -433,7 +584,7 @@ function updateTagList(nID) {
     var tagIDs = ",";
     var tagHtml = "";
     if (nodeTags[nID] && nodeTagList[nID]) {
-        for (var i=0; i<nodeTagList[nID].length; i++) {
+        for (var i = 0; i < nodeTagList[nID].length; i++) {
             var tagID = nodeTagList[nID][i];
             if (nodeTags[nID][tagID] && nodeTags[nID][tagID][1] == 1 && tagIDs.indexOf(","+tagID+",") < 0) {
                 tagIDs += tagID+",";
@@ -452,10 +603,16 @@ var nodeParents = new Array();
 var nodeKidList = new Array();
 var nodeSffxs = new Array("");
 var conditionNodes = new Array();
+function styBlock(id) {
+    if (document.getElementById(id)) document.getElementById(id).style.display="block";
+}
+function styNone(id) {
+    if (document.getElementById(id)) document.getElementById(id).style.display="none";
+}
 function kidsVisible(nID, nSffx, onOff) {
     setNodeVisib(nID, nSffx, onOff);
 	if (nodeKidList[nID] && nodeKidList[nID].length > 0) {
-		for (var k=0; k < nodeKidList[nID].length; k++) {
+		for (var k = 0; k < nodeKidList[nID].length; k++) {
 			kidsVisible(nodeKidList[nID][k], nSffx, onOff);
 		}
 	}
@@ -469,7 +626,7 @@ function setNodeVisib(nID, nSffx, onOff) {
 	return true;
 }
 function chkNodeParentVisib(nID) {
-    /* for (var s=0; s < nodeSffxs.length; s++) {
+    /* for (var s = 0; s < nodeSffxs.length; s++) {
         if (nodeParents[nID] && document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID") && document.getElementById("n"+nodeParents[nID]+nodeSffxs[s]+"VisibleID")) {
             if (onOff) document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID").value=1;
             else document.getElementById("n"+nID+nodeSffxs[s]+"VisibleID").value=0;
@@ -477,7 +634,43 @@ function chkNodeParentVisib(nID) {
     } */
 	return true;
 }
+function setSubResponses(nID, nSffx, onOff, kids) {
+    if (kids.length > 0) {
+        for (var k = 0; k < kids.length; k++) {
+            if (document.getElementById("node"+kids[k]+nSffx+"")) {
+                if (onOff) styBlock("node"+kids[k]+nSffx+"");
+                else styNone("node"+kids[k]+nSffx+"");
+            }
+            kidsVisible(kids[k], nSffx, onOff);
+        }
+    }
+    return true;
+}
 
+function kidsDisplaySkip(nID, nSffx, onOff) {
+	if (nodeKidList[nID] && nodeKidList[nID].length > 0) {
+		for (var k = 0; k < nodeKidList[nID].length; k++) {
+			kidsDisplay(nodeKidList[nID][k], nSffx, onOff);
+		}
+	}
+	return true;
+}
+function kidsDisplay(nID, nSffx, onOff) {
+    setNodeDisp(nID, nSffx, onOff);
+	if (nodeKidList[nID] && nodeKidList[nID].length > 0) {
+		for (var k = 0; k < nodeKidList[nID].length; k++) {
+			kidsDisplay(nodeKidList[nID][k], nSffx, onOff);
+		}
+	}
+	return true;
+}
+function setNodeDisp(nID, nSffx, onOff) {
+	if (document.getElementById("node"+nID+nSffx+"")) {
+		if (onOff) styBlock("node"+nID+nSffx+"");
+		else styNone("node"+nID+nSffx+"");
+	}
+	return true;
+}
 
 function ajaxSearchExpandResults() {
 	if (document.getElementById("ajaxSearchResults").className=="ajaxSearch") document.getElementById("ajaxSearchResults").className="ajaxSearchExpand";
@@ -523,11 +716,94 @@ function runSearch(nID, treeID) {
     return false;
 }
 
+function getSpinner() {
+    return {!! json_encode($GLOBALS["SL"]->sysOpts["spinner-code"]) !!};
+}
+function getSpinnerAjaxWrap() {
+    return {!! json_encode('<div id="ajaxWrapLoad" class="container">') !!}+getSpinner()+{!! json_encode('</div>') !!};
+}
+
+function changeLoopListType(fld) {
+    if (document.getElementById(''+fld+'TypeID')) {
+        if (document.getElementById(''+fld+'TypeID').value == 'manual') {
+            document.getElementById(''+fld+'Defs').style.display = 'none';
+            document.getElementById(''+fld+'Loops').style.display = 'none';
+            document.getElementById(''+fld+'Tbls').style.display = 'none';
+            document.getElementById(''+fld+'DefinitionID').value='';
+            document.getElementById(''+fld+'LoopItemsID').value='';
+            document.getElementById(''+fld+'TablesID').value='';
+        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-def') {
+            document.getElementById(''+fld+'Defs').style.display = 'block';
+            document.getElementById(''+fld+'Loops').style.display = 'none';
+            document.getElementById(''+fld+'Tbls').style.display = 'none';
+        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-loop') {
+            document.getElementById(''+fld+'Defs').style.display = 'none';
+            document.getElementById(''+fld+'Loops').style.display = 'block';
+            document.getElementById(''+fld+'Tbls').style.display = 'none';
+        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl') {
+            document.getElementById(''+fld+'Defs').style.display = 'none';
+            document.getElementById(''+fld+'Loops').style.display = 'none';
+            document.getElementById(''+fld+'Tbls').style.display = 'block';
+        }
+    }
+    return true;
+}
+
+var uploadTypeVid = -1;
+
+function flexAreaAdjust(o) {
+    o.style.height = "1px";
+    setTimeout(function() {
+        var newH = o.scrollHeight+25;
+        o.style.height = (newH)+"px";
+    }, 1);
+}
+
 $(document).ready(function(){
+    
+    function chkFormSess() {
+        if (document.getElementById("csrfTok")) {
+            var src = "/time-out";
+            if (document.getElementById("postNodeForm") && document.getElementById("stepID") && document.getElementById("treeID")) {
+                src += "?form="+document.getElementById("treeID").value;
+            } else if (document.getElementById("isLoginID") || document.getElementById("isSignupID")) {
+                src += "?login=1";
+            }
+            $("#dialogBody").load(src);
+            $("#nondialog").fadeOut(300);
+            $("#dialog").fadeIn(300);
+        }
+        return true;
+    }
+    setTimeout(function() { chkFormSess(); }, (58*60000));
+    
+    function runSaveReload() {
+        if (document.getElementById("stepID")) {
+            document.getElementById("stepID").value="save";
+            return runFormSub();
+        }
+        if (document.mainPageForm) {
+            document.mainPageForm.submit();
+            return true;
+        }
+        location.reload();
+        return false;
+    }
+    function chkRunSaveReload() {
+        if (cntDownOver) {
+            $("#nondialog").fadeIn(300);
+            $("#dialog").fadeOut(300);
+            cntDownOver = false;
+            return runSaveReload();
+        }
+        setTimeout(function() { chkRunSaveReload(); }, 1000);
+    }
+    setTimeout(function() { chkRunSaveReload(); }, 1000);
+    $(document).on("click", ".nFormSaveReload", function() { runSaveReload(); });
 	
     $(document).on("click", ".upTypeBtn", function() {
 		var nID = $(this).attr("name").replace("n", "").replace("fld", "");
-		if (document.getElementById("n"+nID+"fld0") && document.getElementById("n"+nID+"fld0").checked) { // (Video)
+		if (document.getElementById("n"+nID+"fld"+uploadTypeVid+"") && document.getElementById("n"+nID+"fld"+uploadTypeVid+"").checked) { // (Video)
 			$("#up"+nID+"FormFile").slideUp("fast");
 			$("#up"+nID+"FormVideo").slideDown("fast");
 		}
@@ -542,7 +818,7 @@ $(document).ready(function(){
 	
 	$(document).on("click", ".navDeskMaj", function() {
 		var majInd = $(this).attr("id").replace("maj", "");
-		for (var i=0; i < treeMajorSects.length; i++) {
+		for (var i = 0; i < treeMajorSects.length; i++) {
 		    if (i != majInd && document.getElementById("minorNav"+i+"") 
 		        && document.getElementById("majSect"+i+"Vert2")) {
 		        document.getElementById("minorNav"+i+"").style.display = 'none';
@@ -597,7 +873,7 @@ $(document).ready(function(){
     
     $(document).on("click", ".dialogOpen", function() {
 	    if (document.getElementById("dialogBody") && document.getElementById("dialogTitle")) {
-            document.getElementById("dialogBody").innerHTML={!! json_encode($spinner) !!};
+            document.getElementById("dialogBody").innerHTML='<center>'+getSpinner()+'</center>';
             var src = $(this).attr("href");
             var title = $(this).attr("title");
             document.getElementById("dialogTitle").innerHTML=title;
@@ -678,6 +954,52 @@ $(document).ready(function(){
         $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
     }
     
+    function switchTreeOpts(fldID, treeID) {
+	    for (var i = 0; i < treeListChk.length; i++) {
+	        if (treeListChk[i][0] == fldID) {
+	            for (var j = 1; j < treeListChk[i].length; j++) {
+	                var loadURL = "/ajax-get-flds/"+treeID+"";
+	                if (document.getElementById(treeListChk[i][j]+"presel")) {
+	                    loadURL += "?fld="+document.getElementById(treeListChk[i][j]+"presel").value;
+	                }
+	                $("#"+treeListChk[i][j]+"").load(loadURL);
+	            }
+	        }
+	    }
+	    return true;
+    }
+    $(".switchTree").change(function(){
+        var treeFld = $(this).attr("id");
+        switchTreeOpts(treeFld, document.getElementById(treeFld).value);
+	});
+    setTimeout(function() {
+        for (var i = 0; i < treeListChk.length; i++) {
+            if (treeListChk[i][0] && document.getElementById(treeListChk[i][0])) {
+                switchTreeOpts(treeListChk[i][0], document.getElementById(treeListChk[i][0]).value);
+            }
+        }
+    }, 10);
+    
+    function toggleHidFld(fldGrp) {
+        if (document.getElementById("hidFld"+fldGrp+"")) {
+            if (document.getElementById("hidFld"+fldGrp+"").style.display!="block") {
+                $("#hidFld"+fldGrp+"").slideDown("fast");
+            } else {
+                $("#hidFld"+fldGrp+"").slideUp("fast");
+            }
+        }
+        return true;
+    }
+	$(document).on("click", ".hidFldBtn", function() {
+        var fldGrp = $(this).attr("id").replace("hidFldBtn", "");
+        toggleHidFld(fldGrp);
+	});
+	$(document).on("click", ".hidFldBtnSelf", function() {
+        var fldGrp = $(this).attr("id").replace("hidFldBtn", "");
+        toggleHidFld(fldGrp);
+        $(this).slideUp("fast");
+	});
+    
     if (!document.getElementById('loginLnk')) $("#headClear").load("/js-load-menu");
     
     $(document).on("click", ".adminAboutTog", function() {
@@ -686,9 +1008,193 @@ $(document).ready(function(){
         }
 	});
 	
+	function updateImgSelect(nID) {
+        if (document.getElementById("n"+nID+"FldID") && document.getElementById("n"+nID+"SelImg")) {
+            var imgSrc = "";
+            if (document.getElementById("n"+nID+"FldID").value.trim() != "") {
+                imgSrc = document.getElementById("n"+nID+"FldID").value.trim();
+            }
+            document.getElementById("n"+nID+"SelImg").src=imgSrc;
+        }
+        return true;
+    }
+	$(document).on("click", ".openImgUpdate", function() {
+        updateImgSelect($(this).attr("id").replace("imgUpd", "").replace("n", "").replace("FldID", ""));
+	});
+    function defaultImgSelect(nID) {
+        if (document.getElementById("n"+nID+"FldID")) {
+            document.getElementById("n"+nID+"FldID").value = defMetaImg.replace(appUrl, "");
+        }
+        updateImgSelect(nID);
+        return true;
+    }
+	$(document).on("click", ".openImgReset", function() {
+	    var nID = $(this).attr("id").replace("imgReset", "");
+        defaultImgSelect(nID);
+        updateImgSelect(nID);
+	});
+    function openImgSelect(nID, title, presel) {
+        if (document.getElementById("dialogTitle")) document.getElementById("dialogTitle").innerHTML = title;
+        $("#nondialog").fadeOut(300);
+        window.scrollTo(0, 0);
+        $("#dialogBody").load("/ajax/img-sel?nID="+nID+"&presel="+encodeURIComponent(presel));
+        $("#dialog").fadeIn(300);
+        return true;
+    }
+	$(document).on("click", ".openImgSelect", function() {
+	    var imgID = $(this).attr("id").replace("imgSelect", "");
+	    var title = "";
+	    if (document.getElementById("imgSelect"+imgID+"Title")) {
+	        title = document.getElementById("imgSelect"+imgID+"Title").innerHTML.trim();
+	    } else if ($(this).attr("data-title") && $(this).attr("data-title").trim() != '') {
+	        title = $(this).attr("data-title").trim();
+	    }
+        openImgSelect(imgID, title, $(this).attr("data-presel"));
+	});
+    function openImgDetail(nID, imgID) {
+        if (document.getElementById("imgDeetDiv"+nID+"")) {
+            document.getElementById("imgDeetDiv"+nID+"").innerHTML = '<center>'+getSpinner()+'</center>';
+            document.getElementById("hidFldImgUp"+nID+"").style.display = "none";
+            document.getElementById("hidFldBtnImgUp"+nID+"").style.display = "block";
+            $("#imgDeetDiv"+nID+"").load( "/ajax/img-deet?nID="+nID+"&imgID="+imgID+"" );
+        }
+        return true;
+    }
+	$(document).on("click", ".openImgDetail", function() {
+	    var ids = $(this).attr("id").replace("selectImg", "").split("sel");
+        openImgDetail(ids[0], ids[1]);
+	});
+    function getImgNode(imgID) {
+	    var nID = "";
+	    if (document.getElementById("imgNode"+imgID+"ID")) nID = document.getElementById("imgNode"+imgID+"ID").value;
+	    return nID;
+    }
+    function imgChoose(imgID) {
+        var nID = getImgNode(imgID);
+        $("#nondialog").fadeIn(300);
+        $("#dialog").fadeOut(300);
+	    var url = "";
+	    if (document.getElementById("imgUrl"+imgID+"ID")) url = document.getElementById("imgUrl"+imgID+"ID").value;
+        if (document.getElementById("n"+nID+"FldID")) {
+            document.getElementById("n"+nID+"FldID").value=url;
+        }
+        updateImgSelect(nID);
+        return true;
+    }
+	$(document).on("click", ".imgChoose", function() {
+	    imgChoose($(this).attr("id").replace("imgChoose", ""));
+	});
+    function imgSaveDeet(imgID) {
+        var nID = getImgNode(imgID);
+        if (document.getElementById("img"+imgID+"saveUpdate")) {
+            document.getElementById("img"+imgID+"saveUpdate").innerHTML='<center>'+getSpinner()+'</center>';
+            var formData = new FormData(document.getElementById("formSaveImg"+imgID+"ID"));
+            $.ajax({
+                url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/ajax/img-save",
+                type: "POST", 
+                data: formData, 
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $("#img"+imgID+"saveUpdate").empty();
+                    $("#img"+imgID+"saveUpdate").append(data);
+                }, 
+                error: function(xhr, status, error) {
+                    $("#img"+imgID+"saveUpdate").append("<div>(error - "+xhr.responseText+")</div>");
+                }
+            });
+        }
+        return true;
+    }
+	$(document).on("click", ".imgSaveDeet", function() {
+	    var imgID = $(this).attr("id").replace("imgSave", "");
+	    imgSaveDeet(imgID);
+	});
+	$(document).on("keyup", ".imgSaveDeetFld", function(e) {
+        if (e.keyCode == 13) {
+            e.preventDefault();
+            if ($(this).attr("data-imgid")) imgSaveDeet($(this).attr("data-imgid"));
+        }
+    });
+    function imgUpBtn(nID) {
+        if (document.getElementById("img"+nID+"fileUpdate")) {
+            document.getElementById("img"+nID+"fileUpdate").innerHTML='<center>'+getSpinner()+'</center>';
+            var formData = new FormData(document.getElementById("formUpImg"+nID+"ID"));
+            $.ajax({
+                url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/ajax/img-up",
+                type: "POST", 
+                data: formData, 
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $("#img"+nID+"fileUpdate").empty();
+                    $("#img"+nID+"fileUpdate").append(data);
+                }, 
+                error: function(xhr, status, error) {
+                    $("#img"+nID+"fileUpdate").append("<div>(error - "+xhr.responseText+")</div>");
+                }
+            });
+        }
+        return true;
+    }
+	$(document).on("click", ".imgUpBtn", function() {
+	    imgUpBtn($(this).attr("id").replace("imgUp", ""));
+	});
+    
+	
+	function pullNewGraph(nID) {
+	    for (var i=0; i < graphFlds.length; i++) {
+	        if (graphFlds[i][0] == nID) {
+	            var p = graphFlds[i][2];
+	            for (var g=0; g < graphs.length; g++) {
+	                if (graphs[g][0] == p) {
+                        var graphUrl = graphs[g][2];
+                        var fVars = "";
+                        for (var j=0; j < graphFlds.length; j++) {
+                            if (graphFlds[j][2] == graphFlds[i][2]) {
+                                fVars += "__"+graphFlds[j][3]+"|";
+                                if (document.getElementById("n"+graphFlds[j][1]+"FldID")) {
+                                    fVars += document.getElementById("n"+graphFlds[j][1]+"FldID").value;
+                                } else {
+                                    fVars += $(".nCbox"+nID+":checked").map(function() { return this.value; }).get();
+                                }
+                            }
+                        }
+                        if (fVars.length > 0) graphUrl += "?f="+fVars.substring(2);
+                        $("#n"+p+"ajaxLoad").load(graphUrl);
+                        //document.getElementById('node287').innerHTML+="<br />"+graphUrl;
+                    }
+                }
+	        }
+	    }
+	    return true;
+    }
+    $(document).on("change", ".graphUpDrp", function() { pullNewGraph($(this).attr("data-nid")); return true; });
+    $(document).on("click", ".graphUp", function() { pullNewGraph($(this).attr("data-nid")); return true; });
+	
     @if (isset($jqueryXtra)) {!! $jqueryXtra !!} @endif
 	
 });
+
+var cntDownOver = false;
+function updateCountdown(divID, cntFrom, inc) {
+    if (document.getElementById(divID)) {
+        var newCnt = cntFrom-inc;
+        if (newCnt >= 0) {
+            document.getElementById(divID).innerHTML=newCnt;
+            setTimeout("updateCountdown('"+divID+"', "+newCnt+", "+inc+")", (inc*1000));
+        }
+        if (newCnt <= 0) cntDownOver = true;
+    }
+    return true;
+}
+function startCountdown(divID, cntFrom, inc) {
+    cntDownOver = false;
+    if (document.getElementById(divID)) {
+        setTimeout("updateCountdown('"+divID+"', "+cntFrom+", "+inc+")", (inc*1000));
+    }
+    return true;
+}
 
 function openNav() {
     document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-off"] !!} solid";

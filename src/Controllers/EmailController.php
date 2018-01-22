@@ -35,23 +35,7 @@ class EmailController extends Mailable
      */
     public function build()
     {
-        $cssColors = [];
-        $cssRaw = SLDefinitions::where('DefDatabase', 1)
-                ->where('DefSet', 'Style Settings')
-                ->get();
-        if ($cssRaw && sizeof($cssRaw) > 0) {
-            foreach ($cssRaw as $c) {
-                $cssColors[$c->DefSubset] = $c->DefDescription;
-            }
-        }
-        $cssColors["css-dump"] = '';
-        $cssRaw = SLDefinitions::where('DefDatabase', 1)
-                ->where('DefSet', 'Style CSS')
-                ->where('DefSubset', 'email')
-                ->first();
-        if ($cssRaw && isset($cssRaw->DefDescription) > 0) {
-            $cssColors["css-dump"] = $cssRaw->DefDescription;
-        }
+        $cssColors = $GLOBALS["SL"]->getCssColorsEmail();
         return $this->view('vendor.survloop.emails.master')
             ->with([
                 "emaTitle"   => $this->emaTitle,

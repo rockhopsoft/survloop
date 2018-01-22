@@ -82,25 +82,26 @@ class SurvUploadTree extends SurvLoopTree
     
     protected function prevUploadList($nID = -3)
     {
-        if ($nID <= 0 || !isset($this->allNodes[$nID])) {
-            return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
-                ->where('UpCoreID', $this->coreID)
-                ->orderBy('created_at', 'asc')
-                ->get();
-        } else {
+        if ($nID > 0 && isset($this->allNodes[$nID])) {
             $fldID = $this->allNodes[$nID]->getTblFldID();
             if ($fldID > 0) {
-                list($tbl, $fld) = $this->getTblFld();
-                list($linkRecInd, $linkRecID) = $this->currSessDataPos($tbl);
+                list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
+                list($linkRecInd, $linkRecID) = $this->sessData->currSessDataPos($tbl);
                 if ($linkRecID > 0) {
                     return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
                         ->where('UpCoreID', $this->coreID)
+                        ->where('UpNodeID', $nID)
                         ->where('UpLinkFldID', $fldID)
                         ->where('UpLinkRecID', $linkRecID)
                         ->orderBy('created_at', 'asc')
                         ->get();
                 }
             }
+        } else {
+            return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+                ->where('UpCoreID', $this->coreID)
+                ->orderBy('created_at', 'asc')
+                ->get();
         }
         return [];
     }
@@ -159,6 +160,11 @@ class SurvUploadTree extends SurvLoopTree
             'Content-Type'   => $handler->getMimeType(),
             'Content-Length' => $handler->getSize()
         ]);
+        $limit = 10;
+        while (!file_exists($up["file"]) && $limit < 9) {
+            $up["file"] = '../' . $up["file"];
+            $limit++;
+        }
         return Response::make(file_get_contents($up["file"]), 200, $headers);
     }
     
@@ -170,6 +176,11 @@ class SurvUploadTree extends SurvLoopTree
         $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID').value == 1) reqUploadTitle(" 
             . $nID . ");\n";
         $GLOBALS["SL"]->pageJAVA .= "addResTot(" . $nID . ", 4);\n";
+        foreach ($this->uploadTypes as $j => $ty) {
+            if (in_array(strtolower($ty->DefValue), ['video', 'videos'])) {
+                $GLOBALS["SL"]->pageJava .= 'uploadTypeVid = ' . $j . ';' . "\n";
+            }
+        }
         $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
             . view('vendor.survloop.upload-tool', [
                 "nID"            => $nID,
@@ -210,14 +221,19 @@ class SurvUploadTree extends SurvLoopTree
                     . '" target="_blank">' . $upRow->UpUploadFile . '</a>';
                 $this->upDeets[$i]["youtube"]  = '';
                 $this->upDeets[$i]["vimeo"]    = '';
-                $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
-                    . "-upload-types"], 'Video');
+                $this->upDeets[$i]["imgWidth"] = $this->upDeets[$i]["imgHeight"] = 0;
+                $this->upDeets[$i]["imgClass"] = 'w100';
+                $vidTypeID = -1;
+                if (isset($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID . "-upload-types"])) {
+                    $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                        . "-upload-types"], 'Video');
+                }
                 if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->step == 'uploadDel' 
                     && $GLOBALS["SL"]->REQ->has('alt') && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->UpID) {
                     if (file_exists($this->upDeets[$i]["file"]) && trim($upRow->type) != $vidTypeID) {
                         unlink($this->upDeets[$i]["file"]);
                     }
-                    $this->sessData->deleteDataItem($nID, 'Evidence', $upRow->UpID);
+                    SLUploads::find($upRow->UpID)->delete();
                 } else {
                     if (trim($upRow->type) == $vidTypeID) {
                         if (stripos($upRow->UpVideoLink, 'youtube') !== false 
@@ -230,9 +246,22 @@ class SurvUploadTree extends SurvLoopTree
                             $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
                                 . '" target="_blank">vimeo/' . $this->upDeets[$i]["vimeo"] . '</a>';
                         }
-                    } elseif (!file_exists($this->upDeets[$i]["file"])) {
-                        $this->upDeets[$i]["fileLnk"] .= ' &nbsp;&nbsp;<span class="slRedDark"
-                            ><i class="fa fa-exclamation-triangle"></i> <i>File Not Found</i></span>';
+                    } else {
+                        $limit = 0;
+                        while (!file_exists($this->upDeets[$i]["file"]) && $limit < 9) {
+                            $this->upDeets[$i]["file"] = '../' . $this->upDeets[$i]["file"];
+                            $limit++;
+                        }
+                        if (!file_exists($this->upDeets[$i]["file"])) {
+                            $this->upDeets[$i]["fileLnk"] .= ' &nbsp;&nbsp;<span class="slRedDark">'
+                                . '<i class="fa fa-exclamation-triangle"></i> <i>File Not Found</i></span>';
+                        } else {
+                            list($this->upDeets[$i]["imgWidth"], $this->upDeets[$i]["imgHeight"]) 
+                                = getimagesize($this->upDeets[$i]["file"]);
+                            if ($this->upDeets[$i]["imgWidth"] > $this->upDeets[$i]["imgHeight"]) {
+                                $this->upDeets[$i]["imgClass"] = 'h100';
+                            }
+                        }
                     }
                 }
             }
@@ -252,6 +281,11 @@ class SurvUploadTree extends SurvLoopTree
     protected function getPrevUploads($nID, $edit = false)
     {
         $this->prepPrevUploads($nID);
+        $vidTypeID = -1;
+        if (isset($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID . "-upload-types"])) {
+            $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                . "-upload-types"], 'Video');
+        }
         return view('vendor.survloop.upload-previous', [
             "nID"         => $nID,
             "REQ"         => $this->REQ,
@@ -260,8 +294,7 @@ class SurvUploadTree extends SurvLoopTree
             "uploads"     => $this->uploads, 
             "upDeets"     => $this->upDeets, 
             "uploadTypes" => $this->uploadTypes, 
-            "vidTypeID"   => $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
-                . "-upload-types"], 'Video'),
+            "vidTypeID"   => $vidTypeID,
             "v"           => $this->v
         ])->render();
     }
@@ -270,6 +303,11 @@ class SurvUploadTree extends SurvLoopTree
     {
         $this->prepPrevUploads($nID);
         if (!$this->uploads || sizeof($this->uploads) == 0) return [];
+        $vidTypeID = -1;
+        if (isset($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID . "-upload-types"])) {
+            $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                . "-upload-types"], 'Video');
+        }
         $ups = [];
         if (isset($this->uploads) && sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
@@ -292,12 +330,32 @@ class SurvUploadTree extends SurvLoopTree
         return $ups;
     }
     
+    protected function getUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
+    {
+        $ups = [];
+        if (sizeof($nIDs) > 0) {
+            foreach ($nIDs as $nID) {
+                $tmpUps = $this->getUploads($nID, $isAdmin, $isOwner);
+                if (sizeof($tmpUps) > 0) {
+                    foreach ($tmpUps as $up) {
+                        if (!in_array($up, $ups)) $ups[] = $up;
+                    }
+                }
+            }
+        }
+        return $ups;
+    }
+    
     protected function postUploadTool($nID)
     {
         $ret = '';
         $this->loadPrevUploadDeets($nID);
-        $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
-            . "-upload-types"], 'Video');
+        $vidTypeID = -1;
+        if (isset($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+            . "-upload-types"])) {
+            $vidTypeID = $GLOBALS["SL"]->getDefID($GLOBALS["SL"]->sysOpts["tree-" . $GLOBALS["SL"]->treeID 
+                . "-upload-types"], 'Video');
+        }
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
                 if ($GLOBALS["SL"]->REQ->has('up' . $upRow->UpID . 'EditVisib') 
@@ -315,13 +373,14 @@ class SurvUploadTree extends SurvLoopTree
         }
         if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
             $upRow = new SLUploads;
-            $upRow->UpTreeID        = $GLOBALS["SL"]->treeID;
-            $upRow->UpCoreID        = $this->coreID;
-            $upRow->UpLinkFldID     = $this->allNodes[$nID]->getTblFldID();
-            $upRow->UpLinkRecID     = -3;
+            $upRow->UpTreeID    = $GLOBALS["SL"]->treeID;
+            $upRow->UpCoreID    = $this->coreID;
+            $upRow->UpNodeID    = $nID;
+            $upRow->UpLinkFldID = $this->allNodes[$nID]->getTblFldID();
+            $upRow->UpLinkRecID = -3;
             if ($upRow->UpLinkFldID > 0) {
-                list($tbl, $fld) = $this->getTblFld();
-                list($loopInd, $loopID) = $this->currSessDataPos($tbl);
+                list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
+                list($loopInd, $loopID) = $this->sessData->currSessDataPos($tbl);
                 if ($loopID > 0) $upRow->UpLinkRecID = $loopID;
             }
             $upRow->UpType    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
@@ -348,7 +407,7 @@ class SurvUploadTree extends SurvLoopTree
                         $this->mkNewFolder($upFold);
                         $upRow->UpStoredFile = $this->getUploadFile($nID);
                         $filename = $upRow->UpStoredFile . '.' . $extension;
-                        if ($this->debugOn || true) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
+                        //if ($this->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
                         if (file_exists($upFold . $filename)) Storage::delete($upFold . $filename);
                         $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->move($upFold, $filename);
                     }

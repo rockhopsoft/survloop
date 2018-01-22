@@ -11,7 +11,7 @@
             @if ($majSect[2] != 'disabled')
                 <?php $cnt++; ?>
                 <div class="col-md-{{ floor(12/$majTot) }}">
-                    <a data-toggle="tab" href="javascript:void(0)" id="maj{{ $maj }}" class="navDeskMaj
+                    <a data-toggle="tab" href="javascript:;" id="maj{{ $maj }}" class="navDeskMaj
                         @if ($maj == $currMajorSection) active 
                         @elseif (in_array($maj, $sessMajorsTouched)) completed 
                         @endif " >
@@ -41,7 +41,7 @@
                                     @endif "
                                     @if ((!isset($sessMinorsTouched[$maj]) || !in_array($min, $sessMinorsTouched[$maj])) 
                                         && ($maj != $currMajorSection || $min != $currMinorSection))
-                                        href="javascript:void(0)"
+                                        href="javascript:;"
                                     @else
                                         @if ($GLOBALS['SL']->treeIsAdmin)
                                             href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
@@ -75,9 +75,9 @@
     <div id="navMobile">
         
         <div class="f16">
-            <a id="navMobBurger1" class="disIn mR10" href="javascript:void(0)"
+            <a id="navMobBurger1" class="disIn mR10" href="javascript:;"
                 ><i class="fa fa-caret-right f16" aria-hidden="true"></i></a>
-            <a id="navMobBurger2" class="disNon mR5" href="javascript:void(0)"
+            <a id="navMobBurger2" class="disNon mR5" href="javascript:;"
                 ><i class="fa fa-caret-down f16" aria-hidden="true"></i></a>
             <b>{{ $majorSections[$currMajorSection][1] }}</b>
             @if (sizeof($minorSections[$currMajorSection]) > 0 
@@ -110,7 +110,7 @@
                                 @else navMobDone @endif " >
                             @if ($maj != $currMajorSection || $min != $currMinorSection) <i class="fa fa-check"></i> @endif 
                         @else
-                            <a href="javascript:void(0)" class="navMobOff" >
+                            <a href="javascript:;" class="navMobOff" >
                         @endif
                         {{ $minSect[1] }}</a>
                     @empty

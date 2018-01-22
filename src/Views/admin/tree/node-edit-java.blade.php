@@ -1,45 +1,76 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-java.blade.php */
-<?php /* @if ($node->isInstruct()) 
-    var trixElement = document.querySelector("trix-editor");
-    trixElement.editor.setSelectedRange([0, 0]);
-    trixElement.editor.insertHTML("{!! preg_replace("/\r|\n/", "", addslashes($node->nodeRow->NodePromptText)) !!}");
-@endif */ ?>
+
+treeListChk[treeListChk.length] = [ "nodeSurvWidgetTreeID", "nodeWidgGrphYID", "nodeWidgGrphXID", "nodeWidgBarYID", "nodeWidgBarL1ID", "nodeWidgBarL2ID", "nodeWidgPieYID" ];
+
 function changeNodeType(newType) {
     document.getElementById('hasPage').style.display='none';
+    document.getElementById('hasPageOpts').style.display='none';
+    document.getElementById('pageLoopDesc').style.display='none';
+    document.getElementById('pagePreview').style.display='none';
     document.getElementById('hasLoop').style.display='none';
     document.getElementById('hasCycle').style.display='none';
     document.getElementById('hasSort').style.display='none';
     document.getElementById('hasBranch').style.display='none';
     document.getElementById('hasDataManip').style.display='none';
+    document.getElementById('widgetType').style.display='none';
     document.getElementById('hasSurvWidget').style.display='none';
     document.getElementById('hasLayout').style.display='none';
     document.getElementById('hasInstruct').style.display='none';
     document.getElementById('hasBigButt').style.display='none';
-    document.getElementById('hasHeroImg').style.display='none';
+    document.getElementById('dataPrintType').style.display='none';
+    document.getElementById('hasDataPrint').style.display='none';
+    document.getElementById('hasSendEmail').style.display='none';
+    document.getElementById('emailPreviewStuff').style.display='none';
+    document.getElementById('nodeTypeFld1').className='nFld w100 mT10 pT5';
+    document.getElementById('nodeTypeID').className='form-control input-lg';
     if (newType == 'branch' || newType == 'data' || newType == 'loop' || newType == 'sort' || newType == 'cycle' 
         || newType == 'page' || newType == 'instruct' || newType == 'instructRaw' || newType == 'heroImg' 
-        || newType == 'bigButt' || newType == 'survWidget' || newType == 'layout') {
+        || newType == 'bigButt' || newType == 'survWidget' || newType == 'sendEmail' || newType == 'layout' 
+        || newType == 'dataPrint') {
         document.getElementById('hasResponse').style.display='none';
         document.getElementById('hasResponseLayout').style.display='none';
-        if (newType == 'bigButt') {
-            document.getElementById('hasPrompt').style.display='none';
-        }
+        document.getElementById('responseType').style.display='none';
+        if (newType == 'bigButt') document.getElementById('hasPrompt').style.display='none';
         if  (newType == 'instruct' || newType == 'instructRaw') {
             document.getElementById('hasInstruct').style.display='block';
+        } else if (newType == 'page') {
+            document.getElementById('hasPage').style.display='block';
+            document.getElementById('hasPageOpts').style.display='block';
+            document.getElementById('pagePreview').style.display='block';
+        } else if (newType == 'dataPrint') {
+            document.getElementById('dataPrintType').style.display='block';
+            document.getElementById('hasDataPrint').style.display='block';
+            document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
+            document.getElementById('nodeTypeID').className='form-control pT0';
         }
         else if (newType == 'bigButt') document.getElementById('hasBigButt').style.display='block';
-        else if (newType == 'heroImg') document.getElementById('hasHeroImg').style.display='block';
         else if (newType == 'data') document.getElementById('hasDataManip').style.display='block';
         else if (newType == 'branch') document.getElementById('hasBranch').style.display='block';
-        else if (newType == 'loop') document.getElementById('hasLoop').style.display='block';
+        else if (newType == 'loop') {
+            document.getElementById('hasLoop').style.display='block';
+            document.getElementById('hasPage').style.display='block';
+            document.getElementById('pageLoopDesc').style.display='block';
+        }
         else if (newType == 'cycle') document.getElementById('hasCycle').style.display='block';
         else if (newType == 'sort') document.getElementById('hasSort').style.display='block';
-        else if (newType == 'survWidget') document.getElementById('hasSurvWidget').style.display='block';
+        else if (newType == 'survWidget') {
+            document.getElementById('hasSurvWidget').style.display='block';
+            document.getElementById('widgetType').style.display='block';
+            document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
+            document.getElementById('nodeTypeID').className='form-control pT0';
+        }
         else if (newType == 'layout') document.getElementById('hasLayout').style.display='block';
+        else if (newType == 'sendEmail') {
+            document.getElementById('hasSendEmail').style.display='block';
+            document.getElementById('emailPreviewStuff').style.display='block';
+        }
     } else {
         document.getElementById('hasPrompt').style.display='block';
         document.getElementById('hasResponse').style.display='block';
         document.getElementById('hasResponseLayout').style.display='block';
+        document.getElementById('responseType').style.display='block';
+        document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
+        document.getElementById('nodeTypeID').className='form-control pT0';
     }
     if (document.getElementById('isPageBlock')) {
         if (newType == 'instruct' || newType == 'instructRaw' || newType == 'layout') {
@@ -48,9 +79,10 @@ function changeNodeType(newType) {
     }
     return true;
 }
+setTimeout("changeNodeType(document.getElementById('nodeTypeID').value)", 10);
 
 function changeResponseType(newType) {
-    if (newType == 'Radio' || newType == 'Checkbox' || newType == 'Drop Down' || newType == 'Other/Custom') {
+    if (newType == 'Radio' || newType == 'Checkbox' || newType == 'Drop Down' || newType == 'Spreadsheet Table' || newType == 'Other/Custom') {
         document.getElementById('resOpts').style.display='block';
         //document.getElementById('resNotMulti').style.display='none';
         if (newType == 'Drop Down') {
@@ -79,6 +111,18 @@ function changeResponseType(newType) {
     } else {
         document.getElementById('DateOpts').style.display='none';
     }
+    if (newType == 'Text:Number' || newType == 'Slider') {
+        document.getElementById('NumberOpts').style.display='block';
+    } else {
+        document.getElementById('NumberOpts').style.display='none';
+    }
+    if (newType == 'Spreadsheet Table') {
+        document.getElementById('spreadTblOpts').style.display='block';
+        document.getElementById('storeResponseDiv').style.display='none';
+    } else {
+        document.getElementById('spreadTblOpts').style.display='none';
+        document.getElementById('storeResponseDiv').style.display='block';
+    }
     if (newType == 'Checkbox' || newType == 'Other/Custom') {
         for (var i=0; i < {{ $resLimit }}; i++) {
             if (document.getElementById('resMutEx'+i+'')) {
@@ -92,31 +136,27 @@ function changeResponseType(newType) {
             }
         }
     }
+    if (document.getElementById('resOptsLab') && document.getElementById('resOptsLabTbl')) {
+        if (newType == 'Spreadsheet Table') {
+            document.getElementById('resOptsLab').style.display='none';
+            document.getElementById('resOptsLabTbl').style.display='block';
+        } else {
+            document.getElementById('resOptsLab').style.display='block';
+            document.getElementById('resOptsLabTbl').style.display='none';
+        }
+    }
     return true;
 }
 
-function changeResponseListType() {
-    if (document.getElementById('responseListTypeID')) {
-        if (document.getElementById('responseListTypeID').value == 'manual') {
-            document.getElementById('responseOptDefs').style.display = 'none';
-            document.getElementById('responseOptLoops').style.display = 'none';
-            document.getElementById('responseOptTbls').style.display = 'none';
-            document.getElementById('responseDefinitionID').value='';
-            document.getElementById('responseLoopItemsID').value='';
-            document.getElementById('responseTablesID').value='';
-        } else if (document.getElementById('responseListTypeID').value == 'auto-def') {
-            document.getElementById('responseOptDefs').style.display = 'block';
-            document.getElementById('responseOptLoops').style.display = 'none';
-            document.getElementById('responseOptTbls').style.display = 'none';
-        } else if (document.getElementById('responseListTypeID').value == 'auto-loop') {
-            document.getElementById('responseOptDefs').style.display = 'none';
-            document.getElementById('responseOptLoops').style.display = 'block';
-            document.getElementById('responseOptTbls').style.display = 'none';
-        } else if (document.getElementById('responseListTypeID').value == 'auto-tbl') {
-            document.getElementById('responseOptDefs').style.display = 'none';
-            document.getElementById('responseOptLoops').style.display = 'none';
-            document.getElementById('responseOptTbls').style.display = 'block';
-        }
+function changeDataPrintType(newType) {
+    if (newType == 'Data Print Block') {
+        document.getElementById('dataPrintPull').style.display='none';
+        document.getElementById('dataPrintTitle').style.display='block';
+        document.getElementById('dataPrintConds').style.display='none';
+    } else {
+        document.getElementById('dataPrintPull').style.display='block';
+        document.getElementById('dataPrintTitle').style.display='none';
+        document.getElementById('dataPrintConds').style.display='block';
     }
     return true;
 }
@@ -164,15 +204,25 @@ function changeWidgetType() {
      } else {
          document.getElementById('widgetRecLimitID').style.display='none';
      }
-     if (document.getElementById('nodeSurvWidgetTypeID').value == 'Send Email') {
-         document.getElementById('widgetPrePost').style.display='none';
-         document.getElementById('widgetEmail').style.display='block';
-         document.getElementById('emailPreviewStuff').style.display='block';
+     if (document.getElementById('nodeSurvWidgetTypeID').value == 'Plot Graph' || document.getElementById('nodeSurvWidgetTypeID').value == 'Line Graph') {
+         document.getElementById('widgetGraph').style.display='block';
      } else {
-         document.getElementById('widgetEmail').style.display='none';
-         document.getElementById('emailPreviewStuff').style.display='none';
-         document.getElementById('widgetPrePost').style.display='block';
-         
+         document.getElementById('widgetGraph').style.display='none';
+     }
+     if (document.getElementById('nodeSurvWidgetTypeID').value == 'Bar Graph') {
+         document.getElementById('widgetBarChart').style.display='block';
+     } else {
+         document.getElementById('widgetBarChart').style.display='none';
+     }
+     if (document.getElementById('nodeSurvWidgetTypeID').value == 'Pie Chart') {
+         document.getElementById('widgetPieChart').style.display='block';
+     } else {
+         document.getElementById('widgetPieChart').style.display='none';
+     }
+     if (document.getElementById('nodeSurvWidgetTypeID').value == 'Map') {
+         document.getElementById('widgetMap').style.display='block';
+     } else {
+         document.getElementById('widgetMap').style.display='none';
      }
      return true;
 }
@@ -204,15 +254,11 @@ function checkRes() {
 }
 
 function checkDataManipFlds() {
-    if (document.getElementById('dataManipTypeWrap').checked
-        || document.getElementById('dataManipTypeCloseSess').checked) {
-        document.getElementById('dataNewRecord').style.display = 'none';
-    } else {
-        document.getElementById('dataNewRecord').style.display = 'block';
-    }
     if (document.getElementById('dataManipTypeCloseSess').checked) {
+        document.getElementById('dataNewRecord').style.display = 'none';
         document.getElementById('manipCloseSess').style.display = 'block';
     } else {
+        document.getElementById('dataNewRecord').style.display = 'block';
         document.getElementById('manipCloseSess').style.display = 'none';
     }
     return true;
@@ -221,15 +267,14 @@ function checkDataManipFlds() {
 function checkPageBlock() {
     if (document.getElementById('opts71ID').checked) {
         document.getElementById('pageBlockOpts').style.display = 'block';
-    }
-    else {
+    } else {
         document.getElementById('pageBlockOpts').style.display = 'none';
     }
-    
     return true;
 }
 function previewPageBlock() {
-    if (document.getElementById('pageBlock') && document.getElementById('blockBGID')
+    if (document.getElementById('pageBlock') && document.getElementById('opts71ID') 
+        && document.getElementById('opts71ID').checked && document.getElementById('blockBGID')
         && document.getElementById('blockTextID') && document.getElementById('blockLinkID')) {
         if (document.getElementById('blockImgID') && document.getElementById('blockImgID').value.trim() != '') {
             document.getElementById('pageBlock').style.backgroundImage = "url('"+document.getElementById('blockImgID').value+"')";
@@ -275,6 +320,34 @@ function previewBigBtn() {
 }
 setTimeout("previewBigBtn()", 50);
 
+function previewPage() {
+    if (document.getElementById('pagePrev')) {
+        var pTitle = " - {{ $GLOBALS["SL"]->sysOpts["meta-title"] }}";
+        if (document.getElementById('npageTitleFldID')) {
+            pTitle = document.getElementById('npageTitleFldID').value.trim() + pTitle;
+        }
+        var pDesc = "";
+        if (document.getElementById("npageDescFldID")) pDesc = document.getElementById("npageDescFldID").value.trim();
+        var pUrl = "{{ $GLOBALS['SL']->treeBaseUrl(true) }}";
+        if (document.getElementById('nodeSlugID')) pUrl += document.getElementById('nodeSlugID').value.trim();
+        var pUrlS = pUrl.replace("https://www.", "").replace("https://", "").replace("http://www.", "").replace("http://", "");
+        var pImg = @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != "") "" @else "{{ 
+            $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ;
+        pImg = document.getElementById('npageImgFldID').value.trim();
+        if (document.getElementById("metaImgID")) pImg = document.getElementById("metaImgID").value.trim();
+        if (pTitle.length > 60) pTitle = pTitle.substring(0, 60)+"...";
+        if (pDesc.length > 160) pDesc = pDesc.substring(0, 160)+"...";
+        document.getElementById('pagePrev').innerHTML = '<div class="prevImg"><img src="'+pImg+'"></div><div class="p10 mL5"><h3 class="mT0">'+pTitle+'</h3><div class="pB5">'+pDesc+'</div><a href="'+pUrl+'" target="_blank" class="f10">'+pUrlS+'</a></div>';
+    }
+    return true;
+}
+function previewPageAuto() {
+    previewPage();
+    setTimeout("previewPageAuto()", 3000);
+    return true;
+}
+setTimeout("previewPageAuto()", 50);
+
 function checkData() {
     maxRes = 0;
     for (i=1; i < {{ $resLimit }}; i++) {
@@ -286,6 +359,11 @@ function checkData() {
     for (i=(maxRes+2); i < {{ $resLimit }}; i++) {
         if (document.getElementById('dataManipFld'+i+'')) document.getElementById('dataManipFld'+i+'').style.display = 'none';
     }
+    charCountKeyUp('pageTitle');
+    charCountKeyUp('pageDesc');
+    flexAreaAdjust(document.getElementById('npageDescFldID'));
+    keywordCountKeyUp('pageKeywords');
+    flexAreaAdjust(document.getElementById('npageKeywordsFldID'));
     return true;
 }
 setTimeout("checkData()", 100);

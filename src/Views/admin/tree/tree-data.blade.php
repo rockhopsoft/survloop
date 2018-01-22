@@ -116,7 +116,7 @@ New loops can be added by editing any node in the <a href="/dashboard/tree-{{ $G
     <tr><td colspan="4" ><i>none</i></td></tr>
 @endforelse
     <form name="addNewSubset" method="post" action="?all=1&refresh=1&dataStruct=1&newSub=1">
-    {!! csrf_field() !!}
+    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <tr>
         <td colspan=3 >
             <select name="newSubset" class="form-control">
@@ -130,7 +130,7 @@ New loops can be added by editing any node in the <a href="/dashboard/tree-{{ $G
             <option value="0" CHECKED >Manual</option>
             </select>
         </td>
-        <td><a href="javascript:void(0)" class="btn btn-primary" 
+        <td><a href="javascript:;" class="btn btn-primary" 
             onClick="document.addNewSubset.submit();"><i class="fa fa-plus"></i></a></td>
     </tr>
     </form>
@@ -169,7 +169,7 @@ basic core-table-to-loop-table relations.
     <tr><td colspan="4" ><i>none</i></td></tr>
 @endforelse
     <form name="addNewHelper" method="post" action="?all=1&refresh=1&dataStruct=1&newHelper=1">
-    {!! csrf_field() !!}
+    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <tr>
         <td colspan=3 >
             <select name="newHelper" class="form-control">
@@ -181,7 +181,7 @@ basic core-table-to-loop-table relations.
             {!! $GLOBALS['SL']->fieldsDropdown('', 0) !!}
             </select>
         </td>
-        <td><a href="javascript:void(0)" class="btn btn-primary" onClick="document.addNewHelper.submit();"
+        <td><a href="javascript:;" class="btn btn-primary" onClick="document.addNewHelper.submit();"
             ><i class="fa fa-plus"></i></a></td>
     </tr>
     </form>
@@ -219,7 +219,7 @@ require a hierarchical relationship.
     <tr><td colspan="6" ><i>none</i></td></tr>
 @endforelse
     <form name="addNewLinkage" method="post" action="?all=1&refresh=1&dataStruct=1">
-    {!! csrf_field() !!}
+    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <tr>
         <td colspan=5 >
             <select name="newLinkage" class="form-control">
@@ -230,7 +230,7 @@ require a hierarchical relationship.
             @endforelse
             </select>
         </td>
-        <td><a href="javascript:void(0)" class="btn btn-primary" onClick="document.addNewLinkage.submit();"
+        <td><a href="javascript:;" class="btn btn-primary" onClick="document.addNewLinkage.submit();"
             ><i class="fa fa-plus"></i></a></td>
     </tr>
     </form>

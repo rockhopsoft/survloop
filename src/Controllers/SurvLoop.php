@@ -53,6 +53,18 @@ class SurvLoop extends Controller
         return $this->domainPath;
     }
     
+    public function checkHttpsDomain(Request $request)
+    {
+        if (isset($this->domainPath) && strpos($request->fullUrl(), $this->domainPath) === false) {
+            if (strpos($this->domainPath, 'https://') !== false 
+                && strpos($request->fullUrl(), str_replace('https://', 'http://', $this->domainPath)) !== false) {
+                header("Location: " . str_replace('http://', 'https://', $request->fullUrl()));
+                exit;
+            }
+        }
+        return true;
+    }
+    
     protected function syncDataTrees(Request $request, $dbID, $treeID)
     {
         $this->dbID = $dbID;
@@ -169,6 +181,7 @@ class SurvLoop extends Controller
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
     {
         $this->loadDomain();
+        $this->checkHttpsDomain($request);
         if (trim($treeSlug) != '') {
             $urlTrees = SLTree::where('TreeSlug', $treeSlug)
                 ->get();
@@ -178,6 +191,12 @@ class SurvLoop extends Controller
                         $rootNode = SLNode::find($urlTree->TreeFirstPage);
                         if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
                             $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1';
+                            $paramTxt = str_replace($this->domainPath . '/start/' . $urlTree->TreeSlug, '', 
+                                $request->fullUrl());
+                            if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
+                            if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
+                                $redir .= '&' . substr($paramTxt, 1);
+                            }
                             return redirect($this->domainPath . $redir);
                         }
                     }
@@ -187,12 +206,18 @@ class SurvLoop extends Controller
         return redirect($this->domainPath . '/');
     }
     
-    public function loadPageURL(Request $request, $pageSlug = '')
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3)
     {
         if ($this->loadTreeBySlug($request, $pageSlug, true)) {
             $this->loadLoop($request);
+            if ($cid > 0) {
+                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+                if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
+                    $this->custLoop->hideDisclaim = true;
+                }
+            }
             $this->pageContent = $this->custLoop->index($request);
-            if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0) { // then simple page which can be cached
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0 && $cid <= 0) { // then simple page which can be cached
                 $this->topSaveCache();
             }
             return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
@@ -207,6 +232,7 @@ class SurvLoop extends Controller
             return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
         }
         $this->loadDomain();
+        $this->checkHttpsDomain($request);
         $urlTree = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
             . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
         if ($urlTree && sizeof($urlTree) > 0 && isset($urlTree[0]->TreeOpts)) { //  && isset($urlTree[0]->TreeOpts)
@@ -287,6 +313,7 @@ class SurvLoop extends Controller
     public function showMyProfile(Request $request)
     {
         $this->loadDomain();
+        $this->checkHttpsDomain($request);
         if (Auth::user() && isset(Auth::user()->name)) {
             return redirect($this->domainPath . '/profile/' . urlencode(Auth::user()->name));
         }
@@ -299,7 +326,7 @@ class SurvLoop extends Controller
         return $this->custLoop->holdSess($request);
     }
     
-    public function restartSess(Request $request)
+    public function restartSess(Request $request)  
     {
         $this->loadLoop($request);
         return $this->custLoop->restartSess($request);
@@ -366,7 +393,7 @@ class SurvLoop extends Controller
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoopReport($request);
-            return $this->custLoop->byID($request, $cid, $ComSlug);
+            return $this->custLoop->byID($request, $cid, $ComSlug, $request->has('ajax'));
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -576,6 +603,13 @@ class SurvLoop extends Controller
         return $this->custLoop->ajaxEmojiTag($request, $recID, $defID);
     }
     
+    public function ajaxGraph(Request $request, $gType = '', $treeID = 1, $nID = -3)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->ajaxGraph($request, $gType, $nID);
+    }
+    
     public function searchBar(Request $request, $treeID = 1)
     {
         $this->loadTreeByID($request, $treeID);
@@ -593,6 +627,20 @@ class SurvLoop extends Controller
     public function searchResultsAjax(Request $request, $treeID = 1)
     {
         return $this->searchResults($request, $treeID, 1);
+    }
+    
+    public function widgetCust(Request $request, $treeID = 1, $nID = -3)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->widgetCust($request, $nID);
+    }
+    
+    public function getSetFlds(Request $request, $treeID = 1, $rSet = '')
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoopReport($request, true);
+        return $this->custLoop->getSetFlds($request, $rSet);
     }
     
     public function getUploadFile(Request $request, $abbr, $file)
@@ -675,5 +723,9 @@ class SurvLoop extends Controller
         return '<script type="text/javascript"> ' . $ret . ' </script>';
     }
     
+    public function timeOut(Request $request)
+    {
+        return view('auth.dialog-check-form-sess', [ "req" => $request ]);
+    }
     
 }

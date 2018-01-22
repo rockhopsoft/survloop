@@ -7,7 +7,7 @@
             </div><div class="col-md-6">
         @endif
         <div id="{{ $fldName }}ColorSwatch{!! str_replace('#', '', strtoupper($color)) !!}" 
-            class="w100 round5 slBoxShade cursorPoint colorPickFldSwatchBtn" 
+            class="w100 round5 slBoxShd cursorPoint colorPickFldSwatchBtn" 
             style="background: {!! $color !!};">
             <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" 
                 border=0 height=35 width=1 style="background: none;" >
@@ -26,7 +26,7 @@
             class="colorPickCustomBtn btn btn-xs btn-default">Set</a></nobr>
     </div>
     <div class="col-md-6">
-        <div id="{{ $fldName }}CustomColor" class="w100 round5 slBoxShade" 
+        <div id="{{ $fldName }}CustomColor" class="w100 round5 slBoxShd" 
             @if ($isCustom) style="background: {!! $preSel !!};" @endif >
             <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" 
                 border=0 height=35 width=1 style="background: none;" >

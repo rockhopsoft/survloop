@@ -17,10 +17,6 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/',             'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     Route::post('/sub',          'SurvLoop\\Controllers\\SurvLoop@index');
     
-    Route::get( '/ajax',         'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
-    Route::get( '/ajax/{type}',  'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
-    Route::get( '/ajadm',        'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
-    Route::get( '/ajadm/{type}', 'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
     Route::get( '/sortLoop',     'SurvLoop\\Controllers\\SurvLoop@sortLoop');
     Route::get( '/holdSess',     'SurvLoop\\Controllers\\SurvLoop@holdSess');
     Route::get( '/restart',      'SurvLoop\\Controllers\\SurvLoop@restartSess');
@@ -49,31 +45,26 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/records-full/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordFulls');
     Route::get( '/record-prevs/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordPreviews');
     Route::get( '/record-check/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxMultiRecordCheck');
+    Route::get( '/record-graph/{gType}/{treeID}/{nID}',     'SurvLoop\\Controllers\\SurvLoop@ajaxGraph');
+    Route::get( '/widget-custom/{treeID}/{nID}',            'SurvLoop\\Controllers\\SurvLoop@widgetCust');
     
+    Route::get( '/ajax-get-flds/{treeID}',                  'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
+    Route::get( '/ajax-get-flds/{treeID}/{rSet}',           'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
     Route::get( '/ajax-emoji-tag/{treeID}/{recID}/{defID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxEmojiTag');
-    
-    Route::post('/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
-    Route::get( '/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
-    Route::post('/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
-    Route::get( '/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
-    Route::get( '/{treeSlug}-read/{cid}/pdf/full',     'SurvLoop\\Controllers\\SurvLoop@fullPdfByID');
-    Route::get( '/{treeSlug}-read/{cid}/xml/full',     'SurvLoop\\Controllers\\SurvLoop@fullXmlByID');
-    
-    Route::get( '/{treeSlug}-read/{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
-    Route::get( '/{treeSlug}-read/{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-read/{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-read/{cid}/{ComSlug}',   'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::post('/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-report/{cid}/pdf',       'SurvLoop\\Controllers\\SurvLoop@pdfByID');
-    Route::get( '/{treeSlug}-report/{cid}/xml',       'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-report/{cid}/json',      'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-report/{cid}/{ComSlug}', 'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-report/{cid}',           'SurvLoop\\Controllers\\SurvLoop@byID');
+
+    Route::post('/ajax',         'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::get( '/ajax',         'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::post('/ajax/{type}',  'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::get( '/ajax/{type}',  'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
+    Route::post('/ajadm',        'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
+    Route::get( '/ajadm',        'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
+    Route::post('/ajadm/{type}', 'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
+    Route::get( '/ajadm/{type}', 'SurvLoop\\Controllers\\SurvLoop@ajaxChecksAdmin');
     
     Route::get( '/{treeSlug}-xml-all',         'SurvLoop\\Controllers\\SurvLoop@xmlAll');
     Route::get( '/{treeSlug}-xml-example',      'SurvLoop\\Controllers\\SurvLoop@getXmlExample');
     Route::get( '/{treeSlug}-xml-example.xml',  'SurvLoop\\Controllers\\SurvLoop@getXmlExample');
+    Route::get( '/schema/{treeSlug}/xml',       'SurvLoop\\Controllers\\SurvLoop@genXmlSchema');
     Route::get( '/{treeSlug}-xml-schema',       'SurvLoop\\Controllers\\SurvLoop@genXmlSchema');
     Route::get( '/{treeSlug}-xml-schema.xsd',   'SurvLoop\\Controllers\\SurvLoop@genXmlSchema');
     Route::get( '/{treeSlug}-report-xml/{cid}', 'SurvLoop\\Controllers\\SurvLoop@xmlByID');
@@ -96,20 +87,10 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/chkEmail',   'SurvLoop\\Controllers\\SurvLoop@chkEmail');
     
     // Authentication routes...
-    Route::post('/login',                  'SurvLoop\Controllers\Auth\AuthController@postLogin');
-    //Route::get( '/login',                  'SurvLoop\Controllers\Auth\AuthController@getLogin');
-    
-    // Registration routes...
-    //Route::get( '/register',               'SurvLoop\Controllers\Auth\AuthController@getRegister');
-    
-    // Password reset link request routes...
-    //Route::post('/password/email',         'SurvLoop\Controllers\Auth\PasswordController@postEmail');
-    //Route::get( '/password/email',         'SurvLoop\Controllers\Auth\PasswordController@getEmail');
-    
-    // Password reset routes...
-    //Route::post('/password/reset',         'SurvLoop\Controllers\Auth\PasswordController@postReset');
-    //Route::get( '/password/reset/{token}', 'SurvLoop\Controllers\Auth\PasswordController@getReset');
+    Route::post('/login',      'SurvLoop\Controllers\Auth\AuthController@postLogin');
 
+    Route::get( '/time-out',   'SurvLoop\\Controllers\\SurvLoop@timeOut');
+    
     Route::get( '/email-confirm/{token}/{tokenB}', 'SurvLoop\\Controllers\\SurvLoop@processEmailConfirmToken');
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
@@ -177,9 +158,6 @@ Route::group(['middleware' => ['web']], function () {
 
     Route::post('/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     Route::get( '/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
-    
-    Route::post('/{pageSlug}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
-    Route::get( '/{pageSlug}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     
     
     ///////////////////////////////////////////////////////////
@@ -279,6 +257,16 @@ Route::group(['middleware' => ['web']], function () {
     ]);
     
     Route::get('/dashboard/settings', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/settings-{setType}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/settings-{setType}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
         'middleware' => ['auth']
     ]);
@@ -713,9 +701,32 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/{pageSlug}/u-{cid}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}/u-{cid}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::post('/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     
-    Route::post('/dash/{pageSlug}', 'SurvLoop\\Controllers\\AdminController@loadPageURL');
-    Route::get( '/dash/{pageSlug}', 'SurvLoop\\Controllers\\AdminController@loadPageURL');
+    Route::post('/dash/{pageSlug}',   'SurvLoop\\Controllers\\AdminController@loadPageURL');
+    Route::get( '/dash/{pageSlug}',   'SurvLoop\\Controllers\\AdminController@loadPageURL');
+    
+    Route::post('/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
+    Route::get( '/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
+    Route::post('/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{treeSlug}-read/{cid}/pdf/full',     'SurvLoop\\Controllers\\SurvLoop@fullPdfByID');
+    Route::get( '/{treeSlug}-read/{cid}/xml/full',     'SurvLoop\\Controllers\\SurvLoop@fullXmlByID');
+    
+    Route::get( '/{treeSlug}-read/{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
+    Route::get( '/{treeSlug}-read/{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-read/{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-read/{cid}/{ComSlug}',   'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::post('/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}-report/{cid}/pdf',       'SurvLoop\\Controllers\\SurvLoop@pdfByID');
+    Route::get( '/{treeSlug}-report/{cid}/xml',       'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-report/{cid}/json',      'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}-report/{cid}/{ComSlug}', 'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}-report/{cid}',           'SurvLoop\\Controllers\\SurvLoop@byID');
     
     Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{desiredFile}', function ($desiredFile) {
         return redirect('/survloop/jquery-ui-1.12.1/images/' . $desiredFile);

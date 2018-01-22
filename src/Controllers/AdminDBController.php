@@ -39,7 +39,7 @@ class AdminDBController extends AdminController
         $this->v["dbAllowEdits"] = ($this->v["user"] && $this->v["user"]->hasRole('administrator|databaser'));
         $this->v["mission"] = view('vendor.survloop.inc-mission-statement', 
             array("DbMission" => $GLOBALS["SL"]->dbRow->DbMission));
-        if (trim($this->v["currPage"]) == '') $this->v["currPage"] = '/dashboard/db';
+        if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/db';
         $this->v["help"] = '<span class="f10 gryA">?</span>&nbsp;&nbsp;&nbsp;';
         $this->loadLookups();
         set_time_limit(180);
@@ -288,12 +288,9 @@ class AdminDBController extends AdminController
             }
         }
         $this->survLoopInit($request, '/db/' . str_replace('_', '', $dbPrefix));
-        $this->v["IPlegal"] = view('vendor.survloop.dbdesign-legal', [
-            "sysOpts" => $GLOBALS["SL"]->sysOpts
-        ])->render();
-        $this->v["content"] = '<div class="pL20"><h2>' 
-            . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specifications</h2>' 
-            . $this->v["IPlegal"] . '</div><div class="p20">' . $this->full($request, true) . '</div>';
+        $this->v["content"] = view('vendor.survloop.print-header-legal', [])->render() . '<div class="pL20"><h2>' 
+            . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specs</h2></div><div class="p20">' 
+            . $this->full($request, true) . '</div>';
         //echo 'adminPrintFullDBPublic(' . $dbPrefix . '<pre>'; print_r($db); echo '</pre>'; exit;
         $this->v["isPrint"] = true;
         return view('vendor.survloop.master', $this->v);
@@ -413,7 +410,7 @@ class AdminDBController extends AdminController
         if (intVal($fld->FldOperateOther) == 0) $fld->FldOperateOther = 1;
         if (intVal($fld->FldOperateValue) == 0) $fld->FldOperateValue = 1;
         
-        if ($GLOBALS["SL"]->REQ->has('fldEditForm')) {
+        if ($GLOBALS["SL"]->REQ->has('FldName')) {
             $this->cacheFlush();
             $logActions = [
                 'logAction'  => 'Edit', 

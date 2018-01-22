@@ -28,9 +28,9 @@
     @endif
     {{ $GLOBALS['SL']->treeName }}
 </h1>
-@if ($isPrint) 
+@if ($isPrint)
+    {!! view('vendor.survloop.print-header-legal', [])->render() !!}
     <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
-    {{ $IPlegal }}
 @endif
 
 @if (!$isPrint)
@@ -58,7 +58,7 @@
             A user experience is created as a tree filled with branching nodes. 
             Click any node's button (with the icons) to edit, add new nodes, or to move a node. 
             Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
-            <a class="adminAboutTog" href="javascript:void(0)">Read more about these branching trees.</a>
+            <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a>
         </span>
     </div>
 @endif

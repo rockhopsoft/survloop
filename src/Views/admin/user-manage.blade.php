@@ -13,8 +13,8 @@
 </div>
 
 <table class="table table-striped">
-<form name="manageUserRoles" action="/dashboard/users" method="post">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/users" method="post">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <tr>
     <th>Name</th>

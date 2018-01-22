@@ -12,7 +12,7 @@ $v = $surv->custLoop->v;
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
-<div class="p10"></div>
+<div class="p20"></div>
 
 <div class="row loginTitles">
     <div class="col-md-6">

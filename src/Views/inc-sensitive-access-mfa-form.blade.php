@@ -13,8 +13,8 @@
     </div>
     <div class="col-md-4 taC">
         <div class="round20 brd taC p20 mT10"><center>
-            <form method="post" name="accessCode" action="?sub=1">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <form method="post" name="mainPageForm" action="?sub=1">
+            <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
             <h3 class="mT10 mB5">Provide Access Code:</h3>
             <input type="text" class="form-control input-lg taC slGrey" style="width: 190px;"
                 name="t2" id="t2ID" value="XXXX-XXXX-XXXX"

@@ -9,7 +9,7 @@ class SLUploads extends Model
     protected $primaryKey     = 'UpID';
     public $timestamps         = true;
     protected $fillable     = 
-    [    
+    [
 		'UpTreeID', 
 		'UpCoreID', 
 		'UpType', 
@@ -20,6 +20,7 @@ class SLUploads extends Model
 		'UpStoredFile', 
 		'UpVideoLink', 
 		'UpVideoDuration', 
+		'UpNodeID', 
 		'UpLinkFldID', 
 		'UpLinkRecID', 
     ];

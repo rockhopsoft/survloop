@@ -12,7 +12,7 @@
                 >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a> <br />under the
             <a href="{{ $GLOBALS['SL']->sysOpts['app-license-url'] }}" target="_blank" 
                 >{{ $GLOBALS['SL']->sysOpts['app-license'] }}</a>, {{ date("Y") }}.
-            <nobr>Database powered by <a href="https://github.com/wikiworldorder/survloop" 
+            <nobr>Database powered by <a href="https://SurvLoop.org" 
                 target="_blank">SurvLoop</a></nobr>
         </div>
     </div>

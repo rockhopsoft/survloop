@@ -11,7 +11,7 @@
     </div>
     <div class="col-md-6 pT20 taR">
         <a href="/dashboard/email/-3" class="btn btn-default">Create New Email Template</a>
-        <a href="javascript:void(0)" class="btn btn-default mL20" id="showAll">Show/Hide All Email Bodies</a>
+        <a href="javascript:;" class="btn btn-default mL20" id="showAll">Show/Hide All Email Bodies</a>
     </div>
 </div>
 
@@ -26,11 +26,11 @@
                 ><i class="fa fa-pencil fa-flip-horizontal mT10 f18" aria-hidden="true"></i></a>
         </div>
         <div class="col-md-10 pT0">
-            <h3 class="m0 p0"><a class="emailLnk" id="showEmail{{ $email->EmailID }}" href="javascript:void(0)"
+            <h3 class="m0 p0"><a class="emailLnk" id="showEmail{{ $email->EmailID }}" href="javascript:;"
                 >{{ $email->EmailSubject }}</a></h3>
             <span class="slGrey">
                 @if ($email->EmailType == 'Blurb')
-                    [{ <a class="emailLnk fPerc133" id="showEmail{{ $email->EmailID }}" href="javascript:void(0)"
+                    [{ <a class="emailLnk fPerc133" id="showEmail{{ $email->EmailID }}" href="javascript:;"
                         ><i>{{ $email->EmailName }}</i></a> }]
                 @else
                     <span class="fPerc133">{{ $email->EmailName }}</span>
@@ -48,7 +48,13 @@
     <div id="emailBody{{ $email->EmailID }}" class="emailBody row pB20 fPerc133 @if ($i%2 == 0) row2 @endif 
         @if ($isAll) disBlo @else disNon @endif ">
         <div class="col-md-1"></div>
-        <div class="col-md-10 pB20">{!! $email->EmailBody !!}</div>
+        <div class="col-md-10 pB20">{!! 
+            view('vendor.survloop.emails.master', [ 
+                "emaTitle"   => $email->EmailName,
+                "emaContent" => $email->EmailBody,
+                "cssColors"  => $cssColors
+            ])->render()
+        !!}</div>
         <div class="col-md-1"></div>
     </div>
 @empty

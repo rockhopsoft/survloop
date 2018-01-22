@@ -7,7 +7,7 @@
         <nobr><a href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" class="f20"
             >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a></nobr>
         <div class="mT5 f12 gryA">is powered by the 
-        <a href="https://github.com/wikiworldorder/survloop" target="_blank" class="f12">SurvLoop</a>
+        <a href="https://SurvLoop.org" target="_blank" class="f12">SurvLoop</a>
         open data engine.</div>
         <br /><br />
         </center>

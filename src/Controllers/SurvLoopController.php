@@ -26,6 +26,7 @@ use SurvLoop\Controllers\DatabaseLookups;
 class SurvLoopController extends Controller
 {
     public $custAbbr             = 'SurvLoop';
+    protected $CustReport        = array();
     
     protected $dbID              = 1;
     protected $treeID            = 1;
@@ -66,12 +67,17 @@ class SurvLoopController extends Controller
             $this->v["view"]        = 'Public';
             if (!isset($GLOBALS["isPrintPDF"])) $GLOBALS["isPrintPDF"] = false;
             
-            if (!isset($this->v["currPage"])) $this->v["currPage"] = $currPage;
-            if (trim($this->v["currPage"]) == '') {
-                $this->v["currPage"] = $_SERVER["REQUEST_URI"];
-                if (strpos($this->v["currPage"], '?') !== false) {
-                    $this->v["currPage"] = substr($this->v["currPage"], 0, strpos($this->v["currPage"], '?'));
+            if (!isset($this->v["currPage"])) $this->v["currPage"] = ['', ''];
+            if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = $currPage;
+            if (trim($this->v["currPage"][0]) == '') {
+                $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
+                if (strpos($this->v["currPage"][0], '?') !== false) {
+                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, strpos($this->v["currPage"][0], '?'));
                 }
+            }
+            
+            if ($this->REQ->has('sessmsg') && trim($this->REQ->get('sessmsg')) != '') {
+                session()->put('sessMsg', trim($this->REQ->get('sessmsg')));
             }
             
             if (!isset($this->v["currState"]))    $this->v["currState"]    = '';
@@ -220,13 +226,13 @@ class SurvLoopController extends Controller
     
     protected function setCurrPage($currPage = '')
     {
-        $this->v["currPage"] = $currPage;
+        $this->v["currPage"][0] = $currPage;
         return true;
     }
     
     public function getCurrPage()
     {
-        return ((isset($this->v["currPage"])) ? $this->v["currPage"] : '/');
+        return ((isset($this->v["currPage"][0])) ? $this->v["currPage"][0] : '/');
     }
     
     protected function initExtra(Request $request)
@@ -257,7 +263,7 @@ class SurvLoopController extends Controller
     
     protected function genCacheKey($baseOverride = '')
     {
-        $this->cacheKey = str_replace('/', '.', $this->v["currPage"]);
+        $this->cacheKey = str_replace('/', '.', $this->v["currPage"][0]);
         if ($baseOverride != '')  $this->cacheKey = $baseOverride;
         $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID;
         $this->cacheKey .= '.tree' . $GLOBALS["SL"]->treeID;
@@ -290,7 +296,7 @@ class SurvLoopController extends Controller
     // Is this the first time this user has visited the current page?
     protected function isPageFirstTime($currPage = '')
     {
-        if (trim($currPage) == '') $currPage = $this->v["currPage"];
+        if (trim($currPage) == '') $currPage = $this->v["currPage"][0];
         $chk = SLUsersActivity::where('UserActUser', Auth::user()->id)
             ->where('UserActCurrPage', 'LIKE', '%'.$currPage)
             ->get();
@@ -326,7 +332,6 @@ class SurvLoopController extends Controller
         eval($mailStr);
         return true;
     }
-    
     
     
     // a few utilities...
@@ -375,7 +380,7 @@ class SurvLoopController extends Controller
         $eval = "\$recs = App\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
             . implode("', '", $filtIn) . "' ])->orderBy('created_at', 'desc')->get();";
         eval($eval);
-        echo $eval . '<br />';
+        //echo $eval . '<br />';
         $this->v["recs"] = $recs;
         return true;
     }
@@ -413,6 +418,20 @@ class SurvLoopController extends Controller
         }
         $this->tweakAdmMenu($currPage);
         return view('vendor.survloop.admin.admin-menu', $this->admMenuData);
+    }
+    
+    protected function loadCustReport($request, $treeID = -3)
+    {
+        if ($treeID <= 0) $treeID = $this->treeID;
+        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
+            $eval = "\$this->CustReport = new ". $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Report(\$request, -3, " 
+                . $this->dbID . ", " . $treeID . ");";
+            eval($eval);
+        } else {
+            $this->CustReport = new SurvLoopReport($request, -3, $this->dbID, $treeID);
+        }
+        $this->CustReport->survLoopInit($request, $this->v["currPage"][0]);   
     }
 
     
@@ -725,7 +744,7 @@ class SurvLoopController extends Controller
             $emaUsr = User::where('email', $emailTo)->first();
             if ($emaUsr && isset($emaUsr->name)) $emaTo[] = [$emailTo, $emaUsr->name];
         }
-        if ($GLOBALS["SL"]->sysOpts["app-url"] == 'http://homestead.app') {
+        if (strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.app') !== false) {
             echo '<div class="container"><h2>' . $subject . '</h2>' . $body . '<hr><hr></div>';
         } else {
             $this->sendEmail($body, $subject, $emaTo);
@@ -742,9 +761,9 @@ class SurvLoopController extends Controller
         $emailRec->EmailedRecID    = $coreID;
         $emailRec->EmailedTo       = $emailTo;
         $emailRec->EmailedToUser   = $userTo;
-        $emailRec->EmailedFromUser = Auth::user()->id;
-        $emailRec->save();
-        $emailRec->update([ "EmailedSubject" => $subject, "EmailedBody" => $body ]);
+        $emailRec->EmailedFromUser = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : -3);
+        $emailRec->EmailedSubject  = $subject;
+        $emailRec->EmailedBody     = $body;
         $emailRec->save();
         return true;
     }

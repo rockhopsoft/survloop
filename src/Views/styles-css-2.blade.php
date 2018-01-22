@@ -1,34 +1,4 @@
-/* generated from resources/views/vendor/survloop/styles-css.blade.php */
-
-html, body {
-    height: 100%
-}
-body, p, div, table tr td, table tr th, input, textarea, select {
-    font-family: {!! $css["font-main"] !!};
-    font-style: normal;
-    font-weight: 200;
-}
-b, h1, h2, h3, h4, h5, h6 {
-    font-family: {!! $css["font-main"] !!};
-    font-weight: 400;
-}
-
-body, .slBg {
-	margin: 0px;
-	padding: 0px;
-    background: {!! $css["color-main-bg"] !!};
-}
-
-body, p, .slTxt {
-    color: {!! $css["color-main-text"] !!};
-}
-body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
-    line-height: 1.42857143;
-}
-
-a:link, a:visited, a:active, a:hover {
-    color: {!! $css["color-main-link"] !!};
-}
+/* generated from resources/views/vendor/survloop/styles-css-2.blade.php */
 
 .navbar {
     height: 56px;
@@ -38,7 +8,7 @@ a:link, a:visited, a:active, a:hover {
 	overflow: hidden;
 	color: {!! $css["color-nav-text"] !!};
 	background: {!! $css["color-nav-bg"] !!};
-    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
+    border-bottom: 1px {!! $css["color-line-hr"] !!} solid;
 }
 #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
 #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
@@ -153,7 +123,7 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 #dialog {
     display: none;
     width: 100%;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
 }
 #dialogTitle {
@@ -196,6 +166,18 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     height: 46px;
     margin-top: 0px;
 }
+#logoPrint #slLogoImg {
+    height: 50px;
+    margin-top: 10px;
+}
+#slLogo.w100 {
+    width: 100%;
+    margin-top: 10px;
+}
+#slLogoImg.w100 {
+    height: auto;
+    width: 100%;
+}
 
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	font-size: 32pt;
@@ -216,6 +198,7 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 
 
 #ajaxWrap {
+    width: 100%;
     height: 100%;
 }
 #ajaxWrapLoad {
@@ -259,15 +242,21 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     top: -40px;
 }
 .nodeWrap, .nodeWrapError {
-	background: {!! $css["color-main-bg"] !!};
+	background: none;
 	display: block;
 	padding: 0px;
 	-moz-border-radius: 8px; border-radius: 8px;
 	overflow: visible;
+	box-shadow: 0px 0px 0px none;
 }
 .nodeWrapError {
 	padding: 10px 5px 10px 5px;
 	border: 3px {!! $css["color-danger-on"] !!} solid;
+	box-shadow: 0px 0px 20px {!! $css["color-main-text"] !!};
+}
+.nodeWrap.nGraph {
+    padding: 10px;
+    border: 2px {!! $css["color-main-faint"] !!} dashed;
 }
 .nPrompt, .nFld, .nFldFing {
 	display: block;
@@ -286,12 +275,35 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 	font-size: 18px;
     margin-top: 15px;
 }
+.nPrompt.col-md-6 {
+    padding-top: 15px;
+}
 .nFld {
     margin-top: 20px;
 }
 .nFld, .nFld input, .nFld select, .nFld textarea {
 	font-size: 16px;
 }
+.subRes {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+.subRes .nodeWrap {
+    margin-top: 5px;
+}
+.subRes .nFld, .subRes .nodeWrap .nFld {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.slideCol {
+    padding: 19px 0px 0px 25px;
+}
+.slidePercFld {
+    width: 55px; 
+    padding: 6px 6px;
+}
+
 .nPrompt ul, .nPrompt ol {
     padding: 0px 0px 0px 20px;
     margin: 20px 0px 0px 20px;
@@ -333,6 +345,48 @@ label, .nPrompt label {
 	width: 60px;
 }
 
+.flexarea, textarea.flexarea, textarea.form-control.flexarea {
+    min-height: 60px;
+    overflow-y: auto;
+    word-wrap:break-word;
+}
+
+.rqd, h1.rqd, h2.rqd, h3.rqd, label .rqd {
+    color: {!! $css["color-danger-on"] !!}; 
+    font-weight: 100; 
+}
+.rqd, h1 .rqd, h2 .rqd, h3 .rqd, h4 .rqd {
+    font-size: 16px;
+}
+
+
+.prevImg {
+    position: relative;
+    width: 100%;
+    //padding-top: 100%; /* 1:1 Aspect Ratio */
+    padding-bottom: 52.35%; /* 1.91 Aspect Ratio? */
+    //padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    //padding-top: 75%; /* 4:3 Aspect Ratio */
+    //padding-top: 66.66%; /* 3:2 Aspect Ratio */
+    //padding-top: 62.5%; /* 8:5 Aspect Ratio */
+    overflow: hidden;
+    border-bottom: 1px solid {!! $css["color-main-off"] !!};
+}
+.prevImg.brd {
+    border: 1px solid {!! $css["color-main-off"] !!};
+}
+.prevImg img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+}
+
+.imgFileLibrary, a.imgFileLibrary:link, a.imgFileLibrary:visited, a.imgFileLibrary:active, a.imgFileLibrary:hover {
+    font-size: 11px;
+    line-height: 13px;
+}
+
 .ui-widget-header {
     border: 1px solid {!! $css["color-main-grey"] !!};
     background: {!! $css["color-main-text"] !!};
@@ -369,6 +423,9 @@ input.nFormBtnSub, input.nFormBtnBack {
 
 input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
     width: 400px;
+}
+.form-control.pT0, .form-control.input-lg.pT0 {
+    padding-top: 0px;
 }
 .form-control.input-xs {
     height: 23px;
@@ -428,7 +485,7 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
 
 
 #pageBtns {
-    margin-top: 40px;
+    margin-top: 15px;
     width: 100%;
 }
 #formErrorMsg {
@@ -573,7 +630,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	clear: both;
 	width: 100%;
 	color: {!! $css["color-main-on"] !!};
-	font-size: 18pt;
+	font-size: 16pt;
 	padding: 10px 0px 10px 0px;
 	/* border-top: 1px {!! $css["color-main-on"] !!} solid; */
 }
@@ -590,8 +647,13 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     margin: 0px 5px;
     padding: 10px 0px;
 }
+.reportBlock .row .col-md-12, .reportBlock .row .col-md-6 {
+    line-break: loose;
+}
 .reportBlock div span, .reportBlock div div span, .reportBlock div div div span, .reportBlock table tr td span, 
-.slReport .reportBlock div span, .slReport .reportBlock table tr td span {
+.slReport .reportBlock div span, .slReport .reportBlock table tr td span, 
+.slReport .reportBlock div span a.hidFldBtn:link, .slReport .reportBlock div span a.hidFldBtn:visited, 
+.slReport .reportBlock div span a.hidFldBtn:active, .slReport .reportBlock div span a.hidFldBtn:hover {
 	color: {!! $css["color-main-grey"] !!};
 }
 .reportMiniBlockLabel, .slReport .reportMiniBlockLabel {
@@ -605,6 +667,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     display: block;
     width: 100%;
     padding-bottom: 20px;
+    line-break: loose;
 }
 
 .reportPreview {
@@ -612,6 +675,20 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     padding: 10px 0px;
     border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
+
+ul.glossaryList li { margin-bottom: 10px; }
+
+.reportTopAlert {
+    border: 1px {!! $css["color-danger-on"] !!} solid;
+    -moz-border-radius: 5px; border-radius: 5px;
+    color: {!! $css["color-danger-on"] !!};
+    padding: 10px 20px;
+    font-size: 17px;
+}
+@media screen and (max-width: 768px) {
+    .reportTopAlert { font-size: 12px; }
+}
+
 
 .search-bar {
     width: 100%;
@@ -639,6 +716,11 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     margin-right: -2px;
 }
 
+.btn.btn-success, a.btn.btn-success:link, a.btn.btn-success:visited, a.btn.btn-success:active, a.btn.btn-success:hover,
+.btn.btn-warning, a.btn.btn-warning:link, a.btn.btn-warning:visited, a.btn.btn-warning:active, a.btn.btn-warning:hover {
+	color: {!! $css["color-main-bg"] !!};
+}
+
 
 
 .basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
@@ -646,62 +728,114 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     padding: 10px 5px 10px 5px;
     margin: 0px 5px 0px 5px;
 	-moz-border-radius: 20px; border-radius: 20px;
-	border: 1px {!! $css["color-main-faint"] !!} dotted;
+	border: 1px {!! $css["color-main-faint"] !!} solid;
+	border-top: 1px {!! $css["color-main-faint"] !!} solid;
 }
 .basicTier1, .basicTier2, .basicTier3 { border-left: 3px {!! $css["color-main-off"] !!} dotted; }
 .basicTier4, .basicTier5 { border-left: 2px {!! $css["color-main-off"] !!} dotted; }
 .basicTier6, .basicTier7 { border-left: 2px {!! $css["color-main-faint"] !!} dotted; }
 .basicTier8, .basicTier9 { border-left: 1px {!! $css["color-main-faint"] !!} dotted; }
 .basicTier0, .basicTier0.basicTierBranch {
-	border: 1px {!! $css["color-success-on"] !!} dotted;
+	border: 4px {!! $css["color-success-on"] !!} dotted;
 }
-.basicTierBranch {
-	border: 2px {!! $css["color-main-on"] !!} dotted;
+.basicTierBranch, .basicTier1.basicTierBranch, .basicTier2.basicTierBranch, .basicTier3.basicTierBranch, .basicTier4.basicTierBranch, .basicTier5.basicTierBranch, .basicTier6.basicTierBranch, .basicTier7.basicTierBranch, .basicTier8.basicTierBranch {
+	border: 1px {!! $css["color-main-grey"] !!} dashed;
 }
-.basicTier1.basicTierBranch {
-	border: 2px {!! $css["color-main-on"] !!} dotted;
+.basicTierPage, .basicTier1.basicTierPage, .basicTier2.basicTierPage, .basicTier3.basicTierPage, .basicTier4.basicTierPage, .basicTier5.basicTierPage, .basicTier6.basicTierPage, .basicTier7.basicTierPage, .basicTier8.basicTierPage,
+.basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop, .basicTier6.basicTierLoop, .basicTier7.basicTierLoop, .basicTier8.basicTierLoop {
+	border: 4px {!! $css["color-info-on"] !!} double;
+	margin: 15px 5px 15px 5px;
+    padding: 10px;
 }
-.basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop {
-	border: 4px {!! $css["color-main-off"] !!} double;
-    padding: 15px;
+.basicTierLoop, .basicTier0.basicTierBranch, .basicTier0.basicTierBranch.basicTierData {
+	border: 4px {!! $css["color-main-off"] !!} dotted;
 }
-.basicTierPage {
-	border: 4px {!! $css["color-main-on"] !!} double;
-	margin: 15px;
-    padding: 15px;
+.basicTierData, .basicTier1.basicTierData, .basicTier2.basicTierData, .basicTier3.basicTierData, .basicTier4.basicTierData, .basicTier5.basicTierData, .basicTier6.basicTierData, .basicTier7.basicTierData, .basicTier8.basicTierData {
+	border: 2px {!! $css["color-success-on"] !!} dotted;
 }
-.basicTierData, .basicTierBranch.basicTierData, .basicTierPage.basicTierData,
 .basicTierLoop.basicTierData, .basicTier1.basicTierLoop.basicTierData, .basicTier2.basicTierLoop.basicTierData, .basicTier3.basicTierLoop.basicTierData, .basicTier4.basicTierLoop.basicTierData, .basicTier5.basicTierLoop.basicTierData {
-	border-right: 3px {!! $css["color-success-on"] !!} dotted;
+	border-right: 2px {!! $css["color-success-on"] !!} dotted;
+}
+.basicTierDisabled {
+    opacity:0.25; filter:alpha(opacity=25);
 }
 .dbColor {
     color: {!! $css["color-success-on"] !!};
 }
 
-.circleBtn1, .circleBtn0, .circleBtn2 {
+.circleBtn, a.circleBtn:link, a.circleBtn:active, a.circleBtn:visited, a.circleBtn:hover,
+.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover,
+.circleBtn1, a.circleBtn1:link, a.circleBtn1:active, a.circleBtn1:visited, a.circleBtn1:hover,
+.circleBtn2, a.circleBtn2:link, a.circleBtn2:active, a.circleBtn2:visited, a.circleBtn2:hover,
+.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
 	text-align: center;
 	width: 34px;
 	height: 34px;
 	font-size: 18px;
 	-moz-border-radius: 17px; border-radius: 17px;
-	padding: 3px 1px 0px 1px;
-	margin: -10px 0px 0px 0px;
+	padding: 4px 1px 0px 1px;
+	margin: 0px;
 }
-.circleBtn0 {
+.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover {
 	width: 50px;
 	height: 50px;
 	font-size: 25px;
 	-moz-border-radius: 25px; border-radius: 25px;
 	padding: 5px 1px 0px 1px;
-	margin: -15px 0px 0px 0px;
+	background: {!! $css["color-info-on"] !!};
+	color: {!! $css["color-main-bg"] !!};
 }
-.circleBtn2 {
+.circleBtn2, a.circleBtn2:link, a.circleBtn2:active, a.circleBtn2:visited, a.circleBtn2:hover {
 	width: 20px;
 	height: 20px;
 	font-size: 10px;
 	-moz-border-radius: 10px; border-radius: 10px;
 	padding: 2px 1px 0 1px;
-	margin: -4px 0px 0px 0px;
+}
+.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
+	background: {!! $css["color-success-on"] !!};
+	color: {!! $css["color-main-bg"] !!};
+}
+
+
+table.slSpreadTbl tr td.sprdFld {
+    margin: 0px;
+    padding: 0px;
+}
+table.slSpreadTbl tr th {
+    padding: 0px 0px 6px 12px;
+    vertical-align: bottom;
+    border-top: 0px none;
+    border-bottom: 1px {!! $css["color-main-off"] !!} solid;
+}
+table.slSpreadTbl tr td.sprdRowLab {
+    padding: 12px 0px 0px 12px;
+    color: {!! $css["color-main-off"] !!};
+}
+table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab {
+    border-right: 1px {!! $css["color-main-off"] !!} solid;
+}
+table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, table.slSpreadTbl tr th {
+    font-size: 16px;
+}
+table.slSpreadTbl tr.rw2 td {
+    background: {!! $css["color-main-faint"] !!};
+}
+table.slSpreadTbl tr th.cl1, table.slSpreadTbl tr td.sprdFld.cl1 {
+    border-left: 1px {!! $css["color-main-text"] !!} solid;
+}
+table.slSpreadTbl tr th.cl2, table.slSpreadTbl tr td.sprdFld.cl2 {
+    border-left: 1px {!! $css["color-main-text"] !!} solid;
+}
+table.slSpreadTbl tr td.sprdFld input, table.slSpreadTbl tr td.sprdFld select {
+    margin: 0px;
+    background: none;
+    border: 1px {!! $css["color-main-faint"] !!} solid;
+    -moz-border-radius: 0px; border-radius: 0px;
+}
+table.slSpreadTbl tr td.sprdFld .nodeWrap div label {
+    background: none;
+    border: 0px none;
 }
 
 
@@ -857,19 +991,36 @@ label { font-weight: normal; }
     border-radius: 6px;
 }
 
-
-#adminMenu .list-group.panel > .list-group-item {
-  border-bottom-right-radius: 4px;
-  border-bottom-left-radius: 4px
+#admMenu {
+    
 }
-#adminMenu .list-group.panel > .list-group-item .list-group-submenu {
-  margin-left: 20px;
+#admMenu .admMenuTier1, #admMenu .admMenuTier2, #admMenu .admMenuTier3, #admMenu .admMenuTier4 {
+    padding: 5px 5px 5px 15px;
 }
-#adminMenu .list-group.panel > .list-group-item.primeNav {
-	font-weight: normal;
-	font-size: 18pt;
+#admMenu .admMenuTier1 a:link, #admMenu .admMenuTier1 a:visited, #admMenu .admMenuTier1 a:active, #admMenu .admMenuTier1 a:link,
+#admMenu div a.active:link, #admMenu div a.active:visited, #admMenu div a.active:active, #admMenu div a.active:hover {
+    font-weight: bold;
 }
-
+#admMenu a.active:link, #admMenu a.active:visited, #admMenu a.active:active, #admMenu a.active:hover,
+#admMenu div a.active:link, #admMenu div a.active:visited, #admMenu div a.active:active, #admMenu div a.active:hover {
+    color: {!! $css["color-main-text"] !!};
+}
+.admMenuIco, #admMenu .admMenuIco, #admMenu div a .admMenuIco, #admMenu div a:link .admMenuIco, #admMenu div a:visited .admMenuIco, #admMenu div a:active .admMenuIco, #admMenu div a:hover .admMenuIco {
+    display: inline;
+    margin: 0px 5px 0px 0px;
+}
+#admMenu .admMenuTier2 {
+    padding-left: 35px;
+}
+#admMenu .admMenuTier3 {
+    padding-left: 55px;
+}
+#admMenu .admMenuTier4 {
+    padding-left: 75px;
+}
+#admMenu a:link, #admMenu a:visited, #admMenu a:active, #admMenu a:link {
+    display: block;
+}
 
 a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover,
 a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActive:hover,
@@ -961,6 +1112,22 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 
 
 
+.slSlider {
+	width: 100%; 
+	position: relative; 
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    border: 1px solid {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-on"] !!};
+    color: {!! $css["color-main-faint"] !!};
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    border: 1px solid {!! $css["color-main-on"] !!};
+    background: {!! $css["color-main-faint"] !!};
+    color: {!! $css["color-main-on"] !!};
+}
+
+
 
 @media screen and (max-width: 1200px) {
         
@@ -979,7 +1146,14 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
 	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
     input.otherGender { width: 240px; }
-    
+    table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
+    table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
+        table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { font-size: 14px; }
+        
+    input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
+        width: 270px;
+    }
+
 }
 @media screen and (max-width: 480px) {
     
@@ -1038,6 +1212,10 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
 	.jumbotron { padding: 20px; }
 	
+    input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
+        width: 100%;
+    }
+	
 }
 
 
@@ -1088,6 +1266,7 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 .f48, table tr td.f48, i.f48, a.f48:link, a.f48:active, a.f48:visited, a.f48:hover, input.f48 , select.f48 , textarea.f48 { font-size: 48pt; }
 .f60, table tr td.f60, i.f60, a.f60:link, a.f60:active, a.f60:visited, a.f60:hover, input.f60 , select.f60 , textarea.f60 { font-size: 60pt; }
 
+.fPerc40 { font-size: 40%; }
 .fPerc66 { font-size: 66%; }
 .fPerc80 { font-size: 80%; }
 .fPerc125 { font-size: 125%; }
@@ -1128,7 +1307,11 @@ a.overUnd:hover { text-decoration: underline; }
 .disIn { display: inline; }
 .disNon { display: none; }
 .disBlo { display: block; }
+.disRow { display: table-row; }
+.ovrNo  { overflow: hidden; }
+.ovrSho { overflow: visible; }
 .ovrFlo { overflow: auto; }
+.ovrFloY { overflow-y: auto; overflow-x: hidden; }
 
 .ww { word-wrap: break-word; }
 
@@ -1154,6 +1337,10 @@ a.overUnd:hover { text-decoration: underline; }
 .w20, table.w20, table tr td.w20, input.w20, select.w20, textarea.w20 { width: 20%; }
 .w15, table.w15, table tr td.w15, input.w15, select.w15, textarea.w15 { width: 15%; }
 .w10, table.w10, table tr td.w10, input.w10, select.w10, textarea.w10 { width: 10%; }
+.w5, table.w5, table tr td.w5, input.w5, select.w5, textarea.w5 { width: 5%; }
+.w1, table.w1, table tr td.w1, input.w1, select.w1, textarea.w1 { width: 1%; }
+
+.zind0 { z-index: 0; }
 
 .vaT, table tr td.vaT { vertical-align: top; }
 .vaM, table tr td.vaM { vertical-align: middle; }
@@ -1181,8 +1368,10 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .m15 { margin: 15px; } .mL15 { margin-left: 15px; } .mR10 { margin-right: 15px; } .mT10 { margin-top: 15px; } .mB10 { margin-bottom: 15px; }
 .m20 { margin: 20px; } .mL20 { margin-left: 20px; } .mR20 { margin-right: 20px; } .mT20 { margin-top: 20px; } .mB20 { margin-bottom: 20px; }
 .m40 { margin: 40px; } .mL40 { margin-left: 40px; } .mR40 { margin-right: 40px; } .mT40 { margin-top: 40px; } .mB40 { margin-bottom: 40px; }
+.mLn3 { margin-left: -3px; } .mRn3 { margin-right: -3px; } .mTn3 { margin-top: -3px; } .mBn3 { margin-bottom: -3px; }
 .mLn5 { margin-left: -5px; } .mRn5 { margin-right: -5px; } .mTn5 { margin-top: -5px; } .mBn5 { margin-bottom: -5px; }
 .mLn10 { margin-left: -10px; } .mRn10 { margin-right: -10px; } .mTn10 { margin-top: -10px; } .mBn10 { margin-bottom: -10px; }
+.mLn15 { margin-left: -15px; } .mRn15 { margin-right: -15px; } .mTn15 { margin-top: -15px; } .mBn15 { margin-bottom: -15px; }
 .mLn20 { margin-left: -20px; } .mRn20 { margin-right: -20px; } .mTn20 { margin-top: -20px; } .mBn20 { margin-bottom: -20px; }
 .mLn50 { margin-left: -50px; } .mRn50 { margin-right: -50px; } .mTn50 { margin-top: -50px; } .mBn50 { margin-bottom: -50px; }
 
@@ -1212,10 +1401,13 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .opac50 { opacity:0.50; filter:alpha(opacity=50); }
 .opac75 { opacity:0.75; filter:alpha(opacity=75); }
 .opac80 { opacity:0.80; filter:alpha(opacity=80); }
+.opac85 { opacity:0.85; filter:alpha(opacity=85); }
 .opac90 { opacity:0.90; filter:alpha(opacity=90); }
 .opac95 { opacity:0.95; filter:alpha(opacity=95); }
 .opac99 { opacity:0.99; filter:alpha(opacity=99); }
 .opac100 { opacity:1.00; filter:alpha(opacity=100); }
+
+.wrdBrkAll, a.wrdBrkAll:link, a.wrdBrkAll:visited, a.wrdBrkAll:active, a.wrdBrkAll:hover { word-break: break-all; }
 
 .monospacer, textarea.monospacer {
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
@@ -1226,9 +1418,10 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
     color: {!! $css["color-main-bg"] !!};
 }
 
+.red, .redDrk, h1.red, h2.red, h3.red, label .red { color: {!! $css["color-danger-on"] !!}; }
+
 .blk { color: {!! $css["color-main-text"] !!}; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: {!! $css["color-main-bg"] !!}; }
-.red, .redDrk, h1.red, h2.red, h3.red, label .red { color: {!! $css["color-danger-on"] !!}; font-weight: 100; }
 .gry4 { color: #444; }
 .gry6 { color: #666; }
 .gry8 { color: #888; }
@@ -1240,22 +1433,25 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .nobld { font-weight: normal; }
 .ital { font-style: italic; }
 
-.brd { border: 1px {!! $css["color-main-off"] !!} solid; }
-.brdDash { border: 1px {!! $css["color-main-off"] !!} dashed; }
-.brdDashGrey { border: 1px {!! $css["color-main-grey"] !!} dashed; }
-.brdDrk { border: 1px {!! $css["color-main-on"] !!} solid; }
-.brdLgt { border: 1px {!! $css["color-main-off"] !!} solid; }
-.brdRed { border: 1px {!! $css["color-danger-on"] !!} solid; }
+.brdNo     { border: 0px none; }
+.brd       { border: 1px {!! $css["color-main-off"] !!} solid; }
+.brdDsh    { border: 1px {!! $css["color-main-off"] !!} dashed; }
+.brdDshGry { border: 1px {!! $css["color-main-grey"] !!} dashed; }
+.brdDrk    { border: 1px {!! $css["color-main-on"] !!} solid; }
+.brdLgt    { border: 1px {!! $css["color-main-off"] !!} solid; }
+.brdGrey   { border: 1px {!! $css["color-main-grey"] !!} solid; }
+.brdFnt    { border: 1px {!! $css["color-main-faint"] !!} solid; }
+.brdRed    { border: 1px {!! $css["color-danger-on"] !!} solid; }
 .brdRedLgt { border: 1px {!! $css["color-danger-off"] !!} solid; }
-.brdBlk { border: 1px {!! $css["color-main-text"] !!} solid; }
-.brdA { border: 1px #AAA solid; }
-.brdC { border: 1px #CCC solid; }
-.brdEdash { border: 1px #EEE dashed; }
-.brdRedLgtLft { border-left: 1px {!! $css["color-danger-off"] !!} solid; }
+.brdBlk    { border: 1px {!! $css["color-main-text"] !!} solid; }
+.brdA      { border: 1px #AAA solid; }
+.brdC      { border: 1px #CCC solid; }
+.brdEdash  { border: 1px #EEE dashed; }
 
 .brdTop, table tr.brdTop td, table tr.brdTop th { border-top: 1px {!! $css["color-main-off"] !!} solid; }
 .brdBot, table tr.brdBot td, table tr.brdBot th { border-bottom: 1px {!! $css["color-main-off"] !!} solid; }
 .brdLft, table tr.brdLft td, table tr.brdLft th { border-left: 1px {!! $css["color-main-off"] !!} solid; }
+.brdRgt, table tr.brdRgt td, table tr.brdRgt th { border-right: 1px {!! $css["color-main-off"] !!} solid; }
 
 .brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th { border-bottom: 1px {!! $css["color-main-text"] !!} solid; }
 .brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th { border-bottom: 2px {!! $css["color-main-text"] !!} solid; }
@@ -1277,66 +1473,90 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .bgNone, textarea.bgNone { background: none; }
 
 
-.slBlueLight, a.slBlueLight:link, a.slBlueLight:visited, a.slBlueLight:active, a.slBlueLight:hover {
-	color: {!! $css["color-main-off"] !!};
-}
-.slBlueDark, a.slBlueDark:link, a.slBlueDark:visited, a.slBlueDark:active, a.slBlueDark:hover {
-	color: {!! $css["color-main-on"] !!};
-}
-.slBlueFaint, a.slBlueFaint:link, a.slBlueFaint:visited, a.slBlueFaint:active, a.slBlueFaint:hover {
-	color: {!! $css["color-main-faint"] !!};
-}
-
-.slRedDark, a.slRedDark:link, a.slRedDark:visited, a.slRedDark:active, a.slRedDark:hover {
-	color: {!! $css["color-danger-on"] !!};
-}
-.slRedLight, a.slRedLight:link, a.slRedLight:visited, a.slRedLight:active, a.slRedLight:hover {
-	color: {!! $css["color-danger-off"] !!};
-}
-
-.slGreenDark, a.slGreenDark:link, a.slGreenDark:visited, a.slGreenDark:active, a.slGreenDark:hover {
-	color: {!! $css["color-success-on"] !!};
-}
-.slGreenLight, a.slGreenLight:link, a.slGreenLight:visited, a.slGreenLight:active, a.slGreenLight:hover {
-	color: {!! $css["color-success-off"] !!};
-}
-
-.slGrey, a.slGray:link, a.slGray:active, a.slGray:visited, a.slGray:hover {
-    color: {!! $css["color-main-grey"] !!};
-}
-.infoOn {
-    color: {!! $css["color-info-on"] !!};
-}
-.infoOff {
-    color: {!! $css["color-info-off"] !!};
-}
-.warnOn {
-    color: {!! $css["color-warn-on"] !!};
-}
-.warnOff {
-    color: {!! $css["color-warn-off"] !!};
-}
+.infoOn, a.infoOn:link, a.infoOn:visited, a.infoOn:active, a.infoOn:hover { color: {!! $css["color-info-on"] !!};  }
+.infoOff, a.infoOn:link, a.infoOff:visited, a.infoOff:active, a.infoOff:hover { color: {!! $css["color-info-off"] !!}; }
+.warnOn, a.warnOn:link, a.warnOn:visited, a.warnOn:active, a.warnOn:hover  { color: {!! $css["color-warn-on"] !!};  }
+.warnOff, a.warnOff:link, a.warnOff:visited, a.warnOff:active, a.warnOff:hover { color: {!! $css["color-warn-off"] !!}; }
 
 a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	color: {!! $css["color-nav-text"] !!};
 }
 
-.slShade, a.slShade:link, a.slShade:visited, a.slShade:active, a.slShade:hover {
-	text-shadow: -1px 1px 0px {!! $css["color-main-text"] !!};
+.slBlueLight, a.slBlueLight:link, a.slBlueLight:visited, a.slBlueLight:active, a.slBlueLight:hover,
+a:link .slBlueLight, a:visited .slBlueLight, a:active .slBlueLight, a:hover .slBlueLight {
+	color: {!! $css["color-main-off"] !!};
 }
-.slShadeLight, a.slShadeLight:link, a.slShadeLight:visited, a.slShadeLight:active, a.slShadeLight:hover {
-	text-shadow: -1px 1px 0px {!! $css["color-main-off"] !!};
+.slBlueDark, a.slBlueDark:link, a.slBlueDark:visited, a.slBlueDark:active, a.slBlueDark:hover,
+a:link .slBlueDark, a:visited .slBlueDark, a:active .slBlueDark, a:hover .slBlueDark {
+	color: {!! $css["color-main-on"] !!};
 }
-.slBoxShade, a.slBoxShade:link, a.slBoxShade:visited, a.slBoxShade:active, a.slBoxShade:hover {
-	box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!};
+.slBlueFaint, a.slBlueFaint:link, a.slBlueFaint:visited, a.slBlueFaint:active, a.slBlueFaint:hover,
+a:link .slBlueFaint, a:visited .slBlueFaint, a:active .slBlueFaint, a:hover .slBlueFaint {
+	color: {!! $css["color-main-faint"] !!};
 }
 
-.slFaintHover, a.slFaintHover:link, a.slFaintHover:visited, a.slFaintHover:active, a.slFaintHover:hover {
+.slRedDark, a.slRedDark:link, a.slRedDark:visited, a.slRedDark:active, a.slRedDark:hover,
+a:link .slRedDark, a:visited .slRedDark, a:active .slRedDark, a:hover .slRedDark {
+	color: {!! $css["color-danger-on"] !!};
+}
+.slRedLight, a.slRedLight:link, a.slRedLight:visited, a.slRedLight:active, a.slRedLight:hover,
+a:link .slRedLight, a:visited .slRedLight, a:active .slRedLight, a:hover .slRedLight {
+	color: {!! $css["color-danger-off"] !!};
+}
+
+.slGreenDark, a.slGreenDark:link, a.slGreenDark:visited, a.slGreenDark:active, a.slGreenDark:hover,
+a:link .slGreenDark, a:visited .slGreenDark, a:active .slGreenDark, a:hover .slGreenDark {
+	color: {!! $css["color-success-on"] !!};
+}
+.slGreenLight, a.slGreenLight:link, a.slGreenLight:visited, a.slGreenLight:active, a.slGreenLight:hover,
+a:link .slGreenLight, a:visited .slGreenLight, a:active .slGreenLight, a:hover .slGreenLight {
+	color: {!! $css["color-success-off"] !!};
+}
+
+.slGrey, a.slGrey:link, a.slGrey:active, a.slGrey:visited, a.slGrey:hover, 
+a:link .slGrey, a:active .slGrey, a:visited .slGrey, a:hover .slGrey {
+    color: {!! $css["color-main-grey"] !!};
+}
+
+.slShade, a.slShade:link, a.slShade:visited, a.slShade:active, a.slShade:hover,
+a:link .slShade, a:visited .slShade, a:active .slShade, a:hover .slShade {
+	text-shadow: -1px 1px 0px {!! $css["color-main-text"] !!};
+}
+.slShdLgt, a.slShdLgt:link, a.slShdLgt:visited, a.slShdLgt:active, a.slShdLgt:hover,
+a:link .slShdLgt, a:visited .slShdLgt, a:active .slShdLgt, a:hover .slShdLgt {
+	text-shadow: -1px 1px 0px {!! $css["color-main-off"] !!};
+}
+.slBoxShd, a.slBoxShd:link, a.slBoxShd:visited, a.slBoxShd:active, a.slBoxShd:hover,
+a:link .slBoxShd, a:visited .slBoxShd, a:active .slBoxShd, a:hover .slBoxShd {
+	box-shadow: 0px 0px 3px {!! $css["color-main-text"] !!};
+}
+.slBoxShd10, a.slBoxShd10:link, a.slBoxShd10:visited, a.slBoxShd10:active, a.slBoxShd10:hover,
+a:link .slBoxShd10, a:visited .slBoxShd10, a:active .slBoxShd10, a:hover .slBoxShd10 {
+	box-shadow: 0px 0px 20px {!! $css["color-main-text"] !!};
+}
+.slBoxShd20, a.slBoxShd20:link, a.slBoxShd20:visited, a.slBoxShd20:active, a.slBoxShd20:hover,
+a:link .slBoxShd20, a:visited .slBoxShd20, a:active .slBoxShd20, a:hover .slBoxShd20 {
+	box-shadow: 0px 0px 20px {!! $css["color-main-text"] !!};
+}
+.slBoxShdLgt, a.slBoxShdLgt:link, a.slBoxShdLgt:visited, a.slBoxShdLgt:active, a.slBoxShdLgt:hover,
+a:link .slBoxShdLgt, a:visited .slBoxShdLgt, a:active .slBoxShdLgt, a:hover .slBoxShdLgt {
+	box-shadow: 0px 0px 3px {!! $css["color-main-off"] !!};
+}
+.slBoxShdLgt5, a.slBoxShdLgt5:link, a.slBoxShdLgt5:visited, a.slBoxShdLgt5:active, a.slBoxShdLgt5:hover,
+a:link .slBoxShdLgt5, a:visited .slBoxShdLgt5, a:active .slBoxShdLgt5, a:hover .slBoxShdLgt5 {
+	box-shadow: 0px 0px 5px {!! $css["color-main-off"] !!};
+}
+.slBoxShdBg20, a.slBoxShdBg20:link, a.slBoxShdBg20:visited, a.slBoxShdBg20:active, a.slBoxShdBg20:hover,
+a:link .slBoxShdBg20, a:visited .slBoxShdBg20, a:active .slBoxShdBg20, a:hover .slBoxShdBg20 {
+	box-shadow: 0px 0px 20px {!! $css["color-main-bg"] !!};
+}
+
+.slFaintHover, a.slFaintHover:link, a.slFaintHover:visited, a.slFaintHover:active, a.slFaintHover:hover,
+a:link .slFaintHover, a:visited .slFaintHover, a:active .slFaintHover, a:hover .slFaintHover {
 	color: {!! $css["color-main-faint"] !!};
 }
 a.slFaintHover:hover {
 	color: {!! $css["color-main-off"] !!};
 }
-
 
 {!! $css["raw"] !!}

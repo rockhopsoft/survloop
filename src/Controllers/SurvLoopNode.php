@@ -15,6 +15,7 @@ class SurvLoopNode extends CoreNode
     public $responses     = [];
     public $hasShowKids   = false;
     public $hasPageParent = false;
+    public $fldHasOther   = [];
     
     public $dataManips    = [];
     public $colors        = [];
@@ -100,13 +101,70 @@ class SurvLoopNode extends CoreNode
         }
         $this->hasShowKids = false;
         if (sizeof($this->nodeRow) > 0) {
-            $this->responses = SLNodeResponses::where('NodeResNode', $this->nodeID)
-                ->orderBy('NodeResOrd', 'asc')
-                ->get();
-            if (sizeof($this->responses) > 0) {
-                foreach ($this->responses as $j => $res) {
-                    if (intVal($res->NodeResShowKids) > 0) $this->hasShowKids = true;
+            if ($this->isPage() || $this->isLoopRoot()) {
+                $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] = $this->extraOpts["meta-keywords"] 
+                    = $this->extraOpts["meta-img"] = '';
+                if (strpos($this->nodeRow->NodePromptAfter, '::M::') !== false) {
+                    list($this->extraOpts["meta-title"], $this->extraOpts["meta-desc"], 
+                        $this->extraOpts["meta-keywords"], $this->extraOpts["meta-img"]) 
+                        = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->NodePromptAfter);
                 }
+                if ($this->isPage()) {
+                    $this->extraOpts["page-url"] = '';
+                    if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+                        if ($GLOBALS["SL"]->treeIsAdmin) {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%7 == 0) {
+                                $this->extraOpts["page-url"] = '/dashboard';
+                            } else {
+                                $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->TreeSlug;
+                            }
+                        } else {
+                            $this->extraOpts["page-url"] = '/' . $GLOBALS["SL"]->treeRow->TreeSlug;
+                        }
+                    } else { // default survey mode
+                        if ($GLOBALS["SL"]->treeIsAdmin) {
+                            $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' 
+                                . $this->nodeRow->NodePromptNotes;
+                        } else {
+                            $this->extraOpts["page-url"] = '/u/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' 
+                                . $this->nodeRow->NodePromptNotes;
+                        }
+                    }
+                } else { // isLoopRoot
+                    $this->extraOpts["page-url"] = '';
+                    if ($GLOBALS["SL"]->treeIsAdmin) {
+                        $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' 
+                            . $this->nodeRow->NodePromptNotes;
+                    } else {
+                        $this->extraOpts["page-url"] = '/u/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' 
+                            . $this->nodeRow->NodePromptNotes;
+                    }
+                }
+            }
+            if (in_array($this->nodeRow->NodeType, ['Text:Number', 'Slider'])) { // load min and max values
+                $this->extraOpts["minVal"] = $this->extraOpts["maxVal"] = $this->extraOpts["incr"] 
+                    = $this->extraOpts["unit"] = false;
+                $chk = SLNodeResponses::where('NodeResNode', $this->nodeID)
+                    ->get();
+                if ($chk && sizeof($chk) > 0) {
+                    foreach ($chk as $res) {
+                        if (isset($res->NodeResOrd) && isset($res->NodeResValue)) {
+                            if (intVal($res->NodeResOrd) == -1) {
+                                $this->extraOpts["minVal"] = intVal($res->NodeResValue);
+                            } elseif (intVal($res->NodeResOrd) == 1) {
+                                $this->extraOpts["maxVal"] = intVal($res->NodeResValue);
+                            } elseif (intVal($res->NodeResOrd) == 2) {
+                                $this->extraOpts["incr"] = intVal($res->NodeResValue);
+                                $this->extraOpts["unit"] = trim($res->NodeResEng);
+                            }
+                        }
+                    }
+                }
+            } else { // default responses                      
+                $this->responses = SLNodeResponses::where('NodeResNode', $this->nodeID)
+                    ->orderBy('NodeResOrd', 'asc')
+                    ->get();
+                $this->chkFldOther();
             }
             $this->dataManips = SLNode::where('NodeParentID', $this->nodeID)
                 ->where('NodeType', 'Data Manip: Update')
@@ -115,27 +173,70 @@ class SurvLoopNode extends CoreNode
         }
         if ($this->nodeType == 'Send Email') {
             $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"] = $this->extraOpts["emailBCC"] = [];
-            if (strpos($this->nodeRow->NodePromptAfter, '::CC::') !== false) {
-                list($to, $ccs) = explode('::CC::', $this->nodeRow->NodePromptAfter);
+            if (strpos($this->nodeRow->NodePromptNotes, '::CC::') !== false) {
+                list($to, $ccs) = explode('::CC::', $this->nodeRow->NodePromptNotes);
                 list($cc, $bcc) = explode('::BCC::', $ccs);
                 $this->extraOpts["emailTo"]  = $GLOBALS["SL"]->mexplode(',', str_replace('::TO::', '', $to));
                 $this->extraOpts["emailCC"]  = $GLOBALS["SL"]->mexplode(',', $cc);
                 $this->extraOpts["emailBCC"] = $GLOBALS["SL"]->mexplode(',', $bcc);
             }
+        } elseif (in_array($this->nodeType, ['Plot Graph', 'Line Graph'])) {
+            if (strpos($this->nodeRow->NodePromptNotes, '::Ylab::') !== false) {
+                list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+                    str_replace('::Y::', '', $this->nodeRow->NodePromptNotes));
+                list($this->extraOpts["y-axis-lab"], $xtras) = explode('::X::', $xtras);
+                list($this->extraOpts["x-axis"], $xtras) = explode('::Xlab::', $xtras);
+                list($this->extraOpts["x-axis-lab"], $this->extraOpts["conds"]) = explode('::Cnd::', $xtras);
+                $this->extraOpts["data-conds"] = $GLOBALS["SL"]->mexplode('#', $this->extraOpts["conds"]);
+            }
+        } elseif (in_array($this->nodeType, ['Pie Chart'])) {
+            
+        } elseif (in_array($this->nodeType, ['Bar Graph'])) {
+            if (strpos($this->nodeRow->NodePromptNotes, '::Ylab::') !== false) {
+                list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+                    str_replace('::Y::', '', $this->nodeRow->NodePromptNotes));
+                list($this->extraOpts["y-axis-lab"], $xtras) = explode('::Lab1::', $xtras);
+                list($this->extraOpts["lab1"], $xtras) = explode('::Lab2::', $xtras);
+                list($this->extraOpts["lab2"], $xtras) = explode('::Clr1::', $xtras);
+                list($this->extraOpts["clr1"], $xtras) = explode('::Clr2::', $xtras);
+                list($this->extraOpts["clr2"], $xtras) = explode('::Opc1::', $xtras);
+                list($this->extraOpts["opc1"], $xtras) = explode('::Opc2::', $xtras);
+                list($this->extraOpts["opc2"], $xtras) = explode('::Hgt::', $xtras);
+                list($this->extraOpts["hgt"], $this->extraOpts["conds"]) = explode('::Cnd::', $xtras);
+                $this->extraOpts["data-conds"] = $GLOBALS["SL"]->mexplode('#', $this->extraOpts["conds"]);
+                $this->extraOpts['hgt-sty'] = $this->extraOpts['hgt'];
+                if (trim($this->extraOpts['hgt']) != '') {
+                    if (strpos($this->extraOpts['hgt'], '%') === false) {
+                        $this->extraOpts['hgt-sty'] .= $this->extraOpts['hgt-sty'] . 'px'; 
+                    }
+                } else {
+                    $this->extraOpts['hgt-sty'] = '420px';
+                }
+            }
+        } elseif (in_array($this->nodeType, ['Map'])) {
+            
         }
         $this->isPageBlock();
         return true;
     }
     
-    public function genTmpNodeRes($value)
+    public function chkFldOther()
     {
-        $res = new SLNodeResponses;
-        $res->NodeResNode     = $this->nodeID;
-        $res->NodeResEng      = $value;
-        $res->NodeResValue    = $value;
-        $res->NodeResOrd      = sizeof($this->responses);
-        $res->NodeResShowKids = 0;
-        return $res;
+        $this->fldHasOther = [];
+        if (sizeof($this->responses) > 0) {
+            list($tbl, $fld) = $this->getTblFld();
+            foreach ($this->responses as $j => $res) {
+                if (intVal($res->NodeResShowKids) > 0) $this->hasShowKids = true;
+                if (isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
+                    && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
+                    if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:'])
+                        || in_array(strtolower(strip_tags($res->NodeResEng)), ['other', 'other:'])) {
+                        $this->fldHasOther[] = $j;
+                    }
+                }
+            }
+        }
+        return true;
     }
     
     public function valueShowsKid($responseVal = '')
@@ -170,32 +271,59 @@ class SurvLoopNode extends CoreNode
             && intVal($this->responses[$ind]->NodeResMutEx) == 1);
     }
     
-    public function splitTblFld($tblFld)
+    public function clearResponses()
     {
-        $tbl = $fld = '';
-        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false) {
-            list($tbl, $fld) = explode(':', $tblFld);
-        }
-        return array($tbl, $fld);
+        $this->responses = [];
+        return true;
+    }
+    
+    public function addTmpResponse($val = '', $eng = '')
+    {
+        if (trim($eng) == '') $eng = $val;
+        $newRes = new SLNodeResponses;
+        $newRes->NodeResNode     = $this->nodeID;
+        $newRes->NodeResEng      = $eng;
+        $newRes->NodeResValue    = $val;
+        $newRes->NodeResOrd      = sizeof($this->responses);
+        $newRes->NodeResShowKids = 0;
+        $this->responses[] = $newRes;
+        return $newRes;
     }
     
     public function getTblFld()
     {
         if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
-        return $this->splitTblFld($this->dataStore);
+        return $GLOBALS["SL"]->splitTblFld($this->dataStore);
     }
     
     public function getTblFldID()
     {
-        list($tbl, $fld) = $this->getTblFld();
-        if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
-            $fldRow = SLFields::select('FldID')
-                ->where('FldTable', $this->tblI[$tbl])
-                ->whereIn('FldName', [$fld, str_replace($this->tblAbbr[$tbl], '', $fld)])
-                ->first();
-            if ($fldRow && isset($fldRow->FldID)) return $fldRow->FldID;
+        if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
+        return $GLOBALS["SL"]->getTblFldID($this->dataStore);
+    }
+    
+    public function getTblFldName()
+    {
+        if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
+        $tblFld = $GLOBALS["SL"]->splitTblFld($this->dataStore);
+        if (sizeof($tblFld) > 1) return $tblFld[1];
+        return '';
+    }
+    
+    public function hasDefSet()
+    {
+        if (isset($this->extraOpts["hasDefSet"])) return $this->extraOpts["hasDefSet"];
+        $this->extraOpts["hasDefSet"] = (strpos($this->nodeRow->NodeResponseSet, 'Definition::') !== false);
+        return $this->extraOpts["hasDefSet"];
+    }
+    
+    public function parseResponseSet()
+    {
+        $set = [ "type" => '', "set" => '' ];
+        if (trim($this->nodeRow->NodeResponseSet) != '' && strpos($this->nodeRow->NodeResponseSet, '::') !== false) {
+            list($set["type"], $set["set"]) = explode('::', $this->nodeRow->NodeResponseSet);
         }
-        return -3;
+        return $set;
     }
     
     public function nodePreview()
@@ -248,6 +376,16 @@ class SurvLoopNode extends CoreNode
         return (substr($this->nodeType, 0, 10) == 'Data Manip');
     }
     
+    public function isDataPrint()
+    {
+        return (in_array($this->nodeType, ['Data Print', 'Data Print Row', 'Data Print Block']));
+    }
+    
+    public function isSpreadTbl()
+    {
+        return ($this->nodeType == 'Spreadsheet Table');
+    }
+    
     public function isPage()
     {
         return ($this->nodeType == 'Page');
@@ -268,27 +406,37 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeType == 'Big Button'); 
     }
     
-    public function isHeroImg()
+    public function hasResponseOpts()
     {
-        return ($this->nodeType == 'Hero Image');
+        if ($this->nodeType == 'Spreadsheet Table') {
+            return (isset($this->dataStore) && trim($this->dataStore) != '');
+        }
+        return in_array($this->nodeType, ['Radio', 'Checkbox', 'Drop Down', 'Other/Custom']);
     }
     
     public function isSpecial()
     {
         return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
             || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip()
-            || $this->isWidget() || $this->isBigButt() || $this->isHeroImg());
+            || $this->isWidget() || $this->isBigButt() || $this->isLayout() 
+            || $this->isDataPrint() || in_array($this->nodeType, ['Send Email']));
     }
     
     public function isWidget()
     {
-        return (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 'Member Profile Basics', 
-            'Record Full', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons', 'Send Email']));
+        return ($this->isGraph() || in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 
+            'Member Profile Basics', 'Record Full', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons',
+            'Widget Custom']));
+    }
+    
+    public function isGraph()
+    {
+        return (in_array($this->nodeType, ['Plot Graph', 'Line Graph', 'Bar Graph', 'Pie Chart', 'Map']));
     }
     
     public function isLayout()
     {
-        return (in_array($this->nodeType, ['Page Block', 'Layout Row', 'Layout Column']));
+        return (in_array($this->nodeType, ['Page Block', 'Layout Row', 'Layout Column', 'Layout Sub-Response']));
     }
     
     public function canBePageBlock()
@@ -339,7 +487,7 @@ class SurvLoopNode extends CoreNode
             $tbl = $this->dataBranch;
             $fld = str_replace($tbl.':', '', $this->dataStore);
         } else {
-            list($tbl, $fld) = $this->splitTblFld($this->dataStore);
+            list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($this->dataStore);
         }
         $newVal = (intVal($this->responseSet) > 0) ? intVal($this->responseSet) : trim($this->defaultVal);
         return [$tbl, $fld, $newVal];
@@ -347,7 +495,7 @@ class SurvLoopNode extends CoreNode
     
     public function printManipUpdate()
     {
-        if (!$this->isDataManip() || $this->nodeType == 'Data Manip: Wrap') return '';
+        if (!$this->isDataManip()) return '';
         $manipUpdate = $this->getManipUpdate();
         if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') return '';
         $ret = ' , ' . $manipUpdate[1] . ' = ';
@@ -379,6 +527,80 @@ class SurvLoopNode extends CoreNode
             if (isset($colors[7])) $this->colors["blockHeight"]  = $colors[7];
         }
         return true;
+    }
+    
+    public function getIcon()
+    {
+        if ($this->isBranch()) {
+            return '<i class="fa fa-share-alt" title="Branch Title"></i>';
+        } elseif ($this->isLoopRoot()) {
+            return '<i class="fa fa-refresh" title="Start of a New Page, Root of a Data Loop"></i>';
+        } elseif ($this->isLoopCycle()) {
+            return '<i class="fa fa-refresh" title="Data Loop within a Page"></i>';
+        } elseif ($this->isLoopSort()) {
+            return '<i class="fa fa-sort" title="Sort Data Loop Items"></i>';
+        } elseif ($this->isDataManip()) {
+            return '<i class="fa fa-database" title="Data Manipulation"></i>';
+        } elseif ($this->isPage()) {
+            return '<i class="fa fa-file-text-o" title="Start of a New Page"></i>';
+        } elseif ($this->isBigButt() || $this->nodeType == 'Back Next Buttons') {
+            return '<i class="fa fa-hand-pointer-o fa-rotate-90" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Spambot Honey Pot') {
+            return '<i class="fa fa-bug fa-rotate-90" title="Only visible to robots"></i>';
+        } elseif ($this->nodeType == 'Send Email') {
+            return '<i class="fa fa-envelope-o" aria-hidden="true" title="Send an Email"></i>';
+        } elseif ($this->nodeType == 'Checkbox') {
+            return '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Radio') {
+            return '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>';
+        } elseif (in_array($this->nodeType, ['Email', 'Gender', 'Gender Not Sure', 'Long Text', 
+            'Text', 'Text:Number'])) {
+            return '<i class="fa fa-i-cursor" aria-hidden="true"></i>';
+        } elseif (in_array($this->nodeType, ['U.S. States', 'Drop Down', 'Date', 'Feet Inches'])) {
+            return '<i class="fa fa-caret-square-o-down" aria-hidden="true"></i>';
+        } elseif ($this->isSpreadTbl()) {
+            return '<i class="fa fa-table" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Instructions') {
+            return '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Instructions Raw') {
+            return '<i class="fa fa-code" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Hidden Field') {
+            return '<i class="fa fa-eye-slash opac50" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Date Picker') {
+            return '<i class="fa fa-calendar" aria-hidden="true"></i>';
+        } elseif (in_array($this->nodeType, ['Time', 'Date Time'])) {
+            return '<i class="fa fa-clock-o" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Slider') {
+            return '<i class="fa fa-sliders" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'User Sign Up') {
+            return '<i class="fa fa-user-plus" aria-hidden="true"></i>';
+        } elseif ($this->nodeType == 'Uploads') {
+            return '<i class="fa fa-cloud-upload" aria-hidden="true"></i>';
+        } elseif ($this->isLayout()) {
+            return '<i class="fa fa-columns"></i>';
+        } elseif ($this->isWidget()) {
+            if ($this->nodeType == 'Incomplete Sess Check') {
+                return '<i class="fa fa-user-o" aria-hidden="true"></i>';
+            } elseif ($this->nodeType == 'Member Profile') {
+                return '<i class="fa fa-user-circle-o" aria-hidden="true"></i>';
+            } elseif (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured'])) {
+                return '<i class="fa fa-search" aria-hidden="true"></i>';
+            } elseif (in_array($this->nodeType, ['Plot Graph', 'Line Graph'])) {
+                return '<i class="fa fa-area-chart" aria-hidden="true"></i>';
+            } elseif ($this->nodeType == 'Bar Graph') {
+                return '<i class="fa fa-bar-chart" aria-hidden="true"></i>';
+            } elseif ($this->nodeType == 'Pie Chart') {
+                return '<i class="fa fa-pie-chart" aria-hidden="true"></i>';
+            } elseif ($this->nodeType == 'Map') {
+                return '<i class="fa fa-map-o" aria-hidden="true"></i>';
+            } else {
+                return '<i class="fa fa-magic" aria-hidden="true"></i>';
+            }
+        } elseif ($this->isDataPrint()) {
+            return '<i class="fa fa-list-alt" aria-hidden="true"></i>';
+        } else { // if ($this->nodeType == 'Other/Custom')
+            return '<i class="fa fa-hand-spock-o" aria-hidden="true"></i>';
+        }
     }
     
 }

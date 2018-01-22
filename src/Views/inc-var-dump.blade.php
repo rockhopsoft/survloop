@@ -33,12 +33,14 @@
         </div>
         <div class="col-md-6">
             <table border=0 class="table table-striped" >
-            <tr><th colspan=2 >sessInfo:</th></tr>
-            <tr><td>sessID</td><td>{{ $sessInfo->SessID }}</td></tr>
-            <tr><td>coreID</td><td>{{ $sessInfo->SessCoreID }}</td></tr>
-            <tr><td>currNode</td><td>{{ $sessInfo->SessCurrNode }}</td></tr>
-            <tr><td>loopRootJustLeft</td><td>{{ $sessInfo->SessLoopRootJustLeft }}</td></tr>
-            <tr><td>afterJumpTo</td><td>{{ $sessInfo->SessAfterJumpTo }}</td></tr>
+            @if (isset($sessInfo->SessID))
+                <tr><th colspan=2 >sessInfo:</th></tr>
+                <tr><td>sessID</td><td>{{ $sessInfo->SessID }}</td></tr>
+                <tr><td>coreID</td><td>{{ $sessInfo->SessCoreID }}</td></tr>
+                <tr><td>currNode</td><td>{{ $sessInfo->SessCurrNode }}</td></tr>
+                <tr><td>loopRootJustLeft</td><td>{{ $sessInfo->SessLoopRootJustLeft }}</td></tr>
+                <tr><td>afterJumpTo</td><td>{{ $sessInfo->SessAfterJumpTo }}</td></tr>
+            @endif
             <tr><th colspan=2 >sessLoops:</th></tr>
             @forelse ($GLOBALS['SL']->sessLoops as $sessLoop)
                 <tr><td>{{ $sessLoop->SessLoopName }}</td><td>{{ $sessLoop->SessLoopItemID }}</td></tr>

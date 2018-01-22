@@ -17,14 +17,14 @@
 <a href="/dashboard/db/all" class="btn btn-default mR10">All Database Details</a>
 <a href="/dashboard/db/definitions" class="btn btn-default mR10">All Definitions</a>
 
-<form name="defEdit" method="post" 
+<form name="mainPageForm" method="post" 
     @if (isset($def->DefID) && intVal($def->DefID) > 0) 
         action="/dashboard/db/definitions/edit-sub/{{ $def->DefID }}"
     @else
         action="/dashboard/db/definitions/add-sub/{{ urlencode($subset) }}"
     @endif 
 >
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="defEditForm" value="YES">
 
 <div class="row mT20">

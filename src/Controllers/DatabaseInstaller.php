@@ -39,7 +39,7 @@ class DatabaseInstaller extends AdminDBController
             foreach ($flds as $fld) {
                 $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
                 if ($fld->FldType == 'INT') {
-                    if (intVal($fld->FldForeignTable) > 0 
+                    if (intVal($fld->FldForeignTable) > 0 && isset($GLOBALS["SL"]->tbl[$fld->FldForeignTable])
                         && strtolower($GLOBALS["SL"]->tbl[$fld->FldForeignTable]) == 'users') {
                         $tblQuery .= "BIGINT(20) unsigned ";
                     } else {
@@ -118,7 +118,7 @@ class DatabaseInstaller extends AdminDBController
     {
         ini_set('max_execution_time', 180);
         $this->admControlInit($request, '/dashboard/db/all');
-        if (!$this->checkCache('/dashboard/db/export/laravel') && !$request->has('refresh')) {
+        if (!$this->checkCache('/dashboard/db/export/laravel') || $request->has('refresh')) {
             $this->chkModelsFolder();
             $this->v["fileListModel"] = [];
             $this->v["migrationFileUp"] = $this->v["migrationFileDown"] = '';
@@ -138,7 +138,6 @@ class DatabaseInstaller extends AdminDBController
             $tbls = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', 'NOT LIKE', 'Users')
                 ->where('TblName', 'NOT LIKE', 'users')
-                ->where('TblName', 'NOT LIKE', 'Zips')
                 ->orderBy('TblOrd')
                 ->get();
             if ($tbls && sizeof($tbls) > 0) {
@@ -247,7 +246,10 @@ class DatabaseInstaller extends AdminDBController
                                         }
                                     }
                                 }
-                                if (trim($fldData) != '') {
+                                $isSLtmp = ($GLOBALS["SL"]->dbRow->DbPrefix == 'SL_' && in_array($tbl->TblName, [
+                                    'Zips', 'Sess', 'SessLoops', 'SessEmojis'
+                                    ]));
+                                if (trim($fldData) != '' && !$isSLtmp) {
                                     $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
                                         . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
                                         . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
@@ -257,7 +259,6 @@ class DatabaseInstaller extends AdminDBController
                     }
                 }
             }
-            
             
             $newMigFilename = '../database/migrations/'
                 . $this->v["dateStamp"] . '_' . $GLOBALS["SL"]->dbRow->DbPrefix 
@@ -287,6 +288,19 @@ class DatabaseInstaller extends AdminDBController
             $this->v["content"] = view('vendor.survloop.admin.db.export-laravel', $this->v)->render();
             $this->saveCache();
         }
+        if ($request->has('refreshVendor')) {
+            $cpyTxt = $GLOBALS["SL"]->copyDirFiles('../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"],
+                '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models');
+            $this->v["content"] = $cpyTxt . $this->v["content"];
+        }
+        return view('vendor.survloop.master', $this->v);
+    }
+    
+    
+    public function printExportLaravelProgress(Request $request) 
+    {
+        
+        $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
         return view('vendor.survloop.master', $this->v);
     }
     

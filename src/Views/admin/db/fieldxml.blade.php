@@ -20,8 +20,8 @@
 <li><b>Internal Use</b>             - These fields are never included in XML files</li>
 </ul>
 
-<form name="fldXMLForm" action="/dashboard/db/fieldXML/save" method="post" target="hidFrame">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/db/fieldXML/save" method="post" target="hidFrame">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="changedFld" id="changedFldID" value="-3">
 <input type="hidden" name="changedFldSetting" id="changedFldSettingID" value="-3">
 </form>
@@ -29,7 +29,7 @@
 function saveXmlSetting(FldID, newSetting) {
     document.getElementById('changedFldID').value = FldID;
     document.getElementById('changedFldSettingID').value = newSetting;
-    document.fldXMLForm.submit();
+    document.mainPageForm.submit();
     return true;
 }
 </script>

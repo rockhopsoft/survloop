@@ -12,7 +12,7 @@
     @if ($node->nodeRow->NodeParentOrder == 0)
         <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
             <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
-            <a href="javascript:void(0)" class="adminNodeMoveTo" 
+            <a href="javascript:;" class="adminNodeMoveTo" 
                 id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ $node->nodeRow->NodeParentOrder }}"
                 ><i class="fa fa-bullseye"></i> Move Node Here</a>
         </div>
@@ -21,7 +21,7 @@
 
 <div id="nPrintWrap{{ $nID }}" class=" @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
     
-    <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $nID }}" class="btn btn-xs btn-default circleBtn1 editXml">#{{ $nID }}</a> 
+    <a id="showBtns{{ $nID }}" href="javascript:;" class="btn btn-primary circleBtn circleBtn0 editXml">#{{ $nID }}</a> 
     
     <span class="fPerc133 mR10">{{ strip_tags($node->nodeRow->NodePromptText) }}</span> 
     
@@ -59,7 +59,7 @@
         <div class="nodeMover disNon pT5 pB5 
             @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
             <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
-            <a href="javascript:void(0)" class="adminNodeMoveTo" 
+            <a href="javascript:;" class="adminNodeMoveTo" 
             id="moveTo{{ $nID }}ord0"><i class="fa fa-bullseye"></i> Move Node Here</a>
         </div>
         <div class="pT5"></div>
@@ -76,7 +76,7 @@
     </div>
     <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
         <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
-        <a href="javascript:void(0)" class="adminNodeMoveTo" 
+        <a href="javascript:;" class="adminNodeMoveTo" 
         id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ (1+$node->nodeRow->NodeParentOrder) }}"
             ><i class="fa fa-bullseye"></i> Move Node Here</a>
     </div>

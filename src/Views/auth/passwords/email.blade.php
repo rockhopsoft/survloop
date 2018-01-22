@@ -6,12 +6,12 @@ $v = $surv->custLoop->v;
 
 @section('content')
 <!-- resources/views/OPC/auth/email.blade.php -->
-<form class="form-horizontal" role="form" method="POST" action="{{ url('/password/email') }}">
-{{ csrf_field() }}
+<form name="mainPageForm" class="form-horizontal" role="form" method="POST" action="{{ url('/password/email') }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
-<div class="p10"></div>
+<div class="p20"></div>
 
 <div class="row loginTitles">
     <div class="col-md-6">

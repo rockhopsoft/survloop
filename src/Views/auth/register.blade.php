@@ -6,12 +6,13 @@ $v = $surv->custLoop->v;
 
 @section('content')
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
-<form method="POST" action="{{ url('/register') }}">
-{!! csrf_field() !!}
+<form name="mainPageForm" method="POST" action="{{ url('/register') }}">
+<input type="hidden" id="isSignupID" name="isSignup" value="1">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
-<div class="p10"></div>
+<div class="p20"></div>
 
 <div class="row loginTitles">
     <div class="col-md-6">
@@ -42,7 +43,8 @@ $v = $surv->custLoop->v;
 <div id="node004" class="nodeWrap{{ $errors->has('name') ? 'Error' : '' }}">
     <div id="nLabel004" class="nPrompt"><label for="nameID">
         Username: 
-        @if ($GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
+        @if (isset($GLOBALS["SL"]->sysOpts["user-name-optional"]) 
+            && $GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>

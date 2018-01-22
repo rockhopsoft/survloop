@@ -11,13 +11,13 @@
 @for ($i=0; $i < sizeof($adminNav); $i++)
     <div class="fL pR20">
         <h2>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h2>
-        @if (sizeof($adminNav[$i][3]) > 0)
+        @if (sizeof($adminNav[$i][4]) > 0)
             <ul class="m0">
-            @foreach ($adminNav[$i][3] as $link)
+            @foreach ($adminNav[$i][4] as $link)
                 <li><a href="{{ $link[0] }}" class="f16">{!! $link[1] !!}</a>
-                    @if (sizeof($link[3]) > 0)
+                    @if (sizeof($link[4]) > 0)
                         <ul>
-                        @foreach ($link[3] as $link2)
+                        @foreach ($link[4] as $link2)
                             <li><a href="{{ $link2[0] }}" class="f16">{!! $link2[1] !!}</a></li>
                         @endforeach
                         </ul>

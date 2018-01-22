@@ -2,7 +2,7 @@
 
 <div class="p5"></div>
 
-<div id="acknows" class="jumbotron mT20">
+<div id="acknows" class="jumbotron w100 mT20">
     <a href="http://www.amazon.com/gp/product/0321884493/" target="_blank"><img src="/survloop/uploads/hernandez.png" 
         border=0 width=16% hspace=5 align=right ></a> 
     <h2>Acknowledgments</h2>

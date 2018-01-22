@@ -11,7 +11,7 @@
 @forelse ($myTrees as $tree)
     <div class="p10 @if ($GLOBALS['SL']->treeID == $tree->TreeID) row2 @endif ">
         @if ($GLOBALS['SL']->treeID == $tree->TreeID)
-            <a href="javascript:void(0)" class="btn btn-lg btn-primary pull-right" DISABLED 
+            <a href="javascript:;" class="btn btn-lg btn-primary pull-right" DISABLED 
                 ><i class="fa fa-snowflake-o mR5" aria-hidden="true"></i> Current User Experience</a>
         @else
             <a href="/dashboard/tree/switch/{{ $tree->TreeID }}" class="btn btn-lg btn-primary pull-right"
@@ -34,7 +34,7 @@
         <br />
         <div id="treeEdit{{ $tree->TreeID }}" class="disNon">
             <form name="treeForm{{ $tree->TreeID }}" method="post" action="/dashboard/tree/switch">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="treeID" value="{{ $tree->TreeID }}">
             
             

@@ -24,8 +24,10 @@ use App\Models\SLConditionsArticles;
 use App\Models\SLEmails;
 
 use SurvLoop\Controllers\StatesUS;
+use SurvLoop\Controllers\SurvLoopStatic;
+use SurvLoop\Controllers\SurvLoopImages;
 
-class DatabaseLookups
+class DatabaseLookups extends SurvLoopStatic
 {
     public $isAdmin        = false;
     public $dbID           = 1;
@@ -33,8 +35,11 @@ class DatabaseLookups
     public $treeID         = 1;
     public $treeRow        = [];
     public $treeName       = '';
+    public $treeBaseSlug   = '';
     public $treeIsAdmin    = false;
     public $xmlTree        = [];
+    public $reportTree     = [];
+    public $formTree       = [];
     public $coreTbl        = '';
     public $coreTblUserFld = '';
     public $treeXmlID      = -3;
@@ -66,6 +71,11 @@ class DatabaseLookups
     public $dataSubsets    = [];
     public $dataHelpers    = [];
     public $dataLinksOn    = [];
+    public $currCyc        = [
+        "cyc" => ['', '', -3],
+        "res" => ['', '', -3],
+        "tbl" => ['', '', -3]
+        ];
     
     // User's position within potentially nested loops
     public $sessTree       = 'Page';
@@ -74,7 +84,8 @@ class DatabaseLookups
     public $tblLoops       = [];
     public $nodeCondInvert = [];
     
-    public $states         = [];
+    public $states         = false;
+    public $imgs           = false;
     
     public $fldAbouts      = [];
     public $blurbs         = [];
@@ -84,6 +95,7 @@ class DatabaseLookups
     public $sysTree        = [ "forms" => [ "pub" => [], "adm" => [] ], "pages" => [ "pub" => [], "adm" => [] ] ];
     public $treeSettings   = [];
     public $x              = [];
+    public $allTrees       = [];
     
     function __construct(Request $request = NULL, $isAdmin = false, $dbID = 1, $treeID = 1, $treeOverride = -3)
     {
@@ -122,16 +134,21 @@ class DatabaseLookups
                 $this->treeRow->TreeName);
             if ($this->treeRow->TreeType != 'Page') $this->sessTree = $this->treeRow->TreeID;
         }
-
         $this->sysOpts = ["cust-abbr" => 'SurvLoop'];
-        
         $this->loadDBFromCache($request);
-        
         $this->loadTreeMojis();
-        
+        $this->loadDataMap($this->treeID);
+        $this->chkReportFormTree();
+        $GLOBALS["errors"] = '';
+        return true;
+    }
+    
+    public function loadDataMap($treeID = -3)
+    {
+        if ($treeID != $this->treeID) $this->formTree = SLTree::find($treeID);
         $this->dataLoops = [];
         $this->dataLoopNames = [];
-        $dataLoops = SLDataLoop::where('DataLoopTree', $this->treeID)
+        $dataLoops = SLDataLoop::where('DataLoopTree', $treeID)
             ->where('DataLoopRoot', '>', 0)
             ->orderBy('DataLoopTable', 'asc')
             ->get();
@@ -143,20 +160,41 @@ class DatabaseLookups
             }
             // what about tables with multiple loops??
         }
-        $this->dataSubsets = SLDataSubsets::where('DataSubTree', $this->treeID)
+        $this->dataSubsets = SLDataSubsets::where('DataSubTree', $treeID)
             ->orderBy('DataSubTbl', 'asc')
             ->orderBy('DataSubSubTbl', 'asc')
             ->get();
-        $this->dataHelpers = SLDataHelpers::where('DataHelpTree', $this->treeID)
+        $this->dataHelpers = SLDataHelpers::where('DataHelpTree', $treeID)
             ->orderBy('DataHelpParentTable', 'asc')
             ->orderBy('DataHelpTable', 'asc')
             ->get();
-        
-        $this->states = new StatesUS;
-        
-        $GLOBALS["errors"] = '';
-        
+        eval($this->loadDataMapLinks($treeID));
         return true;
+    }
+    
+    public function loadDataMapLinks($treeID = -3)
+    {
+        if ($treeID <= 0) $treeID = $this->treeID;
+        $cache = '';
+        $this->dataLinksOn = [];
+        $linksChk = SLDataLinks::where('DataLinkTree', $treeID)
+            ->get();
+        if ($linksChk && sizeof($linksChk) > 0) {
+            foreach ($linksChk as $link) {
+                $linkMap = $this->getLinkTblMap($link->DataLinkTable);
+                if ($linkMap && sizeof($linkMap) == 5) {
+                    $this->dataLinksOn[$link->DataLinkTable] = $linkMap;
+                }
+            }
+        }
+        $cache .= '$'.'this->dataLinksOn = [];' . "\n";
+        if (sizeof($this->dataLinksOn) > 0) {
+            foreach ($this->dataLinksOn as $tbl => $map) {
+                $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ \'' . $map[0] . '\', \'' . $map[1] 
+                    . '\', \'' . $map[2] . '\', \'' . $map[3] . '\', \'' . $map[4] . '\' ];' . "\n";
+            }
+        }
+        return $cache;
     }
     
     public function urlRoot()
@@ -178,6 +216,38 @@ class DatabaseLookups
         } else {
             $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/DatabaseLookups.php' . "\n\n";
             
+            $cache .= '$'.'this->allDbs = [];' . "\n";
+            $allDbs = SLDatabases::get();
+            if ($allDbs && sizeof($allDbs) > 0) {
+                foreach ($allDbs as $db) {
+                    $cache .= '$'.'this->allDbs[] = ['
+                        . ' "id" => ' . $db->DbID . ', '
+                        . ' "name" => "' . str_replace('"', '\\"', $db->DbName) . '", '
+                        . ' "prfx" => "' . $db->DbPrefix . '" '
+                        . '];' . "\n";
+                }
+            }
+            
+            $this->allTrees = [];
+            $cache .= '$'.'this->allTrees = [];' . "\n";
+            $allTrees = SLTree::where('TreeType', 'Primary Public')
+                ->orderBy('TreeName', 'asc')
+                ->get();
+            if ($allTrees && sizeof($allTrees) > 0) {
+                foreach ($allTrees as $tree) {
+                    if (!isset($this->allTrees[$tree->TreeDatabase])) {
+                        $this->allTrees[$tree->TreeDatabase] = [];
+                        $cache .= '$'.'this->allTrees[' . $tree->TreeDatabase . '] = [];' . "\n";
+                    }
+                    $cache .= '$'.'this->allTrees[' . $tree->TreeDatabase . '][] = ['
+                        . ' "id" => ' . $tree->TreeID . ', '
+                        . ' "name" => "' . str_replace('"', '\\"', $tree->TreeName) . '", '
+                        . ' "slug" => "' . $tree->TreeSlug . '", '
+                        . ' "opts" => ' . $tree->TreeOpts . ' '
+                        . '];' . "\n";
+                }
+            }
+            
             if ($this->treeRow->TreeRoot > 0) {
                 $chk = SLConditionsNodes::select('SL_ConditionsNodes.CondNodeID')
                     ->join('SL_Conditions', 'SL_Conditions.CondID', '=', 'SL_ConditionsNodes.CondNodeCondID')
@@ -189,8 +259,13 @@ class DatabaseLookups
                         $this->treeRow->TreeOpts *= 3;
                         $this->treeRow->save();
                     }
-                    $cache .= '$'.'this->treeIsAdmin = true;' . "\n";
                 }
+            }
+            if ($this->treeRow->TreeOpts%3 == 0) {
+                $cache .= '$'.'this->treeIsAdmin = true;' . "\n"
+                    . '$'.'this->treeBaseSlug = "/dash/' . $this->treeRow->TreeSlug . '/";' . "\n";
+            } else {
+                $cache .= '$'.'this->treeBaseSlug = "/u/' . $this->treeRow->TreeSlug . '/";' . "\n";
             }
 
             $sys = []; /* SLDefinitions::where('DefDatabase', $this->dbID)
@@ -221,7 +296,7 @@ class DatabaseLookups
                     $cache .= '$'.'this->tbls[] = ' . $tbl->TblID . ';' . "\n"
                         . '$'.'this->tblI[\'' . $tbl->TblName . '\'] = ' . intVal($tbl->TblID) . ';' . "\n"
                         . '$'.'this->tbl[' . $tbl->TblID . '] = \'' . $tbl->TblName . '\';' . "\n"
-                        . '$'.'this->tblEng[' . $tbl->TblID . '] = \'' . str_replace("'", "\\'", $tbl->TblEng) . '\';' . "\n"
+                        . '$'.'this->tblEng[' . $tbl->TblID . '] = \'' .str_replace("'", "\\'", $tbl->TblEng).'\';'."\n"
                         . '$'.'this->tblOpts[' . $tbl->TblID . '] = ' . intVal($tbl->TblOpts) . ';' . "\n"
                         . '$'.'this->tblAbbr[\'' . $tbl->TblName . '\'] = \'' . $tbl->TblAbbr . '\';' . "\n"
                         . '$'.'this->fldTypes[\'' . $tbl->TblName . '\'] = [];' . "\n"
@@ -266,24 +341,7 @@ class DatabaseLookups
                     }
                 }
                 
-                $this->dataLinksOn = [];
-                $linksChk = SLDataLinks::where('DataLinkTree', $this->treeID)
-                    ->get();
-                if ($linksChk && sizeof($linksChk) > 0) {
-                    foreach ($linksChk as $link) {
-                        $linkMap = $this->getLinkTblMap($link->DataLinkTable);
-                        if ($linkMap && sizeof($linkMap) == 5) {
-                            $this->dataLinksOn[$link->DataLinkTable] = $linkMap;
-                        }
-                    }
-                }
-                $cache .= '$'.'this->dataLinksOn = [];' . "\n";
-                if (sizeof($this->dataLinksOn) > 0) {
-                    foreach ($this->dataLinksOn as $tbl => $map) {
-                        $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ \'' . $map[0] . '\', \'' . $map[1] 
-                            . '\', \'' . $map[2] . '\', \'' . $map[3] . '\', \'' . $map[4] . '\' ];' . "\n";
-                    }
-                }
+                $cache .= $this->loadDataMapLinks($this->treeID);
                 
                 $cache .= '$'.'this->nodeCondInvert = [];' . "\n";
                 $inv = SLConditionsNodes::where('CondNodeNodeID', '>', 0)
@@ -332,15 +390,44 @@ class DatabaseLookups
                         . '"id" => '        . $xmlTree->TreeID . ', '
                         . '"root" => '      . $xmlTree->TreeRoot . ', '
                         . '"coreTblID" => ' . $xmlTree->TreeCoreTable . ', '
-                        . '"coreTbl" => "'  . $this->tbl[$xmlTree->TreeCoreTable] . '", '
+                        . '"coreTbl" => "'  . ((isset($this->tbl[$xmlTree->TreeCoreTable])) 
+                            ? $this->tbl[$xmlTree->TreeCoreTable] : '') . '", '
                         . '"opts" => '      . $xmlTree->TreeOpts
                     . ' ];' . "\n";
+                }
+                $reportTree = SLTree::where('TreeType', 'Page')
+                    ->where('TreeDatabase', $this->dbID)
+                    ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
+                    ->get();
+                if ($reportTree && sizeof($reportTree) > 0) {
+                    foreach ($reportTree as $t) {
+                        if ($t->TreeOpts%13 == 0) {
+                            $cache2 .= '$'.'this->reportTree = [ '
+                                . '"id" => '   . $t->TreeID . ', '
+                                . '"root" => ' . $t->TreeRoot . ', '
+                                . '"slug" => "' . $t->TreeSlug . '"'
+                            . ' ];' . "\n";
+                        }
+                    }
                 }
             }
             eval($cache2);
             
             if (file_exists($cacheFile)) Storage::delete($cacheFile);
             Storage::put($cacheFile, $cache . $cache2);
+        }
+        return true;
+    }
+    
+    public function chkReportFormTree()
+    {
+        if ($this->treeRow->TreeType == 'Page') {
+            $nodeChk = SLNode::find($this->treeRow->TreeRoot);
+            if ($nodeChk && isset($nodeChk->NodeResponseSet) && intVal($nodeChk->NodeResponseSet) > 0
+                && intVal($nodeChk->NodeResponseSet) != $this->treeID) {
+                $chk = SLTree::find(intVal($nodeChk->NodeResponseSet));
+                $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
+            }
         }
         return true;
     }
@@ -353,7 +440,7 @@ class DatabaseLookups
             $this->chkTblModel($tbl, $path, $forceFile);
             return $path;
         }
-        if (file_exists('../app/Models/SL' . $tbl . '.php')) return "App\\Models\\SL" . $this->tblModels[$tbl];
+        if (file_exists('../app/Models/SL' . $tbl . '.php')) return "App\\Models\\SL" . $tbl;
         return '';
     }
     
@@ -459,6 +546,7 @@ class DatabaseLookups
     {
         /// add fake to [0] position, then reset closest
         $tmpLoops = $this->sessLoops;
+        $this->sessLoops = [];
         $this->sessLoops[0] = new SLSessLoops;
         $this->sessLoops[0]->SessLoopName = $loop;
         $this->sessLoops[0]->SessLoopItemID = $itemID;
@@ -472,6 +560,7 @@ class DatabaseLookups
     public function removeFakeSessLoopCycle($loop, $itemID)
     {
         $tmpLoops = $this->sessLoops;
+        $this->sessLoops = [];
         if (sizeof($tmpLoops) > 0) {
             foreach ($tmpLoops as $i => $l) {
                 if ($l->SessLoopName != $loop || $l->SessLoopItemID != $itemID) {
@@ -546,14 +635,6 @@ class DatabaseLookups
         return '';
     }
     
-    public function getForeignLnkName($tbl1, $tbl2 = '')
-    {
-        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
-            return '';
-        }
-        return $this->getForeignLnk($this->tblI[$tbl1], $this->tblI[$tbl2]);
-    }
-    
     public function getForeignLnk($tbl1, $tbl2 = -3)
     {
         if ($tbl2 <= 0) $tbl2 = $this->treeRow->TreeCoreTable;
@@ -563,6 +644,29 @@ class DatabaseLookups
             ->first();
         if ($fld && isset($fld->FldName)) return trim($fld->FldName);
         return '';
+    }
+    
+    public function getForeignLnkName($tbl1, $tbl2 = '')
+    {
+        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
+            return '';
+        }
+        return $this->getForeignLnk($this->tblI[$tbl1], $this->tblI[$tbl2]);
+    }
+    
+    public function getForeignLnkFldName($tbl1, $tbl2 = -3)
+    {
+        $fldName = $GLOBALS["SL"]->getForeignLnk($tbl1, $tbl2);
+        if ($fldName != '') return $this->tblAbbr[$this->tbl[$tbl1]] . $fldName;
+        return '';
+    }
+    
+    public function getForeignLnkNameFldName($tbl1, $tbl2 = '')
+    {
+        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
+            return '';
+        }
+        return $this->getForeignLnkFldName($this->tblI[$tbl1], $this->tblI[$tbl2]);
     }
     
     public function getForeignOpts($preSel = '', $opts = 'Subset')
@@ -594,8 +698,7 @@ class DatabaseLookups
                 }
             }
         }
-        if ($opts == 'Subset')
-        {
+        if ($opts == 'Subset') {
             $flds = SLFields::select('SL_Fields.FldTable', 'SL_Fields.FldName', 'SL_Fields.FldForeignTable')
                 ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Fields.FldTable')
                 ->where('FldDatabase',         $this->dbID)
@@ -703,6 +806,12 @@ class DatabaseLookups
     
     public function getDefValue($subset = '', $id = '')
     {
+        if ($subset == 'Yes/No') {
+            if (in_array($id, ['Y', '1'])) return 'Yes';
+            if (in_array($id, ['N', '0'])) return 'No';
+            if ($id == '?') return 'Not sure';
+            return '';
+        }
         $this->loadDefinitions($subset);
         if (sizeof($this->defValues[$subset]) > 0) {
             foreach ($this->defValues[$subset] as $def) {
@@ -715,10 +824,7 @@ class DatabaseLookups
     public function getDefSet($subset = '')
     {
         $this->loadDefinitions($subset);
-        if (sizeof($this->defValues[$subset]) > 0) {
-            return $this->defValues[$subset];
-        }
-        return [];
+        return $this->defValues[$subset];
     }
     
     public function getDefDesc($subset = '', $val = '')
@@ -788,8 +894,8 @@ class DatabaseLookups
         } else {
             $fldStr = $fld->TblName . ':' . $fld->TblAbbr . $fld->FldName;
             return '<option value="' . $fldStr . '"' . ((trim($preSel) == $fldStr) ? ' SELECTED' : '') . ' >' . $prfx 
-                . $fldStr . ' ('. (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) 
-                . ')</option>' . "\n";
+                . str_replace(':', ' : ', $fldStr) . ' (' . (($fld->FldForeignTable > 0) ? 'foreign key' 
+                    : strtolower($fld->FldType)) . ')</option>' . "\n";
         }
         return '';
     }
@@ -813,7 +919,57 @@ class DatabaseLookups
         return $ret;
     }
     
+    public function allDefSets()
+    {
+        return SLDefinitions::where('DefSet', 'Value Ranges')
+            ->select('DefSubset')
+            ->distinct()
+            ->orderBy('DefSubset', 'asc')
+            ->get();
+    }
     
+    public function printLoopsDropdowns($preSel = '', $fld = 'loopList', $manualOpt = true)
+    {
+        $currDefinition = $currLoopItems = $currTblRecs = '';
+        if (isset($preSel)) {
+            if (strpos($preSel, 'Definition::') !== false) {
+                $currDefinition = str_replace('Definition::', '', $preSel);
+            } elseif (strpos($preSel, 'LoopItems::') !== false) {
+                $currLoopItems = str_replace('LoopItems::', '', $preSel);
+            } elseif (strpos($preSel, 'Table::') !== false) {
+                $currTblRecs = str_replace('Table::', '', $preSel);
+            }
+        }                   
+        return view('vendor.survloop.admin.tree.node-edit-loop-list', [
+            "fld"            => $fld,
+            "manualOpt"      => $manualOpt,
+            "defs"           => $GLOBALS["SL"]->allDefSets(),
+            "currDefinition" => $currDefinition, 
+            "currLoopItems"  => $currLoopItems, 
+            "currTblRecs"    => $currTblRecs
+        ])->render();
+    }
+    
+    public function postLoopsDropdowns($fld = 'loopList')
+    {
+        $ret = '';
+        if ($this->REQ->has($fld . 'Type')) {
+            if (trim($this->REQ->input($fld . 'Type')) == 'auto-def') {
+                if (trim($this->REQ->input($fld . 'Definition')) != '') {
+                    $ret = 'Definition::' . $this->REQ->input($fld . 'Definition');
+                }
+            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-loop') {
+                if (trim($this->REQ->input($fld . 'LoopItems')) != '') {
+                    $ret = 'LoopItems::'.$this->REQ->input($fld . 'LoopItems');
+                }
+            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-tbl') {
+                if (trim($this->REQ->input($fld . 'Tables')) != '') {
+                    $ret = 'Table::'.$this->REQ->input($fld . 'Tables');
+                }
+            }
+        }
+        return $ret;
+    }
     
     public function getAllSetTables($tblIn = '')
     {
@@ -837,8 +993,7 @@ class DatabaseLookups
     
     public function getSubsetTables($tbl1 = -3, $tbls = [])
     {
-        if ($tbl1 > 0 && !in_array($tbl1, $tbls))
-        {
+        if ($tbl1 > 0 && !in_array($tbl1, $tbls)) {
             $tbls[] = $tbl1;
             if (isset($this->dataSubsets) && sizeof($this->dataSubsets) > 0) {
                 foreach ($this->dataSubsets as $subset) {
@@ -856,6 +1011,16 @@ class DatabaseLookups
             }
         }
         return $tbls;
+    }
+    
+    public function isFldCheckboxHelper($fld = '')
+    {
+        if (isset($this->dataHelpers) && sizeof($this->dataHelpers) > 0) {
+            foreach ($this->dataHelpers as $helper) {
+                if (isset($helper->DataHelpValueField) && $helper->DataHelpValueField == $fld) return true;
+            }
+        }
+        return false;
     }
     
     public function fieldsTblsDropdown($tbls = [], $preSel = '', $prfx = '')
@@ -911,25 +1076,103 @@ class DatabaseLookups
         return -3;
     }
     
-    
-    
-    // just wanted this utility global to easily call from anywhere including views
-    function urlPreview($url)
+    public function getFldRowFromFullName($tbl, $fld)
     {
-        $url = urlClean($url);
-        if (strpos($url, '/') !== false) $url = substr($url, 0, strpos($url, '/'));
-        return $url;
+        return SLFields::where('FldTable', $this->tblI[$tbl])
+            ->where('FldName', str_replace($this->tblAbbr[$tbl], '', $fld))
+            ->first();
     }
     
-    function urlClean($url)
+    public function getFldIDFromFullWritName($tblFld)
     {
-        $url = str_replace('http://', '', str_replace('https://', '', 
-            str_replace('http://www.', '', str_replace('https://www.', '', $url))));
-        $pos = strrpos($url, '/');
-        if ($pos !== false && $pos == strlen($url)-1) $url = substr($url, 0, $pos);
-        return $url;
+        list($tbl, $fld) = explode(':', $tblFld);
+        return $this->getFldRowFromFullName($tbl, $fld)->getKey();
     }
-
+    
+    public function getMapToCore($fldID = -3, $fld = [])
+    {
+        $ret = [];
+        if (sizeof($fld) == 0) $fld = SLFields::find($fldID);
+//echo 'getMapToCore(' . $fldID . ', <pre>'; print_r($fld); echo '</pre>';
+        if ($fld && isset($fld->FldTable) && $fld->FldTable != $this->tblI[$this->coreTbl]) {
+            $linkMap = $this->getLinkTblMap($fld->FldTable);
+//echo 'getMapToCore(tblID: ' . $fld->FldTable . ', tbl: ' . $this->tbl[$fld->FldTable] . ', linkMap: <pre>'; print_r($linkMap); echo '</pre>';
+            
+            
+        }
+        return $ret;
+    }
+    
+    public function digMapToCore($tbl = -3)
+    {
+        $tbls = [];
+        $kids = $this->getSubsetTables($tbl);
+        if (sizeof($kids) > 0) {
+            foreach ($kids as $i => $k) {
+                
+                //$tbls[] = 
+                if (sizeof($tbls) > 0) $tbls[] = $tbl;
+            }
+        }
+        return $tbls;
+    }
+    
+    public function processFiltFld($fldID, $value = '', $ids = [])
+    {
+        if (trim($value) != '' && sizeof($ids) > 0) {
+            //echo 'processFiltFld(fldID: ' . $fldID . ', val: ' . $value . '<br />';
+            if (trim($value) != '') {
+                $fld = SLFields::find($fldID);
+                $tbl = $this->tbl[$fld->FldTable];
+                $keyMap = $GLOBALS["SL"]->getMapToCore($fldID, $fld);
+                if (sizeof($keyMap) == 0) { // then field in core record
+                    $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($tbl) . "::whereIn('" . $this->tblAbbr[$tbl] 
+                        . "ID', \$ids)->where('" .  $this->tblAbbr[$tbl] . $fld->FldName . "', '" . $value 
+                        . "')->select('" . $this->tblAbbr[$tbl] . "ID')->get();";
+                    eval($eval);
+                    //echo $eval . '<pre>'; print_r($chk); echo '</pre>';
+                    $ids = [];
+                    if ($chk && sizeof($chk) > 0) {
+                        foreach ($chk as $lnk) $ids[] = $lnk->getKey();
+                    }
+                    
+                }
+                // filter out for field value
+            }
+        }
+        return $ids;
+    }
+    
+    public function origFldCheckbox($tbl, $fld)
+    {
+        if (!isset($this->formTree->TreeID)) return -3;
+        $chk = SLNode::where('NodeDataStore', $tbl . ':' . $fld)
+            ->where('NodeType', 'Checkbox')
+            ->where('NodeTree', $this->formTree->TreeID)
+            ->first();
+        if ($chk && isset($chk->NodeID)) return $chk->NodeID;
+        return -3;
+    }
+    
+    public function getFldNodeQuestion($tbl, $fld, $tree = -3)
+    {
+        if ($tree <= 0) $tree = $this->treeID;
+        $chk = SLNode::where('NodeTree', $tree)
+            ->where('NodeDataStore', $tbl . ':' . $fld)
+            ->orderBy('NodeID', 'desc')
+            ->get();
+        if ($chk && sizeof($chk) > 0) {
+            foreach ($chk as $node) {
+                if (isset($node->NodePromptText) && trim($node->NodePromptText) != '') {
+                    return $node->NodePromptText;
+                }
+            }
+        }
+        return '';
+    }
+    
+    
+    
     public function splitTblFld($tblFld)
     {
         $tbl = $fld = '';
@@ -938,9 +1181,19 @@ class DatabaseLookups
         }
         return array($tbl, $fld);
     }
-
     
-    
+    public function getTblFldID($tblFld)
+    {
+        list($tbl, $fld) = $this->splitTblFld($tblFld);
+        if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
+            $fldRow = SLFields::select('FldID')
+                ->where('FldTable', $this->tblI[$tbl])
+                ->whereIn('FldName', [$fld, str_replace($this->tblAbbr[$tbl], '', $fld)])
+                ->first();
+            if ($fldRow && isset($fldRow->FldID)) return $fldRow->FldID;
+        }
+        return -3;
+    }
     
     
     public function getFldResponsesByID($fldID)
@@ -1018,121 +1271,124 @@ class DatabaseLookups
         if ($request->has('condID') && intVal($request->condID) > 0) {
             $cond = SLConditions::find(intVal($request->condID));
             SLConditionsVals::where('CondValCondID', $cond->CondID)->delete();
+        } else {
+            $cond->CondDatabase = $this->dbID;
         }
-        else $cond->CondDatabase = $this->dbID;
-        $cond->CondTag      = (($request->has('condHash')) ? $request->condHash : '#');
-        if (substr($cond->CondTag, 0, 1) != '#') {
-            $cond->CondTag  = '#' . $cond->CondTag;
-        }
-        $cond->CondDesc     = (($request->has('condDesc')) ? $request->condDesc : '');
-        $cond->CondOperator = 'CUSTOM';
-        $cond->CondOperDeet = 0;
-        $cond->CondField = $cond->CondTable = $cond->CondLoop = 0;
-        $cond->CondOpts     = 1;
-        
-        if ($request->has('condType') && $request->condType == 'complex') {
-            $cond->CondOperator = 'COMPLEX';
-            $cond->save();
-            if ($request->has('multConds') && sizeof($request->multConds) > 0) {
-                foreach ($request->multConds as $val) {
-                    $chk = SLConditionsVals::where('CondValCondID', $cond->CondID)
-                        ->where('CondValValue', $val)
-                        ->get();
-                    if (!$chk | sizeof($chk) == 0) {
-                        $tmpVal = new SLConditionsVals;
-                        $tmpVal->CondValCondID    = $cond->CondID;
-                        $tmpVal->CondValValue     = $val;
-                        if ($request->has('multCondsNot') && in_array($val, $request->multCondsNot)) {
-                            $tmpVal->CondValValue = (-1*$val);
+        if ($request->has('condHash') && trim($request->condHash) != '' && trim($request->condHash) != '#') {
+            $cond->CondTag      = (($request->has('condHash')) ? $request->condHash : '#');
+            if (substr($cond->CondTag, 0, 1) != '#') {
+                $cond->CondTag  = '#' . $cond->CondTag;
+            }
+            $cond->CondDesc     = (($request->has('condDesc')) ? $request->condDesc : '');
+            $cond->CondOperator = 'CUSTOM';
+            $cond->CondOperDeet = 0;
+            $cond->CondField = $cond->CondTable = $cond->CondLoop = 0;
+            $cond->CondOpts     = 1;
+            
+            if ($request->has('condType') && $request->condType == 'complex') {
+                $cond->CondOperator = 'COMPLEX';
+                $cond->save();
+                if ($request->has('multConds') && sizeof($request->multConds) > 0) {
+                    foreach ($request->multConds as $val) {
+                        $chk = SLConditionsVals::where('CondValCondID', $cond->CondID)
+                            ->where('CondValValue', $val)
+                            ->get();
+                        if (!$chk | sizeof($chk) == 0) {
+                            $tmpVal = new SLConditionsVals;
+                            $tmpVal->CondValCondID    = $cond->CondID;
+                            $tmpVal->CondValValue     = $val;
+                            if ($request->has('multCondsNot') && in_array($val, $request->multCondsNot)) {
+                                $tmpVal->CondValValue = (-1*$val);
+                            }
+                            $tmpVal->save();
                         }
+                    }
+                }
+            } else {
+                if ($request->has('setSelect')) {
+                    $tmp = trim($request->setSelect);
+                    if ($tmp == 'url-parameters') {
+                        $cond->CondOperator = 'URL-PARAM';
+                    } elseif (strpos($tmp, 'loop-') !== false) {
+                        $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
+                    } else {
+                        $cond->CondTable = intVal($this->tblI[$tmp]);
+                    }
+                }
+                if ($cond->CondOperator == 'URL-PARAM') {
+                    $cond->CondOperDeet = $request->paramName;
+                } elseif ($request->has('setFld')) {
+                    $tmp = trim($request->setFld);
+                    if (substr($tmp, 0, 6) == 'EXISTS') {
+                        $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
+                        $cond->CondOperDeet = intVal(substr($tmp, 7));
+                    } else {
+                        $cond->CondField = intVal($request->setFld);
+                        if ($request->has('equals')) {
+                            if ($request->get('equals') == 'equals') $cond->CondOperator = '{';
+                            else $cond->CondOperator = '}';
+                        }
+                    }
+                }
+                $cond->save();
+                if ($cond->CondOperator == 'URL-PARAM') {
+                    $tmpVal = new SLConditionsVals;
+                    $tmpVal->CondValCondID = $cond->CondID;
+                    $tmpVal->CondValValue  = $request->paramVal;
+                    $tmpVal->save();
+                } elseif ($request->has('vals') && sizeof($request->vals) > 0) {
+                    foreach ($request->vals as $val) {
+                        $tmpVal = new SLConditionsVals;
+                        $tmpVal->CondValCondID = $cond->CondID;
+                        $tmpVal->CondValValue  = $val;
                         $tmpVal->save();
                     }
                 }
             }
-        } else {
-            if ($request->has('setSelect')) {
-                $tmp = trim($request->setSelect);
-                if ($tmp == 'url-parameters') {
-                    $cond->CondOperator = 'URL-PARAM';
-                } elseif (strpos($tmp, 'loop-') !== false) {
-                    $cond->CondLoop = intVal(str_replace('loop-', '', $tmp));
-                } else {
-                    $cond->CondTable = intVal($this->tblI[$tmp]);
+            
+            if ($request->has('CondPublicFilter') && intVal($request->get('CondPublicFilter')) == 1) {
+                $cond->CondOpts *= 2;
+            }
+            $artsIn = [];
+            for ($j=0; $j < 10; $j++) {
+                if ($request->has('condArtUrl' . $j . '') && trim($request->get('condArtUrl' . $j . '')) != '') {
+                    $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
+                    if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != '') {
+                        $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
+                    }
                 }
             }
-            if ($cond->CondOperator == 'URL-PARAM') {
-                $cond->CondOperDeet = $request->paramName;
-            } elseif ($request->has('setFld')) {
-                $tmp = trim($request->setFld);
-                if (substr($tmp, 0, 6) == 'EXISTS') {
-                    $cond->CondOperator = 'EXISTS' . substr($tmp, 6, 1);
-                    $cond->CondOperDeet = intVal(substr($tmp, 7));
-                } else {
-                    $cond->CondField = intVal($request->setFld);
-                    if ($request->has('equals')) {
-                        if ($request->get('equals') == 'equals') $cond->CondOperator = '{';
-                        else $cond->CondOperator = '}';
+            $articles = SLConditionsArticles::where('ArticleCondID', $cond->CondID)
+                ->get();
+            if (sizeof($artsIn) == 0) {
+                SLConditionsArticles::where('ArticleCondID', $cond->CondID)
+                    ->delete();
+            } else {
+                $cond->CondOpts *= 3;
+                foreach ($artsIn as $j => $a) {
+                    $foundArt = false;
+                    if ($articles && sizeof($articles) > 0) {
+                        foreach ($articles as $chk) {
+                            if ($chk->ArticleURL == $a[1]) {
+                                if ($chk->ArticleTitle != $a[0]) {
+                                    $chk->ArticleTitle = $a[0];
+                                    $chk->save();
+                                }
+                                $foundArt = true;
+                            }
+                        }
+                    }
+                    if (!$foundArt) {
+                        $newArt = new SLConditionsArticles;
+                        $newArt->ArticleCondID = $cond->CondID;
+                        $newArt->ArticleTitle = $a[0];
+                        $newArt->ArticleURL = $a[1];
+                        $newArt->save();
                     }
                 }
             }
             $cond->save();
-            if ($cond->CondOperator == 'URL-PARAM') {
-                $tmpVal = new SLConditionsVals;
-                $tmpVal->CondValCondID = $cond->CondID;
-                $tmpVal->CondValValue  = $request->paramVal;
-                $tmpVal->save();
-            } elseif ($request->has('vals') && sizeof($request->vals) > 0) {
-                foreach ($request->vals as $val) {
-                    $tmpVal = new SLConditionsVals;
-                    $tmpVal->CondValCondID = $cond->CondID;
-                    $tmpVal->CondValValue  = $val;
-                    $tmpVal->save();
-                }
-            }
         }
-        
-        if ($request->has('CondPublicFilter') && intVal($request->get('CondPublicFilter')) == 1) {
-            $cond->CondOpts *= 2;
-        }
-        $artsIn = [];
-        for ($j=0; $j < 10; $j++) {
-            if ($request->has('condArtUrl' . $j . '') && trim($request->get('condArtUrl' . $j . '')) != '') {
-                $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
-                if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != '') {
-                    $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
-                }
-            }
-        }
-        $articles = SLConditionsArticles::where('ArticleCondID', $cond->CondID)
-            ->get();
-        if (sizeof($artsIn) == 0) {
-            SLConditionsArticles::where('ArticleCondID', $cond->CondID)
-                ->delete();
-        } else {
-            $cond->CondOpts *= 3;
-            foreach ($artsIn as $j => $a) {
-                $foundArt = false;
-                if ($articles && sizeof($articles) > 0) {
-                    foreach ($articles as $chk) {
-                        if ($chk->ArticleURL == $a[1]) {
-                            if ($chk->ArticleTitle != $a[0]) {
-                                $chk->ArticleTitle = $a[0];
-                                $chk->save();
-                            }
-                            $foundArt = true;
-                        }
-                    }
-                }
-                if (!$foundArt) {
-                    $newArt = new SLConditionsArticles;
-                    $newArt->ArticleCondID = $cond->CondID;
-                    $newArt->ArticleTitle = $a[0];
-                    $newArt->ArticleURL = $a[1];
-                    $newArt->save();
-                }
-            }
-        }
-        $cond->save();
         return $cond;
     }
     
@@ -1372,73 +1628,30 @@ class DatabaseLookups
             ->get();
     }
     
-    
-    
-    
-    
-    public function mexplode($delim, $str)
+    public function getCssColors()
     {
-        $ret = [];
-        if (trim(str_replace($delim, '', $str)) != '') {
-            if (strpos($str, $delim) === false) {
-                $ret[] = $str;
-            } else {
-                if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
-                if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
-                $ret = explode($delim, $str);
+        $cssColors = [];
+        $cssRaw = $this->getSysStyles();
+        if ($cssRaw && sizeof($cssRaw) > 0) {
+            foreach ($cssRaw as $c) {
+                $cssColors[$c->DefSubset] = $c->DefDescription;
             }
         }
-        return $ret;
+        return $cssColors;
     }
     
-    public function swapURLwrap($url, $printHttp = true)
+    public function getCssColorsEmail()
     {
-        $urlPrint = str_replace('mailto:', '', $url);
-        if (!$printHttp) $urlPrint = str_replace('http://', '', str_replace('https://', '', $urlPrint));
-        return '<a href="' . $url . '" target="_blank">' . $urlPrint . '</a>'; 
-    }
-    
-    public function sortArrByKey($arr, $key, $ord = 'asc')
-    {
-        if (sizeof($arr) < 2) return $arr;
-        $arrCopy = $arrOrig = $arr;
-        $arr = [];
-        for ($i = 0; $i < sizeof($arrOrig); $i++) {
-            if (sizeof($arrCopy) == 1) {
-                $arr[] = $arrCopy[0];
-            } else {
-                $nextInd = -1;
-                for ($j = 0; $j < sizeof($arrCopy); $j++) {
-                    if ($nextInd < 0) {
-                        $nextInd = $j;
-                    } elseif ($ord == 'asc') {
-                        if ($arrCopy[$j][$key] < $arrCopy[$nextInd][$key]) $nextInd = $j;
-                    } else {
-                        if ($arrCopy[$j][$key] > $arrCopy[$nextInd][$key]) $nextInd = $j;
-                    }
-                }
-                $arr[] = $arrCopy[$nextInd];
-                array_splice($arrCopy, $nextInd, 1);
-            }
+        $cssColors = $this->getCssColors();
+        $cssColors["css-dump"] = '';
+        $cssRaw = SLDefinitions::where('DefDatabase', 1)
+                ->where('DefSet', 'Style CSS')
+                ->where('DefSubset', 'email')
+                ->first();
+        if ($cssRaw && isset($cssRaw->DefDescription) > 0) {
+            $cssColors["css-dump"] = $cssRaw->DefDescription;
         }
-        return $arr;
-    }
-    
-    public function mapsURL($addy)
-    {
-        return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
-    }
-    
-    public function getYoutubeID($url)
-    {
-        $ret = '';
-        $pos = strpos($url, 'v=');
-        if ($pos > 0) {
-            $ret = substr($url, (2+$pos));
-            $pos = strpos($ret, '&');
-            if ($pos > 0) $ret = substr($ret, 0, $pos);
-        }
-        return $ret;
+        return $cssColors;
     }
     
     public function swapSessMsg($page = '')
@@ -1453,7 +1666,7 @@ class DatabaseLookups
             if (trim(session()->get('sessMsg')) != '') {
                 $ret .= '<div class="alert alert-dismissible w100 mB10 '
                     . ((session()->has('sessMsgType') && trim(session()->get('sessMsgType')) != '')
-                        ? session()->get('sessMsgType') : ' alert-info') . ' ">'
+                        ? session()->get('sessMsgType') : 'alert-info') . ' ">'
                     . '<button type="button" class="close" data-dismiss="alert">×</button>' . session()->get('sessMsg')
                 . '</div>';
             }
@@ -1486,5 +1699,142 @@ class DatabaseLookups
         }
         return $pubID;
     }
+    
+    public function debugPrintExtraFilesCSS()
+    {
+        $ret = '';
+        if (isset($this->sysOpts["css-extra-files"]) && trim($this->sysOpts["css-extra-files"]) != '') {
+            $files = $this->mexplode(',', $this->sysOpts["css-extra-files"]);
+            foreach ($files as $url) {
+                $url = trim($url);
+                if (strpos($url, '../vendor/') === 0) $url = $this->convertRel2AbsURL($url);
+                if (trim($url) != '') $ret .= '<script src="' . $url . '" type="text/javascript"></script>';
+            }
+        }
+        return $ret;
+    }
+    
+    public function getDbName($dbID = -3)
+    {
+        if ($dbID <= 0 || sizeof($this->allDbs) == 0) return '';
+        foreach ($this->allDbs as $db) {
+            if ($db["id"] == $dbID) return $db["name"];
+        }
+        return '';
+    }
+    
+    public function allTreeDropOpts($preSel = -3)
+    {
+        $ret = '<option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') . ' >select form tree</option>';
+        if (sizeof($this->allTrees) > 0) {
+            foreach ($this->allTrees as $dbID => $trees) {
+                if (sizeof($trees) > 0) {
+                    $ret .= '<option value="-3" DISABLED >' . $this->getDbName($dbID) . ' Database...</option>';
+                    foreach ($trees as $i => $tree) {
+                        $ret .= '<option ' . ((intVal($preSel) == $tree["id"]) ? 'SELECTED' : '') . ' value="' 
+                            . $tree["id"] . '" > - ' . $tree["name"] . (($tree["opts"]%3 == 0) ? ' (Admin)' : '') 
+                            . '</option>';
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    public function getTreeList()
+    {
+        $trees = [];
+        $chk = SLTree::where('TreeType', 'Primary Public')
+            ->get();
+        if ($chk && sizeof($chk) > 0) {
+            foreach ($chk as $i => $t) {
+                $tblChk = SLTables::find($t->TreeCoreTable);
+                $coreTbl = (($tblChk && isset($tblChk->TblName)) ? $tblChk->TblName : '');
+                $trees[] = [ $t->TreeID, $t->TreeName, $t->TreeSlug, $coreTbl ];
+            }
+        }
+        return $trees;
+    }
+    
+    public function treeBaseUrl($incDomain = false, $hideHttp = false)
+    {
+        $url = (($incDomain) ? $this->sysOpts["app-url"] : '');
+        if ($hideHttp) {
+            $url = str_replace('http://', '', str_replace('http://www.', '', str_replace('https://', '', 
+                str_replace('https://www.', '', $url))));
+        }
+        if ($this->treeRow->TreeType == 'Page') {
+            if ($this->treeIsAdmin) return $url . '/dash/';
+            else return $url . '/';
+        } else {
+            if (isset($this->treeRow->TreeSlug)) {
+                if ($this->treeIsAdmin) return $url . '/dash/' . $this->treeRow->TreeSlug . '/';
+                else return $url . '/u/' . $this->treeRow->TreeSlug . '/';
+            }
+        }
+        return $url . '/';
+    }
+    
+    public function getCycSffx()
+    {
+        return trim($this->currCyc["cyc"][1]) . trim($this->currCyc["res"][1]) . trim($this->currCyc["tbl"][1]);
+    }
+    
+    public function getPckgProj()
+    {
+        if (isset($this->sysOpts["cust-package"]) && strpos($this->sysOpts["cust-package"], '/')) {
+            $split = explode('/', $this->sysOpts["cust-package"]);
+            return $split[1];
+        }
+        return '';
+    }
+    
+    public function setSEO($metaTitle = '', $metaDesc = '', $metaKeywords = '', $metaImg = '')
+    {
+        if (trim($metaTitle) != '') {
+            $GLOBALS['SL']->sysOpts['meta-title'] = $metaTitle . ' - ' . $GLOBALS['SL']->sysOpts['meta-title'];
+        }
+        if (trim($metaDesc) != '') $GLOBALS['SL']->sysOpts['meta-desc'] = $metaDesc;
+        if (trim($metaKeywords) != '') $GLOBALS['SL']->sysOpts['meta-keywords'] = $metaKeywords;
+        if (trim($metaImg) != '') $GLOBALS['SL']->sysOpts['meta-img'] = $metaImg;
+        return true;
+    }
+    
+    public function loadStates()
+    {
+        if ($this->states === false) $this->states = new StatesUS;
+        return true;
+    }
+    
+    public function loadImgs($nID = '', $dbID = 1)
+    {
+        if ($this->imgs === false) $this->imgs = new SurvLoopImages($nID, $dbID);
+        return true;
+    }
+    
+    public function getImgSelect($nID = '', $dbID = 1, $presel = '', $newUp = '') 
+    {
+        $this->loadImgs($nID, $dbID);
+        return $this->imgs->getImgSelect($nID, $dbID, $presel, $newUp);
+    }
+    
+    public function getImgDeet($imgID = -3, $nID = '', $dbID = 1) 
+    {
+        $this->loadImgs($nID, $dbID);
+        return $this->imgs->getImgDeet($imgID);
+    }
+    
+    public function saveImgDeet($imgID = -3, $nID = '', $dbID = 1) 
+    {
+        $this->loadImgs($nID, $dbID);
+        return $this->imgs->saveImgDeet($imgID);
+    }
+    
+    public function uploadImg($nID = '', $presel = '', $dbID = 1)
+    {
+        $this->loadImgs($nID, $dbID);
+        return $this->imgs->uploadImg($nID, $presel);
+    }
+    
     
 }

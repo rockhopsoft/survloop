@@ -7,9 +7,9 @@
         <span style="margin-right: -4px;">NOT</span>
     @endif
     @if ($cond->CondTag == '#NodeDisabled')
-        <b class="red fPerc133">{{ $cond->CondTag }}</b>
+        <b class="red">{{ $cond->CondTag }}</b>
     @elseif (trim($cond->CondOperator) == 'CUSTOM')
-        {{ $cond->CondTag }} <i class="slGreenDark fPerc66">( CUSTOM )</i>
+        {{ $cond->CondTag }}
     @else
         @if (isset($hideDeets) && $hideDeets)
             <a id="showCond{{ ((isset($nID)) ? $nID . 'n' : '') }}{{ $cond->CondID }}" 
@@ -33,13 +33,13 @@
                     /url/?{{ $cond->CondOperDeet }}={{ $cond->condFldResponses["vals"][0][1] }}
                 @endif
             @else
-                @if (intVal($cond->CondLoop) > 0)
-                    {{ $GLOBALS['SL']->getLoopName($cond->CondLoop) }}
-                @else 
-                    {{ $GLOBALS['SL']->tbl[$cond->CondTable] }}
+                @if (isset($cond->CondLoop) && intVal($cond->CondLoop) > 0)
+                    {{ $GLOBALS['SL']->getLoopName($cond->CondLoop) }} : 
+                @elseif (isset($cond->CondTable) && intVal($cond->CondTable) > 0 
+                    && isset($GLOBALS['SL']->tbl[$cond->CondTable]))
+                    {{ $GLOBALS['SL']->tbl[$cond->CondTable] }} : 
                 @endif
-                : {{ $GLOBALS['SL']->getFullFldNameFromID($cond->CondField, false) }}
-                
+                {{ $GLOBALS['SL']->getFullFldNameFromID($cond->CondField, false) }}
                 @if (trim($cond->CondOperator) == 'EXISTS=')
                     @if ($cond->CondOperDeet == 0)
                         <i>zero records exist</i>

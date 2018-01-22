@@ -10,9 +10,9 @@
 <i class="slGrey mL20 fPerc66">Don't worry, you can keep tweaking your entire database design forever.</i></p>
 </center></div>
 
-<form method="POST" @if ($isFresh) action="/fresh/database" @else action="/dashboard/db/new" @endif >
+<form name="mainPageForm" method="POST" @if ($isFresh) action="/fresh/database" @else action="/dashboard/db/new" @endif >
 <input type="hidden" name="freshSub" value="1">
-{!! csrf_field() !!}
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <center><div class="halfPageWidth pT20">
 
 <div class="row">

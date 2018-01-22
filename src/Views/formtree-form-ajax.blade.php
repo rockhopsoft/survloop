@@ -5,7 +5,7 @@ function runFormSub() {
 @else 
     blurAllFlds();
     var formData = new FormData(document.getElementById("postNodeForm"));
-    document.getElementById("ajaxWrap").innerHTML='<div id="ajaxWrapLoad" class="container">{!! $spinner !!}</div>';
+    document.getElementById("ajaxWrap").innerHTML=getSpinnerAjaxWrap();
     window.scrollTo(0, 0);
     $.ajax({
     @if ($GLOBALS['SL']->treeIsAdmin)
@@ -30,40 +30,63 @@ function runFormSub() {
     return false;
 }
 
+function getUpID(thisAttr) {
+    return thisAttr.replace("delLoopItem", "").replace("confirmN", "").replace("confirmY", "").replace("editLoopItem", "");
+}
+
 @if (sizeof($pageHasUpload) > 0)
 $("#nFormUpload").click(function() {
     if (checkNodeForm()) {
         document.getElementById("stepID").value="upload";
         return runFormSub();
+    } else {
+        return false;
     }
-    else return false;
 });
-function getUpID(thisAttr) {
-    return thisAttr.replace("delLoopItem", "").replace("confirmN", "").replace("confirmY", "").replace("editLoopItem", "");
-}
 $(".nFormUploadSave").click(function() {
     document.getElementById("stepID").value="uploadSave";
     document.getElementById("altID").value=getUpID( $(this).attr("id") );
     return runFormSub();
 });
-$(document).on("click", ".nFormLnkEdit", function() {
-    var upID = getUpID( $(this).attr("id") );
-    if (document.getElementById("up"+upID+"Info").style.display == 'none') {
-        document.getElementById("up"+upID+"Info").style.display = 'block';
-        document.getElementById("up"+upID+"InfoEdit").style.display = 'none';
+@endif
+
+@if (sizeof($pageHasUpload) > 0 || $isLoopRoot)
+$(".editLoopItem").click(function() {
+    var id = $(this).attr("id").replace("editLoopItem", "").replace("arrowLoopItem", "");
+    document.getElementById("loopItemID").value=id;
+    return runFormSub();
+});
+var limitTog = false;
+function toggleLineEdit(upID) {
+    if (!limitTog) {
+        limitTog = true;
+        setTimeout(function() { limitTog = false; }, 700);
+        if (document.getElementById("up"+upID+"InfoEdit").style.display != 'block') {
+            $("#up"+upID+"Info").slideUp("fast");
+            setTimeout(function() { $("#up"+upID+"InfoEdit").slideDown("fast"); }, 301);
+            document.getElementById("up"+upID+"EditVisibID").value="0";
+        } else {
+            $("#up"+upID+"InfoEdit").slideUp("fast");
+            setTimeout(function() { $("#up"+upID+"Info").slideDown("fast"); }, 301);
+            document.getElementById("up"+upID+"EditVisibID").value="1";
+        }
     }
-    else {
-        document.getElementById("up"+upID+"Info").style.display = 'none';
-        document.getElementById("up"+upID+"InfoEdit").style.display = 'block';
-    }
-    document.getElementById("up"+upID+"EditVisibID").value="1";
     return true;
+}
+$(document).on("click", ".nFormLnkEdit", function() {
+    return toggleLineEdit(getUpID( $(this).attr("id") ));
 });
 $(document).on("click", ".nFormLnkDel", function() {
-    $("#delLoopItem"+getUpID( $(this).attr("id") )+"confirm").slideDown("fast"); return true;
+    var upID = getUpID( $(this).attr("id") );
+    $("#editLoopItem"+upID+"block").slideUp("fast");
+    $("#delLoopItem"+upID+"confirm").slideDown("fast");
+    return true;
 });
 $(document).on("click", ".nFormLnkDelConfirmNo", function() {
-    $("#delLoopItem"+getUpID( $(this).attr("id") )+"confirm").slideUp("fast"); return true;
+    var upID = getUpID( $(this).attr("id") );
+    $("#delLoopItem"+upID+"confirm").slideUp("fast");
+    $("#editLoopItem"+upID+"block").slideDown("fast");
+    return true;
 });
 $(document).on("click", ".nFormLnkDelConfirmYes", function() {
     document.getElementById("stepID").value="uploadDel";
@@ -90,15 +113,13 @@ $(".nFormBack").click(function() { return exitLoop("Back"); });
 $(".nFormNext").click(function() {
     if (checkNodeForm()) {
         document.getElementById("stepID").value="next";
-        return runFormSub();
+        return runFormSub();                                                                     
     }
     return false;
 });
 $(".nFormBack").click(function() {
     document.getElementById("stepID").value="back";
-@if ($loopRootJustLeft > 0)
-    document.getElementById("jumpToID").value="{{ $loopRootJustLeft }}";
-@endif
+@if ($loopRootJustLeft > 0) document.getElementById("jumpToID").value="{{ $loopRootJustLeft }}"; @endif
     return runFormSub();
 });
 
@@ -112,3 +133,15 @@ $(document).on("click", "a.navJump", function() {
     @endif
     return runFormSub();
 });
+
+window.onpopstate = function(event) {
+    var newPage = document.location.href;
+    newPage = newPage.replace("{{ $GLOBALS['SL']->sysOpts['app-url'] }}", "");
+    if (document.getElementById("stepID")) document.getElementById("stepID").value = "save";
+    if (document.getElementById("popStateUrlID")) document.getElementById("popStateUrlID").value = newPage;
+    return runFormSub();
+};
+
+@if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')
+    setTimeout(function() { if (!document.getElementById('main')) { window.location='{{ $currPage[0] }}'; } }, 10);
+@endif

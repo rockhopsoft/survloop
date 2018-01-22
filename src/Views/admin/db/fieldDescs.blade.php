@@ -34,8 +34,8 @@
     <tr><td colspan=2 ><a href="/dashboard/db/fieldDescs/uniques">Unique Fields Only</a> - <a href="/dashboard/db/fieldDescs/replicas">Replica Fields Only</a></td>
 @endif
 </tr></table><br />
-<form name="FldDescForm" action="/dashboard/db/fieldDescs/save" method="post" target="hidFrame">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/db/fieldDescs/save" method="post" target="hidFrame">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="changedFLds" id="changedFLdsID" value=",">
 <input type="hidden" name="changedFLdsGen" id="changedFLdsGenID" value=",">
 <script type="text/javascript">
@@ -45,7 +45,7 @@ function logFldDescChange(FldID) {
     }
 }
 function submitFldDescChanges() {
-    document.FldDescForm.submit();
+    document.mainPageForm.submit();
     setTimeout("document.getElementById('changedFLdsID').value=','", 1000);
     setTimeout("document.getElementById('changedFLdsGenID').value=','", 1000);
 }
@@ -116,7 +116,7 @@ function submitFldDescChanges() {
                 @endif
                 >{{ $fld->FldNotes }}</textarea></td>
             <td @if ($fld->FldSpecType == 'Generic') data-toggle="tooltip" data-placement="top" title="*Saving will push changes to all copies of this field (Replicas)." @endif
-                ><nobr><a href="javascript:void(0)" onClick="submitFldDescChanges();" class="f32" ><i class="fa fa-floppy-o"></i></a> 
+                ><nobr><a href="javascript:;" onClick="submitFldDescChanges();" class="f32" ><i class="fa fa-floppy-o"></i></a> 
                 @if ($fld->FldSpecType == 'Generic') <span class="red f32">*</span> @endif </nobr></td>
             </tr>
             

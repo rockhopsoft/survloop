@@ -10,7 +10,7 @@
 @forelse ($myDbs as $db)
     <div class="p10 @if ($GLOBALS['SL']->dbID == $db->DbID) row2 @endif ">
         @if ($GLOBALS['SL']->dbID == $db->DbID)
-            <a href="javascript:void(0)" class="btn btn-lg btn-primary pull-right" DISABLED 
+            <a href="javascript:;" class="btn btn-lg btn-primary pull-right" DISABLED 
                 ><i class="fa fa-database mR5" aria-hidden="true"></i> Current Database Being Designed</a>
         @else
             <a href="/dashboard/db/switch/{{ $db->DbID }}" class="btn btn-lg btn-primary pull-right"

@@ -27,7 +27,7 @@
     and the right side details how it all gets into the database.
     </p>
     <div class="pull-right mBn20">
-        <a href="javascript:void(0)" class="adminAboutTog" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
+        <a href="javascript:;" class="adminAboutTog" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
     
 </div> <!-- end jumbotron -->

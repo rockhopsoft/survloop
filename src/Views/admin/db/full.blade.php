@@ -61,7 +61,7 @@
 
 @if (!$isPrint)
 
-    <br /><br /><a href="javascript:void(0)" onClick="document.getElementById('genericFlds').style.display='block'; this.style.display='none';" 
+    <br /><br /><a href="javascript:;" onClick="document.getElementById('genericFlds').style.display='block'; this.style.display='none';" 
     class="f16 p20 disBlo" style="border: 1px #0b0b85 solid; -moz-border-radius: 15px; border-radius: 15px;"><b>Show Generic Fields</b></a>
     <br /><br /><div id="genericFlds" class="disNon"><table border=0 cellpadding=5 cellspacing=0 >
     <tr><td colspan=7 class="p5 pL20 row2 f18 gry6"><i>Generic Fields...</i></td></tr>

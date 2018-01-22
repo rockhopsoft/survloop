@@ -12,7 +12,7 @@
     easily setup to automatically store user responses to a specific field in the database.
     </p>
     <div class="pull-right mBn20">
-        <a href="javascript:void(0)" id="adminAboutBtn" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
+        <a href="javascript:;" id="adminAboutBtn" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
     
 </div> <!-- end jumbotron -->

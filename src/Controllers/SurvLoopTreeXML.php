@@ -76,11 +76,9 @@ class SurvLoopTreeXML extends CoreTree
         }
         $GLOBALS["SL"]->pageAJAX .= '$(".xmlDataChng").click(function(){ 
             if (document.getElementById("xmlNodeTypeTbl").checked) {
-                $("#xmlDataTbl").slideDown("fast"); 
-                $("#xmlDataWrap").slideUp("fast"); 
+                $("#xmlDataTbl").slideDown("fast"); $("#xmlDataWrap").slideUp("fast"); 
             } else {
-                $("#xmlDataTbl").slideUp("fast"); 
-                $("#xmlDataWrap").slideDown("fast"); 
+                $("#xmlDataTbl").slideUp("fast"); $("#xmlDataWrap").slideDown("fast"); 
             }
         });';
         return view('vendor.survloop.admin.tree.node-edit-xmlmap', [

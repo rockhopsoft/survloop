@@ -21,8 +21,8 @@
 @else action="/dashboard/db/field/{{ $tbl->TblAbbr }}/{{ $fld->FldName }}"
 @endif
 >
-<input type="hidden" name="fldEditForm" value="YES">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" name="mainPageForm" value="YES">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 {!! $fullFldSpecs !!}
 

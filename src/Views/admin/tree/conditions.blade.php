@@ -18,8 +18,8 @@
 
 <div id="addCond" class="disNon" style="overflow: hidden;">
     <div class="round10 brd p20 mB20 mTn20" style="padding-top: 40px;">
-        <form name="nodeEditor" method="post" action="/dashboard/db/conds" >
-        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <form name="mainPageForm" method="post" action="/dashboard/db/conds" >
+        <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="addNewCond" value="1">
         {!! view('vendor.survloop.admin.db.inc-addCondition', [ "newOnly" => true ])->render() !!}
         </form>

@@ -18,13 +18,13 @@
     <a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-default">View Table</a>
 </div>
 
-<form name="tblEdit" method="post"
+<form name="mainPageForm" method="post"
     @if (trim($tblName) == '') action="/dashboard/db/addTable"
     @else action="/dashboard/db/table/{{ $tblName }}/edit"
     @endif
     >
 <input type="hidden" name="tblEditForm" value="YES">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <div class="container">
 
     <fieldset class="form-group">

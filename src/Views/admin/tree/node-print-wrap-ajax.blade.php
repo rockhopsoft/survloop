@@ -12,9 +12,12 @@ $(document).on("click", ".circleBtn", function() {
         if (document.getElementById("nodeBtns"+nID+"").style.display=='inline') {
             document.getElementById("nodeBtns"+nID+"").style.display='none';
             document.getElementById("nodeBtns"+nID+"edit").className='slGrey';
+            document.getElementById("nodeBtnEdit"+nID+"").style.display='inline';
+            
         } else {
             document.getElementById("nodeBtns"+nID+"").style.display='inline';
             document.getElementById("nodeBtns"+nID+"edit").className='slBlueDark';
+            document.getElementById("nodeBtnEdit"+nID+"").style.display='none';
         }
     }
     return true;
@@ -44,8 +47,8 @@ $(document).on("click", ".adminNodeMoveTo", function() {
     @if (!$canEditTree) 
         alert("Sorry, you do not have permissions to actually edit the tree.");
     @else
-        document.nodeManip.action+="#n"+document.getElementById("moveNodeID").value+""; 
-        document.nodeManip.submit();
+        document.mainPageForm.action+="#n"+document.getElementById("moveNodeID").value+""; 
+        document.mainPageForm.submit();
     @endif
     return true;
 });

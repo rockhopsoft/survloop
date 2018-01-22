@@ -10,7 +10,7 @@
             action="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
         @endif
     @endif >
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="ajax" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page') value="0" @else value="1" @endif >
 <input type="hidden" name="tree" id="treeID" value="{{ $GLOBALS['SL']->treeID }}">
 <input type="hidden" name="treeSlug" id="treeSlugID" value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}">
@@ -23,5 +23,6 @@
     <input type="hidden" name="jumpTo" id="jumpToID" value="{{ $nodePrintJumpTo }}">
     <input type="hidden" name="afterJumpTo" id="afterJumpToID" value="-3">
 @endif
-<input type="hidden" name="step" id="stepID" value="next">
+<input type="hidden" name="popStateUrl" id="popStateUrlID" value="">
 <input type="hidden" name="zoomPref" id="zoomPrefID" value="{{ $zoomPref }}">
+<input type="hidden" name="step" id="stepID" value="next">

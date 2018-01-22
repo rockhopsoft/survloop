@@ -10,11 +10,13 @@
 <a href="/dashboard/db/export" class="btn btn-default mR10">MySQL Export</a>
 <a href="/dashboard/db/install" class="btn btn-default mR10">Auto-Install Database Design</a>
 
-<a href="{{ $zipFileMig }}" target="_blank" class="btn btn-lg btn-primary mR10" disabled >Download All: LaravelMigrations.zip</a> 
-<a href="{{ $zipFileModel }}" target="_blank" class="btn btn-lg btn-primary mR10" disabled >Download All: LaravelModels.zip</a>
+<a href="{{ $zipFileMig }}" target="_blank" class="btn btn-sm btn-default mR10" disabled >Download Migrations.zip</a>
+<a href="{{ $zipFileModel }}" target="_blank" class="btn btn-sm btn-default mR10" disabled >Download Models.zip</a>
+<a href="?refreshVendor=1" class="btn btn-sm btn-default mR10" >Push Models to Vendor Folder</a>
+<a href="?refresh=1" class="btn btn-sm btn-default mR10" >Force Refresh</a>
 
 <div class="p5"></div>
-Preview Laravel Migration, Seeder, and Model files. <a href="?refresh=1"><i>Force Refresh</i></a>
+<p>Preview Laravel Migration, Seeder, and Model files:</p>
 <div class="row">
     <div class="col-md-4">
         <textarea class="f12" style="width: 100%; height: 400px;">

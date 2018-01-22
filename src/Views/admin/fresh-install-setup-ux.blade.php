@@ -16,9 +16,10 @@ But for now, <br />please focus on the data you want to collect when visitors la
 </p>
 </center></div>
 
-<form method="POST" @if ($isFresh) action="/fresh/user-experience" @else action="/dashboard/tree/new" @endif >
+<form name="mainPageForm" method="POST" 
+    @if ($isFresh) action="/fresh/user-experience" @else action="/dashboard/tree/new" @endif >
 <input type="hidden" name="freshSub" value="1">
-{!! csrf_field() !!}
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <center><div class="halfPageWidth pT20">
 
 <div class="nodeWrap">

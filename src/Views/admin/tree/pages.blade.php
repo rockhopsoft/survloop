@@ -38,35 +38,43 @@
         <div class="mT20 mB10"><a href="javascript:;" id="newPage" class="btn btn-xs btn-default"
             ><i class="fa fa-plus" aria-hidden="true"></i> Create A New Page</a>
         </div>
-        <div id="newPageForm" class="disNon mB20">
-            <form name="newPageForm" method="post" action="/dashboard/pages/list">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="sub" value="1">
-            <hr>
-            <label for="newPageNameID" class="mT0"><h3 class="mT0">New Page Title:</label></h3>
-            <input type="text" name="newPageName" id="newPageNameID" class="form-control" value="">
-            <div class="p10"></div>
-            <label for="newPageSlugID"><h3 class="disIn">New Page URL:</h3>
-                {{ $GLOBALS['SL']->sysOpts["app-url"] }}/<div id="isNewAdmPag" class="disNon">dash/</div></label>
-            <input type="text" name="newPageSlug" id="newPageSlugID" class="form-control" value="">
-            <div class="p5"></div>
-            <b><label><input type="checkbox" name="pageAdmOnly" value="1"
-                onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
-                else { document.getElementById('isNewAdmPag').style.display='none'; }"> 
-                Admin-Only Page</b></label>
-            <div class="p10"></div>
-            <input type="submit" class="btn btn-lg btn-primary" value="Create Page">
-            </form>
-            <hr class="mB10">
-        </div>
-        <div class="mT20 mB10">
+        <div id="newPageForm" class="mB20 disNon">
+            <div class="row row2 pT20 pB20 mB20">
+                <form name="mainPageForm" method="post" action="/dashboard/pages/list">
+                <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="sub" value="1">
+                <div class="col-md-8">
+                    <label for="newPageNameID" class="mT0"><h3 class="mT0">New Page Title:</label></h3>
+                    <input type="text" name="newPageName" id="newPageNameID" class="form-control" value="" 
+                        autocomplete="off">
+                    <div class="p10"></div>
+                    <label for="newPageSlugID"><h3 class="disIn">New Page URL:</h3>
+                        {{ $GLOBALS['SL']->sysOpts["app-url"] }}/<div id="isNewAdmPag" class="disNon">dash/</div></label>
+                    <input type="text" name="newPageSlug" id="newPageSlugID" class="form-control" value="" 
+                        autocomplete="off">
+                    <div class="p10"></div>
+                    <input type="submit" class="btn btn-lg btn-primary" value="Create New Page">
+                </div><div class="col-md-4">
+                    <label class="disBlo mT10"><input type="checkbox" name="pageAdmOnly" value="1" class="mR5"
+                        onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
+                        else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
+                        Admin-Only Page</label>
+                    <label class="disBlo mT10"><input type="checkbox" name="pageIsReport" value="1" class="mR5"
+                        onClick="if (this.checked) { document.getElementById('reportPageTreeID').style.display='block'; } 
+                        else { document.getElementById('reportPageTreeID').style.display='none'; }" autocomplete="off"> 
+                        Report for Form Tree
+                        <select name="reportPageTree" id="reportPageTreeID" class="form-control disNon" 
+                            autocomplete="off">{!! $GLOBALS["SL"]->allTreeDropOpts() !!}
+                        </select>
+                    </label>
+                </div>
+                </form>
+            </div>
             @if (!$autopages["contact"])
                 <a class="btn btn-xs btn-default fL" href="/dashboard/pages/list/add-contact"
                     >Auto-Create: Contact Page</a>
             @endif
-            <div class="fC"></div>
         </div>
-        
     </div>
     <div class="col-md-1"></div>
     <div class="col-md-4">
@@ -89,7 +97,7 @@
         </div>
         <div id="newBlurbForm" class="disNon">
             <form name="newBlurbForm" method="post" action="/dashboard/pages/list">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="sublurb" value="1">
             <hr>
             <label for="newPageNameID" class="mT0"><h3 class="mT0">New Excerpt Name:</label></h3>

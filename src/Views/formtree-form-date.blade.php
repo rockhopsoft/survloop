@@ -1,6 +1,7 @@
 <!-- Stored in resources/views/survloop/formtree-form-date.blade.php -->
 
-<input type="hidden" name="n{{ $nID }}fld" id="n{{ $nID }}FldID" value="{{ $dateStr }}" >
+<input type="hidden" name="n{{ $nID }}fld" id="n{{ $nID }}FldID" value="{{ $dateStr }}" 
+    class=" @if (isset($xtraClass)) {{ $xtraClass }} @endif " data-nid="{{ $nID }}" >
 <div class="timeWrap"><nobr>
     <select name="n{{ $nID }}fldMonth" id="n{{ $nID }}fldMonthID" onChange="formDateChange('{{ $nID }}');" 
         class="form-control input-lg fL mR20" style="width: 120px;">

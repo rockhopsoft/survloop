@@ -31,8 +31,8 @@
 
 <div class="p20"></div>
 
-<form name="runMysql" method="post" action="/dashboard/db/db/db">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" method="post" action="/dashboard/db/db/db">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <textarea name="mys" class="w100 f12" style="height: 250px;"></textarea>
 

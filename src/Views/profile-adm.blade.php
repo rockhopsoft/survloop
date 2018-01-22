@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="fC p20"></div>
-<form name="deptEditor" action="/dashboard/volun/user/{{ $profileUser->id }}" method="post">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/volun/user/{{ $profileUser->id }}" method="post">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="uID" value="{{ $profileUser->id }}">
 
 <h2>Profile: {{ $profileUser->name }}</h2>

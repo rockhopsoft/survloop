@@ -4,44 +4,30 @@
 
 <div class="p10 fC"></div>
 
-<form name="nodeEditor" method="post" 
+<form name="mainPageForm" method="post" 
     @if (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
         action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->NodeID }}"
     @else
         action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-3"
-    @endif
-    >
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+    @endif >
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="sub" value="1">
 <input type="hidden" name="treeID" value="{{ $GLOBALS['SL']->treeID }}">
 <input type="hidden" name="nodeParentID" 
-    @if ($REQ->has('parent') && intVal($REQ->input('parent')) > 0) 
-        value="{{ $REQ->input('parent') }}"
-    @else 
-        value="{{ $node->parentID }}"
-    @endif
-    >
+    @if ($REQ->has('parent') && intVal($REQ->input('parent')) > 0) value="{{ $REQ->input('parent') }}"
+    @else value="{{ $node->parentID }}" @endif >
 <input type="hidden" name="childPlace" 
-    @if ($REQ->has('start') && intVal($REQ->input('start')) > 0) 
-        value="start"
-    @else 
-        @if ($REQ->has('end') && intVal($REQ->input('end')) > 0) value="end" @else value="" @endif
-    @endif
-    >
+    @if ($REQ->has('start') && intVal($REQ->input('start')) > 0) value="start"
+    @elseif ($REQ->has('end') && intVal($REQ->input('end')) > 0) value="end" 
+    @else value="" @endif >
 <input type="hidden" name="orderBefore" 
-    @if ($REQ->has('ordBefore') && intVal($REQ->ordBefore) > 0) 
-        value="{{ $REQ->ordBefore }}"
-    @else 
-        value="-3"
-    @endif
-    >
+    @if ($REQ->has('ordBefore') && intVal($REQ->ordBefore) > 0) value="{{ $REQ->ordBefore }}"
+    @else value="-3"
+    @endif >
 <input type="hidden" name="orderAfter" 
-    @if ($REQ->has('ordAfter') && intVal($REQ->ordAfter) > 0) 
-        value="{{ $REQ->ordAfter }}"
-    @else 
-        value="-3"
-    @endif
-    >
+    @if ($REQ->has('ordAfter') && intVal($REQ->ordAfter) > 0) value="{{ $REQ->ordAfter }}"
+    @else value="-3"
+    @endif >
 
 <div class="panel panel-info">
     <div class="panel-heading">
@@ -73,7 +59,8 @@
                 </label>
             </div>
             <div class="col-md-6">
-                <div id="xmlDataTbl" class=" @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disNon @else disBlo @endif ">
+                <div id="xmlDataTbl" class=" 
+                    @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disNon @else disBlo @endif ">
                     <select name="nodePromptText" id="nodePromptTextID" class="form-control">
                         {!! $GLOBALS['SL']->tablesDropdown($node->nodeRow->NodePromptText) !!}
                     </select>
@@ -94,17 +81,21 @@
                             > Include members with parent, without table wrap
                     </label>
                 </div>
-                <div id="xmlDataWrap" class="mT20 pT20 @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disBlo @else disNon @endif ">
-                    <input type="text" name="wrapPromptText" id="wrapPromptTextID" class="form-control" value="{{ $node->nodeRow->NodePromptText }}">
+                <div id="xmlDataWrap" class="mT20 pT20 
+                    @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disBlo @else disNon @endif ">
+                    <input type="text" name="wrapPromptText" id="wrapPromptTextID" class="form-control" 
+                        value="{{ $node->nodeRow->NodePromptText }}">
                 </div>
             </div>
             <div class="col-md-4 taR">
-                <input type="submit" value="Save Node Changes" class="btn btn-lg btn-primary f22" @if (!$canEditTree) DISABLED @endif >
+                <input type="submit" value="Save Node Changes" class="btn btn-lg btn-primary f22" 
+                    @if (!$canEditTree) DISABLED @endif >
             </div>
         </div>
     </div>
 </div>
 @if ($node->nodeRow->NodeID > 0)
-    <br /><input type="checkbox" name="deleteNode" id="deleteNodeID" value="1" > <label for="deleteNodeID">Delete This Node</label><br />
+    <br /><input type="checkbox" name="deleteNode" id="deleteNodeID" value="1" > 
+    <label for="deleteNodeID">Delete This Node</label><br />
 @endif
 </form>

@@ -24,7 +24,7 @@
             <div class="w100 disBlo BGblueLight vaM" style="height: {{ (2+$height) }}px;">
                 <a href="{{ $upDeets['filePub'] }}" target="_blank" 
                     class="disBlo w100 taC vaM fPerc133 wht" style="height: {{ $height }}px;"
-                    ><div class="f60 wht"><i class="fa fa-file-pdf-o"></i></div>
+                    ><div class="f60 wht pT20"><i class="fa fa-file-pdf-o"></i></div>
                     @if (strlen($upRow->upFile) > 40) <h4 class="wht">{{ $upRow->upFile }}</h4>
                     @else <h3 class="wht">{{ $upRow->upFile }}</h3>
                     @endif

@@ -10,8 +10,8 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
 @section('content')
 
 @if ($dbAllowEdits)
-    <form name="defEdit" action="{{ $formURL }}" method="post" autocomplete="off">
-    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <form name="mainPageForm" action="{{ $formURL }}" method="post" autocomplete="off">
+    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <input type="hidden" name="ruleEditForm" value="YES">
 @endif
 

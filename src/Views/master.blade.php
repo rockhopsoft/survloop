@@ -1,4 +1,4 @@
-<!doctype html><html xmlns:fb="http://www.facebook.com/2008/fbml"><head>
+<!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,16 +20,25 @@
     <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
     
-    <meta name="twitter:card" content="summary"/>
+    
+    <meta name="twitter:card" content="summary_large_image">
+    @if (isset($GLOBALS['SL']->sysOpts['twitter']) && !in_array(trim($GLOBALS['SL']->sysOpts['twitter']), ['', '@']))
+    <meta name="twitter:site" content="{{ $GLOBALS['SL']->sysOpts['twitter'] }}">
+    <meta name="twitter:creator" content="{{ $GLOBALS['SL']->sysOpts['twitter'] }}">
+    @endif
     <meta name="twitter:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}"/>
     <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
     <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
-
+    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
+    
 @endif
 
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys-all.min.css" rel="stylesheet">
 @else
+    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
@@ -37,12 +46,14 @@
     <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-ui-1.12.1/jquery-ui.min.css">
     @endif
     <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
+        }}/sys2.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
 @endif
 
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys-all.min.js" type="text/javascript"></script>
 @else 
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-3.2.1.min.js"></script>
     @if ((isset($needsJqUi) && $needsJqUi) || true)
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
@@ -50,8 +61,9 @@
     @endif
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/js/bootstrap.min.js"></script>
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js" type="text/javascript"></script>
+    {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+        }}/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
@@ -99,7 +111,8 @@
 @endif
 
 
-@if (!isset($isPrint) || !$isPrint)
+@if ((!isset($isPrint) || !$isPrint) 
+    && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
     <ul id="mySideUL" class="nav nav-sidebar">
@@ -115,12 +128,9 @@
     <div id="myNavBarIn" class="container-fluid">
         @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
             <a id="slLogo" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-                <?php /* @if (file_exists(substr($GLOBALS['SL']->sysOpts['logo-img-lrg'], 1))) */ ?>
-                    ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
-                    alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" 
-                    title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" >
-                <?php /* @else style="margin-top: 0px;"><b class="slBlueLight">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</b> 
-                @endif */ ?> </a>
+                ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
+                alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" 
+                title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" ></a>
         @endif
         @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
             && trim($GLOBALS['SL']->sysOpts['show-logo-title']) == 'On')
@@ -135,7 +145,9 @@
     <div id="progWrap"></div>
 </nav>
 <div id="headClear" class="clearfix"></div>
-<div id="headGap"><img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.gif" border=0 ></div>
+<div id="headGap">
+    <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+</div>
 
 <noscript><div class="alert alert-dismissible alert-warning">
     <b>Warning: It looks like you have Javascript disabled. {{ $GLOBALS['SL']->sysOpts['site-name'] }} 
@@ -162,7 +174,7 @@
         @if (isset($admMenuHideable) && $admMenuHideable)
             <div id="admMenuBarsWrap" style="margin: -15px 0px 0px -3px; z-index: 100; position: fixed;">
                 <a id="admMenuBars" class="btn btn-lg btn-primary f18" style="padding: 10px 10px 5px 10px;" 
-                    href="javascript:void(0)"><i class="fa fa-bars"></i></a>
+                    href="javascript:;"><i class="fa fa-bars"></i></a>
             </div>
             <script type="text/javascript">
                 $(document).ready(function(){
@@ -194,7 +206,7 @@
         
         <div class="container-fluid mT10">
             <div class="row">
-                <div id="leftSide" class="col-md-2">
+                <div id="leftSide" class="col-md-2 h100 brdRgt">
                     <div class="disNon"><form class="navbar-form navbar-right"></div>
                         <input type="text" class="form-control" placeholder="Search...">
                     <div class="disNon"></form></div>
@@ -237,11 +249,16 @@
     @if (!isset($hasContain) || !$hasContain) <div id="bodyContain" class="container"> @endif
         @if (isset($content)) {!! $content !!} @endif
         @yield('content')
-    @if (!isset($hasContain) || !$hasContain) </div> @endif
+    @if (!isset($hasContain) || !$hasContain) </div> <!-- end bodyContain --> @endif
     
 @endif
 
-@if (!isset($isPrint) || !$isPrint)
+@if ((!isset($isPrint) || !$isPrint)
+    && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
+
+@if (!isset($admMenu) && !isset($belowAdmMenu)) 
+    @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
+@endif
 
 </div> <!-- end nondialog -->
 <div id="dialog">
@@ -256,11 +273,7 @@
     </div>
 </div>
 
-@endif <?php /* end not print */ ?>
-
-@if (!isset($admMenu) && !isset($belowAdmMenu)) 
-    @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
-@endif
+@endif <?php /* end not print or frame */ ?>
 
 </div> <!-- end #main (non-offcanvas-menu) -->
 

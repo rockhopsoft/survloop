@@ -6,7 +6,7 @@
         ,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
     @endif
     <nobr>{!! $fld[1] !!}
-    <a href="javascript:void(0)" onClick="return delFld({{ $fld[0] }});" 
+    <a href="javascript:;" onClick="return delFld({{ $fld[0] }});" 
         class="red f12 mL5"><span class="glyphicon glyphicon-remove"></span></a></nobr>
 @empty
 @endforelse
@@ -21,7 +21,7 @@ function delFld(delF) { $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/{{ $
 
 @if (intVal($addT) > 0)
     <select name="addF" id="addFID">{!! $fldDrop !!}</select>
-    <a href="javascript:void(0)" id="addFbtn"><i class="fa fa-plus-circle"></i></a>
+    <a href="javascript:;" id="addFbtn"><i class="fa fa-plus-circle"></i></a>
     <script type="text/javascript"> 
     $(document).ready(function(){ $("#addFbtn").click(function(){
         $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/{{ $rF }}?addF="+document.getElementById("addFID").value+""); });

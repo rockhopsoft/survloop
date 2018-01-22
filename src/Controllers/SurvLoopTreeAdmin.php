@@ -41,7 +41,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     {
         $this->survLoopInit($request, $currPage);
         $resLimit = 60;
-        $node = [];
+        $node = $parent = [];
         if ($nodeIN > 0) {
             $node = $this->loadNode(SLNode::find($nodeIN));
             $node->fillNodeRow($nodeIN);
@@ -49,7 +49,9 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if ($nodeIN <= 0 || !$node || sizeof($node) == 0) {
             $node = $this->loadNode();
             $node->nodeRow->NodeTree        = $GLOBALS["SL"]->treeID;
-            $node->nodeRow->NodeParentID    = $GLOBALS["SL"]->REQ->nodeParentID;
+            $node->nodeRow->NodeParentID    = (($GLOBALS["SL"]->REQ->has('parent')) ? $GLOBALS["SL"]->REQ->parent 
+                : (($GLOBALS["SL"]->REQ->has('nodeParentID')) ? $GLOBALS["SL"]->REQ->nodeParentID : -3));
+            $node->parentID = $node->nodeRow->NodeParentID;
             $node->nodeRow->NodeParentOrder = 0;
             $node->nodeRow->NodeOpts        = 1;
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
@@ -57,11 +59,27 @@ class SurvLoopTreeAdmin extends SurvFormTree
             } else {
                 $node->nodeRow->NodeType    = 'Text';
             }
+            if ($node->parentID > 0) {
+                $parent = (($node->parentID > 0) ? SLNode::find($node->parentID) : []);
+                if ($parent && isset($parent->NodeType)) {
+                    if ($parent->NodeType == 'Data Print Block') {
+                        $node->nodeRow->NodeType = 'Data Print Row';
+                    } elseif ($parent->NodeType == 'Loop Cycle') {
+                        $grandParent = (($parent->NodeParentID > 0) ? SLNode::find($parent->NodeParentID) : []);
+                        if ($grandParent && isset($grandParent->NodeType) 
+                            && $grandParent->NodeType == 'Data Print Block') {
+                            $node->nodeRow->NodeType = 'Data Print Row';
+                        }
+                    }
+                }
+            }
             $node->nodeType = $node->nodeRow->NodeType;
         }
+        $parent = (($node->parentID > 0) ? SLNode::find($node->parentID) 
+            : (($GLOBALS["SL"]->REQ->has('parent')) ? SLNode::find($GLOBALS["SL"]->REQ->parent) : []));
         //echo '<pre>'; print_r($node->dataManips); echo '</pre>';
         if ($GLOBALS["SL"]->REQ->has('sub') && $this->canEditTree) {
-            if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
+            if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->get('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
                 if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
@@ -71,55 +89,91 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
                 }
                 elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
-                    if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->input('opts'.$o.'')) == $o
+                    if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o
                         && (!in_array($o, $optsDesktop) || $node->nodeRow->NodeOpts%2 == 0)) {
                         if ($node->nodeRow->NodeOpts%$o > 0) $node->nodeRow->NodeOpts *= $o;
                     } elseif ($node->nodeRow->NodeOpts%$o == 0) {
                         $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/$o;
                     }
                 }
-                
-                $node->nodeRow->NodePromptText      = trim($GLOBALS["SL"]->REQ->input('nodePromptText'));
-                $node->nodeRow->NodePromptNotes     = trim($GLOBALS["SL"]->REQ->input('nodePromptNotes'));
-                $node->nodeRow->NodePromptAfter     = trim($GLOBALS["SL"]->REQ->input('nodePromptAfter'));
-                $node->nodeRow->NodeInternalNotes   = trim($GLOBALS["SL"]->REQ->input('nodeInternalNotes'));
-                $node->nodeRow->NodeDefault         = trim($GLOBALS["SL"]->REQ->input('nodeDefault'));
-                $node->nodeRow->NodeTextSuggest     = trim($GLOBALS["SL"]->REQ->input('nodeTextSuggest'));
-                $node->nodeRow->NodeDataBranch      = trim($GLOBALS["SL"]->REQ->input('nodeDataBranch'));
-                $node->nodeRow->NodeDataStore       = trim($GLOBALS["SL"]->REQ->input('nodeDataStore'));
-                $node->nodeRow->NodeCharLimit       = intVal($GLOBALS["SL"]->REQ->input('nodeCharLimit'));
-                if (($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeParentID <= 0)
-                    || $GLOBALS["SL"]->REQ->nodeType == 'page') {
+                $isPageRoot = ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeParentID <= 0);
+                $node->nodeRow->NodePromptText      = trim($GLOBALS["SL"]->REQ->get('nodePromptText'));
+                $node->nodeRow->NodePromptNotes     = trim($GLOBALS["SL"]->REQ->get('nodePromptNotes'));
+                $node->nodeRow->NodePromptAfter     = trim($GLOBALS["SL"]->REQ->get('nodePromptAfter'));
+                $node->nodeRow->NodeInternalNotes   = trim($GLOBALS["SL"]->REQ->get('nodeInternalNotes'));
+                $node->nodeRow->NodeDefault         = trim($GLOBALS["SL"]->REQ->get('nodeDefault'));
+                $node->nodeRow->NodeTextSuggest     = trim($GLOBALS["SL"]->REQ->get('nodeTextSuggest'));
+                $node->nodeRow->NodeDataBranch      = trim($GLOBALS["SL"]->REQ->get('nodeDataBranch'));
+                $node->nodeRow->NodeDataStore       = trim($GLOBALS["SL"]->REQ->get('nodeDataStore'));
+                $node->nodeRow->NodeCharLimit       = intVal($GLOBALS["SL"]->REQ->get('nodeCharLimit'));
+                if (in_array($GLOBALS["SL"]->REQ->nodeType, ['page', 'loop']) || $isPageRoot) {
+                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->get('nodeSlug'));
+                    $metaDesc = trim($GLOBALS["SL"]->REQ->get('pageDesc'));
+                    if ($metaDesc == $GLOBALS["SL"]->sysOpts["meta-desc"]) $metaDesc = '';
+                    $metaWords = trim($GLOBALS["SL"]->REQ->get('pageKeywords'));
+                    if ($metaWords == $GLOBALS["SL"]->sysOpts["meta-keywords"]) $metaWords = '';
+                    $metaImg = trim($GLOBALS["SL"]->REQ->get('pageImg'));
+                    if (strpos($metaImg, $GLOBALS['SL']->sysOpts['app-url']) === 0) {
+                        $metaImg = str_replace($GLOBALS['SL']->sysOpts['app-url'], '', $metaImg);
+                    }
+                    if ($metaImg == $GLOBALS["SL"]->sysOpts["meta-img"]) $metaImg = '';
+                    $node->nodeRow->NodePromptAfter  = trim($GLOBALS["SL"]->REQ->get('pageTitle')) . '::M::' 
+                        . $metaDesc . '::M::' . $metaWords . '::M::' . $metaImg;
+                }
+                if ($GLOBALS["SL"]->REQ->nodeType == 'page' || $isPageRoot) {
                     $node->nodeRow->NodeType        = 'Page';
-                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->input('nodeSlug'));
-                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->input('pageFocusField'));
+                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->get('pageFocusField'));
+                    if ($isPageRoot) {
+                        if ($GLOBALS["SL"]->REQ->has('reportPage') && intVal($GLOBALS["SL"]->REQ->reportPage) == 13) {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%13 > 0) {
+                                $GLOBALS["SL"]->treeRow->TreeOpts *= 13;
+                                $GLOBALS["SL"]->treeRow->save();
+                            }
+                            if ($GLOBALS["SL"]->REQ->has('reportPageTree') 
+                                && intVal($GLOBALS["SL"]->REQ->reportPageTree) > 0) {
+                                $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->reportPageTree;
+                            } else {
+                                $node->nodeRow->NodeResponseSet = null;
+                            }
+                        } else {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) {
+                                $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/13;
+                                $GLOBALS["SL"]->treeRow->save();
+                            }
+                            $node->nodeRow->NodeResponseSet = null;
+                        }
+                    }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'branch') {
                     $node->nodeRow->NodeType = 'Branch Title';
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('branchTitle'));
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('branchTitle'));
                 } elseif (in_array($GLOBALS["SL"]->REQ->nodeType, ['instruct', 'instructRaw'])) {
                     $node->nodeRow->NodeType        = 'Instructions' 
                         . (($GLOBALS["SL"]->REQ->nodeType == 'instructRaw') ? ' Raw' : '');
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('nodeInstruct'));
-                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->input('instrPromptAfter'));
-                    if ($GLOBALS["SL"]->REQ->has('opts37') && intVal($GLOBALS["SL"]->REQ->input('opts37')) == 37) {
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeInstruct'));
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('instrPromptAfter'));
+                    if ($GLOBALS["SL"]->REQ->has('opts37') && intVal($GLOBALS["SL"]->REQ->get('opts37')) == 37) {
                         if ($node->nodeRow->NodeOpts%37 > 0) $node->nodeRow->NodeOpts *= 37;
                     } elseif ($node->nodeRow->NodeOpts%37 == 0) {
                         $node->nodeRow->NodeOpts    = $node->nodeRow->NodeOpts/37;
                     }
+                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'dataPrint') {
+                    $node->nodeRow->NodeType        = trim($GLOBALS["SL"]->REQ->get('nodeTypeD'));
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('nodeDataPull'));
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeDataBlcTitle'));
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('nodeDataHideIf'));
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'heroImg') {
                     $node->nodeRow->NodeType        = 'Hero Image';
-                    $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->input('pageHeroImg'));
-                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->input('pageHeroImgTxt'));
-                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->input('pageHeroImgBtn'));
-                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->input('pageHeroImgUrl'));
+                    $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->get('pageHeroImg'));
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('pageHeroImgTxt'));
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('pageHeroImgBtn'));
+                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->get('pageHeroImgUrl'));
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'loop') {
                     $node->nodeRow->NodeType        = 'Loop Root';
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->input('nodeLoopInstruct'));
-                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->input('loopSlug'));
-                    $node->nodeRow->NodeDataBranch  = $loop = trim($GLOBALS["SL"]->REQ->input('nodeDataLoop'));
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeLoopInstruct'));
+                    $node->nodeRow->NodeDataBranch  = $loop = trim($GLOBALS["SL"]->REQ->get('nodeDataLoop'));
                     if (!isset($GLOBALS["SL"]->dataLoops[$loop])) {
                         $GLOBALS["SL"]->dataLoops[$loop] = new SLDataLoop;
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTree = $this->treeID;
@@ -132,21 +186,21 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 0;
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 1;
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld = '';
-                    if ($GLOBALS["SL"]->REQ->has('stepLoop') && intVal($GLOBALS["SL"]->REQ->input('stepLoop')) == 1) {
+                    if ($GLOBALS["SL"]->REQ->has('stepLoop') && intVal($GLOBALS["SL"]->REQ->get('stepLoop')) == 1) {
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 1;
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
                         if ($GLOBALS["SL"]->REQ->has('stepLoopDoneField') 
-                            && trim($GLOBALS["SL"]->REQ->input('stepLoopDoneField')) != '') {
+                            && trim($GLOBALS["SL"]->REQ->get('stepLoopDoneField')) != '') {
                             $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld 
-                                = trim($GLOBALS["SL"]->REQ->input('stepLoopDoneField'));
+                                = trim($GLOBALS["SL"]->REQ->get('stepLoopDoneField'));
                         }
                     } elseif (!$GLOBALS["SL"]->REQ->has('stdLoopAuto') 
-                        || intVal($GLOBALS["SL"]->REQ->input('stdLoopAuto')) == 0) {
+                        || intVal($GLOBALS["SL"]->REQ->get('stdLoopAuto')) == 0) {
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
                     }
                     $GLOBALS["SL"]->dataLoops[$loop]->save();
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'cycle') {
-                    $loop = trim($GLOBALS["SL"]->REQ->input('nodeDataCycle'));
+                    $loop = trim($GLOBALS["SL"]->REQ->get('nodeDataCycle'));
                     $node->nodeRow->NodeType        = 'Loop Cycle';
                     $node->nodeRow->NodeResponseSet = 'LoopItems::' . $loop;
                     if (trim($node->nodeRow->NodeDataBranch) == '' && $loop != '') {
@@ -154,18 +208,18 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'sort') {
                     $node->nodeRow->NodeType        = 'Loop Sort';
-                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->input('nodeDataSort'));
-                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->input('DataStoreSort'));
+                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->get('nodeDataSort'));
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('DataStoreSort'));
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'data') {
-                    $node->nodeRow->NodeType        = 'Data Manip: ' . $GLOBALS["SL"]->REQ->input('dataManipType');
-                    if ($GLOBALS["SL"]->REQ->input('dataManipType') == 'Close Sess') {
-                        $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->input('dataManipCloseSessTree');
+                    $node->nodeRow->NodeType        = 'Data Manip: ' . $GLOBALS["SL"]->REQ->get('dataManipType');
+                    if ($GLOBALS["SL"]->REQ->get('dataManipType') == 'Close Sess') {
+                        $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->get('dataManipCloseSessTree');
                     } else {
-                        $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->input('manipMoreStore'));
-                        $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->input('manipMoreVal'));
-                        $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->input('manipMoreSet'));
+                        $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('manipMoreStore'));
+                        $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('manipMoreVal'));
+                        $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->get('manipMoreSet'));
                         for ($i=0; $i < $resLimit; $i++) {
-                            if (trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Store')) != '') {
+                            if (trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Store')) != '') {
                                 if (!isset($node->dataManips[$i])) {
                                     $node->dataManips[$i] = new SLNode;
                                     $node->dataManips[$i]->NodeTree        = $this->treeID;
@@ -174,106 +228,143 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                     $node->dataManips[$i]->NodeParentOrder = $i;
                                 }
                                 $node->dataManips[$i]->NodeDataStore 
-                                    = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Store'));
+                                    = trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Store'));
                                 $node->dataManips[$i]->NodeDefault 
-                                    = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Val'));
+                                    = trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Val'));
                                 $node->dataManips[$i]->NodeResponseSet 
-                                    = trim($GLOBALS["SL"]->REQ->input('manipMore' . $i . 'Set'));
+                                    = trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Set'));
                                 $node->dataManips[$i]->save();
                             } else {
                                 if (isset($node->dataManips[$i])) $node->dataManips[$i]->delete();
                             }
                         }
                     }
-                } elseif ($GLOBALS["SL"]->REQ->nodeType == 'survWidget') {
-                    $node->nodeRow->NodeType        = $GLOBALS["SL"]->REQ->nodeSurvWidgetType;
+                } elseif (in_array($GLOBALS["SL"]->REQ->nodeType, ['survWidget', 'sendEmail'])) {
+                    $node->nodeRow->NodeType        = (($GLOBALS["SL"]->REQ->nodeType == 'sendEmail') ? 'Send Email'
+                        : $GLOBALS["SL"]->REQ->nodeSurvWidgetType);
                     $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->nodeSurvWidgetTree;
                     $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->nodeSurvWidgetLimit);
                     $node->nodeRow->NodePromptText  = $GLOBALS["SL"]->REQ->nodeSurvWidgetPre;
                     $node->nodeRow->NodePromptAfter = $GLOBALS["SL"]->REQ->nodeSurvWidgetPost;
                     if ($node->nodeRow->NodeType == 'Send Email') {
-                        $node->nodeRow->NodePromptAfter = '::TO::' . (($GLOBALS["SL"]->REQ->has('widgetEmailTo')) 
+                        $node->nodeRow->NodePromptNotes = '::TO::' . (($GLOBALS["SL"]->REQ->has('widgetEmailTo')) 
                                 ? implode(',', $GLOBALS["SL"]->REQ->widgetEmailTo) : '')
                             . '::CC::' . (($GLOBALS["SL"]->REQ->has('widgetEmailCC')) 
                                 ? implode(',', $GLOBALS["SL"]->REQ->widgetEmailCC) : '')
                             . '::BCC::' . (($GLOBALS["SL"]->REQ->has('widgetEmailBCC')) 
                                 ? implode(',', $GLOBALS["SL"]->REQ->widgetEmailBCC) : '');
-                        //$node->nodeRow->NodeDefault = (($GLOBALS["SL"]->REQ->has('widgetEmaDef')) 
-                        //    ? $GLOBALS["SL"]->REQ->widgetEmaDef : -3);
+                        $node->nodeRow->NodeDefault = (($GLOBALS["SL"]->REQ->has('widgetEmaDef')) 
+                            ? $GLOBALS["SL"]->REQ->widgetEmaDef : -3);
+                    } elseif (in_array($node->nodeRow->NodeType, ['Plot Graph', 'Line Graph'])) {
+                        $node->nodeRow->NodePromptNotes = '::Y::' . (($GLOBALS["SL"]->REQ->has('nodeWidgGrphY')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgGrphY : '') . '::Ylab::' 
+                            . (($GLOBALS["SL"]->REQ->has('nodeWidgGrphYlab')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgGrphYlab : '') . '::X::' 
+                            . (($GLOBALS["SL"]->REQ->has('nodeWidgGrphX')) ? $GLOBALS["SL"]->REQ->nodeWidgGrphX : '') 
+                            . '::Xlab::' . (($GLOBALS["SL"]->REQ->has('nodeWidgGrphXlab')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgGrphXlab : '') 
+                            . '::Cnd::' . (($GLOBALS["SL"]->REQ->has('nodeWidgConds')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgConds : '');
+                    } elseif (in_array($node->nodeRow->NodeType, ['Bar Graph'])) {
+                        $node->nodeRow->NodePromptNotes = '::Y::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarY')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarY : '') . '::Ylab::' 
+                            . (($GLOBALS["SL"]->REQ->has('nodeWidgBarYlab')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarYlab : '') . '::Lab1::' 
+                            . (($GLOBALS["SL"]->REQ->has('nodeWidgBarL1')) ? $GLOBALS["SL"]->REQ->nodeWidgBarL1 : '')
+                            . '::Lab2::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarL2')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarL2 : '')
+                            . '::Clr1::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarC1')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarC1 : '')
+                            . '::Clr2::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarC2')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarC2 : '')
+                            . '::Opc1::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarO1')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarO1 : '')
+                            . '::Opc2::' . (($GLOBALS["SL"]->REQ->has('nodeWidgBarO2')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgBarO2 : '')
+                            . '::Hgt::' . (($GLOBALS["SL"]->REQ->has('nodeWidgHgt')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgHgt : '')
+                            . '::Cnd::' . (($GLOBALS["SL"]->REQ->has('nodeWidgConds')) 
+                            ? $GLOBALS["SL"]->REQ->nodeWidgConds : '');
+                    } elseif (in_array($node->nodeRow->NodeType, ['Pie Chart'])) {
+                        $node->nodeRow->NodePromptNotes = '';
+                        
+                    } elseif (in_array($node->nodeRow->NodeType, ['Map'])) {
+                        $node->nodeRow->NodePromptNotes = '';
+                        
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'layout') {
-                    $node->nodeRow->NodeType        = $GLOBALS["SL"]->REQ->nodeLayoutType;
+                    $node->nodeRow->NodeType          = $GLOBALS["SL"]->REQ->nodeLayoutType;
                     if ($node->nodeRow->NodeType == 'Layout Row') {
                         $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->nodeLayoutLimitRow);
                     } elseif ($node->nodeRow->NodeType == 'Layout Column') {
                         $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->nodeLayoutLimitCol);
+                    } elseif ($node->nodeRow->NodeType == 'Layout Table') {
+                        
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'bigButt') {
                     $node->nodeRow->NodeType        = 'Big Button';
-                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->input('bigBtnStyle'));
-                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->input('bigBtnText'));
-                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->input('bigBtnJS'));
+                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->get('bigBtnStyle'));
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('bigBtnText'));
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('bigBtnJS'));
                 } else { // other normal response node
-                    $node->nodeRow->NodeType = trim($GLOBALS["SL"]->REQ->input('nodeTypeQ'));
+                    $node->nodeRow->NodeType = trim($GLOBALS["SL"]->REQ->get('nodeTypeQ'));
                     if ($node->nodeRow->NodeType == 'Drop Down') {
                         $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->dropDownSuggest);
+                    } elseif ($node->nodeRow->NodeType == 'Spreadsheet Table') {
+                        $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->get('nodeDataStoreSprd'));
+                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->get('spreadTblMaxRows'));
                     }
                     $newResponses = array();
-                    if (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-def') {
-                        if (trim($GLOBALS["SL"]->REQ->input('responseDefinition')) != '') {
-                            $node->nodeRow->NodeResponseSet 
-                                = 'Definition::'.$GLOBALS["SL"]->REQ->input('responseDefinition');
-                            $defs = SLDefinitions::where('DefSet', 'Value Ranges')
-                                ->where('DefSubset', $GLOBALS["SL"]->REQ->input('responseDefinition'))
-                                ->orderBy('DefOrder', 'asc')
-                                ->get();
-                            if ($defs && sizeof($defs) > 0) {
-                                foreach ($defs as $i => $def) {
-                                    $newResponses[] = [
-                                        "eng"   => $def->DefValue,
-                                        "value" => $def->DefID, 
-                                        "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')) 
-                                            ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'ShowKids')) : 0),
-                                        "mutEx" => (($GLOBALS["SL"]->REQ->has('response'.$i.'MutEx')) 
-                                            ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'MutEx')) : 0)
-                                    ];
-                                }
+                    $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->postLoopsDropdowns('responseList');
+                    if ($node->nodeRow->NodeResponseSet == '') {
+                        for ($i=0; $i < 20; $i++) {
+                            if ($GLOBALS["SL"]->REQ->has('response' . $i . '') 
+                                && trim($GLOBALS["SL"]->REQ->get('response' . $i . '')) != '') {
+                                $newResponses[] = [
+                                    "eng"   => trim($GLOBALS["SL"]->REQ->get('response' . $i . '')),
+                                    "value" => ((trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) != '') 
+                                        ? trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) 
+                                        : trim($GLOBALS["SL"]->REQ->get('response' . $i . ''))), 
+                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
+                                        && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
+                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
+                                ];
                             }
                         }
-                    } elseif (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-loop') {
-                        if (trim($GLOBALS["SL"]->REQ->input('responseLoopItems')) != '') {
-                            $node->nodeRow->NodeResponseSet 
-                                = 'LoopItems::'.$GLOBALS["SL"]->REQ->input('responseLoopItems');
-                        }
-                    } elseif (trim($GLOBALS["SL"]->REQ->input('responseListType')) == 'auto-tbl') {
-                        if (trim($GLOBALS["SL"]->REQ->input('responseTables')) != '') {
-                            $node->nodeRow->NodeResponseSet = 'Table::'.$GLOBALS["SL"]->REQ->input('responseTables');
-                        }
-                    } else {
-                        $node->nodeRow->NodeResponseSet = '';
-                        for ($i=0; $i < 20; $i++) {
-                            if ($GLOBALS["SL"]->REQ->has('response'.$i.'') 
-                                && trim($GLOBALS["SL"]->REQ->input('response'.$i.'')) != '') {
+                    } elseif (strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
+                        $defs = SLDefinitions::where('DefSet', 'Value Ranges')
+                            ->where('DefSubset', str_replace('Definition::', '', $node->nodeRow->NodeResponseSet))
+                            ->orderBy('DefOrder', 'asc')
+                            ->get();
+                        if ($defs && sizeof($defs) > 0) {
+                            foreach ($defs as $i => $def) {
                                 $newResponses[] = [
-                                    "eng"   => trim($GLOBALS["SL"]->REQ->input('response'.$i.'')),
-                                    "value" => ((trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) != '') 
-                                        ? trim($GLOBALS["SL"]->REQ->input('response'.$i.'Val')) 
-                                        : trim($GLOBALS["SL"]->REQ->input('response'.$i.''))), 
-                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response'.$i.'ShowKids')
-                                        && $GLOBALS["SL"]->REQ->has('kidForkSel'.$i.'')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->input('kidForkSel'.$i.'')) : 0),
-                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response'.$i.'MutEx')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->input('response'.$i.'MutEx')) : 0)
+                                    "eng"   => $def->DefValue,
+                                    "value" => $def->DefID, 
+                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
+                                        && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
+                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
+                                        ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
                                 ];
                             }
                         }
                     }
                     if (in_array($GLOBALS["SL"]->REQ->nodeTypeQ, ['Date', 'Date Picker', 'Date Time'])) {
-                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->input('dateOptRestrict'));
+                        $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->get('dateOptRestrict'));
                     }
                     $node->nodeRow->save();
                     $node->nodeID = $node->nodeRow->NodeID;
                     $this->saveNewResponses($node, $newResponses, $resLimit);
+                    if (in_array($node->nodeRow->NodeType, ['Text:Number', 'Slider'])) {
+                        $this->saveSettingInResponse('numOptMin', $node, -1, 'minVal');
+                        $this->saveSettingInResponse('numOptMax', $node, 1, 'maxVal');
+                        if ($node->nodeRow->NodeType == 'Slider') {
+                            $this->saveSettingInResponse('numIncr', $node, 2, 'incr', 'numUnit');
+                        }
+                    }
                 }
                 if (in_array($GLOBALS["SL"]->REQ->nodeType, ['instruct', 'instructRaw', 'layout'])
                     && $node->nodeRow->NodeOpts%71 == 0) {
@@ -310,7 +401,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0) {
                             $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/3;
                         }
-                        $GLOBALS["SL"]->treeRow->TreeName      = trim($GLOBALS["SL"]->REQ->input('pageTreeName'));
+                        $GLOBALS["SL"]->treeRow->TreeName      = trim($GLOBALS["SL"]->REQ->get('pageTitle'));
                         $GLOBALS["SL"]->treeRow->TreeSlug      = trim($GLOBALS["SL"]->REQ->nodeSlug);
                         $GLOBALS["SL"]->treeRow->TreeFirstPage = $node->nodeRow->NodeID;
                         $GLOBALS["SL"]->treeRow->TreeLastPage  = $node->nodeRow->NodeID;
@@ -381,21 +472,6 @@ class SurvLoopTreeAdmin extends SurvFormTree
             return $this->redir($redir, true);
         }
         
-        $defs = SLDefinitions::where('DefSet', 'Value Ranges')
-            ->select('DefSubset')
-            ->distinct()
-            ->orderBy('DefSubset', 'asc')
-            ->get();
-        $currDefinition = $currLoopItems = $currTblRecs = '';
-        if (isset($node->nodeRow->NodeResponseSet)) {
-            if (strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
-                $currDefinition = str_replace('Definition::', '', $node->nodeRow->NodeResponseSet);
-            } elseif (strpos($node->nodeRow->NodeResponseSet, 'LoopItems::') !== false) {
-                $currLoopItems = str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet);
-            } elseif (strpos($node->nodeRow->NodeResponseSet, 'Table::') !== false) {
-                $currTblRecs = str_replace('Table::', '', $node->nodeRow->NodeResponseSet);
-            }
-        }
         $nodeTypeSel = (($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
             && $node->nodeRow->NodeID == $GLOBALS["SL"]->treeRow->TreeRoot) ? ' DISABLED ' : '');
         $branch = ((isset($node->nodeRow->NodeDataBranch)) ? $node->nodeRow->NodeDataBranch : '');
@@ -446,13 +522,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "canEditTree"    => $this->canEditTree, 
             "treeID"         => $this->treeID, 
             "node"           => $node, 
-            "currDefinition" => $currDefinition, 
-            "currLoopItems"  => $currLoopItems, 
-            "currTblRecs"    => $currTblRecs, 
+            "parentNode"     => $parent,
             "nodeTypes"      => $this->nodeTypes, 
             "REQ"            => $this->REQ, 
             "resLimit"       => $resLimit, 
-            "defs"           => $defs,
+            "defs"           => $GLOBALS["SL"]->allDefSets(),
             "nodeTypeSel"    => $nodeTypeSel, 
             "widgetEmail"    => $widgetEmail,
             "emailList"      => $emailList,
@@ -485,12 +559,41 @@ class SurvLoopTreeAdmin extends SurvFormTree
         return true;
     }
     
+    public function saveSettingInResponse($fldName, $node, $settingInd = 0, $optName = '', $engFldName = '')
+    {
+        if ($optName == '') $optName = $fldName;
+        if ($GLOBALS["SL"]->REQ->has($fldName) && trim($GLOBALS["SL"]->REQ->get($fldName)) != '') {
+            $extraOpt = SLNodeResponses::where('NodeResNode', $node->nodeID)
+                ->where('NodeResOrd', $settingInd)
+                ->first();
+            if (!$extraOpt || !isset($extraOpt->NodeResNode)) {
+                $extraOpt = new SLNodeResponses;
+                $extraOpt->NodeResNode = $node->nodeID;
+                $extraOpt->NodeResOrd  = $settingInd;
+            }
+            $extraOpt->NodeResValue = $GLOBALS["SL"]->REQ->get($fldName);
+            if (trim($engFldName) != '' && $GLOBALS["SL"]->REQ->has($engFldName) 
+                && trim($GLOBALS["SL"]->REQ->get($engFldName)) != '') {
+                $extraOpt->NodeResEng = $GLOBALS["SL"]->REQ->get($engFldName);
+            }
+            $extraOpt->save();
+        } elseif (isset($node->extraOpts[$optName]) && $node->extraOpts[$optName] !== false) {
+            SLNodeResponses::where('NodeResNode', $node->nodeID)
+                ->where('NodeResOrd', $settingInd)
+                ->delete();
+        }
+        return true;
+    }
+    
+    
     protected function adminBasicPrintNode($tierNode = array(), $tierDepth = 0)
     {
         $tierDepth++;
+        if (!isset($this->v["pageCnt"])) $this->v["pageCnt"] = 0;
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
             if ($this->hasNode($tierNode[0])) {
                 $this->allNodes[$tierNode[0]]->fillNodeRow();
+                if ($this->allNodes[$tierNode[0]]->isPage()) $this->v["pageCnt"]++;
                 $nodePromptText = $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText;
                 $styPos = strpos($nodePromptText, '<style>');
                 if ($styPos !== false) {
@@ -511,34 +614,47 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             "nID"        => $tierNode[0],
                             "hideDeets"  => true
                         ])->render() . '</span>';
-                $nodeBtns = view('vendor.survloop.admin.tree.node-print-basic-btns', [
-                        "nID"            => $tierNode[0], 
-                        "node"           => $this->allNodes[$tierNode[0]], 
-                        "tierNode"       => $tierNode, 
-                        "canEditTree"    => $this->canEditTree, 
-                        "isPrint"        => $this->v["isPrint"],
-                        "isAlt"          => $this->v["isAlt"]
-                    ])->render();
-                if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
-                    return view('vendor.survloop.admin.tree.node-print-basic', [
-                        "rootID"         => $this->rootID, 
-                        "nID"            => $tierNode[0], 
-                        "node"           => $this->allNodes[$tierNode[0]], 
-                        "nodePromptText" => $nodePromptText,
-                        "tierNode"       => $tierNode, 
-                        "tierDepth"      => $tierDepth, 
-                        "childrenPrints" => $childrenPrints,
-                        "conditionList"  => $conditionList,
-                        "nodeBtns"       => $nodeBtns,
-                        "REQ"            => $this->REQ,
-                        "canEditTree"    => $this->canEditTree, 
-                        "isPrint"        => $this->v["isPrint"],
-                        "isAll"          => $this->v["isAll"],
-                        "isAlt"          => $this->v["isAlt"],
-                        "instructPrint"  => (($this->allNodes[$tierNode[0]]->isInstruct() 
-                            || $this->allNodes[$tierNode[0]]->isInstructRaw()) 
-                            ? $this->printNodePublic($tierNode[0]) : '')
-                    ])->render();
+                if (!isset($GLOBALS["SL"]->x["hideDisabledNodes"]) || !$GLOBALS["SL"]->x["hideDisabledNodes"]
+                    || strpos($conditionList, '#NodeDisabled') === false) {
+                    $nodeBtns = view('vendor.survloop.admin.tree.node-print-basic-btns', [
+                            "nID"            => $tierNode[0], 
+                            "node"           => $this->allNodes[$tierNode[0]], 
+                            "tierNode"       => $tierNode, 
+                            "canEditTree"    => $this->canEditTree, 
+                            "isPrint"        => $this->v["isPrint"],
+                            "isAlt"          => $this->v["isAlt"]
+                        ])->render();
+                    $nodeBtnExpand = view('vendor.survloop.admin.tree.node-print-basic-btn-expand', [
+                            "nID"            => $tierNode[0], 
+                            "node"           => $this->allNodes[$tierNode[0]], 
+                            "tierNode"       => $tierNode, 
+                            "isPrint"        => $this->v["isPrint"],
+                            "isAlt"          => $this->v["isAlt"]
+                        ])->render();
+                    $instructPrint = str_replace('<div class="nodeHalfGap"></div>', '', 
+                        (($this->allNodes[$tierNode[0]]->isInstruct() || $this->allNodes[$tierNode[0]]->isInstructRaw())
+                            ? $this->printNodePublic($tierNode[0]) : ''));
+                    if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
+                        return view('vendor.survloop.admin.tree.node-print-basic', [
+                            "rootID"         => $this->rootID, 
+                            "nID"            => $tierNode[0], 
+                            "node"           => $this->allNodes[$tierNode[0]], 
+                            "nodePromptText" => $nodePromptText,
+                            "tierNode"       => $tierNode, 
+                            "tierDepth"      => $tierDepth, 
+                            "childrenPrints" => $childrenPrints,
+                            "conditionList"  => $conditionList,
+                            "nodeBtns"       => $nodeBtns,
+                            "nodeBtnExpand"  => $nodeBtnExpand,
+                            "REQ"            => $this->REQ,
+                            "canEditTree"    => $this->canEditTree, 
+                            "isPrint"        => $this->v["isPrint"],
+                            "isAll"          => $this->v["isAll"],
+                            "isAlt"          => $this->v["isAlt"],
+                            "pageCnt"        => $this->v["pageCnt"], 
+                            "instructPrint"  => $instructPrint
+                        ])->render();
+                    }
                 }
             }
         }
@@ -558,16 +674,19 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if ($GLOBALS["SL"]->REQ->has('dataStruct')) {
             
         }
+        
+        //$GLOBALS["SL"]->x["dataTypeStats"]
+        
         if ($pubPrint) {
             return $this->adminBasicPrintNode($this->nodeTiers, -1);
         }
         return view('vendor.survloop.admin.tree.node-print-wrap', [
-            "adminBasicPrint"     => $this->adminBasicPrintNode($this->nodeTiers, -1), 
-            "canEditTree"         => $this->canEditTree,
-            "isPrint"             => $this->v["isPrint"]
+            "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
+            "canEditTree"     => $this->canEditTree,
+            "isPrint"         => $this->v["isPrint"]
             ])->render() . '<script type="text/javascript"> $(document).ready(function(){ ' 
             . view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
-                "canEditTree"         => $this->canEditTree
+                "canEditTree" => $this->canEditTree
             ])->render() . ' }); </script>';
     }
     
@@ -635,6 +754,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     }
                 }
                 if ($this->allNodes[$nID]->nodeType == 'U.S. States') {
+                    $GLOBALS["SL"]->loadStates();
                     foreach ($GLOBALS["SL"]->states->stateList as $abbr => $name) {
                         $ind = sizeof($this->allNodes[$nID]->responses);
                         $this->allNodes[$nID]->responses[$ind] = new SLNodeResponses;
@@ -652,17 +772,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $retVal .= '<span class="slBlueDark f16 mL5">#' . $nID . ' ';
                     if ($this->allNodes[$nID]->isLoopRoot()) $retVal .= '<i class="fa fa-refresh mL5"></i> ';
                     if ($this->allNodes[$nID]->isDataManip()) $retVal .= '<i class="fa fa-database mL5"></i> ';
-                    echo '</span> ';
-                    if ($this->allNodes[$nID]->isBranch())
-                    {
+                    $retVal .= '</span> ';
+                    if ($this->allNodes[$nID]->isBranch()) {
                         $retVal .= '<span class="f20"><span class="slGrey"><i class="fa fa-share-alt"></i> <i>' 
                         . (($nID == $this->rootID) ? 'Tree Root Node' : 'Section Branch') . ':</i></span> <b>' 
                         . $this->allNodes[$nID]->nodeRow->NodePromptText . '</b></span><div class="pT5"><a href="#n' 
                         . $nID . '" id="adminNode' . $nID . 'Expand" class="adminNodeExpand '
                         . 'slBlueLight noUnd f12"><i class="fa fa-expand fa-flip-horizontal"></i></a></div>';
-                    }
-                    else
-                    { // non-branch nodes
+                    } else { // non-branch nodes
                         $retVal .= '<span class="' . ((strlen($this->allNodes[$nID]->nodeRow->NodePromptText) > 100) 
                             ? 'f16' : 'f22') . '">' . strip_tags(str_replace('</div>', ' ', str_replace('</h1>', ' ', 
                             str_replace('</h2>', ' ', $this->allNodes[$nID]->nodeRow->NodePromptText)))) 
@@ -678,7 +795,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                 $stats = $this->adminResponseNodeStatsTxt(strtolower($res), $nodeFinalCnt, 
                                     $nodeAttemptsCnt, $nodeFinalVals, $nodeAttempts, $nodeSess);
                                 if ($this->allNodes[$nID]->nodeResponses[0] != '[U.S.States]' 
-                                    || isset($nodeFinalVals[strtolower($res)]) || isset($nodeAttempts[strtolower($res)])) {
+                                    || isset($nodeFinalVals[strtolower($res)]) 
+                                    || isset($nodeAttempts[strtolower($res)])) {
                                     if (sizeof($this->allNodes[$nID]->nodeResponsesShowKids) > 0 
                                         && in_array($j, $this->allNodes[$nID]->nodeResponsesShowKids)) {
                                         $retVal .= '<li class="mT5 mB20"><span class="f18"><b>' . strip_tags($res)
@@ -728,6 +846,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
         }
         return $retVal;
     }
+    
     public function adminPrintFullTreeStats(Request $request) 
     {
         $this->loadTree();

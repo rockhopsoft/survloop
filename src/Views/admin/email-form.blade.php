@@ -11,8 +11,8 @@
 @endif
 <div class="p5"></div>
 
-<form name="emailEditForm" action="/dashboard/email/{{ $currEmailID }}" method="post">
-<input type="hidden" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" action="/dashboard/email/{{ $currEmailID }}" method="post">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="emailID" value="{{ $currEmailID }}" >
 
 <div class="row pB20">

@@ -31,6 +31,9 @@ a:link, a:visited, a:active, a:hover {
 .slBlueDark, a.slBlueDark:link, a.slBlueDark:visited, a.slBlueDark:active, a.slBlueDark:hover {
 	color: {!! $cssColors["color-main-on"] !!};
 }
+.slBlueLight, a.slBlueLight:link, a.slBlueLight:visited, a.slBlueLight:active, a.slBlueLight:hover {
+	color: {!! $cssColors["color-main-off"] !!};
+}
 h1 { font-size: 200%; }
 h2 { font-size: 175%; }
 h3 { font-size: 150%; }
@@ -38,25 +41,54 @@ h4 { font-size: 125%; }
 h5 { font-size: 110%; }
 .fPerc133 { font-size: 133%; }
 
-.borderBox {
+.borderBox, .borderBoxIn {
     margin: 10px; 
+    padding: 2px;
+    width: 100%;
+    max-width: 700px;
     -moz-border-radius: 10px; border-radius: 10px;
-    border: 2px {!! $cssColors['color-main-bg'] !!} solid;
+    border: 1px {!! $cssColors["color-main-on"] !!} solid;
+}
+.borderBoxIn {
+    margin: 0px;
+    padding: 20px;
+    max-width: 658px;
+}
+.contentBox {
+    padding: 20px;
+    color: {!! $cssColors['color-main-text'] !!};
 }
 #logoImg {
-    margin: 10px;
-    height: 60px;
-    max-width: 600px;
+    height: 75px;
+    max-width: 500px;
+    margin-bottom: 10px;
+}
+
+.btn.btn-primary, .btn.btn-primary:link, .btn.btn-primary:visited, .btn.btn-primary:active, .btn.btn-primary:hover,
+.btn.btn-primary.btn-lg, .btn.btn-primary.btn-lg:link, .btn.btn-primary.btn-lg:visited, .btn.btn-primary.btn-lg:active, .btn.btn-primary.btn-lg:hover,
+.btn.btn-primary.btn-xl, .btn.btn-primary.btn-xl:link, .btn.btn-primary.btn-xl:visited, .btn.btn-primary.btn-xl:active, .btn.btn-primary.btn-xl:hover {
+    background-color: {!! $cssColors["color-main-on"] !!};
+    color: {!! $cssColors["color-main-bg"] !!};
+    -moz-border-radius: 10px; border-radius: 10px;
+    border: 0px none;
+    text-decoration: none;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+.btn.btn-primary.btn-lg, .btn.btn-primary.btn-lg:link, .btn.btn-primary.btn-lg:visited, .btn.btn-primary.btn-lg:active, .btn.btn-primary.btn-lg:hover {
+    padding: 10px 16px;
+    font-size: 18px;
+}
+.btn.btn-primary.btn-xl, .btn.btn-primary.btn-xl:link, .btn.btn-primary.btn-xl:visited, .btn.btn-primary.btn-xl:active, .btn.btn-primary.btn-xl:hover {
+    padding: 15px 20px;
+    font-size: 30px;
 }
 {!! $cssColors['css-dump'] !!}
 </style>
 </head><body>
-<div class="borderBox">
+<div class="borderBox"><div class="borderBoxIn">
     <center><img id="logoImg" src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 ></center>
-    <div class="borderBox" style="padding: 20px; color: {!! $cssColors['color-main-text'] !!};">
-        {!! $emaContent !!}
-    </div>
-</div>
-
+    <div class="contentBox">{!! $emaContent !!}</div>
+</div></div>
 </body></html>

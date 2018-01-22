@@ -103,8 +103,8 @@
                     <div class="pT5"><b class="slGrey pL20">Admin Users:</b></div>
                     @foreach ($emailUsers["admin"] as $usr)
                         <label class="w100"><input type="checkbox" name="widgetEmailBCC[]" value="{{ $usr[0] }}"
-                            @if (isset($node->extraOpts["emailCC"]) 
-                                && in_array(trim($usr[0]), $node->extraOpts["emailCC"])) 
+                            @if (isset($node->extraOpts["emailBCC"]) 
+                                && in_array(trim($usr[0]), $node->extraOpts["emailBCC"])) 
                                 CHECKED @endif class="mR5" > {{ $usr[2] }} 
                                 <span class="slGrey fPerc66">({{ $usr[1] }})</span></label>
                     @endforeach
@@ -113,8 +113,8 @@
                     <div class="pT5"><b class="slGrey pL20">Volunteer Users:</b></div>
                     @foreach ($emailUsers["volun"] as $usr)
                         <label class="w100"><input type="checkbox" name="widgetEmailBCC[]" value="{{ $usr[0] }}"
-                            @if (isset($node->extraOpts["emailCC"]) 
-                                && in_array(trim($usr[0]), $node->extraOpts["emailCC"])) 
+                            @if (isset($node->extraOpts["emailBCC"]) 
+                                && in_array(trim($usr[0]), $node->extraOpts["emailBCC"])) 
                                 CHECKED @endif class="mR5" > {{ $usr[2] }} 
                                 <span class="slGrey fPerc66">({{ $usr[1] }})</span></label>
                     @endforeach
@@ -123,8 +123,8 @@
                     <div class="pT5"><b class="slGrey pL20">Other Users:</b></div>
                     @foreach ($emailUsers["users"] as $usr)
                         <label class="w100"><input type="checkbox" name="widgetEmailBCC[]" value="{{ $usr[0] }}"
-                            @if (isset($node->extraOpts["emailCC"]) 
-                                && in_array(trim($usr[0]), $node->extraOpts["emailCC"])) 
+                            @if (isset($node->extraOpts["emailBCC"]) 
+                                && in_array(trim($usr[0]), $node->extraOpts["emailBCC"])) 
                                 CHECKED @endif class="mR5" > {{ $usr[2] }} 
                                 <span class="slGrey fPerc66">({{ $usr[1] }})</span></label>
                     @endforeach

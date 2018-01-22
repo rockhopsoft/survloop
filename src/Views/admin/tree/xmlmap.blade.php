@@ -18,7 +18,7 @@
 <div class="row mTn20">
     <div class="col-md-4">
         <h3>Data Table XML Map</h3>
-        <a href="javascript:void:;" id="editXmlMap" class="f14"
+        <a href="javascript:;" id="editXmlMap" class="f14"
             ><i class="fa fa-pencil" aria-hidden="true"></i> Edit Map</a></nobr>
         <style> .editXml { display: none; } </style>
     </div>
