@@ -10,21 +10,42 @@ use App\Models\SLDefinitions;
 class SurvLoopInstaller extends Controller
 {
     
-    public function installPageHome()
+    public function checkSysInit()
+    {
+        $chk = SLTree::where('TreeType', 'Page')
+            ->where('TreeOpts', 7)
+            ->first();
+        if (!$chk || !isset($chk->TreeID)) $this->installPageHome();
+        $chk = SLTree::where('TreeType', 'Page')
+            ->where('TreeOpts', (7*3))
+            ->first();
+        if (!$chk || !isset($chk->TreeID)) $this->installPageHome('Dashboard');
+        $chk = SLTree::where('TreeType', 'Page')
+            ->where('TreeOpts', (7*17))
+            ->first();
+        if (!$chk || !isset($chk->TreeID)) $this->installPageHome('Volunteer');
+        $chk = SLTree::where('TreeType', 'Page')
+            ->where('TreeOpts', 23)
+            ->first();
+        if (!$chk || !isset($chk->TreeID)) $this->installPageMyProfile();
+        return true;
+    }
+    
+    public function installPageHome($type = 'Home')
     {
         $newTree = new SLTree;
         $newTree->TreeType     = 'Page';
-        $newTree->TreeName     = 'Home';
-        $newTree->TreeSlug     = 'home';
+        $newTree->TreeName     = $type;
+        $newTree->TreeSlug     = strtolower($type);
         $newTree->TreeDatabase = 1;
         $newTree->TreeUser     = 1;
-        $newTree->TreeOpts     = 7;
+        $newTree->TreeOpts     = (($type == 'Dashboard') ? (7*3) : (($type == 'Volunteer') ? (7*17) : 7));
         $newTree->save();
         $node = new SLNode;
         $node->NodeTree        = $newTree->TreeID;
         $node->NodeParentID    = -3;
         $node->NodeType        = 'Page';
-        $node->NodePromptNotes = 'home';
+        $node->NodePromptNotes = strtolower($type);
         $node->save();
         $newTree->TreeRoot     = $node->NodeID;
         $newTree->save();
@@ -33,6 +54,74 @@ class SurvLoopInstaller extends Controller
         $n->NodeParentID       = $node->NodeID;
         $n->NodeType           = 'Instructions';
         $n->NodePromptText     = '<center><h1 style="margin-top: 50px;">Coming Soon</h1></center>';
+        $n->save();
+        return $newTree;
+    }
+    
+    public function installPageMyProfile()
+    {
+        $newTree = new SLTree;
+        $newTree->TreeType      = 'Page';
+        $newTree->TreeName      = 'My Profile';
+        $newTree->TreeSlug      = 'my-profile';
+        $newTree->TreeDatabase  = 1;
+        $newTree->TreeUser      = 1;
+        $newTree->TreeOpts      = 23;
+        $newTree->save();
+        $nPage = new SLNode;
+        $nPage->NodeTree        = $newTree->TreeID;
+        $nPage->NodeParentID    = -3;
+        $nPage->NodeType        = 'Page';
+        $nPage->NodePromptNotes = 'my-profile';
+        $nPage->save();
+        $newTree->TreeRoot      = $nPage->NodeID;
+        $newTree->save();
+        $n = new SLNode;
+        $n->NodeTree            = $newTree->TreeID;
+        $n->NodeParentID        = $nPage->NodeID;
+        $n->NodeParentOrder     = 0;
+        $n->NodeType            = 'Member Profile Basics';
+        $n->save();
+        $nRow = new SLNode;
+        $nRow->NodeTree         = $newTree->TreeID;
+        $nRow->NodeParentID     = $nPage->NodeID;
+        $nRow->NodeParentOrder  = 1;
+        $nRow->NodeType         = 'Layout Row';
+        $nRow->save();
+        $nColL = new SLNode;
+        $nColL->NodeTree        = $newTree->TreeID;
+        $nColL->NodeParentID    = $nRow->NodeID;
+        $nColL->NodeParentOrder = 0;
+        $nColL->NodeType        = 'Layout Column';
+        $nColL->NodeCharLimit   = 7;
+        $nColL->save();
+        $n = new SLNode;
+        $n->NodeTree            = $newTree->TreeID;
+        $n->NodeParentID        = $nRow->NodeID;
+        $n->NodeParentOrder     = 1;
+        $n->NodeType            = 'Layout Column';
+        $n->NodeCharLimit       = 1;
+        $n->save();
+        $nColR = new SLNode;
+        $nColR->NodeTree        = $newTree->TreeID;
+        $nColR->NodeParentID    = $nRow->NodeID;
+        $nColR->NodeParentOrder = 2;
+        $nColR->NodeType        = 'Layout Column';
+        $nColR->NodeCharLimit   = 4;
+        $nColR->save();
+        $n = new SLNode;
+        $n->NodeTree            = $newTree->TreeID;
+        $n->NodeParentID        = $nColL->NodeID;
+        $n->NodeType            = 'Search Results';
+        $n->NodePromptText      = '<h2>Your Participation</h2>';
+        $n->NodeResponseSet     = 1;
+        $n->NodeDataBranch      = 'users';
+        $n->save();
+        $n = new SLNode;
+        $n->NodeTree            = $newTree->TreeID;
+        $n->NodeParentID        = $nColR->NodeID;
+        $n->NodeType            = 'Incomplete Sess Check';
+        $n->NodeResponseSet     = 1;
         $n->save();
         return $newTree;
     }

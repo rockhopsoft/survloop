@@ -22,8 +22,6 @@ class SLConditions extends Model
         'CondOpts', 
     ];
     
-    
-    
     public $condVals             = array();
     public $condFldResponses     = array();
     

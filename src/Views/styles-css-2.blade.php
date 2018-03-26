@@ -1,5 +1,14 @@
 /* generated from resources/views/vendor/survloop/styles-css-2.blade.php */
 
+#absDebug {
+    position: absolute;
+    top: 70px;
+    left: 5px;
+    width: 200px;
+    font-size: 10pt;
+    position: fixed;
+}
+
 .navbar {
     height: 56px;
 	min-height: 56px;
@@ -141,6 +150,23 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     width: 100%;
     height: 100%;
 }
+#admMenuBarsWrap {
+    position: fixed;
+    z-index: 100;
+    margin: -15px 0px 0px -3px;
+}
+#admMenuBars {
+    font-size: 18pt;
+    padding: 10px 10px 5px 10px;
+}
+#admMenuBarsWrap {
+    position: fixed;
+    z-index: 100;
+}
+#leftSideWrap {
+    position: fixed;
+    margin-top: 10px;
+}
 
 #footerLinks {
     display: block;
@@ -239,7 +265,7 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 }
 .nodeAnchor a {
     position: absolute;
-    top: -40px;
+    top: -50px;
 }
 .nodeWrap, .nodeWrapError {
 	background: none;
@@ -252,7 +278,7 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 .nodeWrapError {
 	padding: 10px 5px 10px 5px;
 	border: 3px {!! $css["color-danger-on"] !!} solid;
-	box-shadow: 0px 0px 20px {!! $css["color-main-text"] !!};
+	box-shadow: 0px 0px 20px {!! $css["color-main-grey"] !!};
 }
 .nodeWrap.nGraph {
     padding: 10px;
@@ -289,7 +315,7 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     margin-bottom: 20px;
 }
 .subRes .nodeWrap {
-    margin-top: 5px;
+    margin-top: -15px;
 }
 .subRes .nFld, .subRes .nodeWrap .nFld {
     margin-top: 5px;
@@ -300,8 +326,16 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     padding: 19px 0px 0px 25px;
 }
 .slidePercFld {
+    display: inline;
     width: 55px; 
     padding: 6px 6px;
+    text-align: right;
+}
+.unitFld {
+    display: inline;
+    width: 100px; 
+    padding: 6px 6px;
+    text-align: right;
 }
 
 .nPrompt ul, .nPrompt ol {
@@ -460,6 +494,9 @@ label.finger input {
     margin-top: 0px;
     margin-bottom: 0px;
 }
+label.finger i.pull-right, label.fingerAct i.pull-right {
+    margin-top: 3px;
+}
 
 input.fingerTxt, input.form-control.fingerTxt, .nFld input.form-control.fingerTxt, 
 textarea.fingerTxt, textarea.form-control.fingerTxt, .nFld textarea.form-control.fingerTxt {
@@ -518,7 +555,10 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 .btn.btn-xl, .btn.btn-lg, .btn.btn-md {
     white-space: normal;
 }
-
+.btn.btn-ico, a.btn.btn-ico:link, a.btn.btn-ico:visited, a.btn.btn-ico:active, a.btn.btn-ico:hover {
+    font-size: 20px;
+    padding: 1px 9px;
+}
 
 .subNote, .nPrompt .subNote {
     margin-top: 10px;
@@ -527,16 +567,35 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 	font-size: 14px;
 	color: {!! $css["color-main-grey"] !!};
 }
+label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .nFld label.fingerAct .subNote {
+	font-size: 14px;
+	color: {!! $css["color-main-text"] !!};
+}
 
 
-#sortable { 
+.slSlider {
+	width: 100%; 
+	position: relative; 
+}
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    border: 1px solid {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-on"] !!};
+    color: {!! $css["color-main-faint"] !!};
+}
+.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    border: 1px solid {!! $css["color-main-on"] !!};
+    background: {!! $css["color-main-faint"] !!};
+    color: {!! $css["color-main-on"] !!};
+}
+
+.slSortable { 
 	list-style-type: none; 
 	margin: 0; padding: 0; 
 	text-align: left; 
 	width: 100%; 
 	cursor: move; 
 }
-#sortable li, #sortable li.sortOn, #sortable li.sortOff { 
+.slSortable li, .slSortable li.sortOn, .slSortable li.sortOff { 
 	border-top: 1px {!! $css["color-main-faint"] !!} solid; 
 	border-bottom: 1px {!! $css["color-main-off"] !!} solid; 
 	background: {!! $css["color-main-faint"] !!}; 
@@ -547,20 +606,34 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 	width: 100%; 
 	text-align: left; 
 }
-#sortable li.sortOn { 
+.slSortable li.sortOn { 
 	background: {!! $css["color-main-faint"] !!}; 
 }
-#sortable li i, #sortable li.sortOn i, #sortable li.sortOff i { 
+.slSortable li i, .slSortable li.sortOn i, .slSortable li.sortOff i { 
     margin: 0px 20px;
 }
 @media screen and (max-width: 768px) {
-    #sortable li, #sortable li.sortOn, #sortable li.sortOff {
+    .slSortable li, .slSortable li.sortOn, .slSortable li.sortOff {
         font-size: 14pt;
         padding: 10px 5px;
     }
-    #sortable li i, #sortable li.sortOn i, #sortable li.sortOff i { 
+    .slSortable li i, .slSortable li.sortOn i, .slSortable li.sortOff i { 
         margin: 0px 10px;
     }
+}
+
+
+.imgPreload {
+    opacity:0.01; filter:alpha(opacity=1);
+    width: 100%;
+    height: 1px;
+    margin-bottom: -1px;
+}
+.imgPreload img {
+    width: 1px;
+    height: 1px;
+    display: inline;
+    border: 0px none;
 }
 
 
@@ -652,8 +725,8 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 }
 .reportBlock div span, .reportBlock div div span, .reportBlock div div div span, .reportBlock table tr td span, 
 .slReport .reportBlock div span, .slReport .reportBlock table tr td span, 
-.slReport .reportBlock div span a.hidFldBtn:link, .slReport .reportBlock div span a.hidFldBtn:visited, 
-.slReport .reportBlock div span a.hidFldBtn:active, .slReport .reportBlock div span a.hidFldBtn:hover {
+.slReport .reportBlock div span a.hidivBtn:link, .slReport .reportBlock div span a.hidivBtn:visited, 
+.slReport .reportBlock div span a.hidivBtn:active, .slReport .reportBlock div span a.hidivBtn:hover {
 	color: {!! $css["color-main-grey"] !!};
 }
 .reportMiniBlockLabel, .slReport .reportMiniBlockLabel {
@@ -731,6 +804,9 @@ ul.glossaryList li { margin-bottom: 10px; }
 	border: 1px {!! $css["color-main-faint"] !!} solid;
 	border-top: 1px {!! $css["color-main-faint"] !!} solid;
 }
+.basicTier0 {
+    margin: 0px;
+}
 .basicTier1, .basicTier2, .basicTier3 { border-left: 3px {!! $css["color-main-off"] !!} dotted; }
 .basicTier4, .basicTier5 { border-left: 2px {!! $css["color-main-off"] !!} dotted; }
 .basicTier6, .basicTier7 { border-left: 2px {!! $css["color-main-faint"] !!} dotted; }
@@ -751,7 +827,7 @@ ul.glossaryList li { margin-bottom: 10px; }
 	border: 4px {!! $css["color-main-off"] !!} dotted;
 }
 .basicTierData, .basicTier1.basicTierData, .basicTier2.basicTierData, .basicTier3.basicTierData, .basicTier4.basicTierData, .basicTier5.basicTierData, .basicTier6.basicTierData, .basicTier7.basicTierData, .basicTier8.basicTierData {
-	border: 2px {!! $css["color-success-on"] !!} dotted;
+	border-right: 2px {!! $css["color-success-on"] !!} dotted;
 }
 .basicTierLoop.basicTierData, .basicTier1.basicTierLoop.basicTierData, .basicTier2.basicTierLoop.basicTierData, .basicTier3.basicTierLoop.basicTierData, .basicTier4.basicTierLoop.basicTierData, .basicTier5.basicTierLoop.basicTierData {
 	border-right: 2px {!! $css["color-success-on"] !!} dotted;
@@ -768,35 +844,34 @@ ul.glossaryList li { margin-bottom: 10px; }
 .circleBtn1, a.circleBtn1:link, a.circleBtn1:active, a.circleBtn1:visited, a.circleBtn1:hover,
 .circleBtn2, a.circleBtn2:link, a.circleBtn2:active, a.circleBtn2:visited, a.circleBtn2:hover,
 .circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
+    display: block;
 	text-align: center;
-	width: 34px;
-	height: 34px;
-	font-size: 18px;
-	-moz-border-radius: 17px; border-radius: 17px;
-	padding: 4px 1px 0px 1px;
-	margin: 0px;
-}
-.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover {
-	width: 50px;
-	height: 50px;
-	font-size: 25px;
-	-moz-border-radius: 25px; border-radius: 25px;
-	padding: 5px 1px 0px 1px;
-	background: {!! $css["color-info-on"] !!};
-	color: {!! $css["color-main-bg"] !!};
-}
-.circleBtn2, a.circleBtn2:link, a.circleBtn2:active, a.circleBtn2:visited, a.circleBtn2:hover {
 	width: 20px;
 	height: 20px;
-	font-size: 10px;
 	-moz-border-radius: 10px; border-radius: 10px;
-	padding: 2px 1px 0 1px;
+	padding: 4px 1px 0 1px;
+	font-size: 8px;
+	letter-spacing: -0.03em;
+	color: {!! $css["color-main-bg"] !!};
+	background: {!! $css["color-main-on"] !!};
+    opacity:0.25; filter:alpha(opacity=25);
+}
+a.circleBtn:hover, a.circleBtn0:hover, a.circleBtn1:hover, a.circleBtn2:hover, a.circleBtn3:hover {
+	background: {!! $css["color-main-off"] !!};
+    opacity:1.00; filter:alpha(opacity=100);
+}
+.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover {
+	background: {!! $css["color-info-on"] !!};
+}
+a.circleBtn0:hover {
+	background: {!! $css["color-info-off"] !!};
 }
 .circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
 	background: {!! $css["color-success-on"] !!};
-	color: {!! $css["color-main-bg"] !!};
 }
-
+a.circleBtn3:hover {
+	background: {!! $css["color-success-off"] !!};
+}
 
 table.slSpreadTbl tr td.sprdFld {
     margin: 0px;
@@ -825,7 +900,7 @@ table.slSpreadTbl tr th.cl1, table.slSpreadTbl tr td.sprdFld.cl1 {
     border-left: 1px {!! $css["color-main-text"] !!} solid;
 }
 table.slSpreadTbl tr th.cl2, table.slSpreadTbl tr td.sprdFld.cl2 {
-    border-left: 1px {!! $css["color-main-text"] !!} solid;
+    border-left: 1px {!! $css["color-main-faint"] !!} solid;
 }
 table.slSpreadTbl tr td.sprdFld input, table.slSpreadTbl tr td.sprdFld select {
     margin: 0px;
@@ -837,7 +912,15 @@ table.slSpreadTbl tr td.sprdFld .nodeWrap div label {
     background: none;
     border: 0px none;
 }
-
+table.slSpreadTbl tr th, table.slSpreadTbl tr td {
+    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
+}
+table.slSpreadTbl tr.sprdRowErr th, table.slSpreadTbl tr.sprdRowErr td {
+    border-bottom: 1px {!! $css["color-danger-on"] !!} solid;
+}
+table.slSpreadTbl tr.sprdRowErr td.sprdRowLab {
+    color: {!! $css["color-danger-on"] !!};
+}
 
 table.listTable {
 	width: 100%;
@@ -991,13 +1074,15 @@ label { font-weight: normal; }
     border-radius: 6px;
 }
 
-#admMenu {
-    
+#adminMenu {
+    margin-top: 10px;
 }
 #admMenu .admMenuTier1, #admMenu .admMenuTier2, #admMenu .admMenuTier3, #admMenu .admMenuTier4 {
     padding: 5px 5px 5px 15px;
 }
-#admMenu .admMenuTier1 a:link, #admMenu .admMenuTier1 a:visited, #admMenu .admMenuTier1 a:active, #admMenu .admMenuTier1 a:link,
+#admMenu .admMenuTier1 a:link, #admMenu .admMenuTier1 a:visited, #admMenu .admMenuTier1 a:active, #admMenu .admMenuTier1 a:link {
+    font-size: 110%;
+}
 #admMenu div a.active:link, #admMenu div a.active:visited, #admMenu div a.active:active, #admMenu div a.active:hover {
     font-weight: bold;
 }
@@ -1010,13 +1095,13 @@ label { font-weight: normal; }
     margin: 0px 5px 0px 0px;
 }
 #admMenu .admMenuTier2 {
-    padding-left: 35px;
+    padding-left: 40px;
 }
 #admMenu .admMenuTier3 {
-    padding-left: 55px;
+    padding-left: 60px;
 }
 #admMenu .admMenuTier4 {
-    padding-left: 75px;
+    padding-left: 80px;
 }
 #admMenu a:link, #admMenu a:visited, #admMenu a:active, #admMenu a:link {
     display: block;
@@ -1111,31 +1196,68 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 }
 
 
-
-.slSlider {
-	width: 100%; 
-	position: relative; 
+.sliGalSlide {
+    width: 100%;
+    
 }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-    border: 1px solid {!! $css["color-main-faint"] !!};
-    background: {!! $css["color-main-on"] !!};
-    color: {!! $css["color-main-faint"] !!};
+.sliNavDiv {
+    width: 100%;
+    height: 30px;
+    text-align: center;
 }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-    border: 1px solid {!! $css["color-main-on"] !!};
-    background: {!! $css["color-main-faint"] !!};
+a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover,
+a.sliNavAct, .sliNavDiv a.sliNavAct, .sliNavDiv a.sliNavAct:link, .sliNavDiv a.sliNavAct:active, .sliNavDiv a.sliNavAct:visited, .sliNavDiv a.sliNavAct:hover {
     color: {!! $css["color-main-on"] !!};
+    font-size: 12pt;
+    margin: 5px;
+}
+a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover {
+    opacity:0.33; filter:alpha(opacity=33);
+}
+.sliNavDiv a.sliLft:link, .sliNavDiv a.sliLft:active, .sliNavDiv a.sliLft:visited, .sliNavDiv a.sliLft:hover, 
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
+    width: 20%;
+    height: 30px;
+    padding: 0px;
+    margin: 0px;
+    font-size: 16pt;
+    text-shadow: -1px 1px 1px {!! $css["color-main-faint"] !!};
+    float: left;
+    text-align: left;
+}
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
+    float: right;
+    text-align: right;
+}
+.sliNavDiv a.sliLft i, .sliNavDiv a.sliLft:link i, .sliNavDiv a.sliLft:active i, .sliNavDiv a.sliLft:visited i, .sliNavDiv a.sliLft:hover i, 
+.sliNavDiv a.sliRgt i, .sliNavDiv a.sliRgt:link i, .sliNavDiv a.sliRgt:active i, .sliNavDiv a.sliRgt:visited i, .sliNavDiv a.sliRgt:hover i {
+    margin: 10px;
+}
+.sliNavDiv a.sliLft div, .sliNavDiv a.sliLft:link div, .sliNavDiv a.sliLft:active div, .sliNavDiv a.sliLft:visited div, .sliNavDiv a.sliLft:hover div, 
+.sliNavDiv a.sliRgt div, .sliNavDiv a.sliRgt:link div, .sliNavDiv a.sliRgt:active div, .sliNavDiv a.sliRgt:visited div, .sliNavDiv a.sliRgt:hover div {
+    display: block;
+    width: 100%;
+    height: 1px;
+    margin: 0px;
+    background: {!! $css["color-main-bg"] !!};
+    opacity:0.01; filter:alpha(opacity=1);
+}
+.sliNavDiv a.sliLft:hover div, .sliNavDiv a.sliRgt:hover div {
+    opacity:0.33; filter:alpha(opacity=33);
+    box-shadow: 0px 0px 40px {!! $css["color-main-bg"] !!};
 }
 
 
 
 @media screen and (max-width: 1200px) {
-        
+    
 }
 @media screen and (max-width: 992px) {
     
 	#navDesktop { display: none; }
 	#navMobile { display: block; }
+    #leftSideWrap { position: static; }
+	
     
 }
 @media screen and (max-width: 768px) {
@@ -1148,8 +1270,9 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
     input.otherGender { width: 240px; }
     table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
-        table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { font-size: 14px; }
-        
+        table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { 
+        font-size: 14px; 
+    }   
     input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
         width: 270px;
     }
@@ -1190,7 +1313,7 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
         padding: 15px 5px 15px 5px;
         margin-right: 5px;
     }
-	
+    
     table.slAdmTable tr td, table.slAdmTable tr th, 
     table.slAdmTable tr td a:link, table.slAdmTable tr td a:active, table.slAdmTable tr td a:visited, table.slAdmTable tr td a:hover, 
     table.slAdmTable tr th a:link, table.slAdmTable tr th a:active, table.slAdmTable tr th a:visited, table.slAdmTable tr th a:hover {
@@ -1212,8 +1335,15 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
 	.jumbotron { padding: 20px; }
 	
+	.unitFld { width: 70px; }
     input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
         width: 100%;
+    }
+    
+    table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
+    table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
+        table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th {
+        padding: 12px 3px 0px 6px;
     }
 	
 }
@@ -1316,6 +1446,7 @@ a.overUnd:hover { text-decoration: underline; }
 .ww { word-wrap: break-word; }
 
 .h100, table.h100, table tr td.h100 { height: 100%; }
+.h50, table.h50, table tr td.h50 { height: 50%; }
 .w100, table.w100, table tr td.w100, input.w100, select.w100, textarea.w100 { width: 100%; }
 .w95, table.w95, table tr td.w95, input.w95, select.w95, textarea.w95 { width: 95%; }
 .w90, table.w90, table tr td.w90, input.w90, select.w90, textarea.w90 { width: 90%; }
@@ -1339,6 +1470,10 @@ a.overUnd:hover { text-decoration: underline; }
 .w10, table.w10, table tr td.w10, input.w10, select.w10, textarea.w10 { width: 10%; }
 .w5, table.w5, table tr td.w5, input.w5, select.w5, textarea.w5 { width: 5%; }
 .w1, table.w1, table tr td.w1, input.w1, select.w1, textarea.w1 { width: 1%; }
+.wAuto, h1.wAuto, h2.wAuto, h3.wAuto, h4.wAuto, h5.wAuto,
+a.wAuto:link, a.wAuto:visited, a.wAuto:active, a.wAuto:hover {
+    width: auto;
+}
 
 .zind0 { z-index: 0; }
 
@@ -1356,9 +1491,8 @@ a.noPoint, a.noPoint:link, a.noPoint:visited, a.noPoint:active, a.noPoint:hover,
 a.btn.noPoint, a.btn.noPoint:link, a.btn.noPoint:visited, a.btn.noPoint:active, a.btn.noPoint:hover {
     cursor: default;
 }
-.cursorPoint {
-    cursor: pointer;
-}
+.crsrPntr { cursor: pointer; }
+select.form-control { cursor: pointer; }
 
 /* Can Be Read Like... margin Left 5, margin Bottom negative 5 */
 h1.m0, h2.m0, h3.m0 { margin: 0px; }
@@ -1412,6 +1546,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .monospacer, textarea.monospacer {
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
+
 
 a.label, a.label:link, a.label:visited, a.label:active, a.label:hover, 
 a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:visited, a.label.label-primary:hover {
@@ -1470,7 +1605,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .bgGrn { background: #c3ffe1; }
 .bgYel { background: #fffdc3; }
 .bgRed { background: #ffd2c9; }
-.bgNone, textarea.bgNone { background: none; }
+.bgNone, textarea.bgNone, img.bgNone { background: none; }
 
 
 .infoOn, a.infoOn:link, a.infoOn:visited, a.infoOn:active, a.infoOn:hover { color: {!! $css["color-info-on"] !!};  }

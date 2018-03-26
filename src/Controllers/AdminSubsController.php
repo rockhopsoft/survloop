@@ -43,7 +43,9 @@ class AdminSubsController extends AdminController
     protected function printSubsListing(Request $request)
     {
         $this->v["currPage"][1] = 'All Completed Submissions';
-        if ($this->v["currPage"][0] == '/dashboard/subs/incomplete') $this->v["currPage"][1] = 'All Incomplete Submissions';
+        if ($this->v["currPage"][0] == '/dashboard/subs/incomplete') {
+            $this->v["currPage"][1] = 'All Incomplete Submissions';
+        }
         $this->v["coreAbbr"] = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
         $this->v["subsSort"] = ['created_at', 'desc'];
         $this->v["coreFlds"] = SLFields::select('FldName', 'FldEng', 'FldForeignTable')

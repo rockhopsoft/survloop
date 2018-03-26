@@ -226,12 +226,12 @@
                                     onChange="return changeLayoutType();" >
                                     <option value="Page Block" @if ($node->nodeType == 'Page Block' 
                                         || trim($node->nodeType) == '') SELECTED @endif >Just A Page Block</option>
-                                    <option ></option>
                                     <option value="Layout Row" @if ($node->nodeType == 'Layout Row') SELECTED @endif 
                                         >Layout Row (To Contain Multiple Columns)</option>
                                     <option value="Layout Column" @if ($node->nodeType == 'Layout Column') 
                                         SELECTED @endif >Layout Column (Contained by Layout Row)</option>
-                                    <option ></option>
+                                    <option value="Gallery Slider" @if ($node->nodeType == 'Gallery Slider') 
+                                        SELECTED @endif >Gallery Slider (Scrolls Between Child Nodes)</option>
                                     @if (isset($parentNode->NodeType) && in_array($parentNode->NodeType, ['Checkbox']))
                                         <option value="Layout Sub-Response" 
                                             @if ($node->nodeType == 'Layout Sub-Response') SELECTED @endif 
@@ -568,135 +568,7 @@
                         If a Loop repeats child Page(s) more than one, then the Loop has its own Page too.
                         This root Page provides navigation for the multiple copies of the Loop's descendants.
                     </i></div>
-                    <div class="row mB20">
-                        <div class="col-md-3 fPerc133 slBlueDark">
-                            <h4 class="mT5 mB0"><label for="npageTitleFldID">Page Title:</label></h4>
-                        </div>
-                        <div class="col-md-9 nFld m0 p0">
-                            <input type="text" name="pageTitle" id="npageTitleFldID" autocomplete="off" 
-                                class="form-control input-lg mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
-                                @if (isset($node->extraOpts["meta-title"]) 
-                                    && trim($node->extraOpts["meta-title"]) != '') 
-                                    value="{{ $node->extraOpts["meta-title"] }}"
-                                @else value="{{ $GLOBALS['SL']->treeRow->TreeName }}"
-                                @endif onKeyUp="charCountKeyUp('pageTitle'); previewPage();" >
-                            <div>
-                                <div class="disIn pL5 mR5 row2 fPerc80">
-                                    <div id="wordCntpageTitle" class="disIn">0</div> characters
-                                </div>
-                                <span class="fPerc80 slGrey">
-                                    Most search engines only display the first 60 characters of the title.
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mB20">
-                        <div class="col-md-3 fPerc133 slBlueDark">
-                            <h4><label for="nodeSlugID">Page URL:</label></h4>
-                        </div>
-                        <div class="col-md-9 nFld m0 p0">
-                            <div class="disIn slGrey">{{ $GLOBALS['SL']->treeBaseUrl(true, true) }}</div>
-                            <input type="text" name="nodeSlug" id="nodeSlugID" autocomplete="off" 
-                                class="form-control w40 disIn mT0 mB0" onKeyUp="previewPage();"
-                            @if ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
-                                && isset($GLOBALS['SL']->treeRow->TreeSlug))
-                                value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}" >
-                            @else
-                                value="@if (isset($node->nodeRow->NodePromptNotes)){!! 
-                                    $node->nodeRow->NodePromptNotes !!}@endif" >
-                            @endif
-                        </div>
-                    </div>
-                    <div class="row mB20">
-                        <div class="col-md-3 fPerc133 slBlueDark">
-                            <h4 class="mT5 mB0"><label for="npageDescFldID">Page Description:</label></h4>
-                        </div>
-                        <div class="col-md-9 nFld m0 p0">
-                            <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" 
-                                class="form-control input-lg mT0 mB0 flexarea" 
-                                onKeyUp="charCountKeyUp('pageDesc'); flexAreaAdjust(this); previewPage();"
-                                @if (isset($node->extraOpts["meta-desc"]) && trim($node->extraOpts["meta-desc"]) != '') 
-                                    >{{ $node->extraOpts["meta-desc"] }}</textarea> 
-                                @else >{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}</textarea>
-                                @endif 
-                            <div>
-                                <div class="disIn pL5 mR5 row2 fPerc80">
-                                    <div id="wordCntpageDesc" class="disIn">0</div> characters
-                                </div>
-                                <span class="fPerc80 slGrey">
-                                    Most search engines only display the first 160 characters of the description.
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mB20">
-                        <div class="col-md-3 fPerc133 slBlueDark">
-                            <h4 class="mT5 mB0"><label for="npageKeywordsFldID">Page Keywords:</label></h4>
-                            <span class="fPerc80 slGrey">(comma separated)</span>
-                        </div>
-                        <div class="col-md-9 nFld m0 p0">
-                            <textarea name="pageKeywords" id="npageKeywordsFldID" autocomplete="off" 
-                                class="form-control input-lg mT0 mB0 flexarea" 
-                                onKeyUp="charCountKeyUp('pageKeywords'); flexAreaAdjust(this);"
-                                @if (isset($node->extraOpts["meta-keywords"]) 
-                                    && trim($node->extraOpts["meta-keywords"]) != '') 
-                                    >{{ $node->extraOpts["meta-keywords"] }}</textarea> 
-                                @else >{{ $GLOBALS['SL']->sysOpts['meta-keywords'] }}</textarea>
-                                @endif 
-                            <div>
-                                <div class="disIn pL5 mR5 row2 fPerc80">
-                                    <div id="keywordCntpageKeywords" class="disIn">0</div> keywords
-                                </div>
-                                <span class="fPerc80 slGrey">
-                                    Much less important, but fewer than 10 keywords is better. 
-                                    <a href="https://trends.google.com/trends/" target="_blank"
-                                        ><i class="fa fa-external-link" aria-hidden="true"></i> Search Trends</a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mB20">
-                        <div class="col-md-3 fPerc133 slBlueDark">
-                            <h4 class="mT5 mB0"><label for="npageImgFldID">Page Social Sharing Image:</label></h4>
-                            <span class="fPerc80 slGrey">(ideally 800x418 pixels)</span>
-                        </div>
-                        <div class="col-md-9 nFld m0 p0">
-                            <input type="text" name="pageImg" id="npageImgFldID" autocomplete="off"
-                                class="form-control input-lg mT0 mB0 openImgUpdate" onKeyUp="previewPage();"
-                                @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
-                                    @if (substr($node->extraOpts["meta-img"], 0, 1) == '/')
-                                        value="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ 
-                                        $GLOBALS['SL']->sysOpts['meta-img'] }}"
-                                    @else value="{{ $node->extraOpts["meta-img"] }}" @endif
-                                @else value="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}"
-                                @endif >
-                            <div class="row mT5">
-                                <div class="col-md-8">
-                                    <div class="prevImg brd"><img id="npageImgSelImg" 
-                                @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
-                                    src="{{ $node->extraOpts["meta-img"] }}" 
-                                    @else src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ></div>
-                                </div>
-                                <div class="col-md-4 pT10">
-                                    <a href="javascript:;" class="btn btn-xs btn-default w100 mB10 openImgReset" 
-                                        id="imgResetpageImg"><i class="fa fa-times" aria-hidden="true"></i> 
-                                        Reset to Default</a>
-                                    <a href="javascript:;" class="btn btn-default w100 mB10 openImgSelect"
-                                        id="imgSelectpageImg" data-title="" 
-                                        @if (isset($node->extraOpts["meta-img"]) 
-                                            && trim($node->extraOpts["meta-img"]) != '')
-                                                  data-presel="{{ $node->extraOpts["meta-img"] }}" 
-                                            @else data-presel="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif 
-                                        ><div><i class="fa fa-picture-o" aria-hidden="true"></i> 
-                                        Select or</div><div>Upload Image</div></a><br />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="imgSelectpageImgTitle" class="disNon">
-                        Select Social Sharing Image For The Page: 
-                        @if (isset($node->extraOpts['meta-title']))<i>{{ $node->extraOpts['meta-title'] }}</i> @endif
-                    </div>
+                    {!! view('vendor.survloop.admin.seo-meta-editor', [ "currMeta" => $currMeta ])->render() !!}
                     <div id="hasPageOpts" class="row nFld @if ($node->isPage()) disBlo @else disNon @endif ">
                         <div class="col-md-4">
                             @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
@@ -991,6 +863,12 @@
                                         style="width: 100%; height: 100px;" autocomplete="off" 
                                             >@if (isset($node->nodeRow->NodePromptNotes)
                                             ){!! $node->nodeRow->NodePromptNotes !!}@endif</textarea></div>
+                                    <label class="m10">
+                                        <input type="checkbox" name="opts83" id="opts83ID" value="83" class="mR5"
+                                            @if ($node->nodeRow->NodeOpts%83 == 0) CHECKED @endif autocomplete="off" >
+                                        Show After Pressing Info Button: 
+                                        <a href="javascript:;"><i class="fa fa-info-circle" aria-hidden="true"></i></a>
+                                    </label>
                                 </div>
                             </label>
                         </div>
@@ -1297,19 +1175,19 @@
                                 @endif ">
                                 <div class="row mB10">
                                     <label class="col-md-6">Minimum Allowed:
-                                        <input type="number" name="numOptMin" class="form-control" autocomplete="off"
+                                        <input type="text" name="numOptMin" class="form-control" autocomplete="off"
                                             @if (isset($node->extraOpts["minVal"]) 
                                                 && $node->extraOpts["minVal"] !== false) 
                                                 value="{{ $node->extraOpts["minVal"] }}" @endif ></label>
                                     <label class="col-md-6">Maximum Allowed:
-                                        <input type="number" name="numOptMax" class="form-control" autocomplete="off"
+                                        <input type="text" name="numOptMax" class="form-control" autocomplete="off"
                                             @if (isset($node->extraOpts["maxVal"]) 
                                                 && $node->extraOpts["maxVal"] !== false) 
                                                 value="{{ $node->extraOpts["maxVal"] }}" @endif ></label>
                                 </div>
                                 <div class="row mB10">
                                     <label class="col-md-6">Increment Size:
-                                        <input type="number" name="numIncr" class="form-control" autocomplete="off"
+                                        <input type="text" name="numIncr" class="form-control" autocomplete="off"
                                             @if (isset($node->extraOpts["incr"]) && $node->extraOpts["incr"] !== false) 
                                                 value="{{ $node->extraOpts["incr"] }}" @endif ></label>
                                     <label class="col-md-6">Unit Label:
@@ -1419,7 +1297,8 @@
                                         <option value="" @if (!isset($node->nodeRow->NodeTextSuggest) 
                                             || $node->nodeRow->NodeTextSuggest == '') SELECTED @endif ></option>
                                         @forelse ($defs as $def)
-                                            <option value="{{ $def->DefSubset }}" @if (isset($node->nodeRow->NodeTextSuggest) 
+                                            <option value="{{ $def->DefSubset }}" 
+                                            @if (isset($node->nodeRow->NodeTextSuggest) 
                                                 && $node->nodeRow->NodeTextSuggest == $def->DefSubset) SELECTED @endif 
                                                 >{{ $def->DefSubset }}</option>
                                         @empty
@@ -1467,6 +1346,14 @@
                         <h4 id="resOptsLabTbl" class=" @if (!$node->isSpreadTbl()) disNon 
                             @else disBlo @endif ">Start Table Rows From:</h4>
                         {!! $GLOBALS["SL"]->printLoopsDropdowns($node->nodeRow->NodeResponseSet, 'responseList') !!}
+                        
+                        <div id="nOptsRadio" class="mT20 @if ($node->nodeType == 'Radio') disBlo @else disNon @endif ">
+                            <label>
+                                <input type="checkbox" name="opts79" id="opts79ID" value="79"
+                                    @if ($node->nodeRow->NodeOpts%79 == 0) CHECKED @endif autocomplete="off" >
+                                After Response Selected, Hide Other Options
+                            </label>
+                        </div>
                         
                         <div class="row pB10 mT20">
                             <div class="col-md-4">
@@ -1593,19 +1480,61 @@
         
         </div> <!-- end hasResponse -->
         
-        @if ($node->isPageBlock() || ($GLOBALS['SL']->treeRow->TreeType == 'Page' && $GLOBALS['SL']->REQ->has('parent') 
-            && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot))
-            <div id="isPageBlock" class=" @if ($node->canBePageBlock()) disBlo @else disNon @endif ">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <div class="panel-title">
-                            <h4 class="m0">Page Block Options</h4>
-                        </div>
+        <div id="isPageBlock" class=" @if ($node->isPageBlock()) disBlo @else disNon @endif ">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <h4 class="m0">Style Options</h4>
                     </div>
-                    <div class="panel-body" style="padding: 0px;">
-                        <div id="pageBlock" class="slBg slTxt p20">
-                            <div class="row">
-                                <div class="col-md-4">
+                </div>
+                <div class="panel-body" style="padding: 0px;">
+                    <div id="pageBlock" class="slBg slTxt p20">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select name="blockAlign" id="blockAlignID" class="form-control input-lg mB20" 
+                                    autocomplete="off">
+                                    <option value="left" @if (!isset($node->colors["blockAlign"]) 
+                                        || $node->colors["blockAlign"] == 'left') SELECTED @endif 
+                                        >Align Left</option>
+                                    <option value="center" @if (isset($node->colors["blockAlign"]) 
+                                        && $node->colors["blockAlign"] == 'center') SELECTED @endif 
+                                        >Align Center</option>
+                                    <option value="right" @if (isset($node->colors["blockAlign"]) 
+                                        && $node->colors["blockAlign"] == 'right') SELECTED @endif 
+                                        >Align Right</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="blockHeight" id="blockHeightID" class="form-control input-lg mB20" 
+                                    autocomplete="off">
+                                    <option value="auto" @if (!isset($node->colors["blockHeight"]) 
+                                        || $node->colors["blockHeight"] == 'auto') SELECTED @endif 
+                                        >Auto Height, Default Padding</option>
+                                    <option value="h100" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h100') SELECTED @endif 
+                                        >Full Screen Height</option>
+                                    <option value="h75" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h75') SELECTED @endif 
+                                        >75% Screen Height</option>
+                                    <option value="h66" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h66') SELECTED @endif 
+                                        >66% Screen Height</option>
+                                    <option value="h50" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h50') SELECTED @endif 
+                                        >50% Screen Height</option>
+                                    <option value="h33" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h33') SELECTED @endif 
+                                        >33% Screen Height</option>
+                                    <option value="h25" @if (isset($node->colors["blockHeight"]) 
+                                        && $node->colors["blockHeight"] == 'h25') SELECTED @endif 
+                                        >25% Screen Height</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class=" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
+                                    && $GLOBALS['SL']->REQ->has('parent') 
+                                    && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot) disBlo
+                                    @else disNon @endif ">
                                     <select name="opts67" id="opts67ID" class="form-control input-lg mB20" 
                                         autocomplete="off">
                                         <option value="1" @if ($node->nodeRow->NodeOpts%67 > 0) SELECTED @endif 
@@ -1614,111 +1543,71 @@
                                             >Skinny Content Width</option>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
-                                    <select name="blockHeight" id="blockHeightID" class="form-control input-lg mB20" 
-                                        autocomplete="off">
-                                        <option value="auto" @if (!isset($node->colors["blockHeight"]) 
-                                            || $node->colors["blockHeight"] == 'auto') SELECTED @endif 
-                                            >Auto Height, Default Padding</option>
-                                        <option value="h100" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h100') SELECTED @endif 
-                                            >Full Screen Height</option>
-                                        <option value="h75" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h75') SELECTED @endif 
-                                            >75% Screen Height</option>
-                                        <option value="h66" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h66') SELECTED @endif 
-                                            >66% Screen Height</option>
-                                        <option value="h50" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h50') SELECTED @endif 
-                                            >50% Screen Height</option>
-                                        <option value="h33" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h33') SELECTED @endif 
-                                            >33% Screen Height</option>
-                                        <option value="h25" @if (isset($node->colors["blockHeight"]) 
-                                            && $node->colors["blockHeight"] == 'h25') SELECTED @endif 
-                                            >25% Screen Height</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4">
-                                    <select name="blockAlign" id="blockAlignID" class="form-control input-lg mB20" 
-                                        autocomplete="off">
-                                        <option value="left" @if (!isset($node->colors["blockAlign"]) 
-                                            || $node->colors["blockAlign"] == 'left') SELECTED @endif 
-                                            >Align Left</option>
-                                        <option value="center" @if (isset($node->colors["blockAlign"]) 
-                                            && $node->colors["blockAlign"] == 'center') SELECTED @endif 
-                                            >Align Center</option>
-                                        <option value="right" @if (isset($node->colors["blockAlign"]) 
-                                            && $node->colors["blockAlign"] == 'right') SELECTED @endif 
-                                            >Align Right</option>
-                                    </select>
-                                </div>
                             </div>
-                            <label class="mT10 mB10"><input type="checkbox" name="opts71" id="opts71ID" value="71" 
-                                autocomplete="off" onClick="return checkPageBlock();" 
-                                @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
-                                > <span class="fPerc133">Background</span></label>
-                            <div id="pageBlockOpts" class="pT5 
-                                @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <label for="blockBGID"><h4 class="m0">Background Color</h4></label>
-                                        {!! view('vendor.survloop.inc-color-picker', [
-                                            'fldName' => 'blockBG',
-                                            'preSel'  => ((isset($node->colors["blockBG"])) 
-                                                ? $node->colors["blockBG"] : '#000')
-                                        ])->render() !!}
-                                        <label for="blockTextID"><h4 class="m0">Text Color</h4></label>
-                                        {!! view('vendor.survloop.inc-color-picker', [
-                                            'fldName' => 'blockText',
-                                            'preSel'  => ((isset($node->colors["blockText"])) 
-                                                ? $node->colors["blockText"] : '#DDD')
-                                        ])->render() !!}
-                                        <label for="blockLinkID"><h4 id="blockLinkh4" class="m0 slTxt"
-                                            >Link Color</h4></label>
-                                        {!! view('vendor.survloop.inc-color-picker', [
-                                            'fldName' => 'blockLink',
-                                            'preSel'  => ((isset($node->colors["blockLink"])) 
-                                                ? $node->colors["blockLink"] : '#FFF')
-                                        ])->render() !!}
-                                    </div>
-                                    <div class="col-md-1"></div>
-                                    <div class="col-md-6">
-                                        <label for="blockImgID"><h4 class="m0">Background Image</h4></label>
-                                        <input type="text" class="form-control input-lg w100 mB20 mR20"
-                                            id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
-                                                ? $node->colors['blockImg'] : '') }}">
-                                        <div class="disIn mL10 mR10"><label class="disIn">
-                                            <input type="radio" name="blockImgType" id="blockImgTypeA" 
-                                                value="w100" class="mR5" autocomplete="off" 
-                                                onClick="return checkPageBlock();"
-                                                @if (!isset($node->colors["blockImgType"]) 
-                                                    || $node->colors["blockImgType"] == 'w100') CHECKED @endif 
-                                                    > Full-Width Image
-                                        </label></div>
-                                        <div class="disIn mL10 mR10"><label class="disIn">
-                                            <input type="radio" name="blockImgType" id="blockImgTypeB" 
-                                                value="tiles" class="mR5" onClick="return checkPageBlock();"
-                                                @if (isset($node->colors["blockImgType"]) 
-                                                    && $node->colors["blockImgType"] == 'tiles') CHECKED @endif 
-                                                    autocomplete="off" > Tiled Image
-                                        </label></div>
-                                        <label class="disBlo mT10 mL10 mR10">
-                                            <input type="checkbox" name="blockImgFix" id="blockImgFixID" 
-                                                value="Y" class="mR5" onClick="return checkPageBlock();"
-                                                @if (isset($node->colors["blockImgFix"]) 
-                                                    && $node->colors["blockImgFix"] == 'Y') CHECKED @endif 
-                                                    autocomplete="off" > Fixed Position
-                                        </label>
-                                    </div>
+                        </div>
+                        <label class="mT10 mB10"><input type="checkbox" name="opts71" id="opts71ID" value="71" 
+                            autocomplete="off" onClick="return checkPageBlock();" 
+                            @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
+                            > <span class="fPerc133">Background</span></label>
+                        <div id="pageBlockOpts" class="pT5 
+                            @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <label for="blockBGID"><h4 class="m0">Background Color</h4></label>
+                                    {!! view('vendor.survloop.inc-color-picker', [
+                                        'fldName' => 'blockBG',
+                                        'preSel'  => ((isset($node->colors["blockBG"])) 
+                                            ? $node->colors["blockBG"] : '#000')
+                                    ])->render() !!}
+                                    <label for="blockTextID"><h4 class="m0">Text Color</h4></label>
+                                    {!! view('vendor.survloop.inc-color-picker', [
+                                        'fldName' => 'blockText',
+                                        'preSel'  => ((isset($node->colors["blockText"])) 
+                                            ? $node->colors["blockText"] : '#DDD')
+                                    ])->render() !!}
+                                    <label for="blockLinkID"><h4 id="blockLinkh4" class="m0 slTxt"
+                                        >Link Color</h4></label>
+                                    {!! view('vendor.survloop.inc-color-picker', [
+                                        'fldName' => 'blockLink',
+                                        'preSel'  => ((isset($node->colors["blockLink"])) 
+                                            ? $node->colors["blockLink"] : '#FFF')
+                                    ])->render() !!}
+                                </div>
+                                <div class="col-md-1"></div>
+                                <div class="col-md-6">
+                                    <label for="blockImgID"><h4 class="m0">Background Image</h4></label>
+                                    <input type="text" class="form-control input-lg w100 mB20 mR20"
+                                        id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
+                                            ? $node->colors['blockImg'] : '') }}">
+                                    <div class="disIn mL10 mR10"><label class="disIn">
+                                        <input type="radio" name="blockImgType" id="blockImgTypeA" 
+                                            value="w100" class="mR5" autocomplete="off" 
+                                            onClick="return checkPageBlock();"
+                                            @if (!isset($node->colors["blockImgType"]) 
+                                                || $node->colors["blockImgType"] == 'w100') CHECKED @endif 
+                                                > Full-Width Image
+                                    </label></div>
+                                    <div class="disIn mL10 mR10"><label class="disIn">
+                                        <input type="radio" name="blockImgType" id="blockImgTypeB" 
+                                            value="tiles" class="mR5" onClick="return checkPageBlock();"
+                                            @if (isset($node->colors["blockImgType"]) 
+                                                && $node->colors["blockImgType"] == 'tiles') CHECKED @endif 
+                                                autocomplete="off" > Tiled Image
+                                    </label></div>
+                                    <label class="disBlo mT10 mL10 mR10">
+                                        <input type="checkbox" name="blockImgFix" id="blockImgFixID" 
+                                            value="Y" class="mR5" onClick="return checkPageBlock();"
+                                            @if (isset($node->colors["blockImgFix"]) 
+                                                && $node->colors["blockImgFix"] == 'Y') CHECKED @endif 
+                                                autocomplete="off" > Fixed Position
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
         
     </div>
     <div class="col-md-4">
@@ -1727,12 +1616,8 @@
             <div class="panel-heading">
                 <div class="panel-title"><h4 class="m0">Social Sharing Preview</h4></div>
             </div>
-            <div class="panel-body"><div id="pagePrev" class="slBoxShdLgt"></div></div>
-            <div class="p20 fPerc66 slGrey">
-                If it's not looking updated in Facebook, you should use their debugging tool to "scape" this page again. 
-                This will clear what Facebook has cached, and update it, so you can try sharing again.
-                <a href="https://developers.facebook.com/tools/debug/" target="_blank"
-                    ><i class="fa fa-external-link" aria-hidden="true"></i> URL Linter</a>
+            <div class="panel-body">
+                {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}
             </div>
         </div>
     
@@ -1749,7 +1634,7 @@
                         <input type="hidden" id="delCond{{ $i }}ID" name="delCond{{ $cond->CondID }}" value="N">
                         <div id="cond{{ $i }}wrap" class="round10 brd p5 f18 mB10 pL10">
                             <a id="cond{{ $i }}delBtn" href="javascript:;" class="pull-right disBlo condDelBtn"
-                                ><i class="fa fa-minus-circle" aria-hidden="true"></i></a> 
+                                ><i class="fa fa-trash-o" aria-hidden="true"></i></a> 
                             <div id="cond{{ $i }}delWrap" href="javascript:;" 
                                 class="pull-right disNon f10 pT5 pL10">
                                 <i class="red">Deleted</i> 

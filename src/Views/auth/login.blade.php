@@ -23,7 +23,7 @@ $v = $surv->custLoop->v;
     </div>
 </div>
 
-@if (!isset($GLOBALS['SL']->sysOpts["login-instruct"]) 
+@if (isset($GLOBALS['SL']->sysOpts["login-instruct"]) 
     || trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
     <h4 class="mB20">{!! $GLOBALS['SL']->sysOpts["login-instruct"] !!}</h4>
 @endif

@@ -4,8 +4,8 @@
 
 @section('content')
 
-<h1><i class="fa fa-pencil-square-o"></i> Edit Field Descriptions</nobr></h1>
-<a href="/dashboard/db/all" class="btn btn-xs btn-default">All Database Details</a>
+<h1><span class="slBlueDark"><i class="fa fa-database"></i> 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Field Descriptions</h1>
 @if ($FldDescsView == 'replicas' || $FldDescsView == 'generics' || $FldDescsView == 'uniques')
     <a href="/dashboard/db/fieldDescs/all" class="btn btn-xs btn-default mR10">All Field Descriptions</a>
 @endif
@@ -76,18 +76,18 @@ function submitFldDescChanges() {
             ({{ number_format(sizeof($flds)) }} {{ $fldLabel }})
         </td></tr>
         <tr>
-            <td><i>Edit</i></td>
-            <td class="w15"><i>Field Info</i></td>
-            <td class="w40"><i>Descriptions</i></td>
-            <td class="w40"><i>Notes</i></td>
-            <td><i>Save Changes</i></td>
+            <td class="w5"> </td>
+            <td class="w20"><i>Field Info</i></td>
+            <td class="w50"><i>Descriptions</i></td>
+            <td class="w20"><i>Notes</i></td>
+            <td class="w5"><i>Save Changes</i></td>
         </tr>
         @foreach ($flds as $cnt => $fld)
             
             <tr @if ((1+$cnt)%2 == 0) class="row2" @endif >
-            <td><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
-                class="f14"><i class="fa fa-pencil"></i></a></td>
-            <td class="w15">
+            <td class="w5"><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
+                }}/{{ $fld->FldName }}" class="fPerc133 m5"><i class="fa fa-pencil"></i></a></td>
+            <td class="w20">
                 <span class="f8"><i>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}</i></span><br />
                 <b>{{ $fld->FldEng }}</b><br />
                 <div class="f10">
@@ -101,23 +101,26 @@ function submitFldDescChanges() {
                         - <span class="f8"><i>{{ $tblFldVals[$fld->FldID] }}</i></span>
                     @endif
                 </div></td>
-            <td class="w40"><textarea name="FldDesc{{ $fld->FldID }}" class="eDescs bordC" style="height: 80px; width: 100%;" 
+            <td class="w50"><textarea name="FldDesc{{ $fld->FldID }}" class="eDescs bordC" style="height: 80px; width: 100%;" 
                 @if ($fld->FldSpecType == 'Generic')
                     onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
                 @else
                     onKeyUp="logFldDescChange({{ $fld->FldID }});"
                 @endif
                 >{{ $fld->FldDesc }}</textarea></td>
-            <td class="w40 gray9"><textarea name="FldNotes{{ $fld->FldID }}" class="eNotes bordC" style="height: 80px; width: 100%;"
+            <td class="w20 gray9"><textarea name="FldNotes{{ $fld->FldID }}" class="eNotes bordC" style="height: 80px; width: 100%;"
                 @if ($fld->FldSpecType == 'Generic')
                     onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
                 @else
                     onKeyUp="logFldDescChange({{ $fld->FldID }});"
                 @endif
                 >{{ $fld->FldNotes }}</textarea></td>
-            <td @if ($fld->FldSpecType == 'Generic') data-toggle="tooltip" data-placement="top" title="*Saving will push changes to all copies of this field (Replicas)." @endif
-                ><nobr><a href="javascript:;" onClick="submitFldDescChanges();" class="f32" ><i class="fa fa-floppy-o"></i></a> 
-                @if ($fld->FldSpecType == 'Generic') <span class="red f32">*</span> @endif </nobr></td>
+            <td class="w5" @if ($fld->FldSpecType == 'Generic') data-toggle="tooltip" data-placement="top" 
+                title="*Saving will push changes to all copies of this field (Replicas)." @endif
+                ><nobr><a href="javascript:;" onClick="submitFldDescChanges();" class="fPerc133 m5" 
+                ><i class="fa fa-floppy-o"></i></a> 
+                @if ($fld->FldSpecType == 'Generic') <span class="red">*</span> @endif
+                </nobr></td>
             </tr>
             
         @endforeach

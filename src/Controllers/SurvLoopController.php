@@ -4,6 +4,7 @@ namespace SurvLoop\Controllers;
 use DB;
 use Auth;
 use Cache;
+use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Routing\Controller;
@@ -20,6 +21,7 @@ use App\Models\SLUsersActivity;
 
 use Illuminate\Support\Facades\Mail;
 use SurvLoop\Controllers\EmailController;
+use SurvLoop\Controllers\SurvLoopInstaller;
 
 use SurvLoop\Controllers\DatabaseLookups;
 
@@ -48,12 +50,13 @@ class SurvLoopController extends Controller
     
     protected $extraTree         = [];
     
-    protected function survLoopInit(Request $request, $currPage = '', $runExtra = true)
+    public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
     {
         if (!$this->survInitRun) {
             $this->survInitRun = true;
             if (sizeof($this->REQ) == 0) $this->REQ = $request;
             $this->v["user"]        = Auth::user();
+            $this->v["uID"]         = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
             $this->v["isAdmin"]     = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
             $this->v["isAll"]       = $request->has('all');
             $this->v["isAlt"]       = $request->has('alt');
@@ -78,6 +81,9 @@ class SurvLoopController extends Controller
             
             if ($this->REQ->has('sessmsg') && trim($this->REQ->get('sessmsg')) != '') {
                 session()->put('sessMsg', trim($this->REQ->get('sessmsg')));
+            }
+            if ($this->REQ->has('refresh') && trim($this->REQ->get('refresh')) != '') {
+                $this->checkSystemInit();
             }
             
             if (!isset($this->v["currState"]))    $this->v["currState"]    = '';
@@ -130,9 +136,12 @@ class SurvLoopController extends Controller
     {
         if (!isset($GLOBALS["SL"])) {
             if (!$this->treeFromURL) {
-                if (!isset($this->v["user"])) $this->v["user"] = Auth::user();
-                if (isset($this->v["user"]) && intVal($this->v["user"]->id) > 0) {
-                    $last = SLUsersActivity::where('UserActUser', '=', $this->v["user"]->id)
+                if (!isset($this->v["user"])) {
+                    $this->v["user"] = Auth::user();
+                    $this->v["uID"]  = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+                }
+                if ($this->v["uID"] > 0) {
+                    $last = SLUsersActivity::where('UserActUser', '=', $this->v["uID"])
                         ->where('UserActVal', 'LIKE', '%;%')
                         ->where(function ($query) {
                             $query->where('UserActCurrPage', 'LIKE', '/fresh/database%')
@@ -194,7 +203,7 @@ class SurvLoopController extends Controller
     // Check For Basic System Setup First
     public function checkSystemInit()
     {
-        if (!session()->has('chkSysInit')) {
+        if (!session()->has('chkSysInit') || $this->REQ->has('refresh')) {
             $sysChk = User::select('id')
                 ->get();
             if (!$sysChk || sizeof($sysChk) == 0) {
@@ -214,6 +223,8 @@ class SurvLoopController extends Controller
                     return $this->redir('/fresh/user-experience');
                 }
             }
+            $survInst = new SurvLoopInstaller;
+            $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
         }
         return '';
@@ -334,35 +345,6 @@ class SurvLoopController extends Controller
     }
     
     
-    // a few utilities...
-    
-    public function slugify($text)
-    {
-        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-        $text = preg_replace('~[^-\w]+~', '', $text);
-        $text = trim($text, '-');
-        $text = preg_replace('~-+~', '-', $text);
-        $text = strtolower($text);
-        if (empty($text)) {
-            return 'n-a';
-        }
-        return $text;
-    }
-    
-    function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
-    {
-        header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename=' .$inFilename );
-        echo "<table border=1>";
-        echo $innerTable;
-        echo "</table>";
-        exit;
-        return true;
-    }
-    
-    
-    
     public function freshUser(Request $request)
     {
         $this->survLoopInit($request, '/fresh/creator');
@@ -439,7 +421,7 @@ class SurvLoopController extends Controller
     {
         if ($dbID > 0) {
             $dbRow = SLDatabases::where('DbID', $dbID)
-                //->whereIn('DbUser', [ 0, $this->v["user"]->id ])
+                //->whereIn('DbUser', [ 0, $this->v["uID"] ])
                 ->first();
             if ($dbRow && $dbRow->DbID) {
                 $treeRow = SLTree::where('TreeDatabase', $dbID)
@@ -487,9 +469,10 @@ class SurvLoopController extends Controller
     }
     
     
-    public function extractJava($str = '', $nID = -3)
+    public function extractJava($str = '', $nID = -3, $destroy = false)
     {
         if (trim($str) == '') return '';
+        $tagMeat = '';
         $str = str_replace('</ script>', '</script>', $str);
         $orig = $str;
         $tag1start = strpos($str, '<script');
@@ -498,10 +481,33 @@ class SurvLoopController extends Controller
             if ($tag1end !== false) {
                 $tag2 = strpos($str, '</script>', $tag1end);
                 if ($tag2 !== false) {
-                    $GLOBALS["SL"]->pageJAVA .= (($nID > 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
+                    $tagMeat .= (($nID > 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
                         . substr($str, ($tag1end+1), ($tag2-$tag1end-1))
                         . (($nID > 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
                     $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
+                }
+            }
+        }
+        if (!$destroy) $GLOBALS["SL"]->pageJAVA .= $tagMeat;
+        return $str;
+    }
+    
+    public function extractStyle($str = '', $nID = -3, $destroy = false)
+    {
+        if (trim($str) == '') return '';
+        $tagMeat = '';
+        $str = str_replace('</ style>', '</style>', $str);
+        $orig = $str;
+        $tag1start = strpos($str, '<style');
+        if ($tag1start !== false) {
+            $tag1end = strpos($str, '>', $tag1start);
+            if ($tag1end !== false) {
+                $tag2 = strpos($str, '</style>', $tag1end);
+                if ($tag2 !== false) {
+                    $tagMeat .= (($nID > 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
+                        . substr($str, ($tag1end+1), ($tag2-$tag1end-1))
+                        . (($nID > 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
+                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+8));
                 }
             }
         }
@@ -601,7 +607,6 @@ class SurvLoopController extends Controller
     {
         return $this->loadCustView('inc-scripts-jquery-xtra-search');
     }
-    
     
     protected function loadNavMenu()
     {
@@ -744,7 +749,7 @@ class SurvLoopController extends Controller
             $emaUsr = User::where('email', $emailTo)->first();
             if ($emaUsr && isset($emaUsr->name)) $emaTo[] = [$emailTo, $emaUsr->name];
         }
-        if (strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.app') !== false) {
+        if (strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') !== false) {
             echo '<div class="container"><h2>' . $subject . '</h2>' . $body . '<hr><hr></div>';
         } else {
             $this->sendEmail($body, $subject, $emaTo);
@@ -768,5 +773,80 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    function checkFolder($fold)
+    {
+        $currFold = '';
+        $limit = 0;
+        while (!is_dir($currFold . 'storage/app') && $limit < 9) {
+            $currFold .= '../';
+            $limit++;
+        }
+        $currFold .= 'storage/app';
+        $fold = str_replace('../storage/app/', '', $fold);
+        $subs = [$fold];
+        if (strpos($fold, '/') !== false) $subs = explode('/', $fold);
+        if (sizeof($subs) > 0) {
+            foreach ($subs as $sub) {
+                if (trim($sub) != '') {
+                    $currFold .= '/' . $sub;
+                    if (!is_dir($currFold)) mkdir($currFold);
+                }
+            }
+        }
+        return true;
+    }
+    
+    public function logAdd($log, $content)
+    {
+        $this->checkFolder('../storage/app/log');
+        $fold = '../storage/app/';
+        $file = 'log/' . $log . '.html';
+        $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' . $content 
+            . '<br /><span class="slGrey fPerc80">' . $this->hashIP() . '</span></p>';
+        if (!file_exists($fold . $file)) Storage::disk('local')->put($file, ' ');
+        Storage::disk('local')->prepend($file, $content);
+        return true;
+    }
+    
+    public function logLoad($log)
+    {
+        $file = '../storage/app/log/' . $log . '.html';
+        if ($this->v["isAdmin"] && file_exists($file)) return file_get_contents($file);
+        return '';
+    }
+    
+    public function logPreview($log)
+    {
+        $ret = '';
+        $all = $this->logLoad($log);
+        if (trim($all) != '' && strpos($all, '</p>') !== false) {
+            $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
+            for ($i = 0; ($i < 100 && $i < sizeof($logs)); $i++) {
+                $ret .= $logs[$i] . '</p><div class="p20"></div>';
+            }
+        }
+        return $ret;
+    }
+    
+    public function getIP()
+    {
+        $ip = $_SERVER["REMOTE_ADDR"];
+        if (!empty($_SERVER["HTTP_CLIENT_IP"])) $ip = $_SERVER["HTTP_CLIENT_IP"]; // share internet
+        elseif (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; // pass from proxy
+        return $ip;
+    }
+    
+    public function hashIP()
+    {
+        return hash('sha512', $this->getIP());
+    }
+    
+    public function logAddSessStuff($type)
+    {
+        $log = '';
+        $this->logAdd('session-stuff', $log);
+        return true;
+    }
     
 }

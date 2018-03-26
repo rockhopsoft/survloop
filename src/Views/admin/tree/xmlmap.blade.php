@@ -4,16 +4,7 @@
 
 @section('content')
 
-<ul class="nav nav-tabs mT10" role="tablist">
-    <li role="presentation">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Full Map of Tree</a></li>
-    <li role="presentation">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/data">Tree Data Structures</a></li>
-    <li role="presentation" class="active">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap">Data Export XML Map</a></li>
-</ul>
-
-<h2 class="slBlueDark"><i class="fa fa-snowflake-o"></i> Form Tree: {{ $GLOBALS['SL']->treeName }}</h2>
+<h2><span class="slBlueDark"><i class="fa fa-snowflake-o"></i> {{ $GLOBALS['SL']->treeName }}:</span> XML Map</h2>
     
 <div class="row mTn20">
     <div class="col-md-4">

@@ -10,17 +10,18 @@
             @if ($res[0] == 'O') style="padding-top: 1px; padding-bottom: 1px;" @endif >
             <nobr><div class="disIn mR5">
                 <input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" value="{{ $res[0] }}" type="radio" 
-                    autocomplete="off" onClick="formClickGender({{ $nID }}); checkNodeUp({{ $nID }}, {{ $j }}, 1);"
+                    autocomplete="off" onClick="formClickGender({{ $nID }}); checkNodeUp('{{ $nID }}', {{ $j }}, 1);"
     @else
         mR10"><nobr><div class="disIn mR5">
             <input name="n{{ $nID }}fld" id="n{{ $nID }}fld{{ $j }}" value="{{ $res[0] }}" autocomplete="off" 
-                type="radio" onClick="formClickGender({{ $nID }}); checkNodeUp({{ $nID }}, {{ $j }}, 0); 
+                type="radio" onClick="formClickGender({{ $nID }}); checkNodeUp('{{ $nID }}', {{ $j }}, 0); 
                 @if ($res[0] != 'O') document.getElementById('n{{ $nID }}fldOtherID').value=''; @endif "
     @endif
     @if ($currNodeSessData == $res[0]) CHECKED @endif ></div> {{ $res[1] }}</nobr>
     @if ($res[0] == 'O')
-        <input type="text" name="n{{ $nID }}fldOther" id="n{{ $nID }}fldOtherID" value="{{ $currSessDataOther }}" 
-            class="form-control input-lg disIn otherFld" onKeyUp="formKeyUpOther({{ $nID }}, {{ $j }});">
+        <input type="text" name="n{{ $nID }}fldOther{{ $j }}" id="n{{ $nID }}fldOtherID{{ $j }}" value="{{ 
+            $currSessDataOther }}" class="form-control input-lg disIn ntrStp slTab otherFld" onKeyUp="formKeyUpOther('{{ 
+            $nID }}', {{ $j }});" {!! $GLOBALS['SL']->tabInd() !!}>
     @endif
     </label>
 @endforeach

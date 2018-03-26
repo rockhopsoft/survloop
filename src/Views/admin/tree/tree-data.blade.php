@@ -1,17 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree-data.blade.php -->
 
-
-<ul class="nav nav-tabs mT10" role="tablist">
-    <li role="presentation">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Full Map of Tree</a></li>
-    <li role="presentation" class="active">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/data">Tree Data Structures</a></li>
-    <li role="presentation">
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap">Data Export XML Map</a></li>
-</ul>
-
-<h2 class="slBlueDark"><i class="fa fa-snowflake-o"></i> 
-    {{ $GLOBALS['SL']->treeName }}: Tree's Use of Database Design</nobr></h2>
+<h2><span class="slBlueDark"><i class="fa fa-snowflake-o"></i> 
+    {{ $GLOBALS['SL']->treeName }}:</span> Tree's Use of Database Design</nobr></h2>
 <div class="nodeHalfGap"></div>
 <div class="row">
     <div class="col-md-6">
@@ -110,7 +100,7 @@ New loops can be added by editing any node in the <a href="/dashboard/tree-{{ $G
             @if (isset($link->DataSubAutoGen) && intVal($link->DataSubAutoGen) == 1) Auto-Gen @else Manual @endif
         </td>
         <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->DataSubID }}" 
-            class="f10 slRedDark"><i class="fa fa-times"></i></a></td>
+            class="f10 slRedDark"><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty
     <tr><td colspan="4" ><i>none</i></td></tr>
@@ -163,7 +153,7 @@ basic core-table-to-loop-table relations.
             >{{ $link->DataHelpTable }}</a></td>
         <td>{{ $link->DataHelpValueField }}</td>
         <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->DataHelpID }}" class="f10 slRedDark"
-            ><i class="fa fa-times"></i></a></td>
+            ><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty
     <tr><td colspan="4" ><i>none</i></td></tr>
@@ -213,7 +203,7 @@ require a hierarchical relationship.
         <td class="taR slGrey">{{ $linkMap[3] }} <i class="fa fa-long-arrow-right mL5 slBlueDark"></i></td>
         <td><a href="/dashboard/db/table/{{ $linkMap[4] }}" target="_blank">{{ $linkMap[4] }}</a></td>
         <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delLinkage={{ $tblID }}" class="f10 slRedDark"
-            ><i class="fa fa-times"></i></a></td>
+            ><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty
     <tr><td colspan="6" ><i>none</i></td></tr>

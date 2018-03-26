@@ -4,7 +4,8 @@
     class=" @if (isset($xtraClass)) {{ $xtraClass }} @endif " data-nid="{{ $nID }}" >
 <div class="timeWrap"><nobr>
     <select name="n{{ $nID }}fldMonth" id="n{{ $nID }}fldMonthID" onChange="formDateChange('{{ $nID }}');" 
-        class="form-control input-lg fL mR20" style="width: 120px;">
+        class="form-control input-lg  @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mR20" style="width: 120px;"
+        {!! $GLOBALS["SL"]->tabInd() !!}>
         <option value="00" @if ($month == 'MM' || intVal($month) == 0) SELECTED @endif >month</option>
         @foreach ([1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April', 5 => 'May', 6 => 'June', 7 => 'July', 
             8 => 'August', 9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December'] as $m => $mm)
@@ -13,7 +14,8 @@
         @endforeach
     </select>
     <select name="n{{ $nID }}fldDay" id="n{{ $nID }}fldDayID" onChange="formDateChange('{{ $nID }}');" 
-        class="form-control input-lg fL mR20 mL20" style="width: 70px;">
+        class="form-control input-lg  @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mR20 mL20" style="width: 70px;"
+        {!! $GLOBALS["SL"]->tabInd() !!}>
         <option value="00" @if ($day == 'DD' || intVal($day) == 0) SELECTED @endif >day</option>
         @for ($i = 1; $i < 32; $i++)
             <option @if ($i < 10) value="0{{ $i }}" @else value="{{ $i }}" @endif 
@@ -21,7 +23,8 @@
         @endfor
     </select> <div class="fL pT10"><h4 class="disIn">,</h4></div>
     <select name="n{{ $nID }}fldYear" id="n{{ $nID }}fldYearID" onChange="formDateChange('{{ $nID }}');" 
-        class="form-control input-lg fL mL20" style="width: 100px;">
+        class="form-control input-lg  @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mL20" style="width: 100px;"
+        {!! $GLOBALS["SL"]->tabInd() !!}>
         <option value="0000" @if ($year == 'YYYY' || intVal($year) == 0) SELECTED @endif >year</option>
         @for ($i = intVal(date("Y")); $i > (intVal(date("Y"))-80); $i--)
             <option @if ($i < 10) value="0{{ $i }}" @else value="{{ $i }}" @endif

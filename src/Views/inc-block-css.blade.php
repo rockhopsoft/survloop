@@ -1,11 +1,11 @@
 <!-- generated from resources/views/vendor/survloop/inc-block-css.blade.php -->
-
 @if (sizeof($node->colors) > 0)
     <style>
     @if (isset($node->colors["blockHeight"]) && trim($node->colors["blockHeight"]) != '' 
         && trim($node->colors["blockHeight"]) != 'auto')
         #blockWrap{{ $nIDtxt }} {
-            height: @if ($node->colors["blockHeight"] == 'h100') 95% @else {{ substr($node->colors["blockHeight"], 1) }}% @endif;
+            height: @if ($node->colors["blockHeight"] == 'h100') 95% @else {{ 
+                substr($node->colors["blockHeight"], 1) }}% @endif;
             padding-bottom: 0px;
             overflow: visible;
         }
@@ -21,11 +21,12 @@
     @endif
     @if (isset($node->colors["blockImg"]) && trim($node->colors["blockImg"]) != '')
         #blockWrap{{ $nIDtxt }} { 
-            background: url('{{ $node->colors["blockImg"] }}') @if (isset($node->colors["blockBG"]) && trim($node->colors["blockBG"]) != '') {{ $node->colors["blockBG"] }} @endif ;
+            background: url('{{ $node->colors["blockImg"] }}') @if (isset($node->colors["blockBG"]) 
+                && trim($node->colors["blockBG"]) != '') {{ $node->colors["blockBG"] }} @endif ;
             @if (isset($node->colors["blockImgType"]) && trim($node->colors["blockImgType"]) == 'tiles')
                 background-repeat: repeat;
             @else
-                background-position: left;
+                background-position: center;
                 background-repeat: no-repeat;
                 -webkit-background-size: cover;
                 -moz-background-size: cover;

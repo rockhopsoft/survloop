@@ -4,28 +4,23 @@
 
 @section('content')
 
-<h2><span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Database Overview</h2>
+<h1><span class="slBlueDark"><i class="fa fa-database"></i> 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Database Overview</h1>
 
 <div class="pB10">
-    <b>Mission:</b> {!! $GLOBALS['SL']->dbRow->DbMission !!} ({!! strip_tags($dbStats) !!})
-</div>
-
+    @if (isset($GLOBALS['SL']->dbRow->DbMission) && trim($GLOBALS['SL']->dbRow->DbMission) != '')
+        <b>Mission:</b> {!! $GLOBALS['SL']->dbRow->DbMission !!}<br />
+    @endif
+    <nobr><span class="fPerc133">{!! strip_tags($dbStats) !!}</span></nobr>
 @if (!$isPrint)
-    <a href="/dashboard/db?print=1" target="_blank" class="btn btn-xs btn-default mR10"
+    <a href="/dashboard/db?print=1" target="_blank" class="btn btn-xs btn-default mL10 mTn5"
         ><i class="fa fa-print"></i> Print This Overview</a>
-    <a href="/dashboard/db/addTable" class="btn btn-xs btn-default mR10"
+    <a href="/dashboard/db/addTable" class="btn btn-xs btn-default mL10 mTn5"
         ><i class="fa fa-plus"></i> Add a New Table</a>
-    <a href="/dashboard/db/sortTable" class="btn btn-xs btn-default mR10"
+    <a href="/dashboard/db/sortTable" class="btn btn-xs btn-default mL10 mTn5"
         ><i class="fa fa-sort-amount-asc"></i> Re-Order Tables</a>
-    <a href="/dashboard/db/fieldDescs" class="btn btn-xs btn-default mR10"
-        ><i class="fa fa-pencil"></i> Field Descriptions</a>
-    <a href="/dashboard/db/fieldXML" class="btn btn-xs btn-default mR10"
-        ><i class="fa fa-pencil"></i> Field XML Settings</a>
-    <a href="/dashboard/db/diagrams" target="_blank" class="btn btn-xs btn-default mR10">Tables Diagrams</a>
-    <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-xs btn-default mR10">Field Matrix</a>
-    <a href="/dashboard/db/switch" class="btn btn-xs btn-default mR10">Switch Database</a>
 @endif
+</div>
 
 <div class="fC pT20 pL15">
     <i class="slGrey">Table English Name, Description, Data Type, Technical Name (Abbreviation), Notes</i>

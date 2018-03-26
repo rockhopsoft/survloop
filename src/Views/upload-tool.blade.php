@@ -9,7 +9,7 @@
                 <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" class="finger">
                     <div class="disIn mR5"><input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" 
                         value="{{ $ty->DefID }}" type="radio" autocomplete="off" class="upTypeBtn"
-                        onClick="checkNodeUp({{ $nID }}, {{ $j }}, 1);" ></div>    
+                        onClick="checkNodeUp('{{ $nID }}', {{ $j }}, 1);" ></div>    
                         {{ $ty->DefValue }}
                 </label>
             @endforeach
@@ -27,7 +27,8 @@
                         <a href="https://archive.org/details/opensource_movies" target="_blank">Internet Archive</a>)
                 </label></div>
                 <div class="nFld mT5">
-                    <input type="text" id="up{{ $nID }}VidID" name="up{{ $nID }}Vid" class="form-control input-lg">
+                    <input type="text" id="up{{ $nID }}VidID" name="up{{ $nID }}Vid" 
+                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                 </div>
             </div>
             <div id="up{{ $nID }}FormFile" class="disBlo">
@@ -35,21 +36,23 @@
                     Select Upload File ( .PNG .JPG .GIF .PDF )
                 </label></div>
                 <div class="nFld mT5">
-                    <input type="file" name="up{{ $nID }}File" id="up{{ $nID }}FileID" class="p5 form-control input-lg" 
-                        style="border: 1px #CCC solid;">
+                    <input type="file" name="up{{ $nID }}File" id="up{{ $nID }}FileID" {!! $GLOBALS["SL"]->tabInd() !!}
+                        class="p5 form-control input-lg ntrStp slTab" style="border: 1px #CCC solid;" >
                 </div>
             </div>
             <div class="nodeHalfGap"></div>
             <div id="node100{{ $nID }}" class="nodeWrap">
                 <div id="nLabel100{{ $nID }}" class="nPrompt"><label for="up{{ $nID }}TitleID">Title of Upload</label></div>
                 <div class="nFld mT5">
-                    <input type="text" id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" class="form-control input-lg">
+                    <input type="text" id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" 
+                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                 </div>
             </div>
             <?php /* <div class="nodeHalfGap"></div>
             <div class="nPrompt"><label for="up{{ $nID }}DescID">Upload Description:</label></div>
             <div class="nFld">
-                <input type="text" id="up{{ $nID }}DescID" name="up{{ $nID }}Desc" value="" class="form-control input-lg">
+                <input type="text" id="up{{ $nID }}DescID" name="up{{ $nID }}Desc" value="" 
+                    class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
             </div> */ ?>
             @if (isset($GLOBALS["SL"]->treeSettings["uploads-public"]) 
                 && intVal($GLOBALS["SL"]->treeSettings["uploads-public"][0]) > 0)
@@ -59,7 +62,8 @@
                     <h5>{!! $uploadWarn !!}</h5>
                 </div> 
                 <div class="nFld mT5">
-                    <select name="up{{ $nID }}Privacy" id="up{{ $nID }}PrivacyID" class="form-control input-lg">
+                    <select name="up{{ $nID }}Privacy" id="up{{ $nID }}PrivacyID" 
+                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                         <option value="Public" @if ($isPublic) CHECKED @endif >Public: Visible to whole world</option>
                         <option value="Private" @if (!$isPublic) CHECKED @endif >Private: Visible only to investigators</option>
                     </select>

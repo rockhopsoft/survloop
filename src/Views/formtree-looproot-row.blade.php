@@ -19,7 +19,7 @@
                             ><i class="fa fa-pencil fa-flip-horizontal"></i> Edit</a>
                         <a href="javascript:;" id="delLoopItem{{ $itemID }}" 
                             class="delLoopItem nFormLnkDel nobld btn btn-default mL10 mR10 fR"
-                            ><i class="fa fa-times"></i> Delete</a>
+                            ><i class="fa fa-trash-o"></i> Delete</a>
                         <input type="checkbox" class="disNon" 
                             name="delItem[]" id="delItem{{ $itemID }}" value="{{ $itemID }}" >
                     @endif

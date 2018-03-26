@@ -3,7 +3,7 @@
 @extends('vendor.survloop.master')
 
 @section('content')
-<form name="mainPageForm" action="/dashboard/blurbs/{{ $blurbRow->DefID }}" method="post">
+<form name="mainPageForm" action="/dashboard/pages/snippets/{{ $blurbRow->DefID }}" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="DefID" value="{{ $blurbRow->DefID }}">
 <div class="row">

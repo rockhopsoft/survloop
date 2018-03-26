@@ -23,16 +23,15 @@ addFld("{{ $fld }}");
 @empty
 @endforelse
 function checkNodeForm() {
-    if (document.getElementById("stepID").value == "back") return true;
+    if (document.getElementById("stepID") && document.getElementById("stepID").value == "back") return true;
     hasAttemptedSubmit = true;
-    totFormErrors=0; formErrorsEng = "";
+    totFormErrors = 0; formErrorsEng = ""; firstNodeError = 0;
     {!! $pageJSvalid !!}
     if (totFormErrors > 0) {
         setFormErrs();
         return false;
     }
     clearFormErrs();
-    firstNodeError = 0;
     return true; 
 }
 
@@ -53,3 +52,5 @@ setTimeout("hasAttemptedSubmit = false", 10);
     }
     $(document).ready(mainFixed);
 @endif
+
+setTimeout("lastSlTabIndex = {{ $GLOBALS['SL']->currTabInd }}", 1000);

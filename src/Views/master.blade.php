@@ -66,6 +66,10 @@
         }}/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
 
+@if ((isset($needsCharts) && $needsCharts) 
+    || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/Chart.bundle.min.js"></script>
+@endif
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey={{ env('TinyMCE_API_KEY') }}"></script>
     <?php /* <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
@@ -83,6 +87,8 @@
 <body>
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
+<div id="absDebug"></div>
+<div id="dialogPop" title=""></div>
 @if (isset($hasFbWidget) && $hasFbWidget)
     <div id="fb-root"></div>
     <script>(function(d, s, id) {
@@ -111,7 +117,7 @@
 @endif
 
 
-@if ((!isset($isPrint) || !$isPrint) 
+@if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
@@ -133,7 +139,7 @@
                 title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" ></a>
         @endif
         @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
-            && trim($GLOBALS['SL']->sysOpts['show-logo-title']) == 'On')
+            && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
             <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="pull-left"
                 >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
         @endif
@@ -160,7 +166,13 @@
     
 @endif <?php /* end not print */ ?>
 
-@if (isset($admMenu) || isset($belowAdmMenu))
+@if (isset($isFrame) && $isFrame)
+
+    @if (isset($content)) {!! $content !!} @endif
+    @yield('content')
+    </div>
+
+@elseif (isset($admMenu) || isset($belowAdmMenu))
     
     @if (isset($isPrint) && $isPrint)
         <br />
@@ -172,46 +184,19 @@
     @else
         
         @if (isset($admMenuHideable) && $admMenuHideable)
-            <div id="admMenuBarsWrap" style="margin: -15px 0px 0px -3px; z-index: 100; position: fixed;">
-                <a id="admMenuBars" class="btn btn-lg btn-primary f18" style="padding: 10px 10px 5px 10px;" 
-                    href="javascript:;"><i class="fa fa-bars"></i></a>
+            <div id="admMenuBarsWrap">
+                <a id="admMenuBars" class="btn btn-lg btn-primary" href="javascript:;"><i class="fa fa-bars"></i></a>
             </div>
-            <script type="text/javascript">
-                $(document).ready(function(){
-                    $( document ).ready(function() {
-                        $("#leftSide").removeClass('col-md-2');
-                        $("#leftSide").addClass('disNon');
-                        $("#mainBody").removeClass('col-md-10');
-                        $("#mainBody").addClass('col-md-12');
-                    });
-                    $("#admMenuBars").click(function() {
-                        if (document.getElementById('leftSide').className == 'disNon')
-                        {
-                            $("#mainBody").removeClass('col-md-12');
-                            $("#mainBody").addClass('col-md-10');
-                            $("#leftSide").removeClass('disNon');
-                            $("#leftSide").addClass('col-md-2');
-                        }
-                        else 
-                        {
-                            $("#leftSide").removeClass('col-md-2');
-                            $("#leftSide").addClass('disNon');
-                            $("#mainBody").removeClass('col-md-10');
-                            $("#mainBody").addClass('col-md-12');
-                        }
-                    });
-                });
-            </script>
         @endif
         
         <div class="container-fluid mT10">
             <div class="row">
-                <div id="leftSide" class="col-md-2 h100 brdRgt">
-                    <div class="disNon"><form class="navbar-form navbar-right"></div>
-                        <input type="text" class="form-control" placeholder="Search...">
-                    <div class="disNon"></form></div>
-                    <div id="leftSideWrap"
-                        @if (isset($admMenuHideable) && $admMenuHideable) class="pT20 mT5" @else class="mT10" @endif >
+                <div id="leftSide" class="col-md-2 h100">
+                    <div id="leftSideWrap" class="pR15 brdRgt 
+                        @if (isset($admMenuHideable) && $admMenuHideable) pT20 mT5 @endif " >
+                        <div class="disNon"><form class="navbar-form navbar-right"></div>
+                            <input type="text" class="form-control" placeholder="Search...">
+                        <div class="disNon"></form></div>
                         <div id="adminMenu" class="row">
                             @if (isset($admMenu)) {!! $admMenu !!} @endif
                         </div>
@@ -223,10 +208,8 @@
                 </div>
                 <div id="mainBody" class="col-md-10">
     @endif
-                    <div class="mTn10 pL20">
-                        @if (isset($content)) {!! $content !!} @endif
-                        @yield('content')
-                    </div>
+                    @if (isset($content)) {!! $content !!} @endif
+                    @yield('content')
                     
                     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
                         {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
@@ -253,33 +236,37 @@
     
 @endif
 
-@if ((!isset($isPrint) || !$isPrint)
+@if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
-@if (!isset($admMenu) && !isset($belowAdmMenu)) 
-    @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
-@endif
-
-</div> <!-- end nondialog -->
-<div id="dialog">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h2 id="dialogTitle" class="panel-title"></h2>
-            <a class="dialogClose btn btn-sm btn-default" href="javascript:;"
-                ><i class="fa fa-times" aria-hidden="true"></i></a>
-            <div class="fC"></div>
+    @if (!isset($admMenu) && !isset($belowAdmMenu)) 
+        @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
+    @endif
+    
+    </div> <!-- end nondialog -->
+    <div id="dialog">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h2 id="dialogTitle" class="panel-title"></h2>
+                <a class="dialogClose btn btn-sm btn-default" href="javascript:;"
+                    ><i class="fa fa-times" aria-hidden="true"></i></a>
+                <div class="fC"></div>
+            </div>
+            <div class="panel-body"><div id="dialogBody"></div></div>
         </div>
-        <div class="panel-body"><div id="dialogBody"></div></div>
     </div>
-</div>
 
 @endif <?php /* end not print or frame */ ?>
 
 </div> <!-- end #main (non-offcanvas-menu) -->
 
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
+<div class="imgPreload">
+@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 > @empty @endforelse
+</div>
 
-<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}/survloop/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
@@ -295,7 +282,8 @@
 @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
     {!! $GLOBALS['SL']->pageJAVA !!}
 @endif
-@if (isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')
+{!! $GLOBALS['SL']->getXtraJs() !!}
+@if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
     $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
 @endif
 </script>
@@ -304,14 +292,15 @@
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 @endif
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["google-analytic"])
-    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.app') === false && !isset($admMenu))
+    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false && !isset($admMenu))
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
+        !!}"></script>
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-      ga('create', '{!! $GLOBALS["SL"]->sysOpts["google-analytic"] !!}', 'auto');
-      ga('send', 'pageview');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{!! $GLOBALS["SL"]->sysOpts["google-analytic"] !!}');
     </script>
 @endif
 </body>

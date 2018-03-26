@@ -162,6 +162,15 @@ Route::group(['middleware' => ['web']], function () {
     
     ///////////////////////////////////////////////////////////
     
+    Route::get('/dashboard/logs', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@logsOverview', 
+        'middleware' => ['auth']
+    ]);
+    Route::get('/dashboard/logs/session-stuff', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@logsSessions', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::get('/dashboard/systems-check', [
         'uses'       => 'SurvLoop\Controllers\SurvLoop@systemsCheck',    
         'middleware' => ['auth']
@@ -222,12 +231,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/blurbs/{blurbID}', [
+    Route::post('/dashboard/pages/snippets/{blurbID}', [
         'uses' => 'SurvLoop\Controllers\AdminController@blurbEditSave', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/blurbs/{blurbID}', [
+    Route::get('/dashboard/pages/snippets/{blurbID}', [
         'uses' => 'SurvLoop\Controllers\AdminController@blurbEdit', 
         'middleware' => ['auth']
     ]);
@@ -261,19 +270,30 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/settings-{setType}', [
-        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
+    Route::post('/dashboard/settings-raw', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettingsRaw',
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/settings-{setType}', [
-        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
+    Route::get('/dashboard/settings-raw', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@sysSettingsRaw',
         'middleware' => ['auth']
     ]);
+    
     
     
     
     Route::get('/tree/{treeSlug}', 'SurvLoop\Controllers\AdminTreeController@adminPrintFullTreePublic');
+    
+    Route::post('/dashboard/trees/list', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/trees/list', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
+        'middleware' => ['auth']
+    ]);
     
     Route::post('/dashboard/tree-{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@index', 
@@ -385,6 +405,16 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/dashboard/pages/snippets', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@blurbsList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/pages/snippets', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@blurbsList', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::post('/dashboard/pages/menus', [
         'uses'       => 'SurvLoop\Controllers\AdminController@navMenus', 
         'middleware' => ['auth']
@@ -392,6 +422,16 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get('/dashboard/pages/menus', [
         'uses'       => 'SurvLoop\Controllers\AdminController@navMenus', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/images/gallery', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@imgGallery', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/images/gallery', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@imgGallery', 
         'middleware' => ['auth']
     ]);
     
@@ -679,8 +719,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::get('/dashboard/systems-update', [
+        'uses'       => 'SurvLoop\Controllers\SystemUpdate@index', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::get('/dashboard/css-reload',  'SurvLoop\\Controllers\\AdminController@getCSS');
-    Route::get('/dashboard/run-updates', 'SurvLoop\\Controllers\\AdminController@runDatabaseUpdate');
     
     
     // survey process for any admin tree
@@ -706,8 +750,14 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     
-    Route::post('/dash/{pageSlug}',   'SurvLoop\\Controllers\\AdminController@loadPageURL');
-    Route::get( '/dash/{pageSlug}',   'SurvLoop\\Controllers\\AdminController@loadPageURL');
+    Route::post('/dash/{pageSlug}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
+        'middleware' => ['auth']
+    ]);
+    Route::get('/dash/{pageSlug}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
+        'middleware' => ['auth']
+    ]);
     
     Route::post('/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
     Route::get( '/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
@@ -731,5 +781,5 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{desiredFile}', function ($desiredFile) {
         return redirect('/survloop/jquery-ui-1.12.1/images/' . $desiredFile);
     });
-
+    
 });    

@@ -31,8 +31,8 @@ $v = $surv->custLoop->v;
     </div>
 </div>
 
-<div class="nodeAnchor"><a name="n004"></a></div>
-@if (!isset($GLOBALS['SL']->sysOpts["login-instruct"]) || trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
+<div class="nodeAnchor"><a id="n004" name="n004"></a></div>
+@if (isset($GLOBALS['SL']->sysOpts["login-instruct"]) && trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
     <h4 class="mB20">{!! $GLOBALS['SL']->sysOpts["login-instruct"] !!}</h4>
 @endif
 
@@ -58,7 +58,7 @@ $v = $surv->custLoop->v;
     </div>
 </div>
 
-<div class="nodeAnchor"><a name="n001"></a></div>
+<div class="nodeAnchor"><a id="n001" name="n001"></a></div>
 <div class="nodeHalfGap"></div>
 
 <div id="node001" class="nodeWrap{{ $errors->has('email') ? 'Error' : '' }}">
@@ -83,12 +83,12 @@ $v = $surv->custLoop->v;
     </div>
 </div>
 
-<div class="nodeAnchor"><a name="n002"></a></div>
+<div class="nodeAnchor"><a id="n002" name="n002"></a></div>
 <div class="nodeHalfGap"></div>
 
 <div id="node002" class="nodeWrap{{ $errors->has('password') ? 'Error' : '' }}">
     <div id="nLabel002" class="nPrompt"><label for="password">
-        Password: <span class="red">*required</span>
+        Password: <span class="red">*required, 8 character minimum</span>
     </label></div>
     <div class="nFld mT0">
         <input id="password" name="password" value="" type="password" class="form-control">
@@ -100,7 +100,7 @@ $v = $surv->custLoop->v;
     </div>
 </div>
 
-<div class="nodeAnchor"><a name="n003"></a></div>
+<div class="nodeAnchor"><a id="n003" name="n003"></a></div>
 <div class="nodeHalfGap"></div>
 
 <div id="node003" class="nodeWrap">

@@ -2,13 +2,14 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    Table Diagrams 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Table Diagrams 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
 
-<a href="#tblMatrix" class="btn btn-default mR10"><i class="fa fa-angle-double-down"></i> <b>Table Relationship Matrix</a>
-<a href="#tblDiagSimple" class="btn btn-default mR10"><i class="fa fa-angle-double-down"></i> <b>Simplistic Auto-Diagram</a>
+<a href="#tblDiagSimple" class="btn btn-default mR10"
+    ><i class="fa fa-angle-double-down"></i> Simplistic Auto-Diagram</a>
+<a href="#tblMatrix" class="btn btn-default mR10"
+    ><i class="fa fa-angle-double-down"></i> Table Relationship Matrix</a>
 
 @forelse ($diags as $cnt => $dia)
     <div class="container">
@@ -20,21 +21,20 @@
 @empty
 @endforelse
 
+
+<a name="tblDiagSimple"></a>
+<div class="mT20"><iframe width=100% height=1000 frameborder=0 
+    @if ($GLOBALS["SL"]->REQ->has('refresh')) src="/dashboard/db/network-map?iframe=1&refresh=1"
+    @else src="/dashboard/db/network-map?iframe=1" @endif ></iframe></div>
+
 <a name="tblMatrix"></a><br /><br /><br /><hr>
 <h2>Table Relationship Matrix</h2>
 
 {!! $printMatrix !!}
 
+<div class="adminFootBuff"></div>
+
 <style>
-table.keyMatrix { border-collapse: collapse; background: #FFF; }
-table.keyMatrix tr th { font-size: 10pt; padding: 5px; }
+table.keyMatrix tr th { font-size: 10pt; padding: 3px; }
 table.keyMatrix tr td { text-align: center; }
-table.keyMatrix tr.row2 { background: #EEE; }
-table.keyMatrix tr td.col1, table.keyMatrix tr th.col1 { border: 1px #000 solid; border-right: 1px #999 solid; }
-table.keyMatrix tr td.col2, table.keyMatrix tr th.col2 { border: 1px #000 solid; border-left: 1px #999 solid; }
-table.keyMatrix td.mid { background: #AAA; color: #FFF; border: 1px #000 solid; }
 </style>
-
-
-<br /><br /><a name="tblDiagSimple"></a><br /><hr><br />
-<iframe src="/dashboard/db/network-map" width=100% height=1000 frameborder=0 ></iframe>

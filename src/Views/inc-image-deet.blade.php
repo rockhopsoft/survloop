@@ -50,17 +50,17 @@
         <label>Image Name/Title:<br />
             <input type="text" name="img{{ $img->ImgID }}Name" id="img{{ $img->ImgID }}NameID"
                 @if (isset($img->ImgTitle)) value="{{ $img->ImgTitle }}" @endif 
-                class="form-control w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
+                class="form-control ntrStp slTab w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
         </label>
         <label>Image Attribution:<br />
             <input type="text" name="img{{ $img->ImgID }}Credit" id="img{{ $img->ImgID }}CreditID"
                 @if (isset($img->ImgCredit)) value="{{ $img->ImgCredit }}" @endif 
-                class="form-control w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
+                class="form-control ntrStp slTab w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
         </label>
         <label>Attribution URL:<br />
             <input type="text" name="img{{ $img->ImgID }}CreditUrl" id="img{{ $img->ImgID }}CreditUrlID" 
                 @if (isset($img->ImgCreditUrl)) value="{{ $img->ImgCreditUrl }}" @endif 
-                class="form-control w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
+                class="form-control ntrStp slTab w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
         </label>
         
         <input type="button" id="imgSave{{ $img->ImgID }}" class="btn btn-default w100 imgSaveDeet" 

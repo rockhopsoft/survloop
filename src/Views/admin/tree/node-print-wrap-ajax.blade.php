@@ -26,9 +26,9 @@ $(document).on("click", ".adminNodeShowAdds", function() {
     var nID = $(this).attr("id").replace("showAdds", "");
     $("#nodeKids"+nID+"").slideDown("fast");
     $("#addChild"+nID+"").slideToggle("fast");
-    if (document.getElementById("addSib"+nID+""))         $("#addSib"+nID+"").slideToggle("fast");
-    if (document.getElementById("addSib"+nID+"B"))         $("#addSib"+nID+"B").slideToggle("fast");
-    if (document.getElementById("addChild"+nID+"B"))     $("#addChild"+nID+"B").slideToggle("fast");
+    if (document.getElementById("addSib"+nID+""))    $("#addSib"+nID+"").slideToggle("fast");
+    if (document.getElementById("addSib"+nID+"B"))   $("#addSib"+nID+"B").slideToggle("fast");
+    if (document.getElementById("addChild"+nID+"B")) $("#addChild"+nID+"B").slideToggle("fast");
     return true;
 });
 $(document).on("click", ".adminNodeShowMove", function() {

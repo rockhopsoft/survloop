@@ -8,11 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 
-// ??..
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
 use SurvLoop\Controllers\DatabaseLookups;
+use SurvLoop\Controllers\SurvLoopController;
 
 use App\Models\User;
 use App\Models\SLUsersActivity;
@@ -62,7 +62,7 @@ class AuthController extends Controller
         $validator = Validator::make($data, [
             'name' => 'required|max:50|unique:users',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|confirmed|min:6',
+            'password' => 'required|confirmed|min:8',
         ]);
         /* if ($validator->fails()) {
             echo $validator->messages()->toJson(); exit;
@@ -86,32 +86,18 @@ class AuthController extends Controller
         return $user;
     }
     
-    public function postRegister(Request $request)
-    {
-        if (session()->has('sessID') && session()->get('sessID') > 0) {
-            
-        }
-        $hasUsers = User::select('id')->get();    
-        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
-            $log = new SLUsersActivity;
-            $log->UserActUser = $user->id;
-            if (!$hasUsers || sizeof($hasUsers) == 0) {
-                $user->assignRole('administrator');
-                $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-            } else {
-                /* $user->assignRole('volunteer'); */
-                $log->UserActCurrPage = 'NEW USER!';
-            }
-            $log->save();
-        }
-        return redirect($this->domainPath . '/afterLogin');
-    }
-    
     public function postLogin(Request $request)
     {
+        $pass = false;
         if (Auth::attempt(['name' => $request->email, 'password' => $request->password])) {
-            return redirect($this->redirectPath);
+            $pass = true;
         } elseif (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            $pass = true;
+        }
+        if ($pass) {
+            $sl = new SurvLoopController;
+            $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+            $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
             return redirect($this->redirectPath);
         }
         return view('auth.login', [
@@ -133,6 +119,9 @@ class AuthController extends Controller
     
     public function getLogout()
     {
+        $sl = new SurvLoopController;
+        $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged Out');
         Auth::logout();
         session()->flush();
         return redirect($this->domainPath . '/');

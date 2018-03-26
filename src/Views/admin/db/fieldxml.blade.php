@@ -7,17 +7,18 @@
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    <nobr>Fields XML Options</nobr>
+    <nobr>Field Privacy Settings</nobr> 
 </h1>
-<a href="/dashboard/db/all" class="btn btn-xs btn-default">All Database Details</a>
-
-<div class="clearfix p10"></div>
-
+<h3>Options of each field printed in Reports & XML Exports</h3>
 <ul>
-<li><b>Public Data (Default)</b>     - These fields are always included in resulting XML files</li>
-<li><b>Private Data</b>             - These fields are included in public XML files only if the user chose to make them public </li>
-<li><b>Sensitive Data</b>             - These fields are only included in admin or super user XML files</li>
-<li><b>Internal Use</b>             - These fields are never included in XML files</li>
+<li><b class="slBlueDark">Public Data</b> - 
+    (Default) These fields are always included in resulting XML files</li>
+<li><b class="slBlueDark">Private Data</b> - 
+    These fields are included in public XML files only if the user chose to make them public </li>
+<li><b class="slBlueDark">Sensitive Data</b> - 
+    These fields are only included in admin or super user XML files</li>
+<li><b class="slBlueDark">Internal Use</b> - 
+    These fields are never included in XML files</li>
 </ul>
 
 <form name="mainPageForm" action="/dashboard/db/fieldXML/save" method="post" target="hidFrame">

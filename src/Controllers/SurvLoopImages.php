@@ -221,6 +221,8 @@ class SurvLoopImages
                     //if (file_exists($upFold . $img->ImgFileLoc)) Storage::delete($upFold . $img->ImgFileLoc);
                     if (!file_exists($upFold . $img->ImgFileLoc)) {
                         $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->move($upFold, $img->ImgFileLoc);
+                        $storageFold = '../storage/app/up/' . $GLOBALS["SL"]->getPckgProj() . '/';
+                        copy($upFold . $img->ImgFileLoc, $storageFold . $img->ImgFileLoc);
                     }
                 }
             } else {

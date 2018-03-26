@@ -28,13 +28,11 @@ class SLDataLoop extends Model
     
     public function loadLoopConds()
     {
-        $this->conds = array();
+        $this->conds = [];
         $getConds = SLConditionsNodes::where('CondNodeLoopID', $this->DataLoopID)
             ->get();
-        if ($getConds && sizeof($getConds) > 0)
-        {
-            foreach ($getConds as $c) 
-            {
+        if ($getConds && sizeof($getConds) > 0) {
+            foreach ($getConds as $c) {
                 $cond = SLConditions::find($c->CondNodeCondID);
                 $cond->loadVals();
                 $this->conds[] = $cond;

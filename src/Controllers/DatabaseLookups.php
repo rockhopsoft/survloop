@@ -26,6 +26,7 @@ use App\Models\SLEmails;
 use SurvLoop\Controllers\StatesUS;
 use SurvLoop\Controllers\SurvLoopStatic;
 use SurvLoop\Controllers\SurvLoopImages;
+use SurvLoop\Controllers\SurvLoopNode;
 
 class DatabaseLookups extends SurvLoopStatic
 {
@@ -83,6 +84,7 @@ class DatabaseLookups extends SurvLoopStatic
     public $closestLoop    = [];
     public $tblLoops       = [];
     public $nodeCondInvert = [];
+    public $currTabInd     = 0;
     
     public $states         = false;
     public $imgs           = false;
@@ -104,6 +106,20 @@ class DatabaseLookups extends SurvLoopStatic
         $this->REQ = $request;
         if ($treeOverride > 0) $this->treeOverride = $treeOverride;
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
+            $this->treeID  = $treeID;
+        }
+        $this->treeRow = SLTree::find($this->treeID);
+        if (($treeOverride > 0 || $this->treeOverride <= 0) && (!$this->treeRow || !isset($this->treeRow->TreeID))) {
+            $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
+                ->where('TreeType', 'Primary Public')
+                ->orderBy('TreeID', 'asc')
+                ->first();
+            if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
+        }
+        if ($dbID == -3 && isset($this->treeRow->TreeDatabase) && intVal($this->treeRow->TreeDatabase) > 0) {
+            $dbID = $this->treeRow->TreeDatabase;
+        }
+        if ($treeOverride > 0 || $this->treeOverride <= 0) {
             $this->dbID = $dbID;
         }
         $this->dbRow = SLDatabases::find($this->dbID);
@@ -111,19 +127,6 @@ class DatabaseLookups extends SurvLoopStatic
             && (!isset($this->dbRow) || sizeof($this->dbRow) == 0)) {
         	$this->dbID = 3;
         	$this->dbRow = SLDatabases::find($this->dbID);
-        }
-        if ($treeOverride > 0 || $this->treeOverride <= 0) {
-            $this->treeID  = $treeID;
-        }
-        $this->treeRow = SLTree::where('TreeID', $this->treeID)
-            ->where('TreeDatabase', $this->dbID)
-            ->first();
-        if (($treeOverride > 0 || $this->treeOverride <= 0) && (!$this->treeRow || !isset($this->treeRow->TreeID))) {
-            $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
-                ->where('TreeType', 'Primary Public')
-                ->orderBy('TreeID', 'asc')
-                ->first();
-            if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
         }
         $this->treeIsAdmin = false;
         if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts > 1 && $this->treeRow->TreeOpts%3 == 0) {
@@ -462,7 +465,7 @@ class DatabaseLookups extends SurvLoopStatic
                 foreach ($flds as $fld) {
                     $modelFile .= "\n\t\t'" . $tbl->TblAbbr . $fld->FldName . "', ";
                 }
-            }                                      
+            }
             $tblName = $this->dbRow->DbPrefix . $tbl->TblName;
             $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , [
                 "modelFile" => $modelFile, 
@@ -656,7 +659,7 @@ class DatabaseLookups extends SurvLoopStatic
     
     public function getForeignLnkFldName($tbl1, $tbl2 = -3)
     {
-        $fldName = $GLOBALS["SL"]->getForeignLnk($tbl1, $tbl2);
+        $fldName = $this->getForeignLnk($tbl1, $tbl2);
         if ($fldName != '') return $this->tblAbbr[$this->tbl[$tbl1]] . $fldName;
         return '';
     }
@@ -943,7 +946,7 @@ class DatabaseLookups extends SurvLoopStatic
         return view('vendor.survloop.admin.tree.node-edit-loop-list', [
             "fld"            => $fld,
             "manualOpt"      => $manualOpt,
-            "defs"           => $GLOBALS["SL"]->allDefSets(),
+            "defs"           => $this->allDefSets(),
             "currDefinition" => $currDefinition, 
             "currLoopItems"  => $currLoopItems, 
             "currTblRecs"    => $currTblRecs
@@ -1078,6 +1081,7 @@ class DatabaseLookups extends SurvLoopStatic
     
     public function getFldRowFromFullName($tbl, $fld)
     {
+        if (!isset($this->tblI[$tbl]) || !isset($this->tblAbbr[$tbl])) return [];
         return SLFields::where('FldTable', $this->tblI[$tbl])
             ->where('FldName', str_replace($this->tblAbbr[$tbl], '', $fld))
             ->first();
@@ -1087,6 +1091,141 @@ class DatabaseLookups extends SurvLoopStatic
     {
         list($tbl, $fld) = explode(':', $tblFld);
         return $this->getFldRowFromFullName($tbl, $fld)->getKey();
+    }
+    
+    public function getFldDefSet($tbl, $fld, $fldRow = [])
+    {
+        $ret = '';
+        if (sizeof($fldRow) == 0) $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        if ($fldRow && isset($fldRow->FldValues)) {
+            if (strpos($fldRow->FldValues, 'Def::') !== false) {
+                $ret = str_replace('Def::', '', $fldRow->FldValues);
+            } elseif (in_array($fldRow->FldValues, ['Y;N', 'N;Y', 'Y;N;?', '0;1', '1;0'])) {
+                $ret = 'Yes/No';
+            }
+        }
+        return $ret;
+    }
+    
+    public function getFldTitle($tbl, $fld, $fldRow = [])
+    {
+        if (sizeof($fldRow) == 0) $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        if ($fldRow && isset($fldRow->FldEng)) return $fldRow->FldEng;
+        return '';
+    }
+    
+    public function fld2SchemaType($fld)
+    {
+        if (strpos($fld->FldValues, 'Def::') !== false) return 'xs:string';
+        switch (strtoupper(trim($fld->FldType))) {
+            case 'INT':            return 'xs:integer'; break;
+            case 'DOUBLE':        return 'xs:double'; break;
+            case 'DATE':        return 'xs:date'; break;
+            case 'DATETIME':    return 'xs:dateTime'; break;
+            case 'VARCHAR':
+            case 'TEXT':
+            default:             return 'xs:string';
+        }
+        return 'xs:string';
+    }
+    
+    public function getTblFlds($tbl)
+    {
+        $ret = [];
+        if (isset($this->tblI[$tbl]) && isset($this->tblAbbr[$tbl])) {
+            $chk = SLFields::where('FldTable', '=', $this->tblI[$tbl])
+                ->where('FldSpecType', '=', 'Unique')
+                ->get();
+            if ($chk && sizeof($chk) > 0) {
+                foreach ($chk as $i => $fld) {
+                    $ret[] = $this->tblAbbr[$tbl] . $fld->FldName;
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    public function copyTblRecFromRow($tbl, $row)
+    {
+        if (!isset($this->tblAbbr[$tbl]) || !$row || !isset($row->{ $this->tblAbbr[$tbl] . 'ID' })) return '';
+        $abbr = $this->tblAbbr[$tbl];
+        eval("\$cpyTo = " . $this->modelPath($tbl) . "::find(" . $row->{ $abbr . 'ID' } . ");");
+        if (!$cpyTo || !isset($cpyTo->{ $abbr . 'ID' })) {
+            eval("\$cpyTo = new " . $this->modelPath($tbl) . ";");
+            $cpyTo->{ $abbr . 'ID' } = $row->{ $abbr . 'ID' };
+        }
+        $flds = $this->getTblFlds($tbl);
+        if (sizeof($flds) > 0) {
+            foreach ($flds as $i => $fld) $cpyTo->{ $fld } = $row->{ $fld };
+            $chk = SLTree::where('TreeCoreTable', $this->tblI[$tbl])
+                ->get();
+            if ($chk && sizeof($chk) > 0) {
+                $cpyTo->{ $abbr . 'UserID' }             = $row->{ $abbr . 'UserID' };
+                $cpyTo->{ $abbr . 'IPaddy' }             = $row->{ $abbr . 'IPaddy' };
+                $cpyTo->{ $abbr . 'UniqueStr' }          = $row->{ $abbr . 'UniqueStr' };
+                $cpyTo->{ $abbr . 'VersionAB' }          = $row->{ $abbr . 'VersionAB' };
+                $cpyTo->{ $abbr . 'TreeVersion' }        = $row->{ $abbr . 'TreeVersion' };
+                $cpyTo->{ $abbr . 'IsMobile' }           = $row->{ $abbr . 'IsMobile' };
+                $cpyTo->{ $abbr . 'SubmissionProgress' } = $row->{ $abbr . 'SubmissionProgress' };
+            }
+            $cpyTo->updated_at = $row->updated_at;
+            $cpyTo->created_at = $row->created_at;
+        }
+        $cpyTo->save();
+        return ' , copying ' . $tbl . ' row #' . $row->{ $abbr . 'ID' };
+    }
+    
+    public function copyTblRecTo($tbl, $row, $tblPrfx)
+    {
+        $flds = $this->getTblFlds($tbl);
+        
+        $qman = " ";
+        
+        //$this->dbRow->DbPrefix
+        
+        //$this->v["chk1"] = DB::select( DB::raw( "SELECT r2.* FROM `RII216_PowerScore` r2 JOIN "
+        //    . "`RII_PowerScore` r ON r2.`PsID` LIKE r.`PsID` WHERE r2.`PsZipCode` IS NOT NULL "
+        //    . "AND r2.`PsZipCode` NOT LIKE '' AND (r.`PsZipCode` IS NULL OR r.`PsZipCode` LIKE '')") );
+        
+        
+    }
+    
+    public function printResponse($tbl, $fld, $val, $fldRow = [])
+    {
+        $ret = '';
+        $defSet = $this->getFldDefSet($tbl, $fld, $fldRow);
+        if ($defSet != '') {
+            if (!is_array($val) && $val != '' && substr($val, 0, 1) == ';' && substr($val, strlen($val)-1) == ';') {
+                $val = $this->mexplode(';;', substr($val, 1, strlen($val)-2));
+            }
+        }
+        $str2arr = $this->str2arr($val);
+        if (sizeof($str2arr) > 0 && $str2arr[0] != 'EMPTY ARRAY') $val = $str2arr;
+        if (is_array($val)) {
+            if (sizeof($val) > 0) {
+                if (trim($defSet) != '') {
+                    foreach ($val as $i => $v) $val[$i] = $this->getDefValue($defSet, $v);
+                }
+                $ret = implode(', ', $val);
+                if (trim($ret) == ',') $ret = '';
+            }
+        } else { // not array
+            if (trim($defSet) == '') {
+                if ($val != '' && isset($GLOBALS["SL"]->fldTypes[$tbl]) && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])
+                    && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
+                    $ret = number_format(1*$val);
+                } else {
+                    $ret = $val;
+                }
+            } elseif (trim($defSet) == 'Yes/No') {
+                if (in_array(trim(strtoupper($val)), ['1', 'Y'])) $ret = 'Yes';
+                elseif (in_array(trim(strtoupper($val)), ['0', 'N'])) $ret = 'No';
+                elseif (trim($val) == '?') $ret = 'Not sure';
+            } else {
+                $ret = $GLOBALS["SL"]->getDefValue($defSet, $val);
+            }
+        }
+        return $ret;
     }
     
     public function getMapToCore($fldID = -3, $fld = [])
@@ -1124,9 +1263,9 @@ class DatabaseLookups extends SurvLoopStatic
             if (trim($value) != '') {
                 $fld = SLFields::find($fldID);
                 $tbl = $this->tbl[$fld->FldTable];
-                $keyMap = $GLOBALS["SL"]->getMapToCore($fldID, $fld);
+                $keyMap = $this->getMapToCore($fldID, $fld);
                 if (sizeof($keyMap) == 0) { // then field in core record
-                    $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($tbl) . "::whereIn('" . $this->tblAbbr[$tbl] 
+                    $eval = "\$chk = " . $this->modelPath($tbl) . "::whereIn('" . $this->tblAbbr[$tbl] 
                         . "ID', \$ids)->where('" .  $this->tblAbbr[$tbl] . $fld->FldName . "', '" . $value 
                         . "')->select('" . $this->tblAbbr[$tbl] . "ID')->get();";
                     eval($eval);
@@ -1392,21 +1531,6 @@ class DatabaseLookups extends SurvLoopStatic
         return $cond;
     }
     
-    public function fld2SchemaType($fld)
-    {
-        if (strpos($fld->FldValues, 'Def::') !== false) return 'xs:string';
-        switch (strtoupper(trim($fld->FldType))) {
-            case 'INT':            return 'xs:integer'; break;
-            case 'DOUBLE':        return 'xs:double'; break;
-            case 'DATE':        return 'xs:date'; break;
-            case 'DATETIME':    return 'xs:dateTime'; break;
-            case 'VARCHAR':
-            case 'TEXT':
-            default:             return 'xs:string';
-        }
-        return 'xs:string';
-    }
-    
     public function loadFldAbout($pref = 'Fld')
     {
         $chk = SLFields::where('FldDatabase', 3)
@@ -1537,7 +1661,7 @@ class DatabaseLookups extends SurvLoopStatic
     public function addToHeadCore($js)
     {
         if (!isset($this->sysOpts['header-code'])) $this->sysOpts['header-code'] = '';
-        $this->sysOpts['header-code'] .= $js;
+        if (strpos($this->sysOpts['header-code'], $js) === false) $this->sysOpts['header-code'] .= $js;
         return true;
     }
     
@@ -1775,6 +1899,31 @@ class DatabaseLookups extends SurvLoopStatic
         return $url . '/';
     }
     
+    public function getNodePageName($currNode = -3)
+    {
+        if (!isset($this->x["nodeNames"])) $this->x["nodeNames"] = [];
+        if ($currNode > 0) {
+            if (!isset($this->x["nodeNames"][$currNode])) {
+                $this->x["nodeNames"][$currNode] = '';
+                $row = SLNode::find($currNode);
+                if ($row && isset($row->NodeID)) {
+                    $node = new SurvLoopNode();
+                    $node->fillNodeRow($currNode, $row);
+                    if (isset($node->nodeRow) && isset($node->nodeRow->NodeID)) {
+                        if (isset($node->extraOpts["meta-title"]) && trim($node->extraOpts["meta-title"]) != '') {
+                            $this->x["nodeNames"][$currNode] = $node->extraOpts["meta-title"];
+                        }
+                        if (isset($node->NodePromptNotes)) {
+                            $this->x["nodeNames"][$currNode] = $node->NodePromptNotes;
+                        }
+                    }
+                }
+            }
+            return $this->x["nodeNames"][$currNode];
+        }
+        return '';
+    }
+    
     public function getCycSffx()
     {
         return trim($this->currCyc["cyc"][1]) . trim($this->currCyc["res"][1]) . trim($this->currCyc["tbl"][1]);
@@ -1806,6 +1955,12 @@ class DatabaseLookups extends SurvLoopStatic
         return true;
     }
     
+    public function getState($abbr = '')
+    {
+        $this->loadStates();
+        return $this->states->getState($abbr);
+    }
+    
     public function loadImgs($nID = '', $dbID = 1)
     {
         if ($this->imgs === false) $this->imgs = new SurvLoopImages($nID, $dbID);
@@ -1834,6 +1989,204 @@ class DatabaseLookups extends SurvLoopStatic
     {
         $this->loadImgs($nID, $dbID);
         return $this->imgs->uploadImg($nID, $presel);
+    }
+    
+    public function addTopNavItem($title, $url)
+    {
+        if (strpos($this->pageJAVA, 'addTopNavItem("' . $title . '"') === false) {
+            $this->pageJAVA .= 'setTimeout(\'addTopNavItem("' . $title . '", "' . $url . '")\', 1500);';
+        }
+        return true;
+    }
+    
+    public function tabInd()
+    {
+        $this->currTabInd++;
+        return ' tabindex="' . $this->currTabInd . '" '; 
+    }
+    
+    public function replaceTabInd($str)
+    {
+        $pos = strpos($str, 'tabindex="');
+        if ($pos === false) return $str . $this->tabInd();
+        $posEnd = strpos($str, '"', (10+$pos));
+        return substr($str, 0, $pos) . $this->tabInd() . substr($str, (1+$posEnd));
+    }
+    
+    public function resetTreeNodeStats()
+    {
+        $this->x["dataStatTypes"] = [
+            "quali" => [ 'Text', 'Long Text', 'Email', 'Uploads' ],
+            "choic" => [ 'Radio', 'Checkbox', 'Drop Down', 'Gender', 'Gender Not Sure', 'U.S. States', 'Countries' ],
+            "quant" => [ 'Text:Number', 'Slider', 'Date', 'Date Picker', 'Date Time', 'Time', 'Feet Inches' ]
+            ];
+        $this->x["dataTypeStats"] = [
+            "quali" => [ "all" => 0, "req" => 0 ],
+            "choic" => [ "all" => 0, "req" => 0 ],
+            "quant" => [ "all" => 0, "req" => 0 ],
+            "flds"  => [ ]
+            ];
+        $this->x["qTypeStats"] = [
+            "quali" => [ "all" => 0, "req" => 0 ],
+            "choic" => [ "all" => 0, "req" => 0 ],
+            "quant" => [ "all" => 0, "req" => 0 ],
+            "nodes" => [ "tot" => 0, "loops" => 0, "loopNodes" => 0 ]
+            ];
+        return true;
+    }
+    
+    public function logTreeNodeStat($node = [])
+    {
+        if ($node && isset($node->nodeType)) {
+            $type = '';
+            if (in_array($node->nodeType, $this->x["dataStatTypes"]["quali"]))     $type = 'quali';
+            elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["choic"])) $type = 'choic';
+            elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["quant"])) $type = 'quant';
+            if ($type != '') {
+                if (isset($node->dataStore) && !in_array($node->dataStore, $this->x["dataTypeStats"]["flds"])) {
+                    $this->x["dataTypeStats"]["flds"][] = $node->dataStore;
+                    $this->x["dataTypeStats"][$type]["all"]++;
+                    if ($node->isRequired()) $this->x["dataTypeStats"][$type]["req"]++;
+                }
+                $this->x["qTypeStats"][$type]["all"]++;
+                if ($node->isRequired()) $this->x["qTypeStats"][$type]["req"]++;
+            }
+        }
+        return true;
+    }
+    
+    public function printTreeNodeStats($isPrint = false, $isAll = true, $isAlt = true)
+    {
+        if (isset($this->x["dataTypeStats"]) && isset($this->x["dataTypeStats"]["quali"])) {
+            return view('vendor.survloop.inc-tree-node-type-stats' , [
+                "isPrint"       => $isPrint,
+                "isAll"         => $isAll,
+                "isAlt"         => $isAlt,
+                "dataTypeStats" => $this->x["dataTypeStats"],
+                "qTypeStats"    => $this->x["qTypeStats"]
+                ])->render();
+        }
+        return '';
+    }
+    
+    public function addPreloadImg($src = '')
+    {
+        if (trim($src) == '') return false;
+        if (!isset($this->x["preload-imgs"])) $this->x["preload-imgs"] = [];
+        $this->x["preload-imgs"][] = $src;
+        return true;
+    }
+    
+    public function listPreloadImgs()
+    {
+        if (!isset($this->x["preload-imgs"])) $this->x["preload-imgs"] = [];
+        return $this->x["preload-imgs"];
+    }
+    
+    public function addAdmMenuHshoo($url = '')
+    {
+        if (trim($url) == '') return false;
+        if (!isset($this->x["menu-hshoos"])) $this->x["menu-hshoos"] = [];
+        $this->x["menu-hshoos"][] = $url;
+        $this->addHshoo($url);
+        return true;
+    }
+    
+    public function addAdmMenuHshoos($urls = [])
+    {
+        if (sizeof($urls) > 0) {
+            foreach ($urls as $i => $url) $this->addAdmMenuHshoo($url);
+        }
+        return true;
+    }
+    
+    public function isAdmMenuHshoo($url = '')
+    {
+        return (isset($this->x["menu-hshoos"]) && in_array($url, $this->x["menu-hshoos"]));
+    }
+    
+    public function addHshoo($url = '')
+    {
+        if (trim($url) == '') return false;
+        if (!isset($this->x["hshoos"])) $this->x["hshoos"] = [];
+        if (strpos($url, '#') > 0) $url = substr($url, strpos($url, '#'));
+        $this->x["hshoos"][] = $url;
+        return true;
+    }
+    
+    public function addHshoos($urls = [])
+    {
+        if (sizeof($urls) > 0) {
+            foreach ($urls as $i => $url) $this->addAdmMenuHshoo($url);
+        }
+        return true;
+    }
+    
+    public function isHshoo($url = '')
+    {
+        return (isset($this->x["hshoos"]) && in_array($url, $this->x["hshoos"]));
+    }
+    
+    public function getHshooJs()
+    {
+        $ret = '';
+        if (isset($this->x["hshoos"]) && sizeof($this->x["hshoos"]) > 0) {
+            foreach ($this->x["hshoos"] as $i => $hsh) $ret .= 'addHshoo("' . $hsh . '"); ';
+        }
+        return $ret;
+    }
+    
+    public function getXtraJs()
+    {
+        return $this->getHshooJs();
+    }
+    
+    public function chkMissingReportFlds($treeID = -3)
+    {
+        $ret = '';
+        if ($treeID <= 0) $treeID = $this->treeID;
+        $flds1 = $flds2 = [];
+        $tree1 = SLTree::find($treeID);
+        if ($tree1 && isset($tree1->TreeType) && $tree1->TreeType == 'Page' && $tree1->TreeOpts%13 == 0) { // is report
+            $tree2 = SLTree::where('TreeType', 'Primary Public')
+                ->where('TreeCoreTable', $tree1->TreeCoreTable)
+                ->orderBy('TreeID', 'desc')
+                ->first();
+            if ($tree2 && isset($tree2->TreeID)) {
+                $chk = SLNode::where('NodeTree', $tree1->TreeID)
+                    ->select('NodeDataStore')
+                    ->get();
+                if ($chk && sizeof($chk) > 0) {
+                    foreach ($chk as $i => $node) {
+                        if (isset($node->NodeDataStore) && trim($node->NodeDataStore) != '' 
+                            && !in_array($node->NodeDataStore, $flds1)) {
+                            $flds1[] = $node->NodeDataStore;
+                        }
+                    }
+                }
+                $chk = SLNode::where('NodeTree', $tree2->TreeID)
+                    ->orderBy('NodeDataStore', 'asc')
+                    ->select('NodeDataStore')
+                    ->get();
+                if ($chk && sizeof($chk) > 0) {
+                    foreach ($chk as $i => $node) {
+                        if (isset($node->NodeDataStore) && trim($node->NodeDataStore) != '' 
+                            && !in_array($node->NodeDataStore, $flds2)) {
+                            $flds2[] = $node->NodeDataStore;
+                        }
+                    }
+                }
+            }
+        }
+        if (sizeof($flds2) > 0) {
+            foreach ($flds2 as $fld2) {
+                if (!in_array($fld2, $flds1)) $ret .= ', <span class="mL20">' . $fld2 . '</span>';
+            }
+        }
+        if (trim($ret) != '') {
+            $ret = '<div class="mT20"><b>Fields Missing From Primary Survey:</b>' . substr($ret, 1) . '</div>';
+        }
+        return $ret;
     }
     
     

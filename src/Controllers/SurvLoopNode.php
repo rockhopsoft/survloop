@@ -148,13 +148,15 @@ class SurvLoopNode extends CoreNode
                     ->get();
                 if ($chk && sizeof($chk) > 0) {
                     foreach ($chk as $res) {
-                        if (isset($res->NodeResOrd) && isset($res->NodeResValue)) {
-                            if (intVal($res->NodeResOrd) == -1) {
-                                $this->extraOpts["minVal"] = intVal($res->NodeResValue);
-                            } elseif (intVal($res->NodeResOrd) == 1) {
-                                $this->extraOpts["maxVal"] = intVal($res->NodeResValue);
-                            } elseif (intVal($res->NodeResOrd) == 2) {
-                                $this->extraOpts["incr"] = intVal($res->NodeResValue);
+                        if (isset($res->NodeResOrd)) {
+                            if (isset($res->NodeResValue)) {
+                                switch (intVal($res->NodeResOrd)) {
+                                    case -1: $this->extraOpts["minVal"] = floatVal($res->NodeResValue); break;
+                                    case 1:  $this->extraOpts["maxVal"] = floatVal($res->NodeResValue); break;
+                                    case 2:  $this->extraOpts["incr"]   = floatVal($res->NodeResValue); break;
+                                }
+                            }
+                            if (isset($res->NodeResEng)) {
                                 $this->extraOpts["unit"] = trim($res->NodeResEng);
                             }
                         }
@@ -215,6 +217,11 @@ class SurvLoopNode extends CoreNode
             }
         } elseif (in_array($this->nodeType, ['Map'])) {
             
+            
+        } elseif ($this->isSpreadTbl()) {
+            if (!isset($this->nodeRow->NodeCharLimit) || intVal($this->nodeRow->NodeCharLimit) == 0) {
+                $this->nodeRow->NodeCharLimit = 20;
+            }
         }
         $this->isPageBlock();
         return true;
@@ -310,6 +317,17 @@ class SurvLoopNode extends CoreNode
         return '';
     }
     
+    public function getTblFldLink($isPrint = true)
+    {
+        $fld = SLFields::find($this->getTblFldID());
+        if ($fld && isset($fld->FldTable)) {
+            return '<a target="_blank" href="' . (($isPrint) ? '/db/1' : '/dashboard/db/all') . '#' 
+                . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] . $fld->FldName 
+                . '" class="slGreenDark">' . $this->getTblFldName() . '</a>';
+        }
+        return '';
+    }
+    
     public function hasDefSet()
     {
         if (isset($this->extraOpts["hasDefSet"])) return $this->extraOpts["hasDefSet"];
@@ -401,6 +419,11 @@ class SurvLoopNode extends CoreNode
         return ($this->nodeType == 'Instructions Raw');
     }
     
+    public function isInstructAny()
+    {
+        return ($this->isInstruct() || $this->isInstructRaw());
+    }
+    
     public function isBigButt()
     {
         return ($this->nodeType == 'Big Button'); 
@@ -416,17 +439,21 @@ class SurvLoopNode extends CoreNode
     
     public function isSpecial()
     {
+        return ($this->isNonLoopSpecial() || $this->isLoopRoot() || $this->isLoopCycle());
+    }
+    
+    public function isNonLoopSpecial()
+    {
         return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
-            || $this->isLoopRoot() || $this->isLoopCycle() || $this->isLoopSort() || $this->isDataManip()
-            || $this->isWidget() || $this->isBigButt() || $this->isLayout() 
-            || $this->isDataPrint() || in_array($this->nodeType, ['Send Email']));
+            || $this->isLoopSort() || $this->isDataManip() || $this->isWidget() || $this->isBigButt() 
+            || $this->isLayout() || $this->isDataPrint() || in_array($this->nodeType, ['Send Email']));
     }
     
     public function isWidget()
     {
         return ($this->isGraph() || in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 
             'Member Profile Basics', 'Record Full', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons',
-            'Widget Custom']));
+            'Widget Custom', 'Admin Form']));
     }
     
     public function isGraph()
@@ -436,17 +463,14 @@ class SurvLoopNode extends CoreNode
     
     public function isLayout()
     {
-        return (in_array($this->nodeType, ['Page Block', 'Layout Row', 'Layout Column', 'Layout Sub-Response']));
-    }
-    
-    public function canBePageBlock()
-    {
-        return ($this->isLayout() || $this->isInstruct() || $this->isInstructRaw());
+        return (in_array($this->nodeType, ['Page Block', 'Layout Row', 'Layout Column', 'Layout Sub-Response',
+            'Gallery Slider']));
     }
     
     public function isPageBlock()
     {
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $this->parentID == $GLOBALS["SL"]->treeRow->TreeRoot) {
+        //if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $this->parentID == $GLOBALS["SL"]->treeRow->TreeRoot) {
+        if ($this->isLayout() || $this->isInstructAny()) {
             $this->loadPageBlockColors();
             return true;
         }
@@ -476,6 +500,11 @@ class SurvLoopNode extends CoreNode
     public function isDropdownTagger()
     {
         return ($this->nodeType == 'Drop Down' && $this->nodeRow->NodeOpts%53 == 0);
+    }
+    
+    public function isHnyPot()
+    {
+        return ($this->nodeType == 'Spambot Honey Pot');
     }
     
     
@@ -515,7 +544,8 @@ class SurvLoopNode extends CoreNode
     
     public function loadPageBlockColors()
     {
-        if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '') {
+        if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '' 
+            && sizeof($this->colors) == 0) {
             $colors = explode(';;', $this->nodeRow->NodeDefault);
             if (isset($colors[0])) $this->colors["blockBG"]      = $colors[0];
             if (isset($colors[1])) $this->colors["blockText"]    = $colors[1];
@@ -576,6 +606,10 @@ class SurvLoopNode extends CoreNode
             return '<i class="fa fa-user-plus" aria-hidden="true"></i>';
         } elseif ($this->nodeType == 'Uploads') {
             return '<i class="fa fa-cloud-upload" aria-hidden="true"></i>';
+        } elseif (in_array($this->nodeType, ['Gallery Slider'])) {
+            return '<i class="fa fa-picture-o" aria-hidden="true"></i>';
+        } elseif ($this->isPageBlock()) {
+            return '<i class="fa fa-square-o" aria-hidden="true"></i>';
         } elseif ($this->isLayout()) {
             return '<i class="fa fa-columns"></i>';
         } elseif ($this->isWidget()) {
@@ -601,6 +635,11 @@ class SurvLoopNode extends CoreNode
         } else { // if ($this->nodeType == 'Other/Custom')
             return '<i class="fa fa-hand-spock-o" aria-hidden="true"></i>';
         }
+    }
+    
+    public function isPrintBasicTine()
+    {
+        return ($this->isDataManip() || $this->isLoopCycle() || $this->isLayout() || $this->isBranch());
     }
     
 }

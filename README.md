@@ -2,7 +2,7 @@
 # WikiWorldOrder/SurvLoop
 
 [![Laravel](https://img.shields.io/badge/Laravel-5.3-orange.svg?style=flat-square)](http://laravel.com)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+[![License](https://img.shields.io/aur/license/yaourt.svg?style=flat-square)](https://www.gnu.org/licenses/gpl.html)
 
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
 This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
@@ -46,11 +46,14 @@ XML included an automatically generated schema, eg.<br />
 
 # <a name="getting-started"></a>Getting Started
 
-Here are instructions if you are new to Laravel, or just want step-by-step instructions on how to install its 
-development environment, Homestead: 
-<a href="http://wikiworldorder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/" target="_blank">
-    WikiWorldOrder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/</a>.
+Instructions if you are new to Laravel, or just want to install its local development environment, Homestead: 
+<a href="http://wikiworldorder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/" 
+    target="_blank">WikiWorldOrder.org/2016/11/26/coding-with-laravel-installing-homestead-on-a-mac/</a>.
 
+Instructions if you are new to Laravel, or just want to install it to an online server: 
+<a href="http://wikiworldorder.org/2018/03/15/how-to-install-the-laravel-php-framework-on-digital-ocean/" 
+    target="_blank">WikiWorldOrder.org/2018/03/15/how-to-install-the-laravel-php-framework-on-digital-ocean/</a>.
+    
 * Install Laravel's default user authentication, notifications, and SurvLoop:
 
 ```

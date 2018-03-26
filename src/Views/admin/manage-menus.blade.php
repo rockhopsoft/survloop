@@ -5,9 +5,16 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-6"></div>
     <div class="col-md-6">
-        <h2 class="fL"><i class="fa fa-newspaper-o"></i> Primary Navigation Menu</h2>
+        <h2><i class="fa fa-newspaper-o mR5"></i> Footer Navigation Menu</h2>
+        <span class="slGrey">...soon...</span>
+        <div class="p20"></div>
+        <h2><i class="fa fa-key"></i> Admin Navigation Menu</h2>
+        <span class="slGrey">...soon...</span>
+        <div class="p20"></div>
+    </div>
+    <div class="col-md-6">
+        <h2 class="fL"><i class="fa fa-bars mR5" aria-hidden="true"></i> Burger Navigation Menu</h2>
         <h2 class="fR slBlueDark mR10"><i class="fa fa-level-up" aria-hidden="true"></i></h2>
         <div class="fC"></div>
         

@@ -1,12 +1,12 @@
 <!-- resources/views/auth/register-node.blade.php -->
 
 <input type="hidden" name="emailBlock" id="emailBlockID" value="1">
+<input type="hidden" name="sessTree" id="sessTreeID" value="{{ $GLOBALS['SL']->sessTree }}">
 @if (!isset($GLOBALS["SL"]->sysOpts["user-name-ask"]) || $GLOBALS["SL"]->sysOpts["user-name-ask"] == 'Off')
     <input type="hidden" name="name" id="nameID" value="Session#{{ $coreID }}" >
 @endif
 
 @if ($anonyLogin)
-
     <script type="text/javascript">
     function anonymousLogin() {
         document.getElementById('emailID').value='anonymous.{{ $coreID }}@anonymous.org';
@@ -20,21 +20,17 @@
     <h2><i class="slGrey">Creating a temporary, anonymous account...</i></h2>
     <!-- hiding form from anonymous users or those with unresolved charges -->
     <div class="disNon">
-    
 @endif
-
 
 @if (isset($GLOBALS["SL"]->sysOpts["user-name-ask"]) && $GLOBALS["SL"]->sysOpts["user-name-ask"] == 'On')
     <div id="node004" class="nodeWrap">
-        <div id="nLabel004" class="nPrompt">
-            <label for="nameID">
-                Username
-                @if ($GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
-                    <span class="red">*required</span>
-                @endif
-            </label>
-        </div>
-        <div class="nFld mT0">
+        <div id="nLabel004" class="nPrompt"><label for="nameID">
+            Username
+            @if ($GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
+                <span class="red">*required</span>
+            @endif
+        </label></div>
+        <div class="nFld">
             <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
         </div>
     </div>
@@ -51,7 +47,7 @@
             @endif
         </label>
     </div>
-    <div class="nFld mT0">
+    <div class="nFld">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
     </div>
     @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
@@ -78,23 +74,19 @@
 <div class="nodeGap"></div>
 
 <div id="node002" class="nodeWrap">
-<div id="nLabel002" class="nPrompt">
-    <label for="password">
-        Password <span class="red">*required, 6 character minimum</span>
-    </label>
-</div>
-<div class="nFld mT0">
-    <input id="password" name="password" type="password" class="form-control">
-</div>
+    <div id="nLabel002" class="nPrompt"><label for="password">
+        Password <span class="red">*required, 8 character minimum</span>
+    </label></div>
+    <div class="nFld">
+        <input id="password" name="password" type="password" class="form-control">
+    </div>
 </div>
 <div class="nodeGap"></div>
 <div id="node003" class="nodeWrap">
-    <div id="nLabel003" class="nPrompt">
-        <label for="password_confirmation">
-            Confirm Password <span class="red">*required</span>
-        </label>
-    </div>
-    <div class="nFld mT0">
+    <div id="nLabel003" class="nPrompt"><label for="password_confirmation">
+        Confirm Password <span class="red">*required</span>
+    </label></div>
+    <div class="nFld">
         <input id="password_confirmation" name="password_confirmation" type="password" 
             class="form-control">
     </div>

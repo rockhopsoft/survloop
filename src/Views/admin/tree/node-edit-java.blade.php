@@ -123,6 +123,11 @@ function changeResponseType(newType) {
         document.getElementById('spreadTblOpts').style.display='none';
         document.getElementById('storeResponseDiv').style.display='block';
     }
+    if (newType == 'Radio') {
+        document.getElementById('nOptsRadio').style.display='block';
+    } else {
+        document.getElementById('nOptsRadio').style.display='none';
+    }
     if (newType == 'Checkbox' || newType == 'Other/Custom') {
         for (var i=0; i < {{ $resLimit }}; i++) {
             if (document.getElementById('resMutEx'+i+'')) {
@@ -320,34 +325,6 @@ function previewBigBtn() {
 }
 setTimeout("previewBigBtn()", 50);
 
-function previewPage() {
-    if (document.getElementById('pagePrev')) {
-        var pTitle = " - {{ $GLOBALS["SL"]->sysOpts["meta-title"] }}";
-        if (document.getElementById('npageTitleFldID')) {
-            pTitle = document.getElementById('npageTitleFldID').value.trim() + pTitle;
-        }
-        var pDesc = "";
-        if (document.getElementById("npageDescFldID")) pDesc = document.getElementById("npageDescFldID").value.trim();
-        var pUrl = "{{ $GLOBALS['SL']->treeBaseUrl(true) }}";
-        if (document.getElementById('nodeSlugID')) pUrl += document.getElementById('nodeSlugID').value.trim();
-        var pUrlS = pUrl.replace("https://www.", "").replace("https://", "").replace("http://www.", "").replace("http://", "");
-        var pImg = @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != "") "" @else "{{ 
-            $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ;
-        pImg = document.getElementById('npageImgFldID').value.trim();
-        if (document.getElementById("metaImgID")) pImg = document.getElementById("metaImgID").value.trim();
-        if (pTitle.length > 60) pTitle = pTitle.substring(0, 60)+"...";
-        if (pDesc.length > 160) pDesc = pDesc.substring(0, 160)+"...";
-        document.getElementById('pagePrev').innerHTML = '<div class="prevImg"><img src="'+pImg+'"></div><div class="p10 mL5"><h3 class="mT0">'+pTitle+'</h3><div class="pB5">'+pDesc+'</div><a href="'+pUrl+'" target="_blank" class="f10">'+pUrlS+'</a></div>';
-    }
-    return true;
-}
-function previewPageAuto() {
-    previewPage();
-    setTimeout("previewPageAuto()", 3000);
-    return true;
-}
-setTimeout("previewPageAuto()", 50);
-
 function checkData() {
     maxRes = 0;
     for (i=1; i < {{ $resLimit }}; i++) {
@@ -359,11 +336,6 @@ function checkData() {
     for (i=(maxRes+2); i < {{ $resLimit }}; i++) {
         if (document.getElementById('dataManipFld'+i+'')) document.getElementById('dataManipFld'+i+'').style.display = 'none';
     }
-    charCountKeyUp('pageTitle');
-    charCountKeyUp('pageDesc');
-    flexAreaAdjust(document.getElementById('npageDescFldID'));
-    keywordCountKeyUp('pageKeywords');
-    flexAreaAdjust(document.getElementById('npageKeywordsFldID'));
     return true;
 }
 setTimeout("checkData()", 100);

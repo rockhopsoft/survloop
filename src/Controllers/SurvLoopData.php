@@ -1,6 +1,7 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use DB;
 use Auth;
 use App\Models\SLFields;
 use App\Models\SLNodeSaves;
@@ -307,6 +308,11 @@ class SurvLoopData
         return $recObj;
     }
     
+    public function simpleNewDataRecord($tbl = '')
+    {
+        return $this->newDataRecordInner($tbl, $this->getRecordLinks($tbl));
+    }
+    
     public function deleteDataRecord($tbl = '', $fld = '', $newVal = -3)
     {
 //echo 'deleteDataRecord(tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . '<br />';
@@ -360,7 +366,7 @@ class SurvLoopData
         return $recObj;
     }
     
-    protected function dataWhere($tbl, $where, $whereVal, $operator = "=", $getFirst = "get")
+    public function dataWhere($tbl, $where, $whereVal, $operator = "=", $getFirst = "get")
     {
         eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl)
             . "::where('" . $where . "', '" . $operator . "', '" . $whereVal . "')"
@@ -440,7 +446,7 @@ class SurvLoopData
         return $rows;
     }
     
-    public function getLoopRowIDs()
+    public function getLoopRowIDs($loopName)
     {
         if (isset($this->loopItemIDs[$loopName])) return $this->loopItemIDs[$loopName];
         return [];
@@ -529,6 +535,25 @@ class SurvLoopData
         return $retArr;
     }
     
+    public function getBranchChildRows($tbl2, $idOnly = false)
+    {
+        $ret = [];
+        $bInd = sizeof($this->dataBranches)-1;
+        if ($bInd >= 0 && trim($this->dataBranches[$bInd]["branch"]) != '' && isset($this->dataSets[$tbl2])
+            && sizeof($this->dataSets[$tbl2]) > 0) {
+            $tbl2fld = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl2, $this->dataBranches[$bInd]["branch"]);
+            if (trim($tbl2fld) != '') {
+                foreach ($this->dataSets[$tbl2] as $i => $row) {
+                    if (isset($row->{ $tbl2fld }) && $row->{ $tbl2fld } == $this->dataBranches[$bInd]["itemID"]) {
+                        if ($idOnly) $ret[] = $row->getKey();
+                        else $ret[] = $row;
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+    
     public function sessChildIDFromParent($tbl2)
     {
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
@@ -555,6 +580,42 @@ class SurvLoopData
         return $tmpIDs;
     }
     
+    protected function getAllTableIdFlds($tbl, $flds = [])
+    {
+        $ret = [];
+        if (isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0) {
+            foreach ($this->dataSets[$tbl] as $i => $recObj) {
+                $ret[$i] = [ "id" => $recObj->getKey() ];
+                if (sizeof($flds) > 0) {
+                    foreach ($flds as $i => $fld) {
+                        if (isset($recObj->{ $fld })) $ret[$i][$fld] = $recObj->{ $fld };
+                        else $ret[$i][$fld] = null;
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    // For debugging purposes
+    public function printAllTableIdFlds($tbl, $flds = [])
+    {
+        $ret = '';
+        $arr = $this->getAllTableIdFlds($tbl, $flds);
+        if (sizeof($arr) > 0) {
+            foreach ($arr as $i => $row) {
+                $ret .= ' (( ';
+                if (sizeof($row) > 0) {
+                    foreach ($row as $fld => $val) {
+                        $ret .= (($fld != 'id') ? ' , ' : '') . $fld . ' : ' . $val;
+                    }
+                }
+                $ret .= ' )) ';
+            }
+        }
+        return $ret;
+    }
+    
     public function getLoopDoneItems($loopName, $fld = '')
     {
         $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
@@ -562,8 +623,11 @@ class SurvLoopData
             list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($GLOBALS["SL"]->dataLoops[$loopName]->DataLoopDoneFld);
         }
         $this->loopItemIDsDone = $saves = [];
-        $saves = SLNodeSaves::where('NodeSaveSession', $this->coreID)
-            ->where('NodeSaveTblFld', 'LIKE', $tbl . ':' . $fld)
+        $saves = DB::table('SL_NodeSaves')
+            ->join('SL_Sess', 'SL_NodeSaves.NodeSaveSession', '=', 'SL_Sess.SessID')
+            ->where('SL_Sess.SessTree', '=', $GLOBALS["SL"]->treeID)
+            ->where('SL_Sess.SessCoreID', '=', $this->coreID)
+            ->where('SL_NodeSaves.NodeSaveTblFld', 'LIKE', $tbl . ':' . $fld)
             ->get();
         if ($saves && sizeof($saves) > 0) {
             foreach ($saves as $save) {
@@ -730,37 +794,37 @@ class SurvLoopData
     }
     
     // Here we're trying to find the closest relative within current tree navigation to the table and field in question. 
-    public function currSessData($nID, $tbl, $fld = '', $action = 'get', $newVal = '', $hasParManip = false, 
+    public function currSessData($nID, $tbl, $fld = '', $action = 'get', $newVal = null, $hasParManip = false, 
         $itemInd = -3, $itemID = -3)
     {
         if (trim($tbl) == '' || trim($fld) == '' || !$this->loaded) return '';
-//if ($nID == 557) echo '<br /><br /><br />checkboxNodes: '; print_r($this->checkboxNodes); echo '<br />';
-//if (in_array($nID, [557])) { echo 'currSessData ' . $action . ' (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br />'; }
+//if ($nID == 577) echo '<br /><br /><br />checkboxNodes: '; print_r($this->checkboxNodes); echo '<br />';
+//if (in_array($nID, [577])) { echo 'currSessData ' . $action . ' (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br />'; }
         if (in_array($nID, $this->checkboxNodes) && $GLOBALS["SL"]->isFldCheckboxHelper($fld)) {
             $tblFld = $tbl . '-' . $fld;
             $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
-//if (in_array($nID, [557])) { echo 'currSessData Z (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
+//if (in_array($nID, [577])) { echo 'currSessData Z (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
             if ($this->helpInfo[$tblFld]["link"] && isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
-//if (in_array($nID, [557])) { echo 'currSessData ZZb (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
+//if (in_array($nID, [577])) { echo 'currSessData ZZb (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
                 return $this->currSessDataCheckbox($nID, $tbl, $fld);
             }
         }
-//if ($action == 'update' && in_array($nID, [386, 341, 226, 339])) { echo 'currSessData A (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->checkboxNodes); echo '</pre>'; }
+//if ($action == 'update' && in_array($nID, [577])) { echo 'currSessData A (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->checkboxNodes); echo '</pre>'; }
         if ($itemInd < 0 || $itemID <= 0) list($itemInd, $itemID) = $this->currSessDataPos($tbl, $hasParManip);
-//if ($action == 'update' && in_array($nID, [386, 341, 226, 339])) { echo 'currSessData B (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->dataBranches); echo '</pre>'; }
+//if ($action == 'update' && in_array($nID, [577])) { echo 'currSessData B (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->dataBranches); echo '</pre>'; }
         if ($itemInd < 0 || $itemID <= 0) return '';
         if ($action == 'get') {
             if ($this->dataFieldExists($tbl, $itemInd, $fld)) {
-//if (in_array($nID, [557])) { echo '<br /><br /><br />nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', type: ' . $GLOBALS["SL"]->fldTypes[$tbl][$fld] . ' - ' . $this->dataSets[$tbl][$itemInd]->{ $fld } . '<br /><br />'; exit; }
+//if (in_array($nID, [577])) { echo '<br /><br /><br />dataFieldExists - nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', type: ' . $GLOBALS["SL"]->fldTypes[$tbl][$fld] . ' - ' . $this->dataSets[$tbl][$itemInd]->{ $fld } . '<br /><br />'; }
                 return $this->dataSets[$tbl][$itemInd]->{ $fld };
             }
         } elseif ($action == 'update' && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') $newVal = intVal($newVal);
+            if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT' && $newVal !== null) $newVal = intVal($newVal);
             if (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][$itemInd])) {
                 $this->dataSets[$tbl][$itemInd]->{ $fld } = $newVal;
                 $this->dataSets[$tbl][$itemInd]->save();
-//if (in_array($nID, [386, 341, 226, 339])) { echo 'currSessData Stored, ' . $itemInd . '!<pre>'; print_r($this->dataSets[$tbl][$itemInd]); echo '</pre>'; }
+//if (in_array($nID, [577])) { echo 'currSessData Stored, ' . $itemInd . '!<pre>'; print_r($this->dataSets[$tbl][$itemInd]); echo '</pre>'; }
                 return $newVal;
             } else {
               //$GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl . '][' . $itemInd . '] for ' . $fld . '<br />';
@@ -906,7 +970,11 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
     public function logDataSave($nID = -3, $tbl = '', $itemID = -3, $fld = '', $newVal = '')
     {
         $nodeSave = new SLNodeSaves;
-        $nodeSave->NodeSaveSession    = ((intVal($this->coreID) > 0) ? $this->coreID : 0);
+        $nodeSave->NodeSaveSession    = 0;
+        if (session()->has('sessID' . $GLOBALS["SL"]->sessTree) 
+            && intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree)) > 0) {
+            $nodeSave->NodeSaveSession = session()->get('sessID' . $GLOBALS["SL"]->sessTree);
+        }
         $nodeSave->NodeSaveNode       = $nID;
         $nodeSave->NodeSaveTblFld     = $tbl . ':' . $fld;
         $nodeSave->NodeSaveLoopItemID = $itemID;
@@ -924,7 +992,12 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
     
     protected function loadSessionDataLog($nID = -3, $tbl = '', $fld = '', $set = '')
     {
-        $qryWheres = "where('NodeSaveSession', \$this->coreID)->where('NodeSaveNode', ".$nID.")->";
+        $sessID = 0;
+        if (session()->has('sessID' . $GLOBALS["SL"]->sessTree) 
+            && intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree)) > 0) {
+            $sessID = session()->get('sessID' . $GLOBALS["SL"]->sessTree);
+        }
+        $qryWheres = "where('NodeSaveSession', \$sessID)->where('NodeSaveNode', ".$nID.")->";
         if (trim($tbl) != '' && trim($fld) != '') {
             $qryWheres .= "where('NodeSaveTblFld', '" . $tbl . ":" . $fld 
                 . ((trim($set) != '') ? "[" . $set . "]" : "") . "')->";

@@ -11,19 +11,18 @@
         This will also make it easier for you to access full records in the future.
         </p>
     </div>
-    <div class="col-md-4 taC">
-        <div class="round20 brd taC p20 mT10"><center>
-            <form method="post" name="mainPageForm" action="?sub=1">
-            <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-            <h3 class="mT10 mB5">Provide Access Code:</h3>
-            <input type="text" class="form-control input-lg taC slGrey" style="width: 190px;"
-                name="t2" id="t2ID" value="XXXX-XXXX-XXXX"
-                onFocus="if (this.value=='XXXX-XXXX-XXXX') { this.value=''; this.className='form-control input-lg taC'; }"
-                onBlur="if (this.value=='') { this.value='XXXX-XXXX-XXXX'; this.className='form-control input-lg taC slGrey'; }">
-            <input type="submit" value="Access Full Details" class="btn btn-primary m10">
-            </form>
-        </center></div>
-    </div>
+    <div class="col-md-4 taC"><div class="round20 brd taC p20 mT10"><center>
+        <form method="post" name="mainPageForm" action="?sub=1">
+        <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+        <h3 class="mT10 mB5">Provide Access Code:</h3>
+        <input type="text" class="form-control input-lg slTab taC slGrey" style="width: 190px;" 
+            name="t2" id="t2ID" value="XXXX-XXXX-XXXX" 
+            onFocus="if (this.value=='XXXX-XXXX-XXXX') { this.value=''; this.className='form-control input-lg slTab taC'; }"
+            onBlur="if (this.value=='') { this.value='XXXX-XXXX-XXXX'; this.className='form-control input-lg slTab taC slGrey'; }"
+            {!! $GLOBALS["SL"]->tabInd() !!}>
+        <input type="submit" value="Access Full Details" class="btn btn-primary m10">
+        </form>
+    </center></div></div>
     <div class="col-md-4 p20">
         <p>Only the most recently emailed access code will work, only for the week after it is sent.
         For security, your access code expires after 15 minutes. 

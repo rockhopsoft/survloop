@@ -15,17 +15,7 @@
 
         <h1>System Settings</h1>
         @forelse ($settingsList as $opt => $val)
-            <div class="mB20 mT10 w100"><label class="w100">
-                <h4 class="fL m0">{!! $val[0] !!}</h4>
-                @if (trim($val[1]) != '')
-                    <div class="fR pT5 slGrey">eg. "{!! $val[1] !!}"</div>
-                @endif
-                <div class="fC"></div>
-                <textarea name="sys-{{ $opt }}" class="form-control w100" autocomplete="off" style="
-                @if (strpos($val[0], 'Header Code') !== false) height: 200px; 
-                @else height: 75px; @endif font-family: Courier New; "
-                >@if (isset($GLOBALS["SL"]->sysOpts[$opt])){!! $GLOBALS["SL"]->sysOpts[$opt] !!}@endif</textarea>
-            </label></div>
+            {!! view('vendor.survloop.admin.system-one-setting', [ "opt" => $opt, "val" => $val ])->render() !!}
         @empty
         @endforelse
         
@@ -53,27 +43,8 @@
 
         <h1>System Styles</h1>
         @forelse ($stylesList as $opt => $val)
-            @if ($opt == 'font-main') 
-                <div class="mB20 mT10 w100"><label class="w100">
-                    <h4 class="fL m0">{!! $val[1] !!}</h4>
-                    @if (trim($val[0]) != '') <div class="fR pT5 slGrey">eg. "{!! $val[0] !!}"</div> @endif
-                    <textarea name="sty-{{ $opt }}" class="form-control" style="height: 40px;"
-                        >@if (isset($sysStyles[$opt])){!! $sysStyles[$opt] !!}@endif</textarea>
-                </label></div>
-            @else
-                <div class="mB20 mT10 w100">
-                    <label class="w100"><h4 class="fL m0">{!! $val[1] !!}</h4>
-                    @if (trim($val[0]) != '')
-                        <div class="fR pT5 slGrey slShdLgt"><span style="color: {!! $val[0] !!};">
-                        eg. "{!! $val[0] !!}"</span></div>
-                    @endif
-                    </label>
-                    {!! view('vendor.survloop.inc-color-picker', [
-                        'fldName' => 'sty-' . $opt,
-                        'preSel'  => strtoupper($sysStyles[$opt])
-                    ])->render() !!}
-                </div>
-            @endif
+            {!! view('vendor.survloop.admin.system-one-style', [ 
+                "opt" => $opt, "val" => $val, "sysStyles" => $sysStyles ])->render() !!}
         @empty
         @endforelse
         <div class="mB20"><label class="w100">

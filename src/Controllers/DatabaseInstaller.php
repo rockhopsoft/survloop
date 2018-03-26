@@ -105,7 +105,7 @@ class DatabaseInstaller extends AdminDBController
     
     public function export(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/export');
         if (!$this->checkCache('/dashboard/db/export')) {
             $this->exportMysql();
             $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
@@ -117,7 +117,7 @@ class DatabaseInstaller extends AdminDBController
     public function printExportLaravel(Request $request) 
     {
         ini_set('max_execution_time', 180);
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/export/laravel');
         if (!$this->checkCache('/dashboard/db/export/laravel') || $request->has('refresh')) {
             $this->chkModelsFolder();
             $this->v["fileListModel"] = [];
@@ -306,7 +306,7 @@ class DatabaseInstaller extends AdminDBController
     
     public function autoInstallDatabase(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/install');
         
         $this->v["oldTables"] = array();
         
@@ -394,7 +394,7 @@ class DatabaseInstaller extends AdminDBController
     public function manualMySql(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/all');
-        if ($this->v["user"]->id == 1) { // && in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1'])) {
+        if ($this->v["uID"] == 1) { // && in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1'])) {
     		$this->v["manualMySql"] = 'Connected successfully<br />';
             $db = mysqli_connect(env('DB_HOST', 'localhost'), env('DB_USERNAME', 'homestead'), 
                 env('DB_PASSWORD', 'secret'), env('DB_DATABASE', 'homestead'));

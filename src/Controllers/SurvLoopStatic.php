@@ -73,6 +73,28 @@ class SurvLoopStatic
         return $ret;
     }
     
+    public function getFileExt($file)
+    {
+        $ext = '';
+        if (trim($file) != '') {
+            $tmpExt = explode(".", $file);
+            $ext = strtolower($tmpExt[(sizeof($tmpExt)-1)]);
+        }
+        return $ext;
+    }
+    
+    public function searchDeeperDirs($file)
+    {
+        $newFile = $file;
+        $limit = 0;
+        while (!file_exists($newFile) && $limit < 9) {
+            $newFile = '../' . $newFile;
+            $limit++;
+        }
+        if (file_exists($newFile)) return $newFile;
+        return $file;
+    }
+    
     public function convertRel2AbsURL($url)
     {
         $u = str_replace('../vendor/', '', trim($url));
@@ -113,6 +135,31 @@ class SurvLoopStatic
         }
         closedir($dir);
         return $ret;
+    }
+    
+    public function findDirFile($folder, $file)
+    {
+        return $this->findDirFileInner($folder, $file);
+    }
+    
+    public function findDirFileInner($folder, $file, $subFold = [])
+    {
+        if (!file_exists($folder) || !is_dir($folder)) return [];
+        $dir = opendir($folder);
+        while (false !== ($f = readdir($dir))) {
+            if ($f != '.' && $f != '..') {
+                if (is_dir($folder . '/' . $f)) {
+                    $tmp = $subFold;
+                    $tmp[] = $f;
+                    $tmp = $this->findDirFileInner($folder . '/' . $f, $file, $tmp);
+                    if (sizeof($tmp) > 0) return $tmp;
+                } else {
+                    if ($f == $file) return $subFold;
+                }
+            }
+        }
+        closedir($dir);
+        return [];
     }
     
     public function mapDirFiles($folder, $recurse = true)
@@ -207,6 +254,11 @@ class SurvLoopStatic
         return $this->printRgba($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
     }
     
+    public function printHex2Rgba($hex = '#000000', $a = 1)
+    {
+        return $this->printRgba($this->colorHex2Rgba($hex, $a));
+    }
+    
     public function urlPreview($url)
     {
         $url = urlClean($url);
@@ -222,8 +274,14 @@ class SurvLoopStatic
         if ($pos !== false && $pos == strlen($url)-1) $url = substr($url, 0, $pos);
         return $url;
     }
+    
+    public function stdizeChars($txt)
+    {
+        return str_replace('“', '"', str_replace('”', '"', str_replace("’", "'", $txt)));
+    }
 
-    public function humanFilesize($bytes, $decimals = 2) {
+    public function humanFilesize($bytes, $decimals = 2) 
+    {
         $sz = 'BKMGTP';
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
@@ -265,6 +323,94 @@ class SurvLoopStatic
             case 12: return 'Dec'; break;
         }
         return '';
+    }
+    
+    public function str2arr($str)
+    {
+        $arr = [];
+        if (!is_array($str) && strpos($str, "rray\n") === 1) {
+            if (strpos($str, '=>') !== false) {
+                $split = explode('=>', str_replace("\n", "", str_replace("\n)\n", "", $str)));
+                for ($i = 1; $i < sizeof($split); $i++) {
+                    $val = trim(str_replace('[' . $i . ']', '', $split[$i]));
+                    $arr[] = $val;
+                }
+            } else {
+                $arr[] = 'EMPTY ARRAY';
+            }
+        }
+        return $arr;
+    }
+    
+    public function plainLineBreaks($str)
+    {
+        return str_replace("\n", "<br />", $str);
+    }
+    
+    public function sec2minSec($sec)
+    {
+        $s = ($sec%60);
+        $min = floor($sec/60);
+        $m = ($min%60);
+        $h = floor($min/60);
+        return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') . $m . ':' . (($s < 10) ? '0' : '') . $s;
+    }
+    
+    public function slugify($text)
+    {
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return 'n-a';
+        }
+        return $text;
+    }
+    
+    function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
+    {
+        header('Content-type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename=' .$inFilename );
+        echo "<table border=1>";
+        echo $innerTable;
+        echo "</table>";
+        exit;
+        return true;
+    }
+    
+    
+    
+    public function parseSearchWords($search = '')
+    {
+        $search = trim($search);
+        $ret = [$search];
+        if (substr($search, 0, 1) == '"' && substr($search, 0, 1) == '"') {
+            $ret = [substr($search, 1, strlen($search)-2)];
+        } else {
+            $quote1 = strpos($search, '"');
+            while ($quote1 > 0) {
+                $quote2 = strpos($search, '"', $quote1+1);
+                if ($quote2 > 0) {
+                    $quote = substr($search, $quote1, ($quote2-$quote1+1));
+                    $search = str_replace($quote, '', $search);
+                    $quote1 = strpos($search, '"');
+                    $ret[] = str_replace('"', '', $quote);
+                } else { // single instance of a double-quote :(
+                    $search = str_replace('"', '', $search);
+                }
+            }
+            $search = trim($search);
+            if ($search != '') {
+                $wordSplit = $GLOBALS["SL"]->mexplode(' ', str_replace('  ', ' ', $search));
+                foreach ($wordSplit as $word) {
+                    if (!in_array($word, $ret)) $ret[] = $word;
+                }
+            }
+        }
+        return $ret;
     }
     
 }

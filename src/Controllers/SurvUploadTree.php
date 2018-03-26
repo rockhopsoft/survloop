@@ -56,22 +56,17 @@ class SurvUploadTree extends SurvLoopTree
     
     protected function checkBaseFolders()
     {
-        $upFolds = [
-            '../storage/app/up', 
-            '../storage/app/up/avatar', 
-            '../storage/app/up/evidence', 
-            '../storage/app/up/evidence/' . date("Y/m/d")
-        ];
-        foreach ($upFolds as $fold) $this->checkFolder($fold);
+        $this->checkFolder('../storage/app/up/avatar');
+        $this->checkFolder('../storage/app/up/evidence/' . date("Y/m/d"));
         return true;
     }
     
-    protected function getUploadFolder($nID = -3)
+    protected function getUploadFolder($nID = -3, $coreRow = [], $coreTbl = '')
     {
-        $coreRow = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];
-        $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
+        if ($coreTbl == '') $coreTbl = $GLOBALS["SL"]->coreTbl;
+        if (sizeof($coreRow) == 0) $coreRow = $this->sessData->dataSets[$coreTbl][0];
         $fold = '../storage/app/up/evidence/' . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) 
-            . '/' . $coreRow->{ $coreAbbr . 'UniqueStr' } . '/';
+            . '/' . $coreRow->{ $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'UniqueStr' } . '/';
         return $fold;
     }
     
@@ -80,15 +75,33 @@ class SurvUploadTree extends SurvLoopTree
         return $this->getRandStr('Uploads', 'UpStoredFile', 30);
     }
     
+    protected function cleanUploadList()
+    {
+        $chk = SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+            ->where('UpCoreID', $this->coreID)
+            ->get();
+        if ($chk && sizeof($chk) > 0) {
+            foreach ($chk as $up) {
+                if (trim($up->UpTitle) == '' && trim($up->UpEvidenceDesc) == '' && trim($up->UpUploadFile) == '' 
+                    && trim($up->UpStoredFile) == '' && trim($up->UpVideoLink) == '') {
+                    SLUploads::find($up->UpID)->delete();
+                }
+            }
+        }
+        return true;
+    }
+    
     protected function prevUploadList($nID = -3)
     {
+        $this->cleanUploadList();
+        $ret = $chk = [];
         if ($nID > 0 && isset($this->allNodes[$nID])) {
             $fldID = $this->allNodes[$nID]->getTblFldID();
             if ($fldID > 0) {
                 list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
                 list($linkRecInd, $linkRecID) = $this->sessData->currSessDataPos($tbl);
                 if ($linkRecID > 0) {
-                    return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+                    $chk = SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
                         ->where('UpCoreID', $this->coreID)
                         ->where('UpNodeID', $nID)
                         ->where('UpLinkFldID', $fldID)
@@ -96,14 +109,28 @@ class SurvUploadTree extends SurvLoopTree
                         ->orderBy('created_at', 'asc')
                         ->get();
                 }
+            } else {
+                $chk = SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+                    ->where('UpCoreID', $this->coreID)
+                    ->where('UpNodeID', $nID)
+                    ->orderBy('created_at', 'asc')
+                    ->get();
             }
         } else {
-            return SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
+            $chk = SLUploads::where('UpTreeID', $GLOBALS["SL"]->treeID)
                 ->where('UpCoreID', $this->coreID)
                 ->orderBy('created_at', 'asc')
                 ->get();
         }
-        return [];
+        if ($chk && sizeof($chk) > 0) {
+            foreach ($chk as $i => $up) {
+                if ((isset($up->UpUploadFile) && trim($up->UpUploadFile) != '' && isset($up->UpStoredFile) 
+                    && trim($up->UpStoredFile) != '') || (isset($up->UpVideoLink) && trim($up->UpVideoLink) != '')) {
+                    $ret[] = $up;
+                }
+            }
+        }
+        return $ret;
     }
     
     public function retrieveUploadFile($upID = '')
@@ -133,39 +160,42 @@ class SurvUploadTree extends SurvLoopTree
     
     public function previewImg($up)
     {
-        $handler = new File($up["file"]);
-        $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
-        $lifetime = 86400; // One day in seconds
-        $header_etag = md5($file_time . $up["file"]);
-        $header_modified = gmdate('r', $file_time);
-        $headers = array(
-            'Content-Disposition' => 'inline; filename="' . $this->coreID . '-' . (1+$up["ind"]) 
-                                        . '-' . $up["fileOrig"] . '"',
-            'Last-Modified'       => $header_modified,
-            'Cache-Control'       => 'must-revalidate',
-            'Expires'             => gmdate('r', $file_time + $lifetime),
-            'Pragma'              => 'public',
-            'Etag'                => $header_etag
-        );
-        // Is the resource cached?
-        $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
-        $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
-            && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
-        if ($h1 || $h2) {
-            return Response::make('', 304, $headers); 
+        return response()->file($up["file"]);
+        /*
+        if ($up["ext"] == 'pdf') {
+            
+        } else {
+            $handler = new File($up["file"]);
+            $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
+            $lifetime = 86400; // One day in seconds
+            $header_etag = md5($file_time . $up["file"]);
+            $header_modified = gmdate('r', $file_time);
+            $headers = array(
+                'Content-Disposition' => 'inline; filename="' . $this->coreID . '-' . (1+$up["ind"]) 
+                                            . '-' . $up["fileOrig"] . '"',
+                'Last-Modified'       => $header_modified,
+                'Cache-Control'       => 'must-revalidate',
+                'Expires'             => gmdate('r', $file_time + $lifetime),
+                'Pragma'              => 'public',
+                'Etag'                => $header_etag
+            );
+            // Is the resource cached?
+            $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
+            $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
+                && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
+            if ($h1 || $h2) {
+                return Response::make('', 304, $headers); 
+            }
+            // File (image) is cached by the browser, so we don't have to send it again
+            
+            $headers = array_merge($headers, [
+                'Content-Type'   => $handler->getMimeType(),
+                'Content-Length' => $handler->getSize()
+            ]);
+            $up["file"] = $GLOBALS["SL"]->searchDeeperDirs($up["file"]);
+            return Response::make(file_get_contents($up["file"]), 200, $headers);
         }
-        // File (image) is cached by the browser, so we don't have to send it again
-        
-        $headers = array_merge($headers, [
-            'Content-Type'   => $handler->getMimeType(),
-            'Content-Length' => $handler->getSize()
-        ]);
-        $limit = 10;
-        while (!file_exists($up["file"]) && $limit < 9) {
-            $up["file"] = '../' . $up["file"];
-            $limit++;
-        }
-        return Response::make(file_get_contents($up["file"]), 200, $headers);
+        */
     }
     
     protected function uploadTool($nID)
@@ -173,12 +203,12 @@ class SurvUploadTree extends SurvLoopTree
         $this->loadUploadTypes();
         $GLOBALS["SL"]->pageAJAX .= 'window.refreshUpload = function () { $("#uploadAjax").load("?ajax=1&upNode=' 
             . $nID . '"); }' . "\n";
-        $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID').value == 1) reqUploadTitle(" 
-            . $nID . ");\n";
+        $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID') && document.getElementById('n" 
+            . $nID . "VisibleID').value == 1) reqUploadTitle(" . $nID . ");\n";
         $GLOBALS["SL"]->pageJAVA .= "addResTot(" . $nID . ", 4);\n";
         foreach ($this->uploadTypes as $j => $ty) {
             if (in_array(strtolower($ty->DefValue), ['video', 'videos'])) {
-                $GLOBALS["SL"]->pageJava .= 'uploadTypeVid = ' . $j . ';' . "\n";
+                $GLOBALS["SL"]->pageJAVA .= 'uploadTypeVid = ' . $j . ';' . "\n";
             }
         }
         $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
@@ -204,13 +234,9 @@ class SurvUploadTree extends SurvLoopTree
         $this->upDeets = [];
         if ($this->uploads && sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                $this->upDeets[$i]["ind"]         = $i;
-                $this->upDeets[$i]["privacy"]     = $upRow->UpPrivacy;
-                $this->upDeets[$i]["ext"] = '';
-                if (trim($upRow->UpUploadFile) != '') {
-                    $tmpExt = explode(".", $upRow->UpUploadFile);
-                    $this->upDeets[$i]["ext"] = $tmpExt[(sizeof($tmpExt)-1)];
-                }
+                $this->upDeets[$i]["ind"]      = $i;
+                $this->upDeets[$i]["privacy"]  = $upRow->UpPrivacy;
+                $this->upDeets[$i]["ext"]      = $GLOBALS["SL"]->getFileExt($upRow->UpUploadFile);
                 $this->upDeets[$i]["filename"] = $upRow->UpStoredFile . '.' . $this->upDeets[$i]["ext"];
                 $this->upDeets[$i]["file"]     = $this->getUploadFolder($nID) . $upRow->UpStoredFile 
                     . '.' . $this->upDeets[$i]["ext"];
@@ -246,16 +272,12 @@ class SurvUploadTree extends SurvLoopTree
                             $this->upDeets[$i]["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
                                 . '" target="_blank">vimeo/' . $this->upDeets[$i]["vimeo"] . '</a>';
                         }
-                    } else {
-                        $limit = 0;
-                        while (!file_exists($this->upDeets[$i]["file"]) && $limit < 9) {
-                            $this->upDeets[$i]["file"] = '../' . $this->upDeets[$i]["file"];
-                            $limit++;
-                        }
+                    } elseif (isset($upRow->UpStoredFile) && trim($upRow->UpStoredFile) != '') {
+                        $this->upDeets[$i]["file"] = $GLOBALS["SL"]->searchDeeperDirs($this->upDeets[$i]["file"]);
                         if (!file_exists($this->upDeets[$i]["file"])) {
                             $this->upDeets[$i]["fileLnk"] .= ' &nbsp;&nbsp;<span class="slRedDark">'
                                 . '<i class="fa fa-exclamation-triangle"></i> <i>File Not Found</i></span>';
-                        } else {
+                        } elseif (in_array(strtolower($this->upDeets[$i]["ext"]), ['png', 'gif', 'jpg', 'jpeg'])) {
                             list($this->upDeets[$i]["imgWidth"], $this->upDeets[$i]["imgHeight"]) 
                                 = getimagesize($this->upDeets[$i]["file"]);
                             if ($this->upDeets[$i]["imgWidth"] > $this->upDeets[$i]["imgHeight"]) {
@@ -424,12 +446,6 @@ class SurvUploadTree extends SurvLoopTree
     {
         $this->checkBaseFolders();
         $this->checkFolder($fold);
-        return true;
-    }
-    
-    function checkFolder($fold)
-    {
-        if (!is_dir(storage_path($fold))) Storage::MakeDirectory(storage_path($fold));
         return true;
     }
 

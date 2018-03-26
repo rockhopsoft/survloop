@@ -23,7 +23,7 @@ class SurvLoop extends Controller
     public $custLoop       = [];
     public $dbID           = 1;
     public $treeID         = 1;
-    public $domainPath     = 'http://homestead.app';
+    public $domainPath     = 'http://homestead.test';
     public $cacheKey       = '';
     public $pageContent    = '';
     
@@ -107,6 +107,11 @@ class SurvLoop extends Controller
                     ->orderBy('TreeID', 'asc')
                     ->get();
             } else {
+                $redir = $this->chkPageRedir($treeSlug);
+                if ($redir != $treeSlug) {
+                    echo '<script type="text/javascript"> window.location="' . $redir . '"; </script>';
+                    exit;
+                }
                 $urlTrees = SLTree::where('TreeSlug', $treeSlug)
                     ->where('TreeType', 'Page')
                     ->orderBy('TreeID', 'asc')
@@ -138,6 +143,25 @@ class SurvLoop extends Controller
             }
         }
         return false;
+    }
+    
+    protected function chkPageRedir($treeSlug = '')
+    {
+        if (trim($treeSlug) != '') {
+            $redirTree = SLTree::where('TreeSlug', $treeSlug)
+                ->where('TreeType', 'Redirect')
+                ->orderBy('TreeID', 'asc')
+                ->first();
+            if ($redirTree && isset($redirTree->TreeName) && trim($redirTree->TreeName) != '') {
+                $redirURL = $redirTree->TreeName;
+                if (strpos($redirURL, $this->domainPath) === false && substr($redirURL, 0, 1) != '/'
+                    && strpos($redirURL, 'http://') === false && strpos($redirURL, 'https://') === false) {
+                    $redirURL = '/' . $redirURL;
+                }
+                return $redirURL;
+            }
+        }
+        return $treeSlug;
     }
     
     public function loadLoop(Request $request, $skipSessLoad = false)
@@ -236,6 +260,8 @@ class SurvLoop extends Controller
         $urlTree = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
             . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
         if ($urlTree && sizeof($urlTree) > 0 && isset($urlTree[0]->TreeOpts)) { //  && isset($urlTree[0]->TreeOpts)
+            $redir = $this->chkPageRedir($urlTree[0]->TreeSlug);
+            if ($redir != $urlTree[0]->TreeSlug) return redirect($redir);
             if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                     . $urlTree[0]->TreeID . '?all=1&refresh=1"; </script>';
@@ -296,9 +322,8 @@ class SurvLoop extends Controller
     
     public function showProfile(Request $request, $uname = '')
     {
-        $profileTree = SLTree::where('TreeSlug', 'my-profile')
+        $profileTree = SLTree::where('TreeType', 'Page')
             ->where('TreeOpts', 23) // special page for managing member profiles
-            ->where('TreeType', 'Page')
             ->first();
         if ($profileTree && isset($profileTree->TreeID)) {
             $this->syncDataTrees($request, $profileTree->TreeDatabase, $profileTree->TreeID);
@@ -354,11 +379,18 @@ class SurvLoop extends Controller
     
     public function afterLogin(Request $request)
     {
+        if (session()->has('redir2') && trim(session()->get('redir2')) != '') {
+            return redirect(trim(session()->get('redir2')));
+        }
         if (session()->has('lastTree')) {
             $tree = SLTree::find(session()->get('lastTree'));
             if ($tree && isset($tree->TreeDatabase)) {
                 $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
             }
+        }
+        if (session()->has('sessID') && session()->get('sessID') > 0) {
+            
+            
         }
         $this->loadLoop($request);
         return $this->custLoop->afterLogin($request);
@@ -700,7 +732,6 @@ class SurvLoop extends Controller
         Storage::put($this->cacheKey, $this->pageContent);
         return true;
     }
-    
     
     public function jsLoadMenu(Request $request)
     {

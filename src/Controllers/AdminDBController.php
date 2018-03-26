@@ -176,7 +176,10 @@ class AdminDBController extends AdminController
     protected function getDefOpts($item = '', $link = 0)
     {
         if (sizeof($this->v["dbDefOpts"]) == 0) $this->loadDefOpts();
-        return $this->v["dbDefOpts"][$item][0];
+        if (isset($this->v["dbDefOpts"][$item]) && isset($this->v["dbDefOpts"][$item][0])) {
+            return $this->v["dbDefOpts"][$item][0];
+        }
+        return '';
     }
     
     function logActions($actions = array())
@@ -244,7 +247,7 @@ class AdminDBController extends AdminController
             //    str_replace('"&quot;', '"', str_replace('&quot;"', '"', $this->v["innerTable"]))));
             if ($this->v["isExcel"])
             {
-                $this->exportExcelOldSchool('<tr><td colspan=5 ><b>Complete Database Table Field Listings'
+                $GLOBALS["SL"]->exportExcelOldSchool('<tr><td colspan=5 ><b>Complete Database Table Field Listings'
                     . '</b></td></tr>' . $this->v["innerTable"], 'FullTableListings'.date("ymd").'.xls');
                 exit;
             }
@@ -555,7 +558,7 @@ class AdminDBController extends AdminController
     
     public function businessRules(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/bus-rules');
         if ($GLOBALS["SL"]->REQ->has('delRule') && $GLOBALS["SL"]->REQ->delRule > 0 && $this->v["dbAllowEdits"]) {
             $delRule = SLBusRules::find($GLOBALS["SL"]->REQ->delRule);
             if ($delRule && sizeof($delRule) > 0) $delRule->delete();
@@ -623,7 +626,7 @@ class AdminDBController extends AdminController
     
     public function definitions(Request $request)
     {
-        $this->admControlInit($request);
+        $this->admControlInit($request, '/dashboard/db/definitions');
         $this->v["defSets"] = array();
         $defs = SLDefinitions::where('DefSet', 'Value Ranges')
             ->where('DefDatabase', $this->dbID)
@@ -706,13 +709,13 @@ class AdminDBController extends AdminController
     
     public function ruleAdd(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/bus-rules');
         return $this->printRuleEdit(-3);
     }
     
     public function ruleEdit(Request $request, $ruleID)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/bus-rules');
         return $this->printRuleEdit($ruleID);
     }
     
@@ -803,15 +806,10 @@ class AdminDBController extends AdminController
                 $sorts[] = array($def->DefID, $def->DefValue);
             }
         }
-        $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({
-            axis: "y",
-            update: function (event, ui) {
-                document.getElementById("hidFrameID").src="' . $submitURL . '&"+$(this).sortable("serialize");
-            }
-        });
-        $("#sortable").disableSelection(); ';
         $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
+            'submitURL' => $submitURL,
+            'sortID'    => 'definitions',
             'sortTitle' => $sortTitle,
             'sorts' => $sorts
             ]);
@@ -858,6 +856,7 @@ class AdminDBController extends AdminController
         }
         $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
+            'sortID'    => 'tables',
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
             'sorts' => $sorts
@@ -865,14 +864,14 @@ class AdminDBController extends AdminController
         return view('vendor.survloop.admin.db.tableSort', $this->v);
     }
     
-    public function fldSort(Request $request, $tblName = '') 
+    public function fldSort(Request $request, $tblName = '')
     {
         $this->admControlInit($request, '/dashboard/db/all');
         if (!$this->v["dbAllowEdits"] || trim($tblName) == '') {
             return $this->printOverview();
         }
         $this->v["tblName"] = $tblName;
-        $tbl = SLTables::where('TblName', $tblName)
+        $this->v["tbl"] = SLTables::where('TblName', $tblName)
             ->where('TblDatabase', $this->dbID)
             ->first();
         
@@ -889,10 +888,10 @@ class AdminDBController extends AdminController
         }
         
         $sortTitle = '<a href="/dashboard/db/table/sort" style="font-size: 26px;"><b>' 
-            . $tbl->TblName . '&nbsp;&nbsp;&nbsp;(' . $tbl->TblAbbr . ')</b></a>';
+            . $this->v["tbl"]->TblName . '&nbsp;&nbsp;&nbsp;(' . $this->v["tbl"]->TblAbbr . ')</b></a>';
         $submitURL = '/dashboard/db/table/'.$tblName.'/sort?saveOrder=1';
         $flds = SLFields::select('FldID', 'FldEng', 'FldName', 'FldType', 'FldForeignTable')
-            ->where('FldTable', $tbl->TblID)
+            ->where('FldTable', $this->v["tbl"]->TblID)
             ->where('FldDatabase', $this->dbID)
             ->orderBy('FldOrd')
             ->orderBy('FldEng', 'asc')
@@ -912,22 +911,23 @@ class AdminDBController extends AdminController
         }
         $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
+            'sortID'    => 'fields',
             'sortTitle' => $sortTitle, 
             'submitURL' => $submitURL, 
-            'sorts' => $sorts
+            'sorts'     => $sorts
         ]);
         return view('vendor.survloop.admin.db.fieldSort', $this->v);
     }
     
     public function fieldDescs(Request $request, $view = '')
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/fieldDescs');
         return $this->printFieldDescs($view, false);
     }
     
     public function fieldDescsAll(Request $request, $view = '')
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/fieldDescs/all');
         return $this->printFieldDescs($view, true);
     }
     
@@ -1007,7 +1007,7 @@ class AdminDBController extends AdminController
     
     public function fieldXML(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/fieldXML');
         if (!$this->v["dbAllowEdits"]) return $this->printOverview();
         $this->v["tblsOrdered"] = SLTables::select('TblID')
             ->where('TblDatabase', $this->dbID)
@@ -1027,7 +1027,7 @@ class AdminDBController extends AdminController
     
     public function fieldXMLsave(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/fieldXML');
         if (!$this->v["dbAllowEdits"]) return '';
         if ($GLOBALS["SL"]->REQ->has('changedFld') && $GLOBALS["SL"]->REQ->changedFld > 0 && $GLOBALS["SL"]->REQ->has('changedFldSetting')) {
             $fld = SLFields::where('FldID', $GLOBALS["SL"]->REQ->changedFld)
@@ -1050,7 +1050,7 @@ class AdminDBController extends AdminController
     
     function fieldDescsSave(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/fieldDescs/all');
         if (!$this->v["dbAllowEdits"]) exit;
         $this->cacheFlush();
         if ($GLOBALS["SL"]->REQ->has('changedFLds') && $GLOBALS["SL"]->REQ->changedFLds != '' && $GLOBALS["SL"]->REQ->changedFLds != ',') {
@@ -1090,7 +1090,7 @@ class AdminDBController extends AdminController
     
     public function diagrams(Request $request)
     {
-        $this->admControlInit($request);
+        $this->admControlInit($request, '/dashboard/db/diagrams');
         if (!$this->checkCache()) {
             $this->v["printMatrix"] = '';
             $this->v["diags"] = SLDefinitions::where('DefSet', 'Diagrams')
@@ -1150,7 +1150,7 @@ class AdminDBController extends AdminController
                     $cnt1 = $cnt2 = 1;
                     foreach ($GLOBALS["SL"]->tbls as $tID) {
                         $cnt2++;
-                        $this->v["printMatrix"] .= '<th class="' . (($cnt2%2 == 0) ? 'col2' : 'col1') 
+                        $this->v["printMatrix"] .= '<th class="' . (($cnt2%2 == 0) ? 'cl2' : 'cl1') 
                             . '" >' . $GLOBALS["SL"]->tbl[$tID] . '</th>';
                     }
                     foreach ($GLOBALS["SL"]->tbls as $tID) {
@@ -1160,7 +1160,7 @@ class AdminDBController extends AdminController
                         foreach ($GLOBALS["SL"]->tbls as $tID2) { 
                             $cnt2++;
                             $this->v["printMatrix"] .= '<td class="' 
-                                . (($tID == $tID2) ? 'mid ' : (($cnt2%2 == 0) ? 'col2' : 'col1')) 
+                                . (($tID == $tID2) ? 'BGblueDark ' : (($cnt2%2 == 0) ? 'cl2' : 'cl1')) 
                                 . '" data-toggle="tooltip" data-placement="top"  title="';
                             if (sizeof($tblMatrix[$tID][$tID2]) > 0) { 
                                 $this->v["printMatrix"] .= $tblMatrix[$tID][$tID2][0][0] 
@@ -1190,11 +1190,12 @@ class AdminDBController extends AdminController
     // http://www.html5canvastutorials.com/tutorials/
     public function networkMap(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/diagrams');
         if (!$this->checkCache('/dashboard/db/diagrams/network-map')) {
             $this->v["errors"] = '';
-            $this->v["canvasDimensions"] = array(950, 900);
-            $mainCircleCenter = array($this->v["canvasDimensions"][0]/2, $this->v["canvasDimensions"][1]/2);
+            $this->v["css"] = $this->loadCss();
+            $this->v["canvasDimensions"] = array(950, 950);
+            $mainCircleCenter = [ $this->v["canvasDimensions"][0]/2, $this->v["canvasDimensions"][1]/2 ];
             $sizeMax = 0;
             $this->v["tables"] = $tableLookup = array();
             //$this->v["tables"][] = array('English', Size, Center-X, Center-Y);
@@ -1210,7 +1211,7 @@ class AdminDBController extends AdminController
                         sqrt(sqrt($tbl->TblNumForeignKeys+$tbl->TblNumForeignIn)), 
                         0, 
                         0, 
-                        (($GLOBALS["SL"]->isCoreTbl($tbl->TblID)) ? '#f6c82e' : '')
+                        (($GLOBALS["SL"]->isCoreTbl($tbl->TblID)) ? $this->v["css"]["color-success-on"] : '')
                     ];
                 }
             }
@@ -1222,7 +1223,7 @@ class AdminDBController extends AdminController
                 $this->v["tables"][$i][1] = 43*($this->v["tables"][$i][1]/$sizeMax);
                 if ($this->v["tables"][$i][1] <= 10) $this->v["tables"][$i][1] = 10;
                 $rad = deg2rad(360*$i/sizeof($this->v["tables"]));
-                $dim = 0.46*$this->v["canvasDimensions"][1];
+                $dim = 0.42*$this->v["canvasDimensions"][1];
                 $this->v["tables"][$i][2] = round($mainCircleCenter[0]+(sin($rad)*$dim));
                 $this->v["tables"][$i][3] = round($mainCircleCenter[1]-(cos($rad)*$dim));
             }
@@ -1251,6 +1252,7 @@ class AdminDBController extends AdminController
         }
         $this->v["hideWrap"] = true;
         $this->v["isPrint"] = true;
+        $this->v["isFrame"] = true;
         return view('vendor.survloop.master', $this->v);
     }
     
@@ -1293,7 +1295,7 @@ class AdminDBController extends AdminController
     
     public function fieldMatrix(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/field-matrix');
         if (!$this->checkCache()) {
             $this->v["urlParam"] = (($this->v["isAlt"]) ? 'alt=1&' : '');
             $this->v["fieldMatrix"] = '...';
@@ -1345,7 +1347,7 @@ class AdminDBController extends AdminController
                 $filename = 'OPC-DB-Field_Matrix-' 
                     . (($this->v["isAlt"]) ? 'English' : 'Geek')
                     . '-' . date("ymd");
-                $this->exportExcelOldSchool($tblInner, $filename.'.xls');
+                $GLOBALS["SL"]->exportExcelOldSchool($tblInner, $filename.'.xls');
                 exit;
             }
             

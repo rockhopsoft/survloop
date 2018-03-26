@@ -6,13 +6,9 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    Database Installation Process 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Database Installation Process 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
-
-<a href="/dashboard/db/export" class="btn btn-default mR10">MySQL Export</a>
-<a href="/dashboard/db/export/laravel" class="btn btn-default mR10">Export for Laravel</a>
 
 <div class="clearfix p20"></div>
 

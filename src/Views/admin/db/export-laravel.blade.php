@@ -2,13 +2,9 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    Export for Laravel 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Export for Laravel 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
-
-<a href="/dashboard/db/export" class="btn btn-default mR10">MySQL Export</a>
-<a href="/dashboard/db/install" class="btn btn-default mR10">Auto-Install Database Design</a>
 
 <a href="{{ $zipFileMig }}" target="_blank" class="btn btn-sm btn-default mR10" disabled >Download Migrations.zip</a>
 <a href="{{ $zipFileModel }}" target="_blank" class="btn btn-sm btn-default mR10" disabled >Download Models.zip</a>

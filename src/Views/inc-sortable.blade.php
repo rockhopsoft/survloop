@@ -1,8 +1,5 @@
 <!-- resources/views/vendor/survloop/inc-sortable.blade.php -->
-
-<center><h1 class="mTn20">{!! $sortTitle !!}</h1>
-<div style="width: 75%; min-width: 500px;">
-<ul id="sortable">
+<ul id="sortable{{ $sortID }}" class="slSortable" @if (isset($submitURL)) data-url="{{ $submitURL }}" @endif >
 @forelse($sorts as $sort)
     <li id="item-{{ $sort[0] }}">
         <div class="col-md-11 taL"><i class="fa fa-ellipsis-v slBlueLight mR20"></i> {!! $sort[1] !!}</div>
@@ -10,6 +7,6 @@
         <div class="clearfix"></div>
     </li>
 @empty
-    No values found.
+    <li>No values found.</li>
 @endforelse
-</ul></div></center>
+</ul>

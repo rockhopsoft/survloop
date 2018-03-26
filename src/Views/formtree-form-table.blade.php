@@ -1,35 +1,67 @@
 <!-- Stored in resources/views/survloop/formtree-form-table.blade.php -->
-<div id="node{{ $nID }}{{ trim($GLOBALS['SL']->currCyc['tbl'][1]) }}" class="nodeWrap">
+<div id="node{{ $nIDtxt }}{{ trim($GLOBALS['SL']->currCyc['tbl'][1]) }}" class="nodeWrap">
     <div class="nodeHalfGap"></div>
-    @if (isset($node->nodeRow->NodePromptText) && trim($node->nodeRow->NodePromptText) != '')
-        <div class="nPrompt">{!! $node->nodeRow->NodePromptText !!}</div>
-    @endif
+    <div class="nPrompt">{!! $nodePromptText !!}</div>
     <div class="nFld"><table class="table slSpreadTbl">
-    <tr><th class="sprdRowLab">&nbsp;</th>
+    <tr>
+    @if (trim($tableDat["rowCol"]) != '') <th class="sprdRowLab">&nbsp;</th> @endif
     @forelse ($tableDat["cols"] as $k => $col)
-        <th class=" @if ($k > 0 && $k%2 == 0) cl2 @else cl1 @endif " >
+        <th class=" @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif " >
         @if (isset($col->nodeRow->NodePromptText)) {!! $col->nodeRow->NodePromptText !!} @endif
+        @if (isset($col->NodePromptText)) {!! $col->NodePromptText !!} @endif
         </th>
     @empty @endforelse
+    @if (trim($tableDat["rowCol"]) == '') <th class="c1">&nbsp;</th> @endif
     </tr>
     @forelse ($tableDat["rows"] as $j => $row)
-        <?php $rowName = 'n' . $nID . trim($GLOBALS["SL"]->currCyc["tbl"][1]) . 'fld' . $j; ?>
-        <tr id="{{ $rowName }}row" class=" @if ($j%2 == 0) rw2 @endif " >
-            @if (trim($this->tableDat["rowCol"]) != '')
+        <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 == 0) rw2 @endif " >
+            @if (trim($tableDat["rowCol"]) != '')
                 <td class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
-                <input type="hidden" name="n{{ $nID }}tbl{{ $j }}fldDef" id="n{{ $nID }}tbl{{ $j }}fldDefID" 
+                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
                     value="{{ $row['leftVal'] }}" >
             @else
-                
+                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
+                    value="{{ $row['id'] }}" >
             @endif
             @forelse ($row["cols"] as $k => $col)
-                <td class="sprdFld @if ($k > 0 && $k%2 == 0) cl2 @else cl1 @endif ">
-                {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col)) !!}</td>
+                <td class="sprdFld @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
+                    {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col)) !!}</td>
             @empty
             @endforelse
+            @if (trim($tableDat["rowCol"]) == '')
+                <td class="sprdFld taR"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
+                    data-nid="{{ $nID }}" data-nidtxt="{{ $nIDtxt }}" data-row-ind="{{ $j }}"
+                    ><i class="fa fa-trash-o" aria-hidden="true"></i></a></div></td>
+            @endif
         </tr>
     @empty
     @endforelse
+    @if (trim($tableDat["rowCol"]) == '')
+        @for ($j = sizeof($tableDat["rows"]); $j < $node->nodeRow->NodeCharLimit; $j++)
+            <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 == 0) rw2 @endif 
+                @if ($j == sizeof($tableDat['rows'])) disRow @else disNon @endif " >
+                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
+                    value="-3">
+                @forelse ($tableDat["cols"] as $k => $col)
+                    <td class="sprdFld @if ($k > 0) cl1 @endif ">{!! str_replace('tbl?', 'tbl' . $j, 
+                        $GLOBALS["SL"]->replaceTabInd($tableDat["blnk"][$k])) !!}</td>
+                @empty
+                @endforelse
+                @if (trim($tableDat["rowCol"]) == '')
+                    <td class="taR"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
+                        data-nid="{{ $nID }}" data-nidtxt="{{ $nIDtxt }}" data-row-ind="{{ $j }}"
+                        ><i class="fa fa-trash-o" aria-hidden="true"></i></a></div></td>
+                @endif
+            </tr>
+        @endfor
+        <tr id="n{{ $nIDtxt }}rowAdd" >
+            <td colspan="{{ sizeof($tableDat['cols']) }}">&nbsp;</td>
+            <td class="taR"><a id="addSprdTbl{{ $nIDtxt }}Btn" href="javascript:;" data-nid="{{ $nID }}"
+                data-nidtxt="{{ $nIDtxt }}" data-row-max="{{ $tableDat['maxRow'] }}" 
+                class="btn btn-ico btn-default disBlo addSprdTblRow" 
+                ><i class="fa fa-plus" aria-hidden="true"></i></a></td>
+        </tr>
+    @endif
+    
     </table></div> <!-- end nFld -->
 </div> <!-- end nodeWrap -->
-<?php /* <pre> {!! print_r($tableDat) !!} </pre> */ ?>

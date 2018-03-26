@@ -55,6 +55,8 @@
     <a href="?node=-37" class="btn btn-lg btn-primary f22"><i class="fa fa-plus-square-o"></i> Create Root Node</a>
 @endif
 
+{!! $GLOBALS["SL"]->chkMissingReportFlds() !!}
+
 <div class="adminFootBuff"></div>
 
 <style> ul { margin: 0px 30px; padding: 0px; } </style>
