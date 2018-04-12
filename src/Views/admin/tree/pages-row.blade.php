@@ -16,6 +16,7 @@
 <td class="w25 taR slGrey fPerc133">
     <nobr>
     @if ($tree->TreeOpts%13 == 0) <i class="fa fa-list-alt mR10"></i> @endif
+    @if ($tree->TreeOpts%31 == 0) <i class="fa fa-search mR10"></i> @endif
     @if ($tree->TreeOpts%3 == 0) <i class="fa fa-key mR10" aria-hidden="true"></i>
     @elseif ($tree->TreeOpts%17 == 0) <i class="fa fa-hand-rock-o mR10" aria-hidden="true"></i>
     @endif

@@ -50,23 +50,23 @@
 @if (!$isPrint)
     @if ($isAlt)
         <div class="m5"><a class="btn btn-info" 
-            @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1" 
+            @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1" 
             @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-align-left"></i> Hide Details</a></div>
     @else
         <div class="m5"><a class="btn btn-info" 
-            @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
+            @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
             @else href="/dashboard/tree/map?alt=1" @endif
             ><i class="fa fa-align-left"></i> Show Details</a></div>
     @endif
     @if ($isAll)
         <div class="m5"><a class="btn btn-info" 
-            @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?alt=1" 
+            @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?alt=1" 
             @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Collapse Tree</a></div>
     @else
         <div class="m5"><a class="btn btn-info" 
-            @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
+            @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
             @else href="/dashboard/tree/map?all=1" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Expand Tree</a></div>
     @endif

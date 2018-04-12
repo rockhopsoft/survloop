@@ -17,6 +17,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLContact;
 use App\Models\SLEmails;
+use App\Models\SLSess;
 
 use SurvLoop\Controllers\SurvLoopReport;
 use SurvLoop\Controllers\SurvLoopController;
@@ -107,14 +108,14 @@ class AdminController extends SurvLoopController
         $ret = '';
         /*
         $trees = SLTree::where('TreeDatabase', $this->dbID)
-            ->where('TreeType', 'Primary Public')
+            ->where('TreeType', 'Survey')
             ->orderBy('TreeID', 'asc')
             ->get();
         if ($trees && sizeof($trees) > 0) {
             $ret .= '<i class="fPerc133">Form Trees:</i><br />';
             foreach ($trees as $tree) {
                 if ($this->treeID == $tree->TreeID) {
-                    $ret .= '<a href="/dashboard/tree-' . $tree->TreeID . '/map?all=1&alt=1" class="fPerc133"><b>' 
+                    $ret .= '<a href="/dashboard/surv-' . $tree->TreeID . '/map?all=1&alt=1" class="fPerc133"><b>' 
                         . $tree->TreeName . '</b> <i class="fa fa-pencil" aria-hidden="true"></i></a><br />';
                 } else {
                     $ret .= '<a href="/dashboard/tree/switch/' . $tree->TreeID . '">' . $tree->TreeName . '</a><br />';
@@ -135,7 +136,8 @@ class AdminController extends SurvLoopController
                     $curr = '<a href="/dashboard/page/' . $tree->TreeID . '?all=1&alt=1&refresh=1" class="fPerc133"><b>' 
                         . $tree->TreeName . '</b> <i class="fa fa-pencil" aria-hidden="true"></i></a><br />';
                 }
-                if ($tree->TreeOpts%3 == 0) $admPages .= $curr;
+                if (($urlTree->TreeOpts%3 == 0 && $this->isUserAdmin()) 
+                    || ($urlTree->TreeOpts%17 == 0 && $this->isUserVolun())) $admPages .= $curr;
                 else $ret .= $curr;
             }
         }
@@ -193,15 +195,15 @@ class AdminController extends SurvLoopController
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Surveys / Forms', 
             '<i class="fa fa-snowflake-o" aria-hidden="true"></i>', 1, [
-            $this->admMenuLnk('/dashboard/tree-' . $treeID . '/map?all=1&alt=1', $treeLabel, '', 1, [
-                $this->admMenuLnk('/dashboard/tree-' . $treeID . '/map?all=1&alt=1', 'Full Survey Map'), 
-                $this->admMenuLnk('/dashboard/tree-' . $treeID . '/sessions',        'Session Stats'), 
-                $this->admMenuLnk('/dashboard/tree-' . $treeID . '/stats?all=1',     'Response Stats'),
-                $this->admMenuLnk('/dashboard/tree-' . $treeID . '/data',            'Data Structures'), 
-                $this->admMenuLnk('/dashboard/tree-' . $treeID . '/xmlmap',          'XML Map') 
+            $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', $treeLabel, '', 1, [
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 'Full Survey Map'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Session Stats'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Response Stats'),
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map') 
                 ]), 
-            $this->admMenuLnk('/dashboard/trees/list',     'All Surveys'),
-            $this->admMenuLnk('/dashboard/trees/list#new', 'Add New Survey'),
+            $this->admMenuLnk('/dashboard/surveys/list',     'All Surveys'),
+            $this->admMenuLnk('/dashboard/surveys/list#new', 'Add New Survey'),
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
             $this->admMenuLnk('/dashboard/db', 'All Tables', '', 1, [
@@ -235,8 +237,9 @@ class AdminController extends SurvLoopController
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Settings', '<i class="fa fa-cogs"></i>', 1, [
             $this->admMenuLnk('/dashboard/settings#search',   'Search Engines'),
             $this->admMenuLnk('/dashboard/settings#general',  'General Settings'),
-            $this->admMenuLnk('/dashboard/settings#color',    'Logos, Colors, Fonts'),
-            $this->admMenuLnk('/dashboard/settings#hardcode', 'Code: HTML, CSS, JS'),
+            $this->admMenuLnk('/dashboard/settings#logos',    'Logos & Fonts'),
+            $this->admMenuLnk('/dashboard/settings#color',    'Colors'),
+            $this->admMenuLnk('/dashboard/settings#hardcode', 'Code HTML CSS JS'),
             $this->admMenuLnk('/dashboard/logs',              'System Logs', '', 1, [
                 $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff')
                 ]),
@@ -346,7 +349,6 @@ class AdminController extends SurvLoopController
                 }
             }
         }
-//echo '<br /><br /><br />' . $currPage . ' - '; print_r($this->admMenuData["currNavPos"]); echo '<br />';
         return ($this->admMenuData["currNavPos"][0] > -1 || $this->admMenuData["currNavPos"][1] > -1
             || $this->admMenuData["currNavPos"][2] > -1 || $this->admMenuData["currNavPos"][3] > -1);
     }
@@ -408,8 +410,9 @@ class AdminController extends SurvLoopController
             $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
             if (class_exists($custClass)) $class = $custClass;
         }
-        eval("\$this->CustReport = new " . $class . "(\$request, -3, " . $this->dbID . ", " 
-            . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
+        $this->loadCustReport($request);
+        //eval("\$this->CustReport = new " . $class . "(\$request, -3, " . $this->dbID . ", " 
+        //    . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
         return true;
     }
     
@@ -430,7 +433,17 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.master', $this->v);
     }
     
+    public function loadNodeTreeURLedit(Request $request, $cid = -3, $treeSlug = '')
+    {
+        return $this->loadNodeTreeURLinner($request, $treeSlug, $cid);
+    }
+    
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
+    {
+        return $this->loadNodeTreeURLinner($request, $treeSlug);
+    }
+    
+    public function loadNodeTreeURLinner(Request $request, $treeSlug = '', $cid = -3)
     {
         $this->loadDomain();
         if (trim($treeSlug) != '') {
@@ -438,10 +451,37 @@ class AdminController extends SurvLoopController
                 ->get();
             if ($urlTrees && sizeof($urlTrees) > 0) {
                 foreach ($urlTrees as $urlTree) {
-                    if ($urlTree->TreeOpts%3 == 0) {
+                    if (($urlTree->TreeOpts%3 == 0 && $this->isUserAdmin()) 
+                        || ($urlTree->TreeOpts%17 == 0 && ($this->isUserVolun() || $this->isUserAdmin()))) {
                         $rootNode = SLNode::find($urlTree->TreeFirstPage);
                         if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = '/dash/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes;
+                            $redir = '/dash/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1';
+                            $paramTxt = str_replace($this->domainPath . '/start/' . $urlTree->TreeSlug, '', 
+                                $request->fullUrl());
+                            if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
+                            if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
+                                $redir .= '&' . substr($paramTxt, 1);
+                            }
+                            if (intVal($cid) > 0) {
+                                $sess = SLSess::where('SessUserID', Auth::user()->id)
+                                    ->where('SessTree', $urlTree->TreeID)
+                                    ->where('SessCoreID', $cid)
+                                    ->orderBy('updated_at', 'desc')
+                                    ->first();
+                                if (!$sess || !isset($sess->SessID)) {
+                                    $sess = new SLSess;
+                                    $sess->SessUserID = Auth::user()->id;
+                                    $sess->SessTree   = $urlTree->TreeID;
+                                    $sess->SessCoreID = $cid;
+                                    $sess->save();
+                                }
+                                if (session()->has('sessID' . $urlTree->TreeID)) {
+                                    session()->put('sessID' . $urlTree->TreeID, $sess->SessID);
+                                }
+                                if (session()->has('coreID' . $urlTree->TreeID)) {
+                                    session()->put('coreID' . $urlTree->TreeID, $cid);
+                                }
+                            }
                             return redirect($this->domainPath . $redir);
                         }
                     }
@@ -458,7 +498,12 @@ class AdminController extends SurvLoopController
             $this->admControlInit($request, '/dash/' . $GLOBALS["SL"]->treeRow->TreeSlug);
             $this->v["content"] = $this->CustReport->index($request);
             $this->v["currInReport"] = $this->CustReport->currInReport();
-            return view('vendor.survloop.master', $this->v);
+            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
+                echo '<script type="text/javascript"> window.location="/dashboard/page/' 
+                    . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1"; </script>';
+                exit;
+            }
+            return $this->addAdmCodeToPage(view('vendor.survloop.master', $this->v)->render());
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -481,26 +526,23 @@ class AdminController extends SurvLoopController
     {
         if (trim($treeSlug) != '') {
             $urlTrees = [];
-            if ($type = 'Page') {
+            if ($type == 'Page') {
                 $redir = $this->chkPageRedir($treeSlug);
-                if ($redir != $treeSlug) return redirect($redir);
-                $urlTrees = SLTree::where('TreeSlug', $treeSlug)
-                    ->orderBy('TreeID', 'asc')
-                    ->get();
-            } elseif ($type = 'XML') {
-                $urlTrees = SLTree::where('TreeType', 'Primary Public XML')
+                if ($redir != $treeSlug) redirect($redir);
+                $urlTrees = SLTree::where('TreeType', 'Page')
                     ->where('TreeSlug', $treeSlug)
                     ->orderBy('TreeID', 'asc')
                     ->get();
-            } else {
-                $urlTrees = SLTree::where('TreeType', 'Page')
+            } elseif ($type == 'XML') {
+                $urlTrees = SLTree::where('TreeType', 'Survey XML')
                     ->where('TreeSlug', $treeSlug)
                     ->orderBy('TreeID', 'asc')
                     ->get();
             }
             if ($urlTrees && sizeof($urlTrees) > 0) {
                 foreach ($urlTrees as $urlTree) {
-                    if ($urlTree && isset($urlTree->TreeOpts) && $urlTree->TreeOpts%3 == 0) {
+                    if ($urlTree && isset($urlTree->TreeOpts) && (($urlTree->TreeOpts%3 == 0 && $this->isUserAdmin()) 
+                        || ($urlTree->TreeOpts%17 == 0 && ($this->isUserVolun() || $this->isUserAdmin())))) {
                         $this->syncDataTrees($request, $urlTree->TreeDatabase, $urlTree->TreeID);
                         return true;
                     }
@@ -534,7 +576,8 @@ class AdminController extends SurvLoopController
         if (intVal($treeID) > 0) {
             $tree = SLTree::find($treeID);
             if ($tree && isset($tree->TreeOpts)) {
-                if ($tree->TreeOpts%3 == 0) {
+                if (($tree->TreeOpts%3 == 0 && $this->isUserAdmin()) 
+                    || ($tree->TreeOpts%17 == 0 && ($this->isUserVolun() || $this->isUserAdmin()))) {
                     $this->syncDataTrees($request, $tree->TreeDatabase, $treeID);
                     return true;
                 }
@@ -545,10 +588,9 @@ class AdminController extends SurvLoopController
     
     protected function syncDataTrees(Request $request, $dbID, $treeID)
     {
-        if (!isset($this->v["isAdmin"])) $this->v["isAdmin"] = $this->isUserAdmin();
         $this->treeID = $treeID;
         if (!isset($GLOBALS["SL"]) || $GLOBALS["SL"]->treeID != $treeID) {
-            $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $dbID, $treeID, $treeID);
+            $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeID, $treeID);
             $this->dbID = $GLOBALS["SL"]->dbID;
         }
         return true;
@@ -576,10 +618,10 @@ class AdminController extends SurvLoopController
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
                 return $this->redir('/dashboard/page/' . $treeID . '?all=1&alt=1&refresh=1');
             }
-            return $this->redir('/dashboard/tree-' . $treeID . '/map?all=1&alt=1&refresh=1');
+            return $this->redir('/dashboard/surv-' . $treeID . '/map?all=1&alt=1&refresh=1');
         }
         $this->v["myTrees"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-            ->where('TreeType', 'NOT LIKE', 'Primary Public XML')
+            ->where('TreeType', 'NOT LIKE', 'Survey XML')
             ->where('TreeType', 'NOT LIKE', 'Other Public XML')
             ->where('TreeType', 'NOT LIKE', 'Page')
             ->orderBy('TreeName', 'asc')
@@ -707,6 +749,7 @@ class AdminController extends SurvLoopController
         $GLOBALS["SL"]->addAdmMenuHshoos([
             '/dashboard/settings#search',
             '/dashboard/settings#general', 
+            '/dashboard/settings#logos',
             '/dashboard/settings#color',
             '/dashboard/settings#hardcode'
             ]);
@@ -744,8 +787,8 @@ class AdminController extends SurvLoopController
         $this->admControlInit($request, '/dashboard/pages/list');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
-        if ($this->v["blurbRow"]->DefIsActive <= 0 || $this->v["blurbRow"]->DefIsActive%3 != 0) {
-            $GLOBALS["SL"]->pageJAVA .= 'tinymce.init({ selector:"#DefDescriptionID" });';
+        if ($this->v["blurbRow"]->DefIsActive <= 0 || $this->v["blurbRow"]->DefIsActive%3 > 0) {
+            $GLOBALS["SL"]->pageAJAX .= ' $("#DefDescriptionID").summernote({ height: 500 }); ';
         }
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
@@ -886,6 +929,7 @@ class AdminController extends SurvLoopController
             'color-main-link'   => ['#416CBD', 'Link Color'],
             'color-main-grey'   => ['#999',    'Grey Color'],
             'color-main-faint'  => ['#EDF8FF', 'Faint Color'],
+            'color-main-faintr' => ['#F9FCFF', 'Fainter Color'],
             'color-main-on'     => ['#2B3493', 'Primary Color #1'],
             'color-main-off'    => ['#53F1EB', 'Primary Color #2'],
             'color-info-on'     => ['#5BC0DE', 'Info Color #1'],
@@ -927,7 +971,7 @@ class AdminController extends SurvLoopController
             'twitter'         => ['Twitter Account', '@SurvLoop'], 
             'show-logo-title' => ['Print Site Name Next To Logo', '1 or 0'], 
             'users-create-db' => ['Users Can Create Databases', '1 or 0'], 
-            'has-volunteers'  => ['Has Volunteer Users w/ Special Access', '1 or 0'], 
+            'has-volunteers'  => ['Has Volunteer User Area', '1 or 0'], 
             'parent-company'  => ['Parent Company of This Installation', 'MegaOrg'], 
             'parent-website'  => ['Parent Company\'s Website URL', 'http://www...'], 
             'login-instruct'  => ['User Login Instructions', 'HTML'], 
@@ -1060,7 +1104,7 @@ class AdminController extends SurvLoopController
         $this->v["currEmail"] = new SLEmails;
         if ($emailID > 0) $this->v["currEmail"] = SLEmails::find($emailID);
         $this->v["needsWsyiwyg"] = true;
-        $GLOBALS["SL"]->pageJAVA .= 'tinymce.init({ selector:"#emailBodyID" });';
+        $GLOBALS["SL"]->pageAJAX .= ' $("#emailBodyID").summernote({ height: 500 }); ';
         return view('vendor.survloop.admin.email-form', $this->v);
     }
     
@@ -1075,7 +1119,7 @@ class AdminController extends SurvLoopController
             $currEmail->EmailName    = $request->emailName;
             $currEmail->EmailSubject = $request->emailSubject;
             $currEmail->EmailBody    = $request->emailBody;
-            $currEmail->EmailOpts         = 1;
+            $currEmail->EmailOpts    = 1;
             $currEmail->save();
         }
         return $this->redir('/dashboard/emails');
@@ -1115,7 +1159,7 @@ class AdminController extends SurvLoopController
     {
         if ($request->has('step') && $request->has('tree') && intVal($request->tree) > 0) {
             $this->loadTreeByID($request, $request->tree);
-            $this->admControlInit($request, '/dash/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $request->nodeSlug);
+            $this->admControlInit($request, '/dash/u/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $request->nodeSlug);
             echo '<div class="pT20">' . $this->CustReport->loadNodeURL($request, $request->nodeSlug) . '</div>';
         }
         exit;
@@ -1230,20 +1274,18 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.admin.images-gallery', $this->v);
     }
     
-    public function getCoreDef($set, $subset, $dbID = 1)
+    
+    
+    protected function addAdmCodeToPage($pageContent)
     {
-        $def = SLDefinitions::where('DefDatabase', $dbID)
-            ->where('DefSet',    '=', $set)
-            ->where('DefSubset', '=', $subset)
-            ->first();
-        if (!$def || !isset($def->DefID)) {
-            $def = new SLDefinitions;
-            $def->DefDatabase = $dbID;
-            $def->DefSet      = $set;
-            $def->DefSubset   = $subset;
-            $def->save();
+        $extra = '';
+        if (Auth::user() && isset(Auth::user()->id) && Auth::user()->hasRole('administrator')) {
+            $extra .= ' addTopNavItem("<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>", "?edit=1"); ';
         }
-        return $def;
+        if (trim($extra) != '') {
+            $extra = '<script type="text/javascript"> ' . $extra . ' </script>';
+        }
+        return str_replace("</body>", $extra . "\n</body>", $pageContent);
     }
     
 }

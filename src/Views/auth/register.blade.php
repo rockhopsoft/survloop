@@ -6,7 +6,7 @@ $v = $surv->custLoop->v;
 
 @section('content')
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
-<form name="mainPageForm" method="POST" action="{{ url('/register') }}">
+<form name="mainPageForm" method="POST" action="{{ url('/register') }}" onSubmit="return checkNodeForm();">
 <input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
@@ -90,12 +90,11 @@ $v = $surv->custLoop->v;
     <div id="nLabel002" class="nPrompt"><label for="password">
         Password: <span class="red">*required, 8 character minimum</span>
     </label></div>
+    <div class="relDiv w100"><div id="passStrng" class="red"></div></div>
     <div class="nFld mT0">
         <input id="password" name="password" value="" type="password" class="form-control">
         @if ($errors->has('password'))
-            <span class="help-block">
-                <strong>{{ $errors->first('password') }}</strong>
-            </span>
+            <span class="help-block"><strong>{{ $errors->first('password') }}</strong></span>
         @endif
     </div>
 </div>
@@ -117,8 +116,7 @@ $v = $surv->custLoop->v;
 
 <label><input type="checkbox" name="newVolunteer" value="1" > Volunteer</label>
 
-<center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"
-    onClick="return checkNodeForm();"></center>
+<center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
 
 <div class="nodeHalfGap"></div>
 
@@ -126,7 +124,12 @@ $v = $surv->custLoop->v;
 
 </form>
 
+<script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
+</script>
 <script type="text/javascript">
+$(document).ready(function(){
+{!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
+});
 function checkNodeForm() {
     hasAttemptedSubmit = true;
     totFormErrors=0; formErrorsEng = "";

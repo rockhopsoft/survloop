@@ -20,7 +20,7 @@ class SLTables extends Model
         'TblGroup', 
         'TblOrd', 
         'TblOpts', 
-        'TblActive', 
+        'TblExtend', 
         'TblNumFields', 
         'TblNumForeignKeys', 
         'TblNumForeignIn', 

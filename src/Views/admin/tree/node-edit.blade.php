@@ -4,8 +4,8 @@
 
 @if ($canEditTree)
     <form name="mainPageForm" method="post" @if (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-        action="/dashboard/tree-{{ $treeID }}/map/node/{{ $node->nodeRow->NodeID }}"
-        @else action="/dashboard/tree-{{ $treeID }}/map/node/-3" @endif >
+        action="/dashboard/surv-{{ $treeID }}/map/node/{{ $node->nodeRow->NodeID }}"
+        @else action="/dashboard/surv-{{ $treeID }}/map/node/-3" @endif >
     <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <input type="hidden" name="sub" value="1">
     <input type="hidden" name="treeID" value="{{ $treeID }}">
@@ -35,11 +35,11 @@
         <h2 class="mT0 mB5 slBlueDark">Adding Node</h2>
     @endif
         <a  @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-                href="/dashboard/page/{{ $treeID }}?all=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
+                href="/dashboard/page/{{ $treeID }}?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
             @elseif (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-                href="/dashboard/tree-{{ $treeID }}/map?all=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
+                href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
             @else
-                href="/dashboard/tree-{{ $treeID }}/map?all=1&refresh=1" 
+                href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1" 
             @endif >Back to Form-Tree Map</a>
     </div>
     <div class="col-md-4 mB10">
@@ -170,14 +170,11 @@
                         @if ($node->nodeType == 'Member Profile Basics') SELECTED @endif 
                         >Member Profile Basics</option>
                         
-                @else
+                @endif
                 
                     <option value="Back Next Buttons" 
                         @if ($node->nodeType == 'Back Next Buttons') SELECTED @endif 
-                        >Extra Back-Next Buttons</option>
-                
-                @endif
-                
+                        >Extra Next [Back] Buttons</option>
                     <option value="Widget Custom" 
                         @if ($node->nodeType == 'Widget Custom') SELECTED @endif 
                         >Custom-Written Widget</option>
@@ -339,29 +336,11 @@
             <div class="nFld w100">
                 @if ($node->isInstruct()) 
                     <textarea name="nodeInstruct" id="nodeInstructID" class="form-control w100" autocomplete="off"
-                        style="height: 450px; font-family: Courier New;">@if (isset($node->nodeRow->NodePromptText)){!! 
+                        style="height: 350px;">@if (isset($node->nodeRow->NodePromptText)){!! 
                             $node->nodeRow->NodePromptText !!}@endif</textarea>
-                    <script>tinymce.init({ selector:'#nodeInstructID' });</script>
-                    <?php /* <style> #tinymce {
-                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') text-align: center; 
-                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') text-align: right; 
-                        @endif
-                    } </style> */ ?>
-                    <?php /* <div name="nodeInstruct" id="nodeInstructID" class="brdDshGry nPrompt 
-                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') taC 
-                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') taR 
-                        @endif " autocomplete="off"
-                        style="height: 450px; width: 100%; overflow: auto;" 
-                        >@if (isset($node->nodeRow->NodePromptText)){!! 
-                            $node->nodeRow->NodePromptText !!}@endif</div>
-                    <style> .ql-editor, #nodeInstructID .ql-editor {
-                        @if (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'center') text-align: center; 
-                        @elseif (isset($node->colors['blockAlign']) && $node->colors['blockAlign'] == 'right') text-align: right; 
-                        @endif
-                    } </style> */ ?>
                 @else
                     <textarea name="nodeInstruct" id="nodeInstructID" class="form-control w100" autocomplete="off"
-                        style="height: 250px; font-family: Courier New;">@if (isset($node->nodeRow->NodePromptText)){!! 
+                        style="height: 350px; font-family: Courier New;">@if (isset($node->nodeRow->NodePromptText)){!! 
                             $node->nodeRow->NodePromptText !!}@endif</textarea>
                 @endif
             </div>

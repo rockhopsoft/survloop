@@ -23,20 +23,24 @@
 <div class="mB20">
     @if ($isAll)
         <a class="btn btn-primary pull-right mL10" 
-            @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?alt=1" @else href="/dashboard/tree/map" @endif
+            @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?alt=1" 
+            @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Collapse Tree</a>
     @else
         <a class="btn btn-primary pull-right mL10" 
-            @if ($isAlt) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" @else href="/dashboard/tree/map?all=1" @endif
+            @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
+            @else href="/dashboard/tree/map?all=1" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Expand Tree</a>
     @endif
     @if ($isAlt)
         <a class="btn btn-default pull-right mL10" 
-            @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1" @else href="/dashboard/tree/map" @endif
+            @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1" 
+            @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-align-left"></i> Hide Details</a>
     @else
         <a class="btn btn-default pull-right mL10" 
-            @if ($isAll) href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" @else href="/dashboard/tree/map?alt=1" @endif
+            @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
+            @else href="/dashboard/tree/map?alt=1" @endif
             ><i class="fa fa-align-left"></i> Show Details</a>
     @endif
     <a class="btn btn-default pull-right mL10" href="/dashboard/pages/list"

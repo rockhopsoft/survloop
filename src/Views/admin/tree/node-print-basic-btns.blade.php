@@ -1,19 +1,19 @@
 @if ((!isset($isPrint) || !$isPrint))
     @if ($canEditTree)
         <div class="disIn mL10">
-            <a  @if ($GLOBALS['SL']->treeRow->TreeType == 'Primary Public XML')
-                    href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/xmlmap/node/{{ $nID }}" 
+            <a  @if ($GLOBALS['SL']->treeRow->TreeType == 'Survey XML')
+                    href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/xmlmap/node/{{ $nID }}" 
                 @else
-                    href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
+                    href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
                 @endif >
                 <span id="nodeBtns{{ $nID }}edit" class="slGrey" >
                 <i class="fa fa-pencil" id="nodeBtnEdit{{ $nID }}" class="disIn"></i></span></a>
             <div id="nodeBtns{{ $nID }}" class="disNon">
                 <nobr><a class="btn btn-xs btn-default"
-                @if ($GLOBALS['SL']->treeRow->TreeType == 'Primary Public XML')
-                    href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/xmlmap/node/{{ $nID }}" 
+                @if ($GLOBALS['SL']->treeRow->TreeType == 'Survey XML')
+                    href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/xmlmap/node/{{ $nID }}" 
                 @else
-                    href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
+                    href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
                 @endif ><i class="fa fa-pencil"></i>
                      Edit This Node</a></nobr>
                 <nobr><a href="javascript:;" id="showAdds{{ $nID }}" 

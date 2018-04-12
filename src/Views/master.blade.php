@@ -71,11 +71,8 @@
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/Chart.bundle.min.js"></script>
 @endif
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script src="https://cloud.tinymce.com/stable/tinymce.min.js?apiKey={{ env('TinyMCE_API_KEY') }}"></script>
     <?php /* <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/content-tools.min.css">
-    <?php /* <script src="//cdn.ckeditor.com/4.7.1/standard/ckeditor.js"></script>
-    <script src="//cdn.ckeditor.com/4.7.1/full/ckeditor.js"></script> */ ?>
+        }}/survloop/ContentTools-master/build/content-tools.min.css"> */ ?>
 @endif
 
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
@@ -183,30 +180,42 @@
             </div>
     @else
         
-        @if (isset($admMenuHideable) && $admMenuHideable)
-            <div id="admMenuBarsWrap">
-                <a id="admMenuBars" class="btn btn-lg btn-primary" href="javascript:;"><i class="fa fa-bars"></i></a>
-            </div>
-        @endif
-        
-        <div class="container-fluid mT10">
-            <div class="row">
-                <div id="leftSide" class="col-md-2 h100">
-                    <div id="leftSideWrap" class="pR15 brdRgt 
-                        @if (isset($admMenuHideable) && $admMenuHideable) pT20 mT5 @endif " >
-                        <div class="disNon"><form class="navbar-form navbar-right"></div>
-                            <input type="text" class="form-control" placeholder="Search...">
-                        <div class="disNon"></form></div>
-                        <div id="adminMenu" class="row">
-                            @if (isset($admMenu)) {!! $admMenu !!} @endif
+        <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
+            <td id="leftSide"><div id="leftSideWdth"></div><div id="leftSideWrap">
+                <div id="leftAdmMenu">
+                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
+                        && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                        <div id="admMenuCustom" class="w100 h100 disBlo">
+                            {!! $GLOBALS["SL"]->x["admMenuCustom"] !!}
                         </div>
-                        <div id="adminMenuExtra">
-                            @yield('belowAdmMenu')
-                            @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
-                        </div>
+                        <div id="admMenuNotCustom" class="w100 disNon">
+                    @endif
+                    <form id="dashSearchFrmID" name="dashSearchForm" action="{{ $GLOBALS['SL']->getSrchUrl() }}" 
+                        method="get">
+                        <nobr><input type="text" name="s" id="admSrchFld" class="form-control" placeholder="Search...">
+                        <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
+                            ><i class="fa fa-search" aria-hidden="true"></i></a></div></nobr>
+                    </form>
+                    <div class="admMenu row">
+                        @if (isset($admMenu)) {!! $admMenu !!} @endif
                     </div>
+                    <div id="adminMenuExtra">
+                        @yield('belowAdmMenu')
+                        @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
+                    </div>
+                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
+                        && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                        </div> <!-- end #admMenuNotCustom -->
+                    @endif
                 </div>
-                <div id="mainBody" class="col-md-10">
+                <div id="menuColpsWrap">
+                    <a id="menuColpsBtn" href="javascript:;"
+                        ><nobr><i class="fa fa-caret-square-o-left" aria-hidden="true"></i> Collapse Menu</nobr></a>
+                    <a id="menuUnColpsBtn" href="javascript:;"
+                        ><i class="fa fa-caret-square-o-right" aria-hidden="true"></i></a>
+                </div>
+            </td><td id="mainBody" class="w100 h100">
+                <div class="container-fluid">
     @endif
                     @if (isset($content)) {!! $content !!} @endif
                     @yield('content')
@@ -218,13 +227,8 @@
     @if (isset($isPrint) && $isPrint)    
         </div>
     @else
-                </div>
-                <div id="rightSide" class="disNon">
-                    @yield('rightSide')
-                    @if (isset($rightSide)) {!! $rightSide !!} @endif
-                </div>
             </div>
-        </div>
+        </div></td></tr></table>
     @endif
 
 @else
@@ -267,6 +271,13 @@
 
 <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
     }}/survloop/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/survloop/summernote-0.8.9-dist/summernote.css" rel="stylesheet">
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/survloop/summernote-0.8.9-dist/summernote.js"></script>
+@endif
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 

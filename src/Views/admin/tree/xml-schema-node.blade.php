@@ -13,7 +13,8 @@
                 <xs:sequence>
     @endif
     @if ($TblOpts%5 > 0)
-        <xs:element name="{{ $tblAbbr }}" @if ($TblOpts%7 > 0) minOccurs="0" @endif @if ($TblOpts%11 > 0) maxOccurs="unbounded" @endif >
+        <xs:element name="{{ $tblAbbr }}" @if ($TblOpts%7 > 0) minOccurs="0" @endif 
+            @if ($TblOpts%11 > 0) maxOccurs="unbounded" @endif >
             <xs:complexType mixed="true">
                 <xs:sequence>
     @endif

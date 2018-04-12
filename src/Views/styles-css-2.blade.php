@@ -9,7 +9,7 @@
     position: fixed;
 }
 
-.navbar {
+.navbar, #myNavBar, #myNavBar .navbar {
     height: 56px;
 	min-height: 56px;
 	max-height: 56px;
@@ -150,22 +150,66 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     width: 100%;
     height: 100%;
 }
-#admMenuBarsWrap {
-    position: fixed;
-    z-index: 100;
-    margin: -15px 0px 0px -3px;
+#menuColpsWrap {
+    margin: 15px -15px 0px -15px;
 }
-#admMenuBars {
-    font-size: 18pt;
-    padding: 10px 10px 5px 10px;
+a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover,
+a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    color: {!! $css["color-main-grey"] !!};
 }
-#admMenuBarsWrap {
-    position: fixed;
-    z-index: 100;
+a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
+    display: none;
+}
+#leftSide {
+    height: 100%;
+    border-right: 1px {!! $css["color-main-off"] !!} solid;
+    vertical-align: top;
+    background: {!! $css["color-main-faintr"] !!};
+}
+#leftSideWdth {
+    width: 230px;
 }
 #leftSideWrap {
     position: fixed;
-    margin-top: 10px;
+    width: 230px;
+    padding: 10px 15px 0px 15px;
+}
+#leftAdmMenu {
+    display: block;
+    width: 200px;
+}
+#mainBody {
+    padding: 0px 15px 0px 15px;
+    vertical-align: top;
+}
+
+#admSrchFld {
+    background: none; 
+    background-color: none;
+    margin: 5px 0px;
+}
+#dashSearchFrmID input {
+    display: inline;
+    width: 100%;
+}
+#dashSearchBtnID {
+    position: relative;
+    width: 100%;
+    height: 1px;
+}
+#dashSearchBtnID a:link, #dashSearchBtnID a:active, #dashSearchBtnID a:visited, #dashSearchBtnID a:hover {
+    position: absolute;
+    top: -38px;
+    right: 13px;
+    font-size: 14px;
+}
+#dashSearchBtnID a:hover {
+    top: -39px;
+    right: 12px;
+    font-size: 16px;
 }
 
 #footerLinks {
@@ -798,6 +842,7 @@ ul.glossaryList li { margin-bottom: 10px; }
 
 .basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
 .basicTier5, .basicTier6, .basicTier7, .basicTier8, .basicTier9 {
+    min-width: 80px;
     padding: 10px 5px 10px 5px;
     margin: 0px 5px 0px 5px;
 	-moz-border-radius: 20px; border-radius: 20px;
@@ -975,8 +1020,8 @@ table.detailList tr td {
 	z-index: 99;
 	background: {!! $css["color-main-bg"] !!};
 	box-shadow: 0px 0px 20px {!! $css["color-main-bg"] !!};
-	padding-top: 10px;
-	padding-bottom: 5px;
+	margin: 0px -15px 0px -15px;
+	padding: 5px 15px 5px 15px;
 	top: 47px;
 	border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
@@ -1077,33 +1122,33 @@ label { font-weight: normal; }
 #adminMenu {
     margin-top: 10px;
 }
-#admMenu .admMenuTier1, #admMenu .admMenuTier2, #admMenu .admMenuTier3, #admMenu .admMenuTier4 {
+.admMenu .admMenuTier1, .admMenu .admMenuTier2, .admMenu .admMenuTier3, .admMenu .admMenuTier4 {
     padding: 5px 5px 5px 15px;
 }
-#admMenu .admMenuTier1 a:link, #admMenu .admMenuTier1 a:visited, #admMenu .admMenuTier1 a:active, #admMenu .admMenuTier1 a:link {
+.admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, .admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:link {
     font-size: 110%;
 }
-#admMenu div a.active:link, #admMenu div a.active:visited, #admMenu div a.active:active, #admMenu div a.active:hover {
+.admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
     font-weight: bold;
 }
-#admMenu a.active:link, #admMenu a.active:visited, #admMenu a.active:active, #admMenu a.active:hover,
-#admMenu div a.active:link, #admMenu div a.active:visited, #admMenu div a.active:active, #admMenu div a.active:hover {
+.admMenu a.active:link, .admMenu a.active:visited, .admMenu a.active:active, .admMenu a.active:hover,
+.admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
     color: {!! $css["color-main-text"] !!};
 }
-.admMenuIco, #admMenu .admMenuIco, #admMenu div a .admMenuIco, #admMenu div a:link .admMenuIco, #admMenu div a:visited .admMenuIco, #admMenu div a:active .admMenuIco, #admMenu div a:hover .admMenuIco {
+.admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, .admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
     margin: 0px 5px 0px 0px;
 }
-#admMenu .admMenuTier2 {
+.admMenu .admMenuTier2 {
     padding-left: 40px;
 }
-#admMenu .admMenuTier3 {
+.admMenu .admMenuTier3 {
     padding-left: 60px;
 }
-#admMenu .admMenuTier4 {
+.admMenu .admMenuTier4 {
     padding-left: 80px;
 }
-#admMenu a:link, #admMenu a:visited, #admMenu a:active, #admMenu a:link {
+.admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
     display: block;
 }
 
@@ -1128,6 +1173,14 @@ a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover {
 a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActive:hover {
 	color: {!! $css["color-main-bg"] !!};
 	background: {!! $css["color-main-on"] !!};
+}
+
+#passStrng {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+    font-size: 80%;
+    font-style: italic;
 }
 
 
@@ -1256,8 +1309,20 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     
 	#navDesktop { display: none; }
 	#navMobile { display: block; }
-    #leftSideWrap { position: static; }
 	
+    a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover {
+        display: none;
+    }
+    a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
+	    display: block;
+	}
+    #leftSideWdth { width: 24px; }
+    #leftSideWrap { width: 24px; padding: 0px 6px; }
+    #leftAdmMenu { display: none; }
+    #mainBody { padding: 0px; }
+    @media screen and (max-height: 650px) {
+        #leftSideWrap { position: static; }
+    }
     
 }
 @media screen and (max-width: 768px) {
@@ -1590,16 +1655,24 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 
 .brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th { border-bottom: 1px {!! $css["color-main-text"] !!} solid; }
 .brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th { border-bottom: 2px {!! $css["color-main-text"] !!} solid; }
-.brdBot9, table tr.brdBot9 td, table tr.brdBot9 th { border-bottom: 1px #999 solid; }
+.brdBotGrey, table tr.brdBotGrey td, table tr.brdBotGrey th { border-bottom: 1px {!! $css["color-main-grey"] !!} solid; }
 
 .brdBotBluL, table tr.brdBotBluL td, table tr.brdBotBluL th { border-bottom: 1px {!! $css["color-main-off"] !!} solid; }
 .brdBotBluL3, table tr.brdBotBluL3 td, table tr.brdBotBluL3 th { border-bottom: 3px {!! $css["color-main-off"] !!} solid; }
+
+.brdRgtBluL, table tr.brdRgtBluL td, table tr.brdRgtBluL th { border-right: 1px {!! $css["color-main-off"] !!} solid; }
+.brdRgtGrey, table tr.brdRgtGrey td, table tr.brdRgtGrey th { border-right: 1px {!! $css["color-main-grey"] !!} solid; }
+
+.brdTopBluL, table tr.brdTopBluL td, table tr.brdTopBluL th { border-top: 1px {!! $css["color-main-off"] !!} solid; }
+.brdTopGrey, table tr.brdTopGrey td, table tr.brdTopGrey th { border-top: 1px {!! $css["color-main-grey"] !!} solid; }
+.brdTopFnt, table tr.brdTopFnt td, table tr.brdTopFnt th { border-top: 1px {!! $css["color-main-faint"] !!} solid; }
 
 .row1, table tr.row1 { background: {!! $css["color-main-bg"] !!}; }
 .row2, table tr.row2 { background: {!! $css["color-main-faint"] !!}; }
 .BGblueLight { background: {!! $css["color-main-off"] !!}; }
 .BGblueDark { background: {!! $css["color-main-on"] !!}; }
 .BGredDark { background: {!! $css["color-danger-on"] !!}; }
+.bgFnt { background: {!! $css["color-main-faint"] !!}; }
 .bgWht { background: {!! $css["color-main-bg"] !!}; }
 
 .bgGrn { background: #c3ffe1; }

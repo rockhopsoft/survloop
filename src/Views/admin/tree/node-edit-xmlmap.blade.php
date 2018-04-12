@@ -6,9 +6,9 @@
 
 <form name="mainPageForm" method="post" 
     @if (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-        action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->NodeID }}"
+        action="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->NodeID }}"
     @else
-        action="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-3"
+        action="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-3"
     @endif >
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="sub" value="1">
@@ -33,12 +33,12 @@
     <div class="panel-heading">
         <div class="panel-title">
             @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-                <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
+                <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
                     class="pull-right">Back to XML Map</a>
                 <h2 class="disIn"><span class="fPerc133 mR20">
                     #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
             @else 
-                <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="pull-right"
+                <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="pull-right"
                     >Back to XML Map</a>
                 <h2 class="disIn">Adding Node</h2>
             @endif

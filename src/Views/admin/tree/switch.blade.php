@@ -22,8 +22,8 @@
         <a id="treeEdit{{ $tree->TreeID }}btn" class="treeEditbtn" href="javascript:;"
             ><i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i></a>
         {{ $myTreeNodes[$tree->TreeID] }} Nodes
-        @if ($tree->TreeType == 'Primary Public' && $GLOBALS['SL']->treeID == $tree->TreeID) 
-            - <a href="/dashboard/tree-{{ $tree->TreeID }}/xmlmap">XML Map for data sharing</a>
+        @if ($tree->TreeType == 'Survey' && $GLOBALS['SL']->treeID == $tree->TreeID) 
+            - <a href="/dashboard/surv-{{ $tree->TreeID }}/xmlmap">XML Map for data sharing</a>
         @endif
         <br />Tree URL: 
         @if ($GLOBALS['SL']->treeIsAdmin)

@@ -17,7 +17,9 @@
         <div class="mTn5 mB10 slGrey">since {{ date("n/j/Y", $genTots["date"][2]) }}...</div>
         <ul>
         <li><h3 class="disIn slBlueDark">
-            {{ round(100*($genTots["cmpl"][1]/($genTots["cmpl"][0]+$genTots["cmpl"][1]))) }}%
+            @if (($genTots["cmpl"][0]+$genTots["cmpl"][1]) > 0)
+                {{ round(100*($genTots["cmpl"][1]/($genTots["cmpl"][0]+$genTots["cmpl"][1]))) }}%
+            @endif
             <i class="fa fa-check mL15 mR10"></i> Completed
             <sub class="mL5 slGrey">{{ $genTots["cmpl"][1] }}</sub>
             </h3>
@@ -25,11 +27,17 @@
         </ul>
         
         <ul>
-        <li><span class="fPerc125">{{ round(100*($genTots["mobl"][0]/($genTots["mobl"][0]+$genTots["mobl"][1]))) }}%
+        <li><span class="fPerc125">
+            @if (($genTots["mobl"][0]+$genTots["mobl"][1]) > 0)
+                {{ round(100*($genTots["mobl"][0]/($genTots["mobl"][0]+$genTots["mobl"][1]))) }}%
+            @endif
             <i class="fa fa-laptop mL15 mR10"></i> Desktop</span>
             <sub class="mL5 slGrey">{{ $genTots["mobl"][0] }}</sub>
         </li>
-        <li><span class="fPerc125">{{ round(100*($genTots["mobl"][1]/($genTots["mobl"][0]+$genTots["mobl"][1]))) }}%
+        <li><span class="fPerc125">
+            @if (($genTots["mobl"][0]+$genTots["mobl"][1]) > 0)
+                {{ round(100*($genTots["mobl"][1]/($genTots["mobl"][0]+$genTots["mobl"][1]))) }}%
+            @endif
             <i class="fa fa-mobile mL20 mR20"></i> Mobile</span>
             <sub class="mL5 slGrey">{{ $genTots["mobl"][1] }}</sub>
         </li>
@@ -42,10 +50,10 @@
         <tr><td class="fPerc133 slBlueDark">Average Time</td>
             <td class="fPerc133 slBlueDark"> @if ($genTots["cmpl"][1] > 0)
                 {{ $GLOBALS["SL"]->sec2minSec(round($genTots["date"][1]/$genTots["cmpl"][1])) }}
-                @endif </td>
+            @endif </td>
             <td class="fPerc125"> @if ($genTots["cmpl"][0] > 0)
                 {{ $GLOBALS["SL"]->sec2minSec(round($genTots["date"][0]/$genTots["cmpl"][0])) }}
-                @endif </td>
+            @endif </td>
         </tr>
         <tr><td><i class="fa fa-laptop mR5"></i> Desktop</td>
             <td> @if (($genTots["mobl"][2][0]+$genTots["mobl"][2][1]) > 0)
@@ -88,10 +96,9 @@
             @if (isset($nodeTots[$nID]))
                 <tr><td class="taR slGreenDark"><sub class="mRn10">{{ $nodeTots[$nID]["perc"] }}%</sub></td>
                     <td class="slGreenDark">{{ $nodeTots[$nID]["name"] }}</td>
-                    <td>{{ number_format($nodeTots[$nID]["cmpl"][0]) }}
-                        @if ($genTots["cmpl"][0] > 0)
-                            <sub class="slGrey">{{ round(100*($nodeTots[$nID]["cmpl"][0]/$genTots["cmpl"][0])) }}%</sub>
-                        @endif </td></tr>
+                    <td>{{ number_format($nodeTots[$nID]["cmpl"][0]) }} @if ($genTots["cmpl"][0] > 0)
+                        <sub class="slGrey">{{ round(100*($nodeTots[$nID]["cmpl"][0]/$genTots["cmpl"][0])) }}%</sub>
+                    @endif </td></tr>
             @endif
         @empty
             <tr><td colspan=3 class="slGrey pT20 pB20" ><i>no recent attempts found</i></td></tr>

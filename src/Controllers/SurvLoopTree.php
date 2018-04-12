@@ -127,8 +127,7 @@ class SurvLoopTree extends CoreTree
     
     public function loadPageVariation(Request $request, $dbID = 1, $treeID = 1, $currPage = '/')
     {
-        $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
-        $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $dbID, $treeID, $treeID);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeID, $treeID);
         $this->constructor($request, -3, $dbID, $treeID);
         $this->survInitRun = false;
         $this->survLoopInit($request, $currPage);
@@ -613,7 +612,7 @@ class SurvLoopTree extends CoreTree
             . ((isset($this->allNodes[$this->currNode()]) && $this->allNodes[$this->currNode()]->nodeOpts%59 > 0) 
                 ? intVal($rawPerc) : -3) . ');' . "\n";
         if (isset($this->majorSections[$this->currMajorSection][1]) > 0) {
-            if ($GLOBALS["SL"]->treeRow->TreeOpts%17 == 0) { // navigation version 1
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0 || $this->v["isAdmin"]) { // navigation version 1
                 $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
                     . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
                 $ret .= view('vendor.survloop.inc-progress-bar', [
@@ -1181,7 +1180,7 @@ class SurvLoopTree extends CoreTree
         // If we haven't already tried to leave our loop, nor returned back to its root node...
         if (!$backToRoot && $GLOBALS["SL"]->dataLoops && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             foreach ($GLOBALS["SL"]->dataLoops as $loop) {
-                if (!isset($currLoops[$loop->DataLoopPlural])) {
+                if (!isset($currLoops[$loop->DataLoopPlural]) && isset($this->allNodes[$loop->DataLoopRoot])) {
                     // Then this is a new loop we weren't previously in
                     $path = $this->allNodes[$loop->DataLoopRoot]->nodeTierPath;
                     if (!$this->allNodes[$prevNode]->checkBranch($path)
@@ -1929,17 +1928,15 @@ class SurvLoopTree extends CoreTree
         ])->render();
     }
     
-    public function searchResults(Request $request)
+    public function chkRecsPub(Request $request, $treeID = -3)
     {
-        $this->loadTree();
-        $this->getAllPublicCoreIDs();
-//echo 'A allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
+        if ($treeID <= 0) $treeID = $this->treeID;
         if (!session()->has('chkRecsPub') || $request->has('refresh')) {
             $dumped = [];
             if ($request->has('refresh')) {
-                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $this->treeID)->delete();
+                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)->delete();
             } else {
-                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $this->treeID)
+                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)
                     ->select('SchRecDmpRecID')
                     ->get();
                 if ($chk && sizeof($chk) > 0) {
@@ -1953,8 +1950,17 @@ class SurvLoopTree extends CoreTree
             }
             $this->reloadStats($this->allPublicCoreIDs);
             session()->put('chkRecsPub', 1);
+            return true;
         }
-        
+        return false;
+    }
+    
+    public function searchResults(Request $request)
+    {
+        $this->loadTree();
+        $this->getAllPublicCoreIDs();
+//echo 'A allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
+        $this->chkRecsPub($request);
         $this->getSearchFilts($request);
         $cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
             . '&s=' . $this->searchTxt . $this->advSearchUrlSffx;
@@ -2463,9 +2469,13 @@ class SurvLoopTree extends CoreTree
         $chk = $this->checkSystemInit();
         if (trim($chk) != '') return $chk;
         // Basic System Is Setup, Check for User Intercept From Index
-        if ($GLOBALS["SL"]->treeIsAdmin && ($this->v["uID"] <= 0 
-            || !$this->v["user"]->hasRole('administrator|staff|databaser'))) {
-            return $this->redir('/login');
+        if ($GLOBALS["SL"]->treeIsAdmin) {
+            if ($this->v["uID"] <= 0 || ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0 
+                    && !$this->v["user"]->hasRole('administrator|staff|databaser')) 
+                || ($GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
+                    && !$this->v["user"]->hasRole('administrator|staff|databaser|volunteer'))) {
+                return $this->redir('/login');
+            }
         }
         //if ($this->v["uID"] > 0) $this->loadAllSessData();
         if ($type == 'ajaxChecks') {
@@ -2480,6 +2490,17 @@ class SurvLoopTree extends CoreTree
         // Otherwise, Proceed Running Various Index Functions
         $this->v["currInReport"] = $this->currInReport();
         if ($type == 'testRun') return $this->redir('/');
+        
+        if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0) { // search results page
+            if ($GLOBALS["SL"]->REQ->has('s') && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
+                if ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0) {
+                    $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\'if (document.getElementById("admSrchFld")) '
+                        . 'document.getElementById("admSrchFld").value=' 
+                        . json_encode(trim($GLOBALS["SL"]->REQ->get('s'))) . '\', 10); ';
+                } // else check for the main public search field? 
+            }
+        }
+        
         if ($GLOBALS["SL"]->treeIsAdmin) return $GLOBALS["SL"]->swapSessMsg($this->v["content"]);
         else return $GLOBALS["SL"]->swapSessMsg(view('vendor.survloop.master', $this->v)->render());
     }
@@ -2632,8 +2653,10 @@ class SurvLoopTree extends CoreTree
         $this->getPrintSpecs($this->currNode(), $this->currNodeSubTier);
         
         $this->v["nodeKidFunks"] = '';
-        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' && !$this->hasFrameLoad()) {
-            $ret .= '<center><div class="treeWrapForm">';
+        if (!$this->hasFrameLoad()) {
+            if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' && $GLOBALS["SL"]->treeRow->TreeOpts%23 > 0) {
+                $ret .= '<center><div id="skinnySurv" class="treeWrapForm">';
+            }
         }
         $ret .= ((trim($GLOBALS["errors"]) != '') ? $GLOBALS["errors"] : '') 
             . $this->printNodePublic($this->currNode(), $this->currNodeSubTier) . "\n"
@@ -2641,14 +2664,14 @@ class SurvLoopTree extends CoreTree
                 // (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0) ? $this->loadProgBar() : '') // not exit page?
             . $this->printCurrRecMgmt() . $this->sessDump($lastNode) . "\n";
         if (!$this->hasFrameLoad()) {
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                if (!$GLOBALS["SL"]->treeIsAdmin) $ret .= $this->printNodePageFoot();
-            } else {
+            if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' && $GLOBALS["SL"]->treeRow->TreeOpts%23 > 0) {
                 if (isset($GLOBALS["SL"]->treeSettings["footer"]) && isset($GLOBALS["SL"]->treeSettings["footer"][0]) 
                     && trim($GLOBALS["SL"]->treeSettings["footer"][0]) != '') {
                     $ret .= $GLOBALS["SL"]->treeSettings["footer"][0];
                 }
                 $ret .= '</div></center>';
+            } else {
+                if (!$GLOBALS["SL"]->treeIsAdmin) $ret .= $this->printNodePageFoot();
             }
         }
         if (trim($this->v["nodeKidFunks"]) != '') {

@@ -490,7 +490,6 @@ class CoreTree extends SurvLoopController
     // Check that core record is actually in-progress (editable)
     protected function chkIfCoreIsEditable($coreID = -3, $coreRec = [])
     {
-//echo 'chkIfCoreIsEditable(' . $coreID . ', ' . $this->coreID . ', 11%= ' . ($GLOBALS["SL"]->treeRow->TreeOpts%11) . '<br />';
         if ($coreID <= 0) $coreID = $this->coreID;
         if ($coreID > 0) {
             if ($GLOBALS["SL"]->treeRow->TreeOpts%11 > 0 // Tree allows record edits
@@ -511,7 +510,7 @@ class CoreTree extends SurvLoopController
     
     protected function recordIsEditable($coreTbl, $coreID, $coreRec = [])
     {
-        return $this->recordIsIncomplete($coreTbl, $coreID, $coreRec);
+        return ($this->isAdminUser() || $this->recordIsIncomplete($coreTbl, $coreID, $coreRec));
     }
     
     protected function recordIsIncomplete($coreTbl, $coreID, $coreRec = [])
@@ -542,7 +541,7 @@ class CoreTree extends SurvLoopController
         $modelPath = $GLOBALS["SL"]->modelPath($coreTbl);
         if (trim($coreTbl) != '' && trim($modelPath) != '') {
             eval("\$recObj = new " . $modelPath . ";");
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Primary Public') {
+            if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey') {
                 $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
                 $recObj->{ $coreAbbr . 'UserID' } = $this->v["uID"];
                 $recObj->{ $coreAbbr . 'IPaddy' } = $this->hashIP();

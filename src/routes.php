@@ -34,6 +34,10 @@ Route::group(['middleware' => ['web']], function () {
     
     // survey process for any database or tree
     Route::get( '/start/{treeSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadNodeTreeURL');
+    Route::get( '/start-{cid}/{treeSlug}', [
+        'uses'       => 'SurvLoop\Controllers\SurvLoop@loadNodeTreeURLedit', 
+        'middleware' => ['auth']
+    ]);
     Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
@@ -151,10 +155,6 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => 'auth'
     ]);
     Route::get( '/profile/{uname}', 'SurvLoop\\Controllers\\SurvLoop@showProfile');
-    /* Route::get( '/profile/{uname}',     [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@showProfile',             
-        'middleware' => 'auth'
-    ]); */
 
     Route::post('/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     Route::get( '/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
@@ -285,97 +285,107 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get('/tree/{treeSlug}', 'SurvLoop\Controllers\AdminTreeController@adminPrintFullTreePublic');
     
-    Route::post('/dashboard/trees/list', [
+    Route::post('/dashboard/surveys/list', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/trees/list', [
+    Route::get('/dashboard/surveys/list', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree-{treeID}/map', [
+    Route::post('/dashboard/surv-{treeID}/settings', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSettings', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/surv-{treeID}/settings', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSettings', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/surv-{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@index', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/map', [
+    Route::get('/dashboard/surv-{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@index', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/sessions', [
+    Route::get('/dashboard/surv-{treeID}/sessions', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessions',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/stats', [
+    Route::get('/dashboard/surv-{treeID}/stats', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeStats', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree-{treeID}/data', [
+    Route::post('/dashboard/surv-{treeID}/data', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@data', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/data', [
+    Route::get('/dashboard/surv-{treeID}/data', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@data', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree-{treeID}/map/node/{nID}', [
+    Route::post('/dashboard/surv-{treeID}/map/node/{nID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@nodeEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/map/node/{nID}', [
+    Route::get('/dashboard/surv-{treeID}/map/node/{nID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@nodeEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree-{treeID}/xmlmap', [
+    Route::post('/dashboard/surv-{treeID}/xmlmap', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlmap', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/{treeSlug}-xmlmap', [
+    Route::get('/dashboard/surv-{treeID}/{treeSlug}-xmlmap', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlmapInner', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/xmlmap', [
+    Route::get('/dashboard/surv-{treeID}/xmlmap', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlmap', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree-{treeID}/xmlmap/node/{nodeIN}', [
+    Route::post('/dashboard/surv-{treeID}/xmlmap/node/{nodeIN}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlNodeEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree-{treeID}/xmlmap/node/{nodeIN}', [
+    Route::get('/dashboard/surv-{treeID}/xmlmap/node/{nodeIN}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlNodeEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree/switch/{treeID}', [
+    Route::get('/dashboard/surveys/switch/{treeID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@switchTreeAdmin', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree/switch', [
+    Route::get('/dashboard/surveys/switch', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@switchTreeAdmin', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/tree/new', [
+    Route::post('/dashboard/surveys/new', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@newTree', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/tree/new', [
+    Route::get('/dashboard/surveys/new', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@newTree', 
         'middleware' => ['auth']
     ]);
@@ -732,15 +742,19 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeTreeURL', 
         'middleware' => ['auth']
     ]);
-    Route::post('/dash/sub', [
+    Route::get('/dashboard/start-{cid}/{treeSlug}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeTreeURLedit', 
+        'middleware' => ['auth']
+    ]);
+    Route::post('/dash-sub', [
         'uses'       => 'SurvLoop\Controllers\AdminController@postNodeURL', 
         'middleware' => ['auth']
     ]);
-    Route::post('/dash/{treeSlug}/{nodeSlug}', [
+    Route::post('/dash/u/{treeSlug}/{nodeSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dash/{treeSlug}/{nodeSlug}', [
+    Route::get('/dash/u/{treeSlug}/{nodeSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeURL', 
         'middleware' => ['auth']
     ]);
@@ -750,6 +764,14 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     
+    Route::post('/dash/{pageSlug}/u-{cid}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
+        'middleware' => ['auth']
+    ]);
+    Route::get('/dash/{pageSlug}/u-{cid}', [
+        'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
+        'middleware' => ['auth']
+    ]);
     Route::post('/dash/{pageSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']

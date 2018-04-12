@@ -12,10 +12,7 @@
             Pages are used to manage content throughout your website, both public and admin, 
             and they are build as a one-page Experience/Tree.
             This means you can use conditional login on chunks of content within each page, and more safely
-            integrate many widgets on one page.<br />
-            <nobr><span class="mR20"><i class="fa fa-list-alt"></i> Report for Survey</span></nobr>
-            <nobr><span class="mR20"><i class="fa fa-key" aria-hidden="true"></i> Admin-Only Page</span></nobr>
-            <nobr><span class="mR20"><i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer Page</span></nobr>
+            integrate many widgets on one page.
         </div>
         <table class="table table-striped">
         
@@ -166,6 +163,16 @@
         </div>
         <div class="p10"></div>
         </form>
+        
+        <div class="slGrey">
+            <div class="mB5"><u>Permissions</u></div>
+            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Admin-Only Page</div>
+            <div class="mB5"><i class="fa fa-hand-rock-o mR5" aria-hidden="true"></i> Volunteer Page</div>
+            <div class="mB5"><br /><u>Special Page Types</u></div>
+            <div class="mB5"><i class="fa fa-list-alt mR5"></i> Report for Survey</div>
+            <div class="mB5"><i class="fa fa-search mR5" aria-hidden="true"></i> Search Results</div>
+        </div>
+        
     </div>
 </div>
 

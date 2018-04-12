@@ -1,15 +1,13 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree.blade.php -->
-<div class="row"><div class="col-md-6">
-    <h2 class="mT0"><span class="slBlueDark">
-        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-            <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
-            @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Page</nobr>
-        @else
-            <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
-            Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Survey Map</nobr>
-        @endif
-    </h2>
-</div><div class="col-md-6 taR">
+<h2 class="mB5"><span class="slBlueDark">
+    @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+        <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
+        @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Page</nobr>
+    @else
+        <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
+        Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Survey Map</nobr>
+    @endif
+</h2>
 @if ($GLOBALS['SL']->treeIsAdmin)
     <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
         ><h3 class="m0">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/dashboard/start/' 
@@ -19,18 +17,25 @@
         ><h3 class="m0">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
         . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
 @endif
-</div></div>
+
 @if ($isPrint)
     {!! view('vendor.survloop.print-header-legal', [])->render() !!}
     <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
 @endif
 
 @if (!$isPrint)
-    A survey (or form) is created as a tree filled with branching nodes. 
-    Click any node's button (with its ID#) to edit, add new nodes, or to move a node. 
-    Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
-    <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a> 
-    <span class="red mL20">*required</span>
+    <div class="row">
+        <div class="col-md-9 slGrey">
+            A survey (or form) is created as a tree filled with branching nodes. 
+            Click any node's button (with its ID#) to edit, add new nodes, or to move a node. 
+            Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
+            <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a> 
+            <span class="red mL20">*required</span>
+        </div><div class="col-md-3 taR">
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/settings" class="btn btn-default"
+                ><i class="fa fa-cogs" aria-hidden="true"></i> Survey Settings</a>
+        </div>
+    </div>
 @endif
 
 {!! $GLOBALS["SL"]->printTreeNodeStats($isPrint, $isAll, $isAlt) !!}

@@ -37,13 +37,13 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             <label for="RuleStatementID" data-toggle="tooltip" data-placement="top" 
                 title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="f10 slGrey">?</span></label>
             <textarea class="form-control" id="RuleStatementID" name="RuleStatement" 
-                rows="2" ' . $chkDis . '>{{ $rule->RuleStatement }}</textarea>
+                rows="2" {!! $chkDis !!} >{{ $rule->RuleStatement }}</textarea>
         </fieldset>
         <fieldset class="form-group">
             <label for="RuleConstraintID" data-toggle="tooltip" data-placement="top" 
                 title="{{ $GLOBALS['SL']->fldAbouts['FldConstraint'] }}">Constraint <span class="f10 slGrey">?</span></label>
             <textarea class="form-control" id="RuleConstraintID" name="RuleConstraint" 
-                rows="2" ' . $chkDis . '>{{ $rule->RuleConstraint }}</textarea>
+                rows="2" {!! $chkDis !!} >{{ $rule->RuleConstraint }}</textarea>
         </fieldset>
         <div class="row">
             <div class="col-md-4">
@@ -334,7 +334,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
         <fieldset class="form-group">
             <label for="RuleActionID" class="sr-only" >Action Taken</label>
             <textarea class="form-control" id="RuleActionID" name="RuleAction" 
-                rows="4" ' . $chkDis . '>{{ $rule->RuleAction }}</textarea>
+                rows="4" {!! $chkDis !!} >{{ $rule->RuleAction }}</textarea>
         </fieldset>
     @else 
         {{ $rule->RuleAction }}

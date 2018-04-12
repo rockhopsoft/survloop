@@ -464,9 +464,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 '.dashboard.tree'
             ];
             foreach ($treeCaches as $cache) Cache::forget($cache);
-            $redir = '/dashboard/tree-' . $this->treeID . '/map?all=1&refresh=1#n' . $node->nodeRow->NodeID;
+            $redir = '/dashboard/surv-' . $this->treeID . '/map?all=1&alt=1&refresh=1#n' . $node->nodeRow->NodeID;
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?all=1&refresh=1#n' . $node->nodeRow->NodeID;
+                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1#n' 
+                    . $node->nodeRow->NodeID;
             }
             return $this->redir($redir, true);
         }
@@ -500,7 +501,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "emailList"      => $emailList,
             "emailUsers"     => $emailUsers
             ])->render();
-        $treeList = SLTree::where('TreeType', 'Primary Public')
+        $treeList = SLTree::where('TreeType', 'Survey')
             ->where('TreeDatabase', $this->dbID)
             ->select('TreeID', 'TreeName')
             ->orderBy('TreeName', 'asc')
@@ -547,6 +548,9 @@ class SurvLoopTreeAdmin extends SurvFormTree
         $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-edit-ajax', [
             "node"           => $node
             ])->render();
+        if ($node->isInstruct()) {
+            $GLOBALS["SL"]->pageAJAX .= ' $("#nodeInstructID").summernote({ height: 350 }); ';
+        }
         return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 
             "treeID"         => $this->treeID, 

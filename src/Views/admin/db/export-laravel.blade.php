@@ -31,29 +31,12 @@
     </div>
 </div>
 
-<h1>Instructions To Install Your Database Design<br />
-(and this entire system on another server)</h1>
+<h1>Instructions To Install Your Database Design</h1>
+<h3>(and this entire system on another server)</h3>
 
-<h2>Step 1: Install Laravel 5.1</h2>
-Maybe choose a distinct name instead of "MyUniqueSurvLoop"
-<pre><code>
-$ composer global require "laravel/installer=~1.1"
-$ composer create-project laravel/laravel MyUniqueSurvLoop "5.1.*"
-$ cd MyUniqueSurvLoop
-$ php artisan app:name SurvLoop
-</code></pre>
-The internet knows far more than I...
-<ul>
-    <li><a href="https://laravel.com/docs/5.1/" target="_blank">https://laravel.com/docs/5.1/</a></li>
-    <li><a href="https://laravel.com/docs/5.1/homestead" target="_blank">https://laravel.com/docs/5.1/homestead</a></li>
-    <li><a href="https://laracasts.com/series/laravel-5-from-scratch" target="_blank">https://laracasts.com/series/laravel-5-from-scratch</a></li>
-</ul>
+<h2>Step 1: Install Laravel & SurvLoop</h2>
+<p><a href="https://survloop.org/how-to-install-survloop" target="_blank">How To Install SurvLoop</a></p>
 
-<h2>Step 2: Manually Install Dependent Packages</h2>
-(Sorry this isn't a proper package yet)
-<ol>
-    <li><a href="https://github.com/kodeine/laravel-acl/" target="_blank">https://github.com/kodeine/laravel-acl/</a></li>
-    <?php /* <li><a href="https://github.com/cmgmyr/laravel-messenger" target="_blank">https://github.com/cmgmyr/laravel-messenger</a></li> */ ?>
-</ol>
-
+<h2>Step 2: Include Your Exports In The Database Folder</h2>
+<p>...</p>
 

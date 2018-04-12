@@ -1160,4 +1160,30 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
         return true;
     }
     
+    
+    public function createTblExtendFlds($tblFrom, $idFrom, $tblTo, $xtraFlds = [], $save = true)
+    {
+        $mdl = $GLOBALS["SL"]->modelPath($tblTo);
+        if (trim($mdl) != '') {
+            if (!isset($this->dataSets[$tblTo])) $this->dataSets[$tblTo] = [];
+            $ind = sizeof($this->dataSets[$tblTo]);
+            eval("\$this->dataSets[\$tblTo][\$ind] = new " . $mdl . ";");
+            $rowFrom = $this->getRowById($tblFrom, $idFrom);
+            $extendFlds = $GLOBALS["SL"]->getTblFlds($tblFrom);
+            if (sizeof($extendFlds) > 0) {
+                foreach ($extendFlds as $i => $fld) {
+                    if (isset($rowFrom->{ $fld })) {
+                        $this->dataSets[$tblTo][$ind]->{ $GLOBALS["SL"]->tblAbbr[$tblTo] . $fld } = $rowFrom->{ $fld };
+                    }
+                }
+            }
+            if (sizeof($xtraFlds) > 0) {
+                foreach ($xtraFlds as $fld => $val) $this->dataSets[$tblTo][$ind]->{ $fld } = $val;
+            }
+        }
+        if ($save) $this->dataSets[$tblTo][$ind]->save();
+        return $this->dataSets[$tblTo][$ind];
+    }
+    
+    
 }

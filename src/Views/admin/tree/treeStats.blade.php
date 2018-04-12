@@ -3,10 +3,10 @@
 <h1><i class="fa fa-snowflake-o"></i> {{ $GLOBALS['SL']->treeName }}: Users Response Stats</nobr></h1>
 <div class="container mB20">
 @if ($isAll)
-    <a class="pull-right btn btn-default mR10" href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/stats"
+    <a class="pull-right btn btn-default mR10" href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/stats"
         ><i class="fa fa-expand fa-flip-horizontal"></i> Collapse All Nodes</a>
 @else
-    <a class="pull-right btn btn-default mR10" href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/stats?all=1"
+    <a class="pull-right btn btn-default mR10" href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/stats?all=1"
         ><i class="fa fa-expand fa-flip-horizontal"></i> Expand All Nodes</a>
 @endif
     <b>Down To The NODE.</b> <span class="slGrey">

@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
+use App\Models\SLSess;
 
 use SurvLoop\Controllers\SurvLoopInstaller;
 
@@ -69,7 +70,7 @@ class SurvLoop extends Controller
     {
         $this->dbID = $dbID;
         $this->treeID = $treeID;
-        $GLOBALS["SL"] = new DatabaseLookups($request, $this->isAdmin(), $dbID, $treeID, $treeID);
+        $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeID, $treeID);
         return true;
     }
     
@@ -103,7 +104,7 @@ class SurvLoop extends Controller
             $urlTrees = [];
             if (!$page) {
                 $urlTrees = SLTree::where('TreeSlug', $treeSlug)
-                    ->where('TreeType', 'Primary Public')
+                    ->where('TreeType', 'Survey')
                     ->orderBy('TreeID', 'asc')
                     ->get();
             } else {
@@ -122,7 +123,7 @@ class SurvLoop extends Controller
                     if ($urlTree && isset($urlTree->TreeOpts)) {
                         if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
                             echo '<script type="text/javascript"> window.location="/dashboard/page/' 
-                                . $urlTree->TreeID . '?all=1&refresh=1"; </script>';
+                                . $urlTree->TreeID . '?all=1&alt=1&refresh=1"; </script>';
                             exit;
                         }
                         if ($urlTree->TreeOpts%3 > 0) {
@@ -130,7 +131,7 @@ class SurvLoop extends Controller
                             return true;
                         } else { // maybe this admin tree has a public XML Tree
                             $xmlChk = SLTree::where('TreeSlug', $urlTree->TreeSlug)
-                                ->where('TreeType', 'Primary Public XML')
+                                ->where('TreeType', 'Survey XML')
                                 ->orderBy('TreeID', 'asc')
                                 ->first();
                             if ($xmlChk && isset($xmlChk->TreeOpts) && $xmlChk->TreeOpts%3 > 0) {
@@ -204,6 +205,16 @@ class SurvLoop extends Controller
     
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
     {
+        return $this->loadNodeTreeURLInner($request, $treeSlug);
+    }
+    
+    public function loadNodeTreeURLedit(Request $request, $cid = -3, $treeSlug = '')
+    {
+        return $this->loadNodeTreeURLInner($request, $treeSlug, $cid);
+    }
+    
+    public function loadNodeTreeURLInner(Request $request, $treeSlug = '', $cid = -3)
+    {
         $this->loadDomain();
         $this->checkHttpsDomain($request);
         if (trim($treeSlug) != '') {
@@ -220,6 +231,25 @@ class SurvLoop extends Controller
                             if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
                             if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
                                 $redir .= '&' . substr($paramTxt, 1);
+                            }
+                            if (intVal($cid) > 0) {
+                                $sess = SLSess::where('SessUserID', Auth::user()->id)
+                                    ->where('SessTree', $urlTree->TreeID)
+                                    ->where('SessCoreID', $cid)
+                                    ->orderBy('updated_at', 'desc')
+                                    ->first();
+                                if (!$sess || !isset($sess->SessID)) {
+                                    $sess = new SLSess;
+                                    $sess->SessUserID = Auth::user()->id;
+                                    $sess->SessTree   = $urlTree->TreeID;
+                                    $sess->SessCoreID = $cid;
+                                    $sess->save();
+                                }
+                                if ($request->has("n") && intVal($request->get("n")) > 0) {
+                                    $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
+                                }
+                                session()->put('sessID' . $urlTree->TreeID, $sess->SessID);
+                                session()->put('coreID' . $urlTree->TreeID, $cid);
                             }
                             return redirect($this->domainPath . $redir);
                         }
@@ -239,6 +269,7 @@ class SurvLoop extends Controller
                 if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
                     $this->custLoop->hideDisclaim = true;
                 }
+                $GLOBALS["SL"]->x["pageSlugSffx"] = '/u-' . $cid;
             }
             $this->pageContent = $this->custLoop->index($request);
             if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0 && $cid <= 0) { // then simple page which can be cached
@@ -258,13 +289,13 @@ class SurvLoop extends Controller
         $this->loadDomain();
         $this->checkHttpsDomain($request);
         $urlTree = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
+            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 ORDER BY `TreeID` DESC LIMIT 1" ) );
         if ($urlTree && sizeof($urlTree) > 0 && isset($urlTree[0]->TreeOpts)) { //  && isset($urlTree[0]->TreeOpts)
             $redir = $this->chkPageRedir($urlTree[0]->TreeSlug);
             if ($redir != $urlTree[0]->TreeSlug) return redirect($redir);
             if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
-                    . $urlTree[0]->TreeID . '?all=1&refresh=1"; </script>';
+                    . $urlTree[0]->TreeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;
             }
             $this->syncDataTrees($request, $urlTree[0]->TreeDatabase, $urlTree[0]->TreeID);

@@ -1,4 +1,4 @@
-@if ($GLOBALS["SL"]->treeRow->TreeType == 'Primary Public' && $coreID > 0) 
+@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $coreID > 0) 
     <!-- Stored in resources/views/survloop/formfoot-record-mgmt.blade.php -->
     <div class="p20"></div>
     <div id="sessMgmt" class="round10 brdDshGry slGrey p15">

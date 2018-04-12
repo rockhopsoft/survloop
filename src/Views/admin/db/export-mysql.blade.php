@@ -1,8 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/db/export-mysql.blade.php -->
 
 <h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: MySQL Export 
+    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>: MySQL Export 
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
 

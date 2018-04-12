@@ -11,17 +11,15 @@
             @if ($majSect[2] != 'disabled')
                 <?php $cnt++; ?>
                 <div class="col-md-{{ floor(12/$majTot) }}">
-                    <a data-toggle="tab" href="javascript:;" id="maj{{ $maj }}" class="navDeskMaj
-                        @if ($maj == $currMajorSection) active 
-                        @elseif (in_array($maj, $sessMajorsTouched)) completed 
-                        @endif " >
+                    <a href="javascript:;" id="maj{{ $maj }}" class="navDeskMaj @if ($maj == $currMajorSection) active 
+                        @elseif (in_array($maj, $sessMajorsTouched)) completed @endif " 
+                        @if (!isset($minorSections[$maj]) || sizeof($minorSections[$maj]) == 0)
+                            data-jumpnode="{{ $majSect[0] }}" @else data-toggle="tab" @endif >
                         <center><div class="stepNum">
                         @if ($maj == $currMajorSection) <i class="fa fa-hand-o-down" aria-hidden="true"></i>
-                        @elseif (in_array($maj, $sessMajorsTouched)) <i class="fa fa-check"></i>
-                        @else {{ $cnt }}
-                        @endif
+                        @elseif (in_array($maj, $sessMajorsTouched)) <i class="fa fa-check"></i> @else {{ $cnt }} @endif
                         </div><div class="navVertLine"></div>{{ $majSect[1] }}
-                        <div id="majSect{{ $maj }}Vert2" class="navVertLine2 disNon"></div><center>
+                        <div id="majSect{{ $maj }}Vert2" class="navVertLine2 disNon"></div></center>
                     </a>
                 </div>
             @endif

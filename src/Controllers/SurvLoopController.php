@@ -55,19 +55,20 @@ class SurvLoopController extends Controller
         if (!$this->survInitRun) {
             $this->survInitRun = true;
             if (sizeof($this->REQ) == 0) $this->REQ = $request;
-            $this->v["user"]        = Auth::user();
-            $this->v["uID"]         = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
-            $this->v["isAdmin"]     = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
-            $this->v["isAll"]       = $request->has('all');
-            $this->v["isAlt"]       = $request->has('alt');
-            $this->v["isPrint"]     = $request->has('print');
-            $this->v["isExcel"]     = $request->has('excel');
-            $this->v["isDash"]      = false;
-            $this->v["exportDir"]   = 'survloop';
-            $this->v["hasContain"]  = false;
-            $this->v["content"]     = '';
-            $this->v["isOwner"]     = false;
-            $this->v["view"]        = 'Public';
+            $this->v["user"]       = Auth::user();
+            $this->v["uID"]        = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+            $this->v["isAdmin"]    = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
+            $this->v["isVolun"]    = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
+            $this->v["isAll"]      = $request->has('all');
+            $this->v["isAlt"]      = $request->has('alt');
+            $this->v["isPrint"]    = $request->has('print');
+            $this->v["isExcel"]    = $request->has('excel');
+            $this->v["isDash"]     = false;
+            $this->v["exportDir"]  = 'survloop';
+            $this->v["hasContain"] = false;
+            $this->v["content"]    = '';
+            $this->v["isOwner"]    = false;
+            $this->v["view"]       = 'Public';
             if (!isset($GLOBALS["isPrintPDF"])) $GLOBALS["isPrintPDF"] = false;
             
             if (!isset($this->v["currPage"])) $this->v["currPage"] = ['', ''];
@@ -82,9 +83,6 @@ class SurvLoopController extends Controller
             if ($this->REQ->has('sessmsg') && trim($this->REQ->get('sessmsg')) != '') {
                 session()->put('sessMsg', trim($this->REQ->get('sessmsg')));
             }
-            if ($this->REQ->has('refresh') && trim($this->REQ->get('refresh')) != '') {
-                $this->checkSystemInit();
-            }
             
             if (!isset($this->v["currState"]))    $this->v["currState"]    = '';
             if (!isset($this->v["yourUserInfo"])) $this->v["yourUserInfo"] = [];
@@ -92,6 +90,14 @@ class SurvLoopController extends Controller
             
             $this->loadNavMenu();
             $this->loadDbLookups($request);
+            
+            if ($this->REQ->has('refresh') && trim($this->REQ->get('refresh')) != '') {
+                $this->checkSystemInit();
+            }
+            if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
+                $this->v["pastUpDef"] = $this->v["pastUpArr"] = $this->v["updateList"] = [];
+            }
+            
             if ($this->coreIDoverride > 0) $this->loadAllSessData();
             
             if ($runExtra) {
@@ -160,8 +166,7 @@ class SurvLoopController extends Controller
                     }
                 }
             }
-            if (!isset($this->v["isAdmin"])) $this->v["isAdmin"] = $this->isUserAdmin();
-            $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], $this->dbID, $this->treeID);
+            $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID);
         }
         return true;
     }
@@ -169,6 +174,11 @@ class SurvLoopController extends Controller
     protected function isUserAdmin()
     {
         return (Auth::user() && Auth::user()->hasRole('administrator'));
+    }
+    
+    protected function isUserVolun()
+    {
+        return (Auth::user() && Auth::user()->hasRole('volunteer'));
     }
     
     protected function loadDbFromNode(Request $request, $nID)
@@ -179,8 +189,7 @@ class SurvLoopController extends Controller
             if ($tree && isset($tree->TreeDatabase)) {
                 $this->treeID = $tree->TreeID;
                 $this->dbID = $tree->TreeDatabase;
-                $isAdmin = ((isset($this->v["isAdmin"])) ? $this->v["isAdmin"] : $this->isUserAdmin());
-                $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
+                $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
             }
         }
         return true;
@@ -413,7 +422,9 @@ class SurvLoopController extends Controller
         } else {
             $this->CustReport = new SurvLoopReport($request, -3, $this->dbID, $treeID);
         }
-        $this->CustReport->survLoopInit($request, $this->v["currPage"][0]);   
+        $currPage = '';
+        if (isset($this->v["currPage"]) && sizeof($this->v["currPage"]) > 0) $currPage = $this->v["currPage"][0];
+        $this->CustReport->survLoopInit($request, $currPage);   
     }
 
     
@@ -425,11 +436,10 @@ class SurvLoopController extends Controller
                 ->first();
             if ($dbRow && $dbRow->DbID) {
                 $treeRow = SLTree::where('TreeDatabase', $dbID)
-                    ->where('TreeType', 'Primary Public')
+                    ->where('TreeType', 'Survey')
                     ->first();
                 if ($treeRow && isset($treeRow->TreeID)) {
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->v["isAdmin"], 
-                        $dbID, $treeRow->TreeID, $treeRow->TreeID);
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $dbID, $treeRow->TreeID, $treeRow->TreeID);
                     $this->logPageVisit($currPage, $dbID . ';' . $treeRow->TreeID);
                 }
             }
@@ -445,7 +455,7 @@ class SurvLoopController extends Controller
                 //->where('TreeDatabase', $GLOBALS["SL"]->dbID)
                 ->first();
             if ($treeRow && isset($treeRow->TreeID)) {
-                $GLOBALS["SL"] = new DatabaseLookups($request, $this->isUserAdmin(), $treeRow->TreeDatabase, $treeID, $treeID);
+                $GLOBALS["SL"] = new DatabaseLookups($request, $treeRow->TreeDatabase, $treeID, $treeID);
                 $this->logPageVisit($currPage, $treeRow->TreeDatabase . ';' . $treeID);
             }
             return true;
@@ -847,6 +857,49 @@ class SurvLoopController extends Controller
         $log = '';
         $this->logAdd('session-stuff', $log);
         return true;
+    }
+    
+    public function getCoreDef($set, $subset, $dbID = 1)
+    {
+        $def = SLDefinitions::where('DefDatabase', $dbID)
+            ->where('DefSet',    '=', $set)
+            ->where('DefSubset', '=', $subset)
+            ->first();
+        if (!$def || !isset($def->DefID)) {
+            $def = new SLDefinitions;
+            $def->DefDatabase = $dbID;
+            $def->DefSet      = $set;
+            $def->DefSubset   = $subset;
+            $def->save();
+        }
+        return $def;
+    }
+    
+    protected function loadSysUpdates()
+    {
+        $this->v["pastUpDef"] = $this->getCoreDef('System Checks', 'system-updates');
+        $this->v["pastUpArr"] = $GLOBALS["SL"]->mexplode(';;', $this->v["pastUpDef"]->DefDescription);
+        return true;
+    }
+    
+    protected function addSysUpdate($updateID)
+    {
+        $done = in_array($updateID[0], $this->v["pastUpArr"]);
+        $this->v["updateList"][] = [ $updateID[0], $done, $updateID[1] ];
+        return $done;
+    }
+    
+    protected function sysUpdatesCust($apply = false) { return ''; }
+    
+    
+    public function printUserLnk($uID = -3)
+    {
+        if ($uID > 0) {
+            $user = User::find($uID);
+            if ($user && isset($user->id)) return $user->printUsername();
+            return 'User #' . $uID;
+        }
+        return '';
     }
     
 }

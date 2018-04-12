@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/db/inc-indicate-saved.blade.php -->
 @if ($iframe)
-    <link href="/survloop/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/survloop/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 @endif
 <div id="savedSpin{{ $spot }}" style="display: block;">
     <i class="fa-li fa fa-spinner fa-spin"></i>

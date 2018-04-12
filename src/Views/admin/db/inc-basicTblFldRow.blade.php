@@ -16,9 +16,13 @@
                     href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                 @endif
                     ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> 
-                    <b class="fPerc133">{{ $fld->FldEng }}</b></a>
+                    <b class="fPerc133"> @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
+                        <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
+                    @endif {{ $fld->FldEng }}</b></a>
             @else 
-                <b class="fPerc133">{{ $fld->FldEng }}</b>
+                <b class="fPerc133"> @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
+                    <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
+                @endif {{ $fld->FldEng }}</b>
             @endif
             <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;" 
                 ></a>
@@ -28,9 +32,7 @@
             @endif
             
             <div id="fldSpecA{{ $fld->FldID }}" class=" @if ($isAll && $fld->FldID > 0) disNon @else disBlo @endif ">
-                @if (trim($fld->FldDesc) != '')
-                    <div class="pL20">{!! $fld->FldDesc !!}</div>
-                @endif
+                @if (trim($fld->FldDesc) != '') <div class="pL20">{!! $fld->FldDesc !!}</div> @endif
                 @if (trim($fld->FldNotes) != '') 
                     <div class="pL20 gryA"><i class="mR5">Notes:</i> {!! $fld->FldNotes !!}</div>
                 @endif
@@ -62,28 +64,25 @@
         <div class="col-md-3 taR gry6">
         
             @if ($tblID > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]]) && isset($fld->FldName))
-                <div>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] }}{{ $fld->FldName }}</div>
+                <div>
+                {!! $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] 
+                    . (($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable])) 
+                        ? '<span class="slGreenDark">' . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
+                        . $fld->FldName . '</span>' : $fld->FldName) !!}
+                </div>
             @endif
             @if (strpos($fld->FldKeyType, 'Primary') !== false)
                 @if ($fld->FldKeyStruct == 'Composite') Composite, @endif
                 <b>Primary Key,</b> 
             @endif
             <nobr><i>
-            @if (isset($FldDataTypes[$fld->FldType]))
-                {{ $FldDataTypes[$fld->FldType][1] }} 
-            @endif
-            @if ($fld->FldIsIndex == 1)
-                <span class="gry6 f8">Indexed</span> 
-            @endif
+            @if (isset($FldDataTypes[$fld->FldType])) {{ $FldDataTypes[$fld->FldType][1] }}  @endif
+            @if ($fld->FldIsIndex == 1) <span class="gry6 f8">Indexed</span> @endif
             </i></nobr>
             @if (trim($fldForeignPrint) != '' || trim($fldGenerics) != '')
                 <div>
-                    @if (trim($fldForeignPrint) != '')
-                        {!! $fldForeignPrint !!}
-                    @endif
-                    @if (trim($fldGenerics) != '')
-                        {!! $fldGenerics !!}
-                    @endif
+                    @if (trim($fldForeignPrint) != '') {!! $fldForeignPrint !!} @endif
+                    @if (trim($fldGenerics) != '') {!! $fldGenerics !!} @endif
                 </div>
             @endif
             

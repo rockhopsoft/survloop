@@ -30,16 +30,13 @@
             return true;
         },
         success: function(chkData){ 
-            if (chkData == 'found')
-            {
+            if (chkData == 'found') {
                 document.getElementById('emailBlockID').value = 1;
                 setFormLabelRed('001'); 
                 totFormErrors++;
                 //document.getElementById('emailWarning').style.display='block';
                 $("#emailWarning").slideDown("fast");
-            }
-            else
-            {
+            } else {
                 document.getElementById('emailBlockID').value = 0;
                 setFormLabelBlack('001');
             }
@@ -47,18 +44,13 @@
     });
 @endif
 }
-if (document.getElementById('password') && document.getElementById('password_confirmation'))
-{
-    if (document.getElementById('password').value.trim() == '' 
-        || document.getElementById('password').value.trim().length < 6
-        || document.getElementById('password').value != document.getElementById('password_confirmation').value)
-    {
+if (document.getElementById('password') && document.getElementById('password_confirmation')) {
+    var pass1 = document.getElementById('password').value;
+    if (pass1 == '' || pass1.length < 8 || pass1 != document.getElementById('password_confirmation').value) {
         setFormLabelRed('002');
         setFormLabelRed('003');
         totFormErrors++;
-    }
-    else
-    {
+    } else {
         setFormLabelBlack('002');
         setFormLabelBlack('003');
     }
@@ -66,10 +58,8 @@ if (document.getElementById('password') && document.getElementById('password_con
 
 @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
     if (totFormErrors == 0 && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        @if ($coreID > 0)
-            document.getElementById('emailID').value = 'no.{{ $coreID }}.email@noemail.org';
-        @else
-            document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
-        @endif
+    @if ($coreID > 0) document.getElementById('emailID').value = 'no.{{ $coreID }}.email@noemail.org';
+    @else document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
+    @endif
     }
 @endif

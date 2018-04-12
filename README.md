@@ -142,9 +142,11 @@ $ chown -R www-data:33 database
 
 # <a name="documentation"></a>Documentation
 
-Once installed, documentation of this system's database design can be found at /dashboard/db/all . This system's user 
-experience design for data entry can be found at /dashboard/tree/map?all=1&alt=1 
+Once installed, documentation of this system's database design can be found at /dashboard/db/all. This system's 
+survey design can be found at /dashboard/surv-1/map?all=1&alt=1
 or publicly visible links like those above.
+
+<a href="https://survloop.org/db/SL" target="_blank">https://survloop.org/db/SL</a>
 
 
 # <a name="roadmap"></a>Roadmap

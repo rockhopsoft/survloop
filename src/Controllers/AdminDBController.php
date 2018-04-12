@@ -285,8 +285,7 @@ class AdminDBController extends AdminController
                             }
                         }
                     }
-                    $isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
-                    $GLOBALS["SL"] = new DatabaseLookups($request, $isAdmin, $this->dbID, $this->treeID, $this->treeID);
+                    $GLOBALS["SL"] = new DatabaseLookups($request, $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -309,15 +308,18 @@ class AdminDBController extends AdminController
     {
         $this->v["tblName"] = $tblName;
         $this->v["tbl"] = SLTables::where('TblName', $tblName)->where('TblDatabase', $this->dbID)->first();
+//echo '<pre>'; print_r($GLOBALS["SL"]->fldTypes[$tblName]); echo '</pre>';
         if (trim($tblName) == '' || !$this->v["tbl"] || sizeof($this->v["tbl"]) == 0) {
             return $this->index($GLOBALS["SL"]->REQ);
         }
         $this->v["rules"] = SLBusRules::where('RuleTables', 'LIKE', '%,'.$this->v["tbl"]->TblID.',%')->get();
         $this->v["flds"] = SLFields::where('FldTable', $this->v["tbl"]->TblID)
-            ->where('FldTable', '>', 0)
             ->where('FldDatabase', $this->dbID)
             ->orderBy('FldOrd', 'asc')
             ->get();
+        if (isset($this->v["tbl"]->TblExtend) && intVal($this->v["tbl"]->TblExtend) > 0) {
+            $this->v["flds"] = $GLOBALS["SL"]->addFldRowExtends($this->v["flds"], $this->v["tbl"]->TblExtend);
+        }
         $this->v["foreignsFlds"] = '';
         $foreignsFlds = SLFields::where('FldForeignTable', $this->v["tbl"]->TblID)
             ->where('FldTable', '>', 0)

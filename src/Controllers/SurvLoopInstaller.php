@@ -1,6 +1,7 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use DB;
 use Illuminate\Routing\Controller;
 
 use App\Models\SLTree;
@@ -12,40 +13,46 @@ class SurvLoopInstaller extends Controller
     
     public function checkSysInit()
     {
-        $chk = SLTree::where('TreeType', 'Page')
-            ->where('TreeOpts', 7)
-            ->first();
-        if (!$chk || !isset($chk->TreeID)) $this->installPageHome();
-        $chk = SLTree::where('TreeType', 'Page')
-            ->where('TreeOpts', (7*3))
-            ->first();
-        if (!$chk || !isset($chk->TreeID)) $this->installPageHome('Dashboard');
-        $chk = SLTree::where('TreeType', 'Page')
-            ->where('TreeOpts', (7*17))
-            ->first();
-        if (!$chk || !isset($chk->TreeID)) $this->installPageHome('Volunteer');
-        $chk = SLTree::where('TreeType', 'Page')
-            ->where('TreeOpts', 23)
-            ->first();
-        if (!$chk || !isset($chk->TreeID)) $this->installPageMyProfile();
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Home', 7);
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard', (7*3));
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer', (7*17));
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Search', 31);
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard Search', (31*3), 'search');
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer Search', (31*17), 'volun-search');
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
+            . "AND `TreeOpts`%23 = 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageMyProfile();
         return true;
     }
     
-    public function installPageHome($type = 'Home')
+    public function installPageSimpl($name = 'Home', $opts = 1, $slug = '')
     {
+        if (trim($slug) == '') $slug = $GLOBALS["SL"]->slugify($name);
         $newTree = new SLTree;
         $newTree->TreeType     = 'Page';
-        $newTree->TreeName     = $type;
-        $newTree->TreeSlug     = strtolower($type);
+        $newTree->TreeName     = $name;
+        $newTree->TreeSlug     = $slug;
         $newTree->TreeDatabase = 1;
         $newTree->TreeUser     = 1;
-        $newTree->TreeOpts     = (($type == 'Dashboard') ? (7*3) : (($type == 'Volunteer') ? (7*17) : 7));
+        $newTree->TreeOpts     = $opts;
         $newTree->save();
         $node = new SLNode;
         $node->NodeTree        = $newTree->TreeID;
         $node->NodeParentID    = -3;
         $node->NodeType        = 'Page';
-        $node->NodePromptNotes = strtolower($type);
+        $node->NodePromptNotes = $slug;
         $node->save();
         $newTree->TreeRoot     = $node->NodeID;
         $newTree->save();

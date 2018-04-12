@@ -18,8 +18,9 @@
 <a href="#survopts" class="hshoo">SurvLoop Settings</a> - 
 <a href="#social" class="hshoo">Social Media</a> - 
 <a href="#license" class="hshoo">Licenses</a> - 
-<a href="#color" class="hshoo">Colors & Fonts</a> - 
-<a href="#hardcode" class="hshoo">Hard Code HTML, CSS, JS</a> - 
+<a href="#logos" class="hshoo">Logos & Fonts</a> - 
+<a href="#color" class="hshoo">Colors</a> - 
+<a href="#hardcode" class="hshoo">Hard Code HTML CSS JS</a> - 
 <a href="#custom" class="hshoo">Custom Settings</a>
 
 <h2 class="mB10">Search Engine Optimization</h2>
@@ -104,11 +105,11 @@
     </div>
 </div>
 
-<div class="nodeAnchor"><a id="color" name="color"></a></div>
 <div class="p20"></div>
 <div class="p20"></div>
 <hr>
-<h2>Logos, Colors, Fonts</h2>
+<div class="nodeAnchor"><a id="logos" name="logos"></a></div>
+<h2>Logos & Fonts</h2>
 <h3 class="slBlueDark"><u>Logos</u></h3>
 <div class="row">
     <div class="col-md-7">
@@ -125,6 +126,9 @@
         {!! view('vendor.survloop.admin.system-one-setting', [
             "opt" => 'spinner-code', "val" => ((isset($settingsList["spinner-code"]))
             ? $settingsList["spinner-code"] : '') ])->render() !!}
+        <h3 class="slBlueDark"><u>Fonts</u></h3>
+        {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
+            "opt" => 'font-main', "val" => $stylesList["font-main"] ])->render() !!}
     </div>
     <div class="col-md-1"></div>
     <div class="col-md-4">
@@ -133,11 +137,16 @@
         @endif
     </div>
 </div>
+
+<div class="p20"></div>
+<div class="p20"></div>
+<hr>
+<div class="nodeAnchor"><a id="color" name="color"></a></div>
 <div class="row">
     <div class="col-md-8">
     
         <div class="fR pT20 slGrey"><i>BG = Background</i></div>
-        <h3 class="slBlueDark"><u>Colors</u></h3>
+        <h2><u>Colors</u></h2>
         <div class="row fC">
             <div class="col-md-6">
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
@@ -150,6 +159,8 @@
                     "opt" => 'color-main-grey', "val" => $stylesList["color-main-grey"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
                     "opt" => 'color-main-faint', "val" => $stylesList["color-main-faint"] ])->render() !!}
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
+                    "opt" => 'color-main-faintr', "val" => $stylesList["color-main-faintr"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
                     "opt" => 'color-line-hr', "val" => $stylesList["color-line-hr"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
@@ -181,16 +192,6 @@
                     "opt" => 'color-warn-on', "val" => $stylesList["color-warn-on"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
                     "opt" => 'color-warn-off', "val" => $stylesList["color-warn-off"] ])->render() !!}
-            </div>
-        </div>
-        <h3 class="slBlueDark"><u>Fonts</u></h3>
-        <div class="row">
-            <div class="col-md-7">
-                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
-                    "opt" => 'font-main', "val" => $stylesList["font-main"] ])->render() !!}
-            </div>
-            <div class="col-md-1"></div>
-            <div class="col-md-4">
             </div>
         </div>
 

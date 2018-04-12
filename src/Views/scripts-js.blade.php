@@ -81,23 +81,6 @@ var loopItemsNextID = 0;
 var currItemCnt = 0;
 var maxItemCnt = 0;
 
-function postNodeAutoSave() {
-    if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
-        if (!document.getElementById('emailBlockID')) {
-            var origStep = document.getElementById('stepID').value;
-            var origTarget = document.postNode.target;
-            document.getElementById('stepID').value = "autoSave";
-            document.postNode.target = "hidFrame";
-            document.postNode.submit();
-            document.getElementById('stepID').value = origStep;
-            document.postNode.target = origTarget;
-            setTimeout(function() { postNodeAutoSave() }, 60000);
-            return true;
-        }
-    }
-    return false;
-}
-
 var pressedSubmit = false;
 var hasAttemptedSubmit = false;
 var totFormErrors = 0;
@@ -917,7 +900,7 @@ function initGalSlider(nIDtxt, kids, style) {
 var hshoos = new Array();
 var hshooCurr = 0;
 function addHshoo(hash) {
-    hshoos[hshoos.length] = new Array (hash, 0);
+    hshoos[hshoos.length] = new Array(hash, 0);
     return true;
 }
 
@@ -1086,10 +1069,7 @@ $(document).ready(function(){
     $(document).on("click", "a.navJump", function() {
         if (document.getElementById("stepID") && document.getElementById("jumpToID")) {
             document.getElementById("jumpToID").value = $(this).attr("id").replace("jump", "");
-            @if (isset($GLOBALS['SL']->closestLoop["obj"]->DataLoopRoot) 
-                && intVal($GLOBALS['SL']->closestLoop["obj"]->DataLoopRoot) > 0)
-                document.getElementById("stepID").value="exitLoopJump";
-            @endif
+            if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
             return runFormSub();
         }
         return false;
@@ -1107,6 +1087,22 @@ $(document).ready(function(){
         return false;
     });
     
+    function postNodeAutoSave() {
+        if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
+            if (!document.getElementById('emailBlockID')) {
+                var origStep = document.getElementById('stepID').value;
+                var origTarget = document.postNode.target;
+                document.getElementById('stepID').value = "autoSave";
+                document.postNode.target = "hidFrame";
+                document.postNode.submit();
+                document.getElementById('stepID').value = origStep;
+                document.postNode.target = origTarget;
+                setTimeout(function() { postNodeAutoSave() }, 60000);
+                return true;
+            }
+        }
+        return false;
+    }
     setTimeout(function() { if (!document.getElementById("isPage")) postNodeAutoSave(); }, 60000);
     
     window.onpopstate = function(event) {
@@ -1226,6 +1222,11 @@ $(document).ready(function(){
 	
 	$(document).on("click", ".navDeskMaj", function() {
 		var majInd = $(this).attr("id").replace("maj", "");
+		if ($(this).attr("data-jumpnode") && document.getElementById("stepID") && document.getElementById("jumpToID")) {
+            document.getElementById("jumpToID").value = $(this).attr("data-jumpnode");
+            if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
+            return runFormSub();
+		}
 		for (var i = 0; i < treeMajorSects.length; i++) {
 		    if (i != majInd && document.getElementById("minorNav"+i+"") 
 		        && document.getElementById("majSect"+i+"Vert2")) {
@@ -1312,6 +1313,15 @@ $(document).ready(function(){
         return true;
     }
     
+    $("a.hsho").on('click', function(event) {
+        var hash = $(this).attr("data-hash").trim();
+        if (hash !== "") {
+            if (document.getElementById(hash)) {
+                var newTop = (1+$("#"+hash+"").offset().top);
+                $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
+            }
+        }
+    });
     $("a.hshoo").on('click', function(event) {
         if (this.hash !== "") {
             event.preventDefault();
@@ -1334,17 +1344,18 @@ $(document).ready(function(){
                 }
             }
         }
-        var absMin = 0;
+        var absMin = -1000000000;
         var newArr = new Array();
         for (var i = 0; i < hshoos.length; i++) {
-            var min = new Array(1000000000, 0);
+            var min = new Array(0, 1000000000);
             for (var j = 0; j < hshoos.length; j++) {
-                var h = hshoos[j][1];
-                if (0 < h && absMin < h && h < min[0]) min = new Array(h, j);
+                if (absMin < hshoos[j][1] && hshoos[j][1] < min[1]) { // 0 < h && 
+                    min = new Array(j, hshoos[j][1]);
+                }
             }
-            if (min[0] > 0) {
-                absMin = min[0];
-                newArr[newArr.length] = new Array(hshoos[min[1]][0], hshoos[min[1]][1]);
+            if (min[1] > -1000000000) {
+                absMin = min[1];
+                newArr[newArr.length] = new Array(hshoos[min[0]][0], hshoos[min[0]][1]);
             }
         }
         hshoos = newArr;
@@ -1352,23 +1363,20 @@ $(document).ready(function(){
     }
     function chkHshooScroll() {
         if (hshoos.length > 0) {
-            hshooCurr = 0;
+            hshooCurr = -1;
             var currScroll = $(document).scrollTop();
             for (var i = 0; i < hshoos.length; i++) {
-                if (hshoos[i][1] <= (Math.ceil(currScroll)+2)) {
-                    hshooCurr = i;
+                var compareScroll = Math.ceil(currScroll)+2;
+                if (hshoos[i][1] <= compareScroll) hshooCurr = i;
+            }
+            if (hshooCurr < 0) hshooCurr = 0;
+            for (var i = 0; i < hshoos.length; i++) {
+                var admLnk = "admLnk"+hshoos[i][0].replace('#', '');
+                if (document.getElementById(admLnk)) {
+                    if (i == hshooCurr) $("#"+admLnk+"").addClass('active');
+                    else $("#"+admLnk+"").removeClass('active');
                 }
             }
-            if (hshooCurr >= 0) {
-                for (var i = 0; i < hshoos.length; i++) {
-                    if (i != hshooCurr) {
-                        var admLnk = "admLnk"+hshoos[i][0].replace('#', '');
-                        if (document.getElementById(admLnk)) $("#"+admLnk+"").removeClass('active');
-                    }
-                }
-            }
-            var admLnk = "admLnk"+hshoos[hshooCurr][0].replace('#', '');
-            if (document.getElementById(admLnk)) $("#"+admLnk+"").addClass('active');
         }
         return true;
     }
@@ -1525,6 +1533,28 @@ $(document).ready(function(){
 	$(document).on("click", ".hidivBtnSelf", function() {
         var fldGrp = $(this).attr("id").replace("hidivBtn", "");
         toggleHidiv(fldGrp);
+        $(this).slideUp("fast");
+	});
+    
+    function toggleHidnode(nID) {
+        if (document.getElementById("node"+nID+"")) {
+            if (document.getElementById("node"+nID+"").style.display!="block") {
+                setNodeVisib(""+nID+"", "", true);
+                $("#node"+nID+"").slideDown("fast");
+            } else {
+                setNodeVisib(""+nID+"", "", false);
+                $("#node"+nID+"").slideUp("fast");
+            }
+        }
+        return true;
+    }
+	$(document).on("click", ".hidnodeBtn", function() {
+        var nID = $(this).attr("id").replace("hidnodeBtn", "");
+        toggleHidnode(nID);
+	});
+	$(document).on("click", ".hidnodeBtnSelf", function() {
+        var nID = $(this).attr("id").replace("hidnodeBtn", "");
+        toggleHidnode(nID);
         $(this).slideUp("fast");
 	});
 	
@@ -1853,33 +1883,6 @@ $(document).ready(function(){
         return true;
     });
     
-    function adminColsInit() {
-        if (document.getElementById("admMenuBars") && document.getElementById("leftSide") && document.getElementById("mainBody")) {
-            $("#leftSide").removeClass('col-md-2');
-            $("#leftSide").addClass('disNon');
-            $("#mainBody").removeClass('col-md-10');
-            $("#mainBody").addClass('col-md-12');
-        }
-        return true;
-    }
-    setTimeout(function() { adminColsInit(); }, 1000);
-    $(document).on("click", "#admMenuBars", function() {
-        if (document.getElementById("leftSide") && document.getElementById("mainBody")) {
-            if (document.getElementById('leftSide').className == 'disNon') {
-                $("#mainBody").removeClass('col-md-12');
-                $("#mainBody").addClass('col-md-10');
-                $("#leftSide").removeClass('disNon');
-                $("#leftSide").addClass('col-md-2');
-            } else {
-                $("#leftSide").removeClass('col-md-2');
-                $("#leftSide").addClass('disNon');
-                $("#mainBody").removeClass('col-md-10');
-                $("#mainBody").addClass('col-md-12');
-            }
-        }
-        return true;
-    });
-    
 @if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
     function chkLogoResize() {
         if (!document.getElementById('slLogoImg')) return false;
@@ -1905,6 +1908,91 @@ $(document).ready(function(){
 @endif
             setTimeout(function() { winResizeHold = false; }, 250);
         }
+    });
+    
+    $(document).on("click", ".admSrchFldFocus", function() {
+        if (document.getElementById("admSrchFld")) {
+            $("#admSrchFld").focus();
+        }
+    });
+    
+    function chkFixedHeader() {
+        if (document.getElementById('fixedHeader')) {
+            var newW = 30+Math.round($("#postNodeForm").outerWidth());
+            if (document.getElementById('leftSideWrap') && document.getElementById('leftSideWrap').style.width != '0px') {
+                newW = Math.round($("#mainBody").outerWidth())-40;
+                document.getElementById('fixedHeader').style.paddingTop = '20px';
+                document.getElementById('fixedHeader').style.paddingRight = '20px';
+            }
+            document.getElementById('fixedHeader').style.width = ''+newW+'px';
+            setTimeout(function() { chkFixedHeader(); }, 10000);
+        } else {
+            setTimeout(function() { chkFixedHeader(); }, 60000);
+        }
+    }
+    setTimeout(function() { chkFixedHeader(); }, 100);
+    
+    function openAdmMenu() {
+        if (document.getElementById("leftAdmMenu") && document.getElementById("leftAdmMenu").style.display != 'block') {
+            if (document.getElementById("menuUnColpsBtn")) $("#menuUnColpsBtn").slideUp("fast");
+            if (document.getElementById("menuColpsBtn")) $("#menuColpsBtn").slideDown("fast");
+            if (document.getElementById("leftSideWdth")) {
+                if (document.getElementById("leftSideWrap")) {
+                    $("#leftSideWrap").animate({
+                        padding: "10px 15px 0px 15px"
+                    }, {
+                        duration: 150,
+                        specialEasing: {
+                            width: 'swing'
+                        }
+                    });
+                }
+                $("#leftSideWdth").animate({
+                    width: "230px"
+                }, {
+                    duration: 150,
+                    specialEasing: {
+                        width: 'swing'
+                    }
+                });
+                setTimeout(function() { $("#leftAdmMenu").slideDown(150); }, 150);
+            }
+        }
+    }
+    function closeAdmMenu() {
+        if (document.getElementById("leftAdmMenu") && document.getElementById("leftAdmMenu").style.display != 'none') {
+            if (document.getElementById("menuColpsBtn")) $("#menuColpsBtn").slideUp("fast");
+            if (document.getElementById("menuUnColpsBtn")) $("#menuUnColpsBtn").slideDown("fast");
+               $("#leftAdmMenu").slideUp(150);
+            if (document.getElementById("leftSideWdth")) {
+                setTimeout(function() { 
+                    if (document.getElementById("leftSideWrap")) {
+                        $("#leftSideWrap").animate({
+                            padding: "0px 6px"
+                        }, {
+                            duration: 150,
+                            specialEasing: {
+                                width: 'swing'
+                            }
+                        });
+                    }
+                    $("#leftSideWdth").animate({
+                        width: "24px"
+                    }, {
+                        duration: 150,
+                        specialEasing: {
+                            width: 'swing'
+                        }
+                    });
+                }, 150);
+            }
+        }
+    }
+    $(document).on("click", "#menuColpsBtn", function() { closeAdmMenu(); });
+    $(document).on("click", "#menuUnColpsBtn", function() { openAdmMenu(); });
+    $(window).resize(function() {
+        if ($(window).width() <= 992) closeAdmMenu();
+        else openAdmMenu();
     });
     
     
@@ -1990,17 +2078,6 @@ function printHeadBar(percIn) {
 }
 function getProgBar() {
     return "<div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
-}
-
-function hideRightSide() {
-	if (document.getElementById("mainBody")) document.getElementById("mainBody").className="col-md-10";
-	if (document.getElementById("rightSide")) document.getElementById("rightSide").className="disNon";
-	return true;
-}
-function showRightSide() {
-	if (document.getElementById("mainBody")) document.getElementById("mainBody").className="col-md-7";
-	if (document.getElementById("rightSide")) document.getElementById("rightSide").className="col-md-3";
-	return true;
 }
 
 

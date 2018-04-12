@@ -12,7 +12,7 @@
     @if ($canEditTree && $node->nodeRow->NodeParentID > 0 && !$isPrint)
         <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
+            <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
                 $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
                 class="btn btn-sm btn-warning opac50 w100 mTn15"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
@@ -37,7 +37,7 @@
         @if (isset($conditionList) && strpos($conditionList, '#NodeDisabled') !== false) basicTierDisabled @endif ">
         
         @if ($node->isPrintBasicTine()) <div class="w100 opac50"> @endif
-        <?php /* /dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }} */ ?>
+        <?php /* /dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }} */ ?>
         <table class="w100 mTn5 mB5" cellpadding=0 cellspacing=0 border=0 ><tr><td>
             <a id="showBtns{{ $nID }}" href="javascript:;" class="circleBtn 
                 @if ($node->isPage() || $node->isLoopRoot()) circleBtn0 
@@ -52,10 +52,13 @@
             @elseif ($node->nodeRow->NodeType == 'Layout Column') <i>{{ $node->nodeRow->NodeCharLimit }}/12 Wide</i>
             @elseif ($node->isHnyPot()) <span class="gryA">Spambot Honey Pot (Only Visible to Robots)</span>
             @elseif ($node->isPage())
-                @if ($node->nodeRow->NodeOpts%29 == 0)
-                    Page #{{ $pageCnt }} 
-                    <span class="red mL10"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit</span>
-                @else Page #{{ $pageCnt }} @endif
+                Page 
+                @if ($GLOBALS["SL"]->treeRow->TreeType != 'Page')
+                    #{{ $pageCnt }}
+                    @if ($node->nodeRow->NodeOpts%29 == 0)
+                        <span class="red mL10"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit</span>
+                    @endif
+                @endif
             @elseif ($node->isLoopRoot())
                 Loop Root <b class="slGreenDark mL10">
                 Repeat Child Pages For Each In {{ $node->nodeRow->NodeDataBranch }}</b>
@@ -166,7 +169,7 @@
         @if (!$isPrint)
             <div id="addChild{{ $nID }}" class="disNon 
                 @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&start=1"
+                <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&start=1"
                     class="btn btn-sm btn-warning mTn15"><i class="fa fa-plus-square-o"></i> Add Child Node</a>
             </div>
         @endif
@@ -181,7 +184,7 @@
             @if (!$isPrint)
                 <div id="addChild{{ $nID }}B" class="disNon 
                     @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                    <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&end=1"
+                    <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&end=1"
                         class="btn btn-sm btn-warning opac50 w100 mTn15"
                         ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
                 </div>
@@ -200,7 +203,7 @@
     @if ($node->nodeRow->NodeParentID > 0 && !$isPrint) 
         <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <a href="/dashboard/tree-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
+            <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
                 $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
                 class="btn btn-sm btn-warning opac50 w100 mTn15"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>

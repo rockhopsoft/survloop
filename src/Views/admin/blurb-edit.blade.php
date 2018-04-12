@@ -15,8 +15,8 @@
         </label>
     </div>
     <div class="col-md-4 taR">
-        <a href="/dashboard/pages/list" class="btn btn-sm btn-default m10"
-            ><i class="fa fa-caret-left"></i> Back To Excerpts List</a>
+        <a href="/dashboard/snippets/list" class="btn btn-sm btn-default m10"
+            ><i class="fa fa-caret-left"></i> Back To Snippets List</a>
         <div class="pT20 mT20 mR10 mB10">
             <label>Hard-Coded <input type="checkbox" name="optHardCode" value="3" 
                 @if ($blurbRow->DefIsActive > 0 && $blurbRow->DefIsActive%3 == 0) CHECKED @endif ></label>

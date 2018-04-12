@@ -23,6 +23,17 @@ class SurvLoopStatic
         return $ret;
     }
     
+    public function splitNumDash($str, $delim = '-')
+    {
+        $str = trim($str);
+        $pos = strpos($str, $delim);
+        if ($pos !== false) {
+            return [ intVal(substr($str, 0, $pos)), intVal(substr($str, (1+$pos))) ];
+        }
+        if ($str != '') return [ 0, intVal($str) ];
+        return [ 0, 0 ];
+    }
+    
     public function swapURLwrap($url, $printHttp = true)
     {
         $urlPrint = str_replace('mailto:', '', $url);
@@ -236,7 +247,6 @@ class SurvLoopStatic
     {
         $c1 = $this->colorHex2Rgba($hex1, $a1);
         $c2 = $this->colorHex2Rgba($hex2, $a2);
-        //echo 'colorFade( perc: ' . $perc . ', c1: '; print_r($c1); echo ', c2: '; print_r($c2); echo '<br />';
         if ($perc == 1)     return $c2;
         elseif ($perc == 0) return $c1;
         $cNew = [
@@ -245,13 +255,17 @@ class SurvLoopStatic
             "b" => (($c1["b"] == $c2["b"]) ? $c1["b"] : intVal(($c1["b"]+(($c2["b"]-$c1["b"])*$perc)))),
             "a" => (($c1["a"] == $c2["a"]) ? $c1["a"] : number_format(($c1["a"]+(($c2["a"]-$c1["a"])*$perc)), 2))
             ];
-        //echo 'cNew:<pre>'; print_r($cNew); echo '</pre>';
         return $cNew;
     }
     
     public function printColorFade($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
     {
         return $this->printRgba($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
+    }
+    
+    public function printColorFadeHex($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
+    {
+        return $this->colorRgba2Hex($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
     }
     
     public function printHex2Rgba($hex = '#000000', $a = 1)
@@ -325,6 +339,29 @@ class SurvLoopStatic
         return '';
     }
     
+    public function printTimeAgo($str)
+    {
+        $date = new \DateTime($str);
+        $now = date ('Y-m-d H:i:s', time());
+        $now = new \DateTime($now);
+        if ($now >= $date) {
+            $timeDifference = date_diff($date , $now);
+            $tense = " ago";
+        } else {
+            $timeDifference = date_diff($now, $date);
+            $tense = " until";
+        }
+        $period = [" second", " minute", " hour", " day", " month", " year" ];
+        $periodValue= [ $timeDifference->format('%s'), $timeDifference->format('%i'), $timeDifference->format('%h'), 
+            $timeDifference->format('%d'), $timeDifference->format('%m'), $timeDifference->format('%y') ];
+        for ($i = 0; $i < count($periodValue); $i++) {
+            if ($periodValue[$i] != 1) $period[$i] .= "s";
+            if ($periodValue[$i] > 0) $interval = $periodValue[$i].$period[$i].$tense;
+        }
+        if (isset($interval)) return $interval;
+        return "0 seconds" . $tense;
+    }
+    
     public function str2arr($str)
     {
         $arr = [];
@@ -354,6 +391,22 @@ class SurvLoopStatic
         $m = ($min%60);
         $h = floor($min/60);
         return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') . $m . ':' . (($s < 10) ? '0' : '') . $s;
+    }
+    
+    public function numSupscript($num)
+    {
+        $numStr = trim($num);
+        $last = intVal(substr($numStr, strlen($numStr)-1));
+        if (in_array($num, [11, 12, 13])) {
+            return '<sup>th</sup>';
+        } elseif ($last == 1) {
+            return '<sup>st</sup>';
+        } elseif ($last == 2) {
+            return '<sup>nd</sup>';
+        } elseif ($last == 3) {
+            return '<sup>rd</sup>';
+        }
+        return '<sup>th</sup>';
     }
     
     public function slugify($text)
@@ -404,7 +457,7 @@ class SurvLoopStatic
             }
             $search = trim($search);
             if ($search != '') {
-                $wordSplit = $GLOBALS["SL"]->mexplode(' ', str_replace('  ', ' ', $search));
+                $wordSplit = $this->mexplode(' ', str_replace('  ', ' ', $search));
                 foreach ($wordSplit as $word) {
                     if (!in_array($word, $ret)) $ret[] = $word;
                 }

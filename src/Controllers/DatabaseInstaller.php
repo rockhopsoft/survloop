@@ -27,7 +27,7 @@ class DatabaseInstaller extends AdminDBController
     protected function exportMysqlTbl($tbl, $installHereNow = false)
     {
         if (!isset($this->v["export"])) $this->v["export"] = $this->v["indexesEnd"] = '';
-        if (strtolower($tbl->TblEng) == 'Users') return "";
+        if (strtolower($tbl->TblEng) == 'users') return "";
         $tblQuery = $this->exportMysqlTblCoreStart($tbl);
         $indexes = "";
         $flds = SLFields::where('FldTable', $tbl->TblID)
@@ -35,6 +35,9 @@ class DatabaseInstaller extends AdminDBController
             ->orderBy('FldOrd', 'asc')
             ->orderBy('FldEng', 'asc')
             ->get();
+        if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
+            $flds = $GLOBALS["SL"]->addFldRowExtends($flds, $tbl->TblExtend);
+        }
         if ($flds && sizeof($flds)) {
             foreach ($flds as $fld) {
                 $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
@@ -155,6 +158,9 @@ class DatabaseInstaller extends AdminDBController
                         ->orderBy('FldOrd', 'asc')
                         ->orderBy('FldEng', 'asc')
                         ->get();
+                    if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
+                        $flds = $GLOBALS["SL"]->addFldRowExtends($flds, $tbl->TblExtend);
+                    }
                     if ($flds && sizeof($flds) > 0) {
                         foreach ($flds as $fld) {
                             $fldName = trim($tbl->TblAbbr . $fld->FldName);
@@ -198,19 +204,17 @@ class DatabaseInstaller extends AdminDBController
                             }
                             if (intVal($fld->FldForeignTable) > 0) {
                                 list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
-                                $this->v["migrationFileUp"] .= "\n\t\t\t"
-                                    . "$"."table->foreign('" . $fldName . "')"
+                                $this->v["migrationFileUp"] .= "\n\t\t\t" . "$"."table->foreign('" . $fldName . "')"
                                     . "->references('" . $forID . "')->on('" . $forTbl . "');";
                             }
                         }
                     }
-                    $this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"
-                        ."});"."\n\t";
-                    $this->v["migrationFileDown"] .= "\t"."Schema::drop('" 
-                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
+                    $this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"."});"."\n\t";
+                    $this->v["migrationFileDown"] .= "\t"."Schema::drop('" . $GLOBALS["SL"]->dbRow->DbPrefix 
+                        . $tbl->TblName . "');"."\n\t";
                     
-                    $newModelFilename = '../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
-                        . '/' . $this->v["tblClean"] . '.php';
+                    $newModelFilename = '../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/' 
+                        . $this->v["tblClean"] . '.php';
                     $this->v["fileListModel"][] = $newModelFilename;
                     $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
                     $this->v["dumpOut"]["Models"] .= $fullFileOut;
@@ -247,12 +251,12 @@ class DatabaseInstaller extends AdminDBController
                                     }
                                 }
                                 $isSLtmp = ($GLOBALS["SL"]->dbRow->DbPrefix == 'SL_' && in_array($tbl->TblName, [
-                                    'Zips', 'Sess', 'SessLoops', 'SessEmojis'
-                                    ]));
+                                    'Zips', 'Sess', 'SessLoops', 'SessEmojis', 'LogActions', 'Emailed', 'Tokens', 
+                                    'UsersActivity', 'UsersRoles', 'SearchRecDump', 'NodeSaves', 'NodeSavesPage',
+                                    'users', 'DesignTweaks']));
                                 if (trim($fldData) != '' && !$isSLtmp) {
-                                    $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" 
-                                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
-                                        . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
+                                    $this->v["dumpOut"]["Seeders"] .= "\tDB::table('" . $GLOBALS["SL"]->dbRow->DbPrefix
+                                        . $tbl->TblName . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
                                 }
                             }
                         }
@@ -320,8 +324,7 @@ class DatabaseInstaller extends AdminDBController
             if ($GLOBALS["SL"]->REQ->has('copyData') && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
                 foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
                     if (file_exists('../app/Models/' . $GLOBALS["SL"]->tblModels[$GLOBALS["SL"]->tbl[$copyTbl]])) {
-                        eval("\$transferData[\$copyTbl] = " 
-                            . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl])
+                        eval("\$transferData[\$copyTbl] = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl])
                             . "::get();");
                         $this->v["log"] .= '<br />copying table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
                     }
@@ -330,9 +333,9 @@ class DatabaseInstaller extends AdminDBController
         
             foreach ($GLOBALS["SL"]->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
-                if (!in_array($GLOBALS["SL"]->tbl[$createTbl], ['users', 'Users'])) {
-                    DB::statement('DROP TABLE IF EXISTS `' 
-                        . $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$createTbl] . '`');
+                if (!in_array(strtolower($GLOBALS["SL"]->tbl[$createTbl]), ['users'])) {
+                    DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->DbPrefix 
+                        . $GLOBALS["SL"]->tbl[$createTbl] . '`');
                     $createQry = $this->exportMysqlTbl($tbl, true);
                     echo $createQry . '<br />';
                     DB::statement($createQry);

@@ -70,7 +70,7 @@ class SurvLoopTreeXML extends CoreTree
                 }
                 $node->nodeRow->save();
             }
-            $redir = '/dashboard/tree-' . $GLOBALS["SL"]->treeID . '/xmlmap?all=1&refresh=1#n' . $node->nodeRow->NodeID;
+            $redir = '/dashboard/surv-' . $GLOBALS["SL"]->treeID . '/xmlmap?all=1&refresh=1#n' . $node->nodeRow->NodeID;
             echo '<script type="text/javascript"> setTimeout("window.location=\'' . $redir . '\'", 5); </script>';
             exit;
         }

@@ -48,7 +48,7 @@ class User extends Model implements AuthenticatableContract,
     
     public function printUsername($link = true, $baseurl = '/profile/')
     {
-        if ($link) return '<a href="' . $baseurl . $this->id . '">' . $this->name . '</a>';
+        if ($link) return '<a href="' . $baseurl . urlencode($this->name) . '">' . $this->name . '</a>';
         return $this->name;
     }
     
@@ -56,7 +56,7 @@ class User extends Model implements AuthenticatableContract,
     {
         $uName = $this->name;
         if (strpos($uName, ' ') !== false) $uName = substr($uName, 0, strpos($uName, ' '));
-        if ($link) return '<a href="' . $baseurl . $this->id . '">' . $preFix . $uName . '</a>';
+        if ($link) return '<a href="' . $baseurl . urlencode($this->name) . '">' . $preFix . $uName . '</a>';
         return $uName;
     }
     

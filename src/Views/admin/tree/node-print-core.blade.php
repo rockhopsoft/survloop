@@ -6,7 +6,7 @@
     <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
         <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
+        <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
             ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
     </div>
     @if ($node->nodeRow->NodeParentOrder == 0)
@@ -38,7 +38,7 @@
         <div id="addChild{{ $nID }}" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&start=1"
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&start=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
     @endif
@@ -52,7 +52,7 @@
         <div id="addChild{{ $nID }}B" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
             <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&end=1"
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&end=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
     @else
@@ -71,7 +71,7 @@
     <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
         <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-        <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
+        <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
             ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
     </div>
     <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">

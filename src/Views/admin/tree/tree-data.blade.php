@@ -19,7 +19,7 @@
 <p>
 <i>Loop</i>: The group of records which the end user may provide between <i>Min</i> and <i>Max</i> records 
 in the <i>Table</i>. This data loop plays out for the end user within its family's <i>Root Node</i>. 
-New loops can be added by editing any node in the <a href="/dashboard/tree-{{ $GLOBALS['SL']->treeID }}/map?all=1">Tree Map</a>.
+New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1">Tree Map</a>.
 </p>
 <table class="table table-striped">
     <tr>

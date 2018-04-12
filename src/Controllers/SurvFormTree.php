@@ -123,52 +123,50 @@ class SurvFormTree extends SurvUploadTree
     
     protected function currNodeFormAction()
     {
-        $action = (($GLOBALS["SL"]->treeRow->TreeType != 'Page') ? '/sub' : '/' . $GLOBALS["SL"]->treeRow->TreeSlug);
-        if ($GLOBALS["SL"]->treeIsAdmin) $action = '/dash' . $action;
-        return $action;
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            $ret = '/' . $GLOBALS["SL"]->treeRow->TreeSlug;
+            if ($GLOBALS["SL"]->treeIsAdmin) $ret = '/dash' . $ret;
+            if (isset($GLOBALS["SL"]->x["pageSlugSffx"])) $ret .= $GLOBALS["SL"]->x["pageSlugSffx"];
+            return $ret;
+        }
+        if ($GLOBALS["SL"]->treeIsAdmin) return '/dash-sub';
+        return '/sub';
     }
     
     protected function printNodePublicFormStart($nID)
     {
-        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0) {
-            $loopRootJustLeft = -3;
-            if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
-                $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
-                $this->sessInfo->SessLoopRootJustLeft = -3;
-                $this->sessInfo->save();
-            }
-            return view('vendor.survloop.formtree-form-start', [
-                "nID"              => $nID, 
-                "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
-                "currPage"         => $this->v["currPage"],
-                "action"           => $this->currNodeFormAction(), 
-                "pageHasUpload"    => $this->pageHasUpload, 
-                "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
-                "loopRootJustLeft" => $loopRootJustLeft, 
-                "zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
-                    ? intVal($this->sessInfo->SessZoomPref) : 0), 
-                "hasRegisterNode"  => (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"])
-            ])->render();
-            if (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"]) {
-                session()->put('sessTreeReg', $this->treeID);
-                session()->put('sessTreeRegTime', mktime());
-            }
+        $loopRootJustLeft = -3;
+        if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
+            $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
+            $this->sessInfo->SessLoopRootJustLeft = -3;
+            $this->sessInfo->save();
         }
-        return '';
+        /* if (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"]) {
+            session()->put('sessTreeReg', $this->treeID);
+            session()->put('sessTreeRegTime', mktime());
+        } */
+        return view('vendor.survloop.formtree-form-start', [
+            "nID"              => $nID, 
+            "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
+            "currPage"         => $this->v["currPage"],
+            "action"           => $this->currNodeFormAction(), 
+            "pageHasUpload"    => $this->pageHasUpload, 
+            "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
+            "loopRootJustLeft" => $loopRootJustLeft, 
+            "zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
+                ? intVal($this->sessInfo->SessZoomPref) : 0)
+        ])->render();
     }
     
     protected function printNodePublicFormEnd($nID, $promptNotesSpecial = '')
     {
-        if ($GLOBALS["SL"]->treeRow->TreeType != 'Page' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0) {
-            $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.formtree-form-js', [
-                "pageURL"          => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
-                "pageFldList"      => $this->pageFldList, 
-                "pageJSvalid"      => $this->pageJSvalid,
-                "hasFixedHeader"   => $this->v["hasFixedHeader"]
-            ])->render();
-            return '</form>';
-        }
-        return '';
+        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.formtree-form-js', [
+            "pageURL"          => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
+            "pageFldList"      => $this->pageFldList, 
+            "pageJSvalid"      => $this->pageJSvalid,
+            "hasFixedHeader"   => $this->v["hasFixedHeader"]
+        ])->render();
+        return '</form>';
     }
     
     private $pageNodes = [];
@@ -1057,7 +1055,7 @@ class SurvFormTree extends SurvUploadTree
                         $attrIncr = 'step="' . $curr->extraOpts["incr"] . '" ';
                     }
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">';
-                    if (!$this->hasSpreadsheetParent($nID)) $ret .= '<div class="row"><div class="col-md-2">';
+                    if (!$this->hasSpreadsheetParent($nID)) $ret .= '<div class="row"><div class="col-md-3">';
                     $ret .= '<nobr><input type="number" data-nid="' . $nID . '" class="form-control input-lg ' 
                         . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : ((isset($curr->extraOpts["unit"]) 
                             && trim($curr->extraOpts["unit"]) != '') ? 'unitFld ' : '')) . $xtraClass 
@@ -1065,7 +1063,7 @@ class SurvFormTree extends SurvUploadTree
                         . '" ' . $onKeyUp . ' ' . $attrIncr . $attrMin . $attrMax . $GLOBALS["SL"]->tabInd() . '> ';
                     if (isset($curr->extraOpts["unit"]) && trim($curr->extraOpts["unit"]) != '') {
                         if ($curr->nodeType == 'Text:Number' && !$this->hasSpreadsheetParent($nID)) {
-                            $ret .= '</nobr></div><div class="col-md-1 pT15"><nobr>';
+                            $ret .= '</nobr></div><div class="col-md-3 pT10"><nobr>';
                         }
                         $ret .= $curr->extraOpts["unit"] . '&nbsp;&nbsp;';
                     }
