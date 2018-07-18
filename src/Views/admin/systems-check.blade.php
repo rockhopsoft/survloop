@@ -8,7 +8,7 @@
 <div class="fR pT20"><a href="?testEmail=1">Test Email</a></div>
 <div class="fC"></div>
 
-<h3 style="mT0">If these pages are not throwing error messages, that is very good...</h3>
+<h3 style="mT0">If these pages are not throwing error messages, or redirecting home, then that is a good thing...</h3>
 
 <div class="row mB20">
     @forelse ($sysChks as $i => $chk)

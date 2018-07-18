@@ -19,7 +19,7 @@
 </div>
 
 @foreach ($defSets as $subset => $setDefs)
-    @if ($setDefs && sizeof($setDefs) > 0)
+    @if (sizeof($setDefs))
         <a name="{{ str_replace(' ', '', $subset) }}"></a>
         <div class="row mT10" >
             <div class="col-md-9">

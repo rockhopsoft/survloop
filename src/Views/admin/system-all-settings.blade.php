@@ -67,11 +67,14 @@
     <div class="col-md-4">
         {!! view('vendor.survloop.admin.system-one-setting', [
             "opt" => 'has-volunteers', "val" => $settingsList["has-volunteers"] ])->render() !!}
+        {!! view('vendor.survloop.admin.system-one-setting', [
+            "opt" => 'has-partners', "val" => $settingsList["has-partners"] ])->render() !!}
     </div><div class="col-md-4">
         {!! view('vendor.survloop.admin.system-one-setting', [
             "opt" => 'users-create-db', "val" => $settingsList["users-create-db"] ])->render() !!}
     </div><div class="col-md-4">
-        
+        {!! view('vendor.survloop.admin.system-one-setting', [
+            "opt" => 'has-canada', "val" => $settingsList["has-canada"] ])->render() !!}
     </div>
 </div>
 <div class="nodeAnchor"><a id="social" name="social"></a></div>
@@ -161,6 +164,10 @@
                     "opt" => 'color-main-faint', "val" => $stylesList["color-main-faint"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
                     "opt" => 'color-main-faintr', "val" => $stylesList["color-main-faintr"] ])->render() !!}
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
+                    "opt" => 'color-field-bg', "val" => $stylesList["color-field-bg"] ])->render() !!}
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
+                    "opt" => 'color-form-text', "val" => $stylesList["color-form-text"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,
                     "opt" => 'color-line-hr', "val" => $stylesList["color-line-hr"] ])->render() !!}
                 {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysStyles,

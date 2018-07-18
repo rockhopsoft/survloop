@@ -5,15 +5,158 @@ use App\Models\SLZips;
 use App\Models\SLZipAshrae;
 use App\Models\SLNodeResponses;
 
-class StatesUS
+class Geographs
 {
-    public $stateList = array();
+    public $stateList   = [];
+    public $stateListCa = [];
+    public $countryList = [];
+    public $hasCanada   = false;
     
-    public $countryList = array();
+    function __construct($hasCanada = false)
+    {
+        $this->hasCanada = $hasCanada;
+        return true;
+    }
+    
+    public function getStateAbrr($state = '')
+    {
+        if ($state == 'Federal') return 'US';
+        $this->loadStates();
+        foreach ($this->stateList as $abbr => $name) {
+            if (strtolower($name) == strtolower($state)) return $abbr;
+        }
+        if ($this->hasCanada) {
+            foreach ($this->stateListCa as $name) {
+                if (strtolower($name) == strtolower($state)) return $name;
+            }
+        }
+        return '';
+    }
+    
+    public function getState($abbr = '')
+    {
+        if ($abbr == '') return '';
+        if ($abbr == 'US') return 'Federal';
+        $this->loadStates();
+        if (isset($this->stateList[$abbr])) return $this->stateList[$abbr];
+        if (isset($this->stateListCa[$abbr])) return $this->stateListCa[$abbr];
+        return '';
+    }
+    
+    public function loadStateResponseVals()
+    {
+        $this->loadStates();
+        $retArr = [];
+        foreach ($this->stateList as $abbr => $name) $retArr[] = $abbr;
+        if ($this->hasCanada) {
+            foreach ($this->stateListCa as $name) $retArr[] = $name;
+        }
+        return $retArr;
+    }
+    
+    public function getCountryResponses($nID, $showKidsList = []) {
+        $this->loadCountries();
+        $ret = [];
+        foreach ($this->countryList as $i => $name) {
+            $res = new SLNodeResponses;
+            $res->NodeResNode     = $nID;
+            $res->NodeResOrd      = $i;
+            $res->NodeResEng      = $name;
+            $res->NodeResValue    = $name;
+            $res->NodeResShowKids = ((in_array($name, $showKidsList)) ? 1 : 0);
+            $ret[] = $res;
+        }
+        return $ret;
+    }
+    
+    public function getZipRow($zip = '')
+    {
+        if (trim($zip) == '') return null;
+        if (strlen($zip) > 7) $zip = substr($zip, 0, 5);
+        return SLZips::where('ZipZip', $zip)
+            ->first();
+    }
+    
+    public function getZipProperty($zip = '', $fld = 'City')
+    {
+        $zipRow = $this->getZipRow($zip);
+        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) {
+            return $zipRow->{ 'Zip' . $fld };
+        }
+        return '';
+    }
+    
+    public function getCityCounty($city = '', $state = '')
+    {
+        $chk = SLZips::where('ZipCity', $city)
+            ->where('ZipState', $state)
+            ->first();
+        if ($chk && isset($chk->ZipCounty)) return $chk->ZipCounty;
+        return '';
+    }
+    
+    public function getAshrae($zipRow = null)
+    {
+        if (!$zipRow) return '';
+        if (isset($zipRow->ZipCountry) && $zipRow->ZipCountry == 'Canada') return 'Canada';
+        if ((!isset($zipRow->ZipCountry) || trim($zipRow->ZipCountry) == '') && isset($zipRow->ZipState) 
+            && !in_array($zipRow->ZipState, ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'])) {
+            $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
+                ->where('AshrCounty', $zipRow->ZipCounty)
+                ->first();
+            if ($ashrae && isset($ashrae->AshrZone)) return $ashrae->AshrZone;
+        }
+        return '';   
+    }
+    
+    public function stateDrop($state = '', $all = false)
+    {
+        $this->loadStates();
+        return view('vendor.survloop.inc-drop-opts-states', [
+            "state"       => trim($state),
+            "stateList"   => $this->stateList,
+            "stateListCa" => $this->stateListCa,
+            "hasCanada"   => $this->hasCanada,
+            "all"         => $all
+            ])->render();
+    }
+    
+    public function climateZoneDrop($fltClimate = '')
+    {
+        return view('vendor.survloop.inc-drop-opts-ashrae', [
+            "fltClimate" => $fltClimate,
+            "hasCanada"  => $this->hasCanada
+            ])->render();
+    }
+    
+    public function countryDrop($cntry = '')
+    {
+        $this->loadCountries();
+        return view('vendor.survloop.inc-drop-opts-countries', [
+            "cntry"       => trim($cntry),
+            "countryList" => $this->countryList
+            ])->render();
+    }
+    
+    public function getStateWhereIn($fltState = '')
+    {
+        $ret = [];
+        if (trim($fltState) != '') {
+            $this->loadStates();
+            if ($fltState == 'US') {
+                foreach ($this->stateList as $abbr => $name) $ret[] = $abbr;
+            } elseif ($fltState == 'Canada') {
+                foreach ($this->stateListCa as $abbr => $name) $ret[] = $abbr;
+            } else {
+                $ret[] = $fltState;
+            }
+        }
+        return $ret;
+    }
     
     function loadStates()
     {
-        if (sizeof($this->stateList) == 0) {
+        if (empty($this->stateList)) {
             $this->stateList = [
                 'AL' => "Alabama", 
                 'AK' => "Alaska", 
@@ -67,52 +210,34 @@ class StatesUS
                 'WI' => "Wisconsin", 
                 'WY' => "Wyoming"
             ];
+            if ($this->hasCanada) $this->loadCanadaStates();
         }
         return true;
     }
     
-    public function stateDrop($state = '', $fed = false)
+    function loadCanadaStates()
     {
-        $this->loadStates();
-        $retVal = ''; // '<option value="" ' . (($state == '') ? 'SELECTED' : '') . ' ></option>';
-        if ($fed) $retVal .= '<option value="US" ' . (($state == 'US') ? 'SELECTED' : '') . ' >Federal</option>';
-        foreach ($this->stateList as $abbr => $name) {
-            $retVal .= '<option value="' . $abbr . '" ' . (($state == $abbr) ? 'SELECTED' : '') 
-                . ' >' . $abbr . ' ' . $name . '</option>';
-        }
-        return $retVal;
+        $this->stateListCa = [
+            'AB' => "Alberta",
+            'BC' => "British Columbia",
+            'MB' => "Manitoba",
+            'NB' => "New Brunswick",
+            'NL' => "Newfoundland and Labrador",
+            'NS' => "Nova Scotia",
+            'NT' => "Northwest Territories",
+            'NU' => "Nunavut",
+            'ON' => "Ontario",
+            'PE' => "Prince Edward Island",
+            'QC' => "Quebec",
+            'SK' => "Saskatchewan",
+            'YT' => "Yoken"
+            ];
+        return true;
     }
-    
-    public function getStateAbrr($state = '')
-    {
-        if ($state == 'Federal') return 'US';
-        $this->loadStates();
-        foreach ($this->stateList as $abbr => $name) {
-            if (strtolower($name) == strtolower($state)) return $abbr;
-        }
-        return '';
-    }
-    
-    public function getState($abbr = '')
-    {
-        if ($abbr == '') return '';
-        if ($abbr == 'US') return 'Federal';
-        $this->loadStates();
-        return $this->stateList[$abbr];
-    }
-    
-    public function loadStateResponseVals()
-    {
-        $this->loadStates();
-        $retArr = array();
-        foreach ($this->stateList as $abbr => $name) $retArr[] = $abbr;
-        return $retArr;
-    }
-    
     
     public function loadCountries()
     {
-        if (sizeof($this->countryList) == 0) {
+        if (empty($this->countryList)) {
             $this->countryList = [
                 'United States', 
                 'Afghanistan', 
@@ -320,60 +445,6 @@ class StatesUS
         return true;
     }
     
-    public function countryDrop($cntry = '')
-    {
-        $this->loadCountries();
-        $retVal = '<option value="" ' . (($cntry == '') ? 'SELECTED' : '') . ' ></option>';
-        foreach ($this->countryList as $name) {
-            $retVal .= '<option value="' . $name . '" ' . (($cntry == $name) ? 'SELECTED' : '') 
-                . ' >' . $name . '</option>';
-        }
-        return $retVal;
-    }
     
-    public function getCountryResponses($nID, $showKidsList = []) {
-        $this->loadCountries();
-        $ret = [];
-        foreach ($this->countryList as $i => $name) {
-            $res = new SLNodeResponses;
-            $res->NodeResNode     = $nID;
-            $res->NodeResOrd      = $i;
-            $res->NodeResEng      = $name;
-            $res->NodeResValue    = $name;
-            $res->NodeResShowKids = ((in_array($name, $showKidsList)) ? 1 : 0);
-            $ret[] = $res;
-        }
-        return $ret;
-    }
-    
-    
-    public function getZipRow($zip = '')
-    {
-        if (trim($zip) == '') return [];
-        if (strlen($zip) > 5) $zip = substr($zip, 0, 5);
-        return SLZips::where('ZipZip', $zip)
-            ->first();
-    }
-    
-    public function getZipCity($zip = '')
-    {
-        $zipRow = $this->getZipRow($zip);
-        if ($zipRow && isset($zipRow->ZipCity)) {
-            return $zipRow->ZipCity;
-        }
-        return '';
-    }
-    
-    public function getAshrae($zipRow = [])
-    {
-        if (isset($zipRow->ZipState) 
-            && !in_array($zipRow->ZipState, ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'])) {
-            $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
-                ->where('AshrCounty', $zipRow->ZipCounty)
-                ->first();
-            if ($ashrae && isset($ashrae->AshrZone)) return $ashrae->AshrZone;
-        }
-        return '';   
-    }
     
 }

@@ -44,10 +44,10 @@ class SurvLoopNode extends CoreNode
         return true;
     }
     
-    public function loadNodeRow($nID = -3, $nRow = [])
+    public function loadNodeRow($nID = -3, $nRow = NULL)
     {
-        $this->nodeRow = [];
-        if (sizeof($nRow) > 0) {
+        $this->nodeRow = null;
+        if ($nRow) {
             $this->nodeRow = $nRow;
         } elseif ($nID > 0) {
             $this->nodeRow = SLNode::find($nID)
@@ -61,7 +61,7 @@ class SurvLoopNode extends CoreNode
                     'NodeResponseSet', 'NodeDefault');
         }
         $this->copyFromRow();
-        if (!isset($this->nodeRow) || sizeof($this->nodeRow) == 0) {
+        if (!$this->nodeRow) {
             $this->nodeRow = new SLNode;
             return false;
         }
@@ -71,7 +71,7 @@ class SurvLoopNode extends CoreNode
     
     protected function copyFromRow()
     {
-        if (sizeof($this->nodeRow) > 0) {
+        if ($this->nodeRow) {
             $this->parentID    = $this->nodeRow->NodeParentID;
             $this->parentOrd   = $this->nodeRow->NodeParentOrder;
             $this->nodeOpts    = $this->nodeRow->NodeOpts;
@@ -90,17 +90,17 @@ class SurvLoopNode extends CoreNode
         $this->conds = [];
         $chk = SLConditionsNodes::where('CondNodeNodeID', $this->nodeID)
             ->get();
-        if ($chk && sizeof($chk) > 0) {
+        if ($chk->isNotEmpty()) {
             foreach ($chk as $c) {
                 $cond = SLConditions::find($c->CondNodeCondID);
-                if ($cond && sizeof($cond) > 0) $this->conds[] = $cond;
+                if ($cond) $this->conds[] = $cond;
             }
         }
         if ($this->conds && sizeof($this->conds) > 0) {
             foreach ($this->conds as $i => $c) $c->loadVals();
         }
         $this->hasShowKids = false;
-        if (sizeof($this->nodeRow) > 0) {
+        if ($this->nodeRow) {
             if ($this->isPage() || $this->isLoopRoot()) {
                 $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] = $this->extraOpts["meta-keywords"] 
                     = $this->extraOpts["meta-img"] = '';
@@ -146,7 +146,7 @@ class SurvLoopNode extends CoreNode
                     = $this->extraOpts["unit"] = false;
                 $chk = SLNodeResponses::where('NodeResNode', $this->nodeID)
                     ->get();
-                if ($chk && sizeof($chk) > 0) {
+                if ($chk->isNotEmpty()) {
                     foreach ($chk as $res) {
                         if (isset($res->NodeResOrd)) {
                             if (isset($res->NodeResValue)) {
@@ -267,7 +267,7 @@ class SurvLoopNode extends CoreNode
     
     public function indexShowsKidNode($ind = '')
     {
-        if (sizeof($this->responses) == 0 || !isset($this->responses[$ind])
+        if (empty($this->responses) || !isset($this->responses[$ind])
             || !isset($this->responses[$ind]->NodeResShowKids)) return -3;
         return intVal($this->responses[$ind]->NodeResShowKids);
     }
@@ -297,21 +297,33 @@ class SurvLoopNode extends CoreNode
         return $newRes;
     }
     
+    public function chkFill()
+    {
+        if (!$this->nodeRow || !isset($this->dataStore)) $this->fillNodeRow();
+        return true;
+    }
+    
     public function getTblFld()
     {
-        if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
+        $this->chkFill();
         return $GLOBALS["SL"]->splitTblFld($this->dataStore);
     }
     
     public function getTblFldID()
     {
-        if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
+        $this->chkFill();
         return $GLOBALS["SL"]->getTblFldID($this->dataStore);
+    }
+    
+    public function getFldRow()
+    {
+        $this->chkFill();
+        return $GLOBALS["SL"]->getTblFldRow($this->dataStore);
     }
     
     public function getTblFldName()
     {
-        if (sizeof($this->nodeRow) == 0 || !isset($this->dataStore)) $this->fillNodeRow();
+        $this->chkFill();
         $tblFld = $GLOBALS["SL"]->splitTblFld($this->dataStore);
         if (sizeof($tblFld) > 1) return $tblFld[1];
         return '';
@@ -351,8 +363,8 @@ class SurvLoopNode extends CoreNode
     
     public function tierPathStr($tierPathArr = [])
     {
-        if (sizeof($tierPathArr) == 0) return implode('-', $this->nodeTierPath).'-';
-        return implode('-', $tierPathArr).'-';
+        if (sizeof($tierPathArr) == 0) return implode('-', $this->nodeTierPath) . '-';
+        return implode('-', $tierPathArr) . '-';
     }
     
     public function checkBranch($tierPathArr = [])
@@ -396,7 +408,8 @@ class SurvLoopNode extends CoreNode
     
     public function isDataPrint()
     {
-        return (in_array($this->nodeType, ['Data Print', 'Data Print Row', 'Data Print Block']));
+        return (in_array($this->nodeType, ['Data Print', 'Data Print Row', 'Data Print Block', 'Data Print Columns',
+            'Print Vert Progress']));
     }
     
     public function isSpreadTbl()
@@ -452,8 +465,8 @@ class SurvLoopNode extends CoreNode
     public function isWidget()
     {
         return ($this->isGraph() || in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured', 
-            'Member Profile Basics', 'Record Full', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons',
-            'Widget Custom', 'Admin Form']));
+            'Member Profile Basics', 'Record Full', 'Record Full Public', 'Record Previews', 'Incomplete Sess Check', 
+            'Back Next Buttons', 'Widget Custom', 'Admin Form', 'MFA Dialogue']));
     }
     
     public function isGraph()
@@ -529,7 +542,7 @@ class SurvLoopNode extends CoreNode
         if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') return '';
         $ret = ' , ' . $manipUpdate[1] . ' = ';
         if (isset($this->responseSet) && intVal($this->responseSet) > 0) {
-            $ret .= $GLOBALS["SL"]->getDefValById(intVal($this->responseSet));
+            $ret .= $GLOBALS["SL"]->def->getValById(intVal($this->responseSet));
         } else {
             $ret .= $manipUpdate[2];
         }
@@ -544,8 +557,7 @@ class SurvLoopNode extends CoreNode
     
     public function loadPageBlockColors()
     {
-        if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '' 
-            && sizeof($this->colors) == 0) {
+        if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '' && empty($this->colors)) {
             $colors = explode(';;', $this->nodeRow->NodeDefault);
             if (isset($colors[0])) $this->colors["blockBG"]      = $colors[0];
             if (isset($colors[1])) $this->colors["blockText"]    = $colors[1];
@@ -610,7 +622,7 @@ class SurvLoopNode extends CoreNode
             return '<i class="fa fa-picture-o" aria-hidden="true"></i>';
         } elseif ($this->isPageBlock()) {
             return '<i class="fa fa-square-o" aria-hidden="true"></i>';
-        } elseif ($this->isLayout()) {
+        } elseif ($this->isLayout() || $this->nodeType == 'Data Print Columns') {
             return '<i class="fa fa-columns"></i>';
         } elseif ($this->isWidget()) {
             if ($this->nodeType == 'Incomplete Sess Check') {
@@ -627,6 +639,8 @@ class SurvLoopNode extends CoreNode
                 return '<i class="fa fa-pie-chart" aria-hidden="true"></i>';
             } elseif ($this->nodeType == 'Map') {
                 return '<i class="fa fa-map-o" aria-hidden="true"></i>';
+            } elseif ($this->nodeType == 'MFA Dialogue') {
+                return '<i class="fa fa-lock" aria-hidden="true"></i>';
             } else {
                 return '<i class="fa fa-magic" aria-hidden="true"></i>';
             }

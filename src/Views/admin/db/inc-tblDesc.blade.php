@@ -1,4 +1,4 @@
-@if (isset($tbl) && sizeof($tbl) > 0)
+@if (isset($tbl) && $tbl)
     @if ($isExcel)
         <tr><td><b>{{ $tbl->TblName }}</b></td><td colspan=4 >{{ $tbl->TblEng }} - {{ $tbl->TblDesc }}</td></tr>
         <tr><td>{{ $tbl->TblAbbr }}) {{ $tbl->TblType }}</td><td colspan=4 ><i>Notes: {{ $tbl->TblNotes }}</i></td></tr>

@@ -29,7 +29,7 @@
             @empty
             @endforelse
             @if (trim($tableDat["rowCol"]) == '')
-                <td class="sprdFld taR"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
+                <td class="taC"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
                     data-nid="{{ $nID }}" data-nidtxt="{{ $nIDtxt }}" data-row-ind="{{ $j }}"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i></a></div></td>
             @endif
@@ -39,7 +39,7 @@
     @if (trim($tableDat["rowCol"]) == '')
         @for ($j = sizeof($tableDat["rows"]); $j < $node->nodeRow->NodeCharLimit; $j++)
             <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 == 0) rw2 @endif 
-                @if ($j == sizeof($tableDat['rows'])) disRow @else disNon @endif " >
+                @if ($j < sizeof($tableDat['rows'])) disRow @else disNon @endif " >
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
                     value="-3">
                 @forelse ($tableDat["cols"] as $k => $col)
@@ -48,7 +48,7 @@
                 @empty
                 @endforelse
                 @if (trim($tableDat["rowCol"]) == '')
-                    <td class="taR"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
+                    <td class="taC"><div class="pT5"><a href="javascript:;" class="delSprdTblRow" 
                         data-nid="{{ $nID }}" data-nidtxt="{{ $nIDtxt }}" data-row-ind="{{ $j }}"
                         ><i class="fa fa-trash-o" aria-hidden="true"></i></a></div></td>
                 @endif

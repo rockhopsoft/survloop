@@ -28,16 +28,14 @@ class CoreNode {
     public $responseSet   = '';
     public $defaultVal    = '';
     
-    public $nodeRow       = [];
+    public $nodeRow       = NULL;
     public $nodeRowFilled = false;
     public $nodeTierPath  = [];
     
     function __construct($nID = -3, $nRow = [], $nCache = [])
     {
         $this->nodeID = $nID;
-        if (sizeof($nCache) > 0) {
-            return $this->loadNodeCache($nID, $nCache);
-        }
+        if (sizeof($nCache) > 0) return $this->loadNodeCache($nID, $nCache);
         $this->loadNodeRow($nID, $nRow);
         return true;
     }
@@ -53,10 +51,10 @@ class CoreNode {
         return true;
     }
     
-    public function loadNodeRow($nID = -3, $nRow = [])
+    public function loadNodeRow($nID = -3, $nRow = NULL)
     {
-        $this->nodeRow = [];
-        if ($nRow && sizeof($nRow) > 0) {
+        $this->nodeRow = null;
+        if ($nRow) {
             $this->nodeRow = $nRow;
         } elseif ($nID > 0) {
             $this->nodeRow = SLNode::find($nID)
@@ -65,12 +63,12 @@ class CoreNode {
             $this->nodeRow = SLNode::find($this->nodeID)
                 ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeOpts', 'NodeType');
         }
-        if (!$this->nodeRow || sizeof($this->nodeRow) == 0) $this->nodeRow = new SLNode;
+        if (!$this->nodeRow) $this->nodeRow = new SLNode;
         $this->parentID  = $this->nodeRow->NodeParentID;
         $this->parentOrd = $this->nodeRow->NodeParentOrder;
         $this->nodeOpts  = $this->nodeRow->NodeOpts;
         $this->nodeType  = $this->nodeRow->NodeType;
-        if (!isset($this->nodeRow) || sizeof($this->nodeRow) == 0) {
+        if (!isset($this->nodeRow)) {
             $this->nodeRow = new SLNode;
             return false;
         }
@@ -88,11 +86,11 @@ class CoreNode {
         ];
     }
     
-    public function fillNodeRow($nID = -3, $nRow = [])
+    public function fillNodeRow($nID = -3, $nRow = NULL)
     {
         if ($nID <= 0 && $this->nodeID > 0) $nID = $this->nodeID;
         if (!$this->nodeRowFilled) {
-            if (sizeof($nRow) > 0 && isset($nRow->NodeID)) $this->nodeRow = $nRow;
+            if ($nRow) $this->nodeRow = $nRow;
             else $this->nodeRow = SLNode::find($nID);
             $this->initiateNodeRow();
             $this->nodeRowFilled = true;

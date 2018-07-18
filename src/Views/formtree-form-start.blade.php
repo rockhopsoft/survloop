@@ -1,15 +1,4 @@
 <!-- resources/views/vendor/survloop/formtree-form-start.blade.php -->
-@if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')
-<script type="text/javascript"> 
-function chkLostFrame() {
-    if (!document.getElementById('main')) { window.location='{{ $currPage[0] }}'; }
-    else if (document.getElementById('maincontentWrap')) {
-        document.getElementById('maincontentWrap').style.display = 'block';
-    }
-}
-setTimeout("chkLostFrame()", 0);
-</script>
-@endif
 <form id="postNodeForm" name="postNode" method="post" action="{{ $action }}" target="_self"
     @if (sizeof($pageHasUpload) > 0) enctype="multipart/form-data" @endif >
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
@@ -34,8 +23,10 @@ setTimeout("chkLostFrame()", 0);
         <input type="hidden" name="dataLoopRoot" id="dataLoopRootID" value="{{
             intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) }}">
     @endif
+    @if ($GLOBALS["SL"]->REQ->has("noAutoSave"))
+        <input type="hidden" name="noAutoSave" id="noAutoSaveID" value="1">
+    @endif
 @endif
 <input type="hidden" name="popStateUrl" id="popStateUrlID" value="">
 <input type="hidden" name="zoomPref" id="zoomPrefID" value="{{ $zoomPref }}">
 <input type="hidden" name="step" id="stepID" value="next">
-@if ($GLOBALS['SL']->treeRow->TreeType == 'Page') <div id="isPage"></div> @endif

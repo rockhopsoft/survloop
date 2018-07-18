@@ -11,25 +11,32 @@ use App\Models\SLDefinitions;
 class SurvLoopInstaller extends Controller
 {
     
+    // CONVERT THIS AND OTHER PRIME SPOTS TO ->whereRaw(
     public function checkSysInit()
     {
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0" ) );
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
+            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Home', 7);
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0" ) );
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
+            . "AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard', (7*3));
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%7 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0" ) );
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
+            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer', (7*17));
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
+            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 = 0 AND `TreeOpts`%43 > 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Partner', (7*41));
+        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
+            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 = 0" ) );
+        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Staff', (7*43));
         $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0" ) );
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Search', 31);
         $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0" ) );
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard Search', (31*3), 'search');
         $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0" ) );
+            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0 AND `TreeOpts`%41 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer Search', (31*17), 'volun-search');
         $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
             . "AND `TreeOpts`%23 = 0" ) );

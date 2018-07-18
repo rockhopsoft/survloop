@@ -30,6 +30,7 @@
     <div id="nPrintWrap{{ $nID }}" class=" @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif
         @if ($node->isPage()) basicTierPage 
         @elseif ($node->isLoopRoot()) basicTierLoop 
+        @elseif ($node->nodeRow->NodeOpts%89 == 0) slCard
         @else 
             @if ($node->isBranch()) basicTierBranch @endif
             @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0) basicTierData @endif
@@ -70,6 +71,11 @@
                 $GLOBALS['SL']->getLoopSingular(str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet)) 
                 }}</b>
             @else {{ $node->nodeRow->NodeType }} @endif
+            @if ($node->isSpreadTbl() && isset($node->nodeRow->NodeResponseSet) 
+                && trim($node->nodeRow->NodeResponseSet) != '')
+                <span class="slGreenDark mL10"><i class="fa fa-refresh"></i> Add & Edit 
+                    {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}</span>
+            @endif
             @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
             @if ($isAlt)
                 @if ($node->isOneLiner()) <span class="mL10">(Q&A on one line)</span> @endif
@@ -84,34 +90,40 @@
                 <span class="slBlueDark mL10">{{ $nodePromptText }}</span>
             @elseif ($node->isDataManip())
                 <span class="slGreenDark">
-                    {{ $node->nodeRow->NodeDataBranch }}
-                    @if ($node->nodeRow->NodeType == 'Data Manip: New') Record 
-                    @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') Record 
-                    @elseif ($node->nodeRow->NodeType == 'Data Manip: Wrap') Table 
-                    @else Close User Session @endif </span>
+                {{ $node->nodeRow->NodeDataBranch }}
+                @if ($node->nodeRow->NodeType == 'Data Manip: New') Record 
+                @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') Record 
+                @elseif ($node->nodeRow->NodeType == 'Data Manip: Wrap') Table 
+                @else Close User Session @endif
+                {!! $dataManips !!} </span>
             @endif
         @if (trim($conditionList) != '') {!! $conditionList !!} @endif
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false)
-            @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
-                <div class="pull-right taR pL20 pR5 slGreenDark">
-                    @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
-                        @if ($node->nodeRow->NodeParentID <= 0) <b>{{ $GLOBALS['SL']->coreTbl }}</b>
-                        @elseif ($node->isLoopRoot() 
-                            && isset($GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]))
-                            {{ $GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopTable }}
-                        @else {{ $node->nodeRow->NodeDataBranch }} @endif
-                        <i class="fa fa-database fPerc80"></i>
-                        @if (!$node->isDataManip() && trim($node->nodeRow->NodeDataStore) != '' 
-                            && strpos($node->nodeRow->NodeDataStore, ':') !== false)
-                            <br /><span class="opac50"> {!! $node->getTblFldLink($isPrint) !!}</span>
-                        @endif
+            <div class="pull-right taR pL20 pR5 slGreenDark">
+                @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
+                    @if ($node->nodeRow->NodeParentID <= 0)
+                        <b>{{ $GLOBALS['SL']->coreTbl }}</b> <i class="fa fa-database fPerc80"></i><br />
+                    @elseif ($node->isLoopRoot() 
+                        && isset($GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]))
+                        {{ $GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopTable }}
+                        <i class="fa fa-database fPerc80"></i><br />
+                    @elseif (trim($node->nodeRow->NodeDataBranch) != '') 
+                        {{ $node->nodeRow->NodeDataBranch }} <i class="fa fa-database fPerc80"></i><br />
                     @endif
-                </div>
-            @endif
+                @endif
+                @if (!$node->isDataManip() && trim($node->nodeRow->NodeDataStore) != '' 
+                    && strpos($node->nodeRow->NodeDataStore, ':') !== false)
+                    <span class="opac50"> {!! $node->getTblFldLink($isPrint) !!}</span>
+                @endif
+            </div>
         @endif
         </td></tr></table>
         
-        @if ($node->isInstruct() || $node->isInstructRaw()) <div class="nPrompt">{!! $instructPrint !!}</div>
+        @if ($node->isInstruct() || $node->isInstructRaw()) 
+            @if (isset($nodePromptText) && trim($nodePromptText) != '')
+                <span class="fPerc133">{!! strip_tags($nodePromptText) !!}</span>
+            @endif
+            <?php /* <div class="nPrompt">{!! $instructPrint !!}</div> */ ?>
         @elseif ($node->isPage())
             <a target="_blank" class="mT0 mB10 infoOn" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ 
                 $node->extraOpts['page-url'] }}?preview=1"><h2 class="mT0 mB5"><i class="fa fa-file-text-o"></i>
@@ -122,7 +134,7 @@
                 @if (isset($node->extraOpts["meta-title"])) {!! 
                     $node->extraOpts["meta-title"] !!} @endif </h2></a>
             @if (isset($nodePromptText) && trim($nodePromptText) != '')
-                <span class="fPerc133">{{ $nodePromptText }}</span>
+                <span class="fPerc133">{{ strip_tags($nodePromptText) }}</span>
             @endif
         @elseif ($node->isLoopCycle()) <span class="fPerc125">{{ $nodePromptText }}</span>
         @elseif ($node->isLoopSort())
@@ -134,11 +146,6 @@
             <div class="fPerc133">{{ $GLOBALS["SL"]->getEmailSubj($node->nodeRow->NodeDefault) }}</div>
         @elseif (!$node->isLayout() && !$node->isBranch() && !$node->isDataManip())
             <div class="mL10">
-            @if ((!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false)
-                && (!$node->isDataManip() && trim($node->nodeRow->NodeDataStore) != '' 
-                && strpos($node->nodeRow->NodeDataStore, ':') !== false))
-                <div class="pull-right pL5 pR5 slGreenDark opac50">{!! $node->getTblFldLink($isPrint) !!}</div>
-            @endif
             @if (trim($nodePromptText) != '')
                 <span class="fPerc133 @if ($node->isDataManip()) slGreenDark ital @endif
                     @if ($node->isLoopRoot()) slBlueDark @endif ">{{ $nodePromptText }}</span> 

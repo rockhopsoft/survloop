@@ -19,19 +19,15 @@
         @empty
         @endforelse
         
-        @if (isset($rawSettings) && sizeof($rawSettings) > 0)
+        @if ($rawSettings->isNotEmpty())
             <br /><br /><h2>Custom Settings</h2>
             @foreach ($rawSettings as $i => $s)
                 <div class="f22">{{ $s->setting }}</div>
                 <label class="mL20">
-                    <input type="radio" name="setting{{ $i }}" value="Y"
-                        @if ($s->val == 'Y') CHECKED @endif
-                        > Yes
+                    <input type="radio" name="setting{{ $i }}" value="Y" @if ($s->val == 'Y') CHECKED @endif > Yes
                 </label>
                 <label class="mL20">
-                    <input type="radio" name="setting{{ $i }}" value="N"
-                        @if ($s->val == 'N') CHECKED @endif
-                        > No
+                    <input type="radio" name="setting{{ $i }}" value="N" @if ($s->val == 'N') CHECKED @endif > No
                 </label>
             @endforeach
         @endif

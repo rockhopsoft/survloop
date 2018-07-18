@@ -4,7 +4,7 @@
     </{{ $tbl }}>
 @else
     @if ($TblOpts%5 > 0)
-        <{{ $tblAbbr }} @if (isset($rec) && sizeof($rec) > 0) id="{{ $rec->getKey() }}" @endif >
+        <{{ $tblAbbr }} @if (isset($rec) && $rec) id="{{ $rec->getKey() }}" @endif >
     @endif
     @forelse ($tblFlds as $i => $fld)
         @if ($recFlds[$fld->FldID] !== false)

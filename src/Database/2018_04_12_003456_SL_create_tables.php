@@ -285,8 +285,8 @@ class SLCreateTables extends Migration
 		Schema::create('SL_Images', function(Blueprint $table)
 		{
 			$table->increments('ImgID');
-			$table->integer('ImgDatabaseID')->unsigned()->nullable();
-			$table->foreign('ImgDatabaseID')->references('DbID')->on('SL_Databases');
+			$table->integer('ImgDatabase')->unsigned()->nullable();
+			$table->foreign('ImgDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('ImgUserID')->unsigned()->nullable();
 			$table->foreign('ImgUserID')->references('id')->on('users');
 			$table->string('ImgFileOrig')->nullable();
@@ -475,6 +475,14 @@ class SLCreateTables extends Migration
 			$table->string('LogNewName')->nullable();
 			$table->timestamps();
 		});
+		Schema::create('SL_ZipAshrae', function(Blueprint $table)
+		{
+			$table->increments('AshrID');
+			$table->string('AshrZone', 2)->nullable();
+			$table->string('AshrState', 2)->nullable();
+			$table->string('AshrCounty', 50)->nullable();
+			$table->timestamps();
+		});
 		Schema::create('SL_Zips', function(Blueprint $table)
 		{
 			$table->increments('ZipID');
@@ -527,8 +535,9 @@ class SLCreateTables extends Migration
 		Schema::drop('SL_Emailed');
 		Schema::drop('SL_UsersActivity');
 		Schema::drop('SL_LogActions');
+		Schema::drop('SL_ZipAshrae');
 		Schema::drop('SL_Zips');
-	
+		
     }
 }
 

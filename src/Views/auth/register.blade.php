@@ -114,7 +114,9 @@ $v = $surv->custLoop->v;
 
 <div class="nodeHalfGap"></div>
 
-<label><input type="checkbox" name="newVolunteer" value="1" > Volunteer</label>
+@if ($GLOBALS["SL"]->sysHas('volunteers'))
+    <label><input type="checkbox" name="newVolunteer" value="1" > Volunteer</label>
+@endif
 
 <center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
 

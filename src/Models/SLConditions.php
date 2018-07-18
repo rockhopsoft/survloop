@@ -22,15 +22,15 @@ class SLConditions extends Model
         'CondOpts', 
     ];
     
-    public $condVals             = array();
-    public $condFldResponses     = array();
+    public $condVals             = [];
+    public $condFldResponses     = [];
     
     public function loadVals()
     {
         $this->condVals = [];
         $chk = SLConditionsVals::where('CondValCondID', $this->CondID)
             ->get();
-        if ($chk && sizeof($chk) > 0) {
+        if ($chk->isNotEmpty()) {
             foreach ($chk as $v) $this->condVals[] = trim($v->CondValValue);
         }
         
@@ -43,7 +43,7 @@ class SLConditions extends Model
                 }
             }
             foreach ($this->condVals as $j => $val) {
-                $def = $GLOBALS["SL"]->getDefValById(intVal($val));
+                $def = $GLOBALS["SL"]->def->getValById(intVal($val));
                 $found = false;
                 foreach ($this->condFldResponses["vals"] as $k => $valInfo) {
                     if ($valInfo[0] == $val) {

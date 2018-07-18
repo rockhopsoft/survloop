@@ -27,7 +27,7 @@ class SurvLoopTreeXML extends CoreTree
     public function adminNodeEditXML(Request $request, $nodeIN) 
     {
         $this->initExtra($request);
-        $node = array();
+        $node = NULL;
         if ($nodeIN > 0) {
             if (sizeof($this->allNodes) > 0 && isset($this->allNodes[$nodeIN])) {
                 $node = $this->allNodes[$nodeIN];
@@ -36,7 +36,7 @@ class SurvLoopTreeXML extends CoreTree
             }
             $node->fillNodeRow($nodeIN);
         }
-        if ($nodeIN <= 0 || !$node || sizeof($node) == 0) {
+        if ($nodeIN <= 0 || !$node) {
             $node = $this->loadNode();
             $node->nodeRow->NodeParentID    = $GLOBALS["SL"]->REQ->nodeParentID;
             $node->nodeRow->NodeParentOrder = 0;
@@ -89,7 +89,7 @@ class SurvLoopTreeXML extends CoreTree
         ]);
     }
     
-    protected function adminBasicPrintNode($tierNode = array(), $tierDepth = 0)
+    protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
     {
         $tierDepth++;
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {

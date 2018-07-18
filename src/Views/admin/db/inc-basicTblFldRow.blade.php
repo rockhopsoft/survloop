@@ -9,9 +9,9 @@
     <div class="div">
         <div class="col-md-9">
             @if ($tblLinks > 0 && $dbAllowEdits && !$isPrint)
-                <a 
-                @if ($fld->FldTable > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]])) 
-                    href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}"
+                <a @if ($fld->FldTable > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]])) 
+                    href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
+                        }}/{{ $fld->FldName }}"
                 @else
                     href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                 @endif
@@ -99,7 +99,8 @@
                         "help"            => $help, 
                         "edit"            => false, 
                         "chkDis"        => ' disabled ',
-                        "defSet"        => ((strpos($fld->FldValues, 'Def::') !== false || strpos($fld->FldValues, 'DefX::') !== false) 
+                        "defSet"        => ((strpos($fld->FldValues, 'Def::') !== false 
+                            || strpos($fld->FldValues, 'DefX::') !== false) 
                             ? trim(str_replace('Def::', '', str_replace('DefX::', '', $fld->FldValues))) : '')
                     ])->render() !!}
                 </div>

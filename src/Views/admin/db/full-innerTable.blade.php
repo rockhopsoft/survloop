@@ -34,17 +34,14 @@
                         @if (isset($tblForeigns[$tbl->TblID]))
                             <div class="pull-right taR"><i>Incoming:</i> {!! $tblForeigns[$tbl->TblID] !!}</div>
                         @endif
-                        <div class="label label-primary mR5"><i class="fa fa-link"></i> {{ $tbl->TblNumForeignIn }} 
+                        <i class="fa fa-link"></i> {{ $tbl->TblNumForeignIn }} 
                             @if ($tbl->TblNumForeignIn != 1) Tables @else Table @endif
                             with Foreign Key{{ (($tbl->TblNumForeignIn != 1) ? 's' : '') }}
-                        </div>
                     @endif
                     @if (isset($tblRules[$tbl->TblID]))
                         @forelse ($tblRules[$tbl->TblID] as $rule)
-                            <div class="label label-primary mR5">
-                                <a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" target="_blank" 
-                                    class="slGrey"><i class="fa fa-university"></i> {{ $rule->RuleStatement }}</a>
-                            </div>
+                            <a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" target="_blank" 
+                                class="slGrey"><i class="fa fa-university"></i> {{ $rule->RuleStatement }}</a>
                         @empty
                         @endforelse
                     @endif
@@ -54,15 +51,11 @@
                         <div class="label label-primary">Type: {{ $tbl->TblType }}</div>
                         <div class="label label-primary">{{ $tbl->TblNumFields }} Fields Total</div>
                         @if ($tbl->TblNumForeignKeys > 0)
-                            <div class="label label-primary">
-                                {{ $tbl->TblNumForeignKeys }} Outgoing 
-                                @if ($tbl->TblNumForeignKeys == 1) Key @else Keys @endif 
-                            </div>
+                            {{ $tbl->TblNumForeignKeys }} Outgoing 
+                            @if ($tbl->TblNumForeignKeys == 1) Key @else Keys @endif 
                         @endif
                     @endif
-                    
                     {!! $basicTblFlds[$tbl->TblID] !!}
-                    
                 </div>
             </div>
         @endif

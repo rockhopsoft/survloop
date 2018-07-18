@@ -9,7 +9,7 @@
         <h2><i class="fa fa-newspaper-o mR5"></i> Footer Navigation Menu</h2>
         <span class="slGrey">...soon...</span>
         <div class="p20"></div>
-        <h2><i class="fa fa-key"></i> Admin Navigation Menu</h2>
+        <h2><i class="fa fa-eye"></i> Admin Navigation Menu</h2>
         <span class="slGrey">...soon...</span>
         <div class="p20"></div>
     </div>

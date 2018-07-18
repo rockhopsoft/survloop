@@ -1,33 +1,36 @@
 <!-- resources/views/vendor/survloop/inc-var-dump.blade.php -->
-
 <a name="debug"></a><center>
-<div class="fC taC">
-    <a id="debugPopBtn" class="slBlueFaint mR20" href="#debug"><i class="fa fa-gear"></i></a>
-    <a id="debugPopBtn2" class="slBlueFaint" href="#debug"><i class="fa fa-cogs"></i></a>
+<div class="fC taC opac50">
+    <a id="hidivBtnDbgPop" class="hidivBtn" href="javascript:;"><i class="fa fa-gear"></i></a>
+    <a id="hidivBtnDbgPop2" class="hidivBtn" href="javascript:;"><i class="fa fa-cogs"></i></a>
 </div>
-<div id="debugPop" class="brdDrk p20 mB10 round20 w100 disNon taL">
+<div id="hidivDbgPop">
     <center>
     <div class="f22 bld">lastNode: {{ $lastNode }} -> currNode: {{ $currNode }}</div>
-    <div class="f14 pL10 pB20"><i>coreID: {{ $coreID }}, @if ($user) userID: {{ $user->id }}, {{ $user->name }} @endif , 
-        @if (isset($dataSets["Complaints"])) {{ $dataSets["Complaints"][0]->ComAwardMedallion }} @endif
+    <div class="f14 pL10 pB20"><i>coreID: {{ $coreID }}, @if ($user && isset($user->id)) userID: {{ $user->id }}, 
+        @if (isset($user->name)) {{ $user->name }} @endif @endif , 
+        @if (isset($dataSets["Complaints"]) && $dataSets["Complaints"][0]) 
+            {{ $dataSets["Complaints"][0]->ComAwardMedallion }} @endif
         </i></div>
     </center>
     <div class="row">
         <div class="col-md-6">
             <table border=0 class="table table-striped" >
             <tr><th>SessData Totals</th><th><i>IDs</i></th></tr>
+            <?php /*
             @forelse ($dataSets as $tbl => $rows)
-                @if (sizeof($rows) > 0)
+                @if (($rows && is_array($rows) && sizeof($rows) > 0) || $rows->isNotEmpty())
                     <tr>
                     <td><nobr>{{ $tbl }}</nobr></td>
                     <td><i>
                     @foreach ($rows as $ind => $row)
-                        @if ($ind > 0) , @endif {{ $row->getKey() }} 
+                        @if ($row) @if ($ind > 0) , @endif {{ $row->getKey() }} @endif
                     @endforeach
                     </i></td></tr>
                 @endif
             @empty
             @endforelse
+            */ ?>
             </table>
             POST/GET Requests:<pre>{!! $requestDeets !!}</pre>
         </div>
@@ -47,31 +50,12 @@
             @empty
             @endforelse
             </table>
-            <table border=0 class="table table-striped" >
-            <tr><th colspan=2 >dataBranches:</th></tr>
-            @forelse ($currNodeDataBranch as $i => $branch)
-                <tr><td>
-                    @for ($j = 0; $j <= $i; $j++)
-                        - 
-                    @endfor
-                    <a id="dataB{{ $i }}" class="dataB mL5 f10">{{ $branch["branch"] }}</a>
-                    {{ $branch["loop"] }}
-                </td><td>
-                    {{ $branch["itemID"] }}
-                </td></tr>
-                <tr id="dataBranch{{ $i }}" class="disNon"><td colspan=2 >
-                    <div class="prevBox"><pre class="f8 p0 m0">
-                        {{ print_r($sessData->getRowById($branch["branch"], $branch["itemID"])) }}
-                    </pre></div>
-                </td></tr>
-            @empty
-            @endforelse
-            </table>
+            {!! view('vendor.survloop.inc-var-dump-branches', [ "dataBranches" => $currNodeDataBranch ])->render() !!}
         </div>
     </div>
 </div>
 </center> 
-<div id="debugPop2" class="brdDrk p20 mB10 round20 disNon">
+<div id="hidivDbgPop2">
     <br />kidMap:
     <div class="row">
         <div class="col-md-6">

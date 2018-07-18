@@ -39,11 +39,11 @@ class SurvLoopImages
     {
         $this->scanNewUploads();
         $this->imgs = [];
-        $imgs = SLImages::where('ImgDatabaseID', 1)
+        $imgs = SLImages::where('ImgDatabase', 1)
             ->orderBy('created_at', 'desc')
             ->orderBy('ImgFileLoc', 'asc')
             ->get();
-        if ($imgs && sizeof($imgs) > 0) {
+        if ($imgs->isNotEmpty()) {
             foreach ($imgs as $i => $img) {
                 if ((!$onlyImgs || in_array($img->ImgType, ['jpg', 'png', 'gif'])) && $this->chkImgAllow($img)) {
                     $this->imgs[] = $img;
@@ -58,7 +58,7 @@ class SurvLoopImages
         $allow = false;
         if ($img && isset($img->ImgID)) {
             if (!isset($img->ImgUserID) || intVal($img->ImgUserID) <= 0) {
-                if ($img->ImgDatabaseID == 1) {
+                if ($img->ImgDatabase == 1) {
                     $allow = true;
                 }
                 // might need more checks here, but for now, allow
@@ -94,10 +94,11 @@ class SurvLoopImages
             foreach ($fileMap as $i => $file) {
                 if (is_array($file)) $this->scanNewUpInner($fileMap[$i], $folder, (1+$depth));
                 else {
-                    $img = SLImages::where('ImgFileLoc', $file)->first();
+                    $img = SLImages::where('ImgFileLoc', $file)
+                        ->first();
                     if (!$img || !isset($img->ImgFileLoc)) {
                         $img = new SLImages;
-                        $img->ImgDatabaseID   = 1;
+                        $img->ImgDatabase     = 1;
                         $img->ImgUserID       = 0;
                         $img->ImgFileOrig     = '';
                         $img->ImgFileLoc      = $file;
@@ -132,9 +133,9 @@ class SurvLoopImages
     
     public function chkAllAnalized()
     {
-        $imgs = SLImages::where('ImgDatabaseID', $GLOBALS["SL"]->dbID)
+        $imgs = SLImages::where('ImgDatabase', $GLOBALS["SL"]->dbID)
             ->get();
-        if ($imgs && sizeof($imgs) > 0) {
+        if ($imgs->isNotEmpty()) {
             foreach ($imgs as $i => $img) {
                 if (!isset($img->ImgType) || trim($img->ImgType) == '') { // update to newest added field
                     $this->analizeImg($img);
@@ -160,7 +161,7 @@ class SurvLoopImages
     {
         $this->chkImgSet($nID, $dbID);
         $img = SLImages::where('ImgID', $imgID)
-            ->where('ImgDatabaseID', $this->dbID)
+            ->where('ImgDatabase', $this->dbID)
             ->first();
         $urlPrint = $img->ImgFullFilename;
         if (strpos($img->ImgFullFilename, '/') === 0) $urlPrint = $GLOBALS["SL"]->sysOpts["app-url"] . $urlPrint;
@@ -183,7 +184,7 @@ class SurvLoopImages
     {
         $this->chkImgSet($nID, $dbID);
         $img = SLImages::where('ImgID', $imgID)
-            ->where('ImgDatabaseID', $this->dbID)
+            ->where('ImgDatabase', $this->dbID)
             ->first();
         $img->ImgTitle = (($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Name')) 
             ? trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'Name')) : '');
@@ -200,11 +201,11 @@ class SurvLoopImages
         $this->chkImgSet($nID, $dbID);
         $img = new SLImages;
         if ($GLOBALS["SL"]->REQ->hasFile('imgFile' . $nID . '')) { // file upload
-            $img->ImgDatabaseID = $this->dbID;
-            $img->ImgNodeID = $nID;
-            $img->ImgUserID = ((Auth::user()) ? Auth::user()->id : 0);
-            $img->ImgFileLoc = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->getClientOriginalName();
-            $img->ImgFileLoc = str_replace(' ', '_', $img->ImgFileLoc);
+            $img->ImgDatabase = $this->dbID;
+            $img->ImgNodeID   = $nID;
+            $img->ImgUserID   = ((Auth::user()) ? Auth::user()->id : 0);
+            $img->ImgFileLoc  = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->getClientOriginalName();
+            $img->ImgFileLoc  = str_replace(' ', '_', $img->ImgFileLoc);
             $extension = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->getClientOriginalExtension();
             $mimetype  = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->getMimeType();
             $size      = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->getSize();

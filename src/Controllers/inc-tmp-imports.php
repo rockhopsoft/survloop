@@ -1,13 +1,13 @@
 /*
 $zips = SLZips::orderBy('ZipZip', 'asc')->get();
-if ($zips && sizeof($zips) > 0) {
+if ($zips->isNotEmpty()) {
     $founds = [0, 0, []];
     foreach ($zips as $z) {
         if (!in_array($z->ZipState, ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'])) {
             $chk = SLZipAshrae::where('AshrState', $z->ZipState)
                 ->where('AshrCounty', $z->ZipCounty)
                 ->get();
-            if (!$chk || sizeof($chk) == 0) {
+            if ($chk->isEmpty()) {
                 $chk = SLZipAshrae::where('AshrState', $z->ZipState)
                     ->where('AshrCounty', $z->ZipCounty . ' PARISH')
                     ->first();
@@ -28,8 +28,10 @@ if ($zips && sizeof($zips) > 0) {
     }
     if (sizeof($founds[2]) > 0) {
         foreach ($founds[2] as $state => $arr) {
-            $zipStates = SLZips::where('ZipState', $state)->orderBy('ZipCounty', 'asc')->get();
-            if ($zipStates && sizeof($zipStates) > 0) {
+            $zipStates = SLZips::where('ZipState', $state)
+                ->orderBy('ZipCounty', 'asc')
+                ->get();
+            if ($zipStates->isNotEmpty()) {
                 foreach ($zipStates as $st) {
                     if (strpos($founds[2][$state][1], ',' . $st->ZipCounty . ',') === false) {
                         $founds[2][$state][1] .= ',' . $st->ZipCounty . ',';

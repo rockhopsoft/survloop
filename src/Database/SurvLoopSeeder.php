@@ -453,6 +453,17 @@ class SurvLoopSeeder extends Seeder
 			'TblNumForeignKeys' => '3'
 		]);
 		DB::table('SL_Tables')->insert([
+			'TblID' => 39,
+			'TblDatabase' => '3',
+			'TblAbbr' => 'Ashr',
+			'TblName' => 'ZipAshrae',
+			'TblEng' => 'ASHRAE Climate Zones',
+			'TblDesc' => 'Each record represents one County and State in the United States to map it to its ASHRAE Climate Zone.',
+			'TblType' => 'Linking',
+			'TblGroup' => 'Lookups',
+			'TblNumFields' => '3'
+		]);
+		DB::table('SL_Tables')->insert([
 			'TblID' => 38,
 			'TblDatabase' => '3',
 			'TblAbbr' => 'Zip',
@@ -4879,7 +4890,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldSpecSource' => '0',
-			'FldName' => 'DatabaseID',
+			'FldName' => 'Database',
 			'FldEng' => 'Database ID',
 			'FldDesc' => 'Indicates the unique Database ID number which owns this media item.',
 			'FldForeignTable' => '4',
@@ -5259,6 +5270,63 @@ class SurvLoopSeeder extends Seeder
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
 			'FldDataLength' => '0',
+			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 277,
+			'FldDatabase' => '3',
+			'FldTable' => '39',
+			'FldSpecSource' => '0',
+			'FldName' => 'Zone',
+			'FldEng' => 'ASHRAE Climate Zone',
+			'FldDesc' => 'Indicates the ASHRAE Climate Zone where this record\'s county and state are located.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldValues' => '1A;2A;2B;3A;3B;3C;4A;4B;4C;5A;5B;6A;6B;7A;7B',
+			'FldDataLength' => '2',
+			'FldCharSupport' => ',Letters,Numbers,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 278,
+			'FldDatabase' => '3',
+			'FldTable' => '39',
+			'FldOrd' => '1',
+			'FldSpecSource' => '0',
+			'FldName' => 'State',
+			'FldEng' => 'State',
+			'FldDesc' => 'Indicates the state where this county is located.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '2',
+			'FldCharSupport' => ',Letters,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 279,
+			'FldDatabase' => '3',
+			'FldTable' => '39',
+			'FldOrd' => '2',
+			'FldSpecSource' => '0',
+			'FldName' => 'County',
+			'FldEng' => 'County',
+			'FldDesc' => 'Indicates the county where this record is located.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '50',
 			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',

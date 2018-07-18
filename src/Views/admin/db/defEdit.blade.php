@@ -33,7 +33,7 @@
         <select id="defSubsetID" name="defSubset" autocomplete="off" class="form-control"
             onChange="return chkSubset(this.value);" >
             <option value="" @if ($def->DefSubset == '') SELECTED @endif ></option><option value="_">New Set</option>
-            @if ($subList && sizeof($subList) > 0)
+            @if ($subList->isNotEmpty())
                 @foreach ($subList as $set) {
                     <option value="{{ $set->DefSubset }}" @if ($set->DefSubset == $def->DefSubset) SELECTED @endif 
                     	>{{ $set->DefSubset }}</option>

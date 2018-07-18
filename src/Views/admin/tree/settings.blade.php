@@ -48,12 +48,24 @@
         
         <label class="w100 p10 fPerc133"><input type="checkbox" name="opt3" value="3" autocomplete="off" 
             @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif >
-            <i class="fa fa-key mL10 mR5" aria-hidden="true"></i> 
+            <i class="fa fa-eye mL10 mR5" aria-hidden="true"></i> 
             Admin-Only {{ $GLOBALS['SL']->treeRow->TreeType }}</label>
-        <label class="w100 p10 fPerc133"><input type="checkbox" name="opt17" value="17" autocomplete="off" 
-            @if ($GLOBALS['SL']->treeRow->TreeOpts%17 == 0) CHECKED @endif >
-            <i class="fa fa-hand-rock-o mL10 mR5" aria-hidden="true"></i> 
-            Volunteer {{ $GLOBALS['SL']->treeRow->TreeType }}</label>
+        <label class="w100 p10 fPerc133"><input type="checkbox" name="opt43" value="43" autocomplete="off" 
+            @if ($GLOBALS['SL']->treeRow->TreeOpts%43 == 0) CHECKED @endif >
+            <i class="fa fa-key mL10 mR5" aria-hidden="true"></i> 
+            Staff {{ $GLOBALS['SL']->treeRow->TreeType }}</label>
+        @if ($GLOBALS["SL"]->sysHas('partners'))
+            <label class="w100 p10 fPerc133"><input type="checkbox" name="opt41" value="41" autocomplete="off" 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%41 == 0) CHECKED @endif >
+                <i class="fa fa-university mL10 mR5" aria-hidden="true"></i> 
+                Partner {{ $GLOBALS['SL']->treeRow->TreeType }}</label>
+        @endif
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
+            <label class="w100 p10 fPerc133"><input type="checkbox" name="opt17" value="17" autocomplete="off" 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%17 == 0) CHECKED @endif >
+                <i class="fa fa-hand-rock-o mL10 mR5" aria-hidden="true"></i> 
+                Volunteer {{ $GLOBALS['SL']->treeRow->TreeType }}</label>
+        @endif
             
         @if ($GLOBALS['SL']->treeRow->TreeType == 'Page') 
             <div class="mB5"><br /><u><b>Special Page Types</b></u></div>
@@ -76,10 +88,16 @@
         @else
             <div class="mB5"><br /><u><b>Survey Options</b></u></div>
             <label class="w100 p10 fPerc133"><input type="checkbox" name="opt11" value="11" autocomplete="off" 
-                @if ($GLOBALS['SL']->treeRow->TreeOpts%11 == 0) CHECKED @endif > 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%11 == 0) CHECKED @endif >
                 <span class="mL10">Allow Record Edits</span></label>
+            <label class="w100 p10 fPerc133"><input type="checkbox" name="opt47" value="47" autocomplete="off" 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%47 == 0) CHECKED @endif >
+                <span class="mL10">Uses Public ID#</span></label>
+            <label class="w100 p10 fPerc133"><input type="checkbox" name="opt37" value="37" autocomplete="off" 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%37 == 0) CHECKED @endif >
+                <span class="mL10">Survey Navigation Menu</span></label>
             <label class="w100 p10 fPerc133"><input type="checkbox" name="opt23" value="23" autocomplete="off" 
-                @if ($GLOBALS['SL']->treeRow->TreeOpts%23 == 0) CHECKED @endif > 
+                @if ($GLOBALS['SL']->treeRow->TreeOpts%23 == 0) CHECKED @endif >
                 <span class="mL10">Wider Page Width</span></label>
         @endif
         

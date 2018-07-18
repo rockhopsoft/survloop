@@ -20,7 +20,7 @@
         }
     @endif
     @if (isset($node->colors["blockImg"]) && trim($node->colors["blockImg"]) != '')
-        #blockWrap{{ $nIDtxt }} { 
+        #blockWrap{{ $nIDtxt }} {
             background: url('{{ $node->colors["blockImg"] }}') @if (isset($node->colors["blockBG"]) 
                 && trim($node->colors["blockBG"]) != '') {{ $node->colors["blockBG"] }} @endif ;
             @if (isset($node->colors["blockImgType"]) && trim($node->colors["blockImgType"]) == 'tiles')
@@ -33,8 +33,10 @@
                 -o-background-size: cover;
                 background-size: cover;
             @endif
-            @if (isset($node->colors["blockImgFix"]) && trim($node->colors["blockImgFix"]) == 'Y') 
+            @if (isset($node->colors["blockImgFix"]) && in_array($node->colors["blockImgFix"], ['Y', 'P'])) 
                 background-attachment: fixed;
+            @else
+                background-attachment: scroll;
             @endif
         }
         #blockWrap{{ $nIDtxt }} .nodeWrap, #blockWrap{{ $nIDtxt }} .nodeWrapError { 

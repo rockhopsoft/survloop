@@ -1,7 +1,7 @@
 /* generated from resources/views/vendor/survloop/styles-css-1.blade.php */
 
 html, body {
-    height: 100%
+    height: 100%;
 }
 body, p, div, table tr td, table tr th, input, textarea, select {
     font-family: {!! $css["font-main"] !!};
@@ -20,9 +20,6 @@ body, .slBg {
     background: {!! $css["color-main-bg"] !!};
 }
 
-body, p, .slTxt {
-    color: {!! $css["color-main-text"] !!};
-}
 body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
     line-height: 1.42857143;
 }

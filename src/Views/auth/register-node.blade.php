@@ -76,9 +76,9 @@
 <div id="node002" class="nodeWrap">
     <div id="nLabel002" class="nPrompt"><label for="password">
         Password <span class="red">*required, 8 character minimum</span>
-        <span id="passStrng" class="mL20 red"></span>
     </label></div>
     <div class="nFld">
+        <div class="relDiv w100"><span id="passStrng" class="mL20 red"></span></div>
         <input id="password" name="password" type="password" class="form-control">
     </div>
 </div>
@@ -97,7 +97,7 @@
     </div> <!-- end div hiding form from anonymous users or those with unresolved charges -->
 @endif
 
-<script type="text/javascript" src="zxcvbn-async.js">
+<script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
 </script>
 <script type="text/javascript"> $(document).ready(function(){
 {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}

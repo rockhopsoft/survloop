@@ -1,5 +1,5 @@
 <!-- generated from resources/views/vendor/survloop/inc-tbl-head-sort.blade.php -->
-@if (isset($srtVal) && trim($srtVal) != '' && isset($sort) && sizeof($sort) == 2)
+@if (isset($srtVal) && trim($srtVal) != '' && isset($sort) && is_array($sort) && sizeof($sort) == 2)
     <a href="javascript:;" class="sortScoresBtn" data-sort-type="{{ $srtVal }}" ><nobr>
         {!! $eng !!}
     @if ($srtVal == $sort[0])

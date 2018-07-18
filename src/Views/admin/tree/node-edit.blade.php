@@ -124,11 +124,15 @@
         <div id="dataPrintType" class="@if ($node->isDataPrint()) disBlo @else disNon @endif ">
             <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" autocomplete="off" 
                 class="form-control input-lg slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
-                <option value="Data Print Block" @if (isset($node->nodeRow->NodeType) 
-                    && $node->nodeRow->NodeType == 'Data Print Block') SELECTED @endif >Block of Data Rows</option>
                 <option value="Data Print Row" @if (!isset($node->nodeRow->NodeType) 
                     || in_array(trim($node->nodeRow->NodeType), ['', 'Data Print Row', 'Instructions'])) 
                     SELECTED @endif >Data Block Row</option>
+                <option value="Data Print Block" @if (isset($node->nodeRow->NodeType) 
+                    && $node->nodeRow->NodeType == 'Data Print Block') SELECTED @endif >One Block of Data Rows</option>
+                <option value="Data Print Columns" @if (isset($node->nodeRow->NodeType) 
+                    && $node->nodeRow->NodeType == 'Data Print Columns') SELECTED @endif >Columns of Data Rows</option>
+                <option value="Print Vert Progress" @if (isset($node->nodeRow->NodeType) 
+                    && $node->nodeRow->NodeType == 'Print Vert Progress') SELECTED @endif >Column of Progress</option>
                 <option value="Data Print" @if (isset($node->nodeRow->NodeType) 
                     && $node->nodeRow->NodeType == 'Data Print') SELECTED @endif >Plain Data Printout</option>
             </select></div>
@@ -137,6 +141,12 @@
             <select name="nodeSurvWidgetType" id="nodeSurvWidgetTypeID" autocomplete="off" 
                 class="form-control input-lg w100" onChange="return changeWidgetType();" >
                 
+                <option value="Record Full" 
+                    @if ($node->nodeType == 'Record Full') SELECTED @endif 
+                    >Record Full (Default User Privileges)</option>
+                <option value="Record Full Public" 
+                    @if ($node->nodeType == 'Record Full Public') SELECTED @endif 
+                    >Record Full Public</option>
                 @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
                 
                     <option value="Search" @if ($node->nodeType == 'Search') SELECTED @endif 
@@ -150,9 +160,6 @@
                     <option value="Record Previews" 
                         @if ($node->nodeType == 'Record Previews') SELECTED @endif 
                         >Record Previews</option>
-                    <option value="Record Full" 
-                        @if ($node->nodeType == 'Record Full') SELECTED @endif 
-                        >Record Full</option>
                     <option value="Plot Graph" @if ($node->nodeType == 'Plot Graph') SELECTED @endif 
                         >Plot Graph</option>
                     <option value="Line Graph" @if ($node->nodeType == 'Line Graph') SELECTED @endif 
@@ -169,6 +176,9 @@
                     <option value="Member Profile Basics" 
                         @if ($node->nodeType == 'Member Profile Basics') SELECTED @endif 
                         >Member Profile Basics</option>
+                    <option value="MFA Dialogue" 
+                        @if ($node->nodeType == 'MFA Dialogue') SELECTED @endif 
+                        >Token Access Dialogue</option>
                         
                 @endif
                 
@@ -279,7 +289,8 @@
                     <div class="row mB20">
                         <div class="col-md-6">
                             <label id="dataPrintPull" class="w100 
-                                @if ($node->nodeType == 'Data Print Block') disNon @else disBlo @endif ">
+                                @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
+                                    'Print Vert Progress'])) disNon @else disBlo @endif ">
                                 <h3 class="m0 slGreenDark">Pull User Response</h3>
                                 <div class="nFld m0"><select name="nodeDataPull" class="form-control input-lg w100" 
                                     autocomplete="off" >
@@ -307,7 +318,8 @@
                         </div>
                         <div class="col-md-6">
                             <label id="dataPrintTitle" class="w100 
-                                @if ($node->nodeType == 'Data Print Block') disBlo @else disNon @endif ">
+                                @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
+                                    'Print Vert Progress'])) disBlo @else disNon @endif ">
                                 <h3 class="m0 slGreenDark">Title of Data Block</h3>
                                 <div class="nFld m0"><input type="text" name="nodeDataBlcTitle" autocomplete="off" 
                                     class="form-control input-lg w100" @if (isset($node->nodeRow->NodePromptText)) 
@@ -550,40 +562,59 @@
                     {!! view('vendor.survloop.admin.seo-meta-editor', [ "currMeta" => $currMeta ])->render() !!}
                     <div id="hasPageOpts" class="row nFld @if ($node->isPage()) disBlo @else disNon @endif ">
                         <div class="col-md-4">
-                            @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+                        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+                            <label class="disBlo mT20">
+                                <h4><input type="checkbox" name="homepage" id="homepageID" value="7" 
+                                @if ($GLOBALS['SL']->treeRow->TreeOpts%7 == 0) CHECKED @endif autocomplete="off">
+                                <i class="fa fa-star mL10" aria-hidden="true"></i> Website Home Page</h4>
+                            </label>
+                            <label class="disBlo mT20">
+                                <h4><input type="checkbox" name="adminPage" id="adminPageID" value="3" 
+                                @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif autocomplete="off">
+                                <i class="fa fa-eye mL10" aria-hidden="true"></i> Admin-Only Page</h4>
+                            </label>
+                            <label class="disBlo mT20">
+                                <h4><input type="checkbox" name="staffPage" id="staffPageID" value="43" 
+                                @if ($GLOBALS['SL']->treeRow->TreeOpts%43 == 0) CHECKED @endif autocomplete="off">
+                                <i class="fa fa-key mL10" aria-hidden="true"></i> Staff Page</h4>
+                            </label>
+                            @if ($GLOBALS["SL"]->sysHas('partners'))
                                 <label class="disBlo mT20">
-                                    <h4><input type="checkbox" name="homepage" id="homepageID" value="7" 
-                                    @if ($GLOBALS['SL']->treeRow->TreeOpts%7 == 0) CHECKED @endif autocomplete="off">
-                                    <i class="fa fa-star mL10" aria-hidden="true"></i> Website Home Page</h4>
+                                    <h4><input type="checkbox" name="partnPage" id="partnPageID" value="41" 
+                                    @if ($GLOBALS['SL']->treeRow->TreeOpts%41 == 0) CHECKED @endif autocomplete="off">
+                                    <i class="fa fa-university mL10" aria-hidden="true"></i> Partner Page</h4>
                                 </label>
-                                <label class="disBlo mT20">
-                                    <h4><input type="checkbox" name="adminPage" id="adminPageID" value="3" 
-                                    @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif autocomplete="off">
-                                    <i class="fa fa-key mL10" aria-hidden="true"></i> Admin-Only Page</h4>
-                                </label>
-                                <label class="disBlo mT20"><h4 class="m0">
-                                    <input type="checkbox" name="reportPage" id="reportPageID" value="13" 
-                                    @if ($GLOBALS['SL']->treeRow->TreeOpts%13 == 0) CHECKED @endif autocomplete="off"
-                                    onClick="if (this.checked) { 
-                                        document.getElementById('reportPageTreeID').style.display='block'; 
-                                    } else { document.getElementById('reportPageTreeID').style.display='none'; }">
-                                    <i class="fa fa-list-alt" aria-hidden="true"></i> Report for Form Tree</h4>
-                                    <select name="reportPageTree" id="reportPageTreeID" class="form-control mT5" 
-                                        autocomplete="off">{!! $GLOBALS["SL"]->allTreeDropOpts(
-                                            (($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) 
-                                                ? $node->nodeRow->NodeResponseSet : -3)) !!}
-                                    </select>
-                                </label>
-                            @else
-                                <label class="disBlo red mT20">
-                                    <input type="checkbox" name="opts29" id="opts29ID" value="29" 
-                                        @if ($node->nodeRow->NodeOpts%29 == 0) CHECKED @endif autocomplete="off">
-                                    <i class="fa fa-sign-out mL10" aria-hidden="true"></i> Exit Page 
-                                    <div class="fPerc80 slGrey"><i>(no Next button)</i></div></label>
-                                <label class="disBlo mT20"><input type="checkbox" name="opts59" id="opts59ID" value="59" 
-                                    @if ($node->nodeRow->NodeOpts%59 == 0) CHECKED @endif autocomplete="off">
-                                    Hide Progress Bar</label>
                             @endif
+                            @if ($GLOBALS["SL"]->sysHas('volunteers'))
+                                <label class="disBlo mT20">
+                                    <h4><input type="checkbox" name="volunPage" id="volunPageID" value="17" 
+                                    @if ($GLOBALS['SL']->treeRow->TreeOpts%17 == 0) CHECKED @endif autocomplete="off">
+                                    <i class="fa fa-hand-rock-o mL10" aria-hidden="true"></i> Volunteer Page</h4>
+                                </label>
+                            @endif
+                            <label class="disBlo mT20"><h4 class="m0">
+                                <input type="checkbox" name="reportPage" id="reportPageID" value="13" 
+                                @if ($GLOBALS['SL']->treeRow->TreeOpts%13 == 0) CHECKED @endif autocomplete="off"
+                                onClick="if (this.checked) { 
+                                    document.getElementById('reportPageTreeID').style.display='block'; 
+                                } else { document.getElementById('reportPageTreeID').style.display='none'; }">
+                                <i class="fa fa-list-alt" aria-hidden="true"></i> Report for Form Tree</h4>
+                                <select name="reportPageTree" id="reportPageTreeID" class="form-control mT5" 
+                                    autocomplete="off">{!! $GLOBALS["SL"]->allTreeDropOpts(
+                                        (($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) 
+                                            ? $node->nodeRow->NodeResponseSet : -3)) !!}
+                                </select>
+                            </label>
+                        @else
+                            <label class="disBlo red mT20">
+                                <input type="checkbox" name="opts29" id="opts29ID" value="29" 
+                                    @if ($node->nodeRow->NodeOpts%29 == 0) CHECKED @endif autocomplete="off">
+                                <i class="fa fa-sign-out mL10" aria-hidden="true"></i> Exit Page 
+                                <div class="fPerc80 slGrey"><i>(no Next button)</i></div></label>
+                            <label class="disBlo mT20"><input type="checkbox" name="opts59" id="opts59ID" value="59" 
+                                @if ($node->nodeRow->NodeOpts%59 == 0) CHECKED @endif autocomplete="off">
+                                Hide Progress Bar</label>
+                        @endif
                         </div>
                         <div class="col-md-8">
                             <div class="nFld w100">
@@ -1199,6 +1230,24 @@
                                             value="{{ $node->nodeRow->NodeCharLimit }}" @endif >
                                     </div>
                                 </label>
+                                <label class="col-md-6">
+                                    <h4 class="m0">Add & Edit Loop Rows:</h4> 
+                                    <div class="nFld">
+                                        <select name="spreadTblLoop" id="spreadTblLoopID" autocomplete="off"
+                                            class="form-control input-lg" >
+                                            <option @if (!isset($node->nodeRow->NodeResponseSet)
+                                                || trim($node->nodeRow->NodeResponseSet) == '') SELECTED @endif
+                                                value="" > Select Loop... </option>
+                                            @forelse ($GLOBALS['SL']->dataLoops as $plural => $loop)
+                                                <option @if (isset($node->nodeRow->NodeResponseSet)
+                                                        && $node->nodeRow->NodeResponseSet == ('LoopItems::' . $plural))
+                                                        SELECTED @endif 
+                                                    value="{{ $plural }}" >{{ $plural }}</option>
+                                            @empty
+                                            @endforelse
+                                        </select>
+                                    </div>
+                                </label>
                             </div>
                             <div id="spreadTblDefs" class="row mT10 
                                 @if ($node->hasResponseOpts()) disBlo @else disNon @endif ">
@@ -1377,7 +1426,7 @@
                                             </label>
                                             <div id="kidFork{{ $r }}" class="mL5 
                                                 @if ($node->indexShowsKid($r)) disIn @else disNon @endif ">
-                                                @if (isset($childNodes) && sizeof($childNodes) > 0)
+                                                @if ($childNodes && sizeof($childNodes) > 0)
                                                     @if (sizeof($childNodes) == 1)
                                                         #{{ $childNodes[0]->NodeID }}
                                                         <input type="hidden" name="kidForkSel{{ $r }}" 
@@ -1573,16 +1622,35 @@
                                                 && $node->colors["blockImgType"] == 'tiles') CHECKED @endif 
                                                 autocomplete="off" > Tiled Image
                                     </label></div>
-                                    <label class="disBlo mT10 mL10 mR10">
-                                        <input type="checkbox" name="blockImgFix" id="blockImgFixID" 
+                                    <div class="p5"></div>
+                                    <div class="disIn mL10 mR10"><label class="disIn">
+                                        <input type="radio" name="blockImgFix" id="blockImgFixN" 
+                                            value="N" class="mR5" onClick="return checkPageBlock();"
+                                            @if (!isset($node->colors["blockImgFix"]) 
+                                                || $node->colors["blockImgFix"] == 'N') CHECKED @endif 
+                                                autocomplete="off" > Normal
+                                    </label></div>
+                                    <div class="disIn mL10 mR10"><label class="disIn">
+                                        <input type="radio" name="blockImgFix" id="blockImgFixY" 
                                             value="Y" class="mR5" onClick="return checkPageBlock();"
                                             @if (isset($node->colors["blockImgFix"]) 
                                                 && $node->colors["blockImgFix"] == 'Y') CHECKED @endif 
                                                 autocomplete="off" > Fixed Position
-                                    </label>
+                                    </label></div>
+                                    <div class="disIn mL10 mR10"><label class="disIn">
+                                        <input type="radio" name="blockImgFix" id="blockImgFixP" 
+                                            value="P" class="mR5" onClick="return checkPageBlock();"
+                                            @if (isset($node->colors["blockImgFix"]) 
+                                                && $node->colors["blockImgFix"] == 'P') CHECKED @endif 
+                                                autocomplete="off" > Parrallax Position
+                                    </label></div>
                                 </div>
                             </div>
                         </div>
+                        <div><label class="mT10 mB10"><input type="checkbox" name="opts89" id="opts89ID" value="89" 
+                            autocomplete="off" onClick="return checkPageBlock();" 
+                            @if ($node->nodeRow->NodeOpts%89 == 0) CHECKED @endif
+                            > <span class="fPerc133">Card Wrapper</span></label></div>
                     </div>
                 </div>
             </div>
@@ -1608,7 +1676,7 @@
             </div>
             <div class="panel-body">
                 
-                @if ($node->conds && sizeof($node->conds) > 0)
+                @if (sizeof($node->conds) > 0)
                     @foreach ($node->conds as $i => $cond)
                         <input type="hidden" id="delCond{{ $i }}ID" name="delCond{{ $cond->CondID }}" value="N">
                         <div id="cond{{ $i }}wrap" class="round10 brd p5 f18 mB10 pL10">

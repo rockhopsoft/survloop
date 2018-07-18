@@ -115,9 +115,9 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
         </td>
         <td>
             <select name="newSubAuto" class="form-control">
-            <option value="1">Auto-Gen</option>
-            <option value="2">Loop-Gen</option>
-            <option value="0" CHECKED >Manual</option>
+                <option value="1">Auto-Gen</option>
+                <option value="2">Loop-Gen</option>
+                <option value="0" CHECKED >Manual</option>
             </select>
         </td>
         <td><a href="javascript:;" class="btn btn-primary" 

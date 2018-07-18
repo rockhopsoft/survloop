@@ -6,7 +6,7 @@
 
 <div class="row">
     <div class="col-md-7">
-        <h2><i class="fa fa-newspaper-o"></i> Surveys / Forms</h2>
+        <h2><i class="fa fa-newspaper-o"></i> Surveys & Forms</h2>
         <div class="slGrey pB10">
             Surveys can be one or countless pages long. At their core, they are branching trees of possible user
             experiences. Here you can edit or create new surveys.
@@ -14,40 +14,78 @@
         <table class="table table-striped">
         
         @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%7 == 0) 
+            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%7 > 0) 
+            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         
         @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0) 
+            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0) 
+            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         
-        @if (isset($GLOBALS["SL"]->sysOpts['has-volunteers']) && intVal($GLOBALS["SL"]->sysOpts['has-volunteers']) == 1)
+        @forelse ($myTrees as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
+                && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
+                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty
+        @endforelse
+        @forelse ($myTrees as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
+                && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
+                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty
+        @endforelse
+        
+        @if ($GLOBALS["SL"]->sysHas('partners'))
             @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0) 
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
+                    && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
                     {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
                 @endif
             @empty
             @endforelse
             @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0) 
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
+                    && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty
+            @endforelse
+        @endif
+        
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
+                    && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty
+            @endforelse
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
+                    && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
                     {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
                 @endif
             @empty
@@ -57,8 +95,7 @@
         </table>
         
     </div>
-    <div class="col-md-1"></div>
-    <div class="col-md-4">
+    <div class="col-md-5">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <form name="mainPageForm" method="post" action="/dashboard/surveys/list">
@@ -71,11 +108,23 @@
                 <label class="disBlo"><input type="checkbox" name="pageAdmOnly" value="1" 
                     onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
                     else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                    <i class="fa fa-key" aria-hidden="true"></i> Admin-Only Page</label>
+                    <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only Survey</label>
+                <label class="disBlo"><input type="checkbox" name="pageStfOnly" value="1" 
+                    onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
+                    else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
+                    <i class="fa fa-key" aria-hidden="true"></i> Staff Survey</label>
+            @if ($GLOBALS["SL"]->sysHas('partners'))
+                <label class="disBlo mB5"><input type="checkbox" name="pagePrtOnly" value="1" 
+                    onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
+                    else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
+                    <i class="fa fa-university" aria-hidden="true"></i> Partners Survey</label>
+            @endif
+            @if ($GLOBALS["SL"]->sysHas('volunteers'))
                 <label class="disBlo mB5"><input type="checkbox" name="pageVolOnly" value="1" 
                     onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
                     else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                    <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer Page</label>
+                    <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer Survey</label>
+            @endif
                 <label for="newTreeNameID" class="mT10"><b>New Survey Title:</b></label>
                 <input type="text" name="newTreeName" id="newTreeNameID" class="form-control" value="" 
                     autocomplete="off" onBlur="slugOnBlur(this, 'newTreeSlugID');">
@@ -93,8 +142,14 @@
         
         <div class="slGrey">
             <div class="mB5"><u>Permissions</u></div>
-            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Admin-Only Survey</div>
+            <div class="mB5"><i class="fa fa-eye mR5" aria-hidden="true"></i> Admin-Only Survey</div>
+            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Staff Survey</div>
+        @if ($GLOBALS["SL"]->sysHas('partners'))
+            <div class="mB5"><i class="fa fa-university mR5" aria-hidden="true"></i> Partners Survey</div>
+        @endif
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
             <div class="mB5"><i class="fa fa-hand-rock-o mR5" aria-hidden="true"></i> Volunteer Survey</div>
+        @endif
         </div>
     
     </div>

@@ -1,4 +1,4 @@
-<!-- resources/views/vendor/survloop/inc-tree-javascript.blade.php -->
+/* resources/views/vendor/survloop/inc-tree-javascript.blade.php */
 // treeMajorSects[major-index] = [nodeID, 'Section Title', 'status']
 // treeMinorSects[major-index][minor-index] = [nodeID, 'Section Title', 'status', 'url']
 @forelse ($majorSections as $maj => $majSect)

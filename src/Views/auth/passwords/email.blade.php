@@ -5,7 +5,7 @@ $v = $surv->custLoop->v;
 ?>@extends('vendor.survloop.master')
 
 @section('content')
-<!-- resources/views/OPC/auth/email.blade.php -->
+<!-- resources/views/vendor/survloop/auth/passwords/email.blade.php -->
 <form name="mainPageForm" class="form-horizontal" role="form" method="POST" action="{{ url('/password/email') }}">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
@@ -27,9 +27,7 @@ You will be sent an email with a link to change your password. (Please check you
 </h4>
 
 @if (session('status'))
-    <div class="alert alert-success">
-        {{ session('status') }}
-    </div>
+    <div class="alert alert-success">{{ session('status') }}</div>
 @endif
 
 <div class="nodeGap"></div>

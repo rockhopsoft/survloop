@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
-use SurvLoop\Controllers\DatabaseLookups;
+use SurvLoop\Controllers\CoreGlobals;
 use SurvLoop\Controllers\SurvLoopController;
 
 use App\Models\User;
@@ -134,10 +134,13 @@ class AuthController extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) {
-            $this->domainPath = $appUrl->DefDescription;
-        }
+        if ($appUrl && isset($appUrl->DefDescription)) $this->domainPath = $appUrl->DefDescription;
         return $this->domainPath;
+    }
+    
+    public function printPassReset(Request $request)
+    {
+        return view('vendor.survloop.auth.passwords.email', []);
     }
 
     

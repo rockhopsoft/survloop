@@ -39,12 +39,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
     {
         $this->survLoopInit($request, $currPage);
         $resLimit = 60;
-        $node = $parent = [];
+        $node = $parent = NULL;
         if ($nodeIN > 0) {
             $node = $this->loadNode(SLNode::find($nodeIN));
             $node->fillNodeRow($nodeIN);
         }
-        if ($nodeIN <= 0 || !$node || sizeof($node) == 0) {
+        if ($nodeIN <= 0 || !$node) {
             $node = $this->loadNode();
             $node->nodeRow->NodeTree        = $GLOBALS["SL"]->treeID;
             $node->nodeRow->NodeParentID    = (($GLOBALS["SL"]->REQ->has('parent')) ? $GLOBALS["SL"]->REQ->parent 
@@ -60,12 +60,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
             if ($node->parentID > 0) {
                 $parent = (($node->parentID > 0) ? SLNode::find($node->parentID) : []);
                 if ($parent && isset($parent->NodeType)) {
-                    if ($parent->NodeType == 'Data Print Block') {
+                    if (in_array($parent->NodeType, ['Data Print Block', 'Data Print Columns'])) {
                         $node->nodeRow->NodeType = 'Data Print Row';
                     } elseif ($parent->NodeType == 'Loop Cycle') {
                         $grandParent = (($parent->NodeParentID > 0) ? SLNode::find($parent->NodeParentID) : []);
                         if ($grandParent && isset($grandParent->NodeType) 
-                            && $grandParent->NodeType == 'Data Print Block') {
+                            && in_array($grandParent->NodeType, ['Data Print Block', 'Data Print Columns'])) {
                             $node->nodeRow->NodeType = 'Data Print Row';
                         }
                     }
@@ -87,7 +87,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
                 }
                 elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o
@@ -311,42 +311,47 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     } elseif ($node->nodeRow->NodeType == 'Spreadsheet Table') {
                         $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->get('nodeDataStoreSprd'));
                         $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->get('spreadTblMaxRows'));
+                        $node->nodeRow->NodeResponseSet = ((!$GLOBALS["SL"]->REQ->has('spreadTblLoop')
+                            && trim($GLOBALS["SL"]->REQ->spreadTblLoop) == '') ? ''
+                            : 'LoopItems::' . $GLOBALS["SL"]->REQ->spreadTblLoop);
                     }
-                    $newResponses = array();
-                    $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->postLoopsDropdowns('responseList');
-                    if ($node->nodeRow->NodeResponseSet == '') {
-                        for ($i=0; $i < 20; $i++) {
-                            if ($GLOBALS["SL"]->REQ->has('response' . $i . '') 
-                                && trim($GLOBALS["SL"]->REQ->get('response' . $i . '')) != '') {
-                                $newResponses[] = [
-                                    "eng"   => trim($GLOBALS["SL"]->REQ->get('response' . $i . '')),
-                                    "value" => ((trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) != '') 
-                                        ? trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) 
-                                        : trim($GLOBALS["SL"]->REQ->get('response' . $i . ''))), 
-                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
-                                        && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
-                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
-                                ];
+                    $newResponses = [];
+                    if (!$GLOBALS["SL"]->REQ->has('spreadTblLoop') || trim($GLOBALS["SL"]->REQ->spreadTblLoop) == '') {
+                        $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->postLoopsDropdowns('responseList');
+                        if ($node->nodeRow->NodeResponseSet == '') {
+                            for ($i=0; $i < 20; $i++) {
+                                if ($GLOBALS["SL"]->REQ->has('response' . $i . '') 
+                                    && trim($GLOBALS["SL"]->REQ->get('response' . $i . '')) != '') {
+                                    $newResponses[] = [
+                                        "eng"   => trim($GLOBALS["SL"]->REQ->get('response' . $i . '')),
+                                        "value" => ((trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) != '') 
+                                            ? trim($GLOBALS["SL"]->REQ->get('response' . $i . 'Val')) 
+                                            : trim($GLOBALS["SL"]->REQ->get('response' . $i . ''))), 
+                                        "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
+                                            && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
+                                        "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
+                                    ];
+                                }
                             }
-                        }
-                    } elseif (strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
-                        $defs = SLDefinitions::where('DefSet', 'Value Ranges')
-                            ->where('DefSubset', str_replace('Definition::', '', $node->nodeRow->NodeResponseSet))
-                            ->orderBy('DefOrder', 'asc')
-                            ->get();
-                        if ($defs && sizeof($defs) > 0) {
-                            foreach ($defs as $i => $def) {
-                                $newResponses[] = [
-                                    "eng"   => $def->DefValue,
-                                    "value" => $def->DefID, 
-                                    "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
-                                        && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
-                                    "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
-                                        ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
-                                ];
+                        } elseif (strpos($node->nodeRow->NodeResponseSet, 'Definition::') !== false) {
+                            $defs = SLDefinitions::where('DefSet', 'Value Ranges')
+                                ->where('DefSubset', str_replace('Definition::', '', $node->nodeRow->NodeResponseSet))
+                                ->orderBy('DefOrder', 'asc')
+                                ->get();
+                            if ($defs->isNotEmpty()) {
+                                foreach ($defs as $i => $def) {
+                                    $newResponses[] = [
+                                        "eng"   => $def->DefValue,
+                                        "value" => $def->DefID, 
+                                        "kids"  => (($GLOBALS["SL"]->REQ->has('response' . $i . 'ShowKids')
+                                            && $GLOBALS["SL"]->REQ->has('kidForkSel' . $i . '')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->get('kidForkSel' . $i . '')) : 0),
+                                        "mutEx" => (($GLOBALS["SL"]->REQ->has('response' . $i . 'MutEx')) 
+                                            ? intVal($GLOBALS["SL"]->REQ->get('response' . $i . 'MutEx')) : 0)
+                                    ];
+                                }
                             }
                         }
                     }
@@ -369,8 +374,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             . $GLOBALS["SL"]->REQ->get('blockLink') . ';;' 
                             . $GLOBALS["SL"]->REQ->get('blockImg') . ';;' 
                             . $GLOBALS["SL"]->REQ->get('blockImgType') . ';;' 
-                            . (($GLOBALS["SL"]->REQ->has('blockImgFix') && $GLOBALS["SL"]->REQ->get('blockImgFix') == 'Y') 
-                                ? 'Y' : 'N') . ';;'
+                            . $GLOBALS["SL"]->REQ->get('blockImgFix') . ';;'
                             . $GLOBALS["SL"]->REQ->get('blockAlign') . ';;'
                             . $GLOBALS["SL"]->REQ->get('blockHeight');
                     } else {
@@ -388,17 +392,16 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         $GLOBALS["SL"]->treeRow->save();
                     }
                     if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeType == 'Page') {
-                        if ($GLOBALS["SL"]->REQ->has('homepage') 
-                            && intVal($GLOBALS["SL"]->REQ->homepage) == 7) {
-                            if ($GLOBALS["SL"]->treeRow->TreeOpts%7 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 7;
-                        } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%7 == 0) {
-                            $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/7;
-                        }
-                        if ($GLOBALS["SL"]->REQ->has('adminPage') 
-                            && intVal($GLOBALS["SL"]->REQ->adminPage) == 3) {
-                            if ($GLOBALS["SL"]->treeRow->TreeOpts%3 > 0) $GLOBALS["SL"]->treeRow->TreeOpts *= 3;
-                        } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0) {
-                            $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/3;
+                        $treeOpts = [ ['homepage', 7], ['adminPage', 3], ['volunPage', 17], ['partnPage', 41], 
+                            ['staffPage', 43] ];
+                        foreach ($treeOpts as $o) {
+                            if ($GLOBALS["SL"]->REQ->has($o[0]) && intVal($GLOBALS["SL"]->REQ->get($o[0])) == $o[1]) {
+                                if ($GLOBALS["SL"]->treeRow->TreeOpts%$o[1] > 0) {
+                                    $GLOBALS["SL"]->treeRow->TreeOpts *= $o[1];
+                                }
+                            } elseif ($GLOBALS["SL"]->treeRow->TreeOpts%$o[1] == 0) {
+                                $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/$o[1];
+                            }
                         }
                         $GLOBALS["SL"]->treeRow->TreeName      = trim($GLOBALS["SL"]->REQ->get('pageTitle'));
                         $GLOBALS["SL"]->treeRow->TreeSlug      = trim($GLOBALS["SL"]->REQ->nodeSlug);
@@ -407,7 +410,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
                         $GLOBALS["SL"]->treeRow->save();
                     }
                 }
-                if ($GLOBALS["SL"]->REQ->has('condIDs') && sizeof($GLOBALS["SL"]->REQ->condIDs) > 0) {
+                if ($GLOBALS["SL"]->REQ->has('condIDs') && is_array($GLOBALS["SL"]->REQ->condIDs) 
+                    && sizeof($GLOBALS["SL"]->REQ->condIDs) > 0) {
                     foreach ($GLOBALS["SL"]->REQ->condIDs as $condID) {
                         if ($GLOBALS["SL"]->REQ->has('delCond'.$condID.'') 
                             && $GLOBALS["SL"]->REQ->get('delCond'.$condID.'') == 'Y') {
@@ -433,7 +437,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 
                 if ($node->nodeRow->NodeType == 'Layout Row' && $nodeIN <= 0) { // new row, so create default columns
                     if ($node->nodeRow->NodeCharLimit > 0) {
-                        $colW = $this->getColsWidth($node->nodeRow->NodeCharLimit);
+                        $colW = $GLOBALS["SL"]->getColsWidth($node->nodeRow->NodeCharLimit);
                         $evenTot = $node->nodeRow->NodeCharLimit*$colW;
                         for ($c=0; $c<$node->nodeRow->NodeCharLimit; $c++) {
                             $colNode = $this->loadNode();
@@ -482,7 +486,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
         $emailUsers = [ "admin" => [], "volun" => [], "users" => [] ];
         $chk = User::where('email', 'NOT LIKE', 'anonymous.%@anonymous.org')
             ->get();
-        if ($chk && sizeof($chk) > 0) {
+        if ($chk->isNotEmpty()) {
             foreach ($chk as $u) {
                 if ($u->hasRole('administrator|staff|databaser')) {
                     $emailUsers["admin"][] = [$u->id, $u->email, $u->name];
@@ -623,7 +627,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     }
     
     
-    protected function adminBasicPrintNode($tierNode = array(), $tierDepth = 0)
+    protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
     {
         $tierDepth++;
         if (!isset($this->v["pageCnt"])) $this->v["pageCnt"] = 0;
@@ -643,6 +647,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     foreach ($tierNode[1] as $next) {
                         $childrenPrints .= $this->adminBasicPrintNode($next, $tierDepth);
                     }
+                }
+                $dataManips = $this->allNodes[$tierNode[0]]->printManipUpdate();
+                if (trim($dataManips) != '') {
+                    $dataManips = '<span class="fPerc80 mL5">' . $dataManips . '</span>';
                 }
                 $conditionList = (sizeof($this->allNodes[$tierNode[0]]->conds) == 0) ? ''
                     : '<span class="slGreenDark opac50 mL10"><i class="fa fa-filter" aria-hidden="true"></i>' 
@@ -682,6 +690,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             "tierNode"       => $tierNode, 
                             "tierDepth"      => $tierDepth, 
                             "childrenPrints" => $childrenPrints,
+                            "dataManips"     => $dataManips,
                             "conditionList"  => $conditionList,
                             "nodeBtns"       => $nodeBtns,
                             "nodeBtnExpand"  => $nodeBtnExpand,
@@ -702,6 +711,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     
     public function adminPrintFullTree(Request $request, $pubPrint = false)
     {
+        $this->v["printFullTree"] = true;
         if ($pubPrint) {
             $this->v["isPrint"] = $this->v["isAll"] = $this->v["isAlt"] = true;
         }
@@ -733,12 +743,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
     protected function adminResponseNodeStatsTxt($res, $fnlCnt, $atmptCnt, $fnlVals, $nAtmpts, $nodeSess)
     {
         $stats = [
-            '0% of ' . sizeof($nodeSess) . ' final submissions',
+            '0% of ' . ((is_array($nodeSess)) ? sizeof($nodeSess) : 0) . ' final submissions',
             '0% of all attempts'
             ];
         if (isset($fnlVals[strtolower($res)])) {
-            $stats[0] = '<b>' . round(100*$fnlVals[strtolower($res)]/$fnlCnt) . '%</b> of ' . sizeof($nodeSess) 
-                . ' final submissions';
+            $stats[0] = '<b>' . round(100*$fnlVals[strtolower($res)]/$fnlCnt) . '%</b> of ' 
+                . ((is_array($nodeSess)) ? sizeof($nodeSess) : 0) . ' final submissions';
         }
         if (isset($nAtmpts[strtolower($res)])) {
             $stats[1] = round(100*$nAtmpts[strtolower($res)]/$atmptCnt) . '% of all ' . $atmptCnt . ' attempts';
@@ -746,7 +756,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
         return $stats;
     }
     
-    protected function adminResponseNodeStats($tierNode = array(), $tierDepth = 0)
+    protected function adminResponseNodeStats($tierNode = [], $tierDepth = 0)
     {
         $retVal = '';
         $tierDepth++;
@@ -755,11 +765,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
             if ($this->hasNode($nID) && (sizeof($tierNode[1]) > 0) 
                 || (!$this->allNodes[$nID]->isDataManip() && !$this->allNodes[$nID]->isInstructAny())) {
                 $fnlCnt = $atmptCnt = 0;
-                $fnlVals = $nAtmpts = $nodeSess = array();
+                $fnlVals = $nAtmpts = $nodeSess = [];
                 $nodeSaves = SLNodeSaves::where('NodeSaveNode', $nID)
                     ->orderBy('created_at', 'desc')
                     ->get();
-                if (sizeof($nodeSaves) > 0) {
+                if ($nodeSaves->isNotEmpty()) {
                     foreach ($nodeSaves as $save) {
                         if (strlen($save->NodeSaveNewVal) > 100) {
                             $save->NodeSaveNewVal = substr($save->NodeSaveNewVal, 0, 100) . '...';
@@ -922,7 +932,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     
     
     
-    protected function adminBasicDropdownNode($tierNode = array(), $tierDepth = 0, $preSel = -3)
+    protected function adminBasicDropdownNode($tierNode = [], $tierDepth = 0, $preSel = -3)
     {
         $retVal = '';
         $tierDepth++;
@@ -1013,7 +1023,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 LEFT OUTER JOIN `SL_Node` n ON c.`CondNodeNodeID` LIKE n.`NodeID` 
                 WHERE n.`NodeTree` LIKE '" . $treeID . "'" . ((sizeof($skipConds) > 0) 
                     ? " AND c.`CondNodeCondID` NOT IN ('" . implode("', '", $skipConds) . "')" : "") ) );
-            if ($chk && sizeof($chk) > 0) {
+            if ($chk && sizeof($chk)) {
                 if ($treeRow->TreeOpts%29 > 0) $treeRow->TreeOpts *= 29;
             } else {
                 if ($treeRow->TreeOpts%29 == 0) $treeRow->TreeOpts = $treeRow->TreeOpts/29;

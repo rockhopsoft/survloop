@@ -16,18 +16,22 @@
 <form name="mainPageForm" action="/dashboard/users" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
-<tr>
-    <th>Name</th>
-    <th>Email <span class="slGrey mL10">[<i class="fa fa-check-circle-o" aria-hidden="true"></i> verified]</span></th>
-    <th class="taC">Volunteer</th>
-    <th class="taC">Third Party</th>
-    <th class="taC">Evaluators</th>
-    <th class="taC">Databaser</th>
-    <th class="taC">Admin</th>
-</tr>
-
+<?php $cnt = 0; ?>
 @foreach ($printVoluns as $userSet)
     @forelse ($userSet as $volun)
+        @if ($cnt%15 == 0)
+            <tr>
+                <th>Name</th>
+                <th>Email <span class="slGrey mL10">
+                    [<i class="fa fa-check-circle-o" aria-hidden="true"></i> verified]</span></th>
+                <th class="taC">Volunteer</th>
+                <th class="taC">Partners</th>
+                <th class="taC">Staff</th>
+                <th class="taC">Databaser</th>
+                <th class="taC">Admin</th>
+            </tr>
+        @endif
+        <?php $cnt++; ?>
         <tr>
             <td><b>{!! $volun->printUsername(true, '/dashboard/users/') !!}</b></td>
             <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a>
@@ -38,7 +42,7 @@
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="volunteer" @if ($volun->hasRole('volunteer')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
-                value="thirdparty" {{ $disableAdmin }} @if ($volun->hasRole('thirdparty')) CHECKED @endif ></td>
+                value="partner" {{ $disableAdmin }} @if ($volun->hasRole('partner')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
                 value="staff" {{ $disableAdmin }} @if ($volun->hasRole('staff')) CHECKED @endif ></td>
             <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 

@@ -1,7 +1,9 @@
 /* resources/views/vendor/survloop/formtree-form-js.blade.php */
 function checkFullPage() {
-    if (!document.getElementById('hidFrameID')) {
-@if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+    if (!document.getElementById('main')) {
+@if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')
+        window.location='{{ $currPage[0] }}';
+@elseif ($GLOBALS['SL']->treeRow->TreeType == 'Page')
     @if ($GLOBALS['SL']->treeIsAdmin)
         window.location = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}";
     @else
@@ -15,9 +17,15 @@ function checkFullPage() {
     @endif
 @endif
     }
+    if (document.getElementById('maincontentWrap')) document.getElementById('maincontentWrap').style.display = 'block';
     return true;
 }
 setTimeout("checkFullPage()", 10);
+setTimeout("checkFullPage()", 100);
+setTimeout("checkFullPage()", 1000);
+
+@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0)
+
 @forelse ($pageFldList as $fld)
 addFld("{{ $fld }}");
 @empty
@@ -53,4 +61,6 @@ setTimeout("hasAttemptedSubmit = false", 10);
     $(document).ready(mainFixed);
 @endif
 
-setTimeout("lastSlTabIndex = {{ $GLOBALS['SL']->currTabInd }}", 1000);
+setTimeout("lastSlTabIndex = {{ $GLOBALS['SL']->currTabInd }}", 300);
+
+@endif

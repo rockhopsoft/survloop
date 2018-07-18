@@ -39,7 +39,7 @@ class SurvLoopData
     public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvLoop = [], $dataBranches = [])
     {
         $this->setCoreID($coreTbl, $coreID);
-        if (sizeof($dataBranches) > 0) $this->dataBranches  = $dataBranches;
+        if (sizeof($dataBranches) > 0) $this->dataBranches = $dataBranches;
         $this->checkboxNodes = $checkboxNodes;
         $this->refreshDataSets($isBigSurvLoop);
         $this->loaded = true;
@@ -64,7 +64,7 @@ class SurvLoopData
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
             eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" . $isBigSurvLoop[1] 
                 . "', '" . $isBigSurvLoop[2] . "')->get();");
-            if ($rows && sizeof($rows) > 0) {
+            if ($rows->isNotEmpty()) {
                 foreach ($rows as $row) $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
             }
         }
@@ -80,19 +80,16 @@ class SurvLoopData
     }
     
                                                                                             
-    public function loadData($tbl, $rowID, $recObj = [])
+    public function loadData($tbl, $rowID, $recObj = NULL)
     {
         $GLOBALS["SL"]->modelPath($tbl);
         $subObj = [];
         if (trim($tbl) != '' && $rowID > 0) {
-            if (!$recObj || sizeof($recObj) == 0) {
-                $recObj = $this->dataFind($tbl, $rowID);
-            }
-            if ($tbl == $this->coreTbl && $rowID > 0 && $rowID == $this->coreID 
-                && (!$recObj || sizeof($recObj) == 0)) {
+            if (!$recObj) $recObj = $this->dataFind($tbl, $rowID);
+            if ($tbl == $this->coreTbl && $rowID > 0 && $rowID == $this->coreID && !$recObj) {
                 $this->newDataRecord($tbl, '', -3, true, $this->coreID);
             }
-            if ($recObj && sizeof($recObj) > 0) {
+            if ($recObj) {
                 // Adding record to main set of all records
                 $setInd = $this->initDataSet($tbl);
                 $this->dataSets[$tbl][$setInd] = $recObj;
@@ -106,11 +103,11 @@ class SurvLoopData
                             $subObjs = [];
                             if (trim($subset->DataSubTblLnk) != '' && intVal($recObj->{ $subset->DataSubTblLnk }) > 0) {
                                 $subObjs = $this->dataFind($subset->DataSubSubTbl, $recObj->{ $subset->DataSubTblLnk });
-                                if ($subObjs && sizeof($subObjs) > 0) $subObjs = array($subObjs);
+                                if ($subObjs) $subObjs = [$subObjs];
                             } elseif (trim($subset->DataSubSubLnk) != '') {
                                 $subObjs = $this->dataWhere($subset->DataSubSubTbl, $subset->DataSubSubLnk, $rowID);
                             }
-                            if (sizeof($subObjs) == 0 && $subset->DataSubAutoGen == 1) {
+                            if (empty($subObjs) && $subset->DataSubAutoGen == 1) {
                                 $subObjs = [$this->newDataRecordInner($subset->DataSubSubTbl)];
                                 if (trim($subset->DataSubTblLnk) != '') {
                                     $recObj->update([ $subset->DataSubTblLnk => $subObjs[0]->getKey() ]);
@@ -134,7 +131,7 @@ class SurvLoopData
                                 $GLOBALS["SL"]->tblI[$tbl]);
                             if (trim($keyField) != '') {
                                 $subObjs = $this->dataWhere($loop->DataLoopTable, 
-                                    $GLOBALS["SL"]->tblAbbr[$loop->DataLoopTable].$keyField, $rowID);
+                                    $GLOBALS["SL"]->tblAbbr[$loop->DataLoopTable] . $keyField, $rowID);
                                 $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $loop->DataLoopTable, $subObjs);
                             }
                         }
@@ -163,7 +160,7 @@ class SurvLoopData
                                 $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $linkage[2], $lnkObjs);
                                 foreach ($lnkObjs as $lnkObj) {
                                     $findObj = $this->dataFind($linkage[4], $lnkObj->{ $linkage[3] });
-                                    if ($findObj && sizeof($findObj) > 0) {
+                                    if ($findObj) {
                                         $subObjs = array($findObj);
                                         $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $linkage[4], $subObjs);
                                     } elseif (intVal($lnkObj->{ $linkage[3] }) > 0) {
@@ -192,7 +189,7 @@ class SurvLoopData
             ->where('FldTable', $GLOBALS["SL"]->tblI[$tbl])
             ->where('FldForeignTable', '>', 0)
             ->get();
-        if ($flds && sizeof($flds) > 0) {
+        if ($flds->isNotEmpty()) {
             foreach ($flds as $fldKey) {
                 $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldForeignTable];
                 if ($fldKey->FldForeignTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
@@ -200,7 +197,7 @@ class SurvLoopData
                 } else { // not the special Core case, so find an ancestor
                     list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
                     if ($loopID > 0) {
-                        $newLink = [$GLOBALS["SL"]->tblAbbr[$tbl].$fldKey->FldName, $loopID];
+                        $newLink = [$GLOBALS["SL"]->tblAbbr[$tbl] . $fldKey->FldName, $loopID];
                         if (!in_array($newLink, $linkages["outgoing"])) $linkages["outgoing"][] = $newLink;
                     }
                 }
@@ -214,15 +211,16 @@ class SurvLoopData
                 ->where('FldForeignTable', '>', 0)
                 ->where('FldTable', '>', 0)
                 ->get();
-            if ($flds && sizeof($flds) > 0) {
+            if ($flds->isNotEmpty()) {
                 foreach ($flds as $fldKey) {
                     $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldTable];
+                    $foreignFldName = $GLOBALS["SL"]->tblAbbr[$foreignTbl] . $fldKey->FldName;
                     if ($fldKey->FldTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
-                        $linkages["incoming"][] = [$foreignTbl, $GLOBALS["SL"]->tblAbbr[$foreignTbl].$fldKey->FldName, $this->coreID];
+                        $linkages["incoming"][] = [$foreignTbl, $foreignFldName, $this->coreID];
                     } else { // not the special Core case, so find an ancestor
                         list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
                         if ($loopID > 0) {
-                            $newLink = [$foreignTbl, $GLOBALS["SL"]->tblAbbr[$foreignTbl].$fldKey->FldName, $loopID];
+                            $newLink = [$foreignTbl, $foreignFldName, $loopID];
                             if (!in_array($newLink, $linkages["incoming"])) $linkages["incoming"][] = $newLink;
                         }
                     }
@@ -278,7 +276,7 @@ class SurvLoopData
             $this->refreshDataSets();
         } else {
             $recObj = $this->checkNewDataRecord($tbl, $fld, $newVal, $linkages);
-            if (!$recObj || sizeof($recObj) == 0) {
+            if (!$recObj) {
 //echo 'newDataRecord not found<br />';
                 $recObj = $this->newDataRecordInner($tbl, $linkages, $recID);
                 $this->refreshDataSets();
@@ -290,12 +288,12 @@ class SurvLoopData
     
     public function checkNewDataRecord($tbl = '', $fld = '', $newVal = -3, $linkages = [])
     {
-        $recObj = [];
-        if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal);
+        $recObj = NULL;
+        if (sizeof($linkages) == 0) $linkages = $this->getRecordLinks($tbl, $fld, $newVal, false);
         if (sizeof($linkages["outgoing"]) > 0) {
             $recObj = $this->findRecLinkOutgoing($tbl, $linkages);
         }
-        if ((!$recObj || sizeof($recObj) == 0) && sizeof($linkages["incoming"]) > 0) {
+        if (!$recObj && sizeof($linkages["incoming"]) > 0) {
             foreach ($linkages["incoming"] as $link) {
                 $incomingInd = $this->getRowInd($link[0], intVal($link[2]));
                 if (isset($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }) 
@@ -319,7 +317,7 @@ class SurvLoopData
         $linkages = $this->getRecordLinks($tbl, $fld, $newVal);
         if (sizeof($linkages["incoming"]) == 0) {
             $delObj = $this->findRecLinkOutgoing($tbl, $linkages);
-            if ($delObj && sizeof($delObj) > 0) $delObj->delete();
+            if ($delObj) $delObj->delete();
         } else {
             foreach ($linkages["incoming"] as $link) {
                 $incomingInd = $this->getRowInd($link[0], intVal($link[2]));
@@ -473,29 +471,30 @@ class SurvLoopData
     {
         if ($subObjs && sizeof($subObjs) > 0) {
             foreach ($subObjs as $subObj) {
-                if ($subObj && sizeof($subObj) > 0) {
-                    if (!$this->dataHas($tbl2, $subObj->getKey())) {
-                        $this->addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $subObj->getKey());
-                        $this->loadData($tbl2, $subObj->getKey(), $subObj);
-                    }
+                if ($subObj && !$this->dataHas($tbl2, $subObj->getKey())) {
+                    $this->addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $subObj->getKey());
+                    $this->loadData($tbl2, $subObj->getKey(), $subObj);
                 }
             }
         }
         return true;
     }
     
-    protected function addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $tbl2ID, $tbl2Ind = -3, $lnkTbl = '')
+    public function addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $tbl2ID, $tbl2Ind = -3, $lnkTbl = '')
     {
+        if ($tbl1Ind < 0) $tbl1Ind = $this->getRowInd($tbl1, $tbl1ID);
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
             if (!isset($this->kidMap[$tbl1]))           $this->kidMap[$tbl1] = [];
             if (!isset($this->kidMap[$tbl1][$tbl2]))    $this->kidMap[$tbl1][$tbl2] = [ "id" => [], "ind" => [] ];
             if (!isset($this->parentMap[$tbl2]))        $this->parentMap[$tbl2] = [];
             if (!isset($this->parentMap[$tbl2][$tbl1])) $this->parentMap[$tbl2][$tbl1] = [ "id" => [], "ind" => [] ];
-            
-            if ($tbl2Ind < 0) { // !presuming it's about to be loaded
-                $tbl2Ind = (isset($this->dataSets[$tbl2])) ? sizeof($this->dataSets[$tbl2]) : 0;
+            if ($tbl2Ind < 0) {
+                $tbl2Ind = $this->getRowInd($tbl2, $tbl2ID);
+                if ($tbl2Ind < 0) {
+                    // !presuming it's about to be loaded
+                    $tbl2Ind = (isset($this->dataSets[$tbl2])) ? sizeof($this->dataSets[$tbl2]) : 0;
+                }
             }
-            
             if ($tbl1ID > 0 && $tbl2ID > 0) {
                 $this->kidMap[$tbl1][$tbl2]["id" ][$tbl1ID]     = $tbl2ID;
                 $this->kidMap[$tbl1][$tbl2]["ind"][$tbl1Ind]    = $tbl2Ind;
@@ -629,7 +628,7 @@ class SurvLoopData
             ->where('SL_Sess.SessCoreID', '=', $this->coreID)
             ->where('SL_NodeSaves.NodeSaveTblFld', 'LIKE', $tbl . ':' . $fld)
             ->get();
-        if ($saves && sizeof($saves) > 0) {
+        if ($saves->isNotEmpty()) {
             foreach ($saves as $save) {
                 if (in_array($save->NodeSaveLoopItemID, $this->loopItemIDs[$loopName]) 
                     && !in_array($save->NodeSaveLoopItemID, $this->loopItemIDsDone)) {
@@ -661,9 +660,9 @@ class SurvLoopData
                     && sizeof($GLOBALS["SL"]->closestLoop["obj"]->conds) > 0) {
                     foreach ($GLOBALS["SL"]->closestLoop["obj"]->conds as $i => $cond) {
                         $fld = $GLOBALS["SL"]->getFullFldNameFromID($cond->CondField, false);
-                        if (trim($newFld) == '' 
-                            && trim($fld) != '' && $cond->CondOperator == '{' && sizeof($cond->condVals) == 1
-                            && $GLOBALS["SL"]->tbl[$cond->CondTable] == $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable) {
+                        if (trim($newFld) == '' && trim($fld) != '' && $cond->CondOperator == '{' 
+                            && sizeof($cond->condVals) == 1 && $GLOBALS["SL"]->tbl[$cond->CondTable] 
+                                == $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable) {
                             $newFld = $fld;
                             $newVal = $cond->condVals[0];
                         }
@@ -679,6 +678,28 @@ class SurvLoopData
             return $recObj->getKey();
         }
         return -3;
+    }
+    
+    public function getLatestDataBranch()
+    {
+        if (sizeof($this->dataBranches) > 0) return $this->dataBranches[sizeof($this->dataBranches)-1];
+        return [];
+    }
+    
+    public function getLatestDataBranchID()
+    {
+        $branch = $this->getLatestDataBranch();
+        if (sizeof($branch) > 0 && isset($branch["itemID"])) return $branch["itemID"];
+        return -3;
+    }
+    
+    public function getLatestDataBranchRow()
+    {
+        $branch = $this->getLatestDataBranch();
+        if (sizeof($branch) > 0 && isset($branch["branch"]) && isset($branch["itemID"])) {
+            return $this->getRowById($branch["branch"], $branch["itemID"]);
+        }
+        return null;
     }
     
     public function startTmpDataBranch($tbl, $itemID = -3, $findItemID = true)
@@ -1112,7 +1133,8 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
         return $tbl;
     }
     
-    public function updateZipInfo($zipIn = '', $tbl = '', $fldState = '', $fldCounty = '', $fldAshrae = '', $setInd = 0)
+    public function updateZipInfo($zipIn = '', $tbl = '', $fldState = '', $fldCounty = '', $fldAshrae = '', 
+        $fldCountry = '', $setInd = 0)
     {
         if (trim($zipIn) == '' || trim($tbl) == '') return false;
         $GLOBALS["SL"]->loadStates();
@@ -1120,6 +1142,9 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
         if ($zipRow && isset($zipRow->ZipZip)) {
             if (trim($fldState) != '')  $this->dataSets[$tbl][$setInd]->update([ $fldState  => $zipRow->ZipState  ]);
             if (trim($fldCounty) != '') $this->dataSets[$tbl][$setInd]->update([ $fldCounty => $zipRow->ZipCounty ]);
+            if (trim($fldCountry) != '' && isset($zipRow->ZipCountry)) {
+                $this->dataSets[$tbl][$setInd]->update([ $fldCountry => $zipRow->ZipCountry ]);
+            }
             if (trim($fldAshrae) != '') {
                 $this->dataSets[$tbl][$setInd]->update([ $fldAshrae => $GLOBALS["SL"]->states->getAshrae($zipRow) ]);
             }

@@ -1,12 +1,30 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use Auth;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\File\File;
 
 /* Largely Utilities */
-// just wanted this utility global to easily call from anywhere including views
-class SurvLoopStatic
+class CoreStatic
 {
+    public $uID         = -3;
+    public $REQ         = [];
+    public $sysOpts     = [];
+    public $userRoles   = [];
+    public $pageSCRIPTS = '';
+    public $pageJAVA    = '';
+    public $pageAJAX    = '';
+    public $currTabInd  = 0;
+    public $x           = [];
+    public $debugOn     = false;
+    
+    public function loadStatic(Request $request)
+    {
+        $this->uID = ((Auth::user()) ? Auth::user()->id : -3);
+        $this->REQ = $request;
+        return true;
+    }
     
     public function mexplode($delim, $str)
     {
@@ -37,8 +55,18 @@ class SurvLoopStatic
     public function swapURLwrap($url, $printHttp = true)
     {
         $urlPrint = str_replace('mailto:', '', $url);
-        if (!$printHttp) $urlPrint = str_replace('http://', '', str_replace('https://', '', $urlPrint));
-        return '<a href="' . $url . '" target="_blank">' . $urlPrint . '</a>'; 
+        if (!$printHttp) $urlPrint = $this->printURLdomain($urlPrint);
+        return '<a href="' . $url . '" target="_blank" class="dont-break-out">' . $urlPrint . '</a>'; 
+    }
+    
+    public function printURLdomain($url)
+    {
+        if (trim($url) != '') {
+            $url = str_replace('http://', '', str_replace('https://', '', str_replace('http://www.', '', 
+                str_replace('https://www.', '', $url))));
+            if (substr($url, strlen($url)-1) == '/') $url = substr($url, 0, strlen($url)-1);
+        }
+        return $url;
     }
     
     public function sortArrByKey($arr, $key, $ord = 'asc')
@@ -88,7 +116,7 @@ class SurvLoopStatic
     {
         $ext = '';
         if (trim($file) != '') {
-            $tmpExt = explode(".", $file);
+            $tmpExt = $this->mexplode(".", $file);
             $ext = strtolower($tmpExt[(sizeof($tmpExt)-1)]);
         }
         return $ext;
@@ -213,6 +241,13 @@ class SurvLoopStatic
         return $significand * pow(10, $exponent);
     }
     
+    public function leadZero($num, $sigFigs = 2)
+    {
+        if ($sigFigs == 2) return (($num < 10) ? '0' : '') . $num;
+        if ($sigFigs == 3) return (($num < 10) ? '00' : (($num < 100) ? '0' : '')) . $num;
+        return $num;
+    }
+    
     public function colorHex2Rgba($hex = '#000000', $a = 1)
     {
         $hex = str_replace("#", "", $hex);
@@ -320,6 +355,24 @@ class SurvLoopStatic
         return $sorted;
     }
     
+    // Prints inches in feet and inches
+    public function printHeight($val)
+    {
+        if ($val <= 0) return '';
+        return (floor($val/12)) . "' " . floor($val%12) . '"';
+    }
+    
+    public function getColsWidth($sizeof)
+    {
+        $colW = 12;
+        if ($sizeof == 2) $colW = 6;
+        elseif ($sizeof == 3) $colW = 4;
+        elseif ($sizeof == 4) $colW = 3;
+        elseif (in_array($sizeof, [5, 6])) $colW = 2;
+        elseif (in_array($sizeof, [7, 8, 9, 10, 11, 12])) $colW = 1;
+        return $colW;
+    }
+    
     public function num2Month3($num = 0)
     {
         switch (intVal($num)) {
@@ -409,6 +462,23 @@ class SurvLoopStatic
         return '<sup>th</sup>';
     }
     
+    public function allCapsToUp1stChars($str)
+    {
+        if (strtoupper($str) == $str) {
+            $strOut = '';
+            $words = $this->mexplode(' ', $str);
+            if (sizeof($words) > 0) {
+                foreach ($words as $w) {
+                    if (strlen($w) > 1) {
+                        $strOut .= substr($w, 0, 1) . strtolower(substr($w, 1)) . ' ';
+                    }
+                }
+            }
+            return trim($strOut);
+        }
+        return $str;
+    }
+    
     public function slugify($text)
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
@@ -465,5 +535,57 @@ class SurvLoopStatic
         }
         return $ret;
     }
+    
+    public function opnAjax()
+    {
+        return '<script type="text/javascript"> $(document).ready(function(){ ';
+    }
+    
+    public function clsAjax()
+    {
+        return ' }); </script>';
+    }
+    
+    public function getTwitShareLnk($url = '', $text = '', $hashtags = '')
+    {
+        return 'http://twitter.com/share?url=' . urlencode($url) 
+            . ((trim($text) != '') ? '&text=' . urlencode($text) : '')
+            . ((trim($hashtags) != '') ? '&hashtags=' . urlencode($hashtags) : '');
+    }
+    
+    public function getFacebookShareLnk($url = '', $text = '')
+    {
+        return 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($url);
+    }
+
+    public function tabInd()
+    {
+        $this->currTabInd++;
+        return ' tabindex="' . $this->currTabInd . '" '; 
+    }
+    
+    public function replaceTabInd($str)
+    {
+        $pos = strpos($str, 'tabindex="');
+        if ($pos === false) return $str . $this->tabInd();
+        $posEnd = strpos($str, '"', (10+$pos));
+        return substr($str, 0, $pos) . $this->tabInd() . substr($str, (1+$posEnd));
+    }
+    
+    public function getCurrUrlBase()
+    {
+        $url = $_SERVER['REQUEST_URI'];
+        if (strpos($url, '?') !== false) return substr($url, 0, strpos($url, '?'));
+        return $url;
+    }
+    
+    public function get_content($URL){
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_URL, $URL);
+		$data = curl_exec($ch);
+		curl_close($ch);
+		return $data;
+	}
     
 }

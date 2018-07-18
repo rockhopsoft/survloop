@@ -3,13 +3,16 @@ namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
+use Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
+use App\Models\SLTokens;
 
 use SurvLoop\Controllers\CoreNode;
 use SurvLoop\Controllers\SurvLoopController;
@@ -30,15 +33,18 @@ class CoreTree extends SurvLoopController
     protected $currNodeSubTier    = [];
     
     public $sessData              = [];
+    public $stats                 = [];
     
     protected $REQ                = [];
     protected $tmp                = [];
     
     protected $debugOn            = true;
     
-    protected function loadNode($nodeRow = array())
+    protected function loadNode($nodeRow = NULL)
     {
-        if ($nodeRow && $nodeRow->NodeID > 0) return new CoreNode($nodeRow->NodeID, $nodeRow);
+        if ($nodeRow && isset($nodeRow->NodeID) && $nodeRow->NodeID > 0) {
+            return new CoreNode($nodeRow->NodeID, $nodeRow);
+        }
         $newNode = new CoreNode();
         $newNode->nodeRow->NodeTree = $this->treeID;
         return $newNode;
@@ -51,7 +57,7 @@ class CoreTree extends SurvLoopController
     
     protected function loadTreeStart($treeIn = -3, Request $request = NULL)
     {
-        if ($request && sizeof($request) > 0) $this->REQ = $request;
+        if ($request) $this->REQ = $request;
         if ($treeIn > 0) {
             $this->treeID = $treeIn;
         } elseif ($this->treeID <= 0) {
@@ -75,7 +81,7 @@ class CoreTree extends SurvLoopController
         else $nodes = SLNode::where('NodeTree', $this->treeID)
             ->select('NodeID', 'NodeParentID', 'NodeParentOrder')
             ->get();
-        $this->treeSize = sizeof($nodes);
+        $this->treeSize = $nodes->count();
         foreach ($nodes as $row) {
             if ($row->NodeParentID <= 0) $this->rootID = $row->NodeID;
             $this->allNodes[$row->NodeID] = $this->loadNode($row);
@@ -123,7 +129,7 @@ class CoreTree extends SurvLoopController
         return true;
     }
     
-    protected function loadNodeTiersInner($nodeID = -3, $tierNest = array())
+    protected function loadNodeTiersInner($nodeID = -3, $tierNest = [])
     {
         
         /// THE XML TREE IS JUST BROKEN :( No parent id 755
@@ -146,7 +152,7 @@ class CoreTree extends SurvLoopController
         return $innerArr;
     }
     
-    protected function loadSubTierFromPath($nodeTierPath = array())
+    protected function loadSubTierFromPath($nodeTierPath = [])
     {
         $subTier = $this->nodeTiers;
         if (sizeof($subTier[1]) > 0 && sizeof($nodeTierPath) > 0) {
@@ -160,7 +166,7 @@ class CoreTree extends SurvLoopController
         if ($this->hasNode($nID)) {
             return $this->loadSubTierFromPath($this->allNodes[$nID]->nodeTierPath);
         }
-        return array();
+        return [];
     }
     
     
@@ -266,7 +272,7 @@ class CoreTree extends SurvLoopController
                 ->orderBy('NodeParentOrder', 'asc')
                 ->select('NodeID', 'NodeParentOrder')
                 ->get();
-            if (sizeof($sibs) > 0) {
+            if ($sibs->isNotEmpty()) {
                 foreach ($sibs as $sib) {
                     if ($sib->NodeID == intVal($GLOBALS["SL"]->REQ->input('orderBefore'))) { 
                         $node->nodeRow->NodeParentOrder = $sib->NodeParentOrder; 
@@ -329,8 +335,7 @@ class CoreTree extends SurvLoopController
     
     protected function loadSessInfo($coreTbl)
     {
-//$currRand = rand(0, 100);
-//echo '<br /><br /><br />loadSessInfo ' . $currRand . ' setSessCore1 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
+//echo '<br /><br /><br />loadSessInfo setSessCore1 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         if (!isset($this->v["currPage"])) $this->survLoopInit($this->REQ); // not sure why this 
         if (isset($GLOBALS["SL"]->formTree->TreeID)) return false; 
         
@@ -342,21 +347,21 @@ class CoreTree extends SurvLoopController
             $GLOBALS["SL"]->setClosestLoop();
             return false;
         }
-        if ($this->REQ->has('start') && $this->REQ->has('new') && !isset($this->tmp["startNewCreate"])) {
-//echo 'loadSessInfo ' . $currRand . ' createNewSess A<br />';
+        $cid = (($this->REQ->has('cid') && intVal($this->REQ->has('cid')) > 0) ? intVal($this->REQ->has('cid')) : 0);
+        if ($this->REQ->has('start') && $this->REQ->has('new') && !isset($this->tmp["startNewCreate"]) && $cid <= 0) {
             $this->createNewSess();
             $this->newCoreRow($coreTbl);
             $this->tmp["startNewCreate"] = true;
         } elseif (isset($this->v) && $this->v["uID"] > 0) {
             //$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
             $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
-                ->where('SessTree', $this->treeID)
+                ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
                 ->where('SessCoreID', '>', 0)
                 //->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
                 ->orderBy('updated_at', 'desc')
                 ->first();
             if ($this->sessInfo && isset($this->sessInfo->SessID)) {
-                if ($this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
+                if ($this->isAdminUser() || $this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
                     $this->sessID = $this->sessInfo->SessID;
                     $this->coreID = $this->sessInfo->SessCoreID;
                 } else {
@@ -372,21 +377,15 @@ class CoreTree extends SurvLoopController
             }
             if ($this->sessID > 0) $this->sessInfo = SLSess::find($this->sessID);
         }
-        if (!$this->sessInfo || sizeof($this->sessInfo) == 0) {
-//echo 'loadSessInfo ' . $currRand . ' createNewSess B<br />';
-            $this->createNewSess();
-        }
+        if (!$this->sessInfo) $this->createNewSess();
         $this->setSessCore($this->coreID);
-//echo 'loadSessInfo ' . $currRand . ' setSessCore2 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         
         // Check for and load core record's ID
         if ($this->coreID <= 0 && $this->sessInfo && isset($this->sessInfo->SessCoreID) 
             && intVal($this->sessInfo->SessCoreID) > 0) {
             $this->coreID = $this->sessInfo->SessCoreID;
         }
-//echo 'loadSessInfo ' . $currRand . ' setSessCore3 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         $this->chkIfCoreIsEditable();
-//echo 'loadSessInfo ' . $currRand . ' setSessCore3b c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         if ($this->coreID <= 0) {
             if ($this->v["uID"] > 0) {
                 $pastUserSess = SLSess::where('SessUserID', $this->v["uID"])
@@ -394,15 +393,11 @@ class CoreTree extends SurvLoopController
                     ->where('SessCoreID', '>', '0')
                     ->orderBy('updated_at', 'desc')
                     ->get();
-                if ($pastUserSess && sizeof($pastUserSess) > 0) {
-                    foreach ($pastUserSess as $pastSess) {
-                        $this->chkIfCoreIsEditable($pastSess->SessCoreID);
-//echo 'loadSessInfo ' . $currRand . ' setSessCore3c.' . $pastSess->SessCoreID . ' c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
-                    }
+                if ($pastUserSess->isNotEmpty()) {
+                    foreach ($pastUserSess as $pastSess) $this->chkIfCoreIsEditable($pastSess->SessCoreID);
                 }
             }
         }
-//echo 'loadSessInfo ' . $currRand . ' setSessCore4 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         if ($this->coreIDoverride > 0) {
             // should have more permission checks here...
             $this->coreID = $this->coreIDoverride;
@@ -410,7 +405,6 @@ class CoreTree extends SurvLoopController
             $this->newCoreRow($coreTbl);
         }
         $this->setSessCore($this->coreID);
-//echo 'loadSessInfo ' . $currRand . ' setSessCore5 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         $this->sessInfo->SessTree = $this->treeID;
         if ((!isset($this->sessInfo->SessUserID) || intVal($this->sessInfo->SessUserID) <= 0) && $this->v["uID"] > 0) {
             $this->sessInfo->SessUserID = $this->v["uID"];
@@ -420,7 +414,7 @@ class CoreTree extends SurvLoopController
         $chkNode = SLNode::where('NodeID', $this->sessInfo->SessCurrNode)
             ->where('NodeTree', $this->treeID)
             ->first();
-        if (!$chkNode || sizeof($chkNode) == 0) {
+        if (!$chkNode) {
             $this->sessInfo->SessCurrNode = 0;
             $nodeSaves = DB::table('SL_NodeSavesPage')
                 ->join('SL_Node', 'SL_Node.NodeID', '=', 'SL_NodeSavesPage.PageSaveNode')
@@ -429,7 +423,7 @@ class CoreTree extends SurvLoopController
                 ->select('SL_NodeSavesPage.*')
                 ->orderBy('updated_at', 'desc')
                 ->get();
-            if ($nodeSaves && sizeof($nodeSaves) > 0) {
+            if ($nodeSaves->isNotEmpty()) {
                 foreach ($nodeSaves as $i => $s) {
                     if ($this->sessInfo->SessCurrNode <= 0 && isset($s->PageSaveNode) 
                         && isset($this->allNodes[$s->PageSaveNode])) {
@@ -443,7 +437,6 @@ class CoreTree extends SurvLoopController
         }
         $this->sessInfo->save();
         session()->put('lastTree', $GLOBALS["SL"]->sessTree);
-//echo 'loadSessInfo ' . $currRand . ' setSessCore6 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         $this->chkIfCoreIsEditable();
         $this->updateCurrNode($this->sessInfo->SessCurrNode);
         
@@ -463,29 +456,23 @@ class CoreTree extends SurvLoopController
 				$this->updateCurrNode($this->rootID);
 			}
 		}
-//echo 'loadSessInfo ' . $currRand . ' setSessCore7 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
         return true;
     }
     
-    protected function setCoreRecUser($coreID = -3, $coreRec = [])
+    protected function setCoreRecUser($coreID = -3, $coreRec = NULL)
     {
         if ($coreID <= 0) $coreID = $this->coreID;
-        if ($coreRec && sizeof($coreRec) > 0 && $this->v["uID"] > 0) {
-            if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
-                $this->logAdd('session-stuff', 'Assigning ' . $GLOBALS["SL"]->coreTbl . '#' . $coreID . ' from U#' 
-                    . $coreRec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'UserID' } . ' to U#' 
-                    . $this->v["uID"] . ' <i>(setCoreRecUser)</i>');
-                $coreRec->{ $GLOBALS["SL"]->coreTblUserFld } = $this->v["uID"];
-                $coreRec->save();
-            }
+        if ($coreRec && $this->v["uID"] > 0 && trim($GLOBALS["SL"]->coreTblUserFld) != '') {
+            $this->logAdd('session-stuff', 'Assigning ' . $GLOBALS["SL"]->coreTbl . '#' . $coreID . ' from U#' 
+                . $coreRec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'UserID' } . ' to U#' 
+                . $this->v["uID"] . ' <i>(setCoreRecUser)</i>');
+            $coreRec->{ $GLOBALS["SL"]->coreTblUserFld } = $this->v["uID"];
+            $coreRec->save();
         }
         return $coreRec;
     }
     
-    public function chkCoreRecEmpty($coreID = -3, $coreRec = [])
-    {
-        return false;
-    }
+    public function chkCoreRecEmpty($coreID = -3, $coreRec = NULL) { return false; }
     
     // Check that core record is actually in-progress (editable)
     protected function chkIfCoreIsEditable($coreID = -3, $coreRec = [])
@@ -508,19 +495,24 @@ class CoreTree extends SurvLoopController
         return true;
     }
     
-    protected function recordIsEditable($coreTbl, $coreID, $coreRec = [])
+    protected function recordIsEditable($coreTbl, $coreID, $coreRec = NULL)
     {
         return ($this->isAdminUser() || $this->recordIsIncomplete($coreTbl, $coreID, $coreRec));
     }
     
-    protected function recordIsIncomplete($coreTbl, $coreID, $coreRec = [])
+    protected function recordIsIncomplete($coreTbl, $coreID, $coreRec = NULL)
     {
         return true;
     }
     
-    public function recordIsPublished($coreTbl, $coreID, $coreRec = [])
+    public function isPublished($coreTbl, $coreID, $coreRec = NULL)
     {
         return !$this->recordIsIncomplete($coreTbl, $coreID, $coreRec);
+    }
+    
+    public function isPublishedPublic($coreTbl, $coreID, $coreRec = NULL)
+    {
+        return $this->isPublished($coreTbl, $GLOBALS["SL"]->swapIfPublicID($coreID), $coreRec);
     }
     
     protected function createNewSess($cid = -3)
@@ -573,7 +565,7 @@ class CoreTree extends SurvLoopController
     public function restartSess(Request $request)
     {
         $trees = SLTree::get();
-        if ($trees && sizeof($trees) > 0) {
+        if ($trees->isNotEmpty()) {
             foreach ($trees as $tree) {
                 SLSess::where('SessID', session()->get('sessID' . $tree->TreeID))
                     ->where('SessTree', $tree->TreeID)
@@ -611,7 +603,7 @@ class CoreTree extends SurvLoopController
         $ownerUser = -3;
         eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
             . "::find(" . $cid . ");"); // session()->get('coreID' . $GLOBALS["SL"]->sessTree)
-        if (!$chkRec || sizeof($chkRec) == 0) return $this->redir('/my-profile');
+        if (!$chkRec) return $this->redir('/my-profile');
         if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
             $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
             if ($ownerUser != $this->v["uID"]) return $this->redir('/my-profile');
@@ -656,17 +648,30 @@ class CoreTree extends SurvLoopController
     public function afterLogin(Request $request)
     {
         $this->survLoopInit($request, '');
-        if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff')) {
+        if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff|databaser')) {
             return redirect()->intended('dashboard');
             //return $this->redir('/dashboard');
+        } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer|partner')) {
+            $opt = ($this->v["user"]->hasRole('partner')) ? 41 : 17;
+            $trees = SLTree::where('TreeDatabase', 1)
+                ->where('TreeOpts', '>', 1)
+                ->get();
+            if ($trees->isNotEmpty()) {
+                foreach ($trees as $tree) {
+                    if ($tree->TreeOpts%$opt == 0 && $tree->TreeOpts%7 == 0) {
+                        return redirect()->intended('dash/' . $tree->TreeSlug);
+                    }
+                }
+            }
         } else {
+            $hasCoreTbl = (isset($GLOBALS["SL"]->coreTbl) && isset($GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl]));
             $sessTree = ((session()->has('sessTreeReg')) ? session()->get('sessTreeReg') : $GLOBALS["SL"]->sessTree);
             $sessInfo = [];
-            $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
+            $coreAbbr = (($hasCoreTbl) ? $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] : '');
             $minute = mktime(date("H"), date("i")-1, date("s"), date('n'), date('j'), date('Y'));
             if ($minute < strtotime($this->v["user"]->created_at)) { // signed up in the past minute
                 $firstUser = User::select('id')->get();
-                if ($firstUser && sizeof($firstUser) == 1) {
+                if ($firstUser->isNotEmpty() && sizeof($firstUser) == 1) {
                     $user->assignRole('administrator');
                     $this->logAdd('session-stuff', 'New System Administrator #' . $this->v["user"]->id . ' Registered');
                 } elseif ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
@@ -675,7 +680,7 @@ class CoreTree extends SurvLoopController
                 } else {
                     $this->logAdd('session-stuff', 'New User #' . $this->v["user"]->id . ' Registered');
                 }
-                if (session()->has('coreID' . $sessTree)) {
+                if (session()->has('coreID' . $sessTree) && $hasCoreTbl) {
                     eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
                         . "::find(" . session()->get('coreID' . $sessTree) . ");");
                     if ($chkRec && isset($chkRec->{ $coreAbbr . 'IPaddy' })) {
@@ -708,7 +713,7 @@ class CoreTree extends SurvLoopController
                         . $this->coreID . ' for U#' . $this->v["uID"] . ' <i>(afterLogin)</i>');
                 }
             }
-            if (sizeof($sessInfo) > 0 && isset($sessInfo->SessCurrNode) && intVal($sessInfo->SessCurrNode) > 0) {
+            if ($sessInfo && isset($sessInfo->SessCurrNode) && intVal($sessInfo->SessCurrNode) > 0) {
                 $this->loadTree();
                 $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
                 if (trim($nodeURL) != '') return $this->redir($nodeURL);
@@ -723,18 +728,18 @@ class CoreTree extends SurvLoopController
     public function findUserCoreID()
     {
         $this->coreIncompletes = [];
-        if ($this->v["uID"] > 0) {
-            eval("\$incompletes = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
-                . "::where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] . ")"
-                . "->orderBy('created_at', 'desc')->get();");
-            if ($incompletes && sizeof($incompletes) > 0) {
-                foreach ($incompletes as $i => $row) {
-                    if ($this->recordIsIncomplete($GLOBALS["SL"]->coreTbl, $row->getKey(), $row)) {
-                        $this->coreIncompletes[] = [$row->getKey(), $row];
+        if ($this->v["uID"] > 0 && isset($GLOBALS["SL"]->coreTbl) && trim($GLOBALS["SL"]->coreTbl) != '') {
+            $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl);
+            if (trim($model) != '') {
+                eval("\$incompletes = " . $model . "::where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] . ")"
+                    . "->orderBy('created_at', 'desc')->get();");
+                if ($incompletes->isNotEmpty()) {
+                    foreach ($incompletes as $i => $row) {
+                        if ($this->recordIsIncomplete($GLOBALS["SL"]->coreTbl, $row->getKey(), $row)) {
+                            $this->coreIncompletes[] = [$row->getKey(), $row];
+                        }
                     }
-                }
-                if (sizeof($this->coreIncompletes) > 0) {
-                    return $this->coreIncompletes[0][0];
+                    if (sizeof($this->coreIncompletes) > 0) return $this->coreIncompletes[0][0];
                 }
             }
         }
@@ -746,16 +751,18 @@ class CoreTree extends SurvLoopController
         $this->v["multipleRecords"] = '';
         if (trim($GLOBALS["SL"]->coreTbl) != '') {
             $coreID = $this->findUserCoreID();
-            if (!$this->coreIncompletes || $coreID <= 0 || sizeof($this->coreIncompletes) <= 0
-                || (sizeof($this->coreIncompletes) == 1 && !$oneToo)) return '';
+            if ($coreID <= 0 || !$this->coreIncompletes || sizeof($this->coreIncompletes) == 0
+                || (sizeof($this->coreIncompletes) == 1 && !$oneToo)) {
+                return '';
+            }
             foreach ($this->coreIncompletes as $i => $coreRow) {
                 $this->v["multipleRecords"] .= $this->multiRecordCheckRow($i, $coreRow);
             }
             if (trim($this->v["multipleRecords"]) != '') {
                 $this->v["multipleRecords"] = '<div class="nodeGap"></div>'
                     . $this->multiRecordCheckIntro(sizeof($this->coreIncompletes))
-                    . '<div id="hidivUnfinished" class="disNon brdDrk round5 p10 mTn10"><div class="p10"></div>'
-                    . $this->v["multipleRecords"] . '</div>';
+                    . '<div id="hidivUnfinished' . $this->currNode() . '" class="disNon brdDrk round5 p10 mTn10">'
+                    . '<div class="p10"></div>' . $this->v["multipleRecords"] . '</div>';
                 /* if (!session()->has('multiRecordCheck')) {
                     $GLOBALS["errors"] .= $this->v["multipleRecords"];
                     session()->put('multiRecordCheck', date('Y-m-d H:i:s'));
@@ -767,8 +774,8 @@ class CoreTree extends SurvLoopController
     
     public function multiRecordCheckIntro($cnt = 1)
     {
-        return '<a id="hidivBtnUnfinished" class="btn btn-lg btn-primary w100 hidivBtn" href="javascript:;">' 
-            . $this->v["user"]->name . ', You Have ' 
+        return '<a id="hidivBtnUnfinished' . $this->currNode() . '" class="btn btn-lg btn-primary w100 hidivBtn" '
+            . 'href="javascript:;">' . $this->v["user"]->name . ', You Have ' 
             . (($cnt == 1) ? 'An Unfinished Session' : 'Unfinished Sessions') . '</a>';
     }
     
@@ -854,7 +861,6 @@ class CoreTree extends SurvLoopController
             session()->put('sessMsg', $this->delSessMsg($coreID));
             $newCoreID = $this->findUserCoreID();
             if ($this->coreIncompletes && sizeof($this->coreIncompletes) == 1 && $newCoreID > 0) {
-//echo 'umm D<br />';
                 $this->createNewSess();
                 $this->setSessCore($newCoreID);
             }
@@ -884,42 +890,179 @@ class CoreTree extends SurvLoopController
                     ->whereIn('SessTree', [$this->treeID, $GLOBALS["SL"]->sessTree])
                     ->where('SessCoreID', $coreID)
                     ->get();
-                if ($chk && sizeof($chk) > 0) return true;
+                if ($chk->isNotEmpty()) return true;
             }
             return false;
         }
         // else user is already logged in
-        if ($coreID <= 0) $coreID = $this->coreID;
-        $chk = SLSess::where('SessTree', $this->treeID)
-            ->where('SessUserID', $this->v["uID"])
-            ->where('SessCoreID', $coreID)
-            ->get();
-        if ($chk && sizeof($chk) > 0) return true;
         if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
             eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
                 . "::where('" . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . "ID', " . $coreID . ")"
                 . "->where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] . ")"
                 . "->first();");
-            if ($chk && sizeof($chk) > 0) return true;
+            if ($chk) return true;
+        }
+        if (!$this->isAdminUser()) {
+            $chk = SLSess::where('SessTree', $this->treeID)
+                ->where('SessUserID', $this->v["uID"])
+                ->where('SessCoreID', $coreID)
+                ->get();
+            if ($chk->isNotEmpty()) return true;
         }
         return $this->isCoreOwnerAlt($coreID);
     }
     
-    protected function isCoreOwnerAlt($coreID = -3)
+    protected function isCoreOwnerPublic($coreID = -3)
     {
-        return false;
+        return $this->isCoreOwner($GLOBALS["SL"]->swapIfPublicID($coreID));
     }
+    
+    protected function isCoreOwnerAlt($coreID = -3) { return false; }
+    
+    protected function checkPageViewPerms()
+    {
+        if (!isset($GLOBALS["SL"]->x["pageView"])) $GLOBALS["SL"]->x["pageView"] = '';
+        $initPageView = $GLOBALS["SL"]->x["pageView"];
+        if (!isset($GLOBALS["SL"]->x["dataPerms"])) $GLOBALS["SL"]->x["dataPerms"] = 'public';
+        if ($this->v["uID"] > 0 && $this->v["user"]) {
+            if (in_array($GLOBALS["SL"]->x["pageView"], ['', 'default'])) {
+                $GLOBALS["SL"]->x["pageView"] = 'public';
+                if ($this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                    $GLOBALS["SL"]->x["pageView"] = 'full';
+                }
+            } elseif (!$this->isCoreOwner()) {
+                if (in_array($GLOBALS["SL"]->x["pageView"], ['full', 'full-pdf', 'full-xml'])) {
+                    if (!$this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                        switch ($GLOBALS["SL"]->x["pageView"]) {
+                            case 'full-pdf': $GLOBALS["SL"]->x["pageView"] = 'pdf';    break;
+                            case 'full-xml': $GLOBALS["SL"]->x["pageView"] = 'xml';    break;
+                            default:         $GLOBALS["SL"]->x["pageView"] = 'public'; break;
+                        }
+                    }
+                }
+            }
+            if ($this->v["user"]->hasRole('databaser')) {
+                $GLOBALS["SL"]->x["dataPerms"] = 'internal';
+            } elseif ($this->v["user"]->hasRole('administrator|staff') || $this->isCoreOwner()) {
+                $GLOBALS["SL"]->x["dataPerms"] = 'sensitive';
+            }
+        } else {
+            if (in_array($GLOBALS["SL"]->x["pageView"], ['', 'default', 'full'])) {
+                $GLOBALS["SL"]->x["pageView"] = 'public';
+            } elseif ($GLOBALS["SL"]->x["pageView"] == 'full-pdf') {
+                $GLOBALS["SL"]->x["pageView"] = 'pdf';
+            } elseif ($GLOBALS["SL"]->x["pageView"] == 'full-xml') {
+                $GLOBALS["SL"]->x["pageView"] = 'xml';
+            }
+        }
+        $this->chkPageToken();
+        $this->tweakPageViewPerms();
+        if ($initPageView != $GLOBALS["SL"]->x["pageView"]) {
+            //$this->redir('/' . $GLOBALS["SL"]->treeRow->TreeSlug 
+            //    . '/read-' . $this->corePublicID . '/' . $GLOBALS["SL"]->x["pageView"]);
+        }
+        return true;
+    }
+    
+    protected function tweakPageViewPerms() { return true; }
     
     protected function isAdminUser()
     {
         if (!isset($this->v["user"]) || $this->v["uID"] <= 0) return false;
-        $perm = $this->v["user"]->highestPermission();
-        return (in_array($perm, ['administrator', 'staff']));
+        return $this->v["user"]->hasRole('administrator|databaser|staff');
     }
     
-    protected function isPublic()
+    protected function isPublic() { return true; }
+    
+    protected function chkPageToken()
     {
-        return true;
+        if (strlen($GLOBALS["SL"]->x["pageView"]) > 6 && substr($GLOBALS["SL"]->x["pageView"], 0, 6) == 'token-') {
+            $this->v["tokenIn"] = substr($GLOBALS["SL"]->x["pageView"], 6);
+            $GLOBALS["SL"]->x["pageView"] = '';
+        }
+        if (!isset($this->v["mfaMsg"])) $this->v["mfaMsg"] = '';
+        if (!isset($this->v["pageToken"])) $this->v["pageToken"] = [];
+        if (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '') $this->v["mfaMsg"] = $this->processTokenAccess();
+        return (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0);
+    }
+    
+    public function pageLoadHasToken()
+    {
+        return ( (isset($GLOBALS["SL"]->x["pageView"]) && trim($GLOBALS["SL"]->x["pageView"]) == 'token')
+            || (isset($this->v["mfaMsg"]) && trim($this->v["mfaMsg"]) != '')
+            || (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '')
+            || (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0) );
+    }
+    
+    protected function processTokenAccess($showLabel = true)
+    {
+        if (!isset($this->v["tokenIn"]) || $this->v["tokenIn"] == '') return '';
+        $ret = '';
+        $chk = SLTokens::where('TokType', 'Sensitive')
+            ->where('TokCoreID', $this->coreID)
+            ->where('TokTokToken', $this->v["tokenIn"])
+            ->orderBy('updated_at', 'desc')
+            ->first();
+        if ($chk && isset($chk->TokUserID) && intVal($chk->TokUserID) > 0) {
+            $this->v["tokenUser"] = User::find($chk->TokUserID);
+            if ($this->v["tokenUser"] && isset($this->v["tokenUser"]->id)) {
+                $mfaTools = true;
+                $resultMsg = '';
+                if ($GLOBALS["SL"]->REQ->has('sub') && $GLOBALS["SL"]->REQ->has('t2') 
+                    && trim($GLOBALS["SL"]->REQ->get('t2')) != '') {
+                    $chk = SLTokens::where('TokType', 'MFA')
+                        ->where('TokCoreID', $this->coreID)
+                        ->where('TokTokToken', $GLOBALS["SL"]->REQ->get('t2'))
+                        ->where('updated_at', '>', date("Y-m-d H:i:s", 
+                            mktime(date("H"), date("i"), date("s"), date("m"), date("d")-7, date("Y"))))
+                        ->orderBy('updated_at', 'desc')
+                        ->first();
+                    if ($chk) {
+                        Auth::login($this->v["tokenUser"]);
+                        $successMsg = '<div class="alert alert-success alert-dismissible" role="alert">'
+                            . '<i class="fa-li fa fa-spinner fa-spin"></i> <strong>Access Granted!</strong> '
+                            . '<span class="mL10">Reloading the page ...</span>'
+                            . '<button type="button" class="close" data-dismiss="alert">×</button></div>';
+                        session()->put('sessMsg', $successMsg);
+                        $resultMsg .= $this->processTokenAccessRedirExtra() . '<script type="text/javascript"> '
+                            . 'setTimeout("window.location=\'/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/read-' 
+                            . $this->corePublicID . '/full\'", 300); </script>';
+                    } else {
+                        $resultMsg .= '<div id="keySry" class="alert alert-danger mT10 mB10" role="alert"><strong>'
+                            . 'Whoops!</strong> The Key Code you entered didn\'t match our records or it expired. '
+                            . 'To view the full details using your authorized email address, please '
+                            . '<a href="?resend=access">request a new key code</a>.</div>';
+                    }
+                } else {
+                    if ($GLOBALS["SL"]->REQ->has('resend') 
+                        && trim($GLOBALS["SL"]->REQ->get('resend')) == 'access') {
+                        $this->processTokenAccessEmail();
+                    }
+                }
+                if ($mfaTools) {
+                    $ret .= view('vendor.survloop.inc-sensitive-access-mfa-form', [
+                        "cID"       => $this->coreID, 
+                        "user"      => $this->v["tokenUser"],
+                        "showLabel" => $showLabel
+                        ])->render() . $resultMsg;
+                } else {
+                    $ret .= $resultMsg;
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    protected function processTokenAccessRedirExtra() { return ''; }
+    
+    protected function processTokenAccessEmail() { return '<i>Emailing here needs to be setup.</i>'; }
+    
+    protected function errorDeniedFullPdf()
+    {
+        return '<br /><br /><center><h3>You must <a href="/login">login</a> to access the complete details.<br /><br />'
+            . 'The public version can be found here:<br /><a href="/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/read-' 
+            . $this->corePublicID . '">' . $GLOBALS["SL"]->sysOpts["app-url"] . '/complaint/read-' . $this->corePublicID 
+            . '</a></h3></center>';
     }
     
     
@@ -1020,21 +1163,17 @@ class CoreTree extends SurvLoopController
                 $user->name = $request->name;
                 $user->email = $request->email;
                 $user->save();
-                if ($request->roles && sizeof($request->roles) > 0) {
+                if ($request->has('roles') && is_array($request->roles) && sizeof($request->roles) > 0) {
                     foreach ($user->rolesRanked as $i => $role) {
                         if (in_array($role, $request->roles)) {
-                            if (!$user->hasRole($role)) {
-                                $user->assignRole($role);
-                            }
+                            if (!$user->hasRole($role)) $user->assignRole($role);
                         } elseif ($user->hasRole($role)) {
                             $user->revokeRole($role);
                         }
                     }
                 } else { // no roles selected, delete all that exist
                     foreach ($user->rolesRanked as $i => $role) {
-                        if ($user->hasRole($role)) {
-                            $user->revokeRole($role);
-                        }
+                        if ($user->hasRole($role)) $user->revokeRole($role);
                     }
                 }
             }
@@ -1049,27 +1188,54 @@ class CoreTree extends SurvLoopController
             if ($this->v["profileUser"] && isset($this->v["profileUser"]->id)) {
                 return true;
             }
+        } elseif ($this->v["uID"] > 0 && isset($this->v["user"]->id)) {
+            $this->v["profileUser"] = $this->v["user"];
+            return true;
         }
         return false;
     }
     
-    public function showProfileBasics() 
+    public function showProfileBasics()
     {
-        if ($this->v["profileUser"] && isset($this->v["profileUser"]->id)) {
+        if (isset($this->v["profileUser"]) && isset($this->v["profileUser"]) && isset($this->v["profileUser"]->id)) {
             $this->v["canEdit"] = ($this->v["user"] 
                 && ($this->v["user"]->hasRole('administrator') || $this->v["user"]->id == $this->v["profileUser"]->id));
+            if ($this->v["uID"] > 0 && Session::has('success') && !$GLOBALS["SL"]->isHomestead()) {
+                $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password has been changed.';
+                $emaContent = '<h3>Password updated</h3><p>Hi ' . $this->v["user"]->name 
+                    . ',</p><p>We\'ve changed your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password, as you asked.'
+                    . 'To view or change your account information, visit <a href="' . $GLOBALS["SL"]->sysOpts["app-url"]
+                    . '/my-profile" target="_blank">your profile</a>.</p>'
+                    . '<p>If you did not ask to change your password we are here to help secure your account, '
+                    . 'just contact us.</p><p>–Your friends at ' 
+                    . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
+                $this->sendEmail($emaContent, $emaSubject, [[$this->v["user"]->email, '']]);
+            }
             return view('vendor.survloop.profile', $this->v);
         }
-        return '<div><i>User not found.</i></div>';
+        return '<br /><br /><br /><center><i>User not found.</i></center>'
+            . '<script type="text/javascript"> setTimeout("window.location=\''
+            . ((Auth::user() && isset(Auth::user()->name)) ? '/my-profile' : '/login') . '\'", 10000); </script>';
     }
     
-    public function genNewCorePubID($tbl = '')
+    protected function getParentsAncestry($nID)
     {
-        if (trim($tbl) == '') $tbl = $GLOBALS["SL"]->coreTbl;
-        $pubIdFld = $GLOBALS["SL"]->tblAbbr[$tbl] . 'PublicID';
-        eval("\$idChk = " . $GLOBALS["SL"]->modelPath($tbl) . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
-        if (!$idChk || !isset($idChk->{ $pubIdFld }) || intVal($idChk->{ $pubIdFld }) <= 0) return 1;
-        return (1+intVal($idChk->{ $pubIdFld }));
+        $this->v["ancestors"] = [];
+        $parent = -3;
+        if (isset($this->allNodes[$nID])) $parent = $this->allNodes[$nID]->getParent();
+        while ($parent > 0 && isset($this->allNodes[$parent])) {
+            $this->v["ancestors"][] = $parent;
+            $parent = $this->allNodes[$parent]->getParent();
+        }
+        return $this->v["ancestors"];
     }
+    
+    protected function loadAncestry($nID)
+    {
+        $this->getParentsAncestry($nID);
+        return $this->loadAncestXtnd($nID);
+    }
+    
+    protected function loadAncestXtnd($nID) { return true; }
     
 }

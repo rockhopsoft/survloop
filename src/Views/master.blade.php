@@ -163,25 +163,26 @@
     
 @endif <?php /* end not print */ ?>
 
-@if (isset($isFrame) && $isFrame)
-
-    @if (isset($content)) {!! $content !!} @endif
-    @yield('content')
-    </div>
-
-@elseif (isset($admMenu) || isset($belowAdmMenu))
+@if ((!isset($isFrame) || !$isFrame) && (isset($admMenu) || isset($belowAdmMenu)))
     
-    @if (isset($isPrint) && $isPrint)
+    @if ((isset($isPrint) && $isPrint) || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
+    
         <br />
         <div class="container">
             <div class="p5 pL20">
                 <img src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" alt="Link back to main website" 
                     title="Link back to main website" height=75 border=0 >
             </div>
+            @if (isset($content)) {!! $content !!} @endif
+            @yield('content')
+        </div>
+        
     @else
         
         <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
-            <td id="leftSide"><div id="leftSideWdth"></div><div id="leftSideWrap">
+        <td id="leftSide">
+            <div id="leftSideWdth"></div>
+            <div id="leftSideWrap">
                 <div id="leftAdmMenu">
                     @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
                         && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
@@ -214,39 +215,38 @@
                     <a id="menuUnColpsBtn" href="javascript:;"
                         ><i class="fa fa-caret-square-o-right" aria-hidden="true"></i></a>
                 </div>
-            </td><td id="mainBody" class="w100 h100">
-                <div class="container-fluid">
-    @endif
-                    @if (isset($content)) {!! $content !!} @endif
-                    @yield('content')
-                    
-                    @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
-                        {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
-                    @endif
-            
-    @if (isset($isPrint) && $isPrint)    
-        </div>
-    @else
             </div>
-        </div></td></tr></table>
+        </td><td id="mainBody" class="w100 h100">
+            <div class="container-fluid">
+                @if (isset($content)) {!! $content !!} @endif
+                @yield('content')
+                @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
+                    {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
+                @endif
+            </div>
+        </td>
+    </tr></table>
     @endif
 
 @else
 
-    @if (!isset($hasContain) || !$hasContain) <div id="bodyContain" class="container"> @endif
         @if (isset($content)) {!! $content !!} @endif
         @yield('content')
-    @if (!isset($hasContain) || !$hasContain) </div> <!-- end bodyContain --> @endif
     
 @endif
 
-@if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
+@if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame) 
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
-
-    @if (!isset($admMenu) && !isset($belowAdmMenu)) 
-        @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!} @endif
-    @endif
     
+        @if (!isset($admMenu) && !isset($belowAdmMenu))
+            @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!}
+            @elseif (isset($GLOBALS["SL"]->sysOpts["footer-master"])
+                && trim($GLOBALS["SL"]->sysOpts["footer-master"]) != '')
+                {!! $GLOBALS["SL"]->sysOpts["footer-master"] !!}
+            @endif
+        @endif
+        
     </div> <!-- end nondialog -->
     <div id="dialog">
         <div class="panel panel-primary">
@@ -259,7 +259,9 @@
             <div class="panel-body"><div id="dialogBody"></div></div>
         </div>
     </div>
-
+    
+@else
+    </div> <!-- end nondialog -->
 @endif <?php /* end not print or frame */ ?>
 
 </div> <!-- end #main (non-offcanvas-menu) -->
@@ -296,6 +298,12 @@
 {!! $GLOBALS['SL']->getXtraJs() !!}
 @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
     $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
+@endif
+@if (isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
+    @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
+        alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+    @endif
+    setTimeout("window.print()", 1000);
 @endif
 </script>
 

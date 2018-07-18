@@ -6,10 +6,10 @@
 @endif
 <div class="w100" style="height: @if (isset($hgt)) {{ $hgt }} 
     @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) {{ $currNode->extraOpts['hgt'] }} 
-    @else auto @endif ; overflow: visible;">
+    @else 50% @endif ; overflow: visible;">
 @if (isset($graphFail) && $graphFail)
     <div class="jumbotron w100 h100 mB5"><i>No data found</i></div>
-@elseif (isset($pieData) && sizeof($pieData) > 0)
+@elseif (isset($pieData) && is_array($pieData) && sizeof($pieData) > 0)
     <div class="w100 pR5"><canvas id="{{ $currGraphID }}myChart" style="width: 100%; height: 100%;" ></canvas></div>
     <script>
     new Chart(document.getElementById("{{ $currGraphID }}myChart").getContext('2d'), {

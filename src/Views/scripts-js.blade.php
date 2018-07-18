@@ -850,6 +850,10 @@ function getSpinner() {
 function getSpinnerAjaxWrap() {
     return {!! json_encode('<div id="ajaxWrapLoad" class="container">') !!}+getSpinner()+{!! json_encode('</div>') !!};
 }
+function replaceAjaxWithSpinner() {
+    if (document.getElementById("ajaxWrap")) document.getElementById("ajaxWrap").innerHTML=getSpinnerAjaxWrap();
+    return true;
+}
 
 function changeLoopListType(fld) {
     if (document.getElementById(''+fld+'TypeID')) {
@@ -904,6 +908,22 @@ function addHshoo(hash) {
     return true;
 }
 
+function checkBoxAll(fldBase, count, isChecked) {
+    for (var i = 0; i < count; i++) {
+        var fldID = fldBase.concat(i);
+        if (document.getElementById(fldID)) document.getElementById(fldID).checked = isChecked;
+    }
+    return true;
+}
+
+function isInViewport(node) {
+    var rect = node.getBoundingClientRect();
+    return (
+        (rect.height > 0 || rect.width > 0) && rect.bottom >= 0 && rect.right >= 0 &&
+        rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.left <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
 
 function setPopDiaTxt(title, desc) {
     return true;
@@ -931,6 +951,7 @@ $(document).ready(function(){
     $(document).on("click", ".unPopDialog", function() { unPopDialog(); });
     
     function chkFormSess() {
+        /*
         if (document.getElementById("csrfTok")) {
             var src = "/time-out";
             if (document.getElementById("postNodeForm") && document.getElementById("stepID") && document.getElementById("treeID")) {
@@ -942,6 +963,7 @@ $(document).ready(function(){
             $("#nondialog").fadeOut(300);
             $("#dialog").fadeIn(300);
         }
+        */
         return true;
     }
     setTimeout(function() { chkFormSess(); }, (115*60000));
@@ -973,7 +995,7 @@ $(document).ready(function(){
     function runFormSubAjax() {
         blurAllFlds();
         var formData = new FormData(document.getElementById("postNodeForm"));
-        document.getElementById("ajaxWrap").innerHTML=getSpinnerAjaxWrap();
+        replaceAjaxWithSpinner();
         window.scrollTo(0, 0);
         var actionUrl = "/sub";
         if (document.getElementById("postActionID")) actionUrl = document.getElementById("postActionID").value;
@@ -1089,7 +1111,7 @@ $(document).ready(function(){
     
     function postNodeAutoSave() {
         if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
-            if (!document.getElementById('emailBlockID')) {
+            if (!document.getElementById('emailBlockID') && !document.getElementById('noAutoSaveID')) {
                 var origStep = document.getElementById('stepID').value;
                 var origTarget = document.postNode.target;
                 document.getElementById('stepID').value = "autoSave";
@@ -1116,15 +1138,23 @@ $(document).ready(function(){
         return false;
     };
     
-    function chkOtherFormSub() {
+    function timeoutChecks() {
         if (otherFormSub) {
             return runFormSub();
             otherFormSub = false;
         }
-        setTimeout(function() { chkOtherFormSub(); }, 500);
+        if (document.getElementById("admMenu")) {
+            var leftPos = $(document).scrollLeft();
+            if (leftPos > 0) {
+                document.getElementById("leftSideWrap").style.position="static";
+            } else {
+                document.getElementById("leftSideWrap").style.position="fixed";
+            }
+        }
+        setTimeout(function() { timeoutChecks(); }, 500);
         return true;
     }
-    setTimeout(function() { chkOtherFormSub(); }, 500);
+    setTimeout(function() { timeoutChecks(); }, 500);
     
     $(document).on("click", ".editLoopItem", function() {
         var id = $(this).attr("id").replace("editLoopItem", "").replace("arrowLoopItem", "");
@@ -1313,6 +1343,14 @@ $(document).ready(function(){
         return true;
     }
     
+    $(document).on("click", ".clkBox", function(e) {
+        if ($(this).attr("data-url")) {
+            if (e.shiftKey || e.ctrlKey || e.metaKey) window.open($(this).attr("data-url"), "_blank");
+            else window.location=$(this).attr("data-url");
+        }
+        return true;
+    });
+    
     $("a.hsho").on('click', function(event) {
         var hash = $(this).attr("data-hash").trim();
         if (hash !== "") {
@@ -1385,6 +1423,25 @@ $(document).ready(function(){
     $(document).scroll(function() {
         chkHshooScroll();
     });
+    
+    function chkScrollPar() {
+        var scrolled = $(window).scrollTop();
+        $(".parallax").each(function(index, element) {
+            var initY = $(this).offset().top;
+            var height = $(this).height();
+            var endY  = initY + $(this).height();
+            var visible = isInViewport(this);
+            if (visible) {
+                var diff = scrolled - initY;
+                var ratio = Math.round((diff / height) * 100);
+                $(this).css('background-position','center ' + parseInt(-(ratio * 1.5)) + 'px');
+            }
+        });
+    }
+    $(window).scroll(function() {
+        chkScrollPar();
+    });
+    setTimeout(function() { chkScrollPar() }, 10);
     
 	$(document).on("click", ".searchBarBtn", function() {
         var nID = $(this).attr("id").replace("searchTxt", "").split("t");
@@ -1565,8 +1622,14 @@ $(document).ready(function(){
         if (document.getElementById(dest)) $("#"+dest+"").load(ajxUrl);
 	});
     
-    if (!document.getElementById('loginLnk')) $("#headClear").load("/js-load-menu");
-    
+	function chkMenuLoad() {
+	    if (!document.getElementById('loginLnk') && document.getElementById('headClear')) {
+	        $("#headClear").load("/js-load-menu");
+	    }
+	}
+    setTimeout(function() { chkMenuLoad(); }, 500);
+    setTimeout(function() { chkMenuLoad(); }, 2000);
+	
     $(document).on("click", ".adminAboutTog", function() {
         if (document.getElementById('adminAbout')) {
             $("#adminAbout").slideToggle('slow');
@@ -1726,13 +1789,17 @@ $(document).ready(function(){
 	});
 	$(document).on("click", ".delSprdTblRow", function() {
         var nID = $(this).attr("data-nid");
+        var nIDtxt = $(this).attr("data-nidtxt");
         var rowind = $(this).attr("data-row-ind");
         if (nodeTblList[nID] && nodeTblList[nID].length > 0) {
             for (var i = 0; i < nodeTblList[nID].length; i++) {
-                if (document.getElementById('n'+nodeTblList[nID][i]+'tbl'+rowind+'FldID')) {
-                    document.getElementById('n'+nodeTblList[nID][i]+'tbl'+rowind+'FldID').value='';
+                if (document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID")) {
+                    document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID").value="";
                 }
             }
+        }
+        if (document.getElementById("n"+nIDtxt+"tbl"+rowind+"row")) {
+            document.getElementById("n"+nIDtxt+"tbl"+rowind+"row").style.display="none";
         }
         return true;
     });
@@ -1995,7 +2062,19 @@ $(document).ready(function(){
         else openAdmMenu();
     });
     
-    
+    $(document).on("click", ".clickBox", function() {
+        if ($(this).attr("data-url")) window.location=$(this).attr("data-url");
+        return true;
+	});
+    $(document).on({
+        mouseenter: function () {
+            $(this).css("background-color", "{!! $css['color-main-faint'] !!}");
+        },
+        mouseleave: function () {
+            $(this).css("background-color", "{!! $css['color-main-bg'] !!}");
+        }
+    }, ".clickBox");
+	
     
     @if (isset($jqueryXtra)) {!! $jqueryXtra !!} @endif
 	
@@ -2056,6 +2135,7 @@ function addTopCust(navCode) {
 }
 function addTopNavItem(navTxt, navLink) {
     if (document.getElementById("myNavBarIn")) {
+        if (navTxt == 'pencil') navTxt = "<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>";
         var newLink = "<a class=\"pull-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
         if (document.getElementById("myNavBarIn").innerHTML.indexOf(newLink) < 0) {
             document.getElementById("myNavBarIn").innerHTML += newLink;

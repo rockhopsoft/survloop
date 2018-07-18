@@ -3,7 +3,7 @@
 <div class="w100" style="height: @if (isset($hgt)) {{ $hgt }} 
     @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) {{ $currNode->extraOpts['hgt'] }} 
     @else auto @endif ; overflow: visible;">
-@if ((isset($graphFail) && $graphFail) || !isset($data) || sizeof($data) == 0)
+@if ((isset($graphFail) && $graphFail) || !isset($data) || empty($data))
     <div class="jumbotron w100 h100 mB5"><i>No data found</i></div>
 @else
     <div class="w100 pR5"><canvas id="{{ $currGraphID }}myChart" style="width: 100%; height: 100%;" ></canvas></div>

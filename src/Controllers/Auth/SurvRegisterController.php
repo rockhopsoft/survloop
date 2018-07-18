@@ -36,7 +36,7 @@ class SurvRegisterController extends RegisterController
             if ($admDef && isset($admDef->DefID)) $adminRoleID = $admDef->DefID;
             $hasAdmins = SLUsersRoles::where('RoleUserRID', $adminRoleID) // role id of 'administrator'
                 ->get();
-            if (!$hasAdmins || sizeof($hasAdmins) == 0) {
+            if ($hasAdmins->isEmpty()) {
                 $survUser->assignRole('administrator');
                 $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
             } else {

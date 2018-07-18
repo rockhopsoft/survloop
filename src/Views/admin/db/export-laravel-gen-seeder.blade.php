@@ -13,6 +13,8 @@ class {{ str_replace('_', '', $GLOBALS['SL']->dbRow->DbPrefix) }}Seeder extends 
      */
     public function run()
     {
+@if (!isset($wholeSeed) || $wholeSeed)
     {!! $dumpOut["Seeders"] !!}
     }
 }
+@endif

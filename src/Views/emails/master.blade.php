@@ -41,26 +41,13 @@ h4 { font-size: 125%; }
 h5 { font-size: 110%; }
 .fPerc133 { font-size: 133%; }
 
-.borderBox, .borderBoxIn {
-    margin: 10px; 
-    padding: 2px;
-    width: 100%;
-    max-width: 700px;
-    -moz-border-radius: 10px; border-radius: 10px;
-    border: 1px {!! $cssColors["color-main-on"] !!} solid;
-}
-.borderBoxIn {
-    margin: 0px;
-    padding: 20px;
-    max-width: 658px;
-}
 .contentBox {
     padding: 20px;
     color: {!! $cssColors['color-main-text'] !!};
 }
 #logoImg {
-    height: 75px;
-    max-width: 500px;
+    max-height: 75px;
+    width: 80%;
     margin-bottom: 10px;
 }
 
@@ -86,9 +73,7 @@ h5 { font-size: 110%; }
 {!! $cssColors['css-dump'] !!}
 </style>
 </head><body>
-<div class="borderBox"><div class="borderBoxIn">
-    <center><img id="logoImg" src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 ></center>
-    <div class="contentBox">{!! $emaContent !!}</div>
-</div></div>
+<center><img id="logoImg" src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 ></center>
+<div class="contentBox">{!! $emaContent !!}</div>
 </body></html>

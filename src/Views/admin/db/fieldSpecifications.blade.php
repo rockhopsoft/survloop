@@ -74,7 +74,7 @@
                             <option value="">(load generic field)</option>
                             {!! view('vendor.survloop.admin.db.inc-getFldGenericOpts', [
                                 "presel" => $fld->FldSpecSource, 
-                                "dbFldGenerics" => ((isset($dbFldGenerics)) ? $dbFldGenerics : array()) 
+                                "dbFldGenerics" => ((isset($dbFldGenerics)) ? $dbFldGenerics : []) 
                             ]) !!}
                         </select>
                         <a onClick="if (document.getElementById('FldSpecSourceID').value != '') window.location='{{ $FldSpecSourceJSlnk }}&loadGeneric='+document.getElementById('FldSpecSourceID').value+'';" 
@@ -370,19 +370,28 @@
                                 @endif
                                  )</nobr>
                             </div>
-                            <div data-toggle="tooltip" data-placement="top" title="Degree of Participation B-A: How many 
-                                {{ view('vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldTable, 'link' => 0 ]) }}
-                                records can be associated with a single record from 
-                                {{ view('vendor.survloop.admin.db.inc-getTblName', [ 'id' => $fld->FldForeignTable, 'link' => 0 ]) }} ?">
-                                <i># of these records to one foreign record:</i>
+                            <div data-toggle="tooltip" data-placement="top" 
+                                title="Degree of Participation B-A: How many {{ 
+                                    view('vendor.survloop.admin.db.inc-getTblName', [
+                                        'id' => $fld->FldTable,
+                                        'link' => 0
+                                    ]) }} records can be associated with a single record from {{ 
+                                    view('vendor.survloop.admin.db.inc-getTblName', [
+                                        'id' => $fld->FldForeignTable,
+                                        'link' => 0
+                                        ]) }} ?"><i># of these records to one foreign record:</i>
                             </div>
                             <div class="pB20">
                             @if ($edit)
-                                <nobr>( <label for="FldForeignMin">min:</label> <select id="FldForeignMinID" name="FldForeignMin" style="width: 70px;">
-                                {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMin)) ) !!}
+                                <nobr>( <label for="FldForeignMin">min:</label> 
+                                    <select id="FldForeignMinID" name="FldForeignMin" style="width: 70px;">
+                                    {!! view('vendor.survloop.admin.db.inc-getLinkCnt', [
+                                        "presel" => trim($fld->FldForeignMin) ])->render() !!}
                                 </select>, 
-                                <label for="FldForeignMax">max:</label> <select id="FldForeignMaxID" name="FldForeignMax" style="width: 70px;">
-                                {!! view('vendor.survloop.admin.db.inc-getLinkCnt', array("presel" => trim($fld->FldForeignMax)) ) !!}
+                                <label for="FldForeignMax">max:</label> 
+                                <select id="FldForeignMaxID" name="FldForeignMax" style="width: 70px;">
+                                {!! view('vendor.survloop.admin.db.inc-getLinkCnt', [
+                                    "presel" => trim($fld->FldForeignMax) ])->render() !!}
                                 </select></nobr>
                             @else
                                 <nobr>( min: {{ $fld->FldForeignMin }}, max: {{ $fld->FldForeignMax }} )</span></nobr>

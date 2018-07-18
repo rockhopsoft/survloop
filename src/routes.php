@@ -41,7 +41,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
-    Route::get( '/up/{treeSlug}/{cid}/{upID}',     'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
+    Route::get( '/up/{treeSlug}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
     
     Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
     Route::get( '/search-results/{treeID}',  'SurvLoop\\Controllers\\SurvLoop@searchResultsAjax');
@@ -109,6 +109,16 @@ Route::group(['middleware' => ['web']], function () {
         $response->header('Content-Type', 'text/css');
         return $response;
     });
+    Route::get('/sys1.min.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/sys2.min.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
     Route::get('/sys-all.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.css'));
         $response->header('Content-Type', 'text/css');
@@ -134,6 +144,16 @@ Route::group(['middleware' => ['web']], function () {
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
+    Route::get('/bootstrap.min.css', function() {
+        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/css/bootstrap.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/bootstrap.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/js/bootstrap.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
     
     
     ///////////////////////////////////////////////////////////
@@ -149,13 +169,30 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get( '/my-profile', 'SurvLoop\\Controllers\\SurvLoop@showMyProfile');
     Route::post('/profile/{uname}',     [
-        'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showProfile',     
+        'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showProfile',
         'middleware' => 'auth'
     ]);
     Route::get( '/profile/{uname}', 'SurvLoop\\Controllers\\SurvLoop@showProfile');
-
+    Route::post('/my-profile',     [
+        'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showMyProfile',
+        'middleware' => 'auth'
+    ]);
+    Route::get( '/my-profile',     [
+        'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showMyProfile',
+        'middleware' => 'auth'
+    ]);
+    Route::post('/change-my-password',     [
+        'uses'       => 'SurvLoop\\Controllers\\Auth\\UpdatePasswordController@runUpdate',
+        'middleware' => 'auth'
+    ]);
+    Route::get( '/change-my-password',     [
+        'uses'       => 'SurvLoop\\Controllers\\Auth\\UpdatePasswordController@runUpdate',
+        'middleware' => 'auth'
+    ]);
+    Route::get( '/password/email', 'SurvLoop\\Controllers\\Auth\\AuthController@printPassReset');
+    Route::get( '/password/reset', 'SurvLoop\\Controllers\\Auth\\AuthController@printPassReset');
+    
     Route::post('/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     Route::get( '/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     
@@ -171,7 +208,11 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/systems-check', [
+    Route::get( '/dashboard/systems-check', [
+        'uses'       => 'SurvLoop\Controllers\SurvLoop@systemsCheck',    
+        'middleware' => ['auth']
+    ]);
+    Route::post('/dashboard/systems-check', [
         'uses'       => 'SurvLoop\Controllers\SurvLoop@systemsCheck',    
         'middleware' => ['auth']
     ]);
@@ -317,6 +358,16 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get('/dashboard/surv-{treeID}/sessions', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessions',    
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/surv-{treeID}/sessions/graph-daily', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessGraphDaily',    
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/surv-{treeID}/sessions/graph-durations', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessGraphDurations',    
         'middleware' => ['auth']
     ]);
     
@@ -680,7 +731,7 @@ Route::group(['middleware' => ['web']], function () {
     ]);
     
     Route::get('/dashboard/db/export', [
-        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@export', 
+        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@printExport', 
         'middleware' => ['auth']
     ]);
     
@@ -696,6 +747,21 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get('/dashboard/db/install', [
         'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@autoInstallDatabase', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/db/export/dump', [
+        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@exportDump', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/sl/export', [
+        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@printExportPackage', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/sl/export/laravel', [
+        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@printExportPackageLaravel', 
         'middleware' => ['auth']
     ]);
     
@@ -759,16 +825,32 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::post('/{pageSlug}/u-{cid}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
-    Route::get( '/{pageSlug}/u-{cid}', 'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
-    Route::post('/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
-    Route::get( '/{pageSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    // views include full, public, pdf, full-pdf, xml, full-xml
+    Route::post('/{pageSlug}/read-{cid}/full/t-{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{pageSlug}/read-{cid}/full/t-{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::post('/{pageSlug}/read-{cid}/{view}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}/read-{cid}/{view}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::post('/{pageSlug}/read-{cid}',                'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}/read-{cid}',                'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::post('/{pageSlug}/u-{cid}',                   'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}/u-{cid}',                   'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::post('/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::get( '/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     
-    Route::post('/dash/{pageSlug}/u-{cid}', [
+    /*
+    Route::get( '/{treeSlug}/read-{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
+    Route::get( '/{treeSlug}/read-{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}/read-{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    Route::get( '/{treeSlug}/read-{cid}/{coreSlug}',  'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::post('/{treeSlug}/read-{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
+    Route::get( '/{treeSlug}/read-{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
+    */
+    
+    Route::post('/dash/{pageSlug}/read-{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dash/{pageSlug}/u-{cid}', [
+    Route::get('/dash/{pageSlug}/read-{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
@@ -780,25 +862,6 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
-    
-    Route::post('/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
-    Route::get( '/{treeSlug}-read/{cid}/full',         'SurvLoop\\Controllers\\SurvLoop@fullByID');
-    Route::post('/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
-    Route::get( '/{treeSlug}-read/{cid}/full/{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
-    Route::get( '/{treeSlug}-read/{cid}/pdf/full',     'SurvLoop\\Controllers\\SurvLoop@fullPdfByID');
-    Route::get( '/{treeSlug}-read/{cid}/xml/full',     'SurvLoop\\Controllers\\SurvLoop@fullXmlByID');
-    
-    Route::get( '/{treeSlug}-read/{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
-    Route::get( '/{treeSlug}-read/{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-read/{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-read/{cid}/{ComSlug}',   'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::post('/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-read/{cid}',             'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-report/{cid}/pdf',       'SurvLoop\\Controllers\\SurvLoop@pdfByID');
-    Route::get( '/{treeSlug}-report/{cid}/xml',       'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-report/{cid}/json',      'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}-report/{cid}/{ComSlug}', 'SurvLoop\\Controllers\\SurvLoop@byID');
-    Route::get( '/{treeSlug}-report/{cid}',           'SurvLoop\\Controllers\\SurvLoop@byID');
     
     Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{desiredFile}', function ($desiredFile) {
         return redirect('/survloop/jquery-ui-1.12.1/images/' . $desiredFile);

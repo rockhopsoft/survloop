@@ -154,7 +154,7 @@ function changeResponseType(newType) {
 }
 
 function changeDataPrintType(newType) {
-    if (newType == 'Data Print Block') {
+    if (newType == 'Data Print Block' || newType == 'Data Print Columns' || newType == 'Print Vert Progress') {
         document.getElementById('dataPrintPull').style.display='none';
         document.getElementById('dataPrintTitle').style.display='block';
         document.getElementById('dataPrintConds').style.display='none';
@@ -290,7 +290,7 @@ function previewPageBlock() {
                 document.getElementById('pageBlock').style.backgroundSize = "100%";
                 document.getElementById('pageBlock').style.backgroundRepeat = "no-repeat";
             }
-            if (document.getElementById('blockImgFixID') && document.getElementById('blockImgFixID').checked) {
+            if ((document.getElementById('blockImgFixY') && document.getElementById('blockImgFixY').checked) || (document.getElementById('blockImgFixP') && document.getElementById('blockImgFixP').checked)) {
                 document.getElementById('pageBlock').style.backgroundAttachment = "fixed";
             } else {
                 document.getElementById('pageBlock').style.backgroundAttachment = "scroll";

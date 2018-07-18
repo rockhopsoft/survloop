@@ -1,5 +1,12 @@
 /* generated from resources/views/vendor/survloop/styles-css-2.blade.php */
 
+html, body {
+    font-size: 15px;
+}
+body, p, .slTxt {
+    color: {!! $css["color-main-text"] !!};
+}
+
 #absDebug {
     position: absolute;
     top: 70px;
@@ -7,6 +14,45 @@
     width: 200px;
     font-size: 10pt;
     position: fixed;
+}
+#hidivBtnDbgPop, #hidivBtnDbgPop2 {
+	color: {!! $css["color-main-faint"] !!};
+}
+#hidivBtnDbgPop {
+    margin-right: 20px;
+}
+#hidivDbgPop, #hidivDbgPop2 {
+    border: 1px {!! $css["color-main-on"] !!} solid;
+    padding: 20px;
+    margin: 0px 0px 10px 0px;
+    -moz-border-radius: 20px; border-radius: 20px;
+    width: 100%;
+    display: none;
+    text-align: left;
+}
+.hidivBtnDbgW {
+    position: absolute;
+    right: -20px;
+    top: 20px;
+    text-align: right;
+}
+.hidivBtnDbgN, .hidivBtnDbgW .hidivBtnDbgN, 
+a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDbgN:hover {
+	color: {!! $css["color-main-faint"] !!};
+    margin-right: 20px;
+    opacity:0.5; filter:alpha(opacity=50);
+}
+.hidivDbgN, a.hidivDbgN:link, a.hidivDbgN:active, a.hidivDbgN:visited, a.hidivDbgN:hover {
+    position: absolute;
+    right: 2px;
+    top: 40px;
+    display: none;
+    border: 1px {!! $css["color-main-grey"] !!} dashed;
+    background: {!! $css["color-main-faint"] !!};
+    opacity:0.95; filter:alpha(opacity=95);
+    -moz-border-radius: 20px; border-radius: 20px;
+    text-align: left;
+    padding: 5px 10px;
 }
 
 .navbar, #myNavBar, #myNavBar .navbar {
@@ -17,7 +63,11 @@
 	overflow: hidden;
 	color: {!! $css["color-nav-text"] !!};
 	background: {!! $css["color-nav-bg"] !!};
-    border-bottom: 1px {!! $css["color-line-hr"] !!} solid;
+    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
+}
+#headClear {
+	background: {!! $css["color-nav-bg"] !!};
+	margin-left: -1px;
 }
 #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
 #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
@@ -176,6 +226,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
     position: fixed;
     width: 230px;
     padding: 10px 15px 0px 15px;
+	z-index: 0;
 }
 #leftAdmMenu {
     display: block;
@@ -184,6 +235,8 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
 #mainBody {
     padding: 0px 15px 0px 15px;
     vertical-align: top;
+    background: {!! $css["color-main-bg"] !!};
+	z-index: 100;
 }
 
 #admSrchFld {
@@ -202,7 +255,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
 }
 #dashSearchBtnID a:link, #dashSearchBtnID a:active, #dashSearchBtnID a:visited, #dashSearchBtnID a:hover {
     position: absolute;
-    top: -38px;
+    top: -33px;
     right: 13px;
     font-size: 14px;
 }
@@ -226,6 +279,49 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 }
 #footerLinks p, #footerLinks div div p, #footerLinks p h3, #footerLinks div div p h3, #footerLinks div div h3 {
     margin: 0px;
+}
+
+a.socialTwit:link, a.socialTwit:visited, a.socialTwit:active, a.socialTwit:hover,
+a.socialFace:link, a.socialFace:visited, a.socialFace:active, a.socialFace:hover {
+	position: relative;
+    width: 61px;
+    height: 20px;
+    font-size: 8pt;
+	-moz-border-radius: 3px; border-radius: 3px;
+    color: #FFF;
+    background: #1c95e0;
+}
+a.socialTwit:hover {
+    background: #0c7abf;
+}
+a.socialFace:link, a.socialFace:visited, a.socialFace:active, a.socialFace:hover {
+    background: #4266b2;
+}
+a.socialFace:hover {
+    background: #365799;
+}
+a.socialTwit:link i, a.socialTwit:visited i, a.socialTwit:active i, a.socialTwit:hover i,
+a.socialFace:link i, a.socialFace:visited i, a.socialFace:active i, a.socialFace:hover i {
+	position: absolute;
+	top: 3px;
+	left: 8px;
+    font-size: 11pt;
+}
+a.socialFace:link i, a.socialFace:visited i, a.socialFace:active i, a.socialFace:hover i {
+	left: 7px;
+}
+a.socialTwit:link span, a.socialTwit:visited span, a.socialTwit:active span, a.socialTwit:hover span,
+a.socialFace:link span, a.socialFace:visited span, a.socialFace:active span, a.socialFace:hover span {
+	position: absolute;
+	font-weight: 700;
+	top: 3px;
+	left: 26px;
+}
+a.socialTwit:link img, a.socialTwit:visited img, a.socialTwit:active img, a.socialTwit:hover img,
+a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.socialFace:hover img {
+    width: 61px;
+    height: 20px;
+    opacity:0.0; filter:alpha(opacity=0);
 }
 
 #slLogo {
@@ -268,8 +364,10 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 
 
 #ajaxWrap {
+    display: block;
     width: 100%;
-    height: 100%;
+    min-height: 100%;
+    overflow: visible;
 }
 #ajaxWrapLoad {
     display: block;
@@ -348,12 +446,15 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
 .nPrompt.col-md-6 {
     padding-top: 15px;
 }
+.nPrompt .alert {
+    font-size: 15px;
+}
 .nFld {
     margin-top: 20px;
 }
-.nFld, .nFld input, .nFld select, .nFld textarea {
+/* .nFld, .nFld input, .nFld select, .nFld textarea {
 	font-size: 16px;
-}
+} */
 .subRes {
     padding-left: 20px;
     margin-bottom: 20px;
@@ -382,14 +483,15 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     text-align: right;
 }
 
+/*
 .nPrompt ul, .nPrompt ol {
     padding: 0px 0px 0px 20px;
     margin: 20px 0px 0px 20px;
+}  */
+ul li, ol li, .nPrompt ul li, .nPrompt ol li {
+    margin: 0px 0px 10px 0px;
 }
-.nPrompt ul li, .nPrompt ol li {
-    padding: 0px 0px 0px 0px;
-    margin: 10px 0px 0px 0px;
-}
+
 .nPromptHeader {
 	color: {!! $css["color-main-on"] !!};
 }
@@ -739,52 +841,79 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	padding: 25px 15px 5px 15px;
 	-moz-border-radius: 20px; border-radius: 20px;
 }
-.slReport {
-    font-size: 12pt;
+.slCard {
+    width: 100%;
+    padding: 20px;
+    -moz-border-radius: 6px; border-radius: 6px;
+    background: {!! $css["color-main-bg"] !!};
+    box-shadow: 0px 1px 4px {!! $css["color-main-grey"] !!};
 }
-.reportSectHead, .reportSectHead2, 
-.slReport .reportSectHead, .slReport .reportSectHead2 {
-	clear: both;
+table.repDeetsBlock, .slReport table.repDeetsBlock, table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
 	width: 100%;
-	color: {!! $css["color-main-on"] !!};
-	font-size: 16pt;
-	padding: 10px 0px 10px 0px;
-	/* border-top: 1px {!! $css["color-main-on"] !!} solid; */
 }
-.reportSectHead2, .slReport .reportSectHead2 {
-	font-size: 20pt;
-	/* border-bottom: 1px {!! $css["color-main-on"] !!} solid; */
+.slCard.nodeWrap {
+    margin-bottom: 30px;
 }
-.reportBlock, .slReport .reportBlock {
-	display: block;
-	width: 100%;
-	margin-bottom: 40px;
-}
-.reportBlock .row {
-    margin: 0px 5px;
-    padding: 10px 0px;
-}
-.reportBlock .row .col-md-12, .reportBlock .row .col-md-6 {
+table.repDeetsBlock tr td, table.repDeetsBlock tr th {
+    word-wrap: break-word;
     line-break: loose;
+    padding: 10px 15px;
+    vertical-align: top;
+    width: 50%;
 }
-.reportBlock div span, .reportBlock div div span, .reportBlock div div div span, .reportBlock table tr td span, 
-.slReport .reportBlock div span, .slReport .reportBlock table tr td span, 
-.slReport .reportBlock div span a.hidivBtn:link, .slReport .reportBlock div span a.hidivBtn:visited, 
-.slReport .reportBlock div span a.hidivBtn:active, .slReport .reportBlock div span a.hidivBtn:hover {
+table.repDeetsBlock tr td span, table.repDeetsBlock tr td div span, 
+.slReport table.repDeetsBlock tr td span, .slReport table.repDeetsBlock tr td div span, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:link, .slReport table.repDeetsBlock tr td span a.hidivBtn:visited, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:active, .slReport table.repDeetsBlock tr td span a.hidivBtn:hover {
 	color: {!! $css["color-main-grey"] !!};
 }
-.reportMiniBlockLabel, .slReport .reportMiniBlockLabel {
-    display: block;
-    width: 100%;
-    color: {!! $css["color-main-on"] !!};
-    font-size: 18pt;
-    /* font-weight: bold; */
+
+.dontBreakOut, table.repDeetsBlock tr td, table.repDeetsBlock tr th {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    /*
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    */
 }
-.reportMiniBlockDeets, .slReport .reportMiniBlockDeets {
-    display: block;
+
+table.repDeetVert {
     width: 100%;
-    padding-bottom: 20px;
-    line-break: loose;
+}
+table.repDeetVert, table.repDeetVert tr td, table.repDeetVert tr th {
+    border: 0px;
+    padding: 3px 0px;
+}
+.vertPrgDone, table.repDeetVert tr td .vertPrgDone,
+.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr {
+    margin: 6px 5px 9px 1px;
+	background: {!! $css["color-main-on"] !!};
+}
+.vertPrgCurr, table.repDeetVert tr td .vertPrgCurr {
+    margin: 5px 4px 8px 0px;
+	border: 3px {!! $css["color-main-on"] !!} solid;
+}
+.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr {
+    opacity:0.20; filter:alpha(opacity=20);
+}
+.vertPrgDone, table.repDeetVert tr td .vertPrgDone,
+.vertPrgDone img, table.repDeetVert tr td .vertPrgDone img,
+.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr,
+.vertPrgFutr img, table.repDeetVert tr td .vertPrgFutr img {
+    width: 8px;
+    height: 8px;
+	-moz-border-radius: 4px; border-radius: 4px;
+}
+.vertPrgCurr, table.repDeetVert tr td .vertPrgCurr, 
+.vertPrgCurr img, table.repDeetVert tr td .vertPrgCurr img {
+    width: 10px;
+    height: 10px;
+	-moz-border-radius: 5px; border-radius: 5px;
 }
 
 .reportPreview {
@@ -793,18 +922,11 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
     border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
 
-ul.glossaryList li { margin-bottom: 10px; }
+.slWebReport p {
+    font-size: 125%;
+    margin: 30px 0px;
+}
 
-.reportTopAlert {
-    border: 1px {!! $css["color-danger-on"] !!} solid;
-    -moz-border-radius: 5px; border-radius: 5px;
-    color: {!! $css["color-danger-on"] !!};
-    padding: 10px 20px;
-    font-size: 17px;
-}
-@media screen and (max-width: 768px) {
-    .reportTopAlert { font-size: 12px; }
-}
 
 
 .search-bar {
@@ -843,6 +965,7 @@ ul.glossaryList li { margin-bottom: 10px; }
 .basicTier0, .basicTier1, .basicTier2, .basicTier3, .basicTier4, 
 .basicTier5, .basicTier6, .basicTier7, .basicTier8, .basicTier9 {
     min-width: 80px;
+    max-width: 1130px;
     padding: 10px 5px 10px 5px;
     margin: 0px 5px 0px 5px;
 	-moz-border-radius: 20px; border-radius: 20px;
@@ -876,6 +999,13 @@ ul.glossaryList li { margin-bottom: 10px; }
 }
 .basicTierLoop.basicTierData, .basicTier1.basicTierLoop.basicTierData, .basicTier2.basicTierLoop.basicTierData, .basicTier3.basicTierLoop.basicTierData, .basicTier4.basicTierLoop.basicTierData, .basicTier5.basicTierLoop.basicTierData {
 	border-right: 2px {!! $css["color-success-on"] !!} dotted;
+}
+.basicTier1.slCard, .basicTier2.slCard, .basicTier3.slCard, .basicTier4.slCard, .basicTier5.slCard, .basicTier6.slCard, .basicTier7.slCard, .basicTier8.slCard {
+    border: 0px none;
+    padding: 10px 5px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    -moz-border-radius: 6px; border-radius: 6px;
 }
 .basicTierDisabled {
     opacity:0.25; filter:alpha(opacity=25);
@@ -923,7 +1053,7 @@ table.slSpreadTbl tr td.sprdFld {
     padding: 0px;
 }
 table.slSpreadTbl tr th {
-    padding: 0px 0px 6px 12px;
+    padding: 0px 12px 6px 12px;
     vertical-align: bottom;
     border-top: 0px none;
     border-bottom: 1px {!! $css["color-main-off"] !!} solid;
@@ -977,6 +1107,12 @@ table.listTable tr td, table.listTable tr th {
 	padding: 10px 0px;
 }
 
+.clickBox, tr.clickBox, table tr.clickBox {
+    cursor: pointer;
+	background: {!! $css["color-main-bg"] !!};
+}
+
+
 
 table.detailList {
 	width: 100%;
@@ -1021,7 +1157,7 @@ table.detailList tr td {
 	background: {!! $css["color-main-bg"] !!};
 	box-shadow: 0px 0px 20px {!! $css["color-main-bg"] !!};
 	margin: 0px -15px 0px -15px;
-	padding: 5px 15px 5px 15px;
+	padding: 15px 15px 5px 15px;
 	top: 47px;
 	border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
@@ -1143,10 +1279,10 @@ label { font-weight: normal; }
     padding-left: 40px;
 }
 .admMenu .admMenuTier3 {
-    padding-left: 60px;
+    padding-left: 55px;
 }
 .admMenu .admMenuTier4 {
-    padding-left: 80px;
+    padding-left: 70px;
 }
 .admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
     display: block;
@@ -1300,6 +1436,25 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     box-shadow: 0px 0px 40px {!! $css["color-main-bg"] !!};
 }
 
+.dont-break-out {
+
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+}
 
 
 @media screen and (max-width: 1200px) {
@@ -1341,6 +1496,8 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
         width: 270px;
     }
+    h2 { font-size: 26px; }
+    .glossaryList .col-md-10 { padding-top: 0px; margin-top: -5px; }
 
 }
 @media screen and (max-width: 480px) {
@@ -1408,7 +1565,7 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th {
-        padding: 12px 3px 0px 6px;
+        padding: 12px 6px 0px 6px;
     }
 	
 }
@@ -1562,6 +1719,7 @@ select.form-control { cursor: pointer; }
 /* Can Be Read Like... margin Left 5, margin Bottom negative 5 */
 h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .m0 { margin: 0px; } .mL0 { margin-left: 0px; } .mR0 { margin-right: 0px; } .mT0 { margin-top: 0px; } .mB0 { margin-bottom: 0px; }
+.m3 { margin: 3px; } .mL3 { margin-left: 3px; } .mR3 { margin-right: 3px; } .mT3 { margin-top: 3px; } .mB3 { margin-bottom: 3px; }
 .m5 { margin: 5px; } .mL5 { margin-left: 5px; } .mR5 { margin-right: 5px; } .mT5 { margin-top: 5px; } .mB5 { margin-bottom: 5px; }
 .m10 { margin: 10px; } .mL10 { margin-left: 10px; } .mR10 { margin-right: 10px; } .mT10 { margin-top: 10px; } .mB10 { margin-bottom: 10px; }
 .m15 { margin: 15px; } .mL15 { margin-left: 15px; } .mR10 { margin-right: 15px; } .mT10 { margin-top: 15px; } .mB10 { margin-bottom: 15px; }
@@ -1589,8 +1747,8 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .round20 { -moz-border-radius: 20px; border-radius: 20px; }
 .round30 { -moz-border-radius: 30px; border-radius: 30px; }
 
-.tmbRound { width: 150px; height: 150px; -moz-border-radius: 75px; border-radius: 75px; }
-.bigTmbRound { width: 175px; height: 175px; -moz-border-radius: 87px; border-radius: 87px; }
+.tmbRound { width: 140px; height: 140px; -moz-border-radius: 70px; border-radius: 70px; }
+.bigTmbRound { width: 165px; height: 165px; -moz-border-radius: 82px; border-radius: 82px; }
 
 .opac1 { opacity:0.01; filter:alpha(opacity=1); }
 .opac10 { opacity:0.10; filter:alpha(opacity=10); }
@@ -1598,6 +1756,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .opac25 { opacity:0.25; filter:alpha(opacity=25); }
 .opac33 { opacity:0.33; filter:alpha(opacity=33); }
 .opac50 { opacity:0.50; filter:alpha(opacity=50); }
+.opac66 { opacity:0.66; filter:alpha(opacity=66); }
 .opac75 { opacity:0.75; filter:alpha(opacity=75); }
 .opac80 { opacity:0.80; filter:alpha(opacity=80); }
 .opac85 { opacity:0.85; filter:alpha(opacity=85); }
@@ -1612,6 +1771,8 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
     font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
+.icoBig, i.icoBig, .icoBig i { font-size: 54px; }
+.icoHuge, i.icoHuge, .icoHuge i { font-size: 82px; }
 
 a.label, a.label:link, a.label:visited, a.label:active, a.label:hover, 
 a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:visited, a.label.label-primary:hover {
@@ -1633,7 +1794,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .nobld { font-weight: normal; }
 .ital { font-style: italic; }
 
-.brdNo     { border: 0px none; }
+.brdNo, table.brdNo, table.brdNo tr, table.brdNo tr td { border: 0px none; }
 .brd       { border: 1px {!! $css["color-main-off"] !!} solid; }
 .brdDsh    { border: 1px {!! $css["color-main-off"] !!} dashed; }
 .brdDshGry { border: 1px {!! $css["color-main-grey"] !!} dashed; }
@@ -1668,7 +1829,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdTopFnt, table tr.brdTopFnt td, table tr.brdTopFnt th { border-top: 1px {!! $css["color-main-faint"] !!} solid; }
 
 .row1, table tr.row1 { background: {!! $css["color-main-bg"] !!}; }
-.row2, table tr.row2 { background: {!! $css["color-main-faint"] !!}; }
+.row2, table tr.row2, .table-striped>tbody>tr:nth-of-type(odd) { background: {!! $css["color-main-faint"] !!}; }
 .BGblueLight { background: {!! $css["color-main-off"] !!}; }
 .BGblueDark { background: {!! $css["color-main-on"] !!}; }
 .BGredDark { background: {!! $css["color-danger-on"] !!}; }
@@ -1738,6 +1899,10 @@ a:link .slShdLgt, a:visited .slShdLgt, a:active .slShdLgt, a:hover .slShdLgt {
 a:link .slBoxShd, a:visited .slBoxShd, a:active .slBoxShd, a:hover .slBoxShd {
 	box-shadow: 0px 0px 3px {!! $css["color-main-text"] !!};
 }
+.slBoxShdB, a.slBoxShdB:link, a.slBoxShdB:visited, a.slBoxShdB:active, a.slBoxShdB:hover,
+a:link .slBoxShdB, a:visited .slBoxShdB, a:active .slBoxShdB, a:hover .slBoxShdB {
+	box-shadow: 0px 2px 3px {!! $css["color-main-text"] !!};
+}
 .slBoxShd10, a.slBoxShd10:link, a.slBoxShd10:visited, a.slBoxShd10:active, a.slBoxShd10:hover,
 a:link .slBoxShd10, a:visited .slBoxShd10, a:active .slBoxShd10, a:hover .slBoxShd10 {
 	box-shadow: 0px 0px 20px {!! $css["color-main-text"] !!};
@@ -1757,6 +1922,10 @@ a:link .slBoxShdLgt5, a:visited .slBoxShdLgt5, a:active .slBoxShdLgt5, a:hover .
 .slBoxShdBg20, a.slBoxShdBg20:link, a.slBoxShdBg20:visited, a.slBoxShdBg20:active, a.slBoxShdBg20:hover,
 a:link .slBoxShdBg20, a:visited .slBoxShdBg20, a:active .slBoxShdBg20, a:hover .slBoxShdBg20 {
 	box-shadow: 0px 0px 20px {!! $css["color-main-bg"] !!};
+}
+.slBoxShdGryB, a.slBoxShdGryB:link, a.slBoxShdGryB:visited, a.slBoxShdGryB:active, a.slBoxShdGryB:hover,
+a:link .slBoxShdGryB, a:visited .slBoxShdGryB, a:active .slBoxShdGryB, a:hover .slBoxShdGryB {
+	box-shadow: 0px 2px 3px {!! $css["color-main-grey"] !!};
 }
 
 .slFaintHover, a.slFaintHover:link, a.slFaintHover:visited, a.slFaintHover:active, a.slFaintHover:hover,

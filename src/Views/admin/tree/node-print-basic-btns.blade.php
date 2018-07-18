@@ -7,7 +7,7 @@
                     href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }}" 
                 @endif >
                 <span id="nodeBtns{{ $nID }}edit" class="slGrey" >
-                <i class="fa fa-pencil" id="nodeBtnEdit{{ $nID }}" class="disIn"></i></span></a>
+                <i class="fa fa-pencil disIn" id="nodeBtnEdit{{ $nID }}"></i></span></a>
             <div id="nodeBtns{{ $nID }}" class="disNon">
                 <nobr><a class="btn btn-xs btn-default"
                 @if ($GLOBALS['SL']->treeRow->TreeType == 'Survey XML')

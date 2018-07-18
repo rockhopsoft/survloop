@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-8">
         <div class="w100" style="height: 450px;">
-        @if (isset($graph2print)) {!! $graph2print !!} @endif
+        @if (isset($sessDailyAttempts)) {!! $sessDailyAttempts !!} @endif
         </div>
     </div>
     <div class="col-md-4">

@@ -6,7 +6,7 @@
             >{!! view('vendor.survloop.inc-emoji-tag', [
                 "spot"     => $spot,
                 "emo"      => $emo,
-                "cnt"      => sizeof($users[$emo["id"]]),
+                "cnt"      => ((isset($users[$emo["id"]])) ? sizeof($users[$emo["id"]]) : 0),
                 "isActive" => in_array($uID, $users[$emo["id"]])
             ])->render() !!}</li>
     @endif

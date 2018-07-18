@@ -31,7 +31,7 @@ class SLDataLoop extends Model
         $this->conds = [];
         $getConds = SLConditionsNodes::where('CondNodeLoopID', $this->DataLoopID)
             ->get();
-        if ($getConds && sizeof($getConds) > 0) {
+        if ($getConds->isNotEmpty()) {
             foreach ($getConds as $c) {
                 $cond = SLConditions::find($c->CondNodeCondID);
                 $cond->loadVals();

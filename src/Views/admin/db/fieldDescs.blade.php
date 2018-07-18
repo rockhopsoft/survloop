@@ -61,7 +61,9 @@ function submitFldDescChanges() {
 @endif
 <table border=0 class="FldDescs" >
 <tr><td colspan=5 class="p20 headerBrkRow f24" >
-    @if ($fldLabel == '') Database @else {{ str_replace('s', '', $fldLabel) }} Fields ({{ number_format(sizeof($fldTot)) }}) @endif
+    @if ($fldLabel == '') Database 
+    @else {{ str_replace('s', '', $fldLabel) }} Fields ({{ number_format(sizeof($fldTot)) }})
+    @endif
     @if ($FldDescsViewAll)
         <span class="f16">Showing All - </span><a href="{{ $baseURL }}" class="f12 undL">Show Empties Only</a>
     @else

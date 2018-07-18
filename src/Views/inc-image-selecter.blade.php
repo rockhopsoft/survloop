@@ -4,7 +4,7 @@
     <div class="col-md-8 ovrSho imgFileLibrary">
         
         <h3 class="mT0 slBlueDark">Select Image From Library:</h3>
-        @if (isset($imgs) && sizeof($imgs) > 0)
+        @if (isset($imgs) && is_array($imgs) && sizeof($imgs) > 0)
             <div class="row mB10">
             @foreach ($imgs as $i => $img)
                 @if ($i%6 == 0 && $i > 0) </div><div class="row mB10"> @endif

@@ -1,5 +1,5 @@
 <!-- Stored in resources/views/survloop/upload-previous.blade.php -->
-@if (!$uploads || sizeof($uploads) == 0) 
+@if (!$uploads || empty($uploads)) 
     <h3><span class="slGrey">Nothing uploaded here.</span></h3>
 @else
     <h2 style="margin-bottom: 10px;"><i class="fa fa-cloud-upload"></i> {{ sizeof($uploads) }} Previous Uploads:</h2>
@@ -55,7 +55,7 @@
                                 && intVal($GLOBALS["SL"]->treeSettings["uploads-public"][0]) > 0)
                                 @if ($upRow->UpPrivacy == 'Open') Public @else Private @endif
                             @endif
-                            {{ $GLOBALS['SL']->getDefValById($upRow->type) }}
+                            {{ $GLOBALS['SL']->def->getValById($upRow->type) }}
                         </div>
                         {!! $upDeets[$i]["fileLnk"] !!}
                     </div>

@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\SLDefinitions;
 use App\Models\SLUsersRoles;
 
-use SurvLoop\Controllers\DatabaseLookups;
+use SurvLoop\Controllers\CoreGlobals;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -78,8 +78,8 @@ class User extends Model implements AuthenticatableContract,
     
     public function loadRoles()
     {
-        if (sizeof($this->roles) == 0) {
-            $this->roles = SLDefinitions::select('DefID', 'DefSubset')
+        if (empty($this->roles)) {
+            $this->roles = SLDefinitions::select('DefID', 'DefSubset', 'DefValue')
                 ->where('DefDatabase', 1)
                 ->where('DefSet', 'User Roles')
                 ->orderBy('DefOrder')
@@ -88,14 +88,13 @@ class User extends Model implements AuthenticatableContract,
                 ->join('SL_Definitions', 'SL_UsersRoles.RoleUserRID', '=', 'SL_Definitions.DefID')
                 ->where('SL_UsersRoles.RoleUserUID', $this->id)
                 ->where('SL_Definitions.DefSet', 'User Roles')
-                ->select('SL_Definitions.DefSubset')
+                ->select('SL_Definitions.DefSubset', 'SL_Definitions.DefValue')
                 ->get();
-            if ($chk && sizeof($chk) > 0) {
-                foreach ($chk as $role) {
-                    $this->SLRoles[] = $role->DefSubset;
-                }
+            if ($chk->isNotEmpty()) {
+                foreach ($chk as $role) $this->SLRoles[] = $role->DefSubset;
+            } else {
+                $this->SLRoles[] = 'NO-ROLES';
             }
-            else $this->SLRoles[] = 'NO-ROLES';
         }
         return true;
     }
@@ -125,7 +124,7 @@ class User extends Model implements AuthenticatableContract,
             ->where('RoleUserRID', '=', $roleDef->DefID)
             ->where('RoleUserUID', '=', $this->id)
             ->get();
-        if (!$chk || sizeof($chk) == 0) {
+        if ($chk->isEmpty()) {
             $newRole = new SLUsersRoles;
             $newRole->RoleUserRID = $roleDef->DefID;
             $newRole->RoleUserUID = $this->id;
@@ -172,7 +171,7 @@ class User extends Model implements AuthenticatableContract,
         $retVal = '';
         foreach ($this->roles as $role) { 
             if ($this->hasRole($role->DefSubset)) {
-                $retVal .= ', ' . ucfirst($role->DefSubset);
+                $retVal .= ', ' . $role->DefValue;
             }
         }
         if ($retVal != '') $retVal = substr($retVal, 2);

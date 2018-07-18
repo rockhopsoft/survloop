@@ -4,7 +4,7 @@
 
 @section('content')
 
-<h2><i class="fa fa-envelope-o"></i> {{ $currPageTitle }}</h2>
+<h2><i class="fa fa-envelope-o"></i> {{ $currPage[1] }}</h2>
 
 <div class="p5"></div>
 
@@ -13,7 +13,7 @@
 </ul>
 <div id="myTabContent" class="tab-content">
     <table class="table table-striped">
-    @if (isset($recs) && sizeof($recs) > 0)
+    @if ($recs->isNotEmpty())
         @foreach ($recs as $contact)
             <tr><td class="pB20"><div id="wrapItem{{ $contact->ContID }}" class="row">
                 {!! view('vendor.survloop.admin.contact-row', [ "contact" => $contact ])->render() !!}

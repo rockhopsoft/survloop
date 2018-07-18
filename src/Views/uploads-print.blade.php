@@ -32,9 +32,8 @@
             </div>
         @endif
     @endif
-    {{  $upRow->title }}
+    <p><span class="fPerc125">{{  $upRow->UpTitle }}</span>
     @if ($isAdmin || $isOwner)
-        <span class="mL10 slGrey fPerc66"> @if ($upRow->privacy == 'Open') Public @else Private @endif </span>
-    @endif
-    @if (isset($upRow->desc) && trim($upRow->desc) != '') <div>{{ $upRow->desc }}</div> @endif
+        <span class="mL10 slGrey"> @if ($upRow->UpPrivacy == 'Public') (Public) @else (Private) @endif </span>
+    @endif </p>
 @endif

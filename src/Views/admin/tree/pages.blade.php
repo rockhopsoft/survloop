@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col-md-7">
         
-        <h2><i class="fa fa-newspaper-o"></i> Site Pages <span class="slGreenDark">& Redirects</span></h2>
+        <h2><i class="fa fa-newspaper-o"></i> Site Pages <span class="slGrey">& Redirects</span></h2>
         <div class="slGrey pB10">
             Pages are used to manage content throughout your website, both public and admin, 
             and they are build as a one-page Experience/Tree.
@@ -17,13 +17,15 @@
         <table class="table table-striped">
         
         @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%7 == 0) 
+            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%7 > 0) 
+            @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
@@ -34,13 +36,15 @@
         @endforelse
         
         @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0) 
+            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
         @endforelse
         @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0) 
+            @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
+                && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty
@@ -50,15 +54,57 @@
         @empty
         @endforelse
         
-        @if (isset($GLOBALS["SL"]->sysOpts['has-volunteers']) && intVal($GLOBALS["SL"]->sysOpts['has-volunteers']) == 1)
+        @forelse ($myPages as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 
+                && $tree->TreeOpts%41 > 0)
+                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty
+        @endforelse
+        @forelse ($myPages as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 
+                && $tree->TreeOpts%41 > 0)
+                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty
+        @endforelse
+        @forelse ($myRdr["admin"] as $redir)
+            {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
+        @empty
+        @endforelse
+        
+        @if ($GLOBALS["SL"]->sysHas('partners'))
             @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0) 
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0
+                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
                     {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
                 @endif
             @empty
             @endforelse
             @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0) 
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0
+                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty
+            @endforelse
+            @forelse ($myRdr["partn"] as $redir)
+                {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
+            @empty
+            @endforelse
+        @endif
+        
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0 
+                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty
+            @endforelse
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0
+                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
                     {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
                 @endif
             @empty
@@ -72,8 +118,7 @@
         </table>
         
     </div>
-    <div class="col-md-1"></div>
-    <div class="col-md-4">
+    <div class="col-md-5">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <form name="mainPageForm" method="post" action="/dashboard/pages/list">
@@ -97,11 +142,23 @@
                         <label><input type="checkbox" name="pageAdmOnly" value="1" 
                             onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
                             else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-key" aria-hidden="true"></i> Admin-Only Page</label>
+                            <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only Page</label>
+                        <label><input type="checkbox" name="pageStfOnly" value="1" 
+                            onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
+                            else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
+                            <i class="fa fa-key" aria-hidden="true"></i> Staff Page</label>
+                    @if ($GLOBALS["SL"]->sysHas('partners'))
+                        <label><input type="checkbox" name="pagePrtOnly" value="1" 
+                            onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
+                            else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
+                            <i class="fa fa-university" aria-hidden="true"></i> Partners Page</label>
+                    @endif
+                    @if ($GLOBALS["SL"]->sysHas('volunteers'))
                         <label><input type="checkbox" name="pageVolOnly" value="1" 
                             onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
                             else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
                             <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer Page</label>
+                    @endif
                     </div>
                 </div>
                 <label for="newPageNameID" class="mT10"><b>New Page Title:</b></label>
@@ -142,7 +199,23 @@
                         document.getElementById('isNewAdmRedir').style.display='inline'; } 
                     else { document.getElementById('isNewAdmRedir').style.display='none'; 
                         document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
-                    <i class="fa fa-key" aria-hidden="true"></i> Admin-Only</label>
+                    <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only</label>
+                <label><input type="checkbox" name="redirStfOnly" value="1" 
+                    onClick="if (this.checked) { document.getElementById('isNewAdmRedir').style.display='inline'; 
+                        document.getElementById('isNewAdmRedir').style.display='inline'; } 
+                    else { document.getElementById('isNewAdmRedir').style.display='none'; 
+                        document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
+                    <i class="fa fa-key" aria-hidden="true"></i> Staff</label>
+            @if ($GLOBALS["SL"]->sysHas('partners'))
+                <label class="mL20"><input type="checkbox" name="redirPrtOnly" value="1" 
+                    onClick="if (this.checked) { document.getElementById('isNewAdmRedir').style.display='inline'; 
+                        document.getElementById('isNewAdmRedir2').style.display='inline'; } 
+                    else { document.getElementById('isNewAdmRedir').style.display='none'; 
+                        document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
+                    <i class="fa fa-university" aria-hidden="true"></i> Partner</label>
+                </div>
+            @endif
+            @if ($GLOBALS["SL"]->sysHas('volunteers'))
                 <label class="mL20"><input type="checkbox" name="redirVolOnly" value="1" 
                     onClick="if (this.checked) { document.getElementById('isNewAdmRedir').style.display='inline'; 
                         document.getElementById('isNewAdmRedir2').style.display='inline'; } 
@@ -150,6 +223,7 @@
                         document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
                     <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer</label>
                 </div>
+            @endif
                 <label for="newRedirNameID" class="mT10"><b>Redirect This URL:</b><br />{{ 
                     $GLOBALS['SL']->sysOpts["app-url"] }}/<div id="isNewAdmRedir" class="disNon">dash/</div></label>
                 <input type="text" name="newRedirFrom" id="newRedirFromID" class="form-control" autocomplete="off">
@@ -166,8 +240,14 @@
         
         <div class="slGrey">
             <div class="mB5"><u>Permissions</u></div>
-            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Admin-Only Page</div>
+            <div class="mB5"><i class="fa fa-eye mR5" aria-hidden="true"></i> Admin-Only Page</div>
+            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Staff Page</div>
+        @if ($GLOBALS["SL"]->sysHas('partners'))
+            <div class="mB5"><i class="fa fa-university mR5" aria-hidden="true"></i> Partners Page</div>
+        @endif
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
             <div class="mB5"><i class="fa fa-hand-rock-o mR5" aria-hidden="true"></i> Volunteer Page</div>
+        @endif
             <div class="mB5"><br /><u>Special Page Types</u></div>
             <div class="mB5"><i class="fa fa-list-alt mR5"></i> Report for Survey</div>
             <div class="mB5"><i class="fa fa-search mR5" aria-hidden="true"></i> Search Results</div>
