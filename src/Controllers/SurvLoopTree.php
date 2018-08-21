@@ -26,6 +26,7 @@ use App\Models\SLSearchRecDump;
 use App\Models\SLContact;
 use App\Models\SLConditions;
 use App\Models\SLConditionsArticles;
+use App\Models\SLUsersActivity;
 
 use SurvLoop\Controllers\CoreTree;
 use SurvLoop\Controllers\SurvLoopNode;
@@ -833,6 +834,10 @@ class SurvLoopTree extends CoreTree
                     && !$GLOBALS["SL"]->REQ->has('wdg')) {
                     $retTF = false;
                 }
+            } elseif (trim($cond->CondTag) == '#TestLink') {
+                if (!$GLOBALS["SL"]->REQ->has('test') && intVal($GLOBALS["SL"]->REQ->get('test')) < 1) {
+                    $retTF = false;
+                }
             } elseif (trim($cond->CondTag) == '#IsDataPermPublic') {
                 if ($GLOBALS["SL"]->x["dataPerms"] != 'public') $retTF = false;
             } elseif (trim($cond->CondTag) == '#IsDataPermPrivate') {
@@ -845,6 +850,8 @@ class SurvLoopTree extends CoreTree
                 if (!$this->pageLoadHasToken()) $retTF = false;
             } elseif (trim($cond->CondTag) == '#EmailVerified') {
                 if ($this->v["uID"] <= 0 || !$this->v["user"]->hasVerifiedEmail()) $retTF = false;
+            } elseif (trim($cond->CondTag) == '#NextButton') {
+                if (!isset($this->REQstep) || $this->REQstep != 'next') $retTF = false;
             //} elseif (trim($cond->CondTag) == '#HasUploads') {
             }
         }
@@ -1899,8 +1906,9 @@ class SurvLoopTree extends CoreTree
         } else {
             $this->getAllPublicCoreIDs();
             $this->getSearchFilts($request);
-            if (sizeof($this->allPublicCoreIDs) > 0) {
-                foreach ($this->allPublicCoreIDs as $i => $coreID) {
+            $this->processSearchFilts();
+            if (sizeof($this->allPublicFiltIDs) > 0) {
+                foreach ($this->allPublicFiltIDs as $i => $coreID) {
                     if (!isset($this->searchOpts["limit"]) || $i < $this->searchOpts["limit"]) {
                         $ret .= $this->printReportsRecord($coreID, $full);
                     }
@@ -1918,12 +1926,14 @@ class SurvLoopTree extends CoreTree
         }
         if ($full) {
             return '<div class="reportWrap">' . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) . '</div>';
-        } else {
-            $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
-            return '<div id="reportPreview' . $coreID . '" class="reportPreview">' 
-                . $this->printPreviewReport() . '</div>';
         }
-        return '';
+        return $this->printReportsPrev($coreID);
+    }
+    
+    public function printReportsPrev($coreID = -3)
+    {
+        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        return '<div id="reportPreview' . $coreID . '" class="reportPreview">' . $this->printPreviewReport() . '</div>';
     }
     
     public function unpublishedMessage($coreTbl = '')
@@ -2689,6 +2699,13 @@ class SurvLoopTree extends CoreTree
         $this->v["content"] = $this->printTreePublic()
             . ((isset($GLOBALS["SL"]->x["pageView"]) && trim($GLOBALS["SL"]->x["pageView"]) != '') 
                 ? '<!-- pv.' . $GLOBALS["SL"]->x["pageView"] . ' dp.' . $GLOBALS["SL"]->x["dataPerms"] . ' -->' : '');
+        if ($this->v["currPage"][0] != '/') {
+            $log = new SLUsersActivity;
+            $log->UserActUser = $this->v["uID"];
+            $log->UserActCurrPage = $this->v["currPage"][0] . '.pv:' . $GLOBALS["SL"]->x["pageView"] . '.dp:' 
+                . $GLOBALS["SL"]->x["dataPerms"];
+            $log->save();
+        }
         if ($request->has('ajax') && $request->ajax == 1) { // tree form ajax submission
             echo $this->v["content"];
             exit;

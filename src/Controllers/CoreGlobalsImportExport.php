@@ -482,14 +482,14 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
         return true;
     }
     
-    public function printRowAddy($row, $abbr)
+    public function printRowAddy($row, $abbr, $twoRows = false)
     {
         $ret = '';
         if ($row) {
             foreach (['Address', 'Address2', 'AddressCity', 'AddressState', 'AddressZip'] as $i => $fld) {
                 if (isset($row->{ $abbr . $fld }) && trim($row->{ $abbr . $fld }) != '') {
-                    $ret .= trim($row->{ $abbr . $fld }) 
-                        . ((!in_array($fld, ['AddressState', 'AddressZip'])) ? ', ' : ' ');
+                    $ret .= (($twoRows && $fld == 'AddressCity') ? '<br />' : '')
+                        . trim($row->{ $abbr . $fld }) . (($fld == 'AddressCity') ? ', ' : ' ');
                 }
             }
         }

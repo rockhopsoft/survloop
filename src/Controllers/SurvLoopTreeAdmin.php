@@ -81,6 +81,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
                 if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
+                if (!$node->nodeRow || !isset($node->nodeRow->NodeOpts)) $node->fillNodeRow();
                 
                 if (intVal($node->nodeRow->NodeOpts) <= 1) $node->nodeRow->NodeOpts = 1;
                 if ($GLOBALS["SL"]->REQ->changeResponseMobile == 'desktop') {
@@ -553,7 +554,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "node"           => $node
             ])->render();
         if ($node->isInstruct()) {
-            $GLOBALS["SL"]->pageAJAX .= ' $("#nodeInstructID").summernote({ height: 350 }); ';
+            $GLOBALS["SL"]->pageAJAX .= ' $("#nodeInstructID").summernote({ height: 350 });';
         }
         return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 
@@ -1017,7 +1018,10 @@ class SurvLoopTreeAdmin extends SurvFormTree
             $testCond = SLConditions::where('CondTag', '#TestLink')
                 ->where('CondDatabase', $treeRow->TreeDatabase)
                 ->first();
-            if (!$testCond || !isset($testCond->CondID)) $testCond = SLConditions::where('CondTag', '#TestLink')->first();
+            if (!$testCond || !isset($testCond->CondID)) {
+                $testCond = SLConditions::where('CondTag', '#TestLink')
+                    ->first();
+            }
             if ($testCond && isset($testCond->CondID)) $skipConds[] = $testCond->CondID;
             $chk = DB::select( DB::raw( "SELECT c.`CondNodeCondID`, n.`NodeID` FROM `SL_ConditionsNodes` c 
                 LEFT OUTER JOIN `SL_Node` n ON c.`CondNodeNodeID` LIKE n.`NodeID` 

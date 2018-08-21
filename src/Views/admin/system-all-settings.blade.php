@@ -89,6 +89,10 @@
     <div class="col-md-4">
         {!! view('vendor.survloop.admin.system-one-setting', [
             "opt" => 'google-analytic', "val" => $settingsList["google-analytic"] ])->render() !!}
+        {!! view('vendor.survloop.admin.system-one-setting', [
+            "opt" => 'google-map-key', "val" => $settingsList["google-map-key"] ])->render() !!}
+        {!! view('vendor.survloop.admin.system-one-setting', [
+            "opt" => 'google-map-key2', "val" => $settingsList["google-map-key2"] ])->render() !!}
     </div>
 </div>
 <div class="nodeAnchor"><a id="license" name="license"></a></div>

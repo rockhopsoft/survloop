@@ -195,9 +195,7 @@
     <div class="col-md-4 mB10 slGreenDark">
         <label>
             <h3 class="m0 slGreenDark"><i class="fa fa-database mR5"></i> Data Family
-            @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot)
-                : @if ($GLOBALS['SL']->treeRow->TreeType == 'Page') Page's @else Tree's @endif Core Table
-            @endif
+            @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot) : Core Table @endif
             </h3>
             <span class="fPerc80">Node's whole family tree can store data fields related to table.</span>
             <div class="nFld mT0"><select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off" 

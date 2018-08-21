@@ -81,7 +81,7 @@
 @section('headCode')
 @show
 </head>
-<body>
+<body {!! $GLOBALS["SL"]->getBodyParams() !!} >
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>

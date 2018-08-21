@@ -651,7 +651,7 @@ class AdminDBController extends AdminController
     public function defAdd(Request $request, $set = '')
     {
         $this->admControlInit($request, '/dashboard/db/definitions');
-        return $this->printDefEdit(-3, ((trim($set) != '') ? urldecode($set) : ''));
+        return $this->printDefEdit(-3, ((trim($set) != '' && trim($set) != '_') ? urldecode($set) : ''));
     }
     
     public function defEdit(Request $request, $defID)
@@ -920,24 +920,56 @@ class AdminDBController extends AdminController
         return view('vendor.survloop.admin.db.fieldSort', $this->v);
     }
     
-    public function fieldDescs(Request $request, $view = '')
+    public function fieldDescs(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/fieldDescs');
-        return $this->printFieldDescs($view, false);
-    }
-    
-    public function fieldDescsAll(Request $request, $view = '')
-    {
-        $this->admControlInit($request, '/dashboard/db/fieldDescs/all');
-        return $this->printFieldDescs($view, true);
-    }
-    
-    public function printFieldDescs($view = '', $all = false)
-    {
         if (!$this->v["dbAllowEdits"]) return $this->printOverview();
+        $this->v["view"] = (($request->has('view')) ? $request->get('view') : '');
+        $this->v["tblID"] = (($request->has('table')) ? intVal($request->get('table')) : $GLOBALS["SL"]->tbls[0]);
+        $this->v["tblNext"] = 0;
+        foreach ($GLOBALS["SL"]->tbls as $tblID) {
+            if ($tblID == $this->v["tblID"]) $this->v["tblNext"] = -1;
+            elseif ($this->v["tblNext"] == -1) $this->v["tblNext"] = $tblID;
+        }
+        if ($this->v["tblNext"] <= 0) $this->v["tblNext"] = $GLOBALS["SL"]->tbls[0];
+        if ($request->has('save')) {
+            $this->cacheFlush();
+            if ($request->has('changedFLds') && $request->changedFLds != '' && $request->changedFLds != ',') {
+                $flds = $GLOBALS["SL"]->mexplode(',', $request->changedFLds);
+                if (sizeof($flds) > 0) {
+                    foreach ($flds as $f) {
+                        if (intVal($f) > 0) {
+                            SLFields::find($f)->update([ 
+                                'FldEng'   => $request->input('FldEng' . $f . ''), 
+                                'FldDesc'  => $request->input('FldDesc' . $f . ''), 
+                                'FldNotes' => $request->input('FldNotes' . $f . '') 
+                            ]);
+                        }
+                    }
+                }
+            }
+            if ($request->has('changedFLdsGen') && trim($request->changedFLdsGen) != '' 
+                && trim($request->changedFLdsGen) != ',') {
+                $flds = $GLOBALS["SL"]->mexplode(',', $request->changedFLdsGen);
+                if (sizeof($flds) > 0) {
+                    foreach ($flds as $f) {
+                        if (intVal($f) > 0) {
+                            SLFields::where($f)
+                                ->orWhere(function ($query) { $query
+                                    ->where('FldSpecType', 'Replica')
+                                    ->where('FldSpecSource', $f);
+                                })
+                                ->update([ 
+                                    'FldEng'   => $request->input('FldEng' . $f . ''), 
+                                    'FldDesc'  => $request->input('FldDesc' . $f . ''), 
+                                    'FldNotes' => $request->input('FldNotes' . $f . '') 
+                                ]);
+                        }
+                    }
+                }
+            }
+        }
         $this->loadDefOpts();
-        $this->v["FldDescsView"] = $view;
-        $this->v["FldDescsViewAll"] = $all;
         $this->v["fldTots"] = [ [0, 0], [0, 0], [0, 0] ]; // unique, replica, generic
         $flds = SLFields::select('FldDesc', 'FldSpecType')
             ->where('FldSpecType', 'NOT LIKE', 'Generic')
@@ -945,57 +977,52 @@ class AdminDBController extends AdminController
             ->get();
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                $FldType = (($fld->FldSpecType == 'Generic') ? 2 : (($fld->FldSpecType == 'Replica') ? 1 
+                $fldType = (($fld->FldSpecType == 'Generic') ? 2 : (($fld->FldSpecType == 'Replica') ? 1 
                         : (($fld->FldSpecType == 'Unique') ? 0 : 0)));
-                $this->v["fldTots"][$FldType][1]++;
-                if (trim($fld->FldDesc) != '') $this->v["fldTots"][$FldType][0]++;
+                $this->v["fldTots"][$fldType][1]++;
+                if (trim($fld->FldDesc) != '') $this->v["fldTots"][$fldType][0]++;
             }
         }
-        $this->v["baseURL"] = '/dashboard/db/fieldDescs' . (($view == 'generics') ? '/generics' 
-                : (($view == 'replicas') ? '/replicas' : (($view == 'uniques') ? '/uniques' : '')));
-        $this->v["fldLabel"] = (($view == 'generics') ? 'Generics' : (($view == 'replicas') ? 'Replicas' 
-            : (($view == 'uniques') ? 'Unique' : '')));
-        
-        $FldSpecType = ['NOT LIKE', 'Generic'];
-        if ($view == 'generics') $FldSpecType = ['LIKE', 'Generic'];
-        elseif ($view == 'replicas') $FldSpecType = ['LIKE', 'Replica'];
-        elseif ($view == 'uniques') $FldSpecType = ['LIKE', 'Unique'];
-        $whereAll = ['FldDesc', 'LIKE'];
-        if ($all) $whereAll = ['FldName', 'NOT LIKE'];
+        $this->v["viewParam"] = (($this->v["view"] == 'generics') ? '&view=generics' 
+                : (($this->v["view"] == 'replicas') ? '&view=replicas' 
+                : (($this->v["view"] == 'uniques') ? '&view=uniques' : '')));
+        $this->v["fldLabel"] = (($this->v["view"] == 'generics') ? 'Generics' : (($this->v["view"] == 'replicas') 
+            ? 'Replicas' : (($this->v["view"] == 'uniques') ? 'Unique' : 'Fields')));
+        $fldSpecType = ['NOT LIKE', 'Generic'];
+        if ($this->v["view"] == 'generics') $fldSpecType = ['LIKE', 'Generic'];
+        elseif ($this->v["view"] == 'replicas') $fldSpecType = ['LIKE', 'Replica'];
+        elseif ($this->v["view"] == 'uniques') $fldSpecType = ['LIKE', 'Unique'];
         $this->v["fldTot"] = SLFields::select('FldID')
             ->where('FldDatabase', $this->dbID)
-            ->where('FldSpecType', $FldSpecType[0], $FldSpecType[1])
-            ->where($whereAll[0], $whereAll[1], '')
+            ->where('FldSpecType', $fldSpecType[0], $fldSpecType[1])
             ->get();
-        $this->v["tblFldLists"] = [];
-        $this->v["tblFldVals"] = [];
-        if ($this->v["fldTot"]->isNotEmpty()) {
-            foreach ($GLOBALS["SL"]->tbls as $tblID) {
-                $this->v["tblFldLists"][$tblID] = SLFields::where('FldDatabase', $this->dbID)
-                    ->where('FldSpecType', $FldSpecType[0], $FldSpecType[1])
-                    ->where($whereAll[0], $whereAll[1], '')
-                    ->where('FldTable', $tblID)
-                    ->orderBy('FldOrd', 'asc')
-                    ->orderBy('FldEng', 'asc')
-                    ->get();
-                if ($this->v["tblFldLists"][$tblID]->isNotEmpty()) {
-                    foreach ($this->v["tblFldLists"][$tblID] as $fld) {
-                        $this->v["tblFldVals"][$fld->FldID] = str_replace(';', ' ; ', $fld->FldValues);
-                        if (strpos($fld->FldValues, 'Def::') !== false 
-                            || strpos($fld->FldValues, 'DefX::') !== false) {
-                            $this->v["tblFldVals"][$fld->FldID] = str_replace(';', ' ; ', 
-                                $this->getDefOpts(str_replace('Def::', '', 
-                                    str_replace('DefX::', '', $fld->FldValues)))); 
-                        }
-                        if (isset($this->v["dbBusRulesFld"][$fld->FldID])) {
-                            $this->v["tblFldVals"][$fld->FldID] .= ' <a href="busrules.php?rule=' 
-                                . base64_encode($this->v["dbBusRulesFld"][$fld->FldID][0]) 
-                                . '" class="f10" data-toggle="tooltip" data-placement="top"  title="' 
-                                . str_replace('"', "'", $this->v["dbBusRulesFld"][$fld->FldID][1]) 
-                                . '"><i class="fa fa-university"></i></a>';
-                        }
-                    }
+        $this->v["tblFldVals"] = $this->v["tblFldQuestion"] = [];
+        $this->v["tblFldLists"] = SLFields::where('FldDatabase', $this->dbID)
+            ->where('FldSpecType', $fldSpecType[0], $fldSpecType[1])
+            ->where('FldTable', $this->v["tblID"])
+            ->orderBy('FldOrd', 'asc')
+            ->orderBy('FldEng', 'asc')
+            ->get();
+        if ($this->v["fldTot"]->isNotEmpty() && $this->v["tblFldLists"]->isNotEmpty()) {
+            foreach ($this->v["tblFldLists"] as $fld) {
+                $this->v["tblFldVals"][$fld->FldID] = str_replace(';', ' ; ', $fld->FldValues);
+                if (strpos($fld->FldValues, 'Def::') !== false 
+                    || strpos($fld->FldValues, 'DefX::') !== false) {
+                    $this->v["tblFldVals"][$fld->FldID] = str_replace(';', ' ; ', 
+                        $this->getDefOpts(str_replace('Def::', '', 
+                            str_replace('DefX::', '', $fld->FldValues)))); 
                 }
+                if (isset($this->v["dbBusRulesFld"][$fld->FldID])) {
+                    $this->v["tblFldVals"][$fld->FldID] .= ' <a href="busrules.php?rule=' 
+                        . base64_encode($this->v["dbBusRulesFld"][$fld->FldID][0]) 
+                        . '" class="f10" data-toggle="tooltip" data-placement="top"  title="' 
+                        . str_replace('"', "'", $this->v["dbBusRulesFld"][$fld->FldID][1]) 
+                        . '"><i class="fa fa-university"></i></a>';
+                }
+                $this->v["tblFldQuestion"][$fld->FldID] = strip_tags($GLOBALS["SL"]->getFldNodeQuestion(
+                    $GLOBALS["SL"]->tbl[$this->v["tblID"]], 
+                    $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$this->v["tblID"]]] . $fld->FldName,
+                    0));
             }
         }
         return view('vendor.survloop.admin.db.fieldDescs', $this->v);
@@ -1025,15 +1052,15 @@ class AdminDBController extends AdminController
     {
         $this->admControlInit($request, '/dashboard/db/fieldXML');
         if (!$this->v["dbAllowEdits"]) return '';
-        if ($GLOBALS["SL"]->REQ->has('changedFld') && $GLOBALS["SL"]->REQ->changedFld > 0 && $GLOBALS["SL"]->REQ->has('changedFldSetting')) {
-            $fld = SLFields::where('FldID', $GLOBALS["SL"]->REQ->changedFld)
+        if ($request->has('changedFld') && $request->changedFld > 0 && $request->has('changedFldSetting')) {
+            $fld = SLFields::where('FldID', $request->changedFld)
                 ->where('FldDatabase', $this->dbID)
                 ->first();
             if ($fld) {
                 if (!isset($fld->FldOpts) || intVal($fld->FldOpts) <= 0) $fld->FldOpts = 1;
                 $primes = [7, 11, 13];
                 foreach ($primes as $p) {
-                    if ($GLOBALS["SL"]->REQ->changedFldSetting == $p) {
+                    if ($request->changedFldSetting == $p) {
                         if ($fld->FldOpts%$p > 0) $fld->FldOpts *= $p;
                     }
                     elseif ($fld->FldOpts%$p == 0) $fld->FldOpts = $fld->FldOpts/$p;
@@ -1042,46 +1069,6 @@ class AdminDBController extends AdminController
             }
         }
         return '';
-    }
-    
-    function fieldDescsSave(Request $request) 
-    {
-        $this->admControlInit($request, '/dashboard/db/fieldDescs/all');
-        if (!$this->v["dbAllowEdits"]) exit;
-        $this->cacheFlush();
-        if ($GLOBALS["SL"]->REQ->has('changedFLds') && $GLOBALS["SL"]->REQ->changedFLds != '' && $GLOBALS["SL"]->REQ->changedFLds != ',') {
-            $flds = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->changedFLds);
-            if (sizeof($flds) > 0) {
-                foreach ($flds as $f) {
-                    if (intVal($f) > 0) {
-                        SLFields::find($f)->update([ 
-                            'FldDesc'  => $GLOBALS["SL"]->REQ->input('FldDesc' . $f . ''), 
-                            'FldNotes' => $GLOBALS["SL"]->REQ->input('FldNotes' . $f . '') 
-                        ]);
-                    }
-                }
-            }
-        }
-        if ($GLOBALS["SL"]->REQ->has('changedFLdsGen') && trim($GLOBALS["SL"]->REQ->changedFLdsGen) != '' 
-            && trim($GLOBALS["SL"]->REQ->changedFLdsGen) != ',') {
-            $flds = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->changedFLdsGen);
-            if (sizeof($flds) > 0) {
-                foreach ($flds as $f) {
-                    if (intVal($f) > 0) {
-                        SLFields::where($f)
-                            ->orWhere(function ($query) { 
-                                $query->where('FldSpecType', 'Replica')
-                                ->where('FldSpecSource', $f);
-                            })
-                            ->update([ 
-                                'FldDesc' => $GLOBALS["SL"]->REQ->input('FldDesc'.$f.''), 
-                                'FldNotes' => $GLOBALS["SL"]->REQ->input('FldNotes'.$f.'') 
-                            ]);
-                    }
-                }
-            }
-        }
-        exit;
     }
     
     public function diagrams(Request $request)

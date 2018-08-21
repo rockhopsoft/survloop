@@ -27,6 +27,9 @@
                     @endif
                 @empty
                 @endforelse
+                <option value="--STATES--" @if ($currDefinition == '--STATES--') SELECTED @endif >
+                    @if ($GLOBALS["SL"]->sysOpts['has-canada']) U.S. & Canadian States @else U.S. States @endif
+                    </option>
             </select>
         </div>
         <div id="{{ $fld }}Loops" class=" @if ($currLoopItems != '') disBlo @else disNon @endif ">

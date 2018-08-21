@@ -1,17 +1,4 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-ajax.blade.php */
-<?php /* @if ($node->isInstruct()) 
-var quill = new Quill('#nodeInstructID', {
-  modules: {
-    toolbar: [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline'],
-      ['image', 'code-block']
-    ]
-  },
-  placeholder: 'Compose an epic...',
-  theme: 'snow'  // or 'bubble'
-});
-@endif */ ?>
 
 $("#specialFuncsBtn").click(function(){ $("#specialFuncs").slideToggle("fast"); });
 $("#extraSmallBtn").click(function() { $("#extraSmall").slideToggle("fast"); });

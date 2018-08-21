@@ -69,6 +69,8 @@ class AdminTreeController extends AdminController
             $this->allStdCondition('#IsDataPermInternal', 'The current data permissions are set to internal.');
             $this->allStdCondition('#HasTokenDialogue', 'Current page load includes an access token dialogue.');
             $this->allStdCondition('#EmailVerified', 'Current user\'s email address has been verified.');
+            $this->allStdCondition('#TestLink', 'Current page url parameters includes ?test=1.');
+            $this->allStdCondition('#NextButton', 'Current page load results from clicking the survey\'s next button.');
             //$this->allStdCondition('#HasUploads', 'Current core table record has associated uploads.');
             $trees = SLTree::where('TreeType', 'Page')->get();
             if ($trees->isNotEmpty()) {
@@ -182,7 +184,7 @@ class AdminTreeController extends AdminController
         if (!$this->checkCache()) {
             $this->v["treeClassAdmin"]->loadTreeNodeStats();
             $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
-            $this->v["content"] = '<div class="w33">' 
+            $this->v["content"] = '<div class="w33 slPrint">' 
                 . view('vendor.survloop.logo-print', [ "sysOpts" => $GLOBALS["SL"]->sysOpts, "w100" => true ])->render()
                 . '</div>' . view('vendor.survloop.print-tree-map-desc', [])->render() 
                 . '<div class="p10"></div>' . $GLOBALS["SL"]->printTreeNodeStats(true, true, true) 

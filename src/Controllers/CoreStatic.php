@@ -462,6 +462,32 @@ class CoreStatic
         return '<sup>th</sup>';
     }
     
+    public function calcGrade($num = 100)
+    {
+        if ($num >= 97) return 'A+';
+        if ($num >= 93) return 'A';
+        if ($num >= 90) return 'A-';
+        if ($num >= 87) return 'B+';
+        if ($num >= 83) return 'B';
+        if ($num >= 80) return 'B-';
+        if ($num >= 77) return 'C+';
+        if ($num >= 73) return 'C';
+        if ($num >= 70) return 'C-';
+        if ($num >= 67) return 'D+';
+        if ($num >= 63) return 'D';
+        if ($num >= 60) return 'D-';
+        return 'F';
+    }
+    
+    public function calcGradeSmp($num = 100)
+    {
+        if ($num >= 90) return 'A';
+        if ($num >= 80) return 'B';
+        if ($num >= 70) return 'C';
+        if ($num >= 60) return 'D';
+        return 'F';
+    }
+    
     public function allCapsToUp1stChars($str)
     {
         if (strtoupper($str) == $str) {
@@ -586,6 +612,32 @@ class CoreStatic
 		$data = curl_exec($ch);
 		curl_close($ch);
 		return $data;
+	}
+	
+	public function getArrPercentile($arr, $val, $isGolf = false)
+	{
+	    $pos = 0;
+	    $max = (($isGolf) ? 1000000000 : -1000000000);
+	    if (is_array($arr) && sizeof($arr) > 0) {
+	        if ($isGolf) {
+    	        foreach ($arr as $i => $v) {
+	                if (floatval($val) >= floatval($v) && $max != $v) {
+	                    $pos = $i;
+	                    $max = $v;
+	                }
+	            }
+                return round(($pos/sizeof($arr))*100);
+            } else { // higher value is better
+    	        foreach ($arr as $i => $v) {
+	                if (floatval($val) >= floatval($v) && $max != $v) {
+	                    $pos = $i;
+	                    $max = $v;
+	                }
+	            }
+                return round((1-($pos/sizeof($arr)))*100);
+	        }
+	    }
+	    return 0;
 	}
     
 }

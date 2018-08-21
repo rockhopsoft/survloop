@@ -964,6 +964,8 @@ class CoreGlobalsTables extends CoreStatic
                 if (in_array(trim(strtoupper($val)), ['1', 'Y'])) $ret = 'Yes';
                 elseif (in_array(trim(strtoupper($val)), ['0', 'N'])) $ret = 'No';
                 elseif (trim($val) == '?') $ret = 'Not sure';
+            } elseif ($this->fldTypes[$tbl][$fld] == 'DATE') {
+                $ret = date("n/j/y", strtotime($val));
             } else {
                 $ret = $this->def->getVal($defSet, $val);
             }
@@ -1033,12 +1035,20 @@ class CoreGlobalsTables extends CoreStatic
     
     public function getFldNodeQuestion($tbl, $fld, $tree = -3)
     {
-        if ($tree <= 0) $tree = $this->treeID;
-        $chk = SLNode::where('NodeTree', $tree)
-            ->where('NodeDataStore', $tbl . ':' . $fld)
-            ->orderBy('NodeID', 'desc')
-            ->get();
-        if ($chk->isNotEmpty()) {
+        $chk = null;
+        if ($tree < 0) $tree = $this->treeID;
+        if ($tree == 0) {
+            $chk = SLNode::where('NodeDataStore', $tbl . ':' . $fld)
+                ->orderBy('NodeTree', 'asc')
+                ->orderBy('NodeID', 'desc')
+                ->get();
+        } else {
+            $chk = SLNode::where('NodeTree', $tree)
+                ->where('NodeDataStore', $tbl . ':' . $fld)
+                ->orderBy('NodeID', 'desc')
+                ->get();
+        }
+        if ($chk && $chk->isNotEmpty()) {
             foreach ($chk as $node) {
                 if (isset($node->NodePromptText) && trim($node->NodePromptText) != '') {
                     return $node->NodePromptText;

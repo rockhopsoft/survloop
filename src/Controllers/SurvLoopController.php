@@ -740,7 +740,7 @@ class SurvLoopController extends Controller
         $emailRec->EmailedEmailID  = (($emailID > 0) ? $emailID : 0);
         $emailRec->EmailedTree     = (($treeID > 0)  ? $treeID  : 0);
         $emailRec->EmailedRecID    = (($coreID > 0)  ? $coreID  : 0);
-        $emailRec->EmailedTo       = (($emailTo > 0) ? $emailTo : 0);
+        $emailRec->EmailedTo       = trim($emailTo);
         $emailRec->EmailedToUser   = (($userTo > 0)  ? $userTo  : 0);
         $emailRec->EmailedFromUser = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
         $emailRec->EmailedSubject  = $subject;

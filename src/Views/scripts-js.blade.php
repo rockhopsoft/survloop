@@ -1583,14 +1583,25 @@ $(document).ready(function(){
         }
         return true;
     }
+	$(document).on("click", ".hidivCrt", function() {
+        var fldGrp = $(this).attr("id").replace("hidivBtn", "");
+        if (document.getElementById("hidiv"+fldGrp+"") && document.getElementById("hidivCrt"+fldGrp+"")) {
+            if (document.getElementById("hidiv"+fldGrp+"").style.display!="block") {
+                $("#hidivCrt"+fldGrp+"").attr('class', 'fa fa-chevron-up');
+            } else {
+                $("#hidivCrt"+fldGrp+"").attr('class', 'fa fa-chevron-down');
+            }
+        }
+        return true;
+	});
 	$(document).on("click", ".hidivBtn", function() {
         var fldGrp = $(this).attr("id").replace("hidivBtn", "");
         toggleHidiv(fldGrp);
 	});
 	$(document).on("click", ".hidivBtnSelf", function() {
         var fldGrp = $(this).attr("id").replace("hidivBtn", "");
-        toggleHidiv(fldGrp);
         $(this).slideUp("fast");
+        setTimeout(function() { toggleHidiv(fldGrp); }, 350);
 	});
     
     function toggleHidnode(nID) {
@@ -1614,6 +1625,27 @@ $(document).ready(function(){
         toggleHidnode(nID);
         $(this).slideUp("fast");
 	});
+	
+	$(document).on("click", ".hidTogAll", function() {
+	    if ($(this).attr("data-list") && $(this).attr("data-list").trim() != '') {
+            var list = $(this).attr("data-list").split(",");
+            if (list.length > 0 && document.getElementById("hidiv"+list[0]+"")) {
+                var nowShow = false;
+                if (document.getElementById("hidiv"+list[0]+"").style.display!="block") nowShow = true;
+                for (var j = 0; j < list.length; j++) {
+                    if (document.getElementById("hidiv"+list[j]+"")) {
+                        if (nowShow) $("#hidiv"+list[j]+"").slideDown("fast");
+                        else $("#hidiv"+list[j]+"").slideUp("fast");
+                    }
+                    if (document.getElementById("hidivCrt"+list[j]+"")) {
+                        if (nowShow) $("#hidivCrt"+list[j]+"").attr('class', 'fa fa-chevron-up');
+                        else $("#hidivCrt"+list[j]+"").attr('class', 'fa fa-chevron-down');
+                    }
+                }
+            }
+        }
+	});
+	
 	
 	
 	$(document).on("click", ".ajx", function() {

@@ -175,14 +175,12 @@ class AdminController extends SurvLoopController
                 $this->admMenuLnk('/dashboard/db/field-matrix',       'Field Matrix: Geek'),
                 $this->admMenuLnk('/dashboard/db/bus-rules',          'Business Rules')
                 ]), 
-            $this->admMenuLnk('/dashboard/db/definitions',    'Definition Lists'),
-            $this->admMenuLnk('/dashboard/db/conds',          'Filters / Conditions'),
-            $this->admMenuLnk('/dashboard/db/fieldDescs/all', 'Field Descriptions', '', 1, [
-                $this->admMenuLnk('/dashboard/db/fieldDescs', 'Empty Descriptions')
-                ]), 
-            $this->admMenuLnk('/dashboard/db/fieldXML',  'Field Privacy Settings'), 
-            $this->admMenuLnk('/dashboard/db/workflows', 'Process Workflows'),
-            $this->admMenuLnk('/dashboard/db/export',    'Export', '', 1, [
+            $this->admMenuLnk('/dashboard/db/definitions', 'Definition Lists'),
+            $this->admMenuLnk('/dashboard/db/conds',       'Filters / Conditions'),
+            $this->admMenuLnk('/dashboard/db/fieldDescs',  'Field Descriptions'), 
+            $this->admMenuLnk('/dashboard/db/fieldXML',    'Field Privacy Settings'), 
+            $this->admMenuLnk('/dashboard/db/workflows',   'Process Workflows'),
+            $this->admMenuLnk('/dashboard/db/export',      'Export', '', 1, [
                 $this->admMenuLnk('/dashboard/db/export',         'Database Export'),
                 $this->admMenuLnk('/dashboard/sl/export/laravel', 'SurvLoop Package')
                 ]),
@@ -988,6 +986,8 @@ class AdminController extends SurvLoopController
             'shortcut-icon'   => ['Shortcut Icon Image', '/siteabrv/ico.png'],
             'spinner-code'    => ['Spinner Animation', '&lt;i class="fa-li fa fa-spinner fa-spin"&gt;&lt;/i&gt;'], 
             'google-analytic' => ['Google Analytics Tracking ID', 'UA-23427655-1'], 
+            'google-map-key'  => ['Google Maps API Key: Server', 'string'], 
+            'google-map-key2' => ['Google Maps API Key: Browser', 'string'], 
             'twitter'         => ['Twitter Account', '@SurvLoop'], 
             'show-logo-title' => ['Print Site Name Next To Logo', '1 or 0'], 
             'users-create-db' => ['Users Can Create Databases', '1 or 0'], 

@@ -213,7 +213,6 @@
                     else { document.getElementById('isNewAdmRedir').style.display='none'; 
                         document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
                     <i class="fa fa-university" aria-hidden="true"></i> Partner</label>
-                </div>
             @endif
             @if ($GLOBALS["SL"]->sysHas('volunteers'))
                 <label class="mL20"><input type="checkbox" name="redirVolOnly" value="1" 
@@ -222,8 +221,8 @@
                     else { document.getElementById('isNewAdmRedir').style.display='none'; 
                         document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
                     <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer</label>
-                </div>
             @endif
+                </div>
                 <label for="newRedirNameID" class="mT10"><b>Redirect This URL:</b><br />{{ 
                     $GLOBALS['SL']->sysOpts["app-url"] }}/<div id="isNewAdmRedir" class="disNon">dash/</div></label>
                 <input type="text" name="newRedirFrom" id="newRedirFromID" class="form-control" autocomplete="off">

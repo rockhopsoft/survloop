@@ -1,5 +1,5 @@
 <!-- resources/views/vendor/survloop/print-tree-map-desc.blade.php -->
-<h2>{{ $GLOBALS["SL"]->treeRow->TreeName }}: Survey Form Specs</h2>
+<h2>{{ $GLOBALS["SL"]->treeRow->TreeName }}: Specifications</h2>
 This document shows all questions asked in this user survey. 
 Some questions are conditional depending on previous responses ( e.g. 
     <i class="fa fa-code-fork fa-flip-vertical"></i> , 

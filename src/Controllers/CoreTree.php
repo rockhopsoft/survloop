@@ -13,6 +13,7 @@ use App\Models\SLNode;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
 use App\Models\SLTokens;
+use App\Models\SLUsersActivity;
 
 use SurvLoop\Controllers\CoreNode;
 use SurvLoop\Controllers\SurvLoopController;
@@ -994,7 +995,7 @@ class CoreTree extends SurvLoopController
             || (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0) );
     }
     
-    protected function processTokenAccess($showLabel = true)
+    protected function processTokenAccess($showLabel = 'Enter Key Code:')
     {
         if (!isset($this->v["tokenIn"]) || $this->v["tokenIn"] == '') return '';
         $ret = '';
@@ -1040,17 +1041,24 @@ class CoreTree extends SurvLoopController
                     }
                 }
                 if ($mfaTools) {
-                    $ret .= view('vendor.survloop.inc-sensitive-access-mfa-form', [
-                        "cID"       => $this->coreID, 
-                        "user"      => $this->v["tokenUser"],
-                        "showLabel" => $showLabel
-                        ])->render() . $resultMsg;
+                    $ret .= $this->getMfaForm($showLabel) . $resultMsg;
                 } else {
                     $ret .= $resultMsg;
                 }
             }
         }
         return $ret;
+    }
+    
+    protected function getMfaForm($showLabel = 'Enter Key Code:', $btnText = 'Access Full Details', $btnSz = '-lg')
+    {
+        return view('vendor.survloop.inc-sensitive-access-mfa-form', [
+            "cID"       => $this->coreID, 
+            "user"      => ((isset($this->v["tokenUser"])) ? $this->v["tokenUser"] : null),
+            "showLabel" => $showLabel,
+            "btnText"   => $btnText,
+            "btnSz"     => $btnSz
+            ])->render();
     }
     
     protected function processTokenAccessRedirExtra() { return ''; }

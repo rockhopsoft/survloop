@@ -11,6 +11,7 @@ b, h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
 }
 body {
+    width: 100%;
 	margin: 0px;
 	padding: 0px;
     background: {!! $cssColors["color-main-bg"] !!};
@@ -46,8 +47,7 @@ h5 { font-size: 110%; }
     color: {!! $cssColors['color-main-text'] !!};
 }
 #logoImg {
-    max-height: 75px;
-    width: 80%;
+    max-width: 300px;
     margin-bottom: 10px;
 }
 
@@ -73,7 +73,7 @@ h5 { font-size: 110%; }
 {!! $cssColors['css-dump'] !!}
 </style>
 </head><body>
-<center><img id="logoImg" src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-    }}{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 ></center>
+<!-- <center><img id="logoImg" src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 ></center> -->
 <div class="contentBox">{!! $emaContent !!}</div>
 </body></html>

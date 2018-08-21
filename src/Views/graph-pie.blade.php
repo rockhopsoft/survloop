@@ -4,7 +4,7 @@
 @elseif (isset($yAxisLab)) {!! $yAxisLab !!}
 @elseif (isset($currNode) && isset($currNode->extraOpts["y-axis-lab"])) {!! $currNode->extraOpts['y-axis-lab'] !!}
 @endif
-<div class="w100" style="height: @if (isset($hgt)) {{ $hgt }} 
+<div id="{{ $currGraphID }}myChartWrap" class="w100" style="height: @if (isset($hgt)) {{ $hgt }} 
     @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) {{ $currNode->extraOpts['hgt'] }} 
     @else 50% @endif ; overflow: visible;">
 @if (isset($graphFail) && $graphFail)

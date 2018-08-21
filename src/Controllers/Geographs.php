@@ -121,6 +121,28 @@ class Geographs
             ])->render();
     }
     
+    public function stateResponses($all = false)
+    {
+        $this->loadStates();
+        $responses = [];
+        $cnt = 0;
+        foreach ($this->stateList as $abbr => $name) {
+            $responses[$cnt] = new SLNodeResponses;
+            $responses[$cnt]->NodeResValue = $abbr;
+            $responses[$cnt]->NodeResEng = $name . ' (' . $abbr . ')';
+            $cnt++;
+        }
+        if ($this->hasCanada) {
+            foreach ($this->stateListCa as $abbr => $name) {
+                $responses[$cnt] = new SLNodeResponses;
+                $responses[$cnt]->NodeResValue = $abbr;
+                $responses[$cnt]->NodeResEng = $name . ' (' . $abbr . ')';
+                $cnt++;
+            }
+        }
+        return $responses;
+    }
+    
     public function climateZoneDrop($fltClimate = '')
     {
         return view('vendor.survloop.inc-drop-opts-ashrae', [
@@ -445,6 +467,29 @@ class Geographs
         return true;
     }
     
+    
+    public function getLatLng($addy = '')
+    {
+        if (isset($GLOBALS['SL']->sysOpts["google-map-key"])) {
+            $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($addy) . '&key=' 
+                . $GLOBALS['SL']->sysOpts['google-map-key']; // '&sensor=true'
+            $stateJSON = json_decode(file_get_contents($jsonFile),TRUE);
+            if (sizeof($stateJSON) > 0 && isset($stateJSON["results"]) && sizeof($stateJSON["results"]) > 0
+                && isset($stateJSON["results"][0]["geometry"]) 
+                && isset($stateJSON["results"][0]["geometry"]["location"])) {
+                return [$stateJSON["results"][0]["geometry"]["location"]["lat"], 
+                    $stateJSON["results"][0]["geometry"]["location"]["lng"]];
+            }
+        }
+        return [0, 0];
+    }
+    
+    public function embedMap()
+    {
+        
+        return view('vendor.survloop.embed-google-map', [
+            ]);
+    }
     
     
 }

@@ -6,6 +6,9 @@ html, body {
 body, p, .slTxt {
     color: {!! $css["color-main-text"] !!};
 }
+.note-editable p {
+    color: #000;
+}
 
 #absDebug {
     position: absolute;
@@ -344,6 +347,11 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
     height: auto;
     width: 100%;
 }
+.slPrint #slLogo, .slPrint #slLogo.w100, .slPrint #slLogoImg, .slPrint #slLogoImg.w100 {
+    height: 130px;
+    width: auto;
+}
+
 
 .navbar-brand, a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	font-size: 32pt;
@@ -428,11 +436,10 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
 }
 .nPrompt, .nFld, .nFldFing {
 	display: block;
-	font-size: 18px;
+	font-size: 16px;
 	color: {!! $css["color-main-text"] !!};
 }
-.nPrompt h1, .nPrompt h2, .nPrompt h3, .nFld h1, .nFld h2, .nFld h3, .nFld h4, .nFld h5, .nFld h6, 
-.nPrompt p, .nPrompt div {
+.nPrompt h1, .nPrompt h2, .nPrompt h3, .nFld h1, .nFld h2, .nFld h3, .nFld h4, .nFld h5, .nFld h6 {
     padding: 0px;
     margin: 0px;
 }
@@ -440,14 +447,11 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
 	color: {!! $css["color-main-on"] !!};
 }
 .nPrompt p, .nPrompt ul {
-	font-size: 18px;
+	font-size: 16px;
     margin-top: 15px;
 }
 .nPrompt.col-md-6 {
     padding-top: 15px;
-}
-.nPrompt .alert {
-    font-size: 15px;
 }
 .nFld {
     margin-top: 20px;
@@ -480,7 +484,6 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
     display: inline;
     width: 100px; 
     padding: 6px 6px;
-    text-align: right;
 }
 
 /*
@@ -709,9 +712,13 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 .subNote, .nPrompt .subNote {
     margin-top: 10px;
 }
-.subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p {
+.subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p, .finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
 	color: {!! $css["color-main-grey"] !!};
+}
+.finger .subNote, .fingerAct .subNote {
+    margin-top: 0px;
+    padding-left: 20px;
 }
 label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 	font-size: 14px;
@@ -815,7 +822,6 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 }
 
 
-
 .uploadWrap {
 	padding: 10px 20px;
 	border: 1px {!! $css["color-main-off"] !!} dotted;
@@ -824,7 +830,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 .uploadWrap .uploadTypes {
 	width: 100%;
 }
-.uploadWrap hr {
+hr, .uploadWrap hr {
     border: 0px;
     border-top: 1px {!! $css["color-line-hr"] !!} dotted;
 }
@@ -866,6 +872,11 @@ table.repDeetsBlock tr td span, table.repDeetsBlock tr td div span,
 .slReport table.repDeetsBlock tr td span a.hidivBtn:link, .slReport table.repDeetsBlock tr td span a.hidivBtn:visited, 
 .slReport table.repDeetsBlock tr td span a.hidivBtn:active, .slReport table.repDeetsBlock tr td span a.hidivBtn:hover {
 	color: {!! $css["color-main-grey"] !!};
+}
+
+#gMap {
+    height: 100%;
+    min-height: 600px;
 }
 
 .dontBreakOut, table.repDeetsBlock tr td, table.repDeetsBlock tr th {
@@ -1111,7 +1122,6 @@ table.listTable tr td, table.listTable tr th {
     cursor: pointer;
 	background: {!! $css["color-main-bg"] !!};
 }
-
 
 
 table.detailList {
@@ -1623,6 +1633,8 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 .fPerc80 { font-size: 80%; }
 .fPerc125 { font-size: 125%; }
 .fPerc133 { font-size: 133%; }
+.fPerc200 { font-size: 200%; }
+.fPerc300 { font-size: 300%; }
 
 .lH10, table tr td.lH10, a.lH10:link, a.lH10:active, a.lH10:visited, a.lH10:hover { line-height: 10px; }
 .lH13, table tr td.lH13, a.lH13:link, a.lH13:active, a.lH13:visited, a.lH13:hover { line-height: 13px; }
@@ -1698,6 +1710,7 @@ a.wAuto:link, a.wAuto:visited, a.wAuto:active, a.wAuto:hover {
 }
 
 .zind0 { z-index: 0; }
+.zind100 { z-index: 100; }
 
 .vaT, table tr td.vaT { vertical-align: top; }
 .vaM, table tr td.vaM { vertical-align: middle; }
@@ -1748,7 +1761,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .round30 { -moz-border-radius: 30px; border-radius: 30px; }
 
 .tmbRound { width: 140px; height: 140px; -moz-border-radius: 70px; border-radius: 70px; }
-.bigTmbRound { width: 165px; height: 165px; -moz-border-radius: 82px; border-radius: 82px; }
+.bigTmbRound { width: 125px; height: 125px; -moz-border-radius: 62px; border-radius: 62px; }
 
 .opac1 { opacity:0.01; filter:alpha(opacity=1); }
 .opac10 { opacity:0.10; filter:alpha(opacity=10); }
@@ -1783,6 +1796,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 
 .blk { color: {!! $css["color-main-text"] !!}; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: {!! $css["color-main-bg"] !!}; }
+.fnt, b.fnt, a.fnt:link, a.fnt:active, a.fnt:visited, a.fnt:hover { color: {!! $css["color-main-faint"] !!}; }
 .gry4 { color: #444; }
 .gry6 { color: #666; }
 .gry8 { color: #888; }
@@ -1934,6 +1948,10 @@ a:link .slFaintHover, a:visited .slFaintHover, a:active .slFaintHover, a:hover .
 }
 a.slFaintHover:hover {
 	color: {!! $css["color-main-off"] !!};
+}
+.row2 .slFaintHover, .row2 a.slFaintHover:link, .row2 a.slFaintHover:visited, .row2 a.slFaintHover:active, .row2 a.slFaintHover:hover,
+.row2 a:link .slFaintHover, .row2 a:visited .slFaintHover, .row2 a:active .slFaintHover, .row2 a:hover .slFaintHover {
+	color: {!! $css["color-main-bg"] !!};
 }
 
 {!! $css["raw"] !!}

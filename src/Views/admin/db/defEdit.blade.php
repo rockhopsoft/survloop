@@ -7,10 +7,8 @@
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    @if ($defID > 0) 
-        Edit Definition <span class="f16">{{ $def->DefSubset }}: {{ $def->DefValue }}</span> 
-    @else
-        Add New Definition
+    @if ($defID > 0) Edit Definition <span class="f16">{{ $def->DefSubset }}: {{ $def->DefValue }}</span> 
+    @else Add New Definition
     @endif
 </h1>
 
@@ -20,10 +18,8 @@
 <form name="mainPageForm" method="post" 
     @if (isset($def->DefID) && intVal($def->DefID) > 0) 
         action="/dashboard/db/definitions/edit-sub/{{ $def->DefID }}"
-    @else
-        action="/dashboard/db/definitions/add-sub/{{ urlencode($subset) }}"
-    @endif 
->
+    @else action="/dashboard/db/definitions/add-sub{{ ((trim($subset) != '') ? '/' . urlencode($subset) : '') }}"
+    @endif >
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="defEditForm" value="YES">
 

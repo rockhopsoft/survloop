@@ -431,6 +431,19 @@ class CoreGlobals extends CoreGlobalsImportExport
         return $this->getHshooJs();
     }
     
+    public function addBodyParams($html)
+    {
+        if (!isset($this->x["bodyParams"])) $this->x["bodyParams"] = '';
+        $this->x["bodyParams"] .= $html;
+        return true;
+    }
+    
+    public function getBodyParams()
+    {
+        if (isset($this->x["bodyParams"])) return $this->x["bodyParams"];
+        return '';
+    }
+    
     public function getSrchUrl($override = '')
     {
         if ($override != '') return $this->x["srchUrls"][$override];

@@ -579,28 +579,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/fieldDescs', [
+    Route::post('/dashboard/db/fieldDescs', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldDescs', 
         'middleware' => ['auth']
     ]);
-    
-    Route::get('/dashboard/db/fieldDescs/all', [
-        'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldDescsAll', 
-        'middleware' => ['auth']
-    ]);
-    
-    Route::get('/dashboard/db/fieldDescs/{view}', [
+    Route::get( '/dashboard/db/fieldDescs', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldDescs', 
-        'middleware' => ['auth']
-    ]);
-    
-    Route::get('/dashboard/db/fieldDescs/{view}/all', [
-        'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldDescsAll', 
-        'middleware' => ['auth']
-    ]);
-    
-    Route::post('/dashboard/db/fieldDescs/save', [
-        'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldDescsSave',    
         'middleware' => ['auth']
     ]);
     
@@ -650,12 +634,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/db/definitions/add-sub', [
+    Route::post('/dashboard/db/definitions/add-sub/{subset}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defAdd', 
         'middleware' => ['auth']
     ]);
     
-    Route::post('/dashboard/db/definitions/add-sub/{subset}', [
+    Route::post('/dashboard/db/definitions/add-sub', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defAdd', 
         'middleware' => ['auth']
     ]);
