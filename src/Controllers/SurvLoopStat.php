@@ -945,6 +945,16 @@ class SurvLoopStat
         return $this->pieView($data);
     }
     
+    public function boxWhisk($datAbbr, $fltCol, $hgt = '100%')
+    {
+        $GLOBALS["SL"]->x["needsCharts"] = true;
+        $GLOBALS["SL"]->x["needsViolinPlot"] = true;
+        
+        $dLet = $this->dAbr($datAbbr);
+        $data = [];
+        return view('vendor.survloop.graph-box-whisker', [ "data" => $data, "hgt" => $hgt ])->render();
+    }
+    
     public function pieView($data, $hgt = null)
     {
         $GLOBALS["SL"]->x["needsCharts"] = true;

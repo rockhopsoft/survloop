@@ -24,7 +24,8 @@ setTimeout("checkFullPage()", 10);
 setTimeout("checkFullPage()", 100);
 setTimeout("checkFullPage()", 1000);
 
-@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0)
+@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
+    || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0)
 
 @forelse ($pageFldList as $fld)
 addFld("{{ $fld }}");

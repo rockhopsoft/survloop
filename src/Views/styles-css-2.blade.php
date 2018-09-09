@@ -1828,6 +1828,8 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdLft, table tr.brdLft td, table tr.brdLft th { border-left: 1px {!! $css["color-main-off"] !!} solid; }
 .brdRgt, table tr.brdRgt td, table tr.brdRgt th { border-right: 1px {!! $css["color-main-off"] !!} solid; }
 
+.brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th { border-top: 0px none; }
+
 .brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th { border-bottom: 1px {!! $css["color-main-text"] !!} solid; }
 .brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th { border-bottom: 2px {!! $css["color-main-text"] !!} solid; }
 .brdBotGrey, table tr.brdBotGrey td, table tr.brdBotGrey th { border-bottom: 1px {!! $css["color-main-grey"] !!} solid; }

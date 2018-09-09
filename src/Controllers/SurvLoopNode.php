@@ -512,7 +512,7 @@ class SurvLoopNode extends CoreNode
     
     public function isDropdownTagger()
     {
-        return ($this->nodeType == 'Drop Down' && $this->nodeRow->NodeOpts%53 == 0);
+        return ($this->nodeType == 'Drop Down' && $this->nodeOpts%53 == 0);
     }
     
     public function isHnyPot()
