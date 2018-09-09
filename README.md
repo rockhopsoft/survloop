@@ -45,9 +45,8 @@ Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.
 
 # <a name="requirements"></a>Requirements
 
-* php: >=5.6.4
+* php: >=5.7.1
 * <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.6.*
-* <a href="https://packagist.org/packages/matthiasmullie/minify" target="_blank">matthiasmullie/minify</a>: 1.3.*
 
 # <a name="getting-started"></a>Getting Started
 
@@ -72,7 +71,6 @@ $ nano composer.json
 "require": {
 	...
     "wikiworldorder/survloop": "0.*",
-    "matthiasmullie/minify": "~1.3",
 	...
 },
 ...
@@ -81,8 +79,6 @@ $ nano composer.json
 	"psr-4": {
 		...
 		"SurvLoop\\": "vendor/wikiworldorder/survloop/src/",
-		"MatthiasMullie\\Minify\\": "vendor/matthiasmullie/minify/src/",
-		"MatthiasMullie\\PathConverter\\": "vendor/matthiasmullie/path-converter/src/",
 	}
 	...
 },

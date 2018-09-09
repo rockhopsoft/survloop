@@ -20,7 +20,7 @@
         {
             "name": "Morgan Lesko",
             "homepage": "https://github.com/wikiworldorder/survloop",
-            "email": "mo@wikiworldorder.org",
+            "email": "wikiworldorder@protonmail.com",
             "role": "Developer"
         }
     ],
@@ -38,7 +38,9 @@
     },
     "autoload": {
         "psr-4": {
-            "SurvLoop\\": "src/"
+            "SurvLoop\\": "src/",
+            "MatthiasMullie\\Minify\\": "vendor/matthiasmullie/minify/src/",
+            "MatthiasMullie\\PathConverter\\": "vendor/matthiasmullie/path-converter/src/"
         }
     }
 }
