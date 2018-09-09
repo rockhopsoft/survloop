@@ -840,9 +840,8 @@ class AdminController extends SurvLoopController
         $minifier->minify("../storage/app/sys/sys2.min.css");
         
         $minifier = new Minify\CSS("../storage/app/sys/sys1.min.css");
-        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/bootstrap/css/bootstrap.min.css");
-        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/bootstrap/css/bootstrap-theme.min.css");
-        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/jquery-ui.min.css");
+        $minifier->add("../vendor/components/jqueryui/themes/base/jquery-ui.min.css");
+        $minifier->add("../vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
         if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"]) 
             && trim($GLOBALS["SL"]->sysOpts["css-extra-files"]) != '') {
             $files = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->sysOpts["css-extra-files"]);
@@ -857,9 +856,9 @@ class AdminController extends SurvLoopController
         $minifier = new Minify\JS("../storage/app/sys/sys.js");
         $minifier->minify("../storage/app/sys/sys.min.js");
         
-        $minifier = new Minify\JS("../vendor/wikiworldorder/survloop/src/Public/jquery-3.2.1.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/jquery-ui.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/bootstrap/js/bootstrap.min.js");
+        $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
+        $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
+        $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
         $minifier->add("../vendor/wikiworldorder/survloop/src/Public/scripts-lib.js");
         $minifier->add("../storage/app/sys/sys.min.js");
         $minifier->minify("../storage/app/sys/sys-all.min.js");

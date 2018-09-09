@@ -144,16 +144,57 @@ Route::group(['middleware' => ['web']], function () {
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/bootstrap.min.css', function() {
-        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/css/bootstrap.min.css'));
+    
+    
+    Route::get('/jquery.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/components/jquery/jquery.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/jquery-ui.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/components/jqueryui/jquery-ui.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/jquery-ui.min.css', function() {
+        $response = Response::make(file_get_contents('../vendor/components/jqueryui/themes/base/jquery-ui.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
+    
     Route::get('/bootstrap.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/js/bootstrap.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
+    Route::get('/bootstrap.min.css', function() {
+        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/css/bootstrap.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    
+    Route::get('/summernote.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/summernote.css', function() {
+        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    
+    Route::get('/Chart.bundle.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/nnnick/chartjs/dist/Chart.bundle.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    Route::get('/plotly.min.js', function() {
+        $response = Response::make(file_get_contents('../vendor/plotly/plotly.js/dist/plotly.min.js'));
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    
     
     
     ///////////////////////////////////////////////////////////

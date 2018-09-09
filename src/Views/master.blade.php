@@ -39,12 +39,8 @@
 @else
     <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-    @if ((isset($needsJqUi) && $needsJqUi) || true)
-    <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-ui-1.12.1/jquery-ui.min.css">
-    @endif
+    <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery-ui.min.css">
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/sys2.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
 @endif
@@ -54,12 +50,9 @@
 @else 
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/jquery-3.2.1.min.js"></script>
-    @if ((isset($needsJqUi) && $needsJqUi) || true)
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/jquery-ui-1.12.1/jquery-ui.min.js" type="text/javascript"></script>
-    @endif
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery.min.js"></script>
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.js"></script>
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
@@ -68,7 +61,11 @@
 
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/Chart.bundle.min.js"></script>
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/Chart.bundle.min.js"></script>
+@endif
+@if ((isset($needsPlots) && $needsPlots) 
+    || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/plotly.min.js"></script>
 @endif
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <?php /* <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
@@ -275,10 +272,8 @@
     }}/survloop/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/summernote-0.8.9-dist/summernote.css" rel="stylesheet">
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/summernote-0.8.9-dist/summernote.js"></script>
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/summernote.css" rel="stylesheet">
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/summernote.min.js"></script>
 @endif
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
