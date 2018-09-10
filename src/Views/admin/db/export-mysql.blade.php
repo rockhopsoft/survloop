@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/db/export-mysql.blade.php -->
 
-<nobr><span class="pull-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
+<nobr><span class="float-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>: MySQL Export 
     @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"])

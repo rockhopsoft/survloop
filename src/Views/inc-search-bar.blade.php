@@ -3,7 +3,7 @@
 @if (isset($pre)) {!! $pre !!} @endif
 <div class="search-bar">
     <input type="text" id="searchBar{{ $nID }}t{{ $treeID }}" name="s{{ $nID }}" 
-        class="form-control input-lg slTab searchBar" {!! $GLOBALS["SL"]->tabInd() !!}
+        class="form-control form-control-lg slTab searchBar" {!! $GLOBALS["SL"]->tabInd() !!}
         @if (isset($search)) value="{{ $search }}" @else value="" @endif >
     <div class="search-btn-wrap"><a id="searchTxt{{ $nID }}t{{ $treeID }}" href="javascript:;"
         class="btn btn-info searchBarBtn" 

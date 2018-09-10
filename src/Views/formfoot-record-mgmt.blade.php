@@ -12,14 +12,14 @@
                     {!! $recDesc !!}
                 @endif </h4>
             @if (!isset($isUser) || !$isUser)
-                <a class="pull-right mL20 saveAndRedir" data-redir-url="/register"
+                <a class="float-right mL20 saveAndRedir" data-redir-url="/register"
                     href="javascript:;" ><i class="fa fa-key mL5 mR5" aria-hidden="true"></i> 
                     <span class="mR5">Finish Later</span></a>
             @endif
-            <?php /* <a class="pull-right mL20 saveAndRedir" href="javascript:;" 
+            <?php /* <a class="float-right mL20 saveAndRedir" href="javascript:;" 
                 data-redir-url="/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}?new=1"
                 ><i class="fa fa-star-o mL5 mR5" aria-hidden="true"></i> <span class="mR5">Start New</span></a> */ ?>
-            <a id="hidivBtnRecMgmtDel" class="pull-right mL20 hidivBtn" href="javascript:;" 
+            <a id="hidivBtnRecMgmtDel" class="float-right mL20 hidivBtn" href="javascript:;" 
                 ><i class="fa fa-trash-o mL5 mR5" aria-hidden="true"></i> 
                 <span class="mR5">Delete #{{ $coreID }}</span></a>
             <div id="hidivRecMgmtDel" class="disNon mT20 mL0 w100 round15 brdRed slRedDark row">
@@ -27,7 +27,7 @@
                     Are you sure you want to delete this session?<br />Deleting CANNOT be undone.
                 </div>
                 <div class="col-md-3 taR p15">
-                    <a href="javascript:;" id="recMgmtDelX" class="btn btn-default">Cancel</a>
+                    <a href="javascript:;" id="recMgmtDelX" class="btn btn-secondary">Cancel</a>
                 </div>
                 <div class="col-md-3 taR p15">
                     <a href="/delSess/{{ $treeID }}/{{ $coreID }}" class="btn btn-danger">Yes, Delete #{{ $coreID }}</a>

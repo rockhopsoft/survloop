@@ -11,10 +11,10 @@
 @forelse ($myTrees as $tree)
     <div class="p10 @if ($GLOBALS['SL']->treeID == $tree->TreeID) row2 @endif ">
         @if ($GLOBALS['SL']->treeID == $tree->TreeID)
-            <a href="javascript:;" class="btn btn-lg btn-primary pull-right" DISABLED 
+            <a href="javascript:;" class="btn btn-lg btn-primary float-right" DISABLED 
                 ><i class="fa fa-snowflake-o mR5" aria-hidden="true"></i> Current User Experience</a>
         @else
-            <a href="/dashboard/tree/switch/{{ $tree->TreeID }}" class="btn btn-lg btn-primary pull-right"
+            <a href="/dashboard/tree/switch/{{ $tree->TreeID }}" class="btn btn-lg btn-primary float-right"
                 ><i class="fa fa-arrow-left mR5" aria-hidden="true"></i> Design This User Experience</a>
         @endif
         <h2 class="mT0 @if ($GLOBALS['SL']->treeID == $tree->TreeID) slBlueDark @endif ">{{ $tree->TreeName }}</h2>
@@ -47,7 +47,7 @@
 @endforelse
 
 <div class="p10">
-    <a href="/dashboard/tree/new/" class="btn btn-lg btn-primary pull-right"
+    <a href="/dashboard/tree/new/" class="btn btn-lg btn-primary float-right"
         ><i class="fa fa-star mR5" aria-hidden="true"></i> Create New User Experience</a>
 </div>
 <hr>

@@ -58,7 +58,7 @@
             <td colspan="{{ sizeof($tableDat['cols']) }}">&nbsp;</td>
             <td class="taR"><a id="addSprdTbl{{ $nIDtxt }}Btn" href="javascript:;" data-nid="{{ $nID }}"
                 data-nidtxt="{{ $nIDtxt }}" data-row-max="{{ $tableDat['maxRow'] }}" 
-                class="btn btn-ico btn-default disBlo addSprdTblRow" 
+                class="btn btn-ico btn-secondary disBlo addSprdTblRow" 
                 ><i class="fa fa-plus" aria-hidden="true"></i></a></td>
         </tr>
     @endif

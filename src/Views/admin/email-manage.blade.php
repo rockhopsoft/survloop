@@ -10,8 +10,8 @@
         <div class="slGrey">(eg. in response to completing a survey)</div>
     </div>
     <div class="col-md-6 pT20 taR">
-        <a href="/dashboard/email/-3" class="btn btn-default">Create New Email Template</a>
-        <a href="javascript:;" class="btn btn-default mL20" id="showAll">Show/Hide All Email Bodies</a>
+        <a href="/dashboard/email/-3" class="btn btn-secondary">Create New Email Template</a>
+        <a href="javascript:;" class="btn btn-secondary mL20" id="showAll">Show/Hide All Email Bodies</a>
     </div>
 </div>
 

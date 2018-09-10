@@ -63,7 +63,7 @@
                 class="form-control ntrStp slTab w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
         </label>
         
-        <input type="button" id="imgSave{{ $img->ImgID }}" class="btn btn-default w100 imgSaveDeet" 
+        <input type="button" id="imgSave{{ $img->ImgID }}" class="btn btn-secondary w100 imgSaveDeet" 
             value="Save Changes">
         </form>
         <div id="img{{ $img->ImgID }}saveUpdate" class="w100 pT20 fPerc133 slBlueDark"></div>

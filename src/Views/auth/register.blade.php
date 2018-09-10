@@ -26,7 +26,7 @@ $v = $surv->custLoop->v;
     <div class="col-md-6 taR pT5">
         @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
             || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
-            <a href="/login" class="btn btn-default">Login</a>
+            <a href="/login" class="btn btn-secondary">Login</a>
         @endif
     </div>
 </div>
@@ -51,7 +51,7 @@ $v = $surv->custLoop->v;
     <div class="nFld mT0">
         <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
         @if ($errors->has('name'))
-            <span class="help-block">
+            <span class="form-text">
                 <strong>{{ $errors->first('name') }}</strong>
             </span>
         @endif
@@ -72,7 +72,7 @@ $v = $surv->custLoop->v;
     <div class="nFld mT0">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
         @if ($errors->has('email'))
-            <span class="help-block">
+            <span class="form-text">
                 <strong>{{ $errors->first('email') }}</strong>
             </span>
         @endif
@@ -94,7 +94,7 @@ $v = $surv->custLoop->v;
     <div class="nFld mT0">
         <input id="password" name="password" value="" type="password" class="form-control">
         @if ($errors->has('password'))
-            <span class="help-block"><strong>{{ $errors->first('password') }}</strong></span>
+            <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
         @endif
     </div>
 </div>

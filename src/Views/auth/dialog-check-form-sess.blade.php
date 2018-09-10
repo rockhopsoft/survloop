@@ -15,7 +15,7 @@
     <div class="p10"></div>
     <div class="row">
         <div class="col-md-6 taC">
-            <a class="dialogClose btn btn-lg btn-default" href="javascript:;">Cancel Reload</a>
+            <a class="dialogClose btn btn-lg btn-secondary" href="javascript:;">Cancel Reload</a>
         </div>
         <div class="col-md-6 taC">
             <a class="nFormSaveReload btn btn-lg btn-primary" href="javascript:;">Save & Reload</a>

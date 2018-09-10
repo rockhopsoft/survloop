@@ -20,7 +20,7 @@
     @if ($currNodeSessData == $res[0]) CHECKED @endif ></div> {{ $res[1] }}</nobr>
     @if ($res[0] == 'O')
         <input type="text" name="n{{ $nID }}fldOther{{ $j }}" id="n{{ $nID }}fldOtherID{{ $j }}" value="{{ 
-            $currSessDataOther }}" class="form-control input-lg disIn ntrStp slTab otherFld" onKeyUp="formKeyUpOther('{{ 
+            $currSessDataOther }}" class="form-control form-control-lg disIn ntrStp slTab otherFld" onKeyUp="formKeyUpOther('{{ 
             $nID }}', {{ $j }});" {!! $GLOBALS['SL']->tabInd() !!}>
     @endif
     </label>

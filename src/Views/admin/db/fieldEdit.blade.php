@@ -13,7 +13,7 @@
 @else
     <h1><i class="fa fa-database"></i> Add New Field</h1>
 @endif
-<a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-default">Back To <i>{{ $tbl->TblName }}</i></a>
+<a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-secondary">Back To <i>{{ $tbl->TblName }}</i></a>
 <div class="p10"></div>
 
 <form name="fldEdit" method="post" autocomplete="off" 

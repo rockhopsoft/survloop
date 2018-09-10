@@ -765,8 +765,14 @@ function setSubResponses(nID, nSffx, onOff, kids) {
     if (kids.length > 0) {
         for (var k = 0; k < kids.length; k++) {
             if (document.getElementById("node"+kids[k]+nSffx+"")) {
-                if (onOff) styBlock("node"+kids[k]+nSffx+"");
-                else styNone("node"+kids[k]+nSffx+"");
+                if (onOff) {
+//alert("node kids[k] = "+kids[k]+" , nSffx = "+nSffx+"");
+//will need styFlex(
+                    styBlock("node"+kids[k]+nSffx+"");
+                    
+                } else {
+                    styNone("node"+kids[k]+nSffx+"");
+                }
             }
             kidsVisible(kids[k], nSffx, onOff);
         }
@@ -2134,7 +2140,7 @@ function startCountdown(divID, cntFrom, inc) {
 
 function openNav() {
     document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-off"] !!} solid";
-    document.getElementById("mySidenav").style.boxShadow = "0px 0px 60px {!! $css["color-main-grey"] !!}";
+    document.getElementById("mySidenav").style.boxShadow = "0px 0px 40px {!! $css["color-main-faint"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
     document.getElementById("main").style.marginRight = "300px";
     document.getElementById("navBurger").style.display = "none";
@@ -2158,26 +2164,29 @@ var treeMajorSects = new Array();
 var treeMinorSects = new Array();
 var treeMajorSectsDisabled = new Array();
 function addTopCust(navCode) {
-    if (document.getElementById("myNavBarIn")) {
-        if (document.getElementById("myNavBarIn").innerHTML.indexOf(navCode) < 0) {
-            document.getElementById("myNavBarIn").innerHTML += navCode;
+    if (document.getElementById("myNavBar")) {
+        if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0) {
+            document.getElementById("myNavBar").innerHTML += navCode;
         }
     }
     return true;
 }
 function addTopNavItem(navTxt, navLink) {
-    if (document.getElementById("myNavBarIn")) {
+    if (document.getElementById("myNavBar")) {
         if (navTxt == 'pencil') navTxt = "<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>";
-        var newLink = "<a class=\"pull-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
-        if (document.getElementById("myNavBarIn").innerHTML.indexOf(newLink) < 0) {
-            document.getElementById("myNavBarIn").innerHTML += newLink;
+        var newLink = "<a class=\"float-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
+        if (document.getElementById("myNavBar").innerHTML.indexOf(newLink) < 0) {
+            document.getElementById("myNavBar").innerHTML += newLink;
         }
     }
     return true;
 }
 function addSideNavItem(navTxt, navLink) {
     if (document.getElementById("mySideUL")) {
-        document.getElementById("mySideUL").innerHTML += "<li><a href=\""+navLink+"\">"+navTxt+"</a></li>";
+        var newLink = "<li class=\"nav-item\"><a href=\""+navLink+"\">"+navTxt+"</a></li>";
+        if (document.getElementById("mySideUL").innerHTML.indexOf(newLink) < 0) {
+            document.getElementById("mySideUL").innerHTML += newLink;
+        }
     }
     return true;
 }
@@ -2189,7 +2198,7 @@ function printHeadBar(percIn) {
     return true;
 }
 function getProgBar() {
-    return "<div class=\"progress progress-striped active\"><div class=\"progress-bar progress-bar-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
+    return "<div class=\"progress progress-striped progress-bar-animated\"><div class=\"progress-bar bg-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
 }
 
 

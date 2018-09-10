@@ -13,7 +13,7 @@
 
 @if ($dbAllowEdits)
     <div class="p10">
-        <a href="/dashboard/db/bus-rules/add" class="btn btn-default"
+        <a href="/dashboard/db/bus-rules/add" class="btn btn-secondary"
             ><i class="fa fa-plus-circle"></i> Add New Rule</a>
     </div>
 @endif

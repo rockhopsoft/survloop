@@ -20,7 +20,7 @@
     <tr>
         <td>
             <a href="/dashboard/subs/{{ $com->ComID }}/review" 
-                class="btn btn btn-default round20 p5 f22 slBlueDark"
+                class="btn btn btn-secondary round20 p5 f22 slBlueDark"
                 >#{{ number_format( $sub->{ $coreAbbr.'ID' } ) }}</a>
         </td>
         <td>

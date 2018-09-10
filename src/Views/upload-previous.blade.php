@@ -65,7 +65,7 @@
                             value="0">
                         <div class="nPrompt"><label for="up{{ $upRow->UpID }}EditTitleID">Upload Title:</label></div>
                         <div class="nFld mT0">
-                            <input type="text" class="form-control input-lg ntrStp slTab" 
+                            <input type="text" class="form-control form-control-lg ntrStp slTab" 
                                 name="up{{ $upRow->UpID }}EditTitle" id="up{{ $upRow->UpID }}EditTitleID" 
                                 value="{{ $upRow->UpTitle }}" {!! $GLOBALS["SL"]->tabInd() !!}>
                         </div>
@@ -73,13 +73,13 @@
                         <div class="nPrompt"><label for="up{{ $upRow->UpID }}EditDescID">Description:</label></div>
                         <div class="nFld">
                             <input type="text" name="up{{ $upRow->UpID }}EditDesc" id="up{{ $upRow->UpID }}EditDescID" 
-                                class="form-control input-lg ntrStp slTab" 
+                                class="form-control form-control-lg ntrStp slTab" 
                                 value="{{ $upRow->UpDesc }}" {!! $GLOBALS["SL"]->tabInd() !!}></div> */ ?>
                         @if (sizeof($uploadTypes) > 1)
                             <div class="nodeHalfGap"></div>
                             <div class="nPrompt"><label for="up{{ $upRow->UpID }}EditTypeID">Upload Type:</label></div>
                             <div class="nFld mT0"><select name="up{{ $upRow->UpID }}EditType" 
-                                id="up{{ $upRow->UpID }}EditTypeID" class="form-control input-lg ntrStp slTab"
+                                id="up{{ $upRow->UpID }}EditTypeID" class="form-control form-control-lg ntrStp slTab"
                                 {!! $GLOBALS["SL"]->tabInd() !!}>
                                     @foreach ($uploadTypes as $i => $ty)
                                         <option value="{{ $ty->DefID }}" 
@@ -93,7 +93,7 @@
                             <div class="nodeHalfGap"></div>
                             <div class="nPrompt"><label for="up{{ $upRow->UpID }}EditPrivacyID">Privacy:</label></div>
                             <div class="nFld mT0"><select name="up{{ $upRow->UpID }}EditPrivacy" 
-                                id="up{{ $upRow->UpID }}EditPrivacyID" class="form-control input-lg ntrStp slTab"
+                                id="up{{ $upRow->UpID }}EditPrivacyID" class="form-control form-control-lg ntrStp slTab"
                                 {!! $GLOBALS["SL"]->tabInd() !!}>
                                 <option value="Public" @if ($upRow->UpPrivacy == 'Public') SELECTED @endif 
                                     >Public: Visible to whole world</option>
@@ -110,10 +110,10 @@
                 
                     <div id="editLoopItem{{ $upRow->UpID }}block" class="disBlo">
                         <a href="javascript:;" id="editLoopItem{{ $upRow->UpID }}" 
-                            class="nFormLnkEdit btn btn-default btn-sm w100 mT10"
+                            class="nFormLnkEdit btn btn-secondary btn-sm w100 mT10"
                             ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> Edit</a>
                         <a href="javascript:;" id="delLoopItem{{ $upRow->UpID }}" 
-                            class="nFormLnkDel nobld btn btn-default btn-sm w100 mT20"
+                            class="nFormLnkDel nobld btn btn-secondary btn-sm w100 mT20"
                             ><i class="fa fa-trash-o"></i> Delete</a>
                     </div>
                     <div id="delLoopItem{{ $upRow->UpID }}confirm" 
@@ -121,7 +121,7 @@
                         Delete upload?
                         <a href="javascript:;" class="nFormLnkDelConfirmYes btn btn-primary btn-sm w100 mT10 red" 
                             id="delLoopItem{{ $upRow->UpID }}confirmY">Yes</a>
-                        <a href="javascript:;" class="nFormLnkDelConfirmNo btn btn-default btn-sm w100 mT5" 
+                        <a href="javascript:;" class="nFormLnkDelConfirmNo btn btn-secondary btn-sm w100 mT5" 
                             id="delLoopItem{{ $upRow->UpID }}confirmN">No</a>
                     </div>
                     

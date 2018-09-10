@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/db/fieldSpecifications.blade.php -->
     
-<div class="fieldSpecs panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">
+<div class="fieldSpecs card">
+    <div class="card-header"><h3>
         @if (isset($fld->FldName))
             <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> 
         @else
@@ -9,7 +9,7 @@
         @endif
         @if ($GLOBALS['SL']->dbFullSpecs()) General Elements @endif
     </h3></div>
-    <div class="panel-body">
+    <div class="card-body">
         
         <div class="row">
             <div class="col-md-6">
@@ -139,11 +139,11 @@
 </div>
 
 
-<div class="panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">
+<div class="card">
+    <div class="card-header"><h3>
         <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Physical Elements
     </h3></div>
-    <div class="panel-body">
+    <div class="card-body">
     
         <div class="row">
             <div class="col-md-6">
@@ -262,11 +262,11 @@
     </div>
 </div>
     
-<div class="panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">
+<div class="card">
+    <div class="card-header"><h3>
         <b>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}:</b> Logical Elements
     </h3></div>
-    <div class="panel-body">
+    <div class="card-body">
     
         <div class="row">
             <div class="col-md-4">

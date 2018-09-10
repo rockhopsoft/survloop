@@ -16,7 +16,7 @@
     
         <div class="mB20 mT10 w100"><label class="w100">
         <h3 class="m0">{{ $GLOBALS['SL']->treeRow->TreeType }} Name</h3>
-        <input type="text" class="form-control w100 input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} 
+        <input type="text" class="form-control w100 form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} 
             name="TreeName" value="{{ $GLOBALS['SL']->treeRow->TreeName }}" autocomplete="off" >
         </label></div>
         
@@ -31,13 +31,13 @@
                 @else {{ $GLOBALS["SL"]->sysOpts["app-url"] }}/start/ @endif
             @endif
         </div>
-        <input type="text" class="form-control input-lg w100 ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} 
+        <input type="text" class="form-control form-control-lg w100 ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} 
             name="TreeSlug" value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}" autocomplete="off" >
         </label></div>
         
         <div class="mB20 mT10 w100"><label class="w100">
         <h3 class="m0 slGreenDark">{{ $GLOBALS['SL']->treeRow->TreeType }} Core Database Table</h3>
-        <select class="form-control w100 input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} autocomplete="off"
+        <select class="form-control w100 form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} autocomplete="off"
             name="TreeCoreTable">
             {!! $GLOBALS["SL"]->tablesDropdown($GLOBALS["SL"]->coreTbl) !!}
             </select>

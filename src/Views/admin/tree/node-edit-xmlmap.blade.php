@@ -29,22 +29,20 @@
     @else value="-3"
     @endif >
 
-<div class="panel panel-info">
-    <div class="panel-heading">
-        <div class="panel-title">
-            @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-                <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
-                    class="pull-right">Back to XML Map</a>
-                <h2 class="disIn"><span class="fPerc133 mR20">
-                    #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
-            @else 
-                <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="pull-right"
-                    >Back to XML Map</a>
-                <h2 class="disIn">Adding Node</h2>
-            @endif
-        </div>
+<div class="card">
+    <div class="card-header">
+        @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
+                class="float-right">Back to XML Map</a>
+            <h2 class="disIn"><span class="fPerc133 mR20">
+                #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
+        @else 
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="float-right"
+                >Back to XML Map</a>
+            <h2 class="disIn">Adding Node</h2>
+        @endif
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <div class="row mT20">
             <div class="col-md-2">
                 <label class="mB20">

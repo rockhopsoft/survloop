@@ -175,7 +175,7 @@
                     Auto-Create:<br />
                 @endif
                 @if (!$autopages["contact"])
-                    <a class="btn btn-xs btn-default" href="/dashboard/pages/list/add-contact"
+                    <a class="btn btn-sm btn-secondary" href="/dashboard/pages/list/add-contact"
                         >Contact Page</a>
                 @endif
                 </div>

@@ -6,9 +6,9 @@
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
 
-<a href="#tblDiagSimple" class="btn btn-default mR10"
+<a href="#tblDiagSimple" class="btn btn-secondary mR10"
     ><i class="fa fa-angle-double-down"></i> Simplistic Auto-Diagram</a>
-<a href="#tblMatrix" class="btn btn-default mR10"
+<a href="#tblMatrix" class="btn btn-secondary mR10"
     ><i class="fa fa-angle-double-down"></i> Table Relationship Matrix</a>
 
 @forelse ($diags as $cnt => $dia)

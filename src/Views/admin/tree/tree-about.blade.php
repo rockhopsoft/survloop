@@ -26,7 +26,7 @@
     In the map of your user experience's tree below, the left side previews both what the user will see, 
     and the right side details how it all gets into the database.
     </p>
-    <div class="pull-right mBn20">
+    <div class="float-right mBn20">
         <a href="javascript:;" class="adminAboutTog" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
     

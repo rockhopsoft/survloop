@@ -16,10 +16,10 @@
             <tr><td></td></tr>
         @else 
             <a name="tbl{{ $tbl->TblID }}"></a>
-            <div class="panel panel-info">
-                <div class="panel-heading">
+            <div class="card">
+                <div class="card-header">
                     
-                    <h6 class="m0 pull-right taR">{{ $tbl->TblName }}<br />({{ $tbl->TblAbbr }})</h6>
+                    <h6 class="m0 float-right taR">{{ $tbl->TblName }}<br />({{ $tbl->TblAbbr }})</h6>
                     @if ($tbl->TblEng != 'Users')
                         <a href="/dashboard/db/table/{{ $tbl->TblName }}"><h2 class="m0">{{ $tbl->TblEng }}</h2></a>
                     @else
@@ -28,11 +28,11 @@
                     <h5 class="mT5">{!! $tbl->TblDesc !!}</h5>
                     
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     
                     @if ($tbl->TblNumForeignIn > 0)
                         @if (isset($tblForeigns[$tbl->TblID]))
-                            <div class="pull-right taR"><i>Incoming:</i> {!! $tblForeigns[$tbl->TblID] !!}</div>
+                            <div class="float-right taR"><i>Incoming:</i> {!! $tblForeigns[$tbl->TblID] !!}</div>
                         @endif
                         <i class="fa fa-link"></i> {{ $tbl->TblNumForeignIn }} 
                             @if ($tbl->TblNumForeignIn != 1) Tables @else Table @endif

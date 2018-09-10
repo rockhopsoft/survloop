@@ -45,7 +45,7 @@
     <div class="col-md-4 mB10">
         <h3 class="slBlueDark m0"><i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type</h3>
         <div id="nodeTypeFld1" class="nFld w100 mT10 pT5">
-            <select name="nodeType" id="nodeTypeID" class="form-control input-lg" 
+            <select name="nodeType" id="nodeTypeID" class="form-control form-control-lg" 
                 autocomplete="off" onChange="return changeNodeType(this.value);" {{ $nodeTypeSel }} >
             
             @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
@@ -106,7 +106,7 @@
         </div>
         <div id="responseType" class="@if ($node->isSpecial()) disNon @else disBlo @endif ">
             <div class="nFld m0"><select name="nodeTypeQ" id="nodeTypeQID" 
-                class="form-control input-lg slBlueDark w100" 
+                class="form-control form-control-lg slBlueDark w100" 
                 onChange="return changeResponseType(this.value);" autocomplete="off" >
             @foreach ($nodeTypes as $type)
                 <option value="{{ $type }}" @if (isset($node->nodeRow->NodeType) 
@@ -123,7 +123,7 @@
         </div>
         <div id="dataPrintType" class="@if ($node->isDataPrint()) disBlo @else disNon @endif ">
             <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" autocomplete="off" 
-                class="form-control input-lg slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
+                class="form-control form-control-lg slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
                 <option value="Data Print Row" @if (!isset($node->nodeRow->NodeType) 
                     || in_array(trim($node->nodeRow->NodeType), ['', 'Data Print Row', 'Instructions'])) 
                     SELECTED @endif >Data Block Row</option>
@@ -139,7 +139,7 @@
         </div>
         <div id="widgetType" class="@if ($node->isWidget()) disBlo @else disNon @endif nFld mT0 ">
             <select name="nodeSurvWidgetType" id="nodeSurvWidgetTypeID" autocomplete="off" 
-                class="form-control input-lg w100" onChange="return changeWidgetType();" >
+                class="form-control form-control-lg w100" onChange="return changeWidgetType();" >
                 
                 <option value="Record Full" 
                     @if ($node->nodeType == 'Record Full') SELECTED @endif 
@@ -199,7 +199,7 @@
             </h3>
             <span class="fPerc80">Node's whole family tree can store data fields related to table.</span>
             <div class="nFld mT0"><select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off" 
-                class="form-control input-lg slGreenDark">
+                class="form-control form-control-lg slGreenDark">
                 {!! $dataBranchDrop !!}
             </select></div>
         </label>
@@ -215,19 +215,17 @@
     <div class="col-md-8">
     
         <div id="hasLayout" class=" @if ($node->isLayout()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Layout Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Layout Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="row mB20">
                         <div class="col-md-6">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Layout Node Type</h4>
                                 <div class="nFld"><select name="nodeLayoutType" id="nodeLayoutTypeID"
-                                    class="form-control input-lg w100" autocomplete="off" 
+                                    class="form-control form-control-lg w100" autocomplete="off" 
                                     onChange="return changeLayoutType();" >
                                     <option value="Page Block" @if ($node->nodeType == 'Page Block' 
                                         || trim($node->nodeType) == '') SELECTED @endif >Just A Page Block</option>
@@ -251,7 +249,7 @@
                                 <h4 class="m0 mB5"># of Columns in Row</h4>
                                 <div class="nFld">
                                     <select name="nodeLayoutLimitRow" id="nodeLayoutLimitRowID" autocomplete="off"
-                                    class="form-control input-lg w100" >
+                                    class="form-control form-control-lg w100" >
                                     @for ($i = 1; $i < 13; $i++)
                                         <option value="{{ $i }}" 
                                             @if ($i ==intVal($node->nodeRow->NodeCharLimit)) SELECTED @endif 
@@ -265,7 +263,7 @@
                                 <h4 class="m0 mB5">Column Width (in 12<sup>th</sup>s)</h4>
                                 <div class="nFld">
                                     <input type="number" name="nodeLayoutLimitCol" id="nodeLayoutLimitColID"
-                                        class="form-control input-lg w100" autocomplete="off" 
+                                        class="form-control form-control-lg w100" autocomplete="off" 
                                         value="{!! intVal($node->nodeRow->NodeCharLimit) !!}" >
                                 </div>
                                 (4 columns could have width 3, 2 columns could have 6 each, etc.)
@@ -277,20 +275,18 @@
         </div>
     
         <div id="hasDataPrint" class=" @if ($node->isDataPrint()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Data Printout Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Data Printout Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="row mB20">
                         <div class="col-md-6">
                             <label id="dataPrintPull" class="w100 
                                 @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
                                     'Print Vert Progress'])) disNon @else disBlo @endif ">
                                 <h3 class="m0 slGreenDark">Pull User Response</h3>
-                                <div class="nFld m0"><select name="nodeDataPull" class="form-control input-lg w100" 
+                                <div class="nFld m0"><select name="nodeDataPull" class="form-control form-control-lg w100" 
                                     autocomplete="off" >
                                     {!! $GLOBALS['SL']->fieldsDropdown(isset($node->nodeRow->NodeDataStore) 
                                         ? trim($node->nodeRow->NodeDataStore) : '') !!}
@@ -320,7 +316,7 @@
                                     'Print Vert Progress'])) disBlo @else disNon @endif ">
                                 <h3 class="m0 slGreenDark">Title of Data Block</h3>
                                 <div class="nFld m0"><input type="text" name="nodeDataBlcTitle" autocomplete="off" 
-                                    class="form-control input-lg w100" @if (isset($node->nodeRow->NodePromptText)) 
+                                    class="form-control form-control-lg w100" @if (isset($node->nodeRow->NodePromptText)) 
                                         value="{{ trim($node->nodeRow->NodePromptText) }}" @endif >
                                 </div>
                             </label>
@@ -330,7 +326,7 @@
                                     <h3 class="m0 slGreenDark">Hide Row If Response Is</h3>
                                     <div class="nFld m0">
                                         <input type="text" name="nodeDataHideIf" autocomplete="off" class="
-                                            form-control input-lg w100" @if (isset($node->nodeRow->NodeDefault)) 
+                                            form-control form-control-lg w100" @if (isset($node->nodeRow->NodeDefault)) 
                                             value="{{ trim($node->nodeRow->NodeDefault) }}" @endif >
                                     </div>
                                 </label>
@@ -368,16 +364,14 @@
         </div>
         
         <div id="hasBranch" class=" @if ($node->isBranch()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h3 class="m0">Branch Title</h3>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="m0">Branch Title</h3>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <label for="branchTitleID" class="w100 mT0">
                         <div class="nFld mT0"><input type="text" name="branchTitle" id="branchTitleID" 
-                            class="form-control input-lg" autocomplete="off" 
+                            class="form-control form-control-lg" autocomplete="off" 
                             value="@if (isset($node->nodeRow->NodePromptText)
                                 ){!! strip_tags($node->nodeRow->NodePromptText) !!}@endif" ></div>
                     </label>
@@ -390,13 +384,11 @@
         </div>
         
         <div id="hasLoop" class=" @if ($node->isLoopRoot()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Data Set's Loop Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Data Set's Loop Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <label class="mB10"><div class="row">
                         <div class="col-md-6 nPrompt" style="padding: 5px 0px 0px 15px;">
                             <input type="radio" name="stepLoop" id="stepLoopN" value="0" autocomplete="off" 
@@ -423,7 +415,7 @@
                             <label class="nPrompt">
                                 <h4 class="m0"><span class="slGreenDark">Loop Name</span></h4>
                                 <div class="nFld mT0"><select name="nodeDataLoop" id="nodeDataLoopID" 
-                                    class="form-control input-lg w100 slGreenDark" autocomplete="off" >
+                                    class="form-control form-control-lg w100 slGreenDark" autocomplete="off" >
                                     <option value="" @if (!isset($node->nodeRow->NodeDataBranch) 
                                         || $node->nodeRow->NodeDataBranch == "") SELECTED @endif ></option>
                                     @forelse ($GLOBALS['SL']->dataLoops as $setPlural => $setInfo)
@@ -452,7 +444,7 @@
                                 <label class="nPrompt">
                                     <h4 class="m0">Field Marking A Finished Loop Item (Step)</h4>
                                     <div class="nFld mT0"><select name="stepLoopDoneField" id="stepLoopDoneFieldID" 
-                                        class="form-control input-lg" autocomplete="off" >
+                                        class="form-control form-control-lg" autocomplete="off" >
                                         @if ($node->isStepLoop())
                                             {!! $GLOBALS['SL']->fieldsDropdown(trim($GLOBALS['SL']
                                                 ->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopDoneFld)) !!}
@@ -469,7 +461,7 @@
                         <h4 class="disIn mT0">Root Page Instructions</h4>
                         <small class="mL20 slGrey">(text/HTML)</small>
                         <div class="nFld mT0"><textarea name="nodeLoopInstruct" id="nodeLoopInstructID" 
-                            class="form-control input-lg" style="height: 100px; font-family: Courier New;" 
+                            class="form-control form-control-lg" style="height: 100px; font-family: Courier New;" 
                             autocomplete="off" >@if (isset($node->nodeRow->NodePromptText)
                                     ){!! $node->nodeRow->NodePromptText !!}@endif</textarea></div>
                     </label>
@@ -478,17 +470,15 @@
         </div>
         
         <div id="hasCycle" class=" @if ($node->isLoopCycle()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Data Loop Cycle's Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Data Loop Cycle's Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <label class="nPrompt">
                         <h4 class="m0 mB5"><span class="slGreenDark">Loop To Cycle Through</span></h4>
                         <div class="nFld mT0"><select name="nodeDataCycle" id="nodeDataCycleID" 
-                            class="form-control input-lg w100 slGreenDark" autocomplete="off" >
+                            class="form-control form-control-lg w100 slGreenDark" autocomplete="off" >
                             <option value="" @if (!isset($node->nodeRow->NodeResponseSet) 
                                 || $node->nodeRow->NodeResponseSet == "") SELECTED @endif ></option>
                             @forelse ($GLOBALS['SL']->dataLoops as $setPlural => $setInfo)
@@ -504,19 +494,17 @@
         </div>
         
         <div id="hasSort" class=" @if ($node->isLoopSort()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Data Loop Sorting Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Data Loop Sorting Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="row slGreenDark">
                         <div class="col-md-6 pR20">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5"><span class="slGreenDark">Data Loop:</span></h4>
                                 <div class="nFld mT0"><select name="nodeDataSort" id="nodeDataSortID" 
-                                    class="form-control input-lg w100 slGreenDark" autocomplete="off" >
+                                    class="form-control form-control-lg w100 slGreenDark" autocomplete="off" >
                                     <option value="" @if (!isset($node->nodeRow->NodeResponseSet) 
                                         || $node->nodeRow->NodeResponseSet == "") SELECTED @endif ></option>
                                     @forelse ($GLOBALS['SL']->dataLoops as $setPlural => $setInfo)
@@ -533,7 +521,7 @@
                             <label class="nPrompt">
                                 <h4 class="m0 mB5"><span class="slGreenDark">Loop Sorting Field:</span></h4>
                                 <div class="nFld mT0"><select name="DataStoreSort" id="DataStoreSortID" 
-                                    class="form-control input-lg" autocomplete="off" onClick="return checkData();" >
+                                    class="form-control form-control-lg" autocomplete="off" onClick="return checkData();" >
                                     {!! $GLOBALS['SL']->fieldsDropdown((isset($node->nodeRow->NodeDataStore)) 
                                         ? trim($node->nodeRow->NodeDataStore) : '') !!}
                                 </select></div>
@@ -546,13 +534,11 @@
         </div>
         
         <div id="hasPage" class=" @if ($node->isPage() || $node->isLoopRoot()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Page Settings & SEO</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Page Settings & SEO</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div id="pageLoopDesc" class="mB20 @if ($node->isLoopRoot()) disBlo @else disNon @endif "><i>
                         If a Loop repeats child Page(s) more than one, then the Loop has its own Page too.
                         This root Page provides navigation for the multiple copies of the Loop's descendants.
@@ -632,13 +618,11 @@
         </div>
         
         <div id="hasDataManip" class=" @if ($node->isDataManip()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0"><i class="fa fa-database"></i> Data Manipulation Tools</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0"><i class="fa fa-database"></i> Data Manipulation Tools</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <small class="slGrey">
                         Moving forward with this node conditionally visible, it will run one of these tasks. 
                         Children of this node link to it by setting their data subset to this helper table. 
@@ -716,7 +700,7 @@
                                 <label class="w100">
                                     <div class="nFld mT0">
                                         <select name="manipMoreStore" id="manipMoreStoreID"
-                                        class="form-control input-lg" autocomplete="off" onClick="return checkData();" >
+                                        class="form-control form-control-lg" autocomplete="off" onClick="return checkData();" >
                                         {!! $GLOBALS['SL']->fieldsDropdown((isset($node->nodeRow->NodeDataStore)) 
                                             ? trim($node->nodeRow->NodeDataStore) : '') !!}
                                         </select>
@@ -728,7 +712,7 @@
                             </div>
                             <div class="col-md-2">
                                 <div class="nFld mT0"><input type="text" name="manipMoreVal" 
-                                    class="form-control input-lg" @if (isset($node->nodeRow->NodeDefault)) 
+                                    class="form-control form-control-lg" @if (isset($node->nodeRow->NodeDefault)) 
                                         value="{{ $node->nodeRow->NodeDefault }}" @endif >
                                 </div>
                             </div>
@@ -736,7 +720,7 @@
                                 <h4 class="mT10 slGreenDark">or</h4>
                             </div>
                             <div class="col-md-3">
-                                <div class="nFld mT0"><select name="manipMoreSet" class="form-control input-lg" 
+                                <div class="nFld mT0"><select name="manipMoreSet" class="form-control form-control-lg" 
                                     autocomplete="off" >
                                     {!! $GLOBALS['SL']->allDefsDropdown((isset($node->nodeRow->NodeResponseSet)) 
                                         ? $node->nodeRow->NodeResponseSet : '') !!}
@@ -751,7 +735,7 @@
                                     <div class="col-md-5">
                                         <div class="nFld mT0">
                                             <select name="manipMore{{ $i }}Store" id="manipMore{{ $i }}StoreID" 
-                                                class="form-control input-lg" autocomplete="off" 
+                                                class="form-control form-control-lg" autocomplete="off" 
                                                 onClick="return checkData();" >
                                             @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeDataStore))
                                                 {!! $GLOBALS['SL']->fieldsDropdown($node->dataManips[$i]->NodeDataStore) !!}
@@ -765,7 +749,7 @@
                                     <div class="col-md-2">
                                         <div class="nFld mT0">
                                             <input type="text" name="manipMore{{ $i }}Val" 
-                                                class="form-control input-lg" @if (isset($node->dataManips[$i]) 
+                                                class="form-control form-control-lg" @if (isset($node->dataManips[$i]) 
                                                     && isset($node->dataManips[$i]->NodeDefault))
                                                     value="{!! $node->dataManips[$i]->NodeDefault !!}"
                                                 @else value="" @endif >
@@ -777,7 +761,7 @@
                                     <div class="col-md-3">
                                         <div class="nFld mT0">
                                             <select name="manipMore{{ $i }}Set" 
-                                                class="form-control input-lg" autocomplete="off" >
+                                                class="form-control form-control-lg" autocomplete="off" >
                                                 @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeResponseSet))
                                                     {!! $GLOBALS['SL']->allDefsDropdown($node->dataManips[$i]->NodeResponseSet) !!}
                                                 @else {!! $GLOBALS['SL']->allDefsDropdown() !!} @endif
@@ -793,22 +777,20 @@
         </div>
         
         <div id="hasBigButt" class=" @if ($node->isBigButt()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Big Button Settings</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Big Button Settings</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <h4 class="m0">Button Text</h4>
                     <div class="nFld m0 mB20">
-                        <input type="text" name="bigBtnText" id="bigBtnTextID" class="form-control input-lg" 
+                        <input type="text" name="bigBtnText" id="bigBtnTextID" class="form-control form-control-lg" 
                             @if (isset($node->nodeRow->NodeDefault)) value="{{ $node->nodeRow->NodeDefault }}" 
                             @endif onKeyUp="return previewBigBtn();" >
                     </div>
                     <h4 class="m0">Button On Click Javascript</h4>
                     <div class="nFld m0">
-                        <input type="text" name="bigBtnJS" class="form-control input-lg" 
+                        <input type="text" name="bigBtnJS" class="form-control form-control-lg" 
                             @if (isset($node->nodeRow->NodeDataStore)) value="{{ $node->nodeRow->NodeDataStore }}" 
                             @endif >
                     </div>
@@ -816,7 +798,7 @@
                         <div class="col-md-6">
                             <h4 class="m0">Button Style</h4>
                             <div class="nFld m0">
-                                <select name="bigBtnStyle" id="bigBtnStyleID" class="form-control input-lg"
+                                <select name="bigBtnStyle" id="bigBtnStyleID" class="form-control form-control-lg"
                                     onChange="return previewBigBtn();">
                                     <option value="Default" @if (!isset($node->nodeRow->NodeResponseSet) 
                                         || $node->nodeRow->NodeResponseSet == 'Default') SELECTED @endif 
@@ -847,14 +829,12 @@
         
         <div id="hasPrompt" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <label for="nodePromptTextID"><h4 class="m0 disIn mR20">Question or Prompt for User</h4> 
-                            <small>(text/HTML)</small></label>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <label for="nodePromptTextID"><h4 class="m0 disIn mR20">Question or Prompt for User</h4> 
+                        <small>(text/HTML)</small></label>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="nFld"><textarea name="nodePromptText" id="nodePromptTextID" class="form-control" 
                         style="height: 200px; font-family: Courier New;" autocomplete="off" 
                             >@if (isset($node->nodeRow->NodePromptText)
@@ -902,19 +882,17 @@
         </div>
         
         <div id="hasSurvWidget" class=" @if ($node->isWidget()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">SurvLoop Widget Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">SurvLoop Widget Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="row mB20">
                         <div class="col-md-6">
                             <label class="nPrompt @if ($GLOBALS['SL']->treeRow->TreeType != 'Page') disNon @endif ">
                                 <h4 class="m0 mB5">Related Tree</h4>
                                 <div class="nFld"><select name="nodeSurvWidgetTree" id="nodeSurvWidgetTreeID"
-                                    class="form-control input-lg w100 switchTree" autocomplete="off" >
+                                    class="form-control form-control-lg w100 switchTree" autocomplete="off" >
                                 {!! $GLOBALS["SL"]->sysTreesDrop($node->nodeRow->NodeResponseSet, 'forms', 'all') !!}
                                 </select></div>
                             </label>
@@ -925,13 +903,13 @@
                                 ])) disBlo @else disNon @endif ">
                                 <h4 class="m0 mB5">Record Limit</h4>
                                 <div class="nFld"><input type="number" name="nodeSurvWidgetLimit" 
-                                    id="nodeSurvWidgetLimitID" class="form-control input-lg w100" autocomplete="off" 
+                                    id="nodeSurvWidgetLimitID" class="form-control form-control-lg w100" autocomplete="off" 
                                     value="{!! intVal($node->nodeRow->NodeCharLimit) !!}" ></div>
                             </label>
                         </div>
                     </div>
                     <label class="w100"><h4 class="m0 mB5">Data Filter Conditions</h4>
-                    <input type="text" name="nodeWidgConds" id="nodeWidgCondsID" class="form-control input-lg"
+                    <input type="text" name="nodeWidgConds" id="nodeWidgCondsID" class="form-control form-control-lg"
                         @if (isset($node->extraOpts["conds"])) value="{{ $node->extraOpts["conds"] }}" @endif ></label>
                     <div id="widgetGraph" class="mT20 @if (in_array($node->nodeType, ['Plot Graph', 'Line Graph'])) 
                         disBlo @else disNon @endif ">
@@ -940,7 +918,7 @@
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Y-Axis</h4>
                                     <div class="nFld"><select name="nodeWidgGrphY" id="nodeWidgGrphYID"
-                                        class="form-control input-lg w100" autocomplete="off" >
+                                        class="form-control form-control-lg w100" autocomplete="off" >
                                     </select></div>
                                     <input type="hidden" name="nodeWidgGrphYpresel" id="nodeWidgGrphYIDpresel"
                                         @if (isset($node->extraOpts["y-axis"])) 
@@ -949,7 +927,7 @@
                                 <label class="nPrompt mT10">
                                     Y-Axis Label
                                     <div class="nFld"><input type="text" name="nodeWidgGrphYlab" id="nodeWidgGrphYlabID"
-                                        class="form-control input-lg w100" autocomplete="off"
+                                        class="form-control form-control-lg w100" autocomplete="off"
                                         @if (isset($node->extraOpts["y-axis-lab"])) 
                                             value="{{ $node->extraOpts["y-axis-lab"] }}" @endif >
                                     </select></div>
@@ -959,7 +937,7 @@
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">X-Axis</h4>
                                     <div class="nFld"><select name="nodeWidgGrphX" id="nodeWidgGrphXID"
-                                        class="form-control input-lg w100" autocomplete="off" >
+                                        class="form-control form-control-lg w100" autocomplete="off" >
                                     </select></div>
                                     <input type="hidden" name="nodeWidgGrphXpresel" id="nodeWidgGrphXIDpresel"
                                         @if (isset($node->extraOpts["x-axis"])) 
@@ -968,7 +946,7 @@
                                 <label class="nPrompt mT10">
                                     X-Axis Label
                                     <div class="nFld"><input type="text" name="nodeWidgGrphXlab" id="nodeWidgGrphXlabID"
-                                        class="form-control input-lg w100" autocomplete="off"
+                                        class="form-control form-control-lg w100" autocomplete="off"
                                         @if (isset($node->extraOpts["x-axis-lab"])) 
                                             value="{{ $node->extraOpts["x-axis-lab"] }}" @endif >
                                     </select></div>
@@ -983,7 +961,7 @@
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Value</h4>
                                     <div class="nFld"><select name="nodeWidgBarY" id="nodeWidgBarYID"
-                                        class="form-control input-lg w100" autocomplete="off" >
+                                        class="form-control form-control-lg w100" autocomplete="off" >
                                     </select></div>
                                     <input type="hidden" name="nodeWidgBarYpresel" id="nodeWidgBarYIDpresel"
                                         @if (isset($node->extraOpts["y-axis"])) 
@@ -992,7 +970,7 @@
                                 <label class="nPrompt mT10">
                                     Value Label
                                     <div class="nFld"><input type="text" name="nodeWidgBarYlab" id="nodeWidgBarYlabID"
-                                        class="form-control input-lg w100" autocomplete="off"
+                                        class="form-control form-control-lg w100" autocomplete="off"
                                         @if (isset($node->extraOpts["y-axis-lab"])) 
                                             value="{{ $node->extraOpts["y-axis-lab"] }}" @endif >
                                     </select></div>
@@ -1002,7 +980,7 @@
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Label 1</h4>
                                     <div class="nFld"><select name="nodeWidgBarL1" id="nodeWidgBarL1ID"
-                                        class="form-control input-lg w100" autocomplete="off" >
+                                        class="form-control form-control-lg w100" autocomplete="off" >
                                     </select></div>
                                     <input type="hidden" name="nodeWidgBarL1presel" id="nodeWidgBarL1IDpresel"
                                         @if (isset($node->extraOpts["lab1"])) 
@@ -1011,7 +989,7 @@
                                 <label class="nPrompt mT10">
                                     <h4 class="m0 mB5">Label 2</h4>
                                     <div class="nFld"><select name="nodeWidgBarL2" id="nodeWidgBarL2ID"
-                                        class="form-control input-lg w100" autocomplete="off" >
+                                        class="form-control form-control-lg w100" autocomplete="off" >
                                     </select></div>
                                     <input type="hidden" name="nodeWidgBarL2presel" id="nodeWidgBarL2IDpresel"
                                         @if (isset($node->extraOpts["lab2"])) 
@@ -1059,7 +1037,7 @@
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Value</h4>
                                 <div class="nFld"><select name="nodeWidgPieY" id="nodeWidgPieYID"
-                                    class="form-control input-lg w100" autocomplete="off" >
+                                    class="form-control form-control-lg w100" autocomplete="off" >
                                 </select></div>
                                 <input type="hidden" name="nodeWidgPieYpresel" id="nodeWidgPieYIDpresel"
                                     @if (isset($node->extraOpts["y-axis"])) 
@@ -1068,7 +1046,7 @@
                             <label class="nPrompt mT10">
                                 Value Label
                                 <div class="nFld"><input type="text" name="nodeWidgGrphYlab" id="nodeWidgGrphYlabID"
-                                    class="form-control input-lg w100" autocomplete="off"
+                                    class="form-control form-control-lg w100" autocomplete="off"
                                     @if (isset($node->extraOpts["y-axis-lab"])) 
                                         value="{{ $node->extraOpts["y-axis-lab"] }}" @endif >
                                 </select></div>
@@ -1127,13 +1105,11 @@
         </div>
         
         <div id="hasSendEmail" class=" @if ($node->nodeType == 'Send Email') disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Email Sending Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Email Sending Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     {!! $widgetEmail !!}
                 </div>
             </div>
@@ -1142,18 +1118,16 @@
         <div id="hasResponse" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
         
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">User Response Settings</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">User Response Settings</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div id="storeResponseDiv" class="row mB10 @if ($node->isSpreadTbl()) disNon @else disBlo @endif ">
                         <div class="col-md-6">
                             <label class="w100">
                                 <h4 class="m0 slGreenDark">Store User Response</h4>
-                                <div class="nFld m0"><select name="nodeDataStore" class="form-control input-lg w100" 
+                                <div class="nFld m0"><select name="nodeDataStore" class="form-control form-control-lg w100" 
                                     autocomplete="off" >
                                     {!! $GLOBALS['SL']->fieldsDropdown(isset($node->nodeRow->NodeDataStore) 
                                         ? trim($node->nodeRow->NodeDataStore) : '') !!}
@@ -1163,7 +1137,7 @@
                         <div class="col-md-6">
                             <div class="nFld w100 mT0"><label class="w100">
                                 <h4 class="m0">Default Value:</h4> 
-                                <input type="text" name="nodeDefault" id="nodeDefaultID" class="form-control input-lg"
+                                <input type="text" name="nodeDefault" id="nodeDefaultID" class="form-control form-control-lg"
                                     @if (isset($node->nodeRow->NodeDefault)) value="{{ $node->nodeRow->NodeDefault }}" 
                                     @else value="" @endif autocomplete="off" >
                             </label></div>
@@ -1223,7 +1197,7 @@
                                 <label class="col-md-6">
                                     <h4 class="m0">Maximum Number of Table Rows:</h4> 
                                     <div class="nFld"><input name="spreadTblMaxRows" id="spreadTblMaxRowsID" 
-                                        type="number" class="form-control input-lg" autocomplete="off" 
+                                        type="number" class="form-control form-control-lg" autocomplete="off" 
                                         @if (isset($node->nodeRow->NodeCharLimit)) 
                                             value="{{ $node->nodeRow->NodeCharLimit }}" @endif >
                                     </div>
@@ -1232,7 +1206,7 @@
                                     <h4 class="m0">Add & Edit Loop Rows:</h4> 
                                     <div class="nFld">
                                         <select name="spreadTblLoop" id="spreadTblLoopID" autocomplete="off"
-                                            class="form-control input-lg" >
+                                            class="form-control form-control-lg" >
                                             <option @if (!isset($node->nodeRow->NodeResponseSet)
                                                 || trim($node->nodeRow->NodeResponseSet) == '') SELECTED @endif
                                                 value="" > Select Loop... </option>
@@ -1252,14 +1226,14 @@
                                 <label class="col-md-6">
                                     <h4 class="m0 slGreenDark">Store Row's List Item ID</h4>
                                     <div class="nFld"><select name="nodeDataStoreSprd" 
-                                        autocomplete="off" class="form-control input-lg w100" >
+                                        autocomplete="off" class="form-control form-control-lg w100" >
                                         {!! $GLOBALS['SL']->fieldsDropdown(isset($node->nodeRow->NodeDataStore) 
                                             ? trim($node->nodeRow->NodeDataStore) : '') !!}
                                     </select></div>
                                 </label>
                                 <label class="col-md-6">
                                     <h4 class="m0">If Row Is Left Empty:</h4> 
-                                    <div class="nFld"><select name="opts73" id="opts73ID" class="form-control input-lg" 
+                                    <div class="nFld"><select name="opts73" id="opts73ID" class="form-control form-control-lg" 
                                         autocomplete="off" >
                                         <option value="0" @if ($node->nodeRow->NodeOpts%73 > 0) SELECTED @endif 
                                             > Delete empty rows' records</option>
@@ -1507,17 +1481,15 @@
         </div> <!-- end hasResponse -->
         
         <div id="isPageBlock" class=" @if ($node->isPageBlock()) disBlo @else disNon @endif ">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Style Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Style Options</h4>
                 </div>
-                <div class="panel-body" style="padding: 0px;">
+                <div class="card-body" style="padding: 0px;">
                     <div id="pageBlock" class="slBg slTxt p20">
                         <div class="row">
                             <div class="col-md-4">
-                                <select name="blockAlign" id="blockAlignID" class="form-control input-lg mB20" 
+                                <select name="blockAlign" id="blockAlignID" class="form-control form-control-lg mB20" 
                                     autocomplete="off">
                                     <option value="left" @if (!isset($node->colors["blockAlign"]) 
                                         || $node->colors["blockAlign"] == 'left') SELECTED @endif 
@@ -1531,7 +1503,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <select name="blockHeight" id="blockHeightID" class="form-control input-lg mB20" 
+                                <select name="blockHeight" id="blockHeightID" class="form-control form-control-lg mB20" 
                                     autocomplete="off">
                                     <option value="auto" @if (!isset($node->colors["blockHeight"]) 
                                         || $node->colors["blockHeight"] == 'auto') SELECTED @endif 
@@ -1561,7 +1533,7 @@
                                     && $GLOBALS['SL']->REQ->has('parent') 
                                     && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot) disBlo
                                     @else disNon @endif ">
-                                    <select name="opts67" id="opts67ID" class="form-control input-lg mB20" 
+                                    <select name="opts67" id="opts67ID" class="form-control form-control-lg mB20" 
                                         autocomplete="off">
                                         <option value="1" @if ($node->nodeRow->NodeOpts%67 > 0) SELECTED @endif 
                                             >Full Content Width</option>
@@ -1602,7 +1574,7 @@
                                 <div class="col-md-1"></div>
                                 <div class="col-md-6">
                                     <label for="blockImgID"><h4 class="m0">Background Image</h4></label>
-                                    <input type="text" class="form-control input-lg w100 mB20 mR20"
+                                    <input type="text" class="form-control form-control-lg w100 mB20 mR20"
                                         id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
                                             ? $node->colors['blockImg'] : '') }}">
                                     <div class="disIn mL10 mR10"><label class="disIn">
@@ -1657,31 +1629,29 @@
     </div>
     <div class="col-md-4">
     
-        <div id="pagePreview" class="panel panel-info @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
-            <div class="panel-heading">
-                <div class="panel-title"><h4 class="m0">Social Sharing Preview</h4></div>
+        <div id="pagePreview" class="card @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
+            <div class="card-header">
+                <h4 class="m0">Social Sharing Preview</h4>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}
             </div>
         </div>
     
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <label for="nodeConditionsID"><h4 class="m0">Conditions To Include Node</h4></label>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <label for="nodeConditionsID"><h4 class="m0">Conditions To Include Node</h4></label>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 
                 @if (sizeof($node->conds) > 0)
                     @foreach ($node->conds as $i => $cond)
                         <input type="hidden" id="delCond{{ $i }}ID" name="delCond{{ $cond->CondID }}" value="N">
                         <div id="cond{{ $i }}wrap" class="round10 brd p5 f18 mB10 pL10">
-                            <a id="cond{{ $i }}delBtn" href="javascript:;" class="pull-right disBlo condDelBtn"
+                            <a id="cond{{ $i }}delBtn" href="javascript:;" class="float-right disBlo condDelBtn"
                                 ><i class="fa fa-trash-o" aria-hidden="true"></i></a> 
                             <div id="cond{{ $i }}delWrap" href="javascript:;" 
-                                class="pull-right disNon f10 pT5 pL10">
+                                class="float-right disNon f10 pT5 pL10">
                                 <i class="red">Deleted</i> 
                                 <a id="cond{{ $i }}delUndo" href="javascript:;" 
                                     class="condDelBtnUndo f10 mL20">Undo</a> 
@@ -1702,16 +1672,14 @@
         <div id="hasResponseLayout" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
             
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <h4 class="m0">Node Layout Options</h4>
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="m0">Node Layout Options</h4>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div class="nFld mT0">
                         <select type="radio" name="changeResponseMobile" id="changeResponseMobileID" autocomplete="off"
-                            onChange="changeResponseMobileType();" class="form-control input-lg" >
+                            onChange="changeResponseMobileType();" class="form-control form-control-lg" >
                             <option value="mobile" @if ($node->nodeRow->NodeOpts%2 > 0) SELECTED @endif 
                                 > Mobile default</option>
                             <option value="desktop" @if ($node->nodeRow->NodeOpts%2 == 0) SELECTED @endif

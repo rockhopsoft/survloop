@@ -15,7 +15,7 @@
 </h1>
 
 <div class="p10">
-    <a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-default">View Table</a>
+    <a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-secondary">View Table</a>
 </div>
 
 <form name="mainPageForm" method="post"

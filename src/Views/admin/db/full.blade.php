@@ -6,10 +6,10 @@
             {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Full Database Design</h1>
         <nobr><span class="fPerc133">{!! strip_tags($dbStats) !!}</span></nobr>
 @if (!$isPrint)
-        <a href="/dashboard/db/addTable" class="btn btn-xs btn-default mL10 mTn5"><i class="fa fa-plus"
+        <a href="/dashboard/db/addTable" class="btn btn-sm btn-secondary mL10 mTn5"><i class="fa fa-plus"
             ></i> Add a New Table</a>
-        <a href="/dashboard/db/bus-rules" target="_blank" class="btn btn-xs btn-default mL10 mTn5">Business Rules</a>
-        <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-xs btn-default mL10 mTn5">Field Matrix</a>
+        <a href="/dashboard/db/bus-rules" target="_blank" class="btn btn-sm btn-secondary mL10 mTn5">Business Rules</a>
+        <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-sm btn-secondary mL10 mTn5">Field Matrix</a>
 @endif
     </div>
 @if (!$isPrint)

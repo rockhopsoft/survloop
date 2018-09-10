@@ -19,7 +19,7 @@ $v = $surv->custLoop->v;
         <h1 class="mT0">Reset Password</h1>
     </div>
     <div class="col-md-6 taR pT5">
-        <a href="/login" class="btn btn-default">Login</a>
+        <a href="/login" class="btn btn-secondary">Login</a>
     </div>
 </div>
 
@@ -41,11 +41,11 @@ $v = $surv->custLoop->v;
     <div class="nPrompt"><label for="emailID">Email:</label></div>
     <div class="nFld">
         <input id="emailID" name="email" value="{{ $email or old('email') }}" type="email" 
-            class="form-control input-lg" required autofocus >
+            class="form-control form-control-lg" required autofocus >
     </div>
 </div>
 @if ($errors->has('email'))
-    <span class="help-block">
+    <span class="form-text">
         <strong>{{ $errors->first('email') }}</strong>
     </span>
 @endif
@@ -54,10 +54,10 @@ $v = $surv->custLoop->v;
 
 <div class="nodeWrap">
 <div class="nPrompt"><label for="password">Password:</label></div>
-<div class="nFld"><input id="password" name="password" type="password" class="form-control input-lg" required ></div>
+<div class="nFld"><input id="password" name="password" type="password" class="form-control form-control-lg" required ></div>
 </div>
 @if ($errors->has('password'))
-    <span class="help-block">
+    <span class="form-text">
         <strong>{{ $errors->first('password') }}</strong>
     </span>
 @endif
@@ -67,11 +67,11 @@ $v = $surv->custLoop->v;
 <div class="nodeWrap">
     <div class="nPrompt"><label for="password-confirm">Confirm Password:</label></div>
     <div class="nFld">
-        <input id="password-confirm" name="password_confirmation" type="password" class="form-control input-lg">
+        <input id="password-confirm" name="password_confirmation" type="password" class="form-control form-control-lg">
     </div>
 </div>
 @if ($errors->has('password_confirmation'))
-    <span class="help-block">
+    <span class="form-text">
         <strong>{{ $errors->first('password_confirmation') }}</strong>
     </span>
 @endif

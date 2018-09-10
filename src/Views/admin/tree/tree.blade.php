@@ -32,7 +32,7 @@
             <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a> 
             <span class="red mL20">*required</span>
         </div><div class="col-md-3 taR">
-            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/settings" class="btn btn-default"
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/settings" class="btn btn-secondary"
                 ><i class="fa fa-cogs" aria-hidden="true"></i> Survey Settings</a>
         </div>
     </div>

@@ -5,7 +5,7 @@
     </div>
     <div class="col-md-9 nFld m0 p0">
         <input type="text" name="pageTitle" id="npageTitleFldID" autocomplete="off" 
-            class="form-control input-lg mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
+            class="form-control form-control-lg mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
             @if (isset($currMeta["title"]) && trim($currMeta["title"]) != '') value="{{ $currMeta['title'] }}" @endif
             onKeyUp="charCountKeyUp('pageTitle'); previewPage();" >
         <div>
@@ -37,7 +37,7 @@
     </div>
     <div class="col-md-9 nFld m0 p0">
         <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" 
-            class="form-control input-lg mT0 mB0 flexarea" 
+            class="form-control form-control-lg mT0 mB0 flexarea" 
             onKeyUp="charCountKeyUp('pageDesc'); flexAreaAdjust(this); previewPage();"
             @if (isset($currMeta["desc"]) && trim($currMeta["desc"]) != '') >{{ $currMeta["desc"] }}</textarea> 
             @else ></textarea> @endif
@@ -58,7 +58,7 @@
     </div>
     <div class="col-md-9 nFld m0 p0">
         <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" 
-            class="form-control input-lg mT0 mB0 flexarea" 
+            class="form-control form-control-lg mT0 mB0 flexarea" 
             onKeyUp="keywordCountKeyUp('pageKey'); flexAreaAdjust(this);"
             @if (isset($currMeta["wrds"]) && trim($currMeta["wrds"]) != '') >{{ $currMeta["wrds"] }}</textarea> 
             @else ></textarea> @endif
@@ -81,7 +81,7 @@
     </div>
     <div class="col-md-9 nFld m0 p0">
         <input type="text" name="pageImg" id="npageImgFldID" autocomplete="off"
-            class="form-control input-lg mT0 mB0 openImgUpdate" onKeyUp="previewPage();"
+            class="form-control form-control-lg mT0 mB0 openImgUpdate" onKeyUp="previewPage();"
             @if (isset($currMeta["img"]) && trim($currMeta["img"]) != '') value="{{ $currMeta['img'] }}" @endif >
         <div class="row mT5">
             <div class="col-md-8">
@@ -91,9 +91,9 @@
                 @else src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ></div>
             </div>
             <div class="col-md-4 pT10">
-                <a href="javascript:;" class="btn btn-xs btn-default w100 mB10 openImgReset" id="imgResetpageImg"
+                <a href="javascript:;" class="btn btn-sm btn-secondary w100 mB10 openImgReset" id="imgResetpageImg"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i> Reset to Default</a>
-                <a href="javascript:;" class="btn btn-default w100 mB10 openImgSelect" id="imgSelectpageImg" 
+                <a href="javascript:;" class="btn btn-secondary w100 mB10 openImgSelect" id="imgSelectpageImg" 
                     data-title="" data-presel="{{ $currMeta['img'] }}" 
                     ><div><i class="fa fa-picture-o" aria-hidden="true"></i> 
                     Select or</div><div>Upload Image</div></a><br />

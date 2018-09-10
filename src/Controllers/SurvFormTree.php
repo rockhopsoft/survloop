@@ -111,9 +111,9 @@ class SurvFormTree extends SurvUploadTree
         }
         if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID
             && ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0)) {
-            $ret .= '<a href="javascript:;" class="fL btn btn-default ' . $btnSize . ' nFormBack" id="nFormBack" 
+            $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize . ' nFormBack" id="nFormBack" 
                 >Back</a>';
-            //$ret .= '<input type="button" value="Back" class="fL nFormBack btn btn-lg btn-default" id="nFormBack">';
+            //$ret .= '<input type="button" value="Back" class="fL nFormBack btn btn-lg btn-secondary" id="nFormBack">';
         }
         $ret .= '<div class="clearfix p5"></div></div><div class="disNon"><input type="submit"></div>';
         return $ret; 
@@ -488,6 +488,7 @@ class SurvFormTree extends SurvUploadTree
         elseif ($currVisib == 1 && in_array($nID, $this->hideKidNodes)) $currVisib = 0;
         $visibilityField = '<input type="hidden" name="n' . $nIDtxt . 'Visible" id="n' . $nIDtxt 
             . 'VisibleID" value="' . $currVisib . '">';
+        if ($curr->nodeType == 'Layout Column') $visibilityField = '';
         if ($this->page1stVisib == '' && $currVisib == 1) {
             if (in_array($curr->nodeType, ['Radio', 'Checkbox', 'Gender', 'Gender Not Sure'])) {
                 $this->page1stVisib = 'n' . $nID . 'fld0';
@@ -508,7 +509,7 @@ class SurvFormTree extends SurvUploadTree
         $ret = $this->customNodePrint($nID, $tmpSubTier, $nIDtxt, $nSffx, $currVisib);
         if ($curr->nodeType == 'Data Print Row' && is_array($ret) && sizeof($ret) > 0) return $ret; 
         if (!is_array($ret) && $ret != '') return $visibilityField . $ret;
-        $ret = $visibilityField . $this->nodeSessDump($nIDtxt);
+        $ret = $visibilityField . $this->nodeSessDump($nIDtxt, $nID);
         // else print standard node output...
         
         $xtraClass = ' slTab';
@@ -580,7 +581,7 @@ class SurvFormTree extends SurvUploadTree
         $nodePromptNotes = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptNotes, $itemID, $itemInd);
         if (trim($nodePromptNotes) != '' && !$curr->isLoopRoot()) {
             if ($curr->nodeRow->NodeOpts%83 == 0) {
-                $nodePromptText = '<a id="hidivBtnnLabel' . $nIDtxt . 'notes" class="hidivBtn crsrPntr pull-right">'
+                $nodePromptText = '<a id="hidivBtnnLabel' . $nIDtxt . 'notes" class="hidivBtn crsrPntr float-right">'
                     . '<i class="fa fa-info-circle" aria-hidden="true"></i></a>' . $nodePromptText;
             }
             $nodePromptText .= '<div id="hidivnLabel' . $nIDtxt . 'notes" class="subNote'
@@ -1083,7 +1084,7 @@ class SurvFormTree extends SurvUploadTree
                     
                 } elseif (in_array($curr->nodeType, [ 'Text', 'Email', 'Spambot Honey Pot' ])) {
                     
-                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input class="form-control input-lg' 
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input class="form-control form-control-lg' 
                         . $xtraClass . '" type="' . (($curr->nodeType == 'Email') ? 'email' : 'text')
                         . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
                         . '" ' . $onKeyUp . ' data-nid="' . $nID . '" ' . $GLOBALS["SL"]->tabInd() . '></div>' 
@@ -1111,7 +1112,7 @@ class SurvFormTree extends SurvUploadTree
                 } elseif ($curr->nodeType == 'Long Text') {
                     
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">
-                        <textarea class="form-control input-lg flexarea' . $xtraClass . '" name="n' . $nIDtxt 
+                        <textarea class="form-control form-control-lg flexarea' . $xtraClass . '" name="n' . $nIDtxt 
                         . 'fld" id="n' . $nIDtxt . 'FldID" ' . $onKeyUp . ' data-nid="' . $nID . '" ' 
                         . $GLOBALS["SL"]->tabInd() . '>' . $currNodeSessData . '</textarea></div>' . $charLimit . "\n"
                         . $this->printWordCntStuff($nIDtxt, $curr->nodeRow);
@@ -1148,7 +1149,7 @@ class SurvFormTree extends SurvUploadTree
                     }
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">';
                     if (!$this->hasSpreadsheetParent($nID)) $ret .= '<div class="row"><div class="col-md-3">';
-                    $ret .= '<nobr><input type="number" data-nid="' . $nID . '" class="form-control input-lg ' 
+                    $ret .= '<nobr><input type="number" data-nid="' . $nID . '" class="form-control form-control-lg ' 
                         . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : ((isset($curr->extraOpts["unit"]) 
                             && trim($curr->extraOpts["unit"]) != '') ? 'unitFld ' : '')) . $xtraClass 
                         . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
@@ -1202,7 +1203,7 @@ class SurvFormTree extends SurvUploadTree
                     
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld 
                         . '"><input type="password" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
-                        . 'FldID" value="" ' . $onKeyUp . ' autocomplete="off" class="form-control input-lg' 
+                        . 'FldID" value="" ' . $onKeyUp . ' autocomplete="off" class="form-control form-control-lg' 
                         . $xtraClass . '" data-nid="' . $nID . '"' . $GLOBALS["SL"]->tabInd() . '></div>' 
                         . $charLimit . "\n"; 
                     if ($curr->isRequired()) {
@@ -1217,7 +1218,7 @@ class SurvFormTree extends SurvUploadTree
                     if (sizeof($curr->responses) > 0 || in_array($curr->nodeType, ['U.S. States', 'Countries'])) {
                         $ret .= $nodePrompt . "\n" . '<div class="nFld' . $isOneLinerFld . '"><select name="n' 
                             . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" data-nid="' . $nID 
-                            . '" class="form-control input-lg' . (($isOneLinerFld != '') ? ' w33' : '') 
+                            . '" class="form-control form-control-lg' . (($isOneLinerFld != '') ? ' w33' : '') 
                             . $xtraClass . '" onChange="checkNodeUp(\'' . $nIDtxt . '\', -1, 0);' 
                             . (($curr->isDropdownTagger()) ? ' selectTag(' . $nID 
                                 . ', this.value); this.value=\'\';' : '') . '" autocomplete="off" ' 
@@ -1430,7 +1431,7 @@ class SurvFormTree extends SurvUploadTree
                         }
                         if ($curr->nodeRow->NodeOpts%79 == 0) {
                             $ret .= '<div id="radioUnHide' . $nIDtxt . '" class="disNon"><a onClick="radioUnHide(\'' 
-                                . $nIDtxt . '\');" class="btn btn-default btn-xs opac66" href="javascript:;" '
+                                . $nIDtxt . '\');" class="btn btn-secondary btn-sm opac66" href="javascript:;" '
                                 . '>Show All Options Again</a></div>';
                         }
                         
@@ -1459,7 +1460,7 @@ class SurvFormTree extends SurvUploadTree
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).datepicker({ maxDate: "+0d" });';
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input name="n' . $nIDtxt 
                         . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $dateStr . '" autocomplete="off" ' 
-                        . $onKeyUp . ' type="text" class="dateFld form-control input-lg' . $xtraClass 
+                        . $onKeyUp . ' type="text" class="dateFld form-control form-control-lg' . $xtraClass 
                         . '" data-nid="' . $nID . '"' . $GLOBALS["SL"]->tabInd() . '></div>' . "\n";
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
@@ -1659,9 +1660,9 @@ class SurvFormTree extends SurvUploadTree
             $retKids = '';
             if (sizeof($tmpSubTier[1]) > 0 && !$curr->isLoopCycle() && !$curr->isSpreadTbl()) {
                 if ($curr->nodeType == 'Big Button' && $curr->nodeRow->NodeOpts%43 == 0) $currVisib = 0;
-                $retKids .= '<div id="node' . $nID . 'kids" class="dis' . (($currVisib == 1) ? 'Blo' : 'Non') 
-                    . (($curr->nodeType == 'Gallery Slider') ? ' h50 ovrNo' : '')
-                    . (($curr->nodeType == 'Layout Row') ? ' row' : '') . '">';
+                $retKids .= '<div id="node' . $nID . 'kids" class="'
+                    . (($currVisib == 0) ? 'disNon' : (($curr->nodeType == 'Layout Row') ? 'disFlx row' : 'disBlo'))
+                    . (($curr->nodeType == 'Gallery Slider') ? ' h50 ovrNo' : '') . '">';
                 if ($curr->isGraph()) $this->v["graphFilters"] = $nID;
                 foreach ($tmpSubTier[1] as $childNode) { // recurse deez!..
                     if (!$this->allNodes[$childNode[0]]->isPage() 
@@ -2444,7 +2445,7 @@ class SurvFormTree extends SurvUploadTree
     
     protected function printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
     {
-        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-default mT20 w100 fPerc133 '
+        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-secondary mT20 w100 fPerc133 '
             . (($GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit == 0 || 
                 sizeof($this->sessData->loopItemIDs[$loopName]) < $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit) 
                 ? 'disBlo' : 'disNon')

@@ -22,7 +22,7 @@ function changeNodeType(newType) {
     document.getElementById('hasSendEmail').style.display='none';
     document.getElementById('emailPreviewStuff').style.display='none';
     document.getElementById('nodeTypeFld1').className='nFld w100 mT10 pT5';
-    document.getElementById('nodeTypeID').className='form-control input-lg';
+    document.getElementById('nodeTypeID').className='form-control form-control-lg';
     if (newType == 'branch' || newType == 'data' || newType == 'loop' || newType == 'sort' || newType == 'cycle' 
         || newType == 'page' || newType == 'instruct' || newType == 'instructRaw' || newType == 'heroImg' 
         || newType == 'bigButt' || newType == 'survWidget' || newType == 'sendEmail' || newType == 'layout' 
@@ -314,7 +314,7 @@ function previewBigBtn() {
         var preview = '<div class="nFld m0"><a href="javascript:;" class="';
         if (document.getElementById('bigBtnStyleID').value != 'Text') {
             preview += 'btn ';
-            if (document.getElementById('bigBtnStyleID').value == 'Default') preview += 'btn-default';
+            if (document.getElementById('bigBtnStyleID').value == 'Default') preview += 'btn-secondary';
             else preview += 'btn-primary';
             preview += ' btn-lg nFldBtn';
         }

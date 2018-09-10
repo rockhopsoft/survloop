@@ -29,10 +29,10 @@
                 @if ($i < (1+sizeof($navMenu))) disBlo @else disNon @endif ">
                 <div class="col-md-6"><input type="text" id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][0] !!}" @else value="" @endif 
-                    onKeyUp="checkMainNav();" class="form-control input-lg" autocomplete="off" ></div>
+                    onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
                 <div class="col-md-6"><input type="text" id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][1] !!}" @else value="" @endif 
-                    onKeyUp="checkMainNav();" class="form-control input-lg" autocomplete="off" ></div>
+                    onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
             </div>
         @endfor
         <center><input type="submit" class="btn btn-primary btn-xl" value="Save Menu Changes"></center>

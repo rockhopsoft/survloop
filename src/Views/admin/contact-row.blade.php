@@ -20,7 +20,7 @@
         </label>
         <div class="nFld">
             <select name="ContFlag{{ $contact->ContID }}" id="ContFlag{{ $contact->ContID }}ID" 
-                class="form-control input-lg changeContStatus" {!! $GLOBALS["SL"]->tabInd() !!}>
+                class="form-control form-control-lg changeContStatus" {!! $GLOBALS["SL"]->tabInd() !!}>
                 <option value="Unread" @if ($contact->ContFlag == 'Unread') SELECTED @endif 
                     >Unread</option>
                 <option value="Read" @if ($contact->ContFlag == 'Read') SELECTED @endif 

@@ -10,8 +10,8 @@
     Sorting Defintion Set
 </h1>
 
-<a href="/dashboard/db/all" class="btn btn-default mR10">All Database Details</a>
-<a href="/dashboard/db/definitions" class="btn btn-default mR10">All Definitions</a>
+<a href="/dashboard/db/all" class="btn btn-secondary mR10">All Database Details</a>
+<a href="/dashboard/db/definitions" class="btn btn-secondary mR10">All Definitions</a>
 
 {!! $sortable !!}
 

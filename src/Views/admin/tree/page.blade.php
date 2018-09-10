@@ -22,28 +22,28 @@
 
 <div class="mB20">
     @if ($isAll)
-        <a class="btn btn-primary pull-right mL10" 
+        <a class="btn btn-primary float-right mL10" 
             @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?alt=1" 
             @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Collapse Tree</a>
     @else
-        <a class="btn btn-primary pull-right mL10" 
+        <a class="btn btn-primary float-right mL10" 
             @if ($isAlt) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
             @else href="/dashboard/tree/map?all=1" @endif
             ><i class="fa fa-expand fa-flip-horizontal"></i> Expand Tree</a>
     @endif
     @if ($isAlt)
-        <a class="btn btn-default pull-right mL10" 
+        <a class="btn btn-secondary float-right mL10" 
             @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1" 
             @else href="/dashboard/tree/map" @endif
             ><i class="fa fa-align-left"></i> Hide Details</a>
     @else
-        <a class="btn btn-default pull-right mL10" 
+        <a class="btn btn-secondary float-right mL10" 
             @if ($isAll) href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1&alt=1" 
             @else href="/dashboard/tree/map?alt=1" @endif
             ><i class="fa fa-align-left"></i> Show Details</a>
     @endif
-    <a class="btn btn-default pull-right mL10" href="/dashboard/pages/list"
+    <a class="btn btn-secondary float-right mL10" href="/dashboard/pages/list"
         ><i class="fa fa-newspaper-o"></i> List of Pages</a>
     <span class="slGrey">
         A page is also created as a tree filled with branching nodes. 

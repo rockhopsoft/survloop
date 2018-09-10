@@ -848,7 +848,7 @@ class AdminController extends SurvLoopController
             foreach ($files as $f) $minifier->add(trim($f));
         }
         $minifier->add("../storage/app/sys/sys2.min.css");
-        //$minifier->add("../vendor/wikiworldorder/survloop/src/Public/font-awesome-4.7.0/css/font-awesome.min.css");
+        //$minifier->add("../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css");
         $minifier->minify("../storage/app/sys/sys-all.min.css");
         
         $scriptsjs = view('vendor.survloop.scripts-js', [ "css" => $css ])->render();

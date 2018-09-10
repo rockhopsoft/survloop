@@ -5,7 +5,7 @@
 <h1><span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Field Descriptions</h1>
 @if ($view == 'replicas' || $view == 'generics' || $view == 'uniques')
-    <a href="/dashboard/db/fieldDescs" class="btn btn-xs btn-default mR10">All Field Descriptions</a>
+    <a href="/dashboard/db/fieldDescs" class="btn btn-sm btn-secondary mR10">All Field Descriptions</a>
 @endif
 
 <div class="clearfix p5"></div>
@@ -51,23 +51,23 @@
 <input type="hidden" name="changedFLdsGen" id="changedFLdsGenID" value=",">
 @foreach ($GLOBALS["SL"]->tbls as $loopTblID)
     @if ($tblID != $loopTblID)
-        <div class="panel panel-default">
+        <div class="card">
             <a href="/dashboard/db/fieldDescs?table={{ $loopTblID }}{{ $viewParam }}#tbl{{ $loopTblID }}">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ $GLOBALS["SL"]->tbl[$loopTblID] }} 
+            <div class="card-header">
+                <h3>{{ $GLOBALS["SL"]->tbl[$loopTblID] }} 
                     ({{ (sizeof($GLOBALS["SL"]->fldTypes[$GLOBALS["SL"]->tbl[$loopTblID]])-1) }} 
                     {{ $fldLabel }})
-                    <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h3>
+                    <i class="fa fa-chevron-down float-right" aria-hidden="true"></i></h3>
             </div></a>
         </div>
     @else
         <div class="nodeAnchor"><a name="tbl{{ $loopTblID }}"></a></div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">{{ $GLOBALS["SL"]->tbl[$tblID] }} 
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ $GLOBALS["SL"]->tbl[$tblID] }} 
                     ({{ $tblFldLists->count() }} {{ $fldLabel }})</h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <div class="pL10 pR10"><div class="row slGrey">
                     <div class="col-md-4">Field Label</div>
                     <div class="col-md-6">Full Description</div>

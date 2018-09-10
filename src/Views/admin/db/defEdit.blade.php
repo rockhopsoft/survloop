@@ -12,8 +12,8 @@
     @endif
 </h1>
 
-<a href="/dashboard/db/all" class="btn btn-default mR10">All Database Details</a>
-<a href="/dashboard/db/definitions" class="btn btn-default mR10">All Definitions</a>
+<a href="/dashboard/db/all" class="btn btn-secondary mR10">All Database Details</a>
+<a href="/dashboard/db/definitions" class="btn btn-secondary mR10">All Definitions</a>
 
 <form name="mainPageForm" method="post" 
     @if (isset($def->DefID) && intVal($def->DefID) > 0) 

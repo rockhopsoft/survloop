@@ -20,7 +20,7 @@
         <h3 class="m0 slGrey">Auto-Email Type</h3>
     </div>
     <div class="col-md-9">
-        <select name="emailType" class="form-control input-lg" 
+        <select name="emailType" class="form-control form-control-lg" 
             onChange="if (this.value == 'Blurb') { document.getElementById('subj').style.display='none'; } else { document.getElementById('subj').style.display='block'; }" >
             <option value="To Complainant" @if ($currEmail->EmailType == 'To Complainant' || trim($currEmail->EmailType) == '') SELECTED @endif >Sent To Complainant</option>
             <option value="To Oversight" @if ($currEmail->EmailType == 'To Oversight') SELECTED @endif >Sent To Oversight Agency</option>
@@ -34,7 +34,7 @@
         <h3 class="m0 slGrey">Internal Name</h3>
     </div>
     <div class="col-md-9">
-        <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" class="form-control input-lg" >
+        <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" class="form-control form-control-lg" >
     </div>     
 </div>
 
@@ -43,7 +43,7 @@
         <h3 class="m0 slGrey">Email Subject Line</h3>
     </div>
     <div class="col-md-9">
-        <input type="text" name="emailSubject" value="{{ $currEmail->EmailSubject }}" class="form-control input-lg" >
+        <input type="text" name="emailSubject" value="{{ $currEmail->EmailSubject }}" class="form-control form-control-lg" >
     </div>
 </div>
 
@@ -54,7 +54,7 @@
         <input type="submit" class="btn btn-xl btn-primary w100" value="Save Email Template">
     </div>
     <div class="col-md-9">
-        <textarea name="emailBody" id="emailBodyID" class="form-control input-lg" style="height: 500px;">{{ $currEmail->EmailBody }}</textarea>
+        <textarea name="emailBody" id="emailBodyID" class="form-control form-control-lg" style="height: 500px;">{{ $currEmail->EmailBody }}</textarea>
     </div>
 </div>
 

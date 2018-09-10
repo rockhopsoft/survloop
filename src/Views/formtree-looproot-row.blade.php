@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/formtree-looproot-row.blade.php -->
 
 @if ($node->isStepLoop())
-    <a id="editLoopItem{{ $itemID }}" class="btn btn-default btn-xl w100 taL mB20 editLoopItem" href="javascript:;">
+    <a id="editLoopItem{{ $itemID }}" class="btn btn-secondary btn-xl w100 taL mB20 editLoopItem" href="javascript:;">
     @if (trim($ico) != '')
         <span class=" @if (strpos($ico, 'gryC') !== false) slBlueFaint @else slBlueLight @endif "
             >{!! $ico !!}</span>
@@ -15,10 +15,10 @@
                     <div class="fL"><h3 class="m0">{!! $itemLabel !!}</h3></div>
                     @if ($canEdit)
                         <a href="javascript:;" id="editLoopItem{{ $itemID }}" 
-                            class="editLoopItem btn btn-default mL10 mR10 fR"
+                            class="editLoopItem btn btn-secondary mL10 mR10 fR"
                             ><i class="fa fa-pencil fa-flip-horizontal"></i> Edit</a>
                         <a href="javascript:;" id="delLoopItem{{ $itemID }}" 
-                            class="delLoopItem nFormLnkDel nobld btn btn-default mL10 mR10 fR"
+                            class="delLoopItem nFormLnkDel nobld btn btn-secondary mL10 mR10 fR"
                             ><i class="fa fa-trash-o"></i> Delete</a>
                         <input type="checkbox" class="disNon" 
                             name="delItem[]" id="delItem{{ $itemID }}" value="{{ $itemID }}" >

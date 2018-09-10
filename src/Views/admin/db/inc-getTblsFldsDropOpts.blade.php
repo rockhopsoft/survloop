@@ -3,7 +3,7 @@
         <h4 class="mT10">Data Field:</h4>
     </div>
     <div class="col-md-9">
-        <select id="setFldID" name="setFld" class="form-control input-lg" autocomplete=off >
+        <select id="setFldID" name="setFld" class="form-control form-control-lg" autocomplete=off >
             <option value="" @if (!isset($cond)) SELECTED @endif ></option>
             <option value="EXISTS=0" @if (isset($cond) && isset($cond->CondOperator) && isset($cond->CondOperDeet) 
                 && $cond->CondOperator == 'EXISTS=' && intVal($cond->CondOperDeet) == 0) SELECTED @endif 

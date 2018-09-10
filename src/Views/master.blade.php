@@ -45,6 +45,11 @@
         }}/sys2.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
 @endif
 
+@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" crossorigin="anonymous" 
+        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"></script>
+@endif
+
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys-all.min.js" type="text/javascript"></script>
 @else 
@@ -55,9 +60,11 @@
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.js"></script>
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.js?v={{ 
+        $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
+
+<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/css/fork-awesome.min.css" rel="stylesheet">
 
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
@@ -67,10 +74,9 @@
     || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
     <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/plotly.min.js"></script>
 @endif
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <?php /* <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/content-tools.min.css"> */ ?>
-@endif
+<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/content-tools.min.css">
+@endif */ ?>
 
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
     {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
@@ -93,61 +99,50 @@
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
 @endif
-<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-<!-- Core build with no theme, formatting, non-essential modules -->
-<link href="//cdn.quilljs.com/1.2.3/quill.core.css" rel="stylesheet">
-<script src="//cdn.quilljs.com/1.2.3/quill.core.js"></script>
-
-<!-- Main Quill library -->
-<script src="//cdn.quilljs.com/1.2.3/quill.js"></script>
-<script src="//cdn.quilljs.com/1.2.3/quill.min.js"></script>
-
-<!-- Theme included stylesheets -->
-<link href="//cdn.quilljs.com/1.2.3/quill.snow.css" rel="stylesheet">
-<link href="//cdn.quilljs.com/1.2.3/quill.bubble.css" rel="stylesheet">
-@endif */ ?>
-@if (isset($bodyTopCode))
-    {!! $bodyTopCode !!}
-@endif
+@if (isset($bodyTopCode)) {!! $bodyTopCode !!} @endif
 
 
 @if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
-    <ul id="mySideUL" class="nav nav-sidebar">
+    <div class="headGap">
+        <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+    </div>
+    <ul id="mySideUL" class="nav flex-column">
     @if (isset($navMenu) && sizeof($navMenu) > 0)
-        @foreach ($navMenu as $i => $arr) <li><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li> @endforeach
+        @foreach ($navMenu as $i => $arr) <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li> @endforeach
     @endif
     @if (isset($sideNavLinks) && trim($sideNavLinks) != '') {!! $sideNavLinks !!} @endif
     </ul>
 </div>
 <div id="main">
 
-<nav id="myNavBar" class="navbar navbar-inverse navbar-fixed-top">
-    <div id="myNavBarIn" class="container-fluid">
-        @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
-            <a id="slLogo" class="pull-left" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-                ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
-                alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" 
-                title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Logo (link back home)" ></a>
-        @endif
-        @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
-            && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
-            <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="pull-left"
-                >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
-        @endif
-        <a id="navBurger" title="Show Navigation Menu" class="pull-right disBlo" onClick="toggleNav();"
+<div class="row flex-nowrap fixed-top clearfix">
+    <div class="col-md-4 taL bgWht">
+    @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
+        <a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
+            ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
+            alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
+            title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" ></a>
+    @endif
+    @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
+        && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
+        <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="navbar-brand"
+            >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
+    @endif
+    </div><div class="col-md-8" id="myNavBar">
+        <a id="navBurger" title="Show Navigation Menu" class="float-right disBlo" onClick="toggleNav();"
             href="javascript:;" ><i class="fa fa-bars" aria-hidden="true"></i></a>
-        <a id="navBurgerClose" class="pull-right disNon" onclick="closeNav()" href="javascript:;" 
+        <a id="navBurgerClose" class="float-right disNon" onclick="closeNav()" href="javascript:;" 
             ><i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
-    <div id="progWrap"></div>
-</nav>
-<div id="headClear" class="clearfix"></div>
-<div id="headGap">
+</div>
+<div id="headClear"></div>
+<div class="headGap">
     <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" border=0 alt="spacer" >
 </div>
+<div id="progWrap"></div>
 
 <noscript><div class="alert alert-dismissible alert-warning">
     <b>Warning: It looks like you have Javascript disabled. {{ $GLOBALS['SL']->sysOpts['site-name'] }} 
@@ -246,14 +241,14 @@
         
     </div> <!-- end nondialog -->
     <div id="dialog">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h2 id="dialogTitle" class="panel-title"></h2>
-                <a class="dialogClose btn btn-sm btn-default" href="javascript:;"
+        <div class="card">
+            <div class="card-header">
+                <h2 id="dialogTitle"></h2>
+                <a class="dialogClose btn btn-sm btn-secondary" href="javascript:;"
                     ><i class="fa fa-times" aria-hidden="true"></i></a>
                 <div class="fC"></div>
             </div>
-            <div class="panel-body"><div id="dialogBody"></div></div>
+            <div class="card-body"><div id="dialogBody"></div></div>
         </div>
     </div>
     
@@ -267,9 +262,6 @@
 <div class="imgPreload">
 @forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 > @empty @endforelse
 </div>
-
-<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-    }}/survloop/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/summernote.css" rel="stylesheet">

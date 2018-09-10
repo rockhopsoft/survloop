@@ -10,7 +10,7 @@
     <?php $cond = []; ?>
     <h3 class="slBlueDark mT0"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Condition:</h3>
     @if (!isset($newOnly) || !$newOnly)
-        <select id="oldCondsID" name="oldConds" class="form-control input-lg mT5" autocomplete="off" >
+        <select id="oldCondsID" name="oldConds" class="form-control form-control-lg mT5" autocomplete="off" >
             <option value="0">Select a condition</option>
             <option value="-37">Create a new condition</option>
             <option value="0" disabled ></option>
@@ -35,7 +35,7 @@
                 <h4 class="mT10">Hashtag:</h4>
             </div>
             <div class="col-md-9">
-                <input type="text" id="condHashID" name="condHash" class="form-control input-lg" autocomplete=off
+                <input type="text" id="condHashID" name="condHash" class="form-control form-control-lg" autocomplete=off
                     @if (isset($cond) && isset($cond->CondTag)) value="{{ $cond->CondTag }}" @else value="#" @endif >
             </div>
         </div>
@@ -44,7 +44,7 @@
                 <h4 class="mT10">Description:</h4>
             </div>
             <div class="col-md-9">
-                <input type="text" id="condDescID" name="condDesc" class="form-control input-lg" autocomplete=off 
+                <input type="text" id="condDescID" name="condDesc" class="form-control form-control-lg" autocomplete=off 
                     @if (isset($cond) && isset($cond->CondDesc)) value="{{ $cond->CondDesc }}" @else value="" @endif >
             </div>
         </div>
@@ -54,7 +54,7 @@
             <h4 class="mT10">Condition Type:</h4>
         </div>
         <div class="col-md-9">
-            <select id="condTypeID" name="condType" class="form-control input-lg" autocomplete=off >
+            <select id="condTypeID" name="condType" class="form-control form-control-lg" autocomplete=off >
                 <option @if (!isset($cond) || !isset($cond->CondOperator) || $cond->CondOperator != 'COMPLEX') 
                     SELECTED @endif value="simple" >Simple Condition</option>
                 <option @if (isset($cond) && isset($cond->CondOperator) && $cond->CondOperator == 'COMPLEX') 
@@ -70,7 +70,7 @@
                 <h4 class="mT10">Data Set:</h4>
             </div>
             <div class="col-md-9">
-                <select id="setSelectID" name="setSelect" class="form-control input-lg" autocomplete=off >
+                <select id="setSelectID" name="setSelect" class="form-control form-control-lg" autocomplete=off >
                     <option value="" @if (!isset($cond)) SELECTED @endif ></option>
                     <option value="" DISABLED >SurvLoops:</option>
                     @forelse ($GLOBALS['SL']->dataLoops as $loopName => $loopRow)
@@ -116,13 +116,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <h4 class="m0">Parameter:</h4>
-                            <input type="text" id="paramNameID" name="paramName" class="form-control input-lg" 
+                            <input type="text" id="paramNameID" name="paramName" class="form-control form-control-lg" 
                                 autocomplete=off @if (isset($cond) && isset($cond->CondOperDeet)) 
                                     value="{{ $cond->CondOperDeet }}" @endif >
                         </div>
                         <div class="col-md-6">
                             <h4 class="m0">Value:</h4>
-                            <input type="text" id="paramValID" name="paramVal" class="form-control input-lg" 
+                            <input type="text" id="paramValID" name="paramVal" class="form-control form-control-lg" 
                                 autocomplete=off @if (isset($cond) && isset($cond->condVals) 
                                     && sizeof($cond->condVals) > 0) value="{{ $cond->condVals[0] }}" @endif >
                         </div>

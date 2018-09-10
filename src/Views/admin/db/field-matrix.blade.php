@@ -6,8 +6,8 @@
     @if ($isAlt) Field Matrix (in English) @else Field Matrix (in Geek) @endif
     <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
 </h1>
-<a href="/dashboard/db/field-matrix?{{ $urlParam }}print=1" target="_blank" class="btn btn-default mR10"><i class="fa fa-print"></i> Print Matrix</a>
-<a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-default mR10"><i class="fa fa-file-excel-o"></i> Matrix to Excel</a>
+<a href="/dashboard/db/field-matrix?{{ $urlParam }}print=1" target="_blank" class="btn btn-secondary mR10"><i class="fa fa-print"></i> Print Matrix</a>
+<a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-secondary mR10"><i class="fa fa-file-excel-o"></i> Matrix to Excel</a>
 
 <div class="clearfix p20"></div>
 

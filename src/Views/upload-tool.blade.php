@@ -28,7 +28,7 @@
                 </label></div>
                 <div class="nFld mT5">
                     <input type="text" id="up{{ $nID }}VidID" name="up{{ $nID }}Vid" 
-                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
+                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                 </div>
             </div>
             <div id="up{{ $nID }}FormFile" class="disBlo">
@@ -37,7 +37,7 @@
                 </label></div>
                 <div class="nFld mT5">
                     <input type="file" name="up{{ $nID }}File" id="up{{ $nID }}FileID" {!! $GLOBALS["SL"]->tabInd() !!}
-                        class="p5 form-control input-lg ntrStp slTab" style="border: 1px #CCC solid;" >
+                        class="p5 form-control form-control-lg ntrStp slTab" style="border: 1px #CCC solid;" >
                 </div>
             </div>
             <div class="nodeHalfGap"></div>
@@ -45,14 +45,14 @@
                 <div id="nLabel100{{ $nID }}" class="nPrompt"><label for="up{{ $nID }}TitleID">Title of Upload</label></div>
                 <div class="nFld mT5">
                     <input type="text" id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" 
-                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
+                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                 </div>
             </div>
             <?php /* <div class="nodeHalfGap"></div>
             <div class="nPrompt"><label for="up{{ $nID }}DescID">Upload Description:</label></div>
             <div class="nFld">
                 <input type="text" id="up{{ $nID }}DescID" name="up{{ $nID }}Desc" value="" 
-                    class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
+                    class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
             </div> */ ?>
             @if (isset($GLOBALS["SL"]->treeSettings["uploads-public"]) 
                 && intVal($GLOBALS["SL"]->treeSettings["uploads-public"][0]) > 0)
@@ -63,7 +63,7 @@
                 </div> 
                 <div class="nFld mT5">
                     <select name="up{{ $nID }}Privacy" id="up{{ $nID }}PrivacyID" 
-                        class="form-control input-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
+                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
                         <option value="Public" @if ($isPublic) CHECKED @endif >Public: Visible to whole world</option>
                         <option value="Private" @if (!$isPublic) CHECKED @endif >Private: Visible only to investigators</option>
                     </select>

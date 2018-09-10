@@ -19,7 +19,7 @@ $v = $surv->custLoop->v;
         <h1 class="mT0">Login</h1>
     </div>
     <div class="col-md-6 taR pT5">
-        <a href="/register" class="btn btn-default">Sign Up</a>
+        <a href="/register" class="btn btn-secondary">Sign Up</a>
     </div>
 </div>
 
@@ -40,7 +40,7 @@ $v = $surv->custLoop->v;
     <div class="nFld mT0">
         <input id="emailID" name="email" value="{{ old('email') }}" type="text" class="form-control">
         @if ($errors->has('email'))
-            <span class="help-block">
+            <span class="form-text">
                 <strong>{{ $errors->first('email') }}</strong>
             </span>
         @endif
@@ -54,7 +54,7 @@ $v = $surv->custLoop->v;
     <div class="nFld mT0">
         <input id="password" name="password" value="" type="password" class="form-control">
         @if ($errors->has('password'))
-            <span class="help-block">
+            <span class="form-text">
                 <strong>{{ $errors->first('password') }}</strong>
             </span>
         @endif

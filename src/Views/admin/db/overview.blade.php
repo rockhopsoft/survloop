@@ -13,11 +13,11 @@
     @endif
     <nobr><span class="fPerc133">{!! strip_tags($dbStats) !!}</span></nobr>
 @if (!$isPrint)
-    <a href="/dashboard/db?print=1" target="_blank" class="btn btn-xs btn-default mL10 mTn5"
+    <a href="/dashboard/db?print=1" target="_blank" class="btn btn-sm btn-secondary mL10 mTn5"
         ><i class="fa fa-print"></i> Print This Overview</a>
-    <a href="/dashboard/db/addTable" class="btn btn-xs btn-default mL10 mTn5"
+    <a href="/dashboard/db/addTable" class="btn btn-sm btn-secondary mL10 mTn5"
         ><i class="fa fa-plus"></i> Add a New Table</a>
-    <a href="/dashboard/db/sortTable" class="btn btn-xs btn-default mL10 mTn5"
+    <a href="/dashboard/db/sortTable" class="btn btn-sm btn-secondary mL10 mTn5"
         ><i class="fa fa-sort-amount-asc"></i> Re-Order Tables</a>
 @endif
 </div>
@@ -27,9 +27,9 @@
 </div>
 
 @forelse ($groupTbls as $group => $tbls)
-    <div class="panel panel-info">
-        <div class="panel-heading"><h3 class="panel-title">{{ $group }}</h3></div>
-        <div class="panel-body">
+    <div class="card">
+        <div class="card-header"><h3>{{ $group }}</h3></div>
+        <div class="card-body">
             @forelse ($tbls as $tbl)
                 <div class="pB20">
                     <h3><a href="/dashboard/db/table/{{ $tbl->TblName }}">{{ $tbl->TblEng }}</a></h3>

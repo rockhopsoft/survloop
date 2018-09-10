@@ -5,7 +5,7 @@
 @section('content')
 
 @if ($dbAllowEdits)
-    <a href="/dashboard/db/definitions/add" class="btn btn-default pull-right"
+    <a href="/dashboard/db/definitions/add" class="btn btn-secondary float-right"
         ><i class="fa fa-plus-circle"></i> Add a New Definition</a>
 @endif
 
@@ -15,7 +15,7 @@
     often used as the multi-choice options provided a user for certain questions.</h5>
     
 <div class="slGrey">
-    <i>Values / Options, Description / Notes:</i><i class="pull-right">Definition ID#</i>
+    <i>Values / Options, Description / Notes:</i><i class="float-right">Definition ID#</i>
 </div>
 
 @foreach ($defSets as $subset => $setDefs)
@@ -27,10 +27,10 @@
             </div>
             <div class="col-md-3 taR" >
             @if ($dbAllowEdits)
-                <a href="/dashboard/db/definitions/add/{{ $subset }}" class="btn btn-default m5"
+                <a href="/dashboard/db/definitions/add/{{ $subset }}" class="btn btn-secondary m5"
                     ><i class="fa fa-plus-circle"></i> Add</a>
                 <a href="/dashboard/db/definitions/sort/{!! urlencode($subset) !!}" 
-                    class="btn btn-default m5" ><i class="fa fa-sort-amount-asc"></i>Sort</a>
+                    class="btn btn-secondary m5" ><i class="fa fa-sort-amount-asc"></i>Sort</a>
             @endif
             </div>
         </div>
@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-md-1 taR">
                 @if ($dbAllowEdits)
-                    <a href="/dashboard/db/definitions/edit/{{ $setDef->DefID }}" class="btn btn-sm btn-default m5">
+                    <a href="/dashboard/db/definitions/edit/{{ $setDef->DefID }}" class="btn btn-sm btn-secondary m5">
                     <i class="fa fa-pencil fa-flip-horizontal"></i> {{ $setDef->DefID }}</a>
                 @endif
                 </div>

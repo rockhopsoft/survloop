@@ -443,9 +443,13 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
-    public function nodeSessDump($nIDtxt = '')
+    public function nodeSessDump($nIDtxt = '', $nID = -3)
     {
         if ($this->debugOn && true) {
+            if ($nID > 0 && isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->nodeType)
+                && $this->allNodes[$nID]->nodeType == 'Layout Column') {
+                return '';
+            }
             return view('vendor.survloop.inc-var-dump-node', [
                 "nIDtxt"       => $nIDtxt,
                 "dataBranches" => $this->sessData->dataBranches

@@ -26,13 +26,13 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     @endif
 </h1>
 
-<a href="/dashboard/db/bus-rules" class="btn btn-default mR10">All Business Rules</a>
+<a href="/dashboard/db/bus-rules" class="btn btn-secondary mR10">All Business Rules</a>
 {!! $saveBtn !!}
 <div class="p5"></div>
 
-<div class="panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">Rule Information</h3></div>
-    <div class="panel-body">
+<div class="card">
+    <div class="card-header"><h3>Rule Information</h3></div>
+    <div class="card-body">
         <fieldset class="form-group">
             <label for="RuleStatementID" data-toggle="tooltip" data-placement="top" 
                 title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="f10 slGrey">?</span></label>
@@ -111,12 +111,12 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     </div>
 </div>
 
-<div class="panel panel-info">
-    <div class="panel-heading" data-toggle="tooltip" data-placement="top" 
+<div class="card">
+    <div class="card-header" data-toggle="tooltip" data-placement="top" 
         title="{{ $GLOBALS['SL']->fldAbouts['FldFields'] }}">
-        <h3 class="panel-title">Structures Affected <span class="f10 slGrey">?</span></h3>
+        <h3>Structures Affected <span class="f10 slGrey">?</span></h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <div class="row pB20">
             <div class="col-md-3"><b>Table Names</b></div>
             <div class="col-md-9">
@@ -141,9 +141,9 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     </div>
 </div>
 
-<div class="panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">Field Elements Affected</h3></div>
-    <div class="panel-body">
+<div class="card">
+    <div class="card-header"><h3>Field Elements Affected</h3></div>
+    <div class="card-body">
         <div class="row">
             <div class="col-md-3">
                 <b>Physical Elements<b>
@@ -289,9 +289,9 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     </div>
 </div>
 
-<div class="panel panel-info">
-    <div class="panel-heading"><h3 class="panel-title">Relationship Characteristics Affected</h3></div>
-    <div class="panel-body">
+<div class="card">
+    <div class="card-header"><h3>Relationship Characteristics Affected</h3></div>
+    <div class="card-body">
         <div class="row">
             <div class="col-md-4">
                 <div class="radio">
@@ -324,12 +324,12 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     </div>
 </div>
 
-<div class="panel panel-info">
-    <div class="panel-heading" data-toggle="tooltip" data-placement="top" 
+<div class="card">
+    <div class="card-header" data-toggle="tooltip" data-placement="top" 
         title="{{ $GLOBALS['SL']->fldAbouts['FldAction'] }}">
-        <h3 class="panel-title">Action Taken</h3>
+        <h3>Action Taken</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
     @if ($dbAllowEdits) 
         <fieldset class="form-group">
             <label for="RuleActionID" class="sr-only" >Action Taken</label>

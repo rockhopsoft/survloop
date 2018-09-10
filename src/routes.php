@@ -173,6 +173,17 @@ Route::group(['middleware' => ['web']], function () {
         return $response;
     });
     
+    Route::get('/css/fork-awesome.min.css', function() {
+        $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get('/fonts/{file}', function($file) {
+        $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/fonts/' . $file));
+        //$response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    
     Route::get('/summernote.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.min.js'));
         $response->header('Content-Type', 'application/javascript');

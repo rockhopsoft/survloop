@@ -29,8 +29,8 @@ XML included an automatically generated schema, eg.<br />
 <a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
 <a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
 
-Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank"
->Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
+Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
+Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
 <a href="https://drugstory.me" target="_blank">Drug Story</a>.
 
 # Table of Contents

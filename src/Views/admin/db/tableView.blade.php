@@ -20,24 +20,24 @@
     <div class="col-md-5">
     @if (!$isPrint)
         @if (!$dbAllowEdits)
-            <a href="/admin/db?print=1" target="_blank" class="btn btn-xs btn-default mR10"
+            <a href="/admin/db?print=1" target="_blank" class="btn btn-sm btn-secondary mR10"
                 ><i class="fa fa-print"></i> Print This Overview</a>
         @else
             <div class="row mT20">
                 <div class="col-md-6">
-                    <a href="/admin/db?print=1" target="_blank" class="btn btn-default disBlo taL"
+                    <a href="/admin/db?print=1" target="_blank" class="btn btn-secondary disBlo taL"
                         ><i class="fa fa-print"></i> Print This Overview</a>
                 </div><div class="col-md-6">
-                    <a href="/dashboard/db/table/{{ $tblName }}/edit" class="btn btn-default disBlo taL"
+                    <a href="/dashboard/db/table/{{ $tblName }}/edit" class="btn btn-secondary disBlo taL"
                         ><nobr><i class="fa fa-pencil"></i> Edit Table Properties</nobr></a>
                 </div>
             </div>
             <div class="row mT10 mB20">
                 <div class="col-md-6">
-                    <a href="/dashboard/db/field/{{ $tbl->TblAbbr }}" class="btn btn-default disBlo taL"
+                    <a href="/dashboard/db/field/{{ $tbl->TblAbbr }}" class="btn btn-secondary disBlo taL"
                         ><i class="fa fa-plus"></i> Add a New Field</a>
                 </div><div class="col-md-6">
-                    <a href="/dashboard/db/table/{{ $tblName }}/sort" class="btn btn-default disBlo taL"
+                    <a href="/dashboard/db/table/{{ $tblName }}/sort" class="btn btn-secondary disBlo taL"
                         ><i class="fa fa-sort-amount-asc"></i> Re-Order Fields</a>
                 </div>
             </div>

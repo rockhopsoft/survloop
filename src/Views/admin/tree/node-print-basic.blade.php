@@ -99,7 +99,7 @@
             @endif
         @if (trim($conditionList) != '') {!! $conditionList !!} @endif
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false)
-            <div class="pull-right taR pL20 pR5 slGreenDark">
+            <div class="float-right taR pL20 pR5 slGreenDark">
                 @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
                     @if ($node->nodeRow->NodeParentID <= 0)
                         <b>{{ $GLOBALS['SL']->coreTbl }}</b> <i class="fa fa-database fPerc80"></i><br />

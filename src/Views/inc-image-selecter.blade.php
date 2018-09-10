@@ -27,7 +27,7 @@
     <div class="col-md-4 h100 row2" style="margin: -15px 0px -15px 0px; padding: 15px;">
     
         <a name="imgFile{{ $nID }}anc"></a>
-        <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-default w100 hidivBtnSelf 
+        <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-secondary w100 hidivBtnSelf 
             @if (isset($presel) && trim($presel) != '') disBlo @else disNon @endif " style="margin: -10px 0px 20px 0px;"
             >Upload New Image</a>
         <div id="hidivImgUp{{ $nID }}" 
@@ -40,7 +40,7 @@
             <h3 class="m0 slBlueDark">Upload New Image:</h3>
             <div class="slGrey fPerc80">.PNG .JPG .GIF 4MB maximum</div>
             <input type="file" name="imgFile{{ $nID }}" id="imgFile{{ $nID }}ID" autocomplete="off"
-                class="form-control input-lg ntrStp slTab w100 mT5 openImgUpdate" style="padding: 0px 16px 0px 0px;"
+                class="form-control form-control-lg ntrStp slTab w100 mT5 openImgUpdate" style="padding: 0px 16px 0px 0px;"
                 {!! $GLOBALS["SL"]->tabInd() !!}>
             <input type="button" value="Upload" id="imgUp{{ $nID }}" class="btn btn-lg btn-primary mT10 fR imgUpBtn">
             </form>

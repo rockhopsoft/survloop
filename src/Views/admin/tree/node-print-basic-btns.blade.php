@@ -9,7 +9,7 @@
                 <span id="nodeBtns{{ $nID }}edit" class="slGrey" >
                 <i class="fa fa-pencil disIn" id="nodeBtnEdit{{ $nID }}"></i></span></a>
             <div id="nodeBtns{{ $nID }}" class="disNon">
-                <nobr><a class="btn btn-xs btn-default"
+                <nobr><a class="btn btn-sm btn-secondary"
                 @if ($GLOBALS['SL']->treeRow->TreeType == 'Survey XML')
                     href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/xmlmap/node/{{ $nID }}" 
                 @else
@@ -17,10 +17,10 @@
                 @endif ><i class="fa fa-pencil"></i>
                      Edit This Node</a></nobr>
                 <nobr><a href="javascript:;" id="showAdds{{ $nID }}" 
-                    class="btn btn-xs btn-default adminNodeShowAdds mL10"><i class="fa fa-plus-square-o"></i> 
+                    class="btn btn-sm btn-secondary adminNodeShowAdds mL10"><i class="fa fa-plus-square-o"></i> 
                     Add Related Node</a></nobr>
                 <nobr><a href="javascript:;" id="showMove{{ $nID }}" 
-                    class="btn btn-xs btn-default adminNodeShowMove mL10"><i class="fa fa-arrows-alt"></i> 
+                    class="btn btn-sm btn-secondary adminNodeShowMove mL10"><i class="fa fa-arrows-alt"></i> 
                     Move This Node Anywhere</a></nobr>
             </div>
         </div>

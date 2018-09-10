@@ -947,8 +947,7 @@ class SurvLoopStat
     
     public function boxWhisk($datAbbr, $fltCol, $hgt = '100%')
     {
-        $GLOBALS["SL"]->x["needsCharts"] = true;
-        $GLOBALS["SL"]->x["needsViolinPlot"] = true;
+        $GLOBALS["SL"]->x["needsPlots"] = true;
         
         $dLet = $this->dAbr($datAbbr);
         $data = [];

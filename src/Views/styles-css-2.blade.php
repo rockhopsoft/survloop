@@ -67,6 +67,7 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
 	color: {!! $css["color-nav-text"] !!};
 	background: {!! $css["color-nav-bg"] !!};
     /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
+    text-align: right;
 }
 #headClear {
 	background: {!! $css["color-nav-bg"] !!};
@@ -75,15 +76,15 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
 #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
 #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
     font-size: 18pt;
-    width: 41px;
-    height: 41px;
-    -moz-border-radius: 20px; border-radius: 20px;
-    padding-top: 4px;
-    margin: 5px 0px 0px 10px;
+    width: 39px;
+    height: 31px;
+    -moz-border-radius: 5px; border-radius: 5px;
+    font-size: 1.25rem;
+    margin: 8px 15px 0px 8px;
     text-align: center;
 	color: {!! $css["color-nav-text"] !!};
-	border: 1px {!! $css["color-main-grey"] !!} solid;
-	box-shadow: 0px 0px 5px {!! $css["color-main-off"] !!};
+	border: 1px {!! $css["color-main-faint"] !!} solid;
+	box-shadow: 0px 0px 10px {!! $css["color-main-faintr"] !!};
 }
 #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
     padding-top: 3px;
@@ -106,7 +107,6 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
     right: 0;
     border-left: 0px none;
     overflow-x: hidden;
-    padding-top: 56px;
     transition: 0.5s;
 	color: {!! $css["color-nav-text"] !!};
     background: {!! $css["color-main-faint"] !!};
@@ -131,7 +131,6 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
     height: 100%;
 }
 @media screen and (max-height: 450px) {
-    #mySidenav {padding-top: 15px;}
     #mySidenav a {font-size: 18px;}
 } 
 
@@ -143,14 +142,14 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 	color: {!! $css["color-nav-text"] !!};
 }
 
-#headGap {
+.headGap {
     display: block;
     width: 100%;
     height: 56px;
 	margin-bottom: 0px;
 	background: {!! $css["color-nav-bg"] !!};
 }
-#headGap img {
+.headGap img {
     height: 56px;
     width: 1px;
 }
@@ -170,10 +169,10 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 #slNavMain {
     margin-top: -4px;
 }
-#slNavMain .panel-body, #slNavMain div .panel .panel-body {
+#slNavMain .card-body, #slNavMain div .card .card-body {
     padding: 5px 0px 0px 0px;
 }
-#slNavMain .panel-body, #slNavMain div .panel .panel-body .list-group {
+#slNavMain .card-body, #slNavMain div .card .card-body .list-group {
     margin: 0px;
 }
 .list-group-item.completed, .list-group-item.completed:hover, .list-group-item.completed:focus {
@@ -192,10 +191,10 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     float: left;
     font-size: 22pt;
 }
-#dialog .panel .panel-heading .dialogClose {
+#dialog .card .card-header .dialogClose {
     float: right;
 }
-#dialog .panel .panel-body {
+#dialog .card .card-body {
     text-align: left;
 }
 #nondialog {
@@ -236,7 +235,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
     width: 200px;
 }
 #mainBody {
-    padding: 0px 15px 0px 15px;
+    padding: 15px 0px;
     vertical-align: top;
     background: {!! $css["color-main-bg"] !!};
 	z-index: 100;
@@ -329,10 +328,10 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
 
 #slLogo {
     display: block;
-    margin-top: 2px;
+    margin: 12px 0px 0px 16px;
 }
 #slLogoImg {
-    height: 46px;
+    height: 32px;
     margin-top: 0px;
 }
 #logoPrint #slLogoImg {
@@ -607,7 +606,7 @@ input.nFormBtnSub, input.nFormBtnBack {
 input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
     width: 400px;
 }
-.form-control.pT0, .form-control.input-lg.pT0 {
+.form-control.pT0, .form-control.form-control-lg.pT0 {
     padding-top: 0px;
 }
 .form-control.input-xs {
@@ -643,7 +642,7 @@ label.finger input {
     margin-top: 0px;
     margin-bottom: 0px;
 }
-label.finger i.pull-right, label.fingerAct i.pull-right {
+label.finger i.float-right, label.fingerAct i.float-right {
     margin-top: 3px;
 }
 
@@ -1232,13 +1231,13 @@ label { font-weight: normal; }
 }
 
 
-.panel-info > .panel-heading {
+.card > .card-header {
     color: {!! $css["color-main-bg"] !!};
     background-image: none;
     background-color: {!! $css["color-info-on"] !!};
 }
-.panel-info > .panel-heading h1, .panel-info > .panel-heading h2, .panel-info > .panel-heading h3, 
-.panel-info > .panel-heading h4, .panel-info > .panel-heading h5, .panel-info > .panel-heading h6 {
+.card > .card-header h1, .card > .card-header h2, .card > .card-header h3, 
+.card > .card-header h4, .card > .card-header h5, .card > .card-header h6 {
     color: {!! $css["color-main-bg"] !!};
 }
 
@@ -1498,7 +1497,7 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
 	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
     input.otherGender { width: 240px; }
-    table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
+    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg { padding: 5px; }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { 
         font-size: 14px; 
@@ -1524,7 +1523,6 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
         font-size: 12pt;
         width: 32px;
         height: 32px;
-        -moz-border-radius: 16px; border-radius: 16px;
         padding-top: 4px;
         margin: 9px 0px 0px 8px;
     }
@@ -1572,7 +1570,7 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
         width: 100%;
     }
     
-    table.slSpreadTbl tr td.sprdFld input.input-lg, table.slSpreadTbl tr td.sprdFld select.input-lg { padding: 5px; }
+    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg { padding: 5px; }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th {
         padding: 12px 6px 0px 6px;
@@ -1671,6 +1669,7 @@ a.overUnd:hover { text-decoration: underline; }
 .disIn { display: inline; }
 .disNon { display: none; }
 .disBlo { display: block; }
+.disFlx { display: flex; }
 .disRow { display: table-row; }
 .ovrNo  { overflow: hidden; }
 .ovrSho { overflow: visible; }

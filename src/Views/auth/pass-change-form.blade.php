@@ -8,7 +8,7 @@
     <div class="col-md-8">
         <input id="old" type="password" class="form-control passChgSub" name="old">
         @if ($errors->has('old'))
-            <span class="help-block"><strong>{{ $errors->first('old') }}</strong></span>
+            <span class="form-text"><strong>{{ $errors->first('old') }}</strong></span>
         @endif
     </div>
 </div>
@@ -21,7 +21,7 @@
         <span id="passStrng" class="mR20 red"></span>
         <input id="password" type="password" class="form-control passChgSub" name="password">
         @if ($errors->has('password'))
-            <span class="help-block"><strong>{{ $errors->first('password') }}</strong></span>
+            <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
         @endif
     </div>
 </div>
@@ -33,14 +33,14 @@
     <div class="col-md-8">
         <input id="password-confirm" type="password" class="form-control passChgSub" name="password_confirmation">
         @if ($errors->has('password_confirmation'))
-            <span class="help-block"><strong>{{ $errors->first('password_confirmation') }}</strong></span>
+            <span class="form-text"><strong>{{ $errors->first('password_confirmation') }}</strong></span>
         @endif
     </div>
 </div>
 
 <div>&nbsp;</div>
 
-<div id="passChgErrs" class="pull-left red"></div>
+<div id="passChgErrs" class="float-left red"></div>
 <center><a id="passChgSub" class="btn btn-primary btn-lg" href="javascript:;">Submit</a></center>
 </form>
 

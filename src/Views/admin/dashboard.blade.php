@@ -11,7 +11,7 @@
 <h2 class="mT20 mB0">Full Admin Menu</h3>
 @for ($i=0; $i < sizeof($adminNav); $i++)
     <div class="fL pR20">
-        <h3>{!! str_replace('pull-right', 'pull-left mR5', $adminNav[$i][1]) !!}</h3>
+        <h3>{!! str_replace('float-right', 'float-left mR5', $adminNav[$i][1]) !!}</h3>
         @if (sizeof($adminNav[$i][4]) > 0)
             <ul class="m0">
             @foreach ($adminNav[$i][4] as $link)
@@ -46,22 +46,22 @@
         <h1 class="page-header">Dashboard</h1>
         <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
-                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-fluid" alt="Generic placeholder thumbnail">
                 <h4>Label</h4>
                 <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-fluid" alt="Generic placeholder thumbnail">
                 <h4>Label</h4>
                 <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-fluid" alt="Generic placeholder thumbnail">
                 <h4>Label</h4>
                 <span class="text-muted">Something else</span>
             </div>
             <div class="col-xs-6 col-sm-3 placeholder">
-                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-responsive" alt="Generic placeholder thumbnail">
+                <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" width="200" height="200" class="img-fluid" alt="Generic placeholder thumbnail">
                 <h4>Label</h4>
                 <span class="text-muted">Something else</span>
             </div>
@@ -76,8 +76,7 @@
 </div>
 
 <h2 class="sub-header">Section title</h2>
-<div class="table-responsive">
-<table class="table table-striped">
+<table class="table table-striped table-responsive">
 <thead>
 <tr>
 <th>#</th>
@@ -202,7 +201,6 @@
 </tr>
 </tbody>
 </table>
-</div>
 
 */ ?>
 

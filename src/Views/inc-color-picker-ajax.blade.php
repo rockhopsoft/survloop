@@ -23,7 +23,7 @@
             class="form-control @if (isset($xtraClass)) {{ $xtraClass }} @endif disIn colorPickCustomFld" autocomplete="off"
             @if ($isCustom) value="{!! $preSel !!}" @endif style="width: 90px;" {!! $GLOBALS["SL"]->tabInd() !!}>
         <a href="javascript:;" id="{{ $fldName }}SetCustomColor" 
-            class="colorPickCustomBtn btn btn-xs btn-default">Set</a></nobr>
+            class="colorPickCustomBtn btn btn-sm btn-secondary">Set</a></nobr>
     </div>
     <div class="col-md-6">
         <div id="{{ $fldName }}CustomColor" class="w100 round5 slBoxShd" 

@@ -1,0 +1,4 @@
+Bootstrap 4 Update Round 1
+
+Most external code has finally been removed the SurvLoop code base, in exchange for composer dependencies.
+
