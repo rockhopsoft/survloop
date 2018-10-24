@@ -44,7 +44,7 @@
     </div>
     <div class="card-body">
         <div class="row mT20">
-            <div class="col-md-2">
+            <div class="col-2">
                 <label class="mB20">
                     <input type="radio" name="xmlNodeType" id="xmlNodeTypeTbl" class="xmlDataChng" autocomplete="off" 
                         value="dataTbl" @if (intVal($node->nodeRow->NodePromptNotes) > 0) CHECKED @endif >
@@ -56,7 +56,7 @@
                     <h3 class="disIn m0 slBlueDark"><nobr>Extra Wrap:</nobr></h3>
                 </label>
             </div>
-            <div class="col-md-6">
+            <div class="col-6">
                 <div id="xmlDataTbl" class=" 
                     @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disNon @else disBlo @endif ">
                     <select name="nodePromptText" id="nodePromptTextID" class="form-control">
@@ -85,7 +85,7 @@
                         value="{{ $node->nodeRow->NodePromptText }}">
                 </div>
             </div>
-            <div class="col-md-4 taR">
+            <div class="col-4 taR">
                 <input type="submit" value="Save Node Changes" class="btn btn-lg btn-primary f22" 
                     @if (!$canEditTree) DISABLED @endif >
             </div>

@@ -11,7 +11,7 @@
 <input type="hidden" name="sub" value="1">
 
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-5">
 
         <h1>System Settings</h1>
         @forelse ($settingsList as $opt => $val)
@@ -33,9 +33,9 @@
         @endif
         
     </div>
-    <div class="col-md-1">
+    <div class="col-1">
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
 
         <h1>System Styles</h1>
         @forelse ($stylesList as $opt => $val)
@@ -64,11 +64,11 @@
 
 <h3>Previews</h3>
 <div class="row row2">
-    <div class="col-md-6">
+    <div class="col-6">
         <center><h4>Spinner Animation:</h4><div class="p5"></div>
         {!! $GLOBALS["SL"]->sysOpts["spinner-code"] !!}</center>
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
         
     </div>
 </div>

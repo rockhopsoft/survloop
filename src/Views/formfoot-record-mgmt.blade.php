@@ -22,15 +22,18 @@
             <a id="hidivBtnRecMgmtDel" class="float-right mL20 hidivBtn" href="javascript:;" 
                 ><i class="fa fa-trash-o mL5 mR5" aria-hidden="true"></i> 
                 <span class="mR5">Delete #{{ $coreID }}</span></a>
-            <div id="hidivRecMgmtDel" class="disNon mT20 mL0 w100 round15 brdRed slRedDark row">
-                <div class="col-md-6 p5">
-                    Are you sure you want to delete this session?<br />Deleting CANNOT be undone.
-                </div>
-                <div class="col-md-3 taR p15">
-                    <a href="javascript:;" id="recMgmtDelX" class="btn btn-secondary">Cancel</a>
-                </div>
-                <div class="col-md-3 taR p15">
-                    <a href="/delSess/{{ $treeID }}/{{ $coreID }}" class="btn btn-danger">Yes, Delete #{{ $coreID }}</a>
+            <div id="hidivRecMgmtDel" class="disNon mT20 mL0 w100 round15 brdRed slRedDark">
+                <div class="row">
+                    <div class="col-md-6 col-sm-11"><div class="pT5 pB5 pL15">
+                        Are you sure you want to delete this session?<br />Deleting CANNOT be undone.
+                    </div></div>
+                    <div class="col-md-2 col-sm-11">
+                        <a href="javascript:;" id="recMgmtDelX" class="btn btn-secondary w100 m10">Cancel</a>
+                    </div>
+                    <div class="col-md-3 col-sm-11">
+                        <a href="/delSess/{{ $treeID }}/{{ $coreID }}" class="btn btn-danger w100 m10"
+                            >Yes, Delete #{{ $coreID }}</a>
+                    </div>
                 </div>
             </div>
             <div id="survFootRecMgmt" class="w100"></div>

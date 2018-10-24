@@ -12,7 +12,7 @@
 <input type="hidden" name="sub" value="1">
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
     
         <div class="mB20 mT10 w100"><label class="w100">
         <h3 class="m0">{{ $GLOBALS['SL']->treeRow->TreeType }} Name</h3>
@@ -43,8 +43,8 @@
             </select>
         </label></div>
         
-    </div><div class="col-md-1">
-    </div><div class="col-md-5">
+    </div><div class="col-1">
+    </div><div class="col-5">
         
         <label class="w100 p10 fPerc133"><input type="checkbox" name="opt3" value="3" autocomplete="off" 
             @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif >

@@ -12,7 +12,7 @@
 
 <div class="row mB20">
 @if ($view == 'replicas' || $view == 'generics' || $view == 'uniques')
-    <div class="col-md-6">
+    <div class="col-6">
         @if ($view != 'replicas' && $view != 'generics')
             <h3 class="m0">Unique Fields ({{ $fldTots[0][0] }}/{{ $fldTots[0][1] }})</h3>
         @else 
@@ -20,7 +20,7 @@
                 >Unique Fields ({{ $fldTots[0][0] }}/{{ $fldTots[0][1] }})</a>
         @endif
         <div class="progBar"><div style="width: {{ round(100*$fldTots[0][0]/$fldTots[0][1]) }} %;"></div></div>
-    </div><div class="col-md-6">
+    </div><div class="col-6">
         @if ($view == 'replicas') 
             <h3 class="m0">Replica Fields ({{ $fldTots[1][0] }}/{{ $fldTots[1][1] }})</h3>
         @else
@@ -30,7 +30,7 @@
         <div class="progBar"><div style="width: {{ round(100*$fldTots[1][0]/$fldTots[1][1]) }}%;"></div></div>
     </div>
 @else
-    <div class="col-md-6">
+    <div class="col-6">
         <h2 class="m0">All Tables, All Fields</h2>
         {{ ($fldTots[0][0]+$fldTots[1][0]) }}/{{ ($fldTots[0][1]+$fldTots[1][1]) }} described
         <!-- 
@@ -38,7 +38,7 @@
         <a href="/dashboard/db/fieldDescs?view=replicas">Replica Fields Only</a>
         -->
     </div>
-    <div class="col-md-6"><div class="progBar"><div style="width: {{ 
+    <div class="col-6"><div class="progBar"><div style="width: {{ 
         round(100*($fldTots[0][0]+$fldTots[1][0])/($fldTots[0][1]+$fldTots[1][1])) }}%;"></div></div>
     </div>
 @endif
@@ -69,14 +69,14 @@
             </div>
             <div class="card-body">
                 <div class="pL10 pR10"><div class="row slGrey">
-                    <div class="col-md-4">Field Label</div>
-                    <div class="col-md-6">Full Description</div>
-                    <div class="col-md-2">Internal Notes</div>
+                    <div class="col-4">Field Label</div>
+                    <div class="col-6">Full Description</div>
+                    <div class="col-2">Internal Notes</div>
                 </div></div>
                 @forelse ($tblFldLists as $cnt => $fld)
                     <div class="p10 @if ($cnt%2 == 0) row2 @endif ">
                         <div class="row" >
-                            <div class="col-md-4">
+                            <div class="col-4">
                                 <input name="FldEng{{ $fld->FldID }}" class="form-control bordC w100"
                                     @if ($fld->FldSpecType == 'Generic') 
                                         onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
@@ -99,12 +99,12 @@
                                         - <span class="slGrey">{{ $tblFldVals[$fld->FldID] }}</span>
                                     @endif
                                 </div>
-                            </div><div class="col-md-6">
+                            </div><div class="col-6">
                                 <textarea name="FldDesc{{ $fld->FldID }}" class="form-control w100" 
                                 @if ($fld->FldSpecType == 'Generic') onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
                                 @else onKeyUp="logFldDescChange({{ $fld->FldID }});"
                                 @endif >{{ $fld->FldDesc }}</textarea>
-                            </div><div class="col-md-2">
+                            </div><div class="col-2">
                                 <textarea name="FldNotes{{ $fld->FldID }}" class="form-control w100 slGrey fPerc80"
                                 @if ($fld->FldSpecType == 'Generic') onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
                                 @else onKeyUp="logFldDescChange({{ $fld->FldID }});"

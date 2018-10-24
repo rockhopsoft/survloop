@@ -110,7 +110,7 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    protected function loadSysSettings() 
+    protected function loadSysSettings()
     {
         $settings = SLDefinitions::where('DefSet', 'Custom Settings')
             ->orderBy('DefOrder', 'asc')

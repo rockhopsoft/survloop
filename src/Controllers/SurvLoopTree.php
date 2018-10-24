@@ -451,6 +451,7 @@ class SurvLoopTree extends CoreTree
                 return '';
             }
             return view('vendor.survloop.inc-var-dump-node', [
+                "nID"          => $nID,
                 "nIDtxt"       => $nIDtxt,
                 "dataBranches" => $this->sessData->dataBranches
                 ])->render();
@@ -491,9 +492,12 @@ class SurvLoopTree extends CoreTree
         return false;
     }
     
-    public function loadSessionData($coreTbl, $coreID = -3)
+    public function loadSessionData($coreTbl, $coreID = -3, $skipPublic = false)
     {
-        if ($coreID > 0) $this->chkPublicCoreID($coreTbl, $coreID);
+        if ($coreID > 0) {
+            if (!$skipPublic) $this->chkPublicCoreID($coreTbl, $coreID);
+            else $this->coreID = $this->corePublicID = $coreID;
+        }
         $this->sessData->loadCore($coreTbl, $this->coreID, $this->checkboxNodes, $this->isBigSurvLoop);
         $this->loadExtra();
         $this->setPublicID();
@@ -650,26 +654,29 @@ class SurvLoopTree extends CoreTree
                 }
             }
         }
-        $GLOBALS['SL']->pageJAVA .= 'printHeadBar(' 
-            . ((isset($this->allNodes[$this->currNode()]) && $this->allNodes[$this->currNode()]->nodeOpts%59 > 0) 
-                ? intVal($rawPerc) : -3) . ');' . "\n";
-        if (isset($this->majorSections[$this->currMajorSection][1]) > 0) {
-            if ($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0 || $this->v["isAdmin"]) { // navigation version 1
-                $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
-                    . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
-                $ret .= view('vendor.survloop.inc-progress-bar', [
-                    "allNodes"          => $this->allNodes, 
-                    "majorSections"     => $this->majorSections, 
-                    "minorSections"     => $this->minorSections, 
-                    "sessMajorsTouched" => $this->sessMajorsTouched, 
-                    "sessMinorsTouched" => $this->sessMinorsTouched, 
-                    "currMajorSection"  => $this->currMajorSection, 
-                    "currMinorSection"  => $this->currMinorSection, 
-                    "majTot"            => $majTot,
-                    "rawPerc"           => $rawPerc
-                ])->render();
-                $GLOBALS['SL']->pageJAVA .= 'document.getElementById("progWrap").style.display = "none";' . "\n";
-            }
+        if ($GLOBALS["SL"]->treeRow->TreeOpts%61 == 0) { // survey progress line
+            $GLOBALS['SL']->pageJAVA .= 'printHeadBar(' 
+                . ((isset($this->allNodes[$this->currNode()]) && $this->allNodes[$this->currNode()]->nodeOpts%59 > 0) 
+                    ? intVal($rawPerc) : -3) . ');' . "\n";
+        }
+        if (($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%59 == 0) {
+            && isset($this->majorSections[$this->currMajorSection][1]) > 0) {
+            $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
+                . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
+            $ret .= view('vendor.survloop.inc-progress-bar', [
+                "hasNavBot"         => ($GLOBALS["SL"]->treeRow->TreeOpts%59 == 0),
+                "hasNavTop"         => ($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0),
+                "allNodes"          => $this->allNodes, 
+                "majorSections"     => $this->majorSections, 
+                "minorSections"     => $this->minorSections, 
+                "sessMajorsTouched" => $this->sessMajorsTouched, 
+                "sessMinorsTouched" => $this->sessMinorsTouched, 
+                "currMajorSection"  => $this->currMajorSection, 
+                "currMinorSection"  => $this->currMinorSection, 
+                "majTot"            => $majTot,
+                "rawPerc"           => $rawPerc
+            ])->render();
+            $GLOBALS['SL']->pageJAVA .= 'document.getElementById("progWrap").style.display = "none";' . "\n";
         }
         $GLOBALS['SL']->pageJAVA .= $this->tweakProgBarJS();
         return $ret;
@@ -828,9 +835,14 @@ class SurvLoopTree extends CoreTree
                 if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|staff|databaser')) $retTF = false;
             } elseif (trim($cond->CondTag) == '#IsOwner') {
                 if ($this->v["uID"] <= 0 || !$this->v["isOwner"]) $retTF = false;
+            } elseif (trim($cond->CondTag) == '#IsProfileOwner') {
+                if ($this->v["uID"] <= 0 || !isset($this->v["profileUser"]) || !$this->v["profileUser"]
+                    || !isset($this->v["profileUser"]->id) || $this->v["uID"] != $this->v["profileUser"]->id) {
+                    $retTF = false;
+                }
             } elseif (trim($cond->CondTag) == '#IsPrintable') {
-                if (!isset($GLOBALS["SL"]->x["pageView"]) 
-                    || !in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf'])) {
+                if (!$GLOBALS["SL"]->REQ->has('print') && (!isset($GLOBALS["SL"]->x["pageView"]) 
+                    || !in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsPrintInFrame') {
@@ -1806,6 +1818,7 @@ class SurvLoopTree extends CoreTree
     
     public function ajaxChecks(Request $request, $type = '')
     {
+        $this->survLoopInit($request, '/ajax/' . $type);
         $ret = $this->ajaxChecksCustom($request, $type);
         if (trim($ret) != '') return $ret;
         $ret = $this->ajaxChecksSL($request, $type);
@@ -1865,10 +1878,10 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
-    public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false)
+    public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
     {
         $this->survLoopInit($request, '/report/' . $coreID);
-        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
+        if (!$skipPublic) $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) $this->hideDisclaim = true;
         $this->v["isPublicRead"] = true;
@@ -1895,17 +1908,14 @@ class SurvLoopTree extends CoreTree
         $this->loadTree();
         $ret = '';
         if ($request->has('i') && intVal($request->get('i')) > 0) {
-            if ($this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $request->get('i')) 
-                || $this->isCoreOwnerPublic($request->get('i')) || $this->v["isAdmin"]) {
-                $ret .= $this->printReportsRecord($request->get('i'), $full);
-            }
+            $ret .= $this->printReportsRecord($request->get('i'), $full);
         } elseif ($request->has('ids') && trim($request->get('ids')) != '') {
-            $ids = $GLOBALS["SL"]->mexplode(',', $request->get('ids'));
-            foreach ($ids as $id) {
-                if ($this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $id) || $this->isCoreOwnerPublic($id) 
-                    || $this->v["isAdmin"]) {
-                    $ret .= $this->printReportsRecord($id, $full);
-                }
+            foreach ($GLOBALS["SL"]->mexplode(',', $request->get('ids')) as $id) {
+                $ret .= $this->printReportsRecordPublic($id, $full);
+            }
+        } elseif ($request->has('rawids') && trim($request->get('rawids')) != '') {
+            foreach ($GLOBALS["SL"]->mexplode(',', $request->get('rawids')) as $id) {
+                $ret .= $this->printReportsRecord($id, $full);
             }
         } else {
             $this->getAllPublicCoreIDs();
@@ -1924,8 +1934,20 @@ class SurvLoopTree extends CoreTree
     
     public function printReportsRecord($coreID = -3, $full = true)
     {
+        if (!$this->isPublished($GLOBALS["SL"]->coreTbl, $coreID) && !$this->isCoreOwner($coreID)
+            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
+            return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
+        }
+        if ($full) {
+            return '<div class="reportWrap">' . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true, true) . '</div>';
+        }
+        return $this->printReportsPrev($coreID);
+    }
+    
+    public function printReportsRecordPublic($coreID = -3, $full = true)
+    {
         if (!$this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $coreID) && !$this->isCoreOwnerPublic($coreID)
-            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|databaser|staff'))) {
+            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
             return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
         }
         if ($full) {
@@ -2148,7 +2170,6 @@ class SurvLoopTree extends CoreTree
         $ret = $this->searchResultsOverride($this->treeID);
         if (trim($ret) != '') return $ret;
         $this->processSearchFilts();
-//echo 'allPublicFiltIDs:<pre>'; print_r($this->allPublicFiltIDs); echo '</pre>';
         if (trim($this->searchTxt) == '') {
             if (sizeof($this->allPublicFiltIDs) > 0) {
                 foreach ($this->allPublicFiltIDs as $id) $this->addSearchResult($id);
@@ -2276,20 +2297,18 @@ class SurvLoopTree extends CoreTree
         $this->getAllPublicCoreIDs();
         $this->allPublicFiltIDs = $this->allPublicCoreIDs;
 //echo 'allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
-//echo 'processSearchFilts() <pre>'; print_r($this->searchFilts); echo '</pre>';
+//echo 'processSearchFilts() ' . $GLOBALS["SL"]->getCoreTblUserFld() . ' <pre>'; print_r($this->searchFilts); echo '</pre>';
         if (sizeof($this->searchFilts) > 0) {
+            $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
-                    eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                        . "::whereIn('" . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . "ID', "
-                        . "\$this->allPublicFiltIDs)->where('" . $GLOBALS["SL"]->getCoreTblUserFld() . "', " 
-                        . $val . ")->select('" . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
-                        . "ID')->get();");
+                    eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::whereIn('" . $coreAbbr 
+                        . (($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) ? "Public" : "") 
+                        . "ID', \$this->allPublicFiltIDs)->where('" . $GLOBALS["SL"]->getCoreTblUserFld() . "', "
+                        . $val . ")->select('" . $coreAbbr . "ID')->get();");
                     $this->allPublicFiltIDs = [];
                     if ($chk->isNotEmpty()) {
-                        foreach ($chk as $lnk) {
-                            $this->allPublicFiltIDs[] = $lnk->getKey();
-                        }
+                        foreach ($chk as $lnk) $this->allPublicFiltIDs[] = $lnk->getKey();
                     }
                 } elseif ($key == 'f') {
                     if (sizeof($val) > 0) {
@@ -2451,9 +2470,12 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
+    public function printPreviewReportCustom($isAdmin = false) { return ''; }
+    
     public function printPreviewReport($isAdmin = false)
     {
-        $ret = '';
+        $ret = $this->printPreviewReportCustom($isAdmin);
+        if (trim($ret) != '') return $ret;
         $fldNames = $found = [];
         if (sizeof($this->nodesRawOrder) > 0) {
             foreach ($this->nodesRawOrder as $i => $nID) {
@@ -2625,8 +2647,8 @@ class SurvLoopTree extends CoreTree
         if (sizeof($this->v["glossaryList"]) > 0) {
             $ret = '<h3 class="mT0 mB20 slBlueDark">Glossary of Terms</h3><div class="glossaryList">';
             foreach ($this->v["glossaryList"] as $i => $gloss) {
-                $ret .= '<div class="row' . (($i%2 == 0) ? ' row2' : '') . '"><div class="col-md-2 pT15 pB15">' 
-                    . $gloss[0] . '</div><div class="col-md-10 pT15 pB15">' . ((isset($gloss[1])) ? $gloss[1] : '') 
+                $ret .= '<div class="row' . (($i%2 == 0) ? ' row2' : '') . '"><div class="col-2 pT15 pB15">' 
+                    . $gloss[0] . '</div><div class="col-10 pT15 pB15">' . ((isset($gloss[1])) ? $gloss[1] : '') 
                     . '</div></div>';
             }
             return $ret . '</div>';
@@ -2953,8 +2975,8 @@ class SurvLoopTree extends CoreTree
         return '<br /><br /><center><h3>You are trying to access the complete details of a record which '
             . 'requires you to <a href="/login">login</a> as the owner, or an otherwise authorized user. '
             . '<br /><br />The public version of this complaint can be found here:<br />'
-            . '<a href="/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-read/' . $this->coreID . '">' 
-            . $GLOBALS["SL"]->sysOpts["app-url"] . '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-read/' . $this->coreID 
+            . '<a href="/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/read-' . $this->coreID . '">' 
+            . $GLOBALS["SL"]->sysOpts["app-url"] . '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/read-' . $this->coreID 
             . '</a></h3></center>';
     }
     

@@ -25,13 +25,13 @@
 
 @if (!$isPrint)
     <div class="row">
-        <div class="col-md-9 slGrey">
+        <div class="col-9 slGrey">
             A survey (or form) is created as a tree filled with branching nodes. 
             Click any node's button (with its ID#) to edit, add new nodes, or to move a node. 
             Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
             <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a> 
             <span class="red mL20">*required</span>
-        </div><div class="col-md-3 taR">
+        </div><div class="col-3 taR">
             <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/settings" class="btn btn-secondary"
                 ><i class="fa fa-cogs" aria-hidden="true"></i> Survey Settings</a>
         </div>

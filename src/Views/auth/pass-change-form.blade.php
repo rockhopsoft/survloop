@@ -4,8 +4,8 @@
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="row">
-    <label for="old" class="col-md-4 control-label fPerc133 pT5">Old Password</label>
-    <div class="col-md-8">
+    <label for="old" class="col-4 control-label fPerc133 pT5">Old Password</label>
+    <div class="col-8">
         <input id="old" type="password" class="form-control passChgSub" name="old">
         @if ($errors->has('old'))
             <span class="form-text"><strong>{{ $errors->first('old') }}</strong></span>
@@ -16,8 +16,8 @@
 <div>&nbsp;</div>
 
 <div class="row">
-    <label for="password" class="col-md-4 control-label fPerc133 pT5">Password</label>
-    <div class="col-md-8">
+    <label for="password" class="col-4 control-label fPerc133 pT5">Password</label>
+    <div class="col-8">
         <span id="passStrng" class="mR20 red"></span>
         <input id="password" type="password" class="form-control passChgSub" name="password">
         @if ($errors->has('password'))
@@ -29,8 +29,8 @@
 <div>&nbsp;</div>
 
 <div class="row">
-    <label for="password-confirm" class="col-md-4 control-label fPerc133 pT5">Confirm Password</label>
-    <div class="col-md-8">
+    <label for="password-confirm" class="col-4 control-label fPerc133 pT5">Confirm Password</label>
+    <div class="col-8">
         <input id="password-confirm" type="password" class="form-control passChgSub" name="password_confirmation">
         @if ($errors->has('password_confirmation'))
             <span class="form-text"><strong>{{ $errors->first('password_confirmation') }}</strong></span>

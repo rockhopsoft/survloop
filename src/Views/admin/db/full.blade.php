@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/db/full.blade.php -->
 
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-9">
         <h1><span class="slBlueDark"><i class="fa fa-database"></i> 
             {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Full Database Design</h1>
         <nobr><span class="fPerc133">{!! strip_tags($dbStats) !!}</span></nobr>
@@ -13,7 +13,7 @@
 @endif
     </div>
 @if (!$isPrint)
-    <div class="col-md-3 taR">
+    <div class="col-3 taR">
     <a href="/dashboard/db/all?print=1" target="_blank" class="btn btn-sm btn-info m5"
         ><i class="fa fa-print mR5"></i> Print This Overview</a>
     <a class="btn btn-sm btn-info m5" 
@@ -36,7 +36,7 @@
         All Full Field Specs</a>
     
 @else
-    <div class="col-md-6 taL">
+    <div class="col-6 taL">
 
     All specifications for database designs and user experience (form tree map) are made available
     by <a href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" target="_blanK" 

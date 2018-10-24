@@ -58,12 +58,10 @@
     <div id="emailWarning" class="disNon">
         <div class="alert alert-danger mT20 w100" role="alert">
             <div class="row">
-                <div class="col-md-8">
-                    <h5>An account was already found with this email address. 
-                    Please login to review and/or update your earlier complaint, 
-                    or to file a new complaint with this email address.</h5>
+                <div class="col-8">
+                    <h5>The email has already been taken. Please login or create a new account.</h5>
                 </div>
-                <div class="col-md-4 taC">
+                <div class="col-4 taC">
                     <a href="/login" class="btn btn-lg btn-primary mT20">Login</a>
                 </div>
             </div>

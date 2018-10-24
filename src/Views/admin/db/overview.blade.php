@@ -28,15 +28,15 @@
 
 @forelse ($groupTbls as $group => $tbls)
     <div class="card">
-        <div class="card-header"><h3>{{ $group }}</h3></div>
+        <div class="card-header"><h3 class="m0">{{ $group }}</h3></div>
         <div class="card-body">
             @forelse ($tbls as $tbl)
                 <div class="pB20">
-                    <h3><a href="/dashboard/db/table/{{ $tbl->TblName }}">{{ $tbl->TblEng }}</a></h3>
-                    <h4 class="disIn">{{ $tbl->TblDesc }}</h4>
-                    <h5 class="disIn slGrey">{{ $tbl->TblType }}, {{ $tbl->TblName }} ({{ $tbl->TblAbbr }})
+                    <h4><a href="/dashboard/db/table/{{ $tbl->TblName }}">{{ $tbl->TblEng }}</a></h4>
+                    <p>{{ $tbl->TblDesc }}
+                    <span class="disIn slGrey">{{ $tbl->TblType }}, {{ $tbl->TblName }} ({{ $tbl->TblAbbr }})
                     @if (isset($tbl->TblNotes) && trim($tbl->TblNotes) != '') , {{ $tbl->TblNotes }} @endif
-                    </h5>
+                    </span></p>
                 </div>
             @empty
             No tables in group.

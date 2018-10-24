@@ -62,8 +62,8 @@ class SurvLoopData
         } */
         // check for data needed for root data loop which isn't connected to the core record
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
-            eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" . $isBigSurvLoop[1] 
-                . "', '" . $isBigSurvLoop[2] . "')->get();");
+            eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" 
+                . $isBigSurvLoop[1] . "', '" . $isBigSurvLoop[2] . "')->get();");
             if ($rows->isNotEmpty()) {
                 foreach ($rows as $row) $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
             }

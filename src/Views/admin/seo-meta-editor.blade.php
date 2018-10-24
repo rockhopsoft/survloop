@@ -1,9 +1,9 @@
 <!-- resources/views/vendor/survloop/admin/seo-meta-editor.blade.php -->
 <div class="row mB20">
-    <div class="col-md-3 fPerc133 slBlueDark">
+    <div class="col-3 fPerc133 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageTitleFldID">Page Title:</label></h4>
     </div>
-    <div class="col-md-9 nFld m0 p0">
+    <div class="col-9 nFld m0 p0">
         <input type="text" name="pageTitle" id="npageTitleFldID" autocomplete="off" 
             class="form-control form-control-lg mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
             @if (isset($currMeta["title"]) && trim($currMeta["title"]) != '') value="{{ $currMeta['title'] }}" @endif
@@ -20,10 +20,10 @@
 </div>
 @if (isset($currMeta["slug"]) && $currMeta["slug"] !== false)
     <div class="row mB20">
-        <div class="col-md-3 fPerc133 slBlueDark">
+        <div class="col-3 fPerc133 slBlueDark">
             <h4><label for="nodeSlugID">Page URL:</label></h4>
         </div>
-        <div class="col-md-9 nFld m0 p0">
+        <div class="col-9 nFld m0 p0">
             @if (isset($currMeta["base"])) <div class="disIn slGrey">{{ $currMeta["base"] }}</div> @endif
             <input type="text" name="nodeSlug" id="nodeSlugID" autocomplete="off" 
                 class="form-control w40 disIn mT0 mB0" onKeyUp="previewPage();"
@@ -32,10 +32,10 @@
     </div>
 @endif
 <div class="row mB20">
-    <div class="col-md-3 fPerc133 slBlueDark">
+    <div class="col-3 fPerc133 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageDescFldID">Page Description:</label></h4>
     </div>
-    <div class="col-md-9 nFld m0 p0">
+    <div class="col-9 nFld m0 p0">
         <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" 
             class="form-control form-control-lg mT0 mB0 flexarea" 
             onKeyUp="charCountKeyUp('pageDesc'); flexAreaAdjust(this); previewPage();"
@@ -52,11 +52,11 @@
     </div>
 </div>
 <div class="row mB20">
-    <div class="col-md-3 fPerc133 slBlueDark">
+    <div class="col-3 fPerc133 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageKeyFldID">Page Keywords:</label></h4>
         <span class="fPerc80 slGrey">(comma separated)</span>
     </div>
-    <div class="col-md-9 nFld m0 p0">
+    <div class="col-9 nFld m0 p0">
         <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" 
             class="form-control form-control-lg mT0 mB0 flexarea" 
             onKeyUp="keywordCountKeyUp('pageKey'); flexAreaAdjust(this);"
@@ -75,22 +75,22 @@
     </div>
 </div>
 <div class="row mB20">
-    <div class="col-md-3 fPerc133 slBlueDark">
+    <div class="col-3 fPerc133 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageImgFldID">Page Social Sharing Image:</label></h4>
         <span class="fPerc80 slGrey">(ideally 800x418 pixels)</span>
     </div>
-    <div class="col-md-9 nFld m0 p0">
+    <div class="col-9 nFld m0 p0">
         <input type="text" name="pageImg" id="npageImgFldID" autocomplete="off"
             class="form-control form-control-lg mT0 mB0 openImgUpdate" onKeyUp="previewPage();"
             @if (isset($currMeta["img"]) && trim($currMeta["img"]) != '') value="{{ $currMeta['img'] }}" @endif >
         <div class="row mT5">
-            <div class="col-md-8">
+            <div class="col-8">
                 <div class="prevImg brd"><img id="npageImgSelImg" 
             @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
                 src="{{ $node->extraOpts["meta-img"] }}" 
                 @else src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ></div>
             </div>
-            <div class="col-md-4 pT10">
+            <div class="col-4 pT10">
                 <a href="javascript:;" class="btn btn-sm btn-secondary w100 mB10 openImgReset" id="imgResetpageImg"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i> Reset to Default</a>
                 <a href="javascript:;" class="btn btn-secondary w100 mB10 openImgSelect" id="imgSelectpageImg" 

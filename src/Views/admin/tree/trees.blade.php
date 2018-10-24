@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-7">
         <h2><i class="fa fa-newspaper-o"></i> Surveys & Forms</h2>
         <div class="slGrey pB10">
             Surveys can be one or countless pages long. At their core, they are branching trees of possible user
@@ -95,7 +95,7 @@
         </table>
         
     </div>
-    <div class="col-md-5">
+    <div class="col-5">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <form name="mainPageForm" method="post" action="/dashboard/surveys/list">

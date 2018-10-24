@@ -1,7 +1,7 @@
 <!-- Stored in resources/views/survloop/uploads-print.blade.php -->
 @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->id)
     <a name="up{{ $upRow->id }}"></a>
-    @if (intVal($upRow->type) == $vidTypeID)
+    @if (intVal($upRow->UpType) == $vidTypeID)
         @if (trim($upDeets["youtube"]) != '')
             <iframe id="ytplayer{{ $upRow->id }}" type="text/html" width="100%" 
                 height="{{ $height }}" class="mBn5" frameborder="0" allowfullscreen 

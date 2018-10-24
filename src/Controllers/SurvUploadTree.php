@@ -307,12 +307,12 @@ class SurvUploadTree extends SurvLoopTree
         }
         if ($GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->step == 'uploadDel' 
             && $GLOBALS["SL"]->REQ->has('alt') && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->UpID) {
-            if (file_exists($ret["file"]) && trim($upRow->type) != $vidTypeID) {
+            if (file_exists($ret["file"]) && trim($upRow->UpType) != $vidTypeID) {
                 unlink($ret["file"]);
             }
             SLUploads::find($upRow->UpID)->delete();
         } else {
-            if (trim($upRow->type) == $vidTypeID) {
+            if (intVal($upRow->UpType) == $vidTypeID) {
                 if (stripos($upRow->UpVideoLink, 'youtube') !== false 
                     || stripos($upRow->UpVideoLink, 'youtu.be') !== false) {
                     $ret["youtube"] = $this->getYoutubeID($upRow->UpVideoLink);

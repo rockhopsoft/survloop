@@ -4,7 +4,7 @@
 
 @if (!isset($cond) || $cond->CondField != 'EXISTS' && $cond->CondField != 'EXISTS>1')
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-6">
             <h4 class="mT5"><label class="disBlo">
                 <input type="radio" name="equals" value="equals" autocomplete=off 
                     @if (!isset($cond) || !isset($cond->CondOperator) || $cond->CondOperator == '{') CHECKED @endif
@@ -15,7 +15,7 @@
                     > True if user doesn't select any of these responses:
             </label></h4>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             <div class="slBlueDark fPerc133 pT5"><i class="mR10">Question:</i> {{ $values["prompt"] }}</div>
             <i class="disIn">Responses:</i>
             @forelse ($values["vals"] as $i => $response)

@@ -58,15 +58,17 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
     padding: 5px 10px;
 }
 
-.navbar, #myNavBar, #myNavBar .navbar {
+#mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, #myNavBar, #myNavBar .navbar {
     height: 56px;
 	min-height: 56px;
 	max-height: 56px;
-	padding-top: 3px;
+	padding-top: 1px;
 	overflow: hidden;
 	color: {!! $css["color-nav-text"] !!};
 	background: {!! $css["color-nav-bg"] !!};
     /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
+}
+.navbar, #myNavBar, #myNavBar .navbar {
     text-align: right;
 }
 #headClear {
@@ -75,20 +77,28 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
 }
 #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
 #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-    font-size: 18pt;
-    width: 39px;
-    height: 31px;
-    -moz-border-radius: 5px; border-radius: 5px;
-    font-size: 1.25rem;
-    margin: 8px 15px 0px 8px;
+    width: 55px;
+    height: 39px;
+    -moz-border-radius: 4px; border-radius: 4px;
+    font-size: 24px;
+	padding: 3px;
+    margin: 6px 15px 0 0;
     text-align: center;
 	color: {!! $css["color-nav-text"] !!};
-	border: 1px {!! $css["color-main-faint"] !!} solid;
-	box-shadow: 0px 0px 10px {!! $css["color-main-faintr"] !!};
+	border: 1px {!! $css["color-main-grey"] !!} solid;
 }
-#navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-    padding-top: 3px;
+#navBurger .fa.fa-bars, a#navBurger:link .fa.fa-bars, a#navBurger:active .fa.fa-bars, a#navBurger:visited .fa.fa-bars, a#navBurger:hover .fa.fa-bars {
+    margin-top: 3px;
+    display: block;
 }
+#navBurgerClose .fa.fa-times, a#navBurgerClose:link .fa.fa-times, a#navBurgerClose:active .fa.fa-times, a#navBurgerClose:visited .fa.fa-times, a#navBurgerClose:hover .fa.fa-times {
+    margin-top: 2px;
+    display: block;
+}
+a#navBurger:hover, a#navBurgerClose:hover {
+    text-decoration: none;
+}
+/*
 @-moz-document url-prefix() {
     #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
         padding-top: 3px;
@@ -97,6 +107,7 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
         padding-top: 2px;
     }
 }
+*/
 
 #mySidenav {
     height: 100%;
@@ -328,11 +339,15 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
 
 #slLogo {
     display: block;
-    margin: 12px 0px 0px 16px;
+    margin: 7px 0px 0px 16px;
 }
-#slLogoImg {
-    height: 32px;
+#slLogoImg, #slLogoImgSm {
+    display: inline;
+    height: 40px;
     margin-top: 0px;
+}
+#slLogoImgSm {
+    display: none;
 }
 #logoPrint #slLogoImg {
     height: 50px;
@@ -449,7 +464,7 @@ a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.soci
 	font-size: 16px;
     margin-top: 15px;
 }
-.nPrompt.col-md-6 {
+.nPrompt.col-6 {
     padding-top: 15px;
 }
 .nFld {
@@ -834,8 +849,6 @@ hr, .uploadWrap hr {
     border-top: 1px {!! $css["color-line-hr"] !!} dotted;
 }
 .uploadedWrap {
-	border: 2px {!! $css["color-main-off"] !!} solid;
-    -moz-border-radius: 20px; border-radius: 20px;
     margin-bottom: 10px;
 }
 
@@ -1491,7 +1504,6 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 }
 @media screen and (max-width: 768px) {
 	
-	#slLogoImg { height: 36px; margin-top: 6px; }
 	input.nFormBtnSub, input.nFormBtnBack { font-size: 20pt; }
 	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
@@ -1506,37 +1518,18 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
         width: 270px;
     }
     h2 { font-size: 26px; }
-    .glossaryList .col-md-10 { padding-top: 0px; margin-top: -5px; }
+    .glossaryList .col-10 { padding-top: 0px; margin-top: -5px; }
 
 }
 @media screen and (max-width: 480px) {
     
-	#slLogoImg { height: 30px; margin-top: 8px; margin-left: -5px; }
+    #slLogoImgSm { display: inline; }
+	#slLogoImg { display: none; }
 	#logoTxt {
 	    font-size: 28pt; 
 	    padding-left: 0px;
 	    margin-top: -9px 0px -9px -5px;
 	}
-	
-    #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
-    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-        font-size: 12pt;
-        width: 32px;
-        height: 32px;
-        padding-top: 4px;
-        margin: 9px 0px 0px 8px;
-    }
-    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-        padding-top: 3px;
-    }
-    /* @-moz-document url-prefix() {
-        #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
-            padding-top: 3px;
-        }
-        #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-            padding-top: 2px;
-        }
-    } */
 
     a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
     .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
@@ -1828,6 +1821,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdRgt, table tr.brdRgt td, table tr.brdRgt th { border-right: 1px {!! $css["color-main-off"] !!} solid; }
 
 .brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th { border-top: 0px none; }
+.brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th { border-bottom: 0px none; }
 
 .brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th { border-bottom: 1px {!! $css["color-main-text"] !!} solid; }
 .brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th { border-bottom: 2px {!! $css["color-main-text"] !!} solid; }

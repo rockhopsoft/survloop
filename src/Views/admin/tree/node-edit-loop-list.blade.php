@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-edit-loop-list.blade.php -->
 <div class="row">
-    <div class="col-md-6 nFld mT0">
+    <div class="col-6 nFld mT0">
         <select name="{{ $fld }}Type" id="{{ $fld }}TypeID" class="form-control form-control-lg" autocomplete="off" 
             onChange="changeLoopListType('{{ $fld }}');" >
             @if ($manualOpt) 
@@ -15,7 +15,7 @@
                 > Pull from Entered Table Records </option>
         <select>
     </div>
-    <div class="col-md-6 nFld mT0">
+    <div class="col-6 nFld mT0">
         <div id="{{ $fld }}Defs" class=" @if ($currDefinition != '') disBlo @else disNon @endif ">
             <select name="{{ $fld }}Definition" id="{{ $fld }}DefinitionID" autocomplete="off"
                 class="form-control form-control-lg" onChange="changeLoopListType('{{ $fld }}');" >

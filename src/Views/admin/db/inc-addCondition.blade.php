@@ -31,29 +31,29 @@
 @endif
     <div id="nameIt" class="disBlo">
         <div class="row mT10">
-            <div class="col-md-3 nPrompt">
+            <div class="col-3 nPrompt">
                 <h4 class="mT10">Hashtag:</h4>
             </div>
-            <div class="col-md-9">
+            <div class="col-9">
                 <input type="text" id="condHashID" name="condHash" class="form-control form-control-lg" autocomplete=off
                     @if (isset($cond) && isset($cond->CondTag)) value="{{ $cond->CondTag }}" @else value="#" @endif >
             </div>
         </div>
         <div class="row mT10">
-            <div class="col-md-3 nPrompt">
+            <div class="col-3 nPrompt">
                 <h4 class="mT10">Description:</h4>
             </div>
-            <div class="col-md-9">
+            <div class="col-9">
                 <input type="text" id="condDescID" name="condDesc" class="form-control form-control-lg" autocomplete=off 
                     @if (isset($cond) && isset($cond->CondDesc)) value="{{ $cond->CondDesc }}" @else value="" @endif >
             </div>
         </div>
     </div>
     <div class="row mT10">
-        <div class="col-md-3 nPrompt">
+        <div class="col-3 nPrompt">
             <h4 class="mT10">Condition Type:</h4>
         </div>
-        <div class="col-md-9">
+        <div class="col-9">
             <select id="condTypeID" name="condType" class="form-control form-control-lg" autocomplete=off >
                 <option @if (!isset($cond) || !isset($cond->CondOperator) || $cond->CondOperator != 'COMPLEX') 
                     SELECTED @endif value="simple" >Simple Condition</option>
@@ -66,10 +66,10 @@
         @if (isset($cond) && isset($cond->CondOperator) && $cond->CondOperator == 'COMPLEX') disNon 
         @else disBlo @endif ">
         <div class="row mT10">
-            <div class="col-md-3 nPrompt">
+            <div class="col-3 nPrompt">
                 <h4 class="mT10">Data Set:</h4>
             </div>
-            <div class="col-md-9">
+            <div class="col-9">
                 <select id="setSelectID" name="setSelect" class="form-control form-control-lg" autocomplete=off >
                     <option value="" @if (!isset($cond)) SELECTED @endif ></option>
                     <option value="" DISABLED >SurvLoops:</option>
@@ -111,16 +111,16 @@
         <div id="urlParams" class=" @if (isset($cond) && isset($cond->CondOperator) 
             && $cond->CondOperator == 'URL-PARAM') disBlo @else disNon @endif " >
             <div class="row mT10">
-                <div class="col-md-3"></div>
-                <div class="col-md-9">
+                <div class="col-3"></div>
+                <div class="col-9">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <h4 class="m0">Parameter:</h4>
                             <input type="text" id="paramNameID" name="paramName" class="form-control form-control-lg" 
                                 autocomplete=off @if (isset($cond) && isset($cond->CondOperDeet)) 
                                     value="{{ $cond->CondOperDeet }}" @endif >
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-6">
                             <h4 class="m0">Value:</h4>
                             <input type="text" id="paramValID" name="paramVal" class="form-control form-control-lg" 
                                 autocomplete=off @if (isset($cond) && isset($cond->condVals) 
@@ -136,10 +136,10 @@
     <div id="createNewCondComplex" class="mT20 mB20 
         @if (isset($cond) && isset($cond->CondOperator) && $cond->CondOperator == 'COMPLEX') disBlo 
         @else disNon @endif ">
-        <div class="row"><div class="col-md-4">
+        <div class="row"><div class="col-4">
             @forelse ($condList as $i => $c)
                 @if ($i == ceil(sizeof($condList)/3) || $i == ceil(sizeof($condList)*2/3))
-                    </div><div class="col-md-4">
+                    </div><div class="col-4">
                 @endif
                 <?php
                 $hasMultCond = [false, false];
@@ -186,14 +186,14 @@
     <div id="condArticle" class=" @if (isset($cond) && isset($cond->CondOpts) && intVal($cond->CondOpts) > 0 
         && $cond->CondOpts%3 == 0) disBlo @else disNon @endif ">
         <div class="row mT5 fPerc80">
-            <div class="col-md-6"><i>Article Title</i></div>
-            <div class="col-md-6"><i>Article URL</i></div>
+            <div class="col-6"><i>Article Title</i></div>
+            <div class="col-6"><i>Article URL</i></div>
         </div>
         @for ($j=0; $j < 10; $j++)
             <div id="arti{{ $j }}" class="row @if (isset($condArticles) && isset($condArticles[$cond->CondID]) 
                 && isset($condArticles[$cond->CondID][$j]) && isset($condArticles[$cond->CondID][$j][1])) 
                 disBlo @else disNon @endif ">
-                <div class="col-md-6">
+                <div class="col-6">
                     <input name="condArtTitle{{ $j }}" id="condArtTitle{{ $j }}ID" type="text" class="form-control mB5" 
                         @if (isset($condArticles) && isset($condArticles[$cond->CondID]) 
                             && isset($condArticles[$cond->CondID]) && isset($condArticles[$cond->CondID][$j])
@@ -201,7 +201,7 @@
                             value="{{ $condArticles[$cond->CondID][$j][0] }}" 
                         @endif autocomplete=off >
                 </div>
-                <div class="col-md-6">
+                <div class="col-6">
                     <input name="condArtUrl{{ $j }}" id="condArtUrl{{ $j }}ID" type="text" class="form-control mB5" 
                         @if (isset($condArticles) && isset($condArticles[$cond->CondID]) 
                             && isset($condArticles[$cond->CondID][$j])

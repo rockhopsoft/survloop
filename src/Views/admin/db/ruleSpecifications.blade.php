@@ -46,7 +46,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                 rows="2" {!! $chkDis !!} >{{ $rule->RuleConstraint }}</textarea>
         </fieldset>
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsAppOrient'] }}"
                     ><b>Type</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
@@ -64,7 +64,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsRelation'] }}"
                     ><b>Category</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
@@ -82,7 +82,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldTestOn'] }}"
                     ><b>Test On</b> <span class="f10 slGrey">?</span></span>
                 <div class="radio">
@@ -118,8 +118,8 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     </div>
     <div class="card-body">
         <div class="row pB20">
-            <div class="col-md-3"><b>Table Names</b></div>
-            <div class="col-md-9">
+            <div class="col-3"><b>Table Names</b></div>
+            <div class="col-9">
             @if ($dbAllowEdits) 
                 <div id="tblSelect"><input type="hidden" name="RuleTables" 
                     id="RuleTablesID" value="{{ $rule->RuleTables }}"></div>
@@ -129,8 +129,8 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             </div>
         </div>
         <div class="row pT20">
-            <div class="col-md-3"><b>Field Names</b></div>
-            <div class="col-md-9">
+            <div class="col-3"><b>Field Names</b></div>
+            <div class="col-9">
             @if ($dbAllowEdits) 
                 <div id="fldSelect"><input type="hidden" name="RuleFields" id="RuleFieldsID" value="{{ $rule->RuleFields }}"></div>
             @else
@@ -145,10 +145,10 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     <div class="card-header"><h3>Field Elements Affected</h3></div>
     <div class="card-body">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-3">
                 <b>Physical Elements<b>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RulePhys[]" id="rH2" value="2" {{ $chkDis }} 
@@ -164,7 +164,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RulePhys[]" id="rH5" value="5" {{ $chkDis }} 
@@ -180,7 +180,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RulePhys[]" id="rH11" value="11" {{ $chkDis }} 
@@ -199,7 +199,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
         </div>
         <hr>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-3">
                 <b>Logical Elements<b>
                 <div class="radio">
                     <label>
@@ -216,7 +216,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleLogic[]" id="rL5" value="5" {{ $chkDis }} 
@@ -239,7 +239,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleLogic[]" id="rL13" value="13" {{ $chkDis }} 
@@ -262,7 +262,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-3">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleLogic[]" id="rL23" value="23" {{ $chkDis }} 
@@ -293,7 +293,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     <div class="card-header"><h3>Relationship Characteristics Affected</h3></div>
     <div class="card-body">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-4">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleRel[]" id="rR2" value="2" {{ $chkDis }} 
@@ -302,7 +302,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleRel[]" id="rR3" value="3" {{ $chkDis }} 
@@ -311,7 +311,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
                     </label>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleRel[]" id="rR5" value="5" {{ $chkDis }} 

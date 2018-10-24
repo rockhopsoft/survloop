@@ -1,6 +1,6 @@
 <!-- Stored in resources/views/vendor/survloop/admin/contact-row.blade.php -->
 @if (!isset($forEmail) || !$forEmail)
-    <div class="col-md-9">
+    <div class="col-9">
 @endif
     <h3 class="slBlueDark">{{ $contact->ContSubject }}</h3>
     <div>{{ $contact->ContBody }}</div>
@@ -11,10 +11,10 @@
     @endif
 @if (!isset($forEmail) || !$forEmail)
     </div>
-    <div class="col-md-1">
+    <div class="col-1">
         <div id="rec{{ $contact->ContID }}loading"></div>
     </div>
-    <div class="col-md-2">
+    <div class="col-2">
         <label for="n175FldID">
             #{{ number_format( $contact->ContID ) }} Status:
         </label>

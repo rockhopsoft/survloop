@@ -19,22 +19,22 @@
 @endif
 
 <div class="row">
-<div class="col-md-1"> </div>
-<div class="col-md-7"><i>Statement, Constraint</i></div><div class="col-md-4"><i>Tables Affected</i></div>
+<div class="col-1"> </div>
+<div class="col-7"><i>Statement, Constraint</i></div><div class="col-4"><i>Tables Affected</i></div>
 </div>
 @forelse ($rules as $cnt => $rule)
     <div class="row">
-        <div class="col-md-1 p20"><a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" class="btn btn-primary">
+        <div class="col-1 p20"><a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" class="btn btn-primary">
         @if ($dbAllowEdits) Edit @else View @endif
         </a></div>
-        <div class="col-md-7 p10"><h2 class="mT0">{!! $rule->RuleStatement !!}</h2>
+        <div class="col-7 p10"><h2 class="mT0">{!! $rule->RuleStatement !!}</h2>
             <div class="p5 slGrey">{{ $rule->RuleConstraint }}</div></div>
-        <div class="col-md-3 p10">
+        <div class="col-3 p10">
         @if (isset($ruleTbls[$cnt]) != '' && trim($ruleTbls[$cnt]) != ',')
             {!! $ruleTbls[$cnt] !!}
         @endif
         </div>
-        <div class="col-md-1 p10">
+        <div class="col-1 p10">
         @if ($dbAllowEdits) 
             <a class="red" href="javascript:;" 
                 onClick="if (confirm('Are you sure you want to delete this rule?')) window.location='?delRule={{ $rule->RuleID }}';" 

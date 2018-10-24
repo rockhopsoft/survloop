@@ -42,7 +42,7 @@
 <?php /*
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
         <h1 class="page-header">Dashboard</h1>
         <div class="row placeholders">
             <div class="col-xs-6 col-sm-3 placeholder">
@@ -67,7 +67,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
         <div class="jumbotron taC">
             <h2>Mission</h2>
             <p>{!! $orgMission !!}</p>

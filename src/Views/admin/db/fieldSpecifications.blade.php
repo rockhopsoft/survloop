@@ -12,7 +12,7 @@
     <div class="card-body">
         
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-6">
             
                 <fieldset class="form-group">
                     <label for="FldNameID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldName'] }}">Field Name {!! $help !!}</label>
@@ -38,7 +38,7 @@
 @endif
         
             </div>
-            <div class="col-md-6">
+            <div class="col-6">
             
                 <fieldset class="form-group">
                     <label for="FldTableID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldTable'] }}">Parent Table {!! $help !!}</label>
@@ -113,7 +113,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <fieldset class="form-group">
                     <label for="FldDescID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDesc'] }}">Description {!! $help !!}</label>
                     @if ($edit) <textarea id="FldDescID" name="FldDesc" rows="2" class="form-control">{{ $fld->FldDesc }}</textarea> 
@@ -123,7 +123,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <fieldset class="form-group">
                     <label for="FldNotesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldNotes'] }}">Memo {!! $help !!}</label>
                     @if ($edit) <textarea id="FldNotesID" name="FldNotes" rows="2" class="form-control">{{ $fld->FldNotes }}</textarea>
@@ -146,7 +146,7 @@
     <div class="card-body">
     
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-6">
             
                 <fieldset class="form-group">
                     <label for="FldDataTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDataType'] }}">Data Type {!! $help !!}</label>
@@ -174,13 +174,13 @@
                 </fieldset>
             
             </div>
-            <div class="col-md-6">
+            <div class="col-6">
                 
                 <div class="row" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldCharSupport'] }}">
                     <b>Character Support</b> {!! $help !!}
                 </div>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-6">
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="FldCharSupport[]" value="Letters" {{ $chkDis }} 
@@ -196,7 +196,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-6">
                         <div class="checkbox">
                             <label>
                                 <input type="checkbox" name="FldCharSupport[]" value="Keyboard" {{ $chkDis }} 
@@ -218,7 +218,7 @@
         </div>
             
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-6">
                 <fieldset class="form-group">
                     <label for="FldInputMaskID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldInputMask'] }}">Input Mask {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldInputMaskID" name="FldInputMask" value="{{ $fld->FldInputMask }}" class="form-control" > 
@@ -226,7 +226,7 @@
                     @endif
                 </fieldset>
             </div>
-            <div class="col-md-6">
+            <div class="col-6">
                 <fieldset class="form-group">
                     <label for="FldDisplayFormatID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDisplayFormat'] }}">Display Format {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDisplayFormatID" name="FldDisplayFormat" value="{{ $fld->FldDisplayFormat }}" class="form-control" > 
@@ -239,7 +239,7 @@
 @endif
         
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <fieldset class="form-group">
                     <label for="FldTypeID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldType'] }}">MySQL Type {!! $help !!}</label>
                     @if ($edit)
@@ -269,10 +269,10 @@
     <div class="card-body">
     
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-4">
                 
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyType'] }}">
                             <b>Key Type</b> {!! $help !!}
                         </div>
@@ -309,7 +309,7 @@
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyStruct'] }}">
                             <b>Key Structure</b> {!! $help !!}
                         </div>
@@ -331,7 +331,7 @@
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div id="foreign{{ $fldSfx }}" class=" @if (strpos($fld->FldKeyType, 'Foreign') !== false) disBlo @else disNon @endif ">
                             <fieldset class="form-group">
                                 <label for="FldForeignTableID">Foreign Table:</label>
@@ -402,10 +402,10 @@
                 </div>
                 
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
             
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldRequired'] }}">
                             <b>Required Value</b> {!! $help !!}
                         </div>
@@ -426,7 +426,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldNullSupport'] }}">
                             <b>Null Support</b> {!! $help !!}
                         </div>
@@ -447,7 +447,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldKeyStruct'] }}">
                             <b>FldUnique</b> {!! $help !!}
                         </div>
@@ -468,7 +468,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div class="pT20" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsIndex'] }}">
                             <b>Index Support</b> {!! $help !!}
                         </div>
@@ -490,10 +490,10 @@
                 </div>
                 
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
             
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                         <div data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldEditRule'] }}">
                             <b>Edit Rule</b> {!! $help !!}
                         </div>
@@ -559,7 +559,7 @@
 @endif
     
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12">
                 <fieldset class="form-group">
                     <label for="FldDefaultID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldDefault'] }}">Default Value {!! $help !!}</label>
                     @if ($edit) <input type="text" id="FldDefaultID" name="FldDefault" value="{{ $fld->FldDefault }}" class="form-control" > 
@@ -570,19 +570,19 @@
         </div>
         <div class="row">
         @if (!$edit)
-            <div class="col-md-12" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValues'] }}">
+            <div class="col-12" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValues'] }}">
                 Range of Values {!! $help !!}
                 @if ($defSet == '') {{ $fld->FldValues }} @elseif (isset($dbDefOpts[$defSet])) {{ $dbDefOpts[$defSet][0] }} <i>({{ $fld->FldValues }})</i> @endif
             </div>
         @else
-            <div class="col-md-8">
+            <div class="col-8">
                 <fieldset class="form-group">
                     <label for="FldValuesID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldValues'] }}">Range of Values {!! $help !!}</label>
                     <input type="text" id="FldValuesID" name="FldValues" class="form-control" style="color: @if ($defSet == '') #000 @else #999 @endif ;" 
                     @if ($defSet == '') value="{{ $fld->FldValues }}" @elseif (isset($dbDefOpts[$defSet])) value="{{ $dbDefOpts[$defSet][0] }}" DISABLED @endif >
                 </fieldset>
             </div>
-            <div class="col-md-4">
+            <div class="col-4">
                 <fieldset class="form-group">
                     <label for="FldValuesDefID">Use Definition: <a href="/dashboard/db/definitions" target="_blank" class="f12"><i class="fa fa-book"></i></a></label> 
                     <select id="FldValuesDefID" name="FldValuesDef" class="form-control" onChange="return loadDef(this.value);">
@@ -600,7 +600,7 @@
 @if ($GLOBALS['SL']->dbFullSpecs())
     
         <div class="row mT20">
-            <div class="col-md-12">
+            <div class="col-12">
                 <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['SL']->fldAbouts['FldCompareSame'] }}">
                     <b>Comparisons Allowed</b> {!! $help !!}
                 </div>
@@ -608,7 +608,7 @@
         </div>
         
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="cs2">
                         <input type="checkbox" name="FldCompareSame[]" value="2" {{ $chkDis }} 
@@ -617,7 +617,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs3">
                         <input type="checkbox" name="FldCompareSame[]" value="3" {{ $chkDis }} 
@@ -626,7 +626,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs5">
                         <input type="checkbox" name="FldCompareSame[]" value="5" {{ $chkDis }} 
@@ -635,7 +635,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs7">
                         <input type="checkbox" name="FldCompareSame[]" value="7" {{ $chkDis }} 
@@ -644,7 +644,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs11">
                         <input type="checkbox" name="FldCompareSame[]" value="11" {{ $chkDis }} 
@@ -653,7 +653,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs13">
                         <input type="checkbox" name="FldCompareSame[]" value="13" {{ $chkDis }} 
@@ -662,7 +662,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs17">
                         <input type="checkbox" name="FldCompareSame[]" value="17" {{ $chkDis }} 
@@ -671,7 +671,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cs19">
                         <input type="checkbox" name="FldCompareSame[]" value="19" {{ $chkDis }} 
@@ -680,11 +680,11 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-3"></div>
         </div>
         
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="co2">
                         <input type="checkbox" name="FldCompareOther[]" value="2" {{ $chkDis }} 
@@ -693,7 +693,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co3">
                         <input type="checkbox" name="FldCompareOther[]" value="3" {{ $chkDis }} 
@@ -702,7 +702,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co5">
                         <input type="checkbox" name="FldCompareOther[]" value="5" {{ $chkDis }} 
@@ -711,7 +711,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co7">
                         <input type="checkbox" name="FldCompareOther[]" value="7" {{ $chkDis }} 
@@ -720,7 +720,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co11">
                         <input type="checkbox" name="FldCompareOther[]" value="11" {{ $chkDis }} 
@@ -729,7 +729,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co13">
                         <input type="checkbox" name="FldCompareOther[]" value="13" {{ $chkDis }} 
@@ -738,7 +738,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co17">
                         <input type="checkbox" name="FldCompareOther[]" value="17" {{ $chkDis }} 
@@ -747,7 +747,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="co19">
                         <input type="checkbox" name="FldCompareOther[]" value="19" {{ $chkDis }} 
@@ -756,11 +756,11 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-3"></div>
         </div>
         
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="cv2">
                         <input type="checkbox" name="FldCompareValue[]" value="2" {{ $chkDis }} 
@@ -769,7 +769,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv3">
                         <input type="checkbox" name="FldCompareValue[]" value="3" {{ $chkDis }} 
@@ -778,7 +778,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv5">
                         <input type="checkbox" name="FldCompareValue[]" value="5" {{ $chkDis }} 
@@ -787,7 +787,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv7">
                         <input type="checkbox" name="FldCompareValue[]" value="7" {{ $chkDis }} 
@@ -796,7 +796,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv11">
                         <input type="checkbox" name="FldCompareValue[]" value="11" {{ $chkDis }} 
@@ -805,7 +805,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv13">
                         <input type="checkbox" name="FldCompareValue[]" value="13" {{ $chkDis }} 
@@ -814,7 +814,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv17">
                         <input type="checkbox" name="FldCompareValue[]" value="17" {{ $chkDis }} 
@@ -823,7 +823,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="cv19">
                         <input type="checkbox" name="FldCompareValue[]" value="19" {{ $chkDis }} 
@@ -832,11 +832,11 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-3"></div>
+            <div class="col-3"></div>
         </div>
         
         <div class="row mT20">
-            <div class="col-md-12">
+            <div class="col-12">
                 <div data-toggle="tooltip" data-placement="top"  title="{{ $GLOBALS['SL']->fldAbouts['FldOperateSame'] }}">
                     <b>Operations Allowed</b> {!! $help !!}
                 </div>
@@ -844,7 +844,7 @@
         </div>
         
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="os2">
                         <input type="checkbox" name="FldOperateSame[]" value="2" {{ $chkDis }} 
@@ -853,7 +853,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="os3">
                         <input type="checkbox" name="FldOperateSame[]" value="3" {{ $chkDis }} 
@@ -862,7 +862,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="os5">
                         <input type="checkbox" name="FldOperateSame[]" value="5" {{ $chkDis }} 
@@ -871,7 +871,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="os7">
                         <input type="checkbox" name="FldOperateSame[]" value="7" {{ $chkDis }} 
@@ -880,7 +880,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="os11">
                         <input type="checkbox" name="FldOperateSame[]" value="11" {{ $chkDis }} 
@@ -889,7 +889,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="os13">
                         <input type="checkbox" name="FldOperateSame[]" value="13" {{ $chkDis }} 
@@ -898,7 +898,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="os17">
                         <input type="checkbox" name="FldOperateSame[]" value="17" {{ $chkDis }} 
@@ -907,11 +907,11 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-2"></div>
         </div>
 
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="oo2">
                         <input type="checkbox" name="FldOperateOther[]" value="2" {{ $chkDis }} 
@@ -920,7 +920,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="oo3">
                         <input type="checkbox" name="FldOperateOther[]" value="3" {{ $chkDis }} 
@@ -929,7 +929,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="oo5">
                         <input type="checkbox" name="FldOperateOther[]" value="5" {{ $chkDis }} 
@@ -938,7 +938,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="oo7">
                         <input type="checkbox" name="FldOperateOther[]" value="7" {{ $chkDis }} 
@@ -947,7 +947,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="oo11">
                         <input type="checkbox" name="FldOperateOther[]" value="11" {{ $chkDis }} 
@@ -956,7 +956,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="oo13">
                         <input type="checkbox" name="FldOperateOther[]" value="13" {{ $chkDis }} 
@@ -965,7 +965,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="oo17">
                         <input type="checkbox" name="FldOperateOther[]" value="17" {{ $chkDis }} 
@@ -974,11 +974,11 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-2"></div>
         </div>
 
         <div class="row mB10">
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="ov2">
                         <input type="checkbox" name="FldOperateValue[]" value="2" {{ $chkDis }} 
@@ -987,7 +987,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="ov3">
                         <input type="checkbox" name="FldOperateValue[]" value="3" {{ $chkDis }} 
@@ -996,7 +996,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="ov5">
                         <input type="checkbox" name="FldOperateValue[]" value="5" {{ $chkDis }} 
@@ -1005,7 +1005,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="ov7">
                         <input type="checkbox" name="FldOperateValue[]" value="7" {{ $chkDis }} 
@@ -1014,7 +1014,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="ov11">
                         <input type="checkbox" name="FldOperateValue[]" value="11" {{ $chkDis }} 
@@ -1023,7 +1023,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <div class="radio-inline">
                     <label class="nobld" for="ov13">
                         <input type="checkbox" name="FldOperateValue[]" value="13" {{ $chkDis }} 
@@ -1032,7 +1032,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-2">
                 <div class="radio-inline">
                     <label class="nobld" for="ov17">
                         <input type="checkbox" name="FldOperateValue[]" value="17" {{ $chkDis }} 
@@ -1041,7 +1041,7 @@
                     </label>
                 </div>
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-2"></div>
         </div>
         
 @endif

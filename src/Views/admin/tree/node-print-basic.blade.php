@@ -4,7 +4,7 @@
     || (!$node->isDataManip() && $node->nodeRow->NodeType != 'Spambot Honey Pot')))
 
     @if ($node->nodeRow->NodeType == 'Layout Column')
-        <div class="col-md-{{ $node->nodeRow->NodeCharLimit }}">
+        <div class="col-{{ $node->nodeRow->NodeCharLimit }}">
     @endif
 
     <div class="nodeAnchor"><a id="n{{ $nID }}" name="n{{ $nID }}"></a></div>

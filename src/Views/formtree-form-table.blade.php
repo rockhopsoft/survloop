@@ -14,7 +14,7 @@
     @if (trim($tableDat["rowCol"]) == '') <th class="c1">&nbsp;</th> @endif
     </tr>
     @forelse ($tableDat["rows"] as $j => $row)
-        <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 == 0) rw2 @endif " >
+        <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif " >
             @if (trim($tableDat["rowCol"]) != '')
                 <td class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
@@ -38,8 +38,9 @@
     @endforelse
     @if (trim($tableDat["rowCol"]) == '')
         @for ($j = sizeof($tableDat["rows"]); $j < $node->nodeRow->NodeCharLimit; $j++)
-            <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 == 0) rw2 @endif 
-                @if ($j < sizeof($tableDat['rows'])) disRow @else disNon @endif " >
+            <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif 
+                @if ($j < sizeof($tableDat['rows']) || ($j == 0 && sizeof($tableDat['rows']) == 0)) disRow 
+                @else disNon @endif " >
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
                     value="-3">
                 @forelse ($tableDat["cols"] as $k => $col)
@@ -54,13 +55,12 @@
                 @endif
             </tr>
         @endfor
-        <tr id="n{{ $nIDtxt }}rowAdd" >
-            <td colspan="{{ sizeof($tableDat['cols']) }}">&nbsp;</td>
-            <td class="taR"><a id="addSprdTbl{{ $nIDtxt }}Btn" href="javascript:;" data-nid="{{ $nID }}"
+        <tr id="n{{ $nIDtxt }}rowAdd" ><td class="brdBotNon taR" colspan="{{ (sizeof($tableDat['cols'])+1) }}">
+            <a id="addSprdTbl{{ $nIDtxt }}Btn" href="javascript:;" data-nid="{{ $nID }}"
                 data-nidtxt="{{ $nIDtxt }}" data-row-max="{{ $tableDat['maxRow'] }}" 
-                class="btn btn-ico btn-secondary disBlo addSprdTblRow" 
-                ><i class="fa fa-plus" aria-hidden="true"></i></a></td>
-        </tr>
+                class="btn btn-ico btn-secondary addSprdTblRow" 
+                >Add <i class="fa fa-plus" aria-hidden="true"></i></a>
+        </td></tr>
     @endif
     
     </table></div> <!-- end nFld -->

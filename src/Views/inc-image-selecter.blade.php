@@ -1,14 +1,14 @@
 <!-- resources/views/vendor/survloop/inc-image-selecter.blade.php -->
 
 <div class="row">
-    <div class="col-md-8 ovrSho imgFileLibrary">
+    <div class="col-8 ovrSho imgFileLibrary">
         
         <h3 class="mT0 slBlueDark">Select Image From Library:</h3>
         @if (isset($imgs) && is_array($imgs) && sizeof($imgs) > 0)
             <div class="row mB10">
             @foreach ($imgs as $i => $img)
                 @if ($i%6 == 0 && $i > 0) </div><div class="row mB10"> @endif
-                <div class="col-md-2">
+                <div class="col-2">
                     <a id="selectImg{{ $nID }}sel{{ $img->ImgID }}" class="openImgDetail wrdBrkAll" href="javascript:;" 
                         ><div class="prevImg brdFnt"><img src="{{ $img->ImgFullFilename }}" class="brd"></div>
                         @if (isset($img->ImgTitle) && trim($img->ImgTitle) != '') {{ $img->ImgTitle }}
@@ -24,7 +24,7 @@
         @endif
         
     </div>
-    <div class="col-md-4 h100 row2" style="margin: -15px 0px -15px 0px; padding: 15px;">
+    <div class="col-4 h100 row2" style="margin: -15px 0px -15px 0px; padding: 15px;">
     
         <a name="imgFile{{ $nID }}anc"></a>
         <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-secondary w100 hidivBtnSelf 

@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
         <h2><i class="fa fa-newspaper-o mR5"></i> Footer Navigation Menu</h2>
         <span class="slGrey">...soon...</span>
         <div class="p20"></div>
@@ -13,7 +13,7 @@
         <span class="slGrey">...soon...</span>
         <div class="p20"></div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
         <h2 class="fL"><i class="fa fa-bars mR5" aria-hidden="true"></i> Burger Navigation Menu</h2>
         <h2 class="fR slBlueDark mR10"><i class="fa fa-level-up" aria-hidden="true"></i></h2>
         <div class="fC"></div>
@@ -21,16 +21,16 @@
         <form name="mainPageForm" action="/dashboard/pages/menus?sub=1" method="post" >
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <div class="row slGrey">
-            <div class="col-md-6">Menu Link Text</div>
-            <div class="col-md-6">Link To URL</div>
+            <div class="col-6">Menu Link Text</div>
+            <div class="col-6">Link To URL</div>
         </div>
         @for ($i=0; $i < $cntMax; $i++)
             <div id="navMenuTr{{ $i }}" class="row mT5 mB10 
                 @if ($i < (1+sizeof($navMenu))) disBlo @else disNon @endif ">
-                <div class="col-md-6"><input type="text" id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}" 
+                <div class="col-6"><input type="text" id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][0] !!}" @else value="" @endif 
                     onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
-                <div class="col-md-6"><input type="text" id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}" 
+                <div class="col-6"><input type="text" id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][1] !!}" @else value="" @endif 
                     onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
             </div>

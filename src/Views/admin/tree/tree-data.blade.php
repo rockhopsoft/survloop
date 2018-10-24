@@ -4,12 +4,12 @@
     {{ $GLOBALS['SL']->treeName }}:</span> Tree's Use of Database Design</nobr></h2>
 <div class="nodeHalfGap"></div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
         This area manages which parts of the entire database are actually accessed by this tree.
         This tracks the linkages which are needed for this form-tree to properly save it's data.
     </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-4">
+    <div class="col-2"></div>
+    <div class="col-4">
         <h4 class="m0">Tree's Core Data Table:</h4><h3 class="m0 slBlueDark">
             @if (isset($GLOBALS['SL']->coreTbl)) {{ $GLOBALS['SL']->coreTbl }} @endif </h3>
     </div>

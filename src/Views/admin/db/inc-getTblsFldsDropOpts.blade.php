@@ -1,8 +1,8 @@
 <div class="row mT10">
-    <div class="col-md-3 nPrompt">
+    <div class="col-3 nPrompt">
         <h4 class="mT10">Data Field:</h4>
     </div>
-    <div class="col-md-9">
+    <div class="col-9">
         <select id="setFldID" name="setFld" class="form-control form-control-lg" autocomplete=off >
             <option value="" @if (!isset($cond)) SELECTED @endif ></option>
             <option value="EXISTS=0" @if (isset($cond) && isset($cond->CondOperator) && isset($cond->CondOperDeet) 

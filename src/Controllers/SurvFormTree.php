@@ -254,7 +254,7 @@ class SurvFormTree extends SurvUploadTree
                         $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
                     $str = str_replace('[LoopItemLabel]', '<span class="slBlueDark"><b>' . $label . '</b></span>', $str);
                 }
-                $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark"><b>' . (1+$itemInd) . '</b></span>', $str);
+                $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark">' . (1+$itemInd) . '</span>', $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
             if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {
@@ -339,8 +339,10 @@ class SurvFormTree extends SurvUploadTree
 
         if ($curr->isPage()) {
             $extraOpts = $this->swapIDsSEO($curr->extraOpts);
-            $GLOBALS['SL']->setSEO($extraOpts["meta-title"], $extraOpts["meta-desc"], $extraOpts["meta-keywords"], 
-                $extraOpts["meta-img"]);
+            $GLOBALS['SL']->setSEO($this->swapLabels($nID . '', $extraOpts["meta-title"]), 
+                $this->swapLabels($nID . '', $extraOpts["meta-desc"]), 
+                $this->swapLabels($nID . '', $extraOpts["meta-keywords"]), 
+                $this->swapLabels($nID . '', $extraOpts["meta-img"]) );
         }
         
         // if ($currVisib == 1 && $curr->nodeType == 'Data Manip: New') $this->runDataManip($nID);
@@ -356,7 +358,9 @@ class SurvFormTree extends SurvUploadTree
             $this->runPageLoad($nID);
             if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') $ret .= '<div id="pageTopGapID" class="pageTopGap"></div>';
             if ($curr->isLoopRoot()) {
-                $ret .= $curr->nodeRow->NodePromptText . $this->printSetLoopNav($nID, $curr->dataBranch);
+                $ret .= ((isset($curr->nodeRow->NodePromptText) && trim($curr->nodeRow->NodePromptText) != '')
+                        ? '<div class="nPrompt">' . $curr->nodeRow->NodePromptText . '</div>' : '')
+                    . $this->printSetLoopNav($nID, $curr->dataBranch);
             } else { // isPage()
                 if (sizeof($tmpSubTier[1]) > 0) {
                     foreach ($tmpSubTier[1] as $childNode) { // recurse deez!..
@@ -995,7 +999,7 @@ class SurvFormTree extends SurvUploadTree
                     if ($curr->isOneLiner()) $isOneLiner = ' disIn mR20';
                     if ($curr->isOneLiner() || $curr->isOneLineResponses()) $isOneLinerFld = ' disIn mR20';
                 } elseif ($curr->isOneLiner()) {
-                    $isOneLiner = $isOneLinerFld = ' col-md-6';
+                    $isOneLiner = $isOneLinerFld = ' col-6';
                 }
                 if (trim($isOneLiner) != '') {
                     $nodePrompt = str_replace('class="nPrompt"', 'class="nPrompt' . $isOneLiner . '"', $nodePrompt);
@@ -1021,7 +1025,7 @@ class SurvFormTree extends SurvUploadTree
                     $currNodeSessData = '';
                     $btn = '<div class="nFld"><a id="nBtn' . $nIDtxt . '" class="crsrPntr '
                         . (($curr->nodeRow->NodeResponseSet == 'Text') ? '' : 'btn btn-lg btn-' 
-                            . (($curr->nodeRow->NodeResponseSet == 'Default') ? 'default' : 'primary') . ' nFldBtn')
+                            . (($curr->nodeRow->NodeResponseSet == 'Default') ? 'secondary' : 'primary') . ' nFldBtn')
                         . (($curr->nodeRow->NodeOpts%43 == 0) ? '' : ' nFormNext') . '" ' 
                         . ((trim($curr->nodeRow->NodeDataStore) != '') 
                             ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '') . ' >' 
@@ -1148,7 +1152,7 @@ class SurvFormTree extends SurvUploadTree
                         $attrIncr = 'step="' . $curr->extraOpts["incr"] . '" ';
                     }
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">';
-                    if (!$this->hasSpreadsheetParent($nID)) $ret .= '<div class="row"><div class="col-md-3">';
+                    if (!$this->hasSpreadsheetParent($nID)) $ret .= '<div class="row"><div class="col-3">';
                     $ret .= '<nobr><input type="number" data-nid="' . $nID . '" class="form-control form-control-lg ' 
                         . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : ((isset($curr->extraOpts["unit"]) 
                             && trim($curr->extraOpts["unit"]) != '') ? 'unitFld ' : '')) . $xtraClass 
@@ -1156,14 +1160,14 @@ class SurvFormTree extends SurvUploadTree
                         . '" ' . $onKeyUp . ' ' . $attrIncr . $attrMin . $attrMax . $GLOBALS["SL"]->tabInd() . '> ';
                     if (isset($curr->extraOpts["unit"]) && trim($curr->extraOpts["unit"]) != '') {
                         if ($curr->nodeType == 'Text:Number' && !$this->hasSpreadsheetParent($nID)) {
-                            $ret .= '</nobr></div><div class="col-md-3 pT10"><nobr>';
+                            $ret .= '</nobr></div><div class="col-3 pT10"><nobr>';
                         }
                         $ret .= $curr->extraOpts["unit"] . '&nbsp;&nbsp;';
                     }
                     $ret .= '</nobr>';
                     if (!$this->hasSpreadsheetParent($nID)) $ret .= '</div></div>';
                     if ($curr->nodeType == 'Slider') {
-                        $ret .= '<div class="col-md-10 slideCol"><div id="n' . $nIDtxt 
+                        $ret .= '<div class="col-10 slideCol"><div id="n' . $nIDtxt 
                             . 'slider" class="ui-slider ui-slider-horizontal slSlider"></div></div>';
                     }
                     $ret .= '</div>' . "\n";
@@ -1352,7 +1356,7 @@ class SurvFormTree extends SurvUploadTree
                             }
                             
                             if ($curr->nodeRow->NodeOpts%61 == 0) {
-                                $ret .= '<div class="col-md-' . $GLOBALS["SL"]->getColsWidth(sizeof($curr->responses)) 
+                                $ret .= '<div class="col-' . $GLOBALS["SL"]->getColsWidth(sizeof($curr->responses)) 
                                     . '">';
                             }
                             if ($mobileCheckbox) {
@@ -1751,7 +1755,7 @@ class SurvFormTree extends SurvUploadTree
                     //$loadURL .= '?i=' . $cid . (($search != '') ? '&s=' . $search : '');
                     $wTree = SLTree::find($widgetTreeID);
                     if ($cid > 0 && $wTree) {
-                        $loadURL = '/' . $wTree->TreeSlug . '-read/' . $cid . '/full?ajax=1&wdg=1'
+                        $loadURL = '/' . $wTree->TreeSlug . '/read-' . $cid . '/full?ajax=1&wdg=1'
                             . (($curr->nodeType == 'Record Full Public') ? '&publicView=1' : '');
                         $spinner = '<br /><br /><center>' . $spinner . '</center><br />';
                     }
@@ -2410,7 +2414,7 @@ class SurvFormTree extends SurvUploadTree
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . '</div>';
         }
-        $ret = '<input type="hidden" id="isLoopNav" name="loopNavRoot" value="'
+        $ret = '<div class="nPrompt"><input type="hidden" id="isLoopNav" name="loopNavRoot" value="'
             . intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) . '">' 
             . (($this->allNodes[$nID]->isStepLoop()) ? '<div id="isStepLoop"></div>' : '');
         if (!$this->allNodes[$nID]->isStepLoop() && empty($this->sessData->loopItemIDs[$loopName])) {
@@ -2440,6 +2444,7 @@ class SurvFormTree extends SurvUploadTree
         } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == sizeof($this->sessData->loopItemIDsDone)) {
             $this->nextBtnOverride = 'Done With ' . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural;
         } */
+        $ret .= '</div>';
         return $ret;
     }
     

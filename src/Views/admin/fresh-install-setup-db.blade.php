@@ -16,13 +16,13 @@
 <center><div class="halfPageWidth pT20">
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-8">
         <div class="nodeWrap">
             <div class="nPrompt"><label for="nameID"><b>Database Name</b>: <span class="slGrey fPerc66">(eg. SurvLoop)</span></label></div>
             <div class="nFld"><input id="DbNameID" name="DbName" type="text" class="form-control"></div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <div class="nodeWrap">
             <div class="nPrompt"><label for="nameID"><b>Abbreviation</b>: <span class="slGrey fPerc66">(eg. SL)</span></label></div>
             <div class="nFld"><input id="DbPrefixID" name="DbPrefix" type="text" class="form-control"></div>

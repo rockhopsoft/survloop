@@ -150,14 +150,15 @@ class AdminController extends SurvLoopController
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Site Content', 
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
             $this->admMenuLnk('/dashboard/pages/list',     'Pages & Reports'), 
-            $this->admMenuLnk('/dashboard/surveys/list', 'Surveys & Forms', '', 1, [
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', $treeLabel, '', 1, [
+            $this->admMenuLnk('javascript:;', 'Surveys & Forms', '', 1, [
+                $this->admMenuLnk('javascript:;', $treeLabel, '', 1, [
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 'Full Survey Map'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Session Stats'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Response Stats'),
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map') 
-                    ])
+                    ]),
+                $this->admMenuLnk('/dashboard/surveys/list', 'All Surveys')
                 ]),
             $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets'), 
             $this->admMenuLnk('/dashboard/pages/menus',    'Navigation Menus'), 
@@ -165,12 +166,14 @@ class AdminController extends SurvLoopController
             $this->admMenuLnk('/dashboard/emails',         'Email Templates')
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
-            $this->admMenuLnk('/dashboard/db', 'All Tables', '', 1, [
+            $this->admMenuLnk('javascript:;', 'Data Tables', '', 1, [
+                $this->admMenuLnk('/dashboard/db',           'Full Table List'),
                 $this->admMenuLnk('/dashboard/db/addTable',  'Add A New Table'),
                 $this->admMenuLnk('/dashboard/db/sortTable', 'Re-Order Tables'),
                 $this->admMenuLnk('/dashboard/db/diagrams',  'Data Diagrams')
                 ]), 
-            $this->admMenuLnk('/dashboard/db/all', 'All Fields', '', 1, [
+            $this->admMenuLnk('javascript:;', 'Data Fields', '', 1, [
+                $this->admMenuLnk('/dashboard/db/all',                'Full Field Map'), 
                 $this->admMenuLnk('/dashboard/db/field-matrix?alt=1', 'Field Matrix: English'),
                 $this->admMenuLnk('/dashboard/db/field-matrix',       'Field Matrix: Geek'),
                 $this->admMenuLnk('/dashboard/db/bus-rules',          'Business Rules')
@@ -180,8 +183,8 @@ class AdminController extends SurvLoopController
             $this->admMenuLnk('/dashboard/db/fieldDescs',  'Field Descriptions'), 
             $this->admMenuLnk('/dashboard/db/fieldXML',    'Field Privacy Settings'), 
             $this->admMenuLnk('/dashboard/db/workflows',   'Process Workflows'),
-            $this->admMenuLnk('/dashboard/db/export',      'Export', '', 1, [
-                $this->admMenuLnk('/dashboard/db/export',         'Database Export'),
+            $this->admMenuLnk('javascript:;',              'Export', '', 1, [
+                $this->admMenuLnk('/dashboard/db/export',         'Full Database Export'),
                 $this->admMenuLnk('/dashboard/sl/export/laravel', 'SurvLoop Package')
                 ]),
             $this->admMenuLnk('/dashboard/db/switch', '<i class="slGrey">All Databases</i>')
@@ -191,14 +194,15 @@ class AdminController extends SurvLoopController
             $this->admMenuLnkContact(false)
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Settings', '<i class="fa fa-cogs"></i>', 1, [
-            $this->admMenuLnk('/dashboard/settings#search',   'Search Engines'),
-            $this->admMenuLnk('/dashboard/settings#general',  'General Settings'),
-            $this->admMenuLnk('/dashboard/settings#logos',    'Logos & Fonts'),
-            $this->admMenuLnk('/dashboard/settings#color',    'Colors'),
-            $this->admMenuLnk('/dashboard/settings#hardcode', 'Code HTML CSS JS'),
-            $this->admMenuLnk('/dashboard/logs',              'System Logs', '', 1, [
-                $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff')
+            $this->admMenuLnk('javascript:;',      'System Settings', '', 1, [
+                $this->admMenuLnk('/dashboard/settings#search',   'Search Engines'),
+                $this->admMenuLnk('/dashboard/settings#general',  'General Settings'),
+                $this->admMenuLnk('/dashboard/settings#logos',    'Logos & Fonts'),
+                $this->admMenuLnk('/dashboard/settings#color',    'Colors'),
+                $this->admMenuLnk('/dashboard/settings#hardcode', 'Code HTML CSS JS')
                 ]),
+            $this->admMenuLnk('/dashboard/logs',              'System Logs'),
+            $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff'),
             $this->admMenuLnk('/dashboard/systems-check',     'System Check'),
             $this->admMenuLnk('/dashboard/systems-update',    'System Updates')
             ]);
@@ -249,7 +253,7 @@ class AdminController extends SurvLoopController
             $newRow = (($currTab == 'unread' && $newStatus != 'Unread')
                 || ($currTab == 'all' && $newStatus == 'Trash')) 
                 || ($currTab == 'trash' && $newStatus != 'Trash')
-                ? '<div class="col-md-12"><i>Message moved.</i></div>' 
+                ? '<div class="col-12"><i>Message moved.</i></div>' 
                 : view('vendor.survloop.admin.contact-row', [ "contact" => $cRow ])->render();
             return $newRow . '<script type="text/javascript"> $(document).ready(function(){
                 setTimeout( function() {

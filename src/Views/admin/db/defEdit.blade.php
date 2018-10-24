@@ -24,7 +24,7 @@
 <input type="hidden" name="defEditForm" value="YES">
 
 <div class="row mT20">
-    <div class="col-md-6">
+    <div class="col-6">
         <label for="defSubsetID">Part of Set:</label>
         <select id="defSubsetID" name="defSubset" autocomplete="off" class="form-control"
             onChange="return chkSubset(this.value);" >
@@ -51,7 +51,7 @@
             value=" @if (trim($subset) != '') Add Value @else Save Changes @endif " >
         </center>
     </div>
-    <div class="col-md-6 p20 taR red ">
+    <div class="col-6 p20 taR red ">
         <input type="checkbox" name="deleteDef" id="deleteDefID" value="1">
         <label for="deleteDefID">Delete Definition</label>
     </div>

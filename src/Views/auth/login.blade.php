@@ -15,10 +15,10 @@ $v = $surv->custLoop->v;
 <div class="p20"></div>
 
 <div class="row loginTitles">
-    <div class="col-md-6">
+    <div class="col-6">
         <h1 class="mT0">Login</h1>
     </div>
-    <div class="col-md-6 taR pT5">
+    <div class="col-6 taR pT5">
         <a href="/register" class="btn btn-secondary">Sign Up</a>
     </div>
 </div>

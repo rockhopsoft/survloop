@@ -7,7 +7,7 @@
 <h2><i class="fa fa-heartbeat"></i> System Updates</h2>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
     @if (isset($msgs) && trim($msgs) != '')
         <div class="jumbotron">{!! $msgs !!}</div>
     @endif
@@ -18,13 +18,13 @@
         <h3 class="slGrey"><i>There are no new updates needing installation.</i></h3>
     @endif
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
         All System Updates:<br /><br />
         @forelse ($updateList as $i => $up)
             <div class="p20 @if ($i%2 == 0) row2 @endif @if ($up[1]) slBlueDark @else slRedDark @endif ">
                 <div class="row">
-                    <div class="col-md-6"><b>{!! $up[0] !!}</b></div>
-                    <div class="col-md-6">
+                    <div class="col-6"><b>{!! $up[0] !!}</b></div>
+                    <div class="col-6">
                         @if ($up[1]) <nobr><i class="fa fa-check slGreenDark"></i> Installed</nobr> @else Needed @endif
                     </div>
                 </div>

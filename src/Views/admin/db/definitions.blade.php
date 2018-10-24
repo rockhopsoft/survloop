@@ -22,10 +22,10 @@
     @if (sizeof($setDefs))
         <a name="{{ str_replace(' ', '', $subset) }}"></a>
         <div class="row mT10" >
-            <div class="col-md-9">
-                <h3 class="slBlueDark">{{ $subset }}</h3>
+            <div class="col-9">
+                <h3 class="m0 slBlueDark">{{ $subset }}</h3>
             </div>
-            <div class="col-md-3 taR" >
+            <div class="col-3 taR" >
             @if ($dbAllowEdits)
                 <a href="/dashboard/db/definitions/add/{{ $subset }}" class="btn btn-secondary m5"
                     ><i class="fa fa-plus-circle"></i> Add</a>
@@ -36,25 +36,23 @@
         </div>
         @foreach ($setDefs as $cnt => $setDef)
             <div class="row @if ($cnt%2 == 0) row2 @endif " >
-                <div class="col-md-11">
-                    <h4>{{ $setDef->DefValue }}</h4>
-                    @if (trim($setDef->DefDescription) != '') 
-                        <p class="m0 slGrey">{{ $setDef->DefDescription }}</p>
-                    @endif
-                </div>
-                <div class="col-md-1 taR">
+                <div class="col-1">
                 @if ($dbAllowEdits)
-                    <a href="/dashboard/db/definitions/edit/{{ $setDef->DefID }}" class="btn btn-sm btn-secondary m5">
-                    <i class="fa fa-pencil fa-flip-horizontal"></i> {{ $setDef->DefID }}</a>
+                    <p class="mT5 mB5"><a href="/dashboard/db/definitions/edit/{{ $setDef->DefID }}"
+                        ><i class="fa fa-pencil fa-flip-horizontal"></i> {{ $setDef->DefID }}</a></p>
                 @endif
+                </div>
+                <div class="col-11">
+                    <p class="mT5 mB5">{{ $setDef->DefValue }}</p>
+                    @if (trim($setDef->DefDescription) != '')
+                        <p class="mT0 slGrey">{{ $setDef->DefDescription }}</p>
+                    @endif
                 </div>
             </div>
         @endforeach
         <div class="clearfix p10 mB20" ></div>
     @endif
 @endforeach
-
-<style> h3 { margin: 0px; } </style>
 
 <div class="adminFootBuff"></div>
 

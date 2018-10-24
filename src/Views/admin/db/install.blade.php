@@ -20,7 +20,7 @@
 @endif
 
     <div class="row mT10">
-        <div class="col-md-6">
+        <div class="col-6">
             <table class="table table-striped taC">
             <tr>
                 <th class="taC">Table Name</th>
@@ -39,7 +39,7 @@
             @endforelse
             </table>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             <div class="well mB20">
             This process will directly install the database to this Laravel Installation.
             You can optionally preserve the data currently stored in selected tables, 

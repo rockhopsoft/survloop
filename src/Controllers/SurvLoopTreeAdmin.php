@@ -857,14 +857,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                     || isset($fnlVals[strtolower($res->NodeResValue)]) 
                                     || isset($nAtmpts[strtolower($res->NodeResValue)])) {
                                     $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '') 
-                                        . '"><div class="col-md-6 fPerc133">' 
+                                        . '"><div class="col-6 fPerc133">' 
                                         . $GLOBALS["SL"]->printResponse($tbl, $fld, $res->NodeResValue);
                                     if (isset($res->NodeResShowKids) && $res->NodeResShowKids > 0) {
                                         $retVal .= '<i class="fa fa-code-fork fa-flip-vertical mL5" title="Children '
                                             . 'displayed if selected"></i>';
                                     }
-                                    $retVal .= '</div><div class="col-md-3 slBlueDark">' . $stats[0] 
-                                        . '</div><div class="col-md-3 slGrey">' . $stats[1] . '</div></div>';
+                                    $retVal .= '</div><div class="col-3 slBlueDark">' . $stats[0] 
+                                        . '</div><div class="col-3 slGrey">' . $stats[1] . '</div></div>';
                                 }
                             }
                         } elseif (sizeof($fnlVals) > 0) {
@@ -874,11 +874,11 @@ class SurvLoopTreeAdmin extends SurvFormTree
                                 $stats = $this->adminResponseNodeStatsTxt(strtolower($res), $fnlCnt, $atmptCnt, 
                                     $fnlVals, $nAtmpts, $nodeSess);
                                 $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '') 
-                                    . '"><div class="col-md-6 fPerc133">' . ((trim($res) != '') 
+                                    . '"><div class="col-6 fPerc133">' . ((trim($res) != '') 
                                         ? $GLOBALS["SL"]->printResponse($tbl, $fld, $res)
                                         : '<span class="slGrey"><i>(empty)</i></span>')
-                                    . '</div><div class="col-md-3 slBlueDark">' . $stats[0] 
-                                    . '</div><div class="col-md-3 slGrey">' . $stats[1] . '</div></div>';
+                                    . '</div><div class="col-3 slBlueDark">' . $stats[0] 
+                                    . '</div><div class="col-3 slGrey">' . $stats[1] . '</div></div>';
                                 if ($j == 9) {
                                     $retVal .= '<a name="n' . $nID . 'more"></a><a href="#n' . $nID . 'more" id="show' 
                                         . $nID . 'Response' . $j . 'Stats">show more</a></div><div id="more' . $nID 

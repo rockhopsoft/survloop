@@ -7,9 +7,9 @@
         @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->UpID)
             <a name="up{{ $upRow->UpID }}"></a>
             <div class="row uploadedWrap">
-                <div class="col-md-4 m0 taC">
+                <div class="col-4 m0 taC">
                 
-                    @if (intVal($upRow->type) == $vidTypeID 
+                    @if (intVal($upRow->UpType) == $vidTypeID 
                         && (trim($upDeets[$i]["youtube"]) != '' || trim($upDeets[$i]["vimeo"]) != ''))
                         @if (trim($upDeets[$i]["youtube"]) != '')
                             <iframe id="ytplayer{{ $upRow->UpID }}" type="text/html" width="100%" 
@@ -25,37 +25,35 @@
                     @elseif (isset($upRow->UpUploadFile) && isset($upRow->UpStoredFile) 
                         && trim($upRow->UpUploadFile) != '' && trim($upRow->UpStoredFile) != '')
                         @if (in_array($upDeets[$i]["ext"], array("gif", "jpeg", "jpg", "png")))
-                            <div class="w100 disBlo row2 vaM" 
+                            <div class="w100 disBlo vaM" 
                                 style="height: {{ (2+$height) }}px; overflow: hidden;">
                                 <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
                                     class="disBlo {{ $upDeets[$i]['imgClass'] }} " ><img border=1 
                                     src="{{ $upDeets[$i]['filePub'] }}" class=" {{ $upDeets[$i]['imgClass'] }} "></a>
                             </div>
                         @else
-                            <div class="w100 disBlo row2 vaM" style="height: {{ (2+$height) }}px;">
+                            <div class="w100 disBlo BGblueDark vaM" style="height: {{ (2+$height) }}px;">
                                 <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
-                                    class="disBlo w100 taC vaM fPerc133 wht" style="height: {{ $height }}px;"
-                                    ><div class="f60 wht pT20"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
-                                    @if (strlen($upRow->UpUploadFile) > 40) <h4 class="wht">{{ $upRow->UpUploadFile }}</h4>
-                                    @else <h3 class="wht">{{ $upRow->UpUploadFile }}</h3>
-                                    @endif
+                                    class="disBlo w100 taC vaM wht" style="height: {{ $height }}px;"
+                                    ><div class="f48 mBn5"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
+                                    {{ $upRow->UpUploadFile }}
                                 </a>
                             </div>
                         @endif
                     @endif
                     
                 </div>
-                <div class="col-md-6 pT10">
+                <div class="col-6 pT10">
                     
                     <div id="up{{ $upRow->UpID }}Info" class="disBlo fL">
-                        <h2>{{  $upRow->UpTitle }}</h2> 
+                        <h4>{{  $upRow->UpTitle }}</h4> 
                    <?php /*@if (trim($upRow->UpDesc) != '') <div class="fPerc133">{{ $upRow->UpDesc }}</div> @endif */?>
                         <div class="slGrey pT5">
                             @if (isset($GLOBALS["SL"]->treeSettings["uploads-public"]) 
                                 && intVal($GLOBALS["SL"]->treeSettings["uploads-public"][0]) > 0)
-                                @if ($upRow->UpPrivacy == 'Open') Public @else Private @endif
+                                @if (in_array($upRow->UpPrivacy, ['Public', 'Open'])) Public @else Private @endif
                             @endif
-                            {{ $GLOBALS['SL']->def->getValById($upRow->type) }}
+                            {{ $GLOBALS['SL']->def->getValById($upRow->UpType) }}
                         </div>
                         {!! $upDeets[$i]["fileLnk"] !!}
                     </div>
@@ -83,7 +81,7 @@
                                 {!! $GLOBALS["SL"]->tabInd() !!}>
                                     @foreach ($uploadTypes as $i => $ty)
                                         <option value="{{ $ty->DefID }}" 
-                                            @if ($ty->DefID == $upRow->type) SELECTED @endif 
+                                            @if ($ty->DefID == $upRow->UpType) SELECTED @endif 
                                             >{{ $ty->DefValue }}</option>
                                     @endforeach
                                 </select></div>
@@ -106,7 +104,7 @@
                     </div>
                     
                 </div>
-                <div class="col-md-2">
+                <div class="col-2">
                 
                     <div id="editLoopItem{{ $upRow->UpID }}block" class="disBlo">
                         <a href="javascript:;" id="editLoopItem{{ $upRow->UpID }}" 

@@ -1,6 +1,6 @@
 /* resources/views/vendor/survloop/formtree-form-js.blade.php */
 function checkFullPage() {
-    if (!document.getElementById('main')) {
+    if (!document.getElementById('main') && !document.getElementById('isPrint')) {
 @if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')
         window.location='{{ $currPage[0] }}';
 @elseif ($GLOBALS['SL']->treeRow->TreeType == 'Page')

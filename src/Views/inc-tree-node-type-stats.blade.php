@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/inc-tree-node-type-stats.blade.php -->
 <div class="row mT10 mB10">
-    <div class="col-md-3">
+    <div class="col-3">
         <h3 class="mT0">{{ number_format($qTypeStats["nodes"]["tot"]) }} Nodes Total</h3>
         <div class="pL5">
         <span @if ($qTypeStats["nodes"]["loopNodes"] == 0) class="slGrey" @endif >
@@ -9,7 +9,7 @@
             {{ number_format($qTypeStats["nodes"]["loops"]) }} Loops Total</span>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-3">
         <b class="fPerc125">Total Survey Questions</b><br />
         <span @if ($qTypeStats["choic"]["all"] == 0) class="slGrey" @endif >
             <nobr>{{ number_format($qTypeStats["choic"]["all"]) }} Multiple Choice</span>
@@ -27,7 +27,7 @@
             <span class="red fPerc80 mL5">*{{ number_format($qTypeStats["quant"]["req"]) }}</span>
         @endif </nobr>
     </div>
-    <div class="col-md-3">
+    <div class="col-3">
         <b class="fPerc125">Unique <nobr>Data Fields</nobr></b><br />
         <span @if ($dataTypeStats["choic"]["all"] == 0) class="slGrey" @endif >
             <nobr>{{ number_format($dataTypeStats["choic"]["all"]) }} Multiple Choice</span>
@@ -45,7 +45,7 @@
             <span class="red fPerc80 mL5">*{{ number_format($dataTypeStats["quant"]["req"]) }}</span>
         @endif </nobr>
     </div>
-    <div class="col-md-3 taR">
+    <div class="col-3 taR">
     
 @if (!$isPrint)
     @if ($isAlt)

@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-7">
         
         <h2><i class="fa fa-newspaper-o"></i> Site Pages <span class="slGrey">& Redirects</span></h2>
         <div class="slGrey pB10">
@@ -118,7 +118,7 @@
         </table>
         
     </div>
-    <div class="col-md-5">
+    <div class="col-5">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <form name="mainPageForm" method="post" action="/dashboard/pages/list">
@@ -129,7 +129,7 @@
                 ><h3 class="m0"><i class="fa fa-plus mR5" aria-hidden="true"></i> Create New Page</h3></a>
             <div id="hidivNewPage" class="disNon mT20">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-6">
                         <label><input type="checkbox" name="pageIsReport" value="1"
                             onClick="if (this.checked) { document.getElementById('reportPageTreeID').style.display='block';} 
                             else { document.getElementById('reportPageTreeID').style.display='none'; }" autocomplete="off"> 
@@ -138,7 +138,7 @@
                                 autocomplete="off">{!! $GLOBALS["SL"]->allTreeDropOpts() !!}
                             </select>
                         </label>
-                    </div><div class="col-md-6">
+                    </div><div class="col-6">
                         <label><input type="checkbox" name="pageAdmOnly" value="1" 
                             onClick="if (this.checked) { document.getElementById('isNewAdmPag').style.display='inline'; } 
                             else { document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 

@@ -7,12 +7,12 @@
 <div class="p10"></div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-8">
         <div class="w100" style="height: 450px;">
         @if (isset($sessDailyAttempts)) {!! $sessDailyAttempts !!} @endif
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <h3 class="mT0">Stats of {{ number_format($genTots["cmpl"][0]+$genTots["cmpl"][1]) }} Recent Attempts</h3>
         <div class="mTn5 mB10 slGrey">since {{ date("n/j/Y", $genTots["date"][2]) }}...</div>
         <ul>
@@ -82,12 +82,12 @@
 <div class="p20"></div>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-8">
         <div class="w100" style="height: 450px;">
         @if (isset($graph1print)) {!! $graph1print !!} @endif
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <div class="p10"></div>
         <table class="table table-striped w100">
         <tr><th colspan=2 ><b>Incompletes:<br />Final Page Saved</b></th>
@@ -112,7 +112,7 @@
 
 <h2 class="slBlueDark">Recent Submission Attempt History</h2>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
     @forelse ($coreTots as $i => $core)
         <div class="p15">
             <h3 class="mT20 mB0">@if ($core["cmpl"]) <i class="fa fa-check mL10"></i> @endif
@@ -135,7 +135,7 @@
             @endforelse
         </div>
         @if ($i == round(sizeof($coreTots)/2))
-            </div><div class="col-md-6">
+            </div><div class="col-6">
         @endif
     @empty
     @endforelse

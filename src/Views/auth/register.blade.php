@@ -15,7 +15,7 @@ $v = $surv->custLoop->v;
 <div class="p20"></div>
 
 <div class="row loginTitles">
-    <div class="col-md-6">
+    <div class="col-6">
         @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
             && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
             {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
@@ -23,7 +23,7 @@ $v = $surv->custLoop->v;
             <h1 class="mT0">Sign Up</h1>
         @endif
     </div>
-    <div class="col-md-6 taR pT5">
+    <div class="col-6 taR pT5">
         @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
             || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
             <a href="/login" class="btn btn-secondary">Login</a>

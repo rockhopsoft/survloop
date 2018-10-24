@@ -250,7 +250,12 @@ class SurvLoop extends Controller
         return redirect($this->domainPath . '/');
     }
     
-    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '')
+    public function loadPageURLrawID(Request $request, $pageSlug = '', $cid = -3, $view = '')
+    {
+        return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
+    }
+    
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '', $skipPublic = false)
     {
         if ($this->loadTreeBySlug($request, $pageSlug, true)) {
             if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isAdmin()) {
@@ -260,7 +265,7 @@ class SurvLoop extends Controller
             }
             $this->loadLoop($request);
             if ($cid > 0) {
-                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid, $skipPublic);
                 if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
                     $this->custLoop->hideDisclaim = true;
                 }

@@ -13,7 +13,7 @@
 <div class="row mB20">
     @forelse ($sysChks as $i => $chk)
         @if ($i > 0 && $i%4 == 0) </div><div class="row mB20"> @endif
-        <div class="col-md-3">
+        <div class="col-3">
             <a href="{{ $chk[1] }}" target="_blank"><h4>{{ $chk[0] }}</h4></a>
             <div id="chk{{ $i }}ID"></div>
             

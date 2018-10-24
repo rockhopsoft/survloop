@@ -891,7 +891,7 @@ class SurvLoopStat
         $rowLet = $this->fAbr($fltRow);
         $ret = '<div class="row">';
         foreach ($this->filts[$colLet]["val"] as $i => $colVal) {
-            $ret .= '<div class="col-md-6 pB20"><h3 class="m0">' . $this->filts[$colLet]["vlu"][$i] . '</h3>' 
+            $ret .= '<div class="col-6 pB20"><h3 class="m0">' . $this->filts[$colLet]["vlu"][$i] . '</h3>' 
                 . $this->piePercHasCore($colLet, $rowLet, $i, $tot) . '</div>'
                 . (($i > 0 && $i%2 == 1) ? '</div><div class="row">' : '');
         }

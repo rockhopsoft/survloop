@@ -61,6 +61,7 @@ class AdminTreeController extends AdminController
             $this->allStdCondition('#IsLoggedIn', 'Complainant is currently logged into the system.');
             $this->allStdCondition('#IsNotLoggedIn', 'Complainant is not currently logged into the system.');
             $this->allStdCondition('#IsOwner', 'The user is currently logged is the owner of this record.');
+            $this->allStdCondition('#IsProfileOwner', 'The user is currently logged in owns this user profile.');
             $this->allStdCondition('#IsPrintable', 'The current page view is intended to be printable.');
             $this->allStdCondition('#IsPrintInFrame', 'The current page view is printed into frame/ajax/widget.');
             $this->allStdCondition('#IsDataPermPublic', 'The current data permissions are set to public.');

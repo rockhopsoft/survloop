@@ -11,7 +11,7 @@
     <div class="wrapLoopItem"><a name="item{{ $setIndex }}"></a>
         <div id="wrapItem{{ $itemID }}On" class="brdLgt round20 mB20 pL20 pR20">
             <div class="row">
-                <div class="col-md-12 p20">
+                <div class="col-12 p20">
                     <div class="fL"><h3 class="m0">{!! $itemLabel !!}</h3></div>
                     @if ($canEdit)
                         <a href="javascript:;" id="editLoopItem{{ $itemID }}" 

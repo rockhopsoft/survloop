@@ -14,7 +14,7 @@
         </i></div>
     </center>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-6">
             <table border=0 class="table table-striped" >
             <tr><th>SessData Totals</th><th><i>IDs</i></th></tr>
             <?php /*
@@ -34,7 +34,7 @@
             </table>
             POST/GET Requests:<pre>{!! $requestDeets !!}</pre>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             <table border=0 class="table table-striped" >
             @if (isset($sessInfo->SessID))
                 <tr><th colspan=2 >sessInfo:</th></tr>
@@ -58,10 +58,10 @@
 <div id="hidivDbgPop2">
     <br />kidMap:
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-6">
             <pre>{!! print_r($sessData->kidMap) !!}</pre>
         </div>
-        <div class="col-md-6">
+        <div class="col-6">
             loopItemIDs: <pre>{!! print_r($sessData->loopItemIDs) !!}</pre>
         </div>
     </div>

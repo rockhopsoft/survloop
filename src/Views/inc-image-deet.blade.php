@@ -10,7 +10,7 @@
 <a href="javascript:;" id="imgChoose{{ $img->ImgID }}" class="btn btn-lg btn-primary w100 mT10 mB10 imgChoose"
     >Select This Image</a>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-6">
     
         <a href="{{ $img->ImgFullFilename }}" target="_blank"
             ><img src="{{ $img->ImgFullFilename }}" class="w100 brd"><br />
@@ -38,7 +38,7 @@
         @endif
         
     </div>
-    <div class="col-md-6">
+    <div class="col-6">
     
         <form id="formSaveImg{{ $img->ImgID }}ID" name="formSaveImg{{ $img->ImgID }}" method="post" 
             action="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/ajax/img-save" enctype="multipart/form-data">

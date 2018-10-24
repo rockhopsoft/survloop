@@ -31,11 +31,11 @@
     <input type="hidden" name="CondID{{ $i }}" value="{{ $cond->CondID }}">
     <tr><td class="w100">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-6">
                 <h4 class="m0">{{ $cond->CondTag }}</h4>
                 {{ $cond->CondDesc }}
             </div>
-            <div class="col-md-5">
+            <div class="col-5">
                 <div class="mB5">{!! view('vendor.survloop.admin.db.inc-describeCondition', [
                     "cond" => $cond, 
                     "i" => $i 
@@ -51,7 +51,7 @@
                     @endforeach
                 @endif
             </div>
-            <div class="col-md-1">
+            <div class="col-1">
                 <a href="/dashboard/db/conds/edit/{{ $cond->CondID }}" class="fPerc133 mL5 mR5"
                     ><i class="fa fa-pencil" aria-hidden="true"></i></a><br />
                 <a href="javascript:;" id="condDelBtn{{ $i }}" class="condDelBtn slRedDark fPerc133 mT20 mL5 mR5"

@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-7">
         
         <h2><i class="fa fa-newspaper-o"></i> Content Snippets</h2>
         <div class="slGrey pB10">
@@ -25,8 +25,8 @@
         </table>
         
     </div>
-    <div class="col-md-1"></div>
-    <div class="col-md-4">
+    <div class="col-1"></div>
+    <div class="col-4">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">

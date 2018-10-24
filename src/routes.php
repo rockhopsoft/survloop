@@ -870,6 +870,10 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/{pageSlug}/read-{cid}',                'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::post('/{pageSlug}/u-{cid}',                   'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}/u-{cid}',                   'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
+    Route::post('/{pageSlug}/readi-{cid}/{view}',        'SurvLoop\\Controllers\\SurvLoop@loadPageURLrawID');
+    Route::get( '/{pageSlug}/readi-{cid}/{view}',        'SurvLoop\\Controllers\\SurvLoop@loadPageURLrawID');
+    Route::post('/{pageSlug}/readi-{cid}',               'SurvLoop\\Controllers\\SurvLoop@loadPageURLrawID');
+    Route::get( '/{pageSlug}/readi-{cid}',               'SurvLoop\\Controllers\\SurvLoop@loadPageURLrawID');
     Route::post('/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     

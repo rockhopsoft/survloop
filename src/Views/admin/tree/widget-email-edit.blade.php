@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/tree/widget-email-edit.blade.php -->
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-4">
         <h4 class="slBlueDark m0">Send Email To</h4>
         <div class="pL5">
             <label class="w100"><input type="checkbox" name="widgetEmailTo[]" value="-69" class="mR5"
@@ -44,7 +44,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <h4 class="slBlueDark m0">CC</h4>
         <div class="pL5">
             <label class="w100"><input type="checkbox" name="widgetEmailCC[]" value="-69" class="mR5"
@@ -87,7 +87,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <h4 class="slBlueDark m0">BCC</h4>
         <div class="pL5">
             <label class="w100"><input type="checkbox" name="widgetEmailBCC[]" value="-69" class="mR5"

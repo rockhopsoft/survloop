@@ -7,14 +7,14 @@
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="DefID" value="{{ $blurbRow->DefID }}">
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-8">
         <h2>Editing Excerpt</h2>
         <label><h3>Excerpt Name:</h3>
         <input type="text" class="form-control form-control-lg slBlueDark f26" name="DefSubset" 
             value="{{ $blurbRow->DefSubset }}">
         </label>
     </div>
-    <div class="col-md-4 taR">
+    <div class="col-4 taR">
         <a href="/dashboard/snippets/list" class="btn btn-sm btn-secondary m10"
             ><i class="fa fa-caret-left"></i> Back To Snippets List</a>
         <div class="pT20 mT20 mR10 mB10">

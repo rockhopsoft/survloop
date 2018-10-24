@@ -5,12 +5,12 @@
     <div id="navDesktop">
     
         <div class="row">
-        @if ($majTot == 5) <div class="col-md-1"></div> @endif
+        @if ($majTot == 5) <div class="col-1"></div> @endif
         <?php $cnt = 0; ?>
         @foreach ($majorSections as $maj => $majSect)
             @if ($majSect[2] != 'disabled')
                 <?php $cnt++; ?>
-                <div class="col-md-{{ floor(12/$majTot) }}">
+                <div class="col-{{ floor(12/$majTot) }}">
                     <a href="javascript:;" id="maj{{ $maj }}" class="navDeskMaj @if ($maj == $currMajorSection) active 
                         @elseif (in_array($maj, $sessMajorsTouched)) completed @endif " 
                         @if (!isset($minorSections[$maj]) || sizeof($minorSections[$maj]) == 0)
@@ -24,15 +24,15 @@
                 </div>
             @endif
         @endforeach
-        @if ($majTot == 5) <div class="col-md-1"></div> @endif
+        @if ($majTot == 5) <div class="col-1"></div> @endif
         </div>
         @foreach ($majorSections as $maj => $majSect)
             @if (sizeof($minorSections[$maj]) > 0)
                 <div id="minorNav{{ $maj }}" class="minorNavWrap">
                     <div class="row">
-                        @if (sizeof($minorSections[$maj]) == 5) <div class="col-md-1"></div> @endif
+                        @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
                         @forelse ($minorSections[$maj] as $min => $minSect)
-                            <div class="col-md-{{ floor(12/sizeof($minorSections[$maj])) }}">
+                            <div class="col-{{ floor(12/sizeof($minorSections[$maj])) }}">
                                 <a id="maj{{ $maj }}" class="navDeskMin
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) active 
                                     @elseif (in_array($min, $sessMinorsTouched[$maj])) completed 
@@ -62,7 +62,7 @@
                             </div>
                         @empty
                         @endforelse
-                        @if (sizeof($minorSections[$maj]) == 5) <div class="col-md-1"></div> @endif
+                        @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
                     </div>
                 </div>
             @endif

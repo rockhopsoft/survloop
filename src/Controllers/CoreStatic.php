@@ -626,7 +626,7 @@ class CoreStatic
 	                    $max = $v;
 	                }
 	            }
-                return round(($pos/sizeof($arr))*100);
+                return ($pos/sizeof($arr))*100;
             } else { // higher value is better
     	        foreach ($arr as $i => $v) {
 	                if (floatval($val) >= floatval($v) && $max != $v) {
@@ -634,7 +634,7 @@ class CoreStatic
 	                    $max = $v;
 	                }
 	            }
-                return round((1-($pos/sizeof($arr)))*100);
+                return (1-($pos/sizeof($arr)))*100;
 	        }
 	    }
 	    return 0;

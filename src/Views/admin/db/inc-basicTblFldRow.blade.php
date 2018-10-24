@@ -6,8 +6,8 @@
             <a name="{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}{{ $fld->FldName }}"></a>
         </div>
     @endif
-    <div class="div">
-        <div class="col-md-9">
+    <div class="row">
+        <div class="col-9">
             @if ($tblLinks > 0 && $dbAllowEdits && !$isPrint)
                 <a @if ($fld->FldTable > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]])) 
                     href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
@@ -15,8 +15,8 @@
                 @else
                     href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                 @endif
-                    ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> 
-                    <b class="fPerc133"> @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
+                    ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> <b class="fPerc133">
+                    @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
                         <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
                     @endif {{ $fld->FldEng }}</b></a>
             @else 
@@ -24,8 +24,7 @@
                     <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
                 @endif {{ $fld->FldEng }}</b>
             @endif
-            <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;" 
-                ></a>
+            <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;"></a>
             @if ($fld->FldSpecType == 'Replica') 
                 <span class="gry6 f8" data-toggle="tooltip" data-placement="top" 
                     title="Replica field (copy of a Generic field)"><sup>^</sup></span>
@@ -61,15 +60,13 @@
             @endif
             
         </div>
-        <div class="col-md-3 taR gry6">
+        <div class="col-3 taR gry6">
         
             @if ($tblID > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]]) && isset($fld->FldName))
-                <div>
                 {!! $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] 
                     . (($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable])) 
                         ? '<span class="slGreenDark">' . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
-                        . $fld->FldName . '</span>' : $fld->FldName) !!}
-                </div>
+                        . $fld->FldName . '</span>' : $fld->FldName) !!}<br />
             @endif
             @if (strpos($fld->FldKeyType, 'Primary') !== false)
                 @if ($fld->FldKeyStruct == 'Composite') Composite, @endif
@@ -80,16 +77,14 @@
             @if ($fld->FldIsIndex == 1) <span class="gry6 f8">Indexed</span> @endif
             </i></nobr>
             @if (trim($fldForeignPrint) != '' || trim($fldGenerics) != '')
-                <div>
-                    @if (trim($fldForeignPrint) != '') {!! $fldForeignPrint !!} @endif
-                    @if (trim($fldGenerics) != '') {!! $fldGenerics !!} @endif
-                </div>
+                <br />@if (trim($fldForeignPrint) != '') {!! $fldForeignPrint !!} @endif
+                @if (trim($fldGenerics) != '') {!! $fldGenerics !!} @endif
             @endif
             
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-12">
             @if ($isAll && $fld->FldID > 0) 
                 <div id="fldSpec{{ $fld->FldID }}" class="disBlo p20 m20">
                     {!! view('vendor.survloop.admin.db.fieldSpecifications', [ 

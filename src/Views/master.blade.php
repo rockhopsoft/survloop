@@ -118,24 +118,33 @@
 </div>
 <div id="main">
 
-<div class="row flex-nowrap fixed-top clearfix">
-    <div class="col-md-4 taL bgWht">
+<div id="mainNav" class="row flex-nowrap fixed-top clearfix">
+    <div class="col-md-5 col-sm-10 taL">
     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
         <a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-            ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" class="disIn" border=0 
+            ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 
             alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
-            title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" ></a>
+            title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
+         @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
+             && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+            <img id="slLogoImgSm" src="{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}" border=0 
+                alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
+                title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
+         @endif
+         </a>
     @endif
     @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
         && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
         <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="navbar-brand"
             >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
-    </div><div class="col-md-8" id="myNavBar">
-        <a id="navBurger" title="Show Navigation Menu" class="float-right disBlo" onClick="toggleNav();"
-            href="javascript:;" ><i class="fa fa-bars" aria-hidden="true"></i></a>
-        <a id="navBurgerClose" class="float-right disNon" onclick="closeNav()" href="javascript:;" 
-            ><i class="fa fa-times" aria-hidden="true"></i></a>
+    </div><div class="col-md-7 col-sm-2">
+        <div id="myNavBar">
+            <a id="navBurger" title="Show Navigation Menu" class="float-right disBlo" onClick="toggleNav();"
+                href="javascript:;" ><i class="fa fa-bars" aria-hidden="true"></i></a>
+            <a id="navBurgerClose" class="float-right disNon" onclick="closeNav()" href="javascript:;" 
+                ><i class="fa fa-times" aria-hidden="true"></i></a>
+        </div>
     </div>
 </div>
 <div id="headClear"></div>
@@ -153,6 +162,8 @@
 
 <div id="nondialog">
     
+@else
+    <div id="isPrint"></div>
 @endif <?php /* end not print */ ?>
 
 @if ((!isset($isFrame) || !$isFrame) && (isset($admMenu) || isset($belowAdmMenu)))

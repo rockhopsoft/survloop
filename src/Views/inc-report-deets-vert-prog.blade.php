@@ -6,8 +6,7 @@
     <table border=0 class="w100 brdNo repDeetVert">
     @foreach ($deets as $j => $deet)
         <tr><td class="vaT taC">
-            @if ($j == $last) <div class="vertPrgCurr">
-            @elseif (isset($deet[1]) && intVal($deet[1]) > 0) <div class="vertPrgDone">
+            @if ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0) <div class="vertPrgDone">
             @else <div class="vertPrgFutr"> @endif
             <img src="/survloop/uploads/spacer.gif" border=0 ></div>
         </td><td class="vaT">

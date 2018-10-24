@@ -7,19 +7,19 @@
 <h2><span class="slBlueDark"><i class="fa fa-snowflake-o"></i> {{ $GLOBALS['SL']->treeName }}:</span> XML Map</h2>
     
 <div class="row mTn20">
-    <div class="col-md-4">
+    <div class="col-4">
         <h3>Data Table XML Map</h3>
         <a href="javascript:;" id="editXmlMap" class="f14"
             ><i class="fa fa-pencil" aria-hidden="true"></i> Edit Map</a></nobr>
         <style> .editXml { display: none; } </style>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <h3>XML Schema</h3>
         <a href="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
             /{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema</a>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <h3>XML Example</h3>
         <a href="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
@@ -27,13 +27,13 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4" id="xmlFullTree">
+    <div class="col-4" id="xmlFullTree">
         {!! $adminPrintFullTree !!}
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <iframe src="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema" class="w100" style="height: 1000px;"></iframe>
     </div>
-    <div class="col-md-4">
+    <div class="col-4">
         <iframe src="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example" class="w100" style="height: 1000px;"></iframe>
     </div>
 </div>
