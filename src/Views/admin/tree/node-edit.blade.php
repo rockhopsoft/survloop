@@ -28,13 +28,11 @@
 @endif
 
 <div class="row">
-    <div class="col-2 mB10">
+    <div class="col-md-2 mB10">
     @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-        <h2 class="mT0 mB5 slBlueDark">Editing <nobr>Node #{{ $node->nodeRow->NodeID }}</nobr></h2>
-    @else 
-        <h2 class="mT0 mB5 slBlueDark">Adding Node</h2>
-    @endif
-        <a  @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+        <h3 class="m0 slBlueDark">Editing <nobr>Node #{{ $node->nodeRow->NodeID }}</nobr></h3>
+    @else <h3 class="m0 slBlueDark">Adding Node</h3> @endif
+        <a class="fPerc66 mTn10" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
                 href="/dashboard/page/{{ $treeID }}?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
             @elseif (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
                 href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
@@ -42,8 +40,8 @@
                 href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1" 
             @endif >Back to Form-Tree Map</a>
     </div>
-    <div class="col-4 mB10">
-        <h3 class="slBlueDark m0"><i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type</h3>
+    <div class="col-md-4 mB10">
+        <h4 class="slBlueDark m0"><i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type</h4>
         <div id="nodeTypeFld1" class="nFld w100 mT10 pT5">
             <select name="nodeType" id="nodeTypeID" class="form-control form-control-lg" 
                 autocomplete="off" onChange="return changeNodeType(this.value);" {{ $nodeTypeSel }} >
@@ -192,11 +190,10 @@
             </select>
         </div>
     </div>
-    <div class="col-4 mB10 slGreenDark">
+    <div class="col-md-4 mB10 slGreenDark">
         <label>
-            <h3 class="m0 slGreenDark"><i class="fa fa-database mR5"></i> Data Family
-            @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot) : Core Table @endif
-            </h3>
+            <h4 class="m0 slGreenDark"><i class="fa fa-database mR5"></i> Data Family
+            @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot) : Core Table @endif </h4>
             <span class="fPerc80">Node's whole family tree can store data fields related to table.</span>
             <div class="nFld mT0"><select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off" 
                 class="form-control form-control-lg slGreenDark">
@@ -204,7 +201,7 @@
             </select></div>
         </label>
     </div>
-    <div class="col-2 mB10">
+    <div class="col-md-2 mB10">
         <div id="saveBtnGapTop" class="p20 mT5"></div>
         <input type="submit" value="Save Changes" class="btn btn-lg btn-primary w100" 
             @if (!$canEditTree) DISABLED @endif >
@@ -212,16 +209,16 @@
 </div>
 
 <div class="row">
-    <div class="col-8">
+    <div class="col-md-8">
     
         <div id="hasLayout" class=" @if ($node->isLayout()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Layout Options</h4>
                 </div>
                 <div class="card-body">
                     <div class="row mB20">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Layout Node Type</h4>
                                 <div class="nFld"><select name="nodeLayoutType" id="nodeLayoutTypeID"
@@ -243,7 +240,7 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label id="layoutSizeRow" class="nPrompt @if ($node->nodeType == 'Layout Row') disBlo 
                                 @else disNon @endif ">
                                 <h4 class="m0 mB5"># of Columns in Row</h4>
@@ -275,13 +272,13 @@
         </div>
     
         <div id="hasDataPrint" class=" @if ($node->isDataPrint()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Data Printout Options</h4>
                 </div>
                 <div class="card-body">
                     <div class="row mB20">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label id="dataPrintPull" class="w100 
                                 @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
                                     'Print Vert Progress'])) disNon @else disBlo @endif ">
@@ -310,7 +307,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label id="dataPrintTitle" class="w100 
                                 @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
                                     'Print Vert Progress'])) disBlo @else disNon @endif ">
@@ -364,7 +361,7 @@
         </div>
         
         <div id="hasBranch" class=" @if ($node->isBranch()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h3 class="m0">Branch Title</h3>
                 </div>
@@ -384,34 +381,34 @@
         </div>
         
         <div id="hasLoop" class=" @if ($node->isLoopRoot()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Data Set's Loop Options</h4>
                 </div>
                 <div class="card-body">
                     <label class="mB10"><div class="row">
-                        <div class="col-6 nPrompt" style="padding: 5px 0px 0px 15px;">
+                        <div class="col-md-6 nPrompt" style="padding: 5px 0px 0px 15px;">
                             <input type="radio" name="stepLoop" id="stepLoopN" value="0" autocomplete="off" 
                             @if (!$node->isStepLoop()) CHECKED @endif 
                             > <h4 class="disIn mL5 fPerc133 bld">Standard Loop Behavior</h4>
-                        </div><div class="col-6 slGrey">
+                        </div><div class="col-md-6 slGrey">
                             From this root page, users can add records to the set until
                             they choose to move on or reach the loop's limits.
                         </div>
                     </div></label>
                     <label class="mB10"><div class="row">
-                        <div class="col-6 nPrompt" style="padding: 5px 0px 0px 15px;">
+                        <div class="col-md-6 nPrompt" style="padding: 5px 0px 0px 15px;">
                             <input type="radio" name="stepLoop" id="stepLoopY" value="1" autocomplete="off" 
                             @if ($node->isStepLoop()) CHECKED @endif 
                             > <h4 class="disIn mL5 fPerc133 bld">Step-Through Behavior</h4>
-                        </div><div class="col-6 slGrey">
+                        </div><div class="col-md-6 slGrey">
                             All items in this data set are added elsewhere beforehand.
                             Then the user is stepped through them one by one.
                         </div>
                     </div></label>
                     
                     <div class="row mT20">
-                        <div class="col-6 slGreenDark">
+                        <div class="col-md-6 slGreenDark">
                             <label class="nPrompt">
                                 <h4 class="m0"><span class="slGreenDark">Loop Name</span></h4>
                                 <div class="nFld mT0"><select name="nodeDataLoop" id="nodeDataLoopID" 
@@ -427,7 +424,7 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <div id="stdLoopOpts" class="w100 @if (!$node->isStepLoop()) disBlo @else disNon @endif ">
                                 <label class="nPrompt"><h4>
                                 <input type="checkbox" name="stdLoopAuto" id="stdLoopAutoID" value="1" 
@@ -470,7 +467,7 @@
         </div>
         
         <div id="hasCycle" class=" @if ($node->isLoopCycle()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Data Loop Cycle's Options</h4>
                 </div>
@@ -494,13 +491,13 @@
         </div>
         
         <div id="hasSort" class=" @if ($node->isLoopSort()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Data Loop Sorting Options</h4>
                 </div>
                 <div class="card-body">
                     <div class="row slGreenDark">
-                        <div class="col-6 pR20">
+                        <div class="col-md-6 pR20">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5"><span class="slGreenDark">Data Loop:</span></h4>
                                 <div class="nFld mT0"><select name="nodeDataSort" id="nodeDataSortID" 
@@ -517,7 +514,7 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5"><span class="slGreenDark">Loop Sorting Field:</span></h4>
                                 <div class="nFld mT0"><select name="DataStoreSort" id="DataStoreSortID" 
@@ -534,7 +531,7 @@
         </div>
         
         <div id="hasPage" class=" @if ($node->isPage() || $node->isLoopRoot()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Page Settings & SEO</h4>
                 </div>
@@ -545,44 +542,44 @@
                     </i></div>
                     {!! view('vendor.survloop.admin.seo-meta-editor', [ "currMeta" => $currMeta ])->render() !!}
                     <div id="hasPageOpts" class="row nFld @if ($node->isPage()) disBlo @else disNon @endif ">
-                        <div class="col-4">
+                        <div class="col-md-4">
                         @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
                             <label class="disBlo mT20">
-                                <h4><input type="checkbox" name="homepage" id="homepageID" value="7" 
+                                <input type="checkbox" name="homepage" id="homepageID" value="7" 
                                 @if ($GLOBALS['SL']->treeRow->TreeOpts%7 == 0) CHECKED @endif autocomplete="off">
-                                <i class="fa fa-star mL10" aria-hidden="true"></i> Website Home Page</h4>
+                                <i class="fa fa-star mL10 mR5" aria-hidden="true"></i> Website Home Page
                             </label>
                             <label class="disBlo mT20">
-                                <h4><input type="checkbox" name="adminPage" id="adminPageID" value="3" 
+                                <input type="checkbox" name="adminPage" id="adminPageID" value="3" 
                                 @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif autocomplete="off">
-                                <i class="fa fa-eye mL10" aria-hidden="true"></i> Admin-Only Page</h4>
+                                <i class="fa fa-eye mL10 mR5" aria-hidden="true"></i> Admin-Only Page
                             </label>
                             <label class="disBlo mT20">
-                                <h4><input type="checkbox" name="staffPage" id="staffPageID" value="43" 
+                                <input type="checkbox" name="staffPage" id="staffPageID" value="43" 
                                 @if ($GLOBALS['SL']->treeRow->TreeOpts%43 == 0) CHECKED @endif autocomplete="off">
-                                <i class="fa fa-key mL10" aria-hidden="true"></i> Staff Page</h4>
+                                <i class="fa fa-key mL10 mR5" aria-hidden="true"></i> Staff Page
                             </label>
                             @if ($GLOBALS["SL"]->sysHas('partners'))
                                 <label class="disBlo mT20">
-                                    <h4><input type="checkbox" name="partnPage" id="partnPageID" value="41" 
+                                    <input type="checkbox" name="partnPage" id="partnPageID" value="41" 
                                     @if ($GLOBALS['SL']->treeRow->TreeOpts%41 == 0) CHECKED @endif autocomplete="off">
-                                    <i class="fa fa-university mL10" aria-hidden="true"></i> Partner Page</h4>
+                                    <i class="fa fa-university mL10 mR5" aria-hidden="true"></i> Partner Page
                                 </label>
                             @endif
                             @if ($GLOBALS["SL"]->sysHas('volunteers'))
                                 <label class="disBlo mT20">
-                                    <h4><input type="checkbox" name="volunPage" id="volunPageID" value="17" 
+                                    <input type="checkbox" name="volunPage" id="volunPageID" value="17" 
                                     @if ($GLOBALS['SL']->treeRow->TreeOpts%17 == 0) CHECKED @endif autocomplete="off">
-                                    <i class="fa fa-hand-rock-o mL10" aria-hidden="true"></i> Volunteer Page</h4>
+                                    <i class="fa fa-hand-rock-o mL10 mR5" aria-hidden="true"></i> Volunteer Page
                                 </label>
                             @endif
-                            <label class="disBlo mT20"><h4 class="m0">
+                            <label class="disBlo mT20">
                                 <input type="checkbox" name="reportPage" id="reportPageID" value="13" 
                                 @if ($GLOBALS['SL']->treeRow->TreeOpts%13 == 0) CHECKED @endif autocomplete="off"
                                 onClick="if (this.checked) { 
                                     document.getElementById('reportPageTreeID').style.display='block'; 
                                 } else { document.getElementById('reportPageTreeID').style.display='none'; }">
-                                <i class="fa fa-list-alt" aria-hidden="true"></i> Report for Form Tree</h4>
+                                <i class="fa fa-list-alt mL10 mR5" aria-hidden="true"></i> Report for Form Tree
                                 <select name="reportPageTree" id="reportPageTreeID" class="form-control mT5" 
                                     autocomplete="off">{!! $GLOBALS["SL"]->allTreeDropOpts(
                                         (($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) 
@@ -600,7 +597,7 @@
                                 Hide Progress Bar</label>
                         @endif
                         </div>
-                        <div class="col-8">
+                        <div class="col-md-8">
                             <div class="nFld w100">
                                 <label>
                                     Focus Field: 
@@ -618,7 +615,7 @@
         </div>
         
         <div id="hasDataManip" class=" @if ($node->isDataManip()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0"><i class="fa fa-database"></i> Data Manipulation Tools</h4>
                 </div>
@@ -634,7 +631,7 @@
                                 onClick="return checkDataManipFlds();" autocomplete="off" 
                                 @if (isset($node->nodeRow->NodeType) 
                                     && $node->nodeRow->NodeType == 'Data Manip: New') CHECKED @endif >
-                                <h4 class="pL5 mT0">Create New Record in 
+                                <h4 class="disIn pL5 mT0">Create New Record in 
                                 <span class="slGreenDark">Data Family</span></h4>
                         </label>
                     </div>
@@ -644,7 +641,7 @@
                                 onClick="return checkDataManipFlds();" autocomplete="off" 
                                 @if (isset($node->nodeRow->NodeType) 
                                     && $node->nodeRow->NodeType == 'Data Manip: Update') CHECKED @endif >
-                                <h4 class="pL5 mT0">Update Family Record in 
+                                <h4 class="disIn pL5 mT0">Update Family Record in 
                                 <span class="slGreenDark">Data Family</span></h4>
                         </label>
                     </div>
@@ -654,7 +651,7 @@
                                 onClick="return checkDataManipFlds();" autocomplete="off" 
                                 @if (isset($node->nodeRow->NodeType) 
                                     && $node->nodeRow->NodeType == 'Data Manip: Wrap') CHECKED @endif >
-                                <h4 class="pL5 mT0">Just Wrap Children in 
+                                <h4 class="disIn pL5 mT0">Just Wrap Children in 
                                 <span class="slGreenDark">Data Family</span></h4>
                         </label>
                     </div>
@@ -664,7 +661,7 @@
                                 onClick="return checkDataManipFlds();" autocomplete="off" 
                                 @if (isset($node->nodeRow->NodeType) 
                                     && $node->nodeRow->NodeType == 'Data Manip: Close Sess') CHECKED @endif >
-                                <h4 class="pL5 mB0 mT0 slGrey">End User Session for Form Tree</h4>
+                                <h4 class="disIn pL5 mB0 mT0 slGrey">End User Session for Form Tree</h4>
                                 <div id="manipCloseSess" class=" @if (isset($node->nodeRow->NodeType) 
                                     && $node->nodeRow->NodeType == 'Data Manip: Close Sess') disBlo 
                                     @else disNon @endif "><select name="dataManipCloseSessTree" class="form-control"
@@ -777,7 +774,7 @@
         </div>
         
         <div id="hasBigButt" class=" @if ($node->isBigButt()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Big Button Settings</h4>
                 </div>
@@ -795,7 +792,7 @@
                             @endif >
                     </div>
                     <div class="row mT20 mB20">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <h4 class="m0">Button Style</h4>
                             <div class="nFld m0">
                                 <select name="bigBtnStyle" id="bigBtnStyleID" class="form-control form-control-lg"
@@ -810,7 +807,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-6 pT20 taR">
+                        <div class="col-md-6 pT20 taR">
                             <label class="mT20"><input type="checkbox" name="opts43" value="43" 
                                 @if ($node->nodeRow->NodeOpts%43 == 0) CHECKED @endif > 
                                 <h4 class="disIn">Toggle Child Nodes On Click</h4>
@@ -829,7 +826,7 @@
         
         <div id="hasPrompt" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <label for="nodePromptTextID"><h4 class="m0 disIn mR20">Question or Prompt for User</h4> 
                         <small>(text/HTML)</small></label>
@@ -841,7 +838,7 @@
                                 ){!! $node->nodeRow->NodePromptText !!}@endif</textarea></div>
                         
                     <div class="row mT20">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="w100">
                                 <a id="extraSmallBtn" href="javascript:;" class="f12"
                                     >+ Small Instructions or Side-Notes</a> 
@@ -860,7 +857,7 @@
                                 </div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="w100">
                                 <a id="extraHTMLbtn" href="javascript:;" class="f12"
                                     >+ HTML/JS/CSS Extras After Node Field</a> 
@@ -882,13 +879,13 @@
         </div>
         
         <div id="hasSurvWidget" class=" @if ($node->isWidget()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">SurvLoop Widget Options</h4>
                 </div>
                 <div class="card-body">
                     <div class="row mB20">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="nPrompt @if ($GLOBALS['SL']->treeRow->TreeType != 'Page') disNon @endif ">
                                 <h4 class="m0 mB5">Related Tree</h4>
                                 <div class="nFld"><select name="nodeSurvWidgetTree" id="nodeSurvWidgetTreeID"
@@ -897,7 +894,7 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label id="widgetRecLimitID" class="nPrompt @if (in_array($node->nodeType, [
                                 'Search Results', 'Search Featured', 'Record Previews'
                                 ])) disBlo @else disNon @endif ">
@@ -914,7 +911,7 @@
                     <div id="widgetGraph" class="mT20 @if (in_array($node->nodeType, ['Plot Graph', 'Line Graph'])) 
                         disBlo @else disNon @endif ">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-md-4">
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Y-Axis</h4>
                                     <div class="nFld"><select name="nodeWidgGrphY" id="nodeWidgGrphYID"
@@ -933,7 +930,7 @@
                                     </select></div>
                                 </label>
                             </div>
-                            <div class="col-4">
+                            <div class="col-md-4">
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">X-Axis</h4>
                                     <div class="nFld"><select name="nodeWidgGrphX" id="nodeWidgGrphXID"
@@ -957,7 +954,7 @@
                     <div id="widgetBarChart" class="mT20 @if (in_array($node->nodeType, ['Bar Graph'])) disBlo
                         @else disNon @endif ">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Value</h4>
                                     <div class="nFld"><select name="nodeWidgBarY" id="nodeWidgBarYID"
@@ -976,7 +973,7 @@
                                     </select></div>
                                 </label>
                             </div>
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <label class="nPrompt">
                                     <h4 class="m0 mB5">Label 1</h4>
                                     <div class="nFld"><select name="nodeWidgBarL1" id="nodeWidgBarL1ID"
@@ -998,7 +995,7 @@
                             </div>
                         </div>
                         <div class="row mT20">
-                            <div class="col-6">
+                            <div class="col-md-6">
                                 <label class="nPrompt w100"><h4 class="m0 mB5">Color Starting From Left</h4></label>
                                 {!! view('vendor.survloop.inc-color-picker', [
                                     'fldName' => 'nodeWidgBarC1',
@@ -1010,8 +1007,8 @@
                                     'preSel'  => ((isset($node->extraOpts["clr2"])) ? $node->extraOpts["clr2"] : '')
                                 ])->render() !!}
                             </div>
-                            <div class="col-1"></div>
-                            <div class="col-5">
+                            <div class="col-md-1"></div>
+                            <div class="col-md-5">
                                 <label class="nPrompt">
                                     Opacity Starting From Left
                                     <div class="nFld"><input type="text" name="nodeWidgBarO1" id="nodeWidgBarO1ID"
@@ -1033,7 +1030,7 @@
                     </div>
                     <div id="widgetPieChart" class="row mT20 @if (in_array($node->nodeType, ['Pie Chart'])) disBlo
                         @else disNon @endif ">
-                        <div class="col-4">
+                        <div class="col-md-4">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Value</h4>
                                 <div class="nFld"><select name="nodeWidgPieY" id="nodeWidgPieYID"
@@ -1052,22 +1049,22 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-4">
+                        <div class="col-md-4">
                             
                         </div>
-                        <div class="col-4">
+                        <div class="col-md-4">
                             
                         </div>
                     </div>
                     <div id="widgetMap" class="row mT20 @if (in_array($node->nodeType, ['Map'])) disBlo
                         @else disNon @endif ">
-                        <div class="col-4">
+                        <div class="col-md-4">
                         
                         </div>
-                        <div class="col-4">
+                        <div class="col-md-4">
                             
                         </div>
-                        <div class="col-4">
+                        <div class="col-md-4">
                             
                         </div>
                     </div>
@@ -1081,7 +1078,7 @@
                     </label>
                     <div id="widgetPrePost" class="row mT20 @if ($GLOBALS['SL']->treeRow->TreeType != 'Page'
                         || $node->nodeType == 'Send Email') disNon @else disBlo @endif ">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Pre-Widget</h4>
                                 <div class="nFld"><textarea name="nodeSurvWidgetPre" id="nodeSurvWidgetPreID" 
@@ -1090,7 +1087,7 @@
                                         ){!! $node->nodeRow->NodePromptText !!}@endif</textarea></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="nPrompt">
                                 <h4 class="m0 mB5">Post-Widget</h4>
                                 <div class="nFld"><textarea name="nodeSurvWidgetPost" id="nodeSurvWidgetPostID" 
@@ -1105,7 +1102,7 @@
         </div>
         
         <div id="hasSendEmail" class=" @if ($node->nodeType == 'Send Email') disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Email Sending Options</h4>
                 </div>
@@ -1118,13 +1115,13 @@
         <div id="hasResponse" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
         
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">User Response Settings</h4>
                 </div>
                 <div class="card-body">
                     <div id="storeResponseDiv" class="row mB10 @if ($node->isSpreadTbl()) disNon @else disBlo @endif ">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label class="w100">
                                 <h4 class="m0 slGreenDark">Store User Response</h4>
                                 <div class="nFld m0"><select name="nodeDataStore" class="form-control form-control-lg w100" 
@@ -1134,7 +1131,7 @@
                                 </select></div>
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <div class="nFld w100 mT0"><label class="w100">
                                 <h4 class="m0">Default Value:</h4> 
                                 <input type="text" name="nodeDefault" id="nodeDefaultID" class="form-control form-control-lg"
@@ -1144,14 +1141,14 @@
                         </div>
                     </div>
                     <div class="row mB10">
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <label for="opts5ID" class="red fPerc125 mB10">
                                 <input type="checkbox" name="opts5" id="opts5ID" value="5" autocomplete="off" 
                                     @if ($node->isRequired()) CHECKED @endif 
                                     onClick="return changeRequiredType();"> User Response Required
                             </label>
                         </div>
-                        <div class="col-6">
+                        <div class="col-md-6">
                             <div id="NumberOpts" class=" @if (isset($node->nodeRow->NodeType) && 
                                 in_array($node->nodeRow->NodeType, ['Text:Number', 'Slider'])) disBlo @else disNon 
                                 @endif ">
@@ -1481,14 +1478,14 @@
         </div> <!-- end hasResponse -->
         
         <div id="isPageBlock" class=" @if ($node->isPageBlock()) disBlo @else disNon @endif ">
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Style Options</h4>
                 </div>
                 <div class="card-body" style="padding: 0px;">
                     <div id="pageBlock" class="slBg slTxt p20">
                         <div class="row">
-                            <div class="col-4">
+                            <div class="col-md-4">
                                 <select name="blockAlign" id="blockAlignID" class="form-control form-control-lg mB20" 
                                     autocomplete="off">
                                     <option value="left" @if (!isset($node->colors["blockAlign"]) 
@@ -1502,7 +1499,7 @@
                                         >Align Right</option>
                                 </select>
                             </div>
-                            <div class="col-4">
+                            <div class="col-md-4">
                                 <select name="blockHeight" id="blockHeightID" class="form-control form-control-lg mB20" 
                                     autocomplete="off">
                                     <option value="auto" @if (!isset($node->colors["blockHeight"]) 
@@ -1528,10 +1525,10 @@
                                         >25% Screen Height</option>
                                 </select>
                             </div>
-                            <div class="col-4">
+                            <div class="col-md-4">
                                 <div class=" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
-                                    && $GLOBALS['SL']->REQ->has('parent') 
-                                    && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot) disBlo
+                                    /* && $GLOBALS['SL']->REQ->has('parent') 
+                                    && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot */) disBlo
                                     @else disNon @endif ">
                                     <select name="opts67" id="opts67ID" class="form-control form-control-lg mB20" 
                                         autocomplete="off">
@@ -1550,7 +1547,7 @@
                         <div id="pageBlockOpts" class="pT5 
                             @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
                             <div class="row">
-                                <div class="col-5">
+                                <div class="col-md-5">
                                     <label for="blockBGID"><h4 class="m0">Background Color</h4></label>
                                     {!! view('vendor.survloop.inc-color-picker', [
                                         'fldName' => 'blockBG',
@@ -1571,8 +1568,8 @@
                                             ? $node->colors["blockLink"] : '#FFF')
                                     ])->render() !!}
                                 </div>
-                                <div class="col-1"></div>
-                                <div class="col-6">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-6">
                                     <label for="blockImgID"><h4 class="m0">Background Image</h4></label>
                                     <input type="text" class="form-control form-control-lg w100 mB20 mR20"
                                         id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
@@ -1627,9 +1624,9 @@
         </div>
         
     </div>
-    <div class="col-4">
+    <div class="col-md-4">
     
-        <div id="pagePreview" class="card @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
+        <div id="pagePreview" class="card mB20 @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
             <div class="card-header">
                 <h4 class="m0">Social Sharing Preview</h4>
             </div>
@@ -1638,7 +1635,7 @@
             </div>
         </div>
     
-        <div class="card">
+        <div class="card mB20">
             <div class="card-header">
                 <label for="nodeConditionsID"><h4 class="m0">Conditions To Include Node</h4></label>
             </div>
@@ -1672,7 +1669,7 @@
         <div id="hasResponseLayout" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
             @else disBlo @endif ">
             
-            <div class="card">
+            <div class="card mB20">
                 <div class="card-header">
                     <h4 class="m0">Node Layout Options</h4>
                 </div>
@@ -1720,15 +1717,14 @@
                     </div>
                 </div>
                 
-                <div id="taggerOpts" class="mB10 
-                    @if ($node->nodeRow->NodeType == 'Drop Down') disBlo @else disNon @endif " >
+                <div id="taggerOpts" class="p10 mB10 
+                    @if (in_array($node->nodeRow->NodeType, ['Drop Down', 'U.S. States'])) disBlo @else disNon @endif ">
                     <b>Empty/Non-Response Option:</b> 
                     <div class="nFld"><input type="text" name="dropDownSuggest" class="form-control" 
-                        @if (isset($node->nodeRow->NodeTextSuggest)) 
-                            value="{{ $node->nodeRow->NodeTextSuggest }}"
+                        @if (isset($node->nodeRow->NodeTextSuggest)) value="{{ $node->nodeRow->NodeTextSuggest }}"
                         @endif ></div>
                     
-                    <label for="opts53ID" class="mL10 mT20">
+                    <label for="opts53ID" class="mT20">
                         <input type="checkbox" name="opts53" id="opts53ID" value="53" autocomplete="off" 
                             @if ($node->isDropdownTagger()) CHECKED @endif 
                             > Selecting Responses Adds One Or More Tags

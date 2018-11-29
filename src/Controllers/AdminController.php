@@ -151,14 +151,14 @@ class AdminController extends SurvLoopController
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
             $this->admMenuLnk('/dashboard/pages/list',     'Pages & Reports'), 
             $this->admMenuLnk('javascript:;', 'Surveys & Forms', '', 1, [
+                $this->admMenuLnk('/dashboard/surveys/list', 'All Surveys'),
                 $this->admMenuLnk('javascript:;', $treeLabel, '', 1, [
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 'Full Survey Map'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Session Stats'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Response Stats'),
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
                     $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map') 
-                    ]),
-                $this->admMenuLnk('/dashboard/surveys/list', 'All Surveys')
+                    ])
                 ]),
             $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets'), 
             $this->admMenuLnk('/dashboard/pages/menus',    'Navigation Menus'), 
@@ -201,8 +201,10 @@ class AdminController extends SurvLoopController
                 $this->admMenuLnk('/dashboard/settings#color',    'Colors'),
                 $this->admMenuLnk('/dashboard/settings#hardcode', 'Code HTML CSS JS')
                 ]),
-            $this->admMenuLnk('/dashboard/logs',              'System Logs'),
-            $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff'),
+            $this->admMenuLnk('javascript:;',       'System Logs', '', 1, [
+                $this->admMenuLnk('/dashboard/logs', 'All Logs'),
+                $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff')
+                ]),
             $this->admMenuLnk('/dashboard/systems-check',     'System Check'),
             $this->admMenuLnk('/dashboard/systems-update',    'System Updates')
             ]);
@@ -244,6 +246,7 @@ class AdminController extends SurvLoopController
     {
         $cID = (($request->has('cid')) ? $request->get('cid') : -3);
         $cRow = (($cID > 0) ? SLContact::find($cID) : []);
+        $newStatus = (($request->has('status')) ? $request->get('status') : '');
         if ($cID > 0 && isset($cRow->ContID) && $newStatus != '') {
             $cRow->ContFlag = $newStatus;
             $cRow->save();
@@ -418,10 +421,10 @@ class AdminController extends SurvLoopController
                         || ($urlTree->TreeOpts%43 == 0 && ($this->isUserStaff() || $this->isUserAdmin()))) {
                         $rootNode = SLNode::find($urlTree->TreeFirstPage);
                         if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = '/dash/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1';
-                            $paramTxt = str_replace($this->domainPath . '/start' 
-                                . ((intVal($cid) > 0) ? '-' . $cid : '') . '/' . $urlTree->TreeSlug, '', 
-                                $request->fullUrl());
+                            $redir = '/dash/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes 
+                                . '?start=1&new=1';
+                            $paramTxt = str_replace($this->domainPath . '/start' . ((intVal($cid) > 0) ? '-' . $cid :'')
+                                . '/' . $urlTree->TreeSlug, '', $request->fullUrl());
                             if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
                             if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
                                 $redir .= '&' . substr($paramTxt, 1);
@@ -433,6 +436,7 @@ class AdminController extends SurvLoopController
                                     ->where('SessCoreID', $cid)
                                     ->orderBy('updated_at', 'desc')
                                     ->first();
+//echo '<br /><br /><br /><pre>'; print_r($sess); echo '</pre>';
                                 if (!$sess || !isset($sess->SessID)) {
                                     $sess = new SLSess;
                                     $sess->SessUserID = Auth::user()->id;
@@ -450,6 +454,7 @@ class AdminController extends SurvLoopController
                                     session()->put('coreID' . $urlTree->TreeID, $cid);
                                 }
                             }
+//echo '<br /><br /><br />redir: ' . $redir . '<br />'; exit;
                             return redirect($this->domainPath . $redir);
                         }
                     }
@@ -991,6 +996,8 @@ class AdminController extends SurvLoopController
             'google-analytic' => ['Google Analytics Tracking ID', 'UA-23427655-1'], 
             'google-map-key'  => ['Google Maps API Key: Server', 'string'], 
             'google-map-key2' => ['Google Maps API Key: Browser', 'string'], 
+            'google-cod-key'  => ['Google Geocoding API Key: Server', 'string'], 
+            'google-cod-key2' => ['Google Geocoding API Key: Browser', 'string'], 
             'twitter'         => ['Twitter Account', '@SurvLoop'], 
             'show-logo-title' => ['Print Site Name Next To Logo', '1 or 0'], 
             'users-create-db' => ['Users Can Create Databases', '1 or 0'], 
@@ -1174,7 +1181,8 @@ class AdminController extends SurvLoopController
         $this->v["currPage"][1] = 'Contact Form Messages';
         $GLOBALS["SL"]->pageAJAX .= '$(".changeContStatus").change(function(){
             var cID = $(this).attr( "name" ).replace( "ContFlag", "" );
-            var postUrl = "/ajadm/contact?tab={{ $filtStatus }}&cid="+cID+"&status="+$(this).val();
+            var postUrl = "/ajadm/contact?' . ((isset($filtStatus)) ? 'tab=' . $filtStatus . '&' : '') 
+                . 'cid="+cID+"&status="+$(this).val();
             $( "#wrapItem"+cID+"" ).load( postUrl );
         });';
         return view('vendor.survloop.admin.contact', $this->v);
@@ -1312,6 +1320,7 @@ class AdminController extends SurvLoopController
         $this->v["logs"] = [
             "session" => $this->logPreview('session-stuff')
             ];
+        $this->v["phpInfo"] = $request->has('phpinfo');
         return view('vendor.survloop.admin.logs-overview', $this->v);
     }
     

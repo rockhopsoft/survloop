@@ -95,11 +95,6 @@ class CoreStatic
         return $arr;
     }
     
-    public function mapsURL($addy)
-    {
-        return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
-    }
-    
     public function getYoutubeID($url)
     {
         $ret = '';
@@ -317,11 +312,18 @@ class CoreStatic
     
     public function urlClean($url)
     {
-        $url = str_replace('http://', '', str_replace('https://', '', 
-            str_replace('http://www.', '', str_replace('https://www.', '', $url))));
+        $url = str_replace('m.facebook.com/', 'facebook.com/', str_replace('http://', '', str_replace('https://', '', 
+            str_replace('http://www.', '', str_replace('https://www.', '', $url)))));
         $pos = strrpos($url, '/');
         if ($pos !== false && $pos == strlen($url)-1) $url = substr($url, 0, $pos);
         return $url;
+    }
+    
+    public function urlCleanIfShort($url, $altLabel = 'Link', $max = 35)
+    {
+        $shrt = $this->urlClean($url);
+        if (strlen($shrt) > $max) return $altLabel;
+        return $shrt;
     }
     
     public function stdizeChars($txt)
@@ -572,18 +574,54 @@ class CoreStatic
         return ' }); </script>';
     }
     
-    public function getTwitShareLnk($url = '', $text = '', $hashtags = '')
+    public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
     {
         return 'http://twitter.com/share?url=' . urlencode($url) 
-            . ((trim($text) != '') ? '&text=' . urlencode($text) : '')
+            . ((trim($title) != '') ? '&text=' . urlencode($title) : '')
             . ((trim($hashtags) != '') ? '&hashtags=' . urlencode($hashtags) : '');
     }
     
-    public function getFacebookShareLnk($url = '', $text = '')
+    public function twitShareBtn($url = '', $title = '', $hashtags = '', $class = '', $btnText = '')
+    {
+        return view('vendor.survloop.inc-social-simple-tweet', [
+            "link"     => $url,
+            "title"    => $title,
+            "hashtags" => $hashtags,
+            "class"    => $class,
+            "btnText"  => $btnText
+            ])->render();
+    }
+    
+    public function getFacebookShareLnk($url = '', $title = '')
     {
         return 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($url);
     }
-
+    
+    public function faceShareBtn($url = '', $title = '', $class = '', $btnText = '')
+    {
+        return view('vendor.survloop.inc-social-simple-facebook', [
+            "link"    => $url,
+            "title"   => $title,
+            "class"   => $class,
+            "btnText" => $btnText
+            ])->render();
+    }
+    
+    public function getLinkedinShareLnk($url = '', $title = '')
+    {
+        return 'https://www.linkedin.com/shareArticle?mini=true&url=' . urlencode($url) . '&title=' . urlencode($title);
+    }
+    
+    public function linkedinShareBtn($url = '', $title = '', $class = '', $btnText = '')
+    {
+        return view('vendor.survloop.inc-social-simple-linkedin', [
+            "link"    => $url,
+            "title"   => $title,
+            "class"   => $class,
+            "btnText" => $btnText
+            ])->render();
+    }
+    
     public function tabInd()
     {
         $this->currTabInd++;
@@ -614,6 +652,11 @@ class CoreStatic
 		return $data;
 	}
 	
+	public function getArrPercentileStr($str, $val, $isGolf = false)
+	{
+	    return $this->getArrPercentile($this->mexplode(',', $str), $val, $isGolf);
+	}
+	
 	public function getArrPercentile($arr, $val, $isGolf = false)
 	{
 	    $pos = 0;
@@ -640,4 +683,21 @@ class CoreStatic
 	    return 0;
 	}
     
+    public function makeXMLSafe($strIN) {
+        //$strIN = htmlentities($strIN);
+        $strIN = str_replace("�", "'", str_replace('�', '\'', $strIN));
+        $strIN = str_replace("&#146;", "'", str_replace("&#145;", "'", $strIN));
+        $strIN = str_replace("&#148;", "'", str_replace("&#147;", "'", $strIN));
+        //$strIN = str_replace('&amp;', '&', str_replace('&amp;', '&', str_replace('&amp;', '&', $strIN)));
+        $strIN = str_replace("&#39;", "'", str_replace("&apos;", "'", $strIN));
+        $strIN = str_replace('&quot;', '"', $strIN);
+        $strIN = str_replace('&', '&amp;', $strIN);
+        $strIN = str_replace("'", "&apos;", str_replace("\'", "&apos;", str_replace("\\'", "&apos;", $strIN)));
+        $strIN = str_replace('"', '&quot;', str_replace('\"', '&quot;', str_replace('\\"', '&quot;', $strIN)));
+        $strIN = str_replace('<', '&lt;', $strIN);
+        $strIN = str_replace('>', '&gt;', $strIN);
+        return htmlspecialchars(trim($strIN), ENT_XML1, 'UTF-8');
+        return trim($strIN);
+    }
+	
 }

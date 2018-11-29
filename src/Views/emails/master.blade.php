@@ -43,7 +43,6 @@ h5 { font-size: 110%; }
 .fPerc133 { font-size: 133%; }
 
 .contentBox {
-    padding: 20px;
     color: {!! $cssColors['color-main-text'] !!};
 }
 #logoImg {

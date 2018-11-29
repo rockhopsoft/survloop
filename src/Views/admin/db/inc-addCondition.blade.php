@@ -4,11 +4,11 @@
     @if (isset($cond) && isset($cond->CondID)) value="{{ $cond->CondID }}" @else value="-3" @endif >
 
 @if (isset($cond) && isset($cond->CondTag))
-    <h3 class="slBlueDark mT0 mB20"><i class="fa fa-pencil" aria-hidden="true"></i> 
-        Edit Condition: {{ $cond->CondTag }}</h3>
+    <h4 class="slBlueDark mT0 mB20"><i class="fa fa-pencil" aria-hidden="true"></i> 
+        Edit Condition: {{ $cond->CondTag }}</h4>
 @else
     <?php $cond = []; ?>
-    <h3 class="slBlueDark mT0"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Condition:</h3>
+    <h4 class="slBlueDark mT0"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Condition:</h4>
     @if (!isset($newOnly) || !$newOnly)
         <select id="oldCondsID" name="oldConds" class="form-control form-control-lg mT5" autocomplete="off" >
             <option value="0">Select a condition</option>

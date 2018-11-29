@@ -13,7 +13,7 @@
 <input type="hidden" name="advUrl" id="advUrlID" value="{{ $advUrl }}">
 @if (isset($extra) && trim($extra) != '') {!! $extra !!} @endif
 @if (isset($advanced) && trim($advanced) != '')
-    <div class="fR pT5"><a id="searchAdvBtn{{ $nID }}t{{ $treeID }}" class="searchAdvBtn fPerc133" href="javascript:;"
+    <div class="fR pT15"><a id="searchAdvBtn{{ $nID }}t{{ $treeID }}" class="searchAdvBtn fPerc133" href="javascript:;"
         >Advanced filters <i class="fa fa-cogs" aria-hidden="true"></i></a></div>
 @endif
 <div class="fC"></div>

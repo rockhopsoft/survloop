@@ -517,5 +517,43 @@ class CoreGlobals extends CoreGlobalsImportExport
         $this->loadStates();
         return $this->states->getCityCounty($city, $state);
     }
+
+    public function embedMapSimpAddy($nID = 0, $addy = '', $label = '', $height = 450)
+    {
+        $this->loadStates();
+        return $this->states->embedMapSimpAddy($nID, $addy, $label, $height);
+    }
+    
+    public function embedMapSimpRowAddy($nID, $row, $abbr, $label = '', $height = 450)
+    {
+        $this->loadStates();
+        return $this->states->embedMapSimpAddy($nID, $this->printRowAddy($row, $abbr), $label, $height);
+    }
+    
+    public function printRowAddy($row, $abbr, $twoLines = false)
+    {
+        $ret = '';
+        if ($row) {
+            foreach (['Address', 'Address2', 'AddressCity', 'AddressState', 'AddressZip'] as $i => $fld) {
+                if (isset($row->{ $abbr . $fld }) && trim($row->{ $abbr . $fld }) != '') {
+                    $ret .= (($twoLines && $fld == 'AddressCity') ? '<br />' : '')
+                        . trim($row->{ $abbr . $fld }) . (($fld == 'AddressCity') ? ', ' : ' ');
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    public function mapsURL($addy)
+    {
+        return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
+    }
+    
+    public function rowAddyMapsURL($row, $abbr)
+    {
+        return $this->mapsURL($this->printRowAddy($row, $abbr));
+    }
+    
+    
     
 }

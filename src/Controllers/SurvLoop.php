@@ -215,7 +215,7 @@ class SurvLoop extends Controller
                     if ($urlTree && isset($urlTree->TreeOpts) && $urlTree->TreeOpts%3 > 0) {
                         $rootNode = SLNode::find($urlTree->TreeFirstPage);
                         if ($rootNode && isset($urlTree->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1';
+                            $redir = '/u/' . $urlTree->TreeSlug . '/' . $rootNode->NodePromptNotes . '?start=1&new=1';
                             $paramTxt = str_replace($this->domainPath . '/start/' . $urlTree->TreeSlug, '', 
                                 $request->fullUrl());
                             if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
@@ -421,6 +421,13 @@ class SurvLoop extends Controller
         $this->loadTreeByID($request, $treeID);
         $this->loadLoop($request);
         return $this->custLoop->delSess($request, $cid);
+    }
+    
+    public function cpySess(Request $request, $treeID, $cid)
+    {
+        $this->loadTreeByID($request, $treeID);
+        $this->loadLoop($request);
+        return $this->custLoop->cpySess($request, $cid);
     }
     
     public function afterLogin(Request $request)
@@ -791,11 +798,11 @@ class SurvLoop extends Controller
                 $userName = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
             }
             $ret .= "addTopNavItem('" . $userName . "', '/my-profile\" id=\"loginLnk'); ";
+            $ret .= 'addSideNavItem("Logout", "/logout"); addSideNavItem("My Profile", "/my-profile"); ';
             if (Auth::user()->hasRole('administrator')) {
                 $ret .= 'addTopNavItem("Dashboard", "/dashboard"); '
                     . 'addSideNavItem("Admin Dashboard", "/dashboard"); ';
             }
-            $ret .= 'addSideNavItem("My Profile", "/my-profile"); addSideNavItem("Logout", "/logout"); ';
         } else {
             $ret .= "addTopNavItem('Sign Up', '/register\" id=\"loginLnk'); addTopNavItem('Login', '/login'); "
                 . 'addSideNavItem("Login", "/login"); addSideNavItem("Sign Up", "/register"); ';

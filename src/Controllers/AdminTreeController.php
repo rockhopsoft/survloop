@@ -36,23 +36,22 @@ class AdminTreeController extends AdminController
     	if ($this->v["uID"] > 0) {
     		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
         }
-        $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) 
-            ? session()->get('adminOverOpts') : '');
+        $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) ? session()->get('adminOverOpts') : '');
         if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/tree';
         
-        $this->v["treeClassAdmin"] = new SurvLoopTreeAdmin($this->REQ);
+        if (!isset($this->v["treeClassAdmin"])) $this->v["treeClassAdmin"] = new SurvLoopTreeAdmin($this->REQ);
         $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $this->REQ);
         $this->initExtraCust();
         
         if (!session()->has('chkCoreTbls') || $GLOBALS["SL"]->REQ->has('refresh')) {
-            $userTbl = $this->loadUsrTblRow();
+            $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
             $trees = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
                 ->where('TreeCoreTable', '>', 0)
                 ->get();
             if ($trees->isNotEmpty()) {
                 foreach ($trees as $tree) {
                     $coreTbl = SLTables::find($tree->TreeCoreTable);
-                    $this->initCoreTable($coreTbl, $userTbl);
+                    $GLOBALS["SL"]->initCoreTable($coreTbl, $userTbl);
                 }
             }
             $this->allStdCondition('#IsAdmin', 'The user is currently logged in as an administrator.');
@@ -642,13 +641,13 @@ class AdminTreeController extends AdminController
         }
         $coreTots = [ "core" => $coreID, "node" => -3, "date" => 0, "dur" => 0, "mobl" => false, "cmpl" => false, 
             "log" => [] ];
-        eval("\$coreRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" . $coreID . ");");
+        eval("\$coreRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" . intVal($coreID) . ");");
         if (!$coreRec || !isset($coreRec->updated_at)) return $coreTots;
         $cacheFile = '../storage/app/anlyz/t' . $this->CustReport->treeID . '/c' . $coreID . '.php';
         if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             if (in_array($coreID, $this->v["allPublicCoreIDs"])) $coreTots["cmpl"] = true;
-            $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
+            $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
             if (isset($coreRec->{ $coreAbbr . 'SubmissionProgress' })) {
                 $coreTots["node"] = $coreRec->{ $coreAbbr . 'SubmissionProgress' };
                 $coreTots["date"] = strtotime($coreRec->created_at);
@@ -963,7 +962,7 @@ class AdminTreeController extends AdminController
             $coreTbl->save();
         }
 
-        $userTbl = $this->loadUsrTblRow();
+        $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
         if (!$userTbl) {
             $userTbl = new SLTables;
             $userTbl->TblDatabase = $GLOBALS["SL"]->dbID;
@@ -1058,7 +1057,7 @@ class AdminTreeController extends AdminController
         $tree->TreeLastPage        = $pageNode->NodeID;
         $tree->save();
         
-        $this->initCoreTable($coreTbl, $userTbl);
+        $GLOBALS["SL"]->initCoreTable($coreTbl, $userTbl);
         
         return $tree;
     }
@@ -1083,13 +1082,6 @@ class AdminTreeController extends AdminController
         return $treeXML;
     }
     
-    protected function loadUsrTblRow()
-    {
-        return SLTables::where('TblDatabase', $GLOBALS["SL"]->dbID)
-            ->where('TblEng', 'Users')
-            ->first();
-    }
-    
     protected function chkAllCoreTbls()
     {
         $chk = SLTree::where('TreeType', 'Survey')
@@ -1100,106 +1092,23 @@ class AdminTreeController extends AdminController
             ->where('SL_Tree.TreeType', 'Survey')
             ->select('SL_Tables.*')
             ->get();
-        $userTbl = $this->loadUsrTblRow();
+        $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $tbl) {
-                $this->initCoreTable($tbl, $userTbl);
+                $GLOBALS["SL"]->initCoreTable($tbl, $userTbl);
             }
         }
         return true;
     }
     
-    protected function initCoreTable($coreTbl, $userTbl = null)
-    {
-        if (!$coreTbl || !isset($coreTbl->TblID)) return false;
-        if (!$userTbl) $userTbl = $this->loadUsrTblRow();
-        $coreFlds = [ [ 
-                "FldType" => 'INT', 
-                "FldEng"  => 'User ID', 
-                "FldName" => 'UserID', 
-                "FldDesc" => 'Indicates the unique User ID number of the User '
-                    . 'owning the data stored in this record for this Experience.' 
-            ], [ 
-                "FldType" => 'INT', 
-                "FldEng"  => 'Experience Node Progress', 
-                "FldName" => 'SubmissionProgress', 
-                "FldDesc" => 'Indicates the unique Node ID number of the last '
-                    . 'Experience Node loaded during this User\'s Experience.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Tree Version Number', 
-                "FldName" => 'TreeVersion', 
-                "FldDesc" => 'Stores the current version number of this User Experience, important for tracking bugs.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'A/B Testing Version', 
-                "FldName" => 'VersionAB', 
-                "FldDesc" => 'Stores a complex string reflecting all A/B Testing '
-                    . 'variations in effect at the time of this User\'s Experience of this Node.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Unique String For Record', 
-                "FldName" => 'UniqueStr', 
-                "FldDesc" => 'This unique string is for cases when including the record ID number is not appropriate.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'IP Address', 
-                "FldName" => 'IPaddy', 
-                "FldDesc" => 'Encrypted IP address of the current user.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Using Mobile Device', 
-                "FldName" => 'IsMobile', 
-                "FldDesc" => 'Indicates whether or not the current user is interacting via a mobile deviced.' 
-            ]
-        ];
-        foreach ($coreFlds as $f) {
-            $chk = SLFields::where('FldDatabase', $this->dbID)
-                ->where('FldTable', $coreTbl->TblID)
-                ->where('FldName', $f["FldName"])
-                ->get();
-            if ($chk->isEmpty()) {
-                $fld = new SLFields;
-                $fld->FldDatabase         = $this->dbID;
-                $fld->FldTable            = $coreTbl->TblID;
-                $fld->FldEng              = $f["FldEng"];
-                $fld->FldName             = $f["FldName"];
-                $fld->FldDesc             = $f["FldDesc"];
-                $fld->FldSpecType         = 'Replica';
-                $fld->FldType             = $f["FldType"];
-                if ($f["FldType"] == 'INT') {
-                    $fld->FldDataType     = 'Numeric';
-                    $fld->FldCharSupport  = ',Numbers,';
-                }
-                if ($f["FldName"] == 'UserID') {
-                    $fld->FldKeyType      = ',Foreign,';
-                    $fld->FldForeignTable = $userTbl->TblID;
-                }
-                // Options: Auto-Managed By SurvLoop; Internal Use not in XML
-                $fld->FldOpts             = 39;
-                $fld->save();
-            }
-        }
-        $this->installNewModel($coreTbl, true);
-        return true;
-    }
-    
-    protected function installNewModel($tbl, $forceFile = true)
-    {
-        if ($tbl && isset($tbl->TblName) && $tbl->TblName != 'Users') {
-            $GLOBALS["SL"]->modelPath($tbl->TblName, $forceFile);
-        }
-        return true;
-    }
-    
-    protected function installNewCoreTable($tbl)
+    public function installNewCoreTable($tbl)
     {
         $tblQry = $this->exportMysqlTblCoreStart($tbl) 
             . "  `" . $tbl->TblAbbr . "UserID` bigint(20) unsigned NULL, \n"
             . "  `" . $tbl->TblAbbr . "SubmissionProgress` int(11) NULL , \n"
             . "  `" . $tbl->TblAbbr . "VersionAB` varchar(255) NULL , \n"
             . "  `" . $tbl->TblAbbr . "UniqueStr` varchar(50) NULL , \n"
-            . "  `" . $tbl->TblAbbr . "IPaddy` varchar(50) NULL , \n"
+            . "  `" . $tbl->TblAbbr . "IPaddy` varchar(255) NULL , \n"
             . "  `" . $tbl->TblAbbr . "IsMobile` int(1) NULL , \n"
             . $this->exportMysqlTblCoreFinish($tbl);
         return DB::statement($tblQry);

@@ -20,24 +20,32 @@
         }
     @endif
     @if (isset($node->colors["blockImg"]) && trim($node->colors["blockImg"]) != '')
-        #blockWrap{{ $nIDtxt }} {
-            background: url('{{ $node->colors["blockImg"] }}') @if (isset($node->colors["blockBG"]) 
-                && trim($node->colors["blockBG"]) != '') {{ $node->colors["blockBG"] }} @endif ;
-            @if (isset($node->colors["blockImgType"]) && trim($node->colors["blockImgType"]) == 'tiles')
-                background-repeat: repeat;
-            @else
-                background-position: center;
-                background-repeat: no-repeat;
-                -webkit-background-size: cover;
-                -moz-background-size: cover;
-                -o-background-size: cover;
-                background-size: cover;
-            @endif
-            @if (isset($node->colors["blockImgFix"]) && in_array($node->colors["blockImgFix"], ['Y', 'P'])) 
-                background-attachment: fixed;
-            @else
-                background-attachment: scroll;
-            @endif
+        @supports not (-webkit-overflow-scrolling: touch) { /* CSS for other than iOS devices */
+            #blockWrap{{ $nIDtxt }} {
+                background: url('{{ $node->colors["blockImg"] }}') @if (isset($node->colors["blockBG"]) 
+                    && trim($node->colors["blockBG"]) != '') {{ $node->colors["blockBG"] }} @endif ;
+                @if (isset($node->colors["blockImgType"]) && trim($node->colors["blockImgType"]) == 'tiles')
+                    background-repeat: repeat;
+                @else
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    -webkit-background-size: cover;
+                    -moz-background-size: cover;
+                    -o-background-size: cover;
+                    background-size: cover;
+                @endif
+                @if (isset($node->colors["blockImgFix"]) && in_array($node->colors["blockImgFix"], ['Y', 'P'])) 
+                    background-attachment: fixed;
+                @else
+                    background-attachment: scroll;
+                @endif
+            }
+        }
+        @supports (-webkit-overflow-scrolling: touch) { /* CSS specific to iOS devices */ 
+            #blockWrap{{ $nIDtxt }} {
+                background: url('{{ $node->colors["blockImg"] }}') no-repeat;
+                background-position: center top;
+            }
         }
         #blockWrap{{ $nIDtxt }} .nodeWrap, #blockWrap{{ $nIDtxt }} .nodeWrapError { 
             background: none;

@@ -16,7 +16,7 @@
     @forelse ($tableDat["rows"] as $j => $row)
         <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif " >
             @if (trim($tableDat["rowCol"]) != '')
-                <td class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
+                <td id="n{{ $nIDtxt }}tbl{{ $j }}rowLab" class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
                     value="{{ $row['leftVal'] }}" >
             @else

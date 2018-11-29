@@ -25,6 +25,7 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/switch/{treeID}/{cid}',  'SurvLoop\\Controllers\\SurvLoop@switchSess');
     Route::get( '/delSess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@delSess');
+    Route::get( '/cpySess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@cpySess');
     
     Route::get('/{abbr}/uploads/{file}', 'SurvLoop\\Controllers\\SurvLoop@getUploadFile');
     
@@ -143,6 +144,14 @@ Route::group(['middleware' => ['web']], function () {
         $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
+    });
+    
+    Route::get('/gen-kml/{kmlfile}.kml', function($kmlfile) {
+        if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
+            $response = Response::make(file_get_contents('../storage/app/gen-kml/' . $kmlfile . '.kml'));
+            $response->header('Content-Type', 'text/xml');
+            return $response;
+        }
     });
     
     
@@ -518,6 +527,16 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/dashboard/page/{treeID}/map', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@indexPage', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/page/{treeID}/map', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@indexPage', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::post('/dashboard/pages/snippets', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@blurbsList', 
         'middleware' => ['auth']
@@ -773,6 +792,11 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get('/dashboard/db/export/laravel', [
         'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@printExportLaravel', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get('/dashboard/db/export/laravel/table-model/{tbl}', [
+        'uses'       => 'SurvLoop\Controllers\DatabaseInstaller@refreshTableModel', 
         'middleware' => ['auth']
     ]);
     

@@ -1,7 +1,7 @@
 
 # WikiWorldOrder/SurvLoop
 
-[![Laravel](https://img.shields.io/badge/Laravel-5.6-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-5.7-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
@@ -45,17 +45,21 @@ Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabis
 
 # <a name="requirements"></a>Requirements
 
-* php: >=5.7.1
-* <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.6.*
+* php: >=7.2.11
+* <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.7.*
 
 # <a name="getting-started"></a>Getting Started
 
-These instructions — and more if you are new to Laravel — can also be found here:
-<a href="https://survloop.org/how-to-install-survloop" target="_blank">SurvLoop.org/how-to-install-survloop</a>.
-    
-* Install Laravel's default user authentication, notifications, and SurvLoop:
+The instructions below include the needed steps to install Laravel and SurvLoop.
+For more on creating environments to host Laravel, you can find more instructions on
+<a href="https://survloop.org/how-to-install-laravel-on-a-digital-ocean-server" target="_blank">SurvLoop.org</a>.
+
+* Use Composer to install Laravel with default user authentication, one required package:
 
 ```
+$ composer global require "laravel/installer"
+$ composer create-project laravel/laravel SurvLoop "5.7.*"
+$ cd SurvLoop
 $ php artisan make:auth
 $ php artisan vendor:publish --tag=laravel-notifications
 ```

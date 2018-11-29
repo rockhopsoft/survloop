@@ -3,7 +3,7 @@
     <div class="col-9">
 @endif
     <h3 class="slBlueDark">{{ $contact->ContSubject }}</h3>
-    <div>{{ $contact->ContBody }}</div>
+    <div>{!! $contact->ContBody !!}</div>
     <a href="mailto:{{ $contact->ContEmail }}" class="mR10">{{ $contact->ContEmail }}</a> 
     {{ date('n/j/y g:ia', strtotime( $contact->created_at )) }}
     @if (!isset($forEmail) || !$forEmail && $contact->ContFlag == 'Unread')

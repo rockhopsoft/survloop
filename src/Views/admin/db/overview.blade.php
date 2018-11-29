@@ -23,7 +23,7 @@
 </div>
 
 <div class="fC pT20 pL15">
-    <i class="slGrey">Table English Name, Description, Data Type, Technical Name (Abbreviation), Notes</i>
+    <i class="slGrey">Table Plain English Name, Description, Data Type, Database Name (Abbreviation), Notes</i>
 </div>
 
 @forelse ($groupTbls as $group => $tbls)

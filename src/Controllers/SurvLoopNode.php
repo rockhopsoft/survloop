@@ -105,9 +105,17 @@ class SurvLoopNode extends CoreNode
                 $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] = $this->extraOpts["meta-keywords"] 
                     = $this->extraOpts["meta-img"] = '';
                 if (strpos($this->nodeRow->NodePromptAfter, '::M::') !== false) {
-                    list($this->extraOpts["meta-title"], $this->extraOpts["meta-desc"], 
-                        $this->extraOpts["meta-keywords"], $this->extraOpts["meta-img"]) 
-                        = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->NodePromptAfter);
+                    $meta = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->NodePromptAfter);
+                    if (isset($meta[0])) {
+                        $this->extraOpts["meta-title"] = $meta[0];
+                        if (isset($meta[1])) {
+                            $this->extraOpts["meta-desc"] = $meta[1];
+                            if (isset($meta[2])) {
+                                $this->extraOpts["meta-keywords"] = $meta[2];
+                                if (isset($meta[3])) $this->extraOpts["meta-img"] = $meta[3];
+                            }
+                        }
+                    }
                 }
                 if ($this->isPage()) {
                     $this->extraOpts["page-url"] = '';
@@ -512,7 +520,7 @@ class SurvLoopNode extends CoreNode
     
     public function isDropdownTagger()
     {
-        return ($this->nodeType == 'Drop Down' && $this->nodeOpts%53 == 0);
+        return (in_array($this->nodeType, ['Drop Down', 'U.S. States']) && $this->nodeOpts%53 == 0);
     }
     
     public function isHnyPot()

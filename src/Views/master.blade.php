@@ -15,7 +15,7 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}" />
     <meta property="og:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
-    <meta property="og:url" content="https://{{ $_SERVER['HTTP_HOST'] }}{{ $_SERVER['REQUEST_URI'] }}" />
+    <meta property="og:url" content="https://{{ $_SERVER['HTTP_HOST'] }}{!! $_SERVER['REQUEST_URI'] !!}" />
     <meta property="og:site_name" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}" />
     <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
@@ -103,6 +103,7 @@
 
 
 @if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
@@ -111,7 +112,11 @@
     </div>
     <ul id="mySideUL" class="nav flex-column">
     @if (isset($navMenu) && sizeof($navMenu) > 0)
-        @foreach ($navMenu as $i => $arr) <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li> @endforeach
+        @foreach ($navMenu as $i => $arr)
+            @if (trim($arr[0]) != '' && trim($arr[1]) != '')
+                <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li>
+            @endif
+        @endforeach
     @endif
     @if (isset($sideNavLinks) && trim($sideNavLinks) != '') {!! $sideNavLinks !!} @endif
     </ul>
@@ -121,7 +126,7 @@
 <div id="mainNav" class="row flex-nowrap fixed-top clearfix">
     <div class="col-md-5 col-sm-10 taL">
     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
-        <a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
+        <div id="slLogoWrap"><a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
             ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 
             alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
             title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
@@ -131,7 +136,7 @@
                 alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
                 title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
          @endif
-         </a>
+         </a></div>
     @endif
     @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
         && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
@@ -262,12 +267,12 @@
             <div class="card-body"><div id="dialogBody"></div></div>
         </div>
     </div>
+</div> <!-- end #main (non-offcanvas-menu) -->
     
 @else
-    </div> <!-- end nondialog -->
+
 @endif <?php /* end not print or frame */ ?>
 
-</div> <!-- end #main (non-offcanvas-menu) -->
 
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
 <div class="imgPreload">

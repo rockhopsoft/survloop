@@ -9,6 +9,7 @@ use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
+use App\Models\SLNode;
 use App\Models\SLConditionsNodes;
 use App\Models\SLZips;
 use App\Models\SLTokens;
@@ -482,19 +483,6 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
         return true;
     }
     
-    public function printRowAddy($row, $abbr, $twoRows = false)
-    {
-        $ret = '';
-        if ($row) {
-            foreach (['Address', 'Address2', 'AddressCity', 'AddressState', 'AddressZip'] as $i => $fld) {
-                if (isset($row->{ $abbr . $fld }) && trim($row->{ $abbr . $fld }) != '') {
-                    $ret .= (($twoRows && $fld == 'AddressCity') ? '<br />' : '')
-                        . trim($row->{ $abbr . $fld }) . (($fld == 'AddressCity') ? ', ' : ' ');
-                }
-            }
-        }
-        return $ret;
-    }
     
 }
 

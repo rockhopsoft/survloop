@@ -25,6 +25,7 @@
         }
     ],
     "require": {
+        "laravel/laravel": "5.7.*",
         "doctrine/dbal": "^2.5", 
         "guzzlehttp/guzzle": "^6.2",
         "matthiasmullie/minify": "^1.3",

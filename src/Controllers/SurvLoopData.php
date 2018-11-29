@@ -19,8 +19,6 @@ class SurvLoopData
     
     // Lookup arrays mapping this record to others by table an ID
     public $kidMap          = [];
-    public $parentMap       = [];
-    public $linkMap         = []; // obsolete? i think so
     
     // Tree node's current data structure nested position
     public $dataBranches    = [];
@@ -55,7 +53,7 @@ class SurvLoopData
     
     public function refreshDataSets($isBigSurvLoop = [])
     {
-        $this->dataSets = $this->id2ind = $this->kidMap = $this->parentMap = $this->helpInfo = [];
+        $this->dataSets = $this->id2ind = $this->kidMap = $this->helpInfo = [];
         $this->loadData($this->coreTbl, $this->coreID);
         /* if (Auth::user() && Auth::user()->id) {
             $this->loadData('users', Auth::user()->id);
@@ -251,6 +249,7 @@ class SurvLoopData
                 $recObj->{ $link[0] } = $link[1];
             }
         }
+//if ($recID > 16550) { echo 'newDataRecordInner(' . $tbl . ', recID: ' . $recID . '<br />'; exit; }
         $recObj->save();
         $setInd = $this->initDataSet($tbl);
         $this->dataSets[$tbl][$setInd] = $recObj;
@@ -309,6 +308,16 @@ class SurvLoopData
     public function simpleNewDataRecord($tbl = '')
     {
         return $this->newDataRecordInner($tbl, $this->getRecordLinks($tbl));
+    }
+    
+    public function getNextRecID($tbl = '')
+    {
+        eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::select('" . $GLOBALS["SL"]->tblAbbr[$tbl] 
+            . "ID')->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "ID', 'desc')->first();");
+        if ($recObj && isset($recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID' })) {
+            return (1+$recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID' });
+        }
+        return 1;
     }
     
     public function deleteDataRecord($tbl = '', $fld = '', $newVal = -3)
@@ -485,32 +494,40 @@ class SurvLoopData
         if ($tbl1Ind < 0) $tbl1Ind = $this->getRowInd($tbl1, $tbl1ID);
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
             if (!isset($this->kidMap[$tbl1]))           $this->kidMap[$tbl1] = [];
-            if (!isset($this->kidMap[$tbl1][$tbl2]))    $this->kidMap[$tbl1][$tbl2] = [ "id" => [], "ind" => [] ];
-            if (!isset($this->parentMap[$tbl2]))        $this->parentMap[$tbl2] = [];
-            if (!isset($this->parentMap[$tbl2][$tbl1])) $this->parentMap[$tbl2][$tbl1] = [ "id" => [], "ind" => [] ];
+            if (!isset($this->kidMap[$tbl1][$tbl2]))    $this->kidMap[$tbl1][$tbl2] = [];
             if ($tbl2Ind < 0) {
                 $tbl2Ind = $this->getRowInd($tbl2, $tbl2ID);
-                if ($tbl2Ind < 0) {
-                    // !presuming it's about to be loaded
+                if ($tbl2Ind < 0) { // !presuming it's about to be loaded
                     $tbl2Ind = (isset($this->dataSets[$tbl2])) ? sizeof($this->dataSets[$tbl2]) : 0;
                 }
             }
             if ($tbl1ID > 0 && $tbl2ID > 0) {
-                $this->kidMap[$tbl1][$tbl2]["id" ][$tbl1ID]     = $tbl2ID;
-                $this->kidMap[$tbl1][$tbl2]["ind"][$tbl1Ind]    = $tbl2Ind;
-                $this->parentMap[$tbl2][$tbl1]["id" ][$tbl2ID]  = $tbl1ID;
-                $this->parentMap[$tbl2][$tbl1]["ind"][$tbl2Ind] = $tbl1Ind;
+                $this->kidMap[$tbl1][$tbl2][] = [
+                    "id1" => $tbl1ID,
+                    "id2" => $tbl2ID,
+                    "ind1" => $tbl1Ind,
+                    "ind2" => $tbl2Ind
+                    ];
             }
         }
         return false;
     }
     
-    public function getChild($tbl1, $tbl1ID, $tbl2, $type = "id")
+    public function getChild($tbl1, $tbl1ID, $tbl2, $type = 'id')
     {
-        if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0 
-            && isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
-            && isset($this->kidMap[$tbl1][$tbl2][$type][$tbl1ID])) {
-            return $this->kidMap[$tbl1][$tbl2][$type][$tbl1ID];
+        if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0) {
+            if (isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
+                && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
+                foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
+                    if ($tbl1ID == $map[$type . "1"]) return $map[$type . "2"];
+                }
+            }
+            if (isset($this->kidMap[$tbl2]) && isset($this->kidMap[$tbl2][$tbl1]) 
+                && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
+                foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
+                    if ($tbl1ID == $map[$type . "2"]) return $map[$type . "1"];
+                }
+            }
         }
         return -3;
     }
@@ -525,11 +542,18 @@ class SurvLoopData
     public function getChildRows($tbl1, $tbl1ID, $tbl2)
     {
         $retArr = [];
-        if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0 
-            && isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
-            && isset($this->kidMap[$tbl1][$tbl2]["id"][$tbl1ID])
-            && intVal($this->kidMap[$tbl1][$tbl2]["id"][$tbl1ID]) > 0) {
-            $retArr[] = $this->getRowById($tbl2, $this->kidMap[$tbl1][$tbl2]["id"][$tbl1ID]);
+        if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0) {
+            if (isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
+                && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
+                foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
+                    if ($tbl1ID == $map["id1"]) $retArr[] = $this->getRowById($tbl2, $map["id2"]);
+                }
+            } elseif (isset($this->kidMap[$tbl2]) && isset($this->kidMap[$tbl2][$tbl1]) 
+                && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
+                foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
+                    if ($tbl1ID == $map["id2"]) $retArr[] = $this->getRowById($tbl1, $map["id1"]);
+                }
+            }
         }
         return $retArr;
     }
@@ -819,14 +843,14 @@ class SurvLoopData
         $itemInd = -3, $itemID = -3)
     {
         if (trim($tbl) == '' || trim($fld) == '' || !$this->loaded) return '';
-//if ($nID == 577) echo '<br /><br /><br />checkboxNodes: '; print_r($this->checkboxNodes); echo '<br />';
-//if (in_array($nID, [577])) { echo 'currSessData ' . $action . ' (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br />'; }
+//if ($nID == 1964) { echo '<br /><br /><br />checkboxNodes: '; print_r($this->checkboxNodes); echo ', helper? ' . (($GLOBALS["SL"]->isFldCheckboxHelper($fld)) ? 'T' : 'F') . '<br />'; }
+//if (in_array($nID, [1935])) { echo 'currSessData ' . $action . ' (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br />'; }
         if (in_array($nID, $this->checkboxNodes) && $GLOBALS["SL"]->isFldCheckboxHelper($fld)) {
             $tblFld = $tbl . '-' . $fld;
             $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
-//if (in_array($nID, [577])) { echo 'currSessData Z (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
+//if (in_array($nID, [1935])) { echo 'currSessData Z (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
             if ($this->helpInfo[$tblFld]["link"] && isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
-//if (in_array($nID, [577])) { echo 'currSessData ZZb (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
+//if (in_array($nID, [1935])) { echo 'currSessData ZZb (nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . '<br /><pre>'; print_r($this->helpInfo[$tblFld]); echo '</pre>'; }
                 return $this->currSessDataCheckbox($nID, $tbl, $fld);
             }
         }
@@ -836,7 +860,7 @@ class SurvLoopData
         if ($itemInd < 0 || $itemID <= 0) return '';
         if ($action == 'get') {
             if ($this->dataFieldExists($tbl, $itemInd, $fld)) {
-//if (in_array($nID, [577])) { echo '<br /><br /><br />dataFieldExists - nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', type: ' . $GLOBALS["SL"]->fldTypes[$tbl][$fld] . ' - ' . $this->dataSets[$tbl][$itemInd]->{ $fld } . '<br /><br />'; }
+//if (in_array($nID, [1935])) { echo '<br /><br /><br />dataFieldExists - nID: ' . $nID . ', tbl: ' . $tbl . ', fld: ' . $fld . ', newVal: ' . $newVal . ', type: ' . $GLOBALS["SL"]->fldTypes[$tbl][$fld] . ' - ' . $this->dataSets[$tbl][$itemInd]->{ $fld } . '<br /><br />'; }
                 return $this->dataSets[$tbl][$itemInd]->{ $fld };
             }
         } elseif ($action == 'update' && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
@@ -845,7 +869,7 @@ class SurvLoopData
             if (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][$itemInd])) {
                 $this->dataSets[$tbl][$itemInd]->{ $fld } = $newVal;
                 $this->dataSets[$tbl][$itemInd]->save();
-//if (in_array($nID, [577])) { echo 'currSessData Stored, ' . $itemInd . '!<pre>'; print_r($this->dataSets[$tbl][$itemInd]); echo '</pre>'; }
+//if (in_array($nID, [1935])) { echo 'currSessData Stored, ' . $itemInd . '!<pre>'; print_r($this->dataSets[$tbl][$itemInd]); echo '</pre>'; }
                 return $newVal;
             } else {
               //$GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl . '][' . $itemInd . '] for ' . $fld . '<br />';
@@ -870,7 +894,7 @@ class SurvLoopData
         } elseif ($action == 'update') {
             $this->logDataSave($nID, $tbl, $this->helpInfo[$tblFld]["parentID"], $fld, $newVals);
             // check for newly submitted responses...
-            if (sizeof($newVals) > 0) {
+            if (is_array($newVals) && sizeof($newVals) > 0) {
                 foreach ($newVals as $i => $val) {
                     if (!in_array($val, $this->helpInfo[$tblFld]["pastVals"]) 
                         && isset($this->helpInfo[$tblFld]["link"]->DataHelpTable)) {
@@ -879,22 +903,25 @@ class SurvLoopData
                             $this->helpInfo[$tblFld]["parentID"] = ((Auth::user() && Auth::user()->id) 
                                 ? Auth::user() && Auth::user()->id : -3);
                         }
-                        eval("\$newObj = new " 
-                            . $GLOBALS["SL"]->modelPath($this->helpInfo[$tblFld]["link"]->DataHelpTable) . ";");
-                        $newObj->save();
-                        $newObj->update([ 
-                            $this->helpInfo[$tblFld]["link"]->DataHelpKeyField => $this->helpInfo[$tblFld]["parentID"],
-                            $this->helpInfo[$tblFld]["link"]->DataHelpValueField => $val
-                            ]);
-                        $setInd = $this->initDataSet($tbl);
-                        $this->dataSets[$tbl][$setInd] = $newObj;
-                        $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+                        if ($val && trim($val) != '') {
+                            eval("\$newObj = new " 
+                                . $GLOBALS["SL"]->modelPath($this->helpInfo[$tblFld]["link"]->DataHelpTable) . ";");
+                            $newObj->save();
+                            $newObj->update([
+                                $this->helpInfo[$tblFld]["link"]->DataHelpKeyField 
+                                    => $this->helpInfo[$tblFld]["parentID"],
+                                $this->helpInfo[$tblFld]["link"]->DataHelpValueField => $val
+                                ]);
+                            $setInd = $this->initDataSet($tbl);
+                            $this->dataSets[$tbl][$setInd] = $newObj;
+                            $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+                        }
                     }
                 }
             }
             if (isset($curr->responses) && sizeof($curr->responses) > 0) {
                 foreach ($curr->responses as $j => $res) {
-                    if (!in_array($res->NodeResValue, $newVals) 
+                    if ((!is_array($newVals) || !in_array($res->NodeResValue, $newVals)) 
                         && isset($this->helpInfo[$tblFld]["pastValToID"][$res->NodeResValue])) {
                         $this->deleteDataItem($nID, $this->helpInfo[$tblFld]["link"]->DataHelpTable, 
                             $this->helpInfo[$tblFld]["pastValToID"][$res->NodeResValue]);
@@ -1139,7 +1166,7 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
         if (trim($zipIn) == '' || trim($tbl) == '') return false;
         $GLOBALS["SL"]->loadStates();
         $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
-        if ($zipRow && isset($zipRow->ZipZip)) {
+        if ($zipRow && isset($zipRow->ZipZip) && isset($this->dataSets[$tbl])) {
             if (trim($fldState) != '')  $this->dataSets[$tbl][$setInd]->update([ $fldState  => $zipRow->ZipState  ]);
             if (trim($fldCounty) != '') $this->dataSets[$tbl][$setInd]->update([ $fldCounty => $zipRow->ZipCounty ]);
             if (trim($fldCountry) != '' && isset($zipRow->ZipCountry)) {

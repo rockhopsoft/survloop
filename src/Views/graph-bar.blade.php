@@ -9,7 +9,7 @@
 @if (isset($graphFail) && $graphFail)
     <div class="jumbotron w100 h100 mB5"><i>No data found</i></div>
 @else
-    <div class="w100 pR5"><canvas id="{{ $currGraphID }}myChart" style="width: 100%; height: 100%;" ></canvas></div>
+    <canvas id="{{ $currGraphID }}myChart" style="width: 100%; height: 100%;" ></canvas>
     <script>
     new Chart(document.getElementById("{{ $currGraphID }}myChart"),{
         "type":"bar",

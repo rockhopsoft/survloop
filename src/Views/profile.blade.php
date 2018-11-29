@@ -9,12 +9,15 @@
 @else
     <div class="col-md-8 col-sm-12">
 @endif
+        <div class="slCard h100">
         <a href="/profile/{{ urlencode($profileUser->name) }}"><h1 class="slBlueDark">{{ $profileUser->name }}</h1></a>
         Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}
+        @if (isset($uID) && $profileUser->id == $uID) <br /><a href="/logout">Logout</a> @endif
+        </div>
     </div>
     <div class="col-md-4 col-sm-12">
         @if ($canEdit)
-            <div class="slCard mT10">
+            <div class="slCard h100">
                 <div class="row mB10">
                     <div class="col-lg-3 col-md-12 col-sm-3">Email:</div>
                     <div class="col-lg-9 col-md-12 col-sm-9">{{ $profileUser->email }}
@@ -24,10 +27,12 @@
                     @endif
                     </div>
                 </div>
-                <div class="row mB10">
-                    <div class="col-lg-3 col-md-12 col-sm-3">Roles:</div>
-                    <div class="col-lg-9 col-md-12 col-sm-9">{{ $profileUser->listRoles() }}</div>
-                </div>
+                @if (trim($profileUser->listRoles()) != '')
+                    <div class="row mB10">
+                        <div class="col-lg-3 col-md-12 col-sm-3">Roles:</div>
+                        <div class="col-lg-9 col-md-12 col-sm-9">{{ $profileUser->listRoles() }}</div>
+                    </div>
+                @endif
                 <a id="hidivBtnChgPass" class="hidivBtn" href="javascript:;">Change Password</a>
             </div>
         @endif

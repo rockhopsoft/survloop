@@ -537,7 +537,7 @@ class SurvLoopController extends Controller
         }
         if (!$js) return redirect($redir);
         else {
-            echo '<script type="text/javascript"> setTimeout("window.location=\'' . $redir . '\'", 10); </script>';
+            echo '<script type="text/javascript"> setTimeout("top.location.href=\'' . $redir . '\'", 10); </script>';
             exit;
         }
     }
@@ -680,6 +680,12 @@ class SurvLoopController extends Controller
         if ($type == 'Confirm Email') $hrs = 24*28;
         return date("Y-m-d H:i:s", 
             mktime(intVal(date('H'))-$hrs, date('i'), date('s'), date('m'), date('d'), date('Y')));
+    }
+    
+    public function sendFakeEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
+    {
+        echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
+            . '<hr><hr></div>';
     }
     
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])

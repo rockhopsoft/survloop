@@ -115,7 +115,8 @@ $v = $surv->custLoop->v;
 <div class="nodeHalfGap"></div>
 
 @if ($GLOBALS["SL"]->sysHas('volunteers'))
-    <label><input type="checkbox" name="newVolunteer" value="1" > Volunteer</label>
+    <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
+        @if ($GLOBALS["SL"]->REQ->has('volunteer')) CHECKED @endif > Volunteer</label>
 @endif
 
 <center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
@@ -129,6 +130,9 @@ $v = $surv->custLoop->v;
 <script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
 </script>
 <script type="text/javascript">
+@if ($GLOBALS["SL"]->sysHas('volunteers'))
+setTimeout(function() { if (findGetParam('volunteer')) document.getElementById('newVolunteerID').checked=true; }, 50);
+@endif
 $(document).ready(function(){
 {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
 });

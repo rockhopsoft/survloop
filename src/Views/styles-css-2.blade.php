@@ -158,7 +158,6 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     width: 100%;
     height: 56px;
 	margin-bottom: 0px;
-	background: {!! $css["color-nav-bg"] !!};
 }
 .headGap img {
     height: 56px;
@@ -331,12 +330,17 @@ a.socialFace:link span, a.socialFace:visited span, a.socialFace:active span, a.s
 	left: 26px;
 }
 a.socialTwit:link img, a.socialTwit:visited img, a.socialTwit:active img, a.socialTwit:hover img,
-a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.socialFace:hover img {
+a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.socialFace:hover img,
+a.socialTwit:link div, a.socialTwit:visited div, a.socialTwit:active div, a.socialTwit:hover div,
+a.socialFace:link div, a.socialFace:visited div, a.socialFace:active div, a.socialFace:hover div {
     width: 61px;
     height: 20px;
     opacity:0.0; filter:alpha(opacity=0);
 }
 
+#slLogoWrap {
+    display: block;
+}
 #slLogo {
     display: block;
     margin: 7px 0px 0px 16px;
@@ -532,6 +536,9 @@ label, .nPrompt label {
 .nFld input.dateFld {
 	width: 140px;
 }
+.nFld select.form-control-lg {
+    padding: .2rem 0.7rem;
+}
 .nFld select.timeDrop, .nFld select.form-control.timeDrop {
 	width: 95px;
 }
@@ -623,12 +630,6 @@ input.otherFld, input.form-control.otherFld, label input.otherFld, label input.f
 }
 .form-control.pT0, .form-control.form-control-lg.pT0 {
     padding-top: 0px;
-}
-.form-control.input-xs {
-    height: 23px;
-    padding: 0px 3px;
-    margin: 0px;
-    font-size: 10pt;
 }
 .nodeSub, .nodeWrap.w100 label, .nodeWrap.w100 .nPrompt, .nodeWrap.w100 .nPrompt label {
     width: 100%;
@@ -1243,13 +1244,15 @@ label { font-weight: normal; }
     -moz-border-radius: 20px; border-radius: 20px;
 }
 
-
+.card {
+    background-color: {!! $css["color-main-faintr"] !!};
+    background: {!! $css["color-main-faintr"] !!};
+}
 .card > .card-header {
-    color: {!! $css["color-main-bg"] !!};
     background-image: none;
     background-color: {!! $css["color-info-on"] !!};
 }
-.card > .card-header h1, .card > .card-header h2, .card > .card-header h3, 
+.card > .card-header, .card > .card-header h1, .card > .card-header h2, .card > .card-header h3, 
 .card > .card-header h4, .card > .card-header h5, .card > .card-header h6 {
     color: {!! $css["color-main-bg"] !!};
 }
@@ -1407,6 +1410,17 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 }
 
 
+.embedMapA, .embedMapDescA { width: 100%; height: 420px; }
+.embedMapDescA { overflow-y: scroll; overflow-x: hidden; }
+@media screen and (max-width: 992px) {
+    .embedMapA { margin-bottom: 20px; }
+    .embedMapA, .embedMapDescA { height: 340px; }
+}
+@media screen and (max-width: 768px) {
+    .embedMapA, .embedMapDescA { height: 260px; }
+}
+
+
 .sliGalSlide {
     width: 100%;
     
@@ -1509,7 +1523,9 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
 	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
     input.otherGender { width: 240px; }
-    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg { padding: 5px; }
+    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg {
+        padding: 5px;
+    }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { 
         font-size: 14px; 
@@ -1523,8 +1539,11 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 }
 @media screen and (max-width: 480px) {
     
-    #slLogoImgSm { display: inline; }
-	#slLogoImg { display: none; }
+    @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
+        && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+        #slLogoImgSm { display: inline; }
+        #slLogoImg { display: none; }
+    @endif
 	#logoTxt {
 	    font-size: 28pt; 
 	    padding-left: 0px;
@@ -1753,7 +1772,11 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 .round30 { -moz-border-radius: 30px; border-radius: 30px; }
 
 .tmbRound { width: 140px; height: 140px; -moz-border-radius: 70px; border-radius: 70px; }
-.bigTmbRound { width: 125px; height: 125px; -moz-border-radius: 62px; border-radius: 62px; }
+.bigTmbRound, .bigTmbRoundDiv { width: 125px; height: 125px; -moz-border-radius: 62px; border-radius: 62px; overflow: hidden; }
+.bigTmbRoundDiv img { width: 125px; min-height: 125px; }
+.hugTmbRound, .hugTmbRoundDiv { width: 175px; height: 175px; -moz-border-radius: 87px; border-radius: 87px; overflow: hidden; }
+.hugTmbRoundDiv img { width: 175px; min-height: 175px; }
+.hugTmbRoundDiv { border: 2px {!! $css["color-main-bg"] !!} solid; box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; }
 
 .opac1 { opacity:0.01; filter:alpha(opacity=1); }
 .opac10 { opacity:0.10; filter:alpha(opacity=10); }
@@ -1778,6 +1801,7 @@ h1.m0, h2.m0, h3.m0 { margin: 0px; }
 
 .icoBig, i.icoBig, .icoBig i { font-size: 54px; }
 .icoHuge, i.icoHuge, .icoHuge i { font-size: 82px; }
+.icoMssv, i.icoMssv, .icoMssv i { font-size: 120px; }
 
 a.label, a.label:link, a.label:visited, a.label:active, a.label:hover, 
 a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:visited, a.label.label-primary:hover {
@@ -1844,6 +1868,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .BGredDark { background: {!! $css["color-danger-on"] !!}; }
 .bgFnt { background: {!! $css["color-main-faint"] !!}; }
 .bgWht { background: {!! $css["color-main-bg"] !!}; }
+.bgGry { background: {!! $css["color-main-grey"] !!}; }
 
 .bgGrn { background: #c3ffe1; }
 .bgYel { background: #fffdc3; }

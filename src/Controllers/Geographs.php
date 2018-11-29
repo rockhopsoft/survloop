@@ -3,6 +3,7 @@ namespace SurvLoop\Controllers;
 
 use App\Models\SLZips;
 use App\Models\SLZipAshrae;
+use App\Models\SLAddyGeo;
 use App\Models\SLNodeResponses;
 
 class Geographs
@@ -26,8 +27,8 @@ class Geographs
             if (strtolower($name) == strtolower($state)) return $abbr;
         }
         if ($this->hasCanada) {
-            foreach ($this->stateListCa as $name) {
-                if (strtolower($name) == strtolower($state)) return $name;
+            foreach ($this->stateListCa as $abbr => $name) {
+                if (strtolower($name) == strtolower($state)) return $abbr;
             }
         }
         return '';
@@ -43,18 +44,36 @@ class Geographs
         return '';
     }
     
+    public function getStateByInd($ind = -1)
+    {
+        $cnt = 1;
+        $this->loadStates();
+        foreach ($this->stateList as $abbr => $name) {
+            if ($ind == $cnt) return $abbr;
+            $cnt++;
+        }
+        if ($this->hasCanada) {
+            foreach ($this->stateListCa as $abbr => $name) {
+                if ($ind == $cnt) return $abbr;
+                $cnt++;
+            }
+        }
+        return '';
+    }
+    
     public function loadStateResponseVals()
     {
         $this->loadStates();
         $retArr = [];
         foreach ($this->stateList as $abbr => $name) $retArr[] = $abbr;
         if ($this->hasCanada) {
-            foreach ($this->stateListCa as $name) $retArr[] = $name;
+            foreach ($this->stateListCa as $abbr => $name) $retArr[] = $abbr;
         }
         return $retArr;
     }
     
-    public function getCountryResponses($nID, $showKidsList = []) {
+    public function getCountryResponses($nID, $showKidsList = [])
+    {
         $this->loadCountries();
         $ret = [];
         foreach ($this->countryList as $i => $name) {
@@ -80,9 +99,7 @@ class Geographs
     public function getZipProperty($zip = '', $fld = 'City')
     {
         $zipRow = $this->getZipRow($zip);
-        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) {
-            return $zipRow->{ 'Zip' . $fld };
-        }
+        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) return $zipRow->{ 'Zip' . $fld };
         return '';
     }
     
@@ -470,25 +487,156 @@ class Geographs
     
     public function getLatLng($addy = '')
     {
-        if (isset($GLOBALS['SL']->sysOpts["google-map-key"])) {
-            $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($addy) . '&key=' 
-                . $GLOBALS['SL']->sysOpts['google-map-key']; // '&sensor=true'
-            $stateJSON = json_decode(file_get_contents($jsonFile),TRUE);
-            if (sizeof($stateJSON) > 0 && isset($stateJSON["results"]) && sizeof($stateJSON["results"]) > 0
-                && isset($stateJSON["results"][0]["geometry"]) 
-                && isset($stateJSON["results"][0]["geometry"]["location"])) {
-                return [$stateJSON["results"][0]["geometry"]["location"]["lat"], 
-                    $stateJSON["results"][0]["geometry"]["location"]["lng"]];
+        if (trim($addy) == '') return [0, 0];
+        $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
+            ->first();
+        if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong) || $GLOBALS["SL"]->REQ->has('refresh')) {
+            if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"])) {
+                $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($addy) . '&key=' 
+                    . $GLOBALS["SL"]->sysOpts["google-cod-key"]; // '&sensor=true'
+                $json = json_decode(file_get_contents($jsonFile),TRUE);
+                if (sizeof($json) > 0 && isset($json["results"]) && sizeof($json["results"]) > 0 
+                    && isset($json["results"][0]["geometry"]) && isset($json["results"][0]["geometry"]["location"])) {
+                    $chk = new SLAddyGeo;
+                    $chk->AdyGeoAddress = $addy;
+                    $chk->AdyGeoLat     = $json["results"][0]["geometry"]["location"]["lat"];
+                    $chk->AdyGeoLong    = $json["results"][0]["geometry"]["location"]["lng"];
+                    $chk->save();
+                }
             }
         }
+        if ($chk && isset($chk->AdyGeoLat) && isset($chk->AdyGeoLong)) return [$chk->AdyGeoLat, $chk->AdyGeoLong];
         return [0, 0];
     }
     
-    public function embedMap()
+    public function embedMapSimpAddy($nID = 0, $addy = '', $label = '', $height = 450, $maptype = 'satellite')
     {
+        list($lat, $lng) = $this->getLatLng($addy);
+        return view('vendor.survloop.embed-google-map-simple', [
+            "nID"     => $nID,
+            "addy"    => $addy,
+            "lat"     => $lat,
+            "lng"     => $lng,
+            "height"  => $height,
+            "maptype" => $maptype
+            ])->render();
+    }
+    
+    protected $mapMarkTyp = [];
+    protected $mapMarkers = [];
+    protected $kmlMarkTyp = '';
+    protected $kmlMarkers = '';
+    
+    protected $custCenter = false;
+    protected $mapCenter  = [ 38.5, -97, 4 ]; // initial loading (lat, lng, zoom)
+    
+    protected $kmlPath    = '../storage/app/gen-kml';
+    
+    public function embedMap($nID = 0, $filename = '', $docName = '', $docDesc = '')
+    {
+        if (sizeof($this->mapMarkers) > 0) {
+            $this->kmlMarkersFull($filename);
+            $descAjax = false;
+            if (sizeof($this->mapMarkers) > 0) {
+                foreach ($this->mapMarkers as $i => $mark) {
+                    if (!$descAjax && trim($mark[5]) != '') $descAjax = true;
+                }
+            }
+            return view('vendor.survloop.embed-google-map', [
+                "nID"       => $nID,
+                "filename"  => $filename,
+                "descAjax"  => $descAjax,
+                "mapCenter" => $this->mapCenter
+                ])->render();
+        }
+        return '';
+    }
+    
+    public function addMarkerType($markerName = '', $markerImg = '')
+    {
+        if (trim($markerName) != '') $this->mapMarkTyp[$markerName] = $markerImg;
+        return true;
+    }
+    
+    public function addMapMarker($lat, $lng, $marker = '', $title = '', $desc = '', $ajaxLoad = '')
+    {
+        $this->mapMarkers[] = [$lat, $lng, $marker, $title, $desc, $ajaxLoad];
+        return true;
+    }
+    
+    protected function kmlMarkerStyles()
+    {
+        $this->kmlMarkTyp = '';
+        if (sizeof($this->mapMarkTyp) > 0) {
+            foreach ($this->mapMarkTyp as $type => $img) {
+                $this->kmlMarkTyp .= '<Style id="' . $type . '"><IconStyle><Icon><href>' . $img 
+                    . '</href></Icon></IconStyle></Style>' . "\n\t";
+            }
+        }
+        return $this->kmlMarkTyp;
+    }
+    
+    protected function kmlMapMarkers()
+    {
+        $this->kmlMarkers = '';
+        if (sizeof($this->mapMarkers) > 0) {
+            foreach ($this->mapMarkers as $i => $mark) {
+                if ($mark[0] != 0 && $mark[1] != 0) {
+                    $this->kmlMarkers .= "\t" . '<Placemark>
+                        <name>' . $GLOBALS["SL"]->makeXMLSafe($mark[3]) . '</name>
+                        <description>' . ((trim($mark[5]) != '') ? $mark[5] : '<![CDATA[' . $mark[4] . ']]>')
+                        . '</description>' . (($mark[2] != '') ? '<styleUrl>#' . $mark[2] . '</styleUrl>'."\n" : '') . '
+                        <Point><coordinates>' . $mark[1] . ',' . $mark[0] . ',0</coordinates></Point>
+                    </Placemark>' . "\n";
+                }
+            }
+        }
+        return $this->kmlMarkers;
+    }
+    
+    public function kmlMarkersFull($filename, $docName = '', $docDesc = '')
+    {
+        if (!is_dir($this->kmlPath)) mkdir($this->kmlPath);
+        $fullpath = $this->kmlPath . '/' . $filename . '.kml';
+        $finalKML = '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' . "\n"
+            . '<kml xmlns="http://www.opengis.net/kml/2.2">' . "\n\t"
+            //. '<refreshMode>onChange</refreshMode>' . "\n\t"
+            . '<Document>' . "\n\t" . '<name>' . $GLOBALS["SL"]->makeXMLSafe($docName) . '</name>' . "\n\t"
+            . '<description>' . $GLOBALS["SL"]->makeXMLSafe($docDesc) . '</description>' . "\n\t"
+            . $this->kmlMarkerStyles() . "\n\t" . $this->kmlMapMarkers() . '</Document>' . "\n" . '</kml>';
+//echo 'kmlMarkersFull(' . $filename . '<br /><pre>' . $finalKML . '</pre>'; exit;
+        if (file_exists($fullpath)) unlink($fullpath); 
+        file_put_contents($fullpath, $finalKML);
+        $this->kml2kmz($filename);
+        return true;
+    }
+    
+    public function kmlDrawCircle($centerLat, $centerLng, $radius, $dotCnt = 36)
+    {
+        $retKML = '';
+        $latScale = 0.8-(0.25*(($centerLat-37)/(62-37)));
+        for ($deg=0; $deg<360; $deg+=(360/$dotCnt)) {
+            $lng = ($radius*cos(deg2rad($deg)))+$centerLng;
+            $lat = ($latScale*$radius*sin(deg2rad($deg)))+$centerLat;
+            $retKML .= "\t\t\t\t\t" . $lng . ',' . $lat . ',0' . "\n";
+        }
+        return $retKML;
+    }
+    
+    public function kml2kmz($filename = '')
+    {
+        $filename = $this->kmlPath . '/' . $filename . '.kml';
+        if (!file_exists($filename)) return false;
+        $zipname = str_replace('.kml', '.kmz', $filename);
+        if (file_exists($zipname)) unlink($zipname);
         
-        return view('vendor.survloop.embed-google-map', [
-            ]);
+        /*
+        $zip = new ZipArchive();
+        $zip->open($zipname, ZIPARCHIVE::CREATE);
+        $zip->addFile($filename);
+        $zip->close();
+        */
+        return true;
     }
     
     

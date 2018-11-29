@@ -33,6 +33,7 @@ use SurvLoop\Controllers\SurvLoopNode;
 use SurvLoop\Controllers\SurvLoopData;
 use SurvLoop\Controllers\SurvLoopStat;
 use SurvLoop\Controllers\SurvLoopTreeXML;
+use SurvLoop\Controllers\SurvLoopSearch;
 use SurvLoop\Controllers\CoreGlobals;
 
 class SurvLoopTree extends CoreTree
@@ -47,7 +48,7 @@ class SurvLoopTree extends CoreTree
     public $currMajorSection      = 0;
     public $currMinorSection      = 0;
     
-    protected $pageJSvalid   = '';
+    protected $pageJSvalid        = '';
     
     protected $sessDataChangeLog  = [];
     protected $sessNodesDone      = [];
@@ -60,6 +61,7 @@ class SurvLoopTree extends CoreTree
     
     public $nodeTreeProgressBar   = '';
     protected $checkboxNodes      = [];
+    protected $tagsNodes          = [];
     
     protected $pageCnt            = 0;
     protected $loopCnt            = 0;
@@ -71,18 +73,20 @@ class SurvLoopTree extends CoreTree
     
     public $xmlMapTree            = false;
     
-    public $searchFilts           = [];
-    public $searchOpts            = [];
-    public $searchResults         = [];
+    public $search                = false;
+            public $checkedSearch         = false;
+            public $searchTxt             = '';
+            public $searchParse           = [];
+            public $advSearchUrlSffx      = '';
+            public $advSearchBarJS        = '';
+            public $searchFilts           = [];
+            public $searchOpts            = [];
+            public $searchResults         = [];
+    
     public $allPublicCoreIDs      = [];
     public $allPublicFiltIDs      = [];
     public $emojiTagUsrs          = [];
     
-    public $checkedSearch         = false;
-    public $searchTxt             = '';
-    public $searchParse           = [];
-    public $advSearchUrlSffx      = '';
-    public $advSearchBarJS        = '';
     
     // kidMaps[nodeID][kidNodeID][] = [ responseInd, responseValue ]
     public $kidMaps               = [];
@@ -114,6 +118,7 @@ class SurvLoopTree extends CoreTree
     {
         $this->dbID = (($dbID > 0) ? $dbID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->dbID : 1));
         $this->treeID = (($treeID > 0) ? $treeID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->treeID : 1));
+        $this->search = new SurvLoopSearch;
         $this->survLoopInit($request);
         $this->coreIDoverride = -3;
         if ($sessIn > 0) $this->coreIDoverride = $sessIn;
@@ -170,7 +175,8 @@ class SurvLoopTree extends CoreTree
                         $cache .= $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID\', \'desc\'];' . "\n";
                     }
                 }
-                if ($row->NodeType == 'Checkbox') {
+                if ($row->NodeType == 'Checkbox' 
+                    || (in_array($row->NodeType, ['Drop Down', 'U.S. States']) && $row->NodeOpts%53 == 0)) {
                     $cache .= '$'.'this->checkboxNodes[] = ' . $row->NodeID . ';' . "\n";
                 } elseif (in_array($row->NodeType, ['Data Print', 'Data Print Row']) && isset($row->NodeDataStore)
                     && trim($row->NodeDataStore) != '') {
@@ -320,9 +326,9 @@ class SurvLoopTree extends CoreTree
     
     public function currInReport()
     {
-        if (trim($GLOBALS["SL"]->coreTbl) != '' && isset($GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl])) {
+        if (trim($GLOBALS["SL"]->coreTbl) != '' && $GLOBALS["SL"]->coreTblAbbr() != '') {
             $isLastPage = ($GLOBALS["SL"]->treeRow->TreeLastPage
-                == $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'SubmissionProgress');
+                == $GLOBALS["SL"]->coreTblAbbr() . 'SubmissionProgress');
             if (isset($this->sessInfo->SessCurrNode) 
                 && $this->sessData->currSessData($this->sessInfo->SessCurrNode, $GLOBALS["SL"]->coreTbl, $isLastPage)) {
                 session()->forget('sessID' . $GLOBALS["SL"]->sessTree);
@@ -659,7 +665,7 @@ class SurvLoopTree extends CoreTree
                 . ((isset($this->allNodes[$this->currNode()]) && $this->allNodes[$this->currNode()]->nodeOpts%59 > 0) 
                     ? intVal($rawPerc) : -3) . ');' . "\n";
         }
-        if (($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%59 == 0) {
+        if (($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%59 == 0)
             && isset($this->majorSections[$this->currMajorSection][1]) > 0) {
             $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
                 . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
@@ -1908,7 +1914,7 @@ class SurvLoopTree extends CoreTree
         $this->loadTree();
         $ret = '';
         if ($request->has('i') && intVal($request->get('i')) > 0) {
-            $ret .= $this->printReportsRecord($request->get('i'), $full);
+            $ret .= $this->printReportsRecordPublic($request->get('i'), $full);
         } elseif ($request->has('ids') && trim($request->get('ids')) != '') {
             foreach ($GLOBALS["SL"]->mexplode(',', $request->get('ids')) as $id) {
                 $ret .= $this->printReportsRecordPublic($id, $full);
@@ -1919,12 +1925,12 @@ class SurvLoopTree extends CoreTree
             }
         } else {
             $this->getAllPublicCoreIDs();
-            $this->getSearchFilts($request);
+            $this->getSearchFilts();
             $this->processSearchFilts();
             if (sizeof($this->allPublicFiltIDs) > 0) {
                 foreach ($this->allPublicFiltIDs as $i => $coreID) {
                     if (!isset($this->searchOpts["limit"]) || $i < $this->searchOpts["limit"]) {
-                        $ret .= $this->printReportsRecord($coreID, $full);
+                        $ret .= $this->printReportsRecordPublic($coreID, $full);
                     }
                 }
             }
@@ -1967,9 +1973,12 @@ class SurvLoopTree extends CoreTree
         return '<div class="well well-lg">#' . $this->corePublicID . ' is no longer published.</div>';
     }
     
+    public function xmlAllAccess() { return true; }
+    
     public function xmlAll(Request $request)
     {
         $this->survLoopInit($request, '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-xml-all');
+        if (!$this->xmlAllAccess()) return 'Sorry, access not permitted.';
         $this->loadXmlMapTree($request);
         $this->v["nestedNodes"] = '';
         $this->getAllPublicCoreIDs($GLOBALS["SL"]->xmlTree["coreTbl"]);
@@ -2036,6 +2045,7 @@ class SurvLoopTree extends CoreTree
             $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
         }
+        if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])) return false;
         $dump = $this->genRecDumpNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers, 
             $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]);
         $dump .= $this->genRecDumpXtra();
@@ -2109,7 +2119,7 @@ class SurvLoopTree extends CoreTree
     public function printSearchBar($search = '', $treeID = -3, $pre = '', $post = '', $nID = -3, $ajax = 0)
     {
         if ($treeID <= 0 && $GLOBALS["SL"]->REQ->has('t')) $treeID = intVal($GLOBALS["SL"]->REQ->get('t'));
-        $this->getSearchFilts($GLOBALS["SL"]->REQ);
+        $this->getSearchFilts();
         $GLOBALS["SL"]->pageAJAX .= '$("#searchAdvBtn' . $nID . 't' . $treeID . '").click(function() {
             $("#searchAdv' . $nID . 't' . $treeID . '").slideToggle("fast");
         });';
@@ -2160,7 +2170,7 @@ class SurvLoopTree extends CoreTree
         $this->getAllPublicCoreIDs();
 //echo 'A allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
         $this->chkRecsPub($request);
-        $this->getSearchFilts($request);
+        $this->getSearchFilts();
         $cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
             . '&s=' . $this->searchTxt . $this->advSearchUrlSffx;
         $this->survLoopInit($request, $cacheName);
@@ -2238,7 +2248,7 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
-    public function searchResultsXtra($treeID = 1)
+    public function searchResultsXtra($treeID = -3)
     {
         return true;
     }
@@ -2263,27 +2273,35 @@ class SurvLoopTree extends CoreTree
         return '';
     }
     
-    protected function getSearchFilts(Request $request)
+    protected function getSearchFilts()
     {
         if (!$this->checkedSearch) {
             $this->checkedSearch = true;
             $this->searchTxt = '';
-            if ($request->has('s') && trim($request->get('s')) != '') $this->searchTxt = trim($request->get('s'));
+            if ($GLOBALS["SL"]->REQ->has('s') && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
+                $this->searchTxt = trim($GLOBALS["SL"]->REQ->get('s'));
+            }
             $this->searchParse = $GLOBALS["SL"]->parseSearchWords($this->searchTxt);
             $this->searchFilts = $this->searchOpts = [];
-            if ($request->has('d') && trim($request->get('d')) != '') {
-                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(',', $request->get('d'));
+            if ($GLOBALS["SL"]->REQ->has('d') && trim($GLOBALS["SL"]->REQ->get('d')) != '') {
+                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->get('d'));
             }
-            if ($request->has('f') && trim($request->get('f')) != '') {
-                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode('__', $request->get('f'));
+            if ($GLOBALS["SL"]->REQ->has('f') && trim($GLOBALS["SL"]->REQ->get('f')) != '') {
+                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode('__', $GLOBALS["SL"]->REQ->get('f'));
             }
-            if ($request->has('u') && intVal($request->get('u')) > 0) {
-                $this->searchFilts["user"] = intVal($request->get('u'));
-            } elseif ($request->has('mine') && intVal($request->get('mine')) == 1) {
+            if ($GLOBALS["SL"]->REQ->has('u') && intVal($GLOBALS["SL"]->REQ->get('u')) > 0) {
+                $this->searchFilts["user"] = intVal($GLOBALS["SL"]->REQ->get('u'));
+            } elseif ($GLOBALS["SL"]->REQ->has('mine') && intVal($GLOBALS["SL"]->REQ->get('mine')) == 1) {
                 $this->searchFilts["user"] = $this->v["uID"];
             }
-            if ($request->has('limit') && trim($request->get('limit')) != '') {
-                $this->searchOpts["limit"] = intVal($request->get('limit'));
+            if ($GLOBALS["SL"]->REQ->has('limit') && trim($GLOBALS["SL"]->REQ->get('limit')) != '') {
+                $this->searchOpts["limit"] = intVal($GLOBALS["SL"]->REQ->get('limit'));
+            }
+            $GLOBALS["SL"]->loadStates();
+            if ($GLOBALS["SL"]->REQ->has('state') && trim($GLOBALS["SL"]->REQ->get('state')) != '') {
+                if (!isset($GLOBALS["SL"]->states->stateList[trim($GLOBALS["SL"]->REQ->get('state'))])) {
+                    $this->searchOpts["state"] = trim($GLOBALS["SL"]->REQ->get('state'));
+                }
             }
             $this->searchResultsXtra($this->treeID);
             $this->printSearchBarAdvanced($this->treeID);
@@ -2299,7 +2317,7 @@ class SurvLoopTree extends CoreTree
 //echo 'allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
 //echo 'processSearchFilts() ' . $GLOBALS["SL"]->getCoreTblUserFld() . ' <pre>'; print_r($this->searchFilts); echo '</pre>';
         if (sizeof($this->searchFilts) > 0) {
-            $coreAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
+            $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
                     eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::whereIn('" . $coreAbbr 
@@ -2355,7 +2373,12 @@ class SurvLoopTree extends CoreTree
         if (sizeof($this->searchOpts) > 0) {
             foreach ($this->searchOpts as $key => $val) $ret .= '&' . $key . '=' . $val;
         }
-        return $ret;
+        return $ret . $this->searchFiltsURLXtra();
+    }
+    
+    protected function searchFiltsURLXtra()
+    {
+        return '';
     }
     
     public function ajaxGraph(Request $request, $gType = '', $nID = -3)
@@ -2366,7 +2389,7 @@ class SurvLoopTree extends CoreTree
         $this->v["currGraphID"] = 'nGraph' . $nID;
         if ($this->v["currNode"] && isset($this->v["currNode"]->nodeRow->NodeID) && trim($gType) != '') {
             $this->getAllPublicCoreIDs();
-            $this->getSearchFilts($request);
+            $this->getSearchFilts();
             $this->processSearchFilts();
             $this->v["graphDataPts"] = $this->v["graphMath"] = $rows = $rowsFilt = [];
             if (sizeof($this->allPublicFiltIDs) > 0) {

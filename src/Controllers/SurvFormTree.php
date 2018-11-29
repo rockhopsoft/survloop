@@ -131,8 +131,14 @@ class SurvFormTree extends SurvUploadTree
         return '/sub';
     }
     
+    protected function skipFormForPreview($nID)
+    {
+        return ($GLOBALS["SL"]->REQ->has('isPreview') && $GLOBALS["SL"]->REQ->has('ajax'));
+    }
+    
     protected function printNodePublicFormStart($nID)
     {
+        if ($this->skipFormForPreview($nID)) return '';
         $ret = '';
         $loopRootJustLeft = -3;
         if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
@@ -145,6 +151,7 @@ class SurvFormTree extends SurvUploadTree
             session()->put('sessTreeRegTime', mktime());
         } */
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $ret .= '<div id="isPage"></div>';
+        
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
             || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0) {
             $ret .= view('vendor.survloop.formtree-form-start', [
@@ -164,6 +171,7 @@ class SurvFormTree extends SurvUploadTree
     
     protected function printNodePublicFormEnd($nID, $promptNotesSpecial = '')
     {
+        if ($this->skipFormForPreview($nID)) return '';
         $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.formtree-form-js', [
             "currPage"         => $this->v["currPage"],
             "pageURL"          => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
@@ -316,8 +324,9 @@ class SurvFormTree extends SurvUploadTree
     
     protected function printNodePublic($nID = -3, $tmpSubTier = [], $currVisib = -1)
     {
-        if (!isset($this->allNodes[$nID]) || $this->allNodes[$nID]->nodeType == 'Send Email') return '';
-        if (!$this->checkNodeConditions($nID)) return '';
+        if (!isset($this->allNodes[$nID]) || !$this->checkNodeConditions($nID)) return '';
+        if ($this->allNodes[$nID]->nodeType == 'Send Email') return $this->postNodeSendEmail($nID);
+        
         if (empty($tmpSubTier)) $tmpSubTier = $this->loadNodeSubTier($nID);
         if (!isset($this->v["hasFixedHeader"])) $this->v["hasFixedHeader"] = false;
         $ret = '';
@@ -437,7 +446,7 @@ class SurvFormTree extends SurvUploadTree
                     foreach ($condKids as $condNode => $condVals) {
                         $condHide = true;
                         foreach ($condVals as $cVal) {
-                            if ($this->isCurrDataSelected($currNodeSessData, $cVal, $curr->nodeType)) {
+                            if ($this->isCurrDataSelected($currNodeSessData, $cVal, $curr)) {
                                 $condHide = false;
                             }
                         }
@@ -1224,27 +1233,25 @@ class SurvFormTree extends SurvUploadTree
                             . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" data-nid="' . $nID 
                             . '" class="form-control form-control-lg' . (($isOneLinerFld != '') ? ' w33' : '') 
                             . $xtraClass . '" onChange="checkNodeUp(\'' . $nIDtxt . '\', -1, 0);' 
-                            . (($curr->isDropdownTagger()) ? ' selectTag(' . $nID 
-                                . ', this.value); this.value=\'\';' : '') . '" autocomplete="off" ' 
+                            . (($curr->isDropdownTagger()) ? ' selectTag(\'' . $nIDtxt 
+                                . '\', this.value); this.value=\'\';' : '') . '" autocomplete="off" ' 
                             . $GLOBALS["SL"]->tabInd() . '>'
                             . '<option class="slGrey" value=""' . ((trim($currNodeSessData) == '' 
                                 || $curr->isDropdownTagger()) ? ' SELECTED' : '') . ' >'
                             . ((isset($curr->nodeRow->NodeTextSuggest)) ? $curr->nodeRow->NodeTextSuggest : '') 
                             . '</option>' . "\n";
-                        if ($curr->nodeType == 'U.S. States') {
+                        if ($curr->nodeType == 'U.S. States' && !$curr->isDropdownTagger()) {
                             $GLOBALS["SL"]->loadStates();
                             $ret .= $GLOBALS["SL"]->states->stateDrop($currNodeSessData);
                         } else {
                             foreach ($curr->responses as $j => $res) {
-                                $select = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, 
-                                    $curr->nodeType);
-                                $ret .= '<option value="' . $res->NodeResValue . '" ' 
-                                    . (($select && !$curr->isDropdownTagger()) ? 'SELECTED' : '') 
-                                    . ' >' . $res->NodeResEng . '</option>' . "\n";
+                                $val = (($curr->nodeType == 'U.S. States') ? (1+$j) : $res->NodeResValue);
+                                $select = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr);
+                                $ret .= '<option value="' . $val . '" ' . (($select && !$curr->isDropdownTagger()) 
+                                    ? 'SELECTED' : '') . ' >' . $res->NodeResEng . '</option>' . "\n";
                                 if ($curr->isDropdownTagger()) {
-                                    $GLOBALS["SL"]->pageJAVA .= "\n" . 'addTagOpt(' . $nID . ', ' 
-                                        . $res->NodeResValue . ', ' . json_encode($res->NodeResEng) . ', ' 
-                                        . (($select) ? 1 : 0) . ');';
+                                    $GLOBALS["SL"]->pageJAVA .= "\n" . 'addTagOpt(\'' . $nIDtxt . '\', ' . $val . ', '
+                                        . json_encode($res->NodeResEng) . ', ' . (($select) ? 1 : 0) . ');';
                                 }
                             }
                         }
@@ -1255,10 +1262,10 @@ class SurvFormTree extends SurvUploadTree
                         }
                         $ret .= '</select></div>' . "\n"; 
                         if ($curr->isDropdownTagger()) {
-                            $ret .= '<input type="hidden" name="n' . $nID . 'tagIDs" id="n' . $nID 
+                            $ret .= '<input type="hidden" name="n' . $nIDtxt . 'tagIDs" id="n' . $nIDtxt 
                                 . 'tagIDsID" value="," class="' . $xtraClass . '" data-nid="' . $nID 
-                                . '"><div id="n' . $nID . 'tags" class="slTagList"></div>';
-                            $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("updateTagList(' . $nID . ')", 50);';
+                                . '"><div id="n' . $nIDtxt . 'tags" class="slTagList"></div>';
+                            $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("updateTagList(\'' . $nIDtxt . '\')", 50); ';
                         }
                     }
                     
@@ -1342,8 +1349,7 @@ class SurvFormTree extends SurvUploadTree
                             }
                             $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                             $resNameCheck = '';
-                            $boxChecked = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, 
-                                $curr->nodeType);
+                            $boxChecked = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr);
                             if ($curr->nodeType == 'Radio') {
                                 $resNameCheck = 'name="n' . $nIDtxt . 'fld" ' . (($boxChecked) ? 'CHECKED' : '');
                                 if (sizeof($curr->fldHasOther) > 0 && $otherFld[1] == '') {
@@ -1762,7 +1768,7 @@ class SurvFormTree extends SurvUploadTree
                 } elseif ($curr->nodeType == 'Search Featured') {
                     $ret .= $this->searchResultsFeatured($search, $widgetTreeID);
                 } elseif ($curr->nodeType == 'Search Results') {
-                    $this->getSearchFilts($GLOBALS["SL"]->REQ);
+                    $this->getSearchFilts();
                     $loadURL = '/search-results/' . $widgetTreeID . '?s=' . urlencode($this->searchTxt) 
                         . $this->searchFiltsURL() . $this->advSearchUrlSffx;
                     $curr->nodeRow->NodePromptText = $this->extractJava(str_replace('[[search]]', $search, 
@@ -1830,7 +1836,7 @@ class SurvFormTree extends SurvUploadTree
             && !$this->hasSpreadsheetParent($curr->nodeID));
     }
     
-    protected function isCurrDataSelected($currNodeSessData, $value, $nodeType = 'Text')
+    protected function isCurrDataSelected($currNodeSessData, $value, $node)
     {
         $selected = false;
         $resValCyc = $value . trim($GLOBALS["SL"]->currCyc["cyc"][1]);
@@ -1839,7 +1845,7 @@ class SurvFormTree extends SurvUploadTree
             $selected = (in_array($value, $currNodeSessData) || in_array($resValCyc, $currNodeSessData) 
                 || in_array($resValCyc2, $currNodeSessData));
         } else {
-            if ($nodeType == 'Checkbox') {
+            if ($node->nodeType == 'Checkbox' || $node->isDropdownTagger()) {
                 $selected = (strpos(';' . $currNodeSessData . ';', ';' . $value . ';') !== false 
                     || strpos(';' . $currNodeSessData . ';', ';' . $resValCyc . ';') !== false
                     || strpos(';' . $currNodeSessData . ';', ';' . $resValCyc2 . ';') !== false);
@@ -2043,11 +2049,9 @@ class SurvFormTree extends SurvUploadTree
                         intVal($GLOBALS["SL"]->REQ->loopItem));
                 }
                 if ($curr->nodeType == 'Uploads') {
-                    if ($this->REQstep != 'autoSave') {
-                        $ret .= $this->postUploadTool($nID);
-                    }
+                    if ($this->REQstep != 'autoSave') $ret .= $this->postUploadTool($nID);
                 } elseif ($this->allNodes[$nID]->nodeType == 'Send Email') {
-                    $ret .= $this->postNodeSendEmail($nID);
+                    //$ret .= $this->postNodeSendEmail($nID);
                 } elseif ($curr->isDataManip()) {
 //if ($nID == 557) { echo '<br /><br />post isDataManip(' . $nID . ', currVisib: ' . (($currVisib) ? 'true' : 'false') . '<br />';
                     if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
@@ -2068,6 +2072,7 @@ class SurvFormTree extends SurvUploadTree
                         $newVal = $this->getNodeFormFldBasic($nID, $curr);
 //if (in_array($nID, [827, 787])) { echo '<br /><br /><br />nodeType: ' . $curr->nodeType . ', tagger: ' . (($curr->isDropdownTagger()) ? 'true' : 'false') . ', tbl: ' . $tbl . ', fld: ' . $fld . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . ', <pre>'; print_r($newVal); echo '</pre>'; }
                         if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
+                            $newVal = $this->postNodeTweakNewVal($curr, $newVal);
                             if (sizeof($curr->responses) == 1) { // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
                                 if (is_array($newVal) && sizeof($newVal) == 1) {
                                     $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal[0], 
@@ -2195,6 +2200,19 @@ class SurvFormTree extends SurvUploadTree
     
     protected function openPostNodePublic($nID = -3, $tmpSubTier = [], $curr = [])  { return true; }
     protected function closePostNodePublic($nID = -3, $tmpSubTier = [], $curr = []) { return true; }
+    
+    protected function postNodeTweakNewVal($curr, $newVal)
+    {
+        if ($curr->nodeType == 'U.S. States' && $curr->isDropdownTagger()) {
+            $GLOBALS["SL"]->loadStates();
+            if (!is_array($newVal)) {
+                $newVal = $GLOBALS["SL"]->states->getStateByInd($newVal);
+            } elseif (sizeof($newVal) > 0) {
+                foreach ($newVal as $i => $val) $newVal[$i] = $GLOBALS["SL"]->states->getStateByInd($val);
+            }
+        }
+        return $newVal;
+    }
     
     protected function customResponses($nID, $curr) { return $curr; }
     
@@ -2689,18 +2707,43 @@ class SurvFormTree extends SurvUploadTree
         return $emaToList;
     }
     
+    protected function postEmailFrom()
+    {
+        return [];
+    }
+    
+    protected function postDumpFormEmailSubject()
+    {
+        return $GLOBALS["SL"]->sysOpts["site-name"] . ': ' . $GLOBALS["SL"]->treeRow->TreeName;
+    }
+    
+    protected function postNodeLoadEmail($nID)
+    {
+        $this->v["emaTo"] = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailTo"]);
+        $this->v["emaCC"] = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailCC"]);
+        $this->v["emaBCC"] = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailBCC"]);
+        $this->v["toList"] = '';
+        if (sizeof($this->v["emaTo"]) > 0) {
+            foreach ($this->v["emaTo"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+        }
+        if (sizeof($this->v["emaCC"]) > 0) {
+            foreach ($this->v["emaCC"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+        }
+        if (sizeof($this->v["emaBCC"]) > 0) {
+            foreach ($this->v["emaBCC"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+        }
+        return true;
+    }
     
     protected function postNodeSendEmail($nID)
     {
         if (sizeof($this->allNodes[$nID]->extraOpts["emailTo"]) > 0 
             && (intVal($this->allNodes[$nID]->nodeRow->NodeDefault) > 0 
                 || intVal($this->allNodes[$nID]->nodeRow->NodeDefault) == -69)) {
-            $emaTo = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailTo"]);
-            $emaCC = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailCC"]);
-            $emaBCC = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailBCC"]);
-            if (sizeof($emaTo) > 0) {
+            $this->postNodeLoadEmail($nID);
+            if (sizeof($this->v["emaTo"]) > 0) {
                 $currEmail = [];
-                $emaSubject = $GLOBALS["SL"]->sysOpts["site-name"] . ': ' . $GLOBALS["SL"]->treeRow->TreeName;
+                $emaSubject = $this->postDumpFormEmailSubject();
                 $emaContent = '';
                 if (intVal($this->allNodes[$nID]->nodeRow->NodeDefault) > 0) {
                     $currEmail = SLEmails::find($this->allNodes[$nID]->nodeRow->NodeDefault);
@@ -2712,16 +2755,19 @@ class SurvFormTree extends SurvUploadTree
                     $flds = $GLOBALS["SL"]->REQ->all();
                     if ($flds && sizeof($flds) > 0) {
                         foreach ($flds as $key => $val) {
+                            if (is_array($val)) $val = implode(', ', $val);
                             if (!in_array($key, [ '_token', 'ajax', 'tree', 'treeSlug', 'node', 'nodeSlug', 
                                 'loop', 'loopItem', 'step', 'alt', 'jumpTo', 'afterJumpTo', 'zoomPref' ])
                                 && strpos($key, 'Visible') === false && trim($val) != '') {
                                 $fldNID = intVal(str_replace('n', '', str_replace('fld', '', $key)));
+                                $line = '';
                                 if (isset($this->allNodes[$fldNID]->nodeRow->NodePromptText) 
                                     && trim($this->allNodes[$fldNID]->nodeRow->NodePromptText) != '') {
-                                    $emaContent .= strip_tags($this->allNodes[$fldNID]->nodeRow->NodePromptText) 
-                                        . ':<br />';
+                                    $line .= '<b>' . strip_tags($this->allNodes[$fldNID]->nodeRow->NodePromptText) 
+                                        . '</b><br />';
                                 }
-                                $emaContent .= $val . '<br /><br />';
+                                $line .= $val . '<br /><br />';
+                                if (strpos($emaContent, $line) === false) $emaContent .= $line;
                             }
                         }
                     }
@@ -2730,17 +2776,15 @@ class SurvFormTree extends SurvUploadTree
                     $emaContent = $this->emailRecordSwap($emaContent);
                     $emaSubject = $this->emailRecordSwap($emaSubject);
                     if ($GLOBALS["SL"]->isHomestead()) {
-                        echo '<div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent . '<hr><hr></div>';
+                        $this->sendFakeEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], 
+                            $this->v["emaBCC"]);
                     } else {
-                        $this->sendEmail($emaContent, $emaSubject, $emaTo, $emaCC, $emaBCC);
-                    }
-                    $toList = '';
-                    if (sizeof($emaTo) > 0) {
-                        foreach ($emaTo as $i => $e) $toList .= (($i > 0) ? ' ; ' : '') . $e[0];
+                        $this->sendEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], 
+                            $this->v["emaBCC"], $this->postEmailFrom());
                     }
                     $emaID = ((isset($currEmail->EmailID)) ? $currEmail->EmailID : -3);
-                    $this->logEmailSent($emaContent, $emaSubject, $toList, $emaID, $this->treeID, $this->coreID, 
-                        $this->v["uID"]);
+                    $this->logEmailSent($emaContent, $emaSubject, $this->v["toList"], $emaID, $this->treeID, 
+                        $this->coreID, $this->v["uID"]);
                 }
             }
         }
@@ -2768,6 +2812,7 @@ class SurvFormTree extends SurvUploadTree
             }
         }
         $dynamos = [
+            '[{ Core ID }]', 
             '[{ Login URL }]', 
             '[{ User Email }]', 
             '[{ Email Confirmation URL }]'
@@ -2777,6 +2822,11 @@ class SurvFormTree extends SurvUploadTree
                 $swap = $dy;
                 $dyCore = str_replace('[{ ', '', str_replace(' }]', '', $dy));
                 switch ($dy) {
+                    case '[{ Core ID }]':
+                        $swap = ((isset($this->sessData->dataSets["PowerScore"]) 
+                            && isset($this->sessData->dataSets["PowerScore"][0]->PsID))
+                            ? $this->sessData->dataSets["PowerScore"][0]->PsID : 0);
+                        break;
                     case '[{ Login URL }]':
                         $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] . '/login');
                         break;
@@ -2823,6 +2873,18 @@ class SurvFormTree extends SurvUploadTree
         return $emailBody;
     }
     
+    protected function manualLogContact($nID, $emaContent, $emaSubject, $email = '', $type = '')
+    {
+        $log = new SLContact;
+        $log->ContFlag = 'Unread';
+        $log->ContType = $type;
+        $log->ContEmail = $email;
+        $log->ContSubject = $emaSubject;
+        $log->ContBody = $emaContent;
+        $log->save();
+        return true;
+    }
+    
     protected function processContactForm($nID = -3, $tmpSubTier = [])
     {
         $this->pageCoreFlds = [ 'ContType', 'ContEmail', 'ContSubject', 'ContBody' ];
@@ -2866,7 +2928,7 @@ class SurvFormTree extends SurvUploadTree
     {
         $extraData = '';
         $newVal = $this->getNodeFormFldBasic($nID);
-        if (trim($newVal) != '') {
+        if ($newVal && !is_array($newVal) && trim($newVal) != '') {
             $found = false;
             if (isset($this->allNodes[$nID]->dataStore) 
                 && trim($this->allNodes[$nID]->dataStore) != '') {

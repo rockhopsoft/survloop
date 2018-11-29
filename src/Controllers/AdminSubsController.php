@@ -46,7 +46,7 @@ class AdminSubsController extends AdminController
         if ($this->v["currPage"][0] == '/dashboard/subs/incomplete') {
             $this->v["currPage"][1] = 'All Incomplete Submissions';
         }
-        $this->v["coreAbbr"] = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl];
+        $this->v["coreAbbr"] = $GLOBALS["SL"]->coreTblAbbr();
         $this->v["subsSort"] = ['created_at', 'desc'];
         $this->v["coreFlds"] = SLFields::select('FldName', 'FldEng', 'FldForeignTable')
             ->where('FldDatabase', $this->dbID)

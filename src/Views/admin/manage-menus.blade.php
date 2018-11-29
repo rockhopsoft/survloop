@@ -6,9 +6,6 @@
 
 <div class="row">
     <div class="col-6">
-        <h2><i class="fa fa-newspaper-o mR5"></i> Footer Navigation Menu</h2>
-        <span class="slGrey">...soon...</span>
-        <div class="p20"></div>
         <h2><i class="fa fa-eye"></i> Admin Navigation Menu</h2>
         <span class="slGrey">...soon...</span>
         <div class="p20"></div>
@@ -29,10 +26,10 @@
                 @if ($i < (1+sizeof($navMenu))) disBlo @else disNon @endif ">
                 <div class="col-6"><input type="text" id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][0] !!}" @else value="" @endif 
-                    onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
+                    onKeyUp="checkMainNav();" class="form-control" autocomplete="off" ></div>
                 <div class="col-6"><input type="text" id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}" 
                     @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][1] !!}" @else value="" @endif 
-                    onKeyUp="checkMainNav();" class="form-control form-control-lg" autocomplete="off" ></div>
+                    onKeyUp="checkMainNav();" class="form-control" autocomplete="off" ></div>
             </div>
         @endfor
         <center><input type="submit" class="btn btn-primary btn-xl" value="Save Menu Changes"></center>

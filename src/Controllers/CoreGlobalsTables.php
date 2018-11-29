@@ -104,6 +104,7 @@ class CoreGlobalsTables extends CoreStatic
                 ->first();
             if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
         }
+
         if ($dbID == -3 && isset($this->treeRow->TreeDatabase) && intVal($this->treeRow->TreeDatabase) > 0) {
             $dbID = $this->treeRow->TreeDatabase;
         }
@@ -115,6 +116,9 @@ class CoreGlobalsTables extends CoreStatic
         if (($treeOverride > 0 || $this->treeOverride <= 0) && $dbID == 1 && !$this->dbRow) {
         	$this->dbID = 3;
         	$this->dbRow = SLDatabases::find($this->dbID);
+        }
+        if ($this->treeRow && isset($this->treeRow->TreeCoreTable) && intVal($this->treeRow->TreeCoreTable) > 0) {
+            $this->initCoreTable(SLTables::find($this->treeRow->TreeCoreTable));
         }
         $this->treeIsAdmin = false;
         if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts > 1 && ($this->treeRow->TreeOpts%3 == 0 
@@ -143,7 +147,7 @@ class CoreGlobalsTables extends CoreStatic
     
     public function modelPath($tbl = '', $forceFile = false)
     {
-        if ($tbl == 'users') return "App\\Models\\User";
+        if (strtolower($tbl) == 'users') return "App\\Models\\User";
         if (isset($this->tblModels[$tbl])) {
             $path = "App\\Models\\" . $this->tblModels[$tbl];
             $this->chkTblModel($tbl, $path, $forceFile);
@@ -316,6 +320,16 @@ class CoreGlobalsTables extends CoreStatic
         return ($tblID == $this->treeRow->TreeCoreTable);
     }
     
+    public function coreTblAbbr()
+    {
+        return $this->tblAbbr[$this->coreTbl];
+    }
+    
+    public function coreTblIdFld()
+    {
+        return $this->coreTblAbbr() . 'ID';
+    }
+    
     public function getCoreTblUserFld()
     {
         if ((!isset($this->coreTblUserFld) || trim($this->coreTblUserFld) == '') 
@@ -387,12 +401,18 @@ class CoreGlobalsTables extends CoreStatic
     public function getForeignLnk($tbl1, $tbl2 = -3)
     {
         if ($tbl2 <= 0) $tbl2 = $this->treeRow->TreeCoreTable;
-        $fld = SLFields::select('FldName')
-            ->where('FldTable', $tbl1)
-            ->where('FldForeignTable', $tbl2)
-            ->first();
-        if ($fld && isset($fld->FldName)) return trim($fld->FldName);
-        return '';
+        if (!isset($this->x["foreignLookup"])) $this->x["foreignLookup"] = [];
+        if (!isset($this->x["foreignLookup"][$tbl1 . '-' . $tbl2])) { 
+            $this->x["foreignLookup"][$tbl1 . '-' . $tbl2] = '';
+            $fld = SLFields::select('FldName')
+                ->where('FldTable', $tbl1)
+                ->where('FldForeignTable', $tbl2)
+                ->first();
+            if ($fld && isset($fld->FldName)) {
+                $this->x["foreignLookup"][$tbl1 . '-' . $tbl2] = trim($fld->FldName);
+            }
+        }
+        return $this->x["foreignLookup"][$tbl1 . '-' . $tbl2];
     }
     
     public function getForeignLnkName($tbl1, $tbl2 = '')
@@ -1475,7 +1495,7 @@ class CoreGlobalsTables extends CoreStatic
         if (trim($tbl) == '') $tbl = $this->coreTbl;
         if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) return $pubID;
         $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
-        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" . $pubIdFld . "', '" . $pubID . "')->first();");
+        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
         if ($idChk) return $idChk->getKey();
         return $pubID;
     }
@@ -1707,7 +1727,6 @@ class CoreGlobalsTables extends CoreStatic
     public function isHomestead()
     {
         return (strpos($this->sysOpts["app-url"], 'homestead.test') !== false);
-        
     }
     
     public function getParentDomain()
@@ -1721,6 +1740,107 @@ class CoreGlobalsTables extends CoreStatic
     public function sysHas($type)
     {
         return (isset($this->sysOpts["has-" . $type]) && intVal($this->sysOpts["has-" . $type]) == 1);
+    }
+    
+    public function loadUsrTblRow()
+    {
+        return SLTables::where('TblDatabase', $this->dbID)
+            ->where('TblEng', 'Users')
+            ->first();
+    }
+    
+    public function initCoreTable($coreTbl, $userTbl = null)
+    {
+        if (!$coreTbl || !isset($coreTbl->TblID)) return false;
+        if (!$userTbl) $userTbl = $this->loadUsrTblRow();
+        if ($coreTbl->TblID == $userTbl->TblID) return false;
+        $coreFlds = [ [
+                "FldType" => 'INT', 
+                "FldEng"  => 'User ID', 
+                "FldName" => 'UserID', 
+                "FldDesc" => 'Indicates the unique User ID number of the User '
+                    . 'owning the data stored in this record for this Experience.' 
+            ], [ 
+                "FldType" => 'INT', 
+                "FldEng"  => 'Experience Node Progress', 
+                "FldName" => 'SubmissionProgress', 
+                "FldDesc" => 'Indicates the unique Node ID number of the last '
+                    . 'Experience Node loaded during this User\'s Experience.' 
+            ], [ 
+                "FldType" => 'VARCHAR', 
+                "FldEng"  => 'Tree Version Number', 
+                "FldName" => 'TreeVersion', 
+                "FldDesc" => 'Stores the current version number of this User Experience, important for tracking bugs.' 
+            ], [ 
+                "FldType" => 'VARCHAR', 
+                "FldEng"  => 'A/B Testing Version', 
+                "FldName" => 'VersionAB', 
+                "FldDesc" => 'Stores a complex string reflecting all A/B Testing '
+                    . 'variations in effect at the time of this User\'s Experience of this Node.' 
+            ], [ 
+                "FldType" => 'VARCHAR', 
+                "FldEng"  => 'Unique String For Record', 
+                "FldName" => 'UniqueStr', 
+                "FldDesc" => 'This unique string is for cases when including the record ID number is not appropriate.' 
+            ], [ 
+                "FldType" => 'VARCHAR', 
+                "FldEng"  => 'IP Address', 
+                "FldName" => 'IPaddy', 
+                "FldDesc" => 'Encrypted IP address of the current user.' 
+            ], [ 
+                "FldType" => 'VARCHAR', 
+                "FldEng"  => 'Using Mobile Device', 
+                "FldName" => 'IsMobile', 
+                "FldDesc" => 'Indicates whether or not the current user is interacting via a mobile deviced.' 
+        ] ];
+        foreach ($coreFlds as $f) {
+            $chk = SLFields::where('FldDatabase', $this->dbID)
+                ->where('FldTable', $coreTbl->TblID)
+                ->where('FldName', $f["FldName"])
+                ->get();
+            if ($chk->isEmpty()) {
+                $fld = new SLFields;
+                $fld->FldDatabase         = $this->dbID;
+                $fld->FldTable            = $coreTbl->TblID;
+                $fld->FldEng              = $f["FldEng"];
+                $fld->FldName             = $f["FldName"];
+                $fld->FldDesc             = $f["FldDesc"];
+                $fld->FldSpecType         = 'Replica';
+                $fld->FldType             = $f["FldType"];
+                if ($f["FldType"] == 'INT') {
+                    $fld->FldDataType     = 'Numeric';
+                    $fld->FldCharSupport  = ',Numbers,';
+                }
+                if ($f["FldName"] == 'UserID') {
+                    $fld->FldKeyType      = ',Foreign,';
+                    $fld->FldForeignTable = $userTbl->TblID;
+                }
+                // Options: Auto-Managed By SurvLoop; Internal Use not in XML
+                $fld->FldOpts             = 39;
+                $fld->save();
+                $tblQry = "ALTER TABLE  `" . $this->dbRow->DbPrefix . $coreTbl->TblName . "` ADD `" 
+                    . $coreTbl->TblAbbr . $f["FldName"] . "` ";
+                switch ($f["FldName"]) {
+                    case 'UserID':             $tblQry .= "bigint(20) unsigned"; break;
+                    case 'SubmissionProgress': $tblQry .= "int(11)"; break;
+                    case 'VersionAB':          $tblQry .= "varchar(255)"; break;
+                    case 'UniqueStr':          $tblQry .= "varchar(50)"; break;
+                    case 'IPaddy':             $tblQry .= "varchar(255)"; break;
+                    case 'IsMobile':           $tblQry .= "int(1) NULL"; break;
+                }
+                DB::statement($tblQry . " NULL;");
+            }
+        }
+        $this->installNewModel($coreTbl, true);
+        return true;
+    }
+    
+    public function installNewModel($tbl, $forceFile = true)
+    {
+        if ($tbl && isset($tbl->TblName) && $tbl->TblName != 'Users') {
+            $this->modelPath($tbl->TblName, $forceFile);
+        }
+        return true;
     }
     
 }

@@ -62,7 +62,7 @@
     class="f16 p20 disBlo" style="border: 1px #0b0b85 solid; -moz-border-radius: 15px; border-radius: 15px;"><b>Show Generic Fields</b></a>
     <br /><br /><div id="genericFlds" class="disNon"><table border=0 cellpadding=5 cellspacing=0 >
     <tr><td colspan=7 class="p5 pL20 row2 f18 gry6"><i>Generic Fields...</i></td></tr>
-    <tr><td class="pR20"><i>Field English Name</i></td><td></td><td class="pR20"><i>Field Name</i></td><td class="pR20"><nobr><i>Data Type</i></nobr></td>
+    <tr><td class="pR20"><i>Field Plain English Name</i></td><td></td><td class="pR20"><i>Field Database Name</i></td><td class="pR20"><nobr><i>Data Type</i></nobr></td>
     <td class="pR20"><i>Values?</i></td><td><i>Foreign Key?</i></td><td><i>Tables w/ Replicas</i></td></tr>
     @forelse ($genericFlds as $fld)
         {!! $fld !!}

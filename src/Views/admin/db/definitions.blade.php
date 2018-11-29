@@ -4,6 +4,8 @@
 
 @section('content')
 
+<p>&nbsp;</p>
+
 @if ($dbAllowEdits)
     <a href="/dashboard/db/definitions/add" class="btn btn-secondary float-right"
         ><i class="fa fa-plus-circle"></i> Add a New Definition</a>
@@ -39,7 +41,7 @@
                 <div class="col-1">
                 @if ($dbAllowEdits)
                     <p class="mT5 mB5"><a href="/dashboard/db/definitions/edit/{{ $setDef->DefID }}"
-                        ><i class="fa fa-pencil fa-flip-horizontal"></i> {{ $setDef->DefID }}</a></p>
+                        ><nobr><i class="fa fa-pencil fa-flip-horizontal"></i> {{ $setDef->DefID }}</nobr></a></p>
                 @endif
                 </div>
                 <div class="col-11">

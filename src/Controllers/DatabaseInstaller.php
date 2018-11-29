@@ -230,6 +230,20 @@ class DatabaseInstaller extends AdminDBController
         return $this->printExportLaravel($request, true);
     }
     
+    protected function prepLaravelExport()
+    {
+        $this->v["dumpOut"] = [
+            "Models"     => '', 
+            "Migrations" => '', 
+            "Seeders"    => '',
+            "Zip Files"  => ''
+        ];
+		$this->v["fileListModel"] = [];
+		$this->v["migrationFileUp"] = $this->v["migrationFileDown"] = $this->v["tblClean"] = '';
+        if (!isset($this->v["modelFile"])) $this->v["modelFile"] = "";
+        return true;
+    }
+    
     public function printExportLaravel(Request $request, $asPackage = false) 
     {
         ini_set('max_execution_time', 180);
@@ -243,22 +257,10 @@ class DatabaseInstaller extends AdminDBController
 				. $GLOBALS["SL"]->dbRow->DbPrefix . 'create_tables.php';
 			$newSeedFilename = 'database/seeds/' . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
 				. 'Seeder.php';
-            $this->v["dumpOut"] = [
-                "Models"     => '', 
-                "Migrations" => '', 
-                "Seeders"    => '',
-                "Zip Files"  => ''
-            ];
             $tbls = $this->exportQryTbls();
             if ($this->v["refresh"] == 1) {
-            	
+            	$this->prepLaravelExport();
 				$this->chkModelsFolder();
-				$this->v["fileListModel"] = [];
-				$this->v["migrationFileUp"] = $this->v["migrationFileDown"] = '';
-				$modelPath = "App\\Models\\";
-				/* if ($GLOBALS["SL"]->dbRow->dbName != 'SurvLoop') {
-					$modelPath = "App\\Models\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\";
-				} */
 				if ($tbls->isNotEmpty()) {
 					foreach ($tbls as $tbl) {
 						$indexes = "";
@@ -320,27 +322,7 @@ class DatabaseInstaller extends AdminDBController
 						$this->v["migrationFileDown"] .= "\t"."Schema::drop('" . $GLOBALS["SL"]->dbRow->DbPrefix 
 							. $tbl->TblName . "');"."\n\t";
 						
-						$newModelFilename = '../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/' 
-							. $this->v["tblClean"] . '.php';
-						$this->v["fileListModel"][] = $newModelFilename;
-						$fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
-						$this->v["dumpOut"]["Models"] .= $fullFileOut;
-						if (file_exists($newModelFilename)) {
-							$oldFile = file_get_contents($newModelFilename);
-							$endStr = '// END SurvLoop auto-generated portion of Model';
-							$endPos = strpos($oldFile, $endStr);
-							if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile)) {
-								$append = substr($oldFile, ($endPos+strLen($endStr)+2));
-								$fullFileOut .= "\n\n" . $append;
-							}
-						}
-						file_put_contents($newModelFilename, $fullFileOut);
-						try {
-							copy($newModelFilename, str_replace('/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/',
-								'/Models/', $newModelFilename));
-						} catch (Exception $e) {
-							//echo 'Caught exception: ',  $e->getMessage(), "\n";
-						}
+						$this->saveModelFile();
 					}
 				}
 				Storage::put($newMigFilename, 
@@ -418,6 +400,50 @@ class DatabaseInstaller extends AdminDBController
             $this->v["content"] = $cpyTxt . $this->v["content"];
         }
         return view('vendor.survloop.master', $this->v);
+    }
+    
+    protected function refreshTableModel(Request $request, $tbl = '')
+    {
+        $this->admControlInit($request, '/dashboard/db/export/laravel/table-model');
+        $this->prepLaravelExport();
+        $tbl = SLTables::where('TblName', $tbl)
+            ->first();
+        $this->loadTbl($tbl);
+        $flds = $this->getTableFields($tbl);
+        if ($flds->isNotEmpty()) {
+            foreach ($flds as $fld) {
+                $this->v["modelFile"] .= "\n\t\t'" . trim($tbl->TblAbbr . $fld->FldName) . "', ";
+            }
+        }
+        $this->saveModelFile();
+        return ':)' . (($request->has('redir64')) ? '<script type="text/javascript"> setTimeout("window.location=\'' 
+            . base64_decode($request->get('redir64')) . '\'", 100); </script>' : '');
+    }
+    
+    protected function saveModelFile()
+    {
+        $newModelFilename = '../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/' 
+            . $this->v["tblClean"] . '.php';
+        $this->v["fileListModel"][] = $newModelFilename;
+        $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
+        $this->v["dumpOut"]["Models"] .= $fullFileOut;
+        if (file_exists($newModelFilename)) {
+            $oldFile = file_get_contents($newModelFilename);
+            $endStr = '// END SurvLoop auto-generated portion of Model';
+            $endPos = strpos($oldFile, $endStr);
+            if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile)) {
+                $append = substr($oldFile, ($endPos+strLen($endStr)+2));
+                $fullFileOut .= "\n\n" . $append;
+            }
+        }
+        file_put_contents($newModelFilename, $fullFileOut);
+        try {
+            copy($newModelFilename, str_replace('/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '/',
+                '/Models/', $newModelFilename));
+        } catch (Exception $e) {
+            //echo 'Caught exception: ',  $e->getMessage(), "\n";
+        }
+        return true;
     }
     
     protected function printSeedTbl($eval = '')

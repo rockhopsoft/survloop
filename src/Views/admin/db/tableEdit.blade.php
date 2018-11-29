@@ -28,11 +28,11 @@
 <div class="container">
 
     <fieldset class="form-group">
-        <label for="TblEngID">English Name</label>
+        <label for="TblEngID">Plain English Name</label>
         <input id="TblEngID" name="TblEng" value="{{ $tbl->TblEng }}" type="text" class="form-control" > 
     </fieldset>
     <fieldset class="form-group">
-        <label for="TblNameID">Table Name</label>
+        <label for="TblNameID">Database Name</label>
         <input id="TblNameID" name="TblName" value="{{ $tbl->TblName }}" type="text" class="form-control" > 
     </fieldset>
     <fieldset class="form-group">

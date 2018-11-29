@@ -26,6 +26,6 @@ body, p, div, input, select, textarea, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h
 
 img { border: 0; }
 
-a:link, a:visited, a:active, a:hover {
+a:link, a:visited, a:active, a:hover, .clrLnk {
     color: {!! $css["color-main-link"] !!};
 }

@@ -77,6 +77,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             : (($GLOBALS["SL"]->REQ->has('parent')) ? SLNode::find($GLOBALS["SL"]->REQ->parent) : []));
         //echo '<pre>'; print_r($node->dataManips); echo '</pre>';
         if ($GLOBALS["SL"]->REQ->has('sub') && $this->canEditTree) {
+            $redirOver = '';
             if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->get('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
@@ -307,7 +308,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                     $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('bigBtnJS'));
                 } else { // other normal response node
                     $node->nodeRow->NodeType = trim($GLOBALS["SL"]->REQ->get('nodeTypeQ'));
-                    if ($node->nodeRow->NodeType == 'Drop Down') {
+                    if (in_array($node->nodeRow->NodeType, ['Drop Down', 'U.S. States'])) {
                         $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->dropDownSuggest);
                     } elseif ($node->nodeRow->NodeType == 'Spreadsheet Table') {
                         $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->get('nodeDataStoreSprd'));
@@ -387,10 +388,14 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 
                 if ($node->nodeRow->NodeParentID <= 0) {
                     if (isset($node->nodeRow->NodeDataBranch) 
-                    && isset($GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch])
-                    && (!isset($GLOBALS["SL"]->treeRow->coreTbl) || intVal($GLOBALS["SL"]->treeRow->coreTbl) <= 0)) {
-                        $GLOBALS["SL"]->treeRow->TreeCoreTable = $GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch];
-                        $GLOBALS["SL"]->treeRow->save();
+                        && isset($GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch])
+                        && (!isset($GLOBALS["SL"]->treeRow->coreTbl) || intVal($GLOBALS["SL"]->treeRow->coreTbl) <= 0)){
+                        $newCore = $GLOBALS["SL"]->tblI[$node->nodeRow->NodeDataBranch];
+                        if ($GLOBALS["SL"]->treeRow->TreeCoreTable != $newCore) {
+                            $GLOBALS["SL"]->treeRow->TreeCoreTable = $newCore;
+                            $GLOBALS["SL"]->treeRow->save();
+                            $redirOver = '/dashboard/db/export/laravel/table-model/' . $node->nodeRow->NodeDataBranch;
+                        }
                     }
                     if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeType == 'Page') {
                         $treeOpts = [ ['homepage', 7], ['adminPage', 3], ['volunPage', 17], ['partnPage', 41], 
@@ -469,11 +474,9 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 '.dashboard.tree'
             ];
             foreach ($treeCaches as $cache) Cache::forget($cache);
-            $redir = '/dashboard/surv-' . $this->treeID . '/map?all=1&alt=1&refresh=1#n' . $node->nodeRow->NodeID;
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                $redir = '/dashboard/page/' . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1#n' 
-                    . $node->nodeRow->NodeID;
-            }
+            $redir = '/dashboard/' . (($GLOBALS["SL"]->treeRow->TreeType == 'Page') ? 'page/' : 'surv-')
+                . $this->treeID . '/map?all=1&alt=1&refresh=1#n' . $node->nodeRow->NodeID;
+            if ($redirOver != '') $redir = $redirOver . '?redir64=' . base64_encode($redir);
             return $this->redir($redir, true);
         }
         
@@ -712,6 +715,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
     
     public function adminPrintFullTree(Request $request, $pubPrint = false)
     {
+        $ret = '';
         $this->v["printFullTree"] = true;
         if ($pubPrint) {
             $this->v["isPrint"] = $this->v["isAll"] = $this->v["isAlt"] = true;
@@ -725,11 +729,12 @@ class SurvLoopTreeAdmin extends SurvFormTree
         if ($GLOBALS["SL"]->REQ->has('dataStruct')) {
             
         }
-        
+        $pageJava = $GLOBALS['SL']->pageJAVA;
+        $GLOBALS['SL']->pageJAVA = '';
         if ($pubPrint) {
-            return $this->adminBasicPrintNode($this->nodeTiers, -1);
+            $ret = $this->adminBasicPrintNode($this->nodeTiers, -1);
         }
-        return view('vendor.survloop.admin.tree.node-print-wrap', [
+        $ret = view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"     => $this->canEditTree,
             "isPrint"         => $this->v["isPrint"]
@@ -737,6 +742,8 @@ class SurvLoopTreeAdmin extends SurvFormTree
             . view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
                 "canEditTree" => $this->canEditTree
             ])->render() . ' }); </script>';
+        $GLOBALS['SL']->pageJAVA = $pageJava;
+        return $ret;
     }
     
     
@@ -1036,5 +1043,6 @@ class SurvLoopTreeAdmin extends SurvFormTree
         }
         return true;
     }
+    
     
 }

@@ -8,15 +8,6 @@
         Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Survey Map</nobr>
     @endif
 </h2>
-@if ($GLOBALS['SL']->treeIsAdmin)
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
-        ><h3 class="m0">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/dashboard/start/' 
-        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
-@else
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
-        ><h3 class="m0">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
-        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
-@endif
 
 @if ($isPrint)
     {!! view('vendor.survloop.print-header-legal', [])->render() !!}
@@ -39,6 +30,16 @@
 @endif
 
 {!! $GLOBALS["SL"]->printTreeNodeStats($isPrint, $isAll, $isAlt) !!}
+
+@if ($GLOBALS['SL']->treeIsAdmin)
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
+        ><h3 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/dashboard/start/' 
+        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
+@else
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
+        ><h3 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
+        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
+@endif
 
 {!! $printTree !!}
 
