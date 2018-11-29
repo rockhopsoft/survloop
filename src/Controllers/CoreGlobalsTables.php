@@ -1620,13 +1620,19 @@ class CoreGlobalsTables extends CoreStatic
         return true;
     }
     
-    public function resetTreeNodeStats()
+    public function loadTreeNodeStatTypes()
     {
         $this->x["dataStatTypes"] = [
             "quali" => [ 'Text', 'Long Text', 'Email', 'Uploads' ],
             "choic" => [ 'Radio', 'Checkbox', 'Drop Down', 'Gender', 'Gender Not Sure', 'U.S. States', 'Countries' ],
             "quant" => [ 'Text:Number', 'Slider', 'Date', 'Date Picker', 'Date Time', 'Time', 'Feet Inches' ]
             ];
+        return $this->x["dataStatTypes"];
+    }
+    
+    public function resetTreeNodeStats()
+    {
+        $this->loadTreeNodeStatTypes();
         $this->x["dataTypeStats"] = [
             "quali" => [ "all" => 0, "req" => 0 ],
             "choic" => [ "all" => 0, "req" => 0 ],

@@ -285,8 +285,8 @@ class SLCreateTables extends Migration
 		Schema::create('SL_Images', function(Blueprint $table)
 		{
 			$table->increments('ImgID');
-			$table->integer('ImgDatabase')->unsigned()->nullable();
-			$table->foreign('ImgDatabase')->references('DbID')->on('SL_Databases');
+			$table->integer('ImgDatabaseID')->unsigned()->nullable();
+			$table->foreign('ImgDatabaseID')->references('DbID')->on('SL_Databases');
 			$table->integer('ImgUserID')->unsigned()->nullable();
 			$table->foreign('ImgUserID')->references('id')->on('users');
 			$table->string('ImgFileOrig')->nullable();
@@ -316,13 +316,21 @@ class SLCreateTables extends Migration
 		{
 			$table->increments('TweakID');
 			$table->string('TweakVersionAB')->nullable();
+			$table->string('TweakVersionAB')->nullable();
 			$table->integer('TweakSubmissionProgress')->unsigned()->nullable();
 			$table->foreign('TweakSubmissionProgress')->references('NodeID')->on('SL_Node');
+			$table->integer('TweakSubmissionProgress')->nullable();
+			$table->string('TweakIPaddy')->nullable();
 			$table->string('TweakIPaddy')->nullable();
 			$table->string('TweakTreeVersion')->nullable();
+			$table->string('TweakTreeVersion')->nullable();
+			$table->string('TweakUniqueStr')->nullable();
 			$table->string('TweakUniqueStr')->nullable();
 			$table->integer('TweakUserID')->unsigned()->nullable();
 			$table->foreign('TweakUserID')->references('id')->on('users');
+			$table->integer('TweakUserID')->unsigned()->nullable();
+			$table->foreign('TweakUserID')->references('id')->on('users');
+			$table->string('TweakIsMobile')->nullable();
 			$table->string('TweakIsMobile')->nullable();
 			$table->timestamps();
 		});
@@ -334,6 +342,7 @@ class SLCreateTables extends Migration
 			$table->integer('SessTree')->unsigned()->nullable();
 			$table->foreign('SessTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('SessCoreID')->unsigned()->nullable();
+			$table->foreign('SessCoreID')->references('TweakID')->on('SL_DesignTweaks');
 			$table->integer('SessCurrNode')->unsigned()->nullable();
 			$table->foreign('SessCurrNode')->references('NodeID')->on('SL_Node');
 			$table->integer('SessLoopRootJustLeft')->unsigned()->nullable();
@@ -421,15 +430,15 @@ class SLCreateTables extends Migration
 		});
 		Schema::create('SL_Emails', function(Blueprint $table)
 		{
-			$table->increments('EmailsID');
-			$table->integer('EmailsTree')->unsigned()->nullable();
-			$table->foreign('EmailsTree')->references('TreeID')->on('SL_Tree');
-			$table->string('EmailsType')->nullable();
-			$table->string('EmailsName')->nullable();
-			$table->longText('EmailsSubject')->nullable();
-			$table->longText('EmailsBody')->nullable();
-			$table->integer('EmailsOpts')->default('1')->nullable();
-			$table->integer('EmailsTotSent')->default('0')->nullable();
+			$table->increments('EmailID');
+			$table->integer('EmailTree')->unsigned()->nullable();
+			$table->foreign('EmailTree')->references('TreeID')->on('SL_Tree');
+			$table->string('EmailType')->nullable();
+			$table->string('EmailName')->nullable();
+			$table->longText('EmailSubject')->nullable();
+			$table->longText('EmailBody')->nullable();
+			$table->integer('EmailOpts')->default('1')->nullable();
+			$table->integer('EmailTotSent')->default('0')->nullable();
 			$table->timestamps();
 		});
 		Schema::create('SL_Emailed', function(Blueprint $table)
@@ -439,7 +448,7 @@ class SLCreateTables extends Migration
 			$table->foreign('EmailedTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('EmailedRecID')->nullable();
 			$table->integer('EmailedEmailID')->unsigned()->nullable();
-			$table->foreign('EmailedEmailID')->references('EmailsID')->on('SL_Emails');
+			$table->foreign('EmailedEmailID')->references('EmailID')->on('SL_Emails');
 			$table->string('EmailedTo')->nullable();
 			$table->integer('EmailedToUser')->unsigned()->nullable();
 			$table->foreign('EmailedToUser')->references('id')->on('users');
@@ -475,23 +484,24 @@ class SLCreateTables extends Migration
 			$table->string('LogNewName')->nullable();
 			$table->timestamps();
 		});
-		Schema::create('SL_ZipAshrae', function(Blueprint $table)
-		{
-			$table->increments('AshrID');
-			$table->string('AshrZone', 2)->nullable();
-			$table->string('AshrState', 2)->nullable();
-			$table->string('AshrCounty', 50)->nullable();
-			$table->timestamps();
-		});
 		Schema::create('SL_Zips', function(Blueprint $table)
 		{
 			$table->increments('ZipID');
 			$table->string('ZipZip', 10)->nullable();
 			$table->string('ZipLat')->nullable();
 			$table->string('ZipLong')->nullable();
-			$table->string('ZipCity')->nullable();
-			$table->string('ZipState', 5)->nullable();
+			$table->string('ZipCity', 100)->nullable();
+			$table->string('ZipState')->nullable();
 			$table->string('ZipCounty')->nullable();
+			$table->string('ZipCountry', 100)->nullable();
+			$table->timestamps();
+		});
+		Schema::create('SL_AddyGeo', function(Blueprint $table)
+		{
+			$table->increments('AdyGeoID');
+			$table->string('AdyGeoAddress')->nullable();
+			$table->string('AdyGeoLat')->nullable();
+			$table->string('AdyGeoLong')->nullable();
 			$table->timestamps();
 		});
 	
@@ -535,10 +545,8 @@ class SLCreateTables extends Migration
 		Schema::drop('SL_Emailed');
 		Schema::drop('SL_UsersActivity');
 		Schema::drop('SL_LogActions');
-		Schema::drop('SL_ZipAshrae');
 		Schema::drop('SL_Zips');
-		
+		Schema::drop('SL_AddyGeo');
+	
     }
 }
-
-        

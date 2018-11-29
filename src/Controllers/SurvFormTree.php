@@ -96,7 +96,8 @@ class SurvFormTree extends SurvUploadTree
                 $nextLabel = $this->nextBtnOverride;
             }
             $itemCnt = 0;
-            if (isset($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]])) {
+            if (isset($GLOBALS["SL"]->closestLoop["loop"]) 
+                && isset($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]])) {
                 $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]]);
             }
             if ($this->allNodes[$nID]->isStepLoop() && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {

@@ -38,7 +38,7 @@ class SurvLoopController extends Controller
     protected $corePublicID      = -3;
     protected $coreIDoverride    = -3;
     public $coreIncompletes      = [];
-    protected $sessID            = -3;
+    protected $sessID            = 0;
     protected $sessInfo          = [];
     protected $sessLoops         = [];
     

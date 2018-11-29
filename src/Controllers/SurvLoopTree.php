@@ -1929,8 +1929,13 @@ class SurvLoopTree extends CoreTree
             $this->processSearchFilts();
             if (sizeof($this->allPublicFiltIDs) > 0) {
                 foreach ($this->allPublicFiltIDs as $i => $coreID) {
-                    if (!isset($this->searchOpts["limit"]) || $i < $this->searchOpts["limit"]) {
-                        $ret .= $this->printReportsRecordPublic($coreID, $full);
+                    if (!isset($this->searchOpts["limit"]) || intVal($this->searchOpts["limit"]) == 0
+                        || $i < $this->searchOpts["limit"]) {
+                        if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
+                            $ret .= $this->printReportsRecordPublic($coreID, $full);
+                        } else {
+                            $ret .= $this->printReportsRecord($coreID, $full);
+                        }
                     }
                 }
             }

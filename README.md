@@ -171,7 +171,7 @@ Please report any issue you find in the issues page.
 # <a name="security-help"></a>Reporting a Security Vulnerability
 
 We want to ensure that SurvLoop is a secure HTTP open data platform for everyone. 
-If you've discovered a security vulnerability in SurvLoop, 
+If you've discovered a security vulnerability in the SurvLoop software or SurvLoop.org, 
 we appreciate your help in disclosing it to us in a responsible manner.
 
 Publicly disclosing a vulnerability can put the entire community at risk. 

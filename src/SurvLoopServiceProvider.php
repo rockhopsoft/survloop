@@ -18,7 +18,7 @@ class SurvLoopServiceProvider extends ServiceProvider
     public function boot()
     {
         require __DIR__ . '/routes.php';
-        $migFile = '2017_09_05_210744_SL_create_tables.php';
+        $migFile = '2018_11_29_SL_create_tables.php';
         $this->publishes([
               __DIR__.'/Views'                       => base_path('resources/views/vendor/survloop'),
               __DIR__.'/Views/auth'                  => base_path('resources/views/auth'),

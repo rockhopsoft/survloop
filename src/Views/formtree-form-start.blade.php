@@ -11,8 +11,10 @@
 <input type="hidden" name="treeSlug" id="treeSlugID" value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}">
 <input type="hidden" name="nodeSlug" id="nodeSlugID" value="{{ $nSlug }}">
 @if ($GLOBALS['SL']->treeRow->TreeType != 'Page')
-    <input type="hidden" name="loop" id="loopID" value="{{ $GLOBALS['SL']->closestLoop['loop'] }}">
-    <input type="hidden" name="loopItem" id="loopItemID" value="{{ $GLOBALS['SL']->closestLoop['itemID'] }}">
+    <input type="hidden" name="loop" id="loopID" value="{{ ((isset($GLOBALS['SL']->closestLoop['loop'])) 
+        ? $GLOBALS['SL']->closestLoop['loop'] : 0) }}">
+    <input type="hidden" name="loopItem" id="loopItemID" value="{{ ((isset($GLOBALS['SL']->closestLoop['itemID']))
+        ? $GLOBALS['SL']->closestLoop['itemID'] : 0) }}">
     <input type="hidden" name="alt" id="altID" value="-3">
     <input type="hidden" name="jumpTo" id="jumpToID" value="{{ $nodePrintJumpTo }}">
     <input type="hidden" name="afterJumpTo" id="afterJumpToID" value="-3">

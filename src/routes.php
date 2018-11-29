@@ -95,6 +95,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/login',      'SurvLoop\Controllers\Auth\AuthController@postLogin');
 
     Route::get( '/time-out',   'SurvLoop\\Controllers\\SurvLoop@timeOut');
+    Route::get( '/survloop-stats.json',   'SurvLoop\\Controllers\\SurvLoop@getJsonSurvLoopStats');
     
     Route::get( '/email-confirm/{token}/{tokenB}', 'SurvLoop\\Controllers\\SurvLoop@processEmailConfirmToken');
     
