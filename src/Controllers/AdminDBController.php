@@ -1173,7 +1173,8 @@ class AdminDBController extends AdminController
         $this->admControlInit($request, '/dashboard/db/diagrams');
         if (!$this->checkCache('/dashboard/db/diagrams/network-map')) {
             $this->v["errors"] = '';
-            $this->v["css"] = $this->loadCss();
+            $this->sysDef = new SystemDefinitions;
+            $this->v["css"] = $this->sysDef->loadCss();
             $this->v["canvasDimensions"] = array(950, 950);
             $mainCircleCenter = [ $this->v["canvasDimensions"][0]/2, $this->v["canvasDimensions"][1]/2 ];
             $sizeMax = 0;

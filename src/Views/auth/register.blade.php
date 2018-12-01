@@ -127,7 +127,7 @@ $v = $surv->custLoop->v;
 
 </form>
 
-<script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
+<script type="text/javascript" src="/survloop/zxcvbn.js">
 </script>
 <script type="text/javascript">
 @if ($GLOBALS["SL"]->sysHas('volunteers'))

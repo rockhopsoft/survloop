@@ -27,7 +27,6 @@ use App\Models\SLSearchRecDump;
 
 use SurvLoop\Controllers\CoreStatic;
 use SurvLoop\Controllers\CoreGlobalsDefinitions;
-
 use SurvLoop\Controllers\SurvLoopImages;
 use SurvLoop\Controllers\SurvLoopNode;
 
@@ -145,6 +144,14 @@ class CoreGlobalsTables extends CoreStatic
         return ($this->dbRow->DbOpts%3 > 0);
     }
     
+    public function installNewModel($tbl, $forceFile = true)
+    {
+        if ($tbl && isset($tbl->TblName) && $tbl->TblName != 'Users') {
+            $this->modelPath($tbl->TblName, $forceFile);
+        }
+        return true;
+    }
+    
     public function modelPath($tbl = '', $forceFile = false)
     {
         if (strtolower($tbl) == 'users') return "App\\Models\\User";
@@ -183,10 +190,10 @@ class CoreGlobalsTables extends CoreStatic
                 "tblName"   => $tblName,
                 "tblClean"  => str_replace('_', '', $tblName)
             ]);
-            if (is_writable($modelFilename)) {
+            //if (is_writable($modelFilename)) {
                 if (file_exists($modelFilename)) unlink($modelFilename);
                 file_put_contents($modelFilename, $fullFileOut);
-            }
+            //}
         }
         return true;
     }
@@ -322,7 +329,7 @@ class CoreGlobalsTables extends CoreStatic
     
     public function coreTblAbbr()
     {
-        return $this->tblAbbr[$this->coreTbl];
+        return ((isset($this->tblAbbr[$this->coreTbl])) ? $this->tblAbbr[$this->coreTbl] : '');
     }
     
     public function coreTblIdFld()
@@ -490,6 +497,20 @@ class CoreGlobalsTables extends CoreStatic
             }
         }
         return $ret;
+    }
+    
+    protected function chkForeignKey($foreignKey)
+    {
+        if ($foreignKey && intVal($foreignKey) > 0 && isset($this->tbl[$foreignKey])) {
+            if (strtolower($this->tbl[$foreignKey]) == 'users') {
+                return ['users', 'id'];
+            }
+            return [
+                $this->dbRow->DbPrefix . $this->tbl[$foreignKey], 
+                $this->tblAbbr[$GLOBALS['SL']->tbl[$foreignKey]] . "ID"
+            ];
+        }
+        return ['', ''];
     }
     
     // returns array(Table 1, Foreign Key 1, Linking Table, Foreign Key 2, Table 2)
@@ -1476,7 +1497,7 @@ class CoreGlobalsTables extends CoreStatic
         if (!isset($this->x["tblHasPublicID"])) $this->x["tblHasPublicID"] = [];
         if (isset($this->x["tblHasPublicID"][$tbl])) return $this->x["tblHasPublicID"][$tbl];
         $this->x["tblHasPublicID"][$tbl] = false;
-        if ($this->treeRow->TreeOpts%47 == 0 
+        if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts%47 == 0 
             || (isset($this->reportTree["opts"]) && $this->reportTree["opts"]%47 == 0)) {
             $this->x["tblHasPublicID"][$tbl] = true;
         }
@@ -1755,6 +1776,13 @@ class CoreGlobalsTables extends CoreStatic
             ->first();
     }
     
+    public function chkTableExists($coreTbl, $userTbl = null)
+    {
+        $chk = DB::select( DB::raw("SHOW TABLES LIKE '" . $this->dbRow->DbPrefix . $coreTbl->TblName . "'") );
+        if (!$chk || sizeof($chk) == 0) return false;
+        return true;
+    }
+    
     public function initCoreTable($coreTbl, $userTbl = null)
     {
         if (!$coreTbl || !isset($coreTbl->TblID)) return false;
@@ -1824,28 +1852,23 @@ class CoreGlobalsTables extends CoreStatic
                 // Options: Auto-Managed By SurvLoop; Internal Use not in XML
                 $fld->FldOpts             = 39;
                 $fld->save();
-                $tblQry = "ALTER TABLE  `" . $this->dbRow->DbPrefix . $coreTbl->TblName . "` ADD `" 
-                    . $coreTbl->TblAbbr . $f["FldName"] . "` ";
-                switch ($f["FldName"]) {
-                    case 'UserID':             $tblQry .= "bigint(20) unsigned"; break;
-                    case 'SubmissionProgress': $tblQry .= "int(11)"; break;
-                    case 'VersionAB':          $tblQry .= "varchar(255)"; break;
-                    case 'UniqueStr':          $tblQry .= "varchar(50)"; break;
-                    case 'IPaddy':             $tblQry .= "varchar(255)"; break;
-                    case 'IsMobile':           $tblQry .= "int(1) NULL"; break;
+                if ($this->chkTableExists($coreTbl, $userTbl)) {
+                    $tblQry = "ALTER TABLE  `" . $this->dbRow->DbPrefix . $coreTbl->TblName . "` ADD `" 
+                        . $coreTbl->TblAbbr . $f["FldName"] . "` ";
+                    switch ($f["FldName"]) {
+                        case 'UserID':             $tblQry .= "bigint(20) unsigned"; break;
+                        case 'SubmissionProgress': $tblQry .= "int(11)"; break;
+                        case 'VersionAB':          $tblQry .= "varchar(255)"; break;
+                        case 'UniqueStr':          $tblQry .= "varchar(50)"; break;
+                        case 'IPaddy':             $tblQry .= "varchar(255)"; break;
+                        case 'IsMobile':           $tblQry .= "int(1) NULL"; break;
+                    }
+                    DB::statement($tblQry . " NULL;");
                 }
-                DB::statement($tblQry . " NULL;");
             }
         }
+        $this->createTableIfNotExists($coreTbl, $userTbl);
         $this->installNewModel($coreTbl, true);
-        return true;
-    }
-    
-    public function installNewModel($tbl, $forceFile = true)
-    {
-        if ($tbl && isset($tbl->TblName) && $tbl->TblName != 'Users') {
-            $this->modelPath($tbl->TblName, $forceFile);
-        }
         return true;
     }
     

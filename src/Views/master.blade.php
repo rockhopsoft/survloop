@@ -2,14 +2,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-@if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['meta-title']))
-    <title>{{ $GLOBALS['SL']->sysOpts['meta-title'] }}</title>
+@if (isset($GLOBALS["SL"]) && isset($GLOBALS["SL"]->sysOpts) && isset($GLOBALS["SL"]->sysOpts["meta-title"]))
+    <title>{{ $GLOBALS["SL"]->sysOpts["meta-title"] }}</title>
     <meta name="description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
     <meta name="keywords" content="{{ $GLOBALS['SL']->sysOpts['meta-keywords'] }}" />
     
     <link rel="shortcut icon" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}{{ $GLOBALS['SL']->sysOpts['shortcut-icon'] }}" />
-    <link rel="image_src" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
+    <link rel="image_src" href="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
     
     <meta property="og:locale" content="en_US" />
     <meta property="og:type" content="website" />
@@ -17,8 +17,7 @@
     <meta property="og:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
     <meta property="og:url" content="https://{{ $_SERVER['HTTP_HOST'] }}{!! $_SERVER['REQUEST_URI'] !!}" />
     <meta property="og:site_name" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}" />
-    <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
+    <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
     
     
     <meta name="twitter:card" content="summary_large_image">
@@ -29,20 +28,18 @@
     <meta name="twitter:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}"/>
     <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
     <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
-    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
+    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
     
 @endif
 
-@if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys-all.min.css" rel="stylesheet">
+@if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
+    <link href="/sys-all.min.css" rel="stylesheet">
 @else
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
-    <link rel="stylesheet" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery-ui.min.css">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys2.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
+    <link rel="stylesheet" type="text/css" href="/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
+    <link rel="stylesheet" href="/jquery-ui.min.css">
+    <link href="/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.css?v={{ 
+        $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
 @endif
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
@@ -51,31 +48,29 @@
 @endif
 
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys-all.min.js" type="text/javascript"></script>
+    <script src="/sys-all.min.js" type="text/javascript"></script>
 @else 
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery.min.js"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.js"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/scripts-lib.js" type="text/javascript"></script>
+    <script src="/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    <script src="/jquery.min.js"></script>
+    <script src="/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="/bootstrap.min.js"></script>
+    <script src="/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.js?v={{ 
-        $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    <script src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
 
-<link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/css/fork-awesome.min.css" rel="stylesheet">
+<link href="/css/fork-awesome.min.css" rel="stylesheet">
 
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/Chart.bundle.min.js"></script>
+    <script src="/Chart.bundle.min.js"></script>
 @endif
 @if ((isset($needsPlots) && $needsPlots) 
     || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/plotly.min.js"></script>
+    <script src="/plotly.min.js"></script>
 @endif
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/content-tools.min.css">
+    <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
 @endif */ ?>
 
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
@@ -108,7 +103,7 @@
 
 <div id="mySidenav">
     <div class="headGap">
-        <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+        <img src="/survloop/uploads/spacer.gif" border=0 alt="spacer" >
     </div>
     <ul id="mySideUL" class="nav flex-column">
     @if (isset($navMenu) && sizeof($navMenu) > 0)
@@ -140,7 +135,7 @@
     @endif
     @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
         && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
-        <a id="logoTxt" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}" class="navbar-brand"
+        <a id="logoTxt" href="/" class="navbar-brand"
             >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
     </div><div class="col-md-7 col-sm-2">
@@ -154,12 +149,13 @@
 </div>
 <div id="headClear"></div>
 <div class="headGap">
-    <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+    <img src="/survloop/uploads/spacer.gif" border=0 alt="spacer" >
 </div>
 <div id="progWrap"></div>
 
 <noscript><div class="alert alert-dismissible alert-warning">
-    <b>Warning: It looks like you have Javascript disabled. {{ $GLOBALS['SL']->sysOpts['site-name'] }} 
+    <b>Warning: It looks like you have Javascript disabled.
+    @if (isset($GLOBALS['SL']->sysOpts['site-name'])) {{ $GLOBALS['SL']->sysOpts['site-name'] }} @endif
     requires Javascript to give you the best possible experience.</b>
 </div></noscript>
 
@@ -280,8 +276,8 @@
 </div>
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/summernote.css" rel="stylesheet">
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/summernote.min.js"></script>
+    <link href="/summernote.css" rel="stylesheet">
+    <script src="/summernote.min.js"></script>
 @endif
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)

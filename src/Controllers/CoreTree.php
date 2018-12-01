@@ -343,7 +343,7 @@ class CoreTree extends SurvLoopController
         
         // If we're loading a Page that doesn't even have a Core Table, then we skip all the session checks...
         if ((!isset($GLOBALS["SL"]->treeRow->TreeCoreTable) || intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) <= 0)
-            && $GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            && isset($GLOBALS["SL"]->treeRow->TreeType) && $GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             $this->sessInfo = new SLSess;
             $this->sessID = $this->coreID = -3;
             $GLOBALS["SL"]->setClosestLoop();
@@ -490,7 +490,7 @@ class CoreTree extends SurvLoopController
     {
         if ($coreID <= 0) $coreID = $this->coreID;
         if ($coreID > 0) {
-            if (!$this->isAdminUser() && $GLOBALS["SL"]->treeRow->TreeOpts%11 > 0 // Tree allows record edits
+            if (!$this->isAdminUser() && $GLOBALS["SL"]->treeRow->TreeOpts%11 == 0 // Tree allows record edits
                 && !$this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreID, $coreRec)) {
                 session()->forget('sessID' . $this->treeID);
                 session()->forget('coreID' . $this->treeID);
@@ -805,10 +805,10 @@ class CoreTree extends SurvLoopController
             if ($minute < strtotime($this->v["user"]->created_at)) { // signed up in the past minute
                 $firstUser = User::select('id')->get();
                 if ($firstUser->isNotEmpty() && sizeof($firstUser) == 1) {
-                    $user->assignRole('administrator');
+                    $this->v["user"]->assignRole('administrator');
                     $this->logAdd('session-stuff', 'New System Administrator #' . $this->v["user"]->id . ' Registered');
                 } elseif ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
-                    $user->assignRole('volunteer');
+                    $this->v["user"]->assignRole('volunteer');
                     $this->logAdd('session-stuff', 'New Volunteer #' . $this->v["user"]->id . ' Registered');
                 } else {
                     $this->logAdd('session-stuff', 'New User #' . $this->v["user"]->id . ' Registered');
@@ -1238,10 +1238,9 @@ class CoreTree extends SurvLoopController
     {
         if ($nID > 0) {
             if (!isset($GLOBALS["SL"]->formTree->TreeID)) {
-                if ($this->sessInfo) {
-                    $this->sessInfo->SessCurrNode = $nID;
-                    $this->sessInfo->save();
-                }
+                if (!$this->sessInfo) $this->createNewSess();
+                $this->sessInfo->SessCurrNode = $nID;
+                $this->sessInfo->save();
                 if ($GLOBALS["SL"]->coreTblAbbr() != '' && isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])) {
                     $this->sessData->currSessData($nID, $GLOBALS["SL"]->coreTbl, 
                         $GLOBALS["SL"]->coreTblAbbr() . 'SubmissionProgress', 'update', $nID);

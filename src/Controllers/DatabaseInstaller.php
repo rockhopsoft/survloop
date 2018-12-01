@@ -13,11 +13,11 @@ use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
 
-
 use SurvLoop\Controllers\AdminDBController;
 
 class DatabaseInstaller extends AdminDBController
 {
+    protected $dbMysql = false;
     
     protected function tweakAdmMenu($currPage = '')
     {
@@ -28,85 +28,18 @@ class DatabaseInstaller extends AdminDBController
         return true;
     }
     
-    protected function exportMysqlTbl($tbl, $installHereNow = false)
-    {
-        if (!isset($this->v["export"])) $this->v["export"] = $this->v["indexesEnd"] = '';
-        if (strtolower($tbl->TblEng) == 'users') return "";
-        $tblQuery = $this->exportMysqlTblCoreStart($tbl);
-        $indexes = "";
-        $flds = SLFields::where('FldTable', $tbl->TblID)
-            ->orderBy('FldOrd', 'asc')
-            ->orderBy('FldEng', 'asc')
-            ->get();
-        if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
-            $flds = $GLOBALS["SL"]->addFldRowExtends($flds, $tbl->TblExtend);
-        }
-        if ($flds->isNotEmpty()) {
-            foreach ($flds as $fld) {
-                $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
-                if ($fld->FldType == 'INT') {
-                    if (intVal($fld->FldForeignTable) > 0 && isset($GLOBALS["SL"]->tbl[$fld->FldForeignTable])
-                        && strtolower($GLOBALS["SL"]->tbl[$fld->FldForeignTable]) == 'users') {
-                        $tblQuery .= "BIGINT(20) unsigned ";
-                    } else {
-                        $tblQuery .= "INT(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 11) . ") ";
-                    }
-                } elseif ($fld->FldType == 'DOUBLE') {
-                    $tblQuery .= "DOUBLE ";
-                } elseif ($fld->FldType == 'VARCHAR') {
-                    if ($fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F') {
-                        $tblQuery .= "VARCHAR(1) ";
-                    } else {
-                        $tblQuery .= "VARCHAR(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 255) . ") ";
-                    }
-                } elseif ($fld->FldType == 'TEXT') {
-                    $tblQuery .= "TEXT ";
-                } elseif ($fld->FldType == 'DATE') {
-                    $tblQuery .= "DATE ";
-                } elseif ($fld->FldType == 'DATETIME') {
-                    $tblQuery .= "DATETIME ";
-                }
-                if (($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1)
-                    || ($fld->FldDefault && trim($fld->FldDefault) == 'NULL')) {
-                    $tblQuery .= "NULL ";
-                }
-                if ($fld->FldDefault && trim($fld->FldDefault) != '') {
-                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
-                    else $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
-                }
-                $tblQuery .= ", \n";
-                if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
-                    $indexes .= "  , KEY `" . $tbl->TblAbbr . $fld->FldName . "` "
-                        . "(`" . $tbl->TblAbbr . $fld->FldName . "`) \n";
-                }
-                if (intVal($fld->FldForeignTable) > 0) {
-                    list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
-                    $this->v["indexesEnd"] .= "ALTER TABLE `" 
-                        . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
-                        . "` ADD FOREIGN KEY (`" . $tbl->TblAbbr . $fld->FldName . "`) "
-                        . "REFERENCES `" . $forTbl . "` (`" . $forID . "`); \n";
-                }
-            }
-            $tblQuery .= "  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP , \n"
-                . "  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP , \n"
-                . "  PRIMARY KEY (`" . $tbl->TblAbbr . "ID`) \n " 
-                . $indexes 
-                . " ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; \n\n";
-        }
-        return $tblQuery;
-    }
-    
     protected function exportMysql()
     {
+        if (!isset($this->v["export"])) $this->v["export"] = '';
         $tbls = $this->tblQryStd();
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $i => $tbl) {
-                $this->v["export"] .= $this->exportMysqlTbl($tbl);
+                $this->v["export"] .= $GLOBALS["SL"]->exportMysqlTbl($tbl);
             }
-            $this->v["export"] .= $this->v["indexesEnd"]; 
+            $this->v["export"] .= $GLOBALS["SL"]->x["indexesEnd"]; 
         }
         if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"]) {
-            $this->exportMysqlSl();
+            $GLOBALS["SL"]->exportMysqlSl();
         }
         return true;
     }
@@ -142,8 +75,9 @@ class DatabaseInstaller extends AdminDBController
         if (isset($tbl->TblName)) {
             if ($tbl->TblName == 'Databases') {
                 $eval = "where('DbID', " . $this->dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Images', 'Tables', 
-                'Tree'])) {
+            } elseif (in_array($tbl->TblName, ['Images'])) {
+                $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $this->dbID . ")->";
+            } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
                 $eval = "where('" . $tbl->TblAbbr . "Database', " . $this->dbID . ")->";
             } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
                 'Emails'])) {
@@ -155,57 +89,6 @@ class DatabaseInstaller extends AdminDBController
             }
         }
         return $eval;
-    }
-    
-    protected function exportMysqlSl()
-    {
-        $this->loadSlParents();
-        //$this->tmpDbSwitch();
-        $tbls = $this->tblQrySlExports();
-        if ($tbls->isNotEmpty()) {
-            foreach ($tbls as $i => $tbl) {
-                $this->v["tbl"] = $tbl;
-                $this->v["tblName"] = 'SL_' . $tbl->TblName;
-                $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-                $this->v["export"] .= "\nDROP TABLE IF EXISTS `" . $this->v["tblName"] . "`;\n" 
-                    . $this->exportMysqlTbl($tbl);
-                $flds = $this->getTableFields($tbl);
-                if ($flds->isNotEmpty()) {
-                    $seedChk = $this->getTableSeedDump($this->v["tblClean"], $this->loadSlSeedEval($tbl));
-                    if ($seedChk->isNotEmpty()) {
-                        $this->v["tblInsertStart"] = "\nINSERT INTO `" . $this->v["tblName"] . "` (`" 
-                            . $tbl->TblAbbr . "ID`";
-                        foreach ($flds as $i => $fld) {
-                            $this->v["tblInsertStart"] .= ", `" . $tbl->TblAbbr . $fld->FldName . "`";
-                        }
-                        $this->v["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
-                        $this->v["export"] .= $this->v["tblInsertStart"];
-                        foreach ($seedChk as $ind => $seed) {
-                            if ($ind%5000 == 0 && $ind > 0) $this->v["export"] .= ";\n" . $this->v["tblInsertStart"];
-                            elseif ($ind > 0) $this->v["export"] .= ",\n";
-                            $this->v["export"] .= "(" . $seed->getKey();
-                            foreach ($flds as $fld) {
-                                if (isset($seed->{ $tbl->TblAbbr . $fld->FldName })) {
-                                    $this->v["export"] .= ", '" . str_replace("'", "\'", 
-                                        $seed->{ $tbl->TblAbbr . $fld->FldName }) . "'";
-                                } elseif ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1) {
-                                    $this->v["export"] .= ", NULL";
-                                } else {
-                                    $this->v["export"] .= ", ''";
-                                }
-                            }
-                            $this->v["export"] .= ", '" . $seed->created_at . "', '" . $seed->updated_at . "')";
-                        }
-                        $this->v["export"] .= "; \n";
-                    }
-                }
-            }
-        }
-        while (strpos($this->v["export"], ") VALUES \n,\n") !== false) {
-            $this->v["export"] = str_replace(") VALUES \n,\n", ") VALUES \n", $this->v["export"]);
-        }
-        //$this->tmpDbSwitchBack();
-        return true;
     }
     
     public function printExportPackage(Request $request)
@@ -252,13 +135,15 @@ class DatabaseInstaller extends AdminDBController
         if ($asPackage) $GLOBALS["SL"]->x["exportAsPackage"] = true;
         if (!$this->checkCache(($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export/laravel')) {
         	$this->v["refresh"] = 1;
-            if ($GLOBALS["SL"]->REQ->has('refresh')) $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->get('refresh'));
-			$newMigFilename = 'database/migrations/' . $this->v["dateStmp"] . '_' 
-				. $GLOBALS["SL"]->dbRow->DbPrefix . 'create_tables.php';
+            if ($GLOBALS["SL"]->REQ->has('refresh')) $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
+			$newMigFilename = 'database/migrations/' . $this->v["dateStmp"] . '_000000_create_' 
+				. strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
 			$newSeedFilename = 'database/seeds/' . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
 				. 'Seeder.php';
+		    $migEnds = '';
             $tbls = $this->exportQryTbls();
             if ($this->v["refresh"] == 1) {
+                
             	$this->prepLaravelExport();
 				$this->chkModelsFolder();
 				if ($tbls->isNotEmpty()) {
@@ -311,20 +196,23 @@ class DatabaseInstaller extends AdminDBController
 								if ($fld->FldIsIndex == 1) {
 									$this->v["migrationFileUp"] .= "\n\t\t"."$"."table->index('" . $fldName . "');";
 								}
+								/* // This is throwing errors
 								if (intVal($fld->FldForeignTable) > 0) {
-									list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
-									$this->v["migrationFileUp"] .= "\n\t\t\t" . "$"."table->foreign('" . $fldName . "')"
-										. "->references('" . $forID . "')->on('" . $forTbl . "');";
+									list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->FldForeignTable);
+                                    $migEnds .= "\t"."Schema::table('" . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                                        . "', function($"."table) { $"."table->foreign('" . $fldName 
+                                        . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
 								}
+								*/
 							}
 						}
 						$this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"."});"."\n\t";
 						$this->v["migrationFileDown"] .= "\t"."Schema::drop('" . $GLOBALS["SL"]->dbRow->DbPrefix 
 							. $tbl->TblName . "');"."\n\t";
-						
 						$this->saveModelFile();
 					}
 				}
+				if (trim($migEnds) != '') $this->v["migrationFileUp"] .= $migEnds;
 				Storage::put($newMigFilename, 
 					view('vendor.survloop.admin.db.export-laravel-gen-migration', $this->v)->render());
 				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
@@ -355,7 +243,7 @@ class DatabaseInstaller extends AdminDBController
 					}
 				}
 				if ($asPackage && $GLOBALS["SL"]->dbRow->DbPrefix != 'SL_') {
-					$tbls = $this->tblQrySlExports();
+					$tbls = $GLOBALS["SL"]->tblQrySlExports();
 					if ($tbls->isNotEmpty()) {
 						foreach ($tbls as $tbl) {
 							$this->v["tbl"] = $tbl;
@@ -395,9 +283,10 @@ class DatabaseInstaller extends AdminDBController
 			}
         }
         if ($request->has('refreshVendor')) {
-            $cpyTxt = $GLOBALS["SL"]->copyDirFiles('../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"],
-                '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models');
-            $this->v["content"] = $cpyTxt . $this->v["content"];
+            $this->v["content"] = $GLOBALS["SL"]->copyDirFiles('../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"],
+                    '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models')
+                . $GLOBALS["SL"]->copyDirFiles('../storage/app/database/migrations',
+                    '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Database') . $this->v["content"];
         }
         return view('vendor.survloop.master', $this->v);
     }
@@ -554,7 +443,7 @@ class DatabaseInstaller extends AdminDBController
                 if (!in_array(strtolower($GLOBALS["SL"]->tbl[$createTbl]), ['users'])) {
                     DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->DbPrefix 
                         . $GLOBALS["SL"]->tbl[$createTbl] . '`');
-                    $createQry = $this->exportMysqlTbl($tbl, true);
+                    $createQry = $GLOBALS["SL"]->exportMysqlTbl($tbl, true);
                     echo $createQry . '<br />';
                     DB::statement($createQry);
                     $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["SL"]->tbl[$createTbl]; // $createQry;
@@ -600,21 +489,6 @@ class DatabaseInstaller extends AdminDBController
         return view('vendor.survloop.admin.db.install', $this->v);
     }
     
-    
-    protected function chkForeignKey($foreignKey)
-    {
-        if ($foreignKey && intVal($foreignKey) > 0 && isset($GLOBALS["SL"]->tbl[$foreignKey])) {
-            if (strtolower($GLOBALS["SL"]->tbl[$foreignKey]) == 'users') {
-                return ['users', 'id'];
-            }
-            return [
-                $GLOBALS["SL"]->dbRow->DbPrefix . $GLOBALS["SL"]->tbl[$foreignKey], 
-                $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$foreignKey]] . "ID"
-            ];
-        }
-        return ['', ''];
-    }
-    
     // for emergency cases with questionable database access, this should only be temporarily included
     public function manualMySql(Request $request)
     {
@@ -655,6 +529,14 @@ class DatabaseInstaller extends AdminDBController
         return $this->redir('/dashboard/db/export');
     }
     
+    protected function chkModelsFolder()
+    {
+        if (!file_exists('../app/Models')) mkdir('../app/Models');
+        if (!file_exists('../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"])) {
+            mkdir('../app/Models/' . $GLOBALS["SL"]->sysOpts["cust-abbr"]);
+        }
+        return true;
+    }
     
     
 }

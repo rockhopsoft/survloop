@@ -10,7 +10,7 @@ class SLImages extends Model
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'ImgDatabase', 
+        'ImgDatabaseID', 
         'ImgUserID', 
         'ImgFileOrig', 
         'ImgFileLoc', 

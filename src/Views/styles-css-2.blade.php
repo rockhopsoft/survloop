@@ -58,6 +58,10 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
     padding: 5px 10px;
 }
 
+#mainNav {
+	background: {!! $css["color-nav-bg"] !!};
+    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
+}
 #mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, #myNavBar, #myNavBar .navbar {
     height: 56px;
 	min-height: 56px;
@@ -65,8 +69,6 @@ a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDb
 	padding-top: 1px;
 	overflow: hidden;
 	color: {!! $css["color-nav-text"] !!};
-	background: {!! $css["color-nav-bg"] !!};
-    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
 }
 .navbar, #myNavBar, #myNavBar .navbar {
     text-align: right;

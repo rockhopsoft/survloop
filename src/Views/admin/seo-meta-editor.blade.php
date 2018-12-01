@@ -88,7 +88,8 @@
                 <div class="prevImg brd"><img id="npageImgSelImg" 
             @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
                 src="{{ $node->extraOpts["meta-img"] }}" 
-                @else src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ></div>
+            @elseif (isset($GLOBALS['SL']->sysOpts['meta-img'])) src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif 
+                ></div>
             </div>
             <div class="col-4 pT10">
                 <a href="javascript:;" class="btn btn-sm btn-secondary w100 mB10 openImgReset" id="imgResetpageImg"
@@ -108,7 +109,7 @@
 <script type="text/javascript">
 function previewPage() {
     if (document.getElementById('pagePrev')) {
-        var pTitle = " - {{ $GLOBALS['SL']->sysOpts['meta-title'] }}";
+        var pTitle = " - {{ ((isset($GLOBALS['SL']->sysOpts['meta-title'])) ? $GLOBALS['SL']->sysOpts['meta-title'] : '') }}";
         if (document.getElementById('npageTitleFldID')) {
             pTitle = document.getElementById('npageTitleFldID').value.trim() + pTitle;
         }
@@ -117,8 +118,8 @@ function previewPage() {
         var pUrl = "{{ $GLOBALS['SL']->treeBaseUrl(true) }}";
         if (document.getElementById('nodeSlugID')) pUrl += document.getElementById('nodeSlugID').value.trim();
         var pUrlS = pUrl.replace("https://www.", "").replace("https://", "").replace("http://www.", "").replace("http://", "");
-        var pImg = @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != "") "" @else "{{ 
-            $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ;
+        var pImg = @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != "") "" 
+        @elseif (isset($GLOBALS['SL']->sysOpts['meta-img'])) "{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ;
         pImg = document.getElementById('npageImgFldID').value.trim();
         if (document.getElementById("metaImgID")) pImg = document.getElementById("metaImgID").value.trim();
         if (pTitle.length > 60) pTitle = pTitle.substring(0, 60)+"...";

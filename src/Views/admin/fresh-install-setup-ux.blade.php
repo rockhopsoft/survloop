@@ -17,7 +17,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
 </center></div>
 
 <form name="mainPageForm" method="POST" 
-    @if ($isFresh) action="/fresh/user-experience" @else action="/dashboard/tree/new" @endif >
+    @if ($isFresh) action="/fresh/survey" @else action="/dashboard/tree/new" @endif >
 <input type="hidden" name="freshSub" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <center><div class="halfPageWidth pT20">
@@ -61,5 +61,7 @@ But for now, <br />please focus on the data you want to collect when visitors la
 
 <div class="nodeGap"></div>
 </form></div></center>
+
+<div class="disNon"><iframe src="/dashboard/settings?refresh=1"></iframe></div>
 
 @endsection

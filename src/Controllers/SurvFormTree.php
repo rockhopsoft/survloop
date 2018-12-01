@@ -2776,13 +2776,8 @@ class SurvFormTree extends SurvUploadTree
                 if ($emaContent != '') {
                     $emaContent = $this->emailRecordSwap($emaContent);
                     $emaSubject = $this->emailRecordSwap($emaSubject);
-                    if ($GLOBALS["SL"]->isHomestead()) {
-                        $this->sendFakeEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], 
-                            $this->v["emaBCC"]);
-                    } else {
-                        $this->sendEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], 
-                            $this->v["emaBCC"], $this->postEmailFrom());
-                    }
+                    $this->sendEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], $this->v["emaBCC"],
+                        $this->postEmailFrom());
                     $emaID = ((isset($currEmail->EmailID)) ? $currEmail->EmailID : -3);
                     $this->logEmailSent($emaContent, $emaSubject, $this->v["toList"], $emaID, $this->treeID, 
                         $this->coreID, $this->v["uID"]);

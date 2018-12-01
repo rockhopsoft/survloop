@@ -6,8 +6,8 @@
 
 <div class="jumbotron"><center>
 <h1>Create Your <span class="slBlueDark">Database</span>!</h1>
-<p>Describe the data you want to organize, collect, and share using <span class="slShade">SurvLoop</span>.<br />
-<i class="slGrey mL20 fPerc66">Don't worry, you can keep tweaking your entire database design forever.</i></p>
+<h4>Describe the data you want to organize, collect, and share using <b class="slBlueDark">SurvLoop</b>.</h4>
+<p><i class="slGrey mL20">Don't worry, you can keep tweaking your entire database design forever.</i></p>
 </center></div>
 
 <form name="mainPageForm" method="POST" @if ($isFresh) action="/fresh/database" @else action="/dashboard/db/new" @endif >

@@ -87,6 +87,7 @@ class AdminTreeController extends AdminController
     
     protected function createRootNode($treeRow)
     {
+        if (!isset($treeRow->TreeID)) return -3;
         $newRoot = new SLNode;
         $newRoot->NodeTree     = $treeRow->TreeID;
         $newRoot->NodeParentID = -3;
@@ -496,7 +497,8 @@ class AdminTreeController extends AdminController
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/sessions');
         if (!$this->checkCache() || $refresh) {
             $this->CustReport->loadTree($this->treeID, $request);
-            $this->v["css"] = $this->loadCss();
+            $this->sysDef = new SystemDefinitions;
+            $this->v["css"] = $this->sysDef->loadCss();
             
             // clear empties here
             $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-2, date("Y"));
@@ -882,7 +884,6 @@ class AdminTreeController extends AdminController
                 $db->DbID = 1;
             }
             $db = $this->freshDBstore($request, $db);
-            
             $this->logPageVisit('/fresh/database', $db->DbID . ';0');
             
             // Initialize system-wide settings
@@ -893,6 +894,7 @@ class AdminTreeController extends AdminController
             
             $this->genDbClasses($request->DbPrefix);
             
+            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
             return $this->redir('/dashboard/tree/new');
         }
         return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);
@@ -907,11 +909,9 @@ class AdminTreeController extends AdminController
             // Initialize Database Record Settings
             $db = new SLDatabases;
             $db = $this->freshDBstore($request, $db);
-            
             $this->logPageVisit('/fresh/database', $db->DbID.';0');
-            
             $this->genDbClasses($request->DbPrefix);
-            
+            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
             return $this->redir('/dashboard/tree/new');
         }
         return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);
@@ -989,7 +989,7 @@ class AdminTreeController extends AdminController
     
     public function freshUX(Request $request)
     {
-        $this->survLoopInit($request, '/fresh/experience');
+        $this->survLoopInit($request, '/fresh/survey');
         $this->v["isFresh"] = true;
         if ($request->has('freshSub') && intVal($request->freshSub) == 1
             && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
@@ -998,8 +998,9 @@ class AdminTreeController extends AdminController
                 $tree = new SLTree;
                 $tree->TreeID = 1;
             }
-            $tree = $this->freshUXstore($request, $tree, '/fresh/experience');
-            return $this->redir('/dashboard/surv-' . $tree->TreeID . '/map?all=1&alt=1');
+            $tree = $this->freshUXstore($request, $tree, '/fresh/survey');
+            return $this->redir('/dashboard/settings?refresh=1');
+            //return $this->redir('/dashboard/surv-' . $tree->TreeID . '/map?all=1&alt=1');
         }
         return view('vendor.survloop.admin.fresh-install-setup-ux', $this->v);
     }
@@ -1103,14 +1104,14 @@ class AdminTreeController extends AdminController
     
     public function installNewCoreTable($tbl)
     {
-        $tblQry = $this->exportMysqlTblCoreStart($tbl) 
-            . "  `" . $tbl->TblAbbr . "UserID` bigint(20) unsigned NULL, \n"
-            . "  `" . $tbl->TblAbbr . "SubmissionProgress` int(11) NULL , \n"
-            . "  `" . $tbl->TblAbbr . "VersionAB` varchar(255) NULL , \n"
-            . "  `" . $tbl->TblAbbr . "UniqueStr` varchar(50) NULL , \n"
-            . "  `" . $tbl->TblAbbr . "IPaddy` varchar(255) NULL , \n"
-            . "  `" . $tbl->TblAbbr . "IsMobile` int(1) NULL , \n"
-            . $this->exportMysqlTblCoreFinish($tbl);
+        $tblQry = $GLOBALS["SL"]->mysqlTblCoreStart($tbl) . "  `" 
+            . $tbl->TblAbbr . "UserID` bigint(20) unsigned NULL, \n  `"
+            . $tbl->TblAbbr . "SubmissionProgress` int(11) NULL , \n  `" 
+            . $tbl->TblAbbr . "VersionAB` varchar(255) NULL , \n  `" 
+            . $tbl->TblAbbr . "UniqueStr` varchar(50) NULL , \n  `" 
+            . $tbl->TblAbbr . "IPaddy` varchar(255) NULL , \n  `" 
+            . $tbl->TblAbbr . "IsMobile` int(1) NULL , \n"
+            . $GLOBALS["SL"]->mysqlTblCoreFinish($tbl);
         return DB::statement($tblQry);
     }
     

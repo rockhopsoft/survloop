@@ -149,7 +149,7 @@ class SurvLoopController extends Controller
                         ->where('UserActVal', 'LIKE', '%;%')
                         ->where(function ($query) {
                             $query->where('UserActCurrPage', 'LIKE', '/fresh/database%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/fresh/user-experience%')
+                                ->orWhere('UserActCurrPage', 'LIKE', '/fresh/survey%')
                                 ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/switch%')
                                 ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/new%')
                                 ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/db/switch%')
@@ -206,31 +206,27 @@ class SurvLoopController extends Controller
     // Check For Basic System Setup First
     public function checkSystemInit()
     {
+session()->forget('chkSysInit');
         if (!session()->has('chkSysInit') || $this->REQ->has('refresh')) {
             $sysChk = User::select('id')
                 ->get();
-            if ($sysChk->isEmpty()) {
-                return $this->freshUser($this->REQ);
-            }
+            if ($sysChk->isEmpty()) return $this->freshUser($this->REQ);
             $sysChk = SLDatabases::select('DbID')
                 ->where('DbUser', '>', 0)
                 ->get();
-            if ($sysChk->isEmpty() && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-                return $this->redir('/fresh/database');
-            }
-            if ($GLOBALS["SL"]->dbID > 0) {
-                $sysChk = SLTree::select('TreeID')
-                    ->where('TreeDatabase', '=', $GLOBALS["SL"]->dbID)
-                    ->get();
-                if ($sysChk->isEmpty()) {
-                    return $this->redir('/fresh/user-experience');
-                }
-            }
+            if ($sysChk->isEmpty()) return $this->redir('/fresh/database', true);
+            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
             $survInst = new SurvLoopInstaller;
             $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
         }
         return '';
+    }
+
+    protected function chkHasTreeOne($dbID = 1)
+    {
+        $sysChk = SLTree::find(1);
+        return ($sysChk && isset($sysChk->TreeID));
     }
     
     public function getCoreID()
@@ -682,14 +678,13 @@ class SurvLoopController extends Controller
             mktime(intVal(date('H'))-$hrs, date('i'), date('s'), date('m'), date('d'), date('Y')));
     }
     
-    public function sendFakeEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
-    {
-        echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
-            . '<hr><hr></div>';
-    }
-    
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
     {
+        if ($GLOBALS["SL"]->isHomestead()) {
+            echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
+                . '<hr><hr></div>';
+            return true;
+        }
         if (!isset($repTo[0]) || trim($repTo[0]) == '') $repTo[0] = 'info@' . $GLOBALS["SL"]->getParentDomain();
         if (!isset($repTo[1]) || trim($repTo[1]) == '') $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
         $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.master', [
@@ -874,20 +869,23 @@ class SurvLoopController extends Controller
         return '';
     }
     
-    protected function tblQrySlExports()
-    {
-        return SLTables::where('TblDatabase', 3)
-            ->whereIn('TblName', ['BusRules', 'Conditions', 'ConditionsArticles', 'ConditionsNodes', 'ConditionsVals', 
-                'Databases', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 'Definitions', 'Emails', 'Fields', 
-                'Images', 'Node', 'NodeResponses', 'Tables', 'Tree'])
-            ->orderBy('TblOrd', 'asc')
-            ->get();
-    }
-    
     protected function tblsInPackage()
     {
         if ($this->dbID == 3) return ['ZipAshrae', 'Zips'];
-        return [];
+        $ret = $this->tblsInPackageCustom();
+        if (sizeof($ret) > 0) return $ret;
+        $chk = SLTables::where('TblDatabase', $this->dbID)
+            ->whereRaw("TblOpts%5 LIKE 0")
+            ->select('TblName')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $tbl) $ret[] = $tbl->TblName;
+        }
+//echo '<pre>'; print_r($ret); echo '</pre>'; exit;
+        return $ret;
     }
+    
+    protected function tblsInPackageCustom() { return []; }
+    
     
 }

@@ -324,7 +324,9 @@ class SurvLoop extends Controller
         $GLOBALS["SL"] = new CoreGlobals($request, 1, 1);
         $installer = new SurvLoopInstaller;
         $installer->checkSysInit();
-        return '<i>reload</i>';
+        return '<center><br /><br /><i>Reloading...</i><br /> <iframe src="/dashboard/css-reload" frameborder=0
+            style="width: 60px; height: 60px; border: 0px none;"></iframe></center>
+            <script type="text/javascript"> setTimeout("window.location=\'/\'", 2000); </script>';
     }
     
     protected function addAdmCodeToPage($pageContent)

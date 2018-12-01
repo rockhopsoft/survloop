@@ -7,10 +7,10 @@
 <h2><i class="fa fa-snowflake-o"></i> Conditions / Filters</h2>
 
 <ul id="pageTabs" class="nav nav-tabs">
-    <li><a href="/dashboard/db/conds">All Conditions</a></li>
-    <li><a href="/dashboard/db/conds?only=public">Public Only</a></li>
-    <li><a href="/dashboard/db/conds?only=articles">Articles Only</a></li>
-    <li class="active"><a href="javascript:;">Edit Condition</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds" class="nav-link">All Conditions</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds?only=public" class="nav-link">Public Only</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds?only=articles" class="nav-link">Articles Only</a></li>
+    <li class="nav-item"><a href="javascript:;" class="nav-link active">Edit Condition</a></li>
 </ul>
 
 <div id="addCond" style="overflow: hidden;">

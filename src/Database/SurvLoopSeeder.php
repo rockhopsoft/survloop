@@ -3,7 +3,6 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class SurvLoopSeeder extends Seeder
 {
@@ -14,17 +13,19 @@ class SurvLoopSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('SL_Databases')->insert([
+
+	DB::table('SL_Databases')->insert([
 			'DbID' => 3,
 			'DbUser' => '0',
 			'DbPrefix' => 'SL_',
 			'DbName' => 'SurvLoop',
 			'DbDesc' => 'All The Data Are Belong',
 			'DbMission' => 'Empower you to design your complex databases, collect data with an easy user experience, and create an API to share the data with the world!',
-			'DbTables' => '33',
-			'DbFields' => '248'
+			'DbTables' => '34',
+			'DbFields' => '252'
 		]);
-		DB::table('SL_Tables')->insert([
+	
+	DB::table('SL_Tables')->insert([
 			'TblID' => 3,
 			'TblDatabase' => '3',
 			'TblAbbr' => 'Tweak',
@@ -347,26 +348,6 @@ class SurvLoopSeeder extends Seeder
 			'TblNumForeignIn' => '12'
 		]);
 		DB::table('SL_Tables')->insert([
-			'TblID' => 29,
-			'TblDatabase' => '1',
-			'TblAbbr' => 'Inst',
-			'TblName' => 'Installations',
-			'TblEng' => 'SurvLoop Installations',
-			'TblDesc' => 'This represents each website or system which is currently powered by SurvLoop.',
-			'TblNumFields' => '10',
-			'TblNumForeignKeys' => '1'
-		]);
-		DB::table('SL_Tables')->insert([
-			'TblID' => 30,
-			'TblDatabase' => '1',
-			'TblName' => 'users',
-			'TblEng' => 'Users',
-			'TblDesc' => 'This represents the Laravel Users table, but will not actually be implemented by SurvLoop as part of the database installation.',
-			'TblGroup' => 'Users',
-			'TblOrd' => '15',
-			'TblNumForeignIn' => '1'
-		]);
-		DB::table('SL_Tables')->insert([
 			'TblID' => 31,
 			'TblDatabase' => '3',
 			'TblAbbr' => 'Cont',
@@ -430,7 +411,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('SL_Tables')->insert([
 			'TblID' => 36,
 			'TblDatabase' => '3',
-			'TblAbbr' => 'Emails',
+			'TblAbbr' => 'Email',
 			'TblName' => 'Emails',
 			'TblEng' => 'Email Templates',
 			'TblDesc' => 'Each record represents one Email Template which can be used throughout SurvLoop.',
@@ -453,17 +434,6 @@ class SurvLoopSeeder extends Seeder
 			'TblNumForeignKeys' => '3'
 		]);
 		DB::table('SL_Tables')->insert([
-			'TblID' => 39,
-			'TblDatabase' => '3',
-			'TblAbbr' => 'Ashr',
-			'TblName' => 'ZipAshrae',
-			'TblEng' => 'ASHRAE Climate Zones',
-			'TblDesc' => 'Each record represents one County and State in the United States to map it to its ASHRAE Climate Zone.',
-			'TblType' => 'Linking',
-			'TblGroup' => 'Lookups',
-			'TblNumFields' => '3'
-		]);
-		DB::table('SL_Tables')->insert([
 			'TblID' => 38,
 			'TblDatabase' => '3',
 			'TblAbbr' => 'Zip',
@@ -473,9 +443,21 @@ class SurvLoopSeeder extends Seeder
 			'TblType' => 'Linking',
 			'TblGroup' => 'Lookups',
 			'TblOrd' => '32',
-			'TblNumFields' => '6'
+			'TblNumFields' => '7'
 		]);
-		DB::table('SL_Fields')->insert([
+		DB::table('SL_Tables')->insert([
+			'TblID' => 39,
+			'TblDatabase' => '3',
+			'TblAbbr' => 'AdyGeo',
+			'TblName' => 'AddyGeo',
+			'TblEng' => 'Address Geolocate',
+			'TblDesc' => 'Each record represents one Address (all in one line) to map it to its latitude and longitude coordinates. This is important to reducing the number of geocoding requests sent to third parties.',
+			'TblGroup' => 'Lookups',
+			'TblOrd' => '33',
+			'TblNumFields' => '3'
+		]);
+	
+	DB::table('SL_Fields')->insert([
 			'FldID' => 1,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
@@ -4145,7 +4127,7 @@ class SurvLoopSeeder extends Seeder
 			'FldName' => 'Opts',
 			'FldEng' => 'Tree Options',
 			'FldDesc' => 'Indicates the multiple of various prime numbers which mark specific other qualities of this Node.',
-			'FldNotes' => '%3 Admin-Only; %5 Tree That Is One Big SurvLoop; %7 Area Home Page (for Public, Admin, or Volun); %11 Record Edits Not Allowed (except by Admins); %13 Report for Survey (linked and shares core table); %17 Volunteers Access (& Admin); %19 Contact Form (Auto Page); %23 Page Is Skinny; %29 Page Not [Yet] Simple Enough To Be Cached; %31 Search Bar Results Page (for Public, Admin, or Volun); %37 Survey Navigation Menu; ',
+			'FldNotes' => '%3 Admin-Only; %5 Tree That Is One Big SurvLoop; %7 Area Home Page (for Public, Admin, or Volun); %11 Record Edits Not Allowed (except by Admins); %13 Report for Survey (linked and shares core table); %17 Volunteers Access (& Admin); %19 Contact Form (Auto Page); %23 Page Is Skinny; %29 Page Not [Yet] Simple Enough To Be Cached; %31 Search Bar Results Page (for Public, Admin, or Volun); %37 Survey Navigation Menu Bottom; %41 Partners Member Access; %43 Staff Access; %47 Uses Public ID#; %53 Has Page Form; %59 Survey Navigation Menu Top; %61 Survey Progress Line',
 			'FldForeignMin' => '0',
 			'FldForeignMax' => '0',
 			'FldForeign2Min' => '0',
@@ -4890,7 +4872,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldSpecSource' => '0',
-			'FldName' => 'Database',
+			'FldName' => 'DatabaseID',
 			'FldEng' => 'Database ID',
 			'FldDesc' => 'Indicates the unique Database ID number which owns this media item.',
 			'FldForeignTable' => '4',
@@ -5231,7 +5213,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldDataLength' => '0',
+			'FldDataLength' => '100',
 			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',
@@ -5250,7 +5232,7 @@ class SurvLoopSeeder extends Seeder
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldDataLength' => '5',
+			'FldDataLength' => '0',
 			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',
@@ -5278,18 +5260,17 @@ class SurvLoopSeeder extends Seeder
 		DB::table('SL_Fields')->insert([
 			'FldID' => 277,
 			'FldDatabase' => '3',
-			'FldTable' => '39',
+			'FldTable' => '38',
+			'FldOrd' => '6',
 			'FldSpecSource' => '0',
-			'FldName' => 'Zone',
-			'FldEng' => 'ASHRAE Climate Zone',
-			'FldDesc' => 'Indicates the ASHRAE Climate Zone where this record\'s county and state are located.',
+			'FldName' => 'Country',
+			'FldEng' => 'Country',
+			'FldDesc' => 'Indicates the country where this Zip Code is located.',
 			'FldForeignMin' => 'N',
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldValues' => '1A;2A;2B;3A;3B;3C;4A;4B;4C;5A;5B;6A;6B;7A;7B',
-			'FldDataLength' => '2',
-			'FldCharSupport' => ',Letters,Numbers,',
+			'FldDataLength' => '100',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',
 			'FldCompareSame' => '6'
@@ -5298,17 +5279,15 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 278,
 			'FldDatabase' => '3',
 			'FldTable' => '39',
-			'FldOrd' => '1',
 			'FldSpecSource' => '0',
-			'FldName' => 'State',
-			'FldEng' => 'State',
-			'FldDesc' => 'Indicates the state where this county is located.',
+			'FldName' => 'Address',
+			'FldEng' => 'Full Address',
+			'FldDesc' => 'Indicates the full address, in one line, which is being linked with latitude and longitude coordinates.',
 			'FldForeignMin' => 'N',
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldDataLength' => '2',
-			'FldCharSupport' => ',Letters,',
+			'FldDataLength' => '0',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',
 			'FldCompareSame' => '6'
@@ -5317,26 +5296,581 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 279,
 			'FldDatabase' => '3',
 			'FldTable' => '39',
-			'FldOrd' => '2',
+			'FldOrd' => '1',
 			'FldSpecSource' => '0',
-			'FldName' => 'County',
-			'FldEng' => 'County',
-			'FldDesc' => 'Indicates the county where this record is located.',
+			'FldName' => 'Lat',
+			'FldEng' => 'Latitude',
+			'FldDesc' => 'Indicates the Address\'s latitude is a geographic coordinate that specifies the north–south position of a point on the Earth\'s surface.',
 			'FldForeignMin' => 'N',
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldDataLength' => '50',
-			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
+			'FldDataLength' => '0',
 			'FldKeyType' => ',',
 			'FldNullSupport' => '0',
 			'FldCompareSame' => '6'
 		]);
-		
-		DB::table('SL_Tree')->insert([
+		DB::table('SL_Fields')->insert([
+			'FldID' => 280,
+			'FldDatabase' => '3',
+			'FldTable' => '39',
+			'FldOrd' => '2',
+			'FldSpecSource' => '0',
+			'FldName' => 'Long',
+			'FldEng' => 'Longitude',
+			'FldDesc' => 'Indicates the Address\'s longitude is a geographic coordinate that specifies the east-west position of a point on the Earth\'s surface.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '0',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
+		]);
+	
+	DB::table('SL_Definitions')->insert([
+			'DefID' => 35,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefValue' => 'New Database',
+			'DefDescription' => 'This is part of the SurvLoop installation process, where a user creates a new Database and a primary/default Experience to go with it.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 36,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '5',
+			'DefValue' => 'New Experience',
+			'DefDescription' => 'Create a new, secondary Experience for an existing Database.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 37,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '3',
+			'DefValue' => 'Add a Data Field',
+			'DefDescription' => 'Create a new Field in the Database, without adding it as an Experience Node yet.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 38,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '7',
+			'DefValue' => 'New Experience Question',
+			'DefDescription' => 'Create a new Question Node in a User Experience. This might include a simplified version of adding a new Database Field.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 39,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '1',
+			'DefValue' => 'Add a Data Table',
+			'DefDescription' => 'Create a new Database Table to later fill with Fields.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 40,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '2',
+			'DefValue' => 'Edit Database Table',
+			'DefDescription' => 'Edit the basic properties of a Database Table.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 41,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '4',
+			'DefValue' => 'Edit Database Field',
+			'DefDescription' => 'Edit the basic or thorough properties of a Database Field.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 42,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '6',
+			'DefValue' => 'Edit Experience',
+			'DefDescription' => 'Edit the basic properties of a User Experience.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 43,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Design Tweak Types',
+			'DefOrder' => '8',
+			'DefValue' => 'Edit Experience Question',
+			'DefDescription' => 'Edit the basic properties of a Experience Question Node.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 44,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefValue' => 'Value Ranges',
+			'DefDescription' => 'Each definition in a set of Value Ranges represents one response a user can choose when responding to some question/prompt.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 45,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '1',
+			'DefValue' => 'System Settings',
+			'DefDescription' => 'Each definition for System Settings represents one system-wide specification.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 46,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '2',
+			'DefValue' => 'Style Settings',
+			'DefDescription' => 'Each definition for Style Settings represents one color or other branding element needed system-wide.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 47,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '3',
+			'DefValue' => 'Instructions',
+			'DefDescription' => 'Each definition which is an Instruction represents one blurb, used somewhere in the system, which can be edited by system administrators.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 48,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '4',
+			'DefValue' => 'Diagrams',
+			'DefDescription' => 'Each definition which is a Diagram represents one document uploaded by system administrators.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 49,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '5',
+			'DefValue' => 'Custom Settings',
+			'DefDescription' => 'Each definition for Custom Settings represents one system-wide specification, which is established and defined by a client-specific installation of SurvLoop.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 50,
+			'DefDatabase' => '3',
+			'DefSubset' => 'SurvLoop Definition Types',
+			'DefOrder' => '6',
+			'DefValue' => 'User Roles',
+			'DefDescription' => 'Each definition for User Roles represents one system-wide type of user permissions.'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 467,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'tree-3-core-record-singular',
+			'DefDescription' => 'Tweak'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 468,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'tree-3-core-record-plural',
+			'DefDescription' => 'Tweaks'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 598,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'site-name',
+			'DefDescription' => 'for general reference, in English'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 599,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'cust-abbr',
+			'DefDescription' => 'SiteAbrv'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 600,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'cust-package',
+			'DefDescription' => 'wikiworldorder/survloop'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 601,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'app-url',
+			'DefDescription' => 'http://myapp.com'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 602,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'logo-url',
+			'DefDescription' => '/optionally-different'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 603,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'meta-title'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 604,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'meta-desc'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 605,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'meta-keywords'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 606,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'meta-img'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 607,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'logo-img-lrg',
+			'DefDescription' => '/siteabrv/uploads/logo-large.png'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 608,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'logo-img-md',
+			'DefDescription' => '/siteabrv/uploads/logo-medium.png'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 609,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'logo-img-sm',
+			'DefDescription' => '/siteabrv/uploads/logo-small.png'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 610,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'shortcut-icon',
+			'DefDescription' => '/siteabrv/ico.png'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 611,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'spinner-code',
+			'DefDescription' => '&lt;i class="fa-li fa fa-spinner fa-spin"&gt;&lt;/i&gt;'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 612,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'google-analytic',
+			'DefDescription' => 'UA-23427655-1'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 613,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'twitter',
+			'DefDescription' => '@SurvLoop'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 614,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'show-logo-title',
+			'DefDescription' => '1 or 0'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 615,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'users-create-db',
+			'DefDescription' => '1 or 0'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 616,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'has-volunteers',
+			'DefDescription' => '1 or 0'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 617,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'parent-company',
+			'DefDescription' => 'MegaOrg'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 618,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'parent-website',
+			'DefDescription' => 'http://www...'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 619,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'login-instruct',
+			'DefDescription' => 'HTML'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 620,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'signup-instruct',
+			'DefDescription' => 'HTML'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 621,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'app-license',
+			'DefDescription' => 'Creative Commons Attribution-ShareAlike License'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 622,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'app-license-url',
+			'DefDescription' => 'http://creativecommons.org/licenses/by-sa/3.0/'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 623,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'app-license-img',
+			'DefDescription' => '/survloop/uploads/creative-commons-by-sa-88x31.png'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 624,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'css-extra-files',
+			'DefDescription' => 'comma separated'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 625,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'header-code',
+			'DefDescription' => '&lt;div&gt;Anything&lt;/div&gt;'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 650,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'font-main',
+			'DefDescription' => 'Helvetica,Arial,sans-serif'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 651,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-bg',
+			'DefDescription' => '#FFF'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 652,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-text',
+			'DefDescription' => '#333'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 653,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-link',
+			'DefDescription' => '#416CBD'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 654,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-grey',
+			'DefDescription' => '#999'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 655,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-faint',
+			'DefDescription' => '#EDF8FF'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 656,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-faintr',
+			'DefDescription' => '#F9FCFF'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 657,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-on',
+			'DefDescription' => '#2B3493'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 658,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-main-off',
+			'DefDescription' => '#53F1EB'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 659,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-info-on',
+			'DefDescription' => '#5BC0DE'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 660,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-info-off',
+			'DefDescription' => '#2AABD2'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 661,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-danger-on',
+			'DefDescription' => '#EC2327'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 662,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-danger-off',
+			'DefDescription' => '#F38C5F'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 663,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-success-on',
+			'DefDescription' => '#006D36'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 664,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-success-off',
+			'DefDescription' => '#29B76F'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 665,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-warn-on',
+			'DefDescription' => '#F0AD4E'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 666,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-warn-off',
+			'DefDescription' => '#EB9316'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 667,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-line-hr',
+			'DefDescription' => '#999'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 668,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-field-bg',
+			'DefDescription' => '#FFF'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 669,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-form-text',
+			'DefDescription' => '#333'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 670,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-logo',
+			'DefDescription' => '#53F1EB'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 671,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-nav-bg',
+			'DefDescription' => '#fff'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 672,
+			'DefDatabase' => '3',
+			'DefSet' => 'Style Settings',
+			'DefSubset' => 'color-nav-text',
+			'DefDescription' => '#888'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 676,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'google-map-key',
+			'DefDescription' => 'string'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 677,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'google-map-key2',
+			'DefDescription' => 'string'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 678,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'has-partners',
+			'DefDescription' => '1 or 0'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 679,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'has-canada',
+			'DefDescription' => '1 or 0'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 683,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'google-cod-key',
+			'DefDescription' => 'string'
+		]);
+		DB::table('SL_Definitions')->insert([
+			'DefID' => 684,
+			'DefDatabase' => '3',
+			'DefSet' => 'System Settings',
+			'DefSubset' => 'google-cod-key2',
+			'DefDescription' => 'string'
+		]);
+	
+
+	DB::table('SL_Tree')->insert([
 			'TreeID' => 3,
 			'TreeDatabase' => '3',
 			'TreeUser' => '0',
+			'TreeType' => 'Survey',
 			'TreeName' => 'SurvLoop Database Designer',
 			'TreeDesc' => 'SurvLoop users can add a new field to the database and/or user experience.',
 			'TreeSlug' => 'data-design',
@@ -5349,13 +5883,14 @@ class SurvLoopSeeder extends Seeder
 			'TreeID' => 4,
 			'TreeDatabase' => '3',
 			'TreeUser' => '0',
-			'TreeType' => 'Primary Public XML',
+			'TreeType' => 'Survey XML',
 			'TreeName' => 'SurvLoop Database Designer',
 			'TreeSlug' => 'data-design',
 			'TreeRoot' => '14',
 			'TreeCoreTable' => '3'
 		]);
-		DB::table('SL_Node')->insert([
+	
+	DB::table('SL_Node')->insert([
 			'NodeID' => 7,
 			'NodeTree' => '3',
 			'NodeType' => 'Branch Title',
@@ -5390,6 +5925,6 @@ class SurvLoopSeeder extends Seeder
 			'NodePromptText' => 'DesignTweaks',
 			'NodePromptNotes' => '3'
 		]);
-			
-    }
-}
+	
+
+ } } 

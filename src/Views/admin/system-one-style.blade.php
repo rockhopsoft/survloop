@@ -13,7 +13,7 @@
         </label>
         {!! view('vendor.survloop.inc-color-picker', [
             'fldName' => 'sty-' . $opt,
-            'preSel'  => strtoupper($sysStyles[$opt])
+            'preSel'  => ((isset($sysStyles[$opt])) ? strtoupper($sysStyles[$opt]) : '')
         ])->render() !!}
     </div>
 @endif

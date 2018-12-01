@@ -7,13 +7,13 @@
 <h2 class="slGreenDark"><i class="fa fa-filter" aria-hidden="true"></i> Conditions / Filters</h2>
 
 <ul id="pageTabs" class="nav nav-tabs">
-    <li @if ($filtOnly == 'all') class="active" @endif 
-        ><a href="/dashboard/db/conds">All Conditions</a></li>
-    <li @if ($filtOnly == 'public') class="active" @endif 
-        ><a href="/dashboard/db/conds?only=public">Public Only</a></li>
-    <li @if ($filtOnly == 'articles') class="active" @endif 
-        ><a href="/dashboard/db/conds?only=articles">Articles Only</a></li>
-    <li><a id="addCondLnk" href="javascript:;">Add New Condition</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds" 
+        class="nav-link @if ($filtOnly == 'all') active @endif ">All Conditions</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds?only=public" 
+        class="nav-link @if ($filtOnly == 'public') active @endif ">Public Only</a></li>
+    <li class="nav-item"><a href="/dashboard/db/conds?only=articles" 
+        class="nav-link @if ($filtOnly == 'articles') active @endif ">Articles Only</a></li>
+    <li class="nav-item"><a id="addCondLnk" class="nav-link" href="javascript:;">Add New Condition</a></li>
 </ul>
 
 <div id="addCond" class="disNon" style="overflow: hidden;">

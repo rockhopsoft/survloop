@@ -8,7 +8,7 @@ function debugTxt(txt) {
 }
 
 var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
-var defMetaImg = '{{ $GLOBALS['SL']->sysOpts['meta-img'] }}';
+var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 
@@ -2015,7 +2015,8 @@ $(document).ready(function(){
         return true;
     });
     
-@if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+@if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
+    && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
     function chkLogoResize() {
         if (!document.getElementById('slLogoImg')) return false;
         if (window.innerWidth <= 480) {
@@ -2035,7 +2036,8 @@ $(document).ready(function(){
             winResizeHold = true;
             var win = $(this); //this = window
             sliLoadHgts();
-@if ($GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+@if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
+    && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
             chkLogoResize();
 @endif
             setTimeout(function() { winResizeHold = false; }, 250);

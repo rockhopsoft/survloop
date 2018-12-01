@@ -1,6 +1,7 @@
 <?php
 namespace SurvLoop\Controllers;
 
+use DB;
 use Storage;
 use Illuminate\Http\Request;
 
@@ -241,7 +242,7 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
                         . '"opts" => '  . $reportTree->TreeOpts . ''
                     . ' ];' . "\n";
                 }
-            } elseif ($this->treeRow->TreeOpts%13 == 0) {
+            } elseif ($this->treeRow && isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts%13 == 0) {
                 $reportTree = SLTree::where('TreeType', 'Survey')
                     ->where('TreeDatabase', $this->dbID)
                     ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
@@ -483,6 +484,157 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
         return true;
     }
     
+    
+    public function mysqlTblCoreStart($tbl)
+    {
+        return "CREATE TABLE IF NOT EXISTS `" . (($tbl->TblDatabase == 3) ? 'SL_' : $this->dbRow->DbPrefix) 
+            . $tbl->TblName . "` ( `" . $tbl->TblAbbr . "ID` int(11) NOT NULL AUTO_INCREMENT, \n";
+    }
+    
+    public function mysqlTblCoreFinish($tbl)
+    {
+        return "  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP , \n"
+            . "  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP , \n"
+            . "  PRIMARY KEY (`" . $tbl->TblAbbr . "ID`) )"
+            . "  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
+    }
+    
+    public function exportMysqlTbl($tbl, $installHereNow = false)
+    {
+        if (!isset($this->x["indexesEnd"])) $this->x["indexesEnd"] = '';
+        if (strtolower($tbl->TblEng) == 'users') return "";
+        
+        $tblQuery = $this->mysqlTblCoreStart($tbl);
+        $indexes = "";
+        $flds = SLFields::where('FldTable', $tbl->TblID)
+            ->orderBy('FldOrd', 'asc')
+            ->orderBy('FldEng', 'asc')
+            ->get();
+        if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
+            $flds = $this->addFldRowExtends($flds, $tbl->TblExtend);
+        }
+        if ($flds->isNotEmpty()) {
+            foreach ($flds as $fld) {
+                $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
+                if ($fld->FldType == 'INT') {
+                    if (intVal($fld->FldForeignTable) > 0 && isset($this->tbl[$fld->FldForeignTable])
+                        && strtolower($this->tbl[$fld->FldForeignTable]) == 'users') {
+                        $tblQuery .= "BIGINT(20) unsigned ";
+                    } else {
+                        $tblQuery .= "INT(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 11) . ") ";
+                    }
+                } elseif ($fld->FldType == 'DOUBLE') {
+                    $tblQuery .= "DOUBLE ";
+                } elseif ($fld->FldType == 'VARCHAR') {
+                    if ($fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F') {
+                        $tblQuery .= "VARCHAR(1) ";
+                    } else {
+                        $tblQuery .= "VARCHAR(" . (($fld->FldDataLength > 0) ? $fld->FldDataLength : 255) . ") ";
+                    }
+                } elseif ($fld->FldType == 'TEXT') {
+                    $tblQuery .= "TEXT ";
+                } elseif ($fld->FldType == 'DATE') {
+                    $tblQuery .= "DATE ";
+                } elseif ($fld->FldType == 'DATETIME') {
+                    $tblQuery .= "DATETIME ";
+                }
+                if (($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1)
+                    || ($fld->FldDefault && trim($fld->FldDefault) == 'NULL')) {
+                    $tblQuery .= "NULL ";
+                }
+                if ($fld->FldDefault && trim($fld->FldDefault) != '') {
+                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
+                    else $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
+                }
+                $tblQuery .= ", \n";
+                if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
+                    $indexes .= "  , KEY `" . $tbl->TblAbbr . $fld->FldName . "` "
+                        . "(`" . $tbl->TblAbbr . $fld->FldName . "`) \n";
+                }
+                if (intVal($fld->FldForeignTable) > 0) {
+                    list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
+                    $this->x["indexesEnd"] .= "ALTER TABLE `" 
+                        . $this->dbRow->DbPrefix . $tbl->TblName 
+                        . "` ADD FOREIGN KEY (`" . $tbl->TblAbbr . $fld->FldName . "`) "
+                        . "REFERENCES `" . $forTbl . "` (`" . $forID . "`); \n";
+                }
+            }
+            $tblQuery .= $this->mysqlTblCoreFinish($tbl);
+        }
+        return $tblQuery;
+    }
+    
+    public function tblQrySlExports()
+    {
+        return SLTables::where('TblDatabase', 3)
+            ->whereIn('TblName', ['BusRules', 'Conditions', 'ConditionsArticles', 'ConditionsNodes', 'ConditionsVals', 
+                'Databases', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 'Definitions', 'Emails', 'Fields', 
+                'Images', 'Node', 'NodeResponses', 'Tables', 'Tree'])
+            ->orderBy('TblOrd', 'asc')
+            ->get();
+    }
+    
+    public function exportMysqlSl()
+    {
+        $this->loadSlParents();
+        //$this->tmpDbSwitch();
+        $tbls = $this->tblQrySlExports();
+        if ($tbls->isNotEmpty()) {
+            foreach ($tbls as $i => $tbl) {
+                $this->v["tbl"] = $tbl;
+                $this->v["tblName"] = 'SL_' . $tbl->TblName;
+                $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
+                $this->x["export"] .= "\nDROP TABLE IF EXISTS `" . $this->v["tblName"] . "`;\n" 
+                    . $this->exportMysqlTbl($tbl);
+                $flds = $this->getTableFields($tbl);
+                if ($flds->isNotEmpty()) {
+                    $seedChk = $this->getTableSeedDump($this->v["tblClean"], $this->loadSlSeedEval($tbl));
+                    if ($seedChk->isNotEmpty()) {
+                        $this->v["tblInsertStart"] = "\nINSERT INTO `" . $this->v["tblName"] . "` (`" 
+                            . $tbl->TblAbbr . "ID`";
+                        foreach ($flds as $i => $fld) {
+                            $this->v["tblInsertStart"] .= ", `" . $tbl->TblAbbr . $fld->FldName . "`";
+                        }
+                        $this->v["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
+                        $this->x["export"] .= $this->v["tblInsertStart"];
+                        foreach ($seedChk as $ind => $seed) {
+                            if ($ind%5000 == 0 && $ind > 0) $this->x["export"] .= ";\n" . $this->v["tblInsertStart"];
+                            elseif ($ind > 0) $this->x["export"] .= ",\n";
+                            $this->x["export"] .= "(" . $seed->getKey();
+                            foreach ($flds as $fld) {
+                                if (isset($seed->{ $tbl->TblAbbr . $fld->FldName })) {
+                                    $this->x["export"] .= ", '" . str_replace("'", "\'", 
+                                        $seed->{ $tbl->TblAbbr . $fld->FldName }) . "'";
+                                } elseif ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1) {
+                                    $this->x["export"] .= ", NULL";
+                                } else {
+                                    $this->x["export"] .= ", ''";
+                                }
+                            }
+                            $this->x["export"] .= ", '" . $seed->created_at . "', '" . $seed->updated_at . "')";
+                        }
+                        $this->x["export"] .= "; \n";
+                    }
+                }
+            }
+        }
+        while (strpos($this->x["export"], ") VALUES \n,\n") !== false) {
+            $this->x["export"] = str_replace(") VALUES \n,\n", ") VALUES \n", $this->x["export"]);
+        }
+        //$this->tmpDbSwitchBack();
+        return true;
+    }
+    
+    public function createTableIfNotExists($coreTbl, $userTbl = null)
+    {
+        $this->modelPath($coreTbl->TblName, true);
+        if (!$this->chkTableExists($coreTbl, $userTbl)) {
+            $tblQuery = $this->exportMysqlTbl($coreTbl, true);
+            $chk = DB::select( DB::raw( $tblQuery ) );
+            return false;
+        }
+        return true;
+    }
     
 }
 

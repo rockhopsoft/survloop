@@ -8,12 +8,17 @@ use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLDefinitions;
 
+use SurvLoop\Controllers\SystemDefinitions;
+
 class SurvLoopInstaller extends Controller
 {
     
-    // CONVERT THIS AND OTHER PRIME SPOTS TO ->whereRaw(
     public function checkSysInit()
     {
+        $chkSysDef = new SystemDefinitions;
+        $chkSysDef->checkDefInstalls();
+        
+        // CONVERT THIS AND OTHER PRIME SPOTS TO ->whereRaw(
         $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
             . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
         if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Home', 7);
@@ -52,7 +57,7 @@ class SurvLoopInstaller extends Controller
         $newTree->TreeName     = $name;
         $newTree->TreeSlug     = $slug;
         $newTree->TreeDatabase = 1;
-        $newTree->TreeUser     = 1;
+        $newTree->TreeUser     = 0;
         $newTree->TreeOpts     = $opts;
         $newTree->save();
         $node = new SLNode;

@@ -1,7 +1,9 @@
 <!-- Stored in resources/views/vendor/survloop/db/export-sl-tabs.blade.php -->
 <ul id="pageTabs" class="nav nav-tabs">
-<li @if ($curr == 'laravel') class="active" @endif ><a href="/dashboard/sl/export/laravel">Export for Laravel</a></li>
-<li @if ($curr == 'mysql') class="active" @endif ><a href="/dashboard/sl/export">MySQL</a></li>
-<!--- <li @if ($curr == 'settings') class="active" @endif ><a href="/dashboard/sl/export/settings"
-    >Package Options</a></li> --->
+<li class="nav-item"><a href="/dashboard/sl/export/laravel" class="nav-link @if ($curr == 'laravel') active @endif "
+    >Export for Laravel</a></li>
+<li class="nav-item"><a href="/dashboard/sl/export" class="nav-link @if ($curr == 'mysql') active @endif "
+    >MySQL</a></li>
+<!--- <li class="nav-item"><a href="/dashboard/sl/export/settings" 
+    class="nav-link @if ($curr == 'settings') active @endif ">Package Options</a></li> --->
 </ul>

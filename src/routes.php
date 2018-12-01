@@ -76,11 +76,11 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/xml-example',                 'SurvLoop\\Controllers\\SurvLoop@getXmlExample');
     Route::get( '/xml-schema',                  'SurvLoop\\Controllers\\SurvLoop@genXmlSchema');
     
-    Route::get( '/fresh/creator',         'SurvLoop\\Controllers\\AdminTreeController@freshUser');
-    Route::post('/fresh/database',        'SurvLoop\\Controllers\\AdminTreeController@freshDB');
-    Route::get( '/fresh/database',        'SurvLoop\\Controllers\\AdminTreeController@freshDB');
-    Route::post('/fresh/user-experience', 'SurvLoop\\Controllers\\AdminTreeController@freshUX');
-    Route::get( '/fresh/user-experience', 'SurvLoop\\Controllers\\AdminTreeController@freshUX');
+    Route::get( '/fresh/creator',  'SurvLoop\\Controllers\\AdminTreeController@freshUser');
+    Route::post('/fresh/database', 'SurvLoop\\Controllers\\AdminTreeController@freshDB');
+    Route::get( '/fresh/database', 'SurvLoop\\Controllers\\AdminTreeController@freshDB');
+    Route::post('/fresh/survey',   'SurvLoop\\Controllers\\AdminTreeController@freshUX');
+    Route::get( '/fresh/survey',   'SurvLoop\\Controllers\\AdminTreeController@freshUX');
     
     
     ///////////////////////////////////////////////////////////
