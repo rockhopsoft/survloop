@@ -1841,10 +1841,10 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdC      { border: 1px #CCC solid; }
 .brdEdash  { border: 1px #EEE dashed; }
 
-.brdTop, table tr.brdTop td, table tr.brdTop th { border-top: 1px {!! $css["color-main-off"] !!} solid; }
-.brdBot, table tr.brdBot td, table tr.brdBot th { border-bottom: 1px {!! $css["color-main-off"] !!} solid; }
-.brdLft, table tr.brdLft td, table tr.brdLft th { border-left: 1px {!! $css["color-main-off"] !!} solid; }
-.brdRgt, table tr.brdRgt td, table tr.brdRgt th { border-right: 1px {!! $css["color-main-off"] !!} solid; }
+.brdTop, table tr.brdTop td, table tr.brdTop th, table tr td.brdTop, table tr th.brdTop { border-top: 1px {!! $css["color-main-off"] !!} solid; }
+.brdBot, table tr.brdBot td, table tr.brdBot th, table tr td.brdBot, table tr th.brdBot { border-bottom: 1px {!! $css["color-main-off"] !!} solid; }
+.brdLft, table tr.brdLft td, table tr.brdLft th, table tr td.brdLft, table tr th.brdLft { border-left: 1px {!! $css["color-main-off"] !!} solid; }
+.brdRgt, table tr.brdRgt td, table tr.brdRgt th, table tr td.brdRgt, table tr th.brdRgt { border-right: 1px {!! $css["color-main-off"] !!} solid; }
 
 .brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th { border-top: 0px none; }
 .brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th { border-bottom: 0px none; }

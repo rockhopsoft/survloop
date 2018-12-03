@@ -2757,8 +2757,9 @@ class SurvLoopTree extends CoreTree
         if ($this->v["currPage"][0] != '/') {
             $log = new SLUsersActivity;
             $log->UserActUser = $this->v["uID"];
-            $log->UserActCurrPage = $this->v["currPage"][0] . '.pv:' . $GLOBALS["SL"]->x["pageView"] . '.dp:' 
-                . $GLOBALS["SL"]->x["dataPerms"];
+            $log->UserActCurrPage = $this->v["currPage"][0] 
+                . ((isset($GLOBALS["SL"]->x["pageView"]) && trim($GLOBALS["SL"]->x["pageView"]) != '') 
+                    ? '.pv:' . $GLOBALS["SL"]->x["pageView"] . '.dp:' . $GLOBALS["SL"]->x["dataPerms"] : '');
             $log->save();
         }
         if ($request->has('ajax') && $request->ajax == 1) { // tree form ajax submission

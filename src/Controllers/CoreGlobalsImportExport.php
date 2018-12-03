@@ -2,6 +2,7 @@
 namespace SurvLoop\Controllers;
 
 use DB;
+use App\Models\User;
 use Storage;
 use Illuminate\Http\Request;
 
@@ -635,6 +636,64 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
         }
         return true;
     }
+    
+    public function getPackageLineCount($dir = 'Controllers', $pkg = '', $type = '.php')
+    {
+        if ($pkg == '') $pkg = $this->sysOpts["cust-package"];
+        return $this->getDirLinesCount('../vendor/' . $pkg . '/src/' . $dir, $type);
+    }
+    
+    public function getPackageByteCount($dir = 'Controllers', $pkg = '', $type = '')
+    {
+        if ($pkg == '') $pkg = $this->sysOpts["cust-package"];
+        return $this->getDirSize('../vendor/' . $pkg . '/src/' . $dir, $type);
+    }
+    
+    public function getJsonSurvLoopStats($pkg = '')
+    {
+    	$types = $this->loadTreeNodeStatTypes();
+    	$stats = [ "Date" => date("Y-m-d"), "IconUrl" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"] ];
+    	$survs = $pages = [];
+    	$stats["DbTables"] = SLTables::where('TblDatabase', $this->dbID)
+    	   ->count();
+    	$stats["DbFields"] = SLFields::where('FldDatabase', $this->dbID)
+    	   ->where('FldTable', '>', 0)
+    	   ->count();
+    	$stats["DbLinks"] = SLFields::where('FldDatabase', $this->dbID)
+    	   ->where('FldForeignTable', '>', 0)
+    	   ->where('FldTable', '>', 0)
+    	   ->count();
+    	$chk = SLTree::where('TreeType', 'Survey')
+    		->where('TreeDatabase', $this->dbID)
+    		->select('TreeID')
+    		->get();
+    	if ($chk->isNotEmpty()) {
+    		foreach ($chk as $t) $survs[] = $t->TreeID;
+    	}
+    	$stats["Surveys"] = sizeof($survs);
+    	$stats["SurveyNodes"] = SLNode::whereIn('NodeTree', $survs)->count();
+    	$stats["SurveyNodesMult"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["choic"])->count();
+    	$stats["SurveyNodesOpen"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["quali"])->count();
+    	$stats["SurveyNodesNumb"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["quant"])->count();
+    	$chk = SLTree::where('TreeType', 'Page')
+    		->where('TreeDatabase', $this->dbID)
+    		->select('TreeID')
+    		->get();
+    	if ($chk->isNotEmpty()) {
+    		foreach ($chk as $t) $pages[] = $t->TreeID;
+    	}
+    	$stats["Pages"] = sizeof($pages);
+    	$stats["PageNodes"] = SLNode::whereIn('NodeTree', $pages)->count();
+    	$stats["CodeLinesControllers"] = $this->getPackageLineCount('Controllers', $pkg);
+    	$stats["CodeLinesViews"] = $this->getPackageLineCount('Views', $pkg);
+    	$stats["BytesControllers"] = $this->getPackageByteCount('Controllers', $pkg);
+    	$stats["BytesDatabase"] = $this->getPackageByteCount('Database', $pkg);
+    	$stats["BytesUploads"] = $this->getPackageByteCount('Uploads', $pkg);
+    	$stats["BytesViews"] = $this->getPackageByteCount('Views', $pkg);
+    	$stats["Users"] = User::select('id')->count();
+    	return $stats;
+    }
+    
     
 }
 

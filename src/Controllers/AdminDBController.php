@@ -1186,7 +1186,7 @@ class AdminDBController extends AdminController
                 ->get();
             if ($tbls->isNotEmpty()) {
                 foreach ($tbls as $tbl) {
-                    $tableLookup[$tbl->TblID] = $this->v["tables"]->count();
+                    $tableLookup[$tbl->TblID] = sizeof($this->v["tables"]);
                     $this->v["tables"][] = [
                         $tbl->TblName, 
                         sqrt(sqrt($tbl->TblNumForeignKeys+$tbl->TblNumForeignIn)), 

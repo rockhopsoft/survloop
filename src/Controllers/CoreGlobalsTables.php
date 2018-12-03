@@ -1785,6 +1785,7 @@ class CoreGlobalsTables extends CoreStatic
     
     public function initCoreTable($coreTbl, $userTbl = null)
     {
+        //if ($this->dbID == 3 && $this->sysOpts["cust-abbr"] != 'SurvLoop') return false;
         if (!$coreTbl || !isset($coreTbl->TblID)) return false;
         if (!$userTbl) $userTbl = $this->loadUsrTblRow();
         if ($coreTbl->TblID == $userTbl->TblID) return false;
@@ -1858,10 +1859,11 @@ class CoreGlobalsTables extends CoreStatic
                     switch ($f["FldName"]) {
                         case 'UserID':             $tblQry .= "bigint(20) unsigned"; break;
                         case 'SubmissionProgress': $tblQry .= "int(11)"; break;
-                        case 'VersionAB':          $tblQry .= "varchar(255)"; break;
                         case 'UniqueStr':          $tblQry .= "varchar(50)"; break;
-                        case 'IPaddy':             $tblQry .= "varchar(255)"; break;
                         case 'IsMobile':           $tblQry .= "int(1) NULL"; break;
+                        case 'TreeVersion':
+                        case 'VersionAB':
+                        case 'IPaddy':             $tblQry .= "varchar(255)"; break;
                     }
                     DB::statement($tblQry . " NULL;");
                 }

@@ -134,6 +134,7 @@ class DatabaseInstaller extends AdminDBController
             ? '/dashboard/sl/export/laravel' : '/dashboard/db/export'));
         if ($asPackage) $GLOBALS["SL"]->x["exportAsPackage"] = true;
         if (!$this->checkCache(($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export/laravel')) {
+            
         	$this->v["refresh"] = 1;
             if ($GLOBALS["SL"]->REQ->has('refresh')) $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
 			$newMigFilename = 'database/migrations/' . $this->v["dateStmp"] . '_000000_create_' 

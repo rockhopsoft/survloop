@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
 
+use App\Models\User;
 use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLTables;
@@ -37,9 +38,7 @@ class SurvLoop extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'cust-abbr')
             ->first();
-        if ($chk && isset($chk->DefDescription)) {
-            $this->custAbbr = trim($chk->DefDescription);
-        }
+        if ($chk && isset($chk->DefDescription)) $this->custAbbr = trim($chk->DefDescription);
         return true;
     }
     
@@ -50,9 +49,7 @@ class SurvLoop extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) {
-            $this->domainPath = $appUrl->DefDescription;
-        }
+        if ($appUrl && isset($appUrl->DefDescription)) $this->domainPath = $appUrl->DefDescription;
         return $this->domainPath;
     }
     
@@ -823,33 +820,10 @@ class SurvLoop extends Controller
     public function getJsonSurvLoopStats(Request $request)
     {
         $this->syncDataTrees($request);
-    	$types = $GLOBALS["SL"]->loadTreeNodeStatTypes();
-    	$stats = [ "Date" => date("Y-m-d") ];
-    	$survs = $pages = [];
-    	$stats["DbTables"] = SLTables::where('TblDatabase', 1)->count();
-    	$stats["DbFields"] = SLFields::where('FldDatabase', 1)->count();
-    	$chk = SLTree::where('TreeType', 'Survey')
-    		->where('TreeDatabase', 1)
-    		->select('TreeID')
-    		->get();
-    	if ($chk->isNotEmpty()) {
-    		foreach ($chk as $t) $survs[] = $t->TreeID;
-    	}
-    	$stats["Surveys"] = sizeof($survs);
-    	$stats["SurveyNodes"] = SLNode::whereIn('NodeTree', $survs)->count();
-    	$stats["SurveyNodesMult"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["choic"])->count();
-    	$stats["SurveyNodesOpen"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["quali"])->count();
-    	$stats["SurveyNodesNumb"] = SLNode::whereIn('NodeTree', $survs)->whereIn('NodeType', $types["quant"])->count();
-    	$chk = SLTree::where('TreeType', 'Page')
-    		->where('TreeDatabase', 1)
-    		->select('TreeID')
-    		->get();
-    	if ($chk->isNotEmpty()) {
-    		foreach ($chk as $t) $pages[] = $t->TreeID;
-    	}
-    	$stats["Pages"] = sizeof($pages);
-    	$stats["PageNodes"] = SLNode::whereIn('NodeTree', $pages)->count();
+        $this->loadLoop($request);
         header('Content-Type: application/json');
+        $stats = $GLOBALS["SL"]->getJsonSurvLoopStats();
+    	$stats["Survey1Complete"] = sizeof($this->custLoop->getAllPublicCoreIDs());
         echo json_encode($stats);
         exit;
     }

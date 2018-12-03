@@ -151,6 +151,7 @@ class CoreStatic
     
     public function copyDirFiles($from, $to, $recurse = true)
     {
+        if (trim($from) == '' || trim($to) == '' || !file_exists($from)) return ''; 
         $ret = '';
         $dir = opendir($from);
         if (!file_exists($to) || !is_dir($to)) @mkdir($to);
@@ -169,6 +170,56 @@ class CoreStatic
         }
         closedir($dir);
         return $ret;
+    }
+    
+    public function getDirSize($dirPath = '', $type = '')
+    {
+        if (!file_exists($dirPath)) return 0;
+        $size = 0;
+        $dir = opendir($dirPath);
+        while (false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..') {
+                if (is_dir($dirPath . '/' . $file)) {
+                    $size += $this->getDirSize($dirPath . '/' . $file, $type);
+                } elseif (($type == '' || strpos($file, $type) > 0) && file_exists($dirPath . '/' . $file)) {
+                    $size += filesize($dirPath . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+        return $size;
+    }
+    
+    public function getDirLinesCount($dirPath = '', $type = '.php')
+    {
+        $lines = 0;
+        $dir = opendir($dirPath);
+        while (false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..') {
+                if (is_dir($dirPath . '/' . $file)) {
+                    $lines += $this->getDirLinesCount($dirPath . '/' . $file, $type);
+                } elseif ($type == '' || strpos($file, $type) > 0) {
+                    $cnt = $this->getFileLineCount($dirPath . '/' . $file);
+                    $lines += $cnt;
+                }
+            }
+        }
+        closedir($dir);
+        return $lines;
+    }
+    
+    public function getFileLineCount($file = '')
+    {
+        $lines = 0;
+        if (trim($file) != '' && file_exists($file)) {
+            $handle = fopen($file, "r");
+            while (!feof($handle)) {
+                $line = fgets($handle);
+                $lines++;
+            }
+            fclose($handle);
+        }
+        return $lines;
     }
     
     public function findDirFile($folder, $file)
