@@ -55,9 +55,7 @@ class SurvLoopData
     {
         $this->dataSets = $this->id2ind = $this->kidMap = $this->helpInfo = [];
         $this->loadData($this->coreTbl, $this->coreID);
-        /* if (Auth::user() && Auth::user()->id) {
-            $this->loadData('users', Auth::user()->id);
-        } */
+        // if (Auth::user() && Auth::user()->id) $this->loadData('users', Auth::user()->id);
         // check for data needed for root data loop which isn't connected to the core record
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
             eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" 
@@ -726,6 +724,16 @@ class SurvLoopData
         return null;
     }
     
+    public function getDataBranchRow($tbl = '')
+    {
+        for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
+            if ($this->dataBranches[$i]["branch"] == $tbl) {
+                return $this->getRowById($tbl, $this->dataBranches[$i]["itemID"]);
+            }
+        }
+        return null;
+    }
+    
     public function startTmpDataBranch($tbl, $itemID = -3, $findItemID = true)
     {
         $foundBranch = false;
@@ -803,13 +811,9 @@ class SurvLoopData
                 $itemID = $GLOBALS["SL"]->getSessLoopID($branch["loop"]);
             } elseif (intVal($branch["itemID"]) > 0) {
                 $itemID = $branch["itemID"];
-            }
-            /*
-            elseif (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][0])) 
-            {
+            } /* elseif (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][0])) {
                 $itemID = $this->dataSets[$tbl][0]->getKey();
-            }
-            */
+            } */
         }
         /* this needs to happen elsewhere, in a more specific usage?
         elseif (trim($branch["branch"]) != '' && trim($branch["loop"]) == ''
@@ -952,30 +956,6 @@ class SurvLoopData
                             = $this->currSessDataPos($helper->DataHelpParentTable);
                         $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere($helper->DataHelpTable, 
                             $helper->DataHelpKeyField, $this->helpInfo[$tblFld]["parentID"]);
-/*
-                        $filts = null;
-                        // check for first-degree relative match
-                        
-                        if (sizeof($this->dataBranches) > 1) {
-                            $branch = $this->dataBranches[(sizeof($this->dataBranches)-1)];
-                            if ($helper->DataHelpParentTable == $branch["branch"]) {
-                                $filts = [];
-                                $branchRecs = $this->dataWhere($helper->DataHelpTable, $helper->DataHelpKeyField, $branch["itemID"]);
-                                if ($branchRecs && sizeof($branchRecs) > 0) {
-                                    foreach ($branchRecs as $rec) $filts[] = $rec->getKey();
-                                }
-echo 'branch ' . $this->dataBranches[(sizeof($this->dataBranches)-1)]["branch"] . ' ?= ' . $helper->DataHelpParentTable . ' , ' . $helper->DataHelpKeyField . ' != ' . $branch["itemID"] . '<br />';
-                            }
-echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches[(sizeof($this->dataBranches)-1)]["branch"] . '<pre>'; echo '</pre>';
-                        }
-                        if ($filts !== null) {
-                            for ($i = sizeof($this->helpInfo[$tblFld]["pastObjs"])-1; $i >= 0; $i--) {
-                                if (!in_array($this->helpInfo[$tblFld]["pastObjs"][$i]->getKey(), $filts)) {
-                                    unset($this->helpInfo[$tblFld]["pastObjs"][$i]);
-                                }
-                            }
-                        }
-*/
                         if ($this->helpInfo[$tblFld]["pastObjs"] && sizeof($this->helpInfo[$tblFld]["pastObjs"]) > 0) {
                             foreach ($this->helpInfo[$tblFld]["pastObjs"] as $obj) {
                                 $this->helpInfo[$tblFld]["pastVals"][] = $obj->{ $helper->DataHelpValueField };
@@ -1063,7 +1043,8 @@ echo $tblFld . ' ... ' . $helper->DataHelpKeyField . ' , ' . $this->dataBranches
         $passed = true;
         if ($cond && isset($cond->CondDatabase) && $cond->CondOperator != 'CUSTOM') {
             $cond->loadVals();
-            $loopName = ((intVal($cond->CondLoop) > 0) ? $GLOBALS["SL"]->dataLoopNames[$cond->CondLoop] : '');
+            $loopName = ((intVal($cond->CondLoop) > 0 && isset($GLOBALS["SL"]->dataLoopNames[$cond->CondLoop])) 
+                ? $GLOBALS["SL"]->dataLoopNames[$cond->CondLoop] : '');
             if (intVal($cond->CondTable) <= 0 && trim($loopName) != '' 
                 && isset($GLOBALS["SL"]->dataLoops[$loopName])) {
                 $tblName = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;

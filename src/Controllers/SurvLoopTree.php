@@ -567,7 +567,7 @@ class SurvLoopTree extends CoreTree
         return true;
     }
     
-    protected function printNodeSessDataOverride($nID = -3, $tmpSubTier = [])
+    protected function printNodeSessDataOverride($nID = -3, $tmpSubTier = [], $nIDtxt = '', $currNodeSessionData = '')
     {
         return [];
     }
@@ -641,9 +641,11 @@ class SurvLoopTree extends CoreTree
         $majTot = 0;
         foreach ($this->majorSections as $maj => $majSect) {
             if ($maj == $this->currMajorSection) {
-                $GLOBALS['SL']->pageJAVA .= 'treeMajorSects[' . $maj . '][3]="active";' . "\n";
+                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                    "maj" => $maj, "status" => 'active' ])->render();
             } elseif (in_array($maj, $this->sessMajorsTouched)) {
-                $GLOBALS['SL']->pageJAVA .= 'treeMajorSects[' . $maj . '][3]="completed";' . "\n";
+                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                    "maj" => $maj, "status" => 'completed' ])->render();
             }
             if ($majSect[2] == 'disabled') {
                 $GLOBALS['SL']->pageJAVA .= 'treeMajorSectsDisabled[0]=' . $maj . ';' . "\n";
@@ -653,9 +655,11 @@ class SurvLoopTree extends CoreTree
             if (sizeof($this->minorSections[$maj]) > 0) {
                 foreach ($this->minorSections[$maj] as $min => $minSect) {
                     if ($maj == $this->currMajorSection && $min == $this->currMinorSection) {
-                        $GLOBALS['SL']->pageJAVA .= 'treeMinorSects[' . $maj . '][' . $min . '][3]="active";' . "\n";
+                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                            "maj" => $maj, "min" => $min, "status" => 'active' ])->render();
                     } elseif (in_array($min, $this->sessMinorsTouched[$maj])) {
-                        $GLOBALS['SL']->pageJAVA .= 'treeMinorSects[' . $maj . '][' . $min . '][3]="completed";' ."\n";
+                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                            "maj" => $maj, "min" => $min, "status" => 'completed' ])->render();
                     }
                 }
             }
@@ -669,12 +673,19 @@ class SurvLoopTree extends CoreTree
             && isset($this->majorSections[$this->currMajorSection][1]) > 0) {
             $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
                 . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
+            $majorsOut = $minorsOut = [];
+            foreach ($this->majorSections as $maj => $majSect) {
+                if ($majSect[2] != 'disabled') {
+                    $majorsOut[] = $this->majorSections[$maj];
+                    $minorsOut[] = $this->minorSections[$maj];
+                }
+            }
             $ret .= view('vendor.survloop.inc-progress-bar', [
                 "hasNavBot"         => ($GLOBALS["SL"]->treeRow->TreeOpts%59 == 0),
                 "hasNavTop"         => ($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0),
                 "allNodes"          => $this->allNodes, 
-                "majorSections"     => $this->majorSections, 
-                "minorSections"     => $this->minorSections, 
+                "majorSections"     => $majorsOut, 
+                "minorSections"     => $minorsOut, 
                 "sessMajorsTouched" => $this->sessMajorsTouched, 
                 "sessMinorsTouched" => $this->sessMinorsTouched, 
                 "currMajorSection"  => $this->currMajorSection, 
@@ -2673,11 +2684,12 @@ class SurvLoopTree extends CoreTree
     
     protected function printGlossary()
     {
+        if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) $this->fillGlossary();
         if (sizeof($this->v["glossaryList"]) > 0) {
             $ret = '<h3 class="mT0 mB20 slBlueDark">Glossary of Terms</h3><div class="glossaryList">';
             foreach ($this->v["glossaryList"] as $i => $gloss) {
-                $ret .= '<div class="row' . (($i%2 == 0) ? ' row2' : '') . '"><div class="col-2 pT15 pB15">' 
-                    . $gloss[0] . '</div><div class="col-10 pT15 pB15">' . ((isset($gloss[1])) ? $gloss[1] : '') 
+                $ret .= '<div class="row' . (($i%2 == 0) ? ' row2' : '') . ' pT15 pB15"><div class="col-md-3">' 
+                    . $gloss[0] . '</div><div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '') 
                     . '</div></div>';
             }
             return $ret . '</div>';

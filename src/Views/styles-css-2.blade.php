@@ -731,7 +731,7 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 }
 .subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p, .finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
-	color: {!! $css["color-main-grey"] !!};
+	/* color: {!! $css["color-main-grey"] !!}; */
 }
 .finger .subNote, .fingerAct .subNote {
     margin-top: 0px;
@@ -1224,7 +1224,7 @@ label { font-weight: normal; }
 .navDeskMaj.completed .stepNum, .navDeskMin.completed .stepNum {
 	color: {!! $css["color-main-off"] !!};
 	background: {!! $css["color-main-bg"] !!};
-	border: 1px {!! $css["color-main-off"] !!} solid;
+	border: 1px {!! $css["color-main-on"] !!} solid;
 }
 .navDeskMaj.active .stepNum, .navDeskMin.active .stepNum {
 	color: {!! $css["color-main-on"] !!};
@@ -1236,12 +1236,12 @@ label { font-weight: normal; }
 .navDeskMaj.active .navVertLine2, .navDeskMaj.completed .navVertLine2
 .navDeskMin.active .navVertLine, .navDeskMin.completed .navVertLine, 
 .navDeskMin.active .navVertLine2, .navDeskMin.completed .navVertLine2 {
-	border-left: 1px {!! $css["color-main-on"] !!} solid;
+	border-left: 1px {!! $css["color-main-off"] !!} solid;
 }
 .minorNavWrap {
     display: none;
-    border-top: 1px {!! $css["color-main-text"] !!} solid;
-    padding-top: 20px;
+    border-top: 1px {!! $css["color-main-off"] !!} solid;
+    padding: 20px 0px;
     margin-top: -8px;
     -moz-border-radius: 20px; border-radius: 20px;
 }
@@ -1473,6 +1473,8 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     opacity:0.33; filter:alpha(opacity=33);
     box-shadow: 0px 0px 40px {!! $css["color-main-bg"] !!};
 }
+
+.glossaryList { margin: 0px 15px; }
 
 .dont-break-out {
 

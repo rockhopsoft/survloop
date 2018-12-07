@@ -261,9 +261,18 @@ class SurvFormTree extends SurvUploadTree
                 if (strpos($str, '[LoopItemLabel]') !== false && isset($GLOBALS["SL"]->closestLoop["loop"])) {
                     $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
                         $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
-                    $str = str_replace('[LoopItemLabel]', '<span class="slBlueDark"><b>' . $label . '</b></span>', $str);
+                    $str = str_replace('[LoopItemLabel]', '<span class="slBlueDark">' . $label . '</span>', $str);
                 }
-                $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark">' . (1+$itemInd) . '</span>', $str);
+                $cnt = 1+$itemInd;
+                if (isset($GLOBALS["SL"]->closestLoop["loop"])) {
+                    $rows = $this->sessData->getLoopRows($GLOBALS["SL"]->closestLoop["loop"]);
+                    if ($rows && sizeof($rows) > 0) {
+                        foreach ($rows as $j => $rec) {
+                            if ($rec->getKey() == $itemID) $cnt = 1+$j;
+                        }
+                    }
+                }
+                $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark">' . $cnt . '</span>', $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
             if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {
@@ -275,7 +284,7 @@ class SurvFormTree extends SurvUploadTree
                 $loopRows = $this->sessData->getLoopRows($loopName);
                 if (sizeof($loopRows) == 1) {
                     $label = $this->getLoopItemLabel($loopName, $loopRows[0], $itemInd);
-                    $str = $strPre . '<span class="slBlueDark"><b>' . $label . '</b></span>' . $strPost;
+                    $str = $strPre . '<span class="slBlueDark">' . $label . '</span>' . $strPost;
                 }
             }
         }
@@ -287,23 +296,19 @@ class SurvFormTree extends SurvUploadTree
     
     protected function cleanLabel($str = '')
     {
-        $span = '<span class="slBlueDark"><b>';
-        $str = str_replace($span . 'You</b></span>', $span . 'you</b></span>', $str);
-        $str = str_replace($span . 'you</b></span>&#39;s', $span . 'your</b></span>', $str);
-        $str = str_replace('Was <span class="slBlueDark"><b>you</b></span>', 
-            'Were <span class="slBlueDark"><b>you</b></span>', $str);
-        $str = str_replace('was <span class="slBlueDark"><b>you</b></span>', 
-            'were <span class="slBlueDark"><b>you</b></span>', $str);
-        $str = str_replace($span . 'you</b></span>\'s', $span . 'your</b></span>', $str);
-        $str = str_replace($span . 'you</b></span> was', $span . 'you</b></span> were', $str);
-        $str = str_replace(', [LoopItemLabel]:', ':', 
-            str_replace(', <span class="slBlueDark"><b>[LoopItemLabel]</b></span>:', ':', $str));
-        $str = str_replace(', <span class="slBlueDark"><b></b></span>:', ':', 
-            str_replace(', <span class="slBlueDark"><b>&nbsp;</b></span>:', ':', $str));
+        $span = '<span class="slBlueDark">';
+        $str = str_replace($span . 'You</span>', $span . 'you</span>', $str);
+        $str = str_replace($span . 'you</span>&#39;s', $span . 'your</span>', $str);
+        $str = str_replace('Was <span class="slBlueDark">you</span>', 'Were <span class="slBlueDark">you</span>', $str);
+        $str = str_replace('was <span class="slBlueDark">you</span>', 'were <span class="slBlueDark">you</span>', $str);
+        $str = str_replace($span . 'you</span>\'s', $span . 'your</span>', $str);
+        $str = str_replace($span . 'you</span> was', $span . 'you</span> were', $str);
+        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="slBlueDark">[LoopItemLabel]</span>:',
+            ':', $str));
+        $str = str_replace(', <span class="slBlueDark"></span>:', ':', 
+            str_replace(', <span class="slBlueDark">&nbsp;</span>:', ':', $str));
         $str = trim(str_replace(', :', ':', $str));
-        if (strpos(strip_tags($str), 'you') === 0) {
-            $str = str_replace($span . 'you', $span . 'You', $str);
-        }
+        if (strpos(strip_tags($str), 'you') === 0) $str = str_replace($span . 'you', $span . 'You', $str);
         return $str;
     }
     
@@ -412,18 +417,19 @@ class SurvFormTree extends SurvUploadTree
             $currNodeSessData = $curr->nodeRow->NodeDefault;
         }
         
+        $nSffx = $GLOBALS["SL"]->getCycSffx();
+        $nIDtxt = trim($nID . $nSffx);
+        
         // check for extra custom PHP code stored with the node; check for standardized techniques
-        $nodeOverrides = $this->printNodeSessDataOverride($nID, $tmpSubTier, $currNodeSessData);
+        $nodeOverrides = $this->printNodeSessDataOverride($nID, $tmpSubTier, $nIDtxt, $currNodeSessData);
         if (is_array($nodeOverrides) && sizeof($nodeOverrides) > 1) $currNodeSessData = $nodeOverrides;
         elseif (is_array($nodeOverrides) && sizeof($nodeOverrides) == 1 && isset($nodeOverrides[0])) {
             $currNodeSessData = $nodeOverrides[0];
         }
         
-        $nSffx = $GLOBALS["SL"]->getCycSffx();
         $GLOBALS["SL"]->pageJAVA .= 'nodeList[nodeList.length] = ' . $nID . '; '
             . 'nodeParents[' . $nID . '] = ' . $curr->parentID . ';' . "\n"
             . (($nSffx != '') ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" : '');
-        $nIDtxt = trim($nID . $nSffx);
         $condKids = $showMoreNodes = [];
         if (sizeof($tmpSubTier[1]) > 0) {
             if ($curr->nodeType == 'Countries') {
@@ -668,6 +674,8 @@ class SurvFormTree extends SurvUploadTree
                             $ret .= '<div id="nLabel' . $nIDtxt . '" class="nPrompt"><span class="slGrey mR10">' 
                                 . $deetLabel . '</span>' . $deetVal . '</div>';
                         } elseif ($curr->nodeType == 'Data Print Row') {
+if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVal, $nID]); echo '</pre>'; }
+
                             return [$deetLabel, $deetVal, $nID];
                         }
                     } elseif ($curr->nodeType == 'Data Print Row') {
@@ -986,8 +994,8 @@ class SurvFormTree extends SurvUploadTree
 //if ($nID == 57) { echo '<br /><br /><br />after customResponses <pre>'; print_r($curr->fldHasOther); echo '</pre>'; }
                 // Start normal data field checks
                 $dateStr = $timeStr = '';
-                if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) 
-                    && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID') && trim($currNodeSessData) != '' 
+                if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')
+                    && !is_array($currNodeSessData) && trim($currNodeSessData) != '' 
                     && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])) {
                     // convert current session data for dates and times
                     if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATETIME') {

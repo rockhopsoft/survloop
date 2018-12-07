@@ -1281,29 +1281,36 @@ $(document).ready(function(){
 	});
 	/* $("[data-toggle=\"tooltip\"]").tooltip(); */
 	
+	function hideMajNav(majInd) {
+        if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
+            $("#majSect"+majInd+"Vert2").slideUp(50);
+            $("#minorNav"+majInd+"").slideUp(50);
+        }
+        return true;
+	}
+	
 	$(document).on("click", ".navDeskMaj", function() {
-		var majInd = $(this).attr("id").replace("maj", "");
+		var majInd = parseInt($(this).attr("id").replace("maj", ""));
 		if ($(this).attr("data-jumpnode") && document.getElementById("stepID") && document.getElementById("jumpToID")) {
             document.getElementById("jumpToID").value = $(this).attr("data-jumpnode");
             if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
             return runFormSub();
 		}
 		for (var i = 0; i < treeMajorSects.length; i++) {
-		    if (i != majInd && document.getElementById("minorNav"+i+"") 
-		        && document.getElementById("majSect"+i+"Vert2")) {
-		        document.getElementById("minorNav"+i+"").style.display = 'none';
-		        document.getElementById("majSect"+i+"Vert2").style.display = 'none';
-            }
+		    if (i != majInd) hideMajNav(i);
 		}
 		if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
 		    if (document.getElementById("minorNav"+majInd+"").style.display == 'block') {
-		        document.getElementById("minorNav"+majInd+"").style.display = 'none';
-		        document.getElementById("majSect"+majInd+"Vert2").style.display = 'none';
+		        hideMajNav(majInd);
             } else {
-		        document.getElementById("minorNav"+majInd+"").style.display = 'block';
-		        document.getElementById("majSect"+majInd+"Vert2").style.display = 'block';
+                setTimeout(function() {
+                    $("#minorNav"+majInd+"").slideDown("fast");
+                    $("#majSect"+majInd+"Vert2").slideDown("fast");
+                }, 50);
             }
         }
+        $(this).blur();
+	    return false;
 	});
 	
 	$(document).on("click", "#navMobBurger1", function() {
@@ -1418,9 +1425,7 @@ $(document).ready(function(){
         for (var i = 0; i < hshoos.length; i++) {
             var min = new Array(0, 1000000000);
             for (var j = 0; j < hshoos.length; j++) {
-                if (absMin < hshoos[j][1] && hshoos[j][1] < min[1]) { // 0 < h && 
-                    min = new Array(j, hshoos[j][1]);
-                }
+                if (absMin < hshoos[j][1] && hshoos[j][1] < min[1]) min = new Array(j, hshoos[j][1]);
             }
             if (min[1] > -1000000000) {
                 absMin = min[1];
@@ -1451,9 +1456,7 @@ $(document).ready(function(){
     }
     setTimeout(function() { chkHshoosPos(); }, 10);
     setTimeout(function() { chkHshooScroll(); }, 50);
-    $(document).scroll(function() {
-        chkHshooScroll();
-    });
+    $(document).scroll(function() { chkHshooScroll(); });
     
     function chkScrollPar() {
         var scrolled = $(window).scrollTop();
@@ -1471,9 +1474,7 @@ $(document).ready(function(){
             }
         });
     }
-    $(window).scroll(function() {
-        chkScrollPar();
-    });
+    $(window).scroll(function() { chkScrollPar(); });
     setTimeout(function() { chkScrollPar() }, 10);
     
 	$(document).on("click", ".searchBarBtn", function() {

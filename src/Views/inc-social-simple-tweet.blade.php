@@ -8,6 +8,7 @@
     @else
         <a class="socialTwit" target="_blank" href="{{ $GLOBALS['SL']->getTwitShareLnk($link,
             ((isset($title)) ? $title : ''), ((isset($hashtags)) ? $hashtags : '')) }}" style="color: #FFF;">
-            <div><img src="/survloop/uploads/spacer.gif"><i class="fa fa-twitter" aria-hidden="true"></i> <span>Tweet</span><div></a>
+            <div><img src="/survloop/uploads/spacer.gif"><i class="fa fa-twitter" aria-hidden="true"></i> 
+            <span>Tweet</span></div></a>
     @endif
 @endif

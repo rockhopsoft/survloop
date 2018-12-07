@@ -4,15 +4,17 @@
 @forelse ($majorSections as $maj => $majSect)
 treeMajorSects[{{ $maj }}] = new Array({{ $majSect[0] }}, "{{ $majSect[1] }}", "/", "disabled");
 treeMinorSects[{{ $maj }}] = new Array();
-    @if (sizeof($minorSections[$maj]) > 0)
+    @if (sizeof($minorSections[$maj]) > 0 && isset($GLOBALS['SL']->treeRow->TreeSlug))
         @forelse ($minorSections[$maj] as $min => $minSect)
+            @if (isset($allNodes[$minSect[0]]))
 treeMinorSects[{{ $maj }}][{{ $min }}] = new Array({{ $minSect[0] }}, "{{ $minSect[1] }}", "/", "disabled");
-            @if ($GLOBALS['SL']->treeIsAdmin)
+                @if ($GLOBALS['SL']->treeIsAdmin)
 treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ 
                     $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
-            @else
+                @else
 treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/u/{{ 
                     $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
+                @endif
             @endif
         @empty
         @endforelse

@@ -11,10 +11,10 @@
             @if ($majSect[2] != 'disabled')
                 <?php $cnt++; ?>
                 <div class="col-{{ floor(12/$majTot) }}">
-                    <a href="javascript:;" id="maj{{ $maj }}" class="navDeskMaj @if ($maj == $currMajorSection) active 
-                        @elseif (in_array($maj, $sessMajorsTouched)) completed @endif " 
+                    <a id="maj{{ $maj }}" class="navDeskMaj @if ($maj == $currMajorSection) active 
+                        @elseif (in_array($maj, $sessMajorsTouched)) completed @endif " href="javascript:;"
                         @if (!isset($minorSections[$maj]) || sizeof($minorSections[$maj]) == 0)
-                            data-jumpnode="{{ $majSect[0] }}" @else data-toggle="tab" @endif >
+                            data-jumpnode="{{ $majSect[0] }}" @endif >
                         <center><div class="stepNum">
                         @if ($maj == $currMajorSection) <i class="fa fa-hand-o-down" aria-hidden="true"></i>
                         @elseif (in_array($maj, $sessMajorsTouched)) <i class="fa fa-check"></i> @else {{ $cnt }} @endif
@@ -26,8 +26,10 @@
         @endforeach
         @if ($majTot == 5) <div class="col-1"></div> @endif
         </div>
+        <?php $cnt = 0; ?>
         @foreach ($majorSections as $maj => $majSect)
             @if (sizeof($minorSections[$maj]) > 0)
+                <?php $cnt++; ?>
                 <div id="minorNav{{ $maj }}" class="minorNavWrap">
                     <div class="row">
                         @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
@@ -35,8 +37,7 @@
                             <div class="col-{{ floor(12/sizeof($minorSections[$maj])) }}">
                                 <a id="maj{{ $maj }}" class="navDeskMin
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) active 
-                                    @elseif (in_array($min, $sessMinorsTouched[$maj])) completed 
-                                    @endif "
+                                    @elseif (in_array($min, $sessMinorsTouched[$maj])) completed @endif "
                                     @if ((!isset($sessMinorsTouched[$maj]) || !in_array($min, $sessMinorsTouched[$maj])) 
                                         && ($maj != $currMajorSection || $min != $currMinorSection))
                                         href="javascript:;"
@@ -48,8 +49,7 @@
                                             href="/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
                                                 $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 
                                         @endif
-                                    @endif
-                                    >
+                                    @endif >
                                     <center><div class="stepNum">
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) 
                                         <i class="fa fa-hand-o-down" aria-hidden="true"></i>
