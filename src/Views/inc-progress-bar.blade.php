@@ -41,7 +41,7 @@
                                     @if ((!isset($sessMinorsTouched[$maj]) || !in_array($min, $sessMinorsTouched[$maj])) 
                                         && ($maj != $currMajorSection || $min != $currMinorSection))
                                         href="javascript:;"
-                                    @else
+                                    @elseif (isset($allNodes[$minSect[0]]))
                                         @if ($GLOBALS['SL']->treeIsAdmin)
                                             href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
                                                 $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 

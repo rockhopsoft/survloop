@@ -246,12 +246,6 @@ class AdminTreeController extends AdminController
             ->where('TreeType', 'LIKE', 'Survey')
             ->orderBy('TreeName', 'asc')
             ->get();
-        $this->v["autoTrees"] = [ ];
-        /* if ($this->v["myTrees"]->isNotEmpty()) {
-            foreach ($this->v["myTrees"] as $tree) {
-                //if ($tree->TreeOpts%19 == 0) $this->v["autoTrees"]["contact"] = true;
-            }
-        } */
         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#newTree", function() { '
             . '$("#newTreeForm").slideToggle("fast"); });';
         return view('vendor.survloop.admin.tree.trees', $this->v);
@@ -509,8 +503,9 @@ class AdminTreeController extends AdminController
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $row) {
                     if ($this->CustReport->chkCoreRecEmpty($row->getKey(), $row)) {
-                        eval("\$del = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
-                            . $row->getKey() . ")->delete();");
+                        $row->delete();
+                        //eval("\$del = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
+                        //    . $row->getKey() . ")->delete();");
                     }
                 }
             }

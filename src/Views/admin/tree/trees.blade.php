@@ -18,79 +18,63 @@
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myTrees as $tree)
             @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
+        
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+        @endif
+        
+        @if ($GLOBALS["SL"]->sysHas('partners'))
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myTrees as $tree)
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0) 
+                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+        @endif
+        
+        @forelse ($myTrees as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
+                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty @endforelse
+        @forelse ($myTrees as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
+                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty @endforelse
         
         @forelse ($myTrees as $tree)
             @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myTrees as $tree)
             @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
-        
-        @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
-                && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
-                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-            @endif
-        @empty
-        @endforelse
-        @forelse ($myTrees as $tree)
-            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
-                && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0) 
-                {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-            @endif
-        @empty
-        @endforelse
-        
-        @if ($GLOBALS["SL"]->sysHas('partners'))
-            @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
-                    && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
-                    && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-        @endif
-        
-        @if ($GLOBALS["SL"]->sysHas('volunteers'))
-            @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%3 > 0 
-                    && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myTrees as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%3 > 0 
-                    && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-        @endif
+        @empty @endforelse
         
         </table>
         

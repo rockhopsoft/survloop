@@ -1894,7 +1894,6 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
         }
         $currVisib = ($GLOBALS["SL"]->REQ->has('n' . $nID . 'Visible') 
             && intVal($GLOBALS["SL"]->REQ->input('n' . $nID . 'Visible')) == 1);
-//if (in_array($nID, [827, 787])) { echo 'post postNodePublic(' . $nID . ', type: ' . $curr->nodeType . ', currVisib: ' . (($currVisib) ? 'true' : 'false') . '<br />'; }
         // Check for and process special page forms
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $this->allNodes[$nID]->nodeType == 'Page') {
             if ($GLOBALS["SL"]->treeRow->TreeOpts%19 == 0) {
@@ -1909,7 +1908,7 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
             $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
             $loopCycle = $this->sessData->getLoopRows($loop);
             if (sizeof($loopCycle) > 0) {
-                foreach ($loopCycle as $i => $loopItem) $list .= ','.$loopItem->getKey();
+                foreach ($loopCycle as $i => $loopItem) $list .= ',' . $loopItem->getKey();
             }
             $this->sessData->logDataSave($nID, $loop, -3, 'Sorting ' . $loop . ' Items', $list);
             $this->closePostNodePublic($nID, $tmpSubTier, $curr);
@@ -1955,32 +1954,27 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
             
         } elseif ($curr->isSpreadTbl()) {
             
-//if ($nID == 1423) { echo '<br /><br /><br />post isSpreadTbl(' . $nID . '<br />'; }
             if (sizeof($tmpSubTier[1]) > 0) {
                 $this->tableDat = $this->loadTableDat($curr, [], $tmpSubTier);
                 $GLOBALS["SL"]->currCyc["tbl"][0] = $this->tableDat["tbl"];
                 for ($i = 0; $i < $this->tableDat["maxRow"]; $i++) {
-//if ($nID == 1423) { echo '<br />post isSpreadTbl-A(' . $nID . ', '; print_r($this->sessData->dataBranches); echo '<br />'; }
                     $hasRow = false;
                     $fldVals = [];
                     foreach ($tmpSubTier[1] as $k => $kidNode) {
                         list($kidTbl, $kidFld) = $this->allNodes[$kidNode[0]]->getTblFld();
                         $fldVals[$kidFld] = '';
                         $tmpFldName = 'n' . $kidNode[0] . $nSffx . 'tbl' . $i . 'fld';
-//if ($nID == 1423) { echo '<br />post isSpreadTbl-RowChk(' . $nID . ', kidFld: ' . $kidFld . ', tmpFldName: ' . $tmpFldName . '<br />'; }
                         if ($GLOBALS["SL"]->REQ->has($tmpFldName)) {
                             if (is_array($GLOBALS["SL"]->REQ->get($tmpFldName))) {
                                 if (sizeof($GLOBALS["SL"]->REQ->get($tmpFldName)) > 0) $hasRow = true;
                             } else {
                                 if (trim($GLOBALS["SL"]->REQ->get($tmpFldName)) != '') $hasRow = true;
-//if ($nID == 1423) { echo 'tmpFldName: '. $tmpFldName . ', kidTbl: ' . $kidTbl . ', kidFld: ' . $kidFld . '<br />'; }
                                 if ($kidTbl == $this->tableDat["tbl"]) {
                                     $fldVals[$kidFld] = trim($GLOBALS["SL"]->REQ->get($tmpFldName));
                                 }
                             }
                         }
                     }
-//if ($nID == 1423) { echo '<br />post isSpreadTbl-RowChk(' . $nID . ', i: ' . $i . ', hasRow: ' . (($hasRow) ? 'true' : 'false') . '<br />'; }
                     if (trim($this->tableDat["rowCol"]) != '') {
                         if (isset($this->tableDat["rows"][$i]) && isset($this->tableDat["rows"][$i]["leftVal"]) 
                             && trim($this->tableDat["rows"][$i]["leftVal"]) != '') {
@@ -2002,7 +1996,6 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                     } else { // user adds rows as they go
                         if ($hasRow) {
                             $matches = $this->sessData->getRowIDsByFldVal($this->tableDat["tbl"], $fldVals, true);
-//if ($nID == 1423) { echo '<br /><br /><br />checking tbl ' . $this->tableDat["tbl"] . ', fldVals:<pre>'; print_r($fldVals); print_r($matches); echo '</pre>'; }
                             if (empty($matches)) {
                                 $recObj = $this->sessData->simpleNewDataRecord($this->tableDat["tbl"]);
                                 if (trim($this->tableDat["loop"]) != '') {
@@ -2033,8 +2026,6 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                             $this->sessData->startTmpDataBranch($this->tableDat["tbl"], 
                                 $this->tableDat["rows"][$i]["id"], false);
                         }
-//if ($nID == 1423) { echo 'currCyc:<pre>'; print_r($GLOBALS["SL"]->currCyc["tbl"]); echo '</pre>'; }
-//if ($nID == 1423) { echo 'post isSpreadTbl-C(' . $nID . ',  row: ' . $i . ', '; print_r($this->sessData->dataBranches); echo '<br />'; }
                         foreach ($tmpSubTier[1] as $k => $kidNode) {
                             $ret .= $this->postNodePublic($kidNode[0], $kidNode, $currVisib);
                         }
@@ -2051,7 +2042,6 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
             
         } elseif (!$curr->isDataPrint()) {
             
-//if (in_array($nID, [827, 787])) { echo '<br /><br /><br />post !isDataPrint(' . $nID . ', currVisib: ' . (($currVisib) ? 'true' : 'false') . ', store in ' . $curr->dataStore . '<br />'; }
             if (!$this->postNodePublicCustom($nID, $tmpSubTier)) { // then run standard post
                 if ($GLOBALS["SL"]->REQ->has('loop')) {
                     $this->settingTheLoop(trim($GLOBALS["SL"]->REQ->input('loop')), 
@@ -2059,10 +2049,7 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                 }
                 if ($curr->nodeType == 'Uploads') {
                     if ($this->REQstep != 'autoSave') $ret .= $this->postUploadTool($nID);
-                } elseif ($this->allNodes[$nID]->nodeType == 'Send Email') {
-                    //$ret .= $this->postNodeSendEmail($nID);
                 } elseif ($curr->isDataManip()) {
-//if ($nID == 557) { echo '<br /><br />post isDataManip(' . $nID . ', currVisib: ' . (($currVisib) ? 'true' : 'false') . '<br />';
                     if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
                         && intVal($GLOBALS["SL"]->REQ->input('dataManip' . $nID . '')) == 1) {
                         if ($currVisib) $this->runDataManip($nID);
@@ -2077,9 +2064,7 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                         $this->newLoopItem($nID);
                         //$this->updateCurrNode($this->nextNode($this->currNode()));
                     } elseif (!$curr->isInstruct() && $tbl != '' && $fld != '') {
-//if (in_array($nID, [827, 787])) { echo '<br /><br /><br />post(' . $nID . ', cyc: ' . $GLOBALS["SL"]->currCyc["tbl"][1] . '<br />'; print_r($this->sessData->dataBranches); echo '<br />'; }
                         $newVal = $this->getNodeFormFldBasic($nID, $curr);
-//if (in_array($nID, [827, 787])) { echo '<br /><br /><br />nodeType: ' . $curr->nodeType . ', tagger: ' . (($curr->isDropdownTagger()) ? 'true' : 'false') . ', tbl: ' . $tbl . ', fld: ' . $fld . ', itemInd: ' . $itemInd . ', itemID: ' . $itemID . ', <pre>'; print_r($newVal); echo '</pre>'; }
                         if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
                             $newVal = $this->postNodeTweakNewVal($curr, $newVal);
                             if (sizeof($curr->responses) == 1) { // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
@@ -2096,18 +2081,15 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                                         $hasParManip, $itemInd, $itemID);
                                 }
                             } else {
-//if (in_array($nID, [827, 787])) { echo '<br />Umm? 1 <pre>'; print_r($newVal); echo '</pre>'; }
                                 $curr = $this->checkResponses($curr, $fldForeignTbl);
                                 $this->sessData->currSessDataCheckbox($nID, $tbl, $fld, 'update', $newVal, $curr, 
                                     $itemInd, $itemID);
                             }
                         } else {
-//if (in_array($nID, [827, 787])) { echo '<br />Umm? 2 <pre>'; print_r($newVal); echo '</pre>'; }
                             $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal, $hasParManip, 
                                 $itemInd, $itemID);
                         }
                         // Check for Layout Sub-Response between each Checkbox Response
-//if (in_array($nID, [386, 341, 226, 339])) { echo 'nID: ' . $nID . ', type: ' . $curr->nodeType . ', '; print_r($curr->fldHasOther); echo '<br />'; }
                         if ($curr->nodeType == 'Checkbox' && sizeof($tmpSubTier[1]) > 0 && sizeof($newVal) > 0) {
                             foreach ($newVal as $r => $val) {
                                 foreach ($tmpSubTier[1] as $childNode) {
@@ -2151,10 +2133,8 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                                 }
                             }
                         }
-//if (in_array($nID, [386, 341, 226, 339])) { echo 'nID: ' . $nID . ', type: ' . $curr->nodeType . ', '; print_r($curr->fldHasOther); echo '<br />'; }
                         if (in_array($curr->nodeType, ['Checkbox', 'Radio', 'Gender', 'Gender Not Sure'])
                             && sizeof($curr->fldHasOther) > 0) {
-//if (in_array($nID, [386, 341, 226, 339])) { echo '<pre>'; print_r($curr->responses); echo '</pre>'; }
                             foreach ($curr->responses as $j => $res) {
                                 if (in_array($j, $curr->fldHasOther)) {
                                     $otherVal = (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fldOther' . $j)) 
@@ -2170,12 +2150,9 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
                                     }
                                     $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldVals);
                                     $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
-//if (in_array($nID, [386, 341, 226, 339])) { echo '<br /><br /><br />nID: ' . $nID . ', ' . $res->NodeResEng . ' , ' . $branchRowID . ' , tbl: ' . $tbl . ' , fld: ' . $fld . ' => ' . $res->NodeResValue . ' ; '; print_r($subRowIDs); echo '<br />'; }
                                     if ($branchRowID > 0) {
                                         $GLOBALS["SL"]->currCyc["res"] = [$tbl, 'res' . $j, $res->NodeResValue];
                                         $this->sessData->startTmpDataBranch($tbl, $branchRowID);
-//if (in_array($nID, [386, 341, 226, 339])) { echo '<br /><br /><br />nID: ' . $nID . ', ' . $tbl . ' , ' . $fld . 'Other = ' . $otherVal . '<br />'; }
-//if (in_array($nID, [386, 341, 226, 339])) { echo 'nID: ' . $nID . ', dataBranches: <pre>'; print_r($this->sessData->dataBranches); echo '</pre>'; }
                                         $this->sessData->currSessData($nID, $tbl, $fld . 'Other', 'update', $otherVal, 
                                             $hasParManip);
                                         $this->sessData->endTmpDataBranch($tbl);
@@ -2200,9 +2177,6 @@ if ($nID == 1891) { echo '<br /><br /><br /><pre>'; print_r([$deetLabel, $deetVa
         
         if ($curr->isDataManip()) $this->closeManipBranch($nID);
         
-//$this->tmpDebug('umm.' . $nID . '.B');
-//if ($nID == 334) { echo '<pre>'; print_r($GLOBALS["SL"]->REQ->all()); echo '</pre>'; exit; }
-//echo 'nID: ' . $nID . ' fini, PsArBldTypeOther: ' . ((isset($this->sessData->dataSets["PSAreasBlds"][0]->PsArBldTypeOther)) ? $this->sessData->dataSets["PSAreasBlds"][0]->PsArBldTypeOther : '');
         $this->closePostNodePublic($nID, $tmpSubTier, $curr);
         return $ret;
     }

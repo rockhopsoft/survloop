@@ -21,99 +21,78 @@
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myPages as $tree)
             @if ($tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myRdr["home"] as $redir)
             {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
-        @empty
-        @endforelse
+        @empty @endforelse
+        
+        @if ($GLOBALS["SL"]->sysHas('volunteers'))
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myRdr["volun"] as $redir)
+                {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
+            @empty @endforelse
+        @endif
+        
+        @if ($GLOBALS["SL"]->sysHas('partners'))
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myPages as $tree)
+                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0) 
+                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+                @endif
+            @empty @endforelse
+            @forelse ($myRdr["partn"] as $redir)
+                {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
+            @empty @endforelse
+        @endif
+        
+        @forelse ($myPages as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0)
+                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty @endforelse
+        @forelse ($myPages as $tree)
+            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0)
+                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
+            @endif
+        @empty @endforelse
+        @forelse ($myRdr["admin"] as $redir)
+            {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
+        @empty @endforelse
         
         @forelse ($myPages as $tree)
             @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myPages as $tree)
             @if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%41 > 0 
                 && $tree->TreeOpts%43 > 0) 
                 {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
             @endif
-        @empty
-        @endforelse
+        @empty @endforelse
         @forelse ($myRdr["admin"] as $redir)
             {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
-        @empty
-        @endforelse
-        
-        @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 == 0 && $tree->TreeOpts%17 > 0 
-                && $tree->TreeOpts%41 > 0)
-                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-            @endif
-        @empty
-        @endforelse
-        @forelse ($myPages as $tree)
-            @if ($tree->TreeOpts%43 == 0 && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%7 > 0 && $tree->TreeOpts%17 > 0 
-                && $tree->TreeOpts%41 > 0)
-                {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-            @endif
-        @empty
-        @endforelse
-        @forelse ($myRdr["admin"] as $redir)
-            {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
-        @empty
-        @endforelse
-        
-        @if ($GLOBALS["SL"]->sysHas('partners'))
-            @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 == 0
-                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%41 == 0 && $tree->TreeOpts%7 > 0
-                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%17 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myRdr["partn"] as $redir)
-                {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
-            @empty
-            @endforelse
-        @endif
-        
-        @if ($GLOBALS["SL"]->sysHas('volunteers'))
-            @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 == 0 
-                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myPages as $tree)
-                @if ($tree->TreeOpts%17 == 0 && $tree->TreeOpts%7 > 0
-                    && $tree->TreeOpts%3 > 0 && $tree->TreeOpts%41 > 0 && $tree->TreeOpts%43 > 0) 
-                    {!! view('vendor.survloop.admin.tree.pages-row', [ "tree" => $tree ])->render() !!}
-                @endif
-            @empty
-            @endforelse
-            @forelse ($myRdr["volun"] as $redir)
-                {!! view('vendor.survloop.admin.tree.pages-row-redir', [ "redir" => $redir ])->render() !!}
-            @empty
-            @endforelse
-        @endif
+        @empty @endforelse
         
         </table>
         
