@@ -1,4 +1,12 @@
 <?php
+/**
+  * AdminDatabaseInstall is the admin class responsible for building standard SurvLoop components.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
@@ -6,16 +14,14 @@ use Storage;
 use Illuminate\Http\Request;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
-
 use App\Models\SLTree;
 use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
-
 use SurvLoop\Controllers\AdminDBController;
 
-class DatabaseInstaller extends AdminDBController
+class AdminDatabaseInstall extends AdminDBController
 {
     protected $dbMysql = false;
     
@@ -154,7 +160,7 @@ class DatabaseInstaller extends AdminDBController
 						$this->v["migrationFileUp"] .= "\t"."Schema::create('" . $GLOBALS["SL"]->dbRow->DbPrefix 
 							. $tbl->TblName . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
 							."$"."table->increments('" . $tbl->TblAbbr . "ID');";
-						$this->v["modelFile"] = ''; // also happens in CoreGlobals->chkTblModel($tbl)
+						$this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
 						$flds = $this->getTableFields($tbl);
 						if ($flds->isNotEmpty()) {
 							foreach ($flds as $fld) {
@@ -236,7 +242,7 @@ class DatabaseInstaller extends AdminDBController
 								$runTable = false;
 							}
 						} elseif ($asPackage) {
-							$runTable = in_array($tbl->TblName, $this->CustReport->tblsInPackage());
+							$runTable = in_array($tbl->TblName, $this->custReport->tblsInPackage());
 						}
 						if ($runTable) {
 							Storage::append($newSeedFilename, $this->printSeedTbl($this->loadSlSeedEval($tbl)));

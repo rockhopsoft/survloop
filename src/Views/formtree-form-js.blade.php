@@ -1,20 +1,10 @@
 /* resources/views/vendor/survloop/formtree-form-js.blade.php */
 function checkFullPage() {
-    if (!document.getElementById('main') && !document.getElementById('isPrint')) {
+    if ((!document.getElementById('main') || !document.getElementById('sysJs')) && !document.getElementById('isPrint')) {
 @if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')
-        window.location='{{ $currPage[0] }}';
-@elseif ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-    @if ($GLOBALS['SL']->treeIsAdmin)
-        window.location = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}";
-    @else
-        window.location = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}";
-    @endif
+        window.location="{{ $currPage[0] }}";
 @else
-    @if ($GLOBALS['SL']->treeIsAdmin)
-        window.location = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $pageURL }}";
-    @else
-        window.location = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $pageURL }}";
-    @endif
+        window.location = "{{ $GLOBALS['SL']->getCurrTreeUrl() }}";
 @endif
     }
     if (document.getElementById('maincontentWrap')) document.getElementById('maincontentWrap').style.display = 'block';
@@ -23,6 +13,8 @@ function checkFullPage() {
 setTimeout("checkFullPage()", 10);
 setTimeout("checkFullPage()", 100);
 setTimeout("checkFullPage()", 1000);
+setTimeout("checkFullPage()", 5000);
+setTimeout("checkFullPage()", 10000);
 
 @if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
     || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0)

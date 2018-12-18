@@ -1,25 +1,29 @@
 <?php
+/**
+  * TreeCore is the bottom-level class for a standard branching tree.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
 use Session;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
 use App\Models\SLTokens;
-use App\Models\SLUsersActivity;
-
-use SurvLoop\Controllers\CoreNode;
-use SurvLoop\Controllers\SurvLoopData;
+use SurvLoop\Controllers\TreeNode;
+use SurvLoop\Controllers\SurvData;
 use SurvLoop\Controllers\SurvLoopController;
 
-class CoreTree extends SurvLoopController
+class TreeCore extends SurvLoopController
 {
     
     public $treeID             = -3;
@@ -45,9 +49,9 @@ class CoreTree extends SurvLoopController
     protected function loadNode($nodeRow = NULL)
     {
         if ($nodeRow && isset($nodeRow->NodeID) && $nodeRow->NodeID > 0) {
-            return new CoreNode($nodeRow->NodeID, $nodeRow);
+            return new TreeNode($nodeRow->NodeID, $nodeRow);
         }
-        $newNode = new CoreNode();
+        $newNode = new TreeNode();
         $newNode->nodeRow->NodeTree = $this->treeID;
         return $newNode;
     }
@@ -59,7 +63,6 @@ class CoreTree extends SurvLoopController
     
     protected function loadTreeStart($treeIn = -3, Request $request = NULL)
     {
-        if ($request) $this->REQ = $request;
         if ($treeIn > 0) {
             $this->treeID = $treeIn;
         } elseif ($this->treeID <= 0) {
@@ -253,7 +256,7 @@ class CoreTree extends SurvLoopController
             $node->nodeRow->NodeParentOrder = $GLOBALS["SL"]->REQ->moveToOrder;
             $node->nodeRow->save();
             $this->loadTree();
-            $this->initExtra($this->REQ);
+            $this->initExtra($GLOBALS["SL"]->REQ);
         }
         return true;
     }
@@ -337,8 +340,7 @@ class CoreTree extends SurvLoopController
     
     protected function loadSessInfo($coreTbl)
     {
-//echo '<br /><br /><br />loadSessInfo setSessCore1 c#' . $this->coreID . ' s#' . $this->sessID . '<br />';
-        if (!isset($this->v["currPage"])) $this->survLoopInit($this->REQ); // not sure why this 
+        if (!isset($this->v["currPage"])) $this->survLoopInit($GLOBALS["SL"]->REQ); // not sure why this 
         if (isset($GLOBALS["SL"]->formTree->TreeID)) return false; 
         
         // If we're loading a Page that doesn't even have a Core Table, then we skip all the session checks...
@@ -699,7 +701,7 @@ class CoreTree extends SurvLoopController
         $newCID = $this->deepCopyCoreRecCustom($cid);
         if ($newCID <= 0) {
             $this->deepCopyCoreSkips($cid);
-            $this->v["sessDataCopy"] = new SurvLoopData;
+            $this->v["sessDataCopy"] = new SurvData;
             $this->v["sessDataCopy"]->loadCore($GLOBALS["SL"]->coreTbl, $cid);
             $this->sessData->loadCore($GLOBALS["SL"]->coreTbl);
             foreach ($this->v["sessDataCopy"]->dataSets as $tbl => $rows) {
@@ -782,8 +784,8 @@ class CoreTree extends SurvLoopController
     {
         $this->survLoopInit($request, '');
         if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff|databaser')) {
-            return redirect()->intended('dashboard');
-            //return $this->redir('/dashboard');
+            //return redirect()->intended('dashboard');
+            return $this->redir('/dashboard');
         } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer|partner')) {
             $opt = ($this->v["user"]->hasRole('partner')) ? 41 : 17;
             $trees = SLTree::where('TreeDatabase', 1)
@@ -792,7 +794,8 @@ class CoreTree extends SurvLoopController
             if ($trees->isNotEmpty()) {
                 foreach ($trees as $tree) {
                     if ($tree->TreeOpts%$opt == 0 && $tree->TreeOpts%7 == 0) {
-                        return redirect()->intended('dash/' . $tree->TreeSlug);
+                        //return redirect()->intended('dash/' . $tree->TreeSlug);
+                        return $this->redir('/dash/' . $tree->TreeSlug, true);
                     }
                 }
             }
@@ -849,13 +852,15 @@ class CoreTree extends SurvLoopController
             if ($sessInfo && isset($sessInfo->SessCurrNode) && intVal($sessInfo->SessCurrNode) > 0) {
                 $this->loadTree();
                 $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
-                if (trim($nodeURL) != '') return $this->redir($nodeURL);
+                if (trim($nodeURL) != '') {
+                    return $this->redir($nodeURL, true);
+                }
             }
-            return redirect()->intended('my-profile');
-            //return $this->redir('/my-profile');
+            //return redirect()->intended('my-profile');
+            return $this->redir('/my-profile', true);
         }
-        return redirect()->intended('/home');
-        //return $this->redir('/');
+        //return redirect()->intended('home');
+        return $this->redir('/', true);
     }
 
     public function findUserCoreID()

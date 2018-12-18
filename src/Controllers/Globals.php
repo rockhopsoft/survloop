@@ -1,11 +1,19 @@
 <?php
+/**
+  * Globals is a core class for loading and accessing system information from anywhere.
+  * This is very helpful for processes which may need to be used within Views, etc.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
 use Storage;
 use Illuminate\Http\Request;
-
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
 use App\Models\SLFields;
@@ -24,15 +32,12 @@ use App\Models\SLConditionsNodes;
 use App\Models\SLConditionsArticles;
 use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
-
 use SurvLoop\Controllers\Geographs;
-use SurvLoop\Controllers\CoreStatic;
 use SurvLoop\Controllers\SurvLoopImages;
-use SurvLoop\Controllers\SurvLoopNode;
+use SurvLoop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\GlobalsImportExport;
 
-// Just wanted these utility Globals to easily call from anywhere, including views. Open to other solutions. ;)
-
-class CoreGlobals extends CoreGlobalsImportExport
+class Globals extends GlobalsImportExport
 {
     public $states    = null;
     public $imgs      = false;
@@ -47,7 +52,20 @@ class CoreGlobals extends CoreGlobalsImportExport
         $this->loadTreeMojis();
         $this->loadDataMap($this->treeID);
         $this->chkReportFormTree();
+        $this->loadCustomGlobals();
         $GLOBALS["errors"] = '';
+        return true;
+    }
+    
+    public function loadCustomGlobals()
+    {
+        $GLOBALS["CUST"] = null;
+        if (isset($this->sysOpts["cust-abbr"]) && $this->sysOpts["cust-abbr"] != 'SurvLoop') {
+            $custClass = $this->sysOpts["cust-abbr"] . "\\Controllers\\" . $this->sysOpts["cust-abbr"] . "Globals";
+            if (class_exists($custClass)) {
+                eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+            }
+        }
         return true;
     }
     
@@ -494,8 +512,8 @@ class CoreGlobals extends CoreGlobalsImportExport
     public function loadStates()
     {
         if (!$this->states) {
-            $this->states = new Geographs(isset($GLOBALS['SL']->sysOpts['has-canada'])
-                && intVal($GLOBALS['SL']->sysOpts['has-canada']) == 1);
+            $this->states = new Geographs(isset($this->sysOpts['has-canada'])
+                && intVal($this->sysOpts['has-canada']) == 1);
         }
         return true;
     }

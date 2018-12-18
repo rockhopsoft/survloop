@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\{{ $abbr }};
 
-use SurvLoop\Controllers\SurvFormTree;
+use SurvLoop\Controllers\TreeSurvForm;
 
-class {{ $abbr }} extends SurvFormTree
+class {{ $abbr }} extends TreeSurvForm
 {
     
-    public $classExtension = '{{ $abbr }}';
-    public $treeID             = 1;
     
 }

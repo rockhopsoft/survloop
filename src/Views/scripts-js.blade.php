@@ -1024,9 +1024,9 @@ $(document).ready(function(){
             cntDownOver = false;
             return runSaveReload();
         }
-        setTimeout(function() { chkRunSaveReload(); }, 1000);
+        setTimeout(function() { chkRunSaveReload(); }, 2000);
     }
-    setTimeout(function() { chkRunSaveReload(); }, 1000);
+    setTimeout(function() { chkRunSaveReload(); }, 2000);
     $(document).on("click", ".nFormSaveReload", function() { runSaveReload(); });
     
     function runFormSubAjax() {
@@ -1162,7 +1162,7 @@ $(document).ready(function(){
         }
         return false;
     }
-    setTimeout(function() { if (!document.getElementById("isPage")) postNodeAutoSave(); }, 60000);
+    setTimeout(function() { if (!document.getElementById("isPage")) postNodeAutoSave(); }, 90000);
     
     window.onpopstate = function(event) {
         if (document.getElementById("stepID") && !document.getElementById("isPage")) {
@@ -1182,7 +1182,7 @@ $(document).ready(function(){
             if (leftPos > 0) document.getElementById("leftSideWrap").style.position="static";
             else document.getElementById("leftSideWrap").style.position="fixed";
         }
-        setTimeout(function() { timeoutChecks(); }, 500);
+        setTimeout(function() { timeoutChecks(); }, 2000);
         return true;
     }
     setTimeout(function() { timeoutChecks(); }, 500);
@@ -2060,12 +2060,9 @@ $(document).ready(function(){
                 document.getElementById('fixedHeader').style.paddingRight = '20px';
             }
             document.getElementById('fixedHeader').style.width = ''+newW+'px';
-            setTimeout(function() { chkFixedHeader(); }, 500);
-            setTimeout(function() { chkFixedHeader(); }, 2000);
-            setTimeout(function() { chkFixedHeader(); }, 8000);
-            setTimeout(function() { chkFixedHeader(); }, 60000);
+            setTimeout(function() { chkFixedHeader(); }, 1000);
         } else {
-            setTimeout(function() { chkFixedHeader(); }, 60000);
+            setTimeout(function() { chkFixedHeader(); }, 5000);
         }
     }
     setTimeout(function() { chkFixedHeader(); }, 10);

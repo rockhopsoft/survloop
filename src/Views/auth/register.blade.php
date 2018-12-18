@@ -16,12 +16,11 @@ $v = $surv->custLoop->v;
 
 <div class="row loginTitles">
     <div class="col-6">
-        @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
-            && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
-            {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
-        @else
-            <h1 class="mT0">Sign Up</h1>
-        @endif
+    @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
+        {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
+    @else
+        <h1 class="mT0">Sign Up</h1>
+    @endif
     </div>
     <div class="col-6 taR pT5">
         @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 

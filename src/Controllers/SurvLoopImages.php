@@ -1,4 +1,12 @@
 <?php
+/**
+  * SurvLoopImages is a class which manages SurvLoop's uploaded images like a CMS.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use Auth;
@@ -58,13 +66,17 @@ class SurvLoopImages
         $allow = false;
         if ($img && isset($img->ImgID)) {
             if (!isset($img->ImgUserID) || intVal($img->ImgUserID) <= 0) {
-                if ($img->ImgDatabaseID == 1) $allow = true;
+                if ($img->ImgDatabaseID == 1) {
+                    $allow = true;
+                }
                 // might need more checks here, but for now, allow
                 $allow = true;
             } else { // UserID > 0
                 $user = Auth::user();
                 if ($user) {
-                    if ($img->ImgUserID == $user->id) $allow = true;
+                    if ($img->ImgUserID == $user->id) {
+                        $allow = true;
+                    }
                 }
                 // check image privacy settings (soming soon)
                 $allow = true;
@@ -88,8 +100,9 @@ class SurvLoopImages
     {
         if (sizeof($fileMap) > 0) {
             foreach ($fileMap as $i => $file) {
-                if (is_array($file)) $this->scanNewUpInner($fileMap[$i], $folder, (1+$depth));
-                else {
+                if (is_array($file)) {
+                    $this->scanNewUpInner($fileMap[$i], $folder, (1+$depth));
+                } else {
                     $img = SLImages::where('ImgFileLoc', $file)
                         ->first();
                     if (!$img || !isset($img->ImgFileLoc)) {
@@ -150,7 +163,7 @@ class SurvLoopImages
             "imgs"   => $this->imgs,
             "presel" => $presel,
             "newUp"  => $newUp
-        ])->render();
+            ])->render();
     }
     
     public function getImgDeet($imgID = -3, $nID = '', $dbID = 1)
@@ -160,13 +173,17 @@ class SurvLoopImages
             ->where('ImgDatabaseID', $this->dbID)
             ->first();
         $urlPrint = $img->ImgFullFilename;
-        if (strpos($img->ImgFullFilename, '/') === 0) $urlPrint = $GLOBALS["SL"]->sysOpts["app-url"] . $urlPrint;
+        if (strpos($img->ImgFullFilename, '/') === 0) {
+            $urlPrint = $GLOBALS["SL"]->sysOpts["app-url"] . $urlPrint;
+        }
         $cleanOrig = trim($img->ImgFileOrig);
         if ($cleanOrig != '' && strrpos($cleanOrig, '/') !== false) {
             $cleanOrig = substr($cleanOrig, strrpos($cleanOrig, '/')+1);
         }
         $cleanCurr = $img->ImgFileLoc;
-        if (strrpos($cleanCurr, '/') !== false) $cleanCurr = substr($cleanCurr, strrpos($cleanCurr, '/')+1);
+        if (strrpos($cleanCurr, '/') !== false) {
+            $cleanCurr = substr($cleanCurr, strrpos($cleanCurr, '/')+1);
+        }
         return view('vendor.survloop.inc-image-deet', [
             "nID"       => $this->nID,
             "img"       => $img,
@@ -182,12 +199,16 @@ class SurvLoopImages
         $img = SLImages::where('ImgID', $imgID)
             ->where('ImgDatabaseID', $this->dbID)
             ->first();
-        $img->ImgTitle = (($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Name')) 
-            ? trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'Name')) : '');
-        $img->ImgCredit = (($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Credit')) 
-            ? trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'Credit')) : '');
-        $img->ImgCreditUrl = (($GLOBALS["SL"]->REQ->has('img' . $imgID . 'CreditUrl')) 
-            ? trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'CreditUrl')) : '');
+        $img->ImgTitle = $img->ImgCredit = $img->ImgCreditUrl = '';
+        if ($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Name')) {
+            $img->ImgTitle = trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'Name'));
+        }
+        if ($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Credit')) {
+            $img->ImgCredit = trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'Credit'));
+        }
+        if ($GLOBALS["SL"]->REQ->has('img' . $imgID . 'CreditUrl')) {
+            $img->ImgCreditUrl = trim($GLOBALS["SL"]->REQ->get('img' . $imgID . 'CreditUrl'));
+        }
         $img->save();
         return '<i class="fa fa-check" aria-hidden="true"></i> Saved';
     }
@@ -237,6 +258,5 @@ class SurvLoopImages
         }
         return '<i class="fa fa-times" aria-hidden="true"></i> Something went wrong with your upload.';
     }
-    
     
 }

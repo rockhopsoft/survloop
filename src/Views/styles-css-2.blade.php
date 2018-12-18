@@ -1925,6 +1925,8 @@ a:link .slGrey, a:active .slGrey, a:visited .slGrey, a:hover .slGrey {
     color: {!! $css["color-main-grey"] !!};
 }
 
+sub.slGrey { padding-left: 3px; }
+
 .slShade, a.slShade:link, a.slShade:visited, a.slShade:active, a.slShade:hover,
 a:link .slShade, a:visited .slShade, a:active .slShade, a:hover .slShade {
 	text-shadow: -1px 1px 0px {!! $css["color-main-text"] !!};

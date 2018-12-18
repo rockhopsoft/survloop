@@ -1,4 +1,13 @@
 <?php
+/**
+  * SurvData is a critical class with loads all the details of a survey's core record
+  * according to the database design, and it's settings for a given survey.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
@@ -6,7 +15,7 @@ use Auth;
 use App\Models\SLFields;
 use App\Models\SLNodeSaves;
 
-class SurvLoopData
+class SurvData
 {
     protected $coreID       = -3;
     protected $coreTbl      = '';
@@ -841,9 +850,16 @@ class SurvLoopData
             }
         } elseif ($action == 'update' && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT' && $newVal !== null) $newVal = intVal($newVal);
-            if (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][$itemInd])) {
+            if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
+                if (trim($newVal) == '') {
+                    $newVal = null;
+                } else {
+                    $newVal = intVal($newVal);
+                }
+            } else {
                 $newVal = strip_tags($newVal);
+            }
+            if (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][$itemInd])) {
                 $this->dataSets[$tbl][$itemInd]->{ $fld } = $newVal;
                 $this->dataSets[$tbl][$itemInd]->save();
                 return $newVal;

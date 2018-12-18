@@ -1,9 +1,17 @@
 <?php
+/**
+  * GlobalsDefinitions is a side-class which loads and gets installation definition sets.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use App\Models\SLDefinitions;
 
-class CoreGlobalsDefinitions
+class GlobalsDefinitions
 {   
 	private $dbID = 1;
 	
@@ -30,7 +38,9 @@ class CoreGlobalsDefinitions
         $this->loadDefs($subset);
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $def) {
-                if ($def->DefValue == $value) return $def->DefID;
+                if ($def->DefValue == $value) {
+                    return $def->DefID;
+                }
             }
         }
         return -3;
@@ -40,22 +50,32 @@ class CoreGlobalsDefinitions
     {
         if ($id <= 0) return '';
         $def = SLDefinitions::find($id);
-        if ($def && isset($def->DefValue)) return trim($def->DefValue);
+        if ($def && isset($def->DefValue)) {
+            return trim($def->DefValue);
+        }
         return '';
     }
     
     public function getVal($subset = '', $id = '')
     {
         if ($subset == 'Yes/No') {
-            if (in_array($id, ['Y', '1'])) return 'Yes';
-            if (in_array($id, ['N', '0'])) return 'No';
-            if ($id == '?') return 'Not sure';
+            if (in_array($id, ['Y', '1'])) {
+                return 'Yes';
+            }
+            if (in_array($id, ['N', '0'])) {
+                return 'No';
+            }
+            if ($id == '?') {
+                return 'Not sure';
+            }
             return '';
         }
         $this->loadDefs($subset);
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $def) {
-                if ($def->DefID == $id) return $def->DefValue;
+                if ($def->DefID == $id) {
+                    return $def->DefValue;
+                }
             }
         }
         return '';
@@ -89,8 +109,9 @@ class CoreGlobalsDefinitions
             ->where('DefSubset', $subset)
             ->where('DefValue', $val)
             ->first();
-        if ($chk && isset($chk->DefDescription)) return $chk->DefDescription;
+        if ($chk && isset($chk->DefDescription)) {
+            return $chk->DefDescription;
+        }
         return '';
     }
-    
 }

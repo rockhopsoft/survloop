@@ -1,4 +1,12 @@
 <?php
+/**
+  * TreeNodeSurv extends a standard branching tree's node for SurvLoop's needs.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use App\Models\SLNode;
@@ -6,10 +14,9 @@ use App\Models\SLNodeResponses;
 use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLFields;
+use SurvLoop\Controllers\TreeNodeCore;
 
-use SurvLoop\Controllers\CoreNode;
-
-class SurvLoopNode extends CoreNode
+class TreeNodeSurv extends TreeNodeCore
 {
     public $conds         = [];
     public $responses     = [];
@@ -556,7 +563,7 @@ class SurvLoopNode extends CoreNode
         }
         if (sizeof($this->dataManips) > 0) {
             foreach ($this->dataManips as $manip) {
-                $tmpNode = new SurvLoopNode($manip->nodeID, $manip);
+                $tmpNode = new TreeNodeSurv($manip->nodeID, $manip);
                 $ret .= $tmpNode->printManipUpdate();
             }
         }

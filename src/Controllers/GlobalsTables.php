@@ -1,11 +1,18 @@
 <?php
+/**
+  * GlobalsTables is a mid-level class for loading and accessing system information from anywhere.
+  * This level contains access to the database design, its tables, and field details.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
-use Storage;
 use Illuminate\Http\Request;
-
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
 use App\Models\SLFields;
@@ -17,20 +24,14 @@ use App\Models\SLDataLoop;
 use App\Models\SLDataSubsets;
 use App\Models\SLDataHelpers;
 use App\Models\SLDataLinks;
-use App\Models\SLSessLoops;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
-use App\Models\SLConditionsNodes;
 use App\Models\SLConditionsArticles;
-use App\Models\SLEmails;
-use App\Models\SLSearchRecDump;
+use SurvLoop\Controllers\GlobalsDefinitions;
+use SurvLoop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\GlobalsStatic;
 
-use SurvLoop\Controllers\CoreStatic;
-use SurvLoop\Controllers\CoreGlobalsDefinitions;
-use SurvLoop\Controllers\SurvLoopImages;
-use SurvLoop\Controllers\SurvLoopNode;
-
-class CoreGlobalsTables extends CoreStatic
+class GlobalsTables extends GlobalsStatic
 {
     public $def            = null;
     public $isAdmin        = false;
@@ -83,9 +84,66 @@ class CoreGlobalsTables extends CoreStatic
     public $tblLoops       = [];
     public $nodeCondInvert = [];
     
-    public $sysTree        = [ "forms" => [ "pub" => [], "adm" => [] ], "pages" => [ "pub" => [], "adm" => [] ] ];
+    public $sysTree        = [
+        "forms" => [
+            "pub" => [],
+            "adm" => []
+            ],
+        "pages" => [
+            "pub" => [],
+            "adm" => []
+            ]
+        ];
     public $treeSettings   = [];
     public $allTrees       = [];
+    
+    // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->TreeOpts%TREEOPT_PRIME == 0 )
+    // Site Map Architecture and Permissions Flags
+    public const TREEOPT_HOMEPAGE   = 7;  // Page Tree acts as home page for site area
+    public const TREEOPT_SEARCH     = 31; // Tree acts as search results page for site area 
+    public const TREEOPT_PROFILE    = 23; // This page acts as the default Member Profile for the system
+    public const TREEOPT_SURVREPORT = 13; // This page is a report for the records of another Survey Tree
+    
+    // Site Map Architecture and Permissions Flags
+    public const TREEOPT_ADMIN      = 3;  // Tree access limited to admin users
+    public const TREEOPT_STAFF      = 43; // Tree access limited to staff users
+    public const TREEOPT_PARTNER    = 41; // Tree access limited to partner users
+    public const TREEOPT_VOLUNTEER  = 17; // Tree access limited to volunteer users
+    
+    // Tree Options
+    public const TREEOPT_SKINNY     = 2;  // Tree's contents are wrapped in the skinny page width 
+    
+    // Survey Tree Options
+    public const TREEOPT_NOEDITS    = 11; // Record edits not allowed after complete (except admins)
+    public const TREEOPT_PUBLICID   = 47; // Survey uses a separate unique Public ID for completed records
+    public const TREEOPT_SURVNAVBOT = 37; // A navigation menu is generated below each page of the survey
+    public const TREEOPT_SURVNAVTOP = 59; // A navigation menu is generated atop each page of the survey
+    public const TREEOPT_SURVNAVLIN = 61; // A thin progress bar is generated atop each page of the survey
+    public const TREEOPT_ONEBIGLOOP = 5;  // Survey is one big loop through editable records
+    
+    // Page Tree Options
+    public const TREEOPT_REPORT     = 13; // Page Tree is a Report for a survey, so they share data structures
+    public const TREEOPT_NOCACHE    = 29; // Page Tree is currently too complicated to cache
+    public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
+    public const TREEOPT_CONTACT    = 19; // This page is a SurvLoop standard contact form 
+    
+    public function getTreePrimeConst($type)
+    {
+        eval("return self::TREEOPT_" . $type . ";");
+    }
+    
+    public function chkTreeOpt($treeOpts = 1, $type = '')
+    {
+        if ($type == '' || $treeOpts == 0) return false;
+        $prime = $this->getTreePrimeConst($type);
+        return (intVal($prime) != 0 && $treeOpts%$prime == 0);
+    }
+    
+    public function chkCurrTreeOpt($type = '')
+    {
+        if (!isset($this->treeRow->TreeOpts)) return false;
+        return $this->chkTreeOpt($this->treeRow->TreeOpts, $type);
+    }
     
     public function loadGlobalTables($dbID = 1, $treeID = 1, $treeOverride = -3)
     {
@@ -110,7 +168,7 @@ class CoreGlobalsTables extends CoreStatic
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
             $this->dbID = $dbID;
         }
-        $this->def = new CoreGlobalsDefinitions($this->dbID);
+        $this->def = new GlobalsDefinitions($this->dbID);
         $this->dbRow = SLDatabases::find($this->dbID);
         if (($treeOverride > 0 || $this->treeOverride <= 0) && $dbID == 1 && !$this->dbRow) {
         	$this->dbID = 3;
@@ -168,7 +226,7 @@ class CoreGlobalsTables extends CoreStatic
     {
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) return false;
         $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
-        if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) { // copied from DatabaseInstaller...
+        if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) { // copied from AdminDatabaseInstall...
             $modelFile = '';
             $tbl = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', $tbl)
@@ -248,6 +306,24 @@ class CoreGlobalsTables extends CoreStatic
             }
         }
         return $cache;
+    }
+    
+    public function getCurrTreeUrl()
+    {
+        if ($this->treeRow->TreeType == 'Page') {
+            if ($this->treeIsAdmin) {
+                return $this->sysOpts["app-url"] . '/dash/' . $this->treeRow->TreeSlug;
+            } else {
+                return $this->sysOpts["app-url"] . '/' . $this->treeRow->TreeSlug;
+            }
+        } else {
+            if ($this->treeIsAdmin) {
+                return $this->sysOpts["app-url"] . '/dash/' . $this->treeRow->TreeSlug . '/' . $pageURL;
+            } else {
+                return $this->sysOpts["app-url"] . '/u/' . $this->treeRow->TreeSlug . '/' . $pageURL;
+            }
+        }
+        return $this->sysOpts["app-url"];
     }
     
     public function chkReportTree($coreTbl = '')
@@ -1599,7 +1675,7 @@ class CoreGlobalsTables extends CoreStatic
                 $this->x["nodeNames"][$currNode] = '';
                 $row = SLNode::find($currNode);
                 if ($row && isset($row->NodeID)) {
-                    $node = new SurvLoopNode();
+                    $node = new TreeNodeSurv();
                     $node->fillNodeRow($currNode, $row);
                     if (isset($node->nodeRow) && isset($node->nodeRow->NodeID)) {
                         if (isset($node->extraOpts["meta-title"]) && trim($node->extraOpts["meta-title"]) != '') {

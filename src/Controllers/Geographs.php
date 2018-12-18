@@ -1,4 +1,13 @@
 <?php
+/**
+  * Geographs is a class focused on providing geographically-based data interactions
+  * from dropdown lists of U.S. and Canadian states, to embedding maps.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use App\Models\SLZips;
@@ -544,6 +553,7 @@ class Geographs
             }
             return view('vendor.survloop.embed-google-map', [
                 "nID"       => $nID,
+                "docDesc"   => $docDesc,
                 "filename"  => $filename,
                 "descAjax"  => $descAjax,
                 "mapCenter" => $this->mapCenter
@@ -596,18 +606,24 @@ class Geographs
     
     public function kmlMarkersFull($filename, $docName = '', $docDesc = '')
     {
-        if (!is_dir($this->kmlPath)) mkdir($this->kmlPath);
+        if (!is_dir($this->kmlPath)) {
+            mkdir($this->kmlPath);
+        }
         $fullpath = $this->kmlPath . '/' . $filename . '.kml';
-        $finalKML = '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' . "\n"
-            . '<kml xmlns="http://www.opengis.net/kml/2.2">' . "\n\t"
-            //. '<refreshMode>onChange</refreshMode>' . "\n\t"
-            . '<Document>' . "\n\t" . '<name>' . $GLOBALS["SL"]->makeXMLSafe($docName) . '</name>' . "\n\t"
-            . '<description>' . $GLOBALS["SL"]->makeXMLSafe($docDesc) . '</description>' . "\n\t"
-            . $this->kmlMarkerStyles() . "\n\t" . $this->kmlMapMarkers() . '</Document>' . "\n" . '</kml>';
+        if (!file_exists($fullpath) || $GLOBALS["SL"]->REQ->has('refresh')) {
+            $finalKML = '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' . "\n"
+                . '<kml xmlns="http://www.opengis.net/kml/2.2">' . "\n\t"
+              //. '<refreshMode>onChange</refreshMode>' . "\n\t"
+                . '<Document>' . "\n\t" . '<name>' . $GLOBALS["SL"]->makeXMLSafe($docName) . '</name>' . "\n\t"
+                . '<description>' . $GLOBALS["SL"]->makeXMLSafe($docDesc) . '</description>' . "\n\t"
+                . $this->kmlMarkerStyles() . "\n\t" . $this->kmlMapMarkers() . '</Document>' . "\n" . '</kml>';
 //echo 'kmlMarkersFull(' . $filename . '<br /><pre>' . $finalKML . '</pre>'; exit;
-        if (file_exists($fullpath)) unlink($fullpath); 
-        file_put_contents($fullpath, $finalKML);
-        $this->kml2kmz($filename);
+            if (file_exists($fullpath)) {
+                unlink($fullpath); 
+            }
+            file_put_contents($fullpath, $finalKML);
+            $this->kml2kmz($filename);
+        }
         return true;
     }
     
@@ -626,9 +642,13 @@ class Geographs
     public function kml2kmz($filename = '')
     {
         $filename = $this->kmlPath . '/' . $filename . '.kml';
-        if (!file_exists($filename)) return false;
+        if (!file_exists($filename)) {
+            return false;
+        }
         $zipname = str_replace('.kml', '.kmz', $filename);
-        if (file_exists($zipname)) unlink($zipname);
+        if (file_exists($zipname)) {
+            unlink($zipname);
+        }
         
         /*
         $zip = new ZipArchive();

@@ -1,10 +1,18 @@
 <?php
+/**
+  * TreeSurvAdmin is a higher-level class extending SurvLoop's core tree class
+  * with tools to edit the tree itself.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Cache;
 use Illuminate\Http\Request;
-
 use App\Models\User;
 use App\Models\SLDefinitions;
 use App\Models\SLTree;
@@ -15,14 +23,10 @@ use App\Models\SLConditions;
 use App\Models\SLDataLoop;
 use App\Models\SLConditionsNodes;
 use App\Models\SLEmails;
+use SurvLoop\Controllers\TreeSurvForm;
 
-use SurvLoop\Controllers\SurvFormTree;
-
-class SurvLoopTreeAdmin extends SurvFormTree
+class TreeSurvAdmin extends TreeSurvForm
 {
-    
-    public $classExtension = 'SurvLoopTreeAdmin';
-    
     protected $canEditTree = false;
     
     protected function initExtra(Request $request)
@@ -430,7 +434,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                 if (($GLOBALS["SL"]->REQ->has('oldConds') && intVal($GLOBALS["SL"]->REQ->oldConds) > 0) 
                     || ($GLOBALS["SL"]->REQ->has('condHash') && trim($GLOBALS["SL"]->REQ->condHash) != ''
                         && trim($GLOBALS["SL"]->REQ->condHash) != '#')) {
-                    $newCond = $GLOBALS["SL"]->saveEditCondition($this->REQ);
+                    $newCond = $GLOBALS["SL"]->saveEditCondition($GLOBALS["SL"]->REQ);
                     $newLink = new SLConditionsNodes;
                     $newLink->CondNodeCondID = $newCond->CondID;
                     $newLink->CondNodeNodeID = $node->nodeID;
@@ -565,7 +569,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
             "node"           => $node, 
             "parentNode"     => $parent,
             "nodeTypes"      => $this->nodeTypes, 
-            "REQ"            => $this->REQ, 
+            "REQ"            => $GLOBALS["SL"]->REQ, 
             "resLimit"       => $resLimit, 
             "defs"           => $GLOBALS["SL"]->allDefSets(),
             "nodeTypeSel"    => $nodeTypeSel, 
@@ -698,7 +702,7 @@ class SurvLoopTreeAdmin extends SurvFormTree
                             "conditionList"  => $conditionList,
                             "nodeBtns"       => $nodeBtns,
                             "nodeBtnExpand"  => $nodeBtnExpand,
-                            "REQ"            => $this->REQ,
+                            "REQ"            => $GLOBALS["SL"]->REQ,
                             "canEditTree"    => $this->canEditTree, 
                             "isPrint"        => $this->v["isPrint"],
                             "isAll"          => $this->v["isAll"],

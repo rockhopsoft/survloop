@@ -1,19 +1,26 @@
 <?php
+/**
+  * TreeSurvUpload is a mid-level class atop SurvLoop's branching tree, specifically for 
+  * uploading functionality in surveys and pages.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use Auth;
 use Storage;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
-
 use App\Models\User;
 use App\Models\SLUploads;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
+use SurvLoop\Controllers\TreeNodeSurv;
 
-use SurvLoop\Controllers\SurvLoopNode;
-
-class SurvUploadTree extends SurvLoopTree
+class TreeSurvUpload extends TreeSurv
 {
     public $uploadTypes      = [];
     protected $uploads       = [];
@@ -119,7 +126,7 @@ class SurvUploadTree extends SurvLoopTree
             if (!isset($this->v["upNodes"][$nID])) {
                 $this->v["upNodes"][$nID] = null;
                 $nodeRow = SLNode::find($nID);
-                if ($nodeRow) $this->v["upNodes"][$nID] = new SurvLoopNode($nID, $nodeRow);
+                if ($nodeRow) $this->v["upNodes"][$nID] = new TreeNodeSurv($nID, $nodeRow);
             }
             return $this->v["upNodes"][$nID];
         }
@@ -371,7 +378,7 @@ class SurvUploadTree extends SurvLoopTree
         }
         return view('vendor.survloop.upload-previous', [
             "nID"         => $nID,
-            "REQ"         => $this->REQ,
+            "REQ"         => $GLOBALS["SL"]->REQ,
             "height"      => 160,          
             "width"       => 330,
             "uploads"     => $this->uploads, 
@@ -397,7 +404,7 @@ class SurvUploadTree extends SurvLoopTree
             foreach ($this->uploads as $i => $upRow) {
                 $ups[] = view('vendor.survloop.uploads-print', [
                     "nID"         => $nID,
-                    "REQ"         => $this->REQ,
+                    "REQ"         => $GLOBALS["SL"]->REQ,
                     "height"      => 160,
                     "width"       => 330,
                     "upRow"       => $upRow, 

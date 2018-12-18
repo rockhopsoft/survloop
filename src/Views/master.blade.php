@@ -48,7 +48,7 @@
 @endif
 
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <script src="/sys-all.min.js" type="text/javascript"></script>
+    <script id="sysJs" src="/sys-all.min.js" type="text/javascript"></script>
 @else 
     <script src="/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
     <script src="/jquery.min.js"></script>
@@ -95,7 +95,6 @@
     }(document, 'script', 'facebook-jssdk'));</script>
 @endif
 @if (isset($bodyTopCode)) {!! $bodyTopCode !!} @endif
-
 
 @if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
     && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
@@ -167,8 +166,12 @@
     <div id="isPrint"></div>
 @endif <?php /* end not print */ ?>
 
-@if ((!isset($isFrame) || !$isFrame) && (isset($admMenu) || isset($belowAdmMenu)))
-    
+<?php
+$isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
+?>
+
+@if ((!isset($isFrame) || !$isFrame) && $isDashLayout)
+
     @if ((isset($isPrint) && $isPrint) || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
     
         <br />
@@ -188,8 +191,7 @@
             <div id="leftSideWdth"></div>
             <div id="leftSideWrap">
                 <div id="leftAdmMenu">
-                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
-                        && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
                         <div id="admMenuCustom" class="w100 h100 disBlo">
                             {!! $GLOBALS["SL"]->x["admMenuCustom"] !!}
                         </div>
@@ -201,15 +203,14 @@
                         <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
                             ><i class="fa fa-search" aria-hidden="true"></i></a></div></nobr>
                     </form>
-                    <div class="admMenu row">
+                    <div class="admMenu w100">
                         @if (isset($admMenu)) {!! $admMenu !!} @endif
                     </div>
                     <div id="adminMenuExtra">
                         @yield('belowAdmMenu')
                         @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
                     </div>
-                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
-                        && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
                         </div> <!-- end #admMenuNotCustom -->
                     @endif
                 </div>
@@ -243,7 +244,7 @@
     && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
     
-        @if (!isset($admMenu) && !isset($belowAdmMenu))
+        @if (!$isDashLayout)
             @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!}
             @elseif (isset($GLOBALS["SL"]->sysOpts["footer-master"])
                 && trim($GLOBALS["SL"]->sysOpts["footer-master"]) != '')

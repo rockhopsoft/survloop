@@ -1,16 +1,21 @@
 <?php
+/**
+  * TreeSurvAPI is extends a standard branching tree, for maps of API exports.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
-
 use App\Models\SLNode;
+use SurvLoop\Controllers\TreeCore;
 
-class SurvLoopTreeXML extends CoreTree
+class TreeSurvAPI extends TreeCore
 {
-    
-    public $classExtension = 'SurvLoopTreeXML';
-    
     protected function initExtra(Request $request)
     {
         if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) > 0) {
@@ -85,7 +90,7 @@ class SurvLoopTreeXML extends CoreTree
             "canEditTree" => $this->canEditTree, 
             "treeID"      => $this->treeID, 
             "node"        => $node, 
-            "REQ"         => $this->REQ
+            "REQ"         => $GLOBALS["SL"]->REQ
         ]);
     }
     
@@ -103,7 +108,7 @@ class SurvLoopTreeXML extends CoreTree
                 }
                 return view('vendor.survloop.admin.tree.node-print-core', [
                     "canEditTree"    => $this->canEditTree, 
-                    "REQ"            => $this->REQ, 
+                    "REQ"            => $GLOBALS["SL"]->REQ, 
                     "rootID"         => $this->rootID, 
                     "nID"            => $tierNode[0], 
                     "node"           => $this->allNodes[$tierNode[0]], 

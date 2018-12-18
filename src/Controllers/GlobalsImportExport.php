@@ -1,11 +1,19 @@
 <?php
+/**
+  * GlobalsImportExport is a mid-level class for loading and accessing system information from anywhere.
+  * This level contains processes which are uses during certain import and exports.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use App\Models\User;
 use Storage;
 use Illuminate\Http\Request;
-
 use App\Models\SLDatabases;
 use App\Models\SLTables;
 use App\Models\SLFields;
@@ -15,8 +23,9 @@ use App\Models\SLNode;
 use App\Models\SLConditionsNodes;
 use App\Models\SLZips;
 use App\Models\SLTokens;
+use SurvLoop\Controllers\GlobalsTables;
 
-class CoreGlobalsImportExport extends CoreGlobalsTables
+class GlobalsImportExport extends GlobalsTables
 {
     private $exprtProg = [];
     
@@ -27,7 +36,7 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
-            $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/CoreGlobals.php' . "\n\n";
+            $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/Globals.php' . "\n\n";
             
             $cache .= '$'.'this->allDbs = [];' . "\n";
             $allDbs = SLDatabases::get();
@@ -69,13 +78,16 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
                         ->where('SL_ConditionsNodes.CondNodeNodeID', $this->treeRow->TreeRoot)
                         ->first();
                     if ($chk && isset($chk->CondNodeID)) {
-                        if ($this->treeRow->TreeOpts%3 > 0) {
+                        if ($this->treeRow->TreeOpts%Globals::TREEOPT_ADMIN > 0) {
                             $this->treeRow->TreeOpts *= 3;
                             $this->treeRow->save();
                         }
                     }
                 }
-                if ($this->treeRow->TreeOpts%3 == 0) {
+                if ($this->treeRow->TreeOpts%Globals::TREEOPT_ADMIN == 0
+                    || $this->treeRow->TreeOpts%Globals::TREEOPT_STAFF == 0
+                    || $this->treeRow->TreeOpts%Globals::TREEOPT_PARTNER == 0
+                    || $this->treeRow->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
                     $cache .= '$'.'this->treeIsAdmin = true;' . "\n"
                         . '$'.'this->treeBaseSlug = "/dash/' . $this->treeRow->TreeSlug . '/";' . "\n";
                 } else {
@@ -268,17 +280,21 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
             if ($this->treeRow && isset($this->treeRow->TreeDatabase)) {
                 $searchTrees = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
                     ->where('TreeType', 'Page')
-                    ->where('TreeOpts', '>', 1)
-                    ->orderBy('TreeID', 'desc')
+                    ->whereRaw("TreeOpts%" . Globals::TREEOPT_SEARCH . " = 0")
+                    ->orderBy('TreeID', 'asc')
                     ->get();
                 if ($searchTrees->isNotEmpty()) {
                     foreach ($searchTrees as $tree) {
-                        if ($tree->TreeOpts%31 == 0) {
-                            if ($tree->TreeOpts%3 == 0) $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->TreeSlug;
-                            elseif ($tree->TreeOpts%17 == 0) $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->TreeSlug;
-                            elseif ($tree->TreeOpts%41 == 0) $this->x["srchUrls"]["partner"] = '/dash/' . $tree->TreeSlug;
-                            elseif ($tree->TreeOpts%43 == 0) $this->x["srchUrls"]["staff"] = '/dash/' . $tree->TreeSlug;
-                            else $this->x["srchUrls"]["public"] = '/' . $tree->TreeSlug;
+                        if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0) {
+                            $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->TreeSlug;
+                        } elseif ($tree->TreeOpts%Globals::TREEOPT_STAFF == 0) {
+                            $this->x["srchUrls"]["staff"] = '/dash/' . $tree->TreeSlug;
+                        } elseif ($tree->TreeOpts%Globals::TREEOPT_PARTNER == 0) {
+                            $this->x["srchUrls"]["partner"] = '/dash/' . $tree->TreeSlug;
+                        } elseif ($tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+                            $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->TreeSlug;
+                        } else {
+                            $this->x["srchUrls"]["public"] = '/' . $tree->TreeSlug;
                         }
                     }
                 }
@@ -326,8 +342,8 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
             if (!file_exists($dir)) mkdir($dir);
             $this->exprtProg["fileName"] = $dir . '/' . $filebase . '.csv';
             $this->exprtProg["fileCnt"] = 1;
-            if ($this->REQ->has('export')) {
-                $this->exprtProg["fileCnt"] = $this->REQ->get('export');
+            if ($GLOBALS["SL"]->REQ->has('export')) {
+                $this->exprtProg["fileCnt"] = $GLOBALS["SL"]->REQ->get('export');
                 if ($this->exprtProg["fileCnt"] == 1) $this->exprtProg["tok"]->TokCoreID = 0;
             } elseif (isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
                 && intVal($this->exprtProg["tok"]->TokTreeID) > 0) {
@@ -649,7 +665,7 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
         return $this->getDirSize('../vendor/' . $pkg . '/src/' . $dir, $type);
     }
     
-    public function getJsonSurvLoopStats($pkg = '')
+    public function getJsonSurvStats($pkg = '')
     {
     	$types = $this->loadTreeNodeStatTypes();
     	$stats = [ "Date" => date("Y-m-d"), "IconUrl" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"] ];
@@ -696,5 +712,3 @@ class CoreGlobalsImportExport extends CoreGlobalsTables
     
     
 }
-
-?>

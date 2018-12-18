@@ -1,5 +1,4 @@
 <?php
-
 namespace SurvLoop\Controllers\Auth;
 
 use Auth;
@@ -7,13 +6,10 @@ use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
-
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-
-use SurvLoop\Controllers\CoreGlobals;
+use SurvLoop\Controllers\Globals;
 use SurvLoop\Controllers\SurvLoopController;
-
 use App\Models\User;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
@@ -134,13 +130,15 @@ class AuthController extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) $this->domainPath = $appUrl->DefDescription;
+        if ($appUrl && isset($appUrl->DefDescription)) {
+            $this->domainPath = $appUrl->DefDescription;
+        }
         return $this->domainPath;
     }
     
     public function printPassReset(Request $request)
     {
-        return view('vendor.survloop.auth.passwords.email', []);
+        return view('vendor.survloop.auth.passwords.email');
     }
 
     

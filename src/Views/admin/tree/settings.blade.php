@@ -96,10 +96,10 @@
             <label class="w100 p10 fPerc133"><input type="checkbox" name="opt37" value="37" autocomplete="off" 
                 @if ($GLOBALS['SL']->treeRow->TreeOpts%37 == 0) CHECKED @endif >
                 <span class="mL10">Survey Navigation Menu</span></label>
-            <label class="w100 p10 fPerc133"><input type="checkbox" name="opt23" value="23" autocomplete="off" 
-                @if ($GLOBALS['SL']->treeRow->TreeOpts%23 == 0) CHECKED @endif >
-                <span class="mL10">Wider Page Width</span></label>
         @endif
+        <label class="w100 p10 fPerc133"><input type="checkbox" name="opt2" value="2" autocomplete="off" 
+            @if ($GLOBALS['SL']->treeRow->TreeOpts%2 == 0) CHECKED @endif >
+            <span class="mL10">Skinny Page Width</span></label>
         
     </div>
 </div>

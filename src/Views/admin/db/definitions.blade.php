@@ -1,7 +1,5 @@
 <!-- resources/views/vendor/survloop/admin/db/definitions.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
 @if ($dbAllowEdits)

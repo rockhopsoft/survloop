@@ -1,13 +1,20 @@
 <?php
+/**
+  * SurvLoopInstaller initiallizes a basic SurvLoop installation, after command line installation is complete.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Illuminate\Routing\Controller;
-
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLDefinitions;
-
+use SurvLoop\Controllers\Globals;
 use SurvLoop\Controllers\SystemDefinitions;
 
 class SurvLoopInstaller extends Controller
@@ -17,35 +24,65 @@ class SurvLoopInstaller extends Controller
     {
         $chkSysDef = new SystemDefinitions;
         $chkSysDef->checkDefInstalls();
-        
-        // CONVERT THIS AND OTHER PRIME SPOTS TO ->whereRaw(
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
-            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Home', 7);
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
-            . "AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard', (7*3));
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
-            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer', (7*17));
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
-            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 = 0 AND `TreeOpts`%43 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Partner', (7*41));
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' AND `TreeOpts`%7 = 0 "
-            . "AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0 AND `TreeOpts`%43 = 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Staff', (7*43));
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Search', 31);
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 = 0 AND `TreeOpts`%17 > 0 AND `TreeOpts`%41 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Dashboard Search', (31*3), 'search');
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%31 = 0 AND `TreeOpts`%3 > 0 AND `TreeOpts`%17 = 0 AND `TreeOpts`%41 > 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageSimpl('Volunteer Search', (31*17), 'volun-search');
-        $chk = DB::select( DB::raw( "SELECT * FROM `SL_Tree` WHERE `TreeType` LIKE 'Page' "
-            . "AND `TreeOpts`%23 = 0" ) );
-        if (!$chk || sizeof($chk) == 0) $this->installPageMyProfile();
+        foreach ([ Globals::TREEOPT_HOMEPAGE, Globals::TREEOPT_SEARCH ] as $keyOptType) {
+            $typeName = (($keyOptType == Globals::TREEOPT_HOMEPAGE) ? 'Dashboard' : 'Search');
+            $chk = SLTree::where('TreeType', 'Page')
+                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
+                ->first();
+            if (!$chk || !isset($chk->TreeID)) {
+                $this->installPageSimpl('Home', $keyOptType);
+            }
+            $chk = SLTree::where('TreeType', 'Page')
+                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
+                ->first();
+            if (!$chk || !isset($chk->TreeID)) {
+                $this->installPageSimpl($typeName, ($keyOptType*Globals::TREEOPT_ADMIN));
+            }
+            $chk = SLTree::where('TreeType', 'Page')
+                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
+                ->first();
+            if (!$chk || !isset($chk->TreeID)) {
+                $this->installPageSimpl('Staff ' . $typeName, ($keyOptType*Globals::TREEOPT_STAFF));
+            }
+            $chk = SLTree::where('TreeType', 'Page')
+                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
+                ->first();
+            if (!$chk || !isset($chk->TreeID)) {
+                $this->installPageSimpl('Partner ' . $typeName, ($keyOptType*Globals::TREEOPT_PARTNER));
+            }
+            $chk = SLTree::where('TreeType', 'Page')
+                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
+                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " = 0")
+                ->first();
+            if (!$chk || !isset($chk->TreeID)) {
+                $this->installPageSimpl('Volunteer ' . $typeName, ($keyOptType*Globals::TREEOPT_VOLUNTEER));
+            }
+        }
+        $chk = SLTree::where('TreeType', 'Page')
+            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PROFILE  . " = 0")
+            ->first();
+        if (!$chk || !isset($chk->TreeID)) {
+            $this->installPageMyProfile();
+        }
         return true;
     }
     

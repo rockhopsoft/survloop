@@ -1,11 +1,19 @@
 <?php
+/**
+  * AdminTreeController is the admin class responsible for the tools to edit SurvLoop's tree designs.
+  * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
 use Storage;
 use Illuminate\Http\Request;
-
 use App\Models\SLDatabases;
 use App\Models\SLTables;
 use App\Models\SLFields;
@@ -22,11 +30,11 @@ use App\Models\SLUsersRoles;
 use App\Models\SLSess;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
-
-use SurvLoop\Controllers\SurvLoopTreeAdmin;
-use SurvLoop\Controllers\SurvLoopTreeXML;
+use SurvLoop\Controllers\TreeSurvAdmin;
+use SurvLoop\Controllers\TreeSurvAPI;
 use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\SurvLoopNode;
+use SurvLoop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\AdminController;
 
 class AdminTreeController extends AdminController
 {
@@ -39,11 +47,11 @@ class AdminTreeController extends AdminController
         $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) ? session()->get('adminOverOpts') : '');
         if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/tree';
         
-        if (!isset($this->v["treeClassAdmin"])) $this->v["treeClassAdmin"] = new SurvLoopTreeAdmin($this->REQ);
-        $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $this->REQ);
+        if (!isset($this->v["treeClassAdmin"])) $this->v["treeClassAdmin"] = new TreeSurvAdmin($request);
+        $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $request);
         $this->initExtraCust();
         
-        if (!session()->has('chkCoreTbls') || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('chkCoreTbls') || $request->has('refresh')) {
             $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
             $trees = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
                 ->where('TreeCoreTable', '>', 0)
@@ -151,7 +159,8 @@ class AdminTreeController extends AdminController
     
     public function index(Request $request, $treeID = -3)
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/map?all=1&alt=1');
         if (!$this->checkCache()) {
             $this->chkAllCoreTbls();
@@ -177,7 +186,7 @@ class AdminTreeController extends AdminController
                 if ($t->TreeOpts%3 > 0) { // no admin trees made public [for now]
                     $this->treeID = $t->TreeID;
                     $this->dbID = $t->TreeDatabase;
-                    $GLOBALS["SL"] = new CoreGlobals($request, $this->dbID, $this->treeID, $this->treeID);
+                    $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -203,7 +212,7 @@ class AdminTreeController extends AdminController
         if (!$tree || !isset($tree->TreeName)) return $this->redir('/dashboard/pages/list');
         $this->treeID = $treeID;
         $this->dbID = $tree->TreeDatabase;
-        $GLOBALS["SL"] = new CoreGlobals($request, $this->dbID, $this->treeID, $this->treeID);
+        $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
         $this->admControlInit($request, '/dashboard/pages/list');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
@@ -354,7 +363,8 @@ class AdminTreeController extends AdminController
     
     public function treeSettings(Request $request, $treeID = -3)
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/map?all=1&alt=1');
         if ($request->has('sub') && $request->has('TreeName') && trim($request->get('TreeName')) != '') {
             $GLOBALS["SL"]->treeRow->TreeName      = trim($request->get('TreeName'));
@@ -398,7 +408,8 @@ class AdminTreeController extends AdminController
     
     public function data(Request $request, $treeID = -3)
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/data');
         if ($request->has('dataStruct')) {
             if ($request->has('delSub') && intVal($request->input('delSub')) > 0) {
@@ -475,7 +486,8 @@ class AdminTreeController extends AdminController
     
     public function treeStats(Request $request, $treeID = -3) 
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/stats?all=1');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTreeStats($request);
@@ -485,24 +497,26 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
 
-    public function treeSessions(Request $request, $treeID = -3, $refresh = false) 
+    public function treeSessions(Request $request, $treeID = 1, $refresh = false) 
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/sessions');
         if (!$this->checkCache() || $refresh) {
-            $this->CustReport->loadTree($this->treeID, $request);
+            $this->loadCustLoop($request, $treeID);
+            $this->custReport->loadTree($treeID, $request);
             $this->sysDef = new SystemDefinitions;
             $this->v["css"] = $this->sysDef->loadCss();
             
             // clear empties here
             $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-2, date("Y"));
             eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::"
-                . $this->CustReport->treeSessionsWhereExtra()
+                . $this->custReport->treeSessionsWhereExtra()
                 . "where('updated_at', '<', '" . date("Y-m-d H:i:s", $this->v["dayold"]) 
                 . "')->get();");
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $row) {
-                    if ($this->CustReport->chkCoreRecEmpty($row->getKey(), $row)) {
+                    if ($this->custReport->chkCoreRecEmpty($row->getKey(), $row)) {
                         $row->delete();
                         //eval("\$del = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
                         //    . $row->getKey() . ")->delete();");
@@ -516,11 +530,11 @@ class AdminTreeController extends AdminController
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $n) {
-                    $tmp = new SurvLoopNode($n->NodeID, $n);
+                    $tmp = new TreeNodeSurv($n->NodeID, $n);
                     $tmp->fillNodeRow();
                     $this->v["nodeTots"][$n->NodeID] = [
                         "cmpl" => [ 0, 0 ],
-                        "perc" => intVal($this->CustReport->rawOrderPercent($n->NodeID)),
+                        "perc" => intVal($this->custReport->rawOrderPercent($n->NodeID)),
                         "name" => ((isset($tmp->extraOpts["meta-title"]) && trim($tmp->extraOpts["meta-title"]) != '')
                             ? $tmp->extraOpts["meta-title"] : $n->NodePromptNotes)
                         ];
@@ -528,7 +542,7 @@ class AdminTreeController extends AdminController
                 }
             }
             ksort($this->v["nodeSort"], 1); // SORT_NUMERIC
-            $this->v["allPublicCoreIDs"] = $this->CustReport->getAllPublicCoreIDs();
+            $this->v["allPublicCoreIDs"] = $this->custReport->getAllPublicCoreIDs();
             
             $this->v["last100ids"] = DB::table('SL_NodeSavesPage')
                 ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', '=', 'SL_Sess.SessID')
@@ -631,19 +645,25 @@ class AdminTreeController extends AdminController
     
     protected function analyzeCoreSessions($coreID = -3)
     {
-        if ($coreID <= 0) $coreID = $this->coreID;
-        if (!is_dir('../storage/app/anlyz')) mkdir('../storage/app/anlyz');
-        if (!is_dir('../storage/app/anlyz/t' . $this->CustReport->treeID)) {
-            mkdir('../storage/app/anlyz/t' . $this->CustReport->treeID);
+        if ($coreID <= 0) {
+            $coreID = $this->coreID;
+        }
+        if (!is_dir('../storage/app/anlyz')) {
+            mkdir('../storage/app/anlyz');
+        }
+        if (!is_dir('../storage/app/anlyz/t' . $this->custReport->treeID)) {
+            mkdir('../storage/app/anlyz/t' . $this->custReport->treeID);
         }
         $coreTots = [ "core" => $coreID, "node" => -3, "date" => 0, "dur" => 0, "mobl" => false, "cmpl" => false, 
             "log" => [] ];
         eval("\$coreRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" . intVal($coreID) . ");");
         if (!$coreRec || !isset($coreRec->updated_at)) return $coreTots;
-        $cacheFile = '../storage/app/anlyz/t' . $this->CustReport->treeID . '/c' . $coreID . '.php';
+        $cacheFile = '../storage/app/anlyz/t' . $this->custReport->treeID . '/c' . $coreID . '.php';
         if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (in_array($coreID, $this->v["allPublicCoreIDs"])) $coreTots["cmpl"] = true;
+            if (in_array($coreID, $this->v["allPublicCoreIDs"])) {
+                $coreTots["cmpl"] = true;
+            }
             $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
             if (isset($coreRec->{ $coreAbbr . 'SubmissionProgress' })) {
                 $coreTots["node"] = $coreRec->{ $coreAbbr . 'SubmissionProgress' };
@@ -655,7 +675,7 @@ class AdminTreeController extends AdminController
             $coreLog = '';
             $pages = DB::table('SL_NodeSavesPage')
                 ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', '=', 'SL_Sess.SessID')
-                ->where('SL_Sess.SessTree', '=', $this->CustReport->treeID)
+                ->where('SL_Sess.SessTree', '=', $this->custReport->treeID)
                 ->where('SL_Sess.SessCoreID', '=', $coreID)
                 ->orderBy('SL_NodeSavesPage.created_at', 'asc')
                 ->select('SL_NodeSavesPage.PageSaveNode', 'SL_NodeSavesPage.created_at')
@@ -678,8 +698,12 @@ class AdminTreeController extends AdminController
                     }
                 }
                 $coreTots["dur"] = $coreTots["dur"]-$durMinus;
-                if ($coreTots["dur"] < 0) $coreTots["dur"] = 0;
-                if (trim($coreLog) != '') $coreLog = substr($coreLog, 1);
+                if ($coreTots["dur"] < 0) {
+                    $coreTots["dur"] = 0;
+                }
+                if (trim($coreLog) != '') {
+                    $coreLog = substr($coreLog, 1);
+                }
             }
             $cacheCode = '$'.'coreTots = [ "core" => ' . $coreID . ', "node" => ' . $coreTots["node"] 
                 . ', "date" => ' . ((trim($coreTots["date"]) != '') ? $coreTots["date"] : 0) 
@@ -732,7 +756,7 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
-        $this->CustReport->addCondEditorAjax();
+        $this->custReport->addCondEditorAjax();
         return view('vendor.survloop.admin.tree.conditions', $this->v);
     }
     
@@ -810,10 +834,11 @@ class AdminTreeController extends AdminController
     
     public function xmlmap(Request $request, $treeID = -3)
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new SurvLoopTreeXML;
+        $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
         $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", function() {
@@ -823,10 +848,11 @@ class AdminTreeController extends AdminController
     
     public function xmlNodeEdit(Request $request, $treeID = -3, $nID = -3)
     {
-        $this->syncDataTrees($request, -3, $treeID);
+        $this->initLoader();
+        $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new SurvLoopTreeXML;
+        $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
         return view('vendor.survloop.master', $this->v);
@@ -857,7 +883,7 @@ class AdminTreeController extends AdminController
         $db->DbDesc    = trim($request->DbDesc);
         $db->DbMission = trim($request->DbMission);
         $db->save();
-        $GLOBALS["SL"] = new CoreGlobals($request, $db->dbID, -3);
+        $GLOBALS["SL"] = new Globals($request, $db->dbID, -3);
         return $db;
     }
     
@@ -978,7 +1004,7 @@ class AdminTreeController extends AdminController
         
         $this->installNewCoreTable($coreTbl);
         
-        $GLOBALS["SL"] = new CoreGlobals($request, $GLOBALS["SL"]->dbID, $tree->TreeID);
+        $GLOBALS["SL"] = new Globals($request, $GLOBALS["SL"]->dbID, $tree->TreeID);
         return true;
     }
     

@@ -1,8 +1,15 @@
 <?php
+/**
+  * SystemDefinitions loads and manages key SurvLoop system variables.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\SLDefinitions;
 
 class SystemDefinitions
@@ -20,7 +27,9 @@ class SystemDefinitions
     
     public function loadCss($dbID = 1)
     {
-        if ($dbID <= 0) $dbID = $this->dbID;
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         $this->v["css"] = [];
         $cssRaw = SLDefinitions::where('DefDatabase', $dbID)
             ->where('DefSet', 'Style Settings')
@@ -34,7 +43,9 @@ class SystemDefinitions
                 ->get();
         }
         if ($cssRaw->isNotEmpty()) {
-            foreach ($cssRaw as $i => $c) $this->v["css"][$c->DefSubset] = $c->DefDescription;
+            foreach ($cssRaw as $i => $c) {
+                $this->v["css"][$c->DefSubset] = $c->DefDescription;
+            }
         }
         return $this->checkStyleDefs($this->v["css"]);
     }
@@ -54,7 +65,6 @@ class SystemDefinitions
         if ($dbID <= 0) $dbID = $this->dbID;
         $this->v["settingsList"] = $this->getDefaultSys();
         $this->v["stylesList"] = $this->getDefaultStyles();
-//echo '<pre>'; print_r($this->v); echo '</pre>';
         if (!session()->has('chkSysVars') || $request->has('refresh')) {
             $this->checkSysDefs();
             $this->checkStyleDefs();

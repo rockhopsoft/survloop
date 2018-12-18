@@ -1,4 +1,13 @@
 <?php
+/**
+  * AdminDBController is the admin class responsible for the tools to edit SurvLoop's database design.
+  * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use DB;
@@ -15,8 +24,8 @@ use App\Models\SLBusRules;
 use App\Models\SLLogActions;
 use App\Models\SLDatabases;
 
-use SurvLoop\Controllers\SurvLoopData;
-use SurvLoop\Controllers\CoreGlobals;
+use SurvLoop\Controllers\SurvData;
+use SurvLoop\Controllers\Globals;
 use SurvLoop\Controllers\AdminController;
 
 class AdminDBController extends AdminController
@@ -286,7 +295,7 @@ class AdminDBController extends AdminController
                             }
                         }
                     }
-                    $GLOBALS["SL"] = new CoreGlobals($request, $this->dbID, $this->treeID, $this->treeID);
+                    $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
                 }
             }
         }
@@ -294,7 +303,6 @@ class AdminDBController extends AdminController
         $this->v["content"] = view('vendor.survloop.print-header-legal', [])->render() . '<div class="pL20"><h2>' 
             . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specs</h2></div><div class="p20">' 
             . $this->full($request, true) . '</div>';
-        //echo 'adminPrintFullDBPublic(' . $dbPrefix . '<pre>'; print_r($db); echo '</pre>'; exit;
         $this->v["isPrint"] = true;
         return view('vendor.survloop.master', $this->v);
     }
@@ -311,7 +319,6 @@ class AdminDBController extends AdminController
         $this->v["tbl"] = SLTables::where('TblName', $tblName)
             ->where('TblDatabase', $this->dbID)
             ->first();
-//echo '<pre>'; print_r($GLOBALS["SL"]->fldTypes[$tblName]); echo '</pre>';
         if (trim($tblName) == '' || !$this->v["tbl"]) {
             return $this->index($GLOBALS["SL"]->REQ);
         }
@@ -1359,7 +1366,7 @@ class AdminDBController extends AdminController
     public function getSetFldVals(Request $request, $fldID = '')
     {
         $this->admControlInit($request);
-        $sessData = new SurvLoopData;
+        $sessData = new SurvData;
         return view('vendor.survloop.admin.db.inc-getTblsFldVals', [ 
             "fldID"  => $fldID,
             "values" => $GLOBALS["SL"]->getFldResponsesByID($fldID)

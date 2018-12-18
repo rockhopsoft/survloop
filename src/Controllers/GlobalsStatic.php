@@ -1,12 +1,20 @@
 <?php
+/**
+  * GlobalsStatic is the bottom-level core class for loading and accessing system information from anywhere.
+  * This level contains mostly standalone functions which are not SurvLoop-specific.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\File\File;
 
-/* Largely Utilities */
-class CoreStatic
+class GlobalsStatic
 {
     public $uID         = -3;
     public $REQ         = [];
@@ -33,8 +41,12 @@ class CoreStatic
             if (strpos($str, $delim) === false) {
                 $ret[] = $str;
             } else {
-                if (substr($str, 0, 1) == $delim) $str = substr($str, 1);
-                if (substr($str, strlen($str)-1) == $delim) $str = substr($str, 0, strlen($str)-1);
+                if (substr($str, 0, 1) == $delim) {
+                    $str = substr($str, 1);
+                }
+                if (substr($str, strlen($str)-1) == $delim) {
+                    $str = substr($str, 0, strlen($str)-1);
+                }
                 $ret = explode($delim, $str);
             }
         }

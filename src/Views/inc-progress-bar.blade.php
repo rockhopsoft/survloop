@@ -77,11 +77,13 @@
                 ><i class="fa fa-caret-right f16" aria-hidden="true"></i></a>
             <a id="navMobBurger2" class="disNon mR5" href="javascript:;"
                 ><i class="fa fa-caret-down f16" aria-hidden="true"></i></a>
+        @if (isset($majorSections[$currMajorSection]))
             <b>{{ $majorSections[$currMajorSection][1] }}</b>
             @if (sizeof($minorSections[$currMajorSection]) > 0 
                 && isset($minorSections[$currMajorSection][$currMinorSection]))
                 : {{ $minorSections[$currMajorSection][$currMinorSection][1] }}
             @endif
+        @endif
         </div>
         <div class="brdBotBluL">
             <div class="brdBotBluL3" style="width: {{ $rawPerc }}%;"> </div>

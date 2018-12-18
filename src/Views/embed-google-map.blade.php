@@ -4,7 +4,7 @@
         <div id="map{{ $nID }}" class="embedMapA"></div>
     </div><div class="col-lg-4">
         <div id="map{{ $nID }}ajax" class="embedMapDescA">
-            <h3>Click a point on the map for more details.</h3>
+        @if ($docDesc) {!! $docDesc !!} @else <h3>Click a point on the map for more details.</h3> @endif
         </div>
     </div>
 </div>
