@@ -27,7 +27,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/delSess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@delSess');
     Route::get( '/cpySess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@cpySess');
     
-    Route::get('/{abbr}/uploads/{file}', 'SurvLoop\\Controllers\\SurvLoop@getUploadFile');
+    Route::get( '/{abbr}/uploads/{file}', 'SurvLoop\\Controllers\\SurvLoop@getUploadFile');
     
     // main survey process for primary database, primary tree
     Route::post('/u/{nodeSlug}', 'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
@@ -42,6 +42,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
+    Route::get( '/defer/{treeID}/{nodeID}',  'SurvLoop\\Controllers\\SurvLoop@deferNode');
     Route::get( '/up/{treeSlug}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
     
     Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
@@ -101,53 +102,74 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
     
-    Route::get('/sys.css', function() {
+    Route::get( '/sys.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/sys.min.css', function() {
+    Route::get( '/sys.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/sys1.min.css', function() {
+    Route::get( '/sys1.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/sys2.min.css', function() {
+    Route::get( '/sys2.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/sys-all.min.css', function() {
+    Route::get( '/sys-all.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/sys.js', function() {
+    Route::get( '/sys.js', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/sys.min.js', function() {
+    Route::get( '/sys.min.js', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/sys-all.min.js', function() {
+    Route::get( '/sys-all.min.js', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/tree-{treeID}.js', function($treeID) {
+    Route::get( '/tree-{treeID}.js', function($treeID) {
         $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
     
-    Route::get('/gen-kml/{kmlfile}.kml', function($kmlfile) {
+    Route::get( '/dyna-{file}.css', function($file) {
+        $response = null;
+        if (session()->has('slSessID') && strpos($file, '-s' . session()->get('slSessID') . '-') !== false) {
+            $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.css'));
+        } else {
+            $response = Response::make('/* */');
+        }
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
+    Route::get( '/dyna-{file}.js', function($file) {
+        $response = null;
+        if (session()->has('slSessID') && strpos($file, '-s' . session()->get('slSessID') . '-') !== false) {
+            $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.js'));
+        } else {
+            $response = Response::make('/* */');
+        }
+        $response->header('Content-Type', 'application/javascript');
+        return $response;
+    });
+    
+    Route::get( '/gen-kml/{kmlfile}.kml', function($kmlfile) {
         if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
             $response = Response::make(file_get_contents('../storage/app/gen-kml/' . $kmlfile . '.kml'));
             $response->header('Content-Type', 'text/xml');
@@ -156,61 +178,61 @@ Route::group(['middleware' => ['web']], function () {
     });
     
     
-    Route::get('/jquery.min.js', function() {
+    Route::get( '/jquery.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/components/jquery/jquery.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/jquery-ui.min.js', function() {
+    Route::get( '/jquery-ui.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/components/jqueryui/jquery-ui.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/jquery-ui.min.css', function() {
+    Route::get( '/jquery-ui.min.css', function() {
         $response = Response::make(file_get_contents('../vendor/components/jqueryui/themes/base/jquery-ui.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
     
-    Route::get('/bootstrap.min.js', function() {
+    Route::get( '/bootstrap.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/js/bootstrap.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/bootstrap.min.css', function() {
+    Route::get( '/bootstrap.min.css', function() {
         $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/css/bootstrap.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
     
-    Route::get('/css/fork-awesome.min.css', function() {
+    Route::get( '/css/fork-awesome.min.css', function() {
         $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get('/fonts/{file}', function($file) {
+    Route::get( '/fonts/{file}', function($file) {
         $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/fonts/' . $file));
         //$response->header('Content-Type', 'text/css');
         return $response;
     });
     
-    Route::get('/summernote.min.js', function() {
+    Route::get( '/summernote.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/summernote.css', function() {
+    Route::get( '/summernote.css', function() {
         $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
     
-    Route::get('/Chart.bundle.min.js', function() {
+    Route::get( '/Chart.bundle.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/nnnick/chartjs/dist/Chart.bundle.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get('/plotly.min.js', function() {
+    Route::get( '/plotly.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/plotly/plotly.js/dist/plotly.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
@@ -221,17 +243,17 @@ Route::group(['middleware' => ['web']], function () {
     ///////////////////////////////////////////////////////////
     
     
-    Route::get('/admin', [
+    Route::get( '/admin', [
         'uses'       => 'SurvLoop\\Controllers\\AdminController@loadPageDashboard', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dash', [
+    Route::get( '/dash', [
         'uses'       => 'SurvLoop\\Controllers\\AdminController@loadPageDashboard', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard', [
+    Route::get( '/dashboard', [
         'uses'       => 'SurvLoop\\Controllers\\AdminController@loadPageDashboard', 
         'middleware' => ['auth']
     ]);
@@ -266,11 +288,11 @@ Route::group(['middleware' => ['web']], function () {
     
     ///////////////////////////////////////////////////////////
     
-    Route::get('/dashboard/logs', [
+    Route::get( '/dashboard/logs', [
         'uses'       => 'SurvLoop\Controllers\AdminController@logsOverview', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dashboard/logs/session-stuff', [
+    Route::get( '/dashboard/logs/session-stuff', [
         'uses'       => 'SurvLoop\Controllers\AdminController@logsSessions', 
         'middleware' => ['auth']
     ]);
@@ -284,22 +306,22 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs', [
+    Route::get( '/dashboard/subs', [
         'uses'       => 'SurvLoop\Controllers\AdminController@listSubsAll',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs/all', [
+    Route::get( '/dashboard/subs/all', [
         'uses'       => 'SurvLoop\Controllers\AdminController@listSubsAll',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs/unpublished', [
+    Route::get( '/dashboard/subs/unpublished', [
         'uses'       => 'SurvLoop\Controllers\AdminController@listUnpublished',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/subs/incomplete', [
+    Route::get( '/dashboard/subs/incomplete', [
         'uses'       => 'SurvLoop\Controllers\AdminController@listSubsIncomplete',    
         'middleware' => ['auth']
     ]);
@@ -308,13 +330,13 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@printSubView',    
         'middleware' => ['auth']
     ]);
-    Route::get('/dashboard/subs/{treeID}/{cid}', [
+    Route::get( '/dashboard/subs/{treeID}/{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@printSubView',    
         'middleware' => ['auth']
     ]);
     
     
-    Route::get('/dashboard/contact', [
+    Route::get( '/dashboard/contact', [
         'uses'       => 'SurvLoop\Controllers\AdminController@manageContact', 
         'middleware' => ['auth']
     ]);
@@ -324,7 +346,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/emails', [
+    Route::get( '/dashboard/emails', [
         'uses'       => 'SurvLoop\Controllers\AdminController@manageEmails', 
         'middleware' => ['auth']
     ]);
@@ -334,7 +356,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/email/{emailID}', [
+    Route::get( '/dashboard/email/{emailID}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@manageEmailsForm', 
         'middleware' => ['auth']
     ]);
@@ -344,7 +366,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/pages/snippets/{blurbID}', [
+    Route::get( '/dashboard/pages/snippets/{blurbID}', [
         'uses' => 'SurvLoop\Controllers\AdminController@blurbEdit', 
         'middleware' => ['auth']
     ]);
@@ -359,7 +381,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/users', [
+    Route::get( '/dashboard/users', [
         'uses' => 'SurvLoop\Controllers\AdminController@userManage', 
         'middleware' => ['auth']
     ]);
@@ -373,7 +395,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/settings', [
+    Route::get( '/dashboard/settings', [
         'uses'       => 'SurvLoop\Controllers\AdminController@sysSettings',
         'middleware' => ['auth']
     ]);
@@ -383,7 +405,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/settings-raw', [
+    Route::get( '/dashboard/settings-raw', [
         'uses'       => 'SurvLoop\Controllers\AdminController@sysSettingsRaw',
         'middleware' => ['auth']
     ]);
@@ -391,14 +413,14 @@ Route::group(['middleware' => ['web']], function () {
     
     
     
-    Route::get('/tree/{treeSlug}', 'SurvLoop\Controllers\AdminTreeController@adminPrintFullTreePublic');
+    Route::get( '/tree/{treeSlug}', 'SurvLoop\Controllers\AdminTreeController@adminPrintFullTreePublic');
     
     Route::post('/dashboard/surveys/list', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surveys/list', [
+    Route::get( '/dashboard/surveys/list', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treesList',
         'middleware' => ['auth']
     ]);
@@ -408,7 +430,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/settings', [
+    Route::get( '/dashboard/surv-{treeID}/settings', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSettings', 
         'middleware' => ['auth']
     ]);
@@ -418,27 +440,27 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/map', [
+    Route::get( '/dashboard/surv-{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@index', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/sessions', [
+    Route::get( '/dashboard/surv-{treeID}/sessions', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessions',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/sessions/graph-daily', [
+    Route::get( '/dashboard/surv-{treeID}/sessions/graph-daily', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessGraphDaily',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/sessions/graph-durations', [
+    Route::get( '/dashboard/surv-{treeID}/sessions/graph-durations', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessGraphDurations',    
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/stats', [
+    Route::get( '/dashboard/surv-{treeID}/stats', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeStats', 
         'middleware' => ['auth']
     ]);
@@ -448,7 +470,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/data', [
+    Route::get( '/dashboard/surv-{treeID}/data', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@data', 
         'middleware' => ['auth']
     ]);
@@ -458,7 +480,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/map/node/{nID}', [
+    Route::get( '/dashboard/surv-{treeID}/map/node/{nID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@nodeEdit', 
         'middleware' => ['auth']
     ]);
@@ -468,12 +490,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/{treeSlug}-xmlmap', [
+    Route::get( '/dashboard/surv-{treeID}/{treeSlug}-xmlmap', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlmapInner', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/xmlmap', [
+    Route::get( '/dashboard/surv-{treeID}/xmlmap', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlmap', 
         'middleware' => ['auth']
     ]);
@@ -483,17 +505,17 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surv-{treeID}/xmlmap/node/{nodeIN}', [
+    Route::get( '/dashboard/surv-{treeID}/xmlmap/node/{nodeIN}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@xmlNodeEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surveys/switch/{treeID}', [
+    Route::get( '/dashboard/surveys/switch/{treeID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@switchTreeAdmin', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surveys/switch', [
+    Route::get( '/dashboard/surveys/switch', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@switchTreeAdmin', 
         'middleware' => ['auth']
     ]);
@@ -503,12 +525,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/surveys/new', [
+    Route::get( '/dashboard/surveys/new', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@newTree', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/pages/list/add-{addPageType}', [
+    Route::get( '/dashboard/pages/list/add-{addPageType}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@autoAddPages', 
         'middleware' => ['auth']
     ]);
@@ -518,7 +540,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/pages/list', [
+    Route::get( '/dashboard/pages/list', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@pagesList', 
         'middleware' => ['auth']
     ]);
@@ -528,7 +550,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/page/{treeID}', [
+    Route::get( '/dashboard/page/{treeID}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@indexPage', 
         'middleware' => ['auth']
     ]);
@@ -538,7 +560,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/page/{treeID}/map', [
+    Route::get( '/dashboard/page/{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@indexPage', 
         'middleware' => ['auth']
     ]);
@@ -548,7 +570,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/pages/snippets', [
+    Route::get( '/dashboard/pages/snippets', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@blurbsList', 
         'middleware' => ['auth']
     ]);
@@ -558,7 +580,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/pages/menus', [
+    Route::get( '/dashboard/pages/menus', [
         'uses'       => 'SurvLoop\Controllers\AdminController@navMenus', 
         'middleware' => ['auth']
     ]);
@@ -568,7 +590,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/images/gallery', [
+    Route::get( '/dashboard/images/gallery', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@imgGallery', 
         'middleware' => ['auth']
     ]);
@@ -579,19 +601,19 @@ Route::group(['middleware' => ['web']], function () {
     ///////////////////////////////////////////////////////////
     
     
-    Route::get('/db/{database}', 'SurvLoop\Controllers\AdminDBController@adminPrintFullDBPublic');
+    Route::get( '/db/{database}', 'SurvLoop\Controllers\AdminDBController@adminPrintFullDBPublic');
     
-    Route::get('/dashboard/db', [
+    Route::get( '/dashboard/db', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@index', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/all', [
+    Route::get( '/dashboard/db/all', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@full', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/field-matrix', [
+    Route::get( '/dashboard/db/field-matrix', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldMatrix', 
         'middleware' => ['auth']
     ]);
@@ -601,12 +623,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/addTable', [
+    Route::get( '/dashboard/db/addTable', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@addTable', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/sortTable', [
+    Route::get( '/dashboard/db/sortTable', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@tblSort', 
         'middleware' => ['auth']
     ]);
@@ -616,17 +638,17 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/table/{tblName}/edit', [
+    Route::get( '/dashboard/db/table/{tblName}/edit', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@editTable', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/table/{tblName}/sort', [
+    Route::get( '/dashboard/db/table/{tblName}/sort', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fldSort', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/table/{tblName}', [
+    Route::get( '/dashboard/db/table/{tblName}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@viewTable', 
         'middleware' => ['auth']
     ]);
@@ -636,7 +658,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/field/{tblAbbr}/{FldName}', [
+    Route::get( '/dashboard/db/field/{tblAbbr}/{FldName}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@editField', 
         'middleware' => ['auth']
     ]);
@@ -646,12 +668,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/field/{tblAbbr}', [
+    Route::get( '/dashboard/db/field/{tblAbbr}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@addTableFld', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/ajax-field/{FldID}', [
+    Route::get( '/dashboard/db/ajax-field/{FldID}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldAjax', 
         'middleware' => ['auth']
     ]);
@@ -665,19 +687,19 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/ajax/tblFldSelT/{rT}', [
+    Route::get( '/dashboard/db/ajax/tblFldSelT/{rT}', [
         'uses' => 'SurvLoop\Controllers\AdminDBController@tblSelector'
     ]);
     
-    Route::get('/dashboard/db/ajax/tblFldSelF/{rF}', [
+    Route::get( '/dashboard/db/ajax/tblFldSelF/{rF}', [
         'uses' => 'SurvLoop\Controllers\AdminDBController@fldSelector'
     ]);
     
-    Route::get('/dashboard/db/ajax/getSetFlds/{rSet}', [
+    Route::get( '/dashboard/db/ajax/getSetFlds/{rSet}', [
         'uses' => 'SurvLoop\Controllers\AdminDBController@getSetFlds'
     ]);
     
-    Route::get('/dashboard/db/ajax/getSetFldVals/{FldID}', [
+    Route::get( '/dashboard/db/ajax/getSetFldVals/{FldID}', [
         'uses' => 'SurvLoop\Controllers\AdminDBController@getSetFldVals'
     ]);
     
@@ -686,27 +708,27 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/fieldXML', [
+    Route::get( '/dashboard/db/fieldXML', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@fieldXML', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/definitions', [
+    Route::get( '/dashboard/db/definitions', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@definitions', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/definitions/add/{subset}', [
+    Route::get( '/dashboard/db/definitions/add/{subset}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defAdd', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/definitions/add', [
+    Route::get( '/dashboard/db/definitions/add', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defAdd', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/definitions/edit/{defID}', [
+    Route::get( '/dashboard/db/definitions/edit/{defID}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defEdit', 
         'middleware' => ['auth']
     ]);
@@ -726,12 +748,12 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/definitions/sort/{subset}', [
+    Route::get( '/dashboard/db/definitions/sort/{subset}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@defSort', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/bus-rules', [
+    Route::get( '/dashboard/db/bus-rules', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@businessRules', 
         'middleware' => ['auth']
     ]);
@@ -741,7 +763,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/bus-rules/add', [
+    Route::get( '/dashboard/db/bus-rules/add', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@ruleAdd', 
         'middleware' => ['auth']
     ]);
@@ -751,22 +773,22 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/bus-rules/edit/{ruleID}',    [
+    Route::get( '/dashboard/db/bus-rules/edit/{ruleID}',    [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@ruleEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/diagrams', [
+    Route::get( '/dashboard/db/diagrams', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@diagrams', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/network-map', [
+    Route::get( '/dashboard/db/network-map', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@networkMap', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/workflows', [
+    Route::get( '/dashboard/db/workflows', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@workflows', 
         'middleware' => ['auth']
     ]);
@@ -776,7 +798,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/conds', [
+    Route::get( '/dashboard/db/conds', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@conditions', 
         'middleware' => ['auth']
     ]);
@@ -786,22 +808,22 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/conds/edit/{cid}', [
+    Route::get( '/dashboard/db/conds/edit/{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@condEdit', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/export', [
+    Route::get( '/dashboard/db/export', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@printExport', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/export/laravel', [
+    Route::get( '/dashboard/db/export/laravel', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@printExportLaravel', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/export/laravel/table-model/{tbl}', [
+    Route::get( '/dashboard/db/export/laravel/table-model/{tbl}', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@refreshTableModel', 
         'middleware' => ['auth']
     ]);
@@ -811,22 +833,22 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/install', [
+    Route::get( '/dashboard/db/install', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@autoInstallDatabase', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/export/dump', [
+    Route::get( '/dashboard/db/export/dump', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@exportDump', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/sl/export', [
+    Route::get( '/dashboard/sl/export', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@printExportPackage', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/sl/export/laravel', [
+    Route::get( '/dashboard/sl/export/laravel', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@printExportPackageLaravel', 
         'middleware' => ['auth']
     ]);
@@ -836,17 +858,17 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/db/db', [
+    Route::get( '/dashboard/db/db/db', [
         'uses'       => 'SurvLoop\Controllers\AdminDatabaseInstall@manualMySql', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/switch/{dbID}', [
+    Route::get( '/dashboard/db/switch/{dbID}', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@switchDB', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/switch', [
+    Route::get( '/dashboard/db/switch', [
         'uses'       => 'SurvLoop\Controllers\AdminDBController@switchDB', 
         'middleware' => ['auth']
     ]);
@@ -856,25 +878,25 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/db/new', [
+    Route::get( '/dashboard/db/new', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@newDB', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/systems-update', [
+    Route::get( '/dashboard/systems-update', [
         'uses'       => 'SurvLoop\Controllers\SystemUpdate@index', 
         'middleware' => ['auth']
     ]);
     
-    Route::get('/dashboard/css-reload',  'SurvLoop\\Controllers\\AdminController@getCSS');
+    Route::get( '/dashboard/css-reload',  'SurvLoop\\Controllers\\AdminController@getCSS');
     
     
     // survey process for any admin tree
-    Route::get('/dashboard/start/{treeSlug}', [
+    Route::get( '/dashboard/start/{treeSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeTreeURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dashboard/start-{cid}/{treeSlug}', [
+    Route::get( '/dashboard/start-{cid}/{treeSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeTreeURLedit', 
         'middleware' => ['auth']
     ]);
@@ -886,7 +908,7 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dash/u/{treeSlug}/{nodeSlug}', [
+    Route::get( '/dash/u/{treeSlug}/{nodeSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadNodeURL', 
         'middleware' => ['auth']
     ]);
@@ -917,7 +939,7 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dash/{pageSlug}/read-{cid}', [
+    Route::get( '/dash/{pageSlug}/read-{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
@@ -925,7 +947,7 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);
-    Route::get('/dash/{pageSlug}', [
+    Route::get( '/dash/{pageSlug}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 
         'middleware' => ['auth']
     ]);

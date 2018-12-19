@@ -93,7 +93,7 @@ class TreeSurvAdmin extends TreeSurvForm
                     if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
                 }
                 elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o
@@ -688,7 +688,7 @@ class TreeSurvAdmin extends TreeSurvForm
                         str_replace('<div class="nodeHalfGap"></div>', '', 
                         (($this->allNodes[$tierNode[0]]->isInstruct() || $this->allNodes[$tierNode[0]]->isInstructRaw())
                             ? $this->printNodePublic($tierNode[0]) : '')));
-                    $instructPrint = $this->extractJava($this->extractStyle($instructPrint, -3, true), -3, true);
+                    $instructPrint = $GLOBALS["SL"]->extractJava($GLOBALS["SL"]->extractStyle($instructPrint, -3, true), -3, true);
                     if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
                         return view('vendor.survloop.admin.tree.node-print-basic', [
                             "rootID"         => $this->rootID, 

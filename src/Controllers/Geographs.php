@@ -22,7 +22,7 @@ class Geographs
     public $countryList = [];
     public $hasCanada   = false;
     
-    function __construct($hasCanada = false)
+    public function __construct($hasCanada = false)
     {
         $this->hasCanada = $hasCanada;
         return true;
@@ -551,12 +551,15 @@ class Geographs
                     if (!$descAjax && trim($mark[5]) != '') $descAjax = true;
                 }
             }
-            return view('vendor.survloop.embed-google-map', [
+            $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.embed-google-map-js', [
                 "nID"       => $nID,
-                "docDesc"   => $docDesc,
                 "filename"  => $filename,
                 "descAjax"  => $descAjax,
                 "mapCenter" => $this->mapCenter
+                ])->render();
+            return view('vendor.survloop.embed-google-map', [
+                "nID"       => $nID,
+                "docDesc"   => $docDesc
                 ])->render();
         }
         return '';

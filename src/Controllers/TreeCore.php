@@ -551,7 +551,7 @@ class TreeCore extends SurvLoopController
                 $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
                 $recObj->{ $coreAbbr . 'UserID' } = $this->v["uID"];
                 $recObj->{ $coreAbbr . 'IPaddy' } = $this->hashIP();
-                $recObj->{ $coreAbbr . 'IsMobile' } = $this->isMobile();
+                $recObj->{ $coreAbbr . 'IsMobile' } = $GLOBALS["SL"]->isMobile();
                 $recObj->{ $coreAbbr . 'UniqueStr' }
                     = $this->getRandStr($GLOBALS["SL"]->coreTbl, $coreAbbr . 'UniqueStr', 20);
             }

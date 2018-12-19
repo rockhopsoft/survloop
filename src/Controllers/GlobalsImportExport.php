@@ -14,6 +14,7 @@ use DB;
 use App\Models\User;
 use Storage;
 use Illuminate\Http\Request;
+use MatthiasMullie\Minify;
 use App\Models\SLDatabases;
 use App\Models\SLTables;
 use App\Models\SLFields;
@@ -342,8 +343,8 @@ class GlobalsImportExport extends GlobalsTables
             if (!file_exists($dir)) mkdir($dir);
             $this->exprtProg["fileName"] = $dir . '/' . $filebase . '.csv';
             $this->exprtProg["fileCnt"] = 1;
-            if ($GLOBALS["SL"]->REQ->has('export')) {
-                $this->exprtProg["fileCnt"] = $GLOBALS["SL"]->REQ->get('export');
+            if ($this->REQ->has('export')) {
+                $this->exprtProg["fileCnt"] = $this->REQ->get('export');
                 if ($this->exprtProg["fileCnt"] == 1) $this->exprtProg["tok"]->TokCoreID = 0;
             } elseif (isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
                 && intVal($this->exprtProg["tok"]->TokTreeID) > 0) {
@@ -710,5 +711,64 @@ class GlobalsImportExport extends GlobalsTables
     	return $stats;
     }
     
+    public function genPageDynamicJs($content = '')
+    {
+        
+        $fileCss = '/cache/dynascript/' . date("Ymd") . '-t' . $this->treeID . '-s' . session()->get('slSessID') 
+            . '-r' . rand(10000000, 100000000) . '.css';
+        $content = $this->extractStyle($content, 0);
+        if (trim($this->pageCSS) != '') {
+            Storage::put($fileCss, $this->pageCSS);
+            $fileMin = str_replace('.css', '-min.css', $fileCss);
+            $minifier = new Minify\CSS('../storage/app' . $fileCss);
+            $minifier->minify('../storage/app' . $fileMin);
+            //Storage::delete($fileCss);
+            $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" href="' . $this->sysOpts["app-url"]
+                . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '">' . "\n";
+        }
+        
+        $fileJs = str_replace('.css', '.js', $fileCss);
+        $content = $this->extractJava($content, 0);
+        $java = $this->pageJAVA
+            . ((trim($this->pageAJAX) != '') ? ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ' : '');
+        if (trim($java) != '') {
+            Storage::put($fileJs, $java);
+            $fileMin = str_replace('.js', '-min.js', $fileJs);
+            $minifier = new Minify\JS('../storage/app' . $fileJs);
+            if (file_exists($fileMin)) {
+                Storage::delete($fileMin);
+            }
+            $minifier->minify('../storage/app' . $fileMin);
+            //Storage::delete($fileJs);
+            $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
+            $this->pageSCRIPTS .= '<script async defer id="dynJs" type="text/javascript" src="' 
+                . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '"></script>';
+        }
+        return $content;
+    }
+    
+    public function deferStaticNodePrint($nID, $content = '', $js = '', $ajax = '', $css = '')
+    {
+        if (!isset($this->x["deferCnt"])) {
+            $this->x["deferCnt"] = 0;
+        }
+        $this->x["deferCnt"]++;
+        $file = '/cache/dynascript/t' . $this->treeID . 'n' . $nID . '.html';
+        if (trim($js) != '' || trim($ajax) != '') {
+            $content .= '<script type="text/javascript"> ' . $js . ' ';
+            if (trim($ajax) != '') {
+                $content .= '$(document).ready(function(){ ' . $ajax . ' }); ';
+            }
+            $content .= '</script>';
+        }
+        if (trim($css) != '') {
+            $content .= '<style> ' . $css . ' </style>';
+        }
+        Storage::put($file, $content);
+        $this->pageAJAX .= 'setTimeout(function() { $("#deferNode' . $nID . '").load("/defer/' 
+            . $this->treeID . '/' . $nID . '"); }, ' . (1500+(500*$this->x["deferCnt"])) . '); ';
+        return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center><div class="p20 m20">'
+            . $this->sysOpts["spinner-code"] . '</div></center></div>';
+    }
     
 }

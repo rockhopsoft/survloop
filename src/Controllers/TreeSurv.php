@@ -15,7 +15,6 @@ use Auth;
 use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use MatthiasMullie\Minify;
 use App\Models\User;
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
@@ -46,7 +45,9 @@ class TreeSurv extends TreeSurvLoad
         $ret = '';
         $this->loadTree();
         
-        if ($this->hasAjaxWrapPrinting()) $ret .= '<div id="ajaxWrap">';
+        if ($this->hasAjaxWrapPrinting()) {
+            $ret .= '<div id="ajaxWrap">';
+        }
         $ret .= '<a name="maincontent" id="maincontent"></a>' . "\n";
         if (!$this->isPage) {
             $ret .= '<div id="maincontentWrap" style="display: none;">' . "\n";
@@ -206,19 +207,13 @@ class TreeSurv extends TreeSurvLoad
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '</div>';
         } else {
-            // replace page-based JS stuff
-            $tmpFile = '../storage/app/dynamicJava-' . rand(100000000,1000000000) . '.js';
-            $java = 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();
-                if (document.getElementById("treeJS")) document.getElementById("treeJS").remove();'
-                . ((isset($GLOBALS["SL"]->pageJAVA) && trim($GLOBALS["SL"]->pageJAVA) != '') 
-                ? $GLOBALS["SL"]->pageJAVA : '')
-                . ((isset($GLOBALS["SL"]->pageAJAX) && trim($GLOBALS["SL"]->pageAJAX) != '') 
-                ? ' $(document).ready(function(){ ' . $GLOBALS["SL"]->pageAJAX . ' }); ' : '');
-            file_put_contents($tmpFile, $java);
-            $minifier = new Minify\JS($tmpFile);
-            unlink($tmpFile);
-            $ret .= $GLOBALS["SL"]->pageSCRIPTS . '<script type="text/javascript">' 
-                . $minifier->minify() . '</script>';
+            $GLOBALS["SL"]->pageJAVA 
+                .= 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();
+                    if (document.getElementById("treeJS")) document.getElementById("treeJS").remove();';
+            $GLOBALS["SL"]->pageAJAX 
+                .= 'if (document.getElementById("maincontentWrap")) $("#maincontentWrap").fadeIn(50); ';
+            $ret = $GLOBALS["SL"]->genPageDynamicJs($ret) . $GLOBALS["SL"]->pageSCRIPTS;
+            $GLOBALS["SL"]->pageSCRIPTS = '';
         }
         return $ret;
     }
@@ -240,6 +235,9 @@ class TreeSurv extends TreeSurvLoad
             $this->runAjaxChecks($request);
             exit;
         }
+        if (!isset($this->v["javaNodes"])) {
+            $this->v["javaNodes"] = '';
+        }
         $notes = '';
         if (isset($GLOBALS["SL"]->x["pageView"]) && trim($GLOBALS["SL"]->x["pageView"]) != '') {
             $notes .= 'pv.' . $GLOBALS["SL"]->x["pageView"] . ' dp.' . $GLOBALS["SL"]->x["dataPerms"];
@@ -251,6 +249,7 @@ class TreeSurv extends TreeSurvLoad
             $log->UserActCurrPage = $this->v["currPage"][0] . $notes;
             $log->save();
         }
+        $GLOBALS["SL"]->pageJAVA .= $this->v["javaNodes"];
         if ($request->has('ajax') && $request->ajax == 1) { // tree form ajax submission
             echo $this->ajaxContentWrapCustom($this->v["content"]);
             exit;
@@ -1259,8 +1258,8 @@ class TreeSurv extends TreeSurvLoad
             $this->getAllPublicCoreIDs();
             $this->searcher->getSearchFilts();
             $this->searcher->processSearchFilts();
-            if (sizeof($this->allPublicFiltIDs) > 0) {
-                foreach ($this->allPublicFiltIDs as $i => $coreID) {
+            if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
+                foreach ($this->searcher->allPublicFiltIDs as $i => $coreID) {
                     if (!isset($this->searchOpts["limit"]) || intVal($this->searchOpts["limit"]) == 0
                         || $i < $this->searchOpts["limit"]) {
                         if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
@@ -1307,6 +1306,7 @@ class TreeSurv extends TreeSurvLoad
     
     public function unpublishedMessage($coreTbl = '')
     {
+        if ($this->corePublicID <= 0) return '<!-- -->';
         return '<div class="well well-lg">#' . $this->corePublicID . ' is no longer published.</div>';
     }
     
@@ -1458,7 +1458,7 @@ class TreeSurv extends TreeSurvLoad
             $this->searcher->getSearchFilts();
             $this->searcher->processSearchFilts();
             $this->v["graphDataPts"] = $this->v["graphMath"] = $rows = $rowsFilt = [];
-            if (sizeof($this->allPublicFiltIDs) > 0) {
+            if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
                 if (isset($this->v["currNode"]->extraOpts["y-axis"]) 
                     && intVal($this->v["currNode"]->extraOpts["y-axis"]) > 0) {
                     $fldRec = SLFields::find($this->v["currNode"]->extraOpts["y-axis"]);
@@ -1475,7 +1475,8 @@ class TreeSurv extends TreeSurvLoad
                                 . $fldName . "'" . ((trim($lab1Fld) != '') ? ", '" . $lab1Fld . "'" : "") 
                                 . ((trim($lab2Fld) != '') ? ", '" . $lab2Fld . "'" : "") . ")->where('" . $fldName 
                                 . "', 'NOT LIKE', '')->where('" . $fldName . "', 'NOT LIKE', 0)->whereIn('" . $tblAbbr 
-                                . "ID', \$this->allPublicFiltIDs)->orderBy('" . $fldName . "', 'asc')->get();");
+                                . "ID', \$this->searcher->allPublicFiltIDs)->orderBy('" . $fldName 
+                                . "', 'asc')->get();");
                         } else {
                             //eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) . "::orderBy('" . $isBigSurvLoop[1] 
                             //    . "', '" . $isBigSurvLoop[2] . "')->get();");

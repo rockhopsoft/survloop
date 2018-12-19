@@ -1,4 +1,8 @@
-<!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
+<?php // scrape scripting from main content passed in
+if (isset($content)) {
+    $content = $GLOBALS["SL"]->genPageDynamicJs($content);
+}
+?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +23,6 @@
     <meta property="og:site_name" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}" />
     <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
     
-    
     <meta name="twitter:card" content="summary_large_image">
     @if (isset($GLOBALS['SL']->sysOpts['twitter']) && !in_array(trim($GLOBALS['SL']->sysOpts['twitter']), ['', '@']))
     <meta name="twitter:site" content="{{ $GLOBALS['SL']->sysOpts['twitter'] }}">
@@ -32,34 +35,34 @@
     
 @endif
 
+<link rel="stylesheet" href="/jquery-ui.min.css">
+<link rel="stylesheet" href="/bootstrap.min.css">
+<link rel="stylesheet" href="/css/fork-awesome.min.css">
 @if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
     <link href="/sys-all.min.css" rel="stylesheet">
 @else
     <link rel="stylesheet" type="text/css" href="/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
-    <link rel="stylesheet" href="/jquery-ui.min.css">
-    <link href="/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.css?v={{ 
         $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
 @endif
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" crossorigin="anonymous" 
-        integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"></script>
+    <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
+        crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
+        </script>
 @endif
 
+<script src="/jquery.min.js" type="text/javascript"></script>
+<script src="/jquery-ui.min.js" type="text/javascript"></script>
+<script src="/bootstrap.min.js" type="text/javascript"></script>
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <script id="sysJs" src="/sys-all.min.js" type="text/javascript"></script>
+    <script async id="sysJs" src="/sys-all.min.js" type="text/javascript"></script>
 @else 
     <script src="/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
-    <script src="/jquery.min.js"></script>
-    <script src="/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="/bootstrap.min.js"></script>
     <script src="/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
     <script src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
-
-<link href="/css/fork-awesome.min.css" rel="stylesheet">
 
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
@@ -278,34 +281,36 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link href="/summernote.css" rel="stylesheet">
-    <script src="/summernote.min.js"></script>
+    <script async defer src="/summernote.min.js"></script>
 @endif
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
-    <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/editor.js"></script>
 @endif */ ?>
 
 @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
     {!! $GLOBALS['SL']->pageSCRIPTS !!}
 @endif
-<script id="dynamicJS" type="text/javascript">
-@if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
-    {!! $GLOBALS['SL']->pageJAVA !!}
-@endif
-{!! $GLOBALS['SL']->getXtraJs() !!}
-@if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
-    $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
-@endif
-@if (isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
-    @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
-        alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+@if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
+    <script async defer id="dynamicJS" type="text/javascript">
+    @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
+        {!! $GLOBALS['SL']->pageJAVA !!}
     @endif
-    setTimeout("window.print()", 1000);
+    {!! $GLOBALS['SL']->getXtraJs() !!}
+    @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
+        $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
+    @endif
+    @if (isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
+        @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
+            alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+        @endif
+        setTimeout("window.print()", 1000);
+    @endif
+    </script>
 @endif
-</script>
 
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
@@ -313,7 +318,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["google-analytic"])
     && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false && !isset($admMenu))
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
+    <script async defer src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
         !!}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

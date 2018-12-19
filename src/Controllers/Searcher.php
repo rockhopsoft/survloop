@@ -74,8 +74,8 @@ class Searcher
         return view('vendor.survloop.inc-search-bar', [
             "nID"      => $nID, 
             "treeID"   => $treeID, 
-            "pre"      => $this->extractJava($pre),
-            "post"     => $this->extractJava($post),
+            "pre"      => $GLOBALS["SL"]->extractJava($pre),
+            "post"     => $GLOBALS["SL"]->extractJava($post),
             "ajax"     => $ajax,
             "search"   => $this->searchTxt,
             "extra"    => $this->printSearchBarFilters($treeID, $nID),
@@ -268,7 +268,7 @@ class Searcher
         return true;
     }
     
-    protected function processSearchFilts()
+    public function processSearchFilts()
     {
         //if (sizeof($this->allPublicFiltIDs) > 0) return true;
         $this->getAllPublicCoreIDs();

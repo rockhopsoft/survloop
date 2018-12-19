@@ -146,11 +146,19 @@ class TreeSurvForm extends TreeSurvFormUtils
     
     protected function printNodePublic($nID = -3, $tmpSubTier = [], $currVisib = -1)
     {
-        if (!isset($this->allNodes[$nID]) || !$this->checkNodeConditions($nID)) return '';
-        if ($this->allNodes[$nID]->nodeType == 'Send Email') return $this->postNodeSendEmail($nID);
+        if (!isset($this->allNodes[$nID]) || !$this->checkNodeConditions($nID)) {
+            return '';
+        }
+        if ($this->allNodes[$nID]->nodeType == 'Send Email') {
+            return $this->postNodeSendEmail($nID);
+        }
         
-        if (empty($tmpSubTier)) $tmpSubTier = $this->loadNodeSubTier($nID);
-        if (!isset($this->v["hasFixedHeader"])) $this->v["hasFixedHeader"] = false;
+        if (empty($tmpSubTier)) {
+            $tmpSubTier = $this->loadNodeSubTier($nID);
+        }
+        if (!isset($this->v["hasFixedHeader"])) {
+            $this->v["hasFixedHeader"] = false;
+        }
         $ret = '';
         
         // copy node object; load field info and current session data
@@ -189,7 +197,9 @@ class TreeSurvForm extends TreeSurvFormUtils
             $this->pageHasUpload = $this->pageFldList = $this->hideKidNodes = [];
             $this->runPageExtra($nID);
             $this->runPageLoad($nID);
-            if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') $ret .= '<div id="pageTopGapID" class="pageTopGap"></div>';
+            if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
+                $ret .= '<div id="pageTopGapID" class="pageTopGap"></div>';
+            }
             if ($curr->isLoopRoot()) {
                 $ret .= ((isset($curr->nodeRow->NodePromptText) && trim($curr->nodeRow->NodePromptText) != '')
                         ? '<div class="nPrompt">' . $curr->nodeRow->NodePromptText . '</div>' : '')
@@ -239,12 +249,16 @@ class TreeSurvForm extends TreeSurvFormUtils
         
         // check for extra custom PHP code stored with the node; check for standardized techniques
         $nodeOverrides = $this->printNodeSessDataOverride($nID, $tmpSubTier, $nIDtxt, $currNodeSessData);
-        if (is_array($nodeOverrides) && sizeof($nodeOverrides) > 1) $currNodeSessData = $nodeOverrides;
-        elseif (is_array($nodeOverrides) && sizeof($nodeOverrides) == 1 && isset($nodeOverrides[0])) {
+        if (is_array($nodeOverrides) && sizeof($nodeOverrides) > 1) {
+            $currNodeSessData = $nodeOverrides;
+        } elseif (is_array($nodeOverrides) && sizeof($nodeOverrides) == 1 && isset($nodeOverrides[0])) {
             $currNodeSessData = $nodeOverrides[0];
         }
         
-        $GLOBALS["SL"]->pageJAVA .= 'nodeList[nodeList.length] = ' . $nID . '; '
+        if (!isset($this->v["javaNodes"])) {
+            $this->v["javaNodes"] = '';
+        }
+        $this->v["javaNodes"] .= 'nodeList[nodeList.length] = ' . $nID . '; '
             . 'nodeParents[' . $nID . '] = ' . $curr->parentID . ';' . "\n"
             . (($nSffx != '') ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" : '');
         $condKids = $showMoreNodes = [];
@@ -277,7 +291,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         if ($condHide) $this->hideKidNodes[] = $condNode;
                     }
                 }
-                $GLOBALS["SL"]->pageJAVA .= 'conditionNodes[' . $nID . '] = true;' . "\n";
+                $this->v["javaNodes"] .= 'conditionNodes[' . $nID . '] = true;' . "\n";
                 $childList = [];
                 foreach ($tmpSubTier[1] as $childNode) {
                     $childList[] = $childNode[0];
@@ -308,7 +322,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         }
                     }
                 }
-                $GLOBALS["SL"]->pageJAVA .= 'nodeKidList[' . $nID . '] = ['.implode(', ', $childList).'];' . "\n";
+                $this->v["javaNodes"] .= 'nodeKidList[' . $nID . '] = ['.implode(', ', $childList).'];' . "\n";
             }
         }
         if (sizeof($curr->responses) == 3 && $curr->responses[1]->NodeResValue == '...') {
@@ -357,9 +371,10 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         
         $ret = $this->customNodePrint($nID, $tmpSubTier, $nIDtxt, $nSffx, $currVisib);
-        if ($curr->nodeType == 'Data Print Row' && is_array($ret) && sizeof($ret) > 0) return $ret; 
-        if (!is_array($ret) && $ret != '') {
-            return $visibilityField . $ret;
+        if ($curr->nodeType == 'Data Print Row' && is_array($ret) && sizeof($ret) > 0) {
+            return $ret; 
+        } elseif (!is_array($ret) && $ret != '') {
+            return $visibilityField . $this->wrapNodePrint($ret, $nID);
         }
         $ret = $visibilityField . $this->nodeSessDump($nIDtxt, $nID);
         // else print standard node output...
@@ -391,7 +406,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         $onKeyUp .= ' fldOnKeyUp' . $nIDtxt . '(); ';
                     }
                     $nodePromptAfter = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptAfter, $itemID, $itemInd);
-                    $nodePromptAfter = $this->extractJava($nodePromptAfter, $nID);
+                    $nodePromptAfter = $GLOBALS["SL"]->extractJava($nodePromptAfter, $nID);
                 }
             }
         }
@@ -442,8 +457,8 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         if (strpos($nodePromptText, 'fixedHeader') !== false) $this->v["hasFixedHeader"] = true;
         
-        $nodePromptText  = $this->extractJava($nodePromptText, $nID);
-        $nodePromptNotes = $this->extractJava($nodePromptNotes, $nID);
+        $nodePromptText  = $GLOBALS["SL"]->extractJava($nodePromptText, $nID);
+        $nodePromptNotes = $GLOBALS["SL"]->extractJava($nodePromptNotes, $nID);
         
         $nodePrompt = '';
         if (strpos($curr->nodeRow->NodePromptText, '[[PreviewPrivate]]') !== false 
@@ -742,7 +757,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                             $this->printNodePublic($kidNode[0], $kidNode, 1)));
                         $java .= (($k > 0) ? ', ' : '') . $kidNode[0];
                     }
-                    $GLOBALS["SL"]->pageJAVA .= 'nodeTblList[' . $nID . '] = new Array(' . $java . '); ';
+                    $this->v["javaNodes"] .= 'nodeTblList[' . $nID . '] = new Array(' . $java . '); ';
                     if ($this->tableDat["req"][0]) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
                             . "VisibleID') && document.getElementById('n" . $nIDtxt . "VisibleID').value == 1) {\n"
@@ -888,7 +903,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 $this->hideKidNodes[] = $childNode[0];
                             }
                         }
-                        $GLOBALS["SL"]->pageJAVA .= 'nodeKidList[' . $nID . '] = [' . implode(', ', $childList) . ']; ';
+                        $this->v["javaNodes"] .= 'nodeKidList[' . $nID . '] = [' . implode(', ', $childList) . ']; ';
                         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#nBtn' . $nIDtxt . '", function() { '
                             . 'if (document.getElementById("node' . $nIDtxt . 'kids")) { '
                                 . 'if (!document.getElementById("node' . $nIDtxt . 'kids").style.display '
@@ -1391,7 +1406,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $this->v["needsJqUi"] = true;
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'fldOtherID' . $j 
                         . '" ).autocomplete({ source: [' . substr($genderSuggest, 1) . '] });' . "\n";
-                    $GLOBALS["SL"]->pageJAVA .= 'nodeResTot[' . $nID . '] = ' . sizeof($coreResponses) . '; ';
+                    $this->v["javaNodes"] .= 'nodeResTot[' . $nID . '] = ' . sizeof($coreResponses) . '; ';
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
                             . "VisibleID') && document.getElementById('n" . $nIDtxt 
@@ -1537,6 +1552,14 @@ class TreeSurvForm extends TreeSurvFormUtils
         if ($curr->isDataManip()) $this->closeManipBranch($nID);
         $this->closePrintNodePublic($nID, $nIDtxt, $curr);
         
+        return $this->wrapNodePrint($ret, $nID);
+    }
+    
+    protected function wrapNodePrint($ret, $nID)
+    {
+        if ($this->allNodes[$nID]->chkCurrOpt('DEFERLOAD')) {
+            return $GLOBALS["SL"]->deferStaticNodePrint($nID, $ret);
+        }
         return $ret;
     }
     

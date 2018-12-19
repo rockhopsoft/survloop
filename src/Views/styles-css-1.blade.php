@@ -3,6 +3,10 @@
 html, body {
     height: 100%;
 }
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
 body, p, div, table tr td, table tr th, input, textarea, select {
     font-family: {!! $css["font-main"] !!};
     font-style: normal;

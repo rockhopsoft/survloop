@@ -1617,7 +1617,13 @@
                         <div><label class="mT10 mB10"><input type="checkbox" name="opts89" id="opts89ID" value="89" 
                             autocomplete="off" onClick="return checkPageBlock();" 
                             @if ($node->nodeRow->NodeOpts%89 == 0) CHECKED @endif
-                            > <span class="fPerc133">Card Wrapper</span></label></div>
+                            > <span class="fPerc133">Card Wrapper</span></label>
+                        </div>
+                        <div><label class="mT10 mB10"><input type="checkbox" name="opts97" id="opts97ID" value="97" 
+                            autocomplete="off" onClick="return checkPageBlock();" 
+                            @if ($node->nodeRow->NodeOpts%97 == 0) CHECKED @endif
+                            > <span class="fPerc133">Deferred Load of Node</span></label>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-<!-- resources/views/vendor/survloop/graph-data-line-scatter.blade.php -->
+/* resources/views/vendor/survloop/graph-data-line-scatter.blade.php */
 {
     label: "{{ $label }}",
     fill: false,

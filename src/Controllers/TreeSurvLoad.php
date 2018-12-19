@@ -15,7 +15,6 @@ use Auth;
 use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use MatthiasMullie\Minify;
 use App\Models\User;
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;

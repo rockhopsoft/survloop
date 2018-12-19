@@ -217,9 +217,9 @@ class TreeSurvFormUtils extends TreeSurvInput
                     $this->searcher->getSearchFilts();
                     $loadURL = '/search-results/' . $widgetTreeID . '?s=' . urlencode($this->searcher->searchTxt) 
                         . $this->searcher->searchFiltsURL() . $this->searcher->advSearchUrlSffx;
-                    $curr->nodeRow->NodePromptText = $this->extractJava(str_replace('[[search]]', $search, 
+                    $curr->nodeRow->NodePromptText = $GLOBALS["SL"]->extractJava(str_replace('[[search]]', $search, 
                         $curr->nodeRow->NodePromptText), $nID);
-                    $curr->nodeRow->NodePromptAfter = $this->extractJava(str_replace('[[search]]', $search, 
+                    $curr->nodeRow->NodePromptAfter = $GLOBALS["SL"]->extractJava(str_replace('[[search]]', $search, 
                         $curr->nodeRow->NodePromptAfter), $nID);
                 } elseif ($curr->nodeType == 'Record Previews') {
                     $loadURL = '/record-prevs/' . $widgetTreeID . '?limit=' . $widgetLimit;
@@ -236,10 +236,10 @@ class TreeSurvFormUtils extends TreeSurvInput
                     $loadURL .= $this->widgetCustomLoadUrl($nID, $nIDtxt, $curr);
                 }
                 $ret .= ((trim($curr->nodeRow->NodePromptText) != '') ? '<div>' 
-                    . $this->extractJava($curr->nodeRow->NodePromptText, $nID) 
+                    . $GLOBALS["SL"]->extractJava($curr->nodeRow->NodePromptText, $nID) 
                     . '</div>' : '') . '<div id="n' . $nID . 'ajaxLoad" class="w100">' . $spinner . '</div>'
                     . ((trim($curr->nodeRow->NodePromptAfter) != '') ? '<div>' 
-                    . $this->extractJava($curr->nodeRow->NodePromptAfter, $nID) . '</div>' : '');
+                    . $GLOBALS["SL"]->extractJava($curr->nodeRow->NodePromptAfter, $nID) . '</div>' : '');
                 $GLOBALS["SL"]->pageAJAX .= '$("#n' . $nID . 'ajaxLoad").load("' . $loadURL . '");' . "\n";
             }
         }

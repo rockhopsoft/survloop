@@ -74,10 +74,18 @@ class SurvLoop extends PageLoadUtils
         return redirect($this->domainPath . '/');
     }
     
+    public function deferNode(Request $request, $treeID = 1, $nodeID = -3)
+    {
+        $file = '../storage/app/cache/dynascript/t' . $treeID . 'n' . $nodeID . '.html';
+        if ($treeID > 0 && $nodeID > 0 && $this->loadTreeByID($request, $treeID) && file_exists($file)) {
+            return file_get_contents($file);
+        }
+        return '';
+    }
+    
     public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '', $skipPublic = false)
     {
         $redir = $this->chkPageRedir($pageSlug);
-//echo '<br /><br /><br />pageSlug: ' .$pageSlug . ', redir: ' . $redir . '<br />'; exit;
         if ($redir != $pageSlug) {
             redirect($redir);
         }
