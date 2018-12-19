@@ -437,7 +437,9 @@ class AdminController extends SurvLoopController
         $blurb->DefSubset      = $request->DefSubset;
         $blurb->DefDescription = $request->DefDescription;
         $blurb->DefIsActive = 1;
-        if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) $blurb->DefIsActive *= 3;
+        if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) {
+            $blurb->DefIsActive *= 3;
+        }
         $blurb->save();
         return $this->redir('/dashboard/pages/snippets/' . $blurb->DefID);
     }
@@ -458,6 +460,14 @@ class AdminController extends SurvLoopController
         $syscss = view('vendor.survloop.styles-css-1', [ "css" => $css ])->render();
         file_put_contents("../storage/app/sys/sys1.css", $syscss);
         $minifier = new Minify\CSS("../storage/app/sys/sys1.css");
+        $minifier->add("../vendor/components/jqueryui/themes/base/jquery-ui.min.css");
+        $minifier->add("../vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
+        //$minifier->add("../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css");
+        if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"]) 
+            && trim($GLOBALS["SL"]->sysOpts["css-extra-files"]) != '') {
+            $files = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->sysOpts["css-extra-files"]);
+            foreach ($files as $f) $minifier->add(trim($f));
+        }
         $minifier->minify("../storage/app/sys/sys1.min.css");
         
         $syscss = view('vendor.survloop.styles-css-2', [ "css" => $css ])->render();
@@ -465,29 +475,16 @@ class AdminController extends SurvLoopController
         $minifier = new Minify\CSS("../storage/app/sys/sys2.css");
         $minifier->minify("../storage/app/sys/sys2.min.css");
         
-        $minifier = new Minify\CSS("../storage/app/sys/sys1.min.css");
-        //$minifier->add("../vendor/components/jqueryui/themes/base/jquery-ui.min.css");
-        //$minifier->add("../vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
-        if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"]) 
-            && trim($GLOBALS["SL"]->sysOpts["css-extra-files"]) != '') {
-            $files = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->sysOpts["css-extra-files"]);
-            foreach ($files as $f) $minifier->add(trim($f));
-        }
-        $minifier->add("../storage/app/sys/sys2.min.css");
-        //$minifier->add("../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css");
-        $minifier->minify("../storage/app/sys/sys-all.min.css");
+        $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
+        $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
+        $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
+        $minifier->add("../vendor/wikiworldorder/survloop/src/Public/scripts-lib.js");
+        $minifier->minify("../storage/app/sys/sys1.min.js");
         
         $scriptsjs = view('vendor.survloop.scripts-js', [ "css" => $css ])->render();
         file_put_contents("../storage/app/sys/sys.js", $scriptsjs);
         $minifier = new Minify\JS("../storage/app/sys/sys.js");
-        $minifier->minify("../storage/app/sys/sys.min.js");
-        
-        //$minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
-        //$minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
-        //$minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
-        $minifier = new Minify\JS("../vendor/wikiworldorder/survloop/src/Public/scripts-lib.js");
-        $minifier->add("../storage/app/sys/sys.min.js");
-        $minifier->minify("../storage/app/sys/sys-all.min.js");
+        $minifier->minify("../storage/app/sys/sys2.min.js");
         
         $log = SLDefinitions::where('DefSet', 'System Settings')
             ->where('DefSubset', 'log-css-reload')

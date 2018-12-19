@@ -32,50 +32,47 @@ if (isset($content)) {
     <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
     <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
     <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
-    
 @endif
-
-<link rel="stylesheet" href="/jquery-ui.min.css">
-<link rel="stylesheet" href="/bootstrap.min.css">
-<link rel="stylesheet" href="/css/fork-awesome.min.css">
 @if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
-    <link href="/sys-all.min.css" rel="stylesheet">
+    <link href="/sys1.min.css" rel="stylesheet" type="text/css">
+    <link href="/sys2.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
 @else
-    <link rel="stylesheet" type="text/css" href="/sys1.min.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
-    <link rel="stylesheet" type="text/css" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.css?v={{ 
-        $GLOBALS['SL']->sysOpts['log-css-reload'] }}">
+    <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
+    <link href="/jquery-ui.min.css" rel="stylesheet" type="text/css">
+    <link href="/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
+        }}" rel="stylesheet" type="text/css">
 @endif
-
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
         crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
         </script>
 @endif
-
-<script src="/jquery.min.js" type="text/javascript"></script>
-<script src="/jquery-ui.min.js" type="text/javascript"></script>
-<script src="/bootstrap.min.js" type="text/javascript"></script>
 @if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <script async id="sysJs" src="/sys-all.min.js" type="text/javascript"></script>
+    <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
+    <script async id="sysJs2" src="/sys2.min.js" type="text/javascript"></script>
 @else 
+    <script src="/jquery.min.js" type="text/javascript"></script>
+    <script src="/jquery-ui.min.js" type="text/javascript"></script>
+    <script src="/bootstrap.min.js" type="text/javascript"></script>
     <script src="/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
     <script src="/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
     <script src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
-
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
-    <script src="/Chart.bundle.min.js"></script>
+    <script async src="/Chart.bundle.min.js"></script>
 @endif
 @if ((isset($needsPlots) && $needsPlots) 
     || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
-    <script src="/plotly.min.js"></script>
+    <script async src="/plotly.min.js"></script>
 @endif
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
 @endif */ ?>
-
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
     {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
 @endif

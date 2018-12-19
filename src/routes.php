@@ -102,13 +102,8 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
     
-    Route::get( '/sys.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/sys.min.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys.min.css'));
+    Route::get( '/sys1.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys1.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
@@ -117,28 +112,28 @@ Route::group(['middleware' => ['web']], function () {
         $response->header('Content-Type', 'text/css');
         return $response;
     });
+    Route::get( '/sys2.css', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys2.css'));
+        $response->header('Content-Type', 'text/css');
+        return $response;
+    });
     Route::get( '/sys2.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.css'));
         $response->header('Content-Type', 'text/css');
         return $response;
     });
-    Route::get( '/sys-all.min.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/sys.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys.js'));
+    Route::get( '/sys1.min.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get( '/sys.min.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys.min.js'));
+    Route::get( '/sys2.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys2.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
-    Route::get( '/sys-all.min.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys-all.min.js'));
+    Route::get( '/sys2.min.js', function() {
+        $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.js'));
         $response->header('Content-Type', 'application/javascript');
         return $response;
     });
@@ -150,7 +145,8 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/dyna-{file}.css', function($file) {
         $response = null;
-        if (session()->has('slSessID') && strpos($file, '-s' . session()->get('slSessID') . '-') !== false) {
+        if (strpos($file, '-s') === false || (session()->has('slSessID') 
+            && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
             $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.css'));
         } else {
             $response = Response::make('/* */');
@@ -160,7 +156,8 @@ Route::group(['middleware' => ['web']], function () {
     });
     Route::get( '/dyna-{file}.js', function($file) {
         $response = null;
-        if (session()->has('slSessID') && strpos($file, '-s' . session()->get('slSessID') . '-') !== false) {
+        if (strpos($file, '-s') === false || (session()->has('slSessID') 
+            && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
             $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.js'));
         } else {
             $response = Response::make('/* */');

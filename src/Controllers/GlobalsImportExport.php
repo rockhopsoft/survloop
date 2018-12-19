@@ -713,25 +713,27 @@ class GlobalsImportExport extends GlobalsTables
     
     public function genPageDynamicJs($content = '')
     {
-        
-        $fileCss = '/cache/dynascript/' . date("Ymd") . '-t' . $this->treeID . '-s' . session()->get('slSessID') 
-            . '-r' . rand(10000000, 100000000) . '.css';
+        $fileCss = '/cache/dynascript/' . date("Ymd") . '-t' . $this->treeID;
+        if ($this->treeRow->TreeType != 'Page' || $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
+            $fileCss .= '-s' . session()->get('slSessID') . '-r' . rand(10000000, 100000000);
+        }
+        $fileCss .= '.css';
         $content = $this->extractStyle($content, 0);
-        if (trim($this->pageCSS) != '') {
+        if (trim($this->pageCSS) != '' && trim($this->pageCSS) != '/* */') {
             Storage::put($fileCss, $this->pageCSS);
             $fileMin = str_replace('.css', '-min.css', $fileCss);
             $minifier = new Minify\CSS('../storage/app' . $fileCss);
             $minifier->minify('../storage/app' . $fileMin);
-            //Storage::delete($fileCss);
+            Storage::delete($fileCss);
             $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" href="' . $this->sysOpts["app-url"]
                 . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '">' . "\n";
         }
         
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
-        $java = $this->pageJAVA
-            . ((trim($this->pageAJAX) != '') ? ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ' : '');
-        if (trim($java) != '') {
+        $java = $this->pageJAVA . ((trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') 
+            ? ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ' : '');
+        if (trim($java) != '' && trim($java) != '/* */') {
             Storage::put($fileJs, $java);
             $fileMin = str_replace('.js', '-min.js', $fileJs);
             $minifier = new Minify\JS('../storage/app' . $fileJs);
@@ -739,11 +741,11 @@ class GlobalsImportExport extends GlobalsTables
                 Storage::delete($fileMin);
             }
             $minifier->minify('../storage/app' . $fileMin);
-            //Storage::delete($fileJs);
-            $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
+            Storage::delete($fileJs);
             $this->pageSCRIPTS .= '<script async defer id="dynJs" type="text/javascript" src="' 
                 . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '"></script>';
         }
+        $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
         return $content;
     }
     

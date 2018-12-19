@@ -1025,6 +1025,7 @@ class TreeSurvAdmin extends TreeSurvForm
         if ($treeID <= 0) $treeID = $GLOBALS["SL"]->treeID;
         else $treeRow = SLTree::find($treeID);
         if ($treeRow->TreeType == 'Page') {
+            /* // auto-setting 
             $skipConds = [];
             $testCond = SLConditions::where('CondTag', '#TestLink')
                 ->where('CondDatabase', $treeRow->TreeDatabase)
@@ -1044,6 +1045,7 @@ class TreeSurvAdmin extends TreeSurvForm
                 if ($treeRow->TreeOpts%29 == 0) $treeRow->TreeOpts = $treeRow->TreeOpts/29;
             }
             $treeRow->save();
+            */
         }
         return true;
     }
