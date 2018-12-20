@@ -1,8 +1,4 @@
-<?php // scrape scripting from main content passed in
-if (isset($content)) {
-    $content = $GLOBALS["SL"]->genPageDynamicJs($content);
-}
-?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
+<!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -270,24 +266,10 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 
 @endif <?php /* end not print or frame */ ?>
 
-
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
 <div class="imgPreload">
 @forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 > @empty @endforelse
 </div>
-
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link href="/summernote.css" rel="stylesheet">
-    <script async defer src="/summernote.min.js"></script>
-@endif
-
-<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
-    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/editor.js"></script>
-@endif */ ?>
-
 @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
     {!! $GLOBALS['SL']->pageSCRIPTS !!}
 @endif
@@ -309,6 +291,16 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     </script>
 @endif
 
+<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
+    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/survloop/ContentTools-master/build/editor.js"></script>
+@endif */ ?>
+@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <link href="/summernote.css" rel="stylesheet">
+    <script async defer src="/summernote.min.js"></script>
+@endif
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 @endif

@@ -1,5 +1,4 @@
 /* generated from resources/views/vendor/survloop/styles-css-1.blade.php */
-
 html, body {
     height: 100%;
 }
@@ -33,3 +32,13 @@ img { border: 0; }
 a:link, a:visited, a:active, a:hover, .clrLnk {
     color: {!! $css["color-main-link"] !!};
 }
+
+.disIn { display: inline; }
+.disNon { display: none; }
+.disBlo { display: block; }
+.disFlx { display: flex; }
+.disRow { display: table-row; }
+.ovrNo  { overflow: hidden; }
+.ovrSho { overflow: visible; }
+.ovrFlo { overflow: auto; }
+.ovrFloY { overflow-y: auto; overflow-x: hidden; }

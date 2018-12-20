@@ -718,6 +718,7 @@ class GlobalsImportExport extends GlobalsTables
             $fileCss .= '-s' . session()->get('slSessID') . '-r' . rand(10000000, 100000000);
         }
         $fileCss .= '.css';
+        $sffx = (($this->REQ->has('refresh')) ? '?refresh=' . rand(10000000, 100000000) : '');
         $content = $this->extractStyle($content, 0);
         if (trim($this->pageCSS) != '' && trim($this->pageCSS) != '/* */') {
             Storage::put($fileCss, $this->pageCSS);
@@ -726,7 +727,7 @@ class GlobalsImportExport extends GlobalsTables
             $minifier->minify('../storage/app' . $fileMin);
             Storage::delete($fileCss);
             $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" href="' . $this->sysOpts["app-url"]
-                . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '">' . "\n";
+                . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx . '">' . "\n";
         }
         
         $fileJs = str_replace('.css', '.js', $fileCss);
@@ -743,7 +744,8 @@ class GlobalsImportExport extends GlobalsTables
             $minifier->minify('../storage/app' . $fileMin);
             Storage::delete($fileJs);
             $this->pageSCRIPTS .= '<script async defer id="dynJs" type="text/javascript" src="' 
-                . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . '"></script>';
+                . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx 
+                . '"></script>';
         }
         $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
         return $content;
@@ -768,9 +770,9 @@ class GlobalsImportExport extends GlobalsTables
         }
         Storage::put($file, $content);
         $this->pageAJAX .= 'setTimeout(function() { $("#deferNode' . $nID . '").load("/defer/' 
-            . $this->treeID . '/' . $nID . '"); }, ' . (1500+(500*$this->x["deferCnt"])) . '); ';
-        return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center><div class="p20 m20">'
-            . $this->sysOpts["spinner-code"] . '</div></center></div>';
+            . $this->treeID . '/' . $nID . '"); }, ' . (500+(500*$this->x["deferCnt"])) . '); ';
+        return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center><div id="deferAnim' . $nID 
+            . '" class="p20 m20">' . $this->sysOpts["spinner-code"] . '</div></center></div>';
     }
     
 }

@@ -270,6 +270,7 @@ class TreeSurv extends TreeSurvLoad
                 } // else check for the main public search field? 
             }
         }
+        $this->v["content"] = $GLOBALS["SL"]->genPageDynamicJs($this->v["content"]); // scrape scripts
         if ($GLOBALS["SL"]->treeIsAdmin) {
             return $GLOBALS["SL"]->swapSessMsg($this->v["content"]);
         } else {

@@ -314,7 +314,7 @@ class Searcher
         return true;
     }
      
-    protected function searchFiltsURL()
+    public function searchFiltsURL()
     {
         $ret = '';
         if (sizeof($this->searchFilts) > 0) {

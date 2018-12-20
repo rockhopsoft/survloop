@@ -1682,16 +1682,6 @@ a.overUnd:hover { text-decoration: underline; }
 .fR { float: right; }
 .fC { clear: both; }
 
-.disIn { display: inline; }
-.disNon { display: none; }
-.disBlo { display: block; }
-.disFlx { display: flex; }
-.disRow { display: table-row; }
-.ovrNo  { overflow: hidden; }
-.ovrSho { overflow: visible; }
-.ovrFlo { overflow: auto; }
-.ovrFloY { overflow-y: auto; overflow-x: hidden; }
-
 .ww { word-wrap: break-word; }
 
 .h100, table.h100, table tr td.h100 { height: 100%; }

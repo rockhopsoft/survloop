@@ -447,13 +447,13 @@ class SurvLoop extends PageLoadUtils
         $filename = '../storage/app/up/' . $abbr . '/' . $file;
         $handler = new File($filename);
         $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
-        $lifetime = 86400; // One day in seconds
+        $lifetime = (60*60*24*3); // three days in seconds
         $header_etag = md5($file_time . $filename);
         $header_last_modified = gmdate('r', $file_time);
         $headers = array(
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
+            'Cache-Control'       => 'public, max-age="' . $lifetime . '"', // override caching for sensitive
             'Last-Modified'       => $header_last_modified,
-            'Cache-Control'       => 'must-revalidate',
             'Expires'             => gmdate('r', $file_time + $lifetime),
             'Pragma'              => 'public',
             'Etag'                => $header_etag
