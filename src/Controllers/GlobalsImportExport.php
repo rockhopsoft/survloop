@@ -21,6 +21,7 @@ use App\Models\SLFields;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
 use App\Models\SLNode;
+use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLZips;
 use App\Models\SLTokens;
@@ -318,7 +319,7 @@ class GlobalsImportExport extends GlobalsTables
     
     public function getGenericRows($tbl, $fld = '', $val = '', $oper = '', $ordFld = '')
     {
-        $eval = "\$rows = " . $this->modelPath($tbl) . "::" . ((trim($fld) != '') 
+        eval("\$rows = " . $this->modelPath($tbl) . "::" . ((trim($fld) != '') 
             ? "where('" . $fld . "'" . ((trim($oper) != '') ? ", '" . $oper . "'" : "") . ", '" . $val . "')->" : "")
             . ((in_array($oper, ['<>', 'NOT LIKE']) && strtolower($val) != 'null') 
                 ? "orWhere('" . $fld . "', NULL)->" : "")
@@ -326,8 +327,7 @@ class GlobalsImportExport extends GlobalsTables
             . ((isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
                 && intVal($this->exprtProg["tok"]->TokCoreID) > 0) 
                 ? "offset(" . $this->exprtProg["tok"]->TokCoreID . ")->" : "")
-            . "limit(50000)->get();";
-        eval($eval);
+            . "limit(50000)->get();");
         return $rows;
     }
     
@@ -340,7 +340,9 @@ class GlobalsImportExport extends GlobalsTables
         $this->getExportProgress($filebase);
         if (sizeof($flds) > 0) {
             $dir = '../storage/app/database/csv';
-            if (!file_exists($dir)) mkdir($dir);
+            if (!file_exists($dir)) {
+                mkdir($dir);
+            }
             $this->exprtProg["fileName"] = $dir . '/' . $filebase . '.csv';
             $this->exprtProg["fileCnt"] = 1;
             if ($this->REQ->has('export')) {
@@ -366,7 +368,7 @@ class GlobalsImportExport extends GlobalsTables
                         $this->exprtProg["tok"]->TokCoreID++;
                         if (strlen($this->exprtProg["fileContent"]) > 9000000) {
                             $this->genCsvStore();
-                            echo '<html><body><br /><br /><center>' . $this->sysOpts["spinner-code"] 
+                            echo '<html><body><br /><br /><center>' . $this->spinner() 
                                 . '<br /></center>' . "\n"
                                 . '<script type="text/javascript"> setTimeout("window.location=\'' 
                                 . $this->getCurrUrlBase() . '?export=' . $this->exprtProg["fileCnt"] . '&off=' 
@@ -381,7 +383,7 @@ class GlobalsImportExport extends GlobalsTables
             }
             $this->genCsvStore();
             session()->put('sessMsg', '<h2 class="slBlueDark">Export Complete!</h2>');
-            echo '<html><body><br /><br /><center>' . $this->sysOpts["spinner-code"] . '<br /></center>' . "\n"
+            echo '<html><body><br /><br /><center>' . $this->spinner() . '<br /></center>' . "\n"
                 . '<script type="text/javascript"> setTimeout("window.location=\'' . $this->getCurrUrlBase() 
                 . '\'", 1000); </script></body></html>';
             exit;
@@ -393,8 +395,12 @@ class GlobalsImportExport extends GlobalsTables
     {
         $ret = '';
         if (isset($flds) && sizeof($flds) > 0) {
-            foreach ($flds as $fld => $type) $ret .= ',' . $fld;
-            if (trim($ret) != '') $ret = substr($ret, 1) . "\n";
+            foreach ($flds as $fld => $type) {
+                $ret .= ',' . $fld;
+            }
+            if (trim($ret) != '') {
+                $ret = substr($ret, 1) . "\n";
+            }
         }
         return $ret;
     }
@@ -403,7 +409,9 @@ class GlobalsImportExport extends GlobalsTables
     {
         $filename = str_replace('.csv', '-' . $this->leadZero($this->exprtProg["fileCnt"]) . '.csv', 
             $this->exprtProg["fileName"]);
-        if (file_exists($filename)) unlink($filename);
+        if (file_exists($filename)) {
+            unlink($filename);
+        }
         file_put_contents($filename, $this->exprtProg["fileContent"]);
         $this->exprtProg["fileCnt"]++;
         $this->exprtProg["tok"]->TokTreeID = $this->exprtProg["fileCnt"];
@@ -434,7 +442,9 @@ class GlobalsImportExport extends GlobalsTables
 		$content = [];
 		if (file_exists($filename)) {
 		    $content = $this->mexplode("\n", $this->get_content($filename));
-		    if (sizeof($content) == 0) $content = $this->mexplode("\n", file_get_contents($filename));
+		    if (sizeof($content) == 0) {
+		        $content = $this->mexplode("\n", file_get_contents($filename));
+		    }
 		}
     	return $content;
     }
@@ -458,7 +468,9 @@ class GlobalsImportExport extends GlobalsTables
 						$row = $this->mexplode(',', $l);
 						if (sizeof($row) > 0) {
 							if ($i == 0) {
-								foreach ($row as $j => $fld) $cols[$j] = $fld;
+								foreach ($row as $j => $fld) {
+								    $cols[$j] = $fld;
+								}
 							} else {
 								eval("\$rec = new " . $this->modelPath($tbl) . ";");
 								foreach ($row as $j => $val) {
@@ -519,8 +531,12 @@ class GlobalsImportExport extends GlobalsTables
     
     public function exportMysqlTbl($tbl, $installHereNow = false)
     {
-        if (!isset($this->x["indexesEnd"])) $this->x["indexesEnd"] = '';
-        if (strtolower($tbl->TblEng) == 'users') return "";
+        if (!isset($this->x["indexesEnd"])) {
+            $this->x["indexesEnd"] = '';
+        }
+        if (strtolower($tbl->TblEng) == 'users') {
+            return "";
+        }
         
         $tblQuery = $this->mysqlTblCoreStart($tbl);
         $indexes = "";
@@ -561,8 +577,11 @@ class GlobalsImportExport extends GlobalsTables
                     $tblQuery .= "NULL ";
                 }
                 if ($fld->FldDefault && trim($fld->FldDefault) != '') {
-                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
-                    else $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
+                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) {
+                        $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
+                    } else {
+                        $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
+                    }
                 }
                 $tblQuery .= ", \n";
                 if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
@@ -592,32 +611,102 @@ class GlobalsImportExport extends GlobalsTables
             ->get();
     }
     
+    public function loadSlParents()
+    {
+        $this->x["slTrees"] = $this->x["slNodes"] = $this->x["slConds"] = [];
+        $chk = SLTree::where('TreeDatabase', $this->dbID)
+            ->select('TreeID')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $tree) {
+                $this->x["slTrees"][] = $tree->TreeID;
+            }
+        }
+        $chk = SLNode::whereIn('NodeTree', $this->x["slTrees"])
+            ->select('NodeID')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $node) {
+                $this->x["slNodes"][] = $node->NodeID;
+            }
+        }
+        $chk = SLConditions::where('CondDatabase', $this->dbID)
+            ->select('CondID')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cond) {
+                $this->x["slConds"][] = $cond->CondID;
+            }
+        }
+        return true;
+    }
+    
+    public function getTableSeedDump($tblClean = '', $eval = '')
+    {
+        $seedChk = [];
+        if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
+            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "get();");
+        }
+        return $seedChk;
+    }
+    
+    public function loadSlSeedEval($tbl = [])
+    {
+        if (!isset($this->x["slTrees"])) {
+            $this->loadSlParents();
+        }
+        $eval = "";
+        if (isset($tbl->TblName)) {
+            if ($tbl->TblName == 'Databases') {
+                $eval = "where('DbID', " . $this->dbID . ")->";
+            } elseif (in_array($tbl->TblName, ['Images'])) {
+                $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $this->dbID . ")->";
+            } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
+                $eval = "where('" . $tbl->TblAbbr . "Database', " . $this->dbID . ")->";
+            } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
+                'Emails'])) {
+                $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" . implode(", ", $this->x["slTrees"]) . "])->";
+            } elseif (in_array($tbl->TblName, ['NodeResponses'])) {
+                $eval = "whereIn('" . $tbl->TblAbbr . "Node', [" . implode(", ", $this->x["slNodes"]) . "])->";
+            } elseif (in_array($tbl->TblName, ['ConditionsArticles', 'ConditionsNodes', 'ConditionsVals'])) {
+                $eval = "whereIn('" . $tbl->TblAbbr . "CondID', [" . implode(", ", $this->x["slConds"]) ."])->";
+            }
+        }
+        return $eval;
+    }
+    
     public function exportMysqlSl()
     {
         $this->loadSlParents();
         //$this->tmpDbSwitch();
+        if (!isset($this->x["export"])) {
+            $this->x["export"] = '';
+        }
         $tbls = $this->tblQrySlExports();
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $i => $tbl) {
-                $this->v["tbl"] = $tbl;
-                $this->v["tblName"] = 'SL_' . $tbl->TblName;
-                $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-                $this->x["export"] .= "\nDROP TABLE IF EXISTS `" . $this->v["tblName"] . "`;\n" 
+                $this->x["tbl"] = $tbl;
+                $this->x["tblName"] = 'SL_' . $tbl->TblName;
+                $this->x["tblClean"] = str_replace('_', '', $this->x["tblName"]);
+                $this->x["export"] .= "\nDROP TABLE IF EXISTS `" . $this->x["tblName"] . "`;\n" 
                     . $this->exportMysqlTbl($tbl);
                 $flds = $this->getTableFields($tbl);
                 if ($flds->isNotEmpty()) {
-                    $seedChk = $this->getTableSeedDump($this->v["tblClean"], $this->loadSlSeedEval($tbl));
+                    $seedChk = $this->getTableSeedDump($this->x["tblClean"], $this->loadSlSeedEval($tbl));
                     if ($seedChk->isNotEmpty()) {
-                        $this->v["tblInsertStart"] = "\nINSERT INTO `" . $this->v["tblName"] . "` (`" 
+                        $this->x["tblInsertStart"] = "\nINSERT INTO `" . $this->x["tblName"] . "` (`" 
                             . $tbl->TblAbbr . "ID`";
                         foreach ($flds as $i => $fld) {
-                            $this->v["tblInsertStart"] .= ", `" . $tbl->TblAbbr . $fld->FldName . "`";
+                            $this->x["tblInsertStart"] .= ", `" . $tbl->TblAbbr . $fld->FldName . "`";
                         }
-                        $this->v["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
-                        $this->x["export"] .= $this->v["tblInsertStart"];
+                        $this->x["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
+                        $this->x["export"] .= $this->x["tblInsertStart"];
                         foreach ($seedChk as $ind => $seed) {
-                            if ($ind%5000 == 0 && $ind > 0) $this->x["export"] .= ";\n" . $this->v["tblInsertStart"];
-                            elseif ($ind > 0) $this->x["export"] .= ",\n";
+                            if ($ind%5000 == 0 && $ind > 0) {
+                                $this->x["export"] .= ";\n" . $this->x["tblInsertStart"];
+                            } elseif ($ind > 0) {
+                                $this->x["export"] .= ",\n";
+                            }
                             $this->x["export"] .= "(" . $seed->getKey();
                             foreach ($flds as $fld) {
                                 if (isset($seed->{ $tbl->TblAbbr . $fld->FldName })) {
@@ -656,13 +745,17 @@ class GlobalsImportExport extends GlobalsTables
     
     public function getPackageLineCount($dir = 'Controllers', $pkg = '', $type = '.php')
     {
-        if ($pkg == '') $pkg = $this->sysOpts["cust-package"];
+        if ($pkg == '') {
+            $pkg = $this->sysOpts["cust-package"];
+        }
         return $this->getDirLinesCount('../vendor/' . $pkg . '/src/' . $dir, $type);
     }
     
     public function getPackageByteCount($dir = 'Controllers', $pkg = '', $type = '')
     {
-        if ($pkg == '') $pkg = $this->sysOpts["cust-package"];
+        if ($pkg == '') {
+            $pkg = $this->sysOpts["cust-package"];
+        }
         return $this->getDirSize('../vendor/' . $pkg . '/src/' . $dir, $type);
     }
     
@@ -685,7 +778,9 @@ class GlobalsImportExport extends GlobalsTables
     		->select('TreeID')
     		->get();
     	if ($chk->isNotEmpty()) {
-    		foreach ($chk as $t) $survs[] = $t->TreeID;
+    		foreach ($chk as $t) {
+    		    $survs[] = $t->TreeID;
+    		}
     	}
     	$stats["Surveys"] = sizeof($survs);
     	$stats["SurveyNodes"] = SLNode::whereIn('NodeTree', $survs)->count();
@@ -697,7 +792,9 @@ class GlobalsImportExport extends GlobalsTables
     		->select('TreeID')
     		->get();
     	if ($chk->isNotEmpty()) {
-    		foreach ($chk as $t) $pages[] = $t->TreeID;
+    		foreach ($chk as $t) {
+    		    $pages[] = $t->TreeID;
+    		}
     	}
     	$stats["Pages"] = sizeof($pages);
     	$stats["PageNodes"] = SLNode::whereIn('NodeTree', $pages)->count();
@@ -726,14 +823,17 @@ class GlobalsImportExport extends GlobalsTables
             $minifier = new Minify\CSS('../storage/app' . $fileCss);
             $minifier->minify('../storage/app' . $fileMin);
             Storage::delete($fileCss);
-            $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" href="' . $this->sysOpts["app-url"]
-                . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx . '">' . "\n";
+            $this->pageSCRIPTS .= '<style id="dynCss"> ' . file_get_contents('../storage/app' . $fileMin) . ' </style>';
+            //$this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" href="' . $this->sysOpts["app-url"]
+            //    . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx . '">' . "\n";
         }
         
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
-        $java = $this->pageJAVA . ((trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') 
-            ? ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ' : '');
+        $java = $this->pageJAVA;
+        if (trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') {
+            $java .= ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ';
+        }
         if (trim($java) != '' && trim($java) != '/* */') {
             Storage::put($fileJs, $java);
             $fileMin = str_replace('.js', '-min.js', $fileJs);
@@ -743,7 +843,7 @@ class GlobalsImportExport extends GlobalsTables
             }
             $minifier->minify('../storage/app' . $fileMin);
             Storage::delete($fileJs);
-            $this->pageSCRIPTS .= '<script async defer id="dynJs" type="text/javascript" src="' 
+            $this->pageSCRIPTS .= "\n" . '<script defer id="dynJs" type="text/javascript" src="' 
                 . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx 
                 . '"></script>';
         }
@@ -772,7 +872,16 @@ class GlobalsImportExport extends GlobalsTables
         $this->pageAJAX .= 'setTimeout(function() { $("#deferNode' . $nID . '").load("/defer/' 
             . $this->treeID . '/' . $nID . '"); }, ' . (500+(500*$this->x["deferCnt"])) . '); ';
         return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center><div id="deferAnim' . $nID 
-            . '" class="p20 m20">' . $this->sysOpts["spinner-code"] . '</div></center></div>';
+            . '" class="p20 m20">' . $this->spinner() . '</div></center></div>';
+    }
+    
+    public function spinner($center = false)
+    {
+        $ret = ((isset($this->sysOpts["spinner-code"])) ? $this->sysOpts["spinner-code"] : '...');
+        if ($center) {
+            return '<div class="w100 pT20 pB20"><center>' . $ret . '</center></div>';
+        }
+        return $ret;
     }
     
 }

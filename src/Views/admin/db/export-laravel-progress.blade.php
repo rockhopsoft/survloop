@@ -5,7 +5,7 @@
     	}}</span>: Export for Laravel 
 </h1>
 <br /><br />
-<center>{!! $GLOBALS["SL"]->sysOpts["spinner-code"] !!}</center>
+<center>{!! $GLOBALS["SL"]->spinner() !!}</center>
 <script type="text/javascript">
 setTimeout("window.location='{{ ( (!$GLOBALS['SL']->REQ->has('refresh')) ? '?refresh=2' :
 	( (intVal($GLOBALS['SL']->REQ->get('refresh')) > 2) ? 

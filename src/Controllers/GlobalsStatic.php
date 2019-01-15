@@ -56,6 +56,19 @@ class GlobalsStatic
         return $ret;
     }
     
+    public function wordLimitDotDotDot($str, $wordLimit = 50)
+    {
+        $strs = $this->mexplode(' ', $str);
+        if (sizeof($strs) <= $wordLimit) {
+            return $str;
+        }
+        $ret = '';
+        for ($i=0; $i<$wordLimit; $i++) {
+            $ret .= $strs[$i] . ' ';
+        }
+        return $ret . '...';
+    }
+    
     public function splitNumDash($str, $delim = '-')
     {
         $str = trim($str);
@@ -697,7 +710,9 @@ class GlobalsStatic
     public function replaceTabInd($str)
     {
         $pos = strpos($str, 'tabindex="');
-        if ($pos === false) return $str . $this->tabInd();
+        if ($pos === false) {
+            return $str . $this->tabInd();
+        }
         $posEnd = strpos($str, '"', (10+$pos));
         return substr($str, 0, $pos) . $this->tabInd() . substr($str, (1+$posEnd));
     }
@@ -705,7 +720,9 @@ class GlobalsStatic
     public function getCurrUrlBase()
     {
         $url = $_SERVER['REQUEST_URI'];
-        if (strpos($url, '?') !== false) return substr($url, 0, strpos($url, '?'));
+        if (strpos($url, '?') !== false) {
+            return substr($url, 0, strpos($url, '?'));
+        }
         return $url;
     }
     
@@ -763,12 +780,14 @@ class GlobalsStatic
         $strIN = str_replace('<', '&lt;', $strIN);
         $strIN = str_replace('>', '&gt;', $strIN);
         return htmlspecialchars(trim($strIN), ENT_XML1, 'UTF-8');
-        return trim($strIN);
+        //return trim($strIN);
     }
 	
     public function extractJava($str = '', $nID = -3, $destroy = false)
     {
-        if (trim($str) == '') return '';
+        if (trim($str) == '') {
+            return '';
+        }
         $allMeat = '';
         $str = str_replace('</ script>', '</script>', $str);
         $orig = $str;
@@ -791,13 +810,17 @@ class GlobalsStatic
                     . $tagMeat . (($nID >= 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
             }
         }
-        if (!$destroy) $this->pageJAVA .= $allMeat;
+        if (!$destroy) {
+            $this->pageJAVA .= $allMeat;
+        }
         return $str;
     }
     
     public function extractStyle($str = '', $nID = -3, $destroy = false)
     {
-        if (trim($str) == '') return '';
+        if (trim($str) == '') {
+            return '';
+        }
         $allMeat = '';
         $str = str_replace('</ style>', '</style>', $str);
         $orig = $str;

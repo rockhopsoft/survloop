@@ -44,9 +44,9 @@
 <center><a id="passChgSub" class="btn btn-primary btn-lg" href="javascript:;">Submit</a></center>
 </form>
 
-<script type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
+<script async defer type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
 </script>
-<script type="text/javascript"> $(document).ready(function(){
+<script async defer type="text/javascript"> $(document).ready(function(){
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
     function subPassChg() {
         var errs = '';

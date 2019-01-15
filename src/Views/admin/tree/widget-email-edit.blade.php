@@ -138,7 +138,7 @@
     <label class="w100 mB20" id="widgetEmaDefDump1">
         <input type="radio" name="widgetEmaDef" id="widgetEmaDefDump1" 
             onClick="return changeWidgetEmailDef(-69);"
-            @if (intVal($node->nodeRow->NodeDefault) == -69) CHECKED @endif
+            @if (isset($node->nodeRow->NodeDefault) && intVal($node->nodeRow->NodeDefault) == -69) CHECKED @endif
             value="-69" > <span class="mL5">Dump Entire Form</span>
         <div class="pL20"><i class="slGrey">
         This template will just dumps all the questions and answers provided by the user</i></div>
@@ -147,7 +147,7 @@
         <label class="w100 mB20" id="widgetEmaDef{{ $email->EmailID }}">
             <input type="radio" name="widgetEmaDef" id="widgetEmaDef{{ $email->EmailID }}" 
                 onClick="return changeWidgetEmailDef({{ $email->EmailID }});"
-                @if ($email->EmailID == $node->nodeRow->NodeDefault) CHECKED @endif
+            @if (isset($node->nodeRow->NodeDefault) && $email->EmailID == $node->nodeRow->NodeDefault) CHECKED @endif
                 value="{{ $email->EmailID }}" > <span class="mL5">{{ $email->EmailSubject }}</span>
             <div class="pL20"><i class="slGrey">{{ $email->EmailName }}</i></div>
         </label>

@@ -1,6 +1,7 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-java.blade.php */
 
-treeListChk[treeListChk.length] = [ "nodeSurvWidgetTreeID", "nodeWidgGrphYID", "nodeWidgGrphXID", "nodeWidgBarYID", "nodeWidgBarL1ID", "nodeWidgBarL2ID", "nodeWidgPieYID" ];
+var treeListChk = new Array(); // when [0] is changed, reload field drops [1], [2]...
+treeListChk[0] = [ "nodeSurvWidgetTreeID", "nodeWidgGrphYID", "nodeWidgGrphXID", "nodeWidgBarYID", "nodeWidgBarL1ID", "nodeWidgBarL2ID", "nodeWidgPieYID" ];
 
 function changeNodeType(newType) {
     document.getElementById('hasPage').style.display='none';
@@ -339,3 +340,34 @@ function checkData() {
     return true;
 }
 setTimeout("checkData()", 100);
+
+$(document).ready(function(){
+
+    function switchTreeOpts(fldID, treeID) {
+	    for (var i = 0; i < treeListChk.length; i++) {
+	        if (treeListChk[i][0] == fldID) {
+	            for (var j = 1; j < treeListChk[i].length; j++) {
+	                var loadURL = "/ajax-get-flds/"+treeID+"";
+	                if (document.getElementById(treeListChk[i][j]+"presel")) {
+	                    loadURL += "?fld="+document.getElementById(treeListChk[i][j]+"presel").value;
+	                }
+	                $("#"+treeListChk[i][j]+"").load(loadURL);
+	            }
+	        }
+	    }
+	    return true;
+    }
+    $(".switchTree").change(function(){
+        var treeFld = $(this).attr("id");
+        switchTreeOpts(treeFld, document.getElementById(treeFld).value);
+	});
+    setTimeout(function() {
+        for (var i = 0; i < treeListChk.length; i++) {
+            if (treeListChk[i][0] && document.getElementById(treeListChk[i][0])) {
+                switchTreeOpts(treeListChk[i][0], document.getElementById(treeListChk[i][0]).value);
+            }
+        }
+    }, 10);
+
+});
+

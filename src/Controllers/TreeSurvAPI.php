@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvAPI is extends a standard branching tree, for maps of API exports.
+  * TreeSurvApi is extends a standard branching tree, for maps of API exports.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
@@ -11,10 +11,12 @@ namespace SurvLoop\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
-use SurvLoop\Controllers\TreeCore;
+use App\Models\SLFields;
+use App\Models\SLSearchRecDump;
 
-class TreeSurvAPI extends TreeCore
+class TreeSurvApi extends TreeCore
 {
     protected function initExtra(Request $request)
     {
@@ -151,7 +153,382 @@ class TreeSurvAPI extends TreeCore
         return -3;
     }
     
+    protected function maxUserView()
+    {
+        return true;
+    }
     
+    private function loadXmlMapTree(Request $request)
+    {
+        $this->survLoopInit($request);
+        if (isset($GLOBALS["SL"]->xmlTree["id"]) && empty($this->xmlMapTree)) {
+            $this->xmlMapTree = new TreeSurvApi;
+            $this->xmlMapTree->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
+        }
+        return true;
+    }
+        
+    private function getXmlTmpV($nID, $tblID = -3)
+    {
+        $v = [];
+        if ($tblID > 0) {
+            $v["tbl"] = $GLOBALS["SL"]->tbl[$tblID];
+        } else {
+            $v["tbl"] = $this->xmlMapTree->getNodeTblName($nID);
+        }
+        $v["tblID"]    = ((isset($GLOBALS["SL"]->tblI[$v["tbl"]])) ? $GLOBALS["SL"]->tblI[$v["tbl"]] : 0);
+        $v["tblAbbr"]  = ((isset($GLOBALS["SL"]->tblAbbr[$v["tbl"]])) ? $GLOBALS["SL"]->tblAbbr[$v["tbl"]] : '');
+        $v["TblOpts"]  = 1;
+        if ($nID > 0 && isset($this->xmlMapTree->allNodes[$nID])) {
+            $v["TblOpts"] = $this->xmlMapTree->allNodes[$nID]->nodeOpts;
+        }
+        $v["tblFlds"] = SLFields::select()
+            ->where('FldDatabase', $this->dbID)
+            ->where('FldTable', '=', $v["tblID"])
+            ->orderBy('FldOrd', 'asc')
+            ->orderBy('FldEng', 'asc')
+            ->get();
+        $v["tblFldEnum"] = $v["tblFldDefs"] = [];
+        if ($v["tblFlds"]->isNotEmpty()) {
+            foreach ($v["tblFlds"] as $i => $fld) {
+                $v["tblFldDefs"][$fld->FldID] = [];
+                if (strpos($fld->FldValues, 'Def::') !== false) {
+                    $set = $GLOBALS["SL"]->def->getSet(str_replace('Def::', '', $fld->FldValues));
+                    if (sizeof($set) > 0) {
+                        foreach ($set as $def) {
+                            $v["tblFldDefs"][$fld->FldID][] = $def->DefValue;
+                        }
+                    }
+                } elseif (trim($fld->FldValues) != '' && strpos($fld->FldValues, ';') !== false) {
+                    $v["tblFldDefs"][$fld->FldID] = explode(';', $fld->FldValues);
+                }
+                $v["tblFldEnum"][$fld->FldID] = (sizeof($v["tblFldDefs"][$fld->FldID]) > 0);
+            }
+        }
+        $v["tblHelp"] = $v["tblHelpFld"] = [];
+        if ($v["tblID"] > 0 && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+            foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
+                if ($v["tbl"] == $helper->DataHelpParentTable && $helper->DataHelpValueField
+                    && !in_array($GLOBALS["SL"]->tblI[$helper->DataHelpTable], $v["tblHelp"])) {
+                    $v["tblHelp"][] = $GLOBALS["SL"]->tblI[$helper->DataHelpTable];
+                    $v["tblHelpFld"][$GLOBALS["SL"]->tblI[$helper->DataHelpTable]] 
+                        = SLFields::where('FldTable', $GLOBALS["SL"]->tblI[$helper->DataHelpTable])
+                            ->where('FldName', substr($helper->DataHelpValueField, 
+                                strlen($GLOBALS["SL"]->tblAbbr[$helper->DataHelpTable])))
+                            ->first();
+                }
+            }
+        }
+        return $v;
+    }
     
+    public function genXmlSchema(Request $request)
+    {
+        $this->loadXmlMapTree($request);
+        if (!isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
+            return $this->redir('/');
+        }
+        $this->v["nestedNodes"] = $this->genXmlSchemaNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers);
+        $view = view('vendor.survloop.admin.tree.xml-schema', $this->v)->render();
+        return Response::make($view, '200')->header('Content-Type', 'text/xml');
+    }
+    
+    public function genXmlSchemaNode($nID, $nodeTiers, $overV = [])
+    {
+        $v = [];
+        if (sizeof($overV) > 0) {
+            $v = $overV;
+        } else {
+            $v = $this->getXmlTmpV($nID);
+        }
+        $v["kids"] = '';
+        if ($v["tblHelp"] && sizeof($v["tblHelp"]) > 0) {
+            foreach ($v["tblHelp"] as $help) {
+                $nextV = $this->getXmlTmpV(-3, $help);
+                if (isset($v["tblHelpFld"][$help]->FldName)) {
+                    $v["kids"] .= '<xs:element name="' . $nextV["tbl"] . '" minOccurs="0">
+                        <xs:complexType mixed="true"><xs:sequence>
+                            <xs:element name="' . $v["tblHelpFld"][$help]->FldName 
+                            . '" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence></xs:complexType>
+                    </xs:element>' . "\n";
+                }
+            }
+        }
+        for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
+            $v["kids"] .= $this->genXmlSchemaNode($nodeTiers[1][$i][0], $nodeTiers[1][$i]);
+        }
+        return view('vendor.survloop.admin.tree.xml-schema-node', $v )->render();
+    }
+    
+    public function genXmlReport(Request $request)
+    {
+        if (!isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
+            return $this->redir('/xml-schema');
+        }
+        if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]]) 
+            || empty($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])) {
+            return $this->redir('/xml-schema');
+        }
+        $this->v["nestedNodes"] = $this->genXmlReportNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers, 
+            $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]);
+        if (trim($this->v["nestedNodes"]) == '') {
+            return $this->redir('/xml-schema');
+        }
+        $view = view('vendor.survloop.admin.tree.xml-report', $this->v)->render();
+        return Response::make($view, '200')->header('Content-Type', 'text/xml');
+    }
+    
+    public function genXmlReportNode($nID, $nodeTiers, $rec, $overV = [])
+    {
+        $v = [];
+        if (sizeof($overV) > 0) {
+            $v = $overV;
+        } else {
+            $v = $this->getXmlTmpV($nID);
+        }
+        $v["rec"]     = $rec;
+        $v["recFlds"] = [];
+        if (sizeof($v["tblFlds"]) > 0) {
+            foreach ($v["tblFlds"] as $i => $fld) {
+                //if (!$this->checkValEmpty($fld->FldType, $rec->{ $v["tblAbbr"] . $fld->FldName })) {
+                    $v["recFlds"][$fld->FldID] = $this->genXmlFormatVal($rec, $fld, $v["tblAbbr"]);
+                //}
+            }
+        }
+        $v["kids"] = '';
+        if (is_array($v["tblHelp"]) && sizeof($v["tblHelp"]) > 0) {
+            foreach ($v["tblHelp"] as $help) {
+                $nextV = $this->getXmlTmpV(-3, $help);
+                $kidRows = $this->sessData->getChildRows($v["tbl"], $rec->getKey(), $nextV["tbl"]);
+                if ($kidRows && sizeof($kidRows) > 0) {
+                    if (intVal($nextV["tblID"]) > 0 && $nextV["TblOpts"]%5 > 0) {
+                        $v["kids"] .= '<' . $nextV["tbl"] . '>' . "\n";
+                    }
+                    foreach ($kidRows as $j => $kid) {
+                        if (isset($v["tblHelpFld"][$help]->FldName)) {
+                            //if (!$this->checkValEmpty($kid, 
+                            //    $rec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]] 
+                            //        . $v["tblHelpFld"][$help] })) {
+                                $v["kids"] .= '<' . $v["tblHelpFld"][$help]->FldName . '>' 
+                                    . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], 
+                                        $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]])
+                                . '</' . $v["tblHelpFld"][$help]->FldName . '>' . "\n";
+                            //}
+                        }
+                    }
+                    if (intVal($nextV["tblID"]) > 0 && $nextV["TblOpts"]%5 > 0) {
+                        $v["kids"] .= '</' . $nextV["tbl"] . '>' . "\n";
+                    }
+                }
+            }
+        }
+        for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
+            $tbl2 = $this->xmlMapTree->getNodeTblName($nodeTiers[1][$i][0]);
+            $kidRows = $this->sessData->getChildRows($v["tbl"], $rec->getKey(), $tbl2);
+            if ($kidRows && sizeof($kidRows) > 0) {
+                $nextV = $this->getXmlTmpV($nodeTiers[1][$i][0]);
+                if (intVal($nextV["tblID"]) > 0 && $nextV["TblOpts"]%5 > 0) {
+                    $v["kids"] .= '<' . $nextV["tbl"] . '>' . "\n";
+                }
+                foreach ($kidRows as $j => $kid) {
+                    $v["kids"] .= $this->genXmlReportNode($nodeTiers[1][$i][0], $nodeTiers[1][$i], $kid);
+                }
+                if (intVal($nextV["tblID"]) > 0 && $nextV["TblOpts"]%5 > 0) {
+                    $v["kids"] .= '</' . $nextV["tbl"] . '>' . "\n";
+                }
+            }
+        }
+        return view('vendor.survloop.admin.tree.xml-report-node', $v )->render();
+    }
+    
+    // FldOpts %1 XML Public Data; %7 XML Private Data; %11 XML Sensitive Data; %13 XML Internal Use Data
+    public function checkViewDataPerms($fld)
+    {
+        if ($fld && isset($fld->FldOpts) && intVal($fld->FldOpts) > 0) {
+            if ($fld->FldOpts%7 > 0 && $fld->FldOpts%11 > 0 && $fld->FldOpts%13 > 0) {
+                return true;
+            }
+            if (in_array($GLOBALS["SL"]->x["pageView"], ['full', 'full-pdf', 'full-xml'])) {
+                return true;
+            }
+            if ($fld->FldOpts%13 == 0 || $fld->FldOpts%11 == 0) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    public function checkFldDataPerms($fld)
+    {
+        if ($fld && isset($fld->FldOpts) && intVal($fld->FldOpts) > 0) {
+            if ($fld->FldOpts%7 > 0 && $fld->FldOpts%11 > 0 && $fld->FldOpts%13 > 0) {
+                return true;
+            }
+            if ($GLOBALS["SL"]->x["dataPerms"] == 'internal') {
+                return true;
+            } elseif ($fld->FldOpts%13 == 0) {
+                return false;
+            }
+            if ($fld->FldOpts%11 == 0) {
+                return ($GLOBALS["SL"]->x["dataPerms"] == 'sensitive');
+            }
+            if ($fld->FldOpts%7 == 0) {
+                return in_array($GLOBALS["SL"]->x["dataPerms"], ['private', 'sensitive']);
+            }
+        }
+        return false;
+    }
+    
+    public function genXmlFormatVal($rec, $fld, $abbr)
+    {
+        $val = false;
+        if ($this->checkFldDataPerms($fld) && $this->checkViewDataPerms($fld) 
+            && isset($rec->{ $abbr . $fld->FldName })) {
+            $val = $rec->{ $abbr . $fld->FldName };
+            if (strpos($fld->FldValues, 'Def::') !== false) {
+                if (intVal($val) > 0) {
+                    $val = $GLOBALS["SL"]->def->getVal(str_replace('Def::', '', $fld->FldValues), $val);
+                } else {
+                    $val = false;
+                }
+            } else { // not pulling values from a definition set
+                if (in_array($fld->FldType, array('INT', 'DOUBLE'))) {
+                    if (intVal($val) == 0) {
+                        $val = false;
+                    }
+                } elseif (in_array($fld->FldType, array('VARCHAR', 'TEXT'))) {
+                    if (trim($val) == '') {
+                        $val = false;
+                    } else {
+                        if ($val != htmlspecialchars($val, ENT_XML1, 'UTF-8')) {
+                            $val = '<![CDATA[' . $val . ']]>'; // !in_array($val, array('Y', 'N', '?'))
+                        }
+                    }
+                } elseif ($fld->FldType == 'DATETIME') {
+                    if ($val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00') {
+                        return '';
+                    }
+                    $val = str_replace(' ', 'T', $val);
+                } elseif ($fld->FldType == 'DATE') {
+                    if ($val == '0000-00-00' || $val == '1970-01-01') {
+                        return '';
+                    }
+                }
+            }
+        }
+        return $val;
+    }
+    
+    public function checkValEmpty($fldType, $val)
+    {
+        $val = trim($val);
+        if ($fldType == 'DATE' && ($val == '' || $val == '0000-00-00' || $val == '1970-01-01')) {
+            return true;
+        } elseif ($fldType == 'DATETIME' 
+            && ($val == '' || $val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00')) {
+            return true;
+        }
+        return false;
+    }
+    
+    public function chkRecsPub(Request $request, $treeID = 1)
+    {
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        if (!session()->has('chkRecsPub') || $request->has('refresh')) {
+            $dumped = [];
+            if ($request->has('refresh')) {
+                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)
+                    ->delete();
+                unset($chk);
+            } else {
+                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)
+                    ->select('SchRecDmpRecID')
+                    ->get();
+                if ($chk->isNotEmpty()) {
+                    foreach ($chk as $rec) {
+                        $dumped[] = $rec->SchRecDmpRecID;
+                    }
+                }
+                unset($chk);
+            }
+            if (sizeof($this->searcher->allPublicCoreIDs) > 0) {
+                foreach ($this->searcher->allPublicCoreIDs as $coreID) {
+                    if (!in_array($coreID, $dumped)) {
+                        //$this->genRecDump($coreID, false);
+                    }
+                }
+            }
+            $this->reloadStats($this->searcher->allPublicCoreIDs);
+            session()->put('chkRecsPub', 1);
+            return true;
+        }
+        return false;
+    }
+    
+    public function genRecDump($coreID, $loadTree = true)
+    {
+        $this->loadXmlMapTree($GLOBALS["SL"]->REQ);
+        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
+            $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        } else { // XML core table is different from main tree
+            $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
+            $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
+        }
+        if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])) {
+            return false;
+        }
+        $dump = $this->genRecDumpNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers, 
+            $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]) . $this->genRecDumpXtra();
+//echo 'dump: <textarea style="width: 100%; height: 300px;">' . $dump . '</textarea><br />'; exit;
+        $dumpRec = new SLSearchRecDump;
+        $dumpRec->SchRecDmpTreeID  = $this->treeID;
+        $dumpRec->SchRecDmpRecID   = $coreID;
+        $dumpRec->SchRecDmpRecDump = utf8_encode($GLOBALS["SL"]->stdizeChars(str_replace('  ', ' ', trim($dump))));
+        $dumpRec->save();
+        return true;
+    }
+    
+    public function genRecDumpNode($nID, $nodeTiers, $rec, $overV = [])
+    {
+        $ret = '';
+        $v = $this->getXmlTmpV($nID);
+        if (sizeof($v["tblFlds"]) > 0) {
+            foreach ($v["tblFlds"] as $i => $fld) {
+                $ret .= ' ' . $this->genXmlFormatVal($rec, $fld, $v["tblAbbr"]);
+            }
+        }
+        if (sizeof($v["tblHelp"]) > 0) {
+            foreach ($v["tblHelp"] as $help) {
+                $nextV = $this->getXmlTmpV(-3, $help);
+                $kidRows = $this->sessData->getChildRows($v["tbl"], $rec->getKey(), $nextV["tbl"]);
+                if (sizeof($kidRows) > 0) {
+                    foreach ($kidRows as $j => $kid) {
+                        $ret .= ' ' . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], 
+                            $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]]);
+                    }
+                }
+            }
+        }
+        for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
+            $tbl2 = $this->xmlMapTree->getNodeTblName($nodeTiers[1][$i][0]);
+            $kidRows = $this->sessData->getChildRows($v["tbl"], $rec->getKey(), $tbl2);
+            if (sizeof($kidRows) > 0) {
+                $nextV = $this->getXmlTmpV($nodeTiers[1][$i][0]);
+                foreach ($kidRows as $j => $kid) {
+                    $ret .= ' ' . $this->genRecDumpNode($nodeTiers[1][$i][0], $nodeTiers[1][$i], $kid);
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    protected function genRecDumpXtra()
+    {
+        return '';
+    }
     
 }

@@ -514,7 +514,9 @@ class Geographs
                 }
             }
         }
-        if ($chk && isset($chk->AdyGeoLat) && isset($chk->AdyGeoLong)) return [$chk->AdyGeoLat, $chk->AdyGeoLong];
+        if ($chk && isset($chk->AdyGeoLat) && isset($chk->AdyGeoLong)) {
+            return [$chk->AdyGeoLat, $chk->AdyGeoLong];
+        }
         return [0, 0];
     }
     

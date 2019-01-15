@@ -1,58 +1,50 @@
-<?php // sorry, not sure how this should be done instead
-$surv = new SurvLoop\Controllers\SurvLoop;
-$surv->loadLoop(new Illuminate\Http\Request);
-$v = $surv->custLoop->v;
-?>@extends('vendor.survloop.master')
-
+@extends('vendor.survloop.master')
 @section('content')
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
+
 <form name="mainPageForm" method="POST" action="{{ url('/register') }}" onSubmit="return checkNodeForm();">
-<input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" id="isSignupID" name="isSignup" value="1">
+<input type="hidden" name="previous" 
+    @if (trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
+    @elseif ($request->has('redir')) value="{{ $request->get('redir') }}"
+    @elseif ($request->has('previous')) value="{{ $request->get('previous') }}"
+    @else value="{{ URL::previous() }}"
+    @endif >
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 
 <div class="p20"></div>
 
-<div class="row loginTitles">
-    <div class="col-6">
-    @if (isset($GLOBALS['SL']->sysOpts["signup-instruct"]) && trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '')
-        {!! $GLOBALS['SL']->sysOpts["signup-instruct"] !!}
-    @else
-        <h1 class="mT0">Sign Up</h1>
-    @endif
-    </div>
-    <div class="col-6 taR pT5">
-        @if (!isset($GLOBALS['SL']->sysOpts["signup-instruct"]) 
-            || trim($GLOBALS['SL']->sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
-            <a href="/login" class="btn btn-secondary">Login</a>
-        @endif
-    </div>
-</div>
+@if (!isset($sysOpts["signup-instruct"]) 
+    || trim($sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
+    <a href="/login{{ (($request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
+        }}" class="btn btn-secondary pull-right mL20">Login</a>
+@endif
+@if (isset($sysOpts["signup-instruct"]) && trim($sysOpts["signup-instruct"]) != '')
+    {!! $sysOpts["signup-instruct"] !!}
+@else
+    <h1 class="mT0">Sign Up</h1>
+@endif
 
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
-@if (isset($GLOBALS['SL']->sysOpts["login-instruct"]) && trim($GLOBALS['SL']->sysOpts["login-instruct"]) != '')
-    <h4 class="mB20">{!! $GLOBALS['SL']->sysOpts["login-instruct"] !!}</h4>
+@if (isset($sysOpts["login-instruct"]) && trim($sysOpts["login-instruct"]) != '')
+    <h4 class="mB20">{!! $sysOpts["login-instruct"] !!}</h4>
 @endif
 
-@if (isset($errorMsg))
-    <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
-@endif
+@if (isset($errorMsg)) <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div> @endif
 
-<div id="node004" class="nodeWrap{{ $errors->has('name') ? 'Error' : '' }}">
+<div id="node004" class="nodeWrap{{ ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
     <div id="nLabel004" class="nPrompt"><label for="nameID">
         Username: 
-        @if (isset($GLOBALS["SL"]->sysOpts["user-name-optional"]) 
-            && $GLOBALS["SL"]->sysOpts["user-name-optional"] == 'Off')
+        @if (isset($sysOpts["user-name-optional"]) && $sysOpts["user-name-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
     <div class="nFld mT0">
         <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
-        @if ($errors->has('name'))
-            <span class="form-text">
-                <strong>{{ $errors->first('name') }}</strong>
-            </span>
+        @if (isset($errors) && $errors->has('name'))
+            <span class="form-text"><strong>{{ $errors->first('name') }}</strong></span>
         @endif
     </div>
 </div>
@@ -60,23 +52,21 @@ $v = $surv->custLoop->v;
 <div class="nodeAnchor"><a id="n001" name="n001"></a></div>
 <div class="nodeHalfGap"></div>
 
-<div id="node001" class="nodeWrap{{ $errors->has('email') ? 'Error' : '' }}">
+<div id="node001" class="nodeWrap{{ ((isset($errors) && $errors->has('email')) ? 'Error' : '') }}">
     <div id="nLabel001" class="nPrompt"><label for="emailID">
         Email:
-        @if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
-            || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off')
+        @if (!isset($sysOpts["user-email-optional"]) 
+            || $sysOpts["user-email-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
     <div class="nFld mT0">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
-        @if ($errors->has('email'))
-            <span class="form-text">
-                <strong>{{ $errors->first('email') }}</strong>
-            </span>
+        @if (isset($errors) && $errors->has('email'))
+            <span class="form-text"><strong>{{ $errors->first('email') }}</strong></span>
         @endif
-        @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
-            && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
+        @if (isset($sysOpts["user-email-optional"]) 
+            && $sysOpts["user-email-optional"] == 'On')
             * Currently, you will only be able reset a lost password with an email address.
         @endif
     </div>
@@ -85,14 +75,14 @@ $v = $surv->custLoop->v;
 <div class="nodeAnchor"><a id="n002" name="n002"></a></div>
 <div class="nodeHalfGap"></div>
 
-<div id="node002" class="nodeWrap{{ $errors->has('password') ? 'Error' : '' }}">
+<div id="node002" class="nodeWrap{{ ((isset($errors) && $errors->has('password')) ? 'Error' : '') }}">
     <div id="nLabel002" class="nPrompt"><label for="password">
         Password: <span class="red">*required, 8 character minimum</span>
     </label></div>
     <div class="relDiv w100"><div id="passStrng" class="red"></div></div>
     <div class="nFld mT0">
         <input id="password" name="password" value="" type="password" class="form-control">
-        @if ($errors->has('password'))
+        @if (isset($errors) && $errors->has('password'))
             <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
         @endif
     </div>
@@ -106,8 +96,7 @@ $v = $surv->custLoop->v;
         Confirm Password: <span class="red">*required</span>
     </label></div>
     <div class="nFld mT0">
-        <input id="password_confirmation" name="password_confirmation" value="" type="password" 
-            class="form-control">
+        <input id="password_confirmation" name="password_confirmation" value="" type="password" class="form-control">
     </div>
 </div>
 
@@ -115,7 +104,7 @@ $v = $surv->custLoop->v;
 
 @if ($GLOBALS["SL"]->sysHas('volunteers'))
     <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
-        @if ($GLOBALS["SL"]->REQ->has('volunteer')) CHECKED @endif > Volunteer</label>
+        @if ($request->has('volunteer')) CHECKED @endif > Volunteer</label>
 @endif
 
 <center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
@@ -126,19 +115,76 @@ $v = $surv->custLoop->v;
 
 </form>
 
-<script type="text/javascript" src="/survloop/zxcvbn.js">
-</script>
+<script type="text/javascript" src="/survloop/zxcvbn.js"></script>
 <script type="text/javascript">
 @if ($GLOBALS["SL"]->sysHas('volunteers'))
 setTimeout(function() { if (findGetParam('volunteer')) document.getElementById('newVolunteerID').checked=true; }, 50);
 @endif
 $(document).ready(function(){
-{!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
+    {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
 });
 function checkNodeForm() {
+    emailRequired = {{ $emailRequired }};
     hasAttemptedSubmit = true;
-    totFormErrors=0; formErrorsEng = "";
-    {!! view('vendor.survloop.auth.register-node-jsValid', [ "coreID" => -3 ])->render() !!}
+    totFormErrors = 0;
+    formErrorsEng = "";
+    
+@if (isset($sysOpts["user-name-ask"]) && $sysOpts["user-name-ask"] == 'On' && $sysOpts["user-name-optional"] == 'Off')
+    if (document.getElementById('nameID').value.trim() == '') {
+        setFormLabelRed('004');
+        totFormErrors++;
+    } else {
+        setFormLabelBlack('004');
+    }
+@endif
+
+    if (emailRequired && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
+        setFormLabelRed('001'); 
+        totFormErrors++;
+    } else if (reqFormEmail('emailID') && document.getElementById('emailID').value.trim() != '') {
+        document.getElementById('emailWarning').style.display='none';
+        $.ajax({
+            url: "/chkEmail?"+$("#emailID").serialize(),
+            type: 'GET',
+            async: false,
+            cache: false,
+            timeout: 30000,
+            error: function(){
+                return true;
+            },
+            success: function(chkData){ 
+                if (chkData == 'found') {
+                    document.getElementById('emailBlockID').value = 1;
+                    setFormLabelRed('001'); 
+                    totFormErrors++;
+                    //document.getElementById('emailWarning').style.display='block';
+                    $("#emailWarning").slideDown("fast");
+                } else {
+                    document.getElementById('emailBlockID').value = 0;
+                    setFormLabelBlack('001');
+                }
+            }
+        });
+    }
+    
+    if (document.getElementById('password') && document.getElementById('password_confirmation')) {
+        var pass1 = document.getElementById('password').value;
+        if (pass1 == '' || pass1.length < 8 || pass1 != document.getElementById('password_confirmation').value) {
+            setFormLabelRed('002');
+            setFormLabelRed('003');
+            totFormErrors++;
+        } else {
+            setFormLabelBlack('002');
+            setFormLabelBlack('003');
+        }
+    }
+
+@if (isset($sysOpts["user-email-optional"]) && $sysOpts["user-email-optional"] == 'On')
+    if (totFormErrors == 0 && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
+        document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
+    }
+@endif
+    
     if (totFormErrors > 0) {
         setFormErrs();
         return false;

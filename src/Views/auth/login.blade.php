@@ -9,6 +9,11 @@ $v = $surv->custLoop->v;
 <form name="mainPageForm" method="POST" action="/login">
 <input type="hidden" id="isLoginID" name="isLogin" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+<input type="hidden" name="previous" 
+    @if (Request::has('redir')) value="{{ Request::get('redir') }}"
+    @elseif (Request::has('previous')) value="{{ Request::get('previous') }}"
+    @else value="{{ URL::previous() }}"
+    @endif >
 
 <div class="w100"><center><div id="treeWrap" class="treeWrapForm">
 

@@ -26,7 +26,9 @@ addFld("{{ $fld }}");
 function checkNodeForm() {
     if (document.getElementById("stepID") && document.getElementById("stepID").value == "back") return true;
     hasAttemptedSubmit = true;
-    totFormErrors = 0; formErrorsEng = ""; firstNodeError = 0;
+    totFormErrors = 0;
+    formErrorsEng = "";
+    firstNodeError = 0;
     {!! $pageJSvalid !!}
     if (totFormErrors > 0) {
         setFormErrs();

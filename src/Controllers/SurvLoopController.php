@@ -56,7 +56,7 @@ class SurvLoopController extends Controller
     protected $survInitRun       = false;
     
     protected $extraTree         = [];
-    protected $searcher          = null;
+    public    $searcher          = null;
     
     public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
     {
@@ -66,6 +66,7 @@ class SurvLoopController extends Controller
             $this->v["uID"]        = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
             $this->v["isAdmin"]    = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
             $this->v["isVolun"]    = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
+            $this->initPowerUser();
             $this->v["isAll"]      = $request->has('all');
             $this->v["isAlt"]      = $request->has('alt');
             $this->v["isPrint"]    = $request->has('print');
@@ -374,16 +375,20 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    protected function loadCustLoop($request, $treeID = -3)
+    protected function loadCustLoop(Request $request, $treeID = -3, $dbID = -3)
     {
-        if ($treeID <= 0) $treeID = $this->treeID;
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
             $eval = "\$this->custReport = new ". $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
-                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "(\$request, -3, " 
-                . $this->dbID . ", " . $treeID . ");";
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "(\$request, -3, \$dbID, \$treeID);";
             eval($eval);
         } else {
-            $this->custReport = new TreeSurvForm($request, -3, $this->dbID, $treeID);
+            $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
         }
         $currPage = '';
         if (isset($this->v["currPage"]) && sizeof($this->v["currPage"]) > 0) {
@@ -407,7 +412,7 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    protected function initSearcher()
+    public function initSearcher()
     {
         if ($this->searcher === null) {
             $this->loadCustSearcher();
@@ -617,7 +622,9 @@ class SurvLoopController extends Controller
     
     protected function genTokenStr($type, $strlen = 50, $delim = '-')
     {
-        if ($type == 'MFA') $strlen = 12;
+        if ($type == 'MFA') {
+            $strlen = 12;
+        }
         $token = $this->generateRandomString($strlen);
         if ($type == 'MFA') {
             $token = substr($token, 0, floor(strlen($token)/3)) . $delim 
@@ -630,7 +637,9 @@ class SurvLoopController extends Controller
     public function tokenExpireDate($type = 'Confirm Email')
     {
         $hrs = 24*7;
-        if ($type == 'Confirm Email') $hrs = 24*28;
+        if ($type == 'Confirm Email') {
+            $hrs = 24*28;
+        }
         return date("Y-m-d H:i:s", 
             mktime(intVal(date('H'))-$hrs, date('i'), date('s'), date('m'), date('d'), date('Y')));
     }
@@ -642,8 +651,12 @@ class SurvLoopController extends Controller
                 . '<hr><hr></div>';
             return true;
         }
-        if (!isset($repTo[0]) || trim($repTo[0]) == '') $repTo[0] = 'info@' . $GLOBALS["SL"]->getParentDomain();
-        if (!isset($repTo[1]) || trim($repTo[1]) == '') $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
+        if (!isset($repTo[0]) || trim($repTo[0]) == '') {
+            $repTo[0] = 'info@' . $GLOBALS["SL"]->getParentDomain();
+        }
+        if (!isset($repTo[1]) || trim($repTo[1]) == '') {
+            $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
+        }
         $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.master', [
             'emaSubj'    => \$emaSubject,
             'emaContent' => \$emaContent,
@@ -678,8 +691,7 @@ class SurvLoopController extends Controller
         if (is_array($emailTo)) {
             $emaTo = $emailTo;
             $emailTo = $emailTo[1] . ' <' . $emailTo[0] . '>';
-        }
-        elseif (trim($emailTo) != '') {
+        } elseif (trim($emailTo) != '') {
             $emaUsr = User::where('email', $emailTo)->first();
             if ($emaUsr && isset($emaUsr->name)) {
                 $emaTo[] = [$emailTo, $emaUsr->name];
@@ -826,8 +838,10 @@ class SurvLoopController extends Controller
         return $done;
     }
     
-    protected function sysUpdatesCust($apply = false) { return ''; }
-    
+    protected function sysUpdatesCust($apply = false)
+    {
+        return '';
+    }
     
     public function printUserLnk($uID = -3)
     {
@@ -841,7 +855,7 @@ class SurvLoopController extends Controller
         return '';
     }
     
-    protected function tblsInPackage()
+    public function tblsInPackage()
     {
         if ($this->dbID == 3) {
             return ['ZipAshrae', 'Zips'];
@@ -862,6 +876,17 @@ class SurvLoopController extends Controller
         return $ret;
     }
     
-    protected function tblsInPackageCustom() { return []; }
+    public function tblsInPackageCustom()
+    {
+        return [];
+    }
+    
+    public function initPowerUser($uID = -3)
+    {
+        if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|staff|databaser|brancher|partner')) {
+            return true;
+        }
+        return false;
+    }
     
 }

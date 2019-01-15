@@ -249,7 +249,8 @@
                                     class="form-control form-control-lg w100" >
                                     @for ($i = 1; $i < 13; $i++)
                                         <option value="{{ $i }}" 
-                                            @if ($i ==intVal($node->nodeRow->NodeCharLimit)) SELECTED @endif 
+                                            @if (isset($node->nodeRow->NodeCharLimit) 
+                                                && $i ==intVal($node->nodeRow->NodeCharLimit)) SELECTED @endif 
                                             >{{ $i }}</option>
                                     @endfor
                                     </select>
@@ -261,7 +262,8 @@
                                 <div class="nFld">
                                     <input type="number" name="nodeLayoutLimitCol" id="nodeLayoutLimitColID"
                                         class="form-control form-control-lg w100" autocomplete="off" 
-                                        value="{!! intVal($node->nodeRow->NodeCharLimit) !!}" >
+                                        value="{!! ((isset($node->nodeRow->NodeCharLimit)) 
+                                            ? intVal($node->nodeRow->NodeCharLimit) : '') !!}" >
                                 </div>
                                 (4 columns could have width 3, 2 columns could have 6 each, etc.)
                             </label>

@@ -47,8 +47,10 @@ class AdminDBController extends AdminController
         $this->dbSubTitle = '<span class="f14 red">' . $GLOBALS["SL"]->dbRow->DbDesc . '</span>';
         $this->v["dbAllowEdits"] = ($this->v["user"] && $this->v["user"]->hasRole('administrator|databaser'));
         $this->v["mission"] = view('vendor.survloop.inc-mission-statement', 
-            array("DbMission" => $GLOBALS["SL"]->dbRow->DbMission));
-        if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/db';
+            [ "DbMission" => $GLOBALS["SL"]->dbRow->DbMission ]);
+        if (trim($this->v["currPage"][0]) == '') {
+            $this->v["currPage"][0] = '/dashboard/db';
+        }
         $this->v["help"] = '<span class="f10 gryA">?</span>&nbsp;&nbsp;&nbsp;';
         $this->loadLookups();
         set_time_limit(180);
@@ -69,10 +71,15 @@ class AdminDBController extends AdminController
     protected function loadLookups()
     {
         $runChecks = false;
-        if (!session()->has('dbDesignChecks')) session()->put('dbDesignChecks', 0);
-        else session()->put('dbDesignChecks', (1+session()->get('dbDesignChecks')));
+        if (!session()->has('dbDesignChecks')) {
+            session()->put('dbDesignChecks', 0);
+        } else {
+            session()->put('dbDesignChecks', (1+session()->get('dbDesignChecks')));
+        }
         // moderating cleanup to periodic page loads
-        if (session()->get('dbDesignChecks')%10 == 0) $runChecks = true;  
+        if (session()->get('dbDesignChecks')%10 == 0) {
+            $runChecks = true;
+        }
         
         $this->v["FldDataTypes"] = [];
         $this->v["FldDataTypes"]['VARCHAR']  = array('Text/String (255 characters max)', 'Text');
@@ -89,11 +96,15 @@ class AdminDBController extends AdminController
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $tbl) {
                 if ($runChecks) {
-                    if ($tbl->TblOpts%3 == 0) $tbl->TblOpts = $tbl->TblOpts/3;
+                    if ($tbl->TblOpts%3 == 0) {
+                        $tbl->TblOpts = $tbl->TblOpts/3;
+                    }
                     $keyFlds = SLFields::where('FldTable', $tbl->TblID)
                         ->where('FldKeyType', 'LIKE', '%Primary%')
                         ->first();
-                    if ($keyFlds) $tbl->TblOpts *= 3;
+                    if ($keyFlds) {
+                        $tbl->TblOpts *= 3;
+                    }
                     $tbl->save();
                 }
             }
@@ -108,12 +119,14 @@ class AdminDBController extends AdminController
                 $fldList = $GLOBALS["SL"]->mexplode(',', $rule->RuleFields);
                 if (sizeof($fldList) > 0) {
                     foreach ($fldList as $fldID) {
-                        $this->v["dbBusRulesFld"][intVal($fldID)] = array($rule->ruleID, $rule->RuleStatement);
+                        $this->v["dbBusRulesFld"][intVal($fldID)] = [$rule->ruleID, $rule->RuleStatement];
                     }
                 }
             }
         }
-        if ($runChecks) $this->refreshTableStats();
+        if ($runChecks) {
+            $this->refreshTableStats();
+        }
         $this->v["dbStats"] = $this->printDbStats();
         return true;
     }
@@ -123,7 +136,7 @@ class AdminDBController extends AdminController
         $tblForeigns = [];
         if (sizeof($GLOBALS["SL"]->tbls) > 0) {
             foreach ($GLOBALS["SL"]->tbls as $tblID) {
-                $tblForeigns[$tblID] = array(0, 0, 0);
+                $tblForeigns[$tblID] = [0, 0, 0];
             }
         }
         $flds = SLFields::select('FldTable', 'FldForeignTable')
@@ -184,7 +197,9 @@ class AdminDBController extends AdminController
     
     protected function getDefOpts($item = '', $link = 0)
     {
-        if (empty($this->v["dbDefOpts"])) $this->loadDefOpts();
+        if (empty($this->v["dbDefOpts"])) {
+            $this->loadDefOpts();
+        }
         if (isset($this->v["dbDefOpts"][$item]) && isset($this->v["dbDefOpts"][$item][0])) {
             return $this->v["dbDefOpts"][$item][0];
         }
@@ -417,13 +432,27 @@ class AdminDBController extends AdminController
         }
         
         // Check invalid starting points
-        if (intVal($fld->FldOpts) == 0)         $fld->FldOpts = 1;
-        if (intVal($fld->FldCompareSame) == 0)  $fld->FldCompareSame = 1;
-        if (intVal($fld->FldCompareOther) == 0) $fld->FldCompareOther = 1;
-        if (intVal($fld->FldCompareValue) == 0) $fld->FldCompareValue = 1;
-        if (intVal($fld->FldOperateSame) == 0)  $fld->FldOperateSame = 1;
-        if (intVal($fld->FldOperateOther) == 0) $fld->FldOperateOther = 1;
-        if (intVal($fld->FldOperateValue) == 0) $fld->FldOperateValue = 1;
+        if (intVal($fld->FldOpts) == 0) {
+            $fld->FldOpts = 1;
+        }
+        if (intVal($fld->FldCompareSame) == 0) {
+            $fld->FldCompareSame = 1;
+        }
+        if (intVal($fld->FldCompareOther) == 0) {
+            $fld->FldCompareOther = 1;
+        }
+        if (intVal($fld->FldCompareValue) == 0) {
+            $fld->FldCompareValue = 1;
+        }
+        if (intVal($fld->FldOperateSame) == 0) {
+            $fld->FldOperateSame = 1;
+        }
+        if (intVal($fld->FldOperateOther) == 0) {
+            $fld->FldOperateOther = 1;
+        }
+        if (intVal($fld->FldOperateValue) == 0) {
+            $fld->FldOperateValue = 1;
+        }
         
         if ($GLOBALS["SL"]->REQ->has('FldName')) {
             $this->cacheFlush();
@@ -444,7 +473,9 @@ class AdminDBController extends AdminController
                         ->where('FldTable', $this->v["tbl"]->TblID)
                         ->orderBy('FldOrd', 'desc')
                         ->first();
-                    if ($ordChk) $fld->FldOrd = 1+$ordChk->FldOrd;
+                    if ($ordChk) {
+                        $fld->FldOrd = 1+$ordChk->FldOrd;
+                    }
                 }
                 
                 $fld->FldEng                 = $GLOBALS["SL"]->REQ->FldEng;
@@ -491,11 +522,16 @@ class AdminDBController extends AdminController
                         'FldOperateSame', 'FldOperateOther', 'FldOperateValue'] as $co) {
                         if ($GLOBALS["SL"]->REQ->has($co) && is_array($GLOBALS["SL"]->REQ->input($co)) 
                             && sizeof($GLOBALS["SL"]->REQ->input($co)) > 0) {
-                            if (in_array(3, $GLOBALS["SL"]->REQ->input($co))) $fld->{$co} = 6;
-                            else {
-                                foreach ($GLOBALS["SL"]->REQ->input($co) as $val) $fld->{$co} *= $val;
+                            if (in_array(3, $GLOBALS["SL"]->REQ->input($co))) {
+                                $fld->{$co} = 6;
+                            } else {
+                                foreach ($GLOBALS["SL"]->REQ->input($co) as $val) {
+                                    $fld->{$co} *= $val;
+                                }
                                 foreach (array(5, 7, 11, 13, 17, 19) as $cod) {
-                                    if ($fld->{$co}%$cod == 0) $fld->{$co} *= $fld->{$co}/$cod;
+                                    if ($fld->{$co}%$cod == 0) {
+                                        $fld->{$co} *= $fld->{$co}/$cod;
+                                    }
                                 }
                             }
                         }
@@ -507,7 +543,9 @@ class AdminDBController extends AdminController
                 
                 if ($GLOBALS["SL"]->REQ->has('FldKeyType') && is_array($GLOBALS["SL"]->REQ->FldKeyType) 
                     && sizeof($GLOBALS["SL"]->REQ->FldKeyType) > 0) {
-                    foreach ($GLOBALS["SL"]->REQ->FldKeyType as $val) $fld->FldKeyType .= $val.',';
+                    foreach ($GLOBALS["SL"]->REQ->FldKeyType as $val) {
+                        $fld->FldKeyType .= $val.',';
+                    }
                 }
                 if ($GLOBALS["SL"]->REQ->FldSpecType == 'Generic' || ($GLOBALS["SL"]->REQ->has('saveGeneric') 
                     && $GLOBALS["SL"]->REQ->saveGeneric == 1)) {
@@ -539,8 +577,11 @@ class AdminDBController extends AdminController
             
             $this->logActions($logActions);
             $this->refreshTableStats();
-            if ($fld->FldTable > 0) return $this->redir('/dashboard/db/table/'.$this->v["tbl"]->TblName);
-            else return $this->printViewTable('Generic');
+            if ($fld->FldTable > 0) {
+                return $this->redir('/dashboard/db/table/'.$this->v["tbl"]->TblName);
+            } else {
+                return $this->printViewTable('Generic');
+            }
         }
         
         $this->v["fld"] = $fld;
@@ -573,7 +614,9 @@ class AdminDBController extends AdminController
         $this->admControlInit($request, '/dashboard/db/bus-rules');
         if ($GLOBALS["SL"]->REQ->has('delRule') && $GLOBALS["SL"]->REQ->delRule > 0 && $this->v["dbAllowEdits"]) {
             $delRule = SLBusRules::find($GLOBALS["SL"]->REQ->delRule);
-            if ($delRule->isNotEmpty()) $delRule->delete();
+            if ($delRule->isNotEmpty()) {
+                $delRule->delete();
+            }
         }
         $this->v["rules"] = SLBusRules::where('RuleDatabase', $this->dbID)
             ->orderBy('RuleTables', 'asc')
@@ -648,7 +691,9 @@ class AdminDBController extends AdminController
             ->get();
         if ($defs->isNotEmpty()) {
             foreach ($defs as $cnt => $def) {
-                if (!isset($this->v["defSets"][$def->DefSubset])) $this->v["defSets"][$def->DefSubset] = [];
+                if (!isset($this->v["defSets"][$def->DefSubset])) {
+                    $this->v["defSets"][$def->DefSubset] = [];
+                }
                 $this->v["defSets"][$def->DefSubset][] = $def;
             }
         }
@@ -775,8 +820,9 @@ class AdminDBController extends AdminController
         if ($this->v["dbAllowEdits"]) {
             if ($this->v["ruleID"] <= 0) {
                 $this->v["saveBtn"] = '<input type="submit" value="Add New Rule" class="btn btn-lg btn-primary" >';
+            } else {
+                $this->v["saveBtn"] = '<input type="submit" value="Save Rule Changes" class="btn btn-primary" >';
             }
-            else $this->v["saveBtn"] = '<input type="submit" value="Save Rule Changes" class="btn btn-primary" >';
         }
         $GLOBALS["SL"]->loadFldAbout();
         return view('vendor.survloop.admin.db.ruleSpecifications', $this->v);
@@ -812,7 +858,9 @@ class AdminDBController extends AdminController
             ->get();
         $sorts = [];
         if ($defs->isNotEmpty()) {
-            foreach ($defs as $def) $sorts[] = array($def->DefID, $def->DefValue);
+            foreach ($defs as $def) {
+                $sorts[] = array($def->DefID, $def->DefValue);
+            }
         }
         $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.inc-sortable', [
@@ -935,10 +983,15 @@ class AdminDBController extends AdminController
         $this->v["tblID"] = (($request->has('table')) ? intVal($request->get('table')) : $GLOBALS["SL"]->tbls[0]);
         $this->v["tblNext"] = 0;
         foreach ($GLOBALS["SL"]->tbls as $tblID) {
-            if ($tblID == $this->v["tblID"]) $this->v["tblNext"] = -1;
-            elseif ($this->v["tblNext"] == -1) $this->v["tblNext"] = $tblID;
+            if ($tblID == $this->v["tblID"]) {
+                $this->v["tblNext"] = -1;
+            } elseif ($this->v["tblNext"] == -1) {
+                $this->v["tblNext"] = $tblID;
+            }
         }
-        if ($this->v["tblNext"] <= 0) $this->v["tblNext"] = $GLOBALS["SL"]->tbls[0];
+        if ($this->v["tblNext"] <= 0) {
+            $this->v["tblNext"] = $GLOBALS["SL"]->tbls[0];
+        }
         if ($request->has('save')) {
             $this->cacheFlush();
             if ($request->has('changedFLds') && $request->changedFLds != '' && $request->changedFLds != ',') {
@@ -987,7 +1040,9 @@ class AdminDBController extends AdminController
                 $fldType = (($fld->FldSpecType == 'Generic') ? 2 : (($fld->FldSpecType == 'Replica') ? 1 
                         : (($fld->FldSpecType == 'Unique') ? 0 : 0)));
                 $this->v["fldTots"][$fldType][1]++;
-                if (trim($fld->FldDesc) != '') $this->v["fldTots"][$fldType][0]++;
+                if (trim($fld->FldDesc) != '') {
+                    $this->v["fldTots"][$fldType][0]++;
+                }
             }
         }
         $this->v["viewParam"] = (($this->v["view"] == 'generics') ? '&view=generics' 
@@ -996,9 +1051,13 @@ class AdminDBController extends AdminController
         $this->v["fldLabel"] = (($this->v["view"] == 'generics') ? 'Generics' : (($this->v["view"] == 'replicas') 
             ? 'Replicas' : (($this->v["view"] == 'uniques') ? 'Unique' : 'Fields')));
         $fldSpecType = ['NOT LIKE', 'Generic'];
-        if ($this->v["view"] == 'generics') $fldSpecType = ['LIKE', 'Generic'];
-        elseif ($this->v["view"] == 'replicas') $fldSpecType = ['LIKE', 'Replica'];
-        elseif ($this->v["view"] == 'uniques') $fldSpecType = ['LIKE', 'Unique'];
+        if ($this->v["view"] == 'generics') {
+            $fldSpecType = ['LIKE', 'Generic'];
+        } elseif ($this->v["view"] == 'replicas') {
+            $fldSpecType = ['LIKE', 'Replica'];
+        } elseif ($this->v["view"] == 'uniques') {
+            $fldSpecType = ['LIKE', 'Unique'];
+        }
         $this->v["fldTot"] = SLFields::select('FldID')
             ->where('FldDatabase', $this->dbID)
             ->where('FldSpecType', $fldSpecType[0], $fldSpecType[1])
@@ -1038,7 +1097,9 @@ class AdminDBController extends AdminController
     public function fieldXML(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/fieldXML');
-        if (!$this->v["dbAllowEdits"]) return $this->printOverview();
+        if (!$this->v["dbAllowEdits"]) {
+            return $this->printOverview();
+        }
         $this->v["tblsOrdered"] = SLTables::select('TblID')
             ->where('TblDatabase', $this->dbID)
             ->orderBy('TblOrd', 'asc')
@@ -1058,19 +1119,26 @@ class AdminDBController extends AdminController
     public function fieldXMLsave(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/fieldXML');
-        if (!$this->v["dbAllowEdits"]) return '';
+        if (!$this->v["dbAllowEdits"]) {
+            return '';
+        }
         if ($request->has('changedFld') && $request->changedFld > 0 && $request->has('changedFldSetting')) {
             $fld = SLFields::where('FldID', $request->changedFld)
                 ->where('FldDatabase', $this->dbID)
                 ->first();
             if ($fld) {
-                if (!isset($fld->FldOpts) || intVal($fld->FldOpts) <= 0) $fld->FldOpts = 1;
+                if (!isset($fld->FldOpts) || intVal($fld->FldOpts) <= 0) {
+                    $fld->FldOpts = 1;
+                }
                 $primes = [7, 11, 13];
                 foreach ($primes as $p) {
                     if ($request->changedFldSetting == $p) {
-                        if ($fld->FldOpts%$p > 0) $fld->FldOpts *= $p;
+                        if ($fld->FldOpts%$p > 0) {
+                            $fld->FldOpts *= $p;
+                        }
+                    } elseif ($fld->FldOpts%$p == 0) {
+                        $fld->FldOpts = $fld->FldOpts/$p;
                     }
-                    elseif ($fld->FldOpts%$p == 0) $fld->FldOpts = $fld->FldOpts/$p;
                 }
                 $fld->save();
             }
@@ -1091,7 +1159,9 @@ class AdminDBController extends AdminController
             if (sizeof($GLOBALS["SL"]->tbls) > 0) {
                 foreach ($GLOBALS["SL"]->tbls as $tID) { 
                     $tblMatrix[$tID] = [];
-                    foreach ($GLOBALS["SL"]->tbls as $tID2) $tblMatrix[$tID][$tID2] = [];
+                    foreach ($GLOBALS["SL"]->tbls as $tID2) {
+                        $tblMatrix[$tID][$tID2] = [];
+                    }
                 }
                 $flds = SLFields::select('FldID', 
                     'FldTable', 'FldForeignTable', 
@@ -1203,12 +1273,16 @@ class AdminDBController extends AdminController
                     ];
                 }
                 foreach ($this->v["tables"] as $i => $tbl) {
-                    if ($sizeMax < $this->v["tables"][$i][1]) $sizeMax = $this->v["tables"][$i][1];
+                    if ($sizeMax < $this->v["tables"][$i][1]) {
+                        $sizeMax = $this->v["tables"][$i][1];
+                    }
                 }
                 foreach ($this->v["tables"] as $i => $tbl) {
                     if ($sizeMax <= 0) $sizeMax = 1;
                     $this->v["tables"][$i][1] = 43*($this->v["tables"][$i][1]/$sizeMax);
-                    if ($this->v["tables"][$i][1] <= 10) $this->v["tables"][$i][1] = 10;
+                    if ($this->v["tables"][$i][1] <= 10) {
+                        $this->v["tables"][$i][1] = 10;
+                    }
                     $rad = deg2rad(360*$i/sizeof($this->v["tables"]));
                     $dim = 0.42*$this->v["canvasDimensions"][1];
                     $this->v["tables"][$i][2] = round($mainCircleCenter[0]+(sin($rad)*$dim));
@@ -1248,34 +1322,43 @@ class AdminDBController extends AdminController
     {
         $this->admControlInit($request, '/dashboard/db/all');
         return $this->printEditTable('');
-        return view('vendor.survloop.admin.db.overview', $this->v);
     }
     
     public function editTable(Request $request, $tblName)
     {
         $this->admControlInit($request, '/dashboard/db/all');
-        if (trim($tblName) == '') return $this->printOverview();
+        if (trim($tblName) == '') {
+            return $this->printOverview();
+        }
         return $this->printEditTable($tblName);
     }
     
     public function addTableFld(Request $request, $tblAbbr)
     {
         $this->admControlInit($request, '/dashboard/db/all');
-        if (trim($tblAbbr) == '') return $this->printOverview();
+        if (trim($tblAbbr) == '') {
+            return $this->printOverview();
+        }
         return $this->printEditField($tblAbbr, '');
     }
     
     public function editField(Request $request, $tblAbbr, $fldName)
     {
-        if (trim($fldName) == '') return $this->addTableFld($request, $tblAbbr);
+        if (trim($fldName) == '') {
+            return $this->addTableFld($request, $tblAbbr);
+        }
         $this->admControlInit($request, '/dashboard/db/all');
-        if (trim($tblAbbr) == '') return $this->printOverview();
+        if (trim($tblAbbr) == '') {
+            return $this->printOverview();
+        }
         return $this->printEditField($tblAbbr, $fldName);
     }
     
     public function fieldAjax(Request $request, $fldID = -3)
     {
-        if (intVal($fldID) <= 0) exit;
+        if (intVal($fldID) <= 0) {
+            exit;
+        }
         $this->admControlInit($request);
         $fld = SLFields::find($fldID);
         return $this->fullFldSpecs($fld, false);
@@ -1336,7 +1419,6 @@ class AdminDBController extends AdminController
                 $GLOBALS["SL"]->exportExcelOldSchool($tblInner, $filename.'.xls');
                 exit;
             }
-            
             $this->v["content"] = view('vendor.survloop.admin.db.field-matrix', $this->v)->render();
             $this->saveCache();
         }
@@ -1386,7 +1468,9 @@ class AdminDBController extends AdminController
         $tbls = $this->tblQryStd();
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $tbl) {
-                if (!isset($this->v["groupTbls"][$tbl->TblGroup])) $this->v["groupTbls"][$tbl->TblGroup] = [];
+                if (!isset($this->v["groupTbls"][$tbl->TblGroup])) {
+                    $this->v["groupTbls"][$tbl->TblGroup] = [];
+                }
                 $this->v["groupTbls"][$tbl->TblGroup][] = $tbl;
             }
         }
@@ -1424,7 +1508,9 @@ class AdminDBController extends AdminController
                 if (sizeof($tblList) > 0) {
                     foreach ($tblList as $i => $tbl) {
                         $tbl = intVal($tbl);
-                        if (!isset($this->v["tblRules"][$tbl])) $this->v["tblRules"][$tbl] = [];
+                        if (!isset($this->v["tblRules"][$tbl])) {
+                            $this->v["tblRules"][$tbl] = [];
+                        }
                         $this->v["tblRules"][$tbl][] = $rule;
                     }
                 }
@@ -1444,7 +1530,9 @@ class AdminDBController extends AdminController
             ->get();
         if ($defs->isNotEmpty()) {
             foreach ($defs as $def) {
-                if (!isset($this->v["defDeets"][$def->DefSubset])) $this->v["defDeets"][$def->DefSubset] = [''];
+                if (!isset($this->v["defDeets"][$def->DefSubset])) {
+                    $this->v["defDeets"][$def->DefSubset] = [''];
+                }
                 $this->v["defDeets"][$def->DefSubset][0] .= ';' . $def->DefValue;
                 $this->v["defDeets"][$def->DefSubset][] = $def->DefValue;
             }
@@ -1488,30 +1576,6 @@ class AdminDBController extends AdminController
             ->get();
     }
     
-    protected function getTableFields($tbl = [])
-    {
-        $flds = [];
-        if (isset($tbl->TblID) && intVal($tbl->TblID) > 0) {
-            $flds = SLFields::where('FldTable', $tbl->TblID)
-                ->orderBy('FldOrd', 'asc')
-                ->orderBy('FldEng', 'asc')
-                ->get();
-            if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
-                $flds = $GLOBALS["SL"]->addFldRowExtends($flds, $tbl->TblExtend);
-            }
-        }
-        return $flds;
-    }
-    
-    protected function getTableSeedDump($tblClean = '', $eval = '')
-    {
-        $seedChk = [];
-        if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "get();");
-        }
-        return $seedChk;
-    }
-    
     protected function getTblDropOpts($presel = -3, $blankDefTxt = '(select table)')
     {
         $this->v["presel"] = $presel;
@@ -1547,7 +1611,9 @@ class AdminDBController extends AdminController
             ->orderBy('FldEng', 'asc')
             ->get();
         if ($flds->isNotEmpty()) {
-            foreach ($flds as $fld) $this->v["dbFldGenerics"][] = [$fld->FldID, $fld->FldEng];
+            foreach ($flds as $fld) {
+                $this->v["dbFldGenerics"][] = [$fld->FldID, $fld->FldEng];
+            }
         }
         return true;
     }
@@ -1555,7 +1621,9 @@ class AdminDBController extends AdminController
     protected function getFldGenericOpts($presel = -3)
     {
         $this->v["presel"] = $presel;
-        if (sizeof($this->v["dbFldGenerics"]) == 0) $this->loadGenerics();
+        if (sizeof($this->v["dbFldGenerics"]) == 0) {
+            $this->loadGenerics();
+        }
         return view('vendor.survloop.admin.db.inc-getFldGenericOpts', $this->v);
     }
     
@@ -1608,8 +1676,9 @@ class AdminDBController extends AdminController
             if (isset($this->v["dbDefOpts"][$range])) {
                 $this->v["FldValues"] = str_replace(';', ' ; ', $this->v["dbDefOpts"][$range][0]);
             }
+        } else {
+            $this->v["FldValues"] = str_replace(';', ' ; ', $this->v["FldValues"]);
         }
-        else $this->v["FldValues"] = str_replace(';', ' ; ', $this->v["FldValues"]);
         $this->v["fldForeignPrint"] = $this->printForeignKey($fld, $tblLinks);
         $this->v["fldGenerics"] = $this->printFldGenerics($fld, $tblLinks);
         return view('vendor.survloop.admin.db.inc-basicTblFldRow', $this->v);
@@ -1668,15 +1737,12 @@ class AdminDBController extends AdminController
     
     protected function foreignLinkCnt($preSel = '1')
     {
-        $ret = '<option value="N" ' . (($preSel == 'N') ? 'SELECTED' : '') 
-            . ' >N    (unlimited)</option>';
-        for ($i=0; $i<100; $i++) {
-            $ret .= '<option value="'.$i.'" ' 
-                . (($preSel == (''.$i.'')) ? 'SELECTED' : '') 
-                . ' >'.$i.'</option>';
+        $ret = '<option value="N" ' . (($preSel == 'N') ? 'SELECTED' : '') . ' >N    (unlimited)</option>';
+        for ($i = 0; $i < 100; $i++) {
+            $ret .= '<option value="'.$i.'" ' . (($preSel == (''.$i.'')) ? 'SELECTED' : '') . ' >'.$i.'</option>';
         }
         return $ret;
-        view ( 'vendor.survloop.admin.db.inc-getLinkCnt', array("preSel" => $preSel) );
+        //view ( 'vendor.survloop.admin.db.inc-getLinkCnt', array("preSel" => $preSel) );
     }
     
     function getFldArr($RuleFields = '') 
@@ -1698,8 +1764,7 @@ class AdminDBController extends AdminController
                 foreach ($tblArr as $i => $tblID) {
                     if (intVal($tblID) > 0) {
                         $tblList .= (($i > 0) ? ', ' : '') . '<nobr>' 
-                            . $this->getTblName(intVal($tblID), 1, '', ' target="_blank"') 
-                            . '</nobr>';
+                            . $this->getTblName(intVal($tblID), 1, '', ' target="_blank"') . '</nobr>';
                     }
                 }
             }

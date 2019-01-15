@@ -66,7 +66,7 @@
 <div class="row row2">
     <div class="col-6">
         <center><h4>Spinner Animation:</h4><div class="p5"></div>
-        {!! $GLOBALS["SL"]->sysOpts["spinner-code"] !!}</center>
+        {!! $GLOBALS["SL"]->spinner() !!}</center>
     </div>
     <div class="col-6">
         

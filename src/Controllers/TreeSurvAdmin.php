@@ -85,14 +85,23 @@ class TreeSurvAdmin extends TreeSurvForm
             if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->get('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
-                if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
-                if (!$node->nodeRow || !isset($node->nodeRow->NodeOpts)) $node->fillNodeRow();
-                
-                if (intVal($node->nodeRow->NodeOpts) <= 1) $node->nodeRow->NodeOpts = 1;
-                if ($GLOBALS["SL"]->REQ->changeResponseMobile == 'desktop') {
-                    if ($node->nodeRow->NodeOpts%2 > 0) $node->nodeRow->NodeOpts *= 2;
+                if ($nodeIN <= 0) {
+                    $node = $this->treeAdminNodeNew($node);
                 }
-                elseif ($node->nodeRow->NodeOpts%2 == 0) $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
+                if (!$node->nodeRow || !isset($node->nodeRow->NodeOpts)) {
+                    $node->fillNodeRow();
+                }
+                
+                if (intVal($node->nodeRow->NodeOpts) <= 1) {
+                    $node->nodeRow->NodeOpts = 1;
+                }
+                if ($GLOBALS["SL"]->REQ->changeResponseMobile == 'desktop') {
+                    if ($node->nodeRow->NodeOpts%2 > 0) {
+                        $node->nodeRow->NodeOpts *= 2;
+                    }
+                } elseif ($node->nodeRow->NodeOpts%2 == 0) {
+                    $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
+                }
                 $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
@@ -123,7 +132,9 @@ class TreeSurvAdmin extends TreeSurvForm
                     if (strpos($metaImg, $GLOBALS['SL']->sysOpts['app-url']) === 0) {
                         $metaImg = str_replace($GLOBALS['SL']->sysOpts['app-url'], '', $metaImg);
                     }
-                    if ($metaImg == $GLOBALS["SL"]->sysOpts["meta-img"]) $metaImg = '';
+                    if ($metaImg == $GLOBALS["SL"]->sysOpts["meta-img"]) {
+                        $metaImg = '';
+                    }
                     $node->nodeRow->NodePromptAfter  = trim($GLOBALS["SL"]->REQ->get('pageTitle')) . '::M::' 
                         . $metaDesc . '::M::' . $metaWords . '::M::' . $metaImg;
                 }
@@ -159,7 +170,9 @@ class TreeSurvAdmin extends TreeSurvForm
                     $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeInstruct'));
                     $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('instrPromptAfter'));
                     if ($GLOBALS["SL"]->REQ->has('opts37') && intVal($GLOBALS["SL"]->REQ->get('opts37')) == 37) {
-                        if ($node->nodeRow->NodeOpts%37 > 0) $node->nodeRow->NodeOpts *= 37;
+                        if ($node->nodeRow->NodeOpts%37 > 0) {
+                            $node->nodeRow->NodeOpts *= 37;
+                        }
                     } elseif ($node->nodeRow->NodeOpts%37 == 0) {
                         $node->nodeRow->NodeOpts    = $node->nodeRow->NodeOpts/37;
                     }
@@ -239,7 +252,9 @@ class TreeSurvAdmin extends TreeSurvForm
                                     = trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Set'));
                                 $node->dataManips[$i]->save();
                             } else {
-                                if (isset($node->dataManips[$i])) $node->dataManips[$i]->delete();
+                                if (isset($node->dataManips[$i])) {
+                                    $node->dataManips[$i]->delete();
+                                }
                             }
                         }
                     }
@@ -457,7 +472,9 @@ class TreeSurvAdmin extends TreeSurvForm
                             $colNode->nodeRow->NodeOpts        = 1;
                             $colNode->nodeRow->NodeType        = 'Layout Column';
                             $colNode->nodeRow->NodeCharLimit   = $colW;
-                            if ($c == 0 && $evenTot < 12) $colNode->nodeRow->NodeCharLimit += (12-$evenTot);
+                            if ($c == 0 && $evenTot < 12) {
+                                $colNode->nodeRow->NodeCharLimit += (12-$evenTot);
+                            }
                             $colNode->nodeRow->save();
                         }
                     }
@@ -477,10 +494,14 @@ class TreeSurvAdmin extends TreeSurvForm
                 '.dashboard.tree.stats.alt', 
                 '.dashboard.tree'
             ];
-            foreach ($treeCaches as $cache) Cache::forget($cache);
+            foreach ($treeCaches as $cache) {
+                Cache::forget($cache);
+            }
             $redir = '/dashboard/' . (($GLOBALS["SL"]->treeRow->TreeType == 'Page') ? 'page/' : 'surv-')
                 . $this->treeID . '/map?all=1&alt=1&refresh=1#n' . $node->nodeRow->NodeID;
-            if ($redirOver != '') $redir = $redirOver . '?redir64=' . base64_encode($redir);
+            if ($redirOver != '') {
+                $redir = $redirOver . '?redir64=' . base64_encode($redir);
+            }
             return $this->redir($redir, true);
         }
         
@@ -506,19 +527,19 @@ class TreeSurvAdmin extends TreeSurvForm
             }
         }
         $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.admin.tree.widget-email-edit-java', [
-            "emailList"      => $emailList
+            "emailList"  => $emailList
             ]);
         $widgetEmail = view('vendor.survloop.admin.tree.widget-email-edit', [
-            "node"           => $node, 
-            "emailList"      => $emailList,
-            "emailUsers"     => $emailUsers
+            "node"       => $node, 
+            "emailList"  => $emailList,
+            "emailUsers" => $emailUsers
             ])->render();
         $treeList = SLTree::where('TreeType', 'Survey')
             ->where('TreeDatabase', $this->dbID)
             ->select('TreeID', 'TreeName')
             ->orderBy('TreeName', 'asc')
             ->get();
-        $childNodes = SLNode::where('NodeParentID', $node->nodeRow->NodeID)
+        $childNodes = SLNode::where('NodeParentID', ((isset($node->nodeRow->NodeID)) ? $node->nodeRow->NodeID : 0))
             ->orderBy('NodeParentOrder', 'asc')
             ->get();
         
@@ -552,7 +573,9 @@ class TreeSurvAdmin extends TreeSurvForm
         $currMeta["base"] = $GLOBALS['SL']->treeBaseUrl(true, true);
         
         $this->addCondEditorAjax();
-        if ($node->isInstruct()) $this->v["needsWsyiwyg"] = true;
+        if ($node->isInstruct()) {
+            $this->v["needsWsyiwyg"] = true;
+        }
         $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.admin.tree.node-edit-java', [
             "node"           => $node, 
             "resLimit"       => $resLimit

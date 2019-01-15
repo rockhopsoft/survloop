@@ -31,7 +31,7 @@ use App\Models\SLSess;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use SurvLoop\Controllers\TreeSurvAdmin;
-use SurvLoop\Controllers\TreeSurvAPI;
+use SurvLoop\Controllers\TreeSurvApi;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\TreeNodeSurv;
 use SurvLoop\Controllers\AdminController;
@@ -64,6 +64,11 @@ class AdminTreeController extends AdminController
             }
             $this->allStdCondition('#IsAdmin', 'The user is currently logged in as an administrator.');
             $this->allStdCondition('#IsNotAdmin', 'The user is not currently logged in as an administrator.');
+            $this->allStdCondition('#IsStaff', 'The user is currently logged in as a staff user.');
+            $this->allStdCondition('#IsStaffOrAdmin', 'The user is currently logged in as a staff or admin user.');
+            $this->allStdCondition('#IsPartner', 'The user is currently logged in as a partner.');
+            $this->allStdCondition('#IsVolunteer', 'The user is currently logged in as a volunteer.');
+            $this->allStdCondition('#IsBrancher', 'The user is currently logged in as a database manager.');
             $this->allStdCondition('#NodeDisabled', 'This node is not active (for the public).');
             $this->allStdCondition('#IsLoggedIn', 'Complainant is currently logged into the system.');
             $this->allStdCondition('#IsNotLoggedIn', 'Complainant is not currently logged into the system.');
@@ -173,6 +178,10 @@ class AdminTreeController extends AdminController
         }
         $treeAbout = view('vendor.survloop.admin.tree.tree-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
+        if ($request->has('refresh')) {
+            $GLOBALS["SL"]->pageJAVA .= 'setTimeout('
+                . '"document.getElementById(\'hidFrameID\').src=\'/dashboard/css-reload\'", 2000);';
+        }
         return view('vendor.survloop.master', $this->v);
     }
     
@@ -418,7 +427,7 @@ class AdminTreeController extends AdminController
             } elseif ($request->has('newSub') && $request->has('newSubset')) {
                 $splits = explode(':', $request->input('newSubset'));
                 $newSubset = new SLDataSubsets;
-                $newSubset->DataSubTree    = $this->treeID;
+                $newSubset->DataSubTree    = $GLOBALS["SL"]->treeID;
                 $newSubset->DataSubTbl     = $splits[0];
                 $newSubset->DataSubTblLnk  = $splits[1];
                 $newSubset->DataSubSubTbl  = $splits[2];
@@ -433,7 +442,7 @@ class AdminTreeController extends AdminController
                 $valFld = str_replace($splits[2].':', '', $request->input('newHelperValue'));
                 if (isset($splits[2])) {
                     $newHelp = new SLDataHelpers;
-                    $newHelp->DataHelpTree        = $this->treeID;
+                    $newHelp->DataHelpTree        = $GLOBALS["SL"]->treeID;
                     $newHelp->DataHelpParentTable = $splits[0];
                     $newHelp->DataHelpTable       = $splits[2];
                     $newHelp->DataHelpKeyField    = $splits[3];
@@ -441,7 +450,7 @@ class AdminTreeController extends AdminController
                     $newHelp->save();
                 }
             } elseif ($request->has('delLinkage')) {
-                $found = SLDataLinks::where('DataLinkTree', $this->treeID)
+                $found = SLDataLinks::where('DataLinkTree', $GLOBALS["SL"]->treeID)
                     ->where('DataLinkTable', $request->input('delLinkage'))
                     ->first();
                 if ($found && isset($found->DataLinkTree)) {
@@ -450,7 +459,7 @@ class AdminTreeController extends AdminController
                 }
             } elseif ($request->has('newLinkage')) {
                 $newLink = new SLDataLinks;
-                $newLink->DataLinkTree = $this->treeID;
+                $newLink->DataLinkTree = $GLOBALS["SL"]->treeID;
                 $newLink->DataLinkTable = $request->input('newLinkage');
                 $newLink->save();
                 $GLOBALS["SL"]->dataLinksOn[$request->input('newLinkage')] 
@@ -726,11 +735,10 @@ class AdminTreeController extends AdminController
     public function conditions(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/db/conds');
-        
-        if ($request->has('addNewCond')) $GLOBALS["SL"]->saveEditCondition($request);
-        
-        $this->v["filtOnly"] = 'all';
-        if ($request->has('only')) $this->v["filtOnly"] = $request->get('only');
+        if ($request->has('addNewCond')) {
+            $GLOBALS["SL"]->saveEditCondition($request);
+        }
+        $this->v["filtOnly"] = (($request->has('only')) ? $request->get('only') : 'all');
         $condsRaw = $this->loadCondList();
         if ($request->has('totalConds') && intVal($request->totalConds) > 0) {
             if ($condsRaw && sizeof($condsRaw) > 0) {
@@ -756,6 +764,9 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
+        if (is_array($this->custReport)) {
+            $this->loadCustLoop($request, $this->treeID);
+        }
         $this->custReport->addCondEditorAjax();
         return view('vendor.survloop.admin.tree.conditions', $this->v);
     }
@@ -775,7 +786,7 @@ class AdminTreeController extends AdminController
                 "newOnly"      => false,
                 "cond"         => $this->v["cond"],
                 "condArticles" => $this->v["condArticles"]
-            ])->render();
+                ])->render();
             return view('vendor.survloop.admin.db.inc-condition-edit', $this->v);
         }
         return $this->redir('/dashboard/db/conds');
@@ -829,16 +840,13 @@ class AdminTreeController extends AdminController
         return true;
     }
     
-    
-    
-    
     public function xmlmap(Request $request, $treeID = -3)
     {
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new TreeSurvAPI;
+        $xmlmap = new TreeSurvApi;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
         $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", function() {
@@ -852,17 +860,11 @@ class AdminTreeController extends AdminController
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new TreeSurvAPI;
+        $xmlmap = new TreeSurvApi;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
         return view('vendor.survloop.master', $this->v);
     }
-    
-
-    
-    
-    
-    
     
     protected function updateSysSet($set, $val)
     {
@@ -944,26 +946,22 @@ class AdminTreeController extends AdminController
         if (!file_exists('../app/Http/Controllers/' . trim($dbPrefix))) {
             mkdir('../app/Http/Controllers/' . trim($dbPrefix));
         }
-        $fileName = '../app/Http/Controllers/' . trim($dbPrefix) 
-            . '/' . trim($dbPrefix) . '.php';
-        
+        $fileName = '../app/Http/Controllers/' . trim($dbPrefix) . '/' . trim($dbPrefix) . '.php';
         $file = "<"."?"."php\n" 
-            . view('vendor.survloop.admin.fresh-install-class-core', [
-                "abbr" => trim($dbPrefix)
-            ])->render();
-        if (is_writable($fileName)) file_put_contents($fileName, $file);
-        
+            . view('vendor.survloop.admin.fresh-install-class-core', [ "abbr" => trim($dbPrefix) ])->render();
+        if (is_writable($fileName)) {
+            file_put_contents($fileName, $file);
+        }
         $file = "<"."?"."php\n" 
-            . view('vendor.survloop.admin.fresh-install-class-report', [
-                "abbr" => trim($dbPrefix)
-            ])->render();
-        if (is_writable($fileName)) file_put_contents(str_replace('.php', 'Report.php', $fileName), $file);
-        
+            . view('vendor.survloop.admin.fresh-install-class-report', [ "abbr" => trim($dbPrefix) ])->render();
+        if (is_writable($fileName)) {
+            file_put_contents(str_replace('.php', 'Report.php', $fileName), $file);
+        }
         $file = "<"."?"."php\n" 
-            . view('vendor.survloop.admin.fresh-install-class-admin', [
-                "abbr" => trim($dbPrefix)
-            ])->render();
-        if (is_writable($fileName)) file_put_contents(str_replace('.php', 'Admin.php', $fileName), $file);
+            . view('vendor.survloop.admin.fresh-install-class-admin', [ "abbr" => trim($dbPrefix) ])->render();
+        if (is_writable($fileName)) {
+            file_put_contents(str_replace('.php', 'Admin.php', $fileName), $file);
+        }
         return true;
     }
     
@@ -1111,6 +1109,7 @@ class AdminTreeController extends AdminController
             ->get();
         $chk = DB::table('SL_Tree')
             ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Tree.TreeCoreTable')
+            ->where('SL_Tree.TreeDatabase', $GLOBALS["SL"]->dbID)
             ->where('SL_Tree.TreeType', 'Survey')
             ->select('SL_Tables.*')
             ->get();
@@ -1135,6 +1134,5 @@ class AdminTreeController extends AdminController
             . $GLOBALS["SL"]->mysqlTblCoreFinish($tbl);
         return DB::statement($tblQry);
     }
-    
     
 }

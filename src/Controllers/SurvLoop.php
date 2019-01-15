@@ -17,32 +17,11 @@ use Symfony\Component\HttpFoundation\File\File;
 use App\Models\User;
 use App\Models\SLTree;
 use SurvLoop\Controllers\Globals;
-use SurvLoop\Controllers\PageLoadUtils;
 use SurvLoop\Controllers\SurvLoopInstaller;
+use SurvLoop\Controllers\SurvCustLoop;
 
-class SurvLoop extends PageLoadUtils
+class SurvLoop extends SurvCustLoop
 {
-    // This is where the client installation's extension of TreeSurvForm is loaded
-    public $custLoop       = null;
-    
-    protected function isAdmin()
-    {
-        return (Auth::user() && Auth::user()->hasRole('administrator'));
-    }
-    
-    public function loadLoop(Request $request, $skipSessLoad = false)
-    {
-        $this->loadAbbr();
-        $class = "SurvLoop\\Controllers\\TreeSurvForm";
-        if ($this->custAbbr != 'SurvLoop') {
-            $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
-            if (class_exists($custClass)) $class = $custClass;
-        }
-        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " 
-            . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
-        return true;
-    }
-    
     /**
      * Get a validator for an incoming registration request.
      *
@@ -246,8 +225,31 @@ class SurvLoop extends PageLoadUtils
     public function afterLogin(Request $request)
     {
         if (session()->has('redir2') && trim(session()->get('redir2')) != '') {
+            $this->clearSessRedirs();
             return redirect(trim(session()->get('redir2')));
         }
+        if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0 
+            && session()->has('loginRedir') && trim(session()->get('loginRedir')) != ''
+            && session()->has('lastTreeTime') && session()->has('loginRedirTime')) {
+            if (session()->get('lastTreeTime') < session()->get('loginRedirTime')) {
+                $this->clearSessRedirs();
+                return redirect(session()->get('loginRedir'));
+            } else {
+                $this->afterLoginLastTree();
+            }
+        } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
+            $this->afterLoginLastTree();
+        } elseif (session()->has('loginRedir') && trim(session()->get('loginRedir')) != '') {
+            $this->clearSessRedirs();
+            return redirect(session()->get('loginRedir'));
+        }
+        $this->clearSessRedirs();
+        $this->loadLoop($request);
+        return $this->custLoop->afterLogin($request);
+    }
+    
+    protected function afterLoginLastTree()
+    {
         if (session()->has('lastTree')) {
             $tree = SLTree::find(session()->get('lastTree'));
             if ($tree && isset($tree->TreeDatabase)) {
@@ -257,8 +259,17 @@ class SurvLoop extends PageLoadUtils
         if (session()->has('sessID') && session()->get('sessID') > 0) {
             
         }
-        $this->loadLoop($request);
-        return $this->custLoop->afterLogin($request);
+        return true;
+    }
+    
+    protected function clearSessRedirs()
+    {
+        session()->forget('redir2');
+        session()->forget('lastTree');
+        session()->forget('lastTreeTime');
+        session()->forget('loginRedir');
+        session()->forget('loginRedirTime');
+        return true;
     }
     
     public function retrieveUpload(Request $request, $treeSlug = '', $cid = -3, $upID = '')
@@ -407,19 +418,48 @@ class SurvLoop extends PageLoadUtils
         return $this->custLoop->ajaxGraph($request, $gType, $nID);
     }
     
+    public function searchPrep(Request $request, $treeID = 1)
+    {
+        $this->loadLoop($request, true);
+        $this->custLoop->loadTree($treeID);
+        $this->custLoop->initSearcher();
+        $this->custLoop->searcher->getAllPublicCoreIDs();
+        $this->custLoop->chkRecsPub($request);
+        return true;
+    }
+    
     public function searchBar(Request $request, $treeID = 1)
     {
         $this->loadTreeByID($request, $treeID);
-        $this->loadLoop($request, true);
-        $this->custLoop->initSearcher();
+        $this->searchPrep($request, $treeID);
         return $this->custLoop->searcher->searchBar();
     }
     
     public function searchResults(Request $request, $treeID = 1, $ajax = 0)
     {
         $this->loadTreeByID($request, $treeID, true);
-        $this->loadLoop($request, true);
-        $this->custLoop->initSearcher();
+        $this->searchPrep($request, $treeID);
+        
+            //$this->currLoop->survLoopInit($request, $this->currLoop->searchCacheName());
+            // [ check for cache ]
+        $this->custLoop->searcher->prepSearchResults($request);
+        if (sizeof($this->custLoop->searcher->searchResults) > 0) {
+            foreach ($this->custLoop->searcher->searchResults as $i => $rec) {
+                if (trim($rec[2]) == '') {
+                    $this->custLoop->loadAllSessData($GLOBALS["SL"]->coreTbl, $rec[0]);
+                    $this->custLoop->searcher->searchResults[$i][2] 
+                        = '<div class="reportPreview">' . $this->custLoop->printPreviewReport() . '</div>';
+                    if (isset($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl])
+                        && sizeof($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0
+                        && isset($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)) {
+                        $this->custLoop->searcher->searchResults[$i][1] 
+                            += strtotime($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)
+                                /1000000000000;
+                    }
+//echo 'result1: ' . $this->custLoop->searcher->searchResults[$i][2]; exit;
+                }
+            }
+        }
         return $this->custLoop->searcher->searchResults($request, $ajax);
     }
     
@@ -447,17 +487,17 @@ class SurvLoop extends PageLoadUtils
         $filename = '../storage/app/up/' . $abbr . '/' . $file;
         $handler = new File($filename);
         $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
-        $lifetime = (60*60*24*3); // three days in seconds
+        $lifetime = (60*60*24*5); // five days in seconds
         $header_etag = md5($file_time . $filename);
         $header_last_modified = gmdate('r', $file_time);
-        $headers = array(
+        $headers = [
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
             'Cache-Control'       => 'public, max-age="' . $lifetime . '"', // override caching for sensitive
             'Last-Modified'       => $header_last_modified,
             'Expires'             => gmdate('r', $file_time + $lifetime),
             'Pragma'              => 'public',
             'Etag'                => $header_etag
-        );
+            ];
         
         // Is the resource cached?
         $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
@@ -472,29 +512,20 @@ class SurvLoop extends PageLoadUtils
         $headers = array_merge($headers, [
             'Content-Type'   => $handler->getMimeType(),
             'Content-Length' => $handler->getSize()
-        ]);
+            ]);
         return Response::make(file_get_contents($filename), 200, $headers);
     }
     
     public function jsLoadMenu(Request $request)
     {
-        $ret = '';
+        $username = '';
         if (Auth::user() && isset(Auth::user()->id)) {
-            $userName = Auth::user()->name;
-            if (strpos($userName, 'Session#') !== false) {
-                $userName = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
+            $username = Auth::user()->name;
+            if (strpos($username, 'Session#') !== false) {
+                $username = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
             }
-            $ret .= "addTopNavItem('" . $userName . "', '/my-profile\" id=\"loginLnk'); ";
-            $ret .= 'addSideNavItem("Logout", "/logout"); addSideNavItem("My Profile", "/my-profile"); ';
-            if (Auth::user()->hasRole('administrator')) {
-                $ret .= 'addTopNavItem("Dashboard", "/dashboard"); '
-                    . 'addSideNavItem("Admin Dashboard", "/dashboard"); ';
-            }
-        } else {
-            $ret .= "addTopNavItem('Sign Up', '/register\" id=\"loginLnk'); addTopNavItem('Login', '/login'); "
-                . 'addSideNavItem("Login", "/login"); addSideNavItem("Sign Up", "/register"); ';
         }
-        return '<script type="text/javascript"> ' . $ret . ' </script>';
+        return view('vendor.survloop.inc-java-load-menu', [ "username" => $username ]);
     }
     
     public function timeOut(Request $request)

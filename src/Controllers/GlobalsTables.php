@@ -134,14 +134,18 @@ class GlobalsTables extends GlobalsStatic
     
     public function chkTreeOpt($treeOpts = 1, $type = '')
     {
-        if ($type == '' || $treeOpts == 0) return false;
+        if ($type == '' || $treeOpts == 0) {
+            return false;
+        }
         $prime = $this->getTreePrimeConst($type);
         return (intVal($prime) != 0 && $treeOpts%$prime == 0);
     }
     
     public function chkCurrTreeOpt($type = '')
     {
-        if (!isset($this->treeRow->TreeOpts)) return false;
+        if (!isset($this->treeRow->TreeOpts)) {
+            return false;
+        }
         return $this->chkTreeOpt($this->treeRow->TreeOpts, $type);
     }
     
@@ -149,7 +153,9 @@ class GlobalsTables extends GlobalsStatic
     {
         $this->isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
         $this->isVolun = (Auth::user() && Auth::user()->hasRole('volunteer'));
-        if ($treeOverride > 0) $this->treeOverride = $treeOverride;
+        if ($treeOverride > 0) {
+            $this->treeOverride = $treeOverride;
+        }
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
             $this->treeID  = $treeID;
         }
@@ -159,7 +165,9 @@ class GlobalsTables extends GlobalsStatic
                 ->where('TreeType', 'Survey')
                 ->orderBy('TreeID', 'asc')
                 ->first();
-            if (isset($this->treeRow->TreeID)) $this->treeID = $this->treeRow->TreeID;
+            if (isset($this->treeRow->TreeID)) {
+                $this->treeID = $this->treeRow->TreeID;
+            }
         }
 
         if ($dbID == -3 && isset($this->treeRow->TreeDatabase) && intVal($this->treeRow->TreeDatabase) > 0) {
@@ -186,7 +194,9 @@ class GlobalsTables extends GlobalsStatic
         if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName)) {
             $this->treeName = str_replace($this->dbRow->DbName, str_replace('_', '', $this->dbRow->DbPrefix), 
                 $this->treeRow->TreeName);
-            if ($this->treeRow->TreeType != 'Page') $this->sessTree = $this->treeRow->TreeID;
+            if ($this->treeRow->TreeType != 'Page') {
+                $this->sessTree = $this->treeRow->TreeID;
+            }
         }
         $this->sysOpts = ["cust-abbr" => 'SurvLoop'];
         return true;
@@ -212,13 +222,17 @@ class GlobalsTables extends GlobalsStatic
     
     public function modelPath($tbl = '', $forceFile = false)
     {
-        if (strtolower($tbl) == 'users') return "App\\Models\\User";
+        if (strtolower($tbl) == 'users') {
+            return "App\\Models\\User";
+        }
         if (isset($this->tblModels[$tbl])) {
             $path = "App\\Models\\" . $this->tblModels[$tbl];
             $this->chkTblModel($tbl, $path, $forceFile);
             return $path;
         }
-        if (file_exists('../app/Models/SL' . $tbl . '.php')) return "App\\Models\\SL" . $tbl;
+        if (file_exists('../app/Models/SL' . $tbl . '.php')) {
+            return "App\\Models\\SL" . $tbl;
+        }
         return '';
     }
     
@@ -249,7 +263,9 @@ class GlobalsTables extends GlobalsStatic
                 "tblClean"  => str_replace('_', '', $tblName)
             ]);
             //if (is_writable($modelFilename)) {
-                if (file_exists($modelFilename)) unlink($modelFilename);
+                if (file_exists($modelFilename)) {
+                    unlink($modelFilename);
+                }
                 file_put_contents($modelFilename, $fullFileOut);
             //}
         }
@@ -258,7 +274,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function loadDataMap($treeID = -3)
     {
-        if ($treeID != $this->treeID) $this->formTree = SLTree::find($treeID);
+        if ($treeID != $this->treeID) {
+            $this->formTree = SLTree::find($treeID);
+        }
         $this->dataLoops = [];
         $this->dataLoopNames = [];
         $dataLoops = SLDataLoop::where('DataLoopTree', $treeID)
@@ -287,7 +305,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function loadDataMapLinks($treeID = -3)
     {
-        if ($treeID <= 0) $treeID = $this->treeID;
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
         $cache = '';
         $this->dataLinksOn = [];
         $linksChk = SLDataLinks::where('DataLinkTree', $treeID)
@@ -295,7 +315,9 @@ class GlobalsTables extends GlobalsStatic
         if ($linksChk->isNotEmpty()) {
             foreach ($linksChk as $link) {
                 $linkMap = $this->getLinkTblMap($link->DataLinkTable);
-                if ($linkMap && sizeof($linkMap) == 5) $this->dataLinksOn[$link->DataLinkTable] = $linkMap;
+                if ($linkMap && sizeof($linkMap) == 5) {
+                    $this->dataLinksOn[$link->DataLinkTable] = $linkMap;
+                }
             }
         }
         $cache .= '$'.'this->dataLinksOn = [];' . "\n";
@@ -328,14 +350,18 @@ class GlobalsTables extends GlobalsStatic
     
     public function chkReportTree($coreTbl = '')
     {
-        if ($coreTbl == '') $coreTbl = $this->coreTbl;
+        if ($coreTbl == '') {
+            $coreTbl = $this->coreTbl;
+        }
         $reportTree = SLTree::where('TreeType', 'Page')
             ->where('TreeDatabase', $this->dbID)
             ->where('TreeCoreTable', $this->coreTbl)
             ->get();
         if ($reportTree->isNotEmpty()) {
             foreach ($reportTree as $t) {
-                if ($t->TreeOpts%13 == 0) return $t;
+                if ($t->TreeOpts%13 == 0) {
+                    return $t;
+                }
             }
         }
         return NULL;
@@ -399,7 +425,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function isCoreTbl($tblID)
     {
-        if (!isset($this->treeRow->TreeCoreTable)) return false;
+        if (!isset($this->treeRow->TreeCoreTable)) {
+            return false;
+        }
         return ($tblID == $this->treeRow->TreeCoreTable);
     }
     
@@ -442,10 +470,27 @@ class GlobalsTables extends GlobalsStatic
                 ->orderBy('FldOrd', 'asc')
                 ->get();
             if ($chk->isNotEmpty()) {
-                foreach ($chk as $i => $fld) return $this->tblAbbr[$this->coreTbl] . $fld->FldName;
+                foreach ($chk as $i => $fld) {
+                    return $this->tblAbbr[$this->coreTbl] . $fld->FldName;
+                }
             }
         }
         return '';
+    }
+    
+    public function getTableFields($tbl = [])
+    {
+        $flds = [];
+        if (isset($tbl->TblID) && intVal($tbl->TblID) > 0) {
+            $flds = SLFields::where('FldTable', $tbl->TblID)
+                ->orderBy('FldOrd', 'asc')
+                ->orderBy('FldEng', 'asc')
+                ->get();
+            if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
+                $flds = $this->addFldRowExtends($flds, $tbl->TblExtend);
+            }
+        }
+        return $flds;
     }
     
     // not limited to loaded database
@@ -462,7 +507,9 @@ class GlobalsTables extends GlobalsStatic
                     ->orderBy('FldOrd', 'asc')
                     ->get();
                 if ($chk->isNotEmpty()) {
-                    foreach ($chk as $fldRow) $flds[$tblRow->TblAbbr . $fldRow->FldName] = $fldRow->FldType;
+                    foreach ($chk as $fldRow) {
+                        $flds[$tblRow->TblAbbr . $fldRow->FldName] = $fldRow->FldType;
+                    }
                 }
             }
         }
@@ -471,20 +518,28 @@ class GlobalsTables extends GlobalsStatic
     
     public function fldForeignKeyTbl($tbl, $fld)
     {
-        if (trim($tbl) == '' || trim($fld) == '' || !isset($this->tblI[$tbl])) return '';
+        if (trim($tbl) == '' || trim($fld) == '' || !isset($this->tblI[$tbl])) {
+            return '';
+        }
         $fld = SLFields::select('FldForeignTable')
             ->where('FldTable', $this->tblI[$tbl])
             ->where('FldName', substr($fld, strlen($this->tblAbbr[$tbl])))
             ->where('FldForeignTable', '>', 0)
             ->first();
-        if ($fld && isset($this->tbl[$fld->FldForeignTable])) return $this->tbl[$fld->FldForeignTable];
+        if ($fld && isset($this->tbl[$fld->FldForeignTable])) {
+            return $this->tbl[$fld->FldForeignTable];
+        }
         return '';
     }
     
     public function getForeignLnk($tbl1, $tbl2 = -3)
     {
-        if ($tbl2 <= 0) $tbl2 = $this->treeRow->TreeCoreTable;
-        if (!isset($this->x["foreignLookup"])) $this->x["foreignLookup"] = [];
+        if ($tbl2 <= 0) {
+            $tbl2 = $this->treeRow->TreeCoreTable;
+        }
+        if (!isset($this->x["foreignLookup"])) {
+            $this->x["foreignLookup"] = [];
+        }
         if (!isset($this->x["foreignLookup"][$tbl1 . '-' . $tbl2])) { 
             $this->x["foreignLookup"][$tbl1 . '-' . $tbl2] = '';
             $fld = SLFields::select('FldName')
@@ -509,7 +564,9 @@ class GlobalsTables extends GlobalsStatic
     public function getForeignLnkFldName($tbl1, $tbl2 = -3)
     {
         $fldName = $this->getForeignLnk($tbl1, $tbl2);
-        if ($fldName != '') return $this->tblAbbr[$this->tbl[$tbl1]] . $fldName;
+        if ($fldName != '') {
+            return $this->tblAbbr[$this->tbl[$tbl1]] . $fldName;
+        }
         return '';
     }
     
@@ -523,8 +580,8 @@ class GlobalsTables extends GlobalsStatic
     
     public function getForeignOpts($preSel = '', $opts = 'Subset')
     {
-        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') . ' >parent - field - child</option>
-        <option value=""></option>' . "\n";
+        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') . ' >parent - field - child</option>'
+            . '<option value=""></option>' . "\n";
         $flds = SLFields::select('SL_Fields.FldTable', 'SL_Fields.FldName', 'SL_Fields.FldForeignTable')
             ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Fields.FldForeignTable')
             ->where('FldDatabase',         $this->dbID)
@@ -592,7 +649,9 @@ class GlobalsTables extends GlobalsStatic
     // returns array(Table 1, Foreign Key 1, Linking Table, Foreign Key 2, Table 2)
     public function getLinkTblMap($linkTbl = -3)
     {
-        if ($linkTbl <= 0) return [];
+        if ($linkTbl <= 0) {
+            return [];
+        }
         $foreigns = SLFields::select('FldName', 'FldForeignTable')
             ->where('FldDatabase', $this->dbID)
             ->where('FldTable', $linkTbl)
@@ -692,14 +751,18 @@ class GlobalsTables extends GlobalsStatic
         eval($eval);
         if ($flds->isNotEmpty()) {
         ... some day */
-            foreach ($flds as $fld) $ret .= $this->fieldsDropdownOption($fld, $preSel);
+            foreach ($flds as $fld) {
+                $ret .= $this->fieldsDropdownOption($fld, $preSel);
+            }
         }
         return $ret;
     }
     
     public function fieldsDropdownOption($fld, $preSel = '', $valID = false, $prfx = '')
     {
-        if (!isset($fld->FldID)) return '';
+        if (!isset($fld->FldID)) {
+            return '';
+        }
         if (!isset($fld->TblName) && isset($fld->FldTable) && isset($this->tbl[$fld->FldTable])) {
             $fld->TblName = $this->tbl[$fld->FldTable];
         }
@@ -721,8 +784,7 @@ class GlobalsTables extends GlobalsStatic
     
     public function allDefsDropdown($preSel = '')
     {
-        $ret = '<option value="" ' 
-            . (($preSel == "") ? 'SELECTED' : '') . ' ></option>' . "\n";
+        $ret = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') . ' ></option>' . "\n";
         $defs = SLDefinitions::select('DefSubset', 'DefID', 'DefValue')
             ->where('DefSet', 'Value Ranges')
             ->orderBy('DefSubset', 'asc')
@@ -730,8 +792,7 @@ class GlobalsTables extends GlobalsStatic
             ->get();
         if ($defs->isNotEmpty()) {
             foreach ($defs as $def) {
-                $ret .= '<option value="' . $def->DefID.'" ' 
-                    . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
+                $ret .= '<option value="' . $def->DefID.'" ' . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
                     . $def->DefSubset . ': ' . $def->DefValue . '</option>' . "\n";
             }
         }
@@ -766,7 +827,7 @@ class GlobalsTables extends GlobalsStatic
             "currDefinition" => $currDefinition, 
             "currLoopItems"  => $currLoopItems, 
             "currTblRecs"    => $currTblRecs
-        ])->render();
+            ])->render();
     }
     
     public function postLoopsDropdowns($fld = 'loopList')
@@ -865,7 +926,9 @@ class GlobalsTables extends GlobalsStatic
     {
         if (isset($this->dataHelpers) && sizeof($this->dataHelpers) > 0) {
             foreach ($this->dataHelpers as $helper) {
-                if (isset($helper->DataHelpValueField) && $helper->DataHelpValueField == $fld) return true;
+                if (isset($helper->DataHelpValueField) && $helper->DataHelpValueField == $fld) {
+                    return true;
+                }
             }
         }
         return false;
@@ -887,7 +950,9 @@ class GlobalsTables extends GlobalsStatic
             ->get();
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                if ($prevTbl != $fld->FldTable) $ret .= '<option value=""></option>' . "\n";
+                if ($prevTbl != $fld->FldTable) {
+                    $ret .= '<option value=""></option>' . "\n";
+                }
                 $ret .= $this->fieldsDropdownOption($fld, $preSel, true, $prfx) . "\n";
                 $prevTbl = $fld->FldTable;
             }
@@ -907,7 +972,9 @@ class GlobalsTables extends GlobalsStatic
             ->where('SL_Fields.FldID', $fldID)
             ->select('SL_Tables.TblName', 'SL_Tables.TblAbbr', 'SL_Fields.FldName')
             ->first();
-        if ($fld) return (($full) ? $fld->TblName . ':' : '') . $fld->TblAbbr . $fld->FldName;
+        if ($fld && isset($fld->TblAbbr)) {
+            return (($full) ? $fld->TblName . ':' : '') . $fld->TblAbbr . $fld->FldName;
+        }
         return '';
     }
     
@@ -920,7 +987,9 @@ class GlobalsTables extends GlobalsStatic
         if ($flds->isNotEmpty()) {
             foreach ($flds as $f) {
                 $testName = $f->TblAbbr . $f->FldName; // $f->TblName . ':' . 
-                if ($fldName == $testName) return $f->FldID;
+                if ($fldName == $testName) {
+                    return $f->FldID;
+                }
             }
         }
         return -3;
@@ -928,7 +997,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function getFldRowFromFullName($tbl, $fld)
     {
-        if (!isset($this->tblI[$tbl]) || !isset($this->tblAbbr[$tbl])) return [];
+        if (!isset($this->tblI[$tbl]) || !isset($this->tblAbbr[$tbl])) {
+            return [];
+        }
         return SLFields::where('FldTable', $this->tblI[$tbl])
             ->where('FldName', substr($fld, strlen($this->tblAbbr[$tbl])))
             ->first();
@@ -943,7 +1014,9 @@ class GlobalsTables extends GlobalsStatic
     public function getFldDefSet($tbl, $fld, $fldRow = NULL)
     {
         $ret = '';
-        if (!$fldRow) $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        if (!$fldRow) {
+            $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        }
         if ($fldRow && isset($fldRow->FldValues)) {
             if (strpos($fldRow->FldValues, 'Def::') !== false) {
                 $ret = str_replace('Def::', '', $fldRow->FldValues);
@@ -956,23 +1029,26 @@ class GlobalsTables extends GlobalsStatic
     
     public function getFldTitle($tbl, $fld, $fldRow = NULL)
     {
-        if (!$fldRow) $fldRow = $this->getFldRowFromFullName($tbl, $fld);
-        if ($fldRow && isset($fldRow->FldEng)) return $fldRow->FldEng;
+        if (!$fldRow) {
+            $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        }
+        if ($fldRow && isset($fldRow->FldEng)) {
+            return $fldRow->FldEng;
+        }
         return '';
     }
     
     public function fld2SchemaType($fld)
     {
-        if (strpos($fld->FldValues, 'Def::') !== false) return 'xs:string';
-        switch (strtoupper(trim($fld->FldType))) {
-            case 'INT':            return 'xs:integer'; break;
-            case 'DOUBLE':        return 'xs:double'; break;
-            case 'DATE':        return 'xs:date'; break;
-            case 'DATETIME':    return 'xs:dateTime'; break;
-            case 'VARCHAR':
-            case 'TEXT':
-            default:             return 'xs:string';
+        if (strpos($fld->FldValues, 'Def::') !== false) {
+            return 'xs:string';
         }
+        switch (strtoupper(trim($fld->FldType))) {
+            case 'INT':      return 'xs:integer'; break;
+            case 'DOUBLE':   return 'xs:double'; break;
+            case 'DATE':     return 'xs:date'; break;
+            case 'DATETIME': return 'xs:dateTime'; break;
+        } // case 'VARCHAR': case 'TEXT':
         return 'xs:string';
     }
     
@@ -981,7 +1057,9 @@ class GlobalsTables extends GlobalsStatic
         $ret = [];
         if (isset($this->tblI[$tbl]) && isset($this->fldTypes[$tbl]) && is_array($this->fldTypes[$tbl]) 
             && sizeof($this->fldTypes[$tbl]) > 0) {
-            foreach ($this->fldTypes[$tbl] as $fld => $type) $ret[] = $fld;
+            foreach ($this->fldTypes[$tbl] as $fld => $type) {
+                $ret[] = $fld;
+            }
             /*
             $chk = SLFields::where('FldTable', '=', $this->tblI[$tbl])
                 ->where('FldSpecType', '=', 'Unique')
@@ -998,7 +1076,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function copyTblRecFromRow($tbl, $row)
     {
-        if (!isset($this->tblAbbr[$tbl]) || !$row || !isset($row->{ $this->tblAbbr[$tbl] . 'ID' })) return '';
+        if (!isset($this->tblAbbr[$tbl]) || !$row || !isset($row->{ $this->tblAbbr[$tbl] . 'ID' })) {
+            return '';
+        }
         $abbr = $this->tblAbbr[$tbl];
         eval("\$cpyTo = " . $this->modelPath($tbl) . "::find(" . $row->{ $abbr . 'ID' } . ");");
         if (!$cpyTo || !isset($cpyTo->{ $abbr . 'ID' })) {
@@ -1032,14 +1112,18 @@ class GlobalsTables extends GlobalsStatic
         $flds1 = $this->getTblFlds($tbl1);
         if ($flds1->isNotEmpty()) {
             $prfxPos = strlen($this->tblAbbr[$tbl1]);
-            foreach ($flds1 as $i => $fld1) $flds1[$i] = substr($fld1, $prfxPos);
+            foreach ($flds1 as $i => $fld1) {
+                $flds1[$i] = substr($fld1, $prfxPos);
+            }
         }
         $flds2 = $this->getTblFlds($tbl2);
         if ($flds2->isNotEmpty()) {
             $prfxPos = strlen($this->tblAbbr[$tbl2]);
             foreach ($flds2 as $i => $fld2) {
                 $fld2 = substr($fld2, $prfxPos);
-                if ($fld2 != 'ID' && in_array($fld2, $flds1)) $ret[] = $fld2;
+                if ($fld2 != 'ID' && in_array($fld2, $flds1)) {
+                    $ret[] = $fld2;
+                }
             }
         }
         return $ret;
@@ -1048,7 +1132,9 @@ class GlobalsTables extends GlobalsStatic
     public function printResponse($tbl, $fld, $val, $fldRow = null)
     {
         $ret = '';
-        if (!$fldRow) $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        if (!$fldRow) {
+            $fldRow = $this->getFldRowFromFullName($tbl, $fld);
+        }
         $defSet = $this->getFldDefSet($tbl, $fld, $fldRow);
         if ($defSet != '') {
             if (!is_array($val) && $val != '' && substr($val, 0, 1) == ';' && substr($val, strlen($val)-1) == ';') {
@@ -1056,14 +1142,20 @@ class GlobalsTables extends GlobalsStatic
             }
         }
         $str2arr = $this->str2arr($val);
-        if (sizeof($str2arr) > 0 && $str2arr[0] != 'EMPTY ARRAY') $val = $str2arr;
+        if (sizeof($str2arr) > 0 && $str2arr[0] != 'EMPTY ARRAY') {
+            $val = $str2arr;
+        }
         if (is_array($val)) {
             if (sizeof($val) > 0) {
                 if (trim($defSet) != '') {
-                    foreach ($val as $i => $v) $val[$i] = $this->def->getVal($defSet, $v);
+                    foreach ($val as $i => $v) {
+                        $val[$i] = $this->def->getVal($defSet, $v);
+                    }
                 }
                 $ret = implode(', ', $val);
-                if (trim($ret) == ',') $ret = '';
+                if (trim($ret) == ',') {
+                    $ret = '';
+                }
             }
         } else { // not array
             if (strpos(strtolower($fld), 'gender') !== false && strtoupper($val) == 'M') {
@@ -1078,9 +1170,13 @@ class GlobalsTables extends GlobalsStatic
                     $ret = $val;
                 }
             } elseif (trim($defSet) == 'Yes/No') {
-                if (in_array(trim(strtoupper($val)), ['1', 'Y'])) $ret = 'Yes';
-                elseif (in_array(trim(strtoupper($val)), ['0', 'N'])) $ret = 'No';
-                elseif (trim($val) == '?') $ret = 'Not sure';
+                if (in_array(trim(strtoupper($val)), ['1', 'Y'])) {
+                    $ret = 'Yes';
+                } elseif (in_array(trim(strtoupper($val)), ['0', 'N'])) {
+                    $ret = 'No';
+                } elseif (trim($val) == '?') {
+                    $ret = 'Not sure';
+                }
             } elseif ($this->fldTypes[$tbl][$fld] == 'DATE') {
                 $ret = date("n/j/y", strtotime($val));
             } else {
@@ -1093,7 +1189,9 @@ class GlobalsTables extends GlobalsStatic
     public function getMapToCore($fldID = -3, $fld = NULL)
     {
         $ret = [];
-        if (!$fld) $fld = SLFields::find($fldID);
+        if (!$fld) {
+            $fld = SLFields::find($fldID);
+        }
         if ($fld && isset($fld->FldTable) && $fld->FldTable != $this->tblI[$this->coreTbl]) {
             $linkMap = $this->getLinkTblMap($fld->FldTable);
             
@@ -1109,7 +1207,9 @@ class GlobalsTables extends GlobalsStatic
             foreach ($kids as $i => $k) {
                 
                 //$tbls[] = 
-                if (sizeof($tbls) > 0) $tbls[] = $tbl;
+                if (sizeof($tbls) > 0) {
+                    $tbls[] = $tbl;
+                }
             }
         }
         return $tbls;
@@ -1129,7 +1229,9 @@ class GlobalsTables extends GlobalsStatic
                     eval($eval);
                     $ids = [];
                     if ($chk->isNotEmpty()) {
-                        foreach ($chk as $lnk) $ids[] = $lnk->getKey();
+                        foreach ($chk as $lnk) {
+                            $ids[] = $lnk->getKey();
+                        }
                     }
                     
                 }
@@ -1141,19 +1243,25 @@ class GlobalsTables extends GlobalsStatic
     
     public function origFldCheckbox($tbl, $fld)
     {
-        if (!isset($this->formTree->TreeID)) return -3;
+        if (!isset($this->formTree->TreeID)) {
+            return -3;
+        }
         $chk = SLNode::where('NodeDataStore', $tbl . ':' . $fld)
             ->where('NodeType', 'Checkbox')
             ->where('NodeTree', $this->formTree->TreeID)
             ->first();
-        if ($chk) return $chk->NodeID;
+        if ($chk && isset($chk->NodeID)) {
+            return $chk->NodeID;
+        }
         return -3;
     }
     
     public function getFldNodeQuestion($tbl, $fld, $tree = -3)
     {
         $chk = null;
-        if ($tree < 0) $tree = $this->treeID;
+        if ($tree < 0) {
+            $tree = $this->treeID;
+        }
         if ($tree == 0) {
             $chk = SLNode::where('NodeDataStore', $tbl . ':' . $fld)
                 ->orderBy('NodeTree', 'asc')
@@ -1180,7 +1288,9 @@ class GlobalsTables extends GlobalsStatic
     public function splitTblFld($tblFld)
     {
         $tbl = $fld = '';
-        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false) list($tbl, $fld) = explode(':', $tblFld);
+        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false) {
+            list($tbl, $fld) = explode(':', $tblFld);
+        }
         return [$tbl, $fld];
     }
     
@@ -1192,14 +1302,18 @@ class GlobalsTables extends GlobalsStatic
                 ->where('FldTable', $this->tblI[$tbl])
                 ->where('FldName', substr($fld, strlen($this->tblAbbr[$tbl])))
                 ->first();
-            if ($fldRow && isset($fldRow->FldID)) return $fldRow->FldID;
+            if ($fldRow && isset($fldRow->FldID)) {
+                return $fldRow->FldID;
+            }
         }
         return -3;
     }
     
     public function getTblFldRow($tblFld = '', $tbl = '', $fld = '')
     {
-        if ($tbl == '' || $fld == '') list($tbl, $fld) = $this->splitTblFld($tblFld);
+        if ($tbl == '' || $fld == '') {
+            list($tbl, $fld) = $this->splitTblFld($tblFld);
+        }
         if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
             $fldRow = SLFields::where('FldTable', $this->tblI[$tbl])
                 ->where('FldName', substr($fld, strlen($this->tblAbbr[$tbl])))
@@ -1212,7 +1326,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function getFldResponsesByID($fldID)
     {
-        if (intVal($fldID) <= 0) return array( "prompt" => '', "vals" => [] );
+        if (intVal($fldID) <= 0) {
+            return [ "prompt" => '', "vals" => [] ];
+        }
         return $this->getFldResponses($this->getFullFldNameFromID($fldID));
     }
     
@@ -1240,7 +1356,9 @@ class GlobalsTables extends GlobalsStatic
                 }
             }
             if (sizeof($tmpVals[0]) > 0) {
-                foreach ($tmpVals[0] as $i => $val) $ret["vals"][] = array($val, $tmpVals[1][$i]);
+                foreach ($tmpVals[0] as $i => $val) {
+                    $ret["vals"][] = array($val, $tmpVals[1][$i]);
+                }
             }
         }
         return $ret;
@@ -1253,7 +1371,9 @@ class GlobalsTables extends GlobalsStatic
                 ->orderBy('CondTag')
                 ->get();
             if ($chk->isNotEmpty()) {
-                foreach ($chk as $i => $c) $this->condTags[$c->CondID] = $c->CondTag;
+                foreach ($chk as $i => $c) {
+                    $this->condTags[$c->CondID] = $c->CondTag;
+                }
             }
         }
         return true;
@@ -1335,8 +1455,11 @@ class GlobalsTables extends GlobalsStatic
                     } else {
                         $cond->CondField = intVal($request->setFld);
                         if ($request->has('equals')) {
-                            if ($request->get('equals') == 'equals') $cond->CondOperator = '{';
-                            else $cond->CondOperator = '}';
+                            if ($request->get('equals') == 'equals') {
+                                $cond->CondOperator = '{';
+                            } else {
+                                $cond->CondOperator = '}';
+                            }
                         }
                     }
                 }
@@ -1363,7 +1486,7 @@ class GlobalsTables extends GlobalsStatic
             for ($j=0; $j < 10; $j++) {
                 if ($request->has('condArtUrl' . $j . '') && trim($request->get('condArtUrl' . $j . '')) != '') {
                     $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
-                    if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != '') {
+                    if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != ''){
                         $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
                     }
                 }
@@ -1409,7 +1532,9 @@ class GlobalsTables extends GlobalsStatic
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $f) {
-                if ($f->FldNotes && trim($f->FldNotes) != '') $this->fldAbouts[$pref . $f->FldName] = $f->FldNotes;
+                if ($f->FldNotes && trim($f->FldNotes) != '') {
+                    $this->fldAbouts[$pref . $f->FldName] = $f->FldNotes;
+                }
             }
         }
         return true;
@@ -1419,8 +1544,7 @@ class GlobalsTables extends GlobalsStatic
     {
         if (!isset($this->sysTree[$type]) || !isset($this->sysTree[$type]["pub"]) 
             || empty($this->sysTree[$type]["pub"])) {
-            $treeType = 'Survey';
-            if ($type == 'pages') $treeType = 'Page';
+            $treeType = (($type == 'pages') ? 'Page' : 'Survey');
             $trees = SLTree::where('TreeType', $treeType)
                 ->orderBy('TreeName', 'asc')
                 ->select('TreeID', 'TreeName', 'TreeOpts')
@@ -1465,7 +1589,9 @@ class GlobalsTables extends GlobalsStatic
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $set) {
                     $setting = str_replace('tree-' . $this->treeID . '-', '', $set->DefSubset);
-                    if (!isset($this->treeSettings[$setting])) $this->treeSettings[$setting] = [];
+                    if (!isset($this->treeSettings[$setting])) {
+                        $this->treeSettings[$setting] = [];
+                    }
                     if ($setting == 'emojis') {
                         $names = explode(';', $set->DefValue);
                         $this->treeSettings[$setting][] = [
@@ -1488,7 +1614,9 @@ class GlobalsTables extends GlobalsStatic
     {
         if ($defID > 0 && sizeof($this->treeSettings["emojis"]) > 0) {
             foreach ($this->treeSettings["emojis"] as $emo) {
-                if ($emo["id"] == $defID) return $emo["verb"];
+                if ($emo["id"] == $defID) {
+                    return $emo["verb"];
+                }
             }
         }
         return '';
@@ -1516,8 +1644,12 @@ class GlobalsTables extends GlobalsStatic
     
     public function getCssColor($name = '')
     {
-        if (!isset($this->x["sysColor"])) $this->getCssColors();
-        if (isset($this->x["sysColor"][$name])) return $this->x["sysColor"][$name];
+        if (!isset($this->x["sysColor"])) {
+            $this->getCssColors();
+        }
+        if (isset($this->x["sysColor"][$name])) {
+            return $this->x["sysColor"][$name];
+        }
         return '';
     }
     
@@ -1563,54 +1695,83 @@ class GlobalsTables extends GlobalsStatic
     
     public function swapIfPublicID($pubID = -3, $tbl = '')
     {
-        if (trim($tbl) == '') $tbl = $this->coreTbl;
-        if ($this->tblHasPublicID($tbl)) return $this->chkInPublicID($pubID, $tbl);
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if ($this->tblHasPublicID($tbl)) {
+            return $this->chkInPublicID($pubID, $tbl);
+        }
         return $pubID;
     }
     
     public function tblHasPublicID($tbl = '')
     {
-        if (!isset($this->x["tblHasPublicID"])) $this->x["tblHasPublicID"] = [];
-        if (isset($this->x["tblHasPublicID"][$tbl])) return $this->x["tblHasPublicID"][$tbl];
+        if (!isset($this->x["tblHasPublicID"])) {
+            $this->x["tblHasPublicID"] = [];
+        }
+        if (isset($this->x["tblHasPublicID"][$tbl])) {
+            return $this->x["tblHasPublicID"][$tbl];
+        }
         $this->x["tblHasPublicID"][$tbl] = false;
         if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts%47 == 0 
             || (isset($this->reportTree["opts"]) && $this->reportTree["opts"]%47 == 0)) {
             $this->x["tblHasPublicID"][$tbl] = true;
         }
-        if (trim($tbl) == '') $tbl = $this->coreTbl;
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
         if ($this->x["tblHasPublicID"][$tbl] && isset($this->tblI[$tbl])) {
             $chk = SLFields::where('FldTable', $this->tblI[$tbl])
                 ->where('FldName', 'PublicID')
                 ->first();
-            if (!$chk) $this->x["tblHasPublicID"][$tbl] = false;
+            if (!$chk) {
+                $this->x["tblHasPublicID"][$tbl] = false;
+            }
         }
         return $this->x["tblHasPublicID"][$tbl];
     }
     
     public function chkInPublicID($pubID = -3, $tbl = '')
     {
-        if (trim($tbl) == '') $tbl = $this->coreTbl;
-        if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) return $pubID;
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) {
+            return $pubID;
+        }
         $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
         eval("\$idChk = " . $this->modelPath($tbl) . "::where('" . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
-        if ($idChk) return $idChk->getKey();
+        if ($idChk) {
+            return $idChk->getKey();
+        }
         return $pubID;
     }
     
     public function genNewCorePubID($tbl = '')
     {
-        if (trim($tbl) == '') $tbl = $this->coreTbl;
-        $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
-        eval("\$idChk = " . $this->modelPath($tbl) . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
-        if (!$idChk || !isset($idChk->{ $pubIdFld }) || intVal($idChk->{ $pubIdFld }) <= 0) return 1;
-        return (1+intVal($idChk->{ $pubIdFld }));
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if (isset($this->tblAbbr[$tbl])) {
+            $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
+            eval("\$idChk = " . $this->modelPath($tbl) . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
+            if (!$idChk || !isset($idChk->{ $pubIdFld }) || intVal($idChk->{ $pubIdFld }) <= 0) {
+                return 1;
+            }
+            return (1+intVal($idChk->{ $pubIdFld }));
+        }
+        return 1;
     }
     
     public function getDbName($dbID = -3)
     {
-        if ($dbID <= 0 || sizeof($this->allDbs) == 0) return '';
+        if ($dbID <= 0 || sizeof($this->allDbs) == 0) {
+            return '';
+        }
         foreach ($this->allDbs as $db) {
-            if ($db["id"] == $dbID) return $db["name"];
+            if ($db["id"] == $dbID) {
+                return $db["name"];
+            }
         }
         return '';
     }
@@ -1656,12 +1817,18 @@ class GlobalsTables extends GlobalsStatic
                 str_replace('https://www.', '', $url))));
         }
         if ($this->treeRow->TreeType == 'Page') {
-            if ($this->treeIsAdmin) return $url . '/dash/';
-            else return $url . '/';
+            if ($this->treeIsAdmin) {
+                return $url . '/dash/';
+            } else {
+                return $url . '/';
+            }
         } else {
             if (isset($this->treeRow->TreeSlug)) {
-                if ($this->treeIsAdmin) return $url . '/dash/' . $this->treeRow->TreeSlug . '/';
-                else return $url . '/u/' . $this->treeRow->TreeSlug . '/';
+                if ($this->treeIsAdmin) {
+                    return $url . '/dash/' . $this->treeRow->TreeSlug . '/';
+                } else {
+                    return $url . '/u/' . $this->treeRow->TreeSlug . '/';
+                }
             }
         }
         return $url . '/';
@@ -1711,9 +1878,15 @@ class GlobalsTables extends GlobalsStatic
         if (trim($metaTitle) != '') {
             $GLOBALS['SL']->sysOpts['meta-title'] = $metaTitle . ' - ' . $GLOBALS['SL']->sysOpts['meta-title'];
         }
-        if (trim($metaDesc) != '') $GLOBALS['SL']->sysOpts['meta-desc'] = $metaDesc;
-        if (trim($metaKeywords) != '') $GLOBALS['SL']->sysOpts['meta-keywords'] = $metaKeywords;
-        if (trim($metaImg) != '') $GLOBALS['SL']->sysOpts['meta-img'] = $metaImg;
+        if (trim($metaDesc) != '') {
+            $GLOBALS['SL']->sysOpts['meta-desc'] = $metaDesc;
+        }
+        if (trim($metaKeywords) != '') {
+            $GLOBALS['SL']->sysOpts['meta-keywords'] = $metaKeywords;
+        }
+        if (trim($metaImg) != '') {
+            $GLOBALS['SL']->sysOpts['meta-img'] = $metaImg;
+        }
         return true;
     }
     
@@ -1749,17 +1922,25 @@ class GlobalsTables extends GlobalsStatic
     {
         if ($node && isset($node->nodeType)) {
             $type = '';
-            if (in_array($node->nodeType, $this->x["dataStatTypes"]["quali"]))     $type = 'quali';
-            elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["choic"])) $type = 'choic';
-            elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["quant"])) $type = 'quant';
+            if (in_array($node->nodeType, $this->x["dataStatTypes"]["quali"])) {
+                $type = 'quali';
+            } elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["choic"])) {
+                $type = 'choic';
+            } elseif (in_array($node->nodeType, $this->x["dataStatTypes"]["quant"])) {
+                $type = 'quant';
+            }
             if ($type != '') {
                 if (isset($node->dataStore) && !in_array($node->dataStore, $this->x["dataTypeStats"]["flds"])) {
                     $this->x["dataTypeStats"]["flds"][] = $node->dataStore;
                     $this->x["dataTypeStats"][$type]["all"]++;
-                    if ($node->isRequired()) $this->x["dataTypeStats"][$type]["req"]++;
+                    if ($node->isRequired()) {
+                        $this->x["dataTypeStats"][$type]["req"]++;
+                    }
                 }
                 $this->x["qTypeStats"][$type]["all"]++;
-                if ($node->isRequired()) $this->x["qTypeStats"][$type]["req"]++;
+                if ($node->isRequired()) {
+                    $this->x["qTypeStats"][$type]["req"]++;
+                }
             }
         }
         return true;
@@ -1818,7 +1999,9 @@ class GlobalsTables extends GlobalsStatic
         }
         if (sizeof($flds2) > 0) {
             foreach ($flds2 as $fld2) {
-                if (!in_array($fld2, $flds1)) $ret .= ', <span class="mL20">' . $fld2 . '</span>';
+                if (!in_array($fld2, $flds1)) {
+                    $ret .= ', <span class="mL20">' . $fld2 . '</span>';
+                }
             }
         }
         if (trim($ret) != '') {
@@ -1855,16 +2038,24 @@ class GlobalsTables extends GlobalsStatic
     public function chkTableExists($coreTbl, $userTbl = null)
     {
         $chk = DB::select( DB::raw("SHOW TABLES LIKE '" . $this->dbRow->DbPrefix . $coreTbl->TblName . "'") );
-        if (!$chk || sizeof($chk) == 0) return false;
+        if (!$chk || sizeof($chk) == 0) {
+            return false;
+        }
         return true;
     }
     
     public function initCoreTable($coreTbl, $userTbl = null)
     {
         //if ($this->dbID == 3 && $this->sysOpts["cust-abbr"] != 'SurvLoop') return false;
-        if (!$coreTbl || !isset($coreTbl->TblID)) return false;
-        if (!$userTbl) $userTbl = $this->loadUsrTblRow();
-        if ($coreTbl->TblID == $userTbl->TblID) return false;
+        if (!$coreTbl || !isset($coreTbl->TblID)) {
+            return false;
+        }
+        if (!$userTbl) {
+            $userTbl = $this->loadUsrTblRow();
+        }
+        if ($coreTbl->TblID == $userTbl->TblID) {
+            return false;
+        }
         $coreFlds = [ [
                 "FldType" => 'INT', 
                 "FldEng"  => 'User ID', 

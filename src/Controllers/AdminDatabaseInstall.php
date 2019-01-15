@@ -46,55 +46,10 @@ class AdminDatabaseInstall extends AdminDBController
         }
         if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"]) {
             $GLOBALS["SL"]->exportMysqlSl();
+            $this->v["export"] .= $GLOBALS["SL"]->x["export"];
+            $GLOBALS["SL"]->x["export"] = '';
         }
         return true;
-    }
-    
-    protected function loadSlParents()
-    {
-        $this->v["slTrees"] = $this->v["slNodes"] = $this->v["slConds"] = [];
-        $chk = SLTree::where('TreeDatabase', $this->dbID)
-            ->select('TreeID')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $tree) $this->v["slTrees"][] = $tree->TreeID;
-        }
-        $chk = SLNode::whereIn('NodeTree', $this->v["slTrees"])
-            ->select('NodeID')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $node) $this->v["slNodes"][] = $node->NodeID;
-        }
-        $chk = SLConditions::where('CondDatabase', $this->dbID)
-            ->select('CondID')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $cond) $this->v["slConds"][] = $cond->CondID;
-        }
-        return true;
-    }
-    
-    protected function loadSlSeedEval($tbl = [])
-    {
-        if (!isset($this->v["slTrees"])) $this->loadSlParents();
-        $eval = "";
-        if (isset($tbl->TblName)) {
-            if ($tbl->TblName == 'Databases') {
-                $eval = "where('DbID', " . $this->dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['Images'])) {
-                $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $this->dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
-                $eval = "where('" . $tbl->TblAbbr . "Database', " . $this->dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
-                'Emails'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" . implode(", ", $this->v["slTrees"]) . "])->";
-            } elseif (in_array($tbl->TblName, ['NodeResponses'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Node', [" . implode(", ", $this->v["slNodes"]) . "])->";
-            } elseif (in_array($tbl->TblName, ['ConditionsArticles', 'ConditionsNodes', 'ConditionsVals'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "CondID', [" . implode(", ", $this->v["slConds"]) ."])->";
-            }
-        }
-        return $eval;
     }
     
     public function printExportPackage(Request $request)
@@ -136,13 +91,17 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExportLaravel(Request $request, $asPackage = false) 
     {
         ini_set('max_execution_time', 180);
-        $this->admControlInit($request, (($asPackage) 
-            ? '/dashboard/sl/export/laravel' : '/dashboard/db/export'));
-        if ($asPackage) $GLOBALS["SL"]->x["exportAsPackage"] = true;
-        if (!$this->checkCache(($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export/laravel')) {
-            
+        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export');
+        $this->admControlInit($request, $currPage);
+        if ($asPackage) {
+            $GLOBALS["SL"]->x["exportAsPackage"] = true;
+        }
+        if (!$this->checkCache($currPage)) {
         	$this->v["refresh"] = 1;
-            if ($GLOBALS["SL"]->REQ->has('refresh')) $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
+            if ($GLOBALS["SL"]->REQ->has('refresh')) {
+                $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
+            }
+            
 			$newMigFilename = 'database/migrations/' . $this->v["dateStmp"] . '_000000_create_' 
 				. strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
 			$newSeedFilename = 'database/seeds/' . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
@@ -161,7 +120,7 @@ class AdminDatabaseInstall extends AdminDBController
 							. $tbl->TblName . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
 							."$"."table->increments('" . $tbl->TblAbbr . "ID');";
 						$this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
-						$flds = $this->getTableFields($tbl);
+						$flds = $GLOBALS["SL"]->getTableFields($tbl);
 						if ($flds->isNotEmpty()) {
 							foreach ($flds as $fld) {
 								$fldName = trim($tbl->TblAbbr . $fld->FldName);
@@ -242,10 +201,13 @@ class AdminDatabaseInstall extends AdminDBController
 								$runTable = false;
 							}
 						} elseif ($asPackage) {
+						    if (is_array($this->custReport)) {
+						        $this->loadCustLoop($request, $this->treeID);
+						    }
 							$runTable = in_array($tbl->TblName, $this->custReport->tblsInPackage());
 						}
 						if ($runTable) {
-							Storage::append($newSeedFilename, $this->printSeedTbl($this->loadSlSeedEval($tbl)));
+							Storage::append($newSeedFilename, $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
 						}
 					}
 				}
@@ -256,7 +218,7 @@ class AdminDatabaseInstall extends AdminDBController
 							$this->v["tbl"] = $tbl;
 							$this->v["tblName"] = 'SL_' . $tbl->TblName;
 							$this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-							Storage::append($newSeedFilename, $this->printSeedTbl($this->loadSlSeedEval($tbl)));
+							Storage::append($newSeedFilename, $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
 						}
 					}
 				}
@@ -305,7 +267,7 @@ class AdminDatabaseInstall extends AdminDBController
         $tbl = SLTables::where('TblName', $tbl)
             ->first();
         $this->loadTbl($tbl);
-        $flds = $this->getTableFields($tbl);
+        $flds = $GLOBALS["SL"]->getTableFields($tbl);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
                 $this->v["modelFile"] .= "\n\t\t'" . trim($tbl->TblAbbr . $fld->FldName) . "', ";
@@ -345,11 +307,11 @@ class AdminDatabaseInstall extends AdminDBController
     protected function printSeedTbl($eval = '')
     {
     	$ret = '';
-        $seedChk = $this->getTableSeedDump($this->v["tblClean"], $eval);
+        $seedChk = $GLOBALS["SL"]->getTableSeedDump($this->v["tblClean"], $eval);
         if ($seedChk->isNotEmpty()) {
             foreach ($seedChk as $seed) {
                 $fldData = "\n\t\t\t'" . $this->v["tbl"]->TblAbbr . "ID' => " . $seed->getKey();
-                $flds = $this->getTableFields($this->v["tbl"]);
+                $flds = $GLOBALS["SL"]->getTableFields($this->v["tbl"]);
                 if ($flds->isNotEmpty()) {
                     foreach ($flds as $i => $fld) {
                         $fldName = trim($this->v["tbl"]->TblAbbr . $fld->FldName);

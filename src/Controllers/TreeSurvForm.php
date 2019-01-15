@@ -28,7 +28,9 @@ class TreeSurvForm extends TreeSurvFormUtils
 {
     protected function printNodePublicFormStart($nID)
     {
-        if ($this->skipFormForPreview($nID)) return '';
+        if ($this->skipFormForPreview($nID)) {
+            return '';
+        }
         $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.formtree-form-js', [
             "currPage"       => $this->v["currPage"],
             "pageURL"        => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
@@ -43,20 +45,21 @@ class TreeSurvForm extends TreeSurvFormUtils
             $this->sessInfo->SessLoopRootJustLeft = -3;
             $this->sessInfo->save();
         }
-        /* if (isset($this->v["hasRegisterNode"]) && $this->v["hasRegisterNode"]) {
-            session()->put('sessTreeReg', $this->treeID);
-            session()->put('sessTreeRegTime', mktime());
-        } */
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $ret .= '<div id="isPage"></div>';
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            $ret .= '<div id="isPage"></div>';
+        }
         
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->chkCurrTreeOpt('PAGEFORM')
             || $GLOBALS["SL"]->chkCurrTreeOpt('CONTACT')) {
+            $formAction = $this->currNodeFormAction();
+            $GLOBALS["SL"]->pageJAVA .= 'formActionUrl = "' . $formAction . '"; ';
             $ret .= view('vendor.survloop.formtree-form-start', [
                 "nID"              => $nID, 
                 "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
                 "currPage"         => $this->v["currPage"],
-                "action"           => $this->currNodeFormAction(), 
-                "pageHasUpload"    => $this->pageHasUpload, 
+                "action"           => $formAction, 
+                "isAjax"           => (($GLOBALS['SL']->treeRow->TreeType == 'Page') ? 0 : 1), 
+                "pageHasUpload"    => ((sizeof($this->pageHasUpload) > 0) ? 'enctype="multipart/form-data"' : ''),
                 "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
                 "loopRootJustLeft" => $loopRootJustLeft, 
                 "zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
@@ -68,7 +71,9 @@ class TreeSurvForm extends TreeSurvFormUtils
     
     protected function printNodePublicFormEnd($nID, $promptNotesSpecial = '')
     {
-        if ($this->skipFormForPreview($nID)) return '';
+        if ($this->skipFormForPreview($nID)) {
+            return '';
+        }
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
             || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0) {
             return '</form>';
@@ -78,8 +83,12 @@ class TreeSurvForm extends TreeSurvFormUtils
     protected function nodePrintButton($nID = -3, $tmpSubTier = [], $promptNotesSpecial = '', $printBack = true)
     { 
         $ret = $this->customNodePrintButton($nID, $promptNotesSpecial);
-        if ($ret != '') return $ret;
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') return '';
+        if ($ret != '') {
+            return $ret;
+        }
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            return '';
+        }
         $btnSize = ((in_array($this->pageCnt, [1, 2])) ? 'btn-xl' : 'btn-lg');
         
         // else print standard button variations
@@ -101,19 +110,19 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]]);
             }
             if ($this->allNodes[$nID]->isStepLoop() && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn" 
-                    ><i class="fa fa-arrow-circle-o-right"></i> ' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn"'
+                    . ' ><i class="fa fa-arrow-circle-o-right"></i> ' . $nextLabel . '</a>';
             } else {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn" 
-                    >' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn"'
+                    . ' >' . $nextLabel . '</a>';
                 //$ret .= '<input type="button" value="' . $nextLabel 
                 //    . '" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn">';
             }
         }
         if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID
             && ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0)) {
-            $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize . ' nFormBack" id="nFormBack" 
-                >Back</a>';
+            $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize . ' nFormBack" id="nFormBack"'
+                . ' >Back</a>';
             //$ret .= '<input type="button" value="Back" class="fL nFormBack btn btn-lg btn-secondary" id="nFormBack">';
         }
         $ret .= '<div class="clearfix p5"></div></div><div class="disNon"><input type="submit"></div>';
@@ -124,8 +133,12 @@ class TreeSurvForm extends TreeSurvFormUtils
     {
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             $ret = '/' . $GLOBALS["SL"]->treeRow->TreeSlug;
-            if ($GLOBALS["SL"]->treeIsAdmin) $ret = '/dash' . $ret;
-            if (isset($GLOBALS["SL"]->x["pageSlugSffx"])) $ret .= $GLOBALS["SL"]->x["pageSlugSffx"];
+            if ($GLOBALS["SL"]->treeIsAdmin) {
+                $ret = '/dash' . $ret;
+            }
+            if (isset($GLOBALS["SL"]->x["pageSlugSffx"])) {
+                $ret .= $GLOBALS["SL"]->x["pageSlugSffx"];
+            }
             return $ret;
         }
         return (($GLOBALS["SL"]->treeIsAdmin) ? '/dash-sub' : '/sub');
@@ -142,7 +155,10 @@ class TreeSurvForm extends TreeSurvFormUtils
         return '';
     }
     
-    protected function closePrintNodePublic($nID, $nIDtxt, $curr) { return true; }
+    protected function closePrintNodePublic($nID, $nIDtxt, $curr)
+    {
+        return true;
+    }
     
     protected function printNodePublic($nID = -3, $tmpSubTier = [], $currVisib = -1)
     {
@@ -254,12 +270,14 @@ class TreeSurvForm extends TreeSurvFormUtils
         } elseif (is_array($nodeOverrides) && sizeof($nodeOverrides) == 1 && isset($nodeOverrides[0])) {
             $currNodeSessData = $nodeOverrides[0];
         }
+        if ($GLOBALS["SL"]->REQ->has('nv' . $nIDtxt) && trim($GLOBALS["SL"]->REQ->get('nv' . $nIDtxt)) != '') {
+            $currNodeSessData = $GLOBALS["SL"]->REQ->get('nv' . $nIDtxt);
+        }
         
         if (!isset($this->v["javaNodes"])) {
             $this->v["javaNodes"] = '';
         }
-        $this->v["javaNodes"] .= 'nodeList[nodeList.length] = ' . $nID . '; '
-            . 'nodeParents[' . $nID . '] = ' . $curr->parentID . ';' . "\n"
+        $this->v["javaNodes"] .= 'nodeParents[' . $nID . '] = ' . $curr->parentID . ';' . "\n"
             . (($nSffx != '') ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" : '');
         $condKids = $showMoreNodes = [];
         if (sizeof($tmpSubTier[1]) > 0) {
@@ -455,7 +473,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                 . (($curr->nodeRow->NodeOpts%83 == 0) ? ' disNon' : '') . '">' 
                 . $nodePromptNotes . '</div>' . "\n";
         }
-        if (strpos($nodePromptText, 'fixedHeader') !== false) $this->v["hasFixedHeader"] = true;
+        if (strpos($nodePromptText, 'fixedHeader') !== false) {
+            $this->v["hasFixedHeader"] = true;
+        }
         
         $nodePromptText  = $GLOBALS["SL"]->extractJava($nodePromptText, $nID);
         $nodePromptNotes = $GLOBALS["SL"]->extractJava($nodePromptNotes, $nID);
@@ -924,26 +944,21 @@ class TreeSurvForm extends TreeSurvFormUtils
                     
                 } elseif ($curr->nodeType == 'User Sign Up') {
                     
-                    $this->v["hasRegisterNode"] = true;
-                    $this->pageJSvalid .= view('vendor.survloop.auth.register-node-jsValid', [
-                        "coreID"         => $this->coreID
-                    ])->render();
-                    $ret .= view('vendor.survloop.auth.register-node', [
-                        "coreID"         => $this->coreID, 
-                        "anonyLogin"     => $this->isAnonyLogin(), 
-                        "anonyPass"      => uniqid(),
-                        "currAdmPage"    => '', 
-                        "user"           => Auth::user(),
-                        "inputMobileCls" => $this->inputMobileCls($nID)
-                    ])->render();
+                    session()->put('midSurvSignupTree', $this->treeID);
+                    session()->put('midSurvSignupNode', $nID);
+                    session()->put('midSurvSignupCore', $this->coreID);
+                    $ret .= $GLOBALS["SL"]->spinner(true) . '<script type="text/javascript">
+                        setTimeout("window.location=\'/register?nd=' . $nID . '\'", 100);
+                        </script><style> #pageBtns, #navDesktop, #navMobile { display: none; } </style>';
                     
                 } elseif (in_array($curr->nodeType, [ 'Text', 'Email', 'Spambot Honey Pot' ])) {
                     
-                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input class="form-control form-control-lg' 
-                        . $xtraClass . '" type="' . (($curr->nodeType == 'Email') ? 'email' : 'text')
-                        . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
-                        . '" ' . $onKeyUp . ' data-nid="' . $nID . '" ' . $GLOBALS["SL"]->tabInd() . '></div>' 
-                        . $charLimit . "\n" . $this->printWordCntStuff($nIDtxt, $curr->nodeRow); 
+                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">'
+                        . '<input class="form-control form-control-lg' . $xtraClass . '" type="' 
+                        . (($curr->nodeType == 'Email') ? 'email' : 'text') . '" name="n' . $nIDtxt . 'fld" id="n' 
+                        . $nIDtxt . 'FldID" value="' . $currNodeSessData . '" ' . $onKeyUp . ' data-nid="' . $nID 
+                        . '" ' . $GLOBALS["SL"]->tabInd() . '></div>' . $charLimit . "\n"
+                        . $this->printWordCntStuff($nIDtxt, $curr->nodeRow);
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
                             . "VisibleID') && document.getElementById('n" . $nIDtxt 

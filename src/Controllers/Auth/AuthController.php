@@ -8,11 +8,13 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use SurvLoop\Controllers\Globals;
-use SurvLoop\Controllers\SurvLoopController;
 use App\Models\User;
+use App\Models\SLNode;
+use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
+use SurvLoop\Controllers\SurvLoopController;
+use SurvLoop\Controllers\SurvLoop;
 
 class AuthController extends Controller
 {
@@ -32,6 +34,13 @@ class AuthController extends Controller
     protected $loginPath           = '/login';
     protected $redirectPath        = '/afterLogin';
     protected $redirectAfterLogout = '/login';
+    
+    protected $dbID         = 1;
+    protected $treeID       = 1;
+    protected $currTree     = null;
+    protected $currNode     = null;
+    protected $surv         = null;
+    protected $midSurvRedir = '';
     
     /**
      * Create a new authentication controller instance.
@@ -78,8 +87,77 @@ class AuthController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
-        ]);
+            ]);
         return $user;
+    }
+    
+    protected function chkAuthPageOpts(Request $request)
+    {
+        if ($request->has('nd') && intVal($request->get('nd')) > 0 && session()->has('midSurvSignupNode')
+            && intVal(session()->get('midSurvSignupNode')) == intVal($request->get('nd'))) {
+            $this->currNode = SLNode::find(intVal($request->get('nd')));
+            if ($this->currNode && isset($this->currNode->NodeID) && session()->has('midSurvSignupTree')
+                && intVal(session()->get('midSurvSignupTree')) == $this->currNode->NodeTree) {
+                $this->treeID = $this->currNode->NodeTree;
+                $this->currTree = SLTree::find($this->treeID);
+                if ($this->currTree && isset($this->currTree->TreeDatabase)) {
+                    $this->dbID = $this->currTree->TreeDatabase;
+                }
+            }
+        }
+        $this->surv = new SurvLoop;
+        $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
+        $this->surv->loadLoop($request);
+        if ($request->has('nd') && intVal($request->get('nd')) > 0 && $request->session()->has('midSurvSignupNode')
+            && intVal($request->session()->get('midSurvSignupNode')) == intVal($request->get('nd'))) {
+            $this->currNode = SLNode::find(intVal($request->get('nd')));
+            if ($this->currNode && isset($this->currNode->NodeID) && $request->session()->has('midSurvSignupTree')
+                && intVal($request->session()->get('midSurvSignupTree')) == $this->currNode->NodeTree) {
+                $this->surv->custLoop->loadTree($this->treeID, $request);
+                $this->surv->custLoop->updateCurrNode($this->currNode->NodeID);
+                $this->surv->custLoop->updateCurrNode($this->surv->custLoop->getNextNonBranch($this->currNode->NodeID));
+                $nextNode = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
+                $nextNode->fillNodeRow();
+                $this->midSurvRedir = '/u/' . $this->currTree->TreeSlug . '/' . $nextNode->nodeRow->NodePromptNotes;
+                if (isset($this->currNode->NodePromptText) && trim($this->currNode->NodePromptText) != '') {
+                    $GLOBALS["SL"]->sysOpts["signup-instruct"] = $this->currNode->NodePromptText;
+                }
+            }
+        }
+        //session()->get('midSurvSignupCore', $this->coreID);
+        return true;
+    }
+    
+    public function getRegister(Request $request)
+    {
+        $this->chkAuthPageOpts($request);
+        $emailRequired = 'false';
+        if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
+            || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off') {
+            $emailRequired = 'true';
+        }
+        return view('vendor.survloop.auth.register', [
+            "request"       => $request,
+            "sysOpts"       => $GLOBALS["SL"]->sysOpts,
+            "midSurvRedir"  => $this->midSurvRedir,
+            "emailRequired" => $emailRequired
+            ]);
+    }
+    
+    public function getLogin(Request $request)
+    {
+        $this->chkAuthPageOpts($request);
+        if (Auth::user() && isset(Auth::user()->id)) {
+            return redirect($this->redirectPath());
+        }
+        
+        
+        return view('vendor.survloop.auth.login', [
+            "request"      => $request,
+            "sysOpts"      => $GLOBALS["SL"]->sysOpts,
+            "midSurvRedir" => $this->midSurvRedir,
+            "errorMsg"     => ''
+            ]);
     }
     
     public function postLogin(Request $request)
@@ -96,9 +174,9 @@ class AuthController extends Controller
             $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
             return redirect($this->redirectPath);
         }
-        return view('auth.login', [
+        return view('vendor.survloop.auth.login', [
             "errorMsg" => 'That combination of password with that username or email did not work.' 
-        ]);
+            ]);
         //return $this->getLogin($request);
         //return redirect($this->loginPath . '?error=1');
     }
@@ -140,6 +218,5 @@ class AuthController extends Controller
     {
         return view('vendor.survloop.auth.passwords.email');
     }
-
     
 }

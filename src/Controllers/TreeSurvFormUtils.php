@@ -184,20 +184,18 @@ class TreeSurvFormUtils extends TreeSurvInput
         } elseif (intVal($curr->nodeRow->NodeResponseSet) > 0) {
             $widgetTreeID = $curr->nodeRow->NodeResponseSet;
             $widgetLimit  = intVal($curr->nodeRow->NodeCharLimit);
+            $this->initSearcher();
             if ($curr->nodeType == 'Search') {
-                $this->initSearcher();
                 $ret .= $this->searcher->printSearchBar('', $widgetTreeID, trim($curr->nodeRow->NodePromptText), 
                     trim($curr->nodeRow->NodePromptAfter), $nID, 0);
             } else { // this widget loads via ajax
-                $spinner = (($curr->nodeType != 'Incomplete Sess Check') 
-                    ? ((isset($GLOBALS["SL"]->sysOpts["spinner-code"])) 
-                        ? $GLOBALS["SL"]->sysOpts["spinner-code"] : '') : '');
+                $spinner = (($curr->nodeType != 'Incomplete Sess Check') ? $GLOBALS["SL"]->spinner() : '');
                 $loadURL = '/records-full/' . $widgetTreeID;
                 $search = (($GLOBALS["SL"]->REQ->has('s')) ? trim($GLOBALS["SL"]->REQ->get('s')) : '');
                 if (isset($this->v["profileUser"]) && isset($this->v["profileUser"]->id)) {
-                    $this->advSearchUrlSffx .= '&u=' . $this->v["profileUser"]->id;
+                    $this->searcher->advSearchUrlSffx .= '&u=' . $this->v["profileUser"]->id;
                 } elseif (isset($curr->nodeRow->NodeDataBranch) && trim($curr->nodeRow->NodeDataBranch) == 'users') {
-                    $this->advSearchUrlSffx .= '&mine=1';
+                    $this->searcher->advSearchUrlSffx .= '&mine=1';
                 }
                 if (in_array($curr->nodeType, ['Record Full', 'Record Full Public'])) {
                     $cid = (($GLOBALS["SL"]->REQ->has('i')) ? intVal($GLOBALS["SL"]->REQ->get('i')) 

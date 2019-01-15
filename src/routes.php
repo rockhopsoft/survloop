@@ -86,14 +86,15 @@ Route::group(['middleware' => ['web']], function () {
     
     ///////////////////////////////////////////////////////////
     
-    Route::post('/register',   'SurvLoop\Controllers\Auth\SurvRegisterController@register');
+    Route::post('/register',   'SurvLoop\\Controllers\\Auth\\SurvRegisterController@register');
+    Route::get( '/register',   'SurvLoop\\Controllers\\Auth\\AuthController@getRegister');
     Route::post('/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/logout',     'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');
     Route::get( '/chkEmail',   'SurvLoop\\Controllers\\SurvLoop@chkEmail');
     
     // Authentication routes...
-    Route::post('/login',      'SurvLoop\Controllers\Auth\AuthController@postLogin');
+    Route::post('/login',      'SurvLoop\\Controllers\\Auth\\AuthController@postLogin');
 
     Route::get( '/time-out',   'SurvLoop\\Controllers\\SurvLoop@timeOut');
     Route::get( '/survloop-stats.json',   'SurvLoop\\Controllers\\SurvLoop@getJsonSurvStats');
@@ -110,6 +111,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/sys1.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.css'));
         $response->header('Content-Type', 'text/css');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     Route::get( '/sys2.css', function() {
@@ -120,11 +123,15 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/sys2.min.css', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.css'));
         $response->header('Content-Type', 'text/css');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     Route::get( '/sys1.min.js', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.js'));
         $response->header('Content-Type', 'application/javascript');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     Route::get( '/sys2.js', function() {
@@ -135,11 +142,15 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/sys2.min.js', function() {
         $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.js'));
         $response->header('Content-Type', 'application/javascript');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     Route::get( '/tree-{treeID}.js', function($treeID) {
         $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
         $response->header('Content-Type', 'application/javascript');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     
@@ -152,6 +163,8 @@ Route::group(['middleware' => ['web']], function () {
             $response = Response::make('/* */');
         }
         $response->header('Content-Type', 'text/css');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     Route::get( '/dyna-{file}.js', function($file) {
@@ -163,6 +176,8 @@ Route::group(['middleware' => ['web']], function () {
             $response = Response::make('/* */');
         }
         $response->header('Content-Type', 'application/javascript');
+        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+        $response->header('Expires', gmdate('r', time()+(60*60*24)));
         return $response;
     });
     
@@ -170,6 +185,8 @@ Route::group(['middleware' => ['web']], function () {
         if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
             $response = Response::make(file_get_contents('../storage/app/gen-kml/' . $kmlfile . '.kml'));
             $response->header('Content-Type', 'text/xml');
+            $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
+            $response->header('Expires', gmdate('r', time()+(60*60*24)));
             return $response;
         }
     });
@@ -374,7 +391,7 @@ Route::group(['middleware' => ['web']], function () {
     ]);
     
     Route::post('/dashboard/users', [
-        'uses' => 'SurvLoop\Controllers\AdminController@userManagePost', 
+        'uses' => 'SurvLoop\Controllers\AdminController@userManage', 
         'middleware' => ['auth']
     ]);
     

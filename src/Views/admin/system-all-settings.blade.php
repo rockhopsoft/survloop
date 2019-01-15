@@ -131,7 +131,7 @@
             "opt" => 'spinner-code', "val" => ((isset($sysDef->v["settingsList"]["spinner-code"]))
             ? $sysDef->v["settingsList"]["spinner-code"] : '') ])->render() !!}
     </div><div class="col-md-6">
-        @if (isset($GLOBALS["SL"]->sysOpts["spinner-code"])) {!! $GLOBALS["SL"]->sysOpts["spinner-code"] !!} @endif
+        {!! $GLOBALS["SL"]->spinner() !!}
     </div>
 </div>
 

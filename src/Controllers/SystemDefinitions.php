@@ -62,7 +62,9 @@ class SystemDefinitions
     
     public function prepSysSettings(Request $request, $dbID = 1)
     {
-        if ($dbID <= 0) $dbID = $this->dbID;
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         $this->v["settingsList"] = $this->getDefaultSys();
         $this->v["stylesList"] = $this->getDefaultStyles();
         if (!session()->has('chkSysVars') || $request->has('refresh')) {
@@ -76,9 +78,9 @@ class SystemDefinitions
             ->orderBy('DefOrder')    
             ->get();
         $this->v["custCSS"] = SLDefinitions::where('DefDatabase', $dbID)
-                ->where('DefSet', 'Style CSS')
-                ->where('DefSubset', 'main')
-                ->first();
+            ->where('DefSet', 'Style CSS')
+            ->where('DefSubset', 'main')
+            ->first();
         if (!$this->v["custCSS"] || !isset($this->v["custCSS"]->DefID)) {
             $this->v["custCSS"] = new SLDefinitions;
             $this->v["custCSS"]->DefDatabase = $dbID;
@@ -87,9 +89,9 @@ class SystemDefinitions
             $this->v["custCSS"]->save();
         }
         $this->v["custCSSemail"] = SLDefinitions::where('DefDatabase', $dbID)
-                ->where('DefSet', 'Style CSS')
-                ->where('DefSubset', 'email')
-                ->first();
+            ->where('DefSet', 'Style CSS')
+            ->where('DefSubset', 'email')
+            ->first();
         if (!$this->v["custCSSemail"] || !isset($this->v["custCSSemail"]->DefID)) {
             $this->v["custCSSemail"] = new SLDefinitions;
             $this->v["custCSSemail"]->DefDatabase = $dbID;
@@ -104,11 +106,18 @@ class SystemDefinitions
             foreach ($GLOBALS["SL"]->sysOpts as $opt => $val) {
                 if (isset($this->v["settingsList"][$opt])) {
                     $new = '';
-                    if ($request->has('sys-' . $opt)) $new = $request->get('sys-' . $opt);
-                    if ($opt == 'meta-title' && $request->has('pageTitle')) $new = $request->get('pageTitle');
-                    elseif ($opt == 'meta-desc' && $request->has('pageDesc')) $new = $request->get('pageDesc');
-                    elseif ($opt == 'meta-keywords' && $request->has('pageKey')) $new = $request->get('pageKey');
-                    elseif ($opt == 'meta-img' && $request->has('pageImg')) $new = $request->get('pageImg');
+                    if ($request->has('sys-' . $opt)) {
+                        $new = $request->get('sys-' . $opt);
+                    }
+                    if ($opt == 'meta-title' && $request->has('pageTitle')) {
+                        $new = $request->get('pageTitle');
+                    } elseif ($opt == 'meta-desc' && $request->has('pageDesc')) {
+                        $new = $request->get('pageDesc');
+                    } elseif ($opt == 'meta-keywords' && $request->has('pageKey')) {
+                        $new = $request->get('pageKey');
+                    } elseif ($opt == 'meta-img' && $request->has('pageImg')) {
+                        $new = $request->get('pageImg');
+                    }
                     if ($new != '') {
                         $GLOBALS["SL"]->sysOpts[$opt] = $new;
                         SLDefinitions::where('DefDatabase', $dbID)
@@ -137,7 +146,9 @@ class SystemDefinitions
         }
         $tmp = [];
         if ($this->v["sysStyles"]->isNotEmpty()) {
-            foreach ($this->v["sysStyles"] as $sty) $tmp[$sty->DefSubset] = $sty->DefDescription;
+            foreach ($this->v["sysStyles"] as $sty) {
+                $tmp[$sty->DefSubset] = $sty->DefDescription;
+            }
         }
         $this->v["sysStyles"] = $tmp;
         return true;
@@ -145,10 +156,14 @@ class SystemDefinitions
     
     protected function checkStyleDefs($css = [], $dbID = 1)
     {
-        if ($dbID <= 0) $dbID = $this->dbID;
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         $defaults = $this->getDefaultStyles();
         foreach ($defaults as $key => $val) {
-            if (!isset($css[$key])) $css[$key] = $val[0];
+            if (!isset($css[$key])) {
+                $css[$key] = $val[0];
+            }
             $dbID = $this->dbID;
             //if ($this->dbID == 3 && $GLOBALS["SL"]->sysOpts["cust-abbr"] == 'SurvLoop') $dbID = 1;
             $chk = SLDefinitions::where('DefDatabase', $dbID)
@@ -169,10 +184,14 @@ class SystemDefinitions
     
     protected function checkSysDefs($sys = [], $dbID = 1)
     {
-        if ($dbID <= 0) $dbID = $this->dbID;
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         $defaults = $this->getDefaultSys();
         foreach ($defaults as $key => $val) {
-            if (!isset($css[$key])) $sys[$key] = $val[1];
+            if (!isset($css[$key])) {
+                $sys[$key] = $val[1];
+            }
             $chk = SLDefinitions::where('DefDatabase', $dbID)
                 ->where('DefSet', 'System Settings')
                 ->where('DefSubset', $key)
@@ -285,7 +304,9 @@ class SystemDefinitions
     
     protected function chkAppUrl($dbID = 1)
     {
-        if ($dbID <= 0) $dbID = $this->dbID;
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
         $appUrl = SLDefinitions::where('DefDatabase', $dbID)
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'app-url')

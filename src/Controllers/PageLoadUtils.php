@@ -105,7 +105,7 @@ class PageLoadUtils extends Controller
             && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0);
     }
     
-    protected function loadTreeByID(Request $request, $treeID = -3)
+    public function loadTreeByID(Request $request, $treeID = -3)
     {
         if (intVal($treeID) > 0) {
             $tree = SLTree::find($treeID);
@@ -185,10 +185,13 @@ class PageLoadUtils extends Controller
                         $rootNode = SLNode::find($t->TreeFirstPage);
                         if ($rootNode && isset($t->TreeSlug) && isset($rootNode->NodePromptNotes)) {
                             $redir = $this->dashPrfx . '/u/' . $t->TreeSlug . '/' . $rootNode->NodePromptNotes 
-                                . '?start=1&new=1';
+                                . '?start=1&new=' . rand(100000000, 1000000000);
                             $paramTxt = str_replace($this->domainPath . '/start/' . $t->TreeSlug, '', 
-                                $request->fullUrl());
-                            if (substr($paramTxt, 0, 1) == '/') $paramTxt = substr($paramTxt, 1);
+                                str_replace($this->domainPath . '/dashboard/start/' . $t->TreeSlug, '', 
+                                $request->fullUrl()));
+                            if (substr($paramTxt, 0, 1) == '/') {
+                                $paramTxt = substr($paramTxt, 1);
+                            }
                             if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
                                 $redir .= '&' . substr($paramTxt, 1);
                             }
@@ -210,6 +213,8 @@ class PageLoadUtils extends Controller
                                 }
                                 session()->put('sessID' . $t->TreeID, $sess->SessID);
                                 session()->put('coreID' . $t->TreeID, $cid);
+                            } else {
+                                
                             }
                             return redirect($this->domainPath . $redir);
                         }
@@ -225,6 +230,14 @@ class PageLoadUtils extends Controller
         return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
     }
     
+    protected function chkGenCacheKey()
+    {
+        if (trim($this->cacheKey) == '') {
+            return $this->topGenCacheKey();
+        }
+        return $this->cacheKey;
+    }
+    
     protected function topGenCacheKey()
     {
         $this->cacheKey = '/cache/page-' . substr($_SERVER["REQUEST_URI"], 1) . '.html';
@@ -235,7 +248,9 @@ class PageLoadUtils extends Controller
     {
         $this->topGenCacheKey();
         if ($request->has('refresh')) {
-            if (file_exists($this->cacheKey)) Storage::delete($this->cacheKey);
+            if (file_exists($this->cacheKey)) {
+                Storage::delete($this->cacheKey);
+            }
             return false;
         }
         if (file_exists($this->cacheKey)) {
@@ -247,7 +262,7 @@ class PageLoadUtils extends Controller
     
     protected function topSaveCache()
     {
-        if (trim($this->cacheKey) == '') $this->topGenCacheKey();
+        $this->chkGenCacheKey();
         Storage::put($this->cacheKey, $this->pageContent);
         return true;
     }
@@ -256,10 +271,10 @@ class PageLoadUtils extends Controller
     {
         $extra = '';
         if (Auth::user() && isset(Auth::user()->id) && Auth::user()->hasRole('administrator|staff|brancher')) {
-            $extra .= ' addTopNavItem("pencil", "?edit=1"); ';
+            $extra .= ' setTimeout(\'addTopNavItem("pencil", "?edit=1")\', 2000); ';
         }
         if (trim($extra) != '') {
-            $extra = '<script type="text/javascript"> ' . $extra . ' </script>';
+            $extra = '<script async defer type="text/javascript"> ' . $extra . ' </script>';
         }
         return str_replace("</body>", $extra . "\n</body>", $pageContent);
     }

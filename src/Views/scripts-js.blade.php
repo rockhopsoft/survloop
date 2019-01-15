@@ -36,7 +36,6 @@ function getTreeCoreTbl(treeID) {
     }
     return "";
 }
-var treeListChk = new Array(); // when [0] is changed, reload field drops [1], [2]...
 
 function slugOnBlur(obj, dest) {
     if (obj.value.trim() != '' && document.getElementById(dest) && document.getElementById(dest).value.trim() == '') {
@@ -881,8 +880,7 @@ function runSearch(nID, treeID) {
 }
 
 function getSpinner() {
-    return @if (isset($GLOBALS["SL"]->sysOpts["spinner-code"])) {!! 
-        json_encode($GLOBALS["SL"]->sysOpts["spinner-code"]) !!} @endif;
+    return {!! json_encode($GLOBALS["SL"]->spinner()) !!};
 }
 function getSpinnerAjaxWrap() {
     return {!! json_encode('<div id="ajaxWrapLoad" class="container">') !!}+getSpinner()+{!! json_encode('</div>') !!};
@@ -966,6 +964,8 @@ function setPopDiaTxt(title, desc) {
     return true;
 }
 
+var formActionUrl = "/sub";
+
 $(document).ready(function(){
         
     function popDialog(title, desc) {
@@ -1034,10 +1034,9 @@ $(document).ready(function(){
         var formData = new FormData(document.getElementById("postNodeForm"));
         replaceAjaxWithSpinner();
         window.scrollTo(0, 0);
-        var actionUrl = "/sub";
         if (document.getElementById("postActionID")) actionUrl = document.getElementById("postActionID").value;
         $.ajax({
-            url: actionUrl,
+            url: formActionUrl,
             type: "POST", 
             data: formData, 
             contentType: false,
@@ -1580,32 +1579,6 @@ $(document).ready(function(){
         $("#tblSelect").load("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+"");
         $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
     }
-    
-    function switchTreeOpts(fldID, treeID) {
-	    for (var i = 0; i < treeListChk.length; i++) {
-	        if (treeListChk[i][0] == fldID) {
-	            for (var j = 1; j < treeListChk[i].length; j++) {
-	                var loadURL = "/ajax-get-flds/"+treeID+"";
-	                if (document.getElementById(treeListChk[i][j]+"presel")) {
-	                    loadURL += "?fld="+document.getElementById(treeListChk[i][j]+"presel").value;
-	                }
-	                $("#"+treeListChk[i][j]+"").load(loadURL);
-	            }
-	        }
-	    }
-	    return true;
-    }
-    $(".switchTree").change(function(){
-        var treeFld = $(this).attr("id");
-        switchTreeOpts(treeFld, document.getElementById(treeFld).value);
-	});
-    setTimeout(function() {
-        for (var i = 0; i < treeListChk.length; i++) {
-            if (treeListChk[i][0] && document.getElementById(treeListChk[i][0])) {
-                switchTreeOpts(treeListChk[i][0], document.getElementById(treeListChk[i][0]).value);
-            }
-        }
-    }, 10);
     
     function toggleHidiv(fldGrp) {
         if (document.getElementById("hidiv"+fldGrp+"")) {
@@ -2231,5 +2204,6 @@ function getProgBar() {
     return "<div class=\"progress progress-striped progress-bar-animated\"><div class=\"progress-bar bg-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
 }
 
+@if (isset($treeJs)) {!! $treeJs !!} @endif
 
 @if (isset($jsXtra)) {!! $jsXtra !!} @endif

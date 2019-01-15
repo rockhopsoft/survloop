@@ -34,12 +34,11 @@ use App\Models\SLConditionsArticles;
 use App\Models\SLUsersActivity;
 use SurvLoop\Controllers\TreeNodeSurv;
 use SurvLoop\Controllers\SurvData;
-use SurvLoop\Controllers\TreeSurvAPI;
 use SurvLoop\Controllers\Searcher;
 use SurvLoop\Controllers\Globals;
-use SurvLoop\Controllers\TreeCore;
+use SurvLoop\Controllers\TreeSurvApi;
 
-class TreeSurvLoad extends TreeCore
+class TreeSurvLoad extends TreeSurvApi
 {
     public $treeVersion           = 'v0.1';
     public $abTest                = 'A';
@@ -81,7 +80,7 @@ class TreeSurvLoad extends TreeCore
     public $kidMaps               = [];
     protected $newLoopItemID      = -3;
     
-    protected function loadNode($nodeRow = [])
+    protected function loadNode($nodeRow = NULL)
     {
         if ($nodeRow && isset($nodeRow->NodeID) && $nodeRow->NodeID > 0) {
             return new TreeNodeSurv($nodeRow->NodeID, $nodeRow);
@@ -103,21 +102,23 @@ class TreeSurvLoad extends TreeCore
         return $this->constructor($request, $sessIn, $dbID, $treeID, $skipSessLoad);
     }
 
-    public function constructor(Request $request, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false)
+    public function constructor(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false)
     {
         $this->dbID = (($dbID > 0) ? $dbID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->dbID : 1));
         $this->treeID = (($treeID > 0) ? $treeID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->treeID : 1));
         $this->searcher = new Searcher;
         $this->survLoopInit($request);
         $this->coreIDoverride = -3;
-        if ($sessIn > 0) $this->coreIDoverride = $sessIn;
+        if ($sessIn > 0) {
+            $this->coreIDoverride = $sessIn;
+        }
         if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('tree') 
             && intVal($GLOBALS["SL"]->REQ->get('tree')) > 0) {
             $this->hasREQ = true;
             $this->REQstep = $GLOBALS["SL"]->REQ->get('step');
         }
         $this->loadLookups();
-        $this->isPage = ($GLOBALS["SL"]->treeRow->TreeType == 'Page');
+        $this->isPage = (isset($GLOBALS["SL"]->treeRow->TreeType) && $GLOBALS["SL"]->treeRow->TreeType == 'Page');
         $this->sessData = new SurvData;
         return true;
     }
@@ -152,7 +153,9 @@ class TreeSurvLoad extends TreeCore
                         $rootID = $row->NodeID;
                         $cache .= '$'.'this->rootID = ' . $row->NodeID . ';' . "\n";
                     }
-                    if (in_array($row->NodeType, ['Page', 'Loop Root'])) $this->pageCnt++;
+                    if (in_array($row->NodeType, ['Page', 'Loop Root'])) {
+                        $this->pageCnt++;
+                    }
                     if ($GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 && $row->NodeParentID == $rootID 
                         && $row->NodeType == 'Loop Root' && trim($row->NodeDataBranch) != ''
                         && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch])
@@ -232,6 +235,20 @@ class TreeSurvLoad extends TreeCore
         return true;
     }
     
+    public function hasParentPage($nID)
+    {
+        if (isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->parentID) 
+            && intVal($this->allNodes[$nID]->parentID) > 0) {
+            if (isset($this->allNodes[$this->allNodes[$nID]->parentID]) 
+                && $this->allNodes[$this->allNodes[$nID]->parentID]->isPage()) {
+                return true;
+            } else {
+                return $this->hasParentPage($this->allNodes[$nID]->parentID);
+            }
+        }
+        return false;
+    }
+    
     public function loadNodePageTiersCache()
     {
         $cache = '';
@@ -255,8 +272,12 @@ class TreeSurvLoad extends TreeCore
     
     public function loadAllSessData($coreTbl = '', $coreID = -3)
     {
-        if (trim($coreTbl) == '') $coreTbl = $GLOBALS["SL"]->coreTbl;
-        if ($coreID <= 0) $coreID = $this->coreID; 
+        if (trim($coreTbl) == '') {
+            $coreTbl = $GLOBALS["SL"]->coreTbl;
+        }
+        if ($coreID <= 0) {
+            $coreID = $this->coreID; 
+        }
         $this->loadSessInfo($coreTbl);
         $this->loadSessionData($coreTbl, $coreID);
         $this->loadSessionDataSaves();
@@ -264,7 +285,10 @@ class TreeSurvLoad extends TreeCore
         return true;
     }
     
-    protected function loadExtra() { return true; }
+    protected function loadExtra()
+    {
+        return true;
+    }
     
     public function currInReport()
     {
@@ -289,7 +313,9 @@ class TreeSurvLoad extends TreeCore
         $parents = [$nID];
         while ($this->hasNode($nIDtmp)) {
             $nIDtmp = $this->allNodes[$nIDtmp]->getParent();
-            if (intVal($nIDtmp) > 0) $parents[] = $nIDtmp;
+            if (intVal($nIDtmp) > 0) {
+                $parents[] = $nIDtmp;
+            }
         }
         $this->sessData->dataBranches = [ [
             "branch" => $GLOBALS["SL"]->coreTbl, 
@@ -406,8 +432,11 @@ class TreeSurvLoad extends TreeCore
     public function loadSessionData($coreTbl, $coreID = -3, $skipPublic = false)
     {
         if ($coreID > 0) {
-            if (!$skipPublic) $this->chkPublicCoreID($coreTbl, $coreID);
-            else $this->coreID = $this->corePublicID = $coreID;
+            if (!$skipPublic) {
+                $this->chkPublicCoreID($coreTbl, $coreID);
+            } else {
+                $this->coreID = $this->corePublicID = $coreID;
+            }
         }
         $this->sessData->loadCore($coreTbl, $this->coreID, $this->checkboxNodes, $this->isBigSurvLoop);
         $this->loadExtra();
@@ -419,7 +448,9 @@ class TreeSurvLoad extends TreeCore
     protected function loadSessionDataSaves()
     {
         $this->sessMajorsTouched = $this->sessMinorsTouched = [];
-        for ($s = 0; $s < sizeof($this->majorSections); $s++) $this->sessMinorsTouched[$s] = [];
+        for ($s = 0; $s < sizeof($this->majorSections); $s++) {
+            $this->sessMinorsTouched[$s] = [];
+        }
         $nodeSave = DB::table('SL_NodeSaves')
             ->join('SL_Sess', 'SL_NodeSaves.NodeSaveSession', '=', 'SL_Sess.SessID')
             ->where('SL_Sess.SessTree', '=', $this->treeID)
@@ -512,10 +543,12 @@ class TreeSurvLoad extends TreeCore
         return '';
     }
     
-    protected function loadProgBar()
+    public function loadProgBar()
     {
         $rawPerc = $this->rawOrderPercent($this->currNode());
-        if (intVal($rawPerc) < 0) $rawPerc = 0;
+        if (intVal($rawPerc) < 0) {
+            $rawPerc = 0;
+        }
         if (isset($this->allNodes[$this->currNode()]) && $this->allNodes[$this->currNode()]->nodeType == 'Page' 
             && $this->allNodes[$this->currNode()]->nodeOpts%29 == 0) {
             $rawPerc = 100;
@@ -540,8 +573,6 @@ class TreeSurvLoad extends TreeCore
             }
         }
         $this->createProgBarJs();
-        $GLOBALS["SL"]->pageSCRIPTS .= "\n" . '<script type="text/javascript" id="treeJS" src="' 
-            . $GLOBALS["SL"]->sysOpts["app-url"] . $this->getProgBarJsFilename() . '"></script>' . "\n";
         $ret = '';
         $majTot = 0;
         foreach ($this->majorSections as $maj => $majSect) {
@@ -597,7 +628,7 @@ class TreeSurvLoad extends TreeCore
                 "currMinorSection"  => $this->currMinorSection, 
                 "majTot"            => $majTot,
                 "rawPerc"           => $rawPerc
-            ])->render();
+                ])->render();
             $GLOBALS['SL']->pageJAVA .= 'document.getElementById("progWrap").style.display = "none";' . "\n";
         }
         $GLOBALS['SL']->pageJAVA .= $this->tweakProgBarJS();
@@ -607,27 +638,26 @@ class TreeSurvLoad extends TreeCore
     
     protected function createProgBarJs()
     {
-        $jsFileName = '../storage/app/sys' . $this->getProgBarJsFilename();
+        $jsFileName = '../storage/app/sys/tree-' . $this->treeID . '.js';
         if (!file_exists($jsFileName) || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (file_exists($jsFileName)) unlink($jsFileName);
+            if (file_exists($jsFileName)) {
+                unlink($jsFileName);
+            }
             $jsOut = view('vendor.survloop.inc-tree-javascript', [
-                    "allNodes"          => $this->allNodes, 
-                    "majorSections"     => $this->majorSections, 
-                    "minorSections"     => $this->minorSections
+                "allNodes"          => $this->allNodes, 
+                "majorSections"     => $this->majorSections, 
+                "minorSections"     => $this->minorSections
                 ])->render();
             file_put_contents($jsFileName, $jsOut);
         }
         return true;
     }
     
-    protected function getProgBarJsFilename()
-    {
-        return '/tree-' . $this->treeID . '.js';
-    }
-    
     protected function getCurrMajorSection($nID = -3)
     {
-        if ($nID <= 0) $nID = $this->currNode();
+        if ($nID <= 0) {
+            $nID = $this->currNode();
+        }
         $currSection = 0;
         if (sizeof($this->majorSections) > 0) {
             foreach ($this->majorSections as $s => $sect) {
@@ -643,10 +673,16 @@ class TreeSurvLoad extends TreeCore
     
     protected function getCurrMinorSection($nID = -3, $majorSectInd = -3)
     {
-        if ($nID <= 0) $nID = $this->currNode();
-        if ($majorSectInd <= 0) $majorSectInd = $this->getCurrMajorSection($nID);
+        if ($nID <= 0) {
+            $nID = $this->currNode();
+        }
+        if ($majorSectInd <= 0) {
+            $majorSectInd = $this->getCurrMajorSection($nID);
+        }
         $overrideSection = $this->overrideMinorSection($nID, $majorSectInd);
-        if ($overrideSection >= 0) return $overrideSection;
+        if ($overrideSection >= 0) {
+            return $overrideSection;
+        }
         $currSection = 0;
         if (sizeof($this->minorSections) > 0 && sizeof($this->minorSections[$majorSectInd]) > 0) {
             foreach ($this->minorSections[$majorSectInd] as $s => $sect) {
@@ -669,7 +705,9 @@ class TreeSurvLoad extends TreeCore
     {
         if ($branchID > 0 && sizeof($this->branches) > 0) {
             foreach ($this->branches as $b) {
-                if ($b["id"] == $branchID) return $b["name"];
+                if ($b["id"] == $branchID) {
+                    return $b["name"];
+                }
             }
         }
         return "";
@@ -677,7 +715,9 @@ class TreeSurvLoad extends TreeCore
     
     protected function checkNodeConditions($nID)
     {
-        if (!isset($this->allNodes[$nID])) return false;
+        if (!isset($this->allNodes[$nID])) {
+            return false;
+        }
         $this->allNodes[$nID]->fillNodeRow();
         return $this->parseConditions($this->allNodes[$nID]->conds, [], $nID);
     }
@@ -695,10 +735,13 @@ class TreeSurvLoad extends TreeCore
             foreach ($conds as $i => $cond) {
                 if ($retTF) {
                     if ($cond && isset($cond->CondDatabase) && $cond->CondOperator == 'CUSTOM') {
-                        if (!$this->parseCondPreInstalled($cond)) $retTF = false;
+                        if (!$this->parseCondPreInstalled($cond)) {
+                            $retTF = false;
+                        }
                     } elseif ($cond->CondOperator == 'URL-PARAM') {
-                        if (trim($cond->CondOperDeet) == '') $retTF = false;
-                        elseif (!$GLOBALS["SL"]->REQ->has($cond->CondOperDeet) 
+                        if (trim($cond->CondOperDeet) == '') {
+                            $retTF = false;
+                        } elseif (!$GLOBALS["SL"]->REQ->has($cond->CondOperDeet) 
                             || trim($GLOBALS["SL"]->REQ->get($cond->CondOperDeet)) 
                                 != trim($cond->condFldResponses["vals"][0][1])) {
                             $retTF = false;
@@ -728,8 +771,11 @@ class TreeSurvLoad extends TreeCore
                         $retTF = false; 
                     }
                     $custom = $this->checkNodeConditionsCustom($nID, trim($cond->CondTag));
-                    if ($custom == 0) $retTF = false;
-                    elseif ($custom == 1) $retTF = true;
+                    if ($custom == 0) {
+                        $retTF = false;
+                    } elseif ($custom == 1) {
+                        $retTF = true;
+                    }
                     // This is where all the condition-inversion is applied
                     if ($nID > 0 && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
                         && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->CondID])) {
@@ -756,11 +802,31 @@ class TreeSurvLoad extends TreeCore
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsAdmin') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('administrator|staff|databaser')) {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('administrator')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsNotAdmin') {
-                if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|staff|databaser')) {
+                if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator')) {
+                    $retTF = false;
+                }
+            } elseif (trim($cond->CondTag) == '#IsStaff') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('staff')) {
+                    $retTF = false;
+                }
+            } elseif (trim($cond->CondTag) == '#IsStaffOrAdmin') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('administrator|staff')) {
+                    $retTF = false;
+                }
+            } elseif (trim($cond->CondTag) == '#IsPartner') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('partner')) {
+                    $retTF = false;
+                }
+            } elseif (trim($cond->CondTag) == '#IsVolunteer') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('volunteer')) {
+                    $retTF = false;
+                }
+            } elseif (trim($cond->CondTag) == '#IsBrancher') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('databaser')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsOwner') {
@@ -803,7 +869,9 @@ class TreeSurvLoad extends TreeCore
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#HasTokenDialogue') {
-                if (!$this->pageLoadHasToken()) $retTF = false;
+                if (!$this->pageLoadHasToken()) {
+                    $retTF = false;
+                }
             } elseif (trim($cond->CondTag) == '#EmailVerified') {
                 if ($this->v["uID"] <= 0 || !$this->v["user"]->hasVerifiedEmail()) {
                     $retTF = false;
@@ -855,7 +923,9 @@ class TreeSurvLoad extends TreeCore
         $this->v["allUrls"] = [ "txt" => [], "vid" => [] ];
         $allArticles = SLConditionsArticles::get();
         if ($allArticles->isNotEmpty()) {
-            foreach ($allArticles as $i => $a) $artCondIDs[] = $a->ArticleCondID;
+            foreach ($allArticles as $i => $a) {
+                $artCondIDs[] = $a->ArticleCondID;
+            }
             $allConds = SLConditions::whereIn('CondID', $artCondIDs)->get();
             if ($allConds->isNotEmpty()) {
                 foreach ($allConds as $i => $c) {
@@ -868,10 +938,14 @@ class TreeSurvLoad extends TreeCore
                                 $found = false;
                                 if (sizeof($this->v["allUrls"][$set]) > 0) {
                                     foreach ($this->v["allUrls"][$set] as $url) {
-                                        if ($url[1] == $a->ArticleURL) $found = true;
+                                        if ($url[1] == $a->ArticleURL) {
+                                            $found = true;
+                                        }
                                     }
                                 }
-                                if (!$found) $this->v["allUrls"][$set][] = [$a->ArticleTitle, $a->ArticleURL];
+                                if (!$found) {
+                                    $this->v["allUrls"][$set][] = [$a->ArticleTitle, $a->ArticleURL];
+                                }
                             }
                         }
                         $this->v["articles"][] = [$c, $artLnks];
@@ -892,23 +966,6 @@ class TreeSurvLoad extends TreeCore
     public function treeSessionsWhereExtra() 
     {
         return "";
-    }
-    
-    
-    
-    
-    
-    
-    public function printAllNodesCore()
-    {
-        if (sizeof($this->allNodes) > 0) {
-            $print = [];
-            foreach ($this->allNodes as $n) $print[$n->nodeID] = $n->listCore();
-            echo '<pre>';
-            print_r($print);
-            echo '</pre>';
-        }
-        return true;
     }
     
     public function sessDump($lastNode = -3)
@@ -950,6 +1007,20 @@ class TreeSurvLoad extends TreeCore
     
     protected function tmpDebug($str = '')
     {
+        return true;
+    }
+    
+    public function __toString()
+    {
+        if (sizeof($this->allNodes) > 0) {
+            $print = [];
+            foreach ($this->allNodes as $n) {
+                $print[$n->nodeID] = $n->listCore();
+            }
+            echo '<pre>';
+            print_r($print);
+            echo '</pre>';
+        }
         return true;
     }
     

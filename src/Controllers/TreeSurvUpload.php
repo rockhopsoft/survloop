@@ -19,6 +19,7 @@ use App\Models\SLUploads;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use SurvLoop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\TreeSurv;
 
 class TreeSurvUpload extends TreeSurv
 {

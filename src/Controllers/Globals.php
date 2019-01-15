@@ -342,7 +342,7 @@ class Globals extends GlobalsImportExport
     public function addTopNavItem($title, $url)
     {
         if (strpos($this->pageJAVA, 'addTopNavItem("' . $title . '"') === false) {
-            $this->pageJAVA .= 'setTimeout(\'addTopNavItem("' . $title . '", "' . $url . '")\', 1500);';
+            $this->pageJAVA .= 'setTimeout(\'addTopNavItem("' . $title . '", "' . $url . '")\', 2000);';
         }
         return true;
     }

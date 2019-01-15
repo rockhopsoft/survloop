@@ -1180,9 +1180,9 @@ table.detailList tr td {
 	position: fixed;
 	z-index: 99;
 	background: {!! $css["color-main-bg"] !!};
-	box-shadow: 0px 0px 20px {!! $css["color-main-bg"] !!};
+	box-shadow: 0px 0px 10px {!! $css["color-main-bg"] !!};
 	margin: 0px -15px 0px -15px;
-	padding: 15px 15px 5px 15px;
+	padding: 25px 15px 15px 15px;
 	top: 47px;
 	border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
@@ -1969,5 +1969,15 @@ a.slFaintHover:hover {
 .row2 a:link .slFaintHover, .row2 a:visited .slFaintHover, .row2 a:active .slFaintHover, .row2 a:hover .slFaintHover {
 	color: {!! $css["color-main-bg"] !!};
 }
+
+.disIn { display: inline; }
+.disNon { display: none; }
+.disBlo { display: block; }
+.disFlx { display: flex; }
+.disRow { display: table-row; }
+.ovrNo  { overflow: hidden; }
+.ovrSho { overflow: visible; }
+.ovrFlo { overflow: auto; }
+.ovrFloY { overflow-y: auto; overflow-x: hidden; }
 
 {!! $css["raw"] !!}

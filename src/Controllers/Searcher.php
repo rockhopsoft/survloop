@@ -16,8 +16,9 @@ use Session;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLSearchRecDump;
+use SurvLoop\Controllers\SurvCustLoop;
 
-class Searcher
+class Searcher extends SurvCustLoop
 {
     public $search           = false;
     public $checkedSearch    = false;
@@ -25,6 +26,7 @@ class Searcher
     public $searchParse      = [];
     public $advSearchUrlSffx = '';
     public $advSearchBarJS   = '';
+    public $cacheName        = '';
     public $searchFilts      = [];
     public $searchOpts       = [];
     public $searchResults    = [];
@@ -39,7 +41,10 @@ class Searcher
         $this->initExtra();
     }
     
-    public function initExtra() { return true; }
+    public function initExtra()
+    {
+        return true;
+    }
     
     public function getAllPublicCoreIDs($coreTbl = '')
     {
@@ -82,57 +87,19 @@ class Searcher
             "advanced" => $this->printSearchBarAdvanced($treeID, $nID),
             "advUrl"   => $this->advSearchUrlSffx,
             "advBarJS" => $this->advSearchBarJS
-        ])->render();
+            ])->render();
     }
     
-    public function chkRecsPub(Request $request, $treeID = 1)
+    public function searchCacheName()
     {
-        if ($treeID <= 0) {
-            $treeID = $this->treeID;
-        }
-        if (!session()->has('chkRecsPub') || $request->has('refresh')) {
-            $dumped = [];
-            if ($request->has('refresh')) {
-                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)->delete();
-            } else {
-                $chk = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)
-                    ->select('SchRecDmpRecID')
-                    ->get();
-                if ($chk->isNotEmpty()) {
-                    foreach ($chk as $rec) {
-                        $dumped[] = $rec->SchRecDmpRecID;
-                    }
-                }
-            }
-            if (sizeof($this->allPublicCoreIDs) > 0) {
-                foreach ($this->allPublicCoreIDs as $coreID) {
-                    if (!in_array($coreID, $dumped)) {
-                        $this->genRecDump($coreID);
-                    }
-                }
-            }
-            $this->reloadStats($this->allPublicCoreIDs);
-            session()->put('chkRecsPub', 1);
-            return true;
-        }
-        return false;
-    }
-    
-    public function searchResults(Request $request)
-    {
-        $this->loadTree();
-        $this->getAllPublicCoreIDs();
-//echo 'A allPublicCoreIDs:<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>';
-        $this->chkRecsPub($request);
         $this->getSearchFilts();
-        $cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
+        $this->cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
             . '&s=' . $this->searchTxt . $this->advSearchUrlSffx;
-        $this->survLoopInit($request, $cacheName);
-        
-        // [ check for cache ]
-        
-        $ret = $this->searchResultsOverride($this->treeID);
-        if (trim($ret) != '') return $ret;
+        return $this->cacheName;
+    }
+    
+    public function prepSearchResults(Request $request)
+    {
         $this->processSearchFilts();
         if (trim($this->searchTxt) == '') {
             if (sizeof($this->allPublicFiltIDs) > 0) {
@@ -152,6 +119,16 @@ class Searcher
                 }
             }
         }
+        return true;
+    }
+    
+    public function searchResults(Request $request)
+    {
+        $ret = $this->searchResultsOverride($this->treeID);
+        if (trim($ret) != '') {
+            return $ret;
+        }
+        $this->prepSearchResults($request);
         if (sizeof($this->searchResults) > 0) {
             $printed = [];
             while (sizeof($printed) < sizeof($this->searchResults)) {
@@ -185,16 +162,6 @@ class Searcher
                         $this->searchResults[$i][1] += $weight;
                         return false;
                     }
-                }
-            }
-            if (trim($preview) == '') {
-                $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $recID);
-                $preview = '<div class="reportPreview">' . $this->printPreviewReport() . '</div>';
-                if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])
-                    && sizeof($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0
-                    && isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)) {
-                    $dateWeight = strtotime($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at);
-                    $weight += $dateWeight/1000000000000;
                 }
             }
             $this->searchResults[] = [$recID, $weight, $preview];

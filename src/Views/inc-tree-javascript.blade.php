@@ -1,6 +1,8 @@
 /* resources/views/vendor/survloop/inc-tree-javascript.blade.php */
+<?php /* 
 // treeMajorSects[major-index] = [nodeID, 'Section Title', 'status']
 // treeMinorSects[major-index][minor-index] = [nodeID, 'Section Title', 'status', 'url']
+*/ ?>
 @forelse ($majorSections as $maj => $majSect)
 treeMajorSects[{{ $maj }}] = new Array({{ $majSect[0] }}, "{{ $majSect[1] }}", "/", "disabled");
 treeMinorSects[{{ $maj }}] = new Array();

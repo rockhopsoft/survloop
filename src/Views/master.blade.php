@@ -33,6 +33,8 @@
     <link href="/sys1.min.css" rel="stylesheet" type="text/css">
     <link href="/sys2.min.css" rel="stylesheet" type="text/css">
     <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
+    <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
+    <script id="sysJs2" src="/sys2.min.js" type="text/javascript" defer ></script>
 @else
     <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
     <link href="/jquery-ui.min.css" rel="stylesheet" type="text/css">
@@ -40,16 +42,6 @@
     <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
         }}" rel="stylesheet" type="text/css">
-@endif
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
-        crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
-        </script>
-@endif
-@if (!$GLOBALS["SL"]->REQ->has("debug"))
-    <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
-    <script async id="sysJs2" src="/sys2.min.js" type="text/javascript"></script>
-@else 
     <script src="/jquery.min.js" type="text/javascript"></script>
     <script src="/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/bootstrap.min.js" type="text/javascript"></script>
@@ -57,6 +49,11 @@
     <script src="/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
     <script src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+@endif
+@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
+        crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
+        </script>
 @endif
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
@@ -274,7 +271,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     {!! $GLOBALS['SL']->pageSCRIPTS !!}
 @endif
 @if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
-    <script async defer id="dynamicJS" type="text/javascript">
+    <script id="dynamicJS" type="text/javascript" defer >
     @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
         {!! $GLOBALS['SL']->pageJAVA !!}
     @endif
@@ -292,14 +289,14 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 @endif
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
-    <script async defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/editor.js"></script>
 @endif */ ?>
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link href="/summernote.css" rel="stylesheet">
-    <script async defer src="/summernote.min.js"></script>
+    <script defer src="/summernote.min.js"></script>
 @endif
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
@@ -307,7 +304,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["google-analytic"])
     && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false && !isset($admMenu))
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async defer src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
+    <script defer src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
         !!}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];

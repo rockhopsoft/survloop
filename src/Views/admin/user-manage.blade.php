@@ -13,7 +13,7 @@
 </div>
 
 <table class="table table-striped">
-<form name="mainPageForm" action="/dashboard/users" method="post">
+<form name="mainPageForm" action="/dashboard/users?sub=1" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <?php $cnt = 0; ?>
