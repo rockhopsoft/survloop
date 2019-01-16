@@ -172,7 +172,10 @@ class AuthController extends Controller
             $sl = new SurvLoopController;
             $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
             $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
-            return redirect($this->redirectPath);
+            if ($request->has('previous')) {
+                return redirect($request->get('previous'));
+            }
+            return redirect('/afterLogin');
         }
         return view('vendor.survloop.auth.login', [
             "errorMsg" => 'That combination of password with that username or email did not work.' 

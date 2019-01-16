@@ -106,7 +106,6 @@ class TreeSurvLoad extends TreeSurvApi
     {
         $this->dbID = (($dbID > 0) ? $dbID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->dbID : 1));
         $this->treeID = (($treeID > 0) ? $treeID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->treeID : 1));
-        $this->searcher = new Searcher;
         $this->survLoopInit($request);
         $this->coreIDoverride = -3;
         if ($sessIn > 0) {

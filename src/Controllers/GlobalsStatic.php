@@ -792,7 +792,9 @@ class GlobalsStatic
         $str = str_replace('</ script>', '</script>', $str);
         $orig = $str;
         $tag1start = strpos($str, '<script');
-        while ($tag1start !== false) {
+        $cnt = 0;
+        while ($tag1start !== false && $cnt < 20) {
+            $cnt++;
             $tagMeat = '';
             $tag1end = strpos($str, '>', $tag1start);
             if ($tag1end !== false && substr($str, $tag1start, 21) != '<script id="noExtract') {
@@ -802,8 +804,10 @@ class GlobalsStatic
                     $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
                 }
             }
-            if ($tag1end > 0) {
+            if ($tag1end > 0 && ($tag1end-strlen($tagMeat)) > 0) {
                 $tag1start = strpos($str, '<script', $tag1end-strlen($tagMeat));
+            } else {
+                $tag1start = false;
             }
             if (trim($tagMeat) != '') {
                 $allMeat .= (($nID >= 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')

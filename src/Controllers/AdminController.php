@@ -82,8 +82,8 @@ class AdminController extends SurvLoopController
             ];
         $admMenu = null;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-            $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"]
-            . "AdminMenu";
+            $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "AdminMenu";
             if (class_exists($custClass)) {
                 eval("\$admMenu = new " . $custClass . ";");
             }

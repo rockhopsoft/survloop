@@ -17,7 +17,7 @@ use SurvLoop\Controllers\PageLoadUtils;
 class SurvCustLoop extends PageLoadUtils
 {
     // This is where the client installation's extension of TreeSurvForm is loaded
-    public $custLoop       = null;
+    public $custLoop = null;
     
     protected function isAdmin()
     {

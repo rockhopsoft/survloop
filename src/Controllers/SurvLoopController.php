@@ -398,6 +398,14 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    public function initSearcher()
+    {
+        if ($this->searcher === null) {
+            $this->loadCustSearcher();
+        }
+        return true;
+    }
+    
     protected function loadCustSearcher()
     {
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
@@ -409,14 +417,12 @@ class SurvLoopController extends Controller
         } else {
             $this->searcher = new Searcher;
         }
+        $this->initSearcherXtra();
         return true;
     }
     
-    public function initSearcher()
+    public function initSearcherXtra()
     {
-        if ($this->searcher === null) {
-            $this->loadCustSearcher();
-        }
         return true;
     }
     

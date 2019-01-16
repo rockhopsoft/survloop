@@ -11,7 +11,6 @@ class SurvLoopServiceProvider extends ServiceProvider
         $this->publishes([
                 
               __DIR__.'/Controllers/Middleware'      => base_path('app/Http/Middleware'),
-              __DIR__.'/Controllers/Auth/Override'   => base_path('app/Http/Controllers/Auth'),
               __DIR__.'/Views'                       => base_path('resources/views/vendor/survloop'),
               __DIR__.'/Views/auth'                  => base_path('resources/views/auth'),
               __DIR__.'/Views/auth/passwords'        => base_path('resources/views/auth/passwords'),

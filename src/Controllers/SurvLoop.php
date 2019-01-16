@@ -423,6 +423,7 @@ class SurvLoop extends SurvCustLoop
         $this->loadLoop($request, true);
         $this->custLoop->loadTree($treeID);
         $this->custLoop->initSearcher();
+        $this->custLoop->searcher->getSearchFilts();
         $this->custLoop->searcher->getAllPublicCoreIDs();
         $this->custLoop->chkRecsPub($request);
         return true;
@@ -439,14 +440,14 @@ class SurvLoop extends SurvCustLoop
     {
         $this->loadTreeByID($request, $treeID, true);
         $this->searchPrep($request, $treeID);
-        
+        $this->custLoop->searcher->searchCacheName();
             //$this->currLoop->survLoopInit($request, $this->currLoop->searchCacheName());
             // [ check for cache ]
         $this->custLoop->searcher->prepSearchResults($request);
         if (sizeof($this->custLoop->searcher->searchResults) > 0) {
             foreach ($this->custLoop->searcher->searchResults as $i => $rec) {
                 if (trim($rec[2]) == '') {
-                    $this->custLoop->loadAllSessData($GLOBALS["SL"]->coreTbl, $rec[0]);
+                    $this->custLoop->sessData->loadCore($GLOBALS["SL"]->coreTbl, $rec[0]);
                     $this->custLoop->searcher->searchResults[$i][2] 
                         = '<div class="reportPreview">' . $this->custLoop->printPreviewReport() . '</div>';
                     if (isset($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl])
@@ -456,7 +457,6 @@ class SurvLoop extends SurvCustLoop
                             += strtotime($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)
                                 /1000000000000;
                     }
-//echo 'result1: ' . $this->custLoop->searcher->searchResults[$i][2]; exit;
                 }
             }
         }

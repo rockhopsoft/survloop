@@ -61,6 +61,27 @@ class Searcher extends SurvCustLoop
         return $this->allPublicCoreIDs;
     }
     
+    public function addArchivedCoreIDs($coreTbl = '')
+    {
+        if (trim($coreTbl) == '') {
+            $coreTbl = $GLOBALS["SL"]->coreTbl;
+        }
+        $arcs = $this->getArchivedCoreIDs($coreTbl);
+        if (sizeof($arcs) > 0) {
+            foreach ($arcs as $coreID) {
+                if (!in_array($coreID, $this->allPublicFiltIDs)) {
+                    $this->allPublicFiltIDs[] = $coreID;
+                }
+            }
+        }
+        return $arcs;
+    }
+    
+    protected function getArchivedCoreIDs($coreTbl = '')
+    {
+        return [];
+    }
+    
     public function searchBar()
     {
         $this->survLoopInit($request, '/search-bar/' . $this->treeID);
@@ -92,7 +113,6 @@ class Searcher extends SurvCustLoop
     
     public function searchCacheName()
     {
-        $this->getSearchFilts();
         $this->cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
             . '&s=' . $this->searchTxt . $this->advSearchUrlSffx;
         return $this->cacheName;
@@ -241,6 +261,9 @@ class Searcher extends SurvCustLoop
         $this->getAllPublicCoreIDs();
         $this->allPublicFiltIDs = $this->allPublicCoreIDs;
         if (sizeof($this->searchFilts) > 0) {
+            if (isset($this->searchFilts["user"]) && Auth::user() && $this->searchFilts["user"] == Auth::user()->id) {
+                $this->addArchivedCoreIDs();
+            }
             $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
