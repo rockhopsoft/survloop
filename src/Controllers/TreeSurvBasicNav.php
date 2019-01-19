@@ -43,6 +43,39 @@ class TreeSurvBasicNav extends TreeSurvLoad
         return (($found) ? -1 : 0);
     }
     
+    /*
+    public function getNextPage($nID, $direction = 'next')
+    {
+        if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage && $direction == 'next') {
+            return -37;
+        }
+        if (!$this->hasNode($nID)) {
+            return -3;
+        }
+        
+        
+        $this->loopCnt = 0;
+        while (!$this->isDisplayableNode($nID) && $this->loopCnt < 1000) {
+            if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage && $direction == 'next') {
+                return -37;
+            }
+            $nIDbranch = $this->checkBranchCondition($nID, $direction);
+            if ($nID != $nIDbranch) {
+                $nID = $nIDbranch; 
+            } elseif ($direction == 'next') {
+                $nID = $this->nextNode($nID);
+            } else {
+                $nID = $this->prevNode($nID);
+            }
+            $this->loopCnt++;
+        }
+        if (trim($this->loadingError) != '') {
+            $ret .= '<div class="p10"><i>loadNodeSubTier() - ' . $this->loadingError . '</i></div>';
+        }
+        return $nID;
+    }
+    */
+    
     public function getNextNonBranch($nID, $direction = 'next')
     {
         if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage && $direction == 'next') {

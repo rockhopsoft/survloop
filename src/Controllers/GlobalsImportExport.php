@@ -875,9 +875,9 @@ class GlobalsImportExport extends GlobalsTables
             . '" class="p20 m20">' . $this->spinner() . '</div></center></div>';
     }
     
-    public function spinner($center = false)
+    public function spinner($center = true)
     {
-        $ret = ((isset($this->sysOpts["spinner-code"])) ? $this->sysOpts["spinner-code"] : '...');
+        $ret = ((isset($this->sysOpts["spinner-code"])) ? $this->sysOpts["spinner-code"] : '<b>...</b>');
         if ($center) {
             return '<div class="w100 pT20 pB20"><center>' . $ret . '</center></div>';
         }

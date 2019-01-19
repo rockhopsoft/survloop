@@ -57,11 +57,11 @@
 @endif
 @if ((isset($needsCharts) && $needsCharts) 
     || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
-    <script async src="/Chart.bundle.min.js"></script>
+    <script src="/Chart.bundle.min.js"></script>
 @endif
 @if ((isset($needsPlots) && $needsPlots) 
     || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
-    <script async src="/plotly.min.js"></script>
+    <script src="/plotly.min.js"></script>
 @endif
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link rel="stylesheet" type="text/css" href="/content-tools.min.css">

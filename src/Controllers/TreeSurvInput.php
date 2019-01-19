@@ -22,14 +22,14 @@ use SurvLoop\Controllers\TreeSurvUpload;
 
 class TreeSurvInput extends TreeSurvUpload
 {
-    public $nodeTypes           = [ 
+    public $nodeTypes = [
         'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number', 'Slider', 'Email', 'Password', 
         'Date', 'Date Picker', 'Date Time', 'Time', 'Gender', 'Gender Not Sure', 'Feet Inches', 
         'U.S. States', 'Countries', 'Uploads', 'Spreadsheet Table', 'User Sign Up', 'Hidden Field', 
         'Spambot Honey Pot', 'Other/Custom' 
     ];
     
-    public $nodeSpecialTypes    = [
+    public $nodeSpecialTypes = [
         'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 'Loop Cycle', 'Loop Sort', 
         'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap', 'Data Manip: Close Sess', 'Big Button', 
         'Search', 'Search Results', 'Search Featured', 'Member Profile Basics', 'Send Email', 'Admin Form',

@@ -21,15 +21,14 @@
     <a href="/login{{ (($request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
         }}" class="btn btn-secondary pull-right mL20">Login</a>
 @endif
+<div class="nodeAnchor"><a id="n004" name="n004"></a></div>
 @if (isset($sysOpts["signup-instruct"]) && trim($sysOpts["signup-instruct"]) != '')
-    {!! $sysOpts["signup-instruct"] !!}
+    {!! $sysOpts["signup-instruct"] !!}<br />
 @else
     <h1 class="mT0">Sign Up</h1>
-@endif
-
-<div class="nodeAnchor"><a id="n004" name="n004"></a></div>
-@if (isset($sysOpts["login-instruct"]) && trim($sysOpts["login-instruct"]) != '')
-    <h4 class="mB20">{!! $sysOpts["login-instruct"] !!}</h4>
+    @if (isset($sysOpts["login-instruct"]) && trim($sysOpts["login-instruct"]) != '')
+        <h4 class="mB20">{!! $sysOpts["login-instruct"] !!}</h4>
+    @endif
 @endif
 
 @if (isset($errorMsg)) <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div> @endif
@@ -102,16 +101,27 @@
 
 <div class="nodeHalfGap"></div>
 
-@if ($GLOBALS["SL"]->sysHas('volunteers'))
+@if ($GLOBALS["SL"]->sysHas('volunteers') && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
     <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
         @if ($request->has('volunteer')) CHECKED @endif > Volunteer</label>
 @endif
 
-<center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
+@if (!isset($midSurvBack) || trim($midSurvBack) == '')
+    <center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
+@else
+
+@endif
 
 <div class="nodeHalfGap"></div>
 
 </div></center></div>
+
+<?php /*
+redir: {!! $midSurvRedir !!}<br />
+back: {!! $midSurvBack !!}<br />
+*/ ?>
+
+@if (isset($formFooter)) {!! $formFooter !!} @endif
 
 </form>
 

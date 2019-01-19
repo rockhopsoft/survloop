@@ -944,10 +944,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     
                 } elseif ($curr->nodeType == 'User Sign Up') {
                     
-                    session()->put('midSurvSignupTree', $this->treeID);
-                    session()->put('midSurvSignupNode', $nID);
-                    session()->put('midSurvSignupCore', $this->coreID);
-                    $ret .= $GLOBALS["SL"]->spinner(true) . '<script type="text/javascript">
+                    $ret .= $GLOBALS["SL"]->spinner() . '<script type="text/javascript">
                         setTimeout("window.location=\'/register?nd=' . $nID . '\'", 100);
                         </script><style> #pageBtns, #navDesktop, #navMobile { display: none; } </style>';
                     

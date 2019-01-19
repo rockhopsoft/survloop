@@ -214,7 +214,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         return (isset($GLOBALS["SL"]->sysOpts["footer-master"]) ? $GLOBALS["SL"]->sysOpts["footer-master"] : '');
     }
     
-    protected function printCurrRecMgmt()
+    public function printCurrRecMgmt()
     {
         $recDesc = '';
         if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) 
@@ -225,7 +225,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         return view('vendor.survloop.formfoot-record-mgmt', [
             "coreID"          => $this->coreID,
             "treeID"          => $this->treeID,
-            "multipleRecords" => $this->v["multipleRecords"],
+            "multipleRecords" => ((isset($this->v["multipleRecords"])) ? $this->v["multipleRecords"] : ''),
             "isUser"          => ($this->v["uID"] > 0),
             "recDesc"         => $recDesc
             ])->render();

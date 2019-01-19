@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use App\Models\User;
+use App\Models\SLSess;
 use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
@@ -40,7 +41,9 @@ class AuthController extends Controller
     protected $currTree     = null;
     protected $currNode     = null;
     protected $surv         = null;
+    protected $formFooter   = '';
     protected $midSurvRedir = '';
+    protected $midSurvBack  = '';
     
     /**
      * Create a new authentication controller instance.
@@ -91,43 +94,6 @@ class AuthController extends Controller
         return $user;
     }
     
-    protected function chkAuthPageOpts(Request $request)
-    {
-        if ($request->has('nd') && intVal($request->get('nd')) > 0 && session()->has('midSurvSignupNode')
-            && intVal(session()->get('midSurvSignupNode')) == intVal($request->get('nd'))) {
-            $this->currNode = SLNode::find(intVal($request->get('nd')));
-            if ($this->currNode && isset($this->currNode->NodeID) && session()->has('midSurvSignupTree')
-                && intVal(session()->get('midSurvSignupTree')) == $this->currNode->NodeTree) {
-                $this->treeID = $this->currNode->NodeTree;
-                $this->currTree = SLTree::find($this->treeID);
-                if ($this->currTree && isset($this->currTree->TreeDatabase)) {
-                    $this->dbID = $this->currTree->TreeDatabase;
-                }
-            }
-        }
-        $this->surv = new SurvLoop;
-        $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
-        $this->surv->loadLoop($request);
-        if ($request->has('nd') && intVal($request->get('nd')) > 0 && $request->session()->has('midSurvSignupNode')
-            && intVal($request->session()->get('midSurvSignupNode')) == intVal($request->get('nd'))) {
-            $this->currNode = SLNode::find(intVal($request->get('nd')));
-            if ($this->currNode && isset($this->currNode->NodeID) && $request->session()->has('midSurvSignupTree')
-                && intVal($request->session()->get('midSurvSignupTree')) == $this->currNode->NodeTree) {
-                $this->surv->custLoop->loadTree($this->treeID, $request);
-                $this->surv->custLoop->updateCurrNode($this->currNode->NodeID);
-                $this->surv->custLoop->updateCurrNode($this->surv->custLoop->getNextNonBranch($this->currNode->NodeID));
-                $nextNode = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
-                $nextNode->fillNodeRow();
-                $this->midSurvRedir = '/u/' . $this->currTree->TreeSlug . '/' . $nextNode->nodeRow->NodePromptNotes;
-                if (isset($this->currNode->NodePromptText) && trim($this->currNode->NodePromptText) != '') {
-                    $GLOBALS["SL"]->sysOpts["signup-instruct"] = $this->currNode->NodePromptText;
-                }
-            }
-        }
-        //session()->get('midSurvSignupCore', $this->coreID);
-        return true;
-    }
-    
     public function getRegister(Request $request)
     {
         $this->chkAuthPageOpts($request);
@@ -140,6 +106,8 @@ class AuthController extends Controller
             "request"       => $request,
             "sysOpts"       => $GLOBALS["SL"]->sysOpts,
             "midSurvRedir"  => $this->midSurvRedir,
+            "midSurvBack"   => $this->midSurvBack,
+            "formFooter"    => $this->formFooter,
             "emailRequired" => $emailRequired
             ]);
     }
@@ -150,12 +118,12 @@ class AuthController extends Controller
         if (Auth::user() && isset(Auth::user()->id)) {
             return redirect($this->redirectPath());
         }
-        
-        
         return view('vendor.survloop.auth.login', [
             "request"      => $request,
             "sysOpts"      => $GLOBALS["SL"]->sysOpts,
             "midSurvRedir" => $this->midSurvRedir,
+            "midSurvBack"  => $this->midSurvBack,
+            "formFooter"   => $this->formFooter,
             "errorMsg"     => ''
             ]);
     }
@@ -220,6 +188,68 @@ class AuthController extends Controller
     public function printPassReset(Request $request)
     {
         return view('vendor.survloop.auth.passwords.email');
+    }
+    
+    protected function chkAuthPageOpts(Request $request)
+    {
+        if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
+            $this->treeID = intVal(session()->get('lastTree'));
+            $this->currTree = SLTree::find($this->treeID);
+            if ($this->currTree && isset($this->currTree->TreeDatabase)) {
+                $this->dbID = $this->currTree->TreeDatabase;
+            }
+            if (session()->has('sessID' . $this->treeID) && intVal(session()->get('sessID' . $this->treeID)) > 0
+                && session()->has('coreID' . $this->treeID) && intVal(session()->get('coreID' . $this->treeID)) > 0) {
+                $sess = SLSess::where('SessID', intVal(session()->get('sessID' . $this->treeID)))
+                    ->where('SessCoreID', intVal(session()->get('coreID' . $this->treeID)))
+                    ->where('SessTree', $this->treeID)
+                    ->first();
+                if ($sess && isset($sess->SessCurrNode) && intVal($sess->SessCurrNode) > 0) {
+                    $this->currNode = SLNode::find($sess->SessCurrNode);
+                    $this->loadNodeLoginPass($request);
+                }
+            }
+        }
+        return true;
+    }
+    
+    protected function loadNodeLoginPass(Request $request)
+    {
+        if ($this->currNode && isset($this->currNode->NodeID)) {
+            $nID = $this->currNode->NodeID;
+            $this->surv = new SurvLoop;
+            $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
+            $this->surv->loadLoop($request);
+            $this->surv->custLoop->loadTree($this->treeID, $request);
+            $this->surv->custLoop->updateCurrNode($nID);
+            $this->surv->custLoop->updateCurrNode($this->surv->custLoop->getNextNonBranch($nID));
+            $node2 = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
+            $node2->fillNodeRow();
+            $this->midSurvRedir = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
+            $this->surv->custLoop->updateCurrNode($nID);
+            $this->surv->custLoop->updateCurrNode($this->surv->custLoop->getNextNonBranch($nID, 'prev'));
+            $node2 = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
+            $node2->fillNodeRow();
+            $this->midSurvBack = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
+            $node2 = $this->surv->custLoop->allNodes[$nID];
+            while ($node2 && $node2->nodeType != 'User Sign Up') {
+                $nID2 = $this->surv->custLoop->nextNode($nID);
+                $node2 = null;
+                if (isset($this->surv->custLoop->allNodes[$nID2]) 
+                    && $this->surv->custLoop->allNodes[$nID2]->nodeType != 'Page') {
+                    $node2 = $this->surv->custLoop->allNodes[$nID2];
+                }
+            }
+            if ($node2 && $node2->nodeType == 'User Sign Up') {
+                $node2->fillNodeRow();
+                if (isset($node2->nodeRow->NodePromptText) && trim($node2->nodeRow->NodePromptText) != '') {
+                    $GLOBALS["SL"]->sysOpts["signup-instruct"] = $node2->nodeRow->NodePromptText;
+                }
+            }
+            $this->formFooter = '<center><div class="treeWrapForm">' . $this->surv->custLoop->printCurrRecMgmt()
+                . '</div></center>';
+        }
+        return true;
     }
     
 }

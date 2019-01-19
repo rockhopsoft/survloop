@@ -80,5 +80,7 @@ $v = $surv->custLoop->v;
 
 </div></center></div>
 
+@if (isset($formFooter)) {!! $formFooter !!} @endif
+
 </form>
 @endsection
