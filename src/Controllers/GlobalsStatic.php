@@ -83,7 +83,9 @@ class GlobalsStatic
     public function swapURLwrap($url, $printHttp = true)
     {
         $urlPrint = str_replace('mailto:', '', $url);
-        if (!$printHttp) $urlPrint = $this->printURLdomain($urlPrint);
+        if (!$printHttp) {
+            $urlPrint = $this->printURLdomain($urlPrint);
+        }
         return '<a href="' . $url . '" target="_blank" class="dont-break-out">' . $urlPrint . '</a>'; 
     }
     
@@ -92,14 +94,18 @@ class GlobalsStatic
         if (trim($url) != '') {
             $url = str_replace('http://', '', str_replace('https://', '', str_replace('http://www.', '', 
                 str_replace('https://www.', '', $url))));
-            if (substr($url, strlen($url)-1) == '/') $url = substr($url, 0, strlen($url)-1);
+            if (substr($url, strlen($url)-1) == '/') {
+                $url = substr($url, 0, strlen($url)-1);
+            }
         }
         return $url;
     }
     
     public function sortArrByKey($arr, $key, $ord = 'asc')
     {
-        if (sizeof($arr) < 2) return $arr;
+        if (sizeof($arr) < 2) {
+            return $arr;
+        }
         $arrCopy = $arrOrig = $arr;
         $arr = [];
         for ($i = 0; $i < sizeof($arrOrig); $i++) {
@@ -111,9 +117,13 @@ class GlobalsStatic
                     if ($nextInd < 0) {
                         $nextInd = $j;
                     } elseif ($ord == 'asc') {
-                        if ($arrCopy[$j][$key] < $arrCopy[$nextInd][$key]) $nextInd = $j;
+                        if ($arrCopy[$j][$key] < $arrCopy[$nextInd][$key]) {
+                            $nextInd = $j;
+                        }
                     } else {
-                        if ($arrCopy[$j][$key] > $arrCopy[$nextInd][$key]) $nextInd = $j;
+                        if ($arrCopy[$j][$key] > $arrCopy[$nextInd][$key]) {
+                            $nextInd = $j;
+                        }
                     }
                 }
                 $arr[] = $arrCopy[$nextInd];
@@ -130,7 +140,9 @@ class GlobalsStatic
         if ($pos > 0) {
             $ret = substr($url, (2+$pos));
             $pos = strpos($ret, '&');
-            if ($pos > 0) $ret = substr($ret, 0, $pos);
+            if ($pos > 0) {
+                $ret = substr($ret, 0, $pos);
+            }
         }
         return $ret;
     }
@@ -153,7 +165,9 @@ class GlobalsStatic
             $newFile = '../' . $newFile;
             $limit++;
         }
-        if (file_exists($newFile)) return $newFile;
+        if (file_exists($newFile)) {
+            return $newFile;
+        }
         return $file;
     }
     
@@ -179,7 +193,9 @@ class GlobalsStatic
     
     public function copyDirFiles($from, $to, $recurse = true)
     {
-        if (trim($from) == '' || trim($to) == '' || !file_exists($from)) return ''; 
+        if (trim($from) == '' || trim($to) == '' || !file_exists($from)) {
+            return '';
+        }
         $ret = '';
         $dir = opendir($from);
         if (!file_exists($to) || !is_dir($to)) @mkdir($to);
@@ -202,7 +218,9 @@ class GlobalsStatic
     
     public function getDirSize($dirPath = '', $type = '')
     {
-        if (!file_exists($dirPath)) return 0;
+        if (!file_exists($dirPath)) {
+            return 0;
+        }
         $size = 0;
         $dir = opendir($dirPath);
         while (false !== ($file = readdir($dir))) {
@@ -257,7 +275,9 @@ class GlobalsStatic
     
     public function findDirFileInner($folder, $file, $subFold = [])
     {
-        if (!file_exists($folder) || !is_dir($folder)) return [];
+        if (!file_exists($folder) || !is_dir($folder)) {
+            return [];
+        }
         $dir = opendir($folder);
         while (false !== ($f = readdir($dir))) {
             if ($f != '.' && $f != '..') {
@@ -265,9 +285,13 @@ class GlobalsStatic
                     $tmp = $subFold;
                     $tmp[] = $f;
                     $tmp = $this->findDirFileInner($folder . '/' . $f, $file, $tmp);
-                    if (sizeof($tmp) > 0) return $tmp;
+                    if (sizeof($tmp) > 0) {
+                        return $tmp;
+                    }
                 } else {
-                    if ($f == $file) return $subFold;
+                    if ($f == $file) {
+                        return $subFold;
+                    }
                 }
             }
         }
@@ -296,8 +320,11 @@ class GlobalsStatic
     {
         if ($map && sizeof($map) > 0 && trim($folder) != '') {
             foreach ($map as $i => $file) {
-                if (is_array($file)) $map[$i] = $this->mapDirSlimmer($map[$i], $folder);
-                else $map[$i] = str_replace($folder . '/', '', $map[$i]);
+                if (is_array($file)) {
+                    $map[$i] = $this->mapDirSlimmer($map[$i], $folder);
+                } else {
+                    $map[$i] = str_replace($folder . '/', '', $map[$i]);
+                }
             }
         }
         return $map;
@@ -310,15 +337,21 @@ class GlobalsStatic
     public function sigFigs($value, $sigFigs = 2)
     {
         $exponent = floor(log10(abs($value))+1);
-        if (pow(10, $exponent) == 0 || pow(10, $sigFigs) == 0) return $value;
+        if (pow(10, $exponent) == 0 || pow(10, $sigFigs) == 0) {
+            return $value;
+        }
         $significand = round(($value / pow(10, $exponent)) * pow(10, $sigFigs)) / pow(10, $sigFigs);
         return $significand * pow(10, $exponent);
     }
     
     public function leadZero($num, $sigFigs = 2)
     {
-        if ($sigFigs == 2) return (($num < 10) ? '0' : '') . $num;
-        if ($sigFigs == 3) return (($num < 10) ? '00' : (($num < 100) ? '0' : '')) . $num;
+        if ($sigFigs == 2) {
+            return (($num < 10) ? '0' : '') . $num;
+        }
+        if ($sigFigs == 3) {
+            return (($num < 10) ? '00' : (($num < 100) ? '0' : '')) . $num;
+        }
         return $num;
     }
     
@@ -326,7 +359,7 @@ class GlobalsStatic
     {
         $hex = str_replace("#", "", $hex);
         $rgba = [ "r" => 0, "g" => 0, "b" => 0, "a" => $a ];
-        if(strlen($hex) == 3) {
+        if (strlen($hex) == 3) {
             $rgba["r"] = hexdec(substr($hex,0,1).substr($hex,0,1));
             $rgba["g"] = hexdec(substr($hex,1,1).substr($hex,1,1));
             $rgba["b"] = hexdec(substr($hex,2,1).substr($hex,2,1));
@@ -345,7 +378,9 @@ class GlobalsStatic
 
     public function printRgba($rgba = [])
     {
-        if (!isset($rgba["r"])) return '';
+        if (!isset($rgba["r"])) {
+            return '';
+        }
         if (!isset($rgba["a"]) || $rgba["a"] == 1) {
             return 'rgb(' . $rgba["r"] . ', ' . $rgba["g"] . ', ' . $rgba["b"] . ')';
         }
@@ -356,8 +391,11 @@ class GlobalsStatic
     {
         $c1 = $this->colorHex2Rgba($hex1, $a1);
         $c2 = $this->colorHex2Rgba($hex2, $a2);
-        if ($perc == 1)     return $c2;
-        elseif ($perc == 0) return $c1;
+        if ($perc == 1) {
+            return $c2;
+        } elseif ($perc == 0) {
+            return $c1;
+        }
         $cNew = [
             "r" => (($c1["r"] == $c2["r"]) ? $c1["r"] : intVal(($c1["r"]+(($c2["r"]-$c1["r"])*$perc)))),
             "g" => (($c1["g"] == $c2["g"]) ? $c1["g"] : intVal(($c1["g"]+(($c2["g"]-$c1["g"])*$perc)))),
@@ -385,7 +423,9 @@ class GlobalsStatic
     public function urlPreview($url)
     {
         $url = urlClean($url);
-        if (strpos($url, '/') !== false) $url = substr($url, 0, strpos($url, '/'));
+        if (strpos($url, '/') !== false) {
+            $url = substr($url, 0, strpos($url, '/'));
+        }
         return $url;
     }
     
@@ -394,14 +434,18 @@ class GlobalsStatic
         $url = str_replace('m.facebook.com/', 'facebook.com/', str_replace('http://', '', str_replace('https://', '', 
             str_replace('http://www.', '', str_replace('https://www.', '', $url)))));
         $pos = strrpos($url, '/');
-        if ($pos !== false && $pos == strlen($url)-1) $url = substr($url, 0, $pos);
+        if ($pos !== false && $pos == strlen($url)-1) {
+            $url = substr($url, 0, $pos);
+        }
         return $url;
     }
     
     public function urlCleanIfShort($url, $altLabel = 'Link', $max = 35)
     {
         $shrt = $this->urlClean($url);
-        if (strlen($shrt) > $max) return $altLabel;
+        if (strlen($shrt) > $max) {
+            return $altLabel;
+        }
         return $shrt;
     }
     
@@ -425,7 +469,9 @@ class GlobalsStatic
         for ($i=0; $i<sizeof($bak); $i++) {
             $max = [ 0, -100000000 ];
             for ($j=0; $j<sizeof($bak); $j++) {
-                if (isset($arr[$j]) && $max[1] < $arr[$j][1]) $max = [ $j, $arr[$j][1] ];
+                if (isset($arr[$j]) && $max[1] < $arr[$j][1]) {
+                    $max = [ $j, $arr[$j][1] ];
+                }
             }
             $sorted[] = [ $arr[$max[0]][0], $arr[$max[0]][1], sizeof($sorted), -1 ];
             unset($arr[$max[0]]);
@@ -439,18 +485,26 @@ class GlobalsStatic
     // Prints inches in feet and inches
     public function printHeight($val)
     {
-        if ($val <= 0) return '';
+        if ($val <= 0) {
+            return '';
+        }
         return (floor($val/12)) . "' " . floor($val%12) . '"';
     }
     
     public function getColsWidth($sizeof)
     {
         $colW = 12;
-        if ($sizeof == 2) $colW = 6;
-        elseif ($sizeof == 3) $colW = 4;
-        elseif ($sizeof == 4) $colW = 3;
-        elseif (in_array($sizeof, [5, 6])) $colW = 2;
-        elseif (in_array($sizeof, [7, 8, 9, 10, 11, 12])) $colW = 1;
+        if ($sizeof == 2) {
+            $colW = 6;
+        } elseif ($sizeof == 3) {
+            $colW = 4;
+        } elseif ($sizeof == 4) {
+            $colW = 3;
+        } elseif (in_array($sizeof, [5, 6])) {
+            $colW = 2;
+        } elseif (in_array($sizeof, [7, 8, 9, 10, 11, 12])) {
+            $colW = 1;
+        }
         return $colW;
     }
     
@@ -486,13 +540,21 @@ class GlobalsStatic
             $tense = " until";
         }
         $period = [" second", " minute", " hour", " day", " month", " year" ];
-        $periodValue= [ $timeDifference->format('%s'), $timeDifference->format('%i'), $timeDifference->format('%h'), 
-            $timeDifference->format('%d'), $timeDifference->format('%m'), $timeDifference->format('%y') ];
+        $periodValue= [
+            $timeDifference->format('%s'), $timeDifference->format('%i'), $timeDifference->format('%h'), 
+            $timeDifference->format('%d'), $timeDifference->format('%m'), $timeDifference->format('%y')
+            ];
         for ($i = 0; $i < count($periodValue); $i++) {
-            if ($periodValue[$i] != 1) $period[$i] .= "s";
-            if ($periodValue[$i] > 0) $interval = $periodValue[$i].$period[$i].$tense;
+            if ($periodValue[$i] != 1) {
+                $period[$i] .= "s";
+            }
+            if ($periodValue[$i] > 0) {
+                $interval = $periodValue[$i].$period[$i].$tense;
+            }
         }
-        if (isset($interval)) return $interval;
+        if (isset($interval)) {
+            return $interval;
+        }
         return "0 seconds" . $tense;
     }
     
@@ -545,27 +607,59 @@ class GlobalsStatic
     
     public function calcGrade($num = 100)
     {
-        if ($num >= 97) return 'A+';
-        if ($num >= 93) return 'A';
-        if ($num >= 90) return 'A-';
-        if ($num >= 87) return 'B+';
-        if ($num >= 83) return 'B';
-        if ($num >= 80) return 'B-';
-        if ($num >= 77) return 'C+';
-        if ($num >= 73) return 'C';
-        if ($num >= 70) return 'C-';
-        if ($num >= 67) return 'D+';
-        if ($num >= 63) return 'D';
-        if ($num >= 60) return 'D-';
+        if ($num >= 97) {
+            return 'A+';
+        }
+        if ($num >= 93) {
+            return 'A';
+        }
+        if ($num >= 90) {
+            return 'A-';
+        }
+        if ($num >= 87) {
+            return 'B+';
+        }
+        if ($num >= 83) {
+            return 'B';
+        }
+        if ($num >= 80) {
+            return 'B-';
+        }
+        if ($num >= 77) {
+            return 'C+';
+        }
+        if ($num >= 73) {
+            return 'C';
+        }
+        if ($num >= 70) {
+            return 'C-';
+        }
+        if ($num >= 67) {
+            return 'D+';
+        }
+        if ($num >= 63) {
+            return 'D';
+        }
+        if ($num >= 60) {
+            return 'D-';
+        }
         return 'F';
     }
     
     public function calcGradeSmp($num = 100)
     {
-        if ($num >= 90) return 'A';
-        if ($num >= 80) return 'B';
-        if ($num >= 70) return 'C';
-        if ($num >= 60) return 'D';
+        if ($num >= 90) {
+            return 'A';
+        }
+        if ($num >= 80) {
+            return 'B';
+        }
+        if ($num >= 70) {
+            return 'C';
+        }
+        if ($num >= 60) {
+            return 'D';
+        }
         return 'F';
     }
     
@@ -611,8 +705,6 @@ class GlobalsStatic
         return true;
     }
     
-    
-    
     public function parseSearchWords($search = '')
     {
         $search = trim($search);
@@ -636,7 +728,9 @@ class GlobalsStatic
             if ($search != '') {
                 $wordSplit = $this->mexplode(' ', str_replace('  ', ' ', $search));
                 foreach ($wordSplit as $word) {
-                    if (!in_array($word, $ret)) $ret[] = $word;
+                    if (!in_array($word, $ret)) {
+                        $ret[] = $word;
+                    }
                 }
             }
         }
@@ -726,7 +820,8 @@ class GlobalsStatic
         return $url;
     }
     
-    public function get_content($URL){
+    public function get_content($URL)
+    {
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_URL, $URL);
@@ -766,7 +861,8 @@ class GlobalsStatic
 	    return 0;
 	}
     
-    public function makeXMLSafe($strIN) {
+    public function makeXMLSafe($strIN)
+    {
         //$strIN = htmlentities($strIN);
         $strIN = str_replace("�", "'", str_replace('�', '\'', $strIN));
         $strIN = str_replace("&#146;", "'", str_replace("&#145;", "'", $strIN));
@@ -847,7 +943,9 @@ class GlobalsStatic
                     . $tagMeat . (($nID > 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
             }
         }
-        if (!$destroy) $this->pageCSS .= $allMeat;
+        if (!$destroy) {
+            $this->pageCSS .= $allMeat;
+        }
         return $str;
     }
     

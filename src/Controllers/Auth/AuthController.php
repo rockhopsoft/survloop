@@ -14,6 +14,7 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
+use SurvLoop\Controllers\Globals;
 use SurvLoop\Controllers\SurvLoopController;
 use SurvLoop\Controllers\SurvLoop;
 
@@ -92,6 +93,14 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
             ]);
         return $user;
+    }
+    
+    protected function chkGlobal(Request $request)
+    {
+        if (!isset($GLOBALS["SL"])) {
+            $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
+        }
+        return true;
     }
     
     public function getRegister(Request $request)
@@ -210,6 +219,7 @@ class AuthController extends Controller
                 }
             }
         }
+        $this->chkGlobal($request);
         return true;
     }
     
@@ -226,25 +236,38 @@ class AuthController extends Controller
             $node2 = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
             $node2->fillNodeRow();
             $this->midSurvRedir = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
-            $this->surv->custLoop->updateCurrNode($nID);
-            $this->surv->custLoop->updateCurrNode($this->surv->custLoop->getNextNonBranch($nID, 'prev'));
-            $node2 = $this->surv->custLoop->allNodes[$this->surv->custLoop->currNode()];
-            $node2->fillNodeRow();
-            $this->midSurvBack = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
-            $node2 = $this->surv->custLoop->allNodes[$nID];
-            while ($node2 && $node2->nodeType != 'User Sign Up') {
-                $nID2 = $this->surv->custLoop->nextNode($nID);
-                $node2 = null;
-                if (isset($this->surv->custLoop->allNodes[$nID2]) 
-                    && $this->surv->custLoop->allNodes[$nID2]->nodeType != 'Page') {
-                    $node2 = $this->surv->custLoop->allNodes[$nID2];
+            
+            $backPageNode = $this->surv->custLoop->getPrevOfType($nID);
+            if ($backPageNode > 0) {
+                $node2 = $this->surv->custLoop->allNodes[$backPageNode];
+                $node2->fillNodeRow();
+                $this->midSurvBack = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
+            }
+            
+            $node2 = null; // reset in search of custom mid-survey language
+            if ($request->has('nd') && intVal($request->get('nd')) > 0) {
+                $nIn = intVal($request->get('nd'));
+                if ($this->surv->custLoop->allNodes[$nIn] 
+                    && $this->surv->custLoop->allNodes[$nIn]->nodeType == 'User Sign Up') {
+                    $node2 = $this->surv->custLoop->allNodes[$nIn];
+                    $node2->fillNodeRow();
+                }
+            } else {
+                $node2 = $this->surv->custLoop->allNodes[$nID];
+                while ($node2 && $node2->nodeType != 'User Sign Up') {
+                    $nID2 = $this->surv->custLoop->nextNode($nID);
+                    $node2 = null;
+                    if (isset($this->surv->custLoop->allNodes[$nID2]) 
+                        && $this->surv->custLoop->allNodes[$nID2]->nodeType != 'Page') {
+                        $node2 = $this->surv->custLoop->allNodes[$nID2];
+                    }
+                }
+                if ($node2 && $node2->nodeType == 'User Sign Up') {
+                    $node2->fillNodeRow();
                 }
             }
-            if ($node2 && $node2->nodeType == 'User Sign Up') {
-                $node2->fillNodeRow();
-                if (isset($node2->nodeRow->NodePromptText) && trim($node2->nodeRow->NodePromptText) != '') {
-                    $GLOBALS["SL"]->sysOpts["signup-instruct"] = $node2->nodeRow->NodePromptText;
-                }
+            if ($node2 && isset($node2->nodeRow->NodePromptText) && trim($node2->nodeRow->NodePromptText) != '') {
+                $GLOBALS["SL"]->sysOpts["midsurv-instruct"] = $node2->nodeRow->NodePromptText;
             }
             $this->formFooter = '<center><div class="treeWrapForm">' . $this->surv->custLoop->printCurrRecMgmt()
                 . '</div></center>';

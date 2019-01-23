@@ -1341,7 +1341,7 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 #passStrng {
     position: absolute;
     right: 10px;
-    top: 9px;
+    top: 27px;
     font-size: 80%;
     font-style: italic;
 }

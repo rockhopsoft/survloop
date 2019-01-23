@@ -16,90 +16,93 @@
 
 <div class="p20"></div>
 
-@if (!isset($sysOpts["signup-instruct"]) 
+@if (!isset($sysOpts["signup-instruct"])
     || trim($sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
     <a href="/login{{ (($request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
         }}" class="btn btn-secondary pull-right mL20">Login</a>
 @endif
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
-@if (isset($sysOpts["signup-instruct"]) && trim($sysOpts["signup-instruct"]) != '')
-    {!! $sysOpts["signup-instruct"] !!}<br />
-@else
-    <h1 class="mT0">Sign Up</h1>
-    @if (isset($sysOpts["login-instruct"]) && trim($sysOpts["login-instruct"]) != '')
-        <h4 class="mB20">{!! $sysOpts["login-instruct"] !!}</h4>
+<div class="nPrompt">
+    <h1 class="mT0 mB20">Sign Up</h1>
+    @if (isset($sysOpts["midsurv-instruct"]) && trim($sysOpts["midsurv-instruct"]) != '')
+        {!! $sysOpts["midsurv-instruct"] !!}
+    @elseif (isset($sysOpts["signup-instruct"]) && trim($sysOpts["signup-instruct"]) != '')
+        {!! $sysOpts["signup-instruct"] !!}
     @endif
-@endif
+</div>
 
 @if (isset($errorMsg)) <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div> @endif
 
 <div id="node004" class="nodeWrap{{ ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
+    <div class="nodeHalfGap"></div>
     <div id="nLabel004" class="nPrompt"><label for="nameID">
         Username: 
         @if (isset($sysOpts["user-name-optional"]) && $sysOpts["user-name-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
-    <div class="nFld mT0">
+    <div class="nFld" style="margin-top: 20px;">
         <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
         @if (isset($errors) && $errors->has('name'))
             <span class="form-text"><strong>{{ $errors->first('name') }}</strong></span>
         @endif
     </div>
+    <div class="nodeHalfGap"></div>
 </div>
 
 <div class="nodeAnchor"><a id="n001" name="n001"></a></div>
-<div class="nodeHalfGap"></div>
-
 <div id="node001" class="nodeWrap{{ ((isset($errors) && $errors->has('email')) ? 'Error' : '') }}">
+    <div class="nodeHalfGap"></div>
     <div id="nLabel001" class="nPrompt"><label for="emailID">
         Email:
-        @if (!isset($sysOpts["user-email-optional"]) 
-            || $sysOpts["user-email-optional"] == 'Off')
+        @if (!isset($sysOpts["user-email-optional"]) || $sysOpts["user-email-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
-    <div class="nFld mT0">
+    <div class="nFld" style="margin-top: 20px;">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
         @if (isset($errors) && $errors->has('email'))
             <span class="form-text"><strong>{{ $errors->first('email') }}</strong></span>
         @endif
-        @if (isset($sysOpts["user-email-optional"]) 
-            && $sysOpts["user-email-optional"] == 'On')
+        @if (isset($sysOpts["user-email-optional"]) && $sysOpts["user-email-optional"] == 'On')
             * Currently, you will only be able reset a lost password with an email address.
         @endif
     </div>
+    <div class="nodeHalfGap"></div>
 </div>
 
 <div class="nodeAnchor"><a id="n002" name="n002"></a></div>
-<div class="nodeHalfGap"></div>
-
-<div id="node002" class="nodeWrap{{ ((isset($errors) && $errors->has('password')) ? 'Error' : '') }}">
-    <div id="nLabel002" class="nPrompt"><label for="password">
-        Password: <span class="red">*required, 8 character minimum</span>
-    </label></div>
-    <div class="relDiv w100"><div id="passStrng" class="red"></div></div>
-    <div class="nFld mT0">
-        <input id="password" name="password" value="" type="password" class="form-control">
-        @if (isset($errors) && $errors->has('password'))
-            <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
-        @endif
+<div id="node002" class="nodeWrap">
+    <div class="nodeHalfGap"></div>
+    <div id="node002" class="nodeWrap{{ ((isset($errors) && $errors->has('password')) ? 'Error' : '') }}">
+        <div id="nLabel002" class="nPrompt"><label for="password">
+            Password: <span class="red">*required, 8 character minimum</span>
+        </label></div>
+        <div class="relDiv w100"><div id="passStrng" class="red"></div></div>
+        <div class="nFld" style="margin-top: 20px;">
+            <input id="password" name="password" value="" type="password" class="form-control">
+            @if (isset($errors) && $errors->has('password'))
+                <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
+            @endif
+        </div>
     </div>
+    <div class="nodeHalfGap"></div>
 </div>
 
 <div class="nodeAnchor"><a id="n003" name="n003"></a></div>
-<div class="nodeHalfGap"></div>
-
 <div id="node003" class="nodeWrap">
-    <div id="nLabel003" class="nPrompt"><label for="password-confirm">
-        Confirm Password: <span class="red">*required</span>
-    </label></div>
-    <div class="nFld mT0">
-        <input id="password_confirmation" name="password_confirmation" value="" type="password" class="form-control">
+    <div class="nodeHalfGap"></div>
+    <div id="node003" class="nodeWrap">
+        <div id="nLabel003" class="nPrompt"><label for="password-confirm">
+            Confirm Password: <span class="red">*required</span>
+        </label></div>
+        <div class="nFld" style="margin-top: 20px;">
+            <input id="password_confirmation" name="password_confirmation" type="password" class="form-control"
+                 value="">
+        </div>
     </div>
+    <div class="nodeHalfGap"></div>
 </div>
-
-<div class="nodeHalfGap"></div>
 
 @if ($GLOBALS["SL"]->sysHas('volunteers') && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
     <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
@@ -109,17 +112,18 @@
 @if (!isset($midSurvBack) || trim($midSurvBack) == '')
     <center><input type="submit" class="btn btn-xl btn-primary" value="Sign Up"></center>
 @else
-
+    <div id="pageBtns">
+        <div id="formErrorMsg"></div>
+        <div id="nodeSubBtns" class="nodeSub">
+            <input type="submit" class="fR btn btn-primary btn-lg" value="Sign Up">
+            <a href="{{ $midSurvBack }}" class="fL btn btn-secondary btn-lg" id="nFormBack">Back</a>
+            <div class="fC p5"></div>
+        </div>
+    </div>
+    <div class="pageBotGap"></div>
 @endif
 
-<div class="nodeHalfGap"></div>
-
 </div></center></div>
-
-<?php /*
-redir: {!! $midSurvRedir !!}<br />
-back: {!! $midSurvBack !!}<br />
-*/ ?>
 
 @if (isset($formFooter)) {!! $formFooter !!} @endif
 

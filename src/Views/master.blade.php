@@ -1,4 +1,8 @@
-<!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
+<?php
+if (!isset($GLOBALS["SL"])) {
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals(new Illuminate\Http\Request, 1, 1, 1);
+}
+?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,7 +76,7 @@
 @section('headCode')
 @show
 </head>
-<body {!! $GLOBALS["SL"]->getBodyParams() !!} >
+<body {!! $GLOBALS['SL']->getBodyParams() !!} >
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>

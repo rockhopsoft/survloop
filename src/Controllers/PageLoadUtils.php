@@ -311,7 +311,7 @@ class PageLoadUtils extends Controller
         return true;
     }
     
-    protected function isUserAdmin()
+    public function isUserAdmin()
     {
         return (Auth::user() && Auth::user()->hasRole('administrator'));
     }

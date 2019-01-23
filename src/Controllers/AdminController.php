@@ -269,7 +269,7 @@ class AdminController extends SurvLoopController
             $this->admControlInit($request, '/dash/' . $pageSlug);
             $this->loadCustLoop($request, $this->loader->treeID);
             $this->v["content"] = $this->custReport->index($request);
-            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
+            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->loader->isUserAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                     . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;

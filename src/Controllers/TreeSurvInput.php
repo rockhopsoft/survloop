@@ -501,7 +501,9 @@ class TreeSurvInput extends TreeSurvUpload
                     $flds = $GLOBALS["SL"]->REQ->all();
                     if ($flds && sizeof($flds) > 0) {
                         foreach ($flds as $key => $val) {
-                            if (is_array($val)) $val = implode(', ', $val);
+                            if (is_array($val)) {
+                                $val = implode(', ', $val);
+                            }
                             if (!in_array($key, [ '_token', 'ajax', 'tree', 'treeSlug', 'node', 'nodeSlug', 
                                 'loop', 'loopItem', 'step', 'alt', 'jumpTo', 'afterJumpTo', 'zoomPref' ])
                                 && strpos($key, 'Visible') === false && trim($val) != '') {
@@ -513,7 +515,9 @@ class TreeSurvInput extends TreeSurvUpload
                                         . '</b><br />';
                                 }
                                 $line .= $val . '<br /><br />';
-                                if (strpos($emaContent, $line) === false) $emaContent .= $line;
+                                if (strpos($emaContent, $line) === false) {
+                                    $emaContent .= $line;
+                                }
                             }
                         }
                     }

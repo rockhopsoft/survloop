@@ -88,14 +88,13 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::post('/register',   'SurvLoop\\Controllers\\Auth\\SurvRegisterController@register');
     Route::get( '/register',   'SurvLoop\\Controllers\\Auth\\AuthController@getRegister');
+    Route::post('/login',      'SurvLoop\\Controllers\\Auth\\AuthController@postLogin');
+    Route::get( '/login',      'SurvLoop\\Controllers\\Auth\\AuthController@getLogin');
     Route::post('/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/logout',     'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');
     Route::get( '/chkEmail',   'SurvLoop\\Controllers\\SurvLoop@chkEmail');
     
-    // Authentication routes...
-    Route::post('/login',      'SurvLoop\\Controllers\\Auth\\AuthController@postLogin');
-
     Route::get( '/time-out',   'SurvLoop\\Controllers\\SurvLoop@timeOut');
     Route::get( '/survloop-stats.json',   'SurvLoop\\Controllers\\SurvLoop@getJsonSurvStats');
     
@@ -966,8 +965,8 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{desiredFile}', function ($desiredFile) {
-        return redirect('/survloop/jquery-ui-1.12.1/images/' . $desiredFile);
+    Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{file}', function ($file) {
+        return redirect('/survloop/jquery-ui-1.12.1/images/' . $file);
     });
     
 });    

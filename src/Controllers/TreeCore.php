@@ -1370,6 +1370,20 @@ class TreeCore extends SurvLoopController
         return $nID;
     }
     
+    public function getPrevOfType($nID, $type = 'Page')
+    {
+        if (isset($this->nodesRawIndex[$nID]) && isset($this->allNodes[$nID])) {
+            $ind = $this->nodesRawIndex[$nID]-1;
+            while ($ind >= 0 && $this->allNodes[$this->nodesRawOrder[$ind]]->nodeType != $type) {
+                $ind--;
+            }
+            if ($ind >= 0 && $this->allNodes[$this->nodesRawOrder[$ind]]->nodeType == $type) {
+                return $this->nodesRawOrder[$ind];
+            }
+        }
+        return -3;
+    }
+    
     protected function leavingTheLoop($name = '', $justClearID = false)
     {
         return true;

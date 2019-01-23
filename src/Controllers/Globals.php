@@ -115,7 +115,9 @@ class Globals extends GlobalsImportExport
         $this->sessLoops[0]->SessLoopName = $loop;
         $this->sessLoops[0]->SessLoopItemID = $itemID;
         if (sizeof($tmpLoops) > 0) {
-            foreach ($tmpLoops as $l) $this->sessLoops[] = $l;
+            foreach ($tmpLoops as $l) {
+                $this->sessLoops[] = $l;
+            }
         }
         $this->setClosestLoop($loop, $itemID, $this->dataLoops[$loop]);
         return true;
@@ -152,7 +154,9 @@ class Globals extends GlobalsImportExport
     {
         if (sizeof($this->dataLoops) > 0) {
             foreach ($this->dataLoops as $loop) {
-                if ($loopID == $loop->DataLoopID) return $loop->DataLoopPlural;
+                if ($loopID == $loop->DataLoopID) {
+                    return $loop->DataLoopPlural;
+                }
             }
         }
         return '';
@@ -188,7 +192,9 @@ class Globals extends GlobalsImportExport
     
     protected function getDataSetRow($loopName)
     {
-        if ($loopName == '' || !isset($this->dataLoops[$loopName])) return [];
+        if ($loopName == '' || !isset($this->dataLoops[$loopName])) {
+            return [];
+        }
         return $this->dataLoops[$loopName];
     }
 
@@ -200,7 +206,9 @@ class Globals extends GlobalsImportExport
                 ->where('DefSet', 'Blurbs')
                 ->get();
             if ($defs->isNotEmpty()) {
-                foreach ($defs as $def) $this->blurbs[] = $def->DefSubset;
+                foreach ($defs as $def) {
+                    $this->blurbs[] = $def->DefSubset;
+                }
             }
         }
         return $this->blurbs;
@@ -238,21 +246,26 @@ class Globals extends GlobalsImportExport
     public function getBlurb($blurbName = '', $blurbID = -3)
     {
         $def = [];
-        if ($blurbID > 0) $def = SLDefinitions::find($blurbID);
-        else {
+        if ($blurbID > 0) {
+            $def = SLDefinitions::find($blurbID);
+        } else {
             $def = SLDefinitions::where('DefSubset', $blurbName)
                 ->where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'Blurbs')
                 ->first();
         }
-        if ($def && isset($def->DefDescription)) return $def->DefDescription;
+        if ($def && isset($def->DefDescription)) {
+            return $def->DefDescription;
+        }
         return '';
     }
     
     
     public function loadEmailDropOpts($presel = -3, $tree = -3)
     {
-        if ($tree <= 0) $tree = $this->treeID;
+        if ($tree <= 0) {
+            $tree = $this->treeID;
+        }
         $ret = '';
         $emas = SLEmails::where('EmailTree', $tree)
             ->where('EmailType', 'NOT LIKE', 'Blurb')
@@ -274,7 +287,9 @@ class Globals extends GlobalsImportExport
                 ->where('EmailType', 'Blurb')
                 ->get();
             if ($emas->isNotEmpty()) {
-                foreach ($emas as $e) $this->emaBlurbs[] = $e->EmailName;
+                foreach ($emas as $e) {
+                    $this->emaBlurbs[] = $e->EmailName;
+                }
             }
         }
         return $this->emaBlurbs;
@@ -307,21 +322,29 @@ class Globals extends GlobalsImportExport
     public function getEmailBlurb($blurbName)
     {
         $ema = SLEmails::where('EmailName', $blurbName)->first();
-        if ($ema && isset($ema->EmailBody)) return $ema->EmailBody;
+        if ($ema && isset($ema->EmailBody)) {
+            return $ema->EmailBody;
+        }
         return '';
     }
     
     public function getEmailSubj($emaID)
     {
         $ema = SLEmails::find($emaID);
-        if ($ema && isset($ema->EmailSubject)) return $ema->EmailSubject;
+        if ($ema && isset($ema->EmailSubject)) {
+            return $ema->EmailSubject;
+        }
         return '';
     }
     
     public function addToHeadCore($js)
     {
-        if (!isset($this->sysOpts['header-code'])) $this->sysOpts['header-code'] = '';
-        if (strpos($this->sysOpts['header-code'], $js) === false) $this->sysOpts['header-code'] .= $js;
+        if (!isset($this->sysOpts['header-code'])) {
+            $this->sysOpts['header-code'] = '';
+        }
+        if (strpos($this->sysOpts['header-code'], $js) === false) {
+            $this->sysOpts['header-code'] .= $js;
+        }
         return true;
     }
     
@@ -332,8 +355,12 @@ class Globals extends GlobalsImportExport
             $files = $this->mexplode(',', $this->sysOpts["css-extra-files"]);
             foreach ($files as $url) {
                 $url = trim($url);
-                if (strpos($url, '../vendor/') === 0) $url = $this->convertRel2AbsURL($url);
-                if (trim($url) != '') $ret .= '<script src="' . $url . '" type="text/javascript"></script>';
+                if (strpos($url, '../vendor/') === 0) {
+                    $url = $this->convertRel2AbsURL($url);
+                }
+                if (trim($url) != '') {
+                    $ret .= '<script src="' . $url . '" type="text/javascript"></script>';
+                }
             }
         }
         return $ret;
@@ -349,7 +376,9 @@ class Globals extends GlobalsImportExport
     
     public function loadImgs($nID = '', $dbID = 1)
     {
-        if ($this->imgs === false) $this->imgs = new SurvLoopImages($nID, $dbID);
+        if ($this->imgs === false) {
+            $this->imgs = new SurvLoopImages($nID, $dbID);
+        }
         return true;
     }
     
@@ -379,22 +408,32 @@ class Globals extends GlobalsImportExport
     
     public function addPreloadImg($src = '')
     {
-        if (trim($src) == '') return false;
-        if (!isset($this->x["preload-imgs"])) $this->x["preload-imgs"] = [];
+        if (trim($src) == '') {
+            return false;
+        }
+        if (!isset($this->x["preload-imgs"])) {
+            $this->x["preload-imgs"] = [];
+        }
         $this->x["preload-imgs"][] = $src;
         return true;
     }
     
     public function listPreloadImgs()
     {
-        if (!isset($this->x["preload-imgs"])) $this->x["preload-imgs"] = [];
+        if (!isset($this->x["preload-imgs"])) {
+            $this->x["preload-imgs"] = [];
+        }
         return $this->x["preload-imgs"];
     }
     
     public function addAdmMenuHshoo($url = '')
     {
-        if (trim($url) == '') return false;
-        if (!isset($this->x["menu-hshoos"])) $this->x["menu-hshoos"] = [];
+        if (trim($url) == '') {
+            return false;
+        }
+        if (!isset($this->x["menu-hshoos"])) {
+            $this->x["menu-hshoos"] = [];
+        }
         $this->x["menu-hshoos"][] = $url;
         $this->addHshoo($url);
         return true;
@@ -403,7 +442,9 @@ class Globals extends GlobalsImportExport
     public function addAdmMenuHshoos($urls = [])
     {
         if (sizeof($urls) > 0) {
-            foreach ($urls as $i => $url) $this->addAdmMenuHshoo($url);
+            foreach ($urls as $i => $url) {
+                $this->addAdmMenuHshoo($url);
+            }
         }
         return true;
     }
@@ -415,9 +456,15 @@ class Globals extends GlobalsImportExport
     
     public function addHshoo($url = '')
     {
-        if (trim($url) == '') return false;
-        if (!isset($this->x["hshoos"])) $this->x["hshoos"] = [];
-        if (strpos($url, '#') > 0) $url = substr($url, strpos($url, '#'));
+        if (trim($url) == '') {
+            return false;
+        }
+        if (!isset($this->x["hshoos"])) {
+            $this->x["hshoos"] = [];
+        }
+        if (strpos($url, '#') > 0) {
+            $url = substr($url, strpos($url, '#'));
+        }
         $this->x["hshoos"][] = $url;
         return true;
     }
@@ -425,7 +472,9 @@ class Globals extends GlobalsImportExport
     public function addHshoos($urls = [])
     {
         if (sizeof($urls) > 0) {
-            foreach ($urls as $i => $url) $this->addAdmMenuHshoo($url);
+            foreach ($urls as $i => $url) {
+                $this->addAdmMenuHshoo($url);
+            }
         }
         return true;
     }
@@ -439,7 +488,9 @@ class Globals extends GlobalsImportExport
     {
         $ret = '';
         if (isset($this->x["hshoos"]) && sizeof($this->x["hshoos"]) > 0) {
-            foreach ($this->x["hshoos"] as $i => $hsh) $ret .= 'addHshoo("' . $hsh . '"); ';
+            foreach ($this->x["hshoos"] as $i => $hsh) {
+                $ret .= 'addHshoo("' . $hsh . '"); ';
+            }
         }
         return $ret;
     }
@@ -451,29 +502,56 @@ class Globals extends GlobalsImportExport
     
     public function addBodyParams($html)
     {
-        if (!isset($this->x["bodyParams"])) $this->x["bodyParams"] = '';
+        if (!isset($this->x["bodyParams"])) {
+            $this->x["bodyParams"] = '';
+        }
         $this->x["bodyParams"] .= $html;
         return true;
     }
     
     public function getBodyParams()
     {
-        if (isset($this->x["bodyParams"])) return $this->x["bodyParams"];
-        return '';
+        $ret = '';
+        if (isset($this->x["bodyParams"])) {
+            $ret .= $this->x["bodyParams"];
+        }
+        if (isset($this->x["bodyOverflowX"]) && trim($this->x["bodyOverflowX"]) != '') {
+            $ret .= ' style="overflow-x: ' . $this->x["bodyOverflowX"] . ';" ';
+        }
+        return $ret;
+    }
+    
+    public function pageBodyOverflowX($value = 'visible')
+    {
+        if ($value == 'visible') {
+            $this->x["bodyOverflowX"] = 'visible';
+        } else {
+            $this->x["bodyOverflowX"] = 'hidden';
+        }
+        return true;
     }
     
     public function getSrchUrl($override = '')
     {
-        if ($override != '') return $this->x["srchUrls"][$override];
-        if ($this->isAdmin) return $this->x["srchUrls"]["administrator"];
-        elseif ($this->isVolun) return $this->x["srchUrls"]["volunteer"];
+        if ($override != '') {
+            return $this->x["srchUrls"][$override];
+        }
+        if ($this->isAdmin) {
+            return $this->x["srchUrls"]["administrator"];
+        } elseif ($this->isVolun) {
+            return $this->x["srchUrls"]["volunteer"];
+        }
         return $this->x["srchUrls"]["public"];
     }
     
     public function getDumpSrchResultIDs($searches = [], $treeID = -3)
     {
-        if ($treeID <= 0) $treeID = $this->treeID;
-        if (!isset($this->x["srchResDump"])) $this->x["srchResDump"] = [];
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        if (!isset($this->x["srchResDump"])) {
+            $this->x["srchResDump"] = [];
+        }
         if (sizeof($searches) > 0) {
             foreach ($searches as $s) {
                 $rows = SLSearchRecDump::where('SchRecDmpTreeID', $treeID)
@@ -495,9 +573,15 @@ class Globals extends GlobalsImportExport
     
     public function addSrchResults($set = '?', $rows = [], $idFld = '')
     {
-        if (!isset($this->x["srchResIDs"])) $this->x["srchResIDs"] = [];
-        if (!isset($this->x["srchRes"])) $this->x["srchRes"] = [];
-        if (!isset($this->x["srchRes"][$set])) $this->x["srchRes"][$set] = [];
+        if (!isset($this->x["srchResIDs"])) {
+            $this->x["srchResIDs"] = [];
+        }
+        if (!isset($this->x["srchRes"])) {
+            $this->x["srchRes"] = [];
+        }
+        if (!isset($this->x["srchRes"][$set])) {
+            $this->x["srchRes"][$set] = [];
+        }
         if ($rows->isNotEmpty()) {
             foreach ($rows as $row) {
                 if (isset($row->{ $idFld }) && !in_array($row->{ $idFld }, $this->x["srchResIDs"])) {
@@ -571,7 +655,5 @@ class Globals extends GlobalsImportExport
     {
         return $this->mapsURL($this->printRowAddy($row, $abbr));
     }
-    
-    
     
 }

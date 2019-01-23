@@ -235,10 +235,10 @@ class SurvLoop extends SurvCustLoop
                 $this->clearSessRedirs();
                 return redirect(session()->get('loginRedir'));
             } else {
-                $this->afterLoginLastTree();
+                $this->afterLoginLastTree($request);
             }
         } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
-            $this->afterLoginLastTree();
+            $this->afterLoginLastTree($request);
         } elseif (session()->has('loginRedir') && trim(session()->get('loginRedir')) != '') {
             $this->clearSessRedirs();
             return redirect(session()->get('loginRedir'));
@@ -248,7 +248,7 @@ class SurvLoop extends SurvCustLoop
         return $this->custLoop->afterLogin($request);
     }
     
-    protected function afterLoginLastTree()
+    protected function afterLoginLastTree(Request $request)
     {
         if (session()->has('lastTree')) {
             $tree = SLTree::find(session()->get('lastTree'));
