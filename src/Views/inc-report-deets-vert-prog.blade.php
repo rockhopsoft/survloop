@@ -8,7 +8,7 @@
         <tr><td class="vaT taC">
             @if ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0) <div class="vertPrgDone">
             @else <div class="vertPrgFutr"> @endif
-            <img src="/survloop/uploads/spacer.gif" border=0 ></div>
+            <img src="/survloop/uploads/spacer.gif" border=0 alt="" ></div>
         </td><td class="vaT">
             @if (trim($deet[0])) {{ $deet[0] }} @endif
         </td><td class="vaT taR fPerc80 slGrey">

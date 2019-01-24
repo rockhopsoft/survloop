@@ -99,7 +99,7 @@ if (!isset($GLOBALS["SL"])) {
 
 <div id="mySidenav">
     <div class="headGap">
-        <img src="/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+        <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
     </div>
     <ul id="mySideUL" class="nav flex-column">
     @if (isset($navMenu) && sizeof($navMenu) > 0)
@@ -145,7 +145,7 @@ if (!isset($GLOBALS["SL"])) {
 </div>
 <div id="headClear"></div>
 <div class="headGap">
-    <img src="/survloop/uploads/spacer.gif" border=0 alt="spacer" >
+    <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
 </div>
 <div id="progWrap"></div>
 
@@ -242,7 +242,8 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
     
         @if (!$isDashLayout)
-            @if (isset($footOver) && trim($footOver) != '') {!! $footOver !!}
+            @if (isset($footOver) && trim($footOver) != '')
+                {!! $footOver !!}
             @elseif (isset($GLOBALS["SL"]->sysOpts["footer-master"])
                 && trim($GLOBALS["SL"]->sysOpts["footer-master"]) != '')
                 {!! $GLOBALS["SL"]->sysOpts["footer-master"] !!}
@@ -269,7 +270,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
 <div class="imgPreload">
-@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 > @empty @endforelse
+@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 alt="" > @empty @endforelse
 </div>
 @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
     {!! $GLOBALS['SL']->pageSCRIPTS !!}

@@ -34,8 +34,7 @@ class TreeSurvAdmin extends TreeSurvForm
         foreach ($this->allNodes as $nID => $nodeObj) {
             $this->allNodes[$nID]->fillNodeRow();
         }
-        $this->canEditTree = false;
-    	if ($this->v["uID"] > 0) $this->canEditTree = $this->v["user"]->hasRole('administrator|databaser');
+        $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
         return true;
     }
     
@@ -749,7 +748,9 @@ class TreeSurvAdmin extends TreeSurvForm
         }
         $this->loadTree();
         $this->initExtra($request);
-        if ($pubPrint) $this->v["isPrint"] = true;
+        if ($pubPrint) {
+            $this->v["isPrint"] = true;
+        }
         $this->checkTreeSessOpts();
         $this->treeAdminNodeManip();
         $this->loadTreeNodeStats();
@@ -824,7 +825,9 @@ class TreeSurvAdmin extends TreeSurvForm
                         if (!isset($nodeSess[$save->NodeSaveSession])) {
                             $nodeSess[$save->NodeSaveSession] = 1;
                             foreach ($responses as $j => $res) {
-                                if (!isset($fnlVals[strtolower($res)])) $fnlVals[strtolower($res)] = 0;
+                                if (!isset($fnlVals[strtolower($res)])) {
+                                    $fnlVals[strtolower($res)] = 0;
+                                }
                                 $fnlVals[strtolower($res)]++;
                                 $fnlCnt++;
                             }
@@ -930,7 +933,9 @@ class TreeSurvAdmin extends TreeSurvForm
                 if (sizeof($tierNode[1]) > 0) { 
                     $retVal .= '<div id="nodeKids' . $nID . '" class="dis' 
                         . ((session()->get('adminOverOpts')%2 == 0 || $nID == $this->rootID) ? 'Blo' : 'Non') . '">';
-                    foreach ($tierNode[1] as $next) $retVal .= $this->adminResponseNodeStats($next, $tierDepth);
+                    foreach ($tierNode[1] as $next) {
+                        $retVal .= $this->adminResponseNodeStats($next, $tierDepth);
+                    }
                     $retVal .= '</div>';
                 }
                 $retVal .= '</div></div>';
@@ -953,7 +958,9 @@ class TreeSurvAdmin extends TreeSurvForm
     
     public function checkTreeSessOpts()
     {
-        if (!session()->has('adminOverOpts')) session()->put('adminOverOpts', 2);
+        if (!session()->has('adminOverOpts')) {
+            session()->put('adminOverOpts', 2);
+        }
         if ($GLOBALS["SL"]->REQ->has('all')) {
             if (session()->get('adminOverOpts')%2 > 0) {
                 session()->put('adminOverOpts', (2*session()->get('adminOverOpts')));
@@ -974,7 +981,10 @@ class TreeSurvAdmin extends TreeSurvForm
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) { 
             $nID = $tierNode[0]; 
             if ($this->hasNode($nID)) {
-                $indent = ''; for ($i=0; $i<$tierDepth; $i++) $indent .= ' - ';
+                $indent = '';
+                for ($i=0; $i<$tierDepth; $i++) {
+                    $indent .= ' - ';
+                }
                 $nodeName = $this->allNodes[$nID]->nodeRow->NodePromptText;
                 $retVal .= '<option value="' . $nID . '" ' . ((intVal($preSel) == $nID) ? 'SELECTED' : '') . ' >' 
                     . $indent . ((strlen($nodeName) > 70) ? substr($nodeName, 0, 70).'...' : $nodeName) . '</option>';
@@ -991,9 +1001,9 @@ class TreeSurvAdmin extends TreeSurvForm
     protected function adminBasicDropdown($preSel = -3)
     {
         return '<select name="nodeID" style="width: 100%;">
-        <option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') . ' >select tree node</option>
-        ' . $this->adminBasicDropdownNode($this->nodeTiers, -1, $preSel) . '
-        </select>';
+            <option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') . ' >select tree node</option>
+            ' . $this->adminBasicDropdownNode($this->nodeTiers, -1, $preSel) . '
+            </select>';
     }
     
     protected function updateTreeEnds()

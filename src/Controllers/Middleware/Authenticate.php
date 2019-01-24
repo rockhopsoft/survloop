@@ -1,9 +1,6 @@
 <?php
-
 namespace App\Http\Middleware;
-
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
-
 class Authenticate extends Middleware
 {
     /**
@@ -16,7 +13,7 @@ class Authenticate extends Middleware
     {
         session()->put('loginRedir', $_SERVER["REQUEST_URI"]);
         session()->put('loginRedirTime', time());
-        if (! $request->expectsJson()) {
+        if (!$request->expectsJson()) {
             return route('login');
         }
     }

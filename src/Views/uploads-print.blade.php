@@ -18,7 +18,8 @@
         @if (in_array($upDeets["ext"], array("gif", "jpeg", "jpg", "png")))
             <div class="w100 disBlo" style="height: {{ (2+$height) }}px; overflow: hidden;">
                 <a href="{{ $upDeets['filePub'] }}" target="_blank" class="disBlo w100" 
-                    ><img src="{{ $upDeets['filePub'] }}" border=1 class="w100"></a>
+                    ><img src="{{ $upDeets['filePub'] }}" border=1 class="w100" 
+                        alt="{{ ((isset($upRow->UpStoredFile)) ? $upRow->UpStoredFile : 'Uploaded Image') }}"></a>
             </div>
         @else 
             <div class="w100 disBlo BGblueLight vaM" style="height: {{ (2+$height) }}px;">

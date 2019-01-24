@@ -104,7 +104,10 @@ class TreeNodeCore
         return true;
     }
     
-    public function initiateNodeRow() { return true; }
+    public function initiateNodeRow()
+    {
+        return true;
+    }
     
     /**
      * Returns the Node ID, in the simplest case. 

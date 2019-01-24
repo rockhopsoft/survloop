@@ -6,7 +6,7 @@
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" name="previous" 
-    @if (trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
+    @if (isset($midSurvRedir) && trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
     @elseif ($request->has('redir')) value="{{ $request->get('redir') }}"
     @elseif ($request->has('previous')) value="{{ $request->get('previous') }}"
     @else value="{{ URL::previous() }}"
@@ -61,12 +61,14 @@
     </label></div>
     <div class="nFld" style="margin-top: 20px;">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
+        
         @if (isset($errors) && $errors->has('email'))
             <span class="form-text"><strong>{{ $errors->first('email') }}</strong></span>
         @endif
         @if (isset($sysOpts["user-email-optional"]) && $sysOpts["user-email-optional"] == 'On')
             * Currently, you will only be able reset a lost password with an email address.
         @endif
+        <div id="emailWarning" style="display: none;"></div>
     </div>
     <div class="nodeHalfGap"></div>
 </div>

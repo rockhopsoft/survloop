@@ -27,7 +27,7 @@ class TreeSurvApi extends TreeCore
             $newRoot->NodePromptText  = $GLOBALS["SL"]->coreTbl;
             $newRoot->save();
         }
-        $this->canEditTree = true;
+        $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
         return true;
     }
     
@@ -55,8 +55,12 @@ class TreeSurvApi extends TreeCore
             if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->NodeID);
             } else {
-                if ($nodeIN <= 0) $node = $this->treeAdminNodeNew($node);
-                if (intVal($node->nodeRow->NodeOpts) < 1) $node->nodeRow->NodeOpts = 1;
+                if ($nodeIN <= 0) {
+                    $node = $this->treeAdminNodeNew($node);
+                }
+                if (intVal($node->nodeRow->NodeOpts) < 1) {
+                    $node->nodeRow->NodeOpts = 1;
+                }
                 if ($GLOBALS["SL"]->REQ->xmlNodeType == 'dataWrap') {
                     $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->wrapPromptText);
                     $node->nodeRow->NodePromptNotes = 0;
@@ -93,7 +97,7 @@ class TreeSurvApi extends TreeCore
             "treeID"      => $this->treeID, 
             "node"        => $node, 
             "REQ"         => $GLOBALS["SL"]->REQ
-        ]);
+            ]);
     }
     
     protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
@@ -117,7 +121,7 @@ class TreeSurvApi extends TreeCore
                     "tierNode"       => $tierNode, 
                     "tierDepth"      => $tierDepth, 
                     "childrenPrints" => $childrenPrints
-                ])->render();
+                    ])->render();
             }
         }
         return '';
@@ -130,11 +134,11 @@ class TreeSurvApi extends TreeCore
         $this->treeAdminNodeManip();
         $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-print-wrap-ajax', [
             "canEditTree"     => $this->canEditTree
-        ])->render();
+            ])->render();
         return view('vendor.survloop.admin.tree.node-print-wrap', [
             "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
             "canEditTree"     => $this->canEditTree
-        ])->render();
+            ])->render();
     }
     
     public function getNodeTblName($nID)

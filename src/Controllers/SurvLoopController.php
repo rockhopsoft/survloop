@@ -277,7 +277,7 @@ class SurvLoopController extends Controller
         return '';
     }
     
-    protected function initCustViews()
+    public function initCustViews()
     {
         $chk = SLDefinitions::where('DefDatabase', 1)
             ->where('DefSet', 'Blurbs')

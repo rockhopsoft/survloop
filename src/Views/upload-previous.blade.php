@@ -29,7 +29,9 @@
                                 style="height: {{ (2+$height) }}px; overflow: hidden;">
                                 <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
                                     class="disBlo {{ $upDeets[$i]['imgClass'] }} " ><img border=1 
-                                    src="{{ $upDeets[$i]['filePub'] }}" class=" {{ $upDeets[$i]['imgClass'] }} "></a>
+                                    src="{{ $upDeets[$i]['filePub'] }}" class=" {{ $upDeets[$i]['imgClass'] }} "
+                                    alt="{{ ((isset($upRow->UpStoredFile)) ? $upRow->UpStoredFile : 'Uploaded Image') 
+                                    }}"></a>
                             </div>
                         @else
                             <div class="w100 disBlo BGblueDark vaM" style="height: {{ (2+$height) }}px;">

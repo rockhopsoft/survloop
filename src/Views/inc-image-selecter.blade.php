@@ -10,7 +10,9 @@
                 @if ($i%6 == 0 && $i > 0) </div><div class="row mB10"> @endif
                 <div class="col-2">
                     <a id="selectImg{{ $nID }}sel{{ $img->ImgID }}" class="openImgDetail wrdBrkAll" href="javascript:;" 
-                        ><div class="prevImg brdFnt"><img src="{{ $img->ImgFullFilename }}" class="brd"></div>
+                        ><div class="prevImg brdFnt"><img src="{{ $img->ImgFullFilename }}" class="brd"
+                            alt="{{ ((isset($img->ImgTitle)) ? $img->ImgTitle : '') }}" @endif
+                            ></div>
                         @if (isset($img->ImgTitle) && trim($img->ImgTitle) != '') {{ $img->ImgTitle }}
                         @elseif (strrpos($img->ImgFileLoc, '/') !== false) 
                             {{ str_replace('_', ' ', substr($img->ImgFileLoc, strrpos($img->ImgFileLoc, '/')+1)) }}

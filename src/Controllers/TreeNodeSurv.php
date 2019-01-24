@@ -179,7 +179,9 @@ class TreeNodeSurv extends TreeNodeCore
             }
         }
         if ($this->conds && sizeof($this->conds) > 0) {
-            foreach ($this->conds as $i => $c) $c->loadVals();
+            foreach ($this->conds as $i => $c) {
+                $c->loadVals();
+            }
         }
         $this->hasShowKids = false;
         if ($this->nodeRow) {
@@ -325,7 +327,9 @@ class TreeNodeSurv extends TreeNodeCore
         if (sizeof($this->responses) > 0) {
             list($tbl, $fld) = $this->getTblFld();
             foreach ($this->responses as $j => $res) {
-                if (intVal($res->NodeResShowKids) > 0) $this->hasShowKids = true;
+                if (intVal($res->NodeResShowKids) > 0) {
+                    $this->hasShowKids = true;
+                }
                 if (isset($GLOBALS["SL"]->fldOthers[$fld . 'Other'])
                     && intVal($GLOBALS["SL"]->fldOthers[$fld . 'Other']) > 0) {
                     if (in_array(strtolower(strip_tags($res->NodeResValue)), ['other', 'other:'])
@@ -391,7 +395,9 @@ class TreeNodeSurv extends TreeNodeCore
     
     public function chkFill()
     {
-        if (!$this->nodeRow || !isset($this->dataStore)) $this->fillNodeRow();
+        if ($this->nodeRow === null || !isset($this->nodeRow->NodeID)) {
+            $this->fillNodeRow();
+        }
         return true;
     }
     
@@ -615,7 +621,9 @@ class TreeNodeSurv extends TreeNodeCore
     
     public function getManipUpdate()
     {
-        if (!$this->isDataManip()) return ['', '', ''];
+        if (!$this->isDataManip()) {
+            return ['', '', ''];
+        }
         $this->fillNodeRow();
         if (trim($this->dataBranch) != '') {
             $tbl = $this->dataBranch;
@@ -629,9 +637,13 @@ class TreeNodeSurv extends TreeNodeCore
     
     public function printManipUpdate()
     {
-        if (!$this->isDataManip()) return '';
+        if (!$this->isDataManip()) {
+            return '';
+        }
         $manipUpdate = $this->getManipUpdate();
-        if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') return '';
+        if (trim($manipUpdate[0]) == '' || $manipUpdate[1] == '') {
+            return '';
+        }
         $ret = ' , ' . $manipUpdate[1] . ' = ';
         if (isset($this->responseSet) && intVal($this->responseSet) > 0) {
             $ret .= $GLOBALS["SL"]->def->getValById(intVal($this->responseSet));
@@ -651,14 +663,30 @@ class TreeNodeSurv extends TreeNodeCore
     {
         if (isset($this->nodeRow->NodeDefault) && trim($this->nodeRow->NodeDefault) != '' && empty($this->colors)) {
             $colors = explode(';;', $this->nodeRow->NodeDefault);
-            if (isset($colors[0])) $this->colors["blockBG"]      = $colors[0];
-            if (isset($colors[1])) $this->colors["blockText"]    = $colors[1];
-            if (isset($colors[2])) $this->colors["blockLink"]    = $colors[2];
-            if (isset($colors[3])) $this->colors["blockImg"]     = $colors[3];
-            if (isset($colors[4])) $this->colors["blockImgType"] = $colors[4];
-            if (isset($colors[5])) $this->colors["blockImgFix"]  = $colors[5];
-            if (isset($colors[6])) $this->colors["blockAlign"]   = $colors[6];
-            if (isset($colors[7])) $this->colors["blockHeight"]  = $colors[7];
+            if (isset($colors[0])) {
+                $this->colors["blockBG"] = $colors[0];
+            }
+            if (isset($colors[1])) {
+                $this->colors["blockText"] = $colors[1];
+            }
+            if (isset($colors[2])) {
+                $this->colors["blockLink"] = $colors[2];
+            }
+            if (isset($colors[3])) {
+                $this->colors["blockImg"] = $colors[3];
+            }
+            if (isset($colors[4])) {
+                $this->colors["blockImgType"] = $colors[4];
+            }
+            if (isset($colors[5])) {
+                $this->colors["blockImgFix"] = $colors[5];
+            }
+            if (isset($colors[6])) {
+                $this->colors["blockAlign"] = $colors[6];
+            }
+            if (isset($colors[7])) {
+                $this->colors["blockHeight"] = $colors[7];
+            }
         }
         return true;
     }

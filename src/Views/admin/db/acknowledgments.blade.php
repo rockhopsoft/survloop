@@ -3,8 +3,10 @@
 <div class="p5"></div>
 
 <div id="acknows" class="jumbotron w100 mT20">
-    <a href="http://www.amazon.com/gp/product/0321884493/" target="_blank"><img src="/survloop/uploads/hernandez.png" 
-        border=0 width=16% hspace=5 align=right ></a> 
+    <a href="http://www.amazon.com/gp/product/0321884493/" target="_blank"
+        ><img src="/survloop/uploads/hernandez.png" border=0 width=16% hspace=5 align=right 
+        alt="Database Design for Mere Mortals: A Hands-On Guide to Relational Database Design, by Michael J. Hernandez"
+        ></a> 
     <h2>Acknowledgments</h2>
     <p>
         Since its inception, the emerging database design tools have been striving to rely upon 

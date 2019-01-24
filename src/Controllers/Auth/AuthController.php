@@ -149,13 +149,19 @@ class AuthController extends Controller
             $sl = new SurvLoopController;
             $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
             $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
-            if ($request->has('previous')) {
-                return redirect($request->get('previous'));
+            if ($request->has('previous') && trim($request->get('previous')) != '') {
+                session()->put('previousUrl', trim($request->get('previous')));
             }
             return redirect('/afterLogin');
         }
+        $this->chkAuthPageOpts($request);
         return view('vendor.survloop.auth.login', [
-            "errorMsg" => 'That combination of password with that username or email did not work.' 
+            "request"      => $request,
+            "sysOpts"      => $GLOBALS["SL"]->sysOpts,
+            "midSurvRedir" => $this->midSurvRedir,
+            "midSurvBack"  => $this->midSurvBack,
+            "formFooter"   => $this->formFooter,
+            "errorMsg"     => 'That combination of password with that username or email did not work.' 
             ]);
         //return $this->getLogin($request);
         //return redirect($this->loginPath . '?error=1');
@@ -220,12 +226,17 @@ class AuthController extends Controller
             }
         }
         $this->chkGlobal($request);
+        if (!isset($GLOBALS["SL"]->sysOpts["footer-master"])) {
+            $sl = new SurvLoopController;
+            $sl->initCustViews();
+        }
         return true;
     }
     
     protected function loadNodeLoginPass(Request $request)
     {
-        if ($this->currNode && isset($this->currNode->NodeID)) {
+        if ($this->currNode && isset($this->currNode->NodeID) 
+            && $request->has('nd') && intVal($request->get('nd')) > 0) {
             $nID = $this->currNode->NodeID;
             $this->surv = new SurvLoop;
             $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
@@ -245,14 +256,14 @@ class AuthController extends Controller
             }
             
             $node2 = null; // reset in search of custom mid-survey language
-            if ($request->has('nd') && intVal($request->get('nd')) > 0) {
+            //if ($request->has('nd') && intVal($request->get('nd')) > 0) {
                 $nIn = intVal($request->get('nd'));
                 if ($this->surv->custLoop->allNodes[$nIn] 
                     && $this->surv->custLoop->allNodes[$nIn]->nodeType == 'User Sign Up') {
                     $node2 = $this->surv->custLoop->allNodes[$nIn];
                     $node2->fillNodeRow();
                 }
-            } else {
+            /* } else {
                 $node2 = $this->surv->custLoop->allNodes[$nID];
                 while ($node2 && $node2->nodeType != 'User Sign Up') {
                     $nID2 = $this->surv->custLoop->nextNode($nID);
@@ -265,7 +276,7 @@ class AuthController extends Controller
                 if ($node2 && $node2->nodeType == 'User Sign Up') {
                     $node2->fillNodeRow();
                 }
-            }
+            } */
             if ($node2 && isset($node2->nodeRow->NodePromptText) && trim($node2->nodeRow->NodePromptText) != '') {
                 $GLOBALS["SL"]->sysOpts["midsurv-instruct"] = $node2->nodeRow->NodePromptText;
             }

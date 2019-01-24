@@ -470,13 +470,19 @@ class TreeSurvInput extends TreeSurvUpload
         $this->v["emaBCC"] = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailBCC"]);
         $this->v["toList"] = '';
         if (sizeof($this->v["emaTo"]) > 0) {
-            foreach ($this->v["emaTo"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            foreach ($this->v["emaTo"] as $i => $e) {
+                $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            }
         }
         if (sizeof($this->v["emaCC"]) > 0) {
-            foreach ($this->v["emaCC"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            foreach ($this->v["emaCC"] as $i => $e) {
+                $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            }
         }
         if (sizeof($this->v["emaBCC"]) > 0) {
-            foreach ($this->v["emaBCC"] as $i => $e) $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            foreach ($this->v["emaBCC"] as $i => $e) {
+                $this->v["toList"] .= (($i > 0) ? ' ; ' : '') . $e[0];
+            }
         }
         return true;
     }

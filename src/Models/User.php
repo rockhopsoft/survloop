@@ -91,7 +91,9 @@ class User extends Model implements AuthenticatableContract,
                 ->select('SL_Definitions.DefSubset')
                 ->get();
             if ($chk->isNotEmpty()) {
-                foreach ($chk as $role) $this->SLRoles[] = $role->DefSubset;
+                foreach ($chk as $role) {
+                    $this->SLRoles[] = $role->DefSubset;
+                }
             } else {
                 $this->SLRoles[] = 'NO-ROLES';
             }

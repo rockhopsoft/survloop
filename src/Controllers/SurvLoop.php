@@ -224,26 +224,29 @@ class SurvLoop extends SurvCustLoop
     
     public function afterLogin(Request $request)
     {
-        if (session()->has('redir2') && trim(session()->get('redir2')) != '') {
-            $this->clearSessRedirs();
-            return redirect(trim(session()->get('redir2')));
+        $redir = '';
+        if (session()->has('previousUrl') && trim(session()->get('previousUrl')) != '') {
+            $redir = trim(session()->get('previousUrl'));
+        } elseif (session()->has('redir2') && trim(session()->get('redir2')) != '') {
+            $redir = trim(session()->get('redir2'));
         }
         if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0 
             && session()->has('loginRedir') && trim(session()->get('loginRedir')) != ''
             && session()->has('lastTreeTime') && session()->has('loginRedirTime')) {
             if (session()->get('lastTreeTime') < session()->get('loginRedirTime')) {
-                $this->clearSessRedirs();
-                return redirect(session()->get('loginRedir'));
+                $redir = trim(session()->get('loginRedir'));
             } else {
                 $this->afterLoginLastTree($request);
             }
         } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
             $this->afterLoginLastTree($request);
         } elseif (session()->has('loginRedir') && trim(session()->get('loginRedir')) != '') {
-            $this->clearSessRedirs();
-            return redirect(session()->get('loginRedir'));
+            $redir = trim(session()->get('loginRedir'));
         }
-        $this->clearSessRedirs();
+        if ($redir != '') {
+            $this->clearSessRedirs();
+            return redirect($redir);
+        }
         $this->loadLoop($request);
         return $this->custLoop->afterLogin($request);
     }
@@ -264,6 +267,7 @@ class SurvLoop extends SurvCustLoop
     
     protected function clearSessRedirs()
     {
+        session()->forget('previousUrl');
         session()->forget('redir2');
         session()->forget('lastTree');
         session()->forget('lastTreeTime');

@@ -45,9 +45,13 @@ class AdminTreeController extends AdminController
     		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
         }
         $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) ? session()->get('adminOverOpts') : '');
-        if (trim($this->v["currPage"][0]) == '') $this->v["currPage"][0] = '/dashboard/tree';
+        if (trim($this->v["currPage"][0]) == '') {
+            $this->v["currPage"][0] = '/dashboard/tree';
+        }
         
-        if (!isset($this->v["treeClassAdmin"])) $this->v["treeClassAdmin"] = new TreeSurvAdmin($request);
+        if (!isset($this->v["treeClassAdmin"])) {
+            $this->v["treeClassAdmin"] = new TreeSurvAdmin($request);
+        }
         $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $request);
         $this->initExtraCust();
         
@@ -218,7 +222,9 @@ class AdminTreeController extends AdminController
     public function indexPage(Request $request, $treeID)
     {
         $tree = SLTree::find($treeID);
-        if (!$tree || !isset($tree->TreeName)) return $this->redir('/dashboard/pages/list');
+        if (!$tree || !isset($tree->TreeName)) {
+            return $this->redir('/dashboard/pages/list');
+        }
         $this->treeID = $treeID;
         $this->dbID = $tree->TreeDatabase;
         $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
@@ -231,7 +237,7 @@ class AdminTreeController extends AdminController
         $treeAbout = view('vendor.survloop.admin.tree.page-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
         return view('vendor.survloop.master', $this->v);
-    }
+    }                                        
     
     public function treesList(Request $request)
     {
@@ -243,12 +249,22 @@ class AdminTreeController extends AdminController
             $tree->TreeType = 'Survey';
             $tree->TreeName = trim($request->newTreeName);
             $tree->TreeSlug = trim($request->newTreeSlug);
-            if ($tree->TreeSlug == '') $tree->TreeSlug = $GLOBALS["SL"]->slugify($request->newTreeName);
+            if ($tree->TreeSlug == '') {
+                $tree->TreeSlug = $GLOBALS["SL"]->slugify($request->newTreeName);
+            }
             $tree->TreeOpts = 1;
-            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) $tree->TreeOpts *= 3;
-            if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) $tree->TreeOpts *= 43;
-            if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) $tree->TreeOpts *= 41;
-            if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) $tree->TreeOpts *= 17;
+            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
+                $tree->TreeOpts *= 3;
+            }
+            if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) {
+                $tree->TreeOpts *= 43;
+            }
+            if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) {
+                $tree->TreeOpts *= 41;
+            }
+            if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
+                $tree->TreeOpts *= 17;
+            }
             $tree->save();
             $treeXML = new SLTree;
             $treeXML->TreeDatabase = $tree->TreeDatabase;
@@ -279,13 +295,25 @@ class AdminTreeController extends AdminController
             $tree->TreeType = 'Page';
             $tree->TreeName = trim($request->newPageName);
             $tree->TreeSlug = trim($request->newPageSlug);
-            if ($tree->TreeSlug == '') $tree->TreeSlug = $GLOBALS["SL"]->slugify($request->newPageName);
+            if ($tree->TreeSlug == '') {
+                $tree->TreeSlug = $GLOBALS["SL"]->slugify($request->newPageName);
+            }
             $tree->TreeOpts = 1;
-            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) $tree->TreeOpts *= 3;
-            if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) $tree->TreeOpts *= 43;
-            if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) $tree->TreeOpts *= 41;
-            if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) $tree->TreeOpts *= 17;
-            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) $tree->TreeOpts *= 13;
+            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
+                $tree->TreeOpts *= 3;
+            }
+            if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) {
+                $tree->TreeOpts *= 43;
+            }
+            if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) {
+                $tree->TreeOpts *= 41;
+            }
+            if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
+                $tree->TreeOpts *= 17;
+            }
+            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) {
+                $tree->TreeOpts *= 13;
+            }
             $tree->save();
             if ($tree->TreeOpts%13 == 0 && $request->has('reportPageTree') && intVal($request->reportPageTree) > 0) {
                 $chkTree = SLTree::find($request->reportPageTree);
@@ -308,10 +336,18 @@ class AdminTreeController extends AdminController
             $tree->TreeDesc = trim($request->newRedirTo);
             $tree->TreeSlug = trim($request->newRedirFrom);
             $tree->TreeOpts = 1;
-            if ($request->has('redirAdmOnly') && intVal($request->redirAdmOnly) == 1) $tree->TreeOpts *= 3;
-            if ($request->has('redirStfOnly') && intVal($request->redirStfOnly) == 1) $tree->TreeOpts *= 43;
-            if ($request->has('redirPrtOnly') && intVal($request->redirPrtOnly) == 1) $tree->TreeOpts *= 41;
-            if ($request->has('redirVolOnly') && intVal($request->redirVolOnly) == 1) $tree->TreeOpts *= 17;
+            if ($request->has('redirAdmOnly') && intVal($request->redirAdmOnly) == 1) {
+                $tree->TreeOpts *= 3;
+            }
+            if ($request->has('redirStfOnly') && intVal($request->redirStfOnly) == 1) {
+                $tree->TreeOpts *= 43;
+            }
+            if ($request->has('redirPrtOnly') && intVal($request->redirPrtOnly) == 1) {
+                $tree->TreeOpts *= 41;
+            }
+            if ($request->has('redirVolOnly') && intVal($request->redirVolOnly) == 1) {
+                $tree->TreeOpts *= 17;
+            }
             $tree->save();
             return $this->redir('/dashboard/pages/list');
         }
@@ -364,7 +400,9 @@ class AdminTreeController extends AdminController
         $this->v["autopages"] = [ "contact" => false ];
         if ($this->v["myPages"]->isNotEmpty()) {
             foreach ($this->v["myPages"] as $page) {
-                if ($page->TreeOpts%19 == 0) $this->v["autopages"]["contact"] = true;
+                if ($page->TreeOpts%19 == 0) {
+                    $this->v["autopages"]["contact"] = true;
+                }
             }
         }
         return view('vendor.survloop.admin.tree.pages', $this->v);
@@ -382,8 +420,7 @@ class AdminTreeController extends AdminController
             $GLOBALS["SL"]->treeRow->TreeOpts = 1;
             $opts = [3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
             foreach ($opts as $o) {
-                if ($GLOBALS["SL"]->REQ->has('opt' . $o . '') 
-                    && intVal($GLOBALS["SL"]->REQ->get('opt' . $o . '')) == $o) {
+                if ($GLOBALS["SL"]->REQ->has('opt' . $o) && intVal($GLOBALS["SL"]->REQ->get('opt' . $o)) == $o) {
                     $GLOBALS["SL"]->treeRow->TreeOpts *= $o;
                 }
             }
@@ -398,7 +435,9 @@ class AdminTreeController extends AdminController
         $this->admControlInit($request, '/dashboard/pages/snippets');
         if ($request->has('sublurb')) {
             $blurb = $this->blurbNew($request);
-            if ($blurb > 0) return $this->redir('/dashboard/pages/snippets/' . $blurb);
+            if ($blurb > 0) {
+                return $this->redir('/dashboard/pages/snippets/' . $blurb);
+            }
         }
         $this->v["blurbRows"] = SLDefinitions::where('DefSet', 'Blurbs')
             ->orderBy('DefSubset')
@@ -423,7 +462,9 @@ class AdminTreeController extends AdminController
         if ($request->has('dataStruct')) {
             if ($request->has('delSub') && intVal($request->input('delSub')) > 0) {
                 $found = SLDataSubsets::find($request->input('delSub'));
-                if ($found && isset($found->DataSubTree)) $found->delete();
+                if ($found && isset($found->DataSubTree)) {
+                    $found->delete();
+                }
             } elseif ($request->has('newSub') && $request->has('newSubset')) {
                 $splits = explode(':', $request->input('newSubset'));
                 $newSubset = new SLDataSubsets;
@@ -436,7 +477,9 @@ class AdminTreeController extends AdminController
                 $newSubset->save();
             } elseif ($request->has('delHelper')) {
                 $found = SLDataHelpers::find($request->input('delHelper'));
-                if ($found && isset($found->DataHelpTree)) $found->delete();
+                if ($found && isset($found->DataHelpTree)) {
+                    $found->delete();
+                }
             } elseif ($request->has('newHelper')) {
                 $splits = explode(':', $request->input('newHelper'));
                 $valFld = str_replace($splits[2].':', '', $request->input('newHelperValue'));
@@ -485,7 +528,9 @@ class AdminTreeController extends AdminController
             $this->loadDbFromNode($request, $request->nodeParentID);
         }
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/map?all=1&alt=1');
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') $this->v["currPage"][0] = '/dashboard/pages/list';
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+            $this->v["currPage"][0] = '/dashboard/pages/list';
+        }
         $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $this->v["currPage"][0]);
         if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
@@ -666,7 +711,9 @@ class AdminTreeController extends AdminController
         $coreTots = [ "core" => $coreID, "node" => -3, "date" => 0, "dur" => 0, "mobl" => false, "cmpl" => false, 
             "log" => [] ];
         eval("\$coreRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" . intVal($coreID) . ");");
-        if (!$coreRec || !isset($coreRec->updated_at)) return $coreTots;
+        if (!$coreRec || !isset($coreRec->updated_at)) {
+            return $coreTots;
+        }
         $cacheFile = '../storage/app/anlyz/t' . $this->custReport->treeID . '/c' . $coreID . '.php';
         if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
@@ -699,7 +746,9 @@ class AdminTreeController extends AdminController
                         $coreTots["dur"] = $dur;
                         if ($lastCreateDate > 0) {
                             $lastGap = strtotime($p->created_at)-$lastCreateDate;
-                            if ($lastGap > 3600) $durMinus += $lastGap;
+                            if ($lastGap > 3600) {
+                                $durMinus += $lastGap;
+                            }
                         } elseif ($dur > 3600) {
                             $durMinus += $dur;
                         }
@@ -810,10 +859,14 @@ class AdminTreeController extends AdminController
         $condsRaw = [];
         $condsTmp = $this->getRawConds();
         if ($condsTmp->isNotEmpty()) {
-            foreach ($condsTmp as $c) $condsRaw[] = SLConditions::find($c->CondID);
+            foreach ($condsTmp as $c) {
+                $condsRaw[] = SLConditions::find($c->CondID);
+            }
         }
         if ($condsRaw && sizeof($condsRaw) > 0) {
-            foreach ($condsRaw as $i => $c) $condsRaw[$i]->loadVals();
+            foreach ($condsRaw as $i => $c) {
+                $condsRaw[$i]->loadVals();
+            }
         }
         return $condsRaw;
     }
@@ -917,7 +970,9 @@ class AdminTreeController extends AdminController
             
             $this->genDbClasses($request->DbPrefix);
             
-            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
+            if (!$this->chkHasTreeOne()) {
+                return $this->redir('/fresh/survey', true);
+            }
             return $this->redir('/dashboard/tree/new');
         }
         return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);
@@ -934,7 +989,9 @@ class AdminTreeController extends AdminController
             $db = $this->freshDBstore($request, $db);
             $this->logPageVisit('/fresh/database', $db->DbID.';0');
             $this->genDbClasses($request->DbPrefix);
-            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
+            if (!$this->chkHasTreeOne()) {
+                return $this->redir('/fresh/survey', true);
+            }
             return $this->redir('/dashboard/tree/new');
         }
         return view('vendor.survloop.admin.fresh-install-setup-db', $this->v);

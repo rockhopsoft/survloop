@@ -13,7 +13,8 @@
     <div class="col-6">
     
         <a href="{{ $img->ImgFullFilename }}" target="_blank"
-            ><img src="{{ $img->ImgFullFilename }}" class="w100 brd"><br />
+            ><img src="{{ $img->ImgFullFilename }}" class="w100 brd" alt="{{ 
+                ((isset($img->ImgTitle))) ? $img->ImgTitle : '') }}"><br />
             {!! str_replace('/', '/ ', $GLOBALS["SL"]->urlClean($urlPrint)) !!}<br />
             <span class="slGrey"><i class="fa fa-external-link" aria-hidden="true"></i> Open In New Window</span></a>
         <div class="pT10">

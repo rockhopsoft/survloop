@@ -85,11 +85,12 @@
             @if (isset($currMeta["img"]) && trim($currMeta["img"]) != '') value="{{ $currMeta['img'] }}" @endif >
         <div class="row mT5">
             <div class="col-8">
-                <div class="prevImg brd"><img id="npageImgSelImg" 
-            @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
-                src="{{ $node->extraOpts["meta-img"] }}" 
-            @elseif (isset($GLOBALS['SL']->sysOpts['meta-img'])) src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif 
-                ></div>
+                <div class="prevImg brd"><img id="npageImgSelImg" alt="Page Social Sharing Image" 
+                @if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '')
+                    src="{{ $node->extraOpts["meta-img"] }}" 
+                @elseif (isset($GLOBALS['SL']->sysOpts['meta-img']))
+                    src="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}"
+                @endif ></div>
             </div>
             <div class="col-4 pT10">
                 <a href="javascript:;" class="btn btn-sm btn-secondary w100 mB10 openImgReset" id="imgResetpageImg"

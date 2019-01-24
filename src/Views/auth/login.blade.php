@@ -5,7 +5,7 @@
 <input type="hidden" id="isLoginID" name="isLogin" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="previous" 
-    @if (trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
+    @if (isset($midSurvRedir) && trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
     @elseif ($GLOBALS['SL']->REQ->has('redir')) value="{{ $GLOBALS['SL']->REQ->get('redir') }}"
     @elseif ($GLOBALS['SL']->REQ->has('previous')) value="{{ $GLOBALS['SL']->REQ->get('previous') }}"
     @else value="{{ URL::previous() }}"

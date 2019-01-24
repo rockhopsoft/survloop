@@ -86,10 +86,10 @@ Route::group(['middleware' => ['web']], function () {
     
     ///////////////////////////////////////////////////////////
     
+    Route::post('/login',      [ 'as' => 'login', 'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@postLogin' ]);
+    Route::get( '/login',      [ 'as' => 'login', 'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@getLogin' ]);
     Route::post('/register',   'SurvLoop\\Controllers\\Auth\\SurvRegisterController@register');
     Route::get( '/register',   'SurvLoop\\Controllers\\Auth\\AuthController@getRegister');
-    Route::post('/login',      'SurvLoop\\Controllers\\Auth\\AuthController@postLogin');
-    Route::get( '/login',      'SurvLoop\\Controllers\\Auth\\AuthController@getLogin');
     Route::post('/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
     Route::get( '/logout',     'SurvLoop\\Controllers\\Auth\\AuthController@getLogout');

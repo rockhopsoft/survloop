@@ -9,7 +9,7 @@
     @else
         <a class="socialTwit" target="_blank" href="{{ $GLOBALS['SL']->getLinkedinShareLnk($link,
             ((isset($title)) ? $title : '')) }}" style="color: #FFF;">
-            <div><img src="/survloop/uploads/spacer.gif"><i class="fa fa-linkedin" aria-hidden="true"></i> 
+            <div><img src="/survloop/uploads/spacer.gif" alt=""><i class="fa fa-linkedin" aria-hidden="true"></i> 
             <span>Link</span><div></a>
     @endif
 @endif
