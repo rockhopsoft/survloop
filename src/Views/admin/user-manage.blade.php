@@ -1,7 +1,5 @@
 <!-- resources/views/vendor/survloop/admin/user-manage.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
 <h1><i class="fa fa-users"></i> Manage User Privileges</h1>
@@ -11,10 +9,7 @@
     (<a href="/register" target="_blank">/register</a>, while logged out, easiest in a separate browser) 
     to first create the new user. Then reload this page and change their privileges here as needed.
 </div>
-
 <table class="table table-striped">
-<form name="mainPageForm" action="/dashboard/users?sub=1" method="post">
-<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <?php $cnt = 0; ?>
 @foreach ($printVoluns as $userSet)
@@ -33,30 +28,28 @@
         @endif
         <?php $cnt++; ?>
         <tr>
-            <td><b>{!! $volun->printUsername(true, '/dashboard/users/') !!}</b></td>
+            <td><b>{!! $volun->printUsername(true) !!}</b></td>
             <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a>
                 @if ($volun->hasVerifiedEmail())
                     <span class="slGrey"><i class="fa fa-check-circle-o mL10" aria-hidden="true"></i></span>
                 @endif
             </td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
+            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
                 value="volunteer" @if ($volun->hasRole('volunteer')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
+            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
                 value="partner" {{ $disableAdmin }} @if ($volun->hasRole('partner')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
+            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
                 value="staff" {{ $disableAdmin }} @if ($volun->hasRole('staff')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
+            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
                 value="databaser" {{ $disableAdmin }} @if ($volun->hasRole('databaser')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" 
+            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
                 value="administrator" {{ $disableAdmin }} @if ($volun->hasRole('administrator')) CHECKED @endif ></td>
         </tr>
     @empty
     @endforelse
 @endforeach
 
-</table><br />
-<center><input type="submit" value=" Save All Changes " class="btn btn-lg btn-primary f30"></center>
-</form>
+</table>
 
 <div class="adminFootBuff"></div>
 

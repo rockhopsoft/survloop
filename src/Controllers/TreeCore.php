@@ -1458,33 +1458,39 @@ class TreeCore extends SurvLoopController
      * @param  Request  $request
      * @return Response
      */
-    public function updateProfile(Request $request)
+    public function updateProfile()
     {
-        if ($request->user()) {
-            // $request->user() returns an instance of the authenticated user...
-            if ($request->user()->id == $request->uID || $request->user()->hasRole('administrator')) {
-                $user = User::find($request->uID);
-                $user->name = $request->name;
-                $user->email = $request->email;
+        if ($this->v["uID"] > 0) {
+            // $GLOBALS["SL"]->user() returns an instance of the authenticated user...
+            if ($this->v["uID"] == $GLOBALS["SL"]->REQ->uID || $this->v["user"]->hasRole('administrator')) {
+                $user = User::find($GLOBALS["SL"]->REQ->uID);
+                $user->name = $GLOBALS["SL"]->REQ->name;
+                $user->email = $GLOBALS["SL"]->REQ->email;
                 $user->save();
-                if ($request->has('roles') && is_array($request->roles) && sizeof($request->roles) > 0) {
-                    foreach ($user->rolesRanked as $i => $role) {
-                        if (in_array($role, $request->roles)) {
-                            if (!$user->hasRole($role)) $user->assignRole($role);
-                        } elseif ($user->hasRole($role)) {
-                            $user->revokeRole($role);
+                $user->loadRoles();
+                if ($GLOBALS["SL"]->REQ->has('roles') && is_array($GLOBALS["SL"]->REQ->roles)
+                    && sizeof($GLOBALS["SL"]->REQ->roles) > 0) {
+                    foreach ($user->roles as $i => $role) {
+                        if (in_array($role->DefID, $GLOBALS["SL"]->REQ->roles)) {
+                            if (!$user->hasRole($role->DefSubset)) {
+                                $user->assignRole($role->DefSubset);
+                            }
+                        } elseif ($user->hasRole($role->DefSubset)) {
+                            $user->revokeRole($role->DefSubset);
                         }
                     }
                 } else { // no roles selected, delete all that exist
-                    foreach ($user->rolesRanked as $i => $role) {
-                        if ($user->hasRole($role)) {
-                            $user->revokeRole($role);
+                    foreach ($user->roles as $i => $role) {
+                        if ($user->hasRole($role->DefSubset)) {
+                            $user->revokeRole($role->DefSubset);
                         }
                     }
                 }
+                $this->redir('/profile/' . urlencode($user->name), true);
+                return true;
             }
         }
-        return $this->redir('/dashboard/user/'.$request->uID);
+        return false;
     }
     
     public function setCurrUserProfile($uname = '')
@@ -1504,17 +1510,22 @@ class TreeCore extends SurvLoopController
     public function showProfileBasics()
     {
         if (isset($this->v["profileUser"]) && isset($this->v["profileUser"]) && isset($this->v["profileUser"]->id)) {
+            $this->v["profileUser"]->loadRoles();
             $this->v["canEdit"] = ($this->v["user"] 
                 && ($this->v["user"]->hasRole('administrator') || $this->v["user"]->id == $this->v["profileUser"]->id));
-            if ($this->v["uID"] > 0 && Session::has('success') && !$GLOBALS["SL"]->isHomestead()) {
-                $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password has been changed.';
-                $emaContent = '<h3>Password updated</h3><p>Hi ' . $this->v["user"]->name 
-                    . ',</p><p>We\'ve changed your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password, as you asked.'
-                    . 'To view or change your account information, visit <a href="' . $GLOBALS["SL"]->sysOpts["app-url"]
-                    . '/my-profile" target="_blank">your profile</a>.</p>'
-                    . '<p>If you did not ask to change your password we are here to help secure your account, '
-                    . 'just contact us.</p><p>–Your friends at ' . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
-                $this->sendEmail($emaContent, $emaSubject, [[$this->v["user"]->email, '']]);
+            if ($this->v["uID"] > 0) {
+                if ($GLOBALS["SL"]->REQ->has('edit') && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
+                    $this->updateProfile();
+                } elseif (Session::has('success') && !$GLOBALS["SL"]->isHomestead()) {
+                    $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password has been changed.';
+                    $emaContent = '<h3>Password updated</h3><p>Hi ' . $this->v["user"]->name 
+                        . ',</p><p>We\'ve changed your ' . $GLOBALS["SL"]->sysOpts["site-name"] 
+                        . ' password, as you asked. To view or change your account information, visit <a href="' 
+                        . $GLOBALS["SL"]->sysOpts["app-url"] . '/my-profile" target="_blank">your profile</a>.</p>'
+                        . '<p>If you did not ask to change your password we are here to help secure your account, '
+                        . 'just contact us.</p><p>–Your friends at ' . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
+                    $this->sendEmail($emaContent, $emaSubject, [[$this->v["user"]->email, '']]);
+                }
             }
             return view('vendor.survloop.profile', $this->v);
         }

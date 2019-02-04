@@ -1,11 +1,10 @@
 <!-- resources/views/vendor/survloop/auth/pass-change-form.blade.php -->
-<h3 class="mT0 mB20 slBlueDark">Change Password</h3>
 <form name="changePass" action="/change-my-password" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
-<div class="row">
-    <label for="old" class="col-4 control-label fPerc133 pT5">Old Password</label>
-    <div class="col-8">
+<div class="nodeWrap">
+    <div class="nPrompt"><label for="old">Old Password</label></div>
+    <div class="nFld">
         <input id="old" type="password" class="form-control passChgSub" name="old">
         @if ($errors->has('old'))
             <span class="form-text"><strong>{{ $errors->first('old') }}</strong></span>
@@ -13,11 +12,11 @@
     </div>
 </div>
 
-<div>&nbsp;</div>
+<div class="nodeHalfGap"></div>
 
-<div class="row">
-    <label for="password" class="col-4 control-label fPerc133 pT5">Password</label>
-    <div class="col-8">
+<div class="nodeWrap">
+    <div class="nPrompt"><label for="password">Password</label></div>
+    <div class="nFld">
         <span id="passStrng" class="mR20 red"></span>
         <input id="password" type="password" class="form-control passChgSub" name="password">
         @if ($errors->has('password'))
@@ -26,11 +25,11 @@
     </div>
 </div>
 
-<div>&nbsp;</div>
+<div class="nodeHalfGap"></div>
 
-<div class="row">
-    <label for="password-confirm" class="col-4 control-label fPerc133 pT5">Confirm Password</label>
-    <div class="col-8">
+<div class="nodeWrap">
+    <div class="nPrompt"><label for="password-confirm">Confirm Password</label></div>
+    <div class="nFld">
         <input id="password-confirm" type="password" class="form-control passChgSub" name="password_confirmation">
         @if ($errors->has('password_confirmation'))
             <span class="form-text"><strong>{{ $errors->first('password_confirmation') }}</strong></span>
@@ -38,10 +37,12 @@
     </div>
 </div>
 
-<div>&nbsp;</div>
+<div class="nodeHalfGap"></div>
 
-<div id="passChgErrs" class="float-left red"></div>
-<center><a id="passChgSub" class="btn btn-primary btn-lg" href="javascript:;">Submit</a></center>
+<div id="passChgErrs" class="red"></div>
+<div class="nodeHalfGap"></div>
+<center><a id="passChgSub" class="btn btn-primary btn-xl" href="javascript:;">Change Password</a></center>
+<div class="nodeHalfGap"></div>
 </form>
 
 <script async defer type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">

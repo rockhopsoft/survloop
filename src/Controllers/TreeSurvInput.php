@@ -144,6 +144,7 @@ class TreeSurvInput extends TreeSurvUpload
             if (sizeof($tmpSubTier[1]) > 0) {
                 $this->tableDat = $this->loadTableDat($curr, [], $tmpSubTier);
                 $GLOBALS["SL"]->currCyc["tbl"][0] = $this->tableDat["tbl"];
+//if ($nID == 589) { echo '<pre>'; print_r($this->tableDat); echo '</pre>'; exit; }
                 for ($i = 0; $i < $this->tableDat["maxRow"]; $i++) {
                     $hasRow = false;
                     $fldVals = [];
@@ -153,9 +154,13 @@ class TreeSurvInput extends TreeSurvUpload
                         $tmpFldName = 'n' . $kidNode[0] . $nSffx . 'tbl' . $i . 'fld';
                         if ($GLOBALS["SL"]->REQ->has($tmpFldName)) {
                             if (is_array($GLOBALS["SL"]->REQ->get($tmpFldName))) {
-                                if (sizeof($GLOBALS["SL"]->REQ->get($tmpFldName)) > 0) $hasRow = true;
+                                if (sizeof($GLOBALS["SL"]->REQ->get($tmpFldName)) > 0) {
+                                    $hasRow = true;
+                                }
                             } else {
-                                if (trim($GLOBALS["SL"]->REQ->get($tmpFldName)) != '') $hasRow = true;
+                                if (trim($GLOBALS["SL"]->REQ->get($tmpFldName)) != '') {
+                                    $hasRow = true;
+                                }
                                 if ($kidTbl == $this->tableDat["tbl"]) {
                                     $fldVals[$kidFld] = trim($GLOBALS["SL"]->REQ->get($tmpFldName));
                                 }
@@ -177,8 +182,11 @@ class TreeSurvInput extends TreeSurvUpload
                                     $this->sessData->deleteDataRecordByID($this->tableDat["tbl"], $recObj->getKey());
                                 }
                             }
-                            if ($recObj) $this->tableDat["rows"][$i]["id"] = $recObj->getKey();
-                            else $this->tableDat["rows"][$i]["id"] = -3;
+                            if ($recObj) {
+                                $this->tableDat["rows"][$i]["id"] = $recObj->getKey();
+                            } else {
+                                $this->tableDat["rows"][$i]["id"] = -3;
+                            }
                         }
                     } else { // user adds rows as they go
                         if ($hasRow) {

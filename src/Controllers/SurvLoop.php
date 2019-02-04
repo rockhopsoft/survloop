@@ -243,6 +243,10 @@ class SurvLoop extends SurvCustLoop
         } elseif (session()->has('loginRedir') && trim(session()->get('loginRedir')) != '') {
             $redir = trim(session()->get('loginRedir'));
         }
+        $this->loadDomain();
+        if (in_array($redir, ['/', '/home', $this->domainPath, $this->domainPath . '/'])) {
+            $redir = '/my-profile';
+        }
         if ($redir != '') {
             $this->clearSessRedirs();
             return redirect($redir);

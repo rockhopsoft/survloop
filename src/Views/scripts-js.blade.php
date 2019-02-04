@@ -143,16 +143,15 @@ function setFormLabelRed(nIDtxt) {
                 foundFocus = errorFocus[j][1];
             }
         }
-        if (foundFocus != "") {
+        /* if (foundFocus != "") {
             document.getElementById(foundFocus).focus();
         } else if (document.getElementById("n"+nIDtxt+"FldID")) {
             document.getElementById("n"+nIDtxt+"FldID").focus();
         } else if (document.getElementById("n"+nIDtxt+"fld0")) {
             document.getElementById("n"+nIDtxt+"fld0").focus();
-        } else {
-            scrollTo(document.getElementById("#n"+nIDtxt+""));
-            /* window.location="#n"+nIDtxt+""; */
         }
+        scrollTo(document.getElementById("#n"+nIDtxt+""));
+        /* window.location="#n"+nIDtxt+""; */
     }
 	if (document.getElementById("node"+nIDtxt+"")) {
 	    document.getElementById("node"+nIDtxt+"").className=document.getElementById("node"+nIDtxt+"").className.replace("nodeWrap", "nodeWrapError").replace("nodeWrapErrorError", "nodeWrapError");

@@ -499,8 +499,9 @@ class SurvLoopController extends Controller
                 $redir = $appUrl->DefDescription . $path;
             }
         }
-        if (!$js) return redirect($redir);
-        else {
+        if (!$js) {
+            return redirect($redir);
+        } else {
             echo '<script type="text/javascript"> setTimeout("top.location.href=\'' . $redir . '\'", 10); </script>';
             exit;
         }

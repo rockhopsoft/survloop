@@ -48,15 +48,21 @@ class User extends Model implements AuthenticatableContract,
     
     public function printUsername($link = true, $baseurl = '/profile/')
     {
-        if ($link) return '<a href="' . $baseurl . urlencode($this->name) . '">' . $this->name . '</a>';
+        if ($link) {
+            return '<a href="' . $baseurl . urlencode($this->name) . '">' . $this->name . '</a>';
+        }
         return $this->name;
     }
     
     public function printCasualUsername($link = true, $baseurl = '/profile/', $preFix = '')
     {
         $uName = $this->name;
-        if (strpos($uName, ' ') !== false) $uName = substr($uName, 0, strpos($uName, ' '));
-        if ($link) return '<a href="' . $baseurl . urlencode($this->name) . '">' . $preFix . $uName . '</a>';
+        if (strpos($uName, ' ') !== false) {
+            $uName = substr($uName, 0, strpos($uName, ' '));
+        }
+        if ($link) {
+            return '<a href="' . $baseurl . urlencode($this->name) . '">' . $preFix . $uName . '</a>';
+        }
         return $uName;
     }
     
@@ -79,7 +85,7 @@ class User extends Model implements AuthenticatableContract,
     public function loadRoles()
     {
         if (empty($this->roles)) {
-            $this->roles = SLDefinitions::select('DefID', 'DefSubset')
+            $this->roles = SLDefinitions::select('DefID', 'DefSubset', 'DefValue')
                 ->where('DefDatabase', 1)
                 ->where('DefSet', 'User Roles')
                 ->orderBy('DefOrder')
@@ -104,11 +110,15 @@ class User extends Model implements AuthenticatableContract,
     public function hasRole($role)
     {
         $this->loadRoles();
-        if (strpos($role, '|') === false) return in_array($role, $this->SLRoles);
+        if (strpos($role, '|') === false) {
+            return in_array($role, $this->SLRoles);
+        }
         $ret = false;
         $roles = explode('|', $role);
         foreach ($roles as $r) {
-            if (in_array($r, $this->SLRoles)) $ret = true;
+            if (in_array($r, $this->SLRoles)) {
+                $ret = true;
+            }
         }
         return $ret;
     }
@@ -152,7 +162,9 @@ class User extends Model implements AuthenticatableContract,
             $roles = $this->SLRoles;
             $this->SLRoles = [];
             foreach ($roles as $r) {
-                if ($r != $role) $this->SLRoles[] = $r;
+                if ($r != $role) {
+                    $this->SLRoles[] = $r;
+                }
             }
         }
         return true;
@@ -162,7 +174,9 @@ class User extends Model implements AuthenticatableContract,
     {
         $this->loadRoles();
         foreach ($this->roles as $role) {
-            if ($this->hasRole($role->DefSubset)) return $role->DefSubset;                                             
+            if ($this->hasRole($role->DefSubset)) {
+                return $role->DefSubset;
+            }
         }
         return '';
     }
@@ -176,7 +190,9 @@ class User extends Model implements AuthenticatableContract,
                 $retVal .= ', ' . ucfirst($role->DefSubset);
             }
         }
-        if ($retVal != '') $retVal = substr($retVal, 2);
+        if ($retVal != '') {
+            $retVal = substr($retVal, 2);
+        }
         return $retVal;
     }
     

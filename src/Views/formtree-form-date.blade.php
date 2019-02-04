@@ -24,7 +24,7 @@
         class="form-control form-control-lg  @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mL5" style="width: 100px;"
         {!! $GLOBALS["SL"]->tabInd() !!}>
         <option value="0000" @if ($year == 'YYYY' || intVal($year) == 0) SELECTED @endif >year</option>
-        @for ($i = intVal(date("Y")); $i > (intVal(date("Y"))-80); $i--)
+        @for ($i = intVal(date("Y")); $i > (intVal(date("Y"))-100); $i--)
             <option @if ($i < 10) value="0{{ $i }}" @else value="{{ $i }}" @endif
                 @if ($i == $year) SELECTED @endif >{{ $i }}</option>
         @endfor

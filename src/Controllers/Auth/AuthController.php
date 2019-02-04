@@ -125,7 +125,8 @@ class AuthController extends Controller
     {
         $this->chkAuthPageOpts($request);
         if (Auth::user() && isset(Auth::user()->id)) {
-            return redirect($this->redirectPath());
+            return redirect('/my-profile');
+            //return redirect($this->redirectPath());
         }
         return view('vendor.survloop.auth.login', [
             "request"      => $request,

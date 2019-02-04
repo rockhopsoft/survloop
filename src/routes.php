@@ -251,10 +251,7 @@ Route::group(['middleware' => ['web']], function () {
         return $response;
     });
     
-    
-    
     ///////////////////////////////////////////////////////////
-    
     
     Route::get( '/admin', [
         'uses'       => 'SurvLoop\\Controllers\\AdminController@loadPageDashboard', 
@@ -271,24 +268,24 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::post('/profile/{uname}',     [
+    Route::post('/profile/{uname}', [
         'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showProfile',
         'middleware' => 'auth'
     ]);
     Route::get( '/profile/{uname}', 'SurvLoop\\Controllers\\SurvLoop@showProfile');
-    Route::post('/my-profile',     [
+    Route::post('/my-profile', [
         'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showMyProfile',
         'middleware' => 'auth'
     ]);
-    Route::get( '/my-profile',     [
+    Route::get( '/my-profile', [
         'uses'       => 'SurvLoop\\Controllers\\SurvLoop@showMyProfile',
         'middleware' => 'auth'
     ]);
-    Route::post('/change-my-password',     [
+    Route::post('/change-my-password', [
         'uses'       => 'SurvLoop\\Controllers\\Auth\\UpdatePasswordController@runUpdate',
         'middleware' => 'auth'
     ]);
-    Route::get( '/change-my-password',     [
+    Route::get( '/change-my-password', [
         'uses'       => 'SurvLoop\\Controllers\\Auth\\UpdatePasswordController@runUpdate',
         'middleware' => 'auth'
     ]);

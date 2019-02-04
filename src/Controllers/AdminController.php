@@ -557,25 +557,6 @@ class AdminController extends SurvLoopController
     public function userManage(Request $request)
     {
         $this->admControlInit($request, '/dashboard/users', 'administrator|staff');
-        if ($request->has('sub')) {
-            $users = User::where('name', 'NOT LIKE', 'Session#%')
-                ->get();
-            if ($users->isNotEmpty()) {
-                $users[0]->loadRoles();
-                $roles = $users[0]->roles;
-                foreach ($users as $i => $usr) {
-                    foreach ($roles as $role) {
-                        if ($request->has('user'.$usr->id) && in_array($role->DefSubset, $request->get('user'.$usr->id))) {
-                            if (!$usr->hasRole($role->DefSubset)) {
-                                $usr->assignRole($role->DefSubset);
-                            }
-                        } elseif ($usr->hasRole($role->DefSubset)) {
-                            $usr->revokeRole($role->DefSubset);
-                        }
-                    }
-                }
-            }
-        }
         $this->loadPrintUsers();
         return view('vendor.survloop.admin.user-manage', $this->v);
     }

@@ -850,12 +850,12 @@ class SurvData
             }
         } elseif ($action == 'update' && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
-                if (trim($newVal) == '') {
-                    $newVal = null;
-                } else {
-                    $newVal = intVal($newVal);
-                }
+            if (trim($newVal) == '' && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
+                $newVal = null;
+            } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
+                $newVal = intVal($newVal);
+            } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DOUBLE') {
+                $newVal = floatval($newVal);
             } else {
                 $newVal = strip_tags($newVal);
             }

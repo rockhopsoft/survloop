@@ -110,19 +110,20 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]]);
             }
             if ($this->allNodes[$nID]->isStepLoop() && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn"'
-                    . ' ><i class="fa fa-arrow-circle-o-right"></i> ' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' slTab nFormNext" '
+                    . 'id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() . ' ><i class="fa fa-arrow-circle-o-right"></i> '
+                    . $nextLabel . '</a>';
             } else {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn"'
-                    . ' >' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' slTab nFormNext" '
+                    . 'id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() . ' >' . $nextLabel . '</a>';
                 //$ret .= '<input type="button" value="' . $nextLabel 
                 //    . '" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn">';
             }
         }
         if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID
             && ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0)) {
-            $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize . ' nFormBack" id="nFormBack"'
-                . ' >Back</a>';
+            $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize 
+                . ' slTab nFormBack" id="nFormBack" ' . $GLOBALS["SL"]->tabInd() . ' >Back</a>';
             //$ret .= '<input type="button" value="Back" class="fL nFormBack btn btn-lg btn-secondary" id="nFormBack">';
         }
         $ret .= '<div class="clearfix p5"></div></div><div class="disNon"><input type="submit"></div>';
