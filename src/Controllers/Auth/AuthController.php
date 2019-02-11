@@ -72,7 +72,7 @@ class AuthController extends Controller
             'name' => 'required|max:50|unique:users',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|confirmed|min:8',
-        ]);
+            ]);
         /* if ($validator->fails()) {
             echo $validator->messages()->toJson(); exit;
         } */
@@ -87,6 +87,9 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
+        if (!isset($data['name']) || trim($data['name']) == '') {
+            $data['name'] = $data['email'];
+        }
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -106,11 +109,7 @@ class AuthController extends Controller
     public function getRegister(Request $request)
     {
         $this->chkAuthPageOpts($request);
-        $emailRequired = 'false';
-        if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
-            || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off') {
-            $emailRequired = 'true';
-        }
+        $emailRequired = 'true';
         return view('vendor.survloop.auth.register', [
             "request"       => $request,
             "sysOpts"       => $GLOBALS["SL"]->sysOpts,
@@ -249,7 +248,7 @@ class AuthController extends Controller
             $node2->fillNodeRow();
             $this->midSurvRedir = '/u/' . $this->currTree->TreeSlug . '/' . $node2->nodeRow->NodePromptNotes;
             
-            $backPageNode = $this->surv->custLoop->getPrevOfType($nID);
+            $backPageNode = $this->surv->custLoop->getPrevOfTypeWithConds($nID);
             if ($backPageNode > 0) {
                 $node2 = $this->surv->custLoop->allNodes[$backPageNode];
                 $node2->fillNodeRow();

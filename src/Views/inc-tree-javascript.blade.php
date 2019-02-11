@@ -3,6 +3,10 @@
 // treeMajorSects[major-index] = [nodeID, 'Section Title', 'status']
 // treeMinorSects[major-index][minor-index] = [nodeID, 'Section Title', 'status', 'url']
 */ ?>
+currTree = {{ $GLOBALS["SL"]->treeID }};
+treeMajorSects = new Array();
+treeMinorSects = new Array();
+treeMajorSectsDisabled = new Array();
 @forelse ($majorSections as $maj => $majSect)
 treeMajorSects[{{ $maj }}] = new Array({{ $majSect[0] }}, "{{ $majSect[1] }}", "/", "disabled");
 treeMinorSects[{{ $maj }}] = new Array();
@@ -21,5 +25,11 @@ treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url
         @empty
         @endforelse
     @endif
+@empty
+@endforelse
+
+treeProTips = new Array();
+@forelse ($GLOBALS["SL"]->proTips as $i => $tip)
+treeProTips[treeProTips.length] = '{{ str_replace("'", "&#39;", $tip) }}';
 @empty
 @endforelse

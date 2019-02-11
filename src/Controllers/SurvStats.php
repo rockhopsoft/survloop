@@ -136,7 +136,9 @@ class SurvStats extends SurvStatsCache
                 if (sizeof($this->tagMap) > 0) {
                     foreach ($this->tagMap as $tagLet => $t) {
                         if (isset($t["val"]) && sizeof($t["val"]) > 0) {
-                            foreach ($t["val"] as $v => $tagVal) $this->calcTagAvg($datLet, $tagLet . $tagVal);
+                            foreach ($t["val"] as $v => $tagVal) {
+                                $this->calcTagAvg($datLet, $tagLet . $tagVal);
+                            }
                         }
                     }
                 }   
@@ -252,7 +254,9 @@ class SurvStats extends SurvStatsCache
     
     public function getDatCnt($fStr = '1', $datAbbr = '')
     {
-        if (trim($datAbbr) != '') return $this->getDatCntForDat($fStr, $datAbbr);
+        if (trim($datAbbr) != '') {
+            return $this->getDatCntForDat($fStr, $datAbbr);
+        }
         if (isset($this->dat[$fStr])) {
             return $this->dat[$fStr]["cnt"];
         }

@@ -17,7 +17,7 @@
 
 <div class="row pB20">
     <div class="col-3">
-        <h3 class="m0 slGrey">Auto-Email Type</h3>
+        <h4 class="m0 slGrey">Auto-Email Type</h4>
     </div>
     <div class="col-9">
         <select name="emailType" class="form-control form-control-lg" 
@@ -31,7 +31,7 @@
 
 <div class="row pB20">
     <div class="col-3">
-        <h3 class="m0 slGrey">Internal Name</h3>
+        <h4 class="m0 slGrey">Internal Name</h4>
     </div>
     <div class="col-9">
         <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" class="form-control form-control-lg" >
@@ -40,21 +40,23 @@
 
 <div id="subj" class="row pB20 @if ($currEmail->EmailType == 'Blurb') disNon @else disBlo @endif ">
     <div class="col-3">
-        <h3 class="m0 slGrey">Email Subject Line</h3>
+        <h4 class="m0 slGrey">Email Subject Line</h4>
     </div>
     <div class="col-9">
-        <input type="text" name="emailSubject" value="{{ $currEmail->EmailSubject }}" class="form-control form-control-lg" >
+        <input type="text" name="emailSubject" value="{{ $currEmail->EmailSubject }}" 
+            class="form-control form-control-lg" >
     </div>
 </div>
 
 <div class="row pB20">
     <div class="col-3">
-        <h3 class="m0 slGrey">Email Body</h3>
+        <h4 class="m0 slGrey">Email Body</h4>
         <div class="p20"></div>
         <input type="submit" class="btn btn-xl btn-primary w100" value="Save Email Template">
     </div>
     <div class="col-9">
-        <textarea name="emailBody" id="emailBodyID" class="form-control form-control-lg" style="height: 500px;">{{ $currEmail->EmailBody }}</textarea>
+        <textarea name="emailBody" id="emailBodyID" class="form-control form-control-lg" style="height: 500px;"
+            >{{ $currEmail->EmailBody }}</textarea>
     </div>
 </div>
 

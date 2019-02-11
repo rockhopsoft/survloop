@@ -201,7 +201,7 @@ class Searcher extends SurvCustLoop
     
     public function searchResultsNone($treeID = 1)
     {
-        return '<div class="jumbotron"><h4><i>No records were found matching your search.</i></h4></div>';
+        return '<h4>No records were found matching your search.</h4>';
     }
     
     public function searchResultsFeatured($treeID = 1)

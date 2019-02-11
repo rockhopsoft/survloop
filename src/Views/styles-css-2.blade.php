@@ -1,7 +1,7 @@
 /* generated from resources/views/vendor/survloop/styles-css-2.blade.php */
 
 html, body {
-    font-size: 15px;
+    font-size: 16px;
 }
 body, p, .slTxt {
     color: {!! $css["color-main-text"] !!};
@@ -414,7 +414,7 @@ a.socialFace:link div, a.socialFace:visited div, a.socialFace:active div, a.soci
 }
 .pageBotGap {
 	width: 100%;
-	padding-top: 10px;
+	padding-top: 30px;
 	clear: both;
 }
 .nodeGap {
@@ -731,7 +731,6 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
 }
 .subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p, .finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
-	/* color: {!! $css["color-main-grey"] !!}; */
 }
 .finger .subNote, .fingerAct .subNote {
     margin-top: 0px;
@@ -832,27 +831,14 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 }
 .wrapItemOff {
 	display: none;
-	background: {!! $css["color-danger-off"] !!};
+	background: {!! $css["color-main-faint"] !!};
 	color: {!! $css["color-main-grey"] !!};
 	padding: 15px;
 	-moz-border-radius: 5px; border-radius: 5px;
 }
-
-
-.uploadWrap {
-	padding: 10px 20px;
-	border: 1px {!! $css["color-main-off"] !!} dotted;
-	-moz-border-radius: 20px; border-radius: 20px;
-}
-.uploadWrap .uploadTypes {
-	width: 100%;
-}
-hr, .uploadWrap hr {
-    border: 0px;
-    border-top: 1px {!! $css["color-line-hr"] !!} dotted;
-}
-.uploadedWrap {
-    margin-bottom: 10px;
+.loopItemBtn {
+    width: 90px;
+    margin: 5px 10px 0px 0px;
 }
 
 #reportTakeActions {
@@ -1171,6 +1157,7 @@ table.detailList tr td {
 	position: relative;
 	margin: 0px;
 	width: 100%;
+	min-width: 440px;
 	background: none;
 }
 #fixedHeader h1, #fixedHeader h2 {
@@ -1205,9 +1192,6 @@ label { font-weight: normal; }
 	height: 30px;
 	width: 30px;
 	-moz-border-radius: 15px; border-radius: 15px;
-	color: {!! $css["color-main-off"] !!};
-	background: {!! $css["color-main-faint"] !!};
-	border: 1px {!! $css["color-main-off"] !!} solid;
 }
 .stepNum i {
     margin-top: 4px;
@@ -1216,27 +1200,43 @@ label { font-weight: normal; }
     width: 1px;
     height: 15px;
     margin: 10px 0px 7px 0px;
-    border-left: 1px {!! $css["color-main-off"] !!} solid;
+    border-left: 1px {!! $css["color-main-grey"] !!} solid;
 }
 .navVertLine2 {
     height: 30px;
 }
-.navDeskMaj.completed .stepNum, .navDeskMin.completed .stepNum {
-	color: {!! $css["color-main-off"] !!};
+.stepNum, .navDeskMaj .stepNum, .navDeskMin .stepNum {
+	color: {!! $css["color-main-grey"] !!};
 	background: {!! $css["color-main-bg"] !!};
-	border: 1px {!! $css["color-main-on"] !!} solid;
+	border: 1px {!! $css["color-main-grey"] !!} solid;
 }
-.navDeskMaj.active .stepNum, .navDeskMin.active .stepNum {
-	color: {!! $css["color-main-on"] !!};
+.navDeskMaj.active .stepNum, .navDeskMin.active .stepNum,
+.navDeskMaj.completed .stepNum, .navDeskMin.completed .stepNum {
+	color: {!! $css["color-main-link"] !!};
 	background: {!! $css["color-main-faint"] !!};
-	border: 1px {!! $css["color-main-on"] !!} solid;
-	box-shadow: 0px 0px 2px {!! $css["color-main-faint"] !!};
+	border: 1px {!! $css["color-main-link"] !!} solid;
 }
 .navDeskMaj.active .navVertLine, .navDeskMaj.completed .navVertLine, 
 .navDeskMaj.active .navVertLine2, .navDeskMaj.completed .navVertLine2
 .navDeskMin.active .navVertLine, .navDeskMin.completed .navVertLine, 
 .navDeskMin.active .navVertLine2, .navDeskMin.completed .navVertLine2 {
-	border-left: 1px {!! $css["color-main-off"] !!} solid;
+	border-left: 1px {!! $css["color-main-grey"] !!} solid;
+}
+.navDeskMaj.active .navVertLine, .navDeskMaj.active .navVertLine2,
+.navDeskMaj.completed .navVertLine, .navDeskMaj.completed .navVertLine2 {
+    border-left: 1px {!! $css["color-main-link"] !!} solid;
+}
+a.navDeskMaj:link, a.navDeskMaj:visited, a.navDeskMaj:active, a.navDeskMaj:hover,
+a.navDeskMin:link, a.navDeskMin:visited, a.navDeskMin:active, a.navDeskMin:hover {
+    cursor: not-allowed;
+    color: {!! $css["color-main-grey"] !!};
+}
+a.navDeskMaj.active:link, a.navDeskMaj.active:visited, a.navDeskMaj.active:active, a.navDeskMaj.active:hover,
+a.navDeskMaj.completed:link, a.navDeskMaj.completed:visited, a.navDeskMaj.completed:active, a.navDeskMaj.completed:hover,
+a.navDeskMin.active:link, a.navDeskMin.active:visited, a.navDeskMin.active:active, a.navDeskMin.active:hover,
+a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.completed:active, a.navDeskMin.completed:hover {
+    cursor: pointer;
+    color: {!! $css["color-main-link"] !!};
 }
 .minorNavWrap {
     display: none;
@@ -1804,7 +1804,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 
 .red, .redDrk, h1.red, h2.red, h3.red, label .red { color: {!! $css["color-danger-on"] !!}; }
 
-.blk { color: {!! $css["color-main-text"] !!}; }
+.blk, a.blk:link, a.blk:active, a.blk:visited, a.blk:hover { color: {!! $css["color-main-text"] !!}; }
 .wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: {!! $css["color-main-bg"] !!}; }
 .fnt, b.fnt, a.fnt:link, a.fnt:active, a.fnt:visited, a.fnt:hover { color: {!! $css["color-main-faint"] !!}; }
 .gry4 { color: #444; }

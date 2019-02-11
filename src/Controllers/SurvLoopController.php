@@ -232,12 +232,18 @@ class SurvLoopController extends Controller
         if (!session()->has('chkSysInit') || $GLOBALS["SL"]->REQ->has('refresh')) {
             $sysChk = User::select('id')
                 ->get();
-            if ($sysChk->isEmpty()) return $this->freshUser($GLOBALS["SL"]->REQ);
+            if ($sysChk->isEmpty()) {
+                return $this->freshUser($GLOBALS["SL"]->REQ);
+            }
             $sysChk = SLDatabases::select('DbID')
                 ->where('DbUser', '>', 0)
                 ->get();
-            if ($sysChk->isEmpty()) return $this->redir('/fresh/database', true);
-            if (!$this->chkHasTreeOne()) return $this->redir('/fresh/survey', true);
+            if ($sysChk->isEmpty()) {
+                return $this->redir('/fresh/database', true);
+            }
+            if (!$this->chkHasTreeOne()) {
+                return $this->redir('/fresh/survey', true);
+            }
             $survInst = new SurvLoopInstaller;
             $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
@@ -488,14 +494,14 @@ class SurvLoopController extends Controller
     public function redir($path, $js = false)
     {
         $redir = $path;
-        if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
+        if (isset($GLOBALS["SL"]->sysOpts["app-url"]) && strpos($path, $GLOBALS["SL"]->sysOpts["app-url"]) != 0) {
             $redir = $GLOBALS["SL"]->sysOpts["app-url"] . $path;
         } else {
             $appUrl = SLDefinitions::where('DefDatabase', 1)
                 ->where('DefSet', 'System Settings')
                 ->where('DefSubset', 'app-url')
                 ->first();
-            if ($appUrl && isset($appUrl->DefDescription)) {
+            if ($appUrl && isset($appUrl->DefDescription) && strpos($path, $appUrl->DefDescription) != 0) {
                 $redir = $appUrl->DefDescription . $path;
             }
         }

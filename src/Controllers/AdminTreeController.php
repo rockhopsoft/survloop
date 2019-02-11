@@ -159,7 +159,10 @@ class AdminTreeController extends AdminController
         return true;
     }
     
-    protected function initExtraCust() { return true; }
+    protected function initExtraCust()
+    {
+        return true;
+    }
     
     protected function loadBelowAdmMenu()
     {
@@ -174,15 +177,15 @@ class AdminTreeController extends AdminController
         if (!$this->checkCache()) {
             $this->chkAllCoreTbls();
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
-            $this->v["ipLegal"] = view('vendor.survloop.dbdesign-legal', [
-                "sysOpts" => $GLOBALS["SL"]->sysOpts
-            ])->render();
+            $this->v["ipLegal"] = view('vendor.survloop.dbdesign-legal', 
+                [ "sysOpts" => $GLOBALS["SL"]->sysOpts ])->render();
             $this->v["content"] = view('vendor.survloop.admin.tree.tree', $this->v)->render();
             $this->saveCache();
         }
         $treeAbout = view('vendor.survloop.admin.tree.tree-about', [ "showAbout" => false ])->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
         if ($request->has('refresh')) {
+            $this->v["treeClassAdmin"]->createProgBarJs();
             $GLOBALS["SL"]->pageJAVA .= 'setTimeout('
                 . '"document.getElementById(\'hidFrameID\').src=\'/dashboard/css-reload\'", 2000);';
         }
@@ -418,16 +421,46 @@ class AdminTreeController extends AdminController
             $GLOBALS["SL"]->treeRow->TreeSlug      = trim($request->get('TreeSlug'));
             $GLOBALS["SL"]->treeRow->TreeCoreTable = $GLOBALS["SL"]->tblI[$request->get('TreeCoreTable')];
             $GLOBALS["SL"]->treeRow->TreeOpts = 1;
-            $opts = [3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+            $opts = [2, 3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
             foreach ($opts as $o) {
                 if ($GLOBALS["SL"]->REQ->has('opt' . $o) && intVal($GLOBALS["SL"]->REQ->get('opt' . $o)) == $o) {
                     $GLOBALS["SL"]->treeRow->TreeOpts *= $o;
                 }
             }
             $GLOBALS["SL"]->treeRow->save();
+            $this->storeProTips($request);
             return redirect('/dashboard/surv-' . $treeID . '/map?all=1&alt=1&refresh=1');
         }
         return view('vendor.survloop.admin.tree.settings', $this->v);
+    }
+    
+    public function storeProTips(Request $request)
+    {
+        for ($i = 0; $i < 20; $i++) {
+            if ($request->has('proTip' . $i) && trim($request->get('proTip' . $i)) != '') {
+                $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+                    ->where('DefSet', 'Tree Settings')
+                    ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip')
+                    ->where('DefOrder', $i)
+                    ->update([ 'DefDescription' => $request->get('proTip' . $i) ]);
+                if (!$chk) {
+                    $chk = new SLDefinitions;
+                    $chk->DefDatabase    = $this->dbID;
+                    $chk->DefSet         = 'Tree Settings';
+                    $chk->DefSubset      = 'tree-' . $this->treeID . '-protip';
+                    $chk->DefOrder       = $i;
+                    $chk->DefDescription = $request->get('proTip' . $i);
+                    $chk->save();
+                }
+            } else { // empty tip row
+                $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+                    ->where('DefSet', 'Tree Settings')
+                    ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip')
+                    ->where('DefOrder', $i)
+                    ->delete();
+            }
+        }
+        return true;
     }
     
     public function blurbsList(Request $request)
@@ -677,7 +710,6 @@ class AdminTreeController extends AdminController
                 "graph"       => $this->v["graph2"],
                 "css"         => $this->v["css"]
                 ])->render();
-
             $this->v["content"] = view('vendor.survloop.admin.tree.treeSessions', $this->v)->render();
             $this->saveCache();
         }

@@ -638,8 +638,8 @@ class Globals extends GlobalsImportExport
         if ($row) {
             foreach (['Address', 'Address2', 'AddressCity', 'AddressState', 'AddressZip'] as $i => $fld) {
                 if (isset($row->{ $abbr . $fld }) && trim($row->{ $abbr . $fld }) != '') {
-                    $ret .= (($twoLines && $fld == 'AddressCity') ? '<br />' : '')
-                        . trim($row->{ $abbr . $fld }) . (($fld == 'AddressCity') ? ', ' : ' ');
+                    $ret .= (($twoLines && $fld == 'AddressCity') ? '<br />' : '') . trim($row->{ $abbr . $fld }) 
+                        . ((in_array($fld, ['Address', 'Address2', 'AddressCity'])) ? ', ' : ' ');
                 }
             }
         }

@@ -1,7 +1,5 @@
 <!-- resources/views/vendor/survloop/admin/system-all-settings.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
 <div class="disNon"><iframe src="/dashboard/css-reload" ></iframe></div>
@@ -12,13 +10,20 @@
 
 <div class="nodeAnchor"><a id="search" name="search"></a></div>
 
-@if (!$GLOBALS["SL"]->isHomestead())
-    <div class="fR taR slGrey fPerc80"> {!! str_replace('Current IP Address: ', 'Server IP Address:<br />',
-        file_get_contents('http://checkip.dyndns.com/')) !!}
+<div class="row">
+    <div class="col-sm-8">
+        <h1 class="slBlueDark"><nobr><i class="fa fa-cogs"></i> System</nobr> Settings</h1>
+    </div><div class="col-sm-2 slGrey fPerc80">
+    @if (!$GLOBALS["SL"]->isHomestead())
+        {!! str_replace('Current IP Address: ', 'Server IP Address:<br />', 
+            file_get_contents('http://checkip.dyndns.com/')) !!}
+    @endif
+    </div><div class="col-sm-2">
+        <a href="?refresh=2" class="btn btn-primary btn-sm">Refresh All Caches</a>
     </div>
-@endif
+</div>
+    
 
-<h1 class="slBlueDark"><i class="fa fa-cogs"></i> System Settings</h1>
 <a href="#search" class="hshoo">Search Engine Optimization</a> - 
 <a href="#general" class="hshoo">SurvLoop Configuration</a> - 
 <a href="#survopts" class="hshoo">SurvLoop Settings</a> - 

@@ -56,10 +56,12 @@ class TreeSurvInput extends TreeSurvUpload
     protected function postNodePublic($nID = -3, $tmpSubTier = [])
     {
         $ret = '';
-//if (in_array($nID, [15, 16])) { echo '<br /><br /><br />postNodePublic(nID: ' . $nID . ' init, PsArBldTypeOther: ' . ((isset($this->sessData->dataSets["PSAreasBlds"][0]->PsArBldTypeOther)) ? $this->sessData->dataSets["PSAreasBlds"][0]->PsArBldTypeOther : '') . '<div class="fPerc66 slGrey">'; print_r($this->sessData->dataBranches); echo '</div>'; }
-//if (in_array($nID, [827, 787])) { echo '<br /><br /><br />post postNodePublic(' . $nID . ' A<br />'; }
-        if (!$this->checkNodeConditions($nID)) return '';
-        if (empty($tmpSubTier)) $tmpSubTier = $this->loadNodeSubTier($nID);
+        if (!$this->checkNodeConditions($nID)) {
+            return '';
+        }
+        if (empty($tmpSubTier)) {
+            $tmpSubTier = $this->loadNodeSubTier($nID);
+        }
         $this->allNodes[$nID]->fillNodeRow($nID);
         $curr = $this->allNodes[$nID];
         $this->openPostNodePublic($nID, $tmpSubTier, $curr);
@@ -95,7 +97,9 @@ class TreeSurvInput extends TreeSurvUpload
             $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
             $loopCycle = $this->sessData->getLoopRows($loop);
             if (sizeof($loopCycle) > 0) {
-                foreach ($loopCycle as $i => $loopItem) $list .= ',' . $loopItem->getKey();
+                foreach ($loopCycle as $i => $loopItem) {
+                    $list .= ',' . $loopItem->getKey();
+                }
             }
             $this->sessData->logDataSave($nID, $loop, -3, 'Sorting ' . $loop . ' Items', $list);
             $this->closePostNodePublic($nID, $tmpSubTier, $curr);
@@ -111,7 +115,9 @@ class TreeSurvInput extends TreeSurvUpload
             }
         }
         
-        if ($curr->isDataManip()) $this->loadManipBranch($nID, $currVisib);
+        if ($curr->isDataManip()) {
+            $this->loadManipBranch($nID, $currVisib);
+        }
         $hasParManip = $this->hasParentDataManip($nID);
         
         if ($curr->isLoopCycle()) {
@@ -243,12 +249,17 @@ class TreeSurvInput extends TreeSurvUpload
                         intVal($GLOBALS["SL"]->REQ->loopItem));
                 }
                 if ($curr->nodeType == 'Uploads') {
-                    if ($this->REQstep != 'autoSave') $ret .= $this->postUploadTool($nID);
+                    if ($this->REQstep != 'autoSave') {
+                        $ret .= $this->postUploadTool($nID);
+                    }
                 } elseif ($curr->isDataManip()) {
                     if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
                         && intVal($GLOBALS["SL"]->REQ->input('dataManip' . $nID . '')) == 1) {
-                        if ($currVisib) $this->runDataManip($nID);
-                        else $this->reverseDataManip($nID);
+                        if ($currVisib) {
+                            $this->runDataManip($nID);
+                        } else {
+                            $this->reverseDataManip($nID);
+                        }
                     }
                 } elseif (strpos($curr->dataStore, ':') !== false) {
                     list($tbl, $fld) = $curr->getTblFld();
@@ -292,9 +303,8 @@ class TreeSurvInput extends TreeSurvUpload
                                         && sizeof($childNode[1]) > 0) {
                                         foreach ($curr->responses as $j => $res) {
                                             if ($res->NodeResValue == $val) {
-                                                $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, [
-                                                    $fld => $res->NodeResValue
-                                                    ]);
+                                                $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, 
+                                                    [$fld => $res->NodeResValue]);
                                                 if (sizeof($subRowIDs) > 0) {
                                                     $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
                                                     $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
@@ -320,9 +330,13 @@ class TreeSurvInput extends TreeSurvUpload
                                     foreach ($ress as $cnt => $res) {
                                         $this->kidMaps[$nID][$nKid][$cnt][2] = false;
                                         if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
-                                            if (in_array($res[1], $newVal)) $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                                            if (in_array($res[1], $newVal)) {
+                                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                                            }
                                         } else {
-                                            if ($res[1] == $newVal) $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                                            if ($res[1] == $newVal) {
+                                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                                            }
                                         }
                                     }
                                 }
@@ -370,14 +384,23 @@ class TreeSurvInput extends TreeSurvUpload
             
         }
         
-        if ($curr->isDataManip()) $this->closeManipBranch($nID);
+        if ($curr->isDataManip()) {
+            $this->closeManipBranch($nID);
+        }
         
         $this->closePostNodePublic($nID, $tmpSubTier, $curr);
         return $ret;
     }
     
-    protected function openPostNodePublic($nID = -3, $tmpSubTier = [], $curr = [])  { return true; }
-    protected function closePostNodePublic($nID = -3, $tmpSubTier = [], $curr = []) { return true; }
+    protected function openPostNodePublic($nID = -3, $tmpSubTier = [], $curr = [])
+    {
+        return true;
+    }
+    
+    protected function closePostNodePublic($nID = -3, $tmpSubTier = [], $curr = [])
+    {
+        return true;
+    }
     
     protected function postNodeTweakNewVal($curr, $newVal)
     {
@@ -386,7 +409,9 @@ class TreeSurvInput extends TreeSurvUpload
             if (!is_array($newVal)) {
                 $newVal = $GLOBALS["SL"]->states->getStateByInd($newVal);
             } elseif (sizeof($newVal) > 0) {
-                foreach ($newVal as $i => $val) $newVal[$i] = $GLOBALS["SL"]->states->getStateByInd($val);
+                foreach ($newVal as $i => $val) {
+                    $newVal[$i] = $GLOBALS["SL"]->states->getStateByInd($val);
+                }
             }
         }
         return $newVal;

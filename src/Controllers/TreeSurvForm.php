@@ -295,7 +295,9 @@ class TreeSurvForm extends TreeSurvFormUtils
             if ($curr->hasShowKids && sizeof($curr->responses) > 0) { // displaying children on page is conditional
                 foreach ($curr->responses as $j => $res) {
                     if (intVal($res->NodeResShowKids) > 0) {
-                        if (!isset($condKids[$res->NodeResShowKids])) $condKids[$res->NodeResShowKids] = [];
+                        if (!isset($condKids[$res->NodeResShowKids])) {
+                            $condKids[$res->NodeResShowKids] = [];
+                        }
                         $condKids[$res->NodeResShowKids][] = $res->NodeResValue;
                     }
                 }
@@ -399,7 +401,9 @@ class TreeSurvForm extends TreeSurvFormUtils
         // else print standard node output...
         
         $xtraClass = ' slTab';
-        if ($curr->nodeType != 'Long Text') $xtraClass .= ' ntrStp';
+        if ($curr->nodeType != 'Long Text') {
+            $xtraClass .= ' ntrStp';
+        }
         if (isset($this->v["graphFilters"]) && intVal($this->v["graphFilters"]) > 0 && trim($curr->dataStore) != '') {
             $xtraClass .= ' graphUp' . ((in_array($curr->nodeType, ['Drop Down', 'U.S. States', 'Countries'])) 
                 ? 'Drp' : '');
@@ -462,7 +466,7 @@ class TreeSurvForm extends TreeSurvFormUtils
         // write basic node field labeling
         $nodePromptText  = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptText, $itemID, $itemInd);
         if ($curr->isRequired() && $curr->nodeType != 'Hidden Field') {
-            $nodePromptText = $this->addPromptTextRequired($curr, $nodePromptText);
+            $nodePromptText = $this->addPromptTextRequired($curr, $nodePromptText, $nIDtxt);
         }
         $nodePromptNotes = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptNotes, $itemID, $itemInd);
         if (trim($nodePromptNotes) != '' && !$curr->isLoopRoot()) {
@@ -712,11 +716,16 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $ret .= '">' . "\n";
             }
             
-            if ($curr->nodeRow->NodeOpts%37 == 0) $ret .= '<div class="jumbotron">';
+            if ($curr->nodeRow->NodeOpts%37 == 0) {
+                $ret .= '<div class="jumbotron">';
+            }
             
-            if ($this->shouldPrintHalfGap($curr)) $ret .= '<div class="nodeHalfGap"></div>';
+            if ($this->shouldPrintHalfGap($curr)) {
+                $ret .= '<div class="nodeHalfGap"></div>';
+            }
             
             if ($curr->isLayout() || $curr->isBranch()) {
+                
             } elseif ($curr->isLoopCycle()) {
                 
                 list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
@@ -838,8 +847,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $ret .= view('vendor.survloop.inc-extra-back-next-buttons', [])->render();
                 
             } elseif (in_array($curr->nodeType, ['Search', 'Search Results', 'Search Featured',
-                'Record Full', 'Record Full Public', 'Record Previews', 'Incomplete Sess Check', 'Member Profile Basics',
-                'Plot Graph', 'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 'MFA Dialogue', 'Widget Custom'])) {
+                'Record Full', 'Record Full Public', 'Record Previews', 'Incomplete Sess Check', 
+                'Member Profile Basics', 'Plot Graph', 'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 
+                'MFA Dialogue', 'Widget Custom'])) {
                 
                 $ret .= $this->printWidget($nID, $nIDtxt, $curr);
                 
@@ -947,7 +957,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     
                     $ret .= $GLOBALS["SL"]->spinner() . '<script type="text/javascript">
                         setTimeout("window.location=\'/register?nd=' . $nID . '\'", 100);
-                        </script><style> #pageBtns, #navDesktop, #navMobile { display: none; } </style>';
+                        </script><style> #pageBtns, #navDesktop, #navMobile, #sessMgmtWrap { display: none; } </style>';
                     
                 } elseif (in_array($curr->nodeType, [ 'Text', 'Email', 'Spambot Honey Pot' ])) {
                     
@@ -1105,8 +1115,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 $ret .= '<option value="' . $val . '" ' . (($select && !$curr->isDropdownTagger()) 
                                     ? 'SELECTED' : '') . ' >' . $res->NodeResEng . '</option>' . "\n";
                                 if ($curr->isDropdownTagger()) {
-                                    $GLOBALS["SL"]->pageJAVA .= "\n" . 'addTagOpt(\'' . $nIDtxt . '\', ' . $val . ', '
-                                        . json_encode($res->NodeResEng) . ', ' . (($select) ? 1 : 0) . ');';
+                                    $GLOBALS["SL"]->pageJAVA .= "\n" . 'addTagOpt(\'' . $nIDtxt . '\', ' 
+                                        . json_encode($val) . ', ' . json_encode($res->NodeResEng) . ', ' 
+                                        . (($select) ? 1 : 0) . ');';
                                 }
                             }
                         }
@@ -1134,7 +1145,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                             $ret .= $currNodeSessData;
                         } elseif (sizeof($currNodeSessData) > 0) {
                             foreach ($currNodeSessData as $d) {
-                                if (strpos($d, trim($GLOBALS["SL"]->currCyc["cyc"][1])) === 0) $ret .= $d;
+                                if (strpos($d, trim($GLOBALS["SL"]->currCyc["cyc"][1])) === 0) {
+                                    $ret .= $d;
+                                }
                             }
                         }
                         $ret .= '">';

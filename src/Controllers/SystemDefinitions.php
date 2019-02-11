@@ -287,6 +287,7 @@ class SystemDefinitions
             'twitter'         => ['Twitter Account', '@SurvLoop'], 
             'show-logo-title' => ['Print Site Name Next To Logo', '1 or 0'], 
             'users-create-db' => ['Users Can Create Databases', '1 or 0'], 
+            'user-name-req'   => ['Username Are Required To Register', '1 or 0'], 
             'has-partners'    => ['Has Partners User Area', '1 or 0'], 
             'has-volunteers'  => ['Has Volunteer User Area', '1 or 0'], 
             'has-canada'      => ['Has Canadian Maps', '1 or 0'], 

@@ -162,7 +162,7 @@ class TreeSurvApi extends TreeCore
         return true;
     }
     
-    private function loadXmlMapTree(Request $request)
+    protected function loadXmlMapTree(Request $request)
     {
         $this->survLoopInit($request);
         if (isset($GLOBALS["SL"]->xmlTree["id"]) && empty($this->xmlMapTree)) {
@@ -172,7 +172,7 @@ class TreeSurvApi extends TreeCore
         return true;
     }
         
-    private function getXmlTmpV($nID, $tblID = -3)
+    protected function getXmlTmpV($nID, $tblID = -3)
     {
         $v = [];
         if ($tblID > 0) {
@@ -459,6 +459,7 @@ class TreeSurvApi extends TreeCore
                 }
                 unset($chk);
             }
+            $this->initSearcher();
             if (sizeof($this->searcher->allPublicCoreIDs) > 0) {
                 foreach ($this->searcher->allPublicCoreIDs as $coreID) {
                     if (!in_array($coreID, $dumped)) {

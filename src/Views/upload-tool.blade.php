@@ -1,9 +1,9 @@
 <!-- Stored in resources/views/survloop/upload-tool.blade.php -->
 
 <div id="uploadErrors" class="slRedDark"></div>
-<div id="up{{ $nID }}Wrap" class="uploadWrap">
+<div id="up{{ $nID }}Wrap" class="slCard">
     <div class="uploadTypes">
-        <h2><i class="fa fa-cloud-upload"></i> New Upload:</h2>
+        <h2><i class="fa fa-cloud-upload"></i> New Upload</h2>
         @if (sizeof($uploadTypes) > 1)
             @foreach ($uploadTypes as $j => $ty)
                 <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" class="finger">
@@ -59,7 +59,6 @@
                 <div class="nodeHalfGap"></div>
                 <div class="nPrompt">
                     <label for="up{{ $nID }}VidID">Privacy of Upload</label>
-                    <h5>{!! $uploadWarn !!}</h5>
                 </div> 
                 <div class="nFld mT5">
                     <select name="up{{ $nID }}Privacy" id="up{{ $nID }}PrivacyID" 
@@ -68,6 +67,11 @@
                         <option value="Private" @if (!$isPublic) CHECKED @endif >Private: Visible only to investigators</option>
                     </select>
                 </div>
+                @if (isset($uploadWarn) && trim($uploadWarn) != '')
+                    <div class="alert alert-danger fade in alert-dismissible show" style="margin-top: 10px;">
+                        {!! $uploadWarn !!}
+                    </div>
+                @endif
             @endif
             <div class="nodeHalfGap"></div>
             <a id="nFormUpload" href="javascript:;" class="btn btn-xl btn-primary w100">Upload</a>

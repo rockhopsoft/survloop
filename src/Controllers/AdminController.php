@@ -154,7 +154,7 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.admin.contact-tabs', [
             "filtStatus" => (($request->has('tab')) ? $request->get('tab') : 'unread'),
             "recTots"    => $this->v["recTots"]
-        ])->render();
+            ])->render();
     }
     
     public function ajaxContact(Request $request)
@@ -235,19 +235,16 @@ class AdminController extends SurvLoopController
     public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
     {
         $this->initLoader();
-        if (trim($treeSlug) != '') {
-            $urlTree = SLTree::where('TreeSlug', $treeSlug)
-                ->first();
-            if ($urlTree && isset($urlTree->TreeID)) {
-                $this->dbID = $urlTree->TreeDatabase;
-                $this->treeID = $urlTree->TreeID;
-            }
+        if ($this->loader->loadTreeBySlug($request, $treeSlug)) {
+            $this->dbID = $this->loader->dbID;
+            $this->treeID = $this->loader->treeID;
+            $this->admControlInit($request, '/dashboard/start/' . $treeSlug);
+            $this->loadCustLoop($request, $this->treeID);
+            $this->v["content"] = '<div class="pT20">' . $this->custReport->loadNodeURL($request, $nodeSlug) . '</div>';
+            return view('vendor.survloop.master', $this->v);
         }
-        $this->loader->syncDataTrees($request, $this->dbID, $this->treeID);
-        $this->admControlInit($request, '/dashboard/start/' . $treeSlug);
-        $this->loadCustLoop($request, $this->treeID);
-        $this->v["content"] = '<div class="pT20">' . $this->custReport->loadNodeURL($request, $nodeSlug) . '</div>';
-        return view('vendor.survloop.master', $this->v);
+        $this->loader->loadDomain();
+        return redirect($this->loader->domainPath . '/');
     }
     
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
@@ -259,7 +256,7 @@ class AdminController extends SurvLoopController
     public function loadNodeTreeURLedit(Request $request, $cid = -3, $treeSlug = '')
     {
         $this->initLoader();
-        return $this->loader->loadNodeTreeURLInner($request, $treeSlug, $cid);
+        return $this->loader->loadNodeTreeURLedit($request, $cid, $treeSlug);
     }
     
     public function loadPageURL(Request $request, $pageSlug = '')
@@ -370,8 +367,41 @@ class AdminController extends SurvLoopController
     public function sysSettings(Request $request)
     {
         $this->admControlInit($request, '/dashboard/settings#search');
-        if ($request->has('refresh')) {
-            $this->reloadAllTreesJs($request);
+        if ($request->has('refresh') && intVal($request->get('refresh')) == 2) {
+            $this->initLoader();
+            $chk = SLTree::whereIn('TreeType', [ 'Page', 'Survey' ])
+                ->where('TreeDatabase', 1)
+                ->select('TreeID', 'TreeDatabase')
+                ->orderBy('TreeID', 'asc')
+                ->get();
+            if ($chk->isNotEmpty()) {
+                $next = $curr = $found = 0;
+                if ($request->has('next')) {
+                    $curr = intVal($request->get('next'));
+                }
+                foreach ($chk as $tree) {
+                    if ($curr == 0) {
+                        $curr = $tree->TreeID;
+                    }
+                    if ($found == 1 && $next <= 0) {
+                        $next = $tree->TreeID;
+                    }
+                    if ($tree->TreeID == $curr) {
+                        $found = 1;
+                        $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                        $this->loadCustLoop($request, $tree->TreeID, $tree->TreeDatabase);
+                        $this->custReport->loadTree($tree->TreeID);
+                        $this->custReport->loadProgBar();
+                    }
+                }
+                $this->loader->syncDataTrees($request);
+                if ($next > 0) {
+                    echo '<center><div class="p20"><br /><br /><h2>Refreshing Jasascript Cache for Tree #' . $curr 
+                        . '</h2></div></center><div class="p20">' . $GLOBALS["SL"]->spinner() . '</div>';
+                    return $this->redir('/dashboard/settings?refresh=2&next=' . $next, true);
+                }
+            }
+            return $this->redir('/dashboard/settings?refresh=1', true);
         }
         $GLOBALS["SL"]->addAdmMenuHshoos([
             '/dashboard/settings#search',
@@ -449,24 +479,6 @@ class AdminController extends SurvLoopController
         return $this->redir('/dashboard/pages/snippets/' . $blurb->DefID);
     }
     
-    public function reloadAllTreesJs(Request $request)
-    {
-        $this->initLoader();
-        $chk = SLTree::whereIn('TreeType', ['Page', 'Survey'])
-            ->select('TreeID', 'TreeDatabase')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $tree) {
-                $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-                $this->loadCustLoop($request, $tree->TreeID, $tree->TreeDatabase);
-                $this->custReport->loadTree($tree->TreeID);
-                $this->custReport->loadProgBar();
-            }
-            $this->loader->syncDataTrees($request);
-        }
-        return true;
-    }
-    
     public function getCSS(Request $request)
     {
         $this->survLoopInit($request, '/dashboard/settings');
@@ -521,10 +533,8 @@ class AdminController extends SurvLoopController
                 }
             }
         }
-        $scriptsjs = view('vendor.survloop.scripts-js', [
-            "css"    => $css,
-            "treeJs" => $treeJs
-            ])->render();
+        $scriptsjs = view('vendor.survloop.scripts-js', [ "css" => $css, "treeJs" => $treeJs ])->render()
+            . view('vendor.survloop.scripts-js-ajax', [ "css" => $css, "treeJs" => $treeJs ])->render();
         file_put_contents("../storage/app/sys/sys2.js", $scriptsjs);
         $minifier = new Minify\JS("../storage/app/sys/sys2.js");
         $minifier->minify("../storage/app/sys/sys2.min.js");

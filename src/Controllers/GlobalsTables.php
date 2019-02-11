@@ -50,6 +50,7 @@ class GlobalsTables extends GlobalsStatic
     public $coreTblUserFld = '';
     public $treeXmlID      = -3;
     public $treeOverride   = -3;
+    public $currProTip     = 0;
     
     public $tblModels      = [];
     public $tbls           = [];
@@ -95,6 +96,7 @@ class GlobalsTables extends GlobalsStatic
             ]
         ];
     public $treeSettings   = [];
+    public $proTips        = [];
     public $allTrees       = [];
     
     // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->TreeOpts%TREEOPT_PRIME == 0 )
@@ -327,7 +329,7 @@ class GlobalsTables extends GlobalsStatic
                     . '\', \'' . $map[2] . '\', \'' . $map[3] . '\', \'' . $map[4] . '\' ];' . "\n";
             }
         }
-        return $cache;
+        return $cache . $this->loadProTips();
     }
     
     public function getCurrTreeUrl()
@@ -340,9 +342,9 @@ class GlobalsTables extends GlobalsStatic
             }
         } else {
             if ($this->treeIsAdmin) {
-                return $this->sysOpts["app-url"] . '/dash/' . $this->treeRow->TreeSlug . '/' . $pageURL;
+                return $this->sysOpts["app-url"] . '/dashboard/start/' . $this->treeRow->TreeSlug;
             } else {
-                return $this->sysOpts["app-url"] . '/u/' . $this->treeRow->TreeSlug . '/' . $pageURL;
+                return $this->sysOpts["app-url"] . '/start/' . $this->treeRow->TreeSlug;
             }
         }
         return $this->sysOpts["app-url"];
@@ -1578,6 +1580,25 @@ class GlobalsTables extends GlobalsStatic
         return $ret;
     }
     
+    public function loadProTips()
+    {
+        $cache = '$'.'this->proTips = [];' . "\n";
+        $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+            ->where('DefSet', 'Tree Settings')
+            ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip')
+            ->orderBy('DefOrder', 'asc')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $set) {
+                if (trim($set->DefDescription) != '') {
+                    $cache .= '$'.'this->proTips[] = \'' . str_replace("'", "&#39;", $set->DefDescription) . '\';' 
+                        . "\n";
+                }
+            }
+        }
+        return $cache;
+    }
+    
     public function loadTreeMojis()
     {
         if (empty($this->treeSettings)) {
@@ -1589,20 +1610,22 @@ class GlobalsTables extends GlobalsStatic
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $set) {
                     $setting = str_replace('tree-' . $this->treeID . '-', '', $set->DefSubset);
-                    if (!isset($this->treeSettings[$setting])) {
-                        $this->treeSettings[$setting] = [];
-                    }
-                    if ($setting == 'emojis') {
-                        $names = explode(';', $set->DefValue);
-                        $this->treeSettings[$setting][] = [
-                            "id"     => $set->DefID,
-                            "admin"  => ($set->DefIsActive%7 == 0),
-                            "verb"   => $names[0],
-                            "plural" => $names[1], 
-                            "html"   => $set->DefDescription
-                        ];
-                    } else {
-                        $this->treeSettings[$setting][] = $set->DefDescription;
+                    if ($setting != 'protip') {
+                        if (!isset($this->treeSettings[$setting])) {
+                            $this->treeSettings[$setting] = [];
+                        }
+                        if ($setting == 'emojis') {
+                            $names = explode(';', $set->DefValue);
+                            $this->treeSettings[$setting][] = [
+                                "id"     => $set->DefID,
+                                "admin"  => ($set->DefIsActive%7 == 0),
+                                "verb"   => $names[0],
+                                "plural" => $names[1], 
+                                "html"   => $set->DefDescription
+                            ];
+                        } else {
+                            $this->treeSettings[$setting][] = $set->DefDescription;
+                        }
                     }
                 }
             }

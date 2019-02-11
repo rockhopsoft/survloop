@@ -1,7 +1,7 @@
-@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $coreID > 0) 
+@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $coreID > 0)
     <!-- Stored in resources/views/survloop/formfoot-record-mgmt.blade.php -->
     <div id="sessMgmtWrap" class="disBlo">
-        <div class="slGrey mT10 mB5">
+        <div class="pT20 mT20 mB5">
             Editing {{ $GLOBALS["SL"]->treeRow->TreeName }} #{{ $coreID }}
             @if (trim($recDesc) != '' && $recDesc != $GLOBALS["SL"]->treeRow->TreeName
                 && strpos($GLOBALS["SL"]->treeRow->TreeName, $recDesc) !== false)

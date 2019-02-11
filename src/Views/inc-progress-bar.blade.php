@@ -69,7 +69,6 @@
         @endforeach
         
     </div> <!-- end of desktop navigation -->
-    
     <div id="navMobile">
         
         <div class="f16">

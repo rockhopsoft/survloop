@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\SLDefinitions;
 use App\Models\SLNode;
 use App\Models\SLFields;
+use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use SurvLoop\Controllers\TreeNodeSurv;
 use SurvLoop\Controllers\Globals;
@@ -27,10 +28,11 @@ class TreeSurv extends TreeSurvReport
     {
         $ret = '';
         $this->loadTree();
-        $GLOBALS["SL"]->pageJAVA .= 'function tryTreeLoad' . $this->treeID . '() { 
-            if (typeof treeLoad' . $this->treeID . ' === "function") treeLoad' . $this->treeID . '();
-            else setTimeout("tryTreeLoad' . $this->treeID . '()", 500);
-            return true; } setTimeout("tryTreeLoad' . $this->treeID . '()", 100); ' . "\n";
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $this->coreID <= 0) {
+            return $this->redir($GLOBALS["SL"]->getCurrTreeUrl(), true);
+        }
+        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.inc-check-tree-load-js', [
+            "treeID" => $this->treeID ])->render();
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '<div id="ajaxWrap">';
         }
@@ -59,7 +61,7 @@ class TreeSurv extends TreeSurvReport
         }
         
         $this->loadAncestry($this->currNode());
-
+        
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
             if (!$this->sessInfo) {
                 $this->createNewSess();
@@ -72,7 +74,9 @@ class TreeSurv extends TreeSurvReport
             $logTitle = 'PAGE SAVE' . (($this->REQstep == 'autoSave') ? ' AUTO' : '');
             $this->sessData->logDataSave($GLOBALS["SL"]->REQ->node, $logTitle, -3, '', '');
             $ret .= $this->postNodePublic($GLOBALS["SL"]->REQ->node);
-            if ($this->REQstep == 'autoSave') return 'Saved!-)';
+            if ($this->REQstep == 'autoSave') {
+                return 'Saved!-)';
+            }
             $this->loadAllSessData();
             if (!$this->isPage) {
                 if ($this->REQstep == 'save') {
@@ -89,7 +93,9 @@ class TreeSurv extends TreeSurvReport
                             && trim($GLOBALS["SL"]->REQ->get('afterJumpTo')) != '') {
                             session()->put('redir2', trim($GLOBALS["SL"]->REQ->get('afterJumpTo')));
                         }
-                        if ($redir1 != '') return $this->redir($redir1, true);
+                        if ($redir1 != '') {
+                            return $this->redir($redir1, true);
+                        }
                     }
                 } else {
                     $this->updateCurrNode($GLOBALS["SL"]->REQ->node);
@@ -587,33 +593,7 @@ class TreeSurv extends TreeSurvReport
         $this->survLoopInit($request, '/ajadm/' . $type);
         $nID = (($request->has('nID')) ? trim($request->get('nID')) : '');
         if ($type == 'color-pick') {
-            $fldName = (($request->has('fldName')) ? trim($request->get('fldName')) : '');
-            $preSel = (($request->has('preSel')) ? '#' . trim($request->get('preSel')) : '');
-            if (trim($fldName) != '') {
-                $sysColors = [];
-                $sysStyles = SLDefinitions::where('DefDatabase', 1)
-                    ->where('DefSet', 'Style Settings')
-                    ->orderBy('DefOrder')
-                    ->get();
-                $isCustom = true;
-                if ($sysStyles->isNotEmpty()) {
-                    foreach ($sysStyles as $i => $sty) {
-                        if (strpos($sty->DefSubset, 'color-') !== false 
-                            && !in_array($sty->DefDescription, $sysColors)) {
-                            $sysColors[] = $sty->DefDescription;
-                            if ($sty->DefDescription == $preSel) {
-                                $isCustom = false;
-                            }
-                        }
-                    }
-                }
-                return view('vendor.survloop.inc-color-picker-ajax', [
-                    "sysColors" => $sysColors,
-                    "fldName"   => $fldName,
-                    "preSel"    => $preSel,
-                    "isCustom"  => $isCustom
-                ]);
-            }
+            return $this->ajaxColorPicker($request);
         } elseif (substr($type, 0, 4) == 'img-') {
             $imgID = (($request->has('imgID')) ? trim($request->get('imgID')) : '');
             $presel = (($request->has('presel')) ? trim($request->get('presel')) : '');
@@ -627,6 +607,8 @@ class TreeSurv extends TreeSurvReport
             } elseif ($type == 'img-up') {
                 return $GLOBALS["SL"]->uploadImg($nID, $presel);
             }
+        } elseif ($type == 'log-pro-tip') {
+            $this->ajaxLogLastProTip($request);
         }
         return '';
     }
@@ -634,6 +616,74 @@ class TreeSurv extends TreeSurvReport
     public function ajaxChecksCustom(Request $request, $type = '')
     {
         return '';
+    }
+    
+    protected function ajaxColorPicker(Request $request)
+    {
+        $fldName = (($request->has('fldName')) ? trim($request->get('fldName')) : '');
+        $preSel = (($request->has('preSel')) ? '#' . trim($request->get('preSel')) : '');
+        if (trim($fldName) != '') {
+            $sysColors = [];
+            $sysStyles = SLDefinitions::where('DefDatabase', 1)
+                ->where('DefSet', 'Style Settings')
+                ->orderBy('DefOrder')
+                ->get();
+            $isCustom = true;
+            if ($sysStyles->isNotEmpty()) {
+                foreach ($sysStyles as $i => $sty) {
+                    if (strpos($sty->DefSubset, 'color-') !== false 
+                        && !in_array($sty->DefDescription, $sysColors)) {
+                        $sysColors[] = $sty->DefDescription;
+                        if ($sty->DefDescription == $preSel) {
+                            $isCustom = false;
+                        }
+                    }
+                }
+            }
+            return view('vendor.survloop.inc-color-picker-ajax', [
+                "sysColors" => $sysColors,
+                "fldName"   => $fldName,
+                "preSel"    => $preSel,
+                "isCustom"  => $isCustom
+                ]);
+        }
+        return '';
+    }
+    
+    protected function ajaxLogLastProTip(Request $request)
+    {
+        if ($request->has('tree') && intVal($request->get('tree')) > 0 
+            && $request->has('tip') && intVal($request->get('tip')) > 0) {
+            $tok = $this->getProTipToken();
+            $tok->TokTokToken = intVal($request->get('tip'));
+            $tok->save();
+        }
+        exit;
+    }
+    
+    protected function getProTipToken()
+    {
+        $tok = SLTokens::where('TokType', 'ProTip')
+            ->where('TokUserID', $this->v["uID"])
+            ->where('TokTreeID', $this->treeID)
+            ->first();
+        if (!$tok) {
+            $tok = new SLTokens;
+            $tok->TokType     = 'ProTip';
+            $tok->TokUserID   = $this->v["uID"];
+            $tok->TokTreeID   = $this->treeID;
+            $tok->TokTokToken = 0;
+            $tok->save();
+        }
+        return $tok;
+    }
+    
+    protected function loadTreeProTip()
+    {
+        $tok = $this->getProTipToken();
+        $GLOBALS["SL"]->currProTip = $tok->TokTokToken;
+        $GLOBALS["SL"]->pageJAVA .= ' lastProTip = ' . $tok->TokTokToken . '; ';
+        return true;
     }
     
     public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
@@ -672,6 +722,7 @@ class TreeSurv extends TreeSurvReport
             }
         } else {
             $this->getAllPublicCoreIDs();
+            $this->initSearcher();
             $this->searcher->getSearchFilts();
             $this->searcher->processSearchFilts();
             if (sizeof($this->searcher->allPublicFiltIDs) > 0) {

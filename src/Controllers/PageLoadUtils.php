@@ -184,8 +184,12 @@ class PageLoadUtils extends Controller
                     if ($t && isset($t->TreeOpts) && $this->okToLoadTree($t->TreeOpts)) {
                         $rootNode = SLNode::find($t->TreeFirstPage);
                         if ($rootNode && isset($t->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = $this->dashPrfx . '/u/' . $t->TreeSlug . '/' . $rootNode->NodePromptNotes 
-                                . '?start=1&new=' . rand(100000000, 1000000000);
+                            $redir = $this->dashPrfx . '/u/' . $t->TreeSlug . '/' . $rootNode->NodePromptNotes;
+                            if ($cid > 0) {
+                                $redir .= '?cid=' . $cid;
+                            } else {
+                                $redir .= '?start=1&new=' . rand(100000000, 1000000000);
+                            }
                             $paramTxt = str_replace($this->domainPath . '/start/' . $t->TreeSlug, '', 
                                 str_replace($this->domainPath . '/dashboard/start/' . $t->TreeSlug, '', 
                                 $request->fullUrl()));
@@ -210,6 +214,8 @@ class PageLoadUtils extends Controller
                                 }
                                 if ($request->has("n") && intVal($request->get("n")) > 0) {
                                     $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
+                                } elseif ($sess->SessCurrNode == -86) { // last session deactivate (hopefully completed)
+                                    $sess->update([ 'SessCurrNode' => $t->TreeRoot ]);
                                 }
                                 session()->put('sessID' . $t->TreeID, $sess->SessID);
                                 session()->put('coreID' . $t->TreeID, $cid);

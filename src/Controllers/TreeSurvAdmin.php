@@ -78,7 +78,6 @@ class TreeSurvAdmin extends TreeSurvForm
         }
         $parent = (($node->parentID > 0) ? SLNode::find($node->parentID) 
             : (($GLOBALS["SL"]->REQ->has('parent')) ? SLNode::find($GLOBALS["SL"]->REQ->parent) : []));
-        //echo '<pre>'; print_r($node->dataManips); echo '</pre>';
         if ($GLOBALS["SL"]->REQ->has('sub') && $this->canEditTree) {
             $redirOver = '';
             if ($GLOBALS["SL"]->REQ->has('deleteNode') && intVal($GLOBALS["SL"]->REQ->get('deleteNode')) == 1) {

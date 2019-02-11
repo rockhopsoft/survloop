@@ -47,7 +47,10 @@ class TreeSurvFormUtils extends TreeSurvInput
         return '';
     }
     
-    protected function customResponses($nID, $curr) { return $curr; }
+    protected function customResponses($nID, $curr)
+    {
+        return $curr;
+    }
     
     protected function skipFormForPreview($nID)
     {
@@ -92,7 +95,9 @@ class TreeSurvFormUtils extends TreeSurvInput
     
     protected function swapLabels($nIDtxt = '', $str = '', $itemID = -3, $itemInd = -3)
     {
-        if (trim($str) == '') return '';
+        if (trim($str) == '') {
+            return '';
+        }
         $str = $this->sendEmailBlurbsCustom($str);
         $str = $this->customLabels($nIDtxt, $str);
         $str = $GLOBALS["SL"]->swapBlurbs($str);
@@ -337,7 +342,7 @@ class TreeSurvFormUtils extends TreeSurvInput
         return $newVal;
     }
     
-    public function addPromptTextRequired($currNode = NULL, $nodePromptText = '')
+    public function addPromptTextRequired($currNode = NULL, $nodePromptText = '', $nIDtxt = 'noNID')
     {
         if (!$currNode || !isset($currNode->nodeRow->NodeOpts)) return '';
         $txt = '*required';
@@ -346,31 +351,37 @@ class TreeSurvFormUtils extends TreeSurvInput
             elseif ($currNode->nodeRow->NodeCharLimit > 0) $txt = '*future date required';
         }
         if ($currNode->nodeRow->NodeOpts%13 == 0) {
-            return $nodePromptText . '<p class="rqd">' . $txt . '</p>';
+            return $nodePromptText . '<p id="req' . $nIDtxt . '" class="rqd">' . $txt . '</p>';
         } else {
             $swapPos = -1;
             $lastP = strrpos($nodePromptText, '</p>');
             $lastDiv = strrpos($nodePromptText, '</div>');
-            if ($lastP > 0)       $swapPos = $lastP;
-            elseif ($lastDiv > 0) $swapPos = $lastDiv;
+            if ($lastP > 0) {
+                $swapPos = $lastP;
+            } elseif ($lastDiv > 0) {
+                $swapPos = $lastDiv;
+            }
             if ($swapPos > 0) {
-                return substr($nodePromptText, 0, $swapPos) . ' <span class="rqd">' . $txt . '</span>' 
-                    . substr($nodePromptText, $swapPos);
+                return substr($nodePromptText, 0, $swapPos) . ' <span id="req' . $nIDtxt . '" class="rqd">' 
+                    . $txt . '</span>' . substr($nodePromptText, $swapPos);
             }
             else {
                 $lastH3 = strrpos($nodePromptText, '</h3>');
                 $lastH2 = strrpos($nodePromptText, '</h2>');
                 $lastH1 = strrpos($nodePromptText, '</h1>');
-                if ($lastH3 > 0)  $swapPos = $lastH3;
-                elseif ($lastH2 > 0)  $swapPos = $lastH2;
-                elseif ($lastH1 > 0)  $swapPos = $lastH1;
+                if ($lastH3 > 0) {
+                    $swapPos = $lastH3;
+                } elseif ($lastH2 > 0) {
+                    $swapPos = $lastH2;
+                } elseif ($lastH1 > 0) {
+                    $swapPos = $lastH1;
+                }
                 if ($swapPos > 0) {
-                    return substr($nodePromptText, 0, $swapPos) 
-                        . ' <small class="rqd">' . $txt . '</small>' 
-                        . substr($nodePromptText, $swapPos);
+                    return substr($nodePromptText, 0, $swapPos) . ' <small id="req' . $nIDtxt . '" class="rqd">' 
+                        . $txt . '</small>' . substr($nodePromptText, $swapPos);
                 }
             }
-            return $nodePromptText . ' <span class="rqd">' . $txt . '</span>';
+            return $nodePromptText . ' <span id="req' . $nIDtxt . '" class="rqd">' . $txt . '</span>';
         }
         return '';
     }
@@ -378,8 +389,8 @@ class TreeSurvFormUtils extends TreeSurvInput
     public function nodeHasDateRestriction($nodeRow)
     {
         return (in_array($nodeRow->NodeType, ['Date', 'Date Picker', 'Date Time']) 
-                && $nodeRow->NodeOpts%31 > 0 // Character limit means word count, if enabled
-                && $nodeRow->NodeCharLimit != 0);
+            && $nodeRow->NodeOpts%31 > 0 // Character limit means word count, if enabled
+            && $nodeRow->NodeCharLimit != 0);
     }
     
     public function inputMobileCls($nID)
@@ -451,9 +462,21 @@ class TreeSurvFormUtils extends TreeSurvInput
     protected function getLoopItemLabel($loop, $itemRow = [], $itemInd = -3)
     {
         $name = $this->getLoopItemLabelCustom($loop, $itemRow, $itemInd);
-        if (trim($name) != '') return $name;
-        if (isset($GLOBALS["SL"]->dataLoops[$loop]) && $itemInd >= 0) {
-            return $GLOBALS["SL"]->dataLoops[$loop]->DataLoopSingular . ' #' . (1+$itemInd);
+        if (trim($name) != '') {
+            return $name;
+        }
+        $name = $this->getTableRecLabelCustom($loop, $itemRow, $itemInd);
+        if (trim($name) != '') {
+            return $name;
+        }
+        if (isset($GLOBALS["SL"]->dataLoops[$loop])) {
+            if ($itemInd < 0) {
+                $itemRow = $this->sessData->getDataBranchRow($GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable);
+                $itemInd = $this->sessData->getLoopIndFromID($loop, $itemRow->getKey());
+            }
+            if ($itemInd >= 0) {
+                return $GLOBALS["SL"]->dataLoops[$loop]->DataLoopSingular . ' #' . (1+$itemInd);
+            }
         }
         return '';
     }
@@ -495,8 +518,8 @@ class TreeSurvFormUtils extends TreeSurvInput
             . intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) . '">' 
             . (($this->allNodes[$nID]->isStepLoop()) ? '<div id="isStepLoop"></div>' : '');
         if (!$this->allNodes[$nID]->isStepLoop() && empty($this->sessData->loopItemIDs[$loopName])) {
-            $ret .= '<h3 class="slGrey"><i>No ' . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
-                . ' added yet.</i></h3>' . "\n";
+            $ret .= '<div class="mB20"><h3>No ' . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
+                . ' added yet.</h3></div>';
         } else {
             $ret .= '<div class="p10"></div>';
         }
@@ -527,7 +550,7 @@ class TreeSurvFormUtils extends TreeSurvInput
     
     protected function printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
     {
-        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-secondary mT20 w100 fPerc133 '
+        return '<button type="button" id="nFormAdd" class="btn btn-lg btn-secondary disBlo mT20'
             . (($GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit == 0 || 
                 sizeof($this->sessData->loopItemIDs[$loopName]) < $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit) 
                 ? 'disBlo' : 'disNon')
@@ -544,7 +567,9 @@ class TreeSurvFormUtils extends TreeSurvInput
     protected function printSetLoopNavRow($nID, $loopItem, $setIndex)
     {
         $ret = $this->printSetLoopNavRowCustom($nID, $loopItem, $setIndex);
-        if ($ret != '') return $ret;
+        if ($ret != '') {
+            return $ret;
+        }
         $canEdit = true;
         $itemLabel = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], $loopItem, $setIndex);
         if (strtolower(strip_tags($itemLabel)) == 'you') {
@@ -572,7 +597,7 @@ class TreeSurvFormUtils extends TreeSurvInput
             "canEdit"        => $canEdit,
             "ico"            => $ico, 
             "node"           => $this->allNodes[$nID]
-        ])->render();
+            ])->render();
     }
     
     protected function isNodeJustH1($nodePrompt)
@@ -590,9 +615,8 @@ class TreeSurvFormUtils extends TreeSurvInput
     {
         $ret = '';
         if ($nodeRow->NodeOpts%31 == 0 || $nodeRow->NodeOpts%47 == 0) {
-            $ret .= '<div class="fL slGrey f12 pT5">'
-                . (($nodeRow->NodeOpts%47 == 0) 
-                    ? 'Word count limit: ' . intVal($nodeRow->NodeCharLimit) . '. ' : '')
+            $ret .= '<div class="fL pT5">'
+                . (($nodeRow->NodeOpts%47 == 0) ? 'Word count limit: ' . intVal($nodeRow->NodeCharLimit) . '. ' : '')
                 . (($nodeRow->NodeOpts%31 == 0) 
                     ? 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>.' : '')
             . '</div><div class="fC"></div>';

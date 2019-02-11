@@ -635,7 +635,7 @@ class TreeSurvLoad extends TreeSurvApi
         //return false;
     }
     
-    protected function createProgBarJs()
+    public function createProgBarJs()
     {
         $jsFileName = '../storage/app/sys/tree-' . $this->treeID . '.js';
         if (!file_exists($jsFileName) || $GLOBALS["SL"]->REQ->has('refresh')) {
@@ -643,6 +643,7 @@ class TreeSurvLoad extends TreeSurvApi
                 unlink($jsFileName);
             }
             $jsOut = view('vendor.survloop.inc-tree-javascript', [
+                "treeID"            => $this->treeID,
                 "allNodes"          => $this->allNodes, 
                 "majorSections"     => $this->majorSections, 
                 "minorSections"     => $this->minorSections
@@ -954,6 +955,18 @@ class TreeSurvLoad extends TreeSurvApi
             return true;
         }
         return false;
+    }
+    
+    public function getPrevOfTypeWithConds($nID, $type = 'Page')
+    {
+        $nID = $this->getPrevOfType($nID, $type);
+        while ($nID > 0) {
+            if ($this->checkNodeConditions($nID)) {
+                return $nID;
+            }
+            $nID = $this->getPrevOfType($nID, $type);
+        }
+        return $nID;
     }
     
     public function addCondEditorAjax()

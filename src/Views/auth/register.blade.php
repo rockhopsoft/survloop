@@ -37,7 +37,7 @@
     <div class="nodeHalfGap"></div>
     <div id="nLabel004" class="nPrompt"><label for="nameID">
         Username: 
-        @if (isset($sysOpts["user-name-optional"]) && $sysOpts["user-name-optional"] == 'Off')
+        @if (isset($sysOpts["user-name-req"]) && intVal($sysOpts["user-name-req"]) == 1)
             <span class="red">*required</span>
         @endif
     </label></div>
@@ -145,7 +145,7 @@ function checkNodeForm() {
     totFormErrors = 0;
     formErrorsEng = "";
     
-@if (isset($sysOpts["user-name-ask"]) && $sysOpts["user-name-ask"] == 'On' && $sysOpts["user-name-optional"] == 'Off')
+@if (isset($sysOpts["user-name-req"]) && intVal($sysOpts["user-name-req"]) == 1)
     if (document.getElementById('nameID').value.trim() == '') {
         setFormLabelRed('004');
         totFormErrors++;
