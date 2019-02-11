@@ -239,6 +239,11 @@ Route::group(['middleware' => ['web']], function () {
         $response->header('Content-Type', 'text/css');
         return $response;
     });
+    Route::get( '/font/summernote.eot', function() {
+        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/font/summernote.eot'));
+        $response->header('Content-Type', 'application/vnd.ms-fontobject');
+        return $response;
+    });
     
     Route::get( '/Chart.bundle.min.js', function() {
         $response = Response::make(file_get_contents('../vendor/nnnick/chartjs/dist/Chart.bundle.min.js'));

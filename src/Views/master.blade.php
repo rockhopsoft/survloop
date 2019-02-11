@@ -300,8 +300,10 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
         }}/survloop/ContentTools-master/build/editor.js"></script>
 @endif */ ?>
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
-    <link href="/summernote.css" rel="stylesheet">
-    <script defer src="/summernote.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
+    <?php /* <link href="/summernote.css" rel="stylesheet">
+    <script defer src="/summernote.min.js"></script> */ ?>
 @endif
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
