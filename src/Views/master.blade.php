@@ -2,6 +2,7 @@
 if (!isset($GLOBALS["SL"])) {
     $GLOBALS["SL"] = new SurvLoop\Controllers\Globals(new Illuminate\Http\Request, 1, 1, 1);
 }
+$isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -76,7 +77,7 @@ if (!isset($GLOBALS["SL"])) {
 @section('headCode')
 @show
 </head>
-<body {!! $GLOBALS['SL']->getBodyParams() !!} >
+<body @if ($isDashLayout) class="bodyDash" @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>
@@ -163,10 +164,6 @@ if (!isset($GLOBALS["SL"])) {
     <div id="isPrint"></div>
 @endif <?php /* end not print */ ?>
 
-<?php
-$isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
-?>
-
 @if ((!isset($isFrame) || !$isFrame) && $isDashLayout)
 
     @if ((isset($isPrint) && $isPrint) || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
@@ -194,11 +191,14 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
                         </div>
                         <div id="admMenuNotCustom" class="w100 disNon">
                     @endif
-                    <form id="dashSearchFrmID" name="dashSearchForm" action="{{ $GLOBALS['SL']->getSrchUrl() }}" 
-                        method="get">
-                        <nobr><input type="text" name="s" id="admSrchFld" class="form-control" placeholder="Search...">
+                    <form id="dashSearchFrmID" name="dashSearchForm" method="get"
+                        action="{{ $GLOBALS['SL']->getSrchUrl() }}">
+                        <div id="dashSearchFrmWrap">
                         <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
-                            ><i class="fa fa-search" aria-hidden="true"></i></a></div></nobr>
+                            ><i class="fa fa-search" aria-hidden="true"></i></a></div>
+                        <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
+                            placeholder="Search...">
+                        </div>
                     </form>
                     <div class="admMenu w100">
                         @if (isset($admMenu)) {!! $admMenu !!} @endif
@@ -218,7 +218,10 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
                         ><i class="fa fa-caret-square-o-right" aria-hidden="true"></i></a>
                 </div>
             </div>
-        </td><td id="mainBody" class="w100 h100">
+        </td><td id="mainBody" class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
+            @if ($isDashLayout)
+                <div id="adminMenuTopTabs"> @if (isset($admMenuTabs)) {!! $admMenuTabs !!} @endif </div>
+            @endif
             <div class="container-fluid">
                 @if (isset($content)) {!! $content !!} @endif
                 @yield('content')
@@ -280,7 +283,6 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
         {!! $GLOBALS['SL']->pageJAVA !!}
     @endif
-    {!! $GLOBALS['SL']->getXtraJs() !!}
     @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
         $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
     @endif
@@ -302,8 +304,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
-    <?php /* <link href="/summernote.css" rel="stylesheet">
-    <script defer src="/summernote.min.js"></script> */ ?>
+    <?php /* <link href="/summernote.css" rel="stylesheet"> <script defer src="/summernote.min.js"></script> */ ?>
 @endif
 @if (isset($hasFbWidget) && $hasFbWidget)
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>

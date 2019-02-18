@@ -26,7 +26,7 @@ class AdminMenu
             $this->admMenuLnk('javascript:;', 'Submissions', '<i class="fa fa-star"></i>', 1, [
                 $this->admMenuLnk('/dashboard/subs/all',        'All Complete'), 
                 $this->admMenuLnk('/dashboard/subs/incomplete', 'Incomplete Sessions')
-            ])
+                ])
         ];
         return $this->addAdmMenuBasics($treeMenu);
     }
@@ -41,59 +41,66 @@ class AdminMenu
         list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Site Content', 
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
-            $this->admMenuLnk('/dashboard/pages/list',     'Pages & Reports'), 
-            $this->admMenuLnk('javascript:;', 'Surveys & Forms', '', 1, [
-                $this->admMenuLnk('/dashboard/surveys/list', 'All Surveys'),
-                $this->admMenuLnk('javascript:;', $treeLabel, '', 1, [
-                    $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 'Full Survey Map'), 
-                    $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Session Stats'), 
-                    $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Response Stats'),
-                    $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
-                    $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map') 
-                    ])
-                ]),
-            $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets'), 
+            $this->admMenuLnk('/dashboard/pages/list',     'Pages & Reports', '', 1, [
+                $this->admMenuLnk('/dashboard/pages/list', 'All Pages & Reports'),
+                $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets')
+                ]), 
+            $this->admMenuLnk('/dashboard/surveys/list', 'Surveys & Forms', '', 1, [
+                $this->admMenuLnk('/dashboard/surveys/list', 'Manage All Surveys & Forms'),
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 
+                    '<b>' . $treeLabel . ':</b> Full Survey Map'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Sessions'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Responses'),
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map')
+                ]), 
             $this->admMenuLnk('/dashboard/pages/menus',    'Navigation Menus'), 
             $this->admMenuLnk('/dashboard/images/gallery', 'Media Gallery'),
             $this->admMenuLnk('/dashboard/emails',         'Email Templates')
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
-            $this->admMenuLnk('javascript:;', 'Data Tables', '', 1, [
+            $this->admMenuLnk('/dashboard/db', 'Data Tables', '', 1, [
                 $this->admMenuLnk('/dashboard/db',           'Full Table List'),
                 $this->admMenuLnk('/dashboard/db/addTable',  'Add A New Table'),
                 $this->admMenuLnk('/dashboard/db/sortTable', 'Re-Order Tables'),
                 $this->admMenuLnk('/dashboard/db/diagrams',  'Data Diagrams')
                 ]), 
-            $this->admMenuLnk('javascript:;', 'Data Fields', '', 1, [
+            $this->admMenuLnk('/dashboard/db/all', 'Data Fields', '', 1, [
                 $this->admMenuLnk('/dashboard/db/all',                'Full Field Map'), 
                 $this->admMenuLnk('/dashboard/db/field-matrix?alt=1', 'Field Matrix: English'),
                 $this->admMenuLnk('/dashboard/db/field-matrix',       'Field Matrix: Geek'),
                 $this->admMenuLnk('/dashboard/db/bus-rules',          'Business Rules')
                 ]), 
             $this->admMenuLnk('/dashboard/db/definitions', 'Definition Lists'),
-            $this->admMenuLnk('/dashboard/db/conds',       'Filters / Conditions'),
+            $this->admMenuLnk('/dashboard/db/conds',       'Filters / Conditions', '', 1, [
+                $this->admMenuLnk('/dashboard/db/conds', 'All Conditions'),
+                $this->admMenuLnk('/dashboard/db/conds?only=public', 'Public Only'),
+                $this->admMenuLnk('/dashboard/db/conds?only=articles', 'Articles Only'),
+                $this->admMenuLnk('/dashboard/db/conds?add=1', 'Add New Condition')
+                ]),
             $this->admMenuLnk('/dashboard/db/fieldDescs',  'Field Descriptions'), 
             $this->admMenuLnk('/dashboard/db/fieldXML',    'Field Privacy Settings'), 
             $this->admMenuLnk('/dashboard/db/workflows',   'Process Workflows'),
-            $this->admMenuLnk('javascript:;',              'Export', '', 1, [
+            $this->admMenuLnk('/dashboard/db/export',              'Export', '', 1, [
                 $this->admMenuLnk('/dashboard/db/export',         'Full Database Export'),
                 $this->admMenuLnk('/dashboard/sl/export/laravel', 'SurvLoop Package')
                 ]),
             $this->admMenuLnk('/dashboard/db/switch', '<i class="slGrey">All Databases</i>')
             ]);
-        $treeMenu[] = $this->admMenuLnk('javascript:;', 'Users', '<i class="fa fa-users"></i>', 1, [
+        $treeMenu[] = $this->admMenuLnk('/dashboard/users', 'Users', '<i class="fa fa-users"></i>', 1, [
             $this->admMenuLnk('/dashboard/users', 'All Users'),
+            $this->admMenuLnk('/my-profile', 'My Profile'),
             $this->admMenuLnkContact(false)
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Settings', '<i class="fa fa-cogs"></i>', 1, [
-            $this->admMenuLnk('javascript:;',      'System Settings', '', 1, [
+            $this->admMenuLnk('/dashboard/settings',      'System Settings', '', 1, [
                 $this->admMenuLnk('/dashboard/settings#search',   'Search Engines'),
                 $this->admMenuLnk('/dashboard/settings#general',  'General Settings'),
                 $this->admMenuLnk('/dashboard/settings#logos',    'Logos & Fonts'),
                 $this->admMenuLnk('/dashboard/settings#color',    'Colors'),
                 $this->admMenuLnk('/dashboard/settings#hardcode', 'Code HTML CSS JS')
                 ]),
-            $this->admMenuLnk('javascript:;',       'System Logs', '', 1, [
+            $this->admMenuLnk('/dashboard/logs',       'System Logs', '', 1, [
                 $this->admMenuLnk('/dashboard/logs', 'All Logs'),
                 $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff')
                 ]),
@@ -113,7 +120,11 @@ class AdminMenu
         $cnt = $this->admMenuLnkContactCnt();
         $lnk = 'Contact Form' . (($cnt > 0) ? '<sup id="contactPush" class="red mL5">' . $cnt . '</sup> ' : '');
         $ico = (($icon) ? '<i class="fa fa-envelope-o" aria-hidden="true"></i> ' : '');
-        $ret = [ '/dashboard/contact', $lnk, $ico, 1, [] ];
+        $ret = [ '/dashboard/contact', $lnk, $ico, 1, [
+            $this->admMenuLnk('/dashboard/contact?tab=unread', 'Unread'),
+            $this->admMenuLnk('/dashboard/contact?tab=all', 'All Contacts'),
+            $this->admMenuLnk('/dashboard/contact?tab=trash', 'Trash')
+            ] ];
         return $ret;
     }
     

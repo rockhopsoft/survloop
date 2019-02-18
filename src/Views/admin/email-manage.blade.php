@@ -1,11 +1,11 @@
 @extends('vendor.survloop.master')
 @section('content')
 <!-- resources/views/vendor/survloop/admin/email-manage.blade.php -->
-
+<div class="container">
+<div class="slCard nodeWrap">
 <div class="row mB20">
     <div class="col-6">
         <h2 class="mB0">Manage Email Templates</h2>
-        <div class="slGrey">(eg. in response to completing a survey)</div>
     </div>
     <div class="col-6 pT20 taR">
         <a href="/dashboard/email/-3" class="btn btn-secondary">Create New Email Template</a>
@@ -54,7 +54,7 @@
 @empty
     <i>No emails found!?!</i>
 @endforelse
-
+</div>
+</div>
 <div class="adminFootBuff"></div>
-
 @endsection

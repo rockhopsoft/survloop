@@ -1,12 +1,11 @@
 <!-- Stored in resources/views/vender/survloop/admin/tree/pages.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container">
 <div class="row">
-    <div class="col-7">
-        
+    <div class="col-md-7">
+    
+        <div class="slCard nodeWrap">
         <h2><i class="fa fa-newspaper-o"></i> Site Pages <span class="slGrey">& Redirects</span></h2>
         <div class="slGrey pB10">
             Pages are used to manage content throughout your website, both public and admin, 
@@ -95,10 +94,24 @@
         @empty @endforelse
         
         </table>
+        </div>
         
-    </div>
-    <div class="col-5">
+    </div><div class="col-md-5">
         
+        <div class="slCard nodeWrap slGrey">
+            <div class="row">
+                <div class="col-6">
+                    {!! view('vendor.survloop.admin.tree.inc-legend-perms')->render() !!}
+                </div><div class="col-6">
+                    <div class="mB5"><u>Special Page Types</u></div>
+                    <div class="mB5"><i class="fa fa-list-alt mR5"></i> Report for Survey</div>
+                    <div class="mB5"><i class="fa fa-search mR5" aria-hidden="true"></i> Search Results</div>
+                    <div class="mB5"><i class="fa fa-home mR5" aria-hidden="true"></i> Home/Dashboard Page</div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="slCard nodeWrap">
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
         <form name="mainPageForm" method="post" action="/dashboard/pages/list">
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
@@ -163,8 +176,9 @@
                 <div class="fC"></div>
             </div>
         </div>
-        <div class="p10"></div>
+        </div>
         
+        <div class="slCard nodeWrap">
         <form name="mainRedirForm" method="post" action="/dashboard/pages/list">
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="subRedir" value="1">
@@ -213,22 +227,7 @@
                 <div class="fC"></div>
             </div>
         </div>
-        <div class="p10"></div>
         </form>
-        
-        <div class="slGrey">
-            <div class="mB5"><u>Permissions</u></div>
-            <div class="mB5"><i class="fa fa-eye mR5" aria-hidden="true"></i> Admin-Only Page</div>
-            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Staff Page</div>
-        @if ($GLOBALS["SL"]->sysHas('partners'))
-            <div class="mB5"><i class="fa fa-university mR5" aria-hidden="true"></i> Partners Page</div>
-        @endif
-        @if ($GLOBALS["SL"]->sysHas('volunteers'))
-            <div class="mB5"><i class="fa fa-hand-rock-o mR5" aria-hidden="true"></i> Volunteer Page</div>
-        @endif
-            <div class="mB5"><br /><u>Special Page Types</u></div>
-            <div class="mB5"><i class="fa fa-list-alt mR5"></i> Report for Survey</div>
-            <div class="mB5"><i class="fa fa-search mR5" aria-hidden="true"></i> Search Results</div>
         </div>
         
     </div>

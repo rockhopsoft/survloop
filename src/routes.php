@@ -461,7 +461,7 @@ Route::group(['middleware' => ['web']], function () {
     ]);
     
     Route::get( '/dashboard/surv-{treeID}/sessions', [
-        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessions',    
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@treeSessions',
         'middleware' => ['auth']
     ]);
     

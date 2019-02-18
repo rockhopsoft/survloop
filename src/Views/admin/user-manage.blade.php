@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/user-manage.blade.php -->
 @extends('vendor.survloop.master')
 @section('content')
-
+<div class="container"><div class="slCard nodeWrap">
 <h1><i class="fa fa-users"></i> Manage User Privileges</h1>
 
 <div class="well">
@@ -48,9 +48,8 @@
     @empty
     @endforelse
 @endforeach
-
 </table>
+</div></div>
 
 <div class="adminFootBuff"></div>
-
 @endsection

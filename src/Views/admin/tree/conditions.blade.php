@@ -1,9 +1,8 @@
 <!-- resources/views/vendor/survloop/admin/tree/conditions.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container">
+<div class="slCard nodeWrap">
 <h2 class="slGreenDark"><i class="fa fa-filter" aria-hidden="true"></i> Conditions / Filters</h2>
 
 <ul id="pageTabs" class="nav nav-tabs">
@@ -67,6 +66,6 @@
 @empty
 @endforelse
 </table>
-
+</div></div>
 <div class="adminFootBuff"></div>
 @endsection

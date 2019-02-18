@@ -70,12 +70,26 @@ class TreeSurvFormUtils extends TreeSurvInput
         return true;
     }
     
-    protected function customLabels($nIDtxt = '', $str = '') { return $str; }
+    public function getCurrPubID()
+    {
+        $tbl = $GLOBALS["SL"]->coreTbl;
+        if ($GLOBALS["SL"]->tblHasPublicID() && isset($this->sessData->dataSets[$tbl])
+            && isset($this->sessData->dataSets[$tbl][0]->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'PublicID' })) {
+            return intVal($this->sessData->dataSets[$tbl][0]->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'PublicID' });
+        }
+        return $this->coreID;
+    }
+    
+    protected function customLabels($nIDtxt = '', $str = '')
+    {
+        return $str;
+    }
     
     protected function swapIDs($nIDtxt = '', $str = '')
     {
         $str = str_replace('[[nID]]', $nIDtxt, $str);
         $str = str_replace('[[coreID]]', $this->coreID, str_replace('[[cID]]', $this->coreID, $str));
+        $str = str_replace('[[corePubID]]', $this->getCurrPubID(), $str);
         $str = str_replace('[[DOMAIN]]', $GLOBALS["SL"]->sysOpts["app-url"], $str);
         return $str;
     }

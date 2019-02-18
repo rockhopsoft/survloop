@@ -298,6 +298,7 @@ class SystemDefinitions
             'app-license'     => ['License Info', 'Creative Commons Attribution-ShareAlike License'], 
             'app-license-url' => ['License Info URL', 'http://creativecommons.org/licenses/by-sa/3.0/'], 
             'app-license-img' => ['License Info Image', '/survloop/uploads/creative-commons-by-sa-88x31.png'],
+            'app-license-snc' => ['License Since Year', date("Y")],
             'css-extra-files' => ['CSS Extra Files', 'comma separated'],
             'header-code'     => ['< head > Header Code < / head >', '&lt;div&gt;Anything&lt;/div&gt;']
             ];

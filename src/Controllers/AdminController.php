@@ -101,10 +101,33 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.admin.admin-menu', $this->admMenuData)->render();
     }
     
+    protected function getAdmMenuTopTabs()
+    {
+        $tabs = view('vendor.survloop.admin.admin-menu-tabs', $this->admMenuData)->render();
+        $subTabs = view('vendor.survloop.admin.admin-menu-tabs-sub', $this->admMenuData)->render();
+        return ((trim($tabs) != '') ? '<div id="slTopTabsWrap" class="slTopTabs">' . $tabs . '</div>'
+            . ((trim($subTabs) != '') ? '<div class="slTopTabsSub">' . $subTabs . '</div>' : '')
+            : '<div class="w100" style="margin-bottom: 15px;"> </div>');
+    }
+    
     protected function reloadAdmMenu()
     {
-        $this->v["admMenu"] = $this->getAdmMenu($this->v["currPage"][0]);
+        $this->v["admMenu"]      = $this->getAdmMenu($this->v["currPage"][0]);
         $this->v["belowAdmMenu"] = $this->loadBelowAdmMenu();
+        $this->v["admMenuTabs"]  = $this->getAdmMenuTopTabs();
+        return true;
+    }
+    
+    protected function chkNewAdmMenuPage($currPage = '')
+    {
+        if (trim($currPage) != '' && $this->v["currPage"][0] != $currPage) {
+            $this->v["currPage"][0] = $currPage;
+            $this->reloadAdmMenu();
+        } elseif (isset($GLOBALS["SL"]->x["currPage"]) && trim($GLOBALS["SL"]->x["currPage"]) != ''
+            && $this->v["currPage"][0] != $currPage) {
+            $this->v["currPage"][0] = $GLOBALS["SL"]->x["currPage"];
+            $this->reloadAdmMenu();
+        }
         return true;
     }
     
@@ -241,6 +264,7 @@ class AdminController extends SurvLoopController
             $this->admControlInit($request, '/dashboard/start/' . $treeSlug);
             $this->loadCustLoop($request, $this->treeID);
             $this->v["content"] = '<div class="pT20">' . $this->custReport->loadNodeURL($request, $nodeSlug) . '</div>';
+            $this->chkNewAdmMenuPage();
             return view('vendor.survloop.master', $this->v);
         }
         $this->loader->loadDomain();
@@ -271,6 +295,7 @@ class AdminController extends SurvLoopController
                     . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;
             }
+            $this->chkNewAdmMenuPage();
             return $this->loader->addAdmCodeToPage(view('vendor.survloop.master', $this->v)->render());
         }
         $this->loader->loadDomain();
@@ -814,12 +839,18 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.admin.systems-check', $this->v);
     }
     
-    public function logsOverview(Request $request)
+    public function loadLogs()
     {
-        $this->admControlInit($request, '/dashboard/logs');
         $this->v["logs"] = [
             "session" => $this->logPreview('session-stuff')
             ];
+        return true;
+    }
+    
+    public function logsOverview(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/logs');
+        $this->loadLogs();
         $this->v["phpInfo"] = $request->has('phpinfo');
         return view('vendor.survloop.admin.logs-overview', $this->v);
     }
@@ -827,9 +858,8 @@ class AdminController extends SurvLoopController
     public function logsSessions(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs/session-stuff');
-        $this->v["content"] .= '<h2 class="slBlueDark"><i class="fa fa-eye"></i> Logs of Session Stuff</h2>'
-            . '<div class="p20">' . $this->logLoad('session-stuff') . '</div>';
-        return view('vendor.survloop.master', $this->v);
+        $this->loadLogs();
+        return view('vendor.survloop.admin.logs-sessions', $this->v);
     }
     
     

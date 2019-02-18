@@ -830,7 +830,7 @@ class GlobalsImportExport extends GlobalsTables
         
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
-        $java = $this->pageJAVA;
+        $java = $this->pageJAVA . $GLOBALS["SL"]->getXtraJs();
         if (trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') {
             $java .= ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ';
         }

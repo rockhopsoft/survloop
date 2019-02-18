@@ -37,7 +37,7 @@
                 </label></div>
                 <div class="nFld mT5">
                     <input type="file" name="up{{ $nID }}File" id="up{{ $nID }}FileID" {!! $GLOBALS["SL"]->tabInd() !!}
-                        class="p5 form-control form-control-lg ntrStp slTab" style="border: 1px #CCC solid;" >
+                        class="form-control ntrStp slTab" style="border: 1px #CCC solid;" >
                 </div>
             </div>
             <div class="nodeHalfGap"></div>

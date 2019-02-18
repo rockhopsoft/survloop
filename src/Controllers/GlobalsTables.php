@@ -131,7 +131,8 @@ class GlobalsTables extends GlobalsStatic
     
     public function getTreePrimeConst($type)
     {
-        eval("return self::TREEOPT_" . $type . ";");
+        eval("\$prime = self::TREEOPT_" . $type . ";");
+        return intVal($prime);
     }
     
     public function chkTreeOpt($treeOpts = 1, $type = '')
@@ -236,6 +237,11 @@ class GlobalsTables extends GlobalsStatic
             return "App\\Models\\SL" . $tbl;
         }
         return '';
+    }
+    
+    public function modelPathTblID($tblID = 0, $forceFile = false)
+    {
+        return $this->modelPath($this->tbl[$tblID], $forceFile);
     }
     
     public function chkTblModel($tbl, $path, $forceFile = false)
@@ -1167,7 +1173,7 @@ class GlobalsTables extends GlobalsStatic
             } elseif (trim($defSet) == '') {
                 if ($val != '' && isset($this->fldTypes[$tbl]) && isset($this->fldTypes[$tbl][$fld])
                     && in_array($this->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
-                    $ret = number_format(1*$val);
+                    $ret = number_format(1*floatval($val));
                 } else {
                     $ret = $val;
                 }
@@ -1729,6 +1735,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function tblHasPublicID($tbl = '')
     {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
         if (!isset($this->x["tblHasPublicID"])) {
             $this->x["tblHasPublicID"] = [];
         }
@@ -1739,9 +1748,6 @@ class GlobalsTables extends GlobalsStatic
         if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts%47 == 0 
             || (isset($this->reportTree["opts"]) && $this->reportTree["opts"]%47 == 0)) {
             $this->x["tblHasPublicID"][$tbl] = true;
-        }
-        if (trim($tbl) == '') {
-            $tbl = $this->coreTbl;
         }
         if ($this->x["tblHasPublicID"][$tbl] && isset($this->tblI[$tbl])) {
             $chk = SLFields::where('FldTable', $this->tblI[$tbl])

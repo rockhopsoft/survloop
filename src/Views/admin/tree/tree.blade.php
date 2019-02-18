@@ -1,4 +1,5 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree.blade.php -->
+<div class="container"><div class="slCard nodeWrap">
 <h2 class="mB5"><span class="slBlueDark">
     @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
         <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
@@ -28,8 +29,8 @@
         </div>
     </div>
 @endif
-
 {!! $GLOBALS["SL"]->printTreeNodeStats($isPrint, $isAll, $isAlt) !!}
+</div></div>
 
 @if ($GLOBALS['SL']->treeIsAdmin)
     <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
@@ -40,7 +41,6 @@
         ><h3 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
         . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h3></a>
 @endif
-
 {!! $printTree !!}
 
 @if (!isset($GLOBALS['SL']->treeRow->TreeRoot) || intVal($GLOBALS['SL']->treeRow->TreeRoot) <= 0)

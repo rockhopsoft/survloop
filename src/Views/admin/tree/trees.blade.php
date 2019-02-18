@@ -1,12 +1,12 @@
 <!-- Stored in resources/views/vender/survloop/admin/tree/trees.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container">
 <div class="row">
-    <div class="col-7">
-        <h2><i class="fa fa-newspaper-o"></i> Surveys & Forms</h2>
+    <div class="col-md-7">
+    
+        <div class="slCard nodeWrap">
+        <h2><i class="fa fa-snowflake-o"></i> Surveys & Forms</h2>
         <div class="slGrey pB10">
             Surveys can be one or countless pages long. At their core, they are branching trees of possible user
             experiences. Here you can edit or create new surveys.
@@ -75,13 +75,17 @@
                 {!! view('vendor.survloop.admin.tree.trees-row', [ "tree" => $tree ])->render() !!}
             @endif
         @empty @endforelse
-        
         </table>
+        </div>
         
-    </div>
-    <div class="col-5">
+    </div><div class="col-md-5">
+    
+        <div class="slCard nodeWrap slGrey">
+            {!! view('vendor.survloop.admin.tree.inc-legend-perms')->render() !!}
+        </div>
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
+        <div class="slCard nodeWrap slGrey">
         <form name="mainPageForm" method="post" action="/dashboard/surveys/list">
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="sub" value="1">
@@ -122,20 +126,8 @@
                 </form>
             </div>
         </div>
-        <div class="p10"></div>
-        
-        <div class="slGrey">
-            <div class="mB5"><u>Permissions</u></div>
-            <div class="mB5"><i class="fa fa-eye mR5" aria-hidden="true"></i> Admin-Only Survey</div>
-            <div class="mB5"><i class="fa fa-key mR5" aria-hidden="true"></i> Staff Survey</div>
-        @if ($GLOBALS["SL"]->sysHas('partners'))
-            <div class="mB5"><i class="fa fa-university mR5" aria-hidden="true"></i> Partners Survey</div>
-        @endif
-        @if ($GLOBALS["SL"]->sysHas('volunteers'))
-            <div class="mB5"><i class="fa fa-hand-rock-o mR5" aria-hidden="true"></i> Volunteer Survey</div>
-        @endif
         </div>
-    
+        
     </div>
 </div>
 

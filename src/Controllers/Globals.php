@@ -426,6 +426,11 @@ class Globals extends GlobalsImportExport
         return $this->x["preload-imgs"];
     }
     
+    public function getCurrUrl()
+    {
+        return $_SERVER["REQUEST_URI"];
+    }
+    
     public function addAdmMenuHshoo($url = '')
     {
         if (trim($url) == '') {
@@ -465,7 +470,9 @@ class Globals extends GlobalsImportExport
         if (strpos($url, '#') > 0) {
             $url = substr($url, strpos($url, '#'));
         }
-        $this->x["hshoos"][] = $url;
+        if (!in_array($url, $this->x["hshoos"])) {
+            $this->x["hshoos"][] = $url;
+        }
         return true;
     }
     
@@ -486,13 +493,9 @@ class Globals extends GlobalsImportExport
     
     public function getHshooJs()
     {
-        $ret = '';
-        if (isset($this->x["hshoos"]) && sizeof($this->x["hshoos"]) > 0) {
-            foreach ($this->x["hshoos"] as $i => $hsh) {
-                $ret .= 'addHshoo("' . $hsh . '"); ';
-            }
-        }
-        return $ret;
+        return view('vendor.survloop.inc-check-add-hshoo-js', [
+            "hshoos" => ((isset($this->x["hshoos"])) ? $this->x["hshoos"] : [])
+            ])->render();
     }
     
     public function getXtraJs()
@@ -629,7 +632,7 @@ class Globals extends GlobalsImportExport
     public function embedMapSimpRowAddy($nID, $row, $abbr, $label = '', $height = 450)
     {
         $this->loadStates();
-        return $this->states->embedMapSimpAddy($nID, $this->printRowAddy($row, $abbr), $label, $height);
+        return $this->states->embedMapSimpAddy($nID, $this->printRowAddyNoPO($row, $abbr), $label, $height);
     }
     
     public function printRowAddy($row, $abbr, $twoLines = false)
@@ -646,6 +649,18 @@ class Globals extends GlobalsImportExport
         return $ret;
     }
     
+    public function printRowAddyNoPO($row, $abbr)
+    {
+        if (isset($row->{ $abbr . 'Address' })) {
+            $addy1 = str_replace(' ', '', str_replace('.', '', strtolower($row->{ $abbr . 'Address' })));
+            if (strpos($addy1, 'pobox') !== false && isset($row->{ $abbr . 'AddressCity' }) 
+                && isset($row->{ $abbr . 'AddressState' })) {
+                return $row->{ $abbr . 'AddressCity' } . ', ' . $row->{ $abbr . 'AddressState' };
+            }
+        }
+        return $this->printRowAddy($row, $abbr);
+    }
+    
     public function mapsURL($addy)
     {
         return 'https://www.google.com/maps/search/' . urlencode($addy) . '/';
@@ -654,6 +669,12 @@ class Globals extends GlobalsImportExport
     public function rowAddyMapsURL($row, $abbr)
     {
         return $this->mapsURL($this->printRowAddy($row, $abbr));
+    }
+    
+    public function setCurrPage($currPage = '')
+    {
+        $this->x["currPage"] = $currPage;
+        return true;
     }
     
 }

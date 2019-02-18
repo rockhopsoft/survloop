@@ -24,6 +24,7 @@ class SystemUpdate extends AdminController
     {
         $GLOBALS["slRunUpdates"] = true;
         $this->admControlInit($request, '/dashboard/systems-update');
+        $this->loadCustLoop($request);
         $this->custReport->loadSysUpdates();
         $this->sysUpdates();
         if ($request->has('sub') && intVal($request->get('sub')) == 1) {

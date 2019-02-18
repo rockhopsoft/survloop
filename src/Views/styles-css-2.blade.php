@@ -215,36 +215,35 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     height: 100%;
 }
 #menuColpsWrap {
-    margin: 15px -15px 0px -15px;
+    margin: 15px -15px 0px 0px;
 }
 a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover,
 a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
     display: block;
     width: 100%;
     padding: 10px 15px;
-    color: {!! $css["color-main-grey"] !!};
+    color: {!! $css["color-main-link"] !!};
 }
 a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
     display: none;
 }
 #leftSide {
     height: 100%;
-    border-right: 1px {!! $css["color-main-off"] !!} solid;
     vertical-align: top;
-    background: {!! $css["color-main-faintr"] !!};
+    color: {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-grey"] !!};
 }
 #leftSideWdth {
-    width: 230px;
+    width: 200px;
 }
 #leftSideWrap {
     position: fixed;
-    width: 230px;
-    padding: 10px 15px 0px 15px;
+    width: 200px;
 	z-index: 0;
 }
 #leftAdmMenu {
     display: block;
-    width: 200px;
+    width: 100%;
 }
 #mainBody {
     padding: 15px 0px;
@@ -252,30 +251,41 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
     background: {!! $css["color-main-bg"] !!};
 	z-index: 100;
 }
+#mainBody.mainBodyDash {
+    background: {!! $css["color-main-faint"] !!};
+    padding: 0px;
+}
+body.bodyDash {
+    background: {!! $css["color-main-grey"] !!};
+}
 
+#dashSearchFrmWrap {
+    position: relative;
+    width: 100%;
+    padding: 8px 15px 7px 15px;
+}
 #admSrchFld {
     background: none; 
     background-color: none;
-    margin: 5px 0px;
+    z-index: 1;
 }
-#dashSearchFrmID input {
-    display: inline;
-    width: 100%;
+#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, #admSrchFld a:active, #admSrchFld a:hover {
+    color: {!! $css["color-main-bg"] !!};
+}
+#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, #admSrchFld::-ms-input-placeholder {
+    color: {!! $css["color-main-bg"] !!};
 }
 #dashSearchBtnID {
-    position: relative;
-    width: 100%;
-    height: 1px;
+    position: absolute;
+    z-index: 99;
+    top: 10px;
+    right: 24px;
 }
 #dashSearchBtnID a:link, #dashSearchBtnID a:active, #dashSearchBtnID a:visited, #dashSearchBtnID a:hover {
-    position: absolute;
-    top: -33px;
-    right: 13px;
+    color: {!! $css["color-main-bg"] !!};
     font-size: 14px;
 }
 #dashSearchBtnID a:hover {
-    top: -39px;
-    right: 12px;
     font-size: 16px;
 }
 
@@ -1000,6 +1010,7 @@ table.repDeetVert, table.repDeetVert tr td, table.repDeetVert tr th {
 .basicTierPage, .basicTier1.basicTierPage, .basicTier2.basicTierPage, .basicTier3.basicTierPage, .basicTier4.basicTierPage, .basicTier5.basicTierPage, .basicTier6.basicTierPage, .basicTier7.basicTierPage, .basicTier8.basicTierPage,
 .basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop, .basicTier6.basicTierLoop, .basicTier7.basicTierLoop, .basicTier8.basicTierLoop {
 	border: 4px {!! $css["color-info-on"] !!} double;
+	background: {!! $css["color-main-bg"] !!};
 	margin: 15px 5px 15px 5px;
     padding: 10px;
 }
@@ -1167,9 +1178,8 @@ table.detailList tr td {
 	position: fixed;
 	z-index: 99;
 	background: {!! $css["color-main-bg"] !!};
-	box-shadow: 0px 0px 10px {!! $css["color-main-bg"] !!};
 	margin: 0px -15px 0px -15px;
-	padding: 25px 15px 15px 15px;
+	padding: 15px;
 	top: 47px;
 	border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
@@ -1285,34 +1295,76 @@ a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.comple
 #adminMenu {
     margin-top: 10px;
 }
-.admMenu .admMenuTier1, .admMenu .admMenuTier2, .admMenu .admMenuTier3, .admMenu .admMenuTier4 {
-    padding: 5px 5px 5px 15px;
+.admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
+    display: block;
 }
-.admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, .admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:link {
-    font-size: 110%;
-}
-.admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
-    font-weight: bold;
+.admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, .admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover {
+    color: {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-grey"] !!};
+    padding: 6px 5px 6px 9px;
+    font-size: 120%;
 }
 .admMenu a.active:link, .admMenu a.active:visited, .admMenu a.active:active, .admMenu a.active:hover,
 .admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
-    color: {!! $css["color-main-text"] !!};
+    color: {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-link"] !!};
 }
 .admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, .admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
-    margin: 0px 5px 0px 0px;
 }
-.admMenu .admMenuTier2 {
-    padding-left: 40px;
-}
-.admMenu .admMenuTier3 {
-    padding-left: 55px;
-}
-.admMenu .admMenuTier4 {
-    padding-left: 70px;
-}
-.admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
+.admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, .admMenu div a .admMenuIco.pull-left, 
+.admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, .admMenu div a:active .admMenuIco.pull-left, .admMenu div a:hover .admMenuIco.pull-left {
     display: block;
+    width: 30px;
+    text-align: center;
+}
+.admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover {
+    padding: 10px 5px 10px 23px;
+    font-size: 100%;
+}
+.admMenu .admMenuTier2 a.active:link, .admMenu .admMenuTier2 a.active:visited, .admMenu .admMenuTier2 a.active:active, .admMenu .admMenuTier2 a.active:hover {
+    color: {!! $css["color-main-link"] !!};
+    background: {!! $css["color-main-faint"] !!};
+}
+
+#slTopTabsWrap {
+    position: static;
+    z-index: 100;
+}
+.slTopTabs {
+    width: 100%;
+    padding-top: 7px;
+    margin-bottom: 25px;
+    background: {!! $css["color-main-grey"] !!};
+}
+.slTopTabs ul.nav.nav-tabs {
+    width: 100%;
+    border: 0px none;
+    border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
+}
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:link,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:visited,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:active,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:hover {
+    color: {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-off"] !!};
+    border: 0px none;
+    border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
+    margin-left: 7px;
+}
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:link,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:visited,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:active,
+.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:hover {
+    color: {!! $css["color-main-link"] !!};
+    background: {!! $css["color-main-faint"] !!};
+    border: 0px none;
+}
+.slTopTabsSub {
+    margin-top: -20px;
+}
+.slTopTabsSub ul.nav {
+    
 }
 
 a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover,
@@ -1373,9 +1425,15 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	width: 100%;
 	height: 80px;
 }
-#admFootLegal {
-	font-size: 11pt;
-	padding: 20px 0px 10px 0px;
+#hidivBtnAdmFoot, #hidivAdmFoot {
+    color: {!! $css["color-main-grey"] !!};
+}
+#hidivBtnAdmFoot {
+	padding: 20px 0px 20px 0px;
+	margin-bottom: 10px;
+}
+#hidivAdmFoot {
+	padding: 20px 0px 40px 0px;
 }
 
 #navDesktop {

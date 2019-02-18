@@ -442,10 +442,14 @@ class TreeSurvForm extends TreeSurvFormUtils
                 . $curr->nodeRow->NodeCharLimit . ')", 50);' . "\n";
         } */
         if ($curr->nodeRow->NodeOpts%31 == 0 || $curr->nodeRow->NodeOpts%47 == 0) {
-            if (intVal($curr->nodeRow->NodeCharLimit) == 0) $curr->nodeRow->NodeCharLimit = 10000000000;
-            $onKeyUp .= ' wordCountKeyUp(\'' . $nIDtxt . '\', ' . intVal($curr->nodeRow->NodeCharLimit) . '); ';
-            $GLOBALS["SL"]->pageJAVA .= 'setTimeout("wordCountKeyUp(\'' . $nIDtxt . '\', ' 
-                . intVal($curr->nodeRow->NodeCharLimit) . ')", 50);' . "\n";
+            if (intVal($curr->nodeRow->NodeCharLimit) == 0) {
+                $curr->nodeRow->NodeCharLimit = 10000000000;
+            }
+            $wrdCntKey = 'wordCountKeyUp(\'' . $nIDtxt . '\', ' 
+                . (($curr->nodeRow->NodeOpts%47 == 0) ? $curr->nodeRow->NodeCharLimit : 0) . ', '
+                . intVal($curr->nodeRow->NodeCharLimit) . ')';
+            $onKeyUp .= ' ' . $wrdCntKey . '; ';
+            $GLOBALS["SL"]->pageJAVA .= 'setTimeout("' . $wrdCntKey . '", 50);' . "\n";
         }
         if (isset($curr->extraOpts["minVal"]) && $curr->extraOpts["minVal"] !== false) {
             $onKeyUp .= ' checkMin(\'' . $nIDtxt . '\', ' . $curr->extraOpts["minVal"] . '); ';
@@ -453,7 +457,7 @@ class TreeSurvForm extends TreeSurvFormUtils
         if (isset($curr->extraOpts["maxVal"]) && $curr->extraOpts["maxVal"] !== false) {
             $onKeyUp .= ' checkMax(\'' . $nIDtxt . '\', ' . $curr->extraOpts["maxVal"] . '); ';
         }
-        if ($curr->nodeType == 'Long Text') $onKeyUp .= ' flexAreaAdjust(this); ';
+        //if ($curr->nodeType == 'Long Text') $onKeyUp .= ' flexAreaAdjust(this); ';
         if (trim($onKeyUp) != '') $onKeyUp = ' onKeyUp="' . $onKeyUp . '" ';
         
         // check notes settings for any standardized techniques
@@ -994,8 +998,8 @@ class TreeSurvForm extends TreeSurvFormUtils
                         . 'fld" id="n' . $nIDtxt . 'FldID" ' . $onKeyUp . ' data-nid="' . $nID . '" ' 
                         . $GLOBALS["SL"]->tabInd() . '>' . $currNodeSessData . '</textarea></div>' . $charLimit . "\n"
                         . $this->printWordCntStuff($nIDtxt, $curr->nodeRow);
-                    $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("flexAreaAdjust(document.getElementById(\'n' 
-                        . $nIDtxt . 'FldID\'))", 50);';
+                    //$GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("flexAreaAdjust(document.getElementById(\'n' 
+                    //    . $nIDtxt . 'FldID\'))", 50);';
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "if (document.getElementById('n" . $nIDtxt 
                             . "VisibleID') && document.getElementById('n" . $nIDtxt 

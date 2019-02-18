@@ -34,6 +34,7 @@ use SurvLoop\Controllers\TreeSurvAdmin;
 use SurvLoop\Controllers\TreeSurvApi;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\SessAnalysis;
 use SurvLoop\Controllers\AdminController;
 
 class AdminTreeController extends AdminController
@@ -596,7 +597,7 @@ class AdminTreeController extends AdminController
             $this->v["css"] = $this->sysDef->loadCss();
             
             // clear empties here
-            $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-2, date("Y"));
+            $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-3, date("Y"));
             eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::"
                 . $this->custReport->treeSessionsWhereExtra()
                 . "where('updated_at', '<', '" . date("Y-m-d H:i:s", $this->v["dayold"]) 
@@ -611,24 +612,10 @@ class AdminTreeController extends AdminController
                 }
             }
             
-            $this->v["nodeTots"] = $this->v["nodeSort"] = $this->v["coreTots"] = [];
-            $chk = SLNode::where('NodeTree', $treeID)
-                ->whereIn('NodeType', [ 'Page', 'Loop Root' ])
-                ->get();
-            if ($chk->isNotEmpty()) {
-                foreach ($chk as $n) {
-                    $tmp = new TreeNodeSurv($n->NodeID, $n);
-                    $tmp->fillNodeRow();
-                    $this->v["nodeTots"][$n->NodeID] = [
-                        "cmpl" => [ 0, 0 ],
-                        "perc" => intVal($this->custReport->rawOrderPercent($n->NodeID)),
-                        "name" => ((isset($tmp->extraOpts["meta-title"]) && trim($tmp->extraOpts["meta-title"]) != '')
-                            ? $tmp->extraOpts["meta-title"] : $n->NodePromptNotes)
-                        ];
-                    $this->v["nodeSort"][$this->v["nodeTots"][$n->NodeID]["perc"]] = $n->NodeID;
-                }
-            }
-            ksort($this->v["nodeSort"], 1); // SORT_NUMERIC
+            $analyze = new SessAnalysis($this->custReport->treeID);
+            $this->v["nodeTots"] = $analyze->loadNodeTots($this->custReport);
+            $this->v["nodeSort"] = $analyze->nodeSort;
+            $this->v["coreTots"] = [];
             $this->v["allPublicCoreIDs"] = $this->custReport->getAllPublicCoreIDs();
             
             $this->v["last100ids"] = DB::table('SL_NodeSavesPage')
@@ -638,7 +625,8 @@ class AdminTreeController extends AdminController
                 //->select('SL_NodeSaves.*', 'SL_Sess.SessCoreID')
                 ->orderBy('SL_Sess.created_at', 'desc')
                 ->select('SL_Sess.SessCoreID', 'SL_Sess.SessCurrNode', 'SL_Sess.created_at')
-                ->distinct()->get([ 'SL_Sess.SessCoreID' ]);
+                ->distinct()
+                ->get([ 'SL_Sess.SessCoreID' ]);
             
             $this->v["graph1data"] = [];
             $this->v["genTots"] = [
@@ -649,7 +637,7 @@ class AdminTreeController extends AdminController
             $nodeTots = $lines = [];
             if ($this->v["last100ids"]->isNotEmpty()) {
                 foreach ($this->v["last100ids"] as $i => $rec) {
-                    $coreTots = $this->analyzeCoreSessions($rec->SessCoreID);
+                    $coreTots = $analyze->analyzeCoreSessions($rec->SessCoreID, $this->v["allPublicCoreIDs"]);
                     if ($coreTots["node"] > 0 && isset($this->v["nodeTots"][$coreTots["node"]])) {
                         $this->v["coreTots"][] = $coreTots;
                         $cmpl = (($coreTots["cmpl"]) ? 1 : 0);
@@ -661,7 +649,9 @@ class AdminTreeController extends AdminController
                         $this->v["genTots"]["date"][2] = $coreTots["date"];
                         $this->v["genTots"]["date"][$cmpl] = $this->v["genTots"]["date"][$cmpl]+$coreTots["dur"];
                         $date = date("Y-m-d", $coreTots["date"]);
-                        if (!isset($this->v["genTots"]["date"][3][$date])) $this->v["genTots"]["date"][3][$date] = 0;
+                        if (!isset($this->v["genTots"]["date"][3][$date])) {
+                            $this->v["genTots"]["date"][3][$date] = 0;
+                        }
                         $this->v["genTots"]["date"][3][$date]++;
                         $min = $coreTots["dur"]/60;
                         if ($min < 70) {
@@ -710,7 +700,7 @@ class AdminTreeController extends AdminController
                 "graph"       => $this->v["graph2"],
                 "css"         => $this->v["css"]
                 ])->render();
-            $this->v["content"] = view('vendor.survloop.admin.tree.treeSessions', $this->v)->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.tree-sessions-stats', $this->v)->render();
             $this->saveCache();
         }
         $this->v["needsCharts"] = true;
@@ -729,84 +719,6 @@ class AdminTreeController extends AdminController
         return $this->v["graph1print"];
     }
     
-    protected function analyzeCoreSessions($coreID = -3)
-    {
-        if ($coreID <= 0) {
-            $coreID = $this->coreID;
-        }
-        if (!is_dir('../storage/app/anlyz')) {
-            mkdir('../storage/app/anlyz');
-        }
-        if (!is_dir('../storage/app/anlyz/t' . $this->custReport->treeID)) {
-            mkdir('../storage/app/anlyz/t' . $this->custReport->treeID);
-        }
-        $coreTots = [ "core" => $coreID, "node" => -3, "date" => 0, "dur" => 0, "mobl" => false, "cmpl" => false, 
-            "log" => [] ];
-        eval("\$coreRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" . intVal($coreID) . ");");
-        if (!$coreRec || !isset($coreRec->updated_at)) {
-            return $coreTots;
-        }
-        $cacheFile = '../storage/app/anlyz/t' . $this->custReport->treeID . '/c' . $coreID . '.php';
-        if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
-            || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (in_array($coreID, $this->v["allPublicCoreIDs"])) {
-                $coreTots["cmpl"] = true;
-            }
-            $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
-            if (isset($coreRec->{ $coreAbbr . 'SubmissionProgress' })) {
-                $coreTots["node"] = $coreRec->{ $coreAbbr . 'SubmissionProgress' };
-                $coreTots["date"] = strtotime($coreRec->created_at);
-                if (isset($coreRec->{ $coreAbbr . 'IsMobile' }) && intVal($coreRec->{ $coreAbbr . 'IsMobile' }) == 1) {
-                    $coreTots["mobl"] = true;
-                }
-            }
-            $coreLog = '';
-            $pages = DB::table('SL_NodeSavesPage')
-                ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', '=', 'SL_Sess.SessID')
-                ->where('SL_Sess.SessTree', '=', $this->custReport->treeID)
-                ->where('SL_Sess.SessCoreID', '=', $coreID)
-                ->orderBy('SL_NodeSavesPage.created_at', 'asc')
-                ->select('SL_NodeSavesPage.PageSaveNode', 'SL_NodeSavesPage.created_at')
-                ->distinct()
-                ->get([ 'SL_Sess.SessCoreID' ]);
-            if ($pages->isNotEmpty()) {
-                $lastCreateDate = $durMinus = 0;
-                foreach ($pages as $i => $p) {
-                    $dur = strtotime($p->created_at)-$coreTots["date"];
-                    if ($dur >= 0 && isset($this->v["nodeTots"][$p->PageSaveNode])) {
-                        $coreLog .= ', [ ' . $dur . ', ' . $p->PageSaveNode . ' ]';
-                        $coreTots["dur"] = $dur;
-                        if ($lastCreateDate > 0) {
-                            $lastGap = strtotime($p->created_at)-$lastCreateDate;
-                            if ($lastGap > 3600) {
-                                $durMinus += $lastGap;
-                            }
-                        } elseif ($dur > 3600) {
-                            $durMinus += $dur;
-                        }
-                        $lastCreateDate = strtotime($p->created_at);
-                    }
-                }
-                $coreTots["dur"] = $coreTots["dur"]-$durMinus;
-                if ($coreTots["dur"] < 0) {
-                    $coreTots["dur"] = 0;
-                }
-                if (trim($coreLog) != '') {
-                    $coreLog = substr($coreLog, 1);
-                }
-            }
-            $cacheCode = '$'.'coreTots = [ "core" => ' . $coreID . ', "node" => ' . $coreTots["node"] 
-                . ', "date" => ' . ((trim($coreTots["date"]) != '') ? $coreTots["date"] : 0) 
-                . ', "dur" => ' . ((trim($coreTots["dur"]) != '') ? $coreTots["dur"] : 0) 
-                . ', "mobl" => ' . (($coreTots["mobl"]) ? 'true' : 'false') 
-                . ', "cmpl" => ' . (($coreTots["cmpl"]) ? 'true' : 'false') 
-                . ', "log" => [ ' . $coreLog . ' ] ];' . "\n";
-            file_put_contents($cacheFile, $cacheCode);
-        }
-        eval(file_get_contents($cacheFile));
-        return $coreTots;
-    }
-
     public function workflows(Request $request) 
     {
         $this->admControlInit($request, '/dashboard/db/workflows');

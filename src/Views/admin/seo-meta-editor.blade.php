@@ -1,11 +1,11 @@
 <!-- resources/views/vendor/survloop/admin/seo-meta-editor.blade.php -->
 <div class="row mB20">
-    <div class="col-3 fPerc133 slBlueDark">
+    <div class="col-3 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageTitleFldID">Page Title:</label></h4>
     </div>
     <div class="col-9 nFld m0 p0">
         <input type="text" name="pageTitle" id="npageTitleFldID" autocomplete="off" 
-            class="form-control form-control-lg mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
+            class="form-control mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
             @if (isset($currMeta["title"]) && trim($currMeta["title"]) != '') value="{{ $currMeta['title'] }}" @endif
             onKeyUp="charCountKeyUp('pageTitle'); previewPage();" >
         <div>
@@ -20,8 +20,8 @@
 </div>
 @if (isset($currMeta["slug"]) && $currMeta["slug"] !== false)
     <div class="row mB20">
-        <div class="col-3 fPerc133 slBlueDark">
-            <h4><label for="nodeSlugID">Page URL:</label></h4>
+        <div class="col-3 slBlueDark">
+            <h4 class="mT5 mB0"><label for="nodeSlugID">Page URL:</label></h4>
         </div>
         <div class="col-9 nFld m0 p0">
             @if (isset($currMeta["base"])) <div class="disIn slGrey">{{ $currMeta["base"] }}</div> @endif
@@ -32,12 +32,11 @@
     </div>
 @endif
 <div class="row mB20">
-    <div class="col-3 fPerc133 slBlueDark">
+    <div class="col-3 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageDescFldID">Page Description:</label></h4>
     </div>
     <div class="col-9 nFld m0 p0">
-        <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" 
-            class="form-control form-control-lg mT0 mB0 flexarea" 
+        <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" class="form-control mT0 mB0 flexarea" 
             onKeyUp="charCountKeyUp('pageDesc'); flexAreaAdjust(this); previewPage();"
             @if (isset($currMeta["desc"]) && trim($currMeta["desc"]) != '') >{{ $currMeta["desc"] }}</textarea> 
             @else ></textarea> @endif
@@ -52,13 +51,12 @@
     </div>
 </div>
 <div class="row mB20">
-    <div class="col-3 fPerc133 slBlueDark">
+    <div class="col-3 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageKeyFldID">Page Keywords:</label></h4>
         <span class="fPerc80 slGrey">(comma separated)</span>
     </div>
     <div class="col-9 nFld m0 p0">
-        <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" 
-            class="form-control form-control-lg mT0 mB0 flexarea" 
+        <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" class="form-control mT0 mB0 flexarea" 
             onKeyUp="keywordCountKeyUp('pageKey'); flexAreaAdjust(this);"
             @if (isset($currMeta["wrds"]) && trim($currMeta["wrds"]) != '') >{{ $currMeta["wrds"] }}</textarea> 
             @else ></textarea> @endif
@@ -75,7 +73,7 @@
     </div>
 </div>
 <div class="row mB20">
-    <div class="col-3 fPerc133 slBlueDark">
+    <div class="col-3 slBlueDark">
         <h4 class="mT5 mB0"><label for="npageImgFldID">Page Social Sharing Image:</label></h4>
         <span class="fPerc80 slGrey">(ideally 800x418 pixels)</span>
     </div>

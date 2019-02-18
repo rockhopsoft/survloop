@@ -1,12 +1,11 @@
 <!-- Stored in resources/views/vender/survloop/admin/tree/snippets.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container">
 <div class="row">
-    <div class="col-7">
+    <div class="col-md-8">
         
+        <div class="slCard nodeWrap">
         <h2><i class="fa fa-newspaper-o"></i> Content Snippets</h2>
         <div class="slGrey pB10">
             Snippets are little chunks of content for your site. They can be small or large, control the website's
@@ -23,12 +22,12 @@
             <tr><td><i>No snippets found.</i></td></tr>
         @endforelse
         </table>
+        </div>
         
-    </div>
-    <div class="col-1"></div>
-    <div class="col-4">
+    </div><div class="col-md-4">
         
         <div class="nodeAnchor"><a id="new" name="new"></a></div>
+        <div class="slCard nodeWrap">
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="sub" value="1">
         <div id="newSnipForm" class="row2 p20 mT20 mB20">
@@ -46,10 +45,10 @@
                 </form>
             </div>
         </div>
-        <div class="p10"></div>
+        </div>
         
     </div>
 </div>
-
+</div>
 <div class="adminFootBuff"></div>
 @endsection

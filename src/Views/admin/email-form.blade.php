@@ -1,9 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/email-form.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container"><div class="slCard nodeWrap">
 @if ($currEmailID > 0) 
     <h2 class="mB0">Editing Email Template: {{ $currEmail->EmailName }}</h2> 
 @else
@@ -59,11 +57,8 @@
             >{{ $currEmail->EmailBody }}</textarea>
     </div>
 </div>
-
 </form>
-
 <!--- {{ $currEmail->EmailOpts }} --->
-
+</div></div>
 <div class="adminFootBuff"></div>
-
 @endsection

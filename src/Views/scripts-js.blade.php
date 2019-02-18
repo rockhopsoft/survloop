@@ -558,7 +558,7 @@ function keywordCountKeyUp(nIDtxt) {
 	return true;
 }
 
-function wordCountKeyUp(nIDtxt, limit) {
+function wordCountKeyUp(nIDtxt, limit, warn) {
 	if (document.getElementById("n"+nIDtxt+"FldID")) {
 	    var words = new Array();
 	    if (document.getElementById("n"+nIDtxt+"FldID").value.trim() != "") {
@@ -572,8 +572,8 @@ function wordCountKeyUp(nIDtxt, limit) {
 	        document.getElementById("n"+nIDtxt+"FldID").value = newLimited.trim();
 	    }
 	    if (document.getElementById("wordCnt"+nIDtxt+"")) {
-            var cntWords = "<span class=\"slRedLight\">"+words.length+"</span>";
-            if (words.length < limit) cntWords = "<span class=\"slBlueDark\">"+words.length+"</span>";
+            var cntWords = "<span class=\"slBlueDark\">"+words.length+"</span>";
+            if (0 < warn && warn <= words.length) cntWords = "<span class=\"slRedLight\">"+words.length+"</span>";
             document.getElementById("wordCnt"+nIDtxt+"").innerHTML=cntWords;
         }
 	}
@@ -936,10 +936,30 @@ function initGalSlider(nIDtxt, kids, style) {
 
 var hshoos = new Array();
 var hshooCurr = 0;
+var anchorOffsetBonus = 0;
 function addHshoo(hash) {
     hshoos[hshoos.length] = new Array(hash, 0);
     return true;
 }
+function getHshooInd(currHash) {
+    for (var i = 0; i < hshoos.length; i++) {
+        if (hshoos[i][0] == currHash) return i;
+    }
+    return -1;
+}
+function hasHshoos() {
+    return (hshoos.length > 0);
+}
+function chkHshooTopTabs() {
+    if (hasHshoos() && document.getElementById('slTopTabsWrap') && document.getElementById('adminMenuTopTabs')) {
+        document.getElementById('slTopTabsWrap').style.position='fixed';
+        document.getElementById('adminMenuTopTabs').style.marginBottom='70px';
+    } else {
+        setTimeout("chkHshooTopTabs()", 2000);
+    }
+    return true;
+}
+setTimeout("chkHshooTopTabs()", 200);
 
 function checkBoxAll(fldBase, count, isChecked) {
     for (var i = 0; i < count; i++) {
@@ -1023,7 +1043,7 @@ function getNextProTipText() {
 function addProTipToAjax() {
     if (treeProTips.length > 0) {
         if (document.getElementById("ajaxWrapLoad")) {
-            document.getElementById("ajaxWrapLoad").innerHTML += '<center><h3 class="slBlueDark">'+getNextProTipText()+'</h3></center>';
+            document.getElementById("ajaxWrapLoad").innerHTML += '<center><h3 class="slBlueDark pL15 pR15">'+getNextProTipText()+'</h3></center>';
             logLastProTip();
         }
     }

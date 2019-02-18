@@ -20,6 +20,9 @@ class TreeSurvApi extends TreeCore
 {
     protected function initExtra(Request $request)
     {
+        if (!isset($this->v["uID"])) {
+            $this->loadUserVars();
+        }
         if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) > 0) {
             $newRoot = new SLNode;
             $newRoot->NodeTree        = $this->treeID;

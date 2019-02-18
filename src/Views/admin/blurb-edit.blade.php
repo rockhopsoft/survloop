@@ -1,8 +1,7 @@
 <!-- resources/views/survloop/admin/blurb-edit.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
+<div class="container"><div class="slCard nodeWrap">
 <form name="mainPageForm" action="/dashboard/pages/snippets/{{ $blurbRow->DefID }}" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="DefID" value="{{ $blurbRow->DefID }}">
@@ -30,6 +29,6 @@
     style="height: 500px;">{!! $blurbRow->DefDescription !!}</textarea><br /><br />
 <input type="submit" class="btn btn-lg btn-primary m10" value="Save Changes">
 </form>
-
+</div></div>
 <div class="adminFootBuff"></div>
 @endsection

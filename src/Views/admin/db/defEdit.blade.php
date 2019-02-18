@@ -1,9 +1,8 @@
 <!-- resources/views/vendor/survloop/admin/db/defEdit.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
-
+<div class="container">
+<div class="slCard nodeWrap">
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
@@ -56,9 +55,9 @@
         <label for="deleteDefID">Delete Definition</label>
     </div>
 </div>
-
 </form>
-
+</div>
+</div>
 <script type="text/javascript">
 function chkSubset(newVal) {
     if (newVal == '_') document.getElementById('newSubsetDiv').style.display='block'; 

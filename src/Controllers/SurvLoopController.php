@@ -58,15 +58,21 @@ class SurvLoopController extends Controller
     protected $extraTree         = [];
     public    $searcher          = null;
     
+    protected function loadUserVars()
+    {
+        $this->v["user"]       = Auth::user();
+        $this->v["uID"]        = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+        $this->v["isAdmin"]    = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
+        $this->v["isVolun"]    = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
+        $this->initPowerUser();
+        return true;
+    }
+    
     public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
     {
         if (!$this->survInitRun) {
             $this->survInitRun = true;
-            $this->v["user"]       = Auth::user();
-            $this->v["uID"]        = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
-            $this->v["isAdmin"]    = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
-            $this->v["isVolun"]    = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
-            $this->initPowerUser();
+            $this->loadUserVars();
             $this->v["isAll"]      = $request->has('all');
             $this->v["isAlt"]      = $request->has('alt');
             $this->v["isPrint"]    = $request->has('print');
@@ -837,7 +843,7 @@ class SurvLoopController extends Controller
         return $def;
     }
     
-    protected function loadSysUpdates()
+    public function loadSysUpdates()
     {
         $this->v["pastUpDef"] = $this->getCoreDef('System Checks', 'system-updates');
         $this->v["pastUpArr"] = $GLOBALS["SL"]->mexplode(';;', $this->v["pastUpDef"]->DefDescription);
@@ -896,10 +902,7 @@ class SurvLoopController extends Controller
     
     public function initPowerUser($uID = -3)
     {
-        if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|staff|databaser|brancher|partner')) {
-            return true;
-        }
-        return false;
+        return true;
     }
     
 }

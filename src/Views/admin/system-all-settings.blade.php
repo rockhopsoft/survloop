@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/system-all-settings.blade.php -->
 @extends('vendor.survloop.master')
 @section('content')
-
+<div class="container">
 <div class="disNon"><iframe src="/dashboard/css-reload" ></iframe></div>
 
 <form name="mainPageForm" action="/dashboard/settings" method="post">
@@ -10,32 +10,33 @@
 
 <div class="nodeAnchor"><a id="search" name="search"></a></div>
 
-<div class="row">
-    <div class="col-sm-8">
-        <h1 class="slBlueDark"><nobr><i class="fa fa-cogs"></i> System</nobr> Settings</h1>
-    </div><div class="col-sm-2 slGrey fPerc80">
-    @if (!$GLOBALS["SL"]->isHomestead())
-        {!! str_replace('Current IP Address: ', 'Server IP Address:<br />', 
-            file_get_contents('http://checkip.dyndns.com/')) !!}
-    @endif
-    </div><div class="col-sm-2">
-        <a href="?refresh=2" class="btn btn-primary btn-sm">Refresh All Caches</a>
+<div class="slCard nodeWrap">
+    <div class="row">
+        <div class="col-sm-8">
+            <h1 class="slBlueDark"><nobr><i class="fa fa-cogs"></i> System</nobr> Settings</h1>
+        </div><div class="col-sm-2 slGrey fPerc80">
+        @if (!$GLOBALS["SL"]->isHomestead())
+            {!! str_replace('Current IP Address: ', 'Server IP Address:<br />', 
+                file_get_contents('http://checkip.dyndns.com/')) !!}
+        @endif
+        </div><div class="col-sm-2">
+            <a href="?refresh=2" class="btn btn-primary btn-sm">Refresh All Caches</a>
+        </div>
     </div>
+
+    <a href="#search" class="hshoo">SEO</a> - 
+    <a href="#general" class="hshoo">SurvLoop Configuration</a> - 
+    <a href="#survopts" class="hshoo">SurvLoop Settings</a> - 
+    <a href="#social" class="hshoo">Social Media</a> - 
+    <a href="#license" class="hshoo">Licenses</a> - 
+    <a href="#logos" class="hshoo">Logos & Fonts</a> - 
+    <a href="#color" class="hshoo">Colors</a> - 
+    <a href="#hardcode" class="hshoo">Hard Code HTML CSS JS</a> - 
+    <a href="#custom" class="hshoo">Custom Settings</a>
+    <div class="fC"></div>
 </div>
-    
 
-<a href="#search" class="hshoo">Search Engine Optimization</a> - 
-<a href="#general" class="hshoo">SurvLoop Configuration</a> - 
-<a href="#survopts" class="hshoo">SurvLoop Settings</a> - 
-<a href="#social" class="hshoo">Social Media</a> - 
-<a href="#license" class="hshoo">Licenses</a> - 
-<a href="#logos" class="hshoo">Logos & Fonts</a> - 
-<a href="#color" class="hshoo">Colors</a> - 
-<a href="#hardcode" class="hshoo">Hard Code HTML CSS JS</a> - 
-<a href="#custom" class="hshoo">Custom Settings</a>
-<div class="fC"></div>
-<p>&nbsp;</p>
-
+<div class="slCard nodeWrap">
 <h2 class="mB10">Search Engine Optimization</h2>
 <div class="row">
     <div class="col-8">
@@ -45,11 +46,12 @@
         {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}
     </div>
 </div>
+</div>
 
 <div class="p20"></div>
 <div class="nodeAnchor"><a id="general" name="general"></a></div>
 
-<hr>
+<div class="slCard nodeWrap">
 <h2>General Settings</h2>
 <h3 class="slBlueDark"><u>SurvLoop Configurations</u></h3>
 <div class="row">
@@ -65,8 +67,12 @@
         @endforeach
     </div>
 </div>
-<div class="nodeAnchor"><a id="survopts" name="survopts"></a></div>
+</div>
+
 <div class="p20"></div>
+<div class="nodeAnchor"><a id="survopts" name="survopts"></a></div>
+
+<div class="slCard nodeWrap">
 <h3 class="slBlueDark"><u>SurvLoop Settings</u></h3>
 <div class="row">
     <div class="col-md-6">
@@ -81,8 +87,12 @@
         @endforeach
     </div>
 </div>
-<div class="nodeAnchor"><a id="social" name="social"></a></div>
+</div>
+
 <div class="p20"></div>
+<div class="nodeAnchor"><a id="social" name="social"></a></div>
+
+<div class="slCard nodeWrap">
 <h3 class="slBlueDark"><u>Social Settings</u></h3>
 <div class="row">
     <div class="col-md-6">
@@ -96,25 +106,23 @@
         @endforeach
     </div>
 </div>
-<div class="nodeAnchor"><a id="license" name="license"></a></div>
-<div class="p20"></div>
-<h3 class="slBlueDark"><u>License Settings</u></h3>
-<div class="row">
-    <div class="col-md-6">
-        @foreach (['app-license', 'app-license-url'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
-        @endforeach
-    </div><div class="col-md-6">
-        {!! view('vendor.survloop.admin.system-one-setting', [
-            "opt" => 'app-license-img', "val" => $sysDef->v["settingsList"]["app-license-img"] ])->render() !!}
-    </div>
 </div>
 
 <div class="p20"></div>
+<div class="nodeAnchor"><a id="license" name="license"></a></div>
+
+<div class="slCard nodeWrap">
+<h3 class="slBlueDark"><u>License Settings</u></h3>
+@foreach (['app-license', 'app-license-url', 'app-license-img', 'app-license-snc'] as $opt)
+    {!! view('vendor.survloop.admin.system-one-setting', [
+        "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+@endforeach
+</div>
+
 <div class="p20"></div>
-<hr>
 <div class="nodeAnchor"><a id="logos" name="logos"></a></div>
+
+<div class="slCard nodeWrap">
 <h2>Logos & Fonts</h2>
 <h3 class="slBlueDark"><u>Logos</u></h3>
 <div class="row">
@@ -139,11 +147,12 @@
         {!! $GLOBALS["SL"]->spinner() !!}
     </div>
 </div>
+</div>
 
 <div class="p20"></div>
-<div class="p20"></div>
-<hr>
 <div class="nodeAnchor"><a id="color" name="color"></a></div>
+
+<div class="slCard nodeWrap">
 <div class="row">
     <div class="col-8">
     
@@ -176,12 +185,12 @@
         <div id="previewColors"></div>
     </div>
 </div>
-    
+</div>
 
+<div class="p20"></div>
 <div class="nodeAnchor"><a id="hardcode" name="hardcode"></a></div>
-<div class="p20"></div>
-<div class="p20"></div>
-<hr>
+
+<div class="slCard nodeWrap">
 <h2>Hard Code HTML, CSS, JS</h2>
 {!! view('vendor.survloop.admin.system-one-setting', [
     "opt" => 'header-code', "val" => $sysDef->v["settingsList"]["header-code"] ])->render() !!}
@@ -198,12 +207,13 @@
     <textarea name="sys-cust-css-email" class="form-control" autocomplete="off" 
         style="height: 200px; font-family: Courier New;">{!! $sysDef->v["custCSSemail"]->DefDescription !!}</textarea>
 </label></div>
+</div>
 
 @if (sizeof($sysDef->v["rawSettings"]) > 0)
+    <div class="p20"></div>
     <div class="nodeAnchor"><a id="custom" name="custom"></a></div>
-    <div class="p20"></div>
-    <div class="p20"></div>
-    <hr>
+    
+    <div class="slCard nodeWrap">
     <h2>Custom Settings</h2>
     <div class="row">
         <div class="col-md-6">
@@ -225,13 +235,13 @@
             @endforeach
         </div>
     </div>
+    </div>
 @endif
 
-<div class="p20"></div><div class="p20"></div>
-
+<div class="p20"></div>
 <input type="submit" class="btn btn-xl btn-primary w100" value="Save All Settings Changes">
 
 </form>
-<div class="p20"></div><div class="p20"></div>
-
+</div>
+<div class="adminFootBuff"></div>
 @endsection

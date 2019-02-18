@@ -207,6 +207,9 @@ function checkNodeForm() {
     }
     clearFormErrs();
     firstNodeError = 0;
+    if (document.getElementById('nameID').value.trim() == '') {
+        document.getElementById('nameID').value=document.getElementById('emailID').value;
+    }
     return true;
 }
 </script>
