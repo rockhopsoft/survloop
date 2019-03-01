@@ -2,7 +2,6 @@
     "name": "wikiworldorder/survloop",
     "description": "SurvLoop is a Laravel-based engine for designing a database and creating a mobile-friendly user interface to fill it.",
     "keywords": [
-    	"laravel", 
     	"SurvLoop", 
     	"survey", 
     	"database designer", 
@@ -13,7 +12,8 @@
     	"branching tree",
     	"nodes",
     	"content management system",
-    	"open source"
+    	"open source",
+    	"Laravel", 
     ],
     "license": "GPL-3.0-or-later",
     "authors": [
@@ -25,16 +25,17 @@
         }
     ],
     "require": {
-        "doctrine/dbal": "^2.9.2", 
-        "guzzlehttp/guzzle": "^6.3.3",
-        "matthiasmullie/minify": "^1.3.61",
-        "twbs/bootstrap": "^4.3.1",
-        "components/jquery": "^3.3.1",
-        "components/jqueryui": "^1.12.1",
-        "forkawesome/fork-awesome": "^1.1.5",
-        "nnnick/chartjs": "^v2.7.3",
-        "plotly/plotly.js": "^v1.44.4",
-        "summernote/summernote": "^v0.8.8"
+        "laravel/laravel": "~5.8.0",
+        "doctrine/dbal": "~2.9.2", 
+        "guzzlehttp/guzzle": "~6.3.3",
+        "matthiasmullie/minify": "~1.3.61",
+        "twbs/bootstrap": "~4.3.1",
+        "components/jquery": "~3.3.1",
+        "components/jqueryui": "~1.12.1",
+        "forkawesome/fork-awesome": "~1.1.5",
+        "nnnick/chartjs": "~2.7.3",
+        "plotly/plotly.js": "~1.44.4",
+        "summernote/summernote": "~0.8.8"
     },
     "autoload": {
         "psr-4": {
