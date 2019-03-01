@@ -109,14 +109,12 @@ class AuthController extends Controller
     public function getRegister(Request $request)
     {
         $this->chkAuthPageOpts($request);
-        $emailRequired = 'true';
         return view('vendor.survloop.auth.register', [
             "request"       => $request,
             "sysOpts"       => $GLOBALS["SL"]->sysOpts,
             "midSurvRedir"  => $this->midSurvRedir,
             "midSurvBack"   => $this->midSurvBack,
-            "formFooter"    => $this->formFooter,
-            "emailRequired" => $emailRequired
+            "formFooter"    => $this->formFooter
             ]);
     }
     

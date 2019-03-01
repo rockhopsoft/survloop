@@ -25,16 +25,16 @@
         }
     ],
     "require": {
-        "laravel/laravel": "^5.7.19",
-        "doctrine/dbal": "^2.9", 
-        "guzzlehttp/guzzle": "^6.3",
+        "laravel/laravel": "^v5.8.0",
+        "doctrine/dbal": "^2.9.2", 
+        "guzzlehttp/guzzle": "^6.3.3",
         "matthiasmullie/minify": "^1.3.61",
-        "twbs/bootstrap": "^4.2.1",
+        "twbs/bootstrap": "^4.3.1",
         "components/jquery": "^3.3.1",
         "components/jqueryui": "^1.12.1",
         "forkawesome/fork-awesome": "^1.1.5",
         "nnnick/chartjs": "^v2.7.3",
-        "plotly/plotly.js": "^v1.44.0",
+        "plotly/plotly.js": "^v1.44.4",
         "summernote/summernote": "^v0.8.8"
     },
     "autoload": {

@@ -117,7 +117,7 @@
     <div id="pageBtns">
         <div id="formErrorMsg"></div>
         <div id="nodeSubBtns" class="nodeSub">
-            <input type="submit" class="fR btn btn-primary btn-lg" value="Sign Up">
+            <input type="submit" id="nFormSignupSubBtn" class="fR btn btn-primary btn-lg" value="Sign Up">
             <a href="{{ $midSurvBack }}" class="fL btn btn-secondary btn-lg" id="nFormBack">Back</a>
             <div class="fC p5"></div>
         </div>
@@ -138,80 +138,6 @@ setTimeout(function() { if (findGetParam('volunteer')) document.getElementById('
 @endif
 $(document).ready(function(){
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
-});
-function checkNodeForm() {
-    emailRequired = {{ $emailRequired }};
-    hasAttemptedSubmit = true;
-    totFormErrors = 0;
-    formErrorsEng = "";
-    
-@if (isset($sysOpts["user-name-req"]) && intVal($sysOpts["user-name-req"]) == 1)
-    if (document.getElementById('nameID').value.trim() == '') {
-        setFormLabelRed('004');
-        totFormErrors++;
-    } else {
-        setFormLabelBlack('004');
-    }
-@endif
-
-    if (emailRequired && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        setFormLabelRed('001'); 
-        totFormErrors++;
-    } else if (reqFormEmail('emailID') && document.getElementById('emailID').value.trim() != '') {
-        document.getElementById('emailWarning').style.display='none';
-        $.ajax({
-            url: "/chkEmail?"+$("#emailID").serialize(),
-            type: 'GET',
-            async: false,
-            cache: false,
-            timeout: 30000,
-            error: function(){
-                return true;
-            },
-            success: function(chkData){ 
-                if (chkData == 'found') {
-                    document.getElementById('emailBlockID').value = 1;
-                    setFormLabelRed('001'); 
-                    totFormErrors++;
-                    //document.getElementById('emailWarning').style.display='block';
-                    $("#emailWarning").slideDown("fast");
-                } else {
-                    document.getElementById('emailBlockID').value = 0;
-                    setFormLabelBlack('001');
-                }
-            }
-        });
-    }
-    
-    if (document.getElementById('password') && document.getElementById('password_confirmation')) {
-        var pass1 = document.getElementById('password').value;
-        if (pass1 == '' || pass1.length < 8 || pass1 != document.getElementById('password_confirmation').value) {
-            setFormLabelRed('002');
-            setFormLabelRed('003');
-            totFormErrors++;
-        } else {
-            setFormLabelBlack('002');
-            setFormLabelBlack('003');
-        }
-    }
-
-@if (isset($sysOpts["user-email-optional"]) && $sysOpts["user-email-optional"] == 'On')
-    if (totFormErrors == 0 && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
-    }
-@endif
-    
-    if (totFormErrors > 0) {
-        setFormErrs();
-        return false;
-    }
-    clearFormErrs();
-    firstNodeError = "";
-    if (document.getElementById('nameID').value.trim() == '') {
-        document.getElementById('nameID').value=document.getElementById('emailID').value;
-    }
-    return true;
-}
-</script>
+});</script>
 
 @endsection
