@@ -75,6 +75,10 @@ class SurvLoop extends SurvCustLoop
                 exit;
             }
             $this->loadLoop($request);
+            if ($view == 'pdf') {
+                $this->custLoop->v["isPrint"] = 1;
+                $GLOBALS["SL"]->x["isPrintPDF"] = true;
+            }
             if ($cid > 0) {
                 $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid, $skipPublic);
                 if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
@@ -85,6 +89,11 @@ class SurvLoop extends SurvCustLoop
                 if ($GLOBALS["SL"]->x["pageView"] != '') {
                     $GLOBALS["SL"]->x["pageSlugSffx"] .= '/' . $GLOBALS["SL"]->x["pageView"];
                 }
+            }
+            if (in_array($view, ['xml', 'json'])) {
+                $GLOBALS["SL"]->x["pageView"] = 'public';
+                $this->custLoop->loadXmlMapTree($request);
+                return $this->custLoop->getXmlID($request, $cid, $pageSlug);
             }
             $this->pageContent = $this->custLoop->index($request);
             if ($GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE > 0 && $cid <= 0) {

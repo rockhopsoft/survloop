@@ -10,11 +10,11 @@
             @if ($res[0] == 'O') style="padding-top: 1px; padding-bottom: 1px;" @endif >
             <nobr><div class="disIn mR5">
                 <input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" value="{{ $res[0] }}" type="radio" 
-                    autocomplete="off" onClick="formClickGender({{ $nID }}); checkNodeUp('{{ $nID }}', {{ $j }}, 1);"
+                    autocomplete="off" onClick="formClickGender({{ $nID }});"
     @else
         mR10"><nobr><div class="disIn mR5">
             <input name="n{{ $nID }}fld" id="n{{ $nID }}fld{{ $j }}" value="{{ $res[0] }}" autocomplete="off" 
-                type="radio" onClick="formClickGender({{ $nID }}); checkNodeUp('{{ $nID }}', {{ $j }}, 0); 
+                type="radio" onClick="formClickGender({{ $nID }}); 
                 @if ($res[0] != 'O') document.getElementById('n{{ $nID }}fldOtherID').value=''; @endif "
     @endif
     @if ($currNodeSessData == $res[0]) CHECKED @endif ></div> {{ $res[1] }}</nobr>

@@ -556,8 +556,9 @@ class TreeNodeSurv extends TreeNodeCore
     public function isNonLoopSpecial()
     {
         return ($this->isInstruct() || $this->isInstructRaw() || $this->isPage()  || $this->isBranch() 
-            || $this->isLoopSort() || $this->isDataManip() || $this->isWidget() || $this->isBigButt() 
-            || $this->isLayout() || $this->isDataPrint() || in_array($this->nodeType, ['Send Email']));
+            || $this->isLoopSort() || $this->isDataManip() || $this->isWidget() 
+            || $this->isBigButt() || $this->isLayout() || $this->isDataPrint() 
+            || in_array($this->nodeType, ['Send Email']));
     }
     
     public function isWidget()
@@ -712,62 +713,62 @@ class TreeNodeSurv extends TreeNodeCore
         } elseif ($this->nodeType == 'Send Email') {
             return '<i class="fa fa-envelope-o" aria-hidden="true" title="Send an Email"></i>';
         } elseif ($this->nodeType == 'Checkbox') {
-            return '<i class="fa fa-check-square-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-check-square-o" aria-hidden="true" alt="Checkboxes"></i>';
         } elseif ($this->nodeType == 'Radio') {
-            return '<i class="fa fa-dot-circle-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-dot-circle-o" aria-hidden="true" title="Radio Buttons"></i>';
         } elseif (in_array($this->nodeType, ['Email', 'Gender', 'Gender Not Sure', 'Long Text', 
             'Text', 'Text:Number'])) {
-            return '<i class="fa fa-i-cursor" aria-hidden="true"></i>';
+            return '<i class="fa fa-i-cursor" aria-hidden="true" title="Text Field"></i>';
         } elseif (in_array($this->nodeType, ['U.S. States', 'Drop Down', 'Date', 'Feet Inches'])) {
-            return '<i class="fa fa-caret-square-o-down" aria-hidden="true"></i>';
+            return '<i class="fa fa-caret-square-o-down" aria-hidden="true" title="Drop Down"></i>';
         } elseif ($this->isSpreadTbl()) {
-            return '<i class="fa fa-table" aria-hidden="true"></i>';
+            return '<i class="fa fa-table" aria-hidden="true" title="Spreadsheet Table"></i>';
         } elseif ($this->nodeType == 'Instructions') {
-            return '<i class="fa fa-info-circle" aria-hidden="true"></i>';
+            return '<i class="fa fa-info-circle" aria-hidden="true" title="Instructions"></i>';
         } elseif ($this->nodeType == 'Instructions Raw') {
-            return '<i class="fa fa-code" aria-hidden="true"></i>';
+            return '<i class="fa fa-code" aria-hidden="true" title="Instructions (HTML)"></i>';
         } elseif ($this->nodeType == 'Hidden Field') {
-            return '<i class="fa fa-eye-slash opac50" aria-hidden="true"></i>';
+            return '<i class="fa fa-eye-slash opac50" aria-hidden="true" title="Hidden Field"></i>';
         } elseif ($this->nodeType == 'Date Picker') {
-            return '<i class="fa fa-calendar" aria-hidden="true"></i>';
+            return '<i class="fa fa-calendar" aria-hidden="true" title="Date Picker"></i>';
         } elseif (in_array($this->nodeType, ['Time', 'Date Time'])) {
-            return '<i class="fa fa-clock-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-clock-o" aria-hidden="true" title="Date and/or Time"></i>';
         } elseif ($this->nodeType == 'Slider') {
-            return '<i class="fa fa-sliders" aria-hidden="true"></i>';
+            return '<i class="fa fa-sliders" aria-hidden="true" title="Slider"></i>';
         } elseif ($this->nodeType == 'User Sign Up') {
-            return '<i class="fa fa-user-plus" aria-hidden="true"></i>';
+            return '<i class="fa fa-user-plus" aria-hidden="true" title="User Sign Up"></i>';
         } elseif ($this->nodeType == 'Uploads') {
-            return '<i class="fa fa-cloud-upload" aria-hidden="true"></i>';
+            return '<i class="fa fa-cloud-upload" aria-hidden="true" title="Uploads"></i>';
         } elseif (in_array($this->nodeType, ['Gallery Slider'])) {
-            return '<i class="fa fa-picture-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-picture-o" aria-hidden="true" title="Gallery Slider"></i>';
         } elseif ($this->isPageBlock()) {
-            return '<i class="fa fa-square-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-square-o" aria-hidden="true" title="Page Block"></i>';
         } elseif ($this->isLayout() || $this->nodeType == 'Data Print Columns') {
-            return '<i class="fa fa-columns"></i>';
+            return '<i class="fa fa-columns" title="Column"></i>';
         } elseif ($this->isWidget()) {
             if ($this->nodeType == 'Incomplete Sess Check') {
-                return '<i class="fa fa-user-o" aria-hidden="true"></i>';
+                return '<i class="fa fa-user-o" aria-hidden="true" title="Incomplete Session Check"></i>';
             } elseif ($this->nodeType == 'Member Profile') {
-                return '<i class="fa fa-user-circle-o" aria-hidden="true"></i>';
+                return '<i class="fa fa-user-circle-o" aria-hidden="true" title="Member Profile"></i>';
             } elseif (in_array($this->nodeType, ['Search', 'Search Results', 'Search Featured'])) {
-                return '<i class="fa fa-search" aria-hidden="true"></i>';
+                return '<i class="fa fa-search" aria-hidden="true" title="Search"></i>';
             } elseif (in_array($this->nodeType, ['Plot Graph', 'Line Graph'])) {
-                return '<i class="fa fa-area-chart" aria-hidden="true"></i>';
+                return '<i class="fa fa-area-chart" aria-hidden="true" title="Graph"></i>';
             } elseif ($this->nodeType == 'Bar Graph') {
-                return '<i class="fa fa-bar-chart" aria-hidden="true"></i>';
+                return '<i class="fa fa-bar-chart" aria-hidden="true" title="Bar Graph"></i>';
             } elseif ($this->nodeType == 'Pie Chart') {
-                return '<i class="fa fa-pie-chart" aria-hidden="true"></i>';
+                return '<i class="fa fa-pie-chart" aria-hidden="true" title="Pie Chart"></i>';
             } elseif ($this->nodeType == 'Map') {
-                return '<i class="fa fa-map-o" aria-hidden="true"></i>';
+                return '<i class="fa fa-map-o" aria-hidden="true" title="Map"></i>';
             } elseif ($this->nodeType == 'MFA Dialogue') {
-                return '<i class="fa fa-lock" aria-hidden="true"></i>';
+                return '<i class="fa fa-lock" aria-hidden="true" title="MFA Dialogue"></i>';
             } else {
-                return '<i class="fa fa-magic" aria-hidden="true"></i>';
+                return '<i class="fa fa-magic" aria-hidden="true" title="Widget"></i>';
             }
         } elseif ($this->isDataPrint()) {
-            return '<i class="fa fa-list-alt" aria-hidden="true"></i>';
+            return '<i class="fa fa-list-alt" aria-hidden="true" title="Data Print"></i>';
         } else { // if ($this->nodeType == 'Other/Custom')
-            return '<i class="fa fa-hand-spock-o" aria-hidden="true"></i>';
+            return '<i class="fa fa-magic" aria-hidden="true" title="Other/Custom"></i>';
         }
     }
     

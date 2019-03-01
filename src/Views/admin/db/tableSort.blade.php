@@ -1,9 +1,9 @@
 <!-- resources/views/vendor/survloop/admin/db/tableSort.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
+<div class="container">
+<div class="slCard nodeWrap">
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
@@ -14,6 +14,7 @@
 
 {!! $sortable !!}
 
-<div class="adminFootBuff"></div>
+</div>
+</div>
 
 @endsection

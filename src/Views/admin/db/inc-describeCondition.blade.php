@@ -8,6 +8,8 @@
     @endif
     @if ($cond->CondTag == '#NodeDisabled')
         <b class="red">{{ $cond->CondTag }}</b>
+    @elseif (trim($cond->CondOperator) == 'AB TEST')
+        <i>%AB: {{ $cond->CondDesc }}</i>
     @elseif (trim($cond->CondOperator) == 'CUSTOM')
         {{ $cond->CondTag }}
     @else

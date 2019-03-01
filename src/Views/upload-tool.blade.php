@@ -8,8 +8,7 @@
             @foreach ($uploadTypes as $j => $ty)
                 <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" class="finger">
                     <div class="disIn mR5"><input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" 
-                        value="{{ $ty->DefID }}" type="radio" autocomplete="off" class="upTypeBtn"
-                        onClick="checkNodeUp('{{ $nID }}', {{ $j }}, 1);" ></div>    
+                        value="{{ $ty->DefID }}" type="radio" autocomplete="off" class="upTypeBtn"></div>    
                         {{ $ty->DefValue }}
                 </label>
             @endforeach

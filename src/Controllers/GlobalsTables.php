@@ -46,6 +46,7 @@ class GlobalsTables extends GlobalsStatic
     public $xmlTree        = [];
     public $reportTree     = [];
     public $formTree       = [];
+    
     public $coreTbl        = '';
     public $coreTblUserFld = '';
     public $treeXmlID      = -3;
@@ -62,6 +63,7 @@ class GlobalsTables extends GlobalsStatic
     public $fldOthers      = [];
     public $defValues      = [];
     public $condTags       = [];
+    public $condABs        = [];
     
     public $foreignKeysIn  = [];
     public $foreignKeysOut = [];
@@ -392,6 +394,9 @@ class GlobalsTables extends GlobalsStatic
                 $chk = SLTree::find(intVal($nodeChk->NodeResponseSet));
                 $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
             }
+        }
+        if (!isset($GLOBALS["SL"]->x["pageView"])) {
+            $GLOBALS["SL"]->x["pageView"] = $GLOBALS["SL"]->x["pageSlugSffx"] = '';
         }
         return true;
     }
@@ -878,7 +883,10 @@ class GlobalsTables extends GlobalsStatic
                             $fld = SLFields::find($cond->CondField);
                             if ($fld && isset($fld->FldName) && isset($this->tbl[$cond->CondTable])) {
                                 $tblAbbr = $this->tblAbbr[$this->tbl[$cond->CondTable]];
-                                $ret[] = [ $tblAbbr . $fld->FldName, $vals[0]->CondValValue ];
+                                $ret[] = [
+                                    $tblAbbr . $fld->FldName,
+                                    $vals[0]->CondValValue
+                                    ];
                             }
                         }
                     }
@@ -1331,7 +1339,6 @@ class GlobalsTables extends GlobalsStatic
         return null;
     }
     
-    
     public function getFldResponsesByID($fldID)
     {
         if (intVal($fldID) <= 0) {
@@ -1339,7 +1346,6 @@ class GlobalsTables extends GlobalsStatic
         }
         return $this->getFldResponses($this->getFullFldNameFromID($fldID));
     }
-    
     
     public function getFldResponses($fldName)
     {
@@ -1365,7 +1371,7 @@ class GlobalsTables extends GlobalsStatic
             }
             if (sizeof($tmpVals[0]) > 0) {
                 foreach ($tmpVals[0] as $i => $val) {
-                    $ret["vals"][] = array($val, $tmpVals[1][$i]);
+                    $ret["vals"][] = [$val, $tmpVals[1][$i]];
                 }
             }
         }
@@ -1531,6 +1537,21 @@ class GlobalsTables extends GlobalsStatic
             $cond->save();
         }
         return $cond;
+    }
+    
+    public function loadTestsAB()
+    {
+        $this->condABs = [];
+        $chk = SLConditions::where('CondOperator', 'AB TEST')
+            ->where('CondTag', 'LIKE', '%AB Tree' . $this->treeID . '%')
+            ->orderBy('CondTag', 'asc')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cond) {
+                $this->condABs[] = [$cond->CondID, $cond->CondDesc];
+            }
+        }
+        return $this->condABs;
     }
     
     public function loadFldAbout($pref = 'Fld')
@@ -1865,7 +1886,9 @@ class GlobalsTables extends GlobalsStatic
     
     public function getNodePageName($currNode = -3)
     {
-        if (!isset($this->x["nodeNames"])) $this->x["nodeNames"] = [];
+        if (!isset($this->x["nodeNames"])) {
+            $this->x["nodeNames"] = [];
+        }
         if ($currNode > 0) {
             if (!isset($this->x["nodeNames"][$currNode])) {
                 $this->x["nodeNames"][$currNode] = '';

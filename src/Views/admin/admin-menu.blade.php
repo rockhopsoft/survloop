@@ -32,6 +32,6 @@
         @endif
     @endif
 @empty
-    <a href="/admin/" class="primeNav" >Dashboard</a>
+    <a href="/admin" class="primeNav" >Dashboard</a>
 @endforelse
 </div>

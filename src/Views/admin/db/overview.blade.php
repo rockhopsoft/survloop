@@ -1,11 +1,11 @@
 <!-- resources/views/vendor/survloop/admin/db/overview.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
-<h1><span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Database Overview</h1>
+<div class="container">
+<div class="slCard nodeWrap">
+<h2><span class="slBlueDark"><i class="fa fa-database"></i> 
+    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Database Overview</h2>
 
 <div class="pB10">
     @if (isset($GLOBALS['SL']->dbRow->DbMission) && trim($GLOBALS['SL']->dbRow->DbMission) != '')
@@ -21,27 +21,26 @@
         ><i class="fa fa-sort-amount-asc"></i> Re-Order Tables</a>
 @endif
 </div>
-
-<div class="fC pT20 pL15">
-    <i class="slGrey">Table Plain English Name, Description, Data Type, Database Name (Abbreviation), Notes</i>
+<i class="slGrey">Table Plain English Name, Description, Data Type, Database Name (Abbreviation), Notes</i>
 </div>
 
 @forelse ($groupTbls as $group => $tbls)
-    <div class="card">
-        <div class="card-header"><h3 class="m0">{{ $group }}</h3></div>
-        <div class="card-body">
-            @forelse ($tbls as $tbl)
-                <div class="pB20">
-                    <h4><a href="/dashboard/db/table/{{ $tbl->TblName }}">{{ $tbl->TblEng }}</a></h4>
-                    <p>{{ $tbl->TblDesc }}
-                    <span class="disIn slGrey">{{ $tbl->TblType }}, {{ $tbl->TblName }} ({{ $tbl->TblAbbr }})
-                    @if (isset($tbl->TblNotes) && trim($tbl->TblNotes) != '') , {{ $tbl->TblNotes }} @endif
-                    </span></p>
-                </div>
-            @empty
-            No tables in group.
-            @endforelse
-        </div>
+    <div class="slCard nodeWrap">
+        <h3 class="mT0">{{ $group }}</h3><hr>
+        @forelse ($tbls as $tbl)
+            <div class="pB20">
+                <h4 class="mB0"><a href="/dashboard/db/table/{{ $tbl->TblName }}">{{ $tbl->TblEng }}</a></h4>
+                <p>
+                <span class="slGrey">{{ $tbl->TblName }} ({{ $tbl->TblAbbr }}) {{ $tbl->TblType }}</span><br />
+                {{ $tbl->TblDesc }}
+                @if (isset($tbl->TblNotes) && trim($tbl->TblNotes) != '')
+                    <br /><span class="slGrey">{{ $tbl->TblNotes }}</span>
+                @endif
+                </p>
+            </div>
+        @empty
+        No tables in group.
+        @endforelse
     </div>
 @empty
     No tables yet.
@@ -49,4 +48,5 @@
 
 {!! view('vendor.survloop.admin.db.acknowledgments') !!}
 
+</div>
 @endsection

@@ -8,7 +8,7 @@
         Edit Condition: {{ $cond->CondTag }}</h4>
 @else
     <?php $cond = []; ?>
-    <h4 class="slBlueDark mT0"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add New Condition:</h4>
+    <h4 class="slBlueDark mT0">Add New Condition:</h4>
     @if (!isset($newOnly) || !$newOnly)
         <select id="oldCondsID" name="oldConds" class="form-control form-control-lg mT5" autocomplete="off" >
             <option value="0">Select a condition</option>

@@ -132,14 +132,18 @@ function previewPageAuto() {
     setTimeout("previewPageAuto()", 3000);
     return true;
 }
-function loadSeaEditor() {
-    previewPageAuto();
-    charCountKeyUp('pageTitle');
-    charCountKeyUp('pageDesc');
-    flexAreaAdjust(document.getElementById('npageDescFldID'));
-    keywordCountKeyUp('pageKey');
-    flexAreaAdjust(document.getElementById('npageKeyFldID'));
+function loadSeoEditor() {
+    if (typeof charCountKeyUp === "function") { 
+        previewPageAuto();
+        charCountKeyUp('pageTitle');
+        charCountKeyUp('pageDesc');
+        flexAreaAdjust(document.getElementById('npageDescFldID'));
+        keywordCountKeyUp('pageKey');
+        flexAreaAdjust(document.getElementById('npageKeyFldID'));
+    } else {
+        setTimeout("loadSeoEditor()", 2000);
+    }
     return true;
 }
-setTimeout("loadSeaEditor()", 50);
+setTimeout("loadSeoEditor()", 2000);
 </script>

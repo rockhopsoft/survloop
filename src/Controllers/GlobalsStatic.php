@@ -900,8 +900,9 @@ class GlobalsStatic
                     $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
                 }
             }
-            if ($tag1end > 0 && ($tag1end-strlen($tagMeat)) > 0) {
-                $tag1start = strpos($str, '<script', $tag1end-strlen($tagMeat));
+            $offset = $tag1end-strlen($tagMeat);
+            if (0 < $tag1end && 0 < $offset && $offset < strlen($str)) {
+                $tag1start = strpos($str, '<script', $offset);
             } else {
                 $tag1start = false;
             }

@@ -1,9 +1,9 @@
 <!-- resources/views/vendor/survloop/admin/db/tableView.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
+<div class="container">
+<div class="slCard nodeWrap">
 <div class="row">
     <div class="col-7">
         <h3 class="mB5"><i class="fa fa-database"></i> Table: {{ $tbl->TblEng }}</h3>
@@ -55,6 +55,6 @@
 
 {!! $basicTblFlds !!}
 
-<div class="adminFootBuff"></div>
+</div></div>
 
 @endsection

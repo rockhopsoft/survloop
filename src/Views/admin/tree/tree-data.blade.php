@@ -1,5 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree-data.blade.php -->
 
+<div class="slCard nodeWrap">
 <h2><span class="slBlueDark"><i class="fa fa-snowflake-o"></i> 
     {{ $GLOBALS['SL']->treeName }}:</span> Tree's Use of Database Design</nobr></h2>
 <div class="nodeHalfGap"></div>
@@ -14,7 +15,9 @@
             @if (isset($GLOBALS['SL']->coreTbl)) {{ $GLOBALS['SL']->coreTbl }} @endif </h3>
     </div>
 </div>
+</div>
 
+<div class="slCard nodeWrap">
 <h2>SurvLoops</h2>
 <p>
 <i>Loop</i>: The group of records which the end user may provide between <i>Min</i> and <i>Max</i> records 
@@ -62,9 +65,9 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
     <tr><td colspan="6"><i>none</i></td></tr>
 @endforelse
 </table>
+</div>
 
-<div class="nodeHalfGap"></div>
-
+<div class="slCard nodeWrap">
 <h2>Data Subsets</h2>
 <p>
 <h4 class="disIn">(one-to-one)</h4>
@@ -125,9 +128,9 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
     </tr>
     </form>
 </table>
+</div>
 
-<div class="nodeHalfGap"></div>
-
+<div class="slCard nodeWrap">
 <h2>Data Helpers</h2>
 <p>
 <h4 class="disIn">(one-to-many)</h4>
@@ -176,9 +179,9 @@ basic core-table-to-loop-table relations.
     </tr>
     </form>
 </table>
+</div>
 
-<div class="nodeHalfGap"></div>
-
+<div class="slCard nodeWrap">
 <h2>Data Linkages</h2>
 <p>
 <h4 class="disIn">(many-to-many)</h4>
@@ -225,5 +228,4 @@ require a hierarchical relationship.
     </tr>
     </form>
 </table>
-
-<div class="adminFootBuff"></div>
+</div>

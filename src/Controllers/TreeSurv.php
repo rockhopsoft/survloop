@@ -807,6 +807,7 @@ class TreeSurv extends TreeSurvReport
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
     {
         $this->survLoopInit($request, '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-report-xml/' . $coreID);
+        $GLOBALS["SL"]->x["pageView"] = 'public';
         $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
@@ -815,6 +816,11 @@ class TreeSurv extends TreeSurvReport
             $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
         }
+        return $this->getXmlID($request, $coreID, $coreSlug);
+    }
+    
+    public function getXmlID(Request $request, $coreID, $coreSlug = '')
+    {
         $this->maxUserView();
         $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->x["pageView"];
         if (isset($GLOBALS["fullAccess"]) && $GLOBALS["fullAccess"] && $GLOBALS["SL"]->x["pageView"] != 'full') {

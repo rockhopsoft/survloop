@@ -141,6 +141,7 @@ class SurvLoopController extends Controller
     {
         $slSess = SLSess::where('SessUserID', $this->v["uID"])
             ->where('SessTree', 0)
+            ->where('SessIsActive', 1)
             ->first();
         if (!session()->has('slSessID') || intVal(session()->get('slSessID')) == 0) {
             if (!$slSess || !isset($slSess->SessID)) {

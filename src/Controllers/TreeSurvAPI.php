@@ -15,8 +15,9 @@ use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLSearchRecDump;
+use SurvLoop\Controllers\TreeCoreSess;
 
-class TreeSurvApi extends TreeCore
+class TreeSurvApi extends TreeCoreSess
 {
     protected function initExtra(Request $request)
     {
@@ -165,7 +166,7 @@ class TreeSurvApi extends TreeCore
         return true;
     }
     
-    protected function loadXmlMapTree(Request $request)
+    public function loadXmlMapTree(Request $request)
     {
         $this->survLoopInit($request);
         if (isset($GLOBALS["SL"]->xmlTree["id"]) && empty($this->xmlMapTree)) {

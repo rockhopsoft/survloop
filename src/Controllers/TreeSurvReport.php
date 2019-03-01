@@ -157,7 +157,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                 if (!$emo["admin"] || $admPower) {
                     $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#' . $spot . 'e' . $emo["id"] 
                         . '", function() { $("#' . $spot . 'e' . $emo["id"] . 'Tag").load("/ajax-emoji-tag/' 
-                        . $this->treeID . '/' . $this->coreID . '/' . $emo["id"] . '/"); });' . "\n";
+                        . $this->treeID . '/' . $this->coreID . '/' . $emo["id"] . '"); });' . "\n";
                 }
             }
             $ret .= view('vendor.survloop.inc-emoji-tags', [

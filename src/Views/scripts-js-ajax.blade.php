@@ -38,389 +38,21 @@ $(document).ready(function(){
     }
     setTimeout(function() { chkFormSess(); }, (115*60000));
     
-    function runSaveReload() {
-        if (document.getElementById("stepID")) {
-            document.getElementById("stepID").value="save";
-            return runFormSub();
-        }
-        if (document.mainPageForm) {
-            document.mainPageForm.submit();
-            return true;
-        }
-        location.reload();
-        return false;
-    }
-    function chkRunSaveReload() {
-        if (cntDownOver) {
-            $("#nondialog").fadeIn(300);
-            $("#dialog").fadeOut(300);
-            cntDownOver = false;
-            return runSaveReload();
-        }
-        setTimeout(function() { chkRunSaveReload(); }, 2000);
-    }
-    setTimeout(function() { chkRunSaveReload(); }, 2000);
-    $(document).on("click", ".nFormSaveReload", function() { runSaveReload(); });
-    
-    function runFormSubAjax() {
-        blurAllFlds();
-        var formData = new FormData(document.getElementById("postNodeForm"));
-        replaceAjaxWithSpinner();
-        addProTipToAjax();
-        window.scrollTo(0, 0);
-        if (document.getElementById("postActionID")) actionUrl = document.getElementById("postActionID").value;
-        $.ajax({
-            url: formActionUrl,
-            type: "POST", 
-            data: formData, 
-            contentType: false,
-            processData: false,
-            success: function(data) {
-                $("#ajaxWrap").empty();
-                $("#ajaxWrap").append(data);
-            }, 
-            error: function(xhr, status, error) {
-                $("#ajaxWrap").append("<div>(error - "+xhr.responseText+")</div>");
-            }
-        });
-        resetCheckForm();
-        return false;
-    }
-    
-    function runFormSub() {
-        if (document.getElementById("isPage")) {
-            document.postNode.submit();
-        } else {
-            runFormSubAjax();
-        }
-        return false;
-    }
-    
-    function getUpID(thisAttr) {
-        return thisAttr.replace("delLoopItem", "").replace("confirmN", "").replace("confirmY", "").replace("editLoopItem", "");
-    }
-    
-    $(document).on("click", "#nFormUpload", function() {
-        if (checkNodeForm()) {
-            document.getElementById("stepID").value="upload";
-            return runFormSub();
-        } else {
-            return false;
-        }
-    });
-    $(document).on("click", ".nFormUploadSave", function() {
-        document.getElementById("stepID").value="uploadSave";
-        document.getElementById("altID").value=getUpID( $(this).attr("id") );
-        return runFormSub();
-    });
-    
-    function exitLoop(whichWay) {
-        if (document.getElementById("stepID") && document.getElementById("jumpToID") && checkNodeForm()) {
-            document.getElementById("stepID").value="exitLoop"+whichWay;
-            document.getElementById("jumpToID").value=document.getElementById("isLoopNav").value;
-            runFormSub();
-        }
-        return false;
-    }
-    
-    $(document).on("click", ".nFormNext", function() {
-        if (document.getElementById("stepID")) {
-            pressedSubmit = true;
-            if (document.getElementById("isLoopNav")) return exitLoop("");
-            if (checkNodeForm()) {
-                document.getElementById("stepID").value="next";
-                return runFormSub();
-            }
-            pressedSubmit = false;
-        }
-        return false;
-    });
-    $(document).on("click", ".nFormBack", function() {
-        if (document.getElementById("stepID")) {
-            if (document.getElementById("isLoopNav")) return exitLoop("Back");
-            document.getElementById("stepID").value="back";
-            if (document.getElementById("loopRootJustLeftID") && document.getElementById("loopRootJustLeftID").value > 0) {
-                document.getElementById("jumpToID").value=document.getElementById("loopRootJustLeftID").value;
-            }
-            return runFormSub();
-        }
-        return false;
-    });
-    
-    $(document).on("click", "a.navJump", function() {
-        if (document.getElementById("stepID") && document.getElementById("jumpToID")) {
-            document.getElementById("jumpToID").value = $(this).attr("id").replace("jump", "");
-            if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
-            return runFormSub();
-        }
-        return false;
-    });
-    
-    $(document).on("click", "a.saveAndRedir", function() {
-        if (document.getElementById("stepID") && document.getElementById("jumpToID")) {
-            document.getElementById("stepID").value="save";
-            document.getElementById("jumpToID").value = $(this).attr("data-redir-url");
-            if (document.getElementById("afterJumpToID") && document.getElementById("treeSlugID") && document.getElementById("nodeSlugID")) {
-                document.getElementById("afterJumpToID").value = "/u/"+document.getElementById("treeSlugID").value+"/"+document.getElementById("nodeSlugID").value;
-            }
-            return runFormSub();
-        }
-        return false;
-    });
-    
-    function postNodeAutoSave() {
-        if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
-            if (!document.getElementById('emailBlockID') && !document.getElementById('noAutoSaveID')) {
-                var origStep = document.getElementById('stepID').value;
-                var origTarget = document.postNode.target;
-                document.getElementById('stepID').value = "autoSave";
-                document.postNode.target = "hidFrame";
-                document.postNode.submit();
-                document.getElementById('stepID').value = origStep;
-                document.postNode.target = origTarget;
-                setTimeout(function() { postNodeAutoSave() }, 60000);
-                return true;
-            }
-        }
-        return false;
-    }
-    setTimeout(function() { if (!document.getElementById("isPage")) postNodeAutoSave(); }, 90000);
-    
-    window.onpopstate = function(event) {
-        if (document.getElementById("stepID") && !document.getElementById("isPage")) {
-            var newPage = document.location.href;
-            newPage = newPage.replace("{{ $GLOBALS['SL']->sysOpts['app-url'] }}", "");
-            document.getElementById("stepID").value = "save";
-            if (document.getElementById("popStateUrlID")) document.getElementById("popStateUrlID").value = newPage;
-            return runFormSub();
-        }
-        return false;
-    };
-    
-    function timeoutChecks() {
-        if (otherFormSub) return runFormSub();
-        if (document.getElementById("admMenu")) {
-            var leftPos = $(document).scrollLeft();
-            if (leftPos > 0) document.getElementById("leftSideWrap").style.position="static";
-            else document.getElementById("leftSideWrap").style.position="fixed";
-        }
-        setTimeout(function() { timeoutChecks(); }, 2000);
-        return true;
-    }
-    setTimeout(function() { timeoutChecks(); }, 500);
-    
-    $(document).on("click", ".editLoopItem", function() {
-        var id = $(this).attr("id").replace("editLoopItem", "").replace("arrowLoopItem", "");
-        document.getElementById("loopItemID").value=id;
-        return runFormSub();
-    });
-    var limitTog = false;
-    function toggleLineEdit(upID) {
-        if (!limitTog) {
-            limitTog = true;
-            setTimeout(function() { limitTog = false; }, 700);
-            if (document.getElementById("up"+upID+"InfoEdit").style.display != 'block') {
-                $("#up"+upID+"Info").slideUp("fast");
-                setTimeout(function() { $("#up"+upID+"InfoEdit").slideDown("fast"); }, 301);
-                document.getElementById("up"+upID+"EditVisibID").value="0";
-            } else {
-                $("#up"+upID+"InfoEdit").slideUp("fast");
-                setTimeout(function() { $("#up"+upID+"Info").slideDown("fast"); }, 301);
-                document.getElementById("up"+upID+"EditVisibID").value="1";
-            }
+    function slideToHshooPos(hash) {
+        if (document.getElementById(hash)) {
+            if (anchorOffsetBonus == 0 && document.getElementById("fixedHeader")) anchorOffsetBonus = -80;
+            var newTop = (1+anchorOffsetBonus+$("#"+hash+"").offset().top);
+            $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
         }
         return true;
     }
-    $(document).on("click", ".nFormLnkEdit", function() {
-        return toggleLineEdit(getUpID( $(this).attr("id") ));
-    });
-    $(document).on("click", ".nFormLnkDel", function() {
-        var upID = getUpID( $(this).attr("id") );
-        $("#editLoopItem"+upID+"block").slideUp("fast");
-        $("#delLoopItem"+upID+"confirm").slideDown("fast");
-        return true;
-    });
-    $(document).on("click", ".nFormLnkDelConfirmNo", function() {
-        var upID = getUpID( $(this).attr("id") );
-        $("#delLoopItem"+upID+"confirm").slideUp("fast");
-        $("#editLoopItem"+upID+"block").slideDown("fast");
-        return true;
-    });
-    $(document).on("click", ".nFormLnkDelConfirmYes", function() {
-        document.getElementById("stepID").value="uploadDel";
-        document.getElementById("altID").value=getUpID( $(this).attr("id") );
-        return runFormSub();
-    });
-    $(document).on("click", "#recMgmtDelX", function() {
-        $("#hidivRecMgmtDel").slideUp("fast");
-    });
-	
-    $(document).on("click", "#nFormNextStepItem", function() {
-        document.getElementById("loopItemID").value=loopItemsNextID;
-        document.getElementById("jumpToID").value="-3";
-        document.getElementById("stepID").value="next";
-        return runFormSub();
-    });
-    $(document).on("click", "#nFormAdd", function() {
-        if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value="-37";
-        return runFormSub();
-    });
-    $(document).on("click", ".delLoopItem", function() {
-        var id = $(this).attr("id").replace("delLoopItem", "");
-        document.getElementById("delItem"+id+"").checked=true;
-        document.getElementById("wrapItem"+id+"On").style.display="none";
-        document.getElementById("wrapItem"+id+"Off").style.display="block";
-        updateCnt(-1);
-        return true;
-    });
-    $(document).on("click", ".unDelLoopItem", function() {
-        var id = $(this).attr("id").replace("unDelLoopItem", "");
-        document.getElementById("delItem"+id+"").checked=false;
-        document.getElementById("wrapItem"+id+"On").style.display="block";
-        document.getElementById("wrapItem"+id+"Off").style.display="none";
-        updateCnt(1);
-        return true;
-    });
-    function updateCnt(addCnt) {
-        currItemCnt += addCnt;
-        if (maxItemCnt <= 0 || currItemCnt < maxItemCnt) document.getElementById("nFormAdd").style.display="block";
-        else document.getElementById("nFormAdd").style.display="none";
-        return true;
-    }
-
-    $(document).on("click", ".upTypeBtn", function() {
-		var nIDtxt = $(this).attr("name").replace("n", "").replace("fld", "");
-		if (document.getElementById("n"+nIDtxt+"fld"+uploadTypeVid+"") && document.getElementById("n"+nIDtxt+"fld"+uploadTypeVid+"").checked) { // (Video)
-			$("#up"+nIDtxt+"FormFile").slideUp("fast");
-			$("#up"+nIDtxt+"FormVideo").slideDown("fast");
-		}
-		else { // not video, but file upload
-			$("#up"+nIDtxt+"FormVideo").slideUp("fast");
-			$("#up"+nIDtxt+"FormFile").slideDown("fast");
-		}
-		$("#up"+nIDtxt+"Info").slideDown("fast");
-		return true;
-	});
-	/* $("[data-toggle=\"tooltip\"]").tooltip(); */
-	
-	function hideMajNav(majInd) {
-        if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
-            $("#majSect"+majInd+"Vert2").slideUp(50);
-            $("#minorNav"+majInd+"").slideUp(50);
-        }
-        return true;
-	}
-	
-	$(document).on("click", ".navDeskMaj", function() {
-		var majInd = parseInt($(this).attr("id").replace("maj", ""));
-		if ($(this).attr("data-jumpnode") && document.getElementById("stepID") && document.getElementById("jumpToID")) {
-            document.getElementById("jumpToID").value = $(this).attr("data-jumpnode");
-            if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
-            return runFormSub();
-		}
-		for (var i = 0; i < treeMajorSects.length; i++) {
-		    if (i != majInd) hideMajNav(i);
-		}
-		if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
-		    if (document.getElementById("minorNav"+majInd+"").style.display == 'block') {
-		        hideMajNav(majInd);
-            } else {
-                setTimeout(function() {
-                    $("#minorNav"+majInd+"").slideDown("fast");
-                    $("#majSect"+majInd+"Vert2").slideDown("fast");
-                }, 50);
-            }
-        }
-        $(this).blur();
-	    return false;
-	});
-	
-	$(document).on("click", "#navMobBurger1", function() {
-		document.getElementById("navMobBurger1").style.display="none";
-		document.getElementById("navMobBurger2").style.display="inline";
-		$("#navMobFull").slideDown("fast");
-	});
-	$(document).on("click", "#navMobBurger2", function() {
-		document.getElementById("navMobBurger1").style.display="inline";
-		document.getElementById("navMobBurger2").style.display="none";
-		$("#navMobFull").slideUp("fast");
-	});
-	
-	$(document).on("click", ".nodeShowCond", function() {
-        var nID = $(this).attr("id").replace("showCond", "");
-        if (document.getElementById("condDeets"+nID+"")) {
-            if (document.getElementById("condDeets"+nID+"").style.display=="inline") {
-                document.getElementById("condDeets"+nID+"").style.display="none";
-            } else {
-                document.getElementById("condDeets"+nID+"").style.display="inline";
-            }
-        }
-        return true;
-    });
-
-	function logCngCnt() {
-	    if (document.getElementById('chgCntID')) document.getElementById('chgCntID').value++;
-	    return true;
-	}
-	$(document).on("keyup", ".ntrStp", function(e) {
-        if (e.keyCode == 13) {
-            if (e.preventDefault) e.preventDefault(); 
-            else e.returnValue = false; 
-            nextTabFld($(this).attr("id"));
-            return false; 
-        }
-    });
-	$(document).on("keydown", ".ntrStp", function(e) {
-        if (e.keyCode == 13) { 
-            if (e.preventDefault) e.preventDefault(); 
-            else e.returnValue = false;
-            return false;
-        } else { logCngCnt(); }
-    });
-	$(document).on("click", ".ntrStp", function(e) { logCngCnt(); });
-	var lastSlTabIndex = 0;
-    function nextTabFld(fldID) {
-        if (!document.getElementById(fldID)) return false;
-        var nIDtxt = "";
-        var checkbox = -1;
-        if (fldID.indexOf("FldID") > 0 && fldID.indexOf("n") == 0) {
-            nIDtxt = fldID.replace("FldID", "").replace("n", "");
-        } else if (fldID.indexOf("fld") > 0 && fldID.indexOf("n") == 0) {
-            nIDtxt = fldID.replace("n", "").substr(0, (fldID.indexOf("fld")-1));
-            checkbox = 0;
-        }
-        var currIndex = document.getElementById(fldID).tabIndex;
-        if (lastSlTabIndex > 0 && currIndex == lastSlTabIndex) currIndex = 0;
-        var allTabbables = document.querySelectorAll(".slTab");
-        for (var i = 0; i < allTabbables.length; i++) {
-            if (allTabbables[i].tabIndex >= (currIndex+1)) {
-                if (nIDtxt == "" || chkNodeVisib(nIDtxt)) {
-                    allTabbables[i].focus();
-                    break;
-                }
-            }
-        }
-        return true;
-    }
-    
-    $(document).on("click", ".clkBox", function(e) {
-        if ($(this).attr("data-url")) {
-            if (e.shiftKey || e.ctrlKey || e.metaKey) window.open($(this).attr("data-url"), "_blank");
-            else window.location=$(this).attr("data-url");
-        }
-        return true;
-    });
     
     $("a.hsho").on('click', function(event) {
         var hash = $(this).attr("data-hash").trim();
-        if (hash !== "") {
-            if (document.getElementById(hash)) {
-                var newTop = (1+anchorOffsetBonus+$("#"+hash+"").offset().top);
-                $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
-            }
-        }
+        if (hash !== "") slideToHshooPos(hash);
         return false;
     });
+    
     $("a.hshoo").on('click', function(event) {
         event.preventDefault();
         var hash = '';
@@ -431,13 +63,13 @@ $(document).ready(function(){
         }
         var hashDivID = hash.replace('#', '');
         if (document.getElementById(hashDivID)) {
-            var newTop = (1+anchorOffsetBonus+$(hash).offset().top);
-            $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
+            slideToHshooPos(hash);
             hshooCurr = getHshooInd(hash);
             setTimeout(function() { updateHshooActive(hshooCurr); }, 900);
         }
         return false;
     });
+    
     function chkHshoosPos() {
         for (var i = 0; i < hshoos.length; i++) {
             if (document.getElementById(hshoos[i][0].replace('#', ''))) {
@@ -464,6 +96,7 @@ $(document).ready(function(){
         setTimeout(function() { chkHshoosPos(); }, 5000);
         return true;
     }
+    
     function updateHshooActive(hshooCurr) {
         for (var i = 0; i < hshoos.length; i++) {
             var admLnk = "admLnk"+hshoos[i][0].replace('#', '');
@@ -474,6 +107,7 @@ $(document).ready(function(){
         }
         return true;
     }
+    
     function chkHshooScroll() {
         if (hshoos.length > 0) {
             hshooCurr = -1;
@@ -509,6 +143,64 @@ $(document).ready(function(){
     }
     $(window).scroll(function() { chkScrollPar(); });
     setTimeout(function() { chkScrollPar() }, 10);
+
+{!! view('vendor.survloop.scripts-js-ajax-forms')->render() !!}
+    
+	function hideMajNav(majInd) {
+        if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
+            $("#majSect"+majInd+"Vert2").slideUp(50);
+            $("#minorNav"+majInd+"").slideUp(50);
+        }
+        return true;
+	}
+	
+	$(document).on("click", ".navDeskMaj", function() {
+		var majInd = parseInt($(this).attr("id").replace("maj", ""));
+		if ($(this).attr("data-jumpnode") && document.getElementById("stepID") && document.getElementById("jumpToID")) {
+            document.getElementById("jumpToID").value = $(this).attr("data-jumpnode");
+            if (document.getElementById("dataLoopRootID")) document.getElementById("stepID").value="exitLoopJump";
+            return runFormSub();
+		}
+		for (var i = 0; i < treeMajorSects.length; i++) {
+		    if (i != majInd) hideMajNav(i);
+		}
+		if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
+		    if (document.getElementById("minorNav"+majInd+"").style.display == 'block') {
+		        hideMajNav(majInd);
+            } else {
+                setTimeout(function() {
+                    $("#minorNav"+majInd+"").slideDown("fast");
+                    $("#majSect"+majInd+"Vert2").slideDown("fast");
+                }, 50);
+            }
+        }
+        $(this).blur();
+	    return false;
+	});
+	
+	$(document).on("click", "#navMobToggle", function() {
+	    if (document.getElementById("navMobBurger1").style.display!="none") {
+            document.getElementById("navMobBurger1").style.display="none";
+            document.getElementById("navMobBurger2").style.display="inline";
+            $("#navMobFull").slideDown("fast");
+        } else {
+            document.getElementById("navMobBurger1").style.display="inline";
+            document.getElementById("navMobBurger2").style.display="none";
+            $("#navMobFull").slideUp("fast");
+        }
+	});
+	
+	$(document).on("click", ".nodeShowCond", function() {
+        var nID = $(this).attr("id").replace("showCond", "");
+        if (document.getElementById("condDeets"+nID+"")) {
+            if (document.getElementById("condDeets"+nID+"").style.display=="inline") {
+                document.getElementById("condDeets"+nID+"").style.display="none";
+            } else {
+                document.getElementById("condDeets"+nID+"").style.display="inline";
+            }
+        }
+        return true;
+    });
     
 	$(document).on("click", ".searchBarBtn", function() {
         var nID = $(this).attr("id").replace("searchTxt", "").split("t");
@@ -841,41 +533,6 @@ $(document).ready(function(){
 	    imgUpBtn($(this).attr("id").replace("imgUp", ""));
 	});
 	
-	$(document).on("click", ".addSprdTblRow", function() {
-        var nID = $(this).attr("data-nid");
-        var nIDtxt = $(this).attr("data-nidtxt");
-        var dataRowMax = $(this).attr("data-row-max");
-        var currMax = 0;
-        for (var j = 0; j < dataRowMax; j++) {
-            if (document.getElementById('n'+nIDtxt+'tbl'+j+'row') && document.getElementById('n'+nIDtxt+'tbl'+j+'row').style.display == 'table-row' && currMax < j) {
-                currMax = j;
-            }
-        }
-        currMax++;
-        if (document.getElementById('n'+nIDtxt+'tbl'+currMax+'row')) {
-			document.getElementById('n'+nIDtxt+'tbl'+currMax+'row').style.display = 'table-row';
-        }
-        if (dataRowMax < currMax && document.getElementById('addSprdTbl'+nIDtxt+'Btn')) {
-            document.getElementById('addSprdTbl'+nIDtxt+'Btn').style.display = 'none';
-        }
-	});
-	$(document).on("click", ".delSprdTblRow", function() {
-        var nID = $(this).attr("data-nid");
-        var nIDtxt = $(this).attr("data-nidtxt");
-        var rowind = $(this).attr("data-row-ind");
-        if (nodeTblList[nID] && nodeTblList[nID].length > 0) {
-            for (var i = 0; i < nodeTblList[nID].length; i++) {
-                if (document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID")) {
-                    document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID").value="";
-                }
-            }
-        }
-        if (document.getElementById("n"+nIDtxt+"tbl"+rowind+"row")) {
-            document.getElementById("n"+nIDtxt+"tbl"+rowind+"row").style.display="none";
-        }
-        return true;
-    });
-    
 	function pullNewGraph(nID) {
 	    for (var i=0; i < graphFlds.length; i++) {
 	        if (graphFlds[i][0] == nID) {

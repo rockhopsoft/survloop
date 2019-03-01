@@ -42,10 +42,18 @@ class TreeNodeCore
     public function loadNodeCache($nID = -3, $nCache = [])
     {
         if (sizeof($nCache) > 0) {
-            if (isset($nCache["pID"]))  $this->parentID  = $nCache["pID"];
-            if (isset($nCache["pOrd"])) $this->parentOrd = $nCache["pOrd"];
-            if (isset($nCache["opts"])) $this->nodeOpts  = $nCache["opts"];
-            if (isset($nCache["type"])) $this->nodeType  = $nCache["type"];
+            if (isset($nCache["pID"])) {
+                $this->parentID  = $nCache["pID"];
+            }
+            if (isset($nCache["pOrd"])) {
+                $this->parentOrd = $nCache["pOrd"];
+            }
+            if (isset($nCache["opts"])) {
+                $this->nodeOpts  = $nCache["opts"];
+            }
+            if (isset($nCache["type"])) {
+                $this->nodeType  = $nCache["type"];
+            }
         }
         return true;
     }
@@ -120,7 +128,9 @@ class TreeNodeCore
     
     public function tierPathStr($tierPath = [])
     {
-        if (sizeof($tierPath) == 0) return implode('-', $this->nodeTierPath).'-';
+        if (sizeof($tierPath) == 0) {
+            return implode('-', $this->nodeTierPath).'-';
+        }
         return implode('-', $tierPath).'-';
     }
     

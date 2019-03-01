@@ -227,6 +227,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
 a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
     display: none;
 }
+
 #leftSide {
     height: 100%;
     vertical-align: top;
@@ -245,6 +246,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
     display: block;
     width: 100%;
 }
+
 #mainBody {
     padding: 15px 0px;
     vertical-align: top;
@@ -545,6 +547,7 @@ label, .nPrompt label {
 	background: {!! $css["color-field-bg"] !!};
 	border: 1px {!! $css["color-main-on"] !!} solid;
 }
+
 .nFld input.dateFld {
 	width: 140px;
 }
@@ -1010,7 +1013,7 @@ table.repDeetVert, table.repDeetVert tr td, table.repDeetVert tr th {
 .basicTierPage, .basicTier1.basicTierPage, .basicTier2.basicTierPage, .basicTier3.basicTierPage, .basicTier4.basicTierPage, .basicTier5.basicTierPage, .basicTier6.basicTierPage, .basicTier7.basicTierPage, .basicTier8.basicTierPage,
 .basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop, .basicTier6.basicTierLoop, .basicTier7.basicTierLoop, .basicTier8.basicTierLoop {
 	border: 4px {!! $css["color-info-on"] !!} double;
-	background: {!! $css["color-main-bg"] !!};
+	background: {!! $css["color-main-faintr"] !!};
 	margin: 15px 5px 15px 5px;
     padding: 10px;
 }
@@ -1389,6 +1392,14 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 	color: {!! $css["color-main-bg"] !!};
 	background: {!! $css["color-main-on"] !!};
 }
+#navMobTogInr { padding: 5px 0px 5px 5px; }
+#navMobBurger1, #navMobBurger2 { margin-right: 5px; }
+#navMobPercWrap { margin: 0px -10px -5px -10px; }
+#navMobPercProg {
+    height: 4px;
+    -moz-border-radius: 4px; border-radius: 4px;
+    background: {!! $css["color-main-off"] !!};
+}
 
 #passStrng {
     position: absolute;
@@ -1643,6 +1654,8 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
         width: 100%;
     }
+    
+    .nFld textarea.form-control-lg { font-size: 1rem; }
     
     table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg { padding: 5px; }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 

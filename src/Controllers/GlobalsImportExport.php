@@ -271,14 +271,26 @@ class GlobalsImportExport extends GlobalsTables
                                 . '"root" => ' . $t->TreeRoot . ', '
                                 . '"slug" => "' . $t->TreeSlug . '", '
                                 . '"opts" => ' . $t->TreeOpts . ''
-                            . ' ];' . "\n";
+                                . ' ];' . "\n";
                         }
                     }
                 }
             }
+            $this->loadTestsAB();
+            if (sizeof($this->condABs) > 0) {
+                $cache2 .= '$'.'this->condABs = [];' . "\n";
+                foreach ($this->condABs as $i => $ab) {
+                    $cache2 .= '$'.'this->condABs[] = [ ' . $ab[0] . ', "' . $ab[1] . '" ];' . "\n";
+                }
+            }
             
-            $this->x["srchUrls"] = [ 'public' => '', 'administrator' => '', 'volunteer' => '', 'partner' => '', 
-                'staff' => '' ];
+            $this->x["srchUrls"] = [
+                'public'        => '',
+                'administrator' => '',
+                'volunteer'     => '',
+                'partner'       => '', 
+                'staff'         => ''
+                ];
             if ($this->treeRow && isset($this->treeRow->TreeDatabase)) {
                 $searchTrees = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
                     ->where('TreeType', 'Page')
@@ -308,7 +320,6 @@ class GlobalsImportExport extends GlobalsTables
                 . '"partner"       => \'' . $this->x["srchUrls"]["partner"]       . '\', '
                 . '"volunteer"     => \'' . $this->x["srchUrls"]["volunteer"]     . '\''
             . ' ];' . "\n";
-            
             eval($cache2);
             
             if (file_exists($cacheFile)) Storage::delete($cacheFile);
@@ -812,9 +823,9 @@ class GlobalsImportExport extends GlobalsTables
     {
         $fileCss = '/cache/dynascript/' . date("Ymd") . '-t' . $this->treeID;
         if ($this->treeRow->TreeType != 'Page' || $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
-            $fileCss .= '-s' . session()->get('slSessID') . '-r' . rand(10000000, 100000000);
+            $fileCss .= '-s' . session()->get('slSessID');
         }
-        $fileCss .= '.css';
+        $fileCss .= '-r' . rand(10000000, 100000000) . '.css';
         $sffx = (($this->REQ->has('refresh')) ? '?refresh=' . rand(10000000, 100000000) : '');
         $content = $this->extractStyle($content, 0);
         if (trim($this->pageCSS) != '' && trim($this->pageCSS) != '/* */') {
@@ -843,9 +854,9 @@ class GlobalsImportExport extends GlobalsTables
             }
             $minifier->minify('../storage/app' . $fileMin);
             Storage::delete($fileJs);
-            $this->pageSCRIPTS .= "\n" . '<script defer id="dynJs" type="text/javascript" src="' 
+            $this->pageSCRIPTS .= "\n" . '<script id="dynJs" type="text/javascript" src="' 
                 . $this->sysOpts["app-url"] . str_replace('/cache/dynascript/', '/dyna-', $fileMin) . $sffx 
-                . '"></script>';
+                . '"></script>'; // defer
         }
         $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
         return $content;

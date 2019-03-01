@@ -71,22 +71,20 @@
     </div> <!-- end of desktop navigation -->
     <div id="navMobile">
         
-        <div class="f16">
-            <a id="navMobBurger1" class="disIn mR10" href="javascript:;"
-                ><i class="fa fa-caret-right f16" aria-hidden="true"></i></a>
-            <a id="navMobBurger2" class="disNon mR5" href="javascript:;"
-                ><i class="fa fa-caret-down f16" aria-hidden="true"></i></a>
-        @if (isset($majorSections[$currMajorSection]))
-            <b>{{ $majorSections[$currMajorSection][1] }}</b>
-            @if (sizeof($minorSections[$currMajorSection]) > 0 
-                && isset($minorSections[$currMajorSection][$currMinorSection]))
-                : {{ $minorSections[$currMajorSection][$currMinorSection][1] }}
+        <a id="navMobToggle" class="btn btn-secondary btn-sm w100 taL ovrNo" href="javascript:;">
+            <div id="navMobTogInr">
+                <div id="navMobBurger1" class="disIn"><i class="fa fa-caret-right" aria-hidden="true"></i></div>
+                <div id="navMobBurger2" class="disNon"><i class="fa fa-caret-down" aria-hidden="true"></i></div>
+            @if (isset($majorSections[$currMajorSection]))
+                {{ $majorSections[$currMajorSection][1] }}
+                @if (sizeof($minorSections[$currMajorSection]) > 0 
+                    && isset($minorSections[$currMajorSection][$currMinorSection]))
+                    : {{ $minorSections[$currMajorSection][$currMinorSection][1] }}
+                @endif
             @endif
-        @endif
-        </div>
-        <div class="brdBotBluL">
-            <div class="brdBotBluL3" style="width: {{ $rawPerc }}%;"> </div>
-        </div>
+            </div>
+            <div id="navMobPercWrap"><div id="navMobPercProg" style="width: {{ $rawPerc }}%;"> </div></div>
+        </a>
         
         <div id="navMobFull" class="disNon">
             @foreach ($majorSections as $maj => $majSect)

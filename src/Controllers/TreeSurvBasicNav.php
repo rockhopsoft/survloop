@@ -14,9 +14,9 @@ use DB;
 use App\Models\SLNode;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSessLoops;
-use SurvLoop\Controllers\TreeSurvLoad;
+use SurvLoop\Controllers\TreeSurvProgBar;
 
-class TreeSurvBasicNav extends TreeSurvLoad
+class TreeSurvBasicNav extends TreeSurvProgBar
 {
     // returns 1 if nID is a conditional kid, and is true
     // returns 0 if nID is not a conditional kid

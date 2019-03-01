@@ -436,8 +436,8 @@ class TreeSurvAdmin extends TreeSurvForm
                 if ($GLOBALS["SL"]->REQ->has('condIDs') && is_array($GLOBALS["SL"]->REQ->condIDs) 
                     && sizeof($GLOBALS["SL"]->REQ->condIDs) > 0) {
                     foreach ($GLOBALS["SL"]->REQ->condIDs as $condID) {
-                        if ($GLOBALS["SL"]->REQ->has('delCond'.$condID.'') 
-                            && $GLOBALS["SL"]->REQ->get('delCond'.$condID.'') == 'Y') {
+                        if ($GLOBALS["SL"]->REQ->has('delCond' . $condID . '') 
+                            && $GLOBALS["SL"]->REQ->get('delCond' . $condID . '') == 'Y') {
                             SLConditionsNodes::where('CondNodeCondID', $condID)
                                 ->where('CondNodeNodeID', $node->nodeID)
                                 ->delete();
@@ -457,6 +457,7 @@ class TreeSurvAdmin extends TreeSurvForm
                     }
                     $newLink->save();
                 }
+                $this->saveTestAB($request, $node->nodeID);
                 
                 if ($node->nodeRow->NodeType == 'Layout Row' && $nodeIN <= 0) { // new row, so create default columns
                     if ($node->nodeRow->NodeCharLimit > 0) {
@@ -604,7 +605,6 @@ class TreeSurvAdmin extends TreeSurvForm
         ]);
     }
     
-    
     public function saveNewResponses($node, $newResponses, $resLimit = 60)
     {
         for ($i=0; $i < $resLimit; $i++) {
@@ -655,16 +655,72 @@ class TreeSurvAdmin extends TreeSurvForm
         return true;
     }
     
+    protected function saveTestAB(Request $request, $nodeID)
+    {
+        if (sizeof($GLOBALS["SL"]->condABs) > 0) {
+            foreach ($GLOBALS["SL"]->condABs as $i => $ab) {
+                if ($GLOBALS["SL"]->REQ->has('delCond' . $ab[0] . '') 
+                    && $GLOBALS["SL"]->REQ->get('delCond' . $ab[0] . '') == 'Y') {
+                    SLConditionsNodes::where('CondNodeCondID', $ab[0])
+                        ->where('CondNodeNodeID', $nodeID)
+                        ->delete();
+                }
+            }
+        }
+        if ($request->has('addTestAB') && trim($request->get('addTestAB')) != '') {
+            $condID = -3;
+            $which = 'A';
+            if (trim($request->get('addTestAB')) == 'NewAB') {
+                $condID = $this->addTestAB($request);
+                if ($request->has('addTestABwhich') && trim($request->get('addTestABwhich')) != '') {
+                    $which = trim($request->get('addTestABwhich'));
+                }
+            } elseif (strpos($request->get('addTestAB'), '.') !== false) {
+                list($condID, $which) = explode('.', trim($request->get('addTestAB')));
+                $condID = intVal($condID);
+            }
+            if ($condID > 0 && $nodeID > 0) {
+                $newCond = new SLConditionsNodes;
+                $newCond->CondNodeCondID = $condID;
+                $newCond->CondNodeNodeID = $nodeID;
+                if ($which == 'B') {
+                    $newCond->CondNodeLoopID = -1;
+                }
+                $newCond->save();
+            }
+        }
+    }
+    
+    protected function addTestAB(Request $request)
+    {
+        if ($request->has('addTestABdesc') && trim($request->get('addTestABdesc')) != '') {
+            $cond = new SLConditions;
+            $cond->CondDatabase = $this->dbID;
+            $cond->CondOperator = 'AB TEST';
+            $cond->CondTag      = '%AB Tree' . $this->treeID;
+            $cond->CondDesc     = trim($request->get('addTestABdesc'));
+            $cond->save();
+            return $cond->getKey();
+        }
+        return -3;
+    }
     
     protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
     {
         $tierDepth++;
-        if (!isset($this->v["pageCnt"])) $this->v["pageCnt"] = 0;
+        if (!isset($this->v["pageCnt"])) {
+            $this->v["pageCnt"] = 0;
+        }
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
-            if ($this->hasNode($tierNode[0])) {
+            if (isset($this->allNodes[$tierNode[0]]) && $this->hasNode($tierNode[0])) {
                 $this->allNodes[$tierNode[0]]->fillNodeRow();
-                if ($this->allNodes[$tierNode[0]]->isPage()) $this->v["pageCnt"]++;
-                $nodePromptText = $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText;
+                if ($this->allNodes[$tierNode[0]]->isPage()) {
+                    $this->v["pageCnt"]++;
+                }
+                $nodePromptText = '';
+                if (isset($this->allNodes[$tierNode[0]]->nodeRow->NodePromptText)) {
+                    $nodePromptText = $this->allNodes[$tierNode[0]]->nodeRow->NodePromptText;
+                }
                 $styPos = strpos($nodePromptText, '<style>');
                 if ($styPos !== false) {
                     $styPosEnd = strpos($nodePromptText, '</style>', $styPos);

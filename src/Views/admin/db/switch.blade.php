@@ -30,7 +30,7 @@
 @endforelse
 
 <div class="p10">
-    <a href="/dashboard/db/new/" class="btn btn-lg btn-primary float-right"
+    <a href="/dashboard/db/new" class="btn btn-lg btn-primary float-right"
         ><i class="fa fa-star mR5" aria-hidden="true"></i> Create New Database</a>
 </div>
 <hr>

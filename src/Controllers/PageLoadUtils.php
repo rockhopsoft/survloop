@@ -203,6 +203,7 @@ class PageLoadUtils extends Controller
                                 $sess = SLSess::where('SessUserID', Auth::user()->id)
                                     ->where('SessTree', $t->TreeID)
                                     ->where('SessCoreID', $cid)
+                                    ->where('SessIsActive', 1)
                                     ->orderBy('updated_at', 'desc')
                                     ->first();
                                 if (!$sess || !isset($sess->SessID)) {

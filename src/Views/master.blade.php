@@ -39,7 +39,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     <link href="/sys2.min.css" rel="stylesheet" type="text/css">
     <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
     <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
-    <script id="sysJs2" src="/sys2.min.js" type="text/javascript" defer ></script>
+    <script id="sysJs2" src="/sys2.min.js" type="text/javascript"></script>
 @else
     <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
     <link href="/jquery-ui.min.css" rel="stylesheet" type="text/css">
@@ -286,14 +286,19 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
         $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
     @endif
-    @if (isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
-        @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
-            alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
-        @endif
-        setTimeout("window.print()", 1000);
-    @endif
     </script>
 @endif
+
+@if ((isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
+    || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
+    <script id="dynamicJS" type="text/javascript" defer >
+    @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
+        alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+    @endif
+    setTimeout("window.print()", 1000);
+    </script>
+@endif
+
 
 <?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 

@@ -931,6 +931,8 @@ Route::group(['middleware' => ['web']], function () {
     // views include full, public, pdf, full-pdf, xml, full-xml
     Route::post('/{pageSlug}/read-{cid}/full/t-{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
     Route::get( '/{pageSlug}/read-{cid}/full/t-{token}', 'SurvLoop\\Controllers\\SurvLoop@tokenByID');
+    Route::get( '/{treeSlug}/read-{cid}/xml',            'SurvLoop\\Controllers\\SurvLoop@xmlByID');
+    //Route::get( '/{treeSlug}/read-{cid}/json',           'SurvLoop\\Controllers\\SurvLoop@xmlByID');
     Route::post('/{pageSlug}/read-{cid}/{view}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}/read-{cid}/{view}',         'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::post('/{pageSlug}/read-{cid}',                'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
@@ -943,12 +945,6 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/{pageSlug}/readi-{cid}',               'SurvLoop\\Controllers\\SurvLoop@loadPageURLrawID');
     Route::post('/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
     Route::get( '/{pageSlug}',                           'SurvLoop\\Controllers\\SurvLoop@loadPageURL');
-    
-    /*
-    Route::get( '/{treeSlug}/read-{cid}/pdf',         'SurvLoop\\Controllers\\SurvLoop@pdfByID');
-    Route::get( '/{treeSlug}/read-{cid}/xml',         'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    Route::get( '/{treeSlug}/read-{cid}/json',        'SurvLoop\\Controllers\\SurvLoop@xmlByID');
-    */
     
     Route::post('/dash/{pageSlug}/read-{cid}', [
         'uses'       => 'SurvLoop\Controllers\AdminController@loadPageURL', 

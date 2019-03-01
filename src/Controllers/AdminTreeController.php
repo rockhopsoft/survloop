@@ -11,12 +11,9 @@
 namespace SurvLoop\Controllers;
 
 use DB;
-use Auth;
-use Storage;
 use Illuminate\Http\Request;
 use App\Models\SLDatabases;
 use App\Models\SLTables;
-use App\Models\SLFields;
 use App\Models\SLDefinitions;
 use App\Models\SLTree;
 use App\Models\SLNode;
@@ -27,13 +24,11 @@ use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsArticles;
 use App\Models\SLUsersRoles;
-use App\Models\SLSess;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use SurvLoop\Controllers\TreeSurvAdmin;
 use SurvLoop\Controllers\TreeSurvApi;
 use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\TreeNodeSurv;
 use SurvLoop\Controllers\SessAnalysis;
 use SurvLoop\Controllers\AdminController;
 
@@ -561,11 +556,13 @@ class AdminTreeController extends AdminController
         } elseif ($request->has('nodeParentID') && intVal($request->nodeParentID) > 0) {
             $this->loadDbFromNode($request, $request->nodeParentID);
         }
-        $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/map?all=1&alt=1');
+        $currPage = '/dashboard/surv-' . $treeID . '/map?all=1&alt=1';
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-            $this->v["currPage"][0] = '/dashboard/pages/list';
+            //$currPage = '/dashboard/page/' . $treeID . '?all=1&alt=1';
+            $currPage = '/dashboard/pages/list';
         }
-        $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $this->v["currPage"][0]);
+        $this->admControlInit($request, $currPage);
+        $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $currPage);
         if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
         }

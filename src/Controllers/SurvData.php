@@ -1028,7 +1028,7 @@ class SurvData
             foreach ($this->dataSets as $tbl => $rows) {
                 if (sizeof($rows) > 0) {
                     foreach ($rows as $row) {
-                        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" . $row->getKey() . ")->delete();");
+                        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" . intVal($row->getKey()) . ")->delete();");
                     }
                 }
             }

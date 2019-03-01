@@ -12,7 +12,7 @@ namespace SurvLoop\Controllers;
 
 use SurvLoop\Controllers\SurvStatsCore;
 
-class SurvStatsCache extends SurvStatsCore
+class SurvStatsCache extends SurvStatsFilts
 {
     
     

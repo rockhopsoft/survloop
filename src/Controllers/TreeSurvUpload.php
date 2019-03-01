@@ -258,8 +258,6 @@ class TreeSurvUpload extends TreeSurv
         $this->loadUploadTypes();
         $GLOBALS["SL"]->pageAJAX .= 'window.refreshUpload = function () { $("#uploadAjax").load("?ajax=1&upNode=' 
             . $nID . '"); }' . "\n";
-        $this->pageJSvalid .= "if (document.getElementById('n" . $nID . "VisibleID') && document.getElementById('n" 
-            . $nID . "VisibleID').value == 1) reqUploadTitle(" . $nID . ");\n";
         $GLOBALS["SL"]->pageJAVA .= "addResTot(" . $nID . ", 4);\n";
         foreach ($this->uploadTypes as $j => $ty) {
             if (in_array(strtolower($ty->DefValue), ['video', 'videos'])) {

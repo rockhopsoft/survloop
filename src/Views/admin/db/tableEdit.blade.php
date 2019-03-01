@@ -1,31 +1,23 @@
 <!-- resources/views/vendor/survloop/admin/db/tableEdit.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
+<div class="container">
+<div class="slCard nodeWrap">
+<a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-secondary pull-right">View Table</a>
 <h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    @if (isset($tbl->TblEng) && trim($tbl->TblEng) != '') 
-        Edit Table: {{ $tbl->TblEng }}
-    @else
-        Add New Table
+    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
+    @if (isset($tbl->TblEng) && trim($tbl->TblEng) != '') Edit Table: {{ $tbl->TblEng }}
+    @else Add New Table
     @endif
 </h1>
-
-<div class="p10">
-    <a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-secondary">View Table</a>
-</div>
 
 <form name="mainPageForm" method="post"
     @if (trim($tblName) == '') action="/dashboard/db/addTable"
     @else action="/dashboard/db/table/{{ $tblName }}/edit"
-    @endif
-    >
+    @endif >
 <input type="hidden" name="tblEditForm" value="YES">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-<div class="container">
 
     <fieldset class="form-group">
         <label for="TblEngID">Plain English Name</label>
@@ -71,9 +63,8 @@
     </div>
     </center>
     
-</div></form>
-
-
-<div class="adminFootBuff"></div>
+</form>
+</div>
+</div>
 
 @endsection

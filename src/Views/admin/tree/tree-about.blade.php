@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree-about.blade.php -->
 
-<div id="adminAbout" class="jumbotron @if ($showAbout) disBlo @else disNon @endif ">
+<div id="adminAbout" class=" @if ($showAbout) disBlo @else disNon @endif "><div class="slCard nodeWrap">
     <img src="/survloop/uploads/branching-tree.png" width="25%" align="right" class="mL20 round10" alt="Branching Tree">
     <h1>Branching Tree,<br />Form Generator</h1>
     <p>
@@ -29,5 +29,4 @@
     <div class="float-right mBn20">
         <a href="javascript:;" class="adminAboutTog" >Hide About <i class="fa fa-times" aria-hidden="true"></i></a>
     </div>
-    
-</div> <!-- end jumbotron -->
+</div></div>
