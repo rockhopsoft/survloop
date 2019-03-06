@@ -125,25 +125,6 @@ $(document).ready(function(){
     setTimeout(function() { chkHshooScroll(); }, 50);
     $(document).scroll(function() { chkHshooScroll(); });
     
-    function chkScrollPar() {
-        var scrolled = $(window).scrollTop();
-        $(".parallax").each(function(index, element) {
-            if (!iOS) {
-                var initY = $(this).offset().top;
-                var height = $(this).height();
-                var endY  = initY + $(this).height();
-                var visible = isInViewport(this);
-                if (visible) {
-                    var diff = scrolled - initY;
-                    var ratio = Math.round((diff / height) * 100);
-                    $(this).css('background-position','center ' + parseInt(-(ratio * 1.5)) + 'px');
-                }
-            }
-        });
-    }
-    $(window).scroll(function() { chkScrollPar(); });
-    setTimeout(function() { chkScrollPar() }, 10);
-
 {!! view('vendor.survloop.scripts-js-ajax-forms')->render() !!}
     
 	function hideMajNav(majInd) {

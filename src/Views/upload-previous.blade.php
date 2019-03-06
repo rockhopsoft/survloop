@@ -6,8 +6,8 @@
     @foreach ($uploads as $i => $upRow)
         @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->UpID)
             <a name="up{{ $upRow->UpID }}"></a>
-            <div class="row uploadedWrap">
-                <div class="col-4 m0 taC">
+            <div class="uploadedWrap"><div class="row">
+                <div class="col-md-4 m0 taC">
                 
                     @if (intVal($upRow->UpType) == $vidTypeID 
                         && (trim($upDeets[$i]["youtube"]) != '' || trim($upDeets[$i]["vimeo"]) != ''))
@@ -45,7 +45,7 @@
                     @endif
                     
                 </div>
-                <div class="col-6 pT10">
+                <div class="col-md-6 pT10">
                     
                     <div id="up{{ $upRow->UpID }}Info" class="disBlo fL">
                         <h4>{{  $upRow->UpTitle }}</h4> 
@@ -106,7 +106,7 @@
                     </div>
                     
                 </div>
-                <div class="col-2">
+                <div class="col-md-2">
                 
                     <div id="editLoopItem{{ $upRow->UpID }}block" class="disBlo">
                         <a href="javascript:;" id="editLoopItem{{ $upRow->UpID }}" 
@@ -126,7 +126,7 @@
                     </div>
                     
                 </div>
-            </div>
+            </div></div>
         @endif
     @endforeach
     <div class="fC"></div>

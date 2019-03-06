@@ -552,12 +552,23 @@ class TreeSurvForm extends TreeSurvFormUtils
                     && trim($curr->colors["blockImg"]) != '') {
                     $GLOBALS["SL"]->addPreloadImg($curr->colors["blockImg"]);
                 }
+                $isParallax = (isset($curr->colors["blockImgFix"]) && trim($curr->colors["blockImgFix"]) == 'P');
                 $ret .= view('vendor.survloop.inc-block-css', [ "nIDtxt" => $nIDtxt, "node" => $curr ])->render()
-                    . '<div id="blockWrap' . $nIDtxt . '" class="w100'
-                    . ((isset($curr->colors["blockImgFix"]) && trim($curr->colors["blockImgFix"]) == 'P')
-                        ? ' parallax' : '')
-                    . (($this->hasParentType($nID, 'Gallery Slider')) 
-                        ? (($curr->nodeRow->NodeParentOrder == 0) ? ' disBlo' : ' disNon') : '') . '">';
+                    . '<div id="blockWrap' . $nIDtxt . '" class="w100' . (($this->hasParentType($nID, 'Gallery Slider'))
+                        ? (($curr->nodeRow->NodeParentOrder == 0) ? ' disBlo' : ' disNon') : '');
+                if ($isParallax) {
+                    $imgSrc = '';
+                    if (sizeof($curr->colors) > 0) {
+                        if (isset($curr->colors["blockImg"]) && trim($curr->colors["blockImg"]) != '') {
+                            $ret .= ' parallaxBlock" data-parallax="scroll" data-image-src="' 
+                                . $curr->colors["blockImg"] . '">';
+                        }
+                    } else {
+                        $ret .= '">';
+                    }
+                } else {
+                    $ret .= '">';
+                }
             }
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $curr->parentID == $GLOBALS['SL']->treeRow->TreeRoot) {
                 if ($curr->isPageBlockSkinny()) { // wrap page block

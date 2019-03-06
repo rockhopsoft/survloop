@@ -1928,7 +1928,9 @@ class GlobalsTables extends GlobalsStatic
     public function setSEO($metaTitle = '', $metaDesc = '', $metaKeywords = '', $metaImg = '')
     {
         if (trim($metaTitle) != '') {
-            $GLOBALS['SL']->sysOpts['meta-title'] = $metaTitle . ' - ' . $GLOBALS['SL']->sysOpts['meta-title'];
+            $GLOBALS['SL']->sysOpts['meta-title'] = $metaTitle;
+        } else {
+            $GLOBALS['SL']->sysOpts['meta-title'] = $GLOBALS['SL']->sysOpts['meta-title'];
         }
         if (trim($metaDesc) != '') {
             $GLOBALS['SL']->sysOpts['meta-desc'] = $metaDesc;

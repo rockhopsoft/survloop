@@ -1353,7 +1353,7 @@ a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.comple
     background: {!! $css["color-main-off"] !!};
     border: 0px none;
     border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
-    margin-left: 7px;
+    margin-right: 7px;
 }
 .slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:link,
 .slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:visited,
@@ -1456,7 +1456,9 @@ table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, 
 	margin-bottom: 10px;
 }
 
-
+.uploadedWrap {
+    margin-top: 40px;
+}
 
 
 .imgTmb {
@@ -1606,7 +1608,6 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
         width: 270px;
     }
-    h2 { font-size: 26px; }
     .glossaryList .col-10 { padding-top: 0px; margin-top: -5px; }
 
 }

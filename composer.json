@@ -34,7 +34,8 @@
         "forkawesome/fork-awesome": "^1.1.5",
         "nnnick/chartjs": "^2.7.3",
         "plotly/plotly.js": "^1.44.4",
-        "summernote/summernote": "^0.8.8"
+        "summernote/summernote": "^0.8.8",
+        "pixelcog/parallax.js": "^1.5.0"
     },
     "autoload": {
         "psr-4": {

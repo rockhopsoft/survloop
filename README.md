@@ -1,14 +1,14 @@
 
 # WikiWorldOrder/SurvLoop
 
-[![Laravel](https://img.shields.io/badge/Laravel-5.7-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-5.8-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
 This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
 web-based problems.
 
-It is currently in continued, heavy development, with much happening here in mid-2018, almost ready to go live. 
+It is currently in continued, heavy development, with much happening here in early 2019, almost ready to go live. 
 I plan to provide more documentation in the coming weeks. Thank you for your interest and patience!
 
 This was originally developed to build the 
@@ -46,7 +46,7 @@ Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabis
 # <a name="requirements"></a>Requirements
 
 * php: >=7.2.11
-* <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.7.*
+* <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.8.*
 
 # <a name="getting-started"></a>Getting Started
 
@@ -58,7 +58,7 @@ For more on creating environments to host Laravel, you can find more instruction
 
 ```
 $ composer global require "laravel/installer"
-$ composer create-project laravel/laravel SurvLoop "5.7.*"
+$ composer create-project laravel/laravel SurvLoop "5.8.*"
 $ cd SurvLoop
 $ php artisan make:auth
 $ php artisan vendor:publish --tag=laravel-notifications
