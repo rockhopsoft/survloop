@@ -14,6 +14,7 @@ use DB;
 use Auth;
 use App\Models\SLFields;
 use App\Models\SLNodeSaves;
+use SurvLoop\Controllers\SurvDataTestsAB;
 
 class SurvData
 {
@@ -43,12 +44,19 @@ class SurvData
     public $loopItemIDsDone = [];
     public $loopItemsNextID = -3;
                 
+    // These are the currently active AB Tests for this user's session. Each record has
+    //  [ {Condition 
+    public $testsAB         = [];
+    
     public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvLoop = [], $dataBranches = [])
     {
         $this->setCoreID($coreTbl, $coreID);
-        if (sizeof($dataBranches) > 0) $this->dataBranches = $dataBranches;
+        if (sizeof($dataBranches) > 0) {
+            $this->dataBranches = $dataBranches;
+        }
         $this->checkboxNodes = $checkboxNodes;
         $this->refreshDataSets($isBigSurvLoop);
+        $this->loadSessTestsAB();
         $this->loaded = true;
         return true;
     }
@@ -1275,4 +1283,17 @@ class SurvData
         return $this->dataSets[$tblTo][$ind];
     }
     
+    protected function loadSessTestsAB()
+    {
+        $this->testsAB = new SurvDataTestsAB;
+        $this->testsAB->addParamsAB();
+        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
+            $this->dataSets[$this->coreTbl][0]->update([
+                $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB' => $this->testsAB->printParams()
+                ]);
+        }
+        return true;
+    }
+    
 }
+

@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-xl-7">
     
         <div class="slCard nodeWrap">
         <h2><i class="fa fa-newspaper-o"></i> Site Pages <span class="slGrey">& Redirects</span></h2>
@@ -96,7 +96,7 @@
         </table>
         </div>
         
-    </div><div class="col-md-5">
+    </div><div class="col-xl-5">
         
         <div class="slCard nodeWrap slGrey">
             <div class="row">

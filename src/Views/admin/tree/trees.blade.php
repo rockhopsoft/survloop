@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-xl-7">
     
         <div class="slCard nodeWrap">
         <h2><i class="fa fa-snowflake-o"></i> Surveys & Forms</h2>
@@ -78,7 +78,7 @@
         </table>
         </div>
         
-    </div><div class="col-md-5">
+    </div><div class="col-xl-5">
     
         <div class="slCard nodeWrap slGrey">
             {!! view('vendor.survloop.admin.tree.inc-legend-perms')->render() !!}

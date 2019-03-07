@@ -74,7 +74,7 @@ $ nano composer.json
 ...
 "require": {
 	...
-    "wikiworldorder/survloop": "0.*",
+    "wikiworldorder/survloop": "^0.1.*",
 	...
 },
 ...
@@ -137,8 +137,6 @@ you might also need something like this...
 $ chown -R www-data:33 app/Models
 $ chown -R www-data:33 database
 ```
-
-"pixelcog/parallax.js": "^1.5.0"
 
 * Browse to load the style sheets, etc.. /dashboard/css-reload
 
