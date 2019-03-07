@@ -500,7 +500,7 @@ class Geographs
         $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
             ->first();
         if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong) || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"])) {
+            if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"]) && !$GLOBALS["SL"]->isHomestead()) {
                 $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($addy) . '&key=' 
                     . $GLOBALS["SL"]->sysOpts["google-cod-key"]; // '&sensor=true'
                 $json = json_decode(file_get_contents($jsonFile),TRUE);
@@ -522,6 +522,9 @@ class Geographs
     
     public function embedMapSimpAddy($nID = 0, $addy = '', $label = '', $height = 450, $maptype = 'satellite')
     {
+        if ($GLOBALS["SL"]->isHomestead()) {
+            return '(Map)';
+        }
         list($lat, $lng) = $this->getLatLng($addy);
         return view('vendor.survloop.embed-google-map-simple', [
             "nID"     => $nID,
@@ -545,6 +548,9 @@ class Geographs
     
     public function embedMap($nID = 0, $filename = '', $docName = '', $docDesc = '')
     {
+        if ($GLOBALS["SL"]->isHomestead()) {
+            return '(Map)';
+        }
         if (sizeof($this->mapMarkers) > 0) {
             $this->kmlMarkersFull($filename);
             $descAjax = false;

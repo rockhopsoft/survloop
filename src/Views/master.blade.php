@@ -50,10 +50,10 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
     <script src="/jquery.min.js" type="text/javascript"></script>
     <script src="/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/bootstrap.min.js" type="text/javascript"></script>
-    <script src="/sys1.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
-    <script src="/survloop/scripts-lib.js" type="text/javascript"></script>
+    <script src="/survloop/parallax.min.js" type="text/javascript"></script>
+    <script id="sysJs" src="/survloop/scripts-lib.js" type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
-    <script src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    <script id="sysJs2" src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
 @if (isset($needsWsyiwyg) && $needsWsyiwyg)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 

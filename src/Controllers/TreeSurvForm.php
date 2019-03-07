@@ -560,15 +560,15 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $imgSrc = '';
                     if (sizeof($curr->colors) > 0) {
                         if (isset($curr->colors["blockImg"]) && trim($curr->colors["blockImg"]) != '') {
-                            $ret .= ' parallaxBlock" data-parallax="scroll" data-image-src="' 
-                                . $curr->colors["blockImg"] . '">';
+                            $GLOBALS["SL"]->pageAJAX .= "$('#blockWrap" . $nIDtxt . "').parallax({imageSrc: '" 
+                                . $curr->colors["blockImg"] . "'}); ";
+                            $ret .= ' parallax-window';
+                            //$ret .= ' parallax-window" data-parallax="scroll" data-image-src="' 
+                            //    . $curr->colors["blockImg"];
                         }
-                    } else {
-                        $ret .= '">';
                     }
-                } else {
-                    $ret .= '">';
                 }
+                $ret .= '">';
             }
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $curr->parentID == $GLOBALS['SL']->treeRow->TreeRoot) {
                 if ($curr->isPageBlockSkinny()) { // wrap page block

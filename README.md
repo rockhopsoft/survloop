@@ -45,7 +45,7 @@ Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabis
 
 # <a name="requirements"></a>Requirements
 
-* php: >=7.2.11
+* php: >=7.3
 * <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.8.*
 
 # <a name="getting-started"></a>Getting Started
@@ -137,6 +137,8 @@ you might also need something like this...
 $ chown -R www-data:33 app/Models
 $ chown -R www-data:33 database
 ```
+
+"pixelcog/parallax.js": "^1.5.0"
 
 * Browse to load the style sheets, etc.. /dashboard/css-reload
 
