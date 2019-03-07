@@ -40,6 +40,10 @@ class TreeSurvConds extends TreeSurvApi
                         if (!$this->parseCondPreInstalled($cond)) {
                             $retTF = false;
                         }
+                    } elseif ($cond->CondOperator == 'AB TEST') {
+                        if (!$this->checkActiveTestAB($cond)) {
+                            $retTF = false;
+                        }
                     } elseif ($cond->CondOperator == 'URL-PARAM') {
                         if (trim($cond->CondOperDeet) == '') {
                             $retTF = false;
@@ -269,6 +273,14 @@ class TreeSurvConds extends TreeSurvApi
             $nID = $this->getPrevOfType($nID, $type);
         }
         return $nID;
+    }
+    
+    public function checkActiveTestAB($cond = NULL)
+    {
+        if (!$cond || !isset($cond->CondID) || !$this->sessData->testsAB->checkCond($cond->CondID)) {
+            return false;
+        }
+        return true;
     }
     
 }

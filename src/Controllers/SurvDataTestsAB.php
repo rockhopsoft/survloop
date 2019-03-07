@@ -16,9 +16,6 @@ class SurvDataTestsAB
     
     public function addParamsAB($params = '')
     {
-        if ($params == '' && $GLOBALS["SL"]->REQ->has('ab') && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
-            $params = trim($GLOBALS["SL"]->REQ->get('ab'));
-        }
         $abs = $GLOBALS["SL"]->mexplode('.', $params);
         if (sizeof($abs) > 0) {
             foreach ($abs as $i => $ab) {
@@ -47,6 +44,18 @@ class SurvDataTestsAB
             $this->tests[] = new SurvDataAB($conditionID, $isActive);
         }
         return true;
+    }
+    
+    public function checkCond($conditionID = 0)
+    {
+        if (intVal($conditionID) > 0 && sizeof($this->tests) > 0) {
+            foreach ($this->tests as $test) {
+                if ($conditionID == $test->id && $test->isActive) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public function printParams()

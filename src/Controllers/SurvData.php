@@ -1286,7 +1286,17 @@ class SurvData
     protected function loadSessTestsAB()
     {
         $this->testsAB = new SurvDataTestsAB;
-        $this->testsAB->addParamsAB();
+        $params = '';
+        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
+            $abField = $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB';
+            if (isset($this->dataSets[$this->coreTbl][0]->{ $abField })) {
+                $params = $this->dataSets[$this->coreTbl][0]->{ $abField };
+            }
+        }
+        $this->testsAB->addParamsAB($params);
+        if ($GLOBALS["SL"]->REQ->has('ab') && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
+            $this->testsAB->addParamsAB(trim($GLOBALS["SL"]->REQ->get('ab')));
+        }
         if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
             $this->dataSets[$this->coreTbl][0]->update([
                 $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB' => $this->testsAB->printParams()

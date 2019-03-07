@@ -46,7 +46,7 @@ Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabis
 # <a name="requirements"></a>Requirements
 
 * php: >=7.3
-* <a href="https://packagist.org/packages/laravel/framework" target="_blank">laravel/framework</a>: 5.8.*
+* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 5.8.*
 
 # <a name="getting-started"></a>Getting Started
 
