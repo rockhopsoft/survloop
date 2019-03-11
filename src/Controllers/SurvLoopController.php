@@ -774,8 +774,11 @@ class SurvLoopController extends Controller
         $fold = '../storage/app/';
         $file = 'log/' . $log . '.html';
         $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        if (!isset($GLOBALS["SL"])) {
+            $GLOBALS["SL"] = new Globals(new Request, $this->dbID, $this->treeID);
+        }
         $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' . $content 
-            . '<br /><span class="slGrey fPerc80">' . $this->hashIP() . '</span></p>';
+            . '<br /><span class="slGrey fPerc80">' . $GLOBALS["SL"]->hashIP() . '</span></p>';
         if (!file_exists($fold . $file)) {
             Storage::disk('local')->put($file, ' ');
         }
@@ -803,22 +806,6 @@ class SurvLoopController extends Controller
             }
         }
         return $ret;
-    }
-    
-    public function getIP()
-    {
-        $ip = $_SERVER["REMOTE_ADDR"];
-        if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
-            $ip = $_SERVER["HTTP_CLIENT_IP"]; // share internet
-        } elseif (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-            $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; // pass from proxy
-        }
-        return $ip;
-    }
-    
-    public function hashIP()
-    {
-        return hash('sha512', $this->getIP());
     }
     
     public function logAddSessStuff($type)

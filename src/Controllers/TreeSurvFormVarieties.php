@@ -279,9 +279,13 @@ class TreeSurvFormVarieties extends UserProfile
         }
         $txt = '*required';
         if ($this->nodeHasDateRestriction($currNode->nodeRow)) {
-            if ($currNode->nodeRow->NodeCharLimit < 0) $txt = '*past date required';
-            elseif ($currNode->nodeRow->NodeCharLimit > 0) $txt = '*future date required';
+            if ($currNode->nodeRow->NodeCharLimit < 0) {
+                $txt = '*past date required';
+            } elseif ($currNode->nodeRow->NodeCharLimit > 0) {
+                $txt = '*future date required';
+            }
         }
+        $txt = '<nobr>' . $txt . '</nobr>';
         if ($currNode->nodeRow->NodeOpts%13 == 0) {
             return $nodePromptText . '<p id="req' . $nIDtxt . '" class="rqd">' . $txt . '</p>';
         } else {
@@ -296,8 +300,7 @@ class TreeSurvFormVarieties extends UserProfile
             if ($swapPos > 0) {
                 return substr($nodePromptText, 0, $swapPos) . ' <span id="req' . $nIDtxt . '" class="rqd">' 
                     . $txt . '</span>' . substr($nodePromptText, $swapPos);
-            }
-            else {
+            } else {
                 $lastH3 = strrpos($nodePromptText, '</h3>');
                 $lastH2 = strrpos($nodePromptText, '</h2>');
                 $lastH1 = strrpos($nodePromptText, '</h1>');
@@ -356,7 +359,7 @@ class TreeSurvFormVarieties extends UserProfile
         return $ret;
     }
     
-    protected function formDate($nID, $dateStr = '00/00/0000', $xtraClass = '')
+    protected function formDate($nID, $nIDtxt, $dateStr = '00/00/0000', $xtraClass = '')
     {
         list($month, $day, $year) = ['', '', ''];
         if (trim($dateStr) != '') {
@@ -367,6 +370,7 @@ class TreeSurvFormVarieties extends UserProfile
         }
         return view('vendor.survloop.formtree-form-date', [
             "nID"            => $nID,
+            "nIDtxt"         => $nIDtxt,
             "dateStr"        => $dateStr,
             "month"          => $month,
             "day"            => $day,

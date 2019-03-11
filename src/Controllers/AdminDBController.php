@@ -239,7 +239,9 @@ class AdminDBController extends AdminController
     {
         $cacheB = '';
         $this->v["onlyKeys"] = $request->has('onlyKeys');
-        if ($this->v["onlyKeys"]) $cacheB = '.onlyKeys';
+        if ($this->v["onlyKeys"]) {
+            $cacheB = '.onlyKeys';
+        }
         if ($pubPrint) {
             $this->v["isPrint"] = true;
         } else {
@@ -264,7 +266,9 @@ class AdminDBController extends AdminController
             }
             $this->v["content"] = view('vendor.survloop.admin.db.full-innerTable', $this->v);
         }
-        if ($pubPrint) return $this->v["content"];
+        if ($pubPrint) {
+            return $this->v["content"];
+        }
         if (!$this->checkCache('/dashboard/db/all' . $cacheB)) {
             // this shouldn't be needed, why is it happening?..
             //$this->v["innerTable"] = str_replace('&lt;', '<', str_replace('&gt;', '>', 

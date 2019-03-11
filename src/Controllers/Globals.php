@@ -25,7 +25,9 @@ use App\Models\SLDataLoop;
 use App\Models\SLDataSubsets;
 use App\Models\SLDataHelpers;
 use App\Models\SLDataLinks;
+use App\Models\SLSess;
 use App\Models\SLSessLoops;
+use App\Models\SLSessPage;
 use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
 use SurvLoop\Controllers\Geographs;
@@ -670,6 +672,55 @@ class Globals extends GlobalsImportExport
     public function setCurrPage($currPage = '')
     {
         $this->x["currPage"] = $currPage;
+        return true;
+    }
+    
+    public function createNewSess($treeID = 0)
+    {
+        $sess = new SLSess;
+        $sess->SessUserID   = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        $sess->SessTree     = $treeID;
+        $sess->SessIsMobile = $this->isMobile();
+        $browse = $_SERVER['HTTP_USER_AGENT'];
+        if (strlen($browse) > 254) {
+            $browse = substr($browse, 0, 254);
+        }
+        $sess->SessBrowser  = $browse;
+        $sess->SessIP       = $this->hashIP();
+        $sess->save();
+        session()->put('sessID' . $treeID, $sess->sessID);
+        return $sess;
+    }
+    
+    public function chkSiteSess()
+    {
+        $sess = null;
+        if (session()->has('sessID0') && intVal(session()->get('sessID0')) > 0) {
+            $sess = SLSess::find(intVal(session()->get('sessID0')));
+        } elseif (Auth::user() && isset(Auth::user()->id)) {
+            $sess = SLSess::where('SessTree', 0)
+                ->where('SessUserID', Auth::user()->id)
+                ->first();
+        } else {
+            $sess = SLSess::where('SessTree', 0)
+                ->where('SessIP', $this->hashIP())
+                ->where('SessIsActive', 1)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+        return $sess;
+    }
+    
+    public function logSiteSessPage()
+    {
+        $sess = $this->chkSiteSess();
+        if (!$sess || !isset($sess->SessID)) {
+            $sess = $this->createNewSess();
+        }
+        $page = new SLSessPage;
+        $page->SessPageSessID = $sess->SessID;
+        $page->SessPageURL = $_SERVER["REQUEST_URI"];
+        $page->save();
         return true;
     }
     

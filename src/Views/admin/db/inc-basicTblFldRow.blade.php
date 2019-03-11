@@ -15,14 +15,14 @@
                 @else
                     href="/dashboard/db/field/generic/{{ $fld->FldName }}/{{ $fld->FldName }}"
                 @endif
-                    ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> <b class="fPerc133">
+                    ><i class="fa fa-pencil fa-flip-horizontal mR5"></i> <h4 class="disIn">
                     @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
                         <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
-                    @endif {{ $fld->FldEng }}</b></a>
+                    @endif {{ $fld->FldEng }}</h4></a>
             @else 
-                <b class="fPerc133"> @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
+                <h4 class="disIn"> @if ($tblID != $fld->FldTable && isset($GLOBALS['SL']->tbl[$fld->FldTable]))
                     <span class="slGreenDark">{{ $GLOBALS['SL']->tbl[$fld->FldTable] }}:</span>
-                @endif {{ $fld->FldEng }}</b>
+                @endif {{ $fld->FldEng }}</h4>
             @endif
             <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;"></a>
             @if ($fld->FldSpecType == 'Replica') 

@@ -950,6 +950,22 @@ class GlobalsStatic
         return $str;
     }
     
+    public function getIP()
+    {
+        $ip = $_SERVER["REMOTE_ADDR"];
+        if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
+            $ip = $_SERVER["HTTP_CLIENT_IP"]; // share internet
+        } elseif (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+            $ip = $_SERVER["HTTP_X_FORWARDED_FOR"]; // pass from proxy
+        }
+        return $ip;
+    }
+    
+    public function hashIP()
+    {
+        return hash('sha512', $this->getIP());
+    }
+    
     public function isMobile()
     {
     	return (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec'
@@ -996,6 +1012,19 @@ class GlobalsStatic
         unset($this->x["pageAJAX"]);
         unset($this->x["pageCSS"]);
         return true;
+    }
+    
+    public function printTimeZoneShift($timeStr = '', $hourShift = -5, $format = 'n/j g:ia')
+    {
+        $time = strtotime($timeStr);
+        return $this->printTimeZoneShiftStamp($time, $hourShift, $format);
+    }
+    
+    public function printTimeZoneShiftStamp($time = 0, $hourShift = -5, $format = 'n/j g:ia')
+    {
+        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time), date('s', $time), 
+            date('m', $time), date('d', $time), date('Y', $time));
+        return date($format, $newTime);
     }
     
 }

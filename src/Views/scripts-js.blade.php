@@ -118,9 +118,13 @@ function initGalSlider(nIDtxt, kids, style) {
     return true;
 }
 
+var anchorOffsetBonus = 0;
+function getAnchorOffset() {
+    if (anchorOffsetBonus == 0 && document.getElementById("fixedHeader")) anchorOffsetBonus = -80;
+    return anchorOffsetBonus;
+}
 var hshoos = new Array();
 var hshooCurr = 0;
-var anchorOffsetBonus = 0;
 function addHshoo(hash) {
     hshoos[hshoos.length] = new Array(hash, 0);
     return true;

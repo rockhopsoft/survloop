@@ -77,6 +77,7 @@ class TreeSurvInput extends TreeSurvUpload
             return $ret;
         }
         $nSffx = $GLOBALS["SL"]->getCycSffx();
+        $nIDtxt = trim($nID . $nSffx);
         if ($this->chkKidMapTrue($nID) == -1) {
             $this->closePostNodePublic($nID, $tmpSubTier, $curr);
             return '';
@@ -251,6 +252,11 @@ class TreeSurvInput extends TreeSurvUpload
                 if ($curr->nodeType == 'Uploads') {
                     if ($this->REQstep != 'autoSave') {
                         $ret .= $this->postUploadTool($nID);
+                        $GLOBALS["SL"]->x["reloadSurvPage"] = 'upPrev' . $nIDtxt;
+                        //$GLOBALS["SL"]->pageJAVA .= 'addHshoo("#upPrev' . $nIDtxt . '"); ';
+                        //$GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.upload-slide-to-previous-ajax', [
+                        //    "nIDtxt" => $nIDtxt
+                        //    ])->render();
                     }
                 } elseif ($curr->isDataManip()) {
                     if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
@@ -292,6 +298,9 @@ class TreeSurvInput extends TreeSurvUpload
                                     $itemInd, $itemID);
                             }
                         } else {
+                            if ($curr->nodeType == 'Date' && trim($newVal) == '') { // Redundancy in case JS breaks
+                                $newVal = $this->getRawFormDate($nIDtxt);
+                            }
                             $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal, $hasParManip, 
                                 $itemInd, $itemID);
                         }
@@ -735,6 +744,21 @@ class TreeSurvInput extends TreeSurvUpload
             }
         }
         return $extraData;
+    }
+    
+    protected function getRawFormDate($nIDtxt)
+    {
+        if ($GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldMonth') 
+            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldMonth')) != ''
+            && $GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldDay')
+            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldDay')) != ''
+            && $GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldYear')
+            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldYear')) != '') {
+            return trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldYear'))
+                . '-' . trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldMonth'))
+                . '-' . trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldDay'));
+        }
+        return '';
     }
     
 }

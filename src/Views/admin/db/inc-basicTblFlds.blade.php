@@ -6,9 +6,9 @@
     @endif
     <tr class="disNon"></tr>
     <tr><td>
-        <div class="row gryA">
+        <div class="row slGrey">
             <div class="col-6 pL20">
-                <i><span class="mL10 fPerc133">Field Name (in English)</span>, 
+                <i><span class="mL20">Field Name (in English)</span>, 
                 Description, Notes, Value Options</i>
             </div>
             <div class="col-6 taR pR20">
@@ -17,20 +17,20 @@
         </div>
     </td></tr>
     @if ($GLOBALS['SL']->tbl[$tblID] == 'users')
-        <tr><td><div class="row gry6">
-            <div class="col-9 pL20"><b class="mL10 fPerc133">Users Unique ID</b></div>
+        <tr><td><div class="row slGrey">
+            <div class="col-9 pL20"><h4 class="disIn mL20">Users Unique ID</h4></div>
             <div class="col-3 taR pR20">
                 <div class="slGrey">id<br />Number, Indexed, Primary Key</div>
             </div>
         </div></td></tr>
-        <tr><td><div class="row gry6">
-            <div class="col-9 pL20"><b class="mL10 fPerc133">Username</b></div>
+        <tr><td><div class="row slGrey">
+            <div class="col-9 pL20"><h4 class="disIn mL20">Username</h4></div>
             <div class="col-3 taR pR20">
                 <div class="slGrey">name<br />Text</div>
             </div>
         </div></td></tr>
-        <tr><td><div class="row gry6">
-            <div class="col-9 pL20"><b class="mL10 fPerc133">Email Address</b></div>
+        <tr><td><div class="row slGrey">
+            <div class="col-9 pL20"><h4 class="disIn mL20">Email Address</h4></div>
             <div class="col-3 taR pR20">
                 <div class="slGrey">email<br />Text</div>
             </div>
@@ -38,9 +38,7 @@
     @elseif (intVal($GLOBALS['SL']->tblOpts[$tblID]) == 0 || $GLOBALS['SL']->tblOpts[$tblID]%3 > 0)
         <tr><td>
             <div class="row">
-                <div class="col-9 fPerc133 gry6 pL20">
-                    <b class="mL10">{{ $GLOBALS['SL']->tbl[$tblID] }} Unique ID</b>
-                </div>
+                <div class="col-9 pL20"><h4 class="disIn mL20">{{ $GLOBALS['SL']->tbl[$tblID] }} Unique ID</h4></div>
                 <div class="col-3 taR slGrey pR20">
                     <div>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] }}ID</div>
                     Number, Indexed, Primary Key

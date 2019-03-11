@@ -253,7 +253,7 @@ class TreeSurvUpload extends TreeSurv
         */
     }
     
-    protected function uploadTool($nID)
+    protected function uploadTool($nID, $nIDtxt)
     {
         $this->loadUploadTypes();
         $GLOBALS["SL"]->pageAJAX .= 'window.refreshUpload = function () { $("#uploadAjax").load("?ajax=1&upNode=' 
@@ -270,7 +270,7 @@ class TreeSurvUpload extends TreeSurv
                 "uploadTypes"    => $this->uploadTypes,
                 "uploadWarn"     => $this->uploadWarning($nID),
                 "isPublic"       => $this->isPublic(), 
-                "getPrevUploads" => $this->getPrevUploads($nID, true)
+                "getPrevUploads" => $this->getPrevUploads($nID, $nIDtxt, true)
             ])->render() 
             . ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '</div>' : '');
         return $ret;
@@ -366,7 +366,7 @@ class TreeSurvUpload extends TreeSurv
         return true;
     }
     
-    protected function getPrevUploads($nID, $edit = false)
+    protected function getPrevUploads($nID, $nIDtxt, $edit = false)
     {
         $this->prepPrevUploads($nID);
         $treeID = $this->getUpTree();
@@ -377,6 +377,7 @@ class TreeSurvUpload extends TreeSurv
         }
         return view('vendor.survloop.upload-previous', [
             "nID"         => $nID,
+            "nIDtxt"      => $nIDtxt,
             "REQ"         => $GLOBALS["SL"]->REQ,
             "height"      => 160,          
             "width"       => 330,
@@ -478,7 +479,9 @@ class TreeSurvUpload extends TreeSurv
             if ($upRow->UpLinkFldID > 0) {
                 list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
                 list($loopInd, $loopID) = $this->sessData->currSessDataPos($tbl);
-                if ($loopID > 0) $upRow->UpLinkRecID = $loopID;
+                if ($loopID > 0) {
+                    $upRow->UpLinkRecID = $loopID;
+                }
             }
             $upRow->UpType    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
             $upRow->UpPrivacy = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy');
@@ -505,7 +508,9 @@ class TreeSurvUpload extends TreeSurv
                         $upRow->UpStoredFile = $this->getUploadFile($nID);
                         $filename = $upRow->UpStoredFile . '.' . $extension;
                         //if ($this->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
-                        if (file_exists($upFold . $filename)) Storage::delete($upFold . $filename);
+                        if (file_exists($upFold . $filename)) {
+                            Storage::delete($upFold . $filename);
+                        }
                         $GLOBALS["SL"]->REQ->file('up' . $nID . 'File')->move($upFold, $filename);
                     }
                 } else {

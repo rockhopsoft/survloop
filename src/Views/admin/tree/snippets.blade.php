@@ -15,7 +15,7 @@
         <table class="table table-striped">
         @forelse($blurbRows as $blurb)
             <tr><td class="fPerc133">{{ $blurb->DefSubset }}</td><td>
-                <a href="/dashboard/pages/snippets/{{ $blurb->DefID }}" class="btn btn-primary"
+                <a href="/dashboard/pages/snippets/{{ $blurb->DefID }}"
                     ><i class="fa fa-pencil" aria-hidden="true"></i></a>
             </td></tr>
         @empty

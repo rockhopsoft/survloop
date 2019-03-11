@@ -241,10 +241,7 @@ class TreeCoreSess extends TreeCore
     
     protected function createNewSess($cid = -3)
     {
-        $this->sessInfo = new SLSess;
-        $this->sessInfo->SessUserID = $this->v["uID"];
-        $this->sessInfo->SessTree = $this->treeID;
-        $this->sessInfo->save();
+        $this->sessInfo = $GLOBALS["SL"]->createNewSess($this->treeID);
         $this->setSessCore($cid);
         $this->logAdd('session-stuff', 'New Session ' . $GLOBALS["SL"]->coreTbl . '#' . $this->coreID . ', Sess#' 
             . $this->sessID . ' <i>(createNewSess)</i>');
@@ -260,7 +257,7 @@ class TreeCoreSess extends TreeCore
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey') {
                 $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
                 $recObj->{ $coreAbbr . 'UserID' } = $this->v["uID"];
-                $recObj->{ $coreAbbr . 'IPaddy' } = $this->hashIP();
+                $recObj->{ $coreAbbr . 'IPaddy' } = $GLOBALS["SL"]->hashIP();
                 $recObj->{ $coreAbbr . 'IsMobile' } = $GLOBALS["SL"]->isMobile();
                 $recObj->{ $coreAbbr . 'UniqueStr' }
                     = $this->getRandStr($GLOBALS["SL"]->coreTbl, $coreAbbr . 'UniqueStr', 20);

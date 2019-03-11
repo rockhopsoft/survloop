@@ -1609,7 +1609,7 @@ class GlobalsTables extends GlobalsStatic
     
     public function loadProTips()
     {
-        $cache = '$'.'this->proTips = [];' . "\n";
+        $cache = '$'.'this->proTips = [];' . "\n" . '$'.'this->proTipsImg = [];' . "\n";
         $chk = SLDefinitions::where('DefDatabase', $this->dbID)
             ->where('DefSet', 'Tree Settings')
             ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip')
@@ -1621,6 +1621,16 @@ class GlobalsTables extends GlobalsStatic
                     $cache .= '$'.'this->proTips[] = \'' . str_replace("'", "&#39;", $set->DefDescription) . '\';' 
                         . "\n";
                 }
+            }
+        }
+        $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+            ->where('DefSet', 'Tree Settings')
+            ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protipimg')
+            ->orderBy('DefOrder', 'asc')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $set) {
+                $cache .= '$'.'this->proTipsImg[] = \'' . str_replace("'", "&#39;", $set->DefDescription) . '\';' ."\n";
             }
         }
         return $cache;

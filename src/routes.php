@@ -545,18 +545,8 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get( '/dashboard/pages/list/add-{addPageType}', [
+    Route::get( '/dashboard/pages/add-{addPageType}', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@autoAddPages', 
-        'middleware' => ['auth']
-    ]);
-    
-    Route::post('/dashboard/pages/list', [
-        'uses'       => 'SurvLoop\Controllers\AdminTreeController@pagesList', 
-        'middleware' => ['auth']
-    ]);
-    
-    Route::get( '/dashboard/pages/list', [
-        'uses'       => 'SurvLoop\Controllers\AdminTreeController@pagesList', 
         'middleware' => ['auth']
     ]);
     
@@ -577,6 +567,36 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/dashboard/page/{treeID}/map', [
         'uses'       => 'SurvLoop\Controllers\AdminTreeController@indexPage', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/pages', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@pagesList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/pages', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@pagesList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/reports', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@reportsList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/reports', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@reportsList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/redirects', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@redirectsList', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/redirects', [
+        'uses'       => 'SurvLoop\Controllers\AdminTreeController@redirectsList', 
         'middleware' => ['auth']
     ]);
     

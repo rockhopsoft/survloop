@@ -468,7 +468,7 @@ class AdminController extends SurvLoopController
     
     public function blurbEdit(Request $request, $blurbID)
     {
-        $this->admControlInit($request, '/dashboard/pages/list');
+        $this->admControlInit($request, '/dashboard/pages');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
         if ($this->v["blurbRow"]->DefIsActive <= 0 || $this->v["blurbRow"]->DefIsActive%3 > 0) {

@@ -101,6 +101,10 @@ function addReqNodeRadio(nIDtxt, type, max) {
     reqNodes[getReqNodeInd(nIDtxt)] = new Array(nIDtxt, type, max);
     return true;
 }
+function addReqNodeRadioCustom(nIDtxt, type, idList) {
+    reqNodes[getReqNodeInd(nIDtxt)] = new Array(nIDtxt, type, idList);
+    return true;
+}
 function addReqNodeTbl(nID, nIDtxt, type, max, cols, req) {
     reqNodes[getReqNodeInd(nIDtxt)] = new Array(nIDtxt, type, nID, max, cols, req);
     return true;
@@ -517,8 +521,8 @@ function setSubResponses(nID, nSffx, onOff, kids) {
         for (var k = 0; k < kids.length; k++) {
             if (document.getElementById("node"+kids[k]+nSffx+"")) {
                 if (onOff) {
-//console.log("node kids[k] = "+kids[k]+" , nSffx = "+nSffx+"");
-//will need styFlex(
+/* console.log("node kids[k] = "+kids[k]+" , nSffx = "+nSffx+""); */
+/* will need styFlex( */
                     styBlock("node"+kids[k]+nSffx+"");
                     
                 } else {

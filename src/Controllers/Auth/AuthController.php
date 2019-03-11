@@ -179,6 +179,10 @@ class AuthController extends Controller
     {
         $sl = new SurvLoopController;
         $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        if ($uID > 0) {
+            SLSess::where('SessUserID', $uID)
+                ->update([ 'SessIsActive' => 0 ]);
+        }
         $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged Out');
         Auth::logout();
         session()->flush();

@@ -2,7 +2,7 @@
 @section('content')
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
 
-<form name="mainPageForm" method="POST" action="{{ url('/register') }}" onSubmit="return checkNodeForm();">
+<form name="mainPageForm" method="POST" action="{{ url('/register') }}">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" name="previous" 
@@ -117,7 +117,7 @@
     <div id="pageBtns">
         <div id="formErrorMsg"></div>
         <div id="nodeSubBtns" class="nodeSub">
-            <input type="submit" id="nFormSignupSubBtn" class="fR btn btn-primary btn-lg" value="Sign Up">
+            <input type="submit" class="nFormSignupSubBtn fR btn btn-primary btn-lg" value="Sign Up">
             <a href="{{ $midSurvBack }}" class="fL btn btn-secondary btn-lg" id="nFormBack">Back</a>
             <div class="fC p5"></div>
         </div>

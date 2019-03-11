@@ -24,15 +24,15 @@
         </div>
     </div>
 
-    <a href="#search" class="hshoo">SEO</a> - 
-    <a href="#general" class="hshoo">SurvLoop Configuration</a> - 
-    <a href="#survopts" class="hshoo">SurvLoop Settings</a> - 
-    <a href="#social" class="hshoo">Social Media</a> - 
-    <a href="#license" class="hshoo">Licenses</a> - 
-    <a href="#logos" class="hshoo">Logos & Fonts</a> - 
-    <a href="#color" class="hshoo">Colors</a> - 
-    <a href="#hardcode" class="hshoo">Hard Code HTML CSS JS</a> - 
-    <a href="#custom" class="hshoo">Custom Settings</a>
+    <a href="#search" class="hsho">SEO</a> - 
+    <a href="#general" class="hsho">SurvLoop Configuration</a> - 
+    <a href="#survopts" class="hsho">SurvLoop Settings</a> - 
+    <a href="#social" class="hsho">Social Media</a> - 
+    <a href="#license" class="hsho">Licenses</a> - 
+    <a href="#logos" class="hsho">Logos & Fonts</a> - 
+    <a href="#color" class="hsho">Colors</a> - 
+    <a href="#hardcode" class="hsho">Hard Code HTML CSS JS</a> - 
+    <a href="#custom" class="hsho">Custom Settings</a>
     <div class="fC"></div>
 </div>
 

@@ -195,7 +195,7 @@ class AdminTreeController extends AdminController
             ->get();
         if ($tree->isNotEmpty()) {
             foreach ($tree as $t) {
-                if ($t->TreeOpts%3 > 0) { // no admin trees made public [for now]
+                if ($t->TreeOpts%Globals::TREEOPT_ADMIN > 0) { // no admin trees made public [for now]
                     $this->treeID = $t->TreeID;
                     $this->dbID = $t->TreeDatabase;
                     $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
@@ -222,12 +222,12 @@ class AdminTreeController extends AdminController
     {
         $tree = SLTree::find($treeID);
         if (!$tree || !isset($tree->TreeName)) {
-            return $this->redir('/dashboard/pages/list');
+            return $this->redir('/dashboard/pages');
         }
         $this->treeID = $treeID;
         $this->dbID = $tree->TreeDatabase;
         $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
-        $this->admControlInit($request, '/dashboard/pages/list');
+        $this->admControlInit($request, '/dashboard/pages');
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
             $this->v["content"] = view('vendor.survloop.admin.tree.page', $this->v)->render();
@@ -256,13 +256,13 @@ class AdminTreeController extends AdminController
                 $tree->TreeOpts *= 3;
             }
             if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) {
-                $tree->TreeOpts *= 43;
+                $tree->TreeOpts *= Globals::TREEOPT_STAFF;
             }
             if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) {
-                $tree->TreeOpts *= 41;
+                $tree->TreeOpts *= Globals::TREEOPT_PARTNER;
             }
             if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
-                $tree->TreeOpts *= 17;
+                $tree->TreeOpts *= Globals::TREEOPT_VOLUNTEER;
             }
             $tree->save();
             $treeXML = new SLTree;
@@ -284,9 +284,85 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.admin.tree.trees', $this->v);
     }
     
-    public function pagesList(Request $request)
+    public function reportsList(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/pages/list');
+        return $this->pagesList($request, 'Report');
+    }
+    
+    public function redirectsList(Request $request)
+    {
+        return $this->pagesList($request, 'Redirect');
+    }
+    
+    public function pagesList(Request $request, $pageType = 'Page')
+    {
+        $this->admControlInit($request, (($pageType == 'Page') ? '/dashboard/pages' : (($pageType == 'Report') 
+            ? '/dashboard/reports' : '/dashboard/redirects')));
+        $this->startNewPage($request, $pageType);
+        if ($pageType != 'Redirect') {
+            $this->pagesRedirSaves($request);
+        }
+        $this->v["myRdr"] = [ "home" => [], "volun" => [], "partn" => [], "staff" => [], "admin" => [] ];
+        $this->v["myPages"] = $GLOBALS["SL"]->x["pageUrls"] = $GLOBALS["SL"]->x["myRedirs"] = [];
+        if ($pageType == 'Redirect') {
+            $chk = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
+                ->where('TreeType', 'LIKE', 'Redirect')
+                ->get();
+            if ($chk->isNotEmpty()) {
+                foreach ($chk as $i => $redir) {
+                    $redirUrl = '/' . (($redir->TreeOpts%Globals::TREEOPT_ADMIN == 0 
+                        || $redir->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0 
+                        || $redir->TreeOpts%Globals::TREEOPT_PARTNER == 0 
+                        || $redir->TreeOpts%Globals::TREEOPT_STAFF == 0) ? 'dash/' : '') . $redir->TreeSlug;
+                    if (!isset($GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug])) {
+                        $GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug] = '';
+                    }
+                    $GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug] .= '<br /><i class="mL5 mR5 slGreenDark">also redirects'
+                        . ' from</i><a href="' . $redir->TreeDesc . '" target="_blank">' . $redir->TreeDesc . '</a>';
+                    if (!in_array($redirUrl, $GLOBALS["SL"]->x["pageUrls"])) {
+                        $type = (($redir->TreeOpts%Globals::TREEOPT_ADMIN == 0) 
+                            ? 'admin' : (($redir->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) ? 'volun' 
+                            : (($redir->TreeOpts%Globals::TREEOPT_PARTNER == 0) 
+                                ? 'partn' : (($redir->TreeOpts%Globals::TREEOPT_STAFF == 0) ? 'staff' : 'home'))));
+                        $this->v["myRdr"][$type][] = [ $redirUrl, $redir->TreeDesc, $redir->TreeID ];
+                    }
+                }
+            }
+        } else { // not Redirect
+            $this->v["myPages"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
+                ->whereRaw('TreeOpts%' . Globals::TREEOPT_SURVREPORT . ' ' 
+                    . (($pageType == 'Report') ? '=' : '>') . ' 0')
+                ->where('TreeType', 'LIKE', 'Page')
+                ->orderBy('TreeName', 'asc')
+                ->get();
+            if ($this->v["myPages"]->isNotEmpty()) {
+                foreach ($this->v["myPages"] as $i => $tree) {
+                    if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                        $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/dashboard';
+                    } else {
+                        $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/' 
+                            . (($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 
+                                || $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0 
+                                || $tree->TreeOpts%Globals::TREEOPT_PARTNER == 0 
+                                || $tree->TreeOpts%Globals::TREEOPT_STAFF == 0) ? 'dash/' : '') . $tree->TreeSlug;
+                    }
+                }
+            }
+            $this->v["autopages"] = [ "contact" => false ];
+            if ($this->v["myPages"]->isNotEmpty()) {
+                foreach ($this->v["myPages"] as $page) {
+                    if ($page->TreeOpts%Globals::TREEOPT_CONTACT == 0) {
+                        $this->v["autopages"]["contact"] = true;
+                    }
+                }
+            }
+        }
+        $this->v["pageType"] = $pageType;
+        return view('vendor.survloop.admin.tree.pages', $this->v);
+    }
+    
+    protected function startNewPage(Request $request, $pageType = 'Page')
+    {
         if ($request->has('sub') && $request->has('newPageName')) {
             $tree = new SLTree;
             $tree->TreeDatabase = $GLOBALS["SL"]->dbID;
@@ -299,22 +375,23 @@ class AdminTreeController extends AdminController
             }
             $tree->TreeOpts = 1;
             if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
-                $tree->TreeOpts *= 3;
+                $tree->TreeOpts *= Globals::TREEOPT_ADMIN;
             }
             if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) {
-                $tree->TreeOpts *= 43;
+                $tree->TreeOpts *= Globals::TREEOPT_STAFF;
             }
             if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) {
-                $tree->TreeOpts *= 41;
+                $tree->TreeOpts *= Globals::TREEOPT_PARTNER;
             }
             if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
-                $tree->TreeOpts *= 17;
+                $tree->TreeOpts *= Globals::TREEOPT_VOLUNTEER;
             }
-            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) {
-                $tree->TreeOpts *= 13;
+            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1 && $reports) {
+                $tree->TreeOpts *= Globals::TREEOPT_SURVREPORT;
             }
             $tree->save();
-            if ($tree->TreeOpts%13 == 0 && $request->has('reportPageTree') && intVal($request->reportPageTree) > 0) {
+            if ($tree->TreeOpts%Globals::TREEOPT_REPORT == 0 && $request->has('reportPageTree') 
+                && intVal($request->reportPageTree) > 0) {
                 $chkTree = SLTree::find($request->reportPageTree);
                 if ($chkTree && isset($chkTree->TreeID)) {
                     $tree->update([ 'TreeCoreTable' => $chkTree->TreeCoreTable ]);
@@ -325,8 +402,14 @@ class AdminTreeController extends AdminController
                     }
                 }
             }
-            return $this->redir('/dashboard/page/' . $tree->TreeID . '?all=1&alt=1&refresh=1');
+            echo $this->redir('/dashboard/page/' . $tree->TreeID . '?all=1&alt=1&refresh=1', true);
+            exit;
         }
+        return false;
+    }
+    
+    protected function pagesRedirSaves(Request $request)
+    {
         if ($request->has('subRedir') && $request->has('newRedirFrom')) {
             $tree = new SLTree;
             $tree->TreeDatabase = $GLOBALS["SL"]->dbID;
@@ -336,19 +419,20 @@ class AdminTreeController extends AdminController
             $tree->TreeSlug = trim($request->newRedirFrom);
             $tree->TreeOpts = 1;
             if ($request->has('redirAdmOnly') && intVal($request->redirAdmOnly) == 1) {
-                $tree->TreeOpts *= 3;
+                $tree->TreeOpts *= Globals::TREEOPT_ADMIN;
             }
             if ($request->has('redirStfOnly') && intVal($request->redirStfOnly) == 1) {
-                $tree->TreeOpts *= 43;
+                $tree->TreeOpts *= Globals::TREEOPT_STAFF;
             }
             if ($request->has('redirPrtOnly') && intVal($request->redirPrtOnly) == 1) {
-                $tree->TreeOpts *= 41;
+                $tree->TreeOpts *= Globals::TREEOPT_PARTNER;
             }
             if ($request->has('redirVolOnly') && intVal($request->redirVolOnly) == 1) {
-                $tree->TreeOpts *= 17;
+                $tree->TreeOpts *= Globals::TREEOPT_VOLUNTEER;
             }
             $tree->save();
-            return $this->redir('/dashboard/pages/list');
+            echo $this->redir('/dashboard/redirects/list', true);
+            exit;
         }
         if ($request->has('redirEdit') && intVal($request->get('redirEdit')) > 0 
             && $request->has('redirTo') && $request->has('redirFrom')) {
@@ -358,66 +442,38 @@ class AdminTreeController extends AdminController
                 $tree->TreeSlug = trim($request->redirFrom);
                 $tree->save();
             }
-            return $this->redir('/dashboard/pages/list');
+            echo $this->redir('/dashboard/redirects/list', true);
+            exit;
         }
-        $this->v["myRdr"] = [ "home" => [], "volun" => [], "partn" => [], "staff" => [], "admin" => [] ];
-        $GLOBALS["SL"]->x["pageUrls"] = $GLOBALS["SL"]->x["myRedirs"] = [];
-        $this->v["myPages"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-            ->where('TreeType', 'LIKE', 'Page')
-            ->orderBy('TreeName', 'asc')
-            ->get();
-        if ($this->v["myPages"]->isNotEmpty()) {
-            foreach ($this->v["myPages"] as $i => $tree) {
-                if ($tree->TreeOpts%3 == 0 && $tree->TreeOpts%7 == 0) {
-                    $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/dashboard';
-                } else {
-                    $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/' . (($tree->TreeOpts%3 == 0 
-                        || $tree->TreeOpts%17 == 0 || $tree->TreeOpts%41 == 0 || $tree->TreeOpts%43 == 0) 
-                        ? 'dash/' : '') . $tree->TreeSlug;
-                }
-            }
-        }
-        $chk = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-            ->where('TreeType', 'LIKE', 'Redirect')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $i => $redir) {
-                $redirUrl = '/' . (($redir->TreeOpts%3 == 0 || $redir->TreeOpts%17 == 0 || $redir->TreeOpts%41 == 0 
-                    || $redir->TreeOpts%43 == 0) ? 'dash/' : '') . $redir->TreeSlug;
-                if (!isset($GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug])) {
-                    $GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug] = '';
-                }
-                $GLOBALS["SL"]->x["myRedirs"][$redir->TreeSlug] .= '<br /><i class="mL5 mR5 slGreenDark">also redirects'
-                    . ' from</i><a href="' . $redir->TreeDesc . '" target="_blank">' . $redir->TreeDesc . '</a>';
-                if (!in_array($redirUrl, $GLOBALS["SL"]->x["pageUrls"])) {
-                    $type = (($redir->TreeOpts%3 == 0) ? 'admin' : (($redir->TreeOpts%17 == 0) ? 'volun' 
-                        : (($redir->TreeOpts%41 == 0) ? 'partn' : (($redir->TreeOpts%43 == 0) ? 'staff' : 'home'))));
-                    $this->v["myRdr"][$type][] = [ $redirUrl, $redir->TreeDesc, $redir->TreeID ];
-                }
-            }
-        }
-        $this->v["autopages"] = [ "contact" => false ];
-        if ($this->v["myPages"]->isNotEmpty()) {
-            foreach ($this->v["myPages"] as $page) {
-                if ($page->TreeOpts%19 == 0) {
-                    $this->v["autopages"]["contact"] = true;
-                }
-            }
-        }
-        return view('vendor.survloop.admin.tree.pages', $this->v);
+        return false;
     }
     
     public function treeSettings(Request $request, $treeID = -3)
     {
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
-        $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/map?all=1&alt=1');
+        $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/settings');
         if ($request->has('sub') && $request->has('TreeName') && trim($request->get('TreeName')) != '') {
             $GLOBALS["SL"]->treeRow->TreeName      = trim($request->get('TreeName'));
             $GLOBALS["SL"]->treeRow->TreeSlug      = trim($request->get('TreeSlug'));
             $GLOBALS["SL"]->treeRow->TreeCoreTable = $GLOBALS["SL"]->tblI[$request->get('TreeCoreTable')];
             $GLOBALS["SL"]->treeRow->TreeOpts = 1;
-            $opts = [2, 3, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+            $opts = [
+                Globals::TREEOPT_SKINNY,
+                Globals::TREEOPT_ADMIN,
+                Globals::TREEOPT_HOMEPAGE,
+                Globals::TREEOPT_NOEDITS,
+                Globals::TREEOPT_REPORT,
+                Globals::TREEOPT_VOLUNTEER,
+                Globals::TREEOPT_CONTACT, 
+                Globals::TREEOPT_PROFILE,
+                Globals::TREEOPT_NOCACHE,
+                Globals::TREEOPT_SEARCH,
+                Globals::TREEOPT_SURVNAVBOT,
+                Globals::TREEOPT_PARTNER, 
+                Globals::TREEOPT_STAFF,
+                Globals::TREEOPT_PUBLICID
+                ];
             foreach ($opts as $o) {
                 if ($GLOBALS["SL"]->REQ->has('opt' . $o) && intVal($GLOBALS["SL"]->REQ->get('opt' . $o)) == $o) {
                     $GLOBALS["SL"]->treeRow->TreeOpts *= $o;
@@ -448,10 +504,24 @@ class AdminTreeController extends AdminController
                     $chk->DefDescription = $request->get('proTip' . $i);
                     $chk->save();
                 }
+                $chk = SLDefinitions::where('DefDatabase', $this->dbID)
+                    ->where('DefSet', 'Tree Settings')
+                    ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protipimg')
+                    ->where('DefOrder', $i)
+                    ->update([ 'DefDescription' => $request->get('proTipImg' . $i) ]);
+                if (!$chk) {
+                    $chk = new SLDefinitions;
+                    $chk->DefDatabase    = $this->dbID;
+                    $chk->DefSet         = 'Tree Settings';
+                    $chk->DefSubset      = 'tree-' . $this->treeID . '-protipimg';
+                    $chk->DefOrder       = $i;
+                    $chk->DefDescription = $request->get('proTipImg' . $i);
+                    $chk->save();
+                }
             } else { // empty tip row
                 $chk = SLDefinitions::where('DefDatabase', $this->dbID)
                     ->where('DefSet', 'Tree Settings')
-                    ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip')
+                    ->where('DefSubset', 'LIKE', 'tree-' . $this->treeID . '-protip%')
                     ->where('DefOrder', $i)
                     ->delete();
             }
@@ -559,7 +629,7 @@ class AdminTreeController extends AdminController
         $currPage = '/dashboard/surv-' . $treeID . '/map?all=1&alt=1';
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             //$currPage = '/dashboard/page/' . $treeID . '?all=1&alt=1';
-            $currPage = '/dashboard/pages/list';
+            $currPage = '/dashboard/pages';
         }
         $this->admControlInit($request, $currPage);
         $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $currPage);

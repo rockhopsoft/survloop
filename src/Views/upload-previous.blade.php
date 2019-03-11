@@ -1,11 +1,15 @@
 <!-- Stored in resources/views/survloop/upload-previous.blade.php -->
+<div class="nodeAnchor"><a id="upPrev{{ $nIDtxt }}" name="upPrev{{ $nIDtxt }}"></a></div>
 @if (!$uploads || empty($uploads)) 
-    <h3><span class="slGrey">Nothing uploaded here.</span></h3>
+    <h4><span class="slGrey">Nothing uploaded here.</span></h4>
 @else
-    <h2 style="margin-bottom: 10px;"><i class="fa fa-cloud-upload"></i> {{ sizeof($uploads) }} Previous Uploads:</h2>
+    <h2 style="margin-bottom: 10px;">
+        <i class="fa fa-cloud-upload"></i> {{ sizeof($uploads) }} 
+        Previous @if (sizeof($uploads) == 1) Upload: @else Uploads: @endif
+    </h2>
     @foreach ($uploads as $i => $upRow)
         @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->UpID)
-            <a name="up{{ $upRow->UpID }}"></a>
+            <div class="nodeAnchor"><a id="up{{ $upRow->UpID }}" name="up{{ $upRow->UpID }}"></a></div>
             <div class="uploadedWrap"><div class="row">
                 <div class="col-md-4 m0 taC">
                 

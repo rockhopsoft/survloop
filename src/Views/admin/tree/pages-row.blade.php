@@ -1,6 +1,6 @@
 <!-- Stored in resources/views/vender/survloop/admin/tree/pages-row.blade.php -->
 <tr><td>
-    @if ($tree->TreeOpts%7 > 0)
+    @if ($tree->TreeOpts%7 > 0 && $tree->TreeOpts%13 > 0)
         <div class="relDiv pL20 mL10"><div class="absDiv" style="left: -5px;">
             <i class="fa fa-share fa-flip-vertical opac20" aria-hidden="true"></i></div>
     @endif
@@ -13,7 +13,6 @@
     @elseif ($tree->TreeOpts%17 == 0) <i class="fa fa-hand-rock-o float-right mT5 mR5" aria-hidden="true"></i>
     @endif
     @if ($tree->TreeOpts%7 == 0) <i class="fa fa-home float-right mT5 mR5"></i> @endif
-    @if ($tree->TreeOpts%13 == 0) <i class="fa fa-list-alt float-right mT5 mR5"></i> @endif
     @if ($tree->TreeOpts%31 == 0) <i class="fa fa-search float-right mT5 mR5"></i> @endif
     <a href="{{ $GLOBALS['SL']->x['pageUrls'][$tree->TreeID] }}" target="_blank" class="mL5"
         >{{ $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] }}</a>

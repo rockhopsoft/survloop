@@ -1,15 +1,15 @@
 <!-- resources/views/vendor/survloop/admin/db/tableView.blade.php -->
 @extends('vendor.survloop.master')
 @section('content')
-
 <div class="container">
+
 <div class="slCard nodeWrap">
 <div class="row">
     <div class="col-7">
-        <h3 class="mB5"><i class="fa fa-database"></i> Table: {{ $tbl->TblEng }}</h3>
-        <h4 class="mB10">{{ $tbl->TblName }} ({{ $tbl->TblAbbr }}) <span class="slGrey">{{ $tbl->TblType }}</span></h4>
-        <div class="pB10">{!! $tbl->TblDesc !!}</div>
-        @if (trim($tbl->TblNotes) != '') <div class="slGrey pB10"><i>Notes:</i> {!! $tbl->TblNotes !!}</div> @endif
+        <h3 class="disIn"><i class="fa fa-database"></i> Table: {{ $tbl->TblEng }}</h3>
+        <span class="mL10 slGrey">{{ $tbl->TblName }} ({{ $tbl->TblAbbr }}) {{ $tbl->TblType }}</span>
+        <div class="pT20 pB20">{!! $tbl->TblDesc !!}</div>
+        @if (trim($tbl->TblNotes) != '') <div class="slGrey pB20"><i>Notes:</i> {!! $tbl->TblNotes !!}</div> @endif
     @if ($rules->isNotEmpty())
         @foreach ($rules as $rule)
             <div class="pB10"><a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" target="_blank"

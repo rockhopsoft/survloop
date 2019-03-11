@@ -268,7 +268,7 @@ class TreeSurvForm extends TreeSurvFormUtils
         $ret = $visibilityField . $this->nodeSessDump($nIDtxt, $nID);
         // else print standard node output...
         
-        $xtraClass = ' slTab';
+        $xtraClass = ' slTab slNodeChange';
         if ($curr->nodeType != 'Long Text') {
             $xtraClass .= ' ntrStp';
         }
@@ -1112,23 +1112,27 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 $ret .= '<div class="col-' . $GLOBALS["SL"]->getColsWidth(sizeof($curr->responses)) 
                                     . '">';
                             }
+                            $onClickFull = trim($otherFld[3] . $onClickXtra);
+                            if ($onClickFull != '') {
+                                $onClickFull = ' onClick="' . $onClickFull . '" ';
+                            }
                             if ($mobileCheckbox) {
                                 $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt . 'fld' . $j 
                                     . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') 
                                     . '"><div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j . '" value="' 
                                     . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" ' 
-                                    . $resNameCheck . $respKids . ' autocomplete="off" onClick="' . $otherFld[3] 
-                                    . $onClickXtra . '" ' . $GLOBALS["SL"]->tabInd() . '></div> ' . $res->NodeResEng 
-                                    . ' ' . $otherFld[2] . '</label>' . "\n";
+                                    . $resNameCheck . $respKids . ' autocomplete="off" ' . $onClickFull 
+                                    . ' class="slNodeChange" ' . $GLOBALS["SL"]->tabInd() . '></div> ' 
+                                    . $res->NodeResEng . ' ' . $otherFld[2] . '</label>' . "\n";
                             } else {
                                 $ret .= '<div class="' . $isOneLinerFld . '">' . ((strlen($res) < 40) ? '<nobr>' : '') 
                                     . '<label for="n' . $nIDtxt . 'fld' . $j 
                                     . '" class="mR10"><div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
                                     . '" value="' . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" '
-                                    . $resNameCheck . $respKids . ' autocomplete="off" onClick="' . $otherFld[3] 
-                                    . $onClickXtra . '"' . $GLOBALS["SL"]->tabInd() . '></div> ' . $res->NodeResEng 
-                                    . ' ' . $otherFld[2] . '</label>' . ((strlen($res) < 40) ? '</nobr>' : '') 
-                                    . '</div>' . "\n";
+                                    . $resNameCheck . $respKids . ' autocomplete="off"' . $onClickFull 
+                                    . ' class="slNodeChange"' . $GLOBALS["SL"]->tabInd() . '></div> ' 
+                                    . $res->NodeResEng . ' ' . $otherFld[2] . '</label>' 
+                                    . ((strlen($res) < 40) ? '</nobr>' : '') . '</div>' . "\n";
                             }
                             if ($curr->nodeRow->NodeOpts%61 == 0) {
                                 $ret .= '</div> <!-- end col -->' . "\n";
@@ -1195,7 +1199,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 } elseif ($curr->nodeType == 'Date') {
                     
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">' 
-                        . $this->formDate($nIDtxt, $dateStr, $xtraClass) . '</div>' . "\n";
+                        . $this->formDate($nID, $nIDtxt, $dateStr, $xtraClass) . '</div>' . "\n";
                     if ($this->nodeHasDateRestriction($curr->nodeRow)) { // then enforce time validation
                         if ($curr->isRequired()) {
                             $this->pageJSvalid .= "addReqNodeDateLimit('" . $nIDtxt . "', 'reqFormFldDate" 
@@ -1318,7 +1322,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 } elseif ($curr->nodeType == 'Uploads') {
                     
                     $this->pageHasUpload[] = $nID;
-                    $ret .= $nodePrompt . '<div class="nFld">' . $this->uploadTool($nID) . '</div>';
+                    $ret .= $nodePrompt . '<div class="nFld">' . $this->uploadTool($nID, $nIDtxt) . '</div>';
                     
                 } else { // instruction only
                     

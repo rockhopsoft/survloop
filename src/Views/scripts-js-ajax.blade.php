@@ -1,6 +1,6 @@
 /* generated from resources/views/vendor/survloop/scripts-js-ajax.blade.php */
 $(document).ready(function(){
-        
+    
     function popDialog(title, desc) {
         if (document.getElementById("dialogPop")) {
             document.getElementById("dialogPop").title=title;
@@ -40,20 +40,20 @@ $(document).ready(function(){
     
     function slideToHshooPos(hash) {
         if (document.getElementById(hash)) {
-            if (anchorOffsetBonus == 0 && document.getElementById("fixedHeader")) anchorOffsetBonus = -80;
-            var newTop = (1+anchorOffsetBonus+$("#"+hash+"").offset().top);
+            var newTop = (1+getAnchorOffset()+$("#"+hash+"").offset().top);
             $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
         }
         return true;
     }
     
-    $("a.hsho").on('click', function(event) {
+    $(".hsho").on('click', function(event) {
         var hash = $(this).attr("data-hash").trim();
         if (hash !== "") slideToHshooPos(hash);
         return false;
     });
     
-    $("a.hshoo").on('click', function(event) {
+    $(".hshoo").on('click', function(event) {
+console.log("hshoo");
         event.preventDefault();
         var hash = '';
         if ($(this).attr("id") && $(this).attr("id").substring(0, 6) == 'admLnk') {
@@ -111,7 +111,7 @@ $(document).ready(function(){
     function chkHshooScroll() {
         if (hshoos.length > 0) {
             hshooCurr = -1;
-            var currScroll = Math.ceil($(document).scrollTop())-anchorOffsetBonus;
+            var currScroll = Math.ceil($(document).scrollTop())-getAnchorOffset();
             var compareScroll = currScroll+2;
             for (var i = 0; i < hshoos.length; i++) {
                 if (hshoos[i][1] <= compareScroll) hshooCurr = i;

@@ -43,7 +43,7 @@
                 @else href="/dashboard/tree/map?alt=1" @endif
                 ><i class="fa fa-align-left"></i> Show Details</a>
         @endif
-        <a class="btn btn-secondary float-right mL10" href="/dashboard/pages/list"
+        <a class="btn btn-secondary float-right mL10" href="/dashboard/pages"
             ><i class="fa fa-newspaper-o"></i> List of Pages</a>
         <span class="slGrey">
             A page is also created as a tree filled with branching nodes. 

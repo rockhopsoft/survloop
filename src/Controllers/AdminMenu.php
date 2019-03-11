@@ -41,22 +41,26 @@ class AdminMenu
         list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Site Content', 
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
-            $this->admMenuLnk('/dashboard/pages/list',     'Pages & Reports', '', 1, [
-                $this->admMenuLnk('/dashboard/pages/list', 'All Pages & Reports'),
+            $this->admMenuLnk('/dashboard/pages',         'Pages & Reports', '', 1, [
+                $this->admMenuLnk('/dashboard/pages',     'Web Content Pages'),
+                $this->admMenuLnk('/dashboard/reports',   'Data Reports'),
+                $this->admMenuLnk('/dashboard/redirects',     'URL Redirects'),
                 $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets')
                 ]), 
             $this->admMenuLnk('/dashboard/surveys/list', 'Surveys & Forms', '', 1, [
-                $this->admMenuLnk('/dashboard/surveys/list', 'Manage All Surveys & Forms'),
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 
                     '<b>' . $treeLabel . ':</b> Full Survey Map'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/settings',        'Settings'), 
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Sessions'), 
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Responses'),
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map')
                 ]), 
-            $this->admMenuLnk('/dashboard/pages/menus',    'Navigation Menus'), 
-            $this->admMenuLnk('/dashboard/images/gallery', 'Media Gallery'),
-            $this->admMenuLnk('/dashboard/emails',         'Email Templates')
+            $this->admMenuLnk('/dashboard/pages/menus',     'Navigation Menus'), 
+            $this->admMenuLnk('/dashboard/images/gallery',  'Media Gallery'),
+            $this->admMenuLnk('/dashboard/emails',          'Email Templates', '', 1, [
+                $this->admMenuLnk('/dashboard/sent-emails', 'Sent Emails')
+                ])
             ]);
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
             $this->admMenuLnk('/dashboard/db', 'Data Tables', '', 1, [

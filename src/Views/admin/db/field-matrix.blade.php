@@ -1,15 +1,20 @@
 <!-- resources/views/vendor/survloop/admin/db/field-matrix.blade.php -->
 
-<h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    @if ($isAlt) Field Matrix (in English) @else Field Matrix (in Geek) @endif
-    <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
-</h1>
-<a href="/dashboard/db/field-matrix?{{ $urlParam }}print=1" target="_blank" class="btn btn-secondary mR10"><i class="fa fa-print"></i> Print Matrix</a>
-<a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-secondary mR10"><i class="fa fa-file-excel-o"></i> Matrix to Excel</a>
-
-<div class="clearfix p20"></div>
+<div class="slCard nodeWrap" style="max-width: 800px;">
+    <div class="row">
+        <div class="col-md-8">
+            <h2><span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span></h2>
+            @if ($isAlt) Field Matrix (in English) @else Field Matrix (in Geek) @endif <br />
+            {!! strip_tags($dbStats) !!}
+        </div>
+        <div class="col-md-4">
+            <a href="/dashboard/db/field-matrix?{{ $urlParam }}print=1" target="_blank" 
+                class="btn btn-secondary w100 mB10"><i class="fa fa-print"></i> Print Matrix</a>
+            <a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-secondary w100 mB10"
+                ><i class="fa fa-file-excel-o"></i> Matrix to Excel</a>
+        </div>
+    </div>
+</div>
 
 {!! $dbStats !!}
 <i class="fa fa-link"></i> Foreign Keys<br />
@@ -27,3 +32,4 @@
     </tr>
 @endfor
 </table>
+<style> body { overflow-x: visible; } </style>

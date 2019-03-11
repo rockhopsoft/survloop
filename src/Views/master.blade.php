@@ -2,6 +2,7 @@
 if (!isset($GLOBALS["SL"])) {
     $GLOBALS["SL"] = new SurvLoop\Controllers\Globals(new Illuminate\Http\Request, 1, 1, 1);
 }
+$GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
