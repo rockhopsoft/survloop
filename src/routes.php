@@ -21,7 +21,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/holdSess',     'SurvLoop\\Controllers\\SurvLoop@holdSess');
     Route::get( '/restart',      'SurvLoop\\Controllers\\SurvLoop@restartSess');
     Route::get( '/sessDump',     'SurvLoop\\Controllers\\SurvLoop@sessDump');
-    Route::get( '/test',         function () { return redirect('/?test=1'); });
+    Route::get( '/test',         'SurvLoop\\Controllers\\SurvRoutes@testHome');
     
     Route::get( '/switch/{treeID}/{cid}',  'SurvLoop\\Controllers\\SurvLoop@switchSess');
     Route::get( '/delSess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@delSess');
@@ -102,159 +102,25 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
     
-    Route::get( '/sys1.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys1.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/sys1.min.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.css'));
-        $response->header('Content-Type', 'text/css');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
-    Route::get( '/sys2.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys2.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/sys2.min.css', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.css'));
-        $response->header('Content-Type', 'text/css');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
-    Route::get( '/sys1.min.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys1.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
-    Route::get( '/sys2.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys2.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/sys2.min.js', function() {
-        $response = Response::make(file_get_contents('../storage/app/sys/sys2.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
-    Route::get( '/tree-{treeID}.js', function($treeID) {
-        $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
-        $response->header('Content-Type', 'application/javascript');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
+    Route::get( '/sys{which}.{type}',     'SurvLoop\\Controllers\\SurvRoutes@getSysFile');
+    Route::get( '/sys{which}.min.{type}', 'SurvLoop\\Controllers\\SurvRoutes@getSysFileMin');
+    Route::get( '/tree-{treeID}.js',      'SurvLoop\\Controllers\\SurvRoutes@getSysTreeJs');
+    Route::get( '/dyna-{file}.{type}',    'SurvLoop\\Controllers\\SurvRoutes@getDynaFile');
+    Route::get( '/gen-kml/{kmlfile}.kml', 'SurvLoop\\Controllers\\SurvRoutes@getKml');
     
-    Route::get( '/dyna-{file}.css', function($file) {
-        $response = null;
-        if (strpos($file, '-s') === false || (session()->has('slSessID') 
-            && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
-            $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.css'));
-        } else {
-            $response = Response::make('/* */');
-        }
-        $response->header('Content-Type', 'text/css');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
-    Route::get( '/dyna-{file}.js', function($file) {
-        $response = null;
-        if (strpos($file, '-s') === false || (session()->has('slSessID') 
-            && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
-            $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.js'));
-        } else {
-            $response = Response::make('/* */');
-        }
-        $response->header('Content-Type', 'application/javascript');
-        $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-        $response->header('Expires', gmdate('r', time()+(60*60*24)));
-        return $response;
-    });
+    Route::get( '/jquery.min.js',         'SurvLoop\\Controllers\\SurvRoutes@getJquery');
+    Route::get( '/jquery-ui.min.{type}',  'SurvLoop\\Controllers\\SurvRoutes@getJqueryUi');
+    Route::get( '/bootstrap.min.{type}',  'SurvLoop\\Controllers\\SurvRoutes@getBootstrap');
     
-    Route::get( '/gen-kml/{kmlfile}.kml', function($kmlfile) {
-        if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
-            $response = Response::make(file_get_contents('../storage/app/gen-kml/' . $kmlfile . '.kml'));
-            $response->header('Content-Type', 'text/xml');
-            $response->header('Cache-Control', 'public, max-age="' . (60*60*24) . '"');
-            $response->header('Expires', gmdate('r', time()+(60*60*24)));
-            return $response;
-        }
-    });
+    Route::get( '/css/fork-awesome.min.css', 'SurvLoop\\Controllers\\SurvRoutes@getFontAwesome');
+    Route::get( '/fonts/{file}',             'SurvLoop\\Controllers\\SurvRoutes@getFont');
     
+    Route::get( '/summernote.min.js',     'SurvLoop\\Controllers\\SurvRoutes@getSummernoteJs');
+    Route::get( '/summernote.css',        'SurvLoop\\Controllers\\SurvRoutes@getSummernoteCss');
+    Route::get( '/font/summernote.eot',   'SurvLoop\\Controllers\\SurvRoutes@getSummernoteEot');
     
-    Route::get( '/jquery.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/components/jquery/jquery.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/jquery-ui.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/components/jqueryui/jquery-ui.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/jquery-ui.min.css', function() {
-        $response = Response::make(file_get_contents('../vendor/components/jqueryui/themes/base/jquery-ui.min.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    
-    Route::get( '/bootstrap.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/js/bootstrap.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/bootstrap.min.css', function() {
-        $response = Response::make(file_get_contents('../vendor/twbs/bootstrap/dist/css/bootstrap.min.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    
-    Route::get( '/css/fork-awesome.min.css', function() {
-        $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/fonts/{file}', function($file) {
-        $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/fonts/' . $file));
-        //$response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    
-    Route::get( '/summernote.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/summernote.css', function() {
-        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/summernote.css'));
-        $response->header('Content-Type', 'text/css');
-        return $response;
-    });
-    Route::get( '/font/summernote.eot', function() {
-        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/font/summernote.eot'));
-        $response->header('Content-Type', 'application/vnd.ms-fontobject');
-        return $response;
-    });
-    
-    Route::get( '/Chart.bundle.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/nnnick/chartjs/dist/Chart.bundle.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
-    Route::get( '/plotly.min.js', function() {
-        $response = Response::make(file_get_contents('../vendor/plotly/plotly.js/dist/plotly.min.js'));
-        $response->header('Content-Type', 'application/javascript');
-        return $response;
-    });
+    Route::get( '/Chart.bundle.min.js',   'SurvLoop\\Controllers\\SurvRoutes@getChartJs');
+    Route::get( '/plotly.min.js',         'SurvLoop\\Controllers\\SurvRoutes@getPlotlyJs');
     
     ///////////////////////////////////////////////////////////
     
@@ -983,8 +849,8 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{file}', function ($file) {
-        return redirect('/survloop/jquery-ui-1.12.1/images/' . $file);
-    });
+    
+    Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
+        'SurvLoop\\Controllers\\SurvRoutes@catchJqueryUiMappingError');
     
 });    
