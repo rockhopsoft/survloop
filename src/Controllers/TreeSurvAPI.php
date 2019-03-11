@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvApi is extends a standard branching tree, for maps of API exports.
+  * TreeSurvAPI is extends a standard branching tree, for maps of API exports.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
@@ -17,7 +17,7 @@ use App\Models\SLFields;
 use App\Models\SLSearchRecDump;
 use SurvLoop\Controllers\TreeCoreSess;
 
-class TreeSurvApi extends TreeCoreSess
+class TreeSurvAPI extends TreeCoreSess
 {
     protected function initExtra(Request $request)
     {
@@ -170,7 +170,7 @@ class TreeSurvApi extends TreeCoreSess
     {
         $this->survLoopInit($request);
         if (isset($GLOBALS["SL"]->xmlTree["id"]) && empty($this->xmlMapTree)) {
-            $this->xmlMapTree = new TreeSurvApi;
+            $this->xmlMapTree = new TreeSurvAPI;
             $this->xmlMapTree->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         }
         return true;

@@ -6,6 +6,7 @@ var data = [{
   orientation: 'h'
 }];
 var layout = {
+  @if (isset($height)) height: {{ $height }}, @endif
   yaxis: {
     automargin: true
   }

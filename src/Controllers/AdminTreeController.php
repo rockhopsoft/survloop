@@ -27,7 +27,7 @@ use App\Models\SLUsersRoles;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use SurvLoop\Controllers\TreeSurvAdmin;
-use SurvLoop\Controllers\TreeSurvApi;
+use SurvLoop\Controllers\TreeSurvAPI;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SessAnalysis;
 use SurvLoop\Controllers\AdminController;
@@ -910,7 +910,7 @@ class AdminTreeController extends AdminController
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new TreeSurvApi;
+        $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
         $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", function() {
@@ -924,7 +924,7 @@ class AdminTreeController extends AdminController
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new TreeSurvApi;
+        $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
         return view('vendor.survloop.master', $this->v);

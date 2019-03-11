@@ -11,9 +11,9 @@ namespace SurvLoop\Controllers;
 
 use App\Models\SLConditions;
 use App\Models\SLConditionsArticles;
-use SurvLoop\Controllers\TreeSurvApi;
+use SurvLoop\Controllers\TreeSurvAPI;
 
-class TreeSurvConds extends TreeSurvApi
+class TreeSurvConds extends TreeSurvAPI
 {
     protected function checkNodeConditions($nID)
     {
