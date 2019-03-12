@@ -73,7 +73,7 @@
                 @endif
             @endif
             <div class="nodeHalfGap"></div>
-            <a id="nFormUpload" href="javascript:;" class="btn btn-xl btn-primary w100">Upload</a>
+            <a id="nFormUpload" href="javascript:;" class="btn btn-lg btn-xl btn-primary btn-block">Upload</a>
         </div>
         
         <hr>

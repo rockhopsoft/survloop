@@ -4,23 +4,17 @@ label { font-weight: normal; }
 
 .jumbotron { background: {!! $css["color-main-faint"] !!}; }
 
-.btn-group-xl > .btn, .btn-xl {
-    padding: 15px 20px;
-    font-size: 30px;
-    line-height: 1.3333333;
-    border-radius: 6px;
-}
-
 .btn-primary-simple, .btn-primary, a.btn-primary:link, a.btn-primary:active, a.btn-primary:visited, a.btn-primary:hover,
 a.btn-primary.btn-xl:link, a.btn-primary.btn-xl:active, a.btn-primary.btn-xl:visited, a.btn-primary.btn-xl:hover,
 a.btn-primary.btn-lg:link, a.btn-primary.btn-lg:active, a.btn-primary.btn-lg:visited, a.btn-primary.btn-lg:hover,
 a.btn-primary.btn-sm:link, a.btn-primary.btn-sm:active, a.btn-primary.btn-sm:visited, a.btn-primary.btn-sm:hover,
 input[type="submit"].btn-primary, input[type="submit"].btn-primary.btn-xl, input[type="submit"].btn-primary.btn-lg, 
 input[type="submit"].btn-primary.btn-sm, a.btn-primary:not([href]):not([tabindex]) {
-    color: {!! $css["color-main-bg"] !!};
     background-image: none;
+    color: {!! $css["color-main-bg"] !!};
     background: {!! $css["color-main-on"] !!};
     border: 1px {!! $css["color-main-bg"] !!} solid;
+    text-shadow: none;
 }
 a.btn-primary:hover, a.btn-primary.btn-xl:hover, a.btn-primary.btn-lg:hover, a.btn-primary.btn-sm:hover,
 input[type="submit"].btn-primary:hover, input[type="submit"].btn-primary.btn-xl:hover, 
@@ -36,10 +30,11 @@ a.btn-info.btn-lg:link, a.btn-info.btn-lg:active, a.btn-info.btn-lg:visited, a.b
 a.btn-info.btn-sm:link, a.btn-info.btn-sm:active, a.btn-info.btn-sm:visited, a.btn-info.btn-sm:hover,
 input[type="submit"].btn-info, input[type="submit"].btn-info.btn-xl, 
 input[type="submit"].btn-info.btn-lg, input[type="submit"].btn-info.btn-sm {
-    color: {!! $css["color-info-on"] !!};
     background-image: none;
+    color: {!! $css["color-info-on"] !!};
     background: {!! $css["color-main-faint"] !!};
     border: 1px {!! $css["color-info-on"] !!} solid;
+    text-shadow: none;
 }
 a.btn-info:hover, a.btn-info.btn-xl:hover, a.btn-info.btn-lg:hover, a.btn-info.btn-sm:hover,
 input[type="submit"].btn-info:hover, input[type="submit"].btn-info.btn-xl:hover, 
@@ -55,10 +50,11 @@ a.btn-secondary.btn-lg:link, a.btn-secondary.btn-lg:active, a.btn-secondary.btn-
 a.btn-secondary.btn-sm:link, a.btn-secondary.btn-sm:active, a.btn-secondary.btn-sm:visited, a.btn-secondary.btn-sm:hover,
 input[type="submit"].btn-secondary, input[type="submit"].btn-secondary.btn-xl, 
 input[type="submit"].btn-secondary.btn-lg, input[type="submit"].btn-secondary.btn-sm {
-    color: {!! $css["color-main-on"] !!};
     background-image: none;
+    color: {!! $css["color-main-on"] !!};
     background: {!! $css["color-main-faint"] !!};
     border: 1px {!! $css["color-main-on"] !!} solid;
+    text-shadow: none;
 }
 a.btn-secondary:hover, a.btn-secondary.btn-xl:hover, a.btn-secondary.btn-lg:hover, a.btn-secondary.btn-sm:hover,
 input[type="submit"].btn-secondary:hover, input[type="submit"].btn-secondary.btn-xl:hover, 
@@ -74,10 +70,11 @@ a.btn-danger.btn-lg:link, a.btn-danger.btn-lg:active, a.btn-danger.btn-lg:visite
 a.btn-danger.btn-sm:link, a.btn-danger.btn-sm:active, a.btn-danger.btn-sm:visited, a.btn-danger.btn-sm:hover,
 input[type="submit"].btn-danger, input[type="submit"].btn-danger.btn-xl, 
 input[type="submit"].btn-danger.btn-lg, input[type="submit"].btn-danger.btn-sm {
-    color: {!! $css["color-main-bg"] !!};
     background-image: none;
+    color: {!! $css["color-main-bg"] !!};
     background: {!! $css["color-danger-on"] !!};
     border: 1px {!! $css["color-main-bg"] !!} solid;
+    text-shadow: none;
 }
 a.btn-danger:hover, a.btn-danger.btn-xl:hover, a.btn-danger.btn-lg:hover, a.btn-danger.btn-sm:hover,
 input[type="submit"].btn-danger:hover, input[type="submit"].btn-danger.btn-xl:hover, 

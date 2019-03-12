@@ -2,7 +2,6 @@
 
 #mainNav {
 	background: {!! $css["color-nav-bg"] !!};
-    /* border-bottom: 1px {!! $css["color-line-hr"] !!} solid; */
 }
 #mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, #myNavBar, #myNavBar .navbar {
     height: 56px;

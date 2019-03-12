@@ -70,7 +70,7 @@
 <div class="fC pB20"></div>
 
 @if (!isset($midSurvBack) || trim($midSurvBack) == '')
-    <center><input type="submit" class="btn btn-xl btn-primary" value="Login"></center>
+    <center><input type="submit" class="btn btn-lg btn-xl btn-primary" value="Login"></center>
 @else
     <div id="pageBtns">
         <div id="formErrorMsg"></div>

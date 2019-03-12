@@ -76,7 +76,7 @@ $v = $surv->custLoop->v;
     </span>
 @endif
 
-<center><input type="submit" class="btn btn-xl btn-primary mT20" value="Reset Password"></center>
+<center><input type="submit" class="btn btn-lg btn-xl btn-primary mT20" value="Reset Password"></center>
 
 <div class="nodeGap"></div>
 

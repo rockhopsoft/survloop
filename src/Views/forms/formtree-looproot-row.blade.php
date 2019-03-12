@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/forms/formtree-looproot-row.blade.php -->
 
 @if ($node->isStepLoop())
-    <a id="editLoopItem{{ $itemID }}" class="btn btn-secondary btn-xl w100 taL mB20 editLoopItem" href="javascript:;">
+    <a id="editLoopItem{{ $itemID }}" class="btn btn-secondary btn-lg btn-xl w100 taL mB20 editLoopItem" href="javascript:;">
     @if (trim($ico) != '')
         <span class=" @if (strpos($ico, 'gryC') !== false) slBlueFaint @else slBlueLight @endif "
             >{!! $ico !!}</span>

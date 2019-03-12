@@ -91,9 +91,9 @@
                 @endif ></div>
             </div>
             <div class="col-4 pT10">
-                <a href="javascript:;" class="btn btn-sm btn-secondary w100 mB10 openImgReset" id="imgResetpageImg"
+                <a href="javascript:;" class="btn btn-sm btn-secondary btn-block mB10 openImgReset" id="imgResetpageImg"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i> Reset to Default</a>
-                <a href="javascript:;" class="btn btn-secondary w100 mB10 openImgSelect" id="imgSelectpageImg" 
+                <a href="javascript:;" class="btn btn-secondary btn-block mB10 openImgSelect" id="imgSelectpageImg" 
                     data-title="" data-presel="{{ $currMeta['img'] }}" 
                     ><div><i class="fa fa-picture-o" aria-hidden="true"></i> 
                     Select or</div><div>Upload Image</div></a><br />

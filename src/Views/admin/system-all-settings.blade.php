@@ -239,7 +239,7 @@
 @endif
 
 <div class="p20"></div>
-<input type="submit" class="btn btn-xl btn-primary w100" value="Save All Settings Changes">
+<input type="submit" class="btn btn-lg btn-xl btn-primary btn-block" value="Save All Settings Changes">
 
 </form>
 </div>

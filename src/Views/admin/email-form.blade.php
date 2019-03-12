@@ -50,7 +50,7 @@
     <div class="col-3">
         <h4 class="m0 slGrey">Email Body</h4>
         <div class="p20"></div>
-        <input type="submit" class="btn btn-xl btn-primary w100" value="Save Email Template">
+        <input type="submit" class="btn btn-lg btn-xl btn-primary btn-block" value="Save Email Template">
     </div>
     <div class="col-9">
         <textarea name="emailBody" id="emailBodyID" class="form-control form-control-lg" style="height: 500px;"

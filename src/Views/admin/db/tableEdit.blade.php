@@ -71,7 +71,7 @@
     
 <div class="p20"></div>
 <div class="pB20">
-    <input type="submit" class="btn btn-xl btn-primary pull-right" 
+    <input type="submit" class="btn btn-lg btn-xl btn-primary pull-right" 
             @if (trim($tblName) == '') value="Add Table" @else value="Save Changes" @endif >
     <div class="red">
         <input type="checkbox" name="deleteTbl" id="deleteTblID" value="1" style="width: 20px;"> 

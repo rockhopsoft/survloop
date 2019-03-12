@@ -15,11 +15,11 @@
         </div>
 @if (!$isPrint)
         <div class="col-md-3">
-            <a href="/dashboard/db?print=1" target="_blank" class="btn btn-secondary w100 mB10 taL"
+            <a href="/dashboard/db?print=1" target="_blank" class="btn btn-secondary btn-block mB10 taL"
                 ><i class="fa fa-print"></i> Print This Overview</a>
-            <a href="/dashboard/db/addTable" class="btn btn-secondary w100 mB10 taL"
+            <a href="/dashboard/db/addTable" class="btn btn-secondary btn-block mB10 taL"
                 ><i class="fa fa-plus"></i> Add a New Table</a>
-            <a href="/dashboard/db/sortTable" class="btn btn-secondary w100 mB10 taL"
+            <a href="/dashboard/db/sortTable" class="btn btn-secondary btn-block mB10 taL"
                 ><i class="fa fa-sort-amount-asc"></i> Re-Order Tables</a>
         </div>
 @endif

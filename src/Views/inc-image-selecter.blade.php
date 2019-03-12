@@ -31,7 +31,7 @@
     
         <a name="imgFile{{ $nID }}anc"></a>
         <div class="slCard nodeWrap">
-            <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-secondary w100 hidivBtnSelf 
+            <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-secondary btn-block hidivBtnSelf 
                 @if (isset($presel) && trim($presel) != '') disBlo @else disNon @endif " style="margin: -10px 0px 20px 0px;"
                 >Upload New Image</a>
             <div id="hidivImgUp{{ $nID }}" 

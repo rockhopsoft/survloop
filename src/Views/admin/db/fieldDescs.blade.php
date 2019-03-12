@@ -120,7 +120,7 @@
                     </div>
                 @empty
                 @endforelse
-                <a class="btn btn-lg btn-primary w100 mT20" data-toggle="tooltip" data-placement="top" 
+                <a class="btn btn-lg btn-primary btn-block mT20" data-toggle="tooltip" data-placement="top" 
                     title="*Saving will push changes to all copies of this field (Replicas)."
                     onClick="submitFldDescChanges();" href="javascript:;" 
                     ><i class="fa fa-floppy-o mR5"></i> Save All Changes To This Table's Fields</a>

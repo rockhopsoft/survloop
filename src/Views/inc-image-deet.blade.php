@@ -7,7 +7,7 @@
 </div>
 
 
-<a href="javascript:;" id="imgChoose{{ $img->ImgID }}" class="btn btn-lg btn-primary w100 mT10 mB10 imgChoose"
+<a href="javascript:;" id="imgChoose{{ $img->ImgID }}" class="btn btn-lg btn-primary btn-block mT10 mB10 imgChoose"
     >Select This Image</a>
 <div class="row">
     <div class="col-6">
@@ -64,7 +64,7 @@
                 class="form-control ntrStp slTab w100 mB10 imgSaveDeetFld" data-imgid="{{ $img->ImgID }}" >
         </label>
         
-        <input type="button" id="imgSave{{ $img->ImgID }}" class="btn btn-secondary w100 imgSaveDeet" 
+        <input type="button" id="imgSave{{ $img->ImgID }}" class="btn btn-secondary btn-block imgSaveDeet" 
             value="Save Changes">
         </form>
         <div id="img{{ $img->ImgID }}saveUpdate" class="w100 pT20 fPerc133 slBlueDark"></div>

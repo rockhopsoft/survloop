@@ -11,7 +11,7 @@
             @endif
             @if (isset($needUpdate) && $needUpdate)
                 <h3 class="slBlueDark">The database needs to be backed up before running updates...</h3>
-                <a href="?sub=1" class="btn btn-xl btn-primary m20">&nbsp;&nbsp;Install Updates&nbsp;&nbsp;</a>
+                <a href="?sub=1" class="btn btn-lg btn-xl btn-primary m20">&nbsp;&nbsp;Install Updates&nbsp;&nbsp;</a>
             @else
                 <h3 class="slGrey"><i>There are no new updates needing installation.</i></h3>
             @endif

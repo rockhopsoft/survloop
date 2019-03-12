@@ -62,7 +62,7 @@
         </div>
         <div class="col-md-2 mB10">
             <div id="saveBtnGapTop" class="p20 mT5"></div>
-            <input type="submit" value="Save Changes" class="btn btn-lg btn-primary w100" 
+            <input type="submit" value="Save Changes" class="btn btn-lg btn-primary btn-block" 
                 @if (!$canEditTree) DISABLED @endif >
         </div>
     </div>

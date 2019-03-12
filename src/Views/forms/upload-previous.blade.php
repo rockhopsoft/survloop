@@ -106,7 +106,7 @@
                                 </select></div>
                         @endif
                         <div class="nodeHalfGap"></div>
-                        <input type="submit" value="Save Changes" class="nFormUploadSave btn btn-lg btn-primary w100">
+                        <input type="submit" value="Save Changes" class="nFormUploadSave btn btn-lg btn-primary btn-block">
                     </div>
                     
                 </div>

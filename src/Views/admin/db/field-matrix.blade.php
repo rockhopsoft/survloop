@@ -9,8 +9,8 @@
         </div>
         <div class="col-md-4">
             <a href="/dashboard/db/field-matrix?{{ $urlParam }}print=1" target="_blank" 
-                class="btn btn-secondary w100 mB10"><i class="fa fa-print"></i> Print Matrix</a>
-            <a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-secondary w100 mB10"
+                class="btn btn-secondary btn-block mB10"><i class="fa fa-print"></i> Print Matrix</a>
+            <a href="/dashboard/db/field-matrix?{{ $urlParam }}excel=1" class="btn btn-secondary btn-block mB10"
                 ><i class="fa fa-file-excel-o"></i> Matrix to Excel</a>
         </div>
     </div>

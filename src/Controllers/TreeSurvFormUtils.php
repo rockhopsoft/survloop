@@ -96,7 +96,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             return '';
         }
-        $btnSize = ((in_array($this->pageCnt, [1, 2])) ? 'btn-xl' : 'btn-lg');
+        $btnSize = 'btn-lg' . ((in_array($this->pageCnt, [1, 2])) ? ' btn-xl' : '');
         
         // else print standard button variations
         $ret .= '<div class="fC"></div><div id="nodeSubBtns" class="nodeSub">';

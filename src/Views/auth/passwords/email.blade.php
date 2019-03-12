@@ -46,7 +46,7 @@ You will be sent an email with a link to change your password. (Please check you
 
 <div class="nodeGap"></div>
 
-<center><button type="submit" class="btn btn-xl btn-primary mT20">
+<center><button type="submit" class="btn btn-lg btn-xl btn-primary mT20">
     Send Password Reset Link
 </button></center>
 
