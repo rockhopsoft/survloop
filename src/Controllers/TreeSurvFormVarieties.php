@@ -368,7 +368,7 @@ class TreeSurvFormVarieties extends UserProfile
                 list($month, $day, $year) = ['', '', ''];
             }
         }
-        return view('vendor.survloop.formtree-form-date', [
+        return view('vendor.survloop.forms.formtree-date', [
             "nID"            => $nID,
             "nIDtxt"         => $nIDtxt,
             "dateStr"        => $dateStr,
@@ -406,7 +406,7 @@ class TreeSurvFormVarieties extends UserProfile
             $timeArr[0] = -1; 
             $timeArr[1] = 0; 
         }
-        return view('vendor.survloop.formtree-form-time', [
+        return view('vendor.survloop.forms.formtree-time', [
             "nID"            => $nID,
             "timeArr"        => $timeArr,
             "xtraClass"      => $xtraClass,

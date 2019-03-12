@@ -83,7 +83,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             && isset($this->sessData->loopItemIDs[$loopName])
             && sizeof($this->sessData->loopItemIDs[$loopName]) 
                 > $GLOBALS["SL"]->closestLoop["obj"]->DataLoopWarnLimit) {
-            $limitTxt .= '<div class="gry6 pT20 fPerc133">Limit of ' 
+            $limitTxt .= '<div class="slGrey pT20 fPerc133">Limit of ' 
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . '</div>';
         }
@@ -159,10 +159,10 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             } elseif (in_array($loopItem->getKey(), $this->sessData->loopItemIDsDone)) {
                 $ico = '<i class="fa fa-check"></i>';
             } else {
-                $ico = '<i class="fa fa-check gryA opac10"></i>';
+                $ico = '<i class="fa fa-check slGrey opac10"></i>';
             }
         }
-        return view('vendor.survloop.formtree-looproot-row', [
+        return view('vendor.survloop.forms.formtree-looproot-row', [
             "nID"            => $nID,
             "setIndex"       => $setIndex,
             "itemID"         => $loopItem->getKey(),

@@ -51,7 +51,7 @@ class AdminDBController extends AdminController
         if (trim($this->v["currPage"][0]) == '') {
             $this->v["currPage"][0] = '/dashboard/db';
         }
-        $this->v["help"] = '<span class="f10 gryA">?</span>&nbsp;&nbsp;&nbsp;';
+        $this->v["help"] = '<span class="f10 slGrey">?</span>&nbsp;&nbsp;&nbsp;';
         $this->loadLookups();
         set_time_limit(180);
         return true;

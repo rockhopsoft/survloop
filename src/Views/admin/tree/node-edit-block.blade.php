@@ -68,20 +68,20 @@
                 <div class="row">
                     <div class="col-md-5">
                         <label for="blockBGID"><h4 class="mT0">Background Color</h4></label>
-                        {!! view('vendor.survloop.inc-color-picker', [
+                        {!! view('vendor.survloop.forms.inc-color-picker', [
                             'fldName' => 'blockBG',
                             'preSel'  => ((isset($node->colors["blockBG"])) 
                                 ? $node->colors["blockBG"] : '#000')
                         ])->render() !!}
                         <label for="blockTextID"><h4 class="mT0">Text Color</h4></label>
-                        {!! view('vendor.survloop.inc-color-picker', [
+                        {!! view('vendor.survloop.forms.inc-color-picker', [
                             'fldName' => 'blockText',
                             'preSel'  => ((isset($node->colors["blockText"])) 
                                 ? $node->colors["blockText"] : '#DDD')
                         ])->render() !!}
                         <label for="blockLinkID"><h4 id="blockLinkh4" class="m0 slTxt"
                             >Link Color</h4></label>
-                        {!! view('vendor.survloop.inc-color-picker', [
+                        {!! view('vendor.survloop.forms.inc-color-picker', [
                             'fldName' => 'blockLink',
                             'preSel'  => ((isset($node->colors["blockLink"])) 
                                 ? $node->colors["blockLink"] : '#FFF')

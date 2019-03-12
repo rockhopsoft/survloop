@@ -80,13 +80,13 @@ class SurvStatsGraph extends SurvStatsChart
         
         $dLet = $this->dAbr($datAbbr);
         $data = [];
-        return view('vendor.survloop.graph-box-whisker', [ "data" => $data, "hgt" => $hgt ])->render();
+        return view('vendor.survloop.reports.graph-box-whisker', [ "data" => $data, "hgt" => $hgt ])->render();
     }
     
     public function pieView($data, $hgt = null)
     {
         $GLOBALS["SL"]->x["needsCharts"] = true;
-        return view('vendor.survloop.graph-pie', [ "pieData" => $data, "hgt" => $hgt ])->render();
+        return view('vendor.survloop.reports.graph-pie', [ "pieData" => $data, "hgt" => $hgt ])->render();
     }
     
     public function pieTblPercHas($fltCol, $fltRow, $tot = 'filt')

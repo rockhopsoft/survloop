@@ -491,7 +491,7 @@ class Globals extends GlobalsImportExport
     
     public function getHshooJs()
     {
-        return view('vendor.survloop.inc-check-add-hshoo-js', [
+        return view('vendor.survloop.js.inc-check-add-hshoo', [
             "hshoos" => ((isset($this->x["hshoos"])) ? $this->x["hshoos"] : [])
             ])->render();
     }

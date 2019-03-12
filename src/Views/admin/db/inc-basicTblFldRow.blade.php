@@ -26,14 +26,14 @@
             @endif
             <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;"></a>
             @if ($fld->FldSpecType == 'Replica') 
-                <span class="gry6 f8" data-toggle="tooltip" data-placement="top" 
+                <span class="slGrey f8" data-toggle="tooltip" data-placement="top" 
                     title="Replica field (copy of a Generic field)"><sup>^</sup></span>
             @endif
             
             <div id="fldSpecA{{ $fld->FldID }}" class=" @if ($isAll && $fld->FldID > 0) disNon @else disBlo @endif ">
                 @if (trim($fld->FldDesc) != '') <div class="pL20">{!! $fld->FldDesc !!}</div> @endif
                 @if (trim($fld->FldNotes) != '') 
-                    <div class="pL20 gryA"><i class="mR5">Notes:</i> {!! $fld->FldNotes !!}</div>
+                    <div class="pL20 slGrey"><i class="mR5">Notes:</i> {!! $fld->FldNotes !!}</div>
                 @endif
                 @if ($fld->FldID > 0 && isset($dbBusRulesFld[$fld->FldID]))
                     <div><a href="/dashboard/db/bus-rules/edit/{{ $dbBusRulesFld[$fld->FldID][0] }}" 
@@ -44,7 +44,7 @@
             </div>
             
             @if (trim($FldValues) != '' || trim($fld->FldDefault) != '')
-                <div class="pL20 gry6">
+                <div class="pL20 slGrey">
                 @if (trim($FldValues) != '')
                     <i class="mR5">Values:</i>
                     @if (strpos($FldValues, 'Def::') !== false)
@@ -60,7 +60,7 @@
             @endif
             
         </div>
-        <div class="col-3 taR gry6">
+        <div class="col-3 taR slGrey">
         
             @if ($tblID > 0 && isset($GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]]) && isset($fld->FldName))
                 {!! $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] 
@@ -74,7 +74,7 @@
             @endif
             <nobr><i>
             @if (isset($FldDataTypes[$fld->FldType])) {{ $FldDataTypes[$fld->FldType][1] }}  @endif
-            @if ($fld->FldIsIndex == 1) <span class="gry6 f8">Indexed</span> @endif
+            @if ($fld->FldIsIndex == 1) <span class="slGrey f8">Indexed</span> @endif
             </i></nobr>
             @if (trim($fldForeignPrint) != '' || trim($fldGenerics) != '')
                 <br />@if (trim($fldForeignPrint) != '') {!! $fldForeignPrint !!} @endif

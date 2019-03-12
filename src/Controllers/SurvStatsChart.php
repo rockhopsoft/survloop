@@ -21,7 +21,7 @@ class SurvStatsChart extends SurvStats
         $this->tblOut[] = $this->tblSimpStatRow($fLet, $dLet, 'avg');
         $this->tblOut[] = $this->tblSimpStatRow($fLet, $dLet);
         $this->tblApplyScale();
-        return view('vendor.survloop.inc-stat-tbl-avgtot', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-avgtot', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblFltRowsCalc($fltCol, $fltRow, $datAbbr, $typ = 'sum', $datLabOvr = '', $totTop = true)
@@ -92,7 +92,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        $ret = view('vendor.survloop.inc-stat-tbl-avgtot', [ "tblOut" => $this->tblOut ])->render();
+        $ret = view('vendor.survloop.reports.inc-stat-tbl-avgtot', [ "tblOut" => $this->tblOut ])->render();
         if (trim($datLabOvr) != '') $this->opts["datLabOvr"] = '';
         return $ret;
     }
@@ -151,7 +151,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblFltDatRowPerc($fltCol, $fltRow, $datAbbr, $label = '')
@@ -189,7 +189,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblFltDatRatio2Col($fltCol, $fltRow, $datAbbr, $ratioVal, $label = '', $totTop = true)
@@ -255,7 +255,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblPercHas($fltCol, $fltRow, $tot = 'filt')
@@ -300,7 +300,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblFltRowsBlksCalc($fltCol, $fltRow, $fltBlk, $datAbbr, $typ = 'sum', $headRows = true)
@@ -362,7 +362,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
     }
     
     public function tblFltBlksPercHasDat($fltCol, $fltBlk, $datTypes = [])
@@ -411,7 +411,7 @@ class SurvStatsChart extends SurvStats
                         }
                     }
                 }
-                $ret .= view('vendor.survloop.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+                $ret .= view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
             }
         }
         return $ret;
@@ -485,7 +485,7 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        $ret = view('vendor.survloop.inc-stat-tag-avgtot', [ "tblOut" => $this->tblOut ])->render();
+        $ret = view('vendor.survloop.reports.inc-stat-tag-avgtot', [ "tblOut" => $this->tblOut ])->render();
         return $ret;
     }
     

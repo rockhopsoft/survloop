@@ -265,7 +265,7 @@ class TreeSurvUpload extends TreeSurv
             }
         }
         $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
-            . view('vendor.survloop.upload-tool', [
+            . view('vendor.survloop.forms.upload-tool', [
                 "nID"            => $nID,
                 "uploadTypes"    => $this->uploadTypes,
                 "uploadWarn"     => $this->uploadWarning($nID),
@@ -375,7 +375,7 @@ class TreeSurvUpload extends TreeSurv
             $vidTypeID = $GLOBALS["SL"]->def->getID($GLOBALS["SL"]->sysOpts["tree-" . $treeID 
                 . "-upload-types"], 'Video');
         }
-        return view('vendor.survloop.upload-previous', [
+        return view('vendor.survloop.forms.upload-previous', [
             "nID"         => $nID,
             "nIDtxt"      => $nIDtxt,
             "REQ"         => $GLOBALS["SL"]->REQ,
@@ -402,7 +402,7 @@ class TreeSurvUpload extends TreeSurv
         $ups = [];
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                $ups[] = view('vendor.survloop.uploads-print', [
+                $ups[] = view('vendor.survloop.forms.uploads-print', [
                     "nID"         => $nID,
                     "REQ"         => $GLOBALS["SL"]->REQ,
                     "height"      => 160,
@@ -439,7 +439,7 @@ class TreeSurvUpload extends TreeSurv
     
     protected function reportUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
     {
-        return view('vendor.survloop.inc-report-uploads', [
+        return view('vendor.survloop.reports.inc-uploads', [
                 "uploads" => $this->getUploadsMultNodes($nIDs, $isAdmin, $isOwner)
             ])->render();
     }

@@ -31,7 +31,7 @@ class TreeSurv extends TreeSurvReport
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $this->coreID <= 0) {
             return $this->redir($GLOBALS["SL"]->getCurrTreeUrl(), true);
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.inc-check-tree-load-js', [
+        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.js.inc-check-tree-load', [
             "treeID" => $this->treeID ])->render();
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '<div id="ajaxWrap">';
@@ -640,7 +640,7 @@ class TreeSurv extends TreeSurvReport
                     }
                 }
             }
-            return view('vendor.survloop.inc-color-picker-ajax', [
+            return view('vendor.survloop.forms.inc-color-picker-ajax', [
                 "sysColors" => $sysColors,
                 "fldName"   => $fldName,
                 "preSel"    => $preSel,
@@ -956,11 +956,11 @@ class TreeSurv extends TreeSurvReport
                         $this->v["graph"]["brd"] .= $cma . "\"" . $dat["brd"] . "\"";
                     }
                 }
-                return view('vendor.survloop.graph-bar', $this->v);
+                return view('vendor.survloop.reports.graph-bar', $this->v);
             }
         }
         $this->v["graphFail"] = true;
-        return view('vendor.survloop.graph-bar', $this->v);
+        return view('vendor.survloop.reports.graph-bar', $this->v);
     }
     
     protected function hasAjaxWrapPrinting()

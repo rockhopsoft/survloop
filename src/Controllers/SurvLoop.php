@@ -542,7 +542,7 @@ class SurvLoop extends SurvCustLoop
                 $username = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
             }
         }
-        return view('vendor.survloop.inc-java-load-menu', [ "username" => $username ]);
+        return view('vendor.survloop.js.inc-load-menu', [ "username" => $username ]);
     }
     
     public function timeOut(Request $request)

@@ -10,10 +10,10 @@
         Incoming:</i> {{ $foreignKeyTbls }}</td></tr>
     @else
         <h2>{{ $tbl->TblName }}&nbsp;&nbsp;&nbsp;
-        ({{ $tbl->TblAbbr }})&nbsp;&nbsp;&nbsp;<span class="gry6"><i>{{ $tbl->TblType }}</i></h2>
+        ({{ $tbl->TblAbbr }})&nbsp;&nbsp;&nbsp;<span class="slGrey"><i>{{ $tbl->TblType }}</i></h2>
         <h4 class="m0">{{ $tbl->TblDesc }}</h4>
         @if (trim($tbl->TblNotes) != '')
-            <div class="gry6 f12"><i>Notes: {{ $tbl->TblNotes }}</i></div>
+            <div class="slGrey f12"><i>Notes: {{ $tbl->TblNotes }}</i></div>
         @endif
     @endif
 @endif

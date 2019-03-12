@@ -4,7 +4,7 @@
     
     @if ($isExcel)
         <tr><td colspan=5 ></td></tr>
-        <tr><td colspan=5 class="p5 pL20 f18 gry6">Group: <b>{{ $group }}...</b></td></tr>
+        <tr><td colspan=5 class="p5 pL20 f18 slGrey">Group: <b>{{ $group }}...</b></td></tr>
         <tr><td colspan=5 ></td></tr>
     @endif
     

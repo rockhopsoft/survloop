@@ -53,7 +53,7 @@ class AdminController extends SurvLoopController
                 $perms = 'administrator|staff|databaser|brancher|partner|volunteer';
             }
             if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole($perms)) {
-                echo view('vendor.survloop.inc-js-redirect-home', $this->v)->render();
+                echo view('vendor.survloop.js.inc-redirect-home', $this->v)->render();
                 exit;
             }
             $this->initPowerUser();
@@ -517,7 +517,7 @@ class AdminController extends SurvLoopController
             ->first();
         $css["raw"] = (($custCSS && isset($custCSS->DefDescription)) ? $custCSS->DefDescription : '');
         
-        $syscss = view('vendor.survloop.styles-css-1', [ "css" => $css ])->render();
+        $syscss = view('vendor.survloop.css.styles-1', [ "css" => $css ])->render();
         file_put_contents("../storage/app/sys/sys1.css", $syscss);
         $minifier = new Minify\CSS("../storage/app/sys/sys1.css");
         $minifier->add("../vendor/components/jqueryui/themes/base/jquery-ui.min.css");
@@ -532,7 +532,7 @@ class AdminController extends SurvLoopController
         }
         $minifier->minify("../storage/app/sys/sys1.min.css");
         
-        $syscss = view('vendor.survloop.styles-css-2', [ "css" => $css ])->render();
+        $syscss = view('vendor.survloop.css.styles-2', [ "css" => $css ])->render();
         file_put_contents("../storage/app/sys/sys2.css", $syscss);
         $minifier = new Minify\CSS("../storage/app/sys/sys2.css");
         $minifier->minify("../storage/app/sys/sys2.min.css");
@@ -559,8 +559,8 @@ class AdminController extends SurvLoopController
                 }
             }
         }
-        $scriptsjs = view('vendor.survloop.scripts-js', [ "css" => $css, "treeJs" => $treeJs ])->render()
-            . view('vendor.survloop.scripts-js-ajax', [ "css" => $css, "treeJs" => $treeJs ])->render();
+        $scriptsjs = view('vendor.survloop.js.scripts', [ "css" => $css, "treeJs" => $treeJs ])->render()
+            . view('vendor.survloop.js.scripts-ajax', [ "css" => $css, "treeJs" => $treeJs ])->render();
         file_put_contents("../storage/app/sys/sys2.js", $scriptsjs);
         $minifier = new Minify\JS("../storage/app/sys/sys2.js");
         $minifier->minify("../storage/app/sys/sys2.min.js");

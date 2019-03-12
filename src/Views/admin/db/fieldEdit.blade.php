@@ -6,7 +6,7 @@
 <div class="slCard nodeWrap">
 @if (isset($fldName) && trim($fldName) != '')
     <h1 class="fL"><i class="fa fa-database"></i> Field: {{ $tbl->TblAbbr }}{{ $fld->FldName }}</h1>
-    <div class="fR taR f20 gry6">{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i></div>
+    <div class="fR taR f20 slGrey">{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i></div>
     <div class="fC"></div>
 @else
     <h1><i class="fa fa-database"></i> Add New Field</h1>

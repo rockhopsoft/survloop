@@ -51,7 +51,7 @@
             @if ($node->isInstruct()) Content Chunk, WYSIWYG
             @elseif ($node->isInstructRaw()) Content Chunk, Hard-Coded HTML
             @elseif ($node->nodeRow->NodeType == 'Layout Column') <i>{{ $node->nodeRow->NodeCharLimit }}/12 Wide</i>
-            @elseif ($node->isHnyPot()) <span class="gryA">Spambot Honey Pot (Only Visible to Robots)</span>
+            @elseif ($node->isHnyPot()) <span class="slGrey">Spambot Honey Pot (Only Visible to Robots)</span>
             @elseif ($node->isPage())
                 Page 
                 @if ($GLOBALS["SL"]->treeRow->TreeType != 'Page')
@@ -141,7 +141,7 @@
             <span class="slBlueDark">Sort Loop Items:  
                 {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}</span>
         @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
-            <span class="gryA">{{ $nodePromptText }}</span>
+            <span class="slGrey">{{ $nodePromptText }}</span>
         @elseif ($node->nodeType == 'Send Email')
             <div class="fPerc133">{{ $GLOBALS["SL"]->getEmailSubj($node->nodeRow->NodeDefault) }}</div>
         @elseif (!$node->isLayout() && !$node->isBranch() && !$node->isDataManip())

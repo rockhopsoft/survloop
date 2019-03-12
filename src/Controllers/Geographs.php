@@ -138,7 +138,7 @@ class Geographs
     public function stateDrop($state = '', $all = false)
     {
         $this->loadStates();
-        return view('vendor.survloop.inc-drop-opts-states', [
+        return view('vendor.survloop.forms.inc-drop-opts-states', [
             "state"       => trim($state),
             "stateList"   => $this->stateList,
             "stateListCa" => $this->stateListCa,
@@ -171,7 +171,7 @@ class Geographs
     
     public function climateZoneDrop($fltClimate = '')
     {
-        return view('vendor.survloop.inc-drop-opts-ashrae', [
+        return view('vendor.survloop.forms.inc-drop-opts-ashrae', [
             "fltClimate" => $fltClimate,
             "hasCanada"  => $this->hasCanada
             ])->render();
@@ -180,7 +180,7 @@ class Geographs
     public function countryDrop($cntry = '')
     {
         $this->loadCountries();
-        return view('vendor.survloop.inc-drop-opts-countries', [
+        return view('vendor.survloop.forms.inc-drop-opts-countries', [
             "cntry"       => trim($cntry),
             "countryList" => $this->countryList
             ])->render();
@@ -526,7 +526,7 @@ class Geographs
             return '(Map)';
         }
         list($lat, $lng) = $this->getLatLng($addy);
-        return view('vendor.survloop.embed-google-map-simple', [
+        return view('vendor.survloop.reports.embed-google-map-simple', [
             "nID"     => $nID,
             "addy"    => $addy,
             "lat"     => $lat,
@@ -559,13 +559,13 @@ class Geographs
                     if (!$descAjax && trim($mark[5]) != '') $descAjax = true;
                 }
             }
-            $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.embed-google-map-js', [
+            $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.reports.embed-google-map-js', [
                 "nID"       => $nID,
                 "filename"  => $filename,
                 "descAjax"  => $descAjax,
                 "mapCenter" => $this->mapCenter
                 ])->render();
-            return view('vendor.survloop.embed-google-map', [
+            return view('vendor.survloop.reports.embed-google-map', [
                 "nID"       => $nID,
                 "docDesc"   => $docDesc
                 ])->render();

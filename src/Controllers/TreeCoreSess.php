@@ -552,7 +552,7 @@ class TreeCoreSess extends TreeCore
     public function multiRecordCheckRow($i, $coreRecord)
     {
         if ($this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreRecord[1]->getKey(), $coreRecord[1])) {
-            return view('vendor.survloop.unfinished-record-row', [
+            return view('vendor.survloop.forms.unfinished-record-row', [
                 "tree"     => $this->treeID,
                 "cID"      => $coreRecord[1]->getKey(),
                 "title"    => $this->multiRecordCheckRowTitle($coreRecord), 

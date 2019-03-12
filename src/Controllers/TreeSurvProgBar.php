@@ -75,10 +75,10 @@ class TreeSurvProgBar extends TreeSurvLoad
         $majTot = 0;
         foreach ($this->majorSections as $maj => $majSect) {
             if ($maj == $this->currMajorSection) {
-                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.forms.inc-progress-bar-js-tweak', [
                     "maj" => $maj, "status" => 'active' ])->render();
             } elseif (in_array($maj, $this->sessMajorsTouched)) {
-                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.forms.inc-progress-bar-js-tweak', [
                     "maj" => $maj, "status" => 'completed' ])->render();
             }
             if ($majSect[2] == 'disabled') {
@@ -89,10 +89,10 @@ class TreeSurvProgBar extends TreeSurvLoad
             if (sizeof($this->minorSections[$maj]) > 0) {
                 foreach ($this->minorSections[$maj] as $min => $minSect) {
                     if ($maj == $this->currMajorSection && $min == $this->currMinorSection) {
-                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.forms.inc-progress-bar-js-tweak', [
                             "maj" => $maj, "min" => $min, "status" => 'active' ])->render();
                     } elseif (in_array($min, $this->sessMinorsTouched[$maj])) {
-                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.inc-progress-bar-js-tweak', [
+                        $GLOBALS['SL']->pageJAVA .= view('vendor.survloop.forms.inc-progress-bar-js-tweak', [
                             "maj" => $maj, "min" => $min, "status" => 'completed' ])->render();
                     }
                 }
@@ -114,7 +114,7 @@ class TreeSurvProgBar extends TreeSurvLoad
                     $minorsOut[] = $this->minorSections[$maj];
                 }
             }
-            $ret .= view('vendor.survloop.inc-progress-bar', [
+            $ret .= view('vendor.survloop.forms.inc-progress-bar', [
                 "hasNavBot"         => ($GLOBALS["SL"]->treeRow->TreeOpts%59 == 0),
                 "hasNavTop"         => ($GLOBALS["SL"]->treeRow->TreeOpts%37 == 0),
                 "allNodes"          => $this->allNodes, 
@@ -141,7 +141,7 @@ class TreeSurvProgBar extends TreeSurvLoad
             if (file_exists($jsFileName)) {
                 unlink($jsFileName);
             }
-            $jsOut = view('vendor.survloop.inc-tree-javascript', [
+            $jsOut = view('vendor.survloop.js.inc-tree', [
                 "treeID"            => $this->treeID,
                 "allNodes"          => $this->allNodes, 
                 "majorSections"     => $this->majorSections, 

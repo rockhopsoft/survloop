@@ -730,7 +730,7 @@ class AdminTreeController extends AdminController
                     }
                 }
             }
-            $this->v["graph1print"] = view('vendor.survloop.graph-scatter', [
+            $this->v["graph1print"] = view('vendor.survloop.reports.graph-scatter', [
                 "currGraphID" => 'treeSessScat',
                 "hgt"         => '400px',
                 "dotColor"    => $this->v["css"]["color-main-on"],
@@ -759,7 +759,7 @@ class AdminTreeController extends AdminController
                 $currTime += (24*60*60);
                 $currDate = date("Y-m-d", $currTime);
             }
-            $this->v["graph2print"] = view('vendor.survloop.graph-bar', [
+            $this->v["graph2print"] = view('vendor.survloop.reports.graph-bar', [
                 "currGraphID" => 'treeSessCalen',
                 "hgt"         => '380px',
                 "yAxes"       => '# of Submission Attempts (Active Sessions)',

@@ -115,12 +115,12 @@
             <div class="row mT20">
                 <div class="col-md-6">
                     <label class="nPrompt w100"><h4 class="m0 mB5">Color Starting From Left</h4></label>
-                    {!! view('vendor.survloop.inc-color-picker', [
+                    {!! view('vendor.survloop.forms.inc-color-picker', [
                         'fldName' => 'nodeWidgBarC1',
                         'preSel'  => ((isset($node->extraOpts["clr1"])) ? $node->extraOpts["clr1"] : '')
                     ])->render() !!}
                     <label class="nPrompt w100 mTn5"><h4 class="m0 mB5">Color Ending At Right</h4></label>
-                    {!! view('vendor.survloop.inc-color-picker', [
+                    {!! view('vendor.survloop.forms.inc-color-picker', [
                         'fldName' => 'nodeWidgBarC2',
                         'preSel'  => ((isset($node->extraOpts["clr2"])) ? $node->extraOpts["clr2"] : '')
                     ])->render() !!}

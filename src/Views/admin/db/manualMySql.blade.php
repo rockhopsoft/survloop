@@ -17,7 +17,7 @@
 	        @else
 	            <h3 class="m0 red">Fail - {!! $sql[1] !!}</h3>
 	        @endif
-	        <textarea class="w100 f12 gry6" style="height: 50px;"
+	        <textarea class="w100 f12 slGrey" style="height: 50px;"
 	            >{!! str_replace('</textarea>', '(end text area)', $sql[0]) !!}</textarea>
 	        @if (trim($sql[2]) != '')
                 <textarea class="w100 f10" style="height: 100px;"

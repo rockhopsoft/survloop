@@ -553,7 +553,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $GLOBALS["SL"]->addPreloadImg($curr->colors["blockImg"]);
                 }
                 $isParallax = (isset($curr->colors["blockImgFix"]) && trim($curr->colors["blockImgFix"]) == 'P');
-                $ret .= view('vendor.survloop.inc-block-css', [ "nIDtxt" => $nIDtxt, "node" => $curr ])->render()
+                $ret .= view('vendor.survloop.css.inc-block', [ "nIDtxt" => $nIDtxt, "node" => $curr ])->render()
                     . '<div id="blockWrap' . $nIDtxt . '" class="w100' . (($this->hasParentType($nID, 'Gallery Slider'))
                         ? (($curr->nodeRow->NodeParentOrder == 0) ? ' disBlo' : ' disNon') : '');
                 if ($isParallax) {
@@ -687,7 +687,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                             . "', 'reqFormFldTbl', " . $this->tableDat["maxRow"] . ", cols, " 
                             . (($this->tableDat["req"][1]) ? 'true' : 'false') . ");\n";
                     }
-                    $ret .= view('vendor.survloop.formtree-form-table', [
+                    $ret .= view('vendor.survloop.forms.formtree-table', [
                         "nID"             => $nID,
                         "nIDtxt"          => $nIDtxt,
                         "node"            => $curr,
@@ -731,7 +731,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 
             } elseif ($curr->nodeType == 'Back Next Buttons') {
                 
-                $ret .= view('vendor.survloop.inc-extra-back-next-buttons', [])->render();
+                $ret .= view('vendor.survloop.forms.inc-extra-back-next-buttons', [])->render();
                 
             } elseif (in_array($curr->nodeType, ['Search', 'Search Results', 'Search Featured',
                 'Record Full', 'Record Full Public', 'Record Previews', 'Incomplete Sess Check', 
@@ -1162,7 +1162,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                                         $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];
                                         $ret .= '</div>';
                                         $GLOBALS["SL"]->pageAJAX .= view(
-                                            'vendor.survloop.formtree-form-sub-response-ajax', [
+                                            'vendor.survloop.forms.formtree-sub-response-ajax', [
                                             "nID"      => $nID,
                                             "nSffx"    => $nSffx,
                                             "nIDtxt"   => $nIDtxt,
@@ -1239,7 +1239,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 } elseif ($curr->nodeType == 'Date Time') {
                     
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nID . 'FldID" ).datepicker({ maxDate: "+0d" });';
-                    $ret .= view('vendor.survloop.formtree-form-datetime', [
+                    $ret .= view('vendor.survloop.forms.formtree-datetime', [
                         "nID"            => $nIDtxt,
                         "dateStr"        => $dateStr,
                         "onKeyUp"        => $onKeyUp,
@@ -1266,7 +1266,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $this->pageFldList[] = 'n' . $nIDtxt . 'fldInchID';
                     $feet = ($currNodeSessData > 0) ? floor($currNodeSessData/12) : 0; 
                     $inch = ($currNodeSessData > 0) ? intVal($currNodeSessData)%12 : 0;
-                    $ret .= view('vendor.survloop.formtree-form-feetinch', [
+                    $ret .= view('vendor.survloop.forms.formtree-feetinch', [
                         "nID"              => $nIDtxt,
                         "feet"             => $feet,
                         "inch"             => $inch,
@@ -1294,7 +1294,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     foreach ($coreResponses as $j => $res) {
                         $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                     }
-                    $ret .= view('vendor.survloop.formtree-form-gender', [
+                    $ret .= view('vendor.survloop.forms.formtree-gender', [
                         "nID"               => $nIDtxt,
                         "nodeRow"           => $curr->nodeRow,
                         "nodePromptText"    => $nodePromptText,

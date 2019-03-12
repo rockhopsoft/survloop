@@ -11,7 +11,7 @@
         <label class="w100"><b>{!! $val[1] !!}</b>
         @if (trim($val[0]) != '') <div class="fR slGrey mRn10">eg. "{!! $val[0] !!}"</div> @endif
         </label>
-        {!! view('vendor.survloop.inc-color-picker', [
+        {!! view('vendor.survloop.forms.inc-color-picker', [
             'fldName' => 'sty-' . $opt,
             'preSel'  => ((isset($sysStyles[$opt])) ? strtoupper($sysStyles[$opt]) : '')
         ])->render() !!}

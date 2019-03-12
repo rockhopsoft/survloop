@@ -101,7 +101,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                         && in_array($this->v["uID"], $this->emojiTagUsrs[$defID])) {
                         $isActive = true;
                     }
-                    return view('vendor.survloop.inc-emoji-tag', [
+                    return view('vendor.survloop.reports.inc-emoji-tag', [
                         "spot"     => 't' . $this->treeID . 'r' . $this->coreID, 
                         "emo"      => $emo, 
                         "cnt"      => sizeof($this->emojiTagUsrs[$defID]),
@@ -160,7 +160,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                         . $this->treeID . '/' . $this->coreID . '/' . $emo["id"] . '"); });' . "\n";
                 }
             }
-            $ret .= view('vendor.survloop.inc-emoji-tags', [
+            $ret .= view('vendor.survloop.reports.inc-emoji-tags', [
                 "spot"     => $spot, 
                 "emojis"   => $GLOBALS["SL"]->treeSettings["emojis"], 
                 "users"    => $this->emojiTagUsrs,
@@ -222,7 +222,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             $recDesc = trim($this->getTableRecLabel($GLOBALS["SL"]->coreTbl, 
                 $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]));
         }
-        return view('vendor.survloop.formfoot-record-mgmt', [
+        return view('vendor.survloop.forms.foot-record-mgmt', [
             "coreID"          => $this->coreID,
             "treeID"          => $this->treeID,
             "multipleRecords" => ((isset($this->v["multipleRecords"])) ? $this->v["multipleRecords"] : ''),
@@ -247,7 +247,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     public function printReportDeetsBlock($deets, $blockName = '', $nID = -3)
     {
         $deets = $this->chkDeets($deets);
-        return view('vendor.survloop.inc-report-deets', [
+        return view('vendor.survloop.reports.inc-deets', [
             "nID"       => $nID,
             "deets"     => $deets,
             "blockName" => $blockName
@@ -292,7 +292,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                 $deetCols[$c][] = $deet;
             }
         }
-        return view('vendor.survloop.inc-report-deets-cols', [
+        return view('vendor.survloop.reports.inc-deets-cols', [
             "nID"       => $nID,
             "deetCols"  => $deetCols,
             "blockName" => $blockName,
@@ -310,7 +310,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                 }
             }
         }
-        return view('vendor.survloop.inc-report-deets-vert-prog', [
+        return view('vendor.survloop.reports.inc-deets-vert-prog', [
             "nID"       => $nID,
             "deets"     => $deets,
             "blockName" => $blockName,

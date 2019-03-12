@@ -116,7 +116,7 @@ class SurvTrends extends SurvStatsCore
 //echo 'printDailyGraph(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
         $GLOBALS["SL"]->x["needsCharts"] = true;
         $this->loadAxisPastDayLabels();
-        return view('vendor.survloop.graph-trend-lines', [
+        return view('vendor.survloop.reports.graph-trend-lines', [
             "nIDtxt"     => $this->nIDtxt,
             "datMap"     => $this->datMap,
             "axisLabels" => $this->axisLabels,

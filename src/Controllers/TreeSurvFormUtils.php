@@ -37,12 +37,12 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($this->skipFormForPreview($nID)) {
             return '';
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.formtree-form-js', [
+        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.js.formtree', [
             "currPage"       => $this->v["currPage"],
             "pageJSvalid"    => $this->pageJSvalid,
             "pageFldList"    => $this->pageFldList
             ])->render();
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.formtree-form-ajax', [
+        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.js.formtree-ajax', [
             "hasFixedHeader" => $this->v["hasFixedHeader"]
             ])->render();
         $ret = '';
@@ -59,7 +59,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             || $GLOBALS["SL"]->chkCurrTreeOpt('CONTACT')) {
             $formAction = $this->currNodeFormAction();
             $GLOBALS["SL"]->pageJAVA .= 'formActionUrl = "' . $formAction . '"; ';
-            $ret .= view('vendor.survloop.formtree-form-start', [
+            $ret .= view('vendor.survloop.forms.formtree-start', [
                 "nID"              => $nID, 
                 "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
                 "currPage"         => $this->v["currPage"],

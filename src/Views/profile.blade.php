@@ -3,7 +3,7 @@
 @if (isset($GLOBALS['SL']->sysOpts['avatar-empty']))
     <div class="col-md-2 col-sm-3 pT20">
         <a href="/profile/{{ urlencode($profileUser->name) }}"
-            ><img id="profilePic" class="imgTmb" src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0
+            ><img id="profilePic" class="tmbRound" src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0
                 alt="Avatar or Profile Picture for {{ $profileUser->name }}"></a>
     </div>
     <div class="col-md-6 col-sm-9">

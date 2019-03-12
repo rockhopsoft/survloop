@@ -254,7 +254,7 @@ class TreeSurvInput extends TreeSurvUpload
                         $ret .= $this->postUploadTool($nID);
                         $GLOBALS["SL"]->x["reloadSurvPage"] = 'upPrev' . $nIDtxt;
                         //$GLOBALS["SL"]->pageJAVA .= 'addHshoo("#upPrev' . $nIDtxt . '"); ';
-                        //$GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.upload-slide-to-previous-ajax', [
+                        //$GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.forms.upload-slide-to-previous-ajax', [
                         //    "nIDtxt" => $nIDtxt
                         //    ])->render();
                     }
