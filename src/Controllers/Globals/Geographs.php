@@ -8,7 +8,7 @@
   * @author   Morgan Lesko <mo@wikiworldorder.org>
   * @since 0.0
   */
-namespace SurvLoop\Controllers;
+namespace SurvLoop\Controllers\Globals;
 
 use App\Models\SLZips;
 use App\Models\SLZipAshrae;

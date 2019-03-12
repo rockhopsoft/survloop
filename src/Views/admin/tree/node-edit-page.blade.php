@@ -10,14 +10,10 @@
         
         {!! view('vendor.survloop.admin.seo-meta-editor', [ "currMeta" => $currMeta ])->render() !!}
         
-        <div id="hasPageOpts" class="row nFld @if ($node->isPage()) disBlo @else disNon @endif ">
+        <div id="hasPageOpts" class="nFld @if ($node->isPage()) disBlo @else disNon @endif "><div class="row">
             <div class="col-md-4">
+            
             @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-                <label class="disBlo mT20">
-                    <input type="checkbox" name="homepage" id="homepageID" value="7" 
-                    @if ($GLOBALS['SL']->treeRow->TreeOpts%7 == 0) CHECKED @endif autocomplete="off">
-                    <i class="fa fa-star mL10 mR5" aria-hidden="true"></i> Website Home Page
-                </label>
                 <label class="disBlo mT20">
                     <input type="checkbox" name="adminPage" id="adminPageID" value="3" 
                     @if ($GLOBALS['SL']->treeRow->TreeOpts%3 == 0) CHECKED @endif autocomplete="off">
@@ -42,6 +38,16 @@
                         <i class="fa fa-hand-rock-o mL10 mR5" aria-hidden="true"></i> Volunteer Page
                     </label>
                 @endif
+            @endif
+            
+            </div><div class="col-md-4">
+            
+            @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+                <label class="disBlo mT20">
+                    <input type="checkbox" name="homepage" id="homepageID" value="7" 
+                    @if ($GLOBALS['SL']->treeRow->TreeOpts%7 == 0) CHECKED @endif autocomplete="off">
+                    <i class="fa fa-star mL10 mR5" aria-hidden="true"></i> Website Home Page
+                </label>
                 <label class="disBlo mT20">
                     <input type="checkbox" name="reportPage" id="reportPageID" value="13" 
                     @if ($GLOBALS['SL']->treeRow->TreeOpts%13 == 0) CHECKED @endif autocomplete="off"
@@ -65,10 +71,8 @@
                     @if ($node->nodeRow->NodeOpts%59 == 0) CHECKED @endif autocomplete="off">
                     Hide Progress Bar</label>
             @endif
-            </div>
-            <div class="col-md-8">
                 <div class="nFld w100">
-                    <label>
+                    <label class="w100">
                         Focus Field: 
                         <input type="number" name="pageFocusField" autocomplete="off" 
                             value="{{ $node->nodeRow->NodeCharLimit }}" 
@@ -77,7 +81,19 @@
                         (0 is default, -1 overrides no focus, otherwise set this a Node ID)</i>
                     </label>
                 </div>
+                
+            </div><div class="col-md-1">
+            </div><div class="col-md-3">
+            
+            @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+                <label class="disBlo mT20">
+                    <input type="checkbox" name="pageBg" id="pageBgID" value="67" class="mR5"
+                        @if ($GLOBALS['SL']->treeRow->TreeOpts%67 == 0) CHECKED @endif autocomplete="off">
+                    Whole page has alternate background
+                </label>
+            @endif
+            
             </div>
-        </div>
+        </div></div>
     </div>
 </div>

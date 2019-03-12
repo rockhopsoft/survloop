@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
-namespace SurvLoop\Controllers\Globals\Globals;
+namespace SurvLoop\Controllers\Globals;
 
 use DB;
 use Auth;
@@ -130,6 +130,7 @@ class GlobalsTables extends GlobalsStatic
     public const TREEOPT_NOCACHE    = 29; // Page Tree is currently too complicated to cache
     public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
     public const TREEOPT_CONTACT    = 19; // This page is a SurvLoop standard contact form 
+    public const TREEOPT_BG         = 67; // This whole page has a background color (default: faint)
     
     public function getTreePrimeConst($type)
     {

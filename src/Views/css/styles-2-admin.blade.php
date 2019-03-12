@@ -15,7 +15,7 @@
 .admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-link"] !!};
-    padding: 9px 5px 6px 9px;
+    padding: 9px 5px 9px 9px;
 }
 .admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, .admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
@@ -26,11 +26,13 @@
     width: 30px;
     text-align: center;
 }
+.admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
 .admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover {
     padding: 10px 5px 10px 23px;
     font-size: 100%;
 }
-.admMenu .admMenuTier2 a.active:link, .admMenu .admMenuTier2 a.active:visited, .admMenu .admMenuTier2 a.active:active, .admMenu .admMenuTier2 a.active:hover {
+a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:hover,
+.admMenuTier2 a.tier2active:link, .admMenuTier2 a.tier2active:visited, .admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover {
     color: {!! $css["color-main-link"] !!};
     background: {!! $css["color-main-faint"] !!};
 }

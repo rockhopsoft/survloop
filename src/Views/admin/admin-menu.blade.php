@@ -21,7 +21,7 @@
             <div id="subA{{ $i }}" class="sublinks @if ($currNavPos[0] != $i) collapse @endif ">
             @foreach ($nav[4] as $j => $nA)
                 <div class="admMenuTier2"><a href="{!! $nA[0] !!}" @if ($nA[3]%3 == 0) target="_blank" @endif class="
-                @if ($currNavPos[0] == $i && $currNavPos[1] == $j) active @endif
+                @if ($currNavPos[0] == $i && $currNavPos[1] == $j) tier2active @endif
                 @if ($GLOBALS['SL']->isAdmMenuHshoo($nA[0])) hshoo" id="admLnk{{ substr($nA[0], 1+strpos($nA[0], '#'))}}
                 @else " @endif > 
                 @if (isset($nA[2]) && trim($nA[2]) != '') <div class="admMenuIco">{!! $nA[2] !!}</div> @endif

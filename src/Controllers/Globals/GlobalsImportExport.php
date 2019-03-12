@@ -25,6 +25,7 @@ use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLZips;
 use App\Models\SLTokens;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Globals\GlobalsTables;
 
 class GlobalsImportExport extends GlobalsTables

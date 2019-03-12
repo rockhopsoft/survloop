@@ -4,6 +4,7 @@ if (!isset($GLOBALS["SL"])) {
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
+$bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -78,7 +79,7 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
 @section('headCode')
 @show
 </head>
-<body @if ($isDashLayout) class="bodyDash" @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
+<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>
@@ -220,8 +221,8 @@ $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMe
                 </div>
             </div>
         </td><td id="mainBody" class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
-            @if ($isDashLayout)
-                <div id="adminMenuTopTabs"> @if (isset($admMenuTabs)) {!! $admMenuTabs !!} @endif </div>
+            @if ($isDashLayout && isset($admMenuTabs))
+                <div id="adminMenuTopTabs">{!! $admMenuTabs !!}</div>
             @endif
             <div class="container-fluid">
                 @if (isset($content)) {!! $content !!} @endif

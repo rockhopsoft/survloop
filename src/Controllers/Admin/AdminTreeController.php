@@ -26,10 +26,11 @@ use App\Models\SLConditionsArticles;
 use App\Models\SLUsersRoles;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
-use SurvLoop\Controllers\Tree\TreeSurvAdmin;
-use SurvLoop\Controllers\Tree\TreeSurvAPI;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SessAnalysis;
+use SurvLoop\Controllers\Globals\Globals;
+use SurvLoop\Controllers\Tree\TreeSurvAPI;
+use SurvLoop\Controllers\Tree\TreeSurvAdmin;
 use SurvLoop\Controllers\Admin\AdminController;
 
 class AdminTreeController extends AdminController
