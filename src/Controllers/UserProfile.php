@@ -58,7 +58,7 @@ class UserProfile extends TreeSurvInput
                     eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
                         . "::find(" . session()->get('coreID' . $sessTree) . ");");
                     if ($chkRec && isset($chkRec->{ $coreAbbr . 'IPaddy' })) {
-                        if ($chkRec->{ $coreAbbr . 'IPaddy' } == $this->hashIP() 
+                        if ($chkRec->{ $coreAbbr . 'IPaddy' } == $GLOBALS["SL"]->hashIP() 
                             && (!isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) 
                                 || intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) <= 0)) {
                             $chkRec->update([ $GLOBALS["SL"]->coreTblUserFld => $this->v["uID"] ]);
@@ -140,21 +140,23 @@ class UserProfile extends TreeSurvInput
                 $user->email = $GLOBALS["SL"]->REQ->email;
                 $user->save();
                 $user->loadRoles();
-                if ($GLOBALS["SL"]->REQ->has('roles') && is_array($GLOBALS["SL"]->REQ->roles)
-                    && sizeof($GLOBALS["SL"]->REQ->roles) > 0) {
-                    foreach ($user->roles as $i => $role) {
-                        if (in_array($role->DefID, $GLOBALS["SL"]->REQ->roles)) {
-                            if (!$user->hasRole($role->DefSubset)) {
-                                $user->assignRole($role->DefSubset);
+                if ($this->v["user"]->hasRole('administrator')) {
+                    if ($GLOBALS["SL"]->REQ->has('roles') && is_array($GLOBALS["SL"]->REQ->roles)
+                        && sizeof($GLOBALS["SL"]->REQ->roles) > 0) {
+                        foreach ($user->roles as $i => $role) {
+                            if (in_array($role->DefID, $GLOBALS["SL"]->REQ->roles)) {
+                                if (!$user->hasRole($role->DefSubset)) {
+                                    $user->assignRole($role->DefSubset);
+                                }
+                            } elseif ($user->hasRole($role->DefSubset)) {
+                                $user->revokeRole($role->DefSubset);
                             }
-                        } elseif ($user->hasRole($role->DefSubset)) {
-                            $user->revokeRole($role->DefSubset);
                         }
-                    }
-                } else { // no roles selected, delete all that exist
-                    foreach ($user->roles as $i => $role) {
-                        if ($user->hasRole($role->DefSubset)) {
-                            $user->revokeRole($role->DefSubset);
+                    } else { // no roles selected, delete all that exist
+                        foreach ($user->roles as $i => $role) {
+                            if ($user->hasRole($role->DefSubset)) {
+                                $user->revokeRole($role->DefSubset);
+                            }
                         }
                     }
                 }

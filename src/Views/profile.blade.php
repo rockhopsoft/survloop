@@ -39,6 +39,7 @@
                         </div>
                     </div><div class="col-md-2">
                     </div><div class="col-md-4">
+                    @if ($GLOBALS["SL"]->isAdmin)
                         <div class="nPrompt">Roles:</div>
                         <div class="nFldRadio">
                         @foreach ($profileUser->roles as $i => $role)
@@ -47,6 +48,7 @@
                             <label for="role{{ $i }}">{{ $role->DefValue }}</label><br />
                         @endforeach
                         </div>
+                    @endif
                     </div>
                 </div>
                 <div class="nodeHalfGap"></div>

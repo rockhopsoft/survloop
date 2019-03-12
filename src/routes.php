@@ -102,8 +102,8 @@ Route::group(['middleware' => ['web']], function () {
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
     
-    Route::get( '/sys{which}.{type}',     'SurvLoop\\Controllers\\SurvRoutes@getSysFile');
     Route::get( '/sys{which}.min.{type}', 'SurvLoop\\Controllers\\SurvRoutes@getSysFileMin');
+    Route::get( '/sys{which}.{type}',     'SurvLoop\\Controllers\\SurvRoutes@getSysFile');
     Route::get( '/tree-{treeID}.js',      'SurvLoop\\Controllers\\SurvRoutes@getSysTreeJs');
     Route::get( '/dyna-{file}.{type}',    'SurvLoop\\Controllers\\SurvRoutes@getDynaFile');
     Route::get( '/gen-kml/{kmlfile}.kml', 'SurvLoop\\Controllers\\SurvRoutes@getKml');

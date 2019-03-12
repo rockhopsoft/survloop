@@ -15,10 +15,10 @@
         <div class="col-sm-8">
             <h1 class="slBlueDark"><nobr><i class="fa fa-cogs"></i> System</nobr> Settings</h1>
         </div><div class="col-sm-2 slGrey fPerc80">
-        @if (!$GLOBALS["SL"]->isHomestead())
+        <?php /* @if (!$GLOBALS["SL"]->isHomestead())
             {!! str_replace('Current IP Address: ', 'Server IP Address:<br />', 
                 file_get_contents('http://checkip.dyndns.com/')) !!}
-        @endif
+        @endif */ ?>
         </div><div class="col-sm-2">
             <a href="?refresh=2" class="btn btn-primary btn-sm">Refresh All Caches</a>
         </div>

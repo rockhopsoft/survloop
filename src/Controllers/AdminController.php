@@ -540,7 +540,7 @@ class AdminController extends SurvLoopController
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
         $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
         $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/parallax.min.js");
+        //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/parallax.min.js");
         $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/typewatch.js");
         $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/copy-to-clipboard.js");
         $minifier->minify("../storage/app/sys/sys1.min.js");
@@ -553,9 +553,9 @@ class AdminController extends SurvLoopController
             foreach ($chk as $tree) {
                 $treeFile = '../storage/app/sys/tree-' . $tree->TreeID . '.js';
                 if (file_exists($treeFile)) {
-                    $treeJs .= "\n" . 'function treeLoad' . $tree->TreeID . '() {' . "\n"
-                         . str_replace("\t", "", file_get_contents($treeFile)) . "\n\t"
-                         . 'return true;' . "\n" . '}' . "\n";
+                    $treeJs .= "\n" . 'function treeLoad' . $tree->TreeID . '() {' . "\n" 
+                        . str_replace("\t", "", str_replace("\n", "\n", file_get_contents($treeFile))) . "\n\t"
+                        . 'return true;' . "\n" . '}' . "\n";
                 }
             }
         }

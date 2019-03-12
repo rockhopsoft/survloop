@@ -215,19 +215,36 @@ var treeMajorSects = new Array();
 var treeMinorSects = new Array();
 var treeMajorSectsDisabled = new Array();
 var treeProTips = new Array();
+var treeProTipsImg = new Array();
 var lastProTip = 0;
+
+function unloadTree() {
+    treeMajorSects = new Array();
+    treeMinorSects = new Array();
+    treeMajorSectsDisabled = new Array();
+    treeProTips = new Array();
+    treeProTipsImg = new Array();
+    return true;
+}
 
 function getNextProTipText() {
     lastProTip++;
     if (treeProTips.length <= lastProTip) {
         lastProTip = 0;
     }
-    return treeProTips[lastProTip];
+    return treeProTips[lastProTip].trim();
+}
+function getProTipImg() {
+    return treeProTipsImg[lastProTip].trim();
 }
 function addProTipToAjax() {
     if (treeProTips.length > 0) {
         if (document.getElementById("ajaxWrapLoad")) {
             document.getElementById("ajaxWrapLoad").innerHTML += '<center><h3 class="slBlueDark pL15 pR15">'+getNextProTipText()+'</h3></center>';
+            var img = getProTipImg();
+            if (img.length > 0) {
+                document.getElementById("ajaxWrapLoad").innerHTML += '<center><img src="'+img+'" border=0 class="w50 mT20" style="min-width: 300px;" ></center>';
+            }
             logLastProTip();
         }
     }
