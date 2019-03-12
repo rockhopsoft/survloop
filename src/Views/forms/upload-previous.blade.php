@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/survloop/forms/upload-previous.blade.php -->
+<!-- resources/views/survloop/forms/upload-previous.blade.php -->
 <div class="nodeAnchor"><a id="upPrev{{ $nIDtxt }}" name="upPrev{{ $nIDtxt }}"></a></div>
 @if (!$uploads || empty($uploads)) 
     <h4><span class="slGrey">Nothing uploaded here.</span></h4>
@@ -38,10 +38,10 @@
                                     }}"></a>
                             </div>
                         @else
-                            <div class="w100 disBlo BGblueDark vaM" style="height: {{ (2+$height) }}px;">
+                            <div class="w100 disBlo bgPrimary vaM" style="height: {{ (2+$height) }}px;">
                                 <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
                                     class="disBlo w100 taC vaM wht" style="height: {{ $height }}px;"
-                                    ><div class="f48 mBn5"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
+                                    ><div class="fPerc300 mBn5"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
                                     {{ $upRow->UpUploadFile }}
                                 </a>
                             </div>

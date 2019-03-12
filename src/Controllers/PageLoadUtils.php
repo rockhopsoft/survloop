@@ -18,7 +18,7 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
 use App\Models\SLSess;
-use SurvLoop\Controllers\Globals;
+use SurvLoop\Controllers\Globals\Globals;
 
 class PageLoadUtils extends Controller
 {

@@ -11,7 +11,7 @@
 @empty
 @endforelse
 <br />
-<span class="f10">Add Table:</span> <select name="addT" id="addTID">{!! $tblDrop !!}</select>
+<span class="fPerc80">Add Table:</span> <select name="addT" id="addTID">{!! $tblDrop !!}</select>
 <a href="javascript:;" id="addTbtn"><i class="fa fa-plus-circle"></i></a>
 <script type="text/javascript"> 
 $(document).ready(function(){

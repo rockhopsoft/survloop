@@ -9,7 +9,7 @@
 @if (isset($lastSql) && trim($lastSql) != '')
 	<div class="brd round20 p20">
 	    <h2 class="mT0">Full Query...</h2>
-	    <textarea class="w100 slGrey f10" style="height: 80px;">{!! $lastSql !!}</textarea>
+	    <textarea class="w100 slGrey fPerc80" style="height: 80px;">{!! $lastSql !!}</textarea>
 	    <h2>Query Results...</h2>
 	    @forelse ($lastResults as $sql)
 	        @if (trim($sql[1]) == '')
@@ -20,7 +20,7 @@
 	        <textarea class="w100 f12 slGrey" style="height: 50px;"
 	            >{!! str_replace('</textarea>', '(end text area)', $sql[0]) !!}</textarea>
 	        @if (trim($sql[2]) != '')
-                <textarea class="w100 f10" style="height: 100px;"
+                <textarea class="w100 fPerc80" style="height: 100px;"
                     >{!! str_replace('</textarea>', '(end text area)', $sql[2]) !!}</textarea>
                 <div class="p20"></div>
             @endif

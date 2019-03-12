@@ -5,13 +5,13 @@
 @if ($canEditTree && $node->nodeRow->NodeParentID > 0)
     <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-        <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
+        <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
         <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
             ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
     </div>
     @if ($node->nodeRow->NodeParentOrder == 0)
         <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
+            <span class="slBlueDark"><i class="fa fa-chevron-right"></i></span> 
             <a href="javascript:;" class="adminNodeMoveTo" 
                 id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ $node->nodeRow->NodeParentOrder }}"
                 ><i class="fa fa-bullseye"></i> Move Node Here</a>
@@ -37,7 +37,7 @@
     @if (!$REQ->has('print'))
         <div id="addChild{{ $nID }}" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-            <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
+            <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
             <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&start=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
@@ -51,14 +51,14 @@
         </div>
         <div id="addChild{{ $nID }}B" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-            <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
+            <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
             <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&end=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
     @else
         <div class="nodeMover disNon pT5 pB5 
             @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-            <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
+            <span class="slBlueDark"><i class="fa fa-chevron-right"></i></span> 
             <a href="javascript:;" class="adminNodeMoveTo" 
             id="moveTo{{ $nID }}ord0"><i class="fa fa-bullseye"></i> Move Node Here</a>
         </div>
@@ -70,12 +70,12 @@
 @if ($node->nodeRow->NodeParentID > 0 && !$REQ->has('print')) 
     <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-        <span class="slBlueDark f22"><i class="fa fa-chevron-right"></i></span> 
-        <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
-            ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
+        <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
+        <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $node->nodeRow->NodeParentID 
+            }}&ordAfter={{ $nID }}"><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
     </div>
     <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-        <span class="slBlueDark f14"><i class="fa fa-chevron-right"></i></span> 
+        <span class="slBlueDark"><i class="fa fa-chevron-right"></i></span> 
         <a href="javascript:;" class="adminNodeMoveTo" 
         id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ (1+$node->nodeRow->NodeParentOrder) }}"
             ><i class="fa fa-bullseye"></i> Move Node Here</a>

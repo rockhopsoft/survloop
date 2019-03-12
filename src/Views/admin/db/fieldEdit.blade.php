@@ -6,7 +6,7 @@
 <div class="slCard nodeWrap">
 @if (isset($fldName) && trim($fldName) != '')
     <h1 class="fL"><i class="fa fa-database"></i> Field: {{ $tbl->TblAbbr }}{{ $fld->FldName }}</h1>
-    <div class="fR taR f20 slGrey">{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i></div>
+    <div class="fR taR fPerc125 slGrey">{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i></div>
     <div class="fC"></div>
 @else
     <h1><i class="fa fa-database"></i> Add New Field</h1>
@@ -27,13 +27,13 @@
 <div class="slCard nodeWrap">
 @if ($fld->FldSpecType == 'Generic' && $fld->FldTable <= 0)
     <br /><br /><input type="checkbox" style="width: 40px;" id="pushGenericID" name="pushGeneric" value="1"> 
-    <label for="pushGenericID"><span class="f16"><i class="fa fa-retweet"></i> <i>
-    Push Generic Field Changes To All Replicas</i></span></label><br />
+    <label for="pushGenericID"><i class="fa fa-retweet"></i> <i>
+    Push Generic Field Changes To All Replicas</i></label><br />
 @endif
 <br /><br />
 <center>
 <input type="submit" value=" @if (trim($fldName) == '') Add Field @else Save Changes @endif " 
-    class="btn btn-lg btn-primary f30">
+    class="btn btn-lg btn-primary">
 <br /><br /><br /><br />
 <input type="checkbox" style="width: 40px;" name="delete" id="deleteID" value="1"> 
 <label for="deleteID">Delete Field</label>

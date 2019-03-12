@@ -1,6 +1,6 @@
 <?php
 if (!isset($GLOBALS["SL"])) {
-    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals(new Illuminate\Http\Request, 1, 1, 1);
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(new Illuminate\Http\Request, 1, 1, 1);
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));

@@ -40,18 +40,18 @@ function saveXmlSetting(FldID, newSetting) {
 
     @if ($tblFldLists[$tbl->TblID] && sizeof($tblFldLists[$tbl->TblID]) > 0)
     
-        <tr><td colspan=4 class="p20 headerBrkRow f20" >
+        <tr><td colspan=4 class="p20 headerBrkRow fPerc125" >
             Table: <b>{!! $GLOBALS['SL']->tblEng[$tbl->TblID] !!}</b> 
             ({{ number_format(sizeof($tblFldLists[$tbl->TblID])) }})
         </td></tr>
         @foreach ($tblFldLists[$tbl->TblID] as $cnt => $fld)
             <tr @if ($cnt%2 == 0) class="row2" @endif >
-            <td><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] }}/{{ $fld->FldName }}" 
-                class="f14"><i class="fa fa-pencil"></i></a></td>
+            <td><a href="/dashboard/db/field/{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
+                }}/{{ $fld->FldName }}"><i class="fa fa-pencil"></i></a></td>
             <td class="w40 pB10">
-                <span class="f8"><i>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}</i></span><br />
+                <span class="fPerc80"><i>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }}</i></span><br />
                 <b>{{ $fld->FldEng }}</b><br />
-                <div class="f10">{{ $FldDataTypes[$fld->FldType][1] }}
+                <div class="fPerc80">{{ $FldDataTypes[$fld->FldType][1] }}
                 @if (intVal($fld->FldForeignTable) > 0) 
                     - <i class="fa fa-link"></i>{!! view('vendor.survloop.admin.db.inc-getTblName', [
                         "id" => $fld->FldForeignTable, "link" => 0, "xtraTxt" => ' ID', "xtraLnk" => ''

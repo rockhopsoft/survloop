@@ -9,7 +9,7 @@
     <div class="col-8">
         <h2>Editing Excerpt</h2>
         <label><h3>Excerpt Name:</h3>
-        <input type="text" class="form-control form-control-lg slBlueDark f26" name="DefSubset" 
+        <input type="text" class="form-control form-control-lg slBlueDark" name="DefSubset" 
             value="{{ $blurbRow->DefSubset }}">
         </label>
     </div>

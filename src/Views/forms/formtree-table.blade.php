@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/survloop/forms/formtree-table.blade.php -->
+<!-- resources/views/survloop/forms/formtree-table.blade.php -->
 <div id="node{{ $nIDtxt }}{{ trim($GLOBALS['SL']->currCyc['tbl'][1]) }}" class="nodeWrap">
     <div class="nodeHalfGap"></div>
     <div class="nPrompt">{!! $nodePromptText !!}</div>

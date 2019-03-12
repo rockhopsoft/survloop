@@ -26,7 +26,7 @@
             @endif
             <a id="fldSpecBtn{{ $fld->FldID }}" href="javascript:;"></a>
             @if ($fld->FldSpecType == 'Replica') 
-                <span class="slGrey f8" data-toggle="tooltip" data-placement="top" 
+                <span class="slGrey fPerc80" data-toggle="tooltip" data-placement="top" 
                     title="Replica field (copy of a Generic field)"><sup>^</sup></span>
             @endif
             
@@ -48,7 +48,7 @@
                 @if (trim($FldValues) != '')
                     <i class="mR5">Values:</i>
                     @if (strpos($FldValues, 'Def::') !== false)
-                        {{ str_replace('Def::', '', $FldValues) }} <span class="f10">(Definitions)</span>
+                        {{ str_replace('Def::', '', $FldValues) }} <span class="fPerc80">(Definitions)</span>
                     @else
                         {{ $FldValues }}
                     @endif
@@ -74,7 +74,7 @@
             @endif
             <nobr><i>
             @if (isset($FldDataTypes[$fld->FldType])) {{ $FldDataTypes[$fld->FldType][1] }}  @endif
-            @if ($fld->FldIsIndex == 1) <span class="slGrey f8">Indexed</span> @endif
+            @if ($fld->FldIsIndex == 1) <span class="slGrey fPerc80">Indexed</span> @endif
             </i></nobr>
             @if (trim($fldForeignPrint) != '' || trim($fldGenerics) != '')
                 <br />@if (trim($fldForeignPrint) != '') {!! $fldForeignPrint !!} @endif

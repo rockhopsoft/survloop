@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/db/export-tabs.blade.php -->
+<!-- resources/views/vendor/survloop/db/export-tabs.blade.php -->
 <ul id="pageTabs" class="nav nav-tabs">
 <li class="nav-item"><a href="/dashboard/db/export" class="nav-link @if ($curr == 'mysql') active @endif "
     >MySQL</a></li>

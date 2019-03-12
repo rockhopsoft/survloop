@@ -86,7 +86,7 @@
                 </div>
             </div>
             <div class="col-4 taR">
-                <input type="submit" value="Save Node Changes" class="btn btn-lg btn-primary f22" 
+                <input type="submit" value="Save Node Changes" class="btn btn-lg btn-primary" 
                     @if (!$canEditTree) DISABLED @endif >
             </div>
         </div>

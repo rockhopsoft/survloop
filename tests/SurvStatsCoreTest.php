@@ -2,7 +2,7 @@
 namespace SurvLoop\Tests;
 
 use PHPUnit\Framework\TestCase;
-use SurvLoop\Controllers\SurvStatsCore;
+use SurvLoop\Controllers\Stats\SurvStatsCore;
 
 class SurvStatsCoreTest extends TestCase
 {

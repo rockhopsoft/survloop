@@ -64,7 +64,7 @@ a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, 
 	background: {!! $css["color-main-on"] !!};
 	color: {!! $css["color-main-bg"] !!};
 	border: 0px none;
-	box-shadow: 1px 1px 6px {!! $css["color-main-off"] !!};
+	box-shadow: 1px 1px 6px {!! $css["color-main-on"] !!};
 	-moz-border-radius: 5px; border-radius: 5px;
 	cursor: pointer;
 }

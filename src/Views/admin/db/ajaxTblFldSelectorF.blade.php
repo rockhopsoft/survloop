@@ -12,7 +12,7 @@
 @endforelse
 <br />
 
-<span class="f10">Add Field:</span> 
+<span class="fPerc80">Add Field:</span> 
 <select name="addFT" id="addFTID" onChange="changeTbl();">{!! $tblDrop !!}</select>
 <script type="text/javascript"> 
 function changeTbl() { $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/{{ $rF }}?addT="+document.getElementById("addFTID").value+""); } 

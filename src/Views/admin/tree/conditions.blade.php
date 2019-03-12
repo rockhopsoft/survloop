@@ -53,9 +53,9 @@
             <div class="col-1">
                 <a href="/dashboard/db/conds/edit/{{ $cond->CondID }}" class="fPerc133 mL5 mR5"
                     ><i class="fa fa-pencil" aria-hidden="true"></i></a><br />
-                <a href="javascript:;" id="condDelBtn{{ $i }}" class="condDelBtn slRedDark fPerc133 mT20 mL5 mR5"
+                <a href="javascript:;" id="condDelBtn{{ $i }}" class="condDelBtn txtDanger fPerc133 mT20 mL5 mR5"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i></a>
-                <div id="condDel{{ $i }}" class="disNon red f10">
+                <div id="condDel{{ $i }}" class="disNon red fPerc80">
                     <label>
                         <input type="checkbox" name="CondDelete{{ $i }}" value="1" autocomplete="off"> Yes, Delete
                     </label>

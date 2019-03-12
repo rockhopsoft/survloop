@@ -158,7 +158,7 @@ class SurvLoopImages
     {
         $this->chkImgSet($nID, $dbID);
         $this->findImgs();
-        return view('vendor.survloop.inc-image-selecter', [
+        return view('vendor.survloop.forms.inc-image-selecter', [
             "nID"    => $this->nID,
             "imgs"   => $this->imgs,
             "presel" => $presel,
@@ -184,13 +184,13 @@ class SurvLoopImages
         if (strrpos($cleanCurr, '/') !== false) {
             $cleanCurr = substr($cleanCurr, strrpos($cleanCurr, '/')+1);
         }
-        return view('vendor.survloop.inc-image-deet', [
+        return view('vendor.survloop.forms.inc-image-deet', [
             "nID"       => $this->nID,
             "img"       => $img,
             "urlPrint"  => $urlPrint,
             "cleanOrig" => $cleanOrig,
             "cleanCurr" => $cleanCurr
-        ])->render();
+            ])->render();
     }
     
     public function saveImgDeet($imgID = -3, $nID = '', $dbID = 1)
@@ -229,10 +229,10 @@ class SurvLoopImages
             if (in_array($extension, ["gif", "jpeg", "jpg", "png"]) && in_array($mimetype, ["image/gif", "image/jpeg", 
                     "image/jpg", "image/pjpeg", "image/x-png", "image/png"])) {
                 if (!$GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->isValid()) {
-                    return '<div class="slRedDark p10">Upload Error.' 
+                    return '<div class="txtDanger p10">Upload Error.' 
                         . /* $_FILES["up" . $nID . "File"]["error"] . */ '</div>';
                 } elseif ($size > 4000000) {
-                    return '<div class="slRedDark p10">File size too large. Please compress to less than 4MB.</div>';
+                    return '<div class="txtDanger p10">File size too large. Please compress to less than 4MB.</div>';
                 } else {
                     $upFold = '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Uploads/';
                     //if ($this->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
@@ -244,13 +244,13 @@ class SurvLoopImages
                     }
                 }
             } else {
-                return '<div class="slRedDark p10">Invalid file. Please check the format and try again.</div>';
+                return '<div class="txtDanger p10">Invalid file. Please check the format and try again.</div>';
             }
             $img->save();
             $this->analizeImg($img);
         }
         if (isset($img->ImgID) && intVal($img->ImgID) > 0) {
-            return view('vendor.survloop.inc-image-uploaded', [
+            return view('vendor.survloop.forms.inc-image-uploaded', [
                 "nID"    => $this->nID,
                 "presel" => $presel,
                 "imgID"  => $img->ImgID

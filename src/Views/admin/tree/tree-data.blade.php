@@ -103,7 +103,7 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
             @if (isset($link->DataSubAutoGen) && intVal($link->DataSubAutoGen) == 1) Auto-Gen @else Manual @endif
         </td>
         <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->DataSubID }}" 
-            class="f10 slRedDark"><i class="fa fa-trash-o"></i></a></td>
+            class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty
     <tr><td colspan="4" ><i>none</i></td></tr>
@@ -155,7 +155,7 @@ basic core-table-to-loop-table relations.
         <td><a href="/dashboard/db/table/{{ $link->DataHelpTable }}" target="_blank"
             >{{ $link->DataHelpTable }}</a></td>
         <td>{{ $link->DataHelpValueField }}</td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->DataHelpID }}" class="f10 slRedDark"
+        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->DataHelpID }}" class="fPerc80 txtDanger"
             ><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty
@@ -205,7 +205,7 @@ require a hierarchical relationship.
         <td class="taC"><a href="/dashboard/db/table/{{ $linkMap[2] }}" target="_blank">{{ $linkMap[2] }}</a></td>
         <td class="taR slGrey">{{ $linkMap[3] }} <i class="fa fa-long-arrow-right mL5 slBlueDark"></i></td>
         <td><a href="/dashboard/db/table/{{ $linkMap[4] }}" target="_blank">{{ $linkMap[4] }}</a></td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delLinkage={{ $tblID }}" class="f10 slRedDark"
+        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delLinkage={{ $tblID }}" class="fPerc80 txtDanger"
             ><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty

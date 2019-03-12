@@ -9,8 +9,7 @@
 <div class="row mTn20">
     <div class="col-4">
         <h3>Data Table XML Map</h3>
-        <a href="javascript:;" id="editXmlMap" class="f14"
-            ><i class="fa fa-pencil" aria-hidden="true"></i> Edit Map</a></nobr>
+        <a href="javascript:;" id="editXmlMap"><i class="fa fa-pencil" aria-hidden="true"></i> Edit Map</a></nobr>
         <style> .editXml { display: none; } </style>
     </div>
     <div class="col-4">

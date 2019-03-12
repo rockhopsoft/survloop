@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/survloop/forms/formtree-date.blade.php -->
+<!-- resources/views/survloop/forms/formtree-date.blade.php -->
 
 <input type="hidden" name="n{{ $nID }}fld" id="n{{ $nID }}FldID" value="{{ $dateStr }}" 
     class=" @if (isset($xtraClass)) {{ $xtraClass }} @endif " data-nid="{{ $nID }}" >

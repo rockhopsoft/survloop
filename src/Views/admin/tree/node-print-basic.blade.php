@@ -76,7 +76,7 @@
                 <span class="slGreenDark mL10"><i class="fa fa-refresh"></i> Add & Edit 
                     {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}</span>
             @endif
-            @if ($node->isRequired()) <span class="slRedDark" title="required">*</span> @endif
+            @if ($node->isRequired()) <span class="txtDanger" title="required">*</span> @endif
             @if ($isAlt)
                 @if ($node->isOneLiner()) <span class="mL10">(Q&A on one line)</span> @endif
                 @if ($node->isOneLineResponses()) <span class="mL10">(responses on one line)</span> @endif

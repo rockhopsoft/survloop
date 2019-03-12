@@ -65,7 +65,7 @@ a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.comple
 }
 .minorNavWrap {
     display: none;
-    border-top: 1px {!! $css["color-main-off"] !!} solid;
+    border-top: 1px {!! $css["color-main-on"] !!} solid;
     padding: 20px 0px;
     margin-top: -8px;
     -moz-border-radius: 20px; border-radius: 20px;
@@ -84,7 +84,7 @@ a.navMobDone:link, a.navMobDone:active, a.navMobDone:visited, a.navMobDone:hover
 	border: 1px {!! $css["color-main-on"] !!} solid;
 }
 a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover {
-	color: {!! $css["color-main-off"] !!};
+	color: {!! $css["color-main-on"] !!};
 	border: 1px {!! $css["color-main-faint"] !!} solid;
 	pointer-events: none;
 	text-decoration: none;
@@ -99,7 +99,7 @@ a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActi
 #navMobPercProg {
     height: 4px;
     -moz-border-radius: 4px; border-radius: 4px;
-    background: {!! $css["color-main-off"] !!};
+    background: {!! $css["color-main-on"] !!};
 }
 
 #navDesktop {

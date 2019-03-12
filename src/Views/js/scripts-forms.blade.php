@@ -298,7 +298,7 @@ function wordCountKeyUp(nIDtxt, limit, warn) {
 	    }
 	    if (document.getElementById("wordCnt"+nIDtxt+"")) {
             var cntWords = "<span class=\"slBlueDark\">"+words.length+"</span>";
-            if (0 < warn && warn <= words.length) cntWords = "<span class=\"slRedLight\">"+words.length+"</span>";
+            if (0 < warn && warn <= words.length) cntWords = "<span class=\"txtDanger\">"+words.length+"</span>";
             document.getElementById("wordCnt"+nIDtxt+"").innerHTML=cntWords;
         }
 	}

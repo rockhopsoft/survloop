@@ -21,7 +21,7 @@
             <div class="slCard nodeWrap">
                 All System Updates:<br /><br />
                 @forelse ($updateList as $i => $up)
-                    <div class="p20 @if ($i%2 == 0) row2 @endif @if ($up[1]) slBlueDark @else slRedDark @endif ">
+                    <div class="p20 @if ($i%2 == 0) row2 @endif @if ($up[1]) slBlueDark @else txtDanger @endif ">
                         <div class="row">
                             <div class="col-6"><b>{!! $up[0] !!}</b></div>
                             <div class="col-6">

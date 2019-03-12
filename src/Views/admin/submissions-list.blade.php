@@ -1,9 +1,9 @@
-<!-- Stored in resources/views/vendor/survloop/admin/submissions-list.blade.php -->
-
+<!-- resources/views/vendor/survloop/admin/submissions-list.blade.php -->
 @extends('vendor.survloop.master')
-
 @section('content')
+<div class="container">
 
+<div class="slCard nodeWrap">
 <h1><i class="fa fa-star"></i> {{ $currPageTitle }}</h1>
 
 <div class="p5"></div>
@@ -19,8 +19,7 @@
 @forelse ($subsList as $sub)
     <tr>
         <td>
-            <a href="/dashboard/subs/{{ $com->ComID }}/review" 
-                class="btn btn btn-secondary round20 p5 f22 slBlueDark"
+            <a href="/dashboard/subs/{{ $com->ComID }}/review" class="btn btn-lg btn-secondary slBlueDark"
                 >#{{ number_format( $sub->{ $coreAbbr.'ID' } ) }}</a>
         </td>
         <td>
@@ -40,7 +39,7 @@
 @endforelse
 </table>
 
+</div>
 
-<div class="adminFootBuff"></div>
-
+</div>
 @endsection

@@ -14,7 +14,7 @@ use Illuminate\Routing\Controller;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Globals;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SystemDefinitions;
 
 class SurvLoopInstaller extends Controller

@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/embed-google-map-simple.blade.php -->
+<!-- resources/views/vender/survloop/embed-google-map-simple.blade.php -->
 <iframe id="map{{ $nID }}" height="{{ ((isset($height) && intVal($height) > 0) ? $height : 450) 
     }}" width="100%" frameborder="0" style="border:0"
   src="https://www.google.com/maps/embed/v1/place?key={{ $GLOBALS['SL']->sysOpts['google-map-key2'] 

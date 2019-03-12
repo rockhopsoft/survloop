@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/admin/contact.blade.php -->
+<!-- resources/views/vendor/survloop/admin/contact.blade.php -->
 @extends('vendor.survloop.master')
 @section('content')
 <div class="container">

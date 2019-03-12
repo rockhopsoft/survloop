@@ -1,5 +1,5 @@
 @if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $coreID > 0)
-    <!-- Stored in resources/views/survloop/forms/foot-record-mgmt.blade.php -->
+    <!-- resources/views/survloop/forms/foot-record-mgmt.blade.php -->
     <div id="sessMgmtWrap" class="disBlo pT20">
         <a id="hidivBtnSessMgmtID" class="hidivBtn btn btn-secondary btn-sm" href="javascript:;">
             <div class="pT5 pB5"><i class="fa fa-cogs" aria-hidden="true"></i>
@@ -14,7 +14,7 @@
             @if (!isset($isUser) || !$isUser)
                 <a class="mR10 saveAndRedir" data-redir-url="/register" href="javascript:;">Save and Continue Later</a>
             @endif
-            <a id="hidivBtnRecMgmtDel" class="hidivBtn slRedDark" href="javascript:;">Delete</a>
+            <a id="hidivBtnRecMgmtDel" class="hidivBtn txtDanger" href="javascript:;">Delete</a>
             <div id="hidivRecMgmtDel" class="disNon mT5 w100">
                 <div class="alert alert-danger w100">
                     <i class="fa fa-trash-o mR5" aria-hidden="true"></i> Delete this session? This CANNOT be undone.

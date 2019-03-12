@@ -88,10 +88,8 @@
         
         <div id="navMobFull" class="disNon">
             @foreach ($majorSections as $maj => $majSect)
-                <div class="brdBotBluL pT5 pB5">
-                    <div class="f16">
-                        <b>{{ (1+$maj) }}. {{ $majorSections[$maj][1] }}</b>
-                    </div>
+                <div class="brdBot pT5 pB5">
+                    <b>{{ (1+$maj) }}. {{ $majorSections[$maj][1] }}</b>
                     <div class="pL20">
                     @forelse ($minorSections[$maj] as $min => $minSect)
                         @if (in_array($min, $sessMinorsTouched[$maj]))

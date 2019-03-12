@@ -21,10 +21,10 @@
     //padding-top: 66.66%; /* 3:2 Aspect Ratio */
     //padding-top: 62.5%; /* 8:5 Aspect Ratio */
     overflow: hidden;
-    border-bottom: 1px solid {!! $css["color-main-off"] !!};
+    border-bottom: 1px solid {!! $css["color-main-on"] !!};
 }
 .prevImg.brd {
-    border: 1px solid {!! $css["color-main-off"] !!};
+    border: 1px solid {!! $css["color-main-on"] !!};
 }
 .prevImg img {
     position: absolute;

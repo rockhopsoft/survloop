@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/admin/tree/trees-row.blade.php -->
+<!-- resources/views/vender/survloop/admin/tree/trees-row.blade.php -->
 <tr><td>
     <div class="fPerc133">{{ str_replace('[[coreID]]', 1111, $tree->TreeName) }}</div>
     <a class="float-right" href="/dashboard/surv-{{ $tree->TreeID }}/map?all=1&alt=1"

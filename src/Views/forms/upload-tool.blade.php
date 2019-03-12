@@ -1,6 +1,6 @@
-<!-- Stored in resources/views/survloop/forms/upload-tool.blade.php -->
+<!-- resources/views/survloop/forms/upload-tool.blade.php -->
 
-<div id="uploadErrors" class="slRedDark"></div>
+<div id="uploadErrors" class="txtDanger"></div>
 <div id="up{{ $nID }}Wrap" class="slCard">
     <div class="uploadTypes">
         <h2><i class="fa fa-cloud-upload"></i> New Upload</h2>

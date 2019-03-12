@@ -97,7 +97,7 @@ class Searcher extends SurvCustLoop
         $GLOBALS["SL"]->pageAJAX .= '$("#searchAdvBtn' . $nID . 't' . $treeID . '").click(function() {
             $("#searchAdv' . $nID . 't' . $treeID . '").slideToggle("fast");
         });';
-        return view('vendor.survloop.inc-search-bar', [
+        return view('vendor.survloop.elements.inc-search-bar', [
             "nID"      => $nID, 
             "treeID"   => $treeID, 
             "pre"      => $GLOBALS["SL"]->extractJava($pre),

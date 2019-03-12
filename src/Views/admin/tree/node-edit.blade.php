@@ -211,18 +211,18 @@
             @if (sizeof($node->conds) > 0)
                 @foreach ($node->conds as $i => $cond)
                     <input type="hidden" id="delCond{{ $i }}ID" name="delCond{{ $cond->CondID }}" value="N">
-                    <div id="cond{{ $i }}wrap" class="round10 brd p5 f18 mB10 pL10">
+                    <div id="cond{{ $i }}wrap" class="round10 brd p5 mB10 pL10">
                         <a id="cond{{ $i }}delBtn" href="javascript:;" class="float-right disBlo condDelBtn"
                             ><i class="fa fa-trash-o" aria-hidden="true"></i></a> 
-                        <div id="cond{{ $i }}delWrap" href="javascript:;" class="float-right disNon f10 pT5 pL10">
+                        <div id="cond{{ $i }}delWrap" href="javascript:;" class="float-right disNon fPerc80 pT5 pL10">
                             <i class="red">Deleted</i> 
-                            <a id="cond{{ $i }}delUndo" href="javascript:;" class="condDelBtnUndo f10 mL20">Undo</a> 
+                            <a id="cond{{ $i }}delUndo" href="javascript:;" class="condDelBtnUndo fPerc80 mL20">Undo</a> 
                         </div>
                         @if (trim($cond->CondOperator) == 'AB TEST')
                             %AB: {{ $cond->CondDesc }}
                         @else
                             {{ $cond->CondTag }}
-                            <span class="f10 mL10">{!! view('vendor.survloop.admin.db.inc-describeCondition', [
+                            <span class="fPerc80 mL10">{!! view('vendor.survloop.admin.db.inc-describeCondition', [
                                 "nID"  => $node->nodeID,
                                 "cond" => $cond,
                                 "i"    => $i
@@ -259,7 +259,7 @@
             
             </form>
         @else
-            <div class="p20 m20 f20"><center><i>
+            <div class="p20 m20 fPerc125"><center><i>
                 Sorry, you do not have permissions to actually edit the tree.
             </i></center></div>
             <div class="p20 m20"></div>

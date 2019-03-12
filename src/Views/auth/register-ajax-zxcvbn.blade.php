@@ -3,10 +3,10 @@ $("#password").keyup(function() {
     if (document.getElementById('passStrng')) {
         var textValue = $(this).val();
         var result = zxcvbn(textValue);
-        $("#passStrng").removeClass("slGreenDark").removeClass("slGreenLight").removeClass("warnOn").removeClass("red");
+        $("#passStrng").removeClass("slGreenDark").removeClass("slGreenDark").removeClass("warnOn").removeClass("red");
         if (result.score == 4) {
             $("#passStrng").html("very strong");
-            $("#passStrng").addClass("slGreenLight");
+            $("#passStrng").addClass("slGreenDark");
         } else if (result.score == 3) {
             $("#passStrng").html("strong");
             $("#passStrng").addClass("slGreenDark");

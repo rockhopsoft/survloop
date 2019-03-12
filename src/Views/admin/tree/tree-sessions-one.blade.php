@@ -8,7 +8,7 @@
         <table class="table table-striped"><tbody>
         @forelse ($session["pages"] as $k => $page)
             <tr>
-            <td><span class="slBlueLight">{{ $page["node"] }}</span> /{{ $nodeUrls[$page["node"]] }}</td>
+            <td><span class="slBlueDark">{{ $page["node"] }}</span> /{{ $nodeUrls[$page["node"]] }}</td>
             <td> @if ($k == 0) {{ $page["date"] }} @else {{ round($page["time"], 2) }} min @endif </td>
             </tr>
         @empty

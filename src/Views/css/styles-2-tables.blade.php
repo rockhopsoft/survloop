@@ -8,14 +8,14 @@ table.slSpreadTbl tr th {
     padding: 0px 12px 6px 12px;
     vertical-align: bottom;
     border-top: 0px none;
-    border-bottom: 1px {!! $css["color-main-off"] !!} solid;
+    border-bottom: 1px {!! $css["color-main-on"] !!} solid;
 }
 table.slSpreadTbl tr td.sprdRowLab {
     padding: 12px 0px 0px 12px;
-    color: {!! $css["color-main-off"] !!};
+    color: {!! $css["color-main-on"] !!};
 }
 table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab {
-    border-right: 1px {!! $css["color-main-off"] !!} solid;
+    border-right: 1px {!! $css["color-main-on"] !!} solid;
 }
 table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, table.slSpreadTbl tr th {
     font-size: 16px;

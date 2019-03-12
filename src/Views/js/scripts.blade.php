@@ -189,7 +189,7 @@ function startCountdown(divID, cntFrom, inc) {
 }
 
 function openNav() {
-    document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-off"] !!} solid";
+    document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-on"] !!} solid";
     document.getElementById("mySidenav").style.boxShadow = "0px 0px 40px {!! $css["color-main-faint"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
     document.getElementById("main").style.marginRight = "300px";

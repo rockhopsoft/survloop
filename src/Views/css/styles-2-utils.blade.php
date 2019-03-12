@@ -30,15 +30,6 @@
 	overflow:hidden;
 }
 
-.f8, table tr td.f8, i.f8, a.f8:link, a.f8:active, a.f8:visited, a.f8:hover, input.f8 , select.f8 , textarea.f8 { font-size: 8pt; }
-.f9, table tr td.f9, i.f9, a.f9:link, a.f9:active, a.f9:visited, a.f9:hover, input.f9 , select.f9 , textarea.f9 { font-size: 9pt; }
-.f10, table tr td.f10, i.f10, a.f10:link, a.f10:active, a.f10:visited, a.f10:hover, input.f10 , select.f10 , textarea.f10 { font-size: 10pt; }
-.f11, table tr td.f11, i.f11, a.f11:link, a.f11:active, a.f11:visited, a.f11:hover, input.f11 , select.f11 , textarea.f11 { font-size: 11pt; }
-.f12, table tr td.f12, i.f12, a.f12:link, a.f12:active, a.f12:visited, a.f12:hover, input.f12 , select.f12 , textarea.f12 { font-size: 12pt; }
-.f13, table tr td.f13, i.f13, a.f13:link, a.f13:active, a.f13:visited, a.f13:hover, input.f13 , select.f13 , textarea.f13 { font-size: 13pt; }
-.f14, table tr td.f14, i.f14, a.f14:link, a.f14:active, a.f14:visited, a.f14:hover, input.f14 , select.f14 , textarea.f14 { font-size: 14pt; }
-.f16, table tr td.f16, i.f16, a.f16:link, a.f16:active, a.f16:visited, a.f16:hover, input.f16 , select.f16 , textarea.f16 { font-size: 16pt; }
-.f18, table tr td.f18, i.f18, a.f18:link, a.f18:active, a.f18:visited, a.f18:hover, input.f18 , select.f18 , textarea.f18 { font-size: 18pt; }
 .f20, table tr td.f20, i.f20, a.f20:link, a.f20:active, a.f20:visited, a.f20:hover, input.f20 , select.f20 , textarea.f20 { font-size: 20pt; }
 .f22, table tr td.f22, i.f22, a.f22:link, a.f22:active, a.f22:visited, a.f22:hover, input.f22 , select.f22 , textarea.f22 { font-size: 22pt; }
 .f24, table tr td.f24, i.f24, a.f24:link, a.f24:active, a.f24:visited, a.f24:hover, input.f24 , select.f24 , textarea.f24 { font-size: 24pt; }
@@ -50,13 +41,33 @@
 .f48, table tr td.f48, i.f48, a.f48:link, a.f48:active, a.f48:visited, a.f48:hover, input.f48 , select.f48 , textarea.f48 { font-size: 48pt; }
 .f60, table tr td.f60, i.f60, a.f60:link, a.f60:active, a.f60:visited, a.f60:hover, input.f60 , select.f60 , textarea.f60 { font-size: 60pt; }
 
-.fPerc40 { font-size: 40%; }
-.fPerc66 { font-size: 66%; }
-.fPerc80 { font-size: 80%; }
-.fPerc125 { font-size: 125%; }
-.fPerc133 { font-size: 133%; }
-.fPerc200 { font-size: 200%; }
-.fPerc300 { font-size: 300%; }
+.fPerc40, table tr td.fPerc40, i.fPerc40, a.fPerc40:link, a.fPerc40:active, a.fPerc40:visited, a.fPerc40:hover, input.fPerc40 , select.fPerc40 , textarea.fPerc40 {
+    font-size: 40%;
+}
+.fPerc66, table tr td.fPerc66, i.fPerc66, a.fPerc66:link, a.fPerc66:active, a.fPerc66:visited, a.fPerc66:hover, input.fPerc66 , select.fPerc66 , textarea.fPerc66 {
+    font-size: 66%;
+}
+.fPerc80, table tr td.fPerc80, i.fPerc80, a.fPerc80:link, a.fPerc80:active, a.fPerc80:visited, a.fPerc80:hover, input.fPerc80 , select.fPerc80 , textarea.fPerc80 {
+    font-size: 80%;
+}
+.fPerc125, table tr td.fPerc125, i.fPerc125, a.fPerc125:link, a.fPerc125:active, a.fPerc125:visited, a.fPerc125:hover, input.fPerc125 , select.fPerc125 , textarea.fPerc125 {
+    font-size: 125%;
+}
+.fPerc133, table tr td.fPerc133, i.fPerc133, a.fPerc133:link, a.fPerc133:active, a.fPerc133:visited, a.fPerc133:hover, input.fPerc133 , select.fPerc133 , textarea.fPerc133 {
+    font-size: 133%;
+}
+.fPerc200, table tr td.fPerc200, i.fPerc200, a.fPerc200:link, a.fPerc200:active, a.fPerc200:visited, a.fPerc200:hover, input.fPerc200 , select.fPerc200 , textarea.fPerc200 {
+    font-size: 200%;
+}
+.fPerc300, table tr td.fPerc300, i.fPerc300, a.fPerc300:link, a.fPerc300:active, a.fPerc300:visited, a.fPerc300:hover, input.fPerc300 , select.fPerc300 , textarea.fPerc300 {
+    font-size: 300%;
+}
+.fPerc400, table tr td.fPerc400, i.fPerc400, a.fPerc400:link, a.fPerc400:active, a.fPerc400:visited, a.fPerc400:hover, input.fPerc400 , select.fPerc400 , textarea.fPerc400 {
+    font-size: 400%;
+}
+.fPerc500, table tr td.fPerc500, i.fPerc500, a.fPerc500:link, a.fPerc500:active, a.fPerc500:visited, a.fPerc500:hover, input.fPerc500 , select.fPerc500 , textarea.fPerc500 {
+    font-size: 500%;
+}
 
 .lH10, table tr td.lH10, a.lH10:link, a.lH10:active, a.lH10:visited, a.lH10:hover { line-height: 10px; }
 .lH13, table tr td.lH13, a.lH13:link, a.lH13:active, a.lH13:visited, a.lH13:hover { line-height: 13px; }

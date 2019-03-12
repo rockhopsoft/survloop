@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/admin/tree/pages-row-redir.blade.php -->
+<!-- resources/views/vender/survloop/admin/tree/pages-row-redir.blade.php -->
 <tr><td>
     <a class="float-right ajx" data-dst="ajxT{{ $redir[2] }}" data-ajx="/ajadm/redir-edit?t={{ $redir[2] }}" 
         href="javascript:;" ><i class="fa fa-pencil" aria-hidden="true"></i></a>

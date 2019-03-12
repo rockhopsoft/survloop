@@ -123,7 +123,7 @@ function previewPage() {
         if (document.getElementById("metaImgID")) pImg = document.getElementById("metaImgID").value.trim();
         if (pTitle.length > 60) pTitle = pTitle.substring(0, 60)+"...";
         if (pDesc.length > 160) pDesc = pDesc.substring(0, 160)+"...";
-        document.getElementById('pagePrev').innerHTML = '<div class="prevImg"><img src="'+pImg+'"></div><div class="p10 mL5"><h4 class="mT0">'+pTitle+'</h4><div class="pB5">'+pDesc+'</div><a href="'+pUrl+'" target="_blank" class="f10">'+pUrlS+'</a></div>';
+        document.getElementById('pagePrev').innerHTML = '<div class="prevImg"><img src="'+pImg+'"></div><div class="p10 mL5"><h4 class="mT0">'+pTitle+'</h4><div class="pB5">'+pDesc+'</div><a href="'+pUrl+'" target="_blank" class="fPerc80">'+pUrlS+'</a></div>';
     }
     return true;
 }

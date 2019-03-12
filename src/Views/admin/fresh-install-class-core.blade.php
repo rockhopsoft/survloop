@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\{{ $abbr }};
 
-use SurvLoop\Controllers\TreeSurvForm;
+use SurvLoop\Controllers\Tree\TreeSurvForm;
 
 class {{ $abbr }} extends TreeSurvForm
 {

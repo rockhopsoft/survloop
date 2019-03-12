@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/admin/tree/pages-row.blade.php -->
+<!-- resources/views/vender/survloop/admin/tree/pages-row.blade.php -->
 <tr><td>
     @if ($tree->TreeOpts%7 > 0 && $tree->TreeOpts%13 > 0)
         <div class="relDiv pL20 mL10"><div class="absDiv" style="left: -5px;">

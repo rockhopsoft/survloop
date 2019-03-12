@@ -13,8 +13,8 @@
 .basicTier0 {
     margin: 0px;
 }
-.basicTier1, .basicTier2, .basicTier3 { border-left: 3px {!! $css["color-main-off"] !!} dotted; }
-.basicTier4, .basicTier5 { border-left: 2px {!! $css["color-main-off"] !!} dotted; }
+.basicTier1, .basicTier2, .basicTier3 { border-left: 3px {!! $css["color-main-on"] !!} dotted; }
+.basicTier4, .basicTier5 { border-left: 2px {!! $css["color-main-on"] !!} dotted; }
 .basicTier6, .basicTier7 { border-left: 2px {!! $css["color-main-faint"] !!} dotted; }
 .basicTier8, .basicTier9 { border-left: 1px {!! $css["color-main-faint"] !!} dotted; }
 .basicTier0, .basicTier0.basicTierBranch {
@@ -31,7 +31,7 @@
     padding: 10px;
 }
 .basicTierLoop, .basicTier0.basicTierBranch, .basicTier0.basicTierBranch.basicTierData {
-	border: 4px {!! $css["color-main-off"] !!} dotted;
+	border: 4px {!! $css["color-main-on"] !!} dotted;
 }
 .basicTierData, .basicTier1.basicTierData, .basicTier2.basicTierData, .basicTier3.basicTierData, .basicTier4.basicTierData, .basicTier5.basicTierData, .basicTier6.basicTierData, .basicTier7.basicTierData, .basicTier8.basicTierData {
 	border-right: 2px {!! $css["color-success-on"] !!} dotted;
@@ -68,19 +68,19 @@
     opacity:0.25; filter:alpha(opacity=25);
 }
 a.circleBtn:hover, a.circleBtn0:hover, a.circleBtn1:hover, a.circleBtn2:hover, a.circleBtn3:hover {
-	background: {!! $css["color-main-off"] !!};
+	background: {!! $css["color-main-on"] !!};
     opacity:1.00; filter:alpha(opacity=100);
 }
 .circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover {
 	background: {!! $css["color-info-on"] !!};
 }
 a.circleBtn0:hover {
-	background: {!! $css["color-info-off"] !!};
+	background: {!! $css["color-info-on"] !!};
 }
 .circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
 	background: {!! $css["color-success-on"] !!};
 }
 a.circleBtn3:hover {
-	background: {!! $css["color-success-off"] !!};
+	background: {!! $css["color-success-on"] !!};
 }
 

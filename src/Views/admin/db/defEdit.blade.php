@@ -3,13 +3,13 @@
 @section('content')
 <div class="container">
 <div class="slCard nodeWrap">
-<h1>
+<h2>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    @if ($defID > 0) Edit Definition <span class="f16">{{ $def->DefSubset }}: {{ $def->DefValue }}</span> 
+    @if ($defID > 0) Edit Definition {{ $def->DefSubset }}: {{ $def->DefValue }} 
     @else Add New Definition
     @endif
-</h1>
+</h2>
 
 <a href="/dashboard/db/all" class="btn btn-secondary mR10">All Database Details</a>
 <a href="/dashboard/db/definitions" class="btn btn-secondary mR10">All Definitions</a>
@@ -46,7 +46,7 @@
         <textarea id="defDescriptionID" name="defDescription" class="form-control">{{ $def->DefDescription }}</textarea>
         
         <center><div class="p10"></div>
-        <input type="submit" class="btn btn-lg btn-primary f30" 
+        <input type="submit" class="btn btn-lg btn-primary" 
             value=" @if (trim($subset) != '') Add Value @else Save Changes @endif " >
         </center>
     </div>

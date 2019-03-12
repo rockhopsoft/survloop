@@ -1,4 +1,4 @@
-/* Stored in resources/views/survloop/forms/upload-slide-to-previous-ajax.blade.php */
+/* resources/views/survloop/forms/upload-slide-to-previous-ajax.blade.php */
 function slideToUpload(nIDtxt) {
     if (document.getElementById(nIDtxt)) {
         var newTop = (1+getAnchorOffset()+$("#upPrev{{ $nIDtxt }}").offset().top);

@@ -2,7 +2,7 @@
 
 #reportTakeActions {
 	margin: -20px 0px 15px 0px;
-	border: 1px {!! $css["color-main-off"] !!} solid;
+	border: 1px {!! $css["color-main-on"] !!} solid;
 	background: {!! $css["color-main-faint"] !!};
 	padding: 25px 15px 5px 15px;
 	-moz-border-radius: 20px; border-radius: 20px;
@@ -98,7 +98,7 @@ table.detailList tr th {
 }
 table.detailList tr td {
 	padding-bottom: 40px;
-	border-top: 1px {!! $css["color-main-off"] !!} solid;
+	border-top: 1px {!! $css["color-main-on"] !!} solid;
 }
 
 .glossaryList { margin: 0px 15px; }

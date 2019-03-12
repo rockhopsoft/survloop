@@ -30,7 +30,7 @@ use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
 use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\Globals;
+use SurvLoop\Controllers\Globals\Globals;
 
 class SurvLoopController extends Controller
 {

@@ -170,8 +170,8 @@
             @endforeach
             </div>
             <div class="col-md-6">
-            @foreach (['color-main-on', 'color-main-off', 'color-info-on', 'color-info-off', 'color-success-on', 
-                'color-success-off', 'color-danger-on', 'color-danger-off', 'color-warn-on', 'color-warn-off'] as $opt)
+            @foreach (['color-main-on', 'color-info-on', 'color-success-on', 'color-danger-on', 'color-warn-on',] 
+                as $opt)
                 @if (isset($sysDef->v["stylesList"][$opt]))
                     {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
                         "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
@@ -218,7 +218,7 @@
     <div class="row">
         <div class="col-md-6">
             @foreach ($sysDef->v["rawSettings"] as $i => $s)
-                <div class="f22">{{ $s->setting }}</div>
+                <h4 class="m0">{{ $s->setting }}</h4>
                 <label class="mL20">
                     <input type="radio" name="setting{{ $i }}" value="Y"
                         @if ($s->val == 'Y') CHECKED @endif

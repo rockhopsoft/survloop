@@ -15,7 +15,7 @@ use Auth;
 use Illuminate\Http\Request;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\AdminController;
+use SurvLoop\Controllers\Admin\AdminController;
 
 class SystemUpdate extends AdminController
 {

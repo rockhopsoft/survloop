@@ -17,7 +17,7 @@ var canvas = document.getElementById("myCanvas");
     @elseif ($tables[$line[1]][4] != '')
         line{{ $i }}.strokeStyle = "{{ $tables[$line[1]][4] }}";
     @else
-        line{{ $i }}.strokeStyle = "{!! $css['color-success-off'] !!}";
+        line{{ $i }}.strokeStyle = "{!! $css['color-success-on'] !!}";
     @endif
     line{{ $i }}.stroke();
     <?php /* if (!isset($tables[$line[0]])) {
@@ -31,7 +31,7 @@ var canvas = document.getElementById("myCanvas");
     table{{ $i }}.fillStyle = "{!! $css['color-main-faint'] !!}";
     table{{ $i }}.fill();
     table{{ $i }}.lineWidth = 1;
-    table{{ $i }}.strokeStyle = "{!! $css['color-success-off'] !!}";
+    table{{ $i }}.strokeStyle = "{!! $css['color-success-on'] !!}";
     table{{ $i }}.stroke();
 @endforeach
 

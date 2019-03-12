@@ -22,7 +22,7 @@
         @if ($rawSettings->isNotEmpty())
             <br /><br /><h2>Custom Settings</h2>
             @foreach ($rawSettings as $i => $s)
-                <div class="f22">{{ $s->setting }}</div>
+                <h4 class="m0">{{ $s->setting }}</h4>
                 <label class="mL20">
                     <input type="radio" name="setting{{ $i }}" value="Y" @if ($s->val == 'Y') CHECKED @endif > Yes
                 </label>
@@ -58,7 +58,7 @@
 
 <div class="p20"></div>
 
-<input type="submit" class="btn btn-lg btn-primary p20 f24" value="Save All Settings Changes">
+<input type="submit" class="btn btn-lg btn-primary" value="Save All Settings Changes">
 
 <div class="p20"></div>
 

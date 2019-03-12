@@ -15,7 +15,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSess;
-use Survloop\Controllers\TreeNodeSurv;
+use SurvLoop\Controllers\Tree\TreeNodeSurv;
 
 class SessAnalysis
 {

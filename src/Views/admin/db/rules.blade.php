@@ -1,22 +1,17 @@
 <!-- resources/views/vendor/survloop/admin/db/rules.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
+<div class="container">
 
-<h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
-    Business Rules 
-    <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
-</h1>
-
+<div class="slCard nodeWrap">
 @if ($dbAllowEdits)
-    <div class="p10">
-        <a href="/dashboard/db/bus-rules/add" class="btn btn-secondary"
-            ><i class="fa fa-plus-circle"></i> Add New Rule</a>
-    </div>
+    <a href="/dashboard/db/bus-rules/add" class="btn btn-secondary pull-right"
+        ><i class="fa fa-plus-circle"></i> Add New Rule</a>
 @endif
+<h1>
+    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Business Rules 
+    <nobr>({!! strip_tags($dbStats) !!})</nobr>
+</h1>
 
 <div class="row">
 <div class="col-1"> </div>
@@ -46,7 +41,7 @@
 @empty
     <div class="alert alert-warning" role="alert" >No rules established yet.</div>
 @endforelse
+</div>
 
-<div class="adminFootBuff"></div>
-
+</div>
 @endsection

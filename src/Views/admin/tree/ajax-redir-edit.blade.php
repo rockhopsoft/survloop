@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/admin/tree/ajax-redir-edit.blade.php -->
+<!-- resources/views/vender/survloop/admin/tree/ajax-redir-edit.blade.php -->
 <form name="redirFormT{{ $tree->TreeID }}" method="post" action="/dashboard/pages?redirEdit={{ $tree->TreeID }}">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <div class="row mT10">

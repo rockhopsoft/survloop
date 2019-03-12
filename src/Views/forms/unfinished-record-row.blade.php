@@ -6,7 +6,7 @@
             <div class="mB5">{!! $desc !!}</div>
             <a href="/switch/{{ $tree }}/{{ $cID }}" class="mR10"
                 ><i class="fa fa-pencil fa-flip-horizontal"></i> Continue</a>
-            <a id="hidivBtnRec{{ $cID }}Del" class="hidivBtn slRedDark mR10" href="javascript:;"
+            <a id="hidivBtnRec{{ $cID }}Del" class="hidivBtn txtDanger mR10" href="javascript:;"
                 ><i class="fa fa-trash-o"></i> Delete</a>
             <div id="hidivRec{{ $cID }}Del" class="disNon mT10 w100">
                 <div class="alert alert-danger w100">

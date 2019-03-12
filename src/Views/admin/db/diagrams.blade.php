@@ -3,7 +3,7 @@
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Table Diagrams 
-    <nobr><span class="f14">({!! strip_tags($dbStats) !!})</span></nobr>
+    <nobr>({!! strip_tags($dbStats) !!})</nobr>
 </h1>
 
 <a href="#tblDiagSimple" class="btn btn-secondary mR10"

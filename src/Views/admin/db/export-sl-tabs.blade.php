@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/db/export-sl-tabs.blade.php -->
+<!-- resources/views/vendor/survloop/db/export-sl-tabs.blade.php -->
 <ul id="pageTabs" class="nav nav-tabs">
 <li class="nav-item"><a href="/dashboard/sl/export/laravel" class="nav-link @if ($curr == 'laravel') active @endif "
     >Export for Laravel</a></li>

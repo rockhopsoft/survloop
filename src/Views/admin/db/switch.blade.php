@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vender/survloop/admin/db/switch.blade.php -->
+<!-- resources/views/vender/survloop/admin/db/switch.blade.php -->
 
 @extends('vendor.survloop.master')
 

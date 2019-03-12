@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/survloop/forms/formtree-datetime.blade.php -->
+<!-- resources/views/survloop/forms/formtree-datetime.blade.php -->
 {!! $nodePrompt !!}
 <div class="nFld{{ $isOneLinerFld }}">
     <input type="text" name="n{{ $nID }}fld" id="n{{ $nID }}FldID" value="{{ $dateStr }}" {{ $onKeyUp }} 

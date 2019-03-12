@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/admin/admin-menu.blade.php -->
+<!-- resources/views/vendor/survloop/admin/admin-menu.blade.php -->
 <div id="admMenu">
 @forelse ($adminNav as $i => $nav)
     @if (isset($nav[0]))

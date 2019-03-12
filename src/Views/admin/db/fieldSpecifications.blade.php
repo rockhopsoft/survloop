@@ -65,7 +65,7 @@
                 <fieldset class="formFldSpecSourceIDgroup">
                     <label for="FldSpecSourceID" data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldSpecSource'] }}">Source Specification {!! $help !!}</label>
                     @if (!$edit) 
-                        @if ($fld->FldSpecSource > 0) <span class="f8"><i>#{{ $fld->FldSpecSource }}</i></span> @endif
+                        @if ($fld->FldSpecSource > 0) <span class="fPerc80"><i>#{{ $fld->FldSpecSource }}</i></span> @endif
                     @else
                         <nobr><select name="FldSpecSource" id="FldSpecSourceID" class="form-control" >
                             <option value="">(load generic field)</option>
@@ -75,10 +75,10 @@
                             ]) !!}
                         </select>
                         <a onClick="if (document.getElementById('FldSpecSourceID').value != '') window.location='{{ $FldSpecSourceJSlnk }}&loadGeneric='+document.getElementById('FldSpecSourceID').value+'';" 
-                            href="javascript:;" class="f11"><span class="f8"><i class="fa fa-upload"></i></span>Load</a></nobr><br /><br />
+                            href="javascript:;" class="fPerc80"><span class="fPerc66"><i class="fa fa-upload"></i></span>Load</a></nobr><br /><br />
                         <input type="hidden" id="saveGenericID" name="saveGeneric" value="0">
                         @if ($fld->FldSpecType != 'Generic' || $fld->FldTable > 0)
-                            <a href="javascript:;" onClick="saveGeneric();" class="f10"><i class="fa fa-floppy-o"></i> Save Copy As Generic Field</a>
+                            <a href="javascript:;" onClick="saveGeneric();" class="fPerc80"><i class="fa fa-floppy-o"></i> Save Copy As Generic Field</a>
                         @endif
                         <div id="generState" class="disIn"></div>
                     @endif

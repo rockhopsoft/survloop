@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use App\Models\User;
 use App\Models\SLTree;
-use SurvLoop\Controllers\Globals;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SurvCustLoop;
 

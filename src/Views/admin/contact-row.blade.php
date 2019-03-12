@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/admin/contact-row.blade.php -->
+<!-- resources/views/vendor/survloop/admin/contact-row.blade.php -->
 @if (!isset($forEmail) || !$forEmail)
     <div class="col-9">
 @endif

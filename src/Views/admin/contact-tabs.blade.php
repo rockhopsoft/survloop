@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/vendor/survloop/admin/contact-tabs.blade.php -->
+<!-- resources/views/vendor/survloop/admin/contact-tabs.blade.php -->
 <li class="nav-item"><a href="?tab=unread" class="nav-link @if ($filtStatus == 'unread') active @endif ">Unread 
     @if ($recTots['Unread'] > 0) <span class="badge mL5">{{ $recTots['Unread'] }}</span> @endif
     </a></li>

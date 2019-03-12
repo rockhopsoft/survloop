@@ -143,6 +143,8 @@ $ chown -R www-data:33 database
 
 # <a name="documentation"></a>Documentation
 
+## SurvLoop's Database Database Design
+
 Once installed, documentation of this system's database design can be found at /dashboard/db/all. This system's 
 survey design can be found at /dashboard/surv-1/map?all=1&alt=1
 or publicly visible links like those above.

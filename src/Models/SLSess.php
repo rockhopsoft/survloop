@@ -19,5 +19,6 @@ class SLSess extends Model
         'SessZoomPref', 
         'SessIsMobile', 
         'SessBrowser', 
+        'SessIP', 
     ];
 }

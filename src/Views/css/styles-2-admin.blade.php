@@ -55,7 +55,7 @@
 .slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:active,
 .slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:hover {
     color: {!! $css["color-main-faint"] !!};
-    background: {!! $css["color-main-off"] !!};
+    background: {!! $css["color-main-on"] !!};
     border: 0px none;
     border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
     margin-right: 7px;

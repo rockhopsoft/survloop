@@ -14,7 +14,7 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Globals;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SurvLoopController;
 use SurvLoop\Controllers\SurvLoop;
 

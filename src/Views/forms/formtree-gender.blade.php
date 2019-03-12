@@ -1,4 +1,4 @@
-<!-- Stored in resources/views/survloop/forms/formtree-gender.blade.php -->
+<!-- resources/views/survloop/forms/formtree-gender.blade.php -->
 
 <div id="nLabel42" class="nPrompt">{!! $nodePromptText !!}</div>
 @if ($nodeRow->NodeOpts%2 > 0) <div class="nFldFing mT20"> @else <div class="nFld{{ $isOneLiner }}"> @endif

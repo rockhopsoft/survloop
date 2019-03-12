@@ -35,20 +35,20 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
     <div class="card-body">
         <fieldset class="form-group">
             <label for="RuleStatementID" data-toggle="tooltip" data-placement="top" 
-                title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="f10 slGrey">?</span></label>
+                title="{{ $GLOBALS['SL']->fldAbouts['FldStatement'] }}">Statement <span class="fPerc80 slGrey">?</span></label>
             <textarea class="form-control" id="RuleStatementID" name="RuleStatement" 
                 rows="2" {!! $chkDis !!} >{{ $rule->RuleStatement }}</textarea>
         </fieldset>
         <fieldset class="form-group">
             <label for="RuleConstraintID" data-toggle="tooltip" data-placement="top" 
-                title="{{ $GLOBALS['SL']->fldAbouts['FldConstraint'] }}">Constraint <span class="f10 slGrey">?</span></label>
+                title="{{ $GLOBALS['SL']->fldAbouts['FldConstraint'] }}">Constraint <span class="fPerc80 slGrey">?</span></label>
             <textarea class="form-control" id="RuleConstraintID" name="RuleConstraint" 
                 rows="2" {!! $chkDis !!} >{{ $rule->RuleConstraint }}</textarea>
         </fieldset>
         <div class="row">
             <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsAppOrient'] }}"
-                    ><b>Type</b> <span class="f10 slGrey">?</span></span>
+                    ><b>Type</b> <span class="fPerc80 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="radio" name="RuleType" id="rT2" value="2" {{ $chkDis }} 
@@ -66,7 +66,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             </div>
             <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldIsRelation'] }}"
-                    ><b>Category</b> <span class="f10 slGrey">?</span></span>
+                    ><b>Category</b> <span class="fPerc80 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="radio" name="RuleType57" id="rT5" value="5" {{ $chkDis }} 
@@ -84,7 +84,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
             </div>
             <div class="col-4">
                 <span data-toggle="tooltip" data-placement="top" title="{{ $GLOBALS['SL']->fldAbouts['FldTestOn'] }}"
-                    ><b>Test On</b> <span class="f10 slGrey">?</span></span>
+                    ><b>Test On</b> <span class="fPerc80 slGrey">?</span></span>
                 <div class="radio">
                     <label>
                         <input type="checkbox" name="RuleTestOn[]" id="rT11" value="11" {{ $chkDis }} 
@@ -114,7 +114,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
 <div class="card">
     <div class="card-header" data-toggle="tooltip" data-placement="top" 
         title="{{ $GLOBALS['SL']->fldAbouts['FldFields'] }}">
-        <h3>Structures Affected <span class="f10 slGrey">?</span></h3>
+        <h3>Structures Affected <span class="fPerc80 slGrey">?</span></h3>
     </div>
     <div class="card-body">
         <div class="row pB20">
@@ -345,7 +345,7 @@ $chkDis = (($dbAllowEdits) ? '' : ' DISABLED ');
 @if ($dbAllowEdits) 
     <center>
     <br />
-    {!! str_replace('btn-primary', 'btn-lg btn-primary f26', $saveBtn) !!}
+    {!! str_replace('btn-primary', 'btn-lg btn-primary', $saveBtn) !!}
     </form>
     </center>
 @endif

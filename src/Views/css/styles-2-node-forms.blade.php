@@ -215,12 +215,12 @@ label.finger, label.fingerAct {
     background: {!! $css["color-main-bg"] !!};
 }
 .finger:hover, input.finger:hover+label {
-    border: 1px {!! $css["color-main-off"] !!} solid;
+    border: 1px {!! $css["color-main-on"] !!} solid;
     background: {!! $css["color-main-faint"] !!};
 }
 label.fingerAct, label.fingerAct:active, input.fingerAct:active+label, 
 label.fingerAct:hover, input.fingerAct:hover+label, label.finger:active, input.finger:active+label {
-    border: 1px {!! $css["color-main-off"] !!} solid;
+    border: 1px {!! $css["color-main-on"] !!} solid;
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-on"] !!};
 }
@@ -236,11 +236,11 @@ input.fingerTxt, input.form-control.fingerTxt, .nFld input.form-control.fingerTx
 textarea.fingerTxt, textarea.form-control.fingerTxt, .nFld textarea.form-control.fingerTxt {
     cursor: pointer;
     width: 100%;
-    border: 1px {!! $css["color-main-off"] !!} solid;
+    border: 1px {!! $css["color-main-on"] !!} solid;
     -moz-border-radius: 5px; border-radius: 5px;
 }
 select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.fingerTxt {
-    border: 1px {!! $css["color-main-off"] !!} solid;
+    border: 1px {!! $css["color-main-on"] !!} solid;
     -moz-border-radius: 5px; border-radius: 5px;
 }
 
@@ -333,7 +333,7 @@ label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .n
 }
 .slSortable li, .slSortable li.sortOn, .slSortable li.sortOff { 
 	border-top: 1px {!! $css["color-main-faint"] !!} solid; 
-	border-bottom: 1px {!! $css["color-main-off"] !!} solid; 
+	border-bottom: 1px {!! $css["color-main-on"] !!} solid; 
 	background: {!! $css["color-main-faint"] !!}; 
 	color: {!! $css["color-main-on"] !!}; 
 	font-size: 20pt; 

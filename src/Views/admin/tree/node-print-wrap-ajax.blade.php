@@ -36,7 +36,7 @@ $(document).on("click", ".adminNodeShowMove", function() {
     document.getElementById("moveNodeID").value = nID;
     $(".nodeMover").slideToggle(0);
     document.getElementById("adminMenuExtra").style.position="fixed";
-    document.getElementById("adminMenuExtra").innerHTML="<i class=\'f18\'>Moving Node #"+nID+"</i>";
+    document.getElementById("adminMenuExtra").innerHTML="<i>Moving Node #"+nID+"</i>";
     window.location="#n"+nID+"";
     return true;
 });

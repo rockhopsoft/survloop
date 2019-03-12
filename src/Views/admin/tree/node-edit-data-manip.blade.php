@@ -61,7 +61,7 @@
         <div id="dataNewRecord" class=" @if (isset($node->nodeRow->NodeType) 
             && $node->nodeRow->NodeType == 'Data Manip: Close Sess') disNon @else disBlo @endif ">
             <div class="row pT5">
-                <div class="col-5 f14">
+                <div class="col-5">
                     <label class="w100"><h4 class="mT0">Set Record Field</h4></label>
                 </div>
                 <div class="col-1 taC"></div>
@@ -73,7 +73,7 @@
                 </div>
             </div>
             <div class="row pT5 pB10">
-                <div class="col-5 f14">
+                <div class="col-5">
                     <label class="w100">
                         <div class="nFld mT0">
                             <select name="manipMoreStore" id="manipMoreStoreID"
