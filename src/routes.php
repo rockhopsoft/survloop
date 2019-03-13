@@ -789,7 +789,7 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
-    Route::get( '/dashboard/css-reload',  'SurvLoop\Controllers\Admin\AdminController@getCSS');
+    Route::get( '/css-reload', 'SurvLoop\Controllers\Admin\AdminController@getCSS');
     
     // survey process for any admin tree
     Route::get( '/dashboard/start/{treeSlug}', [

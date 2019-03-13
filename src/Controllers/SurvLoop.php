@@ -142,7 +142,7 @@ class SurvLoop extends SurvCustLoop
         $this->syncDataTrees($request);
         $installer = new SurvLoopInstaller;
         $installer->checkSysInit();
-        return '<center><br /><br /><i>Reloading...</i><br /> <iframe src="/dashboard/css-reload" frameborder=0
+        return '<center><br /><br /><i>Reloading...</i><br /> <iframe src="/css-reload" frameborder=0
             style="width: 60px; height: 60px; border: 0px none;"></iframe></center>
             <script type="text/javascript"> setTimeout("window.location=\'/\'", 2000); </script>';
     }

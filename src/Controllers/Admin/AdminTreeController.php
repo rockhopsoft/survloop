@@ -184,7 +184,7 @@ class AdminTreeController extends AdminController
         if ($request->has('refresh')) {
             $this->v["treeClassAdmin"]->createProgBarJs();
             $GLOBALS["SL"]->pageJAVA .= 'setTimeout('
-                . '"document.getElementById(\'hidFrameID\').src=\'/dashboard/css-reload\'", 2000);';
+                . '"document.getElementById(\'hidFrameID\').src=\'/css-reload\'", 2000);';
         }
         return view('vendor.survloop.master', $this->v);
     }

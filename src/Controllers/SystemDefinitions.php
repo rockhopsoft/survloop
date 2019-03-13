@@ -250,7 +250,6 @@ class SystemDefinitions
             'color-line-hr'     => ['#999',    'Horizontal Rule Color'],
             'color-field-bg'    => ['#FFF',    'Form Field BG Color'],
             'color-form-text'   => ['#333',    'Form Field Text Color'],
-            'color-logo'        => ['#53F1EB', 'Primary Logo Color'],
             'color-nav-bg'      => ['#000',    'Navigation BG Color'],
             'color-nav-text'    => ['#888',    'Navigation Text Color']
             ];

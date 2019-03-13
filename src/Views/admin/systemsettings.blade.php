@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="disNon"><iframe src="/dashboard/css-reload" ></iframe></div>
+<div class="disNon"><iframe src="/css-reload" ></iframe></div>
 
 <form name="mainPageForm" action="/dashboard/settings" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">

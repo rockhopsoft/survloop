@@ -2,7 +2,7 @@
 @extends('vendor.survloop.master')
 @section('content')
 <div class="container">
-<div class="disNon"><iframe src="/dashboard/css-reload" ></iframe></div>
+<div class="disNon"><iframe src="/css-reload" ></iframe></div>
 
 <form name="mainPageForm" action="/dashboard/settings" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
@@ -124,9 +124,9 @@
 
 <div class="slCard nodeWrap">
 <h2>Logos & Fonts</h2>
-<h3 class="slBlueDark"><u>Logos</u></h3>
 <div class="row">
     <div class="col-md-6">
+        <h3 class="slBlueDark"><u>Logos</u></h3>
         @foreach (['logo-img-lrg', 'logo-img-md', 'logo-img-sm', 'show-logo-title', 'shortcut-icon'] as $opt)
             {!! view('vendor.survloop.admin.system-one-setting', [
                 "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
@@ -153,38 +153,37 @@
 <div class="nodeAnchor"><a id="color" name="color"></a></div>
 
 <div class="slCard nodeWrap">
-<div class="row">
-    <div class="col-8">
-    
-        <div class="fR pT20 slGrey"><i>BG = Background</i></div>
-        <h2><u>Colors</u></h2>
-        <div class="row fC">
-            <div class="col-md-6">
-            @foreach (['color-main-bg', 'color-main-text', 'color-main-link', 'color-main-grey', 
-                'color-main-faint', 'color-main-faintr', 'color-field-bg', 'color-form-text', 'color-line-hr', 
-                'color-logo', 'color-nav-bg', 'color-nav-text'] as $opt)
-                @if (isset($sysDef->v["stylesList"][$opt]))
-                    {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-                        "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
-                @endif
-            @endforeach
-            </div>
-            <div class="col-md-6">
-            @foreach (['color-main-on', 'color-info-on', 'color-success-on', 'color-danger-on', 'color-warn-on',] 
-                as $opt)
-                @if (isset($sysDef->v["stylesList"][$opt]))
-                    {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-                        "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
-                @endif
-            @endforeach
-            </div>
+    <div class="fR pT20 slGrey"><i>BG = Background</i></div>
+    <h2 class="slBlueDark"><u>Colors</u></h2>
+    <div class="row fC">
+        <div class="col-md-4">
+        @foreach (['color-main-bg', 'color-main-text', 'color-main-link', 'color-main-grey', 
+                'color-main-faint', 'color-main-faintr'] as $opt)
+            @if (isset($sysDef->v["stylesList"][$opt]))
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
+                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+            @endif
+        @endforeach
         </div>
-
+        <div class="col-md-4">
+        @foreach (['color-field-bg', 'color-form-text', 'color-line-hr', 'color-nav-bg', 'color-nav-text'] as $opt)
+            @if (isset($sysDef->v["stylesList"][$opt]))
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
+                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+            @endif
+        @endforeach
+        </div>
+        <div class="col-md-4">
+        @foreach (['color-main-on', 'color-info-on', 'color-success-on', 'color-danger-on', 'color-warn-on',] 
+                as $opt)
+            @if (isset($sysDef->v["stylesList"][$opt]))
+                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
+                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+            @endif
+        @endforeach
+        </div>
     </div>
-    <div class="col-4">
-        <div id="previewColors"></div>
-    </div>
-</div>
+    <div id="previewColors"></div>
 </div>
 
 <div class="p20"></div>
