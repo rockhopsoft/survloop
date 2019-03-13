@@ -68,9 +68,9 @@
     padding-bottom: 56.25%;
     padding-top: 60px; overflow: hidden;
 }
-.responsive-video iframe, .nPrompt .responsive-video iframe,
-.responsive-video object, .nPrompt .responsive-video object,
-.responsive-video embed, .nPrompt .responsive-video embed {
+iframe.responsive-video, .responsive-video iframe, .nPrompt .responsive-video iframe,
+object.responsive-video, .responsive-video object, .nPrompt .responsive-video object,
+embed.responsive-video, .responsive-video embed, .nPrompt .responsive-video embed {
     position: absolute;
     top: 0;
     left: 0;

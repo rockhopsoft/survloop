@@ -13,12 +13,14 @@
 .basicTier0 {
     margin: 0px;
 }
-.basicTier1, .basicTier2, .basicTier3 { border-left: 3px {!! $css["color-main-on"] !!} dotted; }
-.basicTier4, .basicTier5 { border-left: 2px {!! $css["color-main-on"] !!} dotted; }
-.basicTier6, .basicTier7 { border-left: 2px {!! $css["color-main-faint"] !!} dotted; }
-.basicTier8, .basicTier9 { border-left: 1px {!! $css["color-main-faint"] !!} dotted; }
+.basicTier1, .basicTier3, .basicTier5, .basicTier7, .basicTier9 {
+    border-left: 1px {!! $css["color-main-grey"] !!} dotted;
+}
+.basicTier2, .basicTier4, .basicTier6, .basicTier8 {
+    border-left: 1px {!! $css["color-main-on"] !!} dotted;
+}
 .basicTier0, .basicTier0.basicTierBranch {
-	border: 4px {!! $css["color-success-on"] !!} dotted;
+	border: 2px {!! $css["color-success-on"] !!} dashed;
 }
 .basicTierBranch, .basicTier1.basicTierBranch, .basicTier2.basicTierBranch, .basicTier3.basicTierBranch, .basicTier4.basicTierBranch, .basicTier5.basicTierBranch, .basicTier6.basicTierBranch, .basicTier7.basicTierBranch, .basicTier8.basicTierBranch {
 	border: 1px {!! $css["color-main-grey"] !!} dashed;
@@ -26,7 +28,7 @@
 .basicTierPage, .basicTier1.basicTierPage, .basicTier2.basicTierPage, .basicTier3.basicTierPage, .basicTier4.basicTierPage, .basicTier5.basicTierPage, .basicTier6.basicTierPage, .basicTier7.basicTierPage, .basicTier8.basicTierPage,
 .basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop, .basicTier6.basicTierLoop, .basicTier7.basicTierLoop, .basicTier8.basicTierLoop {
 	border: 4px {!! $css["color-info-on"] !!} double;
-	background: {!! $css["color-main-faintr"] !!};
+	background: {!! $css["color-main-bg"] !!};
 	margin: 15px 5px 15px 5px;
     padding: 10px;
 }

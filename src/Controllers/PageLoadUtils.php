@@ -1,6 +1,6 @@
 <?php
 /**
-  * PageLoadUtils assists the routing processes in SurvRoutes and AdminController.
+  * PageLoadUtils assists the SurvLoop-level routing processes in SurvRoutes and AdminController.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
