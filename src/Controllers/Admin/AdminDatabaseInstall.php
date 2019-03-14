@@ -19,7 +19,7 @@ use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
-use SurvLoop\Controllers\AdminDBController;
+use SurvLoop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
 {
@@ -505,6 +505,9 @@ class AdminDatabaseInstall extends AdminDBController
     {
         if (!file_exists('../app/Models')) {
             mkdir('../app/Models');
+        }
+        if (!file_exists('../storage/app/models')) {
+            mkdir('../storage/app/models');
         }
         if (!file_exists('../storage/app/models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]))) {
             mkdir('../storage/app/models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]));

@@ -4,6 +4,21 @@ label { font-weight: normal; }
 
 .jumbotron { background: {!! $css["color-main-faint"] !!}; }
 
+a.btn.btn-xl:link, a.btn.btn-xl:active, a.btn.btn-xl:visited, a.btn.btn-xl:hover,
+a.btn.btn-lg.btn-xl:link, a.btn.btn-lg.btn-xl:active, a.btn.btn-lg.btn-xl:visited, a.btn.btn-lg.btn-xl:hover,
+a.btn-primary.btn-xl:link, a.btn-primary.btn-xl:active, a.btn-primary.btn-xl:visited, a.btn-primary.btn-xl:hover,
+a.btn-primary.btn-lg.btn-xl:link, a.btn-primary.btn-lg.btn-xl:active, a.btn-primary.btn-lg.btn-xl:visited, a.btn-primary.btn-lg.btn-xl:hover,
+a.btn-secondary.btn-xl:link, a.btn-secondary.btn-xl:active, a.btn-secondary.btn-xl:visited, a.btn-secondary.btn-xl:hover,
+a.btn-secondary.btn-lg.btn-xl:link, a.btn-secondary.btn-lg.btn-xl:active, a.btn-secondary.btn-lg.btn-xl:visited, a.btn-secondary.btn-lg.btn-xl:hover,
+a.btn-info.btn-xl:link, a.btn-info.btn-xl:active, a.btn-info.btn-xl:visited, a.btn-info.btn-xl:hover,
+a.btn-info.btn-lg.btn-xl:link, a.btn-info.btn-lg.btn-xl:active, a.btn-info.btn-lg.btn-xl:visited, a.btn-info.btn-lg.btn-xl:hover,
+a.btn-danger.btn-xl:link, a.btn-danger.btn-xl:active, a.btn-danger.btn-xl:visited, a.btn-danger.btn-xl:hover,
+a.btn-danger.btn-lg.btn-xl:link, a.btn-danger.btn-lg.btn-xl:active, a.btn-danger.btn-lg.btn-xl:visited, a.btn-danger.btn-lg.btn-xl:hover {
+    padding: 1rem 1rem;
+    font-size: 1.75rem;
+}
+
+
 .btn-primary-simple, .btn-primary, a.btn-primary:link, a.btn-primary:active, a.btn-primary:visited, a.btn-primary:hover,
 a.btn-primary.btn-xl:link, a.btn-primary.btn-xl:active, a.btn-primary.btn-xl:visited, a.btn-primary.btn-xl:hover,
 a.btn-primary.btn-lg:link, a.btn-primary.btn-lg:active, a.btn-primary.btn-lg:visited, a.btn-primary.btn-lg:hover,
