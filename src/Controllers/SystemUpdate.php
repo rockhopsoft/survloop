@@ -5,7 +5,7 @@
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
-  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
 namespace SurvLoop\Controllers;

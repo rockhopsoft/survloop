@@ -95,6 +95,8 @@ function checkNodeForm() {
         if (document.getElementById('n'+reqNodes[i][0]+'VisibleID') && document.getElementById('n'+reqNodes[i][0]+'VisibleID').value == 1) {
             if (reqNodes[i][1] == 'reqFormFld') {
                 reqFormFld(reqNodes[i][0]);
+            } else if (reqNodes[i][1] == 'reqFormFldOther') {
+                reqFormFldOther(reqNodes[i][0]);
             } else if (reqNodes[i][1] == 'reqFormFldEmail') {
                 reqFormFldEmail(reqNodes[i][0]);
             } else if (reqNodes[i][1] == 'reqFormFldRadio') {
@@ -468,6 +470,16 @@ function reqFormFld(nIDtxt) {
     return true;
 }
 
+function reqFormFldOther(nIDtxt) {
+    if (document.getElementById("n"+nIDtxt+"fldOtherID") && document.getElementById("n"+nIDtxt+"fldOtherID").value.trim() == "") {
+        setFormLabelRed(nIDtxt);
+        totFormErrors++;
+    } else {
+        setFormLabelBlack(nIDtxt);
+    }
+    return true;
+}
+
 function reqFormFldEmail(nIDtxt) {
     if (!reqFormEmail("n"+nIDtxt+"FldID")) {
         setFormLabelRed(nIDtxt);
@@ -697,7 +709,9 @@ function formClickGender(nIDtxt) {
 }
 
 function checkNodeFormSignup() {
-    emailRequired = true;
+@if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
+    var emailRequired = false;
+@else var emailRequired = true; @endif
     hasAttemptedSubmit = true;
     totFormErrors = 0;
     formErrorsEng = "";
@@ -748,14 +762,12 @@ function checkNodeFormSignup() {
             setFormLabelBlack('003');
         }
     }
-@if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
-    if (totFormErrors == 0 && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
-    }
-@endif
     if (totFormErrors > 0) {
         setFormErrs();
         return false;
+    }
+    if (!emailRequired && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
+        document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
     }
     clearFormErrs();
     firstNodeError = "";

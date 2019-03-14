@@ -1,11 +1,10 @@
 <?php
 /**
-  * Searcher manages the primary needs of system searches, optionally extended by a 
-  * client-custom class.
+  * Searcher manages the primary needs of system searches, optionally autoloads client class extension.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
-  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
 namespace SurvLoop\Controllers;
@@ -36,8 +35,9 @@ class Searcher extends SurvCustLoop
     
     public $v                = []; // variables to pass to views
     
-    public function __construct()
+    public function __construct($treeID = 1)
     {
+        $this->treeID = $treeID;
         $this->initExtra();
     }
     

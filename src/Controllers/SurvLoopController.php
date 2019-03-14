@@ -425,10 +425,10 @@ class SurvLoopController extends Controller
             $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Searcher";
             if (class_exists($custClass)) {
-                eval("\$this->searcher = new ". $custClass . ";");
+                eval("\$this->searcher = new ". $custClass . "(" . $this->treeID . ");");
             }
         } else {
-            $this->searcher = new Searcher;
+            $this->searcher = new Searcher($this->treeID);
         }
         $this->initSearcherXtra();
         return true;

@@ -5,7 +5,7 @@
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
-  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
 namespace SurvLoop\Controllers\Tree;
@@ -32,7 +32,6 @@ use App\Models\SLContact;
 use App\Models\SLUsersActivity;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\SurvData;
-use SurvLoop\Controllers\Searcher;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Tree\TreeSurvConds;
 

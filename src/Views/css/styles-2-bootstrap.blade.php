@@ -13,7 +13,10 @@ a.btn-secondary.btn-lg.btn-xl:link, a.btn-secondary.btn-lg.btn-xl:active, a.btn-
 a.btn-info.btn-xl:link, a.btn-info.btn-xl:active, a.btn-info.btn-xl:visited, a.btn-info.btn-xl:hover,
 a.btn-info.btn-lg.btn-xl:link, a.btn-info.btn-lg.btn-xl:active, a.btn-info.btn-lg.btn-xl:visited, a.btn-info.btn-lg.btn-xl:hover,
 a.btn-danger.btn-xl:link, a.btn-danger.btn-xl:active, a.btn-danger.btn-xl:visited, a.btn-danger.btn-xl:hover,
-a.btn-danger.btn-lg.btn-xl:link, a.btn-danger.btn-lg.btn-xl:active, a.btn-danger.btn-lg.btn-xl:visited, a.btn-danger.btn-lg.btn-xl:hover {
+a.btn-danger.btn-lg.btn-xl:link, a.btn-danger.btn-lg.btn-xl:active, a.btn-danger.btn-lg.btn-xl:visited, a.btn-danger.btn-lg.btn-xl:hover,
+input[type="submit"].btn.btn-xl, input[type="submit"].btn.btn-lg.btn-xl, input[type="submit"].btn-primary.btn-xl, 
+input[type="submit"].btn-primary.btn-lg.btn-xl, input[type="submit"].btn-secondary.btn-xl, input[type="submit"].btn-info.btn-xl, 
+input[type="submit"].btn-info.btn-lg.btn-xl, input[type="submit"].btn-danger.btn-xl, input[type="submit"].btn-danger.btn-lg.btn-xl {
     padding: 1rem 1rem;
     font-size: 1.75rem;
 }

@@ -24,8 +24,8 @@
     </div>
 </div>
 <h3 class="mT20 mB5">Excerpt Content:</h3>
-<textarea name="DefDescription" id="DefDescriptionID" 
-    @if ($blurbRow->DefIsActive > 0 && $blurbRow->DefIsActive%3 == 0) class="w100" @else class="w100 nPrompt" @endif
+<textarea name="DefDescription" id="DefDescriptionID" class="form-control
+    @if ($blurbRow->DefIsActive > 0 && $blurbRow->DefIsActive%3 == 0) w100 @else w100 nPrompt @endif "
     style="height: 500px;">{!! $blurbRow->DefDescription !!}</textarea><br /><br />
 <input type="submit" class="btn btn-lg btn-primary m10" value="Save Changes">
 </form>

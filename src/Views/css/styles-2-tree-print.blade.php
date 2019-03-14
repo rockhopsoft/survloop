@@ -36,10 +36,10 @@
 	border: 4px {!! $css["color-main-on"] !!} dotted;
 }
 .basicTierData, .basicTier1.basicTierData, .basicTier2.basicTierData, .basicTier3.basicTierData, .basicTier4.basicTierData, .basicTier5.basicTierData, .basicTier6.basicTierData, .basicTier7.basicTierData, .basicTier8.basicTierData {
-	border-right: 2px {!! $css["color-success-on"] !!} dotted;
+	border-right: 2px {!! $css["color-success-on"] !!} dashed;
 }
 .basicTierLoop.basicTierData, .basicTier1.basicTierLoop.basicTierData, .basicTier2.basicTierLoop.basicTierData, .basicTier3.basicTierLoop.basicTierData, .basicTier4.basicTierLoop.basicTierData, .basicTier5.basicTierLoop.basicTierData {
-	border-right: 2px {!! $css["color-success-on"] !!} dotted;
+	border-right: 2px {!! $css["color-success-on"] !!} dashed;
 }
 .basicTier1.slCard, .basicTier2.slCard, .basicTier3.slCard, .basicTier4.slCard, .basicTier5.slCard, .basicTier6.slCard, .basicTier7.slCard, .basicTier8.slCard {
     border: 0px none;

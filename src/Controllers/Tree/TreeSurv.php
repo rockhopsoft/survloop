@@ -5,7 +5,7 @@
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
-  * @author   Morgan Lesko <mo@wikiworldorder.org>
+  * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
 namespace SurvLoop\Controllers\Tree;
@@ -547,8 +547,14 @@ class TreeSurv extends TreeSurvReport
         return true;
     }
     
+    public function runAjaxChecksCustom(Request $request, $over = '')
+    {
+        return false;
+    }
+    
     public function runAjaxChecks(Request $request, $over = '')
     {
+        $this->runAjaxChecksCustom($request, $over);
         if ($request->has('email') && $request->has('password')) {
             print_r($request);
             $chk = User::where('email', $request->email)

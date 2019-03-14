@@ -112,7 +112,7 @@
 @endif
 
 @if (!isset($midSurvBack) || trim($midSurvBack) == '')
-    <center><input type="submit" class="btn btn-lg btn-xl btn-primary" value="Sign Up"></center>
+    <center><input type="submit" class="nFormSignupSubBtn btn btn-lg btn-xl btn-primary" value="Sign Up"></center>
 @else
     <div id="pageBtns">
         <div id="formErrorMsg"></div>

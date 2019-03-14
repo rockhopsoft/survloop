@@ -231,16 +231,18 @@ class SurvData
                 ->get();
             if ($flds->isNotEmpty()) {
                 foreach ($flds as $fldKey) {
-                    $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldTable];
-                    $foreignFldName = $GLOBALS["SL"]->tblAbbr[$foreignTbl] . $fldKey->FldName;
-                    if ($fldKey->FldTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
-                        $linkages["incoming"][] = [$foreignTbl, $foreignFldName, $this->coreID];
-                    } else { // not the special Core case, so find an ancestor
-                        list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
-                        if ($loopID > 0) {
-                            $newLink = [$foreignTbl, $foreignFldName, $loopID];
-                            if (!in_array($newLink, $linkages["incoming"])) {
-                                $linkages["incoming"][] = $newLink;
+                    if (isset($GLOBALS["SL"]->tbl[$fldKey->FldTable])) {
+                        $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldTable];
+                        $foreignFldName = $GLOBALS["SL"]->tblAbbr[$foreignTbl] . $fldKey->FldName;
+                        if ($fldKey->FldTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
+                            $linkages["incoming"][] = [$foreignTbl, $foreignFldName, $this->coreID];
+                        } else { // not the special Core case, so find an ancestor
+                            list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
+                            if ($loopID > 0) {
+                                $newLink = [$foreignTbl, $foreignFldName, $loopID];
+                                if (!in_array($newLink, $linkages["incoming"])) {
+                                    $linkages["incoming"][] = $newLink;
+                                }
                             }
                         }
                     }
