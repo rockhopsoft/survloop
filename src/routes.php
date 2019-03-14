@@ -704,6 +704,16 @@ Route::group(['middleware' => ['web']], function () {
         'middleware' => ['auth']
     ]);
     
+    Route::post('/dashboard/db/conds/add', [
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminTreeController@condAdd', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/db/conds/add', [
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminTreeController@condAdd', 
+        'middleware' => ['auth']
+    ]);
+    
     Route::post('/dashboard/db/conds/edit/{cid}', [
         'uses'       => 'SurvLoop\Controllers\Admin\AdminTreeController@condEdit', 
         'middleware' => ['auth']

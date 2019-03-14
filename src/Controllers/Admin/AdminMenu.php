@@ -41,20 +41,20 @@ class AdminMenu
         list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
         $treeMenu[] = $this->admMenuLnk('javascript:;', 'Site Content', 
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
-            $this->admMenuLnk('/dashboard/pages',         'Pages & Reports', '', 1, [
-                $this->admMenuLnk('/dashboard/pages',     'Web Content Pages'),
-                $this->admMenuLnk('/dashboard/reports',   'Data Reports'),
-                $this->admMenuLnk('/dashboard/redirects',     'URL Redirects'),
+            $this->admMenuLnk('/dashboard/pages',              'Pages & Reports', '', 1, [
+                $this->admMenuLnk('/dashboard/pages',          'Web Content Pages'),
+                $this->admMenuLnk('/dashboard/reports',        'Data Reports'),
+                $this->admMenuLnk('/dashboard/redirects',      'URL Redirects'),
                 $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets')
                 ]), 
             $this->admMenuLnk('/dashboard/surveys/list', 'Surveys & Forms', '', 1, [
                 $this->admMenuLnk('/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 
                     '<b>' . $treeLabel . ':</b> Full Survey Map'), 
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/settings',        'Settings'), 
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',        'Sessions'), 
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1',     'Responses'),
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',            'Data Structures'), 
-                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',          'XML Map')
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/settings',    'Settings'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/sessions',    'Sessions'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/stats?all=1', 'Responses'),
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/data',        'Data Structures'), 
+                $this->admMenuLnk('/dashboard/surv-' . $treeID . '/xmlmap',      'XML Map')
                 ]), 
             $this->admMenuLnk('/dashboard/pages/menus',     'Navigation Menus'), 
             $this->admMenuLnk('/dashboard/images/gallery',  'Media Gallery'),
@@ -77,19 +77,19 @@ class AdminMenu
                 ]), 
             $this->admMenuLnk('/dashboard/db/definitions', 'Definition Lists'),
             $this->admMenuLnk('/dashboard/db/conds',       'Filters / Conditions', '', 1, [
-                $this->admMenuLnk('/dashboard/db/conds', 'All Conditions'),
-                $this->admMenuLnk('/dashboard/db/conds?only=public', 'Public Only'),
+                $this->admMenuLnk('/dashboard/db/conds',               'All Conditions'),
+                $this->admMenuLnk('/dashboard/db/conds?only=public',   'Public Only'),
                 $this->admMenuLnk('/dashboard/db/conds?only=articles', 'Articles Only'),
-                $this->admMenuLnk('/dashboard/db/conds?add=1', 'Add New Condition')
+                $this->admMenuLnk('/dashboard/db/conds/add',           'Add New Condition')
                 ]),
             $this->admMenuLnk('/dashboard/db/fieldDescs',  'Field Descriptions'), 
             $this->admMenuLnk('/dashboard/db/fieldXML',    'Field Privacy Settings'), 
             $this->admMenuLnk('/dashboard/db/workflows',   'Process Workflows'),
-            $this->admMenuLnk('/dashboard/db/export',              'Export', '', 1, [
+            $this->admMenuLnk('/dashboard/db/export',             'Export', '', 1, [
                 $this->admMenuLnk('/dashboard/db/export',         'Full Database Export'),
                 $this->admMenuLnk('/dashboard/sl/export/laravel', 'SurvLoop Package')
                 ]),
-            $this->admMenuLnk('/dashboard/db/switch', '<i class="slGrey">All Databases</i>')
+            $this->admMenuLnk('/dashboard/db/switch', '<span class="fPerc80">All Databases</span>')
             ]);
         $treeMenu[] = $this->admMenuLnk('/dashboard/users', 'Users', '<i class="fa fa-users"></i>', 1, [
             $this->admMenuLnk('/dashboard/users', 'All Users'),

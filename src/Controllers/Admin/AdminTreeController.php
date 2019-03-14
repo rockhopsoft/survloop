@@ -798,12 +798,22 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.admin.tree.workflows', $this->v);
     }
     
-    public function conditions(Request $request) 
+    public function condAdd(Request $request) 
     {
-        $this->admControlInit($request, '/dashboard/db/conds');
+        $this->admControlInit($request, '/dashboard/db/conds/add');
         if ($request->has('addNewCond')) {
             $GLOBALS["SL"]->saveEditCondition($request);
         }
+        if (is_array($this->custReport)) {
+            $this->loadCustLoop($request, $this->treeID);
+        }
+        $this->custReport->addCondEditorAjax();
+        return view('vendor.survloop.admin.tree.cond-add-page', $this->v);
+    }
+    
+    public function conditions(Request $request) 
+    {
+        $this->admControlInit($request, '/dashboard/db/conds');
         $this->v["filtOnly"] = (($request->has('only')) ? $request->get('only') : 'all');
         $condsRaw = $this->loadCondList();
         if ($request->has('totalConds') && intVal($request->totalConds) > 0) {
@@ -820,7 +830,6 @@ class AdminTreeController extends AdminController
                 }
             }
         }
-
         $this->v["condSplits"] = $this->loadCondList();
         $this->v["condIDs"] = '';
         if ($this->v["condSplits"] && sizeof($this->v["condSplits"]) > 0) {
@@ -830,10 +839,6 @@ class AdminTreeController extends AdminController
             $this->v["condIDs"] = substr($this->v["condIDs"], 1);
         }
         $this->loadCondArticles();
-        if (is_array($this->custReport)) {
-            $this->loadCustLoop($request, $this->treeID);
-        }
-        $this->custReport->addCondEditorAjax();
         return view('vendor.survloop.admin.tree.conditions', $this->v);
     }
     

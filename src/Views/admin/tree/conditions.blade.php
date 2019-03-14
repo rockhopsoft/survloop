@@ -4,27 +4,6 @@
 <div class="container">
 <div class="slCard nodeWrap">
 <h2 class="slGreenDark"><i class="fa fa-filter" aria-hidden="true"></i> Conditions / Filters</h2>
-
-<ul id="pageTabs" class="nav nav-tabs">
-    <li class="nav-item"><a href="/dashboard/db/conds" 
-        class="nav-link @if ($filtOnly == 'all') active @endif ">All Conditions</a></li>
-    <li class="nav-item"><a href="/dashboard/db/conds?only=public" 
-        class="nav-link @if ($filtOnly == 'public') active @endif ">Public Only</a></li>
-    <li class="nav-item"><a href="/dashboard/db/conds?only=articles" 
-        class="nav-link @if ($filtOnly == 'articles') active @endif ">Articles Only</a></li>
-    <li class="nav-item"><a id="addCondLnk" class="nav-link" href="javascript:;">Add New Condition</a></li>
-</ul>
-
-<div id="addCond" class="disNon" style="overflow: hidden;">
-    <div class="round10 brd p20 mB20 mTn20" style="padding-top: 40px;">
-        <form name="mainPageForm" method="post" action="/dashboard/db/conds" >
-        <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="addNewCond" value="1">
-        {!! view('vendor.survloop.admin.db.inc-addCondition', [ "newOnly" => true ])->render() !!}
-        </form>
-    </div>
-</div>
-
 <table class="table table-striped w100">
 @forelse ($condSplits as $i => $cond)
     <input type="hidden" name="CondID{{ $i }}" value="{{ $cond->CondID }}">
