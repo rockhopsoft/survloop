@@ -421,13 +421,16 @@ class SurvLoopController extends Controller
     
     protected function loadCustSearcher()
     {
+        $loaded = false;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
             $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Searcher";
             if (class_exists($custClass)) {
                 eval("\$this->searcher = new ". $custClass . "(" . $this->treeID . ");");
+                $loaded = true;
             }
-        } else {
+        }
+        if (!$loaded) {
             $this->searcher = new Searcher($this->treeID);
         }
         $this->initSearcherXtra();
@@ -684,21 +687,24 @@ class SurvLoopController extends Controller
             ], function (\$m) { \$m->subject('" . str_replace("'", "\\'", $emaSubject) . "')";
                 if (sizeof($emaTo) > 0) {
                     foreach ($emaTo as $i => $eTo) {
-                        $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') ? ", '" . $eTo[1] . "'" : "") . ")";
+                        $mail .= "->to('" . $eTo[0] . "'" 
+                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
                 if (sizeof($emaCC) > 0) {
                     foreach ($emaCC as $eTo) {
-                        $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') ? ", '" . $eTo[1] . "'" : "") . ")";
+                        $mail .= "->cc('" . $eTo[0] . "'" 
+                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
                 if (sizeof($emaBCC) > 0) {
                     foreach ($emaBCC as $eTo) {
-                        $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') ? ", '" . $eTo[1] . "'" : "") . ")";
+                        $mail .= "->bcc('" . $eTo[0] . "'" 
+                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
-        $mail .= "->replyTo('" . $repTo[0] . "'" . ((trim($repTo[1]) != '') ? ", '" . $repTo[1] . "'" : "") . ")"
-            . "; });";
+        $mail .= "->replyTo('" . $repTo[0] . "'" 
+            . ((trim($repTo[1]) != '') ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
         eval($mail);
         return true;
     }

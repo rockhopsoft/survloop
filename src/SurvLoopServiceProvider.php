@@ -24,7 +24,6 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__.'/Uploads'              => base_path('storage/app/up/survloop'),
             __DIR__.'/Models'               => base_path('storage/app/models/survloop'),
             __DIR__.'/Models'               => base_path('app/Models'),
-            __DIR__.'/Public'               => base_path('public/survloop'),
 
             __DIR__.'/Database/2018_11_30_000000_create_survloop_tables.php'
                 => base_path('database/migrations/2018_11_30_000000_create_survloop_tables.php'),

@@ -22,13 +22,13 @@
                         alt="{{ ((isset($upRow->UpStoredFile)) ? $upRow->UpStoredFile : 'Uploaded Image') }}"></a>
             </div>
         @else 
-            <div class="w100 disBlo bgInfo vaM" style="height: {{ (2+$height) }}px;">
-                <a href="{{ $upDeets['filePub'] }}" target="_blank" 
-                    class="disBlo w100 taL vaM fPerc133 wht" style="height: {{ $height }}px;"
-                    ><div class="fPerc400 wht mT20 mL20 disIn"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
-                    @if (strlen($upRow->UpUploadFile) > 40) <h4 class="disIn wht m0">{{ $upRow->UpUploadFile }}</h4>
-                    @else <h3 class="disIn wht m0">{{ $upRow->UpUploadFile }}</h3>
-                    @endif
+            <div class="w100 disBlo bgInfo" style="height: {{ (2+$height) }}px;">
+                <a href="{{ $upDeets['filePub'] }}" target="_blank" class="disBlo w100 taL wht" 
+                    style="height: {{ $height }}px;"><div class="pL20 pT5">
+                    <div class="fPerc200 wht mT20"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
+                    @if (strlen($upRow->UpUploadFile) > 40) {{ $upRow->UpUploadFile }}
+                    @else <h4 class="disIn wht m0">{{ $upRow->UpUploadFile }}</h4>
+                    @endif </div>
                 </a>
             </div>
         @endif
