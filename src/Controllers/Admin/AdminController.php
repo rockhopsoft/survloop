@@ -916,5 +916,15 @@ class AdminController extends SurvLoopController
         return view('vendor.survloop.admin.images-gallery', $this->v);
     }
     
+    public function printSubView(Request $request, $treeID = 1, $cid = -3)
+    {
+        if ($treeID > 0 && $cid > 0) {
+            $treeRow = SLTree::find($treeID);
+            if ($treeRow && isset($treeRow->TreeSlug)) {
+                return redirect('/' . $treeRow->TreeSlug . '/read-' . $cid);
+            }
+        }
+        return 'Not found :(';
+    }
     
 }

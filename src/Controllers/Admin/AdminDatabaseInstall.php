@@ -27,9 +27,9 @@ class AdminDatabaseInstall extends AdminDBController
     
     protected function tweakAdmMenu($currPage = '')
     {
-        $this->v["dateStmp"] = date("Y_m_d");
-        $this->v["dateStamp"] = date("Y_m_d_His");
-        $this->v["zipFileMig"] = $this->v["exportDir"] . '/' . $this->v["dateStmp"] . '_LaravelMigrations.zip';
+        $this->v["dateStmp"]     = date("Y_m_d");
+        $this->v["dateStamp"]    = date("Y_m_d_His");
+        $this->v["zipFileMig"]   = $this->v["exportDir"] . '/' . $this->v["dateStmp"] . '_LaravelMigrations.zip';
         $this->v["zipFileModel"] = $this->v["exportDir"] . '/' . $this->v["dateStmp"] . '_LaravelModels.zip';
         return true;
     }
@@ -60,7 +60,9 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExport(Request $request, $asPackage = false)
     {
         $this->admControlInit($request, (($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export'));
-        if ($asPackage) $GLOBALS["SL"]->x["exportAsPackage"] = true;
+        if ($asPackage) {
+            $GLOBALS["SL"]->x["exportAsPackage"] = true;
+        }
         if (!$this->checkCache((($asPackage) ? '/dashboard/sl/export' : '/dashboard/db/export'))) {
             $this->exportMysql();
             $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
@@ -84,7 +86,9 @@ class AdminDatabaseInstall extends AdminDBController
         ];
 		$this->v["fileListModel"] = [];
 		$this->v["migrationFileUp"] = $this->v["migrationFileDown"] = $this->v["tblClean"] = '';
-        if (!isset($this->v["modelFile"])) $this->v["modelFile"] = "";
+        if (!isset($this->v["modelFile"])) {
+            $this->v["modelFile"] = "";
+        }
         return true;
     }
     
@@ -178,26 +182,41 @@ class AdminDatabaseInstall extends AdminDBController
 						$this->saveModelFile();
 					}
 				}
-				if (trim($migEnds) != '') $this->v["migrationFileUp"] .= $migEnds;
+				if (trim($migEnds) != '') {
+				    $this->v["migrationFileUp"] .= $migEnds;
+				}
 				Storage::put($newMigFilename, 
 					view('vendor.survloop.admin.db.export-laravel-gen-migration', $this->v)->render());
+				$this->v["nextUrl"] = '?refresh=2';
 				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
 				return view('vendor.survloop.master', $this->v);
 				
 			} elseif ($this->v["refresh"] == 2) {
 				
-				Storage::put($newSeedFilename, view('vendor.survloop.admin.db.export-laravel-gen-seeder', [
-					"wholeSeed" => false ])->render());
+			    $found = -1;
+			    $currTbl = $nextTbl = '';
+			    if ($request->has('tbl') && trim($request->get('tbl')) != '') {
+			        $currTbl = trim($request->get('tbl'));
+			    } else {
+                    Storage::put($newSeedFilename, view('vendor.survloop.admin.db.export-laravel-gen-seeder', [
+                        "wholeSeed" => false
+                        ])->render());
+                }
 				if ($tbls->isNotEmpty()) {
-					foreach ($tbls as $tbl) {
+				    if ($currTbl == '') {
+				        $currTbl = $tbls[0]->TblName;
+				    }
+					foreach ($tbls as $i => $tbl) {
 						$this->loadTbl($tbl);
 						$runTable = true;
 						if ($GLOBALS["SL"]->dbRow->DbPrefix == 'SL_') {
 							if (in_array($tbl->TblName, ['Zips', 'ZipAshrae'])) {
 								$runTable = $asPackage;
-							} elseif (in_array($tbl->TblName, ['Sess', 'SessLoops', 'SessEmojis', 'LogActions', 
-								'Emailed', 'Tokens', 'UsersActivity', 'UsersRoles', 'SearchRecDump', 'NodeSaves', 
-								'NodeSavesPage', 'users', 'DesignTweaks'])) {
+							} elseif (in_array($tbl->TblName, [
+							    'AddyGeo', 'DesignTweaks', 'Emailed', 'LogActions', 'NodeSaves', 'NodeSavesPage', 
+							    'SearchRecDump', 'Sess', 'SessLoops', 'SessEmojis', 'SessSite', 'SessPage', 
+							    'Tokens', 'users', 'UsersActivity', 'UsersRoles'
+							    ])) {
 								$runTable = false;
 							}
 						} elseif ($asPackage) {
@@ -207,22 +226,37 @@ class AdminDatabaseInstall extends AdminDBController
 							$runTable = in_array($tbl->TblName, $this->custReport->tblsInPackage());
 						}
 						if ($runTable) {
-							Storage::append($newSeedFilename, $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
+						    if ($currTbl == $tbl->TblName) {
+                                Storage::append($newSeedFilename, 
+                                    $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
+						        $found = $i;
+						    } elseif ($found >= 0 && $nextTbl == '') {
+						        $nextTbl = $tbl->TblName;
+						    }
 						}
 					}
 				}
-				if ($asPackage && $GLOBALS["SL"]->dbRow->DbPrefix != 'SL_') {
+				if ($found < 0 && $asPackage && $GLOBALS["SL"]->dbRow->DbPrefix != 'SL_') {
 					$tbls = $GLOBALS["SL"]->tblQrySlExports();
 					if ($tbls->isNotEmpty()) {
-						foreach ($tbls as $tbl) {
-							$this->v["tbl"] = $tbl;
-							$this->v["tblName"] = 'SL_' . $tbl->TblName;
-							$this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-							Storage::append($newSeedFilename, $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
+						foreach ($tbls as $i => $tbl) {
+						    if ($currTbl == $tbl->TblName) {
+                                $this->v["tbl"] = $tbl;
+                                $this->v["tblName"] = 'SL_' . $tbl->TblName;
+                                $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
+                                Storage::append($newSeedFilename, 
+                                    $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
+						        $found = $i;
+						    } elseif ($found >= 0 && $nextTbl == '') {
+						        $nextTbl = $tbl->TblName;
+						    }
 						}
 					}
 				}
-				Storage::append($newSeedFilename, ' } } ');
+				if ($nextTbl == '') {
+				    Storage::append($newSeedFilename, ' } } ');
+				}
+				$this->v["nextUrl"] = '?refresh=' . (($nextTbl != '') ? '2&tbl=' . $nextTbl : '3');
 				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
 				return view('vendor.survloop.master', $this->v);
 				
@@ -246,6 +280,11 @@ class AdminDatabaseInstall extends AdminDBController
 				
                 $this->v["dumpOut"]["Migrations"] = $newMigFilename;
                 $this->v["dumpOut"]["Seeders"] = $newSeedFilename;
+				if (isset($GLOBALS['SL']->x['exportAsPackage']) && $GLOBALS['SL']->x['exportAsPackage']) {
+				    $this->v["nextUrl"] = '/dashboard/sl/export/laravel';
+				} else {
+				    $this->v["nextUrl"] = '/dashboard/db/export/laravel';
+				}
 				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel', $this->v)->render();
 				$this->saveCache();
 				
@@ -469,7 +508,9 @@ class AdminDatabaseInstall extends AdminDBController
     		$this->v["manualMySql"] = 'Connected successfully<br />';
             $db = mysqli_connect(env('DB_HOST', 'localhost'), env('DB_USERNAME', 'homestead'), 
                 env('DB_PASSWORD', 'secret'), env('DB_DATABASE', 'homestead'));
-            if ($db->connect_error) $this->v["manualMySql"] = "Connection failed: " . $db->connect_error . '<br />';
+            if ($db->connect_error) {
+                $this->v["manualMySql"] = "Connection failed: " . $db->connect_error . '<br />';
+            }
     		$this->v["lastSql"] = '';
     		$this->v["lastResults"] = [];
     		if ($request->has('mys') && trim($request->mys) != '') {

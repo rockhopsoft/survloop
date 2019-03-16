@@ -29,5 +29,5 @@
 @endif
 @endif
 <input type="hidden" name="popStateUrl" id="popStateUrlID" value="">
-<input type="hidden" name="zoomPref" id="zoomPrefID" value="{{ $zoomPref }}">
+<?php /* <input type="hidden" name="zoomPref" id="zoomPrefID" value="{{ $zoomPref }}"> */ ?>
 <input type="hidden" name="step" id="stepID" value="next">

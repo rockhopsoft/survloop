@@ -68,9 +68,9 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                 "isAjax"           => (($GLOBALS['SL']->treeRow->TreeType == 'Page') ? 0 : 1), 
                 "pageHasUpload"    => ((sizeof($this->pageHasUpload) > 0) ? 'enctype="multipart/form-data"' : ''),
                 "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
-                "loopRootJustLeft" => $loopRootJustLeft, 
-                "zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
-                    ? intVal($this->sessInfo->SessZoomPref) : 0)
+                "loopRootJustLeft" => $loopRootJustLeft
+                //"zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
+                //    ? intVal($this->sessInfo->SessZoomPref) : 0)
                 ])->render();
         }
         return $ret;

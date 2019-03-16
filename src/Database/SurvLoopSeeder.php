@@ -4,7 +4,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class SurvLoopSeeder extends Seeder
+class SLSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -21,8 +21,8 @@ class SurvLoopSeeder extends Seeder
 			'DbName' => 'SurvLoop',
 			'DbDesc' => 'All The Data Are Belong',
 			'DbMission' => 'Empower you to design your complex databases, collect data with an easy user experience, and create an API to share the data with the world!',
-			'DbTables' => '34',
-			'DbFields' => '252'
+			'DbTables' => '36',
+			'DbFields' => '260'
 		]);
 	
 	DB::table('SL_Tables')->insert([
@@ -203,7 +203,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Node Saves',
 			'TblDesc' => 'Each record represents one User\'s Response to a specific Node during a specific Session. Among other quality control, this is important for comparing the efficacy of various A/B testing in the user experience.',
 			'TblGroup' => 'Session Records',
-			'TblOrd' => '23',
+			'TblOrd' => '22',
 			'TblNumFields' => '6',
 			'TblNumForeignKeys' => '2'
 		]);
@@ -215,7 +215,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Page Saves',
 			'TblDesc' => 'Each record represents one timestamp of a User\'s submission of a specific Page Node during a specific Session. This is important for quickly checking or reviewing the progress of Users through an Experience.',
 			'TblGroup' => 'Session Records',
-			'TblOrd' => '22',
+			'TblOrd' => '21',
 			'TblNumFields' => '3',
 			'TblNumForeignKeys' => '2'
 		]);
@@ -228,7 +228,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record represents one User\'s Session while going through an Experience. This is important for saving a User\'s progress if they have to complete an Experience over the course of multiple browser sessions.',
 			'TblGroup' => 'Session Records',
 			'TblOrd' => '19',
-			'TblNumFields' => '9',
+			'TblNumFields' => '10',
 			'TblNumForeignKeys' => '6',
 			'TblNumForeignIn' => '3'
 		]);
@@ -254,7 +254,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record represents one log entry of a User\'s Activity, important for tracking system usage.',
 			'TblType' => 'Validation',
 			'TblGroup' => 'Logs',
-			'TblOrd' => '30',
+			'TblOrd' => '32',
 			'TblNumFields' => '3',
 			'TblNumForeignKeys' => '1'
 		]);
@@ -267,7 +267,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record represents one linkage between a Laravel system User and a User Role as defined by it\'s unique ID in the Definitions table. ',
 			'TblType' => 'Linking',
 			'TblGroup' => 'Users',
-			'TblOrd' => '25',
+			'TblOrd' => '27',
 			'TblNumFields' => '2',
 			'TblNumForeignKeys' => '1'
 		]);
@@ -280,7 +280,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record represents one detailed Log entry of an Administrator\'s database design changes, important for keeping a history for undoing mistakes.',
 			'TblType' => 'Validation',
 			'TblGroup' => 'Logs',
-			'TblOrd' => '31',
+			'TblOrd' => '33',
 			'TblNumFields' => '7',
 			'TblNumForeignKeys' => '4'
 		]);
@@ -344,7 +344,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Users',
 			'TblDesc' => 'This represents the Laravel Users table, but will not actually be implemented by SurvLoop as part of the database installation.',
 			'TblGroup' => 'Users',
-			'TblOrd' => '26',
+			'TblOrd' => '28',
 			'TblNumForeignIn' => '12'
 		]);
 		DB::table('SL_Tables')->insert([
@@ -355,7 +355,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Contact Form',
 			'TblDesc' => 'Each record represents one complete submission of the default Contact Form.',
 			'TblGroup' => 'Users',
-			'TblOrd' => '27',
+			'TblOrd' => '29',
 			'TblNumFields' => '5'
 		]);
 		DB::table('SL_Tables')->insert([
@@ -380,7 +380,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record stores one tag of one submission, by one user. This enables users to interact and provide feedback on completed Experience submissions, and to prevent users from tagging more than once.',
 			'TblType' => 'Linking',
 			'TblGroup' => 'Session Records',
-			'TblOrd' => '21',
+			'TblOrd' => '23',
 			'TblNumFields' => '4',
 			'TblNumForeignKeys' => '3'
 		]);
@@ -392,7 +392,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Tokens',
 			'TblDesc' => 'Each record one security token, of various types, which can be sent to a user to confirms some action or grant some access with greater security.',
 			'TblGroup' => 'Users',
-			'TblOrd' => '24',
+			'TblOrd' => '26',
 			'TblNumFields' => '5',
 			'TblNumForeignKeys' => '2'
 		]);
@@ -404,7 +404,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Emailings',
 			'TblDesc' => 'Each record represents one individual Email Template Mailing, including a copy of the auto-generated (then optionally customized) body of the sent email.',
 			'TblGroup' => 'Users',
-			'TblOrd' => '29',
+			'TblOrd' => '31',
 			'TblNumFields' => '9',
 			'TblNumForeignKeys' => '4'
 		]);
@@ -416,7 +416,7 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Email Templates',
 			'TblDesc' => 'Each record represents one Email Template which can be used throughout SurvLoop.',
 			'TblGroup' => 'Users',
-			'TblOrd' => '28',
+			'TblOrd' => '30',
 			'TblNumFields' => '7',
 			'TblNumForeignKeys' => '1',
 			'TblNumForeignIn' => '1'
@@ -442,7 +442,7 @@ class SurvLoopSeeder extends Seeder
 			'TblDesc' => 'Each record represents one United States zip code to map it to state and counties. ',
 			'TblType' => 'Linking',
 			'TblGroup' => 'Lookups',
-			'TblOrd' => '32',
+			'TblOrd' => '34',
 			'TblNumFields' => '7'
 		]);
 		DB::table('SL_Tables')->insert([
@@ -453,8 +453,32 @@ class SurvLoopSeeder extends Seeder
 			'TblEng' => 'Address Geolocate',
 			'TblDesc' => 'Each record represents one Address (all in one line) to map it to its latitude and longitude coordinates. This is important to reducing the number of geocoding requests sent to third parties.',
 			'TblGroup' => 'Lookups',
-			'TblOrd' => '33',
+			'TblOrd' => '35',
 			'TblNumFields' => '3'
+		]);
+		DB::table('SL_Tables')->insert([
+			'TblID' => 41,
+			'TblDatabase' => '3',
+			'TblAbbr' => 'SessPage',
+			'TblName' => 'SessPage',
+			'TblEng' => 'Session Page Loads',
+			'TblDesc' => 'Each record represents one page load, or server-side redirect, as related to their current Session. This is important for saving a User\'s path through the entire website.',
+			'TblGroup' => 'Session Records',
+			'TblOrd' => '25',
+			'TblNumFields' => '2',
+			'TblNumForeignKeys' => '1'
+		]);
+		DB::table('SL_Tables')->insert([
+			'TblID' => 42,
+			'TblDatabase' => '3',
+			'TblAbbr' => 'SiteSess',
+			'TblName' => 'SessSite',
+			'TblEng' => 'Site Session',
+			'TblDesc' => 'Each record represents one User\'s Site Session while browsing through the whole website, not just surveys. This is important for identifying any problems in the website use flow.',
+			'TblGroup' => 'Session Records',
+			'TblOrd' => '24',
+			'TblNumFields' => '5',
+			'TblNumForeignIn' => '1'
 		]);
 	
 	DB::table('SL_Fields')->insert([
@@ -2482,7 +2506,7 @@ class SurvLoopSeeder extends Seeder
 			'FldName' => 'Opts',
 			'FldEng' => 'Node Options',
 			'FldDesc' => 'Indicates the multiple of various prime numbers which mark specific other qualities of this Node.',
-			'FldNotes' => 'For XML Nodes... %5 Include members with parent, without table wrap; %7 Min 1 Record; %11 Max 1 Record; | For Other Nodes... %2 Customize Layout; %13 \'Required\' Displayed On Separate Line; %29 Exit Page; %31 Show Word Count; %37 Wrap In Jumbotron Style; %41 Echo Response Edits To Div; %43 Toggle Child Nodes On Click; %47 Limit Word Count; %53 Dropdown Tagger; %59 Hide Progress Bar; %61 Responses In Columns; %67 Skinny Content Width; %71 Content Block Background; %73 Leave Existing Rows\' Records; %79 After Response Selected, Hide Other Options; %83 Show After Pressing Info Button',
+			'FldNotes' => 'For XML Nodes... %5 Include members with parent, without table wrap; %7 Min 1 Record; %11 Max 1 Record; | For Other Nodes... %2 Customize Layout; %13 \'Required\' Displayed On Separate Line; %29 Exit Page; %31 Show Word Count; %37 Wrap In Jumbotron Style; %41 Echo Response Edits To Div; %43 Toggle Child Nodes On Click; %47 Limit Word Count; %53 Dropdown Tagger; %59 Hide Progress Bar; %61 Responses In Columns; %67 Skinny Content Width; %71 Content Block Background; %73 Leave Existing Rows\' Records; %79 After Response Selected, Hide Other Options; %83 Show After Pressing Info Button; %89 Wrap in Card Element; %97 Defer Loading of Node Contents',
 			'FldForeignMin' => 'N',
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
@@ -3474,7 +3498,7 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 157,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
-			'FldOrd' => '3',
+			'FldOrd' => '4',
 			'FldSpecSource' => '0',
 			'FldName' => 'CurrNode',
 			'FldEng' => 'Session Current Node ID',
@@ -3495,7 +3519,7 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 158,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
-			'FldOrd' => '4',
+			'FldOrd' => '5',
 			'FldSpecSource' => '0',
 			'FldName' => 'LoopRootJustLeft',
 			'FldEng' => 'Just Left Loop Root ID',
@@ -3516,7 +3540,7 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 159,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
-			'FldOrd' => '5',
+			'FldOrd' => '6',
 			'FldSpecSource' => '0',
 			'FldName' => 'AfterJumpTo',
 			'FldEng' => 'Jump From Node ID',
@@ -3536,8 +3560,8 @@ class SurvLoopSeeder extends Seeder
 		DB::table('SL_Fields')->insert([
 			'FldID' => 160,
 			'FldDatabase' => '3',
-			'FldTable' => '19',
-			'FldOrd' => '6',
+			'FldTable' => '42',
+			'FldOrd' => '3',
 			'FldSpecSource' => '0',
 			'FldName' => 'ZoomPref',
 			'FldEng' => 'Zoom Preference',
@@ -3557,7 +3581,7 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 161,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
-			'FldOrd' => '7',
+			'FldOrd' => '8',
 			'FldSpecSource' => '0',
 			'FldName' => 'IsMobile',
 			'FldEng' => 'Using Mobile Device',
@@ -3579,7 +3603,7 @@ class SurvLoopSeeder extends Seeder
 			'FldID' => 162,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
-			'FldOrd' => '8',
+			'FldOrd' => '9',
 			'FldSpecSource' => '0',
 			'FldName' => 'Browser',
 			'FldEng' => 'Session Browser',
@@ -3588,11 +3612,11 @@ class SurvLoopSeeder extends Seeder
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
 			'FldForeign2Max' => 'N',
-			'FldDataLength' => '100',
+			'FldDataLength' => '255',
 			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
 			'FldKeyType' => ',',
-			'FldCompareSame' => '6',
-			'FldOpts' => '13'
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
 			'FldID' => 163,
@@ -4142,6 +4166,20 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
+			'FldID' => 207,
+			'FldDatabase' => '3',
+			'FldTable' => '42',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'IPaddy',
+			'FldEng' => 'IP Address',
+			'FldDesc' => 'Encrypted IP address of the current user.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
 			'FldID' => 219,
 			'FldDatabase' => '3',
 			'FldTable' => '12',
@@ -4514,20 +4552,6 @@ class SurvLoopSeeder extends Seeder
 			'FldName' => 'UniqueStr',
 			'FldEng' => 'Unique String For Record',
 			'FldDesc' => 'This unique string is for cases when including the record ID number is not appropriate.',
-			'FldForeignMin' => '11',
-			'FldForeignMax' => '11',
-			'FldForeign2Min' => '11',
-			'FldForeign2Max' => '11',
-			'FldOpts' => '39'
-		]);
-		DB::table('SL_Fields')->insert([
-			'FldID' => 239,
-			'FldDatabase' => '3',
-			'FldTable' => '3',
-			'FldSpecType' => 'Replica',
-			'FldName' => 'IPaddy',
-			'FldEng' => 'IP Address',
-			'FldDesc' => 'Encrypted IP address of the current user.',
 			'FldForeignMin' => '11',
 			'FldForeignMax' => '11',
 			'FldForeign2Min' => '11',
@@ -5328,6 +5352,162 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0',
 			'FldCompareSame' => '6'
 		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 301,
+			'FldDatabase' => '3',
+			'FldTable' => '19',
+			'FldOrd' => '3',
+			'FldSpecSource' => '0',
+			'FldName' => 'IsActive',
+			'FldEng' => 'Is Active',
+			'FldDesc' => 'Indicates whether or not this session is currently active, or editable. This allows us to avoid permanently deleting these records valuable for audits.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldValues' => '0;1',
+			'FldType' => 'INT',
+			'FldDataType' => 'Numeric',
+			'FldDataLength' => '1',
+			'FldCharSupport' => ',Numbers,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '878800'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 302,
+			'FldDatabase' => '3',
+			'FldTable' => '41',
+			'FldSpecSource' => '0',
+			'FldName' => 'SessID',
+			'FldEng' => 'Session ID',
+			'FldDesc' => 'Indicates the unique Session ID for the User Session who loaded this page.',
+			'FldForeignTable' => '42',
+			'FldForeignMin' => '0',
+			'FldForeignMax' => 'N',
+			'FldType' => 'INT',
+			'FldDataType' => 'Numeric',
+			'FldDataLength' => '0',
+			'FldCharSupport' => ',Numbers,',
+			'FldKeyType' => ',Foreign,',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '878800'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 303,
+			'FldDatabase' => '3',
+			'FldTable' => '41',
+			'FldOrd' => '1',
+			'FldSpecSource' => '0',
+			'FldName' => 'URL',
+			'FldEng' => 'URL Loaded',
+			'FldDesc' => 'Indicates the URL which is currently being loaded, or redirected through on the server-side.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '0',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6',
+			'FldCompareOther' => '6',
+			'FldCompareValue' => '6'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 304,
+			'FldDatabase' => '3',
+			'FldTable' => '42',
+			'FldSpecSource' => '0',
+			'FldName' => 'UserID',
+			'FldEng' => 'Session User ID',
+			'FldDesc' => 'Indicates the unique User ID for the Database User logged in and using this Site Session record.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldType' => 'TEXT',
+			'FldDataType' => 'Numeric',
+			'FldDataLength' => '0',
+			'FldCharSupport' => ',Numbers,',
+			'FldKeyType' => ',Foreign,',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '878800'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 305,
+			'FldDatabase' => '3',
+			'FldTable' => '42',
+			'FldOrd' => '2',
+			'FldSpecSource' => '0',
+			'FldName' => 'Browser',
+			'FldEng' => 'Session Browser',
+			'FldDesc' => 'Indicates the web browser used during this Session.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '255',
+			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '6'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 306,
+			'FldDatabase' => '3',
+			'FldTable' => '42',
+			'FldOrd' => '1',
+			'FldSpecSource' => '0',
+			'FldName' => 'IsMobile',
+			'FldEng' => 'Using Mobile Device',
+			'FldDesc' => 'Indicates whether or not the User is currently using a mobile device (1 if yes).
+',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldValues' => '0;1',
+			'FldType' => 'INT',
+			'FldDataType' => 'Numeric',
+			'FldDataLength' => '1',
+			'FldCharSupport' => ',Numbers,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '878800'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 307,
+			'FldDatabase' => '3',
+			'FldTable' => '3',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'IPaddy',
+			'FldEng' => 'IP Address',
+			'FldDesc' => 'Encrypted IP address of the current user.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 308,
+			'FldDatabase' => '3',
+			'FldTable' => '19',
+			'FldOrd' => '10',
+			'FldSpecSource' => '0',
+			'FldName' => 'IP',
+			'FldEng' => 'IP Address',
+			'FldDesc' => 'Encrypted IP address of the current user.',
+			'FldForeignMin' => 'N',
+			'FldForeignMax' => 'N',
+			'FldForeign2Min' => 'N',
+			'FldForeign2Max' => 'N',
+			'FldDataLength' => '0',
+			'FldCharSupport' => ',Letters,Numbers,Keyboard,',
+			'FldKeyType' => ',',
+			'FldNullSupport' => '0',
+			'FldCompareSame' => '878800'
+		]);
 	
 	DB::table('SL_Definitions')->insert([
 			'DefID' => 35,
@@ -5481,7 +5661,7 @@ class SurvLoopSeeder extends Seeder
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
 			'DefSubset' => 'cust-abbr',
-			'DefDescription' => 'SiteAbrv'
+			'DefDescription' => 'SurvLoop'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 600,
@@ -5718,25 +5898,11 @@ class SurvLoopSeeder extends Seeder
 			'DefDescription' => '#2B3493'
 		]);
 		DB::table('SL_Definitions')->insert([
-			'DefID' => 658,
-			'DefDatabase' => '3',
-			'DefSet' => 'Style Settings',
-			'DefSubset' => 'color-main-off',
-			'DefDescription' => '#53F1EB'
-		]);
-		DB::table('SL_Definitions')->insert([
 			'DefID' => 659,
 			'DefDatabase' => '3',
 			'DefSet' => 'Style Settings',
 			'DefSubset' => 'color-info-on',
 			'DefDescription' => '#5BC0DE'
-		]);
-		DB::table('SL_Definitions')->insert([
-			'DefID' => 660,
-			'DefDatabase' => '3',
-			'DefSet' => 'Style Settings',
-			'DefSubset' => 'color-info-off',
-			'DefDescription' => '#2AABD2'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 661,
@@ -5746,13 +5912,6 @@ class SurvLoopSeeder extends Seeder
 			'DefDescription' => '#EC2327'
 		]);
 		DB::table('SL_Definitions')->insert([
-			'DefID' => 662,
-			'DefDatabase' => '3',
-			'DefSet' => 'Style Settings',
-			'DefSubset' => 'color-danger-off',
-			'DefDescription' => '#F38C5F'
-		]);
-		DB::table('SL_Definitions')->insert([
 			'DefID' => 663,
 			'DefDatabase' => '3',
 			'DefSet' => 'Style Settings',
@@ -5760,25 +5919,11 @@ class SurvLoopSeeder extends Seeder
 			'DefDescription' => '#006D36'
 		]);
 		DB::table('SL_Definitions')->insert([
-			'DefID' => 664,
-			'DefDatabase' => '3',
-			'DefSet' => 'Style Settings',
-			'DefSubset' => 'color-success-off',
-			'DefDescription' => '#29B76F'
-		]);
-		DB::table('SL_Definitions')->insert([
 			'DefID' => 665,
 			'DefDatabase' => '3',
 			'DefSet' => 'Style Settings',
 			'DefSubset' => 'color-warn-on',
 			'DefDescription' => '#F0AD4E'
-		]);
-		DB::table('SL_Definitions')->insert([
-			'DefID' => 666,
-			'DefDatabase' => '3',
-			'DefSet' => 'Style Settings',
-			'DefSubset' => 'color-warn-off',
-			'DefDescription' => '#EB9316'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 667,
@@ -5826,15 +5971,13 @@ class SurvLoopSeeder extends Seeder
 			'DefID' => 676,
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
-			'DefSubset' => 'google-map-key',
-			'DefDescription' => 'string'
+			'DefSubset' => 'google-map-key'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 677,
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
-			'DefSubset' => 'google-map-key2',
-			'DefDescription' => 'string'
+			'DefSubset' => 'google-map-key2'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 678,
@@ -5854,15 +5997,13 @@ class SurvLoopSeeder extends Seeder
 			'DefID' => 683,
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
-			'DefSubset' => 'google-cod-key',
-			'DefDescription' => 'string'
+			'DefSubset' => 'google-cod-key'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 684,
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
-			'DefSubset' => 'google-cod-key2',
-			'DefDescription' => 'string'
+			'DefSubset' => 'google-cod-key2'
 		]);
 	
 
@@ -5926,5 +6067,4 @@ class SurvLoopSeeder extends Seeder
 			'NodePromptNotes' => '3'
 		]);
 	
-
  } } 

@@ -27,6 +27,7 @@ use App\Models\SLDataHelpers;
 use App\Models\SLDataLinks;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
+use App\Models\SLSessSite;
 use App\Models\SLSessPage;
 use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
@@ -675,51 +676,60 @@ class Globals extends GlobalsImportExport
         return true;
     }
     
+    public function setTreeSessID($sessID = 0, $treeID = 0)
+    {
+        session()->put('sessID' . $treeID, $sessID);
+        return true;
+    }
+    
     public function createNewSess($treeID = 0)
     {
         $sess = new SLSess;
         $sess->SessUserID   = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
         $sess->SessTree     = $treeID;
         $sess->SessIsMobile = $this->isMobile();
-        $browse = $_SERVER['HTTP_USER_AGENT'];
-        if (strlen($browse) > 254) {
-            $browse = substr($browse, 0, 254);
-        }
-        $sess->SessBrowser  = $browse;
+        $sess->SessBrowser  = $this->getCroppedBrowser();
         $sess->SessIP       = $this->hashIP();
         $sess->save();
-        session()->put('sessID' . $treeID, $sess->sessID);
+        $this->setTreeSessID($sess->SessID, $treeID);
         return $sess;
     }
     
-    public function chkSiteSess()
+    public function getCroppedBrowser()
     {
-        $sess = null;
-        if (session()->has('sessID0') && intVal(session()->get('sessID0')) > 0) {
-            $sess = SLSess::find(intVal(session()->get('sessID0')));
-        } elseif (Auth::user() && isset(Auth::user()->id)) {
-            $sess = SLSess::where('SessTree', 0)
-                ->where('SessUserID', Auth::user()->id)
-                ->first();
-        } else {
-            $sess = SLSess::where('SessTree', 0)
-                ->where('SessIP', $this->hashIP())
-                ->where('SessIsActive', 1)
-                ->orderBy('created_at', 'desc')
-                ->first();
+        $browser = ((isset($_SERVER['HTTP_USER_AGENT'])) ? $_SERVER['HTTP_USER_AGENT'] : '');
+        if (strlen($browser) > 254) {
+            $browser = substr($browser, 0, 254);
         }
-        return $sess;
+        return $browser;
     }
     
     public function logSiteSessPage()
     {
-        $sess = $this->chkSiteSess();
-        if (!$sess || !isset($sess->SessID)) {
-            $sess = $this->createNewSess();
+        $sess = null;
+        if (session()->has('sessID0') && intVal(session()->get('sessID0')) > 0) {
+            $sess = SLSessSite::find(intVal(session()->get('sessID0')));
+        } elseif (Auth::user() && isset(Auth::user()->id)) {
+            $sess = SLSessSite::where('SiteSessUserID', Auth::user()->id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+        } else {
+            $sess = SLSessSite::where('SiteSessIPaddy', $this->hashIP())
+                ->orderBy('created_at', 'desc')
+                ->first();
+        }
+        if (!$sess || !isset($sess->SiteSessID)) {
+            $sess = new SLSessSite;
+            $sess->SiteSessUserID   = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+            $sess->SiteSessIsMobile = $this->isMobile();
+            $sess->SiteSessBrowser  = $this->getCroppedBrowser();
+            $sess->SiteSessIPaddy   = $this->hashIP();
+            $sess->save();
+            $this->setTreeSessID($sess->SiteSessID);
         }
         $page = new SLSessPage;
-        $page->SessPageSessID = $sess->SessID;
-        $page->SessPageURL = $_SERVER["REQUEST_URI"];
+        $page->SessPageSessID = $sess->SiteSessID;
+        $page->SessPageURL = ((isset($_SERVER["REQUEST_URI"])) ? $_SERVER["REQUEST_URI"] : '');
         $page->save();
         return true;
     }

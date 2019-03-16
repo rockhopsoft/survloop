@@ -4,7 +4,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSurvLoopTables extends Migration
+class SLCreateTables extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +17,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DbID');
 			$table->integer('DbUser')->unsigned()->nullable();
-			$table->foreign('DbUser')->references('id')->on('users');
 			$table->string('DbPrefix', 25)->nullable();
 			$table->string('DbName')->nullable();
 			$table->longText('DbDesc')->nullable();
@@ -31,7 +30,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('TblID');
 			$table->integer('TblDatabase')->unsigned()->nullable();
-			$table->foreign('TblDatabase')->references('DbID')->on('SL_Databases');
 			$table->string('TblAbbr')->nullable();
 			$table->string('TblName')->nullable();
 			$table->string('TblEng')->nullable();
@@ -42,7 +40,6 @@ class CreateSurvLoopTables extends Migration
 			$table->integer('TblOrd')->default('0')->nullable();
 			$table->integer('TblOpts')->default('1')->nullable();
 			$table->integer('TblExtend')->unsigned()->default('0')->nullable();
-			$table->foreign('TblExtend')->references('TblID')->on('SL_Tables');
 			$table->integer('TblNumFields')->default('0')->nullable();
 			$table->integer('TblNumForeignKeys')->default('0')->nullable();
 			$table->integer('TblNumForeignIn')->default('0')->nullable();
@@ -52,20 +49,16 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('FldID');
 			$table->integer('FldDatabase')->unsigned()->nullable();
-			$table->foreign('FldDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('FldTable')->unsigned()->nullable();
-			$table->foreign('FldTable')->references('TblID')->on('SL_Tables');
 			$table->integer('FldOrd')->default('0')->nullable();
 			$table->string('FldSpecType', 10)->default('Unique')->nullable();
 			$table->integer('FldSpecSource')->default('-3')->nullable();
-			$table->foreign('FldSpecSource')->references('FldID')->on('SL_Fields');
 			$table->string('FldName')->nullable();
 			$table->string('FldEng')->nullable();
 			$table->string('FldAlias')->nullable();
 			$table->longText('FldDesc')->nullable();
 			$table->longText('FldNotes')->nullable();
 			$table->integer('FldForeignTable')->default('-3')->nullable();
-			$table->foreign('FldForeignTable')->references('TblID')->on('SL_Tables');
 			$table->string('FldForeignMin', 11)->default('1')->nullable();
 			$table->string('FldForeignMax', 11)->default('1')->nullable();
 			$table->string('FldForeign2Min', 11)->default('1')->nullable();
@@ -100,7 +93,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DefID');
 			$table->integer('DefDatabase')->unsigned()->nullable();
-			$table->foreign('DefDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('DefSet')->unsigned()->default('Value Ranges')->nullable();
 			$table->string('DefSubset', 50)->nullable();
 			$table->integer('DefOrder')->default('0')->nullable();
@@ -113,7 +105,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('RuleID');
 			$table->integer('RuleDatabase')->unsigned()->nullable();
-			$table->foreign('RuleDatabase')->references('DbID')->on('SL_Databases');
 			$table->longText('RuleStatement')->nullable();
 			$table->longText('RuleConstraint')->nullable();
 			$table->string('RuleTables')->default(',')->nullable();
@@ -131,21 +122,15 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('TreeID');
 			$table->integer('TreeDatabase')->unsigned()->nullable();
-			$table->foreign('TreeDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('TreeUser')->unsigned()->nullable();
-			$table->foreign('TreeUser')->references('id')->on('users');
 			$table->string('TreeType', 30)->default('Primary Public')->nullable();
 			$table->string('TreeName')->nullable();
 			$table->longText('TreeDesc')->nullable();
 			$table->string('TreeSlug')->nullable();
 			$table->integer('TreeRoot')->unsigned()->nullable();
-			$table->foreign('TreeRoot')->references('NodeID')->on('SL_Node');
 			$table->integer('TreeFirstPage')->unsigned()->nullable();
-			$table->foreign('TreeFirstPage')->references('NodeID')->on('SL_Node');
 			$table->integer('TreeLastPage')->unsigned()->nullable();
-			$table->foreign('TreeLastPage')->references('NodeID')->on('SL_Node');
 			$table->integer('TreeCoreTable')->unsigned()->nullable();
-			$table->foreign('TreeCoreTable')->references('TblID')->on('SL_Tables');
 			$table->integer('TreeOpts')->default('1')->nullable();
 			$table->timestamps();
 		});
@@ -153,9 +138,7 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('NodeID');
 			$table->integer('NodeTree')->unsigned()->nullable();
-			$table->foreign('NodeTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('NodeParentID')->default('-3')->nullable();
-			$table->foreign('NodeParentID')->references('NodeID')->on('SL_Node');
 			$table->integer('NodeParentOrder')->default('0')->nullable();
 			$table->string('NodeType', 25)->nullable();
 			$table->longText('NodePromptText')->nullable();
@@ -177,7 +160,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('NodeResID');
 			$table->integer('NodeResNode')->unsigned()->nullable();
-			$table->foreign('NodeResNode')->references('NodeID')->on('SL_Node');
 			$table->integer('NodeResOrd')->default('0')->nullable();
 			$table->string('NodeResEng')->nullable();
 			$table->string('NodeResValue')->nullable();
@@ -189,17 +171,13 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('CondID');
 			$table->integer('CondDatabase')->unsigned()->nullable();
-			$table->foreign('CondDatabase')->references('DbID')->on('SL_Databases');
 			$table->string('CondTag', 100)->nullable();
 			$table->longText('CondDesc')->nullable();
 			$table->string('CondOperator', 50)->default('{')->nullable();
 			$table->string('CondOperDeet', 100)->nullable();
 			$table->integer('CondField')->unsigned()->nullable();
-			$table->foreign('CondField')->references('FldID')->on('SL_Fields');
 			$table->integer('CondTable')->unsigned()->nullable();
-			$table->foreign('CondTable')->references('TblID')->on('SL_Tables');
 			$table->integer('CondLoop')->unsigned()->nullable();
-			$table->foreign('CondLoop')->references('DataLoopID')->on('SL_DataLoop');
 			$table->integer('CondOpts')->default('1')->nullable();
 			$table->timestamps();
 		});
@@ -207,7 +185,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('CondValID');
 			$table->integer('CondValCondID')->unsigned()->nullable();
-			$table->foreign('CondValCondID')->references('CondID')->on('SL_Conditions');
 			$table->string('CondValValue')->nullable();
 			$table->timestamps();
 		});
@@ -215,18 +192,14 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('CondNodeID');
 			$table->integer('CondNodeCondID')->unsigned()->nullable();
-			$table->foreign('CondNodeCondID')->references('CondID')->on('SL_Conditions');
 			$table->integer('CondNodeNodeID')->unsigned()->nullable();
-			$table->foreign('CondNodeNodeID')->references('CondNodeID')->on('SL_ConditionsNodes');
 			$table->integer('CondNodeLoopID')->unsigned()->nullable();
-			$table->foreign('CondNodeLoopID')->references('DataLoopID')->on('SL_DataLoop');
 			$table->timestamps();
 		});
 		Schema::create('SL_ConditionsArticles', function(Blueprint $table)
 		{
 			$table->increments('ArticleID');
 			$table->integer('ArticleCondID')->unsigned()->nullable();
-			$table->foreign('ArticleCondID')->references('ArticleID')->on('SL_ConditionsArticles');
 			$table->string('ArticleURL')->nullable();
 			$table->string('ArticleTitle')->nullable();
 			$table->timestamps();
@@ -235,9 +208,7 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DataLoopID');
 			$table->integer('DataLoopTree')->unsigned()->nullable();
-			$table->foreign('DataLoopTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('DataLoopRoot')->unsigned()->nullable();
-			$table->foreign('DataLoopRoot')->references('NodeID')->on('SL_Node');
 			$table->string('DataLoopPlural', 50)->nullable();
 			$table->string('DataLoopSingular', 50)->nullable();
 			$table->string('DataLoopTable', 100)->nullable();
@@ -254,7 +225,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DataSubID');
 			$table->integer('DataSubTree')->unsigned()->nullable();
-			$table->foreign('DataSubTree')->references('TreeID')->on('SL_Tree');
 			$table->string('DataSubTbl', 100)->nullable();
 			$table->string('DataSubTblLnk', 100)->nullable();
 			$table->string('DataSubSubTbl', 50)->nullable();
@@ -266,7 +236,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DataHelpID');
 			$table->integer('DataHelpTree')->unsigned()->nullable();
-			$table->foreign('DataHelpTree')->references('TreeID')->on('SL_Tree');
 			$table->string('DataHelpParentTable', 50)->nullable();
 			$table->string('DataHelpTable', 50)->nullable();
 			$table->string('DataHelpKeyField', 50)->nullable();
@@ -277,18 +246,14 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('DataLinkID');
 			$table->integer('DataLinkTree')->unsigned()->nullable();
-			$table->foreign('DataLinkTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('DataLinkTable')->unsigned()->nullable();
-			$table->foreign('DataLinkTable')->references('TblID')->on('SL_Tables');
 			$table->timestamps();
 		});
 		Schema::create('SL_Images', function(Blueprint $table)
 		{
 			$table->increments('ImgID');
 			$table->integer('ImgDatabaseID')->unsigned()->nullable();
-			$table->foreign('ImgDatabaseID')->references('DbID')->on('SL_Databases');
 			$table->integer('ImgUserID')->unsigned()->nullable();
-			$table->foreign('ImgUserID')->references('id')->on('users');
 			$table->string('ImgFileOrig')->nullable();
 			$table->string('ImgFileLoc')->nullable();
 			$table->string('ImgFullFilename')->nullable();
@@ -296,7 +261,6 @@ class CreateSurvLoopTables extends Migration
 			$table->string('ImgCredit')->nullable();
 			$table->string('ImgCreditUrl')->nullable();
 			$table->integer('ImgNodeID')->unsigned()->nullable();
-			$table->foreign('ImgNodeID')->references('NodeID')->on('SL_Node');
 			$table->string('ImgType', 10)->nullable();
 			$table->integer('ImgFileSize')->nullable();
 			$table->integer('ImgWidth')->nullable();
@@ -307,7 +271,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('SchRecDmpID');
 			$table->integer('SchRecDmpTreeID')->unsigned()->nullable();
-			$table->foreign('SchRecDmpTreeID')->references('TreeID')->on('SL_Tree');
 			$table->integer('SchRecDmpRecID')->nullable();
 			$table->longText('SchRecDmpDump')->nullable();
 			$table->timestamps();
@@ -318,7 +281,6 @@ class CreateSurvLoopTables extends Migration
 			$table->string('TweakVersionAB')->nullable();
 			$table->string('TweakVersionAB')->nullable();
 			$table->integer('TweakSubmissionProgress')->unsigned()->nullable();
-			$table->foreign('TweakSubmissionProgress')->references('NodeID')->on('SL_Node');
 			$table->integer('TweakSubmissionProgress')->nullable();
 			$table->string('TweakIPaddy')->nullable();
 			$table->string('TweakIPaddy')->nullable();
@@ -327,9 +289,7 @@ class CreateSurvLoopTables extends Migration
 			$table->string('TweakUniqueStr')->nullable();
 			$table->string('TweakUniqueStr')->nullable();
 			$table->integer('TweakUserID')->unsigned()->nullable();
-			$table->foreign('TweakUserID')->references('id')->on('users');
 			$table->integer('TweakUserID')->unsigned()->nullable();
-			$table->foreign('TweakUserID')->references('id')->on('users');
 			$table->string('TweakIsMobile')->nullable();
 			$table->string('TweakIsMobile')->nullable();
 			$table->timestamps();
@@ -338,50 +298,30 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('SessID');
 			$table->integer('SessUserID')->unsigned()->nullable();
-			$table->foreign('SessUserID')->references('id')->on('users');
 			$table->integer('SessTree')->unsigned()->nullable();
-			$table->foreign('SessTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('SessCoreID')->unsigned()->nullable();
-			$table->foreign('SessCoreID')->references('TweakID')->on('SL_DesignTweaks');
+			$table->boolean('SessIsActive')->nullable();
 			$table->integer('SessCurrNode')->unsigned()->nullable();
-			$table->foreign('SessCurrNode')->references('NodeID')->on('SL_Node');
 			$table->integer('SessLoopRootJustLeft')->unsigned()->nullable();
-			$table->foreign('SessLoopRootJustLeft')->references('NodeID')->on('SL_Node');
 			$table->integer('SessAfterJumpTo')->unsigned()->nullable();
-			$table->foreign('SessAfterJumpTo')->references('NodeID')->on('SL_Node');
-			$table->integer('SessZoomPref')->nullable();
 			$table->boolean('SessIsMobile')->nullable();
-			$table->string('SessBrowser', 100)->nullable();
+			$table->string('SessBrowser', 255)->nullable();
+			$table->string('SessIP')->nullable();
 			$table->timestamps();
 		});
 		Schema::create('SL_SessLoops', function(Blueprint $table)
 		{
 			$table->increments('SessLoopID');
 			$table->integer('SessLoopSessID')->unsigned()->nullable();
-			$table->foreign('SessLoopSessID')->references('SessID')->on('SL_Sess');
 			$table->string('SessLoopName', 50)->nullable();
 			$table->integer('SessLoopItemID')->nullable();
-			$table->timestamps();
-		});
-		Schema::create('SL_SessEmojis', function(Blueprint $table)
-		{
-			$table->increments('SessEmoID');
-			$table->integer('SessEmoUserID')->unsigned()->nullable();
-			$table->foreign('SessEmoUserID')->references('id')->on('users');
-			$table->integer('SessEmoTreeID')->unsigned()->nullable();
-			$table->foreign('SessEmoTreeID')->references('TreeID')->on('SL_Tree');
-			$table->integer('SessEmoRecID')->nullable();
-			$table->integer('SessEmoDefID')->unsigned()->nullable();
-			$table->foreign('SessEmoDefID')->references('DefID')->on('SL_Definitions');
 			$table->timestamps();
 		});
 		Schema::create('SL_NodeSavesPage', function(Blueprint $table)
 		{
 			$table->increments('PageSaveID');
 			$table->integer('PageSaveSession')->unsigned()->nullable();
-			$table->foreign('PageSaveSession')->references('SessID')->on('SL_Sess');
 			$table->integer('PageSaveNode')->unsigned()->nullable();
-			$table->foreign('PageSaveNode')->references('NodeID')->on('SL_Node');
 			$table->integer('PageSaveLoopItemID')->nullable();
 			$table->timestamps();
 		});
@@ -389,13 +329,37 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('NodeSaveID');
 			$table->integer('NodeSaveSession')->unsigned()->nullable();
-			$table->foreign('NodeSaveSession')->references('SessID')->on('SL_Sess');
 			$table->integer('NodeSaveLoopItemID')->nullable();
 			$table->integer('NodeSaveNode')->unsigned()->nullable();
-			$table->foreign('NodeSaveNode')->references('NodeID')->on('SL_Node');
 			$table->string('NodeSaveVersionAB')->nullable();
 			$table->string('NodeSaveTblFld', 100)->nullable();
 			$table->longText('NodeSaveNewVal')->nullable();
+			$table->timestamps();
+		});
+		Schema::create('SL_SessEmojis', function(Blueprint $table)
+		{
+			$table->increments('SessEmoID');
+			$table->integer('SessEmoUserID')->unsigned()->nullable();
+			$table->integer('SessEmoTreeID')->unsigned()->nullable();
+			$table->integer('SessEmoRecID')->nullable();
+			$table->integer('SessEmoDefID')->unsigned()->nullable();
+			$table->timestamps();
+		});
+		Schema::create('SL_SessSite', function(Blueprint $table)
+		{
+			$table->increments('SiteSessID');
+			$table->string('SiteSessIPaddy')->nullable();
+			$table->longText('SiteSessUserID')->nullable();
+			$table->boolean('SiteSessIsMobile')->nullable();
+			$table->string('SiteSessBrowser', 255)->nullable();
+			$table->integer('SiteSessZoomPref')->nullable();
+			$table->timestamps();
+		});
+		Schema::create('SL_SessPage', function(Blueprint $table)
+		{
+			$table->increments('SessPageID');
+			$table->integer('SessPageSessID')->unsigned()->nullable();
+			$table->string('SessPageURL')->nullable();
 			$table->timestamps();
 		});
 		Schema::create('SL_Tokens', function(Blueprint $table)
@@ -403,9 +367,7 @@ class CreateSurvLoopTables extends Migration
 			$table->increments('TokID');
 			$table->string('TokType', 20)->nullable();
 			$table->integer('TokUserID')->unsigned()->nullable();
-			$table->foreign('TokUserID')->references('id')->on('users');
 			$table->integer('TokTreeID')->unsigned()->nullable();
-			$table->foreign('TokTreeID')->references('TreeID')->on('SL_Tree');
 			$table->integer('TokCoreID')->nullable();
 			$table->string('TokTokToken', 255)->nullable();
 			$table->timestamps();
@@ -414,7 +376,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('RoleUserID');
 			$table->integer('RoleUserUID')->unsigned()->nullable();
-			$table->foreign('RoleUserUID')->references('id')->on('users');
 			$table->integer('RoleUserRID')->nullable();
 			$table->timestamps();
 		});
@@ -432,7 +393,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('EmailID');
 			$table->integer('EmailTree')->unsigned()->nullable();
-			$table->foreign('EmailTree')->references('TreeID')->on('SL_Tree');
 			$table->string('EmailType')->nullable();
 			$table->string('EmailName')->nullable();
 			$table->longText('EmailSubject')->nullable();
@@ -445,15 +405,11 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('EmailedID');
 			$table->integer('EmailedTree')->unsigned()->nullable();
-			$table->foreign('EmailedTree')->references('TreeID')->on('SL_Tree');
 			$table->integer('EmailedRecID')->nullable();
 			$table->integer('EmailedEmailID')->unsigned()->nullable();
-			$table->foreign('EmailedEmailID')->references('EmailID')->on('SL_Emails');
 			$table->string('EmailedTo')->nullable();
 			$table->integer('EmailedToUser')->unsigned()->nullable();
-			$table->foreign('EmailedToUser')->references('id')->on('users');
 			$table->integer('EmailedFromUser')->unsigned()->nullable();
-			$table->foreign('EmailedFromUser')->references('id')->on('users');
 			$table->string('EmailedSubject')->nullable();
 			$table->longText('EmailedBody')->nullable();
 			$table->integer('EmailedOpts')->default('1')->nullable();
@@ -463,7 +419,6 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('UserActID');
 			$table->integer('UserActUser')->unsigned()->nullable();
-			$table->foreign('UserActUser')->references('id')->on('users');
 			$table->string('UserActCurrPage')->nullable();
 			$table->longText('UserActVal')->nullable();
 			$table->timestamps();
@@ -472,13 +427,9 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('LogID');
 			$table->integer('LogUser')->unsigned()->nullable();
-			$table->foreign('LogUser')->references('id')->on('users');
 			$table->integer('LogDatabase')->unsigned()->nullable();
-			$table->foreign('LogDatabase')->references('DbID')->on('SL_Databases');
 			$table->integer('LogTable')->unsigned()->nullable();
-			$table->foreign('LogTable')->references('TblID')->on('SL_Tables');
 			$table->integer('LogField')->unsigned()->nullable();
-			$table->foreign('LogField')->references('FldID')->on('SL_Fields');
 			$table->string('LogAction', 20)->nullable();
 			$table->string('LogOldName')->nullable();
 			$table->string('LogNewName')->nullable();
@@ -535,9 +486,11 @@ class CreateSurvLoopTables extends Migration
 		Schema::drop('SL_DesignTweaks');
 		Schema::drop('SL_Sess');
 		Schema::drop('SL_SessLoops');
-		Schema::drop('SL_SessEmojis');
 		Schema::drop('SL_NodeSavesPage');
 		Schema::drop('SL_NodeSaves');
+		Schema::drop('SL_SessEmojis');
+		Schema::drop('SL_SessSite');
+		Schema::drop('SL_SessPage');
 		Schema::drop('SL_Tokens');
 		Schema::drop('SL_UsersRoles');
 		Schema::drop('SL_Contact');
