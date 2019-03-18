@@ -14,6 +14,19 @@ use Illuminate\Support\ServiceProvider;
 
 class SurvLoopServiceProvider extends ServiceProvider
 {
+    public function register()
+    {
+        /*
+        * Register the service provider for the dependency.
+        */
+        $this->app->register('SurvLoop\SurvLoopServiceProvider');
+        /*
+        * Create aliases for the dependency.
+        */
+        $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+        $loader->alias('SurvLoop', 'WikiWorldOrder\SurvLoop\SurvLoopFacade');
+    }
+
     public function boot()
     {
         require __DIR__ . '/routes.php';
@@ -24,14 +37,19 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__.'/Uploads'              => base_path('storage/app/up/survloop'),
             __DIR__.'/Models'               => base_path('storage/app/models/survloop'),
             __DIR__.'/Models'               => base_path('app/Models'),
+            __DIR__.'/Models/User.php'      => base_path('app/User.php'),
 
-            __DIR__.'/Database/2018_11_30_000000_create_survloop_tables.php'
-                => base_path('database/migrations/2018_11_30_000000_create_survloop_tables.php'),
-            __DIR__.'/Database/SurvLoopSeeder.php' => base_path('database/seeds/SurvLoopSeeder.php'),
-            __DIR__.'/Database/ZipCodeSeeder.php'  => base_path('database/seeds/ZipCodeSeeder.php'),
-            
-            __DIR__.'/Controllers/Middleware/Authenticate.php' => base_path('app/Http/Middleware/Authenticate.php'),
-            __DIR__.'/Controllers/Middleware/routes-api.php'   => base_path('routes/api.php'),
+            __DIR__.'/Controllers/Middleware/routes-api.php'
+                => base_path('routes/api.php'),
+            __DIR__.'/Controllers/Middleware/Authenticate.php' 
+                => base_path('app/Http/Middleware/Authenticate.php'),
+
+            __DIR__.'/Database/2019_03_15_000000_create_survloop_tables.php'
+                => base_path('database/migrations/2019_03_15_000000_create_survloop_tables.php'),
+            __DIR__.'/Database/SurvLoopSeeder.php'
+                => base_path('database/seeds/SurvLoopSeeder.php'),
+            base_path('/vendor/wikiworldorder/survloop-libraries/src/geo/ZipCodeSeeder.php')
+                => base_path('database/seeds/ZipCodeSeeder.php')
             ]);
     }
 }

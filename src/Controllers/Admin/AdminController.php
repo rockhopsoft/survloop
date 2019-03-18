@@ -541,9 +541,9 @@ class AdminController extends SurvLoopController
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
         $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
         $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
-        //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/parallax.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/typewatch.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/copy-to-clipboard.js");
+        //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/parallax.min.js");
+        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/typewatch.js");
+        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/copy-to-clipboard.js");
         $minifier->minify("../storage/app/sys/sys1.min.js");
         
         $treeJs = '';
