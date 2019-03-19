@@ -40,6 +40,7 @@
     "autoload": {
         "psr-4": {
             "SurvLoop\\": "src/",
+            "SurvLoop\\Models\\": "storage/app/models/survloop",
             "MatthiasMullie\\Minify\\": "vendor/matthiasmullie/minify/src/",
             "MatthiasMullie\\PathConverter\\": "vendor/matthiasmullie/path-converter/src/"
         }
