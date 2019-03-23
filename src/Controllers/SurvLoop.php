@@ -514,7 +514,7 @@ class SurvLoop extends SurvCustLoop
             'Expires'             => gmdate('r', $file_time + $lifetime),
             'Pragma'              => 'public',
             'Etag'                => $header_etag
-            ];
+        ];
         
         // Is the resource cached?
         $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
@@ -529,7 +529,7 @@ class SurvLoop extends SurvCustLoop
         $headers = array_merge($headers, [
             'Content-Type'   => $handler->getMimeType(),
             'Content-Length' => $handler->getSize()
-            ]);
+        ]);
         return Response::make(file_get_contents($filename), 200, $headers);
     }
     

@@ -278,6 +278,7 @@ class TreeSurvFormVarieties extends UserProfile
             return '';
         }
         $txt = '*required';
+        /* This needs to be limited in the form, before any validation
         if ($this->nodeHasDateRestriction($currNode->nodeRow)) {
             if ($currNode->nodeRow->NodeCharLimit < 0) {
                 $txt = '*past date required';
@@ -285,6 +286,7 @@ class TreeSurvFormVarieties extends UserProfile
                 $txt = '*future date required';
             }
         }
+        */
         $txt = '<nobr>' . $txt . '</nobr>';
         if ($currNode->nodeRow->NodeOpts%13 == 0) {
             return $nodePromptText . '<p id="req' . $nIDtxt . '" class="rqd">' . $txt . '</p>';
@@ -350,10 +352,10 @@ class TreeSurvFormVarieties extends UserProfile
     {
         $ret = '';
         if ($nodeRow->NodeOpts%31 == 0 || $nodeRow->NodeOpts%47 == 0) {
-            $ret .= '<div class="fL pT5">'
+            $ret .= '<div id="currWordCount" class="fL pT15">'
                 . (($nodeRow->NodeOpts%47 == 0) ? 'Word count limit: ' . intVal($nodeRow->NodeCharLimit) . '. ' : '')
                 . (($nodeRow->NodeOpts%31 == 0) 
-                    ? 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>.' : '')
+                    ? 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>' : '')
             . '</div><div class="fC"></div>';
         }
         return $ret;
