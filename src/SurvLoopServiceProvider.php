@@ -14,18 +14,18 @@ use Illuminate\Support\ServiceProvider;
 
 class SurvLoopServiceProvider extends ServiceProvider
 {
-    public function register()
-    {
+//    public function register()
+//    {
         /*
         * Register the service provider for the dependency.
         */
-        $this->app->register('SurvLoop\SurvLoopServiceProvider');
+//        $this->app->register('SurvLoop\SurvLoopServiceProvider');
         /*
         * Create aliases for the dependency.
         */
-        $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-        $loader->alias('SurvLoop', 'WikiWorldOrder\SurvLoop\SurvLoopFacade');
-    }
+//        $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+//        $loader->alias('SurvLoop', 'WikiWorldOrder\SurvLoop\SurvLoopFacade');
+//    }
 
     public function boot()
     {
