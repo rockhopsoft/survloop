@@ -279,18 +279,11 @@ class SurvLoopCreateTables extends Migration
 		{
 			$table->increments('TweakID');
 			$table->string('TweakVersionAB')->nullable();
-			$table->string('TweakVersionAB')->nullable();
 			$table->integer('TweakSubmissionProgress')->unsigned()->nullable();
-			$table->integer('TweakSubmissionProgress')->nullable();
-			$table->string('TweakIPaddy')->nullable();
 			$table->string('TweakIPaddy')->nullable();
 			$table->string('TweakTreeVersion')->nullable();
-			$table->string('TweakTreeVersion')->nullable();
-			$table->string('TweakUniqueStr')->nullable();
 			$table->string('TweakUniqueStr')->nullable();
 			$table->integer('TweakUserID')->unsigned()->nullable();
-			$table->integer('TweakUserID')->unsigned()->nullable();
-			$table->string('TweakIsMobile')->nullable();
 			$table->string('TweakIsMobile')->nullable();
 			$table->timestamps();
 		});
