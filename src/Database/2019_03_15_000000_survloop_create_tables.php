@@ -93,7 +93,7 @@ class SurvLoopCreateTables extends Migration
 		{
 			$table->increments('DefID');
 			$table->integer('DefDatabase')->unsigned()->nullable();
-			$table->integer('DefSet')->unsigned()->default('Value Ranges')->nullable();
+			$table->string('DefSet', 20)->default('Value Ranges')->nullable();
 			$table->string('DefSubset', 50)->nullable();
 			$table->integer('DefOrder')->default('0')->nullable();
 			$table->boolean('DefIsActive')->default('1')->nullable();
