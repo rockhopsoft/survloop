@@ -362,7 +362,7 @@ class SurvLoopController extends Controller
             "content" => '<div class="jumbotron mBn20"><center>
                 <h1>SurvLoop Installed!</h1><p><i>ALL OUR DATA ARE BELONG</i></p>
             </center></div>'
-        ]);
+        ])->render();
     }
     
     protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
