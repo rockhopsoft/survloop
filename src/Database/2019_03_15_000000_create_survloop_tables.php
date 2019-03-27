@@ -4,7 +4,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class SurvLoopCreateTables extends Migration
+class CreateSurvLoopTables extends Migration
 {
     /**
      * Run the migrations.

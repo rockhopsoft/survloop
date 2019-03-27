@@ -4,7 +4,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class SLSeeder extends Seeder
+class SurvLoopSeeder extends Seeder
 {
     /**
      * Run the database seeds.
