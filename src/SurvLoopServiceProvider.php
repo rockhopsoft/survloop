@@ -45,8 +45,8 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__.'/Controllers/Middleware/Authenticate.php' 
                 => base_path('app/Http/Middleware/Authenticate.php'),
 
-            __DIR__.'/Database/2019_03_15_000000_survloop_create_tables.php'
-                => base_path('database/migrations/2019_03_15_000000_survloop_create_tables.php'),
+            __DIR__.'/Database/2019_03_15_000000_create_survloop_tables.php'
+                => base_path('database/migrations/2019_03_15_000000_create_survloop_tables.php'),
             __DIR__.'/Database/SurvLoopSeeder.php'
                 => base_path('database/seeds/SurvLoopSeeder.php'),
             base_path('/vendor/wikiworldorder/survloop-libraries/src/geo/ZipCodeSeeder.php')

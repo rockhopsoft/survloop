@@ -164,7 +164,7 @@ class AdminDatabaseInstall extends AdminDBController
 								}
 								$this->v["migrationFileUp"] .=  "->nullable();";
 								if ($fld->FldIsIndex == 1) {
-									$this->v["migrationFileUp"] .= "\n\t\t"."$"."table->index('" . $fldName . "');";
+									$this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->index('" . $fldName . "');";
 								}
 								/* // This is throwing errors
 								if (intVal($fld->FldForeignTable) > 0) {
