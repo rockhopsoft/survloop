@@ -50,7 +50,11 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__.'/Database/SurvLoopSeeder.php'
                 => base_path('database/seeds/SurvLoopSeeder.php'),
             base_path('/vendor/wikiworldorder/survloop-libraries/src/geo/ZipCodeSeeder.php')
-                => base_path('database/seeds/ZipCodeSeeder.php')
-            ]);
+                => base_path('database/seeds/ZipCodeSeeder.php'),
+
+            base_path('/vendor/wikiworldorder/survloop-libraries/src/js/zxcvbn.js')
+                => base_path('public/survloop/zxcvbn.js')
+
+        ]);
     }
 }

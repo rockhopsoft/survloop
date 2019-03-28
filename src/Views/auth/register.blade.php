@@ -19,7 +19,7 @@
 @if (!isset($sysOpts["signup-instruct"])
     || trim($sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
     <a href="/login{{ ((isset($request) && $request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
-        }}" class="btn btn-secondary pull-right mL20">Login</a>
+        }}" class="btn btn-secondary pull-right mL20" id="registerLoginLnk">Login</a>
 @endif
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
 <div class="nPrompt">

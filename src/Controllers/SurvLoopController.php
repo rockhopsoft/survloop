@@ -358,11 +358,25 @@ class SurvLoopController extends Controller
     {
         $this->survLoopInit($request, '/fresh/creator');
         $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">Create Admin Account</h2>';
-        return view('vendor.survloop.auth.register', [
-            "content" => '<div class="jumbotron mBn20"><center>
-                <h1>SurvLoop Installed!</h1><p><i>ALL OUR DATA ARE BELONG</i></p>
-            </center></div>'
-        ])->render();
+        $content = '<center><div class="treeWrapForm mT20 mBn20">
+            <h1 class="slBlueDark">SurvLoop Installed!</h1><h4>All Out Data Are Belong...</h4>
+            <p>Please create the first admin super user account.</p></div></center>';
+        if (!$request->has('cssLoaded')) {
+            $content = '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
+                <style> body, #registerLoginLnk { display: none; } </style>
+                <script type="text/javascript"> setTimeout("window.location=\'?cssLoaded=1\'", 100); </script>';
+        }
+        if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
+            if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $_SERVER["HTTP_HOST"]
+                && $GLOBALS["SL"]->sysOpts["app-url"] != 'https://' . $_SERVER["HTTP_HOST"]) {
+                SLDefinitions::where('DefDatabase', 1)
+                    ->where('DefSet', 'System Settings')
+                    ->whereIn('DefSubset', ['app-url', 'logo-url'])
+                    ->update([ "DefDescription" =>  'http://' . $_SERVER["HTTP_HOST"] ]);
+            }
+
+        }
+        return view('vendor.survloop.auth.register', [ "content" => $content ])->render();
     }
     
     protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
