@@ -161,7 +161,7 @@ class CreateSurvLoopTables extends Migration
 			$table->increments('NodeResID');
 			$table->integer('NodeResNode')->unsigned()->nullable();
 			$table->integer('NodeResOrd')->default('0')->nullable();
-			$table->string('NodeResEng')->nullable();
+			$table->longText('NodeResEng')->nullable();
 			$table->string('NodeResValue')->nullable();
 			$table->integer('NodeResShowKids')->default('0')->nullable();
 			$table->integer('NodeResMutEx')->default('0')->nullable();
