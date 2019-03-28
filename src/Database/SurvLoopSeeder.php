@@ -13,7 +13,7 @@ class SurvLoopSeeder extends Seeder
      */
     public function run()
     {
-
+    	
 	DB::table('SL_Databases')->insert([
 			'DbID' => 3,
 			'DbUser' => '0',
@@ -482,7 +482,7 @@ class SurvLoopSeeder extends Seeder
 		]);
 	
 	DB::table('SL_Fields')->insert([
-			'FldID' => 1,
+			'FldID' => 1001,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldSpecSource' => '0',
@@ -502,7 +502,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 2,
+			'FldID' => 1002,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '1',
@@ -519,7 +519,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 3,
+			'FldID' => 1003,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '2',
@@ -535,7 +535,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 4,
+			'FldID' => 1004,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '3',
@@ -551,7 +551,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 5,
+			'FldID' => 1005,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '4',
@@ -567,7 +567,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 6,
+			'FldID' => 1006,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '6',
@@ -587,7 +587,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 7,
+			'FldID' => 1007,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '7',
@@ -607,7 +607,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 8,
+			'FldID' => 1008,
 			'FldDatabase' => '3',
 			'FldTable' => '4',
 			'FldOrd' => '5',
@@ -629,7 +629,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 9,
+			'FldID' => 1009,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldSpecSource' => '0',
@@ -649,7 +649,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 10,
+			'FldID' => 1010,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '3',
@@ -666,7 +666,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 11,
+			'FldID' => 1011,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '2',
@@ -683,7 +683,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 12,
+			'FldID' => 1012,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '1',
@@ -700,7 +700,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 13,
+			'FldID' => 1013,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '4',
@@ -717,7 +717,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 14,
+			'FldID' => 1014,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '5',
@@ -733,7 +733,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 15,
+			'FldID' => 1015,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '7',
@@ -750,7 +750,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 16,
+			'FldID' => 1016,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '6',
@@ -769,7 +769,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 17,
+			'FldID' => 1017,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '8',
@@ -789,7 +789,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 18,
+			'FldID' => 1018,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '9',
@@ -812,7 +812,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 19,
+			'FldID' => 1019,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '10',
@@ -834,7 +834,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 20,
+			'FldID' => 1020,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '11',
@@ -854,7 +854,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 21,
+			'FldID' => 1021,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '12',
@@ -874,7 +874,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 22,
+			'FldID' => 1022,
 			'FldDatabase' => '3',
 			'FldTable' => '9',
 			'FldOrd' => '13',
@@ -894,7 +894,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 23,
+			'FldID' => 1023,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldSpecSource' => '0',
@@ -914,7 +914,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 24,
+			'FldID' => 1024,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '1',
@@ -936,7 +936,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 25,
+			'FldID' => 1025,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '2',
@@ -956,7 +956,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 26,
+			'FldID' => 1026,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '6',
@@ -973,7 +973,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 27,
+			'FldID' => 1027,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '5',
@@ -991,7 +991,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 28,
+			'FldID' => 1028,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '8',
@@ -1008,7 +1008,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 29,
+			'FldID' => 1029,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '9',
@@ -1025,7 +1025,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 30,
+			'FldID' => 1030,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '18',
@@ -1044,7 +1044,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 31,
+			'FldID' => 1031,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '10',
@@ -1066,7 +1066,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 32,
+			'FldID' => 1032,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '14',
@@ -1084,7 +1084,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCharSupport' => ',Numbers,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 33,
+			'FldID' => 1033,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '11',
@@ -1102,7 +1102,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCharSupport' => ',Numbers,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 34,
+			'FldID' => 1034,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '12',
@@ -1120,7 +1120,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCharSupport' => ',Numbers,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 35,
+			'FldID' => 1035,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '13',
@@ -1138,7 +1138,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCharSupport' => ',Numbers,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 36,
+			'FldID' => 1036,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '15',
@@ -1157,7 +1157,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 37,
+			'FldID' => 1037,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '17',
@@ -1179,7 +1179,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 38,
+			'FldID' => 1038,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '16',
@@ -1195,7 +1195,7 @@ class SurvLoopSeeder extends Seeder
 			'FldDataLength' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 39,
+			'FldID' => 1039,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '3',
@@ -1215,7 +1215,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 40,
+			'FldID' => 1040,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '4',
@@ -1238,7 +1238,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 41,
+			'FldID' => 1041,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '7',
@@ -1255,7 +1255,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCharSupport' => ',Letters,Numbers,Keyboard,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 42,
+			'FldID' => 1042,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '19',
@@ -1275,7 +1275,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 43,
+			'FldID' => 1043,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '20',
@@ -1295,7 +1295,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 44,
+			'FldID' => 1044,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '21',
@@ -1316,7 +1316,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 45,
+			'FldID' => 1045,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '22',
@@ -1336,7 +1336,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 46,
+			'FldID' => 1046,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '23',
@@ -1354,7 +1354,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 47,
+			'FldID' => 1047,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '24',
@@ -1372,7 +1372,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 48,
+			'FldID' => 1048,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '25',
@@ -1392,7 +1392,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 49,
+			'FldID' => 1049,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '26',
@@ -1411,7 +1411,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 50,
+			'FldID' => 1050,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '27',
@@ -1431,7 +1431,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 51,
+			'FldID' => 1051,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '28',
@@ -1453,7 +1453,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 52,
+			'FldID' => 1052,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '29',
@@ -1475,7 +1475,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 53,
+			'FldID' => 1053,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '30',
@@ -1495,7 +1495,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 54,
+			'FldID' => 1054,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '31',
@@ -1517,7 +1517,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 55,
+			'FldID' => 1055,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '33',
@@ -1538,7 +1538,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 56,
+			'FldID' => 1056,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '32',
@@ -1560,7 +1560,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 57,
+			'FldID' => 1057,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '34',
@@ -1581,7 +1581,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 58,
+			'FldID' => 1058,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '35',
@@ -1602,7 +1602,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 59,
+			'FldID' => 1059,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '36',
@@ -1623,7 +1623,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 60,
+			'FldID' => 1060,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '37',
@@ -1644,7 +1644,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 61,
+			'FldID' => 1061,
 			'FldDatabase' => '3',
 			'FldTable' => '10',
 			'FldOrd' => '38',
@@ -1666,7 +1666,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 62,
+			'FldID' => 1062,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '1',
@@ -1686,7 +1686,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 63,
+			'FldID' => 1063,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '2',
@@ -1703,7 +1703,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 64,
+			'FldID' => 1064,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '4',
@@ -1725,7 +1725,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 65,
+			'FldID' => 1065,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '3',
@@ -1746,7 +1746,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 66,
+			'FldID' => 1066,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '5',
@@ -1763,7 +1763,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 67,
+			'FldID' => 1067,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldOrd' => '6',
@@ -1780,7 +1780,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 68,
+			'FldID' => 1068,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldSpecSource' => '0',
@@ -1800,7 +1800,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 69,
+			'FldID' => 1069,
 			'FldDatabase' => '3',
 			'FldTable' => '7',
 			'FldSpecSource' => '0',
@@ -1820,7 +1820,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 70,
+			'FldID' => 1070,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '1',
@@ -1838,7 +1838,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 71,
+			'FldID' => 1071,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '2',
@@ -1856,7 +1856,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 72,
+			'FldID' => 1072,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '5',
@@ -1879,7 +1879,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 73,
+			'FldID' => 1073,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '6',
@@ -1902,7 +1902,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 74,
+			'FldID' => 1074,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '7',
@@ -1923,7 +1923,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 75,
+			'FldID' => 1075,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '3',
@@ -1942,7 +1942,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 76,
+			'FldID' => 1076,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '4',
@@ -1961,7 +1961,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 77,
+			'FldID' => 1077,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '8',
@@ -1984,7 +1984,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 78,
+			'FldID' => 1078,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '9',
@@ -2007,7 +2007,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 79,
+			'FldID' => 1079,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '10',
@@ -2029,7 +2029,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 80,
+			'FldID' => 1080,
 			'FldDatabase' => '3',
 			'FldTable' => '6',
 			'FldOrd' => '11',
@@ -2047,7 +2047,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 81,
+			'FldID' => 1081,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldSpecSource' => '0',
@@ -2067,7 +2067,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 82,
+			'FldID' => 1082,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '1',
@@ -2088,7 +2088,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 83,
+			'FldID' => 1083,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '2',
@@ -2108,7 +2108,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 84,
+			'FldID' => 1084,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '3',
@@ -2126,7 +2126,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 85,
+			'FldID' => 1085,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '4',
@@ -2144,7 +2144,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 86,
+			'FldID' => 1086,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '5',
@@ -2162,7 +2162,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 87,
+			'FldID' => 1087,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '6',
@@ -2182,7 +2182,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 88,
+			'FldID' => 1088,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '7',
@@ -2202,7 +2202,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 89,
+			'FldID' => 1089,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '8',
@@ -2222,7 +2222,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 90,
+			'FldID' => 1090,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '9',
@@ -2243,7 +2243,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 91,
+			'FldID' => 1091,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldSpecSource' => '0',
@@ -2264,7 +2264,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 92,
+			'FldID' => 1092,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '1',
@@ -2285,7 +2285,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 93,
+			'FldID' => 1093,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '2',
@@ -2306,7 +2306,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 94,
+			'FldID' => 1094,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '3',
@@ -2324,7 +2324,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 95,
+			'FldID' => 1095,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '4',
@@ -2341,7 +2341,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 96,
+			'FldID' => 1096,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '5',
@@ -2358,7 +2358,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 97,
+			'FldID' => 1097,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '6',
@@ -2375,7 +2375,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 98,
+			'FldID' => 1098,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '7',
@@ -2392,7 +2392,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 99,
+			'FldID' => 1099,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '8',
@@ -2409,7 +2409,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 100,
+			'FldID' => 1100,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '9',
@@ -2425,7 +2425,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 101,
+			'FldID' => 1101,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '10',
@@ -2443,7 +2443,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 102,
+			'FldID' => 1102,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '11',
@@ -2462,7 +2462,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 103,
+			'FldID' => 1103,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '12',
@@ -2478,7 +2478,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 104,
+			'FldID' => 1104,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '13',
@@ -2498,7 +2498,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 105,
+			'FldID' => 1105,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '16',
@@ -2521,7 +2521,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 106,
+			'FldID' => 1106,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '15',
@@ -2541,7 +2541,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 107,
+			'FldID' => 1107,
 			'FldDatabase' => '3',
 			'FldTable' => '15',
 			'FldOrd' => '14',
@@ -2561,7 +2561,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 108,
+			'FldID' => 1108,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldSpecSource' => '0',
@@ -2580,7 +2580,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 109,
+			'FldID' => 1109,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldOrd' => '1',
@@ -2600,7 +2600,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 110,
+			'FldID' => 1110,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldOrd' => '2',
@@ -2616,7 +2616,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 111,
+			'FldID' => 1111,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldOrd' => '3',
@@ -2632,7 +2632,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 112,
+			'FldID' => 1112,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldOrd' => '4',
@@ -2654,7 +2654,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 113,
+			'FldID' => 1113,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldSpecSource' => '0',
@@ -2673,7 +2673,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 114,
+			'FldID' => 1114,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '1',
@@ -2693,7 +2693,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 115,
+			'FldID' => 1115,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '2',
@@ -2710,7 +2710,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 116,
+			'FldID' => 1116,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '3',
@@ -2729,7 +2729,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 117,
+			'FldID' => 1117,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '4',
@@ -2745,7 +2745,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 118,
+			'FldID' => 1118,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '5',
@@ -2765,7 +2765,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 119,
+			'FldID' => 1119,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '6',
@@ -2785,7 +2785,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 120,
+			'FldID' => 1120,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '7',
@@ -2805,7 +2805,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 121,
+			'FldID' => 1121,
 			'FldDatabase' => '3',
 			'FldTable' => '11',
 			'FldOrd' => '8',
@@ -2828,7 +2828,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 122,
+			'FldID' => 1122,
 			'FldDatabase' => '3',
 			'FldTable' => '14',
 			'FldSpecSource' => '0',
@@ -2847,7 +2847,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 123,
+			'FldID' => 1123,
 			'FldDatabase' => '3',
 			'FldTable' => '14',
 			'FldOrd' => '1',
@@ -2863,7 +2863,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 124,
+			'FldID' => 1124,
 			'FldDatabase' => '3',
 			'FldTable' => '13',
 			'FldSpecSource' => '0',
@@ -2882,7 +2882,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 125,
+			'FldID' => 1125,
 			'FldDatabase' => '3',
 			'FldTable' => '13',
 			'FldOrd' => '1',
@@ -2902,7 +2902,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 126,
+			'FldID' => 1126,
 			'FldDatabase' => '3',
 			'FldTable' => '13',
 			'FldOrd' => '2',
@@ -2922,7 +2922,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 127,
+			'FldID' => 1127,
 			'FldDatabase' => '3',
 			'FldTable' => '12',
 			'FldSpecSource' => '0',
@@ -2941,7 +2941,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 128,
+			'FldID' => 1128,
 			'FldDatabase' => '3',
 			'FldTable' => '12',
 			'FldOrd' => '1',
@@ -2958,7 +2958,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 129,
+			'FldID' => 1129,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldSpecSource' => '0',
@@ -2977,7 +2977,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 130,
+			'FldID' => 1130,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldSpecSource' => '0',
@@ -2996,7 +2996,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 131,
+			'FldID' => 1131,
 			'FldDatabase' => '3',
 			'FldTable' => '27',
 			'FldSpecSource' => '0',
@@ -3015,7 +3015,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 132,
+			'FldID' => 1132,
 			'FldDatabase' => '3',
 			'FldTable' => '25',
 			'FldSpecSource' => '0',
@@ -3034,7 +3034,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 133,
+			'FldID' => 1133,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '1',
@@ -3054,7 +3054,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 134,
+			'FldID' => 1134,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '2',
@@ -3070,7 +3070,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 135,
+			'FldID' => 1135,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '3',
@@ -3086,7 +3086,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 136,
+			'FldID' => 1136,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '4',
@@ -3104,7 +3104,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 137,
+			'FldID' => 1137,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '5',
@@ -3122,7 +3122,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 138,
+			'FldID' => 1138,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '6',
@@ -3140,7 +3140,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 139,
+			'FldID' => 1139,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '7',
@@ -3161,7 +3161,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 140,
+			'FldID' => 1140,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '8',
@@ -3182,7 +3182,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 141,
+			'FldID' => 1141,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '9',
@@ -3203,7 +3203,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 142,
+			'FldID' => 1142,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '10',
@@ -3225,7 +3225,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 143,
+			'FldID' => 1143,
 			'FldDatabase' => '3',
 			'FldTable' => '24',
 			'FldOrd' => '11',
@@ -3247,7 +3247,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 144,
+			'FldID' => 1144,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldOrd' => '1',
@@ -3265,7 +3265,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 145,
+			'FldID' => 1145,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldOrd' => '2',
@@ -3283,7 +3283,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 146,
+			'FldID' => 1146,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldOrd' => '3',
@@ -3301,7 +3301,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 147,
+			'FldID' => 1147,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldOrd' => '4',
@@ -3319,7 +3319,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 148,
+			'FldID' => 1148,
 			'FldDatabase' => '3',
 			'FldTable' => '26',
 			'FldOrd' => '5',
@@ -3341,7 +3341,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 149,
+			'FldID' => 1149,
 			'FldDatabase' => '3',
 			'FldTable' => '27',
 			'FldOrd' => '1',
@@ -3359,7 +3359,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 150,
+			'FldID' => 1150,
 			'FldDatabase' => '3',
 			'FldTable' => '27',
 			'FldOrd' => '2',
@@ -3377,7 +3377,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 151,
+			'FldID' => 1151,
 			'FldDatabase' => '3',
 			'FldTable' => '27',
 			'FldOrd' => '3',
@@ -3395,7 +3395,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 152,
+			'FldID' => 1152,
 			'FldDatabase' => '3',
 			'FldTable' => '27',
 			'FldOrd' => '4',
@@ -3413,7 +3413,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 153,
+			'FldID' => 1153,
 			'FldDatabase' => '3',
 			'FldTable' => '25',
 			'FldOrd' => '1',
@@ -3433,7 +3433,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ',Foreign,'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 154,
+			'FldID' => 1154,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '2',
@@ -3454,7 +3454,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 155,
+			'FldID' => 1155,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldSpecSource' => '0',
@@ -3474,7 +3474,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 156,
+			'FldID' => 1156,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '1',
@@ -3495,7 +3495,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 157,
+			'FldID' => 1157,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '4',
@@ -3516,7 +3516,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 158,
+			'FldID' => 1158,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '5',
@@ -3537,7 +3537,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 159,
+			'FldID' => 1159,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '6',
@@ -3558,7 +3558,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 160,
+			'FldID' => 1160,
 			'FldDatabase' => '3',
 			'FldTable' => '42',
 			'FldOrd' => '3',
@@ -3578,7 +3578,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 161,
+			'FldID' => 1161,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '8',
@@ -3600,7 +3600,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 162,
+			'FldID' => 1162,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '9',
@@ -3619,7 +3619,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 163,
+			'FldID' => 1163,
 			'FldDatabase' => '3',
 			'FldTable' => '20',
 			'FldSpecSource' => '0',
@@ -3639,7 +3639,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 164,
+			'FldID' => 1164,
 			'FldDatabase' => '3',
 			'FldTable' => '20',
 			'FldOrd' => '2',
@@ -3657,7 +3657,7 @@ class SurvLoopSeeder extends Seeder
 			'FldKeyType' => ','
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 165,
+			'FldID' => 1165,
 			'FldDatabase' => '3',
 			'FldTable' => '20',
 			'FldOrd' => '3',
@@ -3677,7 +3677,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 166,
+			'FldID' => 1166,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldSpecSource' => '0',
@@ -3697,7 +3697,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 167,
+			'FldID' => 1167,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldOrd' => '2',
@@ -3718,7 +3718,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 168,
+			'FldID' => 1168,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldOrd' => '3',
@@ -3736,7 +3736,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 169,
+			'FldID' => 1169,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldOrd' => '4',
@@ -3755,7 +3755,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 170,
+			'FldID' => 1170,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldOrd' => '1',
@@ -3775,7 +3775,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 171,
+			'FldID' => 1171,
 			'FldDatabase' => '3',
 			'FldTable' => '17',
 			'FldOrd' => '5',
@@ -3793,7 +3793,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 172,
+			'FldID' => 1172,
 			'FldDatabase' => '3',
 			'FldTable' => '18',
 			'FldSpecSource' => '0',
@@ -3813,7 +3813,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 173,
+			'FldID' => 1173,
 			'FldDatabase' => '3',
 			'FldTable' => '18',
 			'FldOrd' => '1',
@@ -3834,7 +3834,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 174,
+			'FldID' => 1174,
 			'FldDatabase' => '3',
 			'FldTable' => '18',
 			'FldOrd' => '2',
@@ -3854,7 +3854,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 175,
+			'FldID' => 1175,
 			'FldDatabase' => '3',
 			'FldTable' => '22',
 			'FldSpecSource' => '0',
@@ -3874,7 +3874,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 176,
+			'FldID' => 1176,
 			'FldDatabase' => '3',
 			'FldTable' => '22',
 			'FldOrd' => '1',
@@ -3894,7 +3894,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 177,
+			'FldID' => 1177,
 			'FldDatabase' => '3',
 			'FldTable' => '21',
 			'FldSpecSource' => '0',
@@ -3914,7 +3914,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 178,
+			'FldID' => 1178,
 			'FldDatabase' => '3',
 			'FldTable' => '21',
 			'FldOrd' => '1',
@@ -3932,7 +3932,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 179,
+			'FldID' => 1179,
 			'FldDatabase' => '3',
 			'FldTable' => '21',
 			'FldOrd' => '2',
@@ -3950,7 +3950,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 180,
+			'FldID' => 1180,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '1',
@@ -3971,7 +3971,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 181,
+			'FldID' => 1181,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '2',
@@ -3992,7 +3992,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 182,
+			'FldID' => 1182,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '3',
@@ -4013,7 +4013,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 183,
+			'FldID' => 1183,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '4',
@@ -4033,7 +4033,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 184,
+			'FldID' => 1184,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '5',
@@ -4051,7 +4051,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 185,
+			'FldID' => 1185,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldOrd' => '6',
@@ -4069,7 +4069,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 186,
+			'FldID' => 1186,
 			'FldDatabase' => '3',
 			'FldTable' => '23',
 			'FldSpecSource' => '0',
@@ -4089,7 +4089,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '13'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 187,
+			'FldID' => 1187,
 			'FldDatabase' => '3',
 			'FldTable' => '3',
 			'FldName' => 'UserID',
@@ -4109,7 +4109,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '39'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 188,
+			'FldID' => 1188,
 			'FldDatabase' => '3',
 			'FldTable' => '3',
 			'FldSpecSource' => '0',
@@ -4128,7 +4128,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '39'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 189,
+			'FldID' => 1189,
 			'FldDatabase' => '3',
 			'FldTable' => '3',
 			'FldName' => 'VersionAB',
@@ -4143,7 +4143,63 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '39'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 200,
+			'FldID' => 1196,
+			'FldDatabase' => '3',
+			'FldTable' => '3',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'IPaddy',
+			'FldEng' => 'IP Address',
+			'FldDesc' => 'Encrypted IP address of the current user.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 1197,
+			'FldDatabase' => '3',
+			'FldTable' => '3',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'TreeVersion',
+			'FldEng' => 'Tree Version Number',
+			'FldDesc' => 'Stores the current version number of this User Experience, important for tracking bugs.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 1198,
+			'FldDatabase' => '3',
+			'FldTable' => '3',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'UniqueStr',
+			'FldEng' => 'Unique String For Record',
+			'FldDesc' => 'This unique string is for cases when including the record ID number is not appropriate.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 1199,
+			'FldDatabase' => '3',
+			'FldTable' => '3',
+			'FldSpecType' => 'Replica',
+			'FldName' => 'IsMobile',
+			'FldEng' => 'Using Mobile Device',
+			'FldDesc' => 'Indicates whether or not the current user is interacting via a mobile deviced.',
+			'FldForeignMin' => '11',
+			'FldForeignMax' => '11',
+			'FldForeign2Min' => '11',
+			'FldForeign2Max' => '11',
+			'FldOpts' => '39'
+		]);
+		DB::table('SL_Fields')->insert([
+			'FldID' => 1200,
 			'FldDatabase' => '3',
 			'FldTable' => '5',
 			'FldOrd' => '10',
@@ -4166,7 +4222,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 207,
+			'FldID' => 1201,
 			'FldDatabase' => '3',
 			'FldTable' => '42',
 			'FldSpecType' => 'Replica',
@@ -4180,7 +4236,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOpts' => '39'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 219,
+			'FldID' => 1202,
 			'FldDatabase' => '3',
 			'FldTable' => '12',
 			'FldOrd' => '2',
@@ -4198,7 +4254,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 220,
+			'FldID' => 1203,
 			'FldDatabase' => '3',
 			'FldTable' => '31',
 			'FldSpecSource' => '0',
@@ -4216,7 +4272,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 221,
+			'FldID' => 1204,
 			'FldDatabase' => '3',
 			'FldTable' => '31',
 			'FldOrd' => '1',
@@ -4237,7 +4293,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 222,
+			'FldID' => 1205,
 			'FldDatabase' => '3',
 			'FldTable' => '31',
 			'FldOrd' => '2',
@@ -4257,7 +4313,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareOther' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 223,
+			'FldID' => 1206,
 			'FldDatabase' => '3',
 			'FldTable' => '31',
 			'FldOrd' => '3',
@@ -4275,7 +4331,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 224,
+			'FldID' => 1207,
 			'FldDatabase' => '3',
 			'FldTable' => '31',
 			'FldOrd' => '4',
@@ -4293,7 +4349,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 225,
+			'FldID' => 1208,
 			'FldDatabase' => '3',
 			'FldTable' => '32',
 			'FldSpecSource' => '0',
@@ -4311,7 +4367,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 226,
+			'FldID' => 1209,
 			'FldDatabase' => '3',
 			'FldTable' => '32',
 			'FldOrd' => '1',
@@ -4331,7 +4387,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 227,
+			'FldID' => 1210,
 			'FldDatabase' => '3',
 			'FldTable' => '32',
 			'FldOrd' => '2',
@@ -4349,7 +4405,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 228,
+			'FldID' => 1211,
 			'FldDatabase' => '3',
 			'FldTable' => '33',
 			'FldSpecSource' => '0',
@@ -4369,7 +4425,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 229,
+			'FldID' => 1212,
 			'FldDatabase' => '3',
 			'FldTable' => '33',
 			'FldOrd' => '1',
@@ -4389,7 +4445,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 230,
+			'FldID' => 1213,
 			'FldDatabase' => '3',
 			'FldTable' => '33',
 			'FldOrd' => '2',
@@ -4410,7 +4466,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 231,
+			'FldID' => 1214,
 			'FldDatabase' => '3',
 			'FldTable' => '33',
 			'FldOrd' => '3',
@@ -4430,7 +4486,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 232,
+			'FldID' => 1215,
 			'FldDatabase' => '3',
 			'FldTable' => '34',
 			'FldSpecSource' => '0',
@@ -4449,7 +4505,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 233,
+			'FldID' => 1216,
 			'FldDatabase' => '3',
 			'FldTable' => '34',
 			'FldOrd' => '1',
@@ -4470,7 +4526,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 234,
+			'FldID' => 1217,
 			'FldDatabase' => '3',
 			'FldTable' => '34',
 			'FldOrd' => '2',
@@ -4491,7 +4547,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 235,
+			'FldID' => 1218,
 			'FldDatabase' => '3',
 			'FldTable' => '34',
 			'FldOrd' => '3',
@@ -4512,7 +4568,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 236,
+			'FldID' => 1219,
 			'FldDatabase' => '3',
 			'FldTable' => '34',
 			'FldOrd' => '4',
@@ -4531,49 +4587,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 237,
-			'FldDatabase' => '3',
-			'FldTable' => '3',
-			'FldSpecType' => 'Replica',
-			'FldName' => 'TreeVersion',
-			'FldEng' => 'Tree Version Number',
-			'FldDesc' => 'Stores the current version number of this User Experience, important for tracking bugs.',
-			'FldForeignMin' => '11',
-			'FldForeignMax' => '11',
-			'FldForeign2Min' => '11',
-			'FldForeign2Max' => '11',
-			'FldOpts' => '39'
-		]);
-		DB::table('SL_Fields')->insert([
-			'FldID' => 238,
-			'FldDatabase' => '3',
-			'FldTable' => '3',
-			'FldSpecType' => 'Replica',
-			'FldName' => 'UniqueStr',
-			'FldEng' => 'Unique String For Record',
-			'FldDesc' => 'This unique string is for cases when including the record ID number is not appropriate.',
-			'FldForeignMin' => '11',
-			'FldForeignMax' => '11',
-			'FldForeign2Min' => '11',
-			'FldForeign2Max' => '11',
-			'FldOpts' => '39'
-		]);
-		DB::table('SL_Fields')->insert([
-			'FldID' => 240,
-			'FldDatabase' => '3',
-			'FldTable' => '3',
-			'FldSpecType' => 'Replica',
-			'FldName' => 'IsMobile',
-			'FldEng' => 'Using Mobile Device',
-			'FldDesc' => 'Indicates whether or not the current user is interacting via a mobile deviced.',
-			'FldForeignMin' => '11',
-			'FldForeignMax' => '11',
-			'FldForeign2Min' => '11',
-			'FldForeign2Max' => '11',
-			'FldOpts' => '39'
-		]);
-		DB::table('SL_Fields')->insert([
-			'FldID' => 241,
+			'FldID' => 1220,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldSpecSource' => '0',
@@ -4593,7 +4607,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 242,
+			'FldID' => 1221,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '1',
@@ -4613,7 +4627,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 243,
+			'FldID' => 1222,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '2',
@@ -4633,7 +4647,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 244,
+			'FldID' => 1223,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '3',
@@ -4652,7 +4666,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 245,
+			'FldID' => 1224,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '4',
@@ -4674,7 +4688,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 246,
+			'FldID' => 1225,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '5',
@@ -4695,7 +4709,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 247,
+			'FldID' => 1226,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '6',
@@ -4713,7 +4727,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 248,
+			'FldID' => 1227,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '7',
@@ -4732,7 +4746,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 249,
+			'FldID' => 1228,
 			'FldDatabase' => '3',
 			'FldTable' => '35',
 			'FldOrd' => '8',
@@ -4755,7 +4769,7 @@ class SurvLoopSeeder extends Seeder
 			'FldOperateSame' => '52'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 250,
+			'FldID' => 1229,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldSpecSource' => '0',
@@ -4775,7 +4789,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 251,
+			'FldID' => 1230,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '1',
@@ -4794,7 +4808,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 252,
+			'FldID' => 1231,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '2',
@@ -4812,7 +4826,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 253,
+			'FldID' => 1232,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '3',
@@ -4830,7 +4844,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 254,
+			'FldID' => 1233,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '4',
@@ -4848,7 +4862,7 @@ class SurvLoopSeeder extends Seeder
 			'FldNullSupport' => '0'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 255,
+			'FldID' => 1234,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '5',
@@ -4870,7 +4884,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 256,
+			'FldID' => 1235,
 			'FldDatabase' => '3',
 			'FldTable' => '36',
 			'FldOrd' => '6',
@@ -4892,7 +4906,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 257,
+			'FldID' => 1236,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldSpecSource' => '0',
@@ -4911,7 +4925,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 258,
+			'FldID' => 1237,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '1',
@@ -4932,7 +4946,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 259,
+			'FldID' => 1238,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '2',
@@ -4951,7 +4965,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 260,
+			'FldID' => 1239,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '3',
@@ -4970,7 +4984,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 261,
+			'FldID' => 1240,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '4',
@@ -4988,7 +5002,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 262,
+			'FldID' => 1241,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '5',
@@ -5007,7 +5021,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 263,
+			'FldID' => 1242,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '6',
@@ -5025,7 +5039,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 264,
+			'FldID' => 1243,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '7',
@@ -5043,7 +5057,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 265,
+			'FldID' => 1244,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '8',
@@ -5064,7 +5078,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 266,
+			'FldID' => 1245,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '9',
@@ -5084,7 +5098,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 267,
+			'FldID' => 1246,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '10',
@@ -5105,7 +5119,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 268,
+			'FldID' => 1247,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '11',
@@ -5126,7 +5140,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 269,
+			'FldID' => 1248,
 			'FldDatabase' => '3',
 			'FldTable' => '37',
 			'FldOrd' => '12',
@@ -5147,7 +5161,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 270,
+			'FldID' => 1249,
 			'FldDatabase' => '3',
 			'FldTable' => '16',
 			'FldOrd' => '5',
@@ -5169,7 +5183,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 271,
+			'FldID' => 1250,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldSpecSource' => '0',
@@ -5187,7 +5201,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 272,
+			'FldID' => 1251,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '1',
@@ -5206,7 +5220,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 273,
+			'FldID' => 1252,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '2',
@@ -5225,7 +5239,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 274,
+			'FldID' => 1253,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '3',
@@ -5244,7 +5258,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 275,
+			'FldID' => 1254,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '4',
@@ -5263,7 +5277,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 276,
+			'FldID' => 1255,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '5',
@@ -5282,7 +5296,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 277,
+			'FldID' => 1256,
 			'FldDatabase' => '3',
 			'FldTable' => '38',
 			'FldOrd' => '6',
@@ -5300,7 +5314,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 278,
+			'FldID' => 1257,
 			'FldDatabase' => '3',
 			'FldTable' => '39',
 			'FldSpecSource' => '0',
@@ -5317,7 +5331,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 279,
+			'FldID' => 1258,
 			'FldDatabase' => '3',
 			'FldTable' => '39',
 			'FldOrd' => '1',
@@ -5335,7 +5349,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 280,
+			'FldID' => 1259,
 			'FldDatabase' => '3',
 			'FldTable' => '39',
 			'FldOrd' => '2',
@@ -5353,7 +5367,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 301,
+			'FldID' => 1260,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '3',
@@ -5375,7 +5389,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 302,
+			'FldID' => 1261,
 			'FldDatabase' => '3',
 			'FldTable' => '41',
 			'FldSpecSource' => '0',
@@ -5394,7 +5408,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 303,
+			'FldID' => 1262,
 			'FldDatabase' => '3',
 			'FldTable' => '41',
 			'FldOrd' => '1',
@@ -5414,7 +5428,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareValue' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 304,
+			'FldID' => 1263,
 			'FldDatabase' => '3',
 			'FldTable' => '42',
 			'FldSpecSource' => '0',
@@ -5434,7 +5448,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 305,
+			'FldID' => 1264,
 			'FldDatabase' => '3',
 			'FldTable' => '42',
 			'FldOrd' => '2',
@@ -5453,7 +5467,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '6'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 306,
+			'FldID' => 1265,
 			'FldDatabase' => '3',
 			'FldTable' => '42',
 			'FldOrd' => '1',
@@ -5476,21 +5490,7 @@ class SurvLoopSeeder extends Seeder
 			'FldCompareSame' => '878800'
 		]);
 		DB::table('SL_Fields')->insert([
-			'FldID' => 307,
-			'FldDatabase' => '3',
-			'FldTable' => '3',
-			'FldSpecType' => 'Replica',
-			'FldName' => 'IPaddy',
-			'FldEng' => 'IP Address',
-			'FldDesc' => 'Encrypted IP address of the current user.',
-			'FldForeignMin' => '11',
-			'FldForeignMax' => '11',
-			'FldForeign2Min' => '11',
-			'FldForeign2Max' => '11',
-			'FldOpts' => '39'
-		]);
-		DB::table('SL_Fields')->insert([
-			'FldID' => 308,
+			'FldID' => 1266,
 			'FldDatabase' => '3',
 			'FldTable' => '19',
 			'FldOrd' => '10',
@@ -6029,42 +6029,6 @@ class SurvLoopSeeder extends Seeder
 			'TreeSlug' => 'data-design',
 			'TreeRoot' => '14',
 			'TreeCoreTable' => '3'
-		]);
-	
-	DB::table('SL_Node')->insert([
-			'NodeID' => 7,
-			'NodeTree' => '3',
-			'NodeType' => 'Branch Title',
-			'NodePromptText' => 'Database Designer'
-		]);
-		DB::table('SL_Node')->insert([
-			'NodeID' => 9,
-			'NodeTree' => '3',
-			'NodeParentID' => '11',
-			'NodeType' => 'Text',
-			'NodePromptText' => '<h2 class="slBlueDark">Welcome</h2>What kind of cool data do you want to collect and share?'
-		]);
-		DB::table('SL_Node')->insert([
-			'NodeID' => 10,
-			'NodeTree' => '4',
-			'NodeType' => 'Text',
-			'NodePromptText' => 'DesignTweaks',
-			'NodePromptNotes' => '3'
-		]);
-		DB::table('SL_Node')->insert([
-			'NodeID' => 11,
-			'NodeTree' => '3',
-			'NodeParentID' => '7',
-			'NodeType' => 'Page',
-			'NodePromptText' => 'Welcome To Database Designer',
-			'NodePromptNotes' => 'welcome'
-		]);
-		DB::table('SL_Node')->insert([
-			'NodeID' => 14,
-			'NodeTree' => '4',
-			'NodeType' => 'XML',
-			'NodePromptText' => 'DesignTweaks',
-			'NodePromptNotes' => '3'
 		]);
 	
  } } 
