@@ -192,8 +192,8 @@ class CreateSurvLoopTables extends Migration
 		{
 			$table->increments('CondNodeID');
 			$table->integer('CondNodeCondID')->unsigned()->nullable();
-			$table->integer('CondNodeNodeID')->unsigned()->nullable();
-			$table->integer('CondNodeLoopID')->unsigned()->nullable();
+			$table->integer('CondNodeNodeID')->nullable();
+			$table->integer('CondNodeLoopID')->nullable();
 			$table->timestamps();
 		});
 		Schema::create('SL_ConditionsArticles', function(Blueprint $table)

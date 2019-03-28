@@ -7,8 +7,8 @@
 <input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" name="previous" 
     @if (isset($midSurvRedir) && trim($midSurvRedir) != '') value="{{ $midSurvRedir }}"
-    @elseif ($request->has('redir')) value="{{ $request->get('redir') }}"
-    @elseif ($request->has('previous')) value="{{ $request->get('previous') }}"
+    @elseif (isset($request) && $request->has('redir')) value="{{ $request->get('redir') }}"
+    @elseif (isset($request) && $request->has('previous')) value="{{ $request->get('previous') }}"
     @else value="{{ URL::previous() }}"
     @endif >
 
@@ -18,7 +18,7 @@
 
 @if (!isset($sysOpts["signup-instruct"])
     || trim($sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
-    <a href="/login{{ (($request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
+    <a href="/login{{ ((isset($request) && $request->has('nd')) ? '?nd=' . $request->get('nd') : '') 
         }}" class="btn btn-secondary pull-right mL20">Login</a>
 @endif
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
@@ -108,7 +108,7 @@
 
 @if ($GLOBALS["SL"]->sysHas('volunteers') && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
     <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
-        @if ($request->has('volunteer')) CHECKED @endif > Volunteer</label>
+        @if (isset($request) && $request->has('volunteer')) CHECKED @endif > Volunteer</label>
 @endif
 
 @if (!isset($midSurvBack) || trim($midSurvBack) == '')

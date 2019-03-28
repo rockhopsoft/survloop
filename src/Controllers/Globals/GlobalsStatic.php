@@ -577,7 +577,7 @@ class GlobalsStatic
     
     public function plainLineBreaks($str)
     {
-        return str_replace("\n", "<br />", $str);
+        return str_replace("\n", "<br />", str_replace("\t", "    ", $str));
     }
     
     public function sec2minSec($sec)
