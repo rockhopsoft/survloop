@@ -540,6 +540,7 @@ class AdminController extends SurvLoopController
         
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
         $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
+        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/popper.min.js");
         $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
         //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/parallax.min.js");
         $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/typewatch.js");
