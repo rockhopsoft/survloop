@@ -77,7 +77,7 @@ class SurvRoutes extends Controller
         } else {
             $response = Response::make('/* */');
         }
-        $response->header('Content-Type', 'text/css');
+        $response->header('Content-Type', (($type == 'js') ? 'application/javascript' : 'text/css'));
         $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         $response->header('Expires', gmdate('r', time()+$expires));
         return $response;

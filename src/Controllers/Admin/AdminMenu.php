@@ -43,7 +43,7 @@ class AdminMenu
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
             $this->admMenuLnk('/dashboard/pages',              'Pages & Reports', '', 1, [
                 $this->admMenuLnk('/dashboard/pages',          'Web Content Pages'),
-                $this->admMenuLnk('/dashboard/reports',        'Data Reports'),
+                $this->admMenuLnk('/dashboard/reports',        'Dynamic Reports'),
                 $this->admMenuLnk('/dashboard/redirects',      'URL Redirects'),
                 $this->admMenuLnk('/dashboard/pages/snippets', 'Content Snippets')
                 ]), 
