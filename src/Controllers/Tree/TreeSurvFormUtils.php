@@ -61,6 +61,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             $GLOBALS["SL"]->pageJAVA .= 'formActionUrl = "' . $formAction . '"; ';
             $ret .= view('vendor.survloop.forms.formtree-start', [
                 "nID"              => $nID, 
+                "coreID"           => $this->coreID, 
                 "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
                 "currPage"         => $this->v["currPage"],
                 "action"           => $formAction, 

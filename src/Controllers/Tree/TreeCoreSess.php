@@ -44,7 +44,17 @@ class TreeCoreSess extends TreeCore
         }
         $cid = (($GLOBALS["SL"]->REQ->has('cid') && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) 
             ? intVal($GLOBALS["SL"]->REQ->get('cid')) : 0);
-        if ($cid <= 0 && $GLOBALS["SL"]->REQ->has('start') && $GLOBALS["SL"]->REQ->has('new')
+        if ($GLOBALS["SL"]->REQ->has('core') && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
+            $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
+                ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
+                ->where('SessCoreID', '>', intVal($GLOBALS["SL"]->REQ->get('core')))
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            if ($this->sessInfo && isset($this->sessInfo->SessID)) {
+                $this->sessID = $this->sessInfo->SessID;
+                $this->coreID = $this->sessInfo->SessCoreID;
+            }
+        } elseif ($cid <= 0 && $GLOBALS["SL"]->REQ->has('start') && $GLOBALS["SL"]->REQ->has('new')
             && !session()->has('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'))) {
             $this->createNewSess();
             $this->newCoreRow($coreTbl);

@@ -5,6 +5,7 @@
 <input type="hidden" name="postAction" id="postActionID" value="{{ $action }}">
 <input type="hidden" name="ajax" id="ajaxID" value="{{ $isAjax }}">
 <input type="hidden" name="tree" id="treeID" value="{{ $GLOBALS['SL']->treeID }}">
+<input type="hidden" name="core" id="coreID" value="{{ $coreID }}">
 <input type="hidden" name="node" id="nodeID" value="{{ $nID }}">
 <input type="hidden" name="treeSlug" id="treeSlugID" value="{{ $GLOBALS['SL']->treeRow->TreeSlug }}">
 <input type="hidden" name="nodeSlug" id="nodeSlugID" value="{{ $nSlug }}">
