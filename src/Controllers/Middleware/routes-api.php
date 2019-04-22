@@ -13,7 +13,4 @@ use Illuminate\Http\Request;
 |
 */
 
-// Commented out because this default throws errors with the route caching
-//Route::middleware('auth:api')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
+require('../vendor/wikiworldorder/survloop/src/routes.php');
