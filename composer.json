@@ -40,7 +40,6 @@
     "autoload": {
         "psr-4": {
             "SurvLoop\\": "src/",
-            "SurvLoop\\Models\\": "storage/app/models/survloop",
             "MatthiasMullie\\Minify\\": "vendor/matthiasmullie/minify/src/",
             "MatthiasMullie\\PathConverter\\": "vendor/matthiasmullie/path-converter/src/"
         }
@@ -48,10 +47,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "WikiWorldOrder\\SurvLoop\\SurvLoopServiceProvider"
+                "SurvLoop\\SurvLoopServiceProvider"
             ],
             "aliases": {
-                "SurvLoop": "WikiWorldOrder\\SurvLoop\\SurvLoopFacade"
+                "SurvLoop": "SurvLoop\\SurvLoopFacade"
             }
         }
     }
