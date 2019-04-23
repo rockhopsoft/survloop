@@ -14,19 +14,6 @@ use Illuminate\Support\ServiceProvider;
 
 class SurvLoopServiceProvider extends ServiceProvider
 {
-//    public function register()
-//    {
-        /*
-        * Register the service provider for the dependency.
-        */
-//        $this->app->register('SurvLoop\SurvLoopServiceProvider');
-        /*
-        * Create aliases for the dependency.
-        */
-//        $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-//        $loader->alias('SurvLoop', 'WikiWorldOrder\SurvLoop\SurvLoopFacade');
-//    }
-
     public function boot()
     {
         //require __DIR__ . '/routes.php';
@@ -43,6 +30,8 @@ class SurvLoopServiceProvider extends ServiceProvider
 
             __DIR__.'/Controllers/Middleware/routes-api.php'
                 => base_path('routes/api.php'),
+            __DIR__.'/Controllers/Middleware/routes-web.php'
+                => base_path('routes/web.php'),
             __DIR__.'/Controllers/Middleware/Authenticate.php' 
                 => base_path('app/Http/Middleware/Authenticate.php'),
 

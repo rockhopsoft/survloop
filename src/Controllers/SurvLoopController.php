@@ -335,11 +335,15 @@ class SurvLoopController extends Controller
     // Is this the first time this user has visited the current page?
     protected function isPageFirstTime($currPage = '')
     {
-        if (trim($currPage) == '') $currPage = $this->v["currPage"][0];
+        if (trim($currPage) == '') {
+            $currPage = $this->v["currPage"][0];
+        }
         $chk = SLUsersActivity::where('UserActUser', Auth::user()->id)
             ->where('UserActCurrPage', 'LIKE', '%'.$currPage)
             ->get();
-        if ($chk->isNotEmpty()) return false;
+        if ($chk->isNotEmpty()) {
+            return false;
+        }
         return true;
     }
     
@@ -348,7 +352,9 @@ class SurvLoopController extends Controller
         $log = new SLUsersActivity;
         $log->UserActUser = Auth::user()->id;
         $log->UserActCurrPage = $_SERVER["REQUEST_URI"];
-        if (strlen($log->UserActCurrPage) > 255) $log->UserActCurrPage = substr($log->UserActCurrPage, 0, 255);
+        if (strlen($log->UserActCurrPage) > 255) {
+            $log->UserActCurrPage = substr($log->UserActCurrPage, 0, 255);
+        }
         $log->UserActVal = $val;
         $log->save();
         return true;

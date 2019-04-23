@@ -234,9 +234,9 @@ class SurvLoop extends SurvCustLoop
     public function afterLogin(Request $request)
     {
         $redir = '';
-        if (session()->has('previousUrl') && trim(session()->get('previousUrl')) != '') {
+        if (session()->has('previousUrl') && $this->urlNotCssNorJs(session()->get('previousUrl'))) {
             $redir = trim(session()->get('previousUrl'));
-        } elseif (session()->has('redir2') && trim(session()->get('redir2')) != '') {
+        } elseif (session()->has('redir2') && $this->urlNotCssNorJs(session()->get('redir2'))) {
             $redir = trim(session()->get('redir2'));
         }
         if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0 
@@ -249,7 +249,7 @@ class SurvLoop extends SurvCustLoop
             }
         } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
             $this->afterLoginLastTree($request);
-        } elseif (session()->has('loginRedir') && trim(session()->get('loginRedir')) != '') {
+        } elseif (session()->has('loginRedir') && $this->urlNotCssNorJs(session()->get('loginRedir'))) {
             $redir = trim(session()->get('loginRedir'));
         }
         $this->loadDomain();

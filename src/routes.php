@@ -862,4 +862,5 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
         'SurvLoop\\Controllers\\SurvRoutes@catchJqueryUiMappingError');
     
-});    
+
+});

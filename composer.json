@@ -35,7 +35,7 @@
         "nnnick/chartjs": "^2.7.3",
         "plotly/plotly.js": "^1.44.4",
         "summernote/summernote": "v0.8.8",
-        "wikiworldorder/survloop-libraries": "^0.1.2"
+        "wikiworldorder/survloop-libraries": "^0.1.5"
     },
     "autoload": {
         "psr-4": {

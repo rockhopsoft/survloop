@@ -13,4 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-require('../vendor/wikiworldorder/survloop/src/routes.php');
+//Route::get('/user', function (Request $request) {
+//    return $request->user();
+//})->middleware('auth:api');

@@ -3,7 +3,7 @@
 @if (isset($GLOBALS['SL']->sysOpts['site-name']))
     <a id="hidivBtnAdmFoot" class="hidivBtn" href="javascript:;"
         ><i class="fa fa-creative-commons" aria-hidden="true"></i> 
-        @if ($GLOBALS["SL"]->sysOpts["app-license-snc"] != date("Y"))
+        @if (isset($GLOBALS["SL"]->sysOpts["app-license-snc"]) && $GLOBALS["SL"]->sysOpts["app-license-snc"] != date("Y"))
             {{ $GLOBALS["SL"]->sysOpts["app-license-snc"] }}-{{ date("Y") }}
         @else {{ date("Y") }} @endif </a>
     <div id="hidivAdmFoot" class="disNon">
@@ -17,7 +17,7 @@
             >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a> <br />under the
         <a href="{{ $GLOBALS['SL']->sysOpts['app-license-url'] }}" target="_blank" 
             >{{ $GLOBALS['SL']->sysOpts['app-license'] }}</a>, 
-            @if ($GLOBALS["SL"]->sysOpts["app-license-snc"] != date("Y"))
+            @if (isset($GLOBALS["SL"]->sysOpts["app-license-snc"]) && $GLOBALS["SL"]->sysOpts["app-license-snc"] != date("Y"))
             {{ $GLOBALS["SL"]->sysOpts["app-license-snc"] }}-{{ date("Y") }}.
         @else {{ date("Y") }}. @endif
         <nobr>Database powered by <a href="https://SurvLoop.org" target="_blank">SurvLoop</a></nobr>

@@ -337,5 +337,21 @@ class PageLoadUtils extends Controller
     {
         return (Auth::user() && Auth::user()->hasRole('partner'));
     }
+
+    protected function urlNotCssNorJs($str)
+    {
+        $str = trim($str);
+        if ($str == '') {
+            return false;
+        }
+        $dot = strrpos($str, '.');
+        if ($dot > 0) {
+            $sffx = substr($str, $dot);
+            if (in_array($sffx, ['css', 'js'])) {
+                return false;
+            }
+        }
+        return true;
+    }
     
 }

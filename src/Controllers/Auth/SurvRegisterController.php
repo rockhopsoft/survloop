@@ -25,32 +25,34 @@ class SurvRegisterController extends RegisterController
     protected function registered(Request $request, $user)
     {
         $survUser = User::find($user->id);
-        if ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
-            $log = new SLUsersActivity;
-            $log->UserActUser = $survUser->id;
-            $adminRoleID = 15;
-            $admDef = SLDefinitions::where('DefDatabase', 1)
-                ->where('DefSet', 'User Roles')
-                ->where('DefSubset', 'administrator')
-                ->first();
-            if ($admDef && isset($admDef->DefID)) $adminRoleID = $admDef->DefID;
-            $hasAdmins = SLUsersRoles::where('RoleUserRID', $adminRoleID) // role id of 'administrator'
-                ->get();
-            if ($hasAdmins->isEmpty()) {
-                $survUser->assignRole('administrator');
-                $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-            } else {
-                $survUser->assignRole('volunteer');
-                $log->UserActCurrPage = 'NEW VOLUNTEER!';
-            }
-            $log->save();
+        $log = new SLUsersActivity;
+        $log->UserActUser = $survUser->id;
+        $adminRoleID = 15; // but let's double-check this system
+        $admDef = SLDefinitions::where('DefDatabase', 1)
+            ->where('DefSet', 'User Roles')
+            ->where('DefSubset', 'administrator')
+            ->first();
+        if ($admDef && isset($admDef->DefID)) {
+            $adminRoleID = $admDef->DefID;
         }
+        $hasAdmins = SLUsersRoles::where('RoleUserRID', $adminRoleID) // role id of 'administrator'
+            ->get();
+        if ($hasAdmins->isEmpty()) {
+            $survUser->assignRole('administrator');
+            $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
+        } elseif ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
+            $survUser->assignRole('volunteer');
+            $log->UserActCurrPage = 'NEW VOLUNTEER!';
+        }
+        $log->save();
         $domainPath = '';
         $appUrl = SLDefinitions::where('DefDatabase', 1)
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) $domainPath = $appUrl->DefDescription;
+        if ($appUrl && isset($appUrl->DefDescription)) {
+            $domainPath = $appUrl->DefDescription;
+        }
         return redirect($domainPath . '/afterLogin');
     }
     
