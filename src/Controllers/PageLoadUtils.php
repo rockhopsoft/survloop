@@ -208,9 +208,10 @@ class PageLoadUtils extends Controller
                                     ->first();
                                 if (!$sess || !isset($sess->SessID)) {
                                     $sess = new SLSess;
-                                    $sess->SessUserID = Auth::user()->id;
-                                    $sess->SessTree   = $t->TreeID;
-                                    $sess->SessCoreID = $cid;
+                                    $sess->SessUserID   = Auth::user()->id;
+                                    $sess->SessTree     = $t->TreeID;
+                                    $sess->SessCoreID   = $cid;
+                                    $sess->SessIsActive = 1;
                                     $sess->save();
                                 }
                                 if ($request->has("n") && intVal($request->get("n")) > 0) {

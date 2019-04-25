@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
 use App\Models\User;
+use App\Models\SLSess;
 use App\Models\SLTree;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SurvLoopInstaller;
@@ -236,6 +237,26 @@ class SurvLoop extends SurvCustLoop
         $redir = '';
         if (session()->has('previousUrl') && $this->urlNotCssNorJs(session()->get('previousUrl'))) {
             $redir = trim(session()->get('previousUrl'));
+            // check if being redirected back to a survey session, which needs to be associated with new user ID
+            if (strpos($redir, '/u/') == 0 && Auth::user() && isset(Auth::user()->id) && Auth::user()->id > 0) {
+                $treeSlug = substr($redir, 3);
+                $pos = strpos($treeSlug, '/');
+                if ($pos > 0) {
+                    $treeSlug = substr($treeSlug, 0, $pos);
+                    $chk = SLTree::where('TreeType', 'Survey')
+                        ->where('TreeSlug', $treeSlug)
+                        ->get();
+                    if ($chk->isNotEmpty()) {
+                        foreach ($chk as $tree) {
+                            if (session()->has('sessID' . $tree->TreeID) && session()->has('coreID' . $tree->TreeID)
+                                && intVal(session()->get('sessID' . $tree->TreeID)) > 0) {
+                                SLSess::find(session()->get('sessID' . $tree->TreeID))
+                                    ->update([ 'SessUserID' => Auth::user()->id ]);
+                            }
+                        }
+                    }
+                }
+            }
         } elseif (session()->has('redir2') && $this->urlNotCssNorJs(session()->get('redir2'))) {
             $redir = trim(session()->get('redir2'));
         }

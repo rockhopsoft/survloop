@@ -48,12 +48,15 @@ class TreeSurv extends TreeSurvReport
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('superHardJump')) {
             $this->updateCurrNode(intVal($GLOBALS["SL"]->REQ->superHardJump));
         }
-        
+        if (session()->has('redirLoginSurvey') || $GLOBALS["SL"]->REQ->has('test')) {
+            $this->updateCurrNodeNB($this->nextNode($this->currNode(), $this->currNodeSubTier));
+            $this->setNodeIdURL($this->currNode());
+            session()->forget('redirLoginSurvey');
+        }
         if ($this->currNode() < 0 || !isset($this->allNodes[$this->currNode()])) {
             $this->updateCurrNode($GLOBALS["SL"]->treeRow->TreeRoot);
             //return '<h1>Sorry, Page Not Found.</h1>';
         }
-        
         // double-check we haven't landed on a mid-page node
         if (isset($this->allNodes[$this->currNode()]) && !$this->allNodes[$this->currNode()]->isPage() 
             && !$this->allNodes[$this->currNode()]->isLoopRoot()) {
@@ -276,7 +279,10 @@ class TreeSurv extends TreeSurvReport
         }
     }
     
-    protected function ajaxContentWrapCustom($str, $nID = -3) { return $str; }
+    protected function ajaxContentWrapCustom($str, $nID = -3)
+    {
+        return $str;
+    }
     
     protected function runCurrNode($nID)
     {

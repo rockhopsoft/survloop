@@ -49,7 +49,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         $loopRootJustLeft = -3;
         if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
             $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
-            $this->sessInfo->SessLoopRootJustLeft = -3;
+            $this->sessInfo->SessLoopRootJustLeft = 0;
             $this->sessInfo->save();
         }
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {

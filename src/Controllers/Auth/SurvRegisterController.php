@@ -53,6 +53,10 @@ class SurvRegisterController extends RegisterController
         if ($appUrl && isset($appUrl->DefDescription)) {
             $domainPath = $appUrl->DefDescription;
         }
+        if ($request->has('previous') && trim($request->get('previous')) != '') {
+            session()->put('redirLoginSurvey', time());
+            session()->put('previousUrl', trim($request->get('previous')));
+        }
         return redirect($domainPath . '/afterLogin');
     }
     

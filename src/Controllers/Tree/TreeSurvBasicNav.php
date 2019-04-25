@@ -181,7 +181,7 @@ class TreeSurvBasicNav extends TreeSurvProgBar
         return $clear;
     }
     
-    protected function settingTheLoop($name, $itemID = -3, $rootJustLeft = -3)
+    protected function settingTheLoop($name, $itemID = -3, $rootJustLeft = 0)
     {
         if ($name == '') {
             return false; 
@@ -292,6 +292,15 @@ class TreeSurvBasicNav extends TreeSurvProgBar
     public function setNodeURL($slug = '')
     {
         $this->urlSlug = $slug;
+        return true;
+    }
+    
+    public function setNodeIdURL($nodeID = 0)
+    {
+        $chk = SLNode::find($nodeID);
+        if ($chk && isset($chk->NodePromptNotes)) {
+            $this->urlSlug = $chk->NodePromptNotes;
+        }
         return true;
     }
     

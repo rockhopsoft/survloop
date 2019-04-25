@@ -148,6 +148,7 @@ class AuthController extends Controller
             $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
             $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
             if ($request->has('previous') && trim($request->get('previous')) != '') {
+                session()->put('redirLoginSurvey', time());
                 session()->put('previousUrl', trim($request->get('previous')));
             }
             return redirect('/afterLogin');

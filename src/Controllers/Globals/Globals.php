@@ -690,6 +690,7 @@ class Globals extends GlobalsImportExport
         $sess->SessIsMobile = $this->isMobile();
         $sess->SessBrowser  = $this->getCroppedBrowser();
         $sess->SessIP       = $this->hashIP();
+        $sess->SessIsActive = 1;
         $sess->save();
         $this->setTreeSessID($sess->SessID, $treeID);
         return $sess;

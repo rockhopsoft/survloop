@@ -27,6 +27,6 @@ treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url
 
 @forelse ($GLOBALS["SL"]->proTips as $i => $tip)
 treeProTips[{{ $i }}] = '{{ str_replace("'", "&#39;", $tip) }}';
-treeProTipsImg[{{ $i }}] = '{{ $GLOBALS["SL"]->proTipsImg[$i] }}';
+treeProTipsImg[{{ $i }}] = @if (isset($GLOBALS["SL"]->proTipsImg[$i])) '{{ $GLOBALS["SL"]->proTipsImg[$i] }}'; @else ''; @endif
 @empty
 @endforelse

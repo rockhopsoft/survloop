@@ -448,7 +448,23 @@ class CreateSurvLoopTables extends Migration
 			$table->string('AdyGeoLong')->nullable();
 			$table->timestamps();
 		});
-	
+		Schema::create('SL_Uploads', function(Blueprint $table)
+		{
+			$table->increments('UpID');
+			$table->integer('UpTreeID')->nullable();
+			$table->integer('UpCoreID')->nullable();
+			$table->integer('UpType')->nullable();
+			$table->string('UpPrivacy', 10)->nullable();
+			$table->string('UpTitle')->nullable();
+			$table->longText('UpDesc')->nullable();
+			$table->string('UpUploadFile')->nullable();
+			$table->string('UpStoredFile')->nullable();
+			$table->string('UpVideoLink')->nullable();
+			$table->integer('UpNodeID')->nullable();
+			$table->integer('UpLinkFldID')->nullable();
+			$table->integer('UpLinkRecID')->nullable();
+			$table->timestamps();
+		});
     }
 
     /**
@@ -493,6 +509,7 @@ class CreateSurvLoopTables extends Migration
 		Schema::drop('SL_LogActions');
 		Schema::drop('SL_Zips');
 		Schema::drop('SL_AddyGeo');
+		Schema::drop('SL_Uploads');
 	
     }
 }

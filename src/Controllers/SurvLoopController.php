@@ -371,7 +371,7 @@ class SurvLoopController extends Controller
         if (!$request->has('cssLoaded')) {
             $content = '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
                 <style> body, #registerLoginLnk { display: none; } </style>
-                <script type="text/javascript"> setTimeout("window.location=\'?cssLoaded=1\'", 100); </script>';
+                <script type="text/javascript"> setTimeout("window.location=\'?cssLoaded=1\'", 2000); </script>';
         }
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
             if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $_SERVER["HTTP_HOST"]
