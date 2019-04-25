@@ -151,7 +151,7 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     width: 100%;
 }
 .slPrint #slLogo, .slPrint #slLogo.w100, .slPrint #slLogoImg, .slPrint #slLogoImg.w100 {
-    height: 130px;
+    height: 100px;
     width: auto;
 }
 

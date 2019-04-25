@@ -1290,7 +1290,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                         ["M", "Male"   ],
                         ["O", "Other: "]
                         ];
-                    if ($curr->nodeType == 'Gender Not Sure') $coreResponses[] = ["?", "Not Sure"];
+                    if ($curr->nodeType == 'Gender Not Sure') {
+                        $coreResponses[] = ["?", "Not Sure"];
+                    }
                     foreach ($coreResponses as $j => $res) {
                         $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                     }

@@ -4,6 +4,26 @@
 [![Laravel](https://img.shields.io/badge/Laravel-5.8-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
+# Table of Contents
+* [About](#about)
+* [Requirements](#requirements)
+* [Getting Started](#getting-started)
+* [Documentation](#documentation)
+* [Roadmap](#roadmap)
+* [Change Logs](#change-logs)
+* [Contribution Guidelines](#contribution-guidelines)
+* [Reporting a Security Vulnerability](#security-help)
+
+
+# <a name="about"></a>About
+
+* PHP Controllers ~ 1.2 MB (on disk)
+* Blade HTML Template Views ~ 572 KB total
+* Javascript/jQuery within Blade Templates ~ 131 KB
+* CSS within Blade Templates ~ 131 KB
+* SurvLoop-Generated PHP Eloquent Models ~ 172 KB
+* SurvLoop-Generated PHP Laravel Database Migration & Seeders ~ 229 KB
+
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
 This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
 web-based problems.
@@ -31,15 +51,6 @@ XML included an automatically generated schema, eg.<br />
 Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
 Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
 <a href="https://drugstory.me" target="_blank">Drug Story</a> (less active).
-
-# Table of Contents
-* [Requirements](#requirements)
-* [Getting Started](#getting-started)
-* [Documentation](#documentation)
-* [Roadmap](#roadmap)
-* [Change Logs](#change-logs)
-* [Contribution Guidelines](#contribution-guidelines)
-* [Reporting a Security Vulnerability](#security-help)
 
 
 # <a name="requirements"></a>Requirements
@@ -153,8 +164,8 @@ Better documentation is juuust beginning to be created...
 
 <a href="https://survloop.org/package-files-folders-classes" target="_blank">survloop.org/package-files-folders-classes</a>
 
-Once installed, documentation of this system's database design can be found at /dashboard/db/all. This system's 
-survey design can be found at /dashboard/surv-1/map?all=1&alt=1
+Once installed, documentation of this system's database design can be found at http://localhost/dashboard/db/all. This system's 
+survey design can be found at http://localhost/dashboard/surv-1/map?all=1&alt=1
 or publicly visible links like those above.
 
 <a href="https://survloop.org/db/SL" target="_blank">survloop.org/db/SL</a>
@@ -166,11 +177,12 @@ Here's the TODO list for the next release (**1.0**). It's my first time building
 
 * [ ] Correct all issues needed for minimum viable product, and launch Open Police Complaints.
 * [ ] Integrate options for MFA using Laravel-compatible package.
-* [ ] Upgrade database and graphic design for admin tools, thus far only used by the author.
+* [ ] Upgrade database and graphic design for admin tools, thus far only used by the author. This should include database preparations for multi-lingual support.
 * [ ] Code commenting, learning and adopting more community norms.
 * [ ] Add decent levels of unit testing. Hopefully improve the organization of objects/classes.
 * [ ] Improve import/export work flow for copying/moving installations.
 * [ ] Generate all admin tools by SurvLoop itself.
+* [ ] Add multi-lingual support on the Node-level (surveys and web pages), for starters, then database design.
 * [ ] Finish migrating all raw queries to use Laravel's process.
 * [ ] Convert more SurvLoop (older) code to take advantage of more Laravel built-in icapabilities.
 

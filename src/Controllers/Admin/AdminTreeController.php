@@ -207,7 +207,7 @@ class AdminTreeController extends AdminController
         if (!$this->checkCache()) {
             $this->v["treeClassAdmin"]->loadTreeNodeStats();
             $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
-            $this->v["content"] = '<div class="w33 slPrint">' 
+            $this->v["content"] = '<div class="container"><div class="slPrint" style="max-widht: 500px;">' 
                 . view('vendor.survloop.elements.logo-print', [
                     "sysOpts" => $GLOBALS["SL"]->sysOpts,
                     "w100" => true
@@ -217,7 +217,7 @@ class AdminTreeController extends AdminController
                 . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true)
                 . view('vendor.survloop.elements.dbdesign-legal', [
                     "sysOpts" => $GLOBALS["SL"]->sysOpts
-                    ])->render();
+                    ])->render() . '</div>';
             $this->saveCache();
         }
         $this->v["isPrint"] = true;

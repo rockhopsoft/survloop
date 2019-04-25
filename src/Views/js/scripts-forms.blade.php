@@ -65,7 +65,13 @@ function clearFormErrs() {
 	return true;
 }
 
+function stripN(nIDtxt) {
+    if (nIDtxt.substring(0, 1) == "n") nIDtxt = nIDtxt.substring(1);
+    return nIDtxt;
+}
+
 function txt2nID(nIDtxt) {
+    nIDtxt = stripN(nIDtxt);
     if (nIDtxt.indexOf('cyc') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('cyc'))));
     if (nIDtxt.indexOf('res') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('res'))));
     if (nIDtxt.indexOf('tbl') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('tbl'))));
@@ -79,7 +85,7 @@ function getNodeAndResFromFldID(nFldID) {
             nodeAndRes[0] = nFldID.substring(0, nFldID.indexOf('FldID'));
         } else if (nFldID.indexOf('fld') > 0) {
             nodeAndRes[0] = nFldID.substring(0, nFldID.indexOf('fld'));
-            nodeAndRes[1] = parseInt(nFldID.substring(2+nFldID.indexOf('fld')));
+            nodeAndRes[1] = parseInt(nFldID.substring(3+nFldID.indexOf('fld')));
         }
     }
     return nodeAndRes;
@@ -136,15 +142,14 @@ function chkIsRadioNode(nIDtxt) {
     return false;
 }
 function runRadioClick(nIDtxt, response) {
-    if (document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"radioCurrID")) {
-        if (document.getElementById("n"+nIDtxt+"fld"+response+"").value != document.getElementById("n"+nIDtxt+"radioCurrID").value) {
-            document.getElementById("n"+nIDtxt+"radioCurrID").value = document.getElementById("n"+nIDtxt+"fld"+response+"").value;
+    if (document.getElementById(nIDtxt+"fld"+response) && document.getElementById(nIDtxt+"radioCurrID")) {
+        if (document.getElementById(nIDtxt+"fld"+response).value != document.getElementById(nIDtxt+"radioCurrID").value) {
+            document.getElementById(nIDtxt+"radioCurrID").value = document.getElementById(nIDtxt+"fld"+response+"").value;
         } else {
-            document.getElementById("n"+nIDtxt+"fld"+response+"").checked = false;
-            document.getElementById("n"+nIDtxt+"radioCurrID").value = "";
-            checkFingerClass(nIDtxt);
-            chkFormCheck();
+            document.getElementById(nIDtxt+"fld"+response+"").checked = false;
+            document.getElementById(nIDtxt+"radioCurrID").value = "";
         }
+        checkFingerClass(nIDtxt);
     }
     return true;
 }
@@ -333,12 +338,12 @@ function addMutEx(nID, response) {
 }
 
 function checkFingerClass(nIDtxt) {
-    for (var j = 0; j < nodeResTot[nIDtxt]; j++) {
-        if (document.getElementById("n"+nIDtxt+"fld"+j+"lab") && document.getElementById("n"+nIDtxt+"fld"+j+"")) {
-            if (document.getElementById("n"+nIDtxt+"fld"+j+"").checked) {
-                document.getElementById("n"+nIDtxt+"fld"+j+"lab").className = "fingerAct";
+    for (var j = 0; j < nodeResTot[stripN(nIDtxt)]; j++) {
+        if (document.getElementById(nIDtxt+"fld"+j+"lab") && document.getElementById(nIDtxt+"fld"+j+"")) {
+            if (document.getElementById(nIDtxt+"fld"+j+"").checked) {
+                document.getElementById(nIDtxt+"fld"+j+"lab").className = "fingerAct";
             } else {
-                document.getElementById("n"+nIDtxt+"fld"+j+"lab").className = "finger";
+                document.getElementById(nIDtxt+"fld"+j+"lab").className = "finger";
             }
         }
     }

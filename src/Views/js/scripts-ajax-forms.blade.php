@@ -659,7 +659,7 @@ function checkNodeUp(nIDtxt, response) {
         nID = txt2nID(nIDtxt);
         checkMutEx(nIDtxt, response);
         if (nID > 0 && nodeMobile[nID]) checkFingerClass(nIDtxt);
-        if (chkIsRadioNode(nIDtxt)) setTimeout("runRadioClick('"+nIDtxt+"', '"+response+"')", 10);
+        if (chkIsRadioNode(nIDtxt)) runRadioClick(nIDtxt, response);
         chkFormCheck();
     }
     return true;
@@ -670,10 +670,15 @@ function tryCheckNodeUp(nFldID) {
         checkingForm = true;
         var nodeAndRes = getNodeAndResFromFldID(nFldID);
         checkNodeUp(nodeAndRes[0], nodeAndRes[1]);
-        setTimeout(function() { checkingForm = false; }, 2000);
+        setTimeout(function() { checkingForm = false; }, 800);
     }
     return true;
 }
+
+$(".slNodeChange").keyup(function() { return tryCheckNodeUp($(this).attr("id")); });
+$(".slNodeChange").click(function() { return tryCheckNodeUp($(this).attr("id")); });
+$("input.slNodeChange").click(function() { return tryCheckNodeUp($(this).attr("id")); });
+
 $(document).on("keyup", "input.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
 $(document).on("keyup", "textarea.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
 $(document).on("change", "select.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
@@ -682,9 +687,6 @@ $(document).on("click", "input.slNodeChange", function() { return tryCheckNodeUp
 $(document).on("keyup", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
 $(document).on("change", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
 $(document).on("click", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-
-$(".slNodeChange").keyup(function() { return tryCheckNodeUp($(this).attr("id")); });
-$(".slNodeChange").click(function() { return tryCheckNodeUp($(this).attr("id")); });
 
 
 function formKeyUpOther(nIDtxt, j) {
@@ -695,6 +697,14 @@ function formKeyUpOther(nIDtxt, j) {
     chkFormCheck();
     return true;
 }
+$(document).on("keyup", "input.slNodeKeyUpOther", function() {
+    if ($(this).attr("data-nid")) {
+        var nIDtxt = $(this).attr("data-nid");
+        var j = $(this).attr("data-j");
+        return formKeyUpOther(nIDtxt, j);
+    }
+    return false;
+});
 
 function formClickGender(nIDtxt) {
     if (document.getElementById("n"+nIDtxt+"fldOtherID")) {
@@ -707,6 +717,14 @@ function formClickGender(nIDtxt) {
     chkFormCheck();
     return true;
 }
+$(document).on("click", "input.slNodeClkGender", function() {
+    if ($(this).attr("data-nid")) {
+        var nID = $(this).attr("data-nid");
+        return formClickGender(nID);
+    }
+    return false;
+});
+
 
 function checkNodeFormSignup() {
 @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
