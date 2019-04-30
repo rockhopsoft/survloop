@@ -28,29 +28,7 @@
     margin: 6px 15px 0 0;
     text-align: center;
 	color: {!! $css["color-nav-text"] !!};
-	border: 1px {!! $css["color-main-grey"] !!} solid;
 }
-#navBurger .fa.fa-bars, a#navBurger:link .fa.fa-bars, a#navBurger:active .fa.fa-bars, a#navBurger:visited .fa.fa-bars, a#navBurger:hover .fa.fa-bars {
-    margin-top: 3px;
-    display: block;
-}
-#navBurgerClose .fa.fa-times, a#navBurgerClose:link .fa.fa-times, a#navBurgerClose:active .fa.fa-times, a#navBurgerClose:visited .fa.fa-times, a#navBurgerClose:hover .fa.fa-times {
-    margin-top: 2px;
-    display: block;
-}
-a#navBurger:hover, a#navBurgerClose:hover {
-    text-decoration: none;
-}
-/*
-@-moz-document url-prefix() {
-    #navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover {
-        padding-top: 3px;
-    }
-    #navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-        padding-top: 2px;
-    }
-}
-*/
 
 .headGap {
     display: block;

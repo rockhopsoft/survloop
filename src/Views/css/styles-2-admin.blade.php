@@ -105,6 +105,7 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
 }
 a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
     display: none;
+    margin: 10px 0px 10px -16px;
 }
 #leftSide {
     height: 100%;

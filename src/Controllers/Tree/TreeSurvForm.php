@@ -909,13 +909,19 @@ class TreeSurvForm extends TreeSurvFormUtils
                     if (isset($curr->extraOpts["incr"]) && $curr->extraOpts["incr"] > 0) {
                         $attrIncr = 'step="' . $curr->extraOpts["incr"] . '" ';
                     }
-                    $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '">';
+                    $ret .= $nodePrompt;
+                    if ($curr->chkCurrOpt('MONTHCALC')) {
+                        $presel = $this->monthlyCalcPreselections($nID, $nIDtxt);
+                        $ret .= $this->printMonthlyCalculator($nIDtxt, $presel);
+                    }
+                    $ret .= '<div class="nFld' . $isOneLinerFld . '">';
                     if (!$this->hasSpreadsheetParent($nID)) {
                         $ret .= '<div class="row"><div class="col-3">';
                     }
                     $ret .= '<nobr><input type="number" data-nid="' . $nID . '" class="form-control form-control-lg ' 
-                        . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : ((isset($curr->extraOpts["unit"]) 
-                            && trim($curr->extraOpts["unit"]) != '') ? 'unitFld ' : '')) . $xtraClass 
+                        . (($curr->nodeType == 'Slider') ? 'slidePercFld ' 
+                            : 'w100 ' . ((isset($curr->extraOpts["unit"]) && trim($curr->extraOpts["unit"]) != '') 
+                                ? 'unitFld ' : '')) . $xtraClass 
                         . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
                         . '" ' . $onKeyUp . ' ' . $attrIncr . $attrMin . $attrMax . $GLOBALS["SL"]->tabInd() . '> ';
                     if (isset($curr->extraOpts["unit"]) && trim($curr->extraOpts["unit"]) != '') {

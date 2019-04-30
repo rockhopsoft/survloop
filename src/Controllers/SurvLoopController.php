@@ -583,7 +583,9 @@ class SurvLoopController extends Controller
             ->get();
         $this->v["navMenu"] = [];
         if ($settings->isNotEmpty()) {
-            foreach ($settings as $s) $this->v["navMenu"][] = [$s->DefValue, $s->DefDescription];
+            foreach ($settings as $s) {
+                $this->v["navMenu"][] = [$s->DefValue, $s->DefDescription];
+            }
         }
         return true;
     }
@@ -601,7 +603,9 @@ class SurvLoopController extends Controller
     
     protected function createToken($type, $treeID = -3, $coreID = -3, $userID = -3)
     {
-        if ($userID <= 0 && Auth::user() && isset(Auth::user()->id)) $userID = Auth::user()->id;
+        if ($userID <= 0 && Auth::user() && isset(Auth::user()->id)) {
+            $userID = Auth::user()->id;
+        }
         if ($type == 'Confirm Email') {
             if ($userID > 0) {
                 $tokRow = SLTokens::where('TokType', $type)
@@ -618,7 +622,9 @@ class SurvLoopController extends Controller
             }
         } elseif ($type == 'Sensitive') {
             $token = $this->chkBasicToken($type, $treeID, $coreID, $userID);
-            if (trim($token) != '') return $token;
+            if (trim($token) != '') {
+                return $token;
+            }
             $tokRow = $this->makeBasicToken($type, $treeID, $coreID, $userID);
             return $tokRow->TokTokToken;
         } elseif ($type == 'MFA') {

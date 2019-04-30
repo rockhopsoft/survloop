@@ -89,7 +89,7 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 } elseif ($node->nodeRow->NodeOpts%2 == 0) {
                     $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
                 }
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o

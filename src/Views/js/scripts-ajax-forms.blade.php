@@ -670,8 +670,9 @@ function tryCheckNodeUp(nFldID) {
         checkingForm = true;
         var nodeAndRes = getNodeAndResFromFldID(nFldID);
         checkNodeUp(nodeAndRes[0], nodeAndRes[1]);
-        setTimeout(function() { checkingForm = false; }, 800);
+        setTimeout(function() { checkingForm = false; }, 500);
     }
+    setTimeout(function() { tryCheckNodeUp(nFldID); }, 10000);
     return true;
 }
 

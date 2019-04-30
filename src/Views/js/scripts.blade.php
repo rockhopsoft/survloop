@@ -265,6 +265,19 @@ function addTopCust(navCode) {
     }
     return true;
 }
+function addTopCustRight(navCode) {
+    if (document.getElementById("myNavBar")) {
+        if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0) {
+            var loginPos = document.getElementById("myNavBar").innerHTML.indexOf('fa fa-times');
+            if (loginPos > 0) {
+                document.getElementById("myNavBar").innerHTML = document.getElementById("myNavBar").innerHTML.substring(0,loginPos+40)+navCode+document.getElementById("myNavBar").innerHTML.substring(loginPos+40);
+            } else {
+                document.getElementById("myNavBar").innerHTML += navCode;
+            }
+        }
+    }
+    return true;
+}
 function addTopNavItem(navTxt, navLink) {
     if (document.getElementById("myNavBar")) {
         if (navTxt == 'pencil') navTxt = "<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>";

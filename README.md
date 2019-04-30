@@ -18,10 +18,10 @@
 # <a name="about"></a>About
 
 * PHP Controllers ~ 1.2 MB (on disk)
-* Blade HTML Template Views ~ 572 KB total
+* Blade HTML Template Views ~ 572 KB
 * Javascript/jQuery within Blade Templates ~ 131 KB
 * CSS within Blade Templates ~ 131 KB
-* SurvLoop-Generated PHP Eloquent Models ~ 172 KB
+* SurvLoop-Generated PHP Eloquent Data Table Models ~ 172 KB
 * SurvLoop-Generated PHP Laravel Database Migration & Seeders ~ 229 KB
 
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
@@ -51,6 +51,9 @@ XML included an automatically generated schema, eg.<br />
 Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
 Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
 <a href="https://drugstory.me" target="_blank">Drug Story</a> (less active).
+
+The installation used for SurvLoop.org is currently the best example of a bare-bones extenstion of SurvLoop:<br />
+<a href="https://github.com/wikiworldorder/survlooporg" target="_blank">github.com/wikiworldorder/survlooporg</a>
 
 
 # <a name="requirements"></a>Requirements
@@ -87,7 +90,7 @@ mysql> exit;
 $ exit
 ```
 
-At this point, you should be able to browse to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> for PhpMyAdmin.
+At this point, you can optionally browse to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> for PhpMyAdmin.
 ```
 Server: mysql
 Username: default

@@ -497,7 +497,7 @@ class TreeSurvLoad extends TreeSurvConds
         return 'Node #' . $nID . '<br />';
     }
     
-    protected function postNodePublicCustom($nID = -3, $tmpSubTier = [])
+    protected function postNodePublicCustom($nID = -3, $nIDtxt = '', $tmpSubTier = [])
     {
         return false;
     }

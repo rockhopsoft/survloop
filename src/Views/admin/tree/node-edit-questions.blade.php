@@ -105,6 +105,11 @@
                                 @if (isset($node->extraOpts["unit"]) && $node->extraOpts["unit"] !== false) 
                                     value="{{ $node->extraOpts["unit"] }}" @endif ></label>
                     </div>
+                    <label class="m10">
+                        <input type="checkbox" name="opts101" id="opts101ID" value="101" class="mR5"
+                            @if ($node->nodeRow->NodeOpts%101 == 0) CHECKED @endif autocomplete="off" >
+                        Provide Calculator to Sum 12 Months
+                    </label>
                 </div>
             </div>
             <div id="spreadTblOpts" class="p20 @if ($node->isSpreadTbl()) disBlo @else disNon @endif ">

@@ -339,7 +339,7 @@ class PageLoadUtils extends Controller
         return (Auth::user() && Auth::user()->hasRole('partner'));
     }
 
-    protected function urlNotCssNorJs($str)
+    protected function urlNotResourceFile($str)
     {
         $str = trim($str);
         if ($str == '') {
@@ -348,7 +348,7 @@ class PageLoadUtils extends Controller
         $dot = strrpos($str, '.');
         if ($dot > 0) {
             $sffx = substr($str, $dot);
-            if (in_array($sffx, ['css', 'js'])) {
+            if (in_array(strtolower($sffx), ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2'])) {
                 return false;
             }
         }

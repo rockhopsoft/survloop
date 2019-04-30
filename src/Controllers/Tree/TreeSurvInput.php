@@ -244,7 +244,7 @@ class TreeSurvInput extends TreeSurvUpload
             
         } elseif (!$curr->isDataPrint()) {
             
-            if (!$this->postNodePublicCustom($nID, $tmpSubTier)) { // then run standard post
+            if (!$this->postNodePublicCustom($nID, $nIDtxt, $tmpSubTier)) { // then run standard post
                 if ($GLOBALS["SL"]->REQ->has('loop')) {
                     $this->settingTheLoop(trim($GLOBALS["SL"]->REQ->input('loop')), 
                         intVal($GLOBALS["SL"]->REQ->loopItem));

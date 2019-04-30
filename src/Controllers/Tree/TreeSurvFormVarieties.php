@@ -505,4 +505,21 @@ class TreeSurvFormVarieties extends UserProfile
         return trim($ret);
     }
     
+    public function monthlyCalcPreselections($nID, $nIDtxt = '')
+    {
+        return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    }
+    
+    public function printMonthlyCalculator($nIDtxt = '', $presel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $extraJS = '')
+    {
+        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.forms.formtree-monthly-calculator-ajax', [
+            "nIDtxt"  => $nIDtxt,
+            "extraJS" => $extraJS
+            ])->render();
+        return view('vendor.survloop.forms.formtree-monthly-calculator', [
+            "nIDtxt" => $nIDtxt,
+            "presel" => $presel
+            ])->render();
+    }
+    
 }

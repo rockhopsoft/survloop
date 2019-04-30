@@ -9,7 +9,7 @@
   */
 namespace SurvLoop\Controllers\Stats;
 
-use SurvLoop\Controllers\SurvStatsChart;
+use SurvLoop\Controllers\Stats\SurvStatsChart;
 
 class SurvStatsGraph extends SurvStatsChart
 {

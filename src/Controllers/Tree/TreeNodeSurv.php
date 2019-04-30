@@ -37,39 +37,40 @@ class TreeNodeSurv extends TreeNodeCore
     
     // Tree Nodes are assigned an optional property when ( SLNode->NodeOpts%OPT_PRIME == 0 )
     // Node Options
-    public const OPT_DROPTAGGER = 53; // This node's dropdown stores like a checkbox, associating tags
+    public const OPT_DROPTAGGER = 53;  // This node's dropdown stores like a checkbox, associating tags
 
     // Node Visual Layout Options
-    public const OPT_SKINNY     = 67; // This node's contents are wrapped in the skinny page width 
-    public const OPT_JUMBOTRON  = 37; // Wrap the contents of this node inside bootstrap's Jumbotron
-    public const OPT_BLOCKBACKG = 71; // Node has content block background and color properties
-    public const OPT_CARDWRAP   = 89; // Wrap the contents of this node inside a Card
-    public const OPT_DEFERLOAD  = 97; // Defer loading the contents of this load until after the rest of the page
+    public const OPT_SKINNY     = 67;  // This node's contents are wrapped in the skinny page width 
+    public const OPT_JUMBOTRON  = 37;  // Wrap the contents of this node inside bootstrap's Jumbotron
+    public const OPT_BLOCKBACKG = 71;  // Node has content block background and color properties
+    public const OPT_CARDWRAP   = 89;  // Wrap the contents of this node inside a Card
+    public const OPT_DEFERLOAD  = 97;  // Defer loading the contents of this load until after the rest of the page
     
     // Node Form Field Layout Options
-    public const OPT_CUSTOMLAY  = 2;  // Node uses some layout overrides instead of default
-    public const OPT_REQUIRELIN = 13; // "*Required" must appear on its own line
-    public const OPT_RESPOCOLS  = 61; // Node responses layed out in columns
+    public const OPT_CUSTOMLAY  = 2;   // Node uses some layout overrides instead of default
+    public const OPT_REQUIRELIN = 13;  // "*Required" must appear on its own line
+    public const OPT_RESPOCOLS  = 61;  // Node responses layed out in columns
     
     // Node Form Field Saving Options
-    public const OPT_TBLSAVEROW = 73; // Table leaves existing rows' records upon saving (don't delete empties)
+    public const OPT_TBLSAVEROW = 73;  // Table leaves existing rows' records upon saving (don't delete empties)
     
     // Node Interaction Options
-    public const OPT_WORDCOUNT  = 31; // Open ended field should show a live word count
-    public const OPT_WORDLIMIT  = 47; // Force limit on word count
-    public const OPT_ECHOSTROKE = 41; // Echo response edits to specific div, every keystroke
-    public const OPT_BTNTOGGLE  = 43; // Toggle child nodes if node button is clicked
-    public const OPT_HIDESELECT = 79; // Hide unselected options after radio button selected
-    public const OPT_REVEALINFO = 83; // Reveal node sub-notes upon clicking a little info icon
+    public const OPT_WORDCOUNT  = 31;  // Open ended field should show a live word count
+    public const OPT_WORDLIMIT  = 47;  // Force limit on word count
+    public const OPT_ECHOSTROKE = 41;  // Echo response edits to specific div, every keystroke
+    public const OPT_BTNTOGGLE  = 43;  // Toggle child nodes if node button is clicked
+    public const OPT_HIDESELECT = 79;  // Hide unselected options after radio button selected
+    public const OPT_REVEALINFO = 83;  // Reveal node sub-notes upon clicking a little info icon
+    public const OPT_MONTHCALC  = 101; // Provides a calculator to total 12 months
     
     // Page Node Options
-    public const OPT_EXITPAGE   = 29; // Node is an Exit Page, without a next button 
-    public const OPT_HIDEPROG   = 59; // Hide progress bar on this page
+    public const OPT_EXITPAGE   = 29;  // Node is an Exit Page, without a next button 
+    public const OPT_HIDEPROG   = 59;  // Hide progress bar on this page
     
     // For XML Tree Nodes
-    public const OPT_XMLPARENTS = 5;  // Include members with parent, without table wrap
-    public const OPT_XMLMIN     = 7;  // Min 1 Record
-    public const OPT_XMLMAX     = 11; // Max 1 Record
+    public const OPT_XMLPARENTS = 5;   // Include members with parent, without table wrap
+    public const OPT_XMLMIN     = 7;   // Min 1 Record
+    public const OPT_XMLMAX     = 11;  // Max 1 Record
     
     public function getPrimeConst($type)
     {

@@ -17,7 +17,7 @@
 }
 .nodeHalfGap {
 	width: 100%;
-	height: 20px;
+	height: 30px;
 	clear: both;
 }
 
@@ -121,7 +121,7 @@
 }
 .slidePercFld {
     display: inline;
-    width: 55px; 
+    width: 57px; 
     padding: 6px 6px;
     text-align: right;
 }

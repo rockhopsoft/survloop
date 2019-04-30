@@ -235,7 +235,7 @@ class SurvLoop extends SurvCustLoop
     public function afterLogin(Request $request)
     {
         $redir = '';
-        if (session()->has('previousUrl') && $this->urlNotCssNorJs(session()->get('previousUrl'))) {
+        if (session()->has('previousUrl') && $this->urlNotResourceFile(session()->get('previousUrl'))) {
             $redir = trim(session()->get('previousUrl'));
             // check if being redirected back to a survey session, which needs to be associated with new user ID
             if (strpos($redir, '/u/') == 0 && Auth::user() && isset(Auth::user()->id) && Auth::user()->id > 0) {
@@ -257,7 +257,7 @@ class SurvLoop extends SurvCustLoop
                     }
                 }
             }
-        } elseif (session()->has('redir2') && $this->urlNotCssNorJs(session()->get('redir2'))) {
+        } elseif (session()->has('redir2') && $this->urlNotResourceFile(session()->get('redir2'))) {
             $redir = trim(session()->get('redir2'));
         }
         if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0 
@@ -270,7 +270,7 @@ class SurvLoop extends SurvCustLoop
             }
         } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
             $this->afterLoginLastTree($request);
-        } elseif (session()->has('loginRedir') && $this->urlNotCssNorJs(session()->get('loginRedir'))) {
+        } elseif (session()->has('loginRedir') && $this->urlNotResourceFile(session()->get('loginRedir'))) {
             $redir = trim(session()->get('loginRedir'));
         }
         $this->loadDomain();
