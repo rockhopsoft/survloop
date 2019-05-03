@@ -153,9 +153,9 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 <div id="progWrap"></div>
 
 <noscript><div class="alert alert-dismissible alert-warning">
-    <b>Warning: It looks like you have Javascript disabled.
+    <b>Warning: It looks like you have JavaScript disabled.
     @if (isset($GLOBALS['SL']->sysOpts['site-name'])) {{ $GLOBALS['SL']->sysOpts['site-name'] }} @endif
-    requires Javascript to give you the best possible experience.</b>
+    requires JavaScript to give you the best possible experience.</b>
 </div></noscript>
 
 <!-- SessMsg -->

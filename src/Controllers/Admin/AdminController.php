@@ -421,7 +421,7 @@ class AdminController extends SurvLoopController
                 }
                 $this->loader->syncDataTrees($request);
                 if ($next > 0) {
-                    echo '<center><div class="p20"><br /><br /><h2>Refreshing Jasascript Cache for Tree #' . $curr 
+                    echo '<center><div class="p20"><br /><br /><h2>Refreshing JavaScript Cache for Tree #' . $curr 
                         . '</h2></div></center><div class="p20">' . $GLOBALS["SL"]->spinner() . '</div>';
                     return $this->redir('/dashboard/settings?refresh=2&next=' . $next, true);
                 }

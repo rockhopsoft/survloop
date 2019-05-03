@@ -281,11 +281,13 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         
         $mobileCheckbox = ($curr->nodeRow->NodeOpts%2 > 0);
+        /*
         if (in_array($curr->nodeType, ['Radio', 'Checkbox']) && sizeof($curr->responses) > 0 && $mobileCheckbox) {
             $GLOBALS["SL"]->pageJAVA .= 'addIsMobile(' . $nID . ', true); ';
         } else {
             $GLOBALS["SL"]->pageJAVA .= 'addIsMobile(' . $nID . ', false); ';
         }
+        */
         
         // check for extra custom HTML/JS/CSS code stored with the node; check for standardized techniques
         $nodePromptAfter = '';
@@ -1093,7 +1095,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 }
                                 $otherFld[2] = '<input type="text" name="n' . $nID . 'fldOther' . $j . '" id="n' 
                                     . $nID . 'fldOtherID' . $j . '" value="' . $otherFld[1] 
-                                    . '" class="form-control disIn ntrStp slTab otherFld mL10"' 
+                                    . '" class="form-control disIn ntrStp slTab otherFld slNodeKeyUpOther mL10"' 
                                     . $GLOBALS["SL"]->tabInd() . '>';
                             }
                             
@@ -1178,12 +1180,12 @@ class TreeSurvForm extends TreeSurvFormUtils
                                     }
                                 }
                             }
-                            if ($curr->nodeType == 'Checkbox' && in_array($j, $curr->fldHasOther)) {
+                            /* if ($curr->nodeType == 'Checkbox' && in_array($j, $curr->fldHasOther)) {
                                 $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' . $nIDtxt . 'fldOtherID' . $j 
                                     . '", function() { if (document.getElementById("n' . $nIDtxt . 'fldOtherID' . $j 
                                     . '").value.trim() != "") { formKeyUpOther(\'' . $nID . '\', ' . $j . '); } });';
                                     // chkSubRes' . $nIDtxt . 'j' . $j . '();
-                            }
+                            } */
                         }
                         if ($curr->isRequired()) {
                             $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt . "', 'reqFormFldRadio', " 

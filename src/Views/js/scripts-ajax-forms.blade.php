@@ -670,9 +670,8 @@ function tryCheckNodeUp(nFldID) {
         checkingForm = true;
         var nodeAndRes = getNodeAndResFromFldID(nFldID);
         checkNodeUp(nodeAndRes[0], nodeAndRes[1]);
-        setTimeout(function() { checkingForm = false; }, 500);
+        setTimeout(function() { checkingForm = false; }, 400);
     }
-    setTimeout(function() { tryCheckNodeUp(nFldID); }, 10000);
     return true;
 }
 
@@ -699,7 +698,7 @@ function formKeyUpOther(nIDtxt, j) {
     return true;
 }
 $(document).on("keyup", "input.slNodeKeyUpOther", function() {
-    if ($(this).attr("data-nid")) {
+    if ($(this).attr("data-nid") && $(this).attr("data-j")) {
         var nIDtxt = $(this).attr("data-nid");
         var j = $(this).attr("data-j");
         return formKeyUpOther(nIDtxt, j);

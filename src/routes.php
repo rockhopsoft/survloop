@@ -160,8 +160,13 @@ Route::group(['middleware' => ['web']], function () {
         'uses'       => 'SurvLoop\\Controllers\\Auth\\UpdatePasswordController@runUpdate',
         'middleware' => 'auth'
     ]);
+    Route::post('password/email', 'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
     Route::get( '/password/email', 'SurvLoop\\Controllers\\Auth\\AuthController@printPassReset');
     Route::get( '/password/reset', 'SurvLoop\\Controllers\\Auth\\AuthController@printPassReset');
+    Route::get('password/reset/{token}', 'App\\Http\\Controllers\\Auth\\ResetPasswordController@showResetForm')->name('password.reset');
+    Route::get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.update');
+    //Route::post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+
     
     Route::post('/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
     Route::get( '/home', 'SurvLoop\\Controllers\\SurvLoop@loadPageHome');

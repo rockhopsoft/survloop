@@ -149,7 +149,7 @@
                         @if (isset($node->nodeRow->NodeDefault)) value="{{ $node->nodeRow->NodeDefault }}" 
                         @endif onKeyUp="return previewBigBtn();" >
                 </div>
-                <h4 class="mT0">Button On Click Javascript</h4>
+                <h4 class="mT0">Button On Click JavaScript</h4>
                 <div class="nFld m0">
                     <input type="text" name="bigBtnJS" class="form-control form-control-lg" 
                         @if (isset($node->nodeRow->NodeDataStore)) value="{{ $node->nodeRow->NodeDataStore }}" 

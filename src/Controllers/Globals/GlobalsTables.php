@@ -2077,7 +2077,7 @@ class GlobalsTables extends GlobalsStatic
     
     public function isHomestead()
     {
-        return (strpos($this->sysOpts["app-url"], 'homestead.test') !== false);
+        return (strpos($this->sysOpts["app-url"], '.test') !== false);
     }
     
     public function getParentDomain()

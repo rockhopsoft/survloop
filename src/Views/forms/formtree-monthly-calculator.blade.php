@@ -13,6 +13,6 @@
             @endfor
         </div>
         <a id="monthlyCalcTot{{ $nIDtxt }}" href="javascript:;" class="btn btn-sm btn-secondary"
-            ><i class="fa fa-arrow-down" aria-hidden="true"></i> Apply Up Total</a>
+            ><i class="fa fa-arrow-down" aria-hidden="true"></i> Add Up Total</a>
     </div>
 </div>

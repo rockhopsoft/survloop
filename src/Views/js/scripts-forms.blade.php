@@ -356,20 +356,18 @@ function checkMutEx(nIDtxt, response) {
         var hasMutEx = false;
         var clickedMutEx = false;
         for (var i = 0; i < nodeMutEx[nID].length; i++) {
-            if (nodeMutEx[nID][i] == response) {
-                if (document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
-                    clickedMutEx = true;
-                    for (var j=0; j < nodeResTot[nID]; j++) {
-                        if (j != response) {
-                            document.getElementById("n"+nIDtxt+"fld"+j+"").checked = false;
-                        }
+            if (nodeMutEx[nID][i] == response && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
+                clickedMutEx = true;
+                for (var j=0; j < nodeResTot[nID]; j++) {
+                    if (j != response && document.getElementById("n"+nIDtxt+"fld"+j+"")) {
+                        document.getElementById("n"+nIDtxt+"fld"+j+"").checked = false;
                     }
                 }
             }
         }
         if (!clickedMutEx) {
             for (var i=0; i < nodeMutEx[nID].length; i++) {
-                if (nodeMutEx[nID][i] != response && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
+                if (nodeMutEx[nID][i] != response && document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nID][i]+"") && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
                     document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nID][i]+"").checked = false;
                 }
             }

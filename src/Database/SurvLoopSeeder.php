@@ -2365,7 +2365,7 @@ class SurvLoopSeeder extends Seeder
 			'FldSpecSource' => '0',
 			'FldName' => 'PromptAfter',
 			'FldEng' => 'Extra HTML After Node Response',
-			'FldDesc' => 'Stores any extra HTML, CSS, or Javascript which a Database Designer wants to appear directly after the User\'s opportunity to Respond to a Node\'s Prompt.',
+			'FldDesc' => 'Stores any extra HTML, CSS, or JavaScript which a Database Designer wants to appear directly after the User\'s opportunity to Respond to a Node\'s Prompt.',
 			'FldForeignMin' => 'N',
 			'FldForeignMax' => 'N',
 			'FldForeign2Min' => 'N',
