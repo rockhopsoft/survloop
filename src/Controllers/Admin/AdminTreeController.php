@@ -88,7 +88,9 @@ class AdminTreeController extends AdminController
             //$this->allStdCondition('#HasUploads', 'Current core table record has associated uploads.');
             $trees = SLTree::where('TreeType', 'Page')->get();
             if ($trees->isNotEmpty()) {
-                foreach ($trees as $tree) $this->v["treeClassAdmin"]->updateTreeOpts($tree->TreeID);
+                foreach ($trees as $tree) {
+                    $this->v["treeClassAdmin"]->updateTreeOpts($tree->TreeID);
+                }
             }
             session()->put('chkCoreTbls', 1);
         }
@@ -101,7 +103,15 @@ class AdminTreeController extends AdminController
     
     protected function createRootNode($treeRow)
     {
-        if (!isset($treeRow->TreeID)) return -3;
+        if (!isset($treeRow->TreeID)) {
+            return -3;
+        }
+        $chk = SLNode::where('NodeTree', $treeRow->TreeID)
+            ->where('NodeParentID', -3)
+            ->first();
+        if ($chk && isset($chk->NodeID)) {
+            return -3;
+        }
         $newRoot = new SLNode;
         $newRoot->NodeTree     = $treeRow->TreeID;
         $newRoot->NodeParentID = -3;

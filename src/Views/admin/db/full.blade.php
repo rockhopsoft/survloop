@@ -1,5 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/db/full.blade.php -->
 
+<div class="container">
+
 <div class="row">
     <div class="col-9">
         <h1><span class="slBlueDark"><i class="fa fa-database"></i> 
@@ -73,3 +75,4 @@
     
 @endif
 
+</div>

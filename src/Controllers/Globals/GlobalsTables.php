@@ -824,7 +824,8 @@ class GlobalsTables extends GlobalsStatic
     
     public function printLoopsDropdowns($preSel = '', $fld = 'loopList', $manualOpt = true)
     {
-        $currDefinition = $currLoopItems = $currTblRecs = '';
+        $currDefinition = $currLoopItems = $currTblRecs = $currTblAll = '';
+        $currTblAllCond = 0;
         if (isset($preSel)) {
             if (strpos($preSel, 'Definition::') !== false) {
                 $currDefinition = str_replace('Definition::', '', $preSel);
@@ -832,6 +833,10 @@ class GlobalsTables extends GlobalsStatic
                 $currLoopItems = str_replace('LoopItems::', '', $preSel);
             } elseif (strpos($preSel, 'Table::') !== false) {
                 $currTblRecs = str_replace('Table::', '', $preSel);
+            } elseif (strpos($preSel, 'TableAll::') !== false) {
+                list($currTblAll, $currTblAllCond) 
+                    = $GLOBALS["SL"]->mexplode('::', str_replace('TableAll::', '', $preSel));
+                $currTblAllCond = intVal($currTblAllCond);
             }
         }                   
         return view('vendor.survloop.admin.tree.node-edit-loop-list', [
@@ -840,7 +845,9 @@ class GlobalsTables extends GlobalsStatic
             "defs"           => $this->allDefSets(),
             "currDefinition" => $currDefinition, 
             "currLoopItems"  => $currLoopItems, 
-            "currTblRecs"    => $currTblRecs
+            "currTblRecs"    => $currTblRecs,
+            "currTblAll"     => $currTblAll,
+            "currTblAllCond" => $currTblAllCond
             ])->render();
     }
     
@@ -854,11 +861,16 @@ class GlobalsTables extends GlobalsStatic
                 }
             } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-loop') {
                 if (trim($this->REQ->input($fld . 'LoopItems')) != '') {
-                    $ret = 'LoopItems::'.$this->REQ->input($fld . 'LoopItems');
+                    $ret = 'LoopItems::' . $this->REQ->input($fld . 'LoopItems');
                 }
             } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-tbl') {
                 if (trim($this->REQ->input($fld . 'Tables')) != '') {
-                    $ret = 'Table::'.$this->REQ->input($fld . 'Tables');
+                    $ret = 'Table::' . $this->REQ->input($fld . 'Tables');
+                }
+            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-tbl-all') {
+                if (trim($this->REQ->input($fld . 'Tables')) != '' && $this->isAdmin) {
+                    $ret = 'TableAll::' . $this->REQ->input($fld . 'Tables') . '::' 
+                        . intVal($this->REQ->input($fld . 'TableCond'));
                 }
             }
         }

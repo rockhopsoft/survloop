@@ -10,9 +10,11 @@
             <option value="auto-def" @if ($currDefinition != '') SELECTED @endif
                 > Pull from Definition Set </option>
             <option value="auto-loop" @if ($currLoopItems != '') SELECTED @endif
-                > Pull from Entered Loop Items </option>
+                > Pull from entered loop items </option>
             <option value="auto-tbl" @if ($currTblRecs != '') SELECTED @endif
-                > Pull from Entered Table Records </option>
+                > Pull from entered table records </option>
+            <option value="auto-tbl-all" @if ($currTblAll != '') SELECTED @endif
+                > Pull from all table records </option>
         <select>
     </div>
     <div class="col-6 nFld mT0">
@@ -43,18 +45,30 @@
                 @endforelse
             </select>
         </div>
-        <div id="{{ $fld }}Tbls" class=" @if ($currTblRecs != '') disBlo @else disNon @endif ">
+        <div id="{{ $fld }}Tbls" class=" @if ($currTblRecs != '' || $currTblAll != '') disBlo @else disNon @endif ">
             <select name="{{ $fld }}Tables" id="{{ $fld }}TablesID" autocomplete="off"
                 class="form-control form-control-lg" onChange="changeLoopListType('{{ $fld }}');" >
-                <option value="" @if ($currTblRecs == '') SELECTED @endif > Select Data Table... </option>
+                <option value="" @if ($currTblRecs == '' && $currTblAll == '') SELECTED @endif > Select Data Table... </option>
                 @forelse ($GLOBALS['SL']->tbl as $tID => $tblName)
-                    <option value="{{ $tblName }}" @if ($currTblRecs == $tblName) SELECTED @endif >
+                    <option value="{{ $tblName }}" @if ($currTblRecs == $tblName || $currTblAll == $tblName) SELECTED @endif >
                         @if ($GLOBALS['SL']->tblEng[$tID] != $tblName)
                             {{ $GLOBALS['SL']->tblEng[$tID] }} ({{ $tblName }})
                         @else {{ $GLOBALS['SL']->tblEng[$tID] }} @endif </option>
                 @empty
                 @endforelse
             </select>
+            <div id="{{ $fld }}TblCond" class=" @if ($currTblAll != '') disBlo @else disNon @endif ">
+                <select name="{{ $fld }}TableCond" id="{{ $fld }}TableCondID" autocomplete="off"
+                    class="form-control form-control-lg" >
+                    <option value="0" @if (intVal($currTblAllCond) == 0) SELECTED @endif 
+                        >Select a condition related to this table</option>
+                @forelse ($GLOBALS['SL']->getCondList() as $c)
+                    <option value="{{ $c->CondID }}" @if (intVal($currTblAllCond) == $c->CondID) SELECTED @endif 
+                        >{{ $c->CondTag }} - {{ $c->CondDesc }}</option>
+                @empty
+                @endforelse
+                </select>
+            </div>
         </div>
     </div>
 </div>

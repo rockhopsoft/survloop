@@ -585,6 +585,7 @@ function changeLoopListType(fld) {
             document.getElementById(''+fld+'Defs').style.display = 'none';
             document.getElementById(''+fld+'Loops').style.display = 'none';
             document.getElementById(''+fld+'Tbls').style.display = 'none';
+            document.getElementById(''+fld+'TblCond').style.display = 'none';
             document.getElementById(''+fld+'DefinitionID').value='';
             document.getElementById(''+fld+'LoopItemsID').value='';
             document.getElementById(''+fld+'TablesID').value='';
@@ -596,10 +597,13 @@ function changeLoopListType(fld) {
             document.getElementById(''+fld+'Defs').style.display = 'none';
             document.getElementById(''+fld+'Loops').style.display = 'block';
             document.getElementById(''+fld+'Tbls').style.display = 'none';
-        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl') {
+        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl' || document.getElementById(''+fld+'TypeID').value == 'auto-tbl-all') {
             document.getElementById(''+fld+'Defs').style.display = 'none';
             document.getElementById(''+fld+'Loops').style.display = 'none';
             document.getElementById(''+fld+'Tbls').style.display = 'block';
+            if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl-all') {
+                document.getElementById(''+fld+'TblCond').style.display = 'block';
+            }
         }
     }
     return true;

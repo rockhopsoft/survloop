@@ -464,6 +464,21 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                     }
                 }
             }
+        } elseif (isset($curr->responseSet) && strpos($curr->responseSet, 'TableAll::') !== false) {
+            list($tbl, $condID) = $GLOBALS["SL"]->mexplode('::', str_replace('TableAll::', '', $curr->responseSet));
+            if ($this->v["isAdmin"]) {
+                eval("\$chk = " . $GLOBALS["SL"]->modelPath($tbl) . "::orderBy('created_at', 'desc')->get();");
+                if ($chk->isNotEmpty()) {
+                    foreach ($chk as $i => $row) {
+                        $recName = $this->getTableRecLabel($tbl, $row, $i);
+                        if (trim($recName) != '') {
+                            $curr->responses[$i] = new SLNodeResponses;
+                            $curr->responses[$i]->NodeResValue = $row->getKey();
+                            $curr->responses[$i]->NodeResEng = $recName;
+                        }
+                    }
+                }
+            }
         } elseif (isset($curr->responseSet) && $curr->responseSet == 'Definition::--STATES--') {
             $GLOBALS["SL"]->loadStates();
             $curr->responses = $GLOBALS["SL"]->states->stateResponses();

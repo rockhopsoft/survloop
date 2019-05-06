@@ -19,19 +19,41 @@ use SurvLoop\Controllers\Tree\TreeCoreSess;
 
 class TreeSurvAPI extends TreeCoreSess
 {
+    protected $canEditTree = false;
+    
     protected function initExtra(Request $request)
     {
         if (!isset($this->v["uID"])) {
             $this->loadUserVars();
         }
-        if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) > 0) {
-            $newRoot = new SLNode;
-            $newRoot->NodeTree        = $this->treeID;
-            $newRoot->NodePromptNotes = $GLOBALS["SL"]->treeRow->TreeCoreTable;
-            $newRoot->NodePromptText  = $GLOBALS["SL"]->coreTbl;
-            $newRoot->save();
+        foreach ($this->allNodes as $nID => $nodeObj) {
+            $this->allNodes[$nID]->fillNodeRow();
+            if ($this->allNodes[$nID]->nodeRow->NodeParentID == -3
+                && (!$this->rootID || intVal($this->rootID) <= 0)) {
+                $this->rootID = $this->allNodes[$nID]->nodeRow->NodeParentID;
+            }
         }
+        $this->checkTreeRoot();
         $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
+        return true;
+    }
+    
+    public function checkTreeRoot()
+    {
+        if ((!$this->rootID || intVal($this->rootID) <= 0) && intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) > 0) {
+            $chk = SLNode::where('NodeTree', $this->treeID)
+                ->where('NodeParentID', -3)
+                ->first();
+            if (!$chk || !isset($chk->NodeID)) {
+                $newRoot = new SLNode;
+                $newRoot->NodeTree        = $this->treeID;
+                $newRoot->NodeParentID    = -3;
+                $newRoot->NodeType        = 'Page';
+                $newRoot->NodePromptNotes = $GLOBALS["SL"]->treeRow->TreeCoreTable;
+                $newRoot->NodePromptText  = $GLOBALS["SL"]->coreTbl;
+                $newRoot->save();
+            }
+        }
         return true;
     }
     

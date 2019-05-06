@@ -1,9 +1,8 @@
 <!-- resources/views/vendor/survloop/admin/db/fieldxml.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
+<div class="container"><div class="slCard">
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
     {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
@@ -94,6 +93,7 @@ function saveXmlSetting(FldID, newSetting) {
 @endforelse
 
 </table>
+</div></div>
 
 <div class="p20"></div><div class="p20"></div>
 @endsection

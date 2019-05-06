@@ -16,6 +16,7 @@
             <tr><td></td></tr>
         @else 
             <a name="tbl{{ $tbl->TblID }}"></a>
+            <div class="pT20"></div>
             <div class="card">
                 <div class="card-header">
                     

@@ -415,8 +415,13 @@ class TreeSurvNodeEdit extends TreeSurvForm
                         }
                     }
                     if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeType == 'Page') {
-                        $treeOpts = [ ['homepage', 7], ['adminPage', 3], ['volunPage', 17], ['partnPage', 41], 
-                            ['staffPage', 43] ];
+                        $treeOpts = [
+                            ['homepage',  7],
+                            ['adminPage', 3],
+                            ['volunPage', 17],
+                            ['partnPage', 41], 
+                            ['staffPage', 43]
+                        ];
                         foreach ($treeOpts as $o) {
                             if ($GLOBALS["SL"]->REQ->has($o[0]) && intVal($GLOBALS["SL"]->REQ->get($o[0])) == $o[1]) {
                                 if ($GLOBALS["SL"]->treeRow->TreeOpts%$o[1] > 0) {
@@ -460,7 +465,7 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 $this->saveTestAB($request, $node->nodeID);
                 
                 if ($node->nodeRow->NodeType == 'Layout Row' && $nodeIN <= 0) { // new row, so create default columns
-                    if ($node->nodeRow->NodeCharLimit > 0) {
+                    if ($node->nodeRow->NodeCharLimit > 0 && $GLOBALS["SL"]->treeID > 0) {
                         $colW = $GLOBALS["SL"]->getColsWidth($node->nodeRow->NodeCharLimit);
                         $evenTot = $node->nodeRow->NodeCharLimit*$colW;
                         for ($c=0; $c<$node->nodeRow->NodeCharLimit; $c++) {

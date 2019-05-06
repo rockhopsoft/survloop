@@ -72,15 +72,12 @@ class TreeNodeCore
         }
         if (!$this->nodeRow) {
             $this->nodeRow = new SLNode;
+            return false;
         }
         $this->parentID  = $this->nodeRow->NodeParentID;
         $this->parentOrd = $this->nodeRow->NodeParentOrder;
         $this->nodeOpts  = $this->nodeRow->NodeOpts;
         $this->nodeType  = $this->nodeRow->NodeType;
-        if (!isset($this->nodeRow)) {
-            $this->nodeRow = new SLNode;
-            return false;
-        }
         //$this->fillNodeRow();
         return true;
     }

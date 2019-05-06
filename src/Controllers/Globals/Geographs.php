@@ -523,7 +523,7 @@ class Geographs
     public function embedMapSimpAddy($nID = 0, $addy = '', $label = '', $height = 450, $maptype = 'satellite')
     {
         if ($GLOBALS["SL"]->isHomestead()) {
-            return '(Map)';
+            return '<div style="height: 420px; padding-top: 200px;">(Map)</div>';
         }
         list($lat, $lng) = $this->getLatLng($addy);
         return view('vendor.survloop.reports.embed-google-map-simple', [
@@ -549,7 +549,7 @@ class Geographs
     public function embedMap($nID = 0, $filename = '', $docName = '', $docDesc = '')
     {
         if ($GLOBALS["SL"]->isHomestead()) {
-            return '(Map)';
+            return '<div style="height: 420px; padding-top: 200px;">(Map)</div>';
         }
         if (sizeof($this->mapMarkers) > 0) {
             $this->kmlMarkersFull($filename);

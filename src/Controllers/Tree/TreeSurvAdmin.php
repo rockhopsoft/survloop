@@ -27,17 +27,6 @@ use SurvLoop\Controllers\Tree\TreeSurvNodeEdit;
 
 class TreeSurvAdmin extends TreeSurvNodeEdit
 {
-    protected $canEditTree = false;
-    
-    protected function initExtra(Request $request)
-    {
-        foreach ($this->allNodes as $nID => $nodeObj) {
-            $this->allNodes[$nID]->fillNodeRow();
-        }
-        $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
-        return true;
-    }
-    
     protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
     {
         $tierDepth++;
@@ -396,11 +385,13 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
     
     protected function updateTreeEnds()
     {
-        $GLOBALS["SL"]->treeRow->TreeFirstPage = $GLOBALS["SL"]->treeRow->TreeLastPage = -3;
+        $GLOBALS["SL"]->treeRow->TreeFirstPage = $GLOBALS["SL"]->treeRow->TreeLastPage = 0;
         foreach ($this->nodesRawOrder as $nID) {
             if (isset($this->allNodes[$nID]) 
                 && ($this->allNodes[$nID]->isPage() || $this->allNodes[$nID]->isLoopRoot())) {
-                if ($GLOBALS["SL"]->treeRow->TreeFirstPage <= 0) $GLOBALS["SL"]->treeRow->TreeFirstPage = $nID;
+                if ($GLOBALS["SL"]->treeRow->TreeFirstPage <= 0) {
+                    $GLOBALS["SL"]->treeRow->TreeFirstPage = $nID;
+                }
                 $GLOBALS["SL"]->treeRow->TreeLastPage = $nID;
             }
         }
