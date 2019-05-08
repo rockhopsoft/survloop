@@ -248,7 +248,7 @@ class Globals extends GlobalsImportExport
         if ($blurbID > 0) {
             $def = SLDefinitions::find($blurbID);
         } else {
-            $def = SLDefinitions::where('DefSubset', $blurbName)
+            $def = SLDefinitions::where('DefSubset', 'LIKE', $blurbName)
                 ->where('DefDatabase', $this->dbID)
                 ->where('DefSet', 'Blurbs')
                 ->first();

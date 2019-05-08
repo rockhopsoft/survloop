@@ -200,29 +200,7 @@ class PageLoadUtils extends Controller
                                 $redir .= '&' . substr($paramTxt, 1);
                             }
                             if (intVal($cid) > 0) {
-                                $sess = SLSess::where('SessUserID', Auth::user()->id)
-                                    ->where('SessTree', $t->TreeID)
-                                    ->where('SessCoreID', $cid)
-                                    ->where('SessIsActive', 1)
-                                    ->orderBy('updated_at', 'desc')
-                                    ->first();
-                                if (!$sess || !isset($sess->SessID)) {
-                                    $sess = new SLSess;
-                                    $sess->SessUserID   = Auth::user()->id;
-                                    $sess->SessTree     = $t->TreeID;
-                                    $sess->SessCoreID   = $cid;
-                                    $sess->SessIsActive = 1;
-                                    $sess->save();
-                                }
-                                if ($request->has("n") && intVal($request->get("n")) > 0) {
-                                    $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
-                                } elseif ($sess->SessCurrNode == -86) { // last session deactivate (hopefully completed)
-                                    $sess->update([ 'SessCurrNode' => $t->TreeRoot ]);
-                                }
-                                session()->put('sessID' . $t->TreeID, $sess->SessID);
-                                session()->put('coreID' . $t->TreeID, $cid);
-                            } else {
-                                
+                                $this->loadPageCID($request, $t, $cid);
                             }
                             return redirect($this->domainPath . $redir);
                         }
@@ -231,6 +209,34 @@ class PageLoadUtils extends Controller
             }
         }
         return redirect($this->domainPath . '/');
+    }
+    
+    public function loadPageCID(Request $request, $tree, $cid)
+    {
+        if ($cid > 0 && $tree && isset($tree->TreeID)) {
+            $sess = SLSess::where('SessUserID', Auth::user()->id)
+                ->where('SessTree', $tree->TreeID)
+                ->where('SessCoreID', $cid)
+                ->where('SessIsActive', 1)
+                ->orderBy('updated_at', 'desc')
+                ->first();
+            if (!$sess || !isset($sess->SessID)) {
+                $sess = new SLSess;
+                $sess->SessUserID   = Auth::user()->id;
+                $sess->SessTree     = $tree->TreeID;
+                $sess->SessCoreID   = $cid;
+                $sess->SessIsActive = 1;
+                $sess->save();
+            }
+            if ($request->has("n") && intVal($request->get("n")) > 0) {
+                $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
+            } elseif ($sess->SessCurrNode == -86) { // last session deactivate (hopefully completed)
+                $sess->update([ 'SessCurrNode' => $tree->TreeRoot ]);
+            }
+            session()->put('sessID' . $tree->TreeID, $sess->SessID);
+            session()->put('coreID' . $tree->TreeID, $cid);
+        }
+        return true;
     }
     
     public function loadPageURLrawID(Request $request, $pageSlug = '', $cid = -3, $view = '')

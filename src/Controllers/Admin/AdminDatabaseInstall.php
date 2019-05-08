@@ -112,6 +112,8 @@ class AdminDatabaseInstall extends AdminDBController
 				. 'Seeder.php';
 		    $migEnds = '';
             $tbls = $this->exportQryTbls();
+            
+            // Phase 1) Create migration files
             if ($this->v["refresh"] == 1) {
                 
             	$this->prepLaravelExport();
@@ -186,81 +188,134 @@ class AdminDatabaseInstall extends AdminDBController
 				    $this->v["migrationFileUp"] .= $migEnds;
 				}
 				Storage::put($newMigFilename, 
-					view('vendor.survloop.admin.db.export-laravel-gen-migration', $this->v)->render());
+                    view('vendor.survloop.admin.db.export-laravel-gen-migration', $this->v)->render());
 				$this->v["nextUrl"] = '?refresh=2';
+                if ($tbls->isNotEmpty() && isset($tbls[0]->TblName)) {
+                    $this->v["nextUrl"] .= '&tbl=' . $tbls[0]->TblName;
+                }
 				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
 				return view('vendor.survloop.master', $this->v);
-				
-			} elseif ($this->v["refresh"] == 2) {
-				
-			    $found = -1;
-			    $currTbl = $nextTbl = '';
-			    if ($request->has('tbl') && trim($request->get('tbl')) != '') {
-			        $currTbl = trim($request->get('tbl'));
-			    } else {
-                    Storage::put($newSeedFilename, view('vendor.survloop.admin.db.export-laravel-gen-seeder', [
+                
+            // Phase 2) Create seeder files for custom system's database
+            } elseif ($this->v["refresh"] == 2) {
+                
+                $found = -1;
+                $seedCnt = $finishedTable = 1;
+                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') ? trim($request->get('tbls')) : ',');
+                $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
+                $limit = 1000;
+                if ($tbls->isNotEmpty()) {
+                    if (is_array($this->custReport)) {
+                        $this->loadCustLoop($request, $this->treeID);
+                    }
+                    foreach ($tbls as $i => $tbl) {
+                        $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) . $tbl->TblName;
+                        if (in_array($tbl->TblName, $this->custReport->tblsInPackage()) && $found < 0 
+                            && strpos($done, ',' . $tbl->TblName . ',') === false) {
+                            $this->loadTbl($tbl);
+                            $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
+                            /*
+                            if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
+                                $tblSeeds = '';
+                                list($seedCnt, $seedChk) = $GLOBALS["SL"]->getTableSeedDumpLimit($tblClean, '', $limit, $page);
+                                if ($seedChk->isNotEmpty()) {
+                                    foreach ($seedChk as $seed) {
+                                        $tblSeeds .= $this->printSeedTblRow($seed);
+                                    }
+                                }
+                                $newSeedFilename = str_replace('.php', '-' . $page . '.php', $newSeedFilename);
+                                //Storage::delete('file.jpg');
+                                Storage::put($newSeedFilename, $tblSeeds);
+                                if ($seedChk->count() < $limit) {
+                                    $done .= $tbl->TblName . ',';
+                                } else {
+                                    $page++;
+                                    $finishedTable = 0;
+                                }
+                            } else { // dump whole table at once
+                                */
+                                $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl));
+                                Storage::put($newSeedFilename, $tblSeeds);
+                                $done .= $tbl->TblName . ',';
+                            //}
+                            $found = $i;
+                        }
+                    }
+                }
+                $this->v["nextUrl"] = '?refresh=' . (($found >= 0) ? '2&tbls=' . $done 
+                    . (($finishedTable == 0) ? '&page=' . $page : '') : (($asPackage) ? '3' : '4'));
+                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+                return view('vendor.survloop.master', $this->v);
+                
+            // Phase 3) Create seeder files for custom system's SurvLoop configurations
+            } elseif ($this->v["refresh"] == 3) {
+                
+                $found = -1;
+                $seedCnt = $finishedTable = 1;
+                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') ? trim($request->get('tbls')) : ',');
+                $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
+                $limit = 1000;
+                if (true || $asPackage) {
+                    $prevDb = $GLOBALS["SL"]->dbID;
+                    $prevTree = $GLOBALS["SL"]->treeID;
+                    $this->initLoader();
+                    $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, 3, 3);
+                    $tbls = $GLOBALS["SL"]->tblQrySlExports();
+                    if ($tbls->isNotEmpty()) {
+                        foreach ($tbls as $i => $tbl) {
+                            $this->v["tblClean"] = 'SL' . $tbl->TblName;
+                            if ($found < 0 && strpos($done, ',' . $tbl->TblName . ',') === false) {
+                                $this->loadTbl($tbl);
+                                $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
+                                $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl, $prevDb));
+                                Storage::put($newSeedFilename, $tblSeeds);
+                                $done .= $tbl->TblName . ',';
+                                $found = $i;
+                            }
+                        }
+                    }
+                    $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, $prevDb, $prevTree);
+                }
+                $this->v["nextUrl"] = '?refresh=' . (($found >= 0) ? '3&tbls=' . $done 
+                    . (($finishedTable == 0) ? '&page=' . $page : '') : '4');
+                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+                return view('vendor.survloop.master', $this->v);
+                
+            // Phase 4) Merge all seeder files into one ready for package
+            } elseif ($this->v["refresh"] == 4) {
+                
+                Storage::put($newSeedFilename, view('vendor.survloop.admin.db.export-laravel-gen-seeder', [
                         "wholeSeed" => false
                         ])->render());
+                $tbls = $this->exportQryTbls();
+                if (is_array($this->custReport)) {
+                    $this->loadCustLoop($request, $this->treeID);
                 }
-				if ($tbls->isNotEmpty()) {
-				    if ($currTbl == '') {
-				        $currTbl = $tbls[0]->TblName;
-				    }
-					foreach ($tbls as $i => $tbl) {
-						$this->loadTbl($tbl);
-						$runTable = true;
-						if ($GLOBALS["SL"]->dbRow->DbPrefix == 'SL_') {
-							if (in_array($tbl->TblName, ['Zips', 'ZipAshrae'])) {
-								$runTable = $asPackage;
-							} elseif (in_array($tbl->TblName, [
-							    'AddyGeo', 'DesignTweaks', 'Emailed', 'LogActions', 'NodeSaves', 'NodeSavesPage', 
-							    'SearchRecDump', 'Sess', 'SessLoops', 'SessEmojis', 'SessSite', 'SessPage', 
-							    'Tokens', 'users', 'UsersActivity', 'UsersRoles'
-							    ])) {
-								$runTable = false;
-							}
-						} elseif ($asPackage) {
-						    if (is_array($this->custReport)) {
-						        $this->loadCustLoop($request, $this->treeID);
-						    }
-							$runTable = in_array($tbl->TblName, $this->custReport->tblsInPackage());
-						}
-						if ($runTable) {
-						    if ($currTbl == $tbl->TblName) {
-                                Storage::append($newSeedFilename, 
-                                    $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
-						        $found = $i;
-						    } elseif ($found >= 0 && $nextTbl == '') {
-						        $nextTbl = $tbl->TblName;
-						    }
-						}
-					}
-				}
-				if ($found < 0 && $asPackage && $GLOBALS["SL"]->dbRow->DbPrefix != 'SL_') {
-					$tbls = $GLOBALS["SL"]->tblQrySlExports();
-					if ($tbls->isNotEmpty()) {
-						foreach ($tbls as $i => $tbl) {
-						    if ($currTbl == $tbl->TblName) {
-                                $this->v["tbl"] = $tbl;
-                                $this->v["tblName"] = 'SL_' . $tbl->TblName;
-                                $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
-                                Storage::append($newSeedFilename, 
-                                    $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl)));
-						        $found = $i;
-						    } elseif ($found >= 0 && $nextTbl == '') {
-						        $nextTbl = $tbl->TblName;
-						    }
-						}
-					}
-				}
-				if ($nextTbl == '') {
-				    Storage::append($newSeedFilename, ' } } ');
-				}
-				$this->v["nextUrl"] = '?refresh=' . (($nextTbl != '') ? '2&tbl=' . $nextTbl : '3');
-				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
-				return view('vendor.survloop.master', $this->v);
-				
-			} elseif ($this->v["refresh"] > 2) {
+                foreach ($tbls as $i => $tbl) {
+                    if (in_array($tbl->TblName, $this->custReport->tblsInPackage())) {
+                        $tblFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
+                        if (Storage::exists($tblFilename)) {
+                            Storage::append($newSeedFilename, Storage::get($tblFilename));
+                        }
+                    }
+                }
+                $tbls = $GLOBALS["SL"]->tblQrySlExports();
+                if ($tbls->isNotEmpty()) {
+                    foreach ($tbls as $i => $tbl) {
+                        $tblFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
+                        if (Storage::exists($tblFilename)) {
+                            Storage::append($newSeedFilename, Storage::get($tblFilename));
+                        }
+                    }
+                }
+                Storage::append($newSeedFilename, ' } }');
+                
+                $this->v["nextUrl"] = '?refresh=5';
+                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+                return view('vendor.survloop.master', $this->v);
+                
+            // Phase 5) Display resulting exports
+            } elseif ($this->v["refresh"] > 4) {
 				
 				/* NOT MVP!
 				$zip = new ZipArchive();
@@ -345,29 +400,36 @@ class AdminDatabaseInstall extends AdminDBController
         return true;
     }
     
-    protected function printSeedTbl($eval = '')
+    protected function printSeedTbl($eval = '', $limit = 10000, $start = 0)
     {
     	$ret = '';
-        $seedChk = $GLOBALS["SL"]->getTableSeedDump($this->v["tblClean"], $eval);
+        $seedChk = $GLOBALS["SL"]->getTableSeedDump($this->v["tblClean"], $eval, $limit, $start);
         if ($seedChk->isNotEmpty()) {
             foreach ($seedChk as $seed) {
-                $fldData = "\n\t\t\t'" . $this->v["tbl"]->TblAbbr . "ID' => " . $seed->getKey();
-                $flds = $GLOBALS["SL"]->getTableFields($this->v["tbl"]);
-                if ($flds->isNotEmpty()) {
-                    foreach ($flds as $i => $fld) {
-                        $fldName = trim($this->v["tbl"]->TblAbbr . $fld->FldName);
-                        if (isset($seed->{ $fldName }) && trim($seed->{ $fldName }) != trim($fld->FldDefault)) {
-                            $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
-                                . str_replace("'", "\'", $seed->{ $fldName }) . "'";
-                        }
-                    }
-                }
-                if (trim($fldData) != '') {
-                    $ret .= "\tDB::table('" 
-                        . (($this->v["tbl"]->TblDatabase == 3) ? 'SL_' : $GLOBALS["SL"]->dbRow->DbPrefix)
-                        . $this->v["tbl"]->TblName . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
+                $ret .= $this->printSeedTblRow($seed);
+            }
+        }
+        return $ret;
+    }
+    
+    protected function printSeedTblRow($seed)
+    {
+        $ret = '';
+        $fldData = "\n\t\t\t'" . $this->v["tbl"]->TblAbbr . "ID' => " . $seed->getKey();
+        $flds = $GLOBALS["SL"]->getTableFields($this->v["tbl"]);
+        if ($flds->isNotEmpty()) {
+            foreach ($flds as $i => $fld) {
+                $fldName = trim($this->v["tbl"]->TblAbbr . $fld->FldName);
+                if (isset($seed->{ $fldName }) && trim($seed->{ $fldName }) != trim($fld->FldDefault)) {
+                    $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
+                        . str_replace("'", "\'", $seed->{ $fldName }) . "'";
                 }
             }
+        }
+        if (trim($fldData) != '') {
+            $ret .= "\tDB::table('" 
+                . (($this->v["tbl"]->TblDatabase == 3) ? 'SL_' : $GLOBALS["SL"]->dbRow->DbPrefix)
+                . $this->v["tbl"]->TblName . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
         }
         return $ret;
     }

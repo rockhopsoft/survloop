@@ -217,17 +217,35 @@ class AdminTreeController extends AdminController
         if (!$this->checkCache()) {
             $this->v["treeClassAdmin"]->loadTreeNodeStats();
             $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
-            $this->v["content"] = '<div class="container"><div class="slPrint" style="max-widht: 500px;">' 
-                . view('vendor.survloop.elements.logo-print', [
-                    "sysOpts" => $GLOBALS["SL"]->sysOpts,
-                    "w100" => true
-                    ])->render()
-                . '</div>' . view('vendor.survloop.elements.print-tree-map-desc')->render() 
-                . '<div class="p10"></div>' . $GLOBALS["SL"]->printTreeNodeStats(true, true, true) 
-                . $this->v["treeClassAdmin"]->adminPrintFullTree($request, true)
-                . view('vendor.survloop.elements.dbdesign-legal', [
+            $this->v["content"] = '<div class="container">';
+            
+            $custHeader = $GLOBALS["SL"]->getBlurb('Tree Map Header: ' . $GLOBALS["SL"]->treeRow->TreeName);
+            if (trim($custHeader) != '') {
+                $readMore = '<div class="p15"><a href="javascript:;" id="hidivBtnReadMore" class="hidivBtn"'
+                    . '>About this map</a><div id="hidivReadMore" class="disNon">';
+                if (strpos($custHeader, '[[TreeStats]]') !== false) {
+                    $this->v["content"] .= str_replace('[[TreeStats]]', $GLOBALS["SL"]->printTreeNodeStats(true, true, true), $custHeader) 
+                        . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() . '</div></div>';
+                } else {
+                    $this->v["content"] .= $custHeader . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() 
+                        . '</div></div><div class="p10"></div>' . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
+                }
+                
+            } else {
+                $this->v["content"] .= view('vendor.survloop.elements.logo-print', [
+                        "sysOpts" => $GLOBALS["SL"]->sysOpts,
+                        "w100" => true
+                        ])->render()
+                    . '<h2>' . $GLOBALS["SL"]->treeRow->TreeName . ': Specifications</h2>'
+                    . view('vendor.survloop.elements.print-tree-map-desc')->render()
+                    . '<div class="p10"></div>'
+                    . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
+            }
+            $this->v["content"] .= str_replace('Content Chunk, WYSIWYG', 'Content Chunk', 
+                    $this->v["treeClassAdmin"]->adminPrintFullTree($request, true))
+                . '<a name="licenseInfo"></a><div class="mT20 mB20 p20">' . view('vendor.survloop.elements.dbdesign-legal', [
                     "sysOpts" => $GLOBALS["SL"]->sysOpts
-                    ])->render() . '</div>';
+                    ])->render() . '</div></div>';
             $this->saveCache();
         }
         $this->v["isPrint"] = true;
@@ -402,7 +420,7 @@ class AdminTreeController extends AdminController
             if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
                 $tree->TreeOpts *= Globals::TREEOPT_VOLUNTEER;
             }
-            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1 && $reports) {
+            if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) {
                 $tree->TreeOpts *= Globals::TREEOPT_SURVREPORT;
             }
             $tree->save();

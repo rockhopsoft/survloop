@@ -254,7 +254,6 @@ class AdminController extends SurvLoopController
              || $this->admMenuData["currNavPos"][2] > -1 || $this->admMenuData["currNavPos"][3] > -1);
     }
     
-    
     public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
     {
         $this->initLoader();
@@ -283,12 +282,19 @@ class AdminController extends SurvLoopController
         return $this->loader->loadNodeTreeURLedit($request, $cid, $treeSlug);
     }
     
-    public function loadPageURL(Request $request, $pageSlug = '')
+    //public function loadPageURL(Request $request, $pageSlug = '')
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '')
     {
         $this->initLoader();
         if ($this->loader->loadTreeBySlug($request, $pageSlug, 'Page')) {
             $this->admControlInit($request, '/dash/' . $pageSlug);
             $this->loadCustLoop($request, $this->loader->treeID);
+            if ($request->has('new') && intVal($request->get('new')) == 1) {
+                $this->custReport->restartTreeSess($GLOBALS["SL"]->treeID);
+            } elseif ($cid && intVal($cid) > 0) {
+                $this->loader->loadPageCID($request, $GLOBALS["SL"]->treeRow, intVal($cid));
+                $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+            }
             $this->v["content"] = $this->custReport->index($request);
             if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->loader->isUserAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 

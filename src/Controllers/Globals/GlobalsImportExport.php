@@ -653,28 +653,58 @@ class GlobalsImportExport extends GlobalsTables
         return true;
     }
     
-    public function getTableSeedDump($tblClean = '', $eval = '')
+    public function chkTableSeedCnt($tblClean = '', $eval = '')
+    {
+        $seedCnt = 0;
+        if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
+            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" . $eval . "count();");
+        }
+        return (($seedCnt && intVal($seedCnt) > 0) ? intVal($seedCnt) : 0);
+    }
+    
+    public function chkTableSeedLimits($tblClean = '', $eval = '', $limit = 10000)
+    {
+        $seedCnt = $this->chkTableSeedCnt($tblClean, $eval);
+        return ($limit < intVal($seedCnt));
+    }
+    
+    public function getTableSeedDump($tblClean = '', $eval = '', $limit = 10000, $start = 0)
     {
         $seedChk = [];
         if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "get();");
+            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "orderBy('created_at', 'asc')->get();");
         }
         return $seedChk;
     }
     
-    public function loadSlSeedEval($tbl = [])
+    public function getTableSeedDumpLimit($tblClean = '', $eval = '', $limit = 10000, $start = 0)
     {
+        return [
+            $this->chkTableSeedCnt($tblClean, $eval),
+            $this->getTableSeedDump($tblClean, $eval, $limit, $start)
+        ];
+    }
+    
+    public function loadSlSeedEval($tbl = [], $dbIN = -3)
+    {
+        $dbID = $this->dbID;
+        if ($dbIN > 0) {
+            $dbID = $dbIN;
+        }
         if (!isset($this->x["slTrees"])) {
             $this->loadSlParents();
         }
         $eval = "";
         if (isset($tbl->TblName)) {
             if ($tbl->TblName == 'Databases') {
-                $eval = "where('DbID', " . $this->dbID . ")->";
+                $eval = "where('DbID', " . $dbID . ")->";
             } elseif (in_array($tbl->TblName, ['Images'])) {
-                $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $this->dbID . ")->";
+                $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $dbID . ")->";
             } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
-                $eval = "where('" . $tbl->TblAbbr . "Database', " . $this->dbID . ")->";
+                $eval = "where('" . $tbl->TblAbbr . "Database', " . $dbID . ")->";
+                if ($tbl->TblName == 'Definitions') {
+                    $eval = "whereNotIn('DefSubset', ['google-analytic', 'google-cod-key', 'google-cod-key2', 'google-map-key', 'google-map-key2', 'google-maps-key', 'google-maps-key2'])->";
+                }
             } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
                 'Emails'])) {
                 $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" . implode(", ", $this->x["slTrees"]) . "])->";

@@ -44,7 +44,12 @@ class TreeCoreSess extends TreeCore
         }
         $cid = (($GLOBALS["SL"]->REQ->has('cid') && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) 
             ? intVal($GLOBALS["SL"]->REQ->get('cid')) : 0);
-        if ($GLOBALS["SL"]->REQ->has('core') && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
+        if ($GLOBALS["SL"]->REQ->has('start') && $GLOBALS["SL"]->REQ->has('new')
+            && !session()->has('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'))) {
+            $this->createNewSess();
+            $this->newCoreRow($coreTbl);
+            session()->put('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'), time());
+        } elseif ($GLOBALS["SL"]->REQ->has('core') && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
             $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
                 ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
                 ->where('SessCoreID', '=', intVal($GLOBALS["SL"]->REQ->get('core')))
@@ -54,11 +59,6 @@ class TreeCoreSess extends TreeCore
                 $this->sessID = $this->sessInfo->SessID;
                 $this->coreID = $this->sessInfo->SessCoreID;
             }
-        } elseif ($cid <= 0 && $GLOBALS["SL"]->REQ->has('start') && $GLOBALS["SL"]->REQ->has('new')
-            && !session()->has('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'))) {
-            $this->createNewSess();
-            $this->newCoreRow($coreTbl);
-            session()->put('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'), time());
         } elseif (isset($this->v) && $this->v["uID"] > 0) {
             //$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
             $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
@@ -304,16 +304,24 @@ class TreeCoreSess extends TreeCore
         return true;
     }
     
+    public function restartTreeSess($treeID)
+    {
+        if (session()->has('sessID' . $treeID)) {
+            SLSess::where('SessID', session()->get('sessID' . $treeID))
+                ->where('SessTree', $treeID)
+                ->update([ 'SessIsActive' => 0 ]);
+            session()->forget('sessID' . $treeID);
+            session()->forget('coreID' . $treeID);
+        }
+        return true;
+    }
+    
     public function restartSess(Request $request)
     {
         $trees = SLTree::get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $tree) {
-                SLSess::where('SessID', session()->get('sessID' . $tree->TreeID))
-                    ->where('SessTree', $tree->TreeID)
-                    ->update([ 'SessIsActive' => 0 ]);
-                session()->forget('sessID' . $tree->TreeID);
-                session()->forget('coreID' . $tree->TreeID);
+                $this->restartTreeSess($tree->TreeID);
             }
         }
         session()->forget('sessIDPage');
