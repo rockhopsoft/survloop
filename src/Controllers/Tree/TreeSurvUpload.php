@@ -44,21 +44,18 @@ class TreeSurvUpload extends TreeSurv
     protected function getRandStr($tbl, $fld, $len)
     {
         $str = $this->genRandStr($len);
-        while (!$this->checkRandStr($tbl, $fld, $str)) $str = $this->genRandStr($len);
+        while (!$this->checkRandStr($tbl, $fld, $str)) {
+            $str = $this->genRandStr($len);
+        }
         return $str;
     }
     
     protected function getUpTree()
     {
-        if ($this->upTree > 0) return $this->upTree;
-        if (isset($GLOBALS["SL"]->reportTree) && isset($GLOBALS["SL"]->reportTree["id"])) {
-            $this->upTree = $GLOBALS["SL"]->reportTree["id"];
-        } else {
-            $reportTree = $GLOBALS["SL"]->chkReportTree();
-            if ($reportTree) $reportTree->TreeID;
-            else $this->upTree = $this->treeID;
+        if ($this->upTree > 0) {
+            return $this->upTree;
         }
-        return $this->upTree;
+        return $GLOBALS["SL"]->chkReportCoreTree();
     }
     
     
@@ -68,13 +65,16 @@ class TreeSurvUpload extends TreeSurv
     
     protected function loadUploadTypes()
     {
-        if (sizeof($this->uploadTypes) > 0) return $this->uploadTypes;
-        $treeID = $this->getUpTree();
+        if ($this->uploadTypes && $this->uploadTypes->isNotEmpty()) {
+            return $this->uploadTypes;
+        }
+        //$treeID = $this->getUpTree();
+        $treeID = $this->treeID;
         $upType = "tree-" . $treeID . "-upload-types";
         if (isset($GLOBALS["SL"]->sysOpts[$upType])) {
             $this->uploadTypes = $GLOBALS["SL"]->def->getSet($GLOBALS["SL"]->sysOpts[$upType]);
         }
-        if (empty($this->uploadTypes)) {
+        if (!$this->uploadTypes || $this->uploadTypes->isEmpty()) {
             $this->uploadTypes = $GLOBALS["SL"]->def->getSet('Upload Types');
         }
         return $this->uploadTypes;
@@ -89,9 +89,15 @@ class TreeSurvUpload extends TreeSurv
     
     protected function getUploadFolder($coreRow = NULL, $coreTbl = '')
     {
-        if ($coreTbl == '') $coreTbl = $GLOBALS["SL"]->coreTbl;
-        if (!$coreRow && isset($this->sessData->dataSets[$coreTbl])) $coreRow = $this->sessData->dataSets[$coreTbl][0];
-        if (!isset($coreRow->created_at)) return '';
+        if ($coreTbl == '') {
+            $coreTbl = $GLOBALS["SL"]->coreTbl;
+        }
+        if (!$coreRow && isset($this->sessData->dataSets[$coreTbl])) {
+            $coreRow = $this->sessData->dataSets[$coreTbl][0];
+        }
+        if (!isset($coreRow->created_at)) {
+            return '';
+        }
         $fold = '../storage/app/up/evidence/' . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) 
             . '/' . $coreRow->{ $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'UniqueStr' } . '/';
         return $fold;
@@ -122,12 +128,18 @@ class TreeSurvUpload extends TreeSurv
     protected function getUpNode($nID = -3)
     {
         if ($nID > 0) {
-            if (isset($this->allNodes[$nID])) return $this->allNodes[$nID];
-            if (!isset($this->v["upNodes"])) $this->v["upNodes"] = [];
+            if (isset($this->allNodes[$nID])) {
+                return $this->allNodes[$nID];
+            }
+            if (!isset($this->v["upNodes"])) {
+                $this->v["upNodes"] = [];
+            }
             if (!isset($this->v["upNodes"][$nID])) {
                 $this->v["upNodes"][$nID] = null;
                 $nodeRow = SLNode::find($nID);
-                if ($nodeRow) $this->v["upNodes"][$nID] = new TreeNodeSurv($nID, $nodeRow);
+                if ($nodeRow) {
+                    $this->v["upNodes"][$nID] = new TreeNodeSurv($nID, $nodeRow);
+                }
             }
             return $this->v["upNodes"][$nID];
         }
@@ -189,7 +201,9 @@ class TreeSurvUpload extends TreeSurv
         $treeID = $this->getUpTree();
         $fileRoot = $upID;
         $fileExt = '';
-        if (strpos($upID, '.') !== false) list($fileRoot, $fileExt) = explode('.', $upID);
+        if (strpos($upID, '.') !== false) {
+            list($fileRoot, $fileExt) = explode('.', $upID);
+        }
         $upRow = SLUploads::where('UpTreeID', $treeID)
             ->where('UpCoreID', $this->coreID)
             ->where('UpStoredFile', $fileRoot)
@@ -264,15 +278,16 @@ class TreeSurvUpload extends TreeSurv
                 $GLOBALS["SL"]->pageJAVA .= 'uploadTypeVid = ' . $j . ';' . "\n";
             }
         }
-        $ret = ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '<div id="uploadAjax">' : '') 
-            . view('vendor.survloop.forms.upload-tool', [
+        $ret = view('vendor.survloop.forms.upload-tool', [
                 "nID"            => $nID,
                 "uploadTypes"    => $this->uploadTypes,
                 "uploadWarn"     => $this->uploadWarning($nID),
                 "isPublic"       => $this->isPublic(), 
                 "getPrevUploads" => $this->getPrevUploads($nID, $nIDtxt, true)
-            ])->render() 
-            . ((!$GLOBALS["SL"]->REQ->has('ajax')) ? '</div>' : '');
+            ])->render();
+        if (!$GLOBALS["SL"]->REQ->has('ajax')) {
+            $ret = '<div id="uploadAjax">' . $ret . '</div>';
+        }
         return $ret;
     }
     
@@ -297,7 +312,7 @@ class TreeSurvUpload extends TreeSurv
         $ret["filename"] = $upRow->UpStoredFile . '.' . $ret["ext"];
         $ret["file"]     = $this->getUploadFolder() . $upRow->UpStoredFile 
             . '.' . $ret["ext"];
-        $ret["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->corePublicID
+        $ret["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->coreID
             . '/' . $upRow->UpStoredFile . '.' . $ret["ext"];
         $ret["fileOrig"] = $upRow->UpUploadFile;
         $ret["fileLnk"]  = '<a href="' . $ret["filePub"] 
@@ -352,7 +367,9 @@ class TreeSurvUpload extends TreeSurv
         $treeID = $this->getUpTree();
         $this->upDeets = [];
         if (sizeof($this->uploads) > 0) {
-            foreach ($this->uploads as $i => $upRow) $this->upDeets[$i] = $this->loadUpDeets($upRow, $i);
+            foreach ($this->uploads as $i => $upRow) {
+                $this->upDeets[$i] = $this->loadUpDeets($upRow, $i);
+            }
         }
         return true;
     }

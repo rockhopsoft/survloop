@@ -13,30 +13,35 @@
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="emailID" value="{{ $currEmailID }}" >
 
-<div class="row pB20">
+<div class="row mB20">
     <div class="col-3">
         <h4 class="m0 slGrey">Auto-Email Type</h4>
     </div>
     <div class="col-9">
         <select name="emailType" class="form-control form-control-lg" 
             onChange="if (this.value == 'Blurb') { document.getElementById('subj').style.display='none'; } else { document.getElementById('subj').style.display='block'; }" >
-            <option value="To Complainant" @if ($currEmail->EmailType == 'To Complainant' || trim($currEmail->EmailType) == '') SELECTED @endif >Sent To Complainant</option>
-            <option value="To Oversight" @if ($currEmail->EmailType == 'To Oversight') SELECTED @endif >Sent To Oversight Agency</option>
-            <option value="Blurb" @if ($currEmail->EmailType == 'Blurb') SELECTED @endif >Excerpt used within other emails</option>
+            <option value="To Complainant" 
+                @if ($currEmail->EmailType == 'To Complainant' || trim($currEmail->EmailType) == '') SELECTED @endif
+                >Sent To Complainant</option>
+            <option value="To Oversight" @if ($currEmail->EmailType == 'To Oversight') SELECTED @endif 
+                >Sent To Oversight Agency</option>
+            <option value="Blurb" @if ($currEmail->EmailType == 'Blurb') SELECTED @endif 
+                >Excerpt used within other emails</option>
         </select>
     </div>
 </div>
 
-<div class="row pB20">
+<div class="row mB20">
     <div class="col-3">
         <h4 class="m0 slGrey">Internal Name</h4>
     </div>
     <div class="col-9">
-        <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" class="form-control form-control-lg" >
+        <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" 
+            class="form-control form-control-lg" >
     </div>     
 </div>
 
-<div id="subj" class="row pB20 @if ($currEmail->EmailType == 'Blurb') disNon @else disBlo @endif ">
+<div id="subj" class="row pB20 @if ($currEmail->EmailType == 'Blurb') disNon @else disFlx @endif ">
     <div class="col-3">
         <h4 class="m0 slGrey">Email Subject Line</h4>
     </div>
@@ -46,7 +51,7 @@
     </div>
 </div>
 
-<div class="row pB20">
+<div class="row mB20">
     <div class="col-3">
         <h4 class="m0 slGrey">Email Body</h4>
         <div class="p20"></div>

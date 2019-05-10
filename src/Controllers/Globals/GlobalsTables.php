@@ -359,6 +359,22 @@ class GlobalsTables extends GlobalsStatic
         return $this->sysOpts["app-url"];
     }
     
+    public function chkReportCoreTree($coreTbl = '')
+    {
+        if ($coreTbl == '') {
+            $coreTbl = $this->coreTbl;
+        }
+        $coreTree = SLTree::where('TreeType', 'Survey')
+            ->where('TreeDatabase', $this->dbID)
+            ->where('TreeCoreTable', $this->tblI[$coreTbl])
+            ->orderBy('TreeID', 'asc')
+            ->first();
+        if ($coreTree && isset($coreTree->TreeID)) {
+            return $coreTree->TreeID;
+        }
+        return NULL;
+    }
+    
     public function chkReportTree($coreTbl = '')
     {
         if ($coreTbl == '') {
@@ -366,7 +382,7 @@ class GlobalsTables extends GlobalsStatic
         }
         $reportTree = SLTree::where('TreeType', 'Page')
             ->where('TreeDatabase', $this->dbID)
-            ->where('TreeCoreTable', $this->coreTbl)
+            ->where('TreeCoreTable', $this->tblI[$coreTbl])
             ->get();
         if ($reportTree->isNotEmpty()) {
             foreach ($reportTree as $t) {
@@ -2089,7 +2105,10 @@ class GlobalsTables extends GlobalsStatic
     
     public function isHomestead()
     {
-        return (strpos($this->sysOpts["app-url"], '.test') !== false);
+        return (strpos($this->sysOpts["app-url"], '.test') !== false 
+            || strpos($this->sysOpts["app-url"], '.dev') !== false
+            || strpos($this->sysOpts["app-url"], 'localhost') !== false
+            || strpos($this->sysOpts["app-url"], 'homestead') !== false);
     }
     
     public function getParentDomain()
@@ -2114,11 +2133,12 @@ class GlobalsTables extends GlobalsStatic
     
     public function chkTableExists($coreTbl, $userTbl = null)
     {
-        $chk = DB::select( DB::raw("SHOW TABLES LIKE '" . $this->dbRow->DbPrefix . $coreTbl->TblName . "'") );
-        if (!$chk || sizeof($chk) == 0) {
-            return false;
-        }
-        return true;
+        return \Schema::hasTable($this->dbRow->DbPrefix . $coreTbl->TblName);
+        //$chk = DB::select( DB::raw("SHOW TABLES LIKE '" . $this->dbRow->DbPrefix . $coreTbl->TblName . "'") );
+        //if (!$chk || sizeof($chk) == 0) {
+        //    return false;
+        //}
+        //return true;
     }
     
     public function initCoreTable($coreTbl, $userTbl = null)

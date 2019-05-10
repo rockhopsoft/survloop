@@ -4,7 +4,8 @@
 <div id="up{{ $nID }}Wrap" class="slCard">
     <div class="uploadTypes">
         <h2><i class="fa fa-cloud-upload"></i> New Upload</h2>
-        @if (sizeof($uploadTypes) > 1)
+        
+        @if ($uploadTypes->count() > 1)
             @foreach ($uploadTypes as $j => $ty)
                 <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" class="finger">
                     <div class="disIn mR5"><input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" 
@@ -12,7 +13,7 @@
                         {{ $ty->DefValue }}
                 </label>
             @endforeach
-        @else
+        @elseif ($uploadTypes->isNotEmpty() > 1)
             <input type="hidden" autocomplete="off" id="n{{ $nID }}fldID" name="n{{ $nID }}fld" 
                 value="{{ $uploadTypes[0]->DefID }}">
         @endif
@@ -78,7 +79,7 @@
         
         <hr>
         
-        {!! $getPrevUploads !!}
+        @if (isset($getPrevUploads)) {!! $getPrevUploads !!} @endif
         
     </div>
 </div>

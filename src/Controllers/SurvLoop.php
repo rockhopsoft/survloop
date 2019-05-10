@@ -114,29 +114,37 @@ class SurvLoop extends SurvCustLoop
         }
         $this->loadDomain();
         $this->checkHttpsDomain($request);
-        $tree = SLTree::where('TreeType', 'Page')
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
+        $trees = SLTree::where('TreeType', 'Page')
+            /* ->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
             ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN . " > 0")
             ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF . " > 0")
             ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER . " > 0")
+            ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER . " > 0") */
             ->orderBy('TreeID', 'asc')
-            ->first();
-        if ($tree && isset($tree->TreeID)) {
-            $redir = $this->chkPageRedir($tree->TreeSlug);
-            if ($redir != $tree->TreeSlug) return redirect($redir);
-            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
-                echo '<script type="text/javascript"> window.location="/dashboard/page/' 
-                    . $tree->TreeID . '?all=1&alt=1&refresh=1"; </script>';
-                exit;
+            ->get();
+        if ($trees->isNotEmpty()) {
+            foreach ($trees as $i => $tree) {
+                if (isset($tree->TreeOpts) && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0 
+                    && $tree->TreeOpts%Globals::TREEOPT_ADMIN > 0 && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
+                    && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
+                    $redir = $this->chkPageRedir($tree->TreeSlug);
+                    if ($redir != $tree->TreeSlug) {
+                        return redirect($redir);
+                    }
+                    if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
+                        echo '<script type="text/javascript"> window.location="/dashboard/page/' 
+                            . $tree->TreeID . '?all=1&alt=1&refresh=1"; </script>';
+                        exit;
+                    }
+                    $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                    $this->loadLoop($request);
+                    $this->pageContent = $this->custLoop->index($request);
+                    if ($tree->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
+                        $this->topSaveCache();
+                    }
+                    return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
+                }
             }
-            $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-            $this->loadLoop($request);
-            $this->pageContent = $this->custLoop->index($request);
-            if ($tree->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
-                $this->topSaveCache();
-            }
-            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
         }
         
         // else Home Page not found, so let's create one

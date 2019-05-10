@@ -127,7 +127,7 @@
 }
 .unitFld {
     display: inline;
-    width: 100px; 
+    width: 120px; 
     padding: 6px 6px;
 }
 

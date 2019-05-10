@@ -43,7 +43,8 @@ class UserProfile extends TreeSurvInput
             $sessInfo = null;
             $coreAbbr = (($hasCoreTbl) ? $GLOBALS["SL"]->coreTblAbbr() : '');
             $minute = mktime(date("H"), date("i")-1, date("s"), date('n'), date('j'), date('Y'));
-            if ($minute < strtotime($this->v["user"]->created_at)) { // signed up in the past minute
+            if ($this->v["user"] && isset($this->v["user"]->created_at) 
+                && $minute < strtotime($this->v["user"]->created_at)) { // signed up in the past minute
                 $firstUser = User::select('id')->get();
                 if ($firstUser->isNotEmpty() && sizeof($firstUser) == 1) {
                     $this->v["user"]->assignRole('administrator');

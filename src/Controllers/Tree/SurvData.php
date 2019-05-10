@@ -501,7 +501,9 @@ class SurvData
     {
         if (isset($this->loopItemIDs[$loopName]) && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $ind => $id) {
-                if ($id == $itemID) return $ind;
+                if ($id == $itemID) {
+                    return $ind;
+                }
             }
         }
         return -1;
@@ -531,8 +533,12 @@ class SurvData
     {
         if ($tbl1Ind < 0) $tbl1Ind = $this->getRowInd($tbl1, $tbl1ID);
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
-            if (!isset($this->kidMap[$tbl1]))           $this->kidMap[$tbl1] = [];
-            if (!isset($this->kidMap[$tbl1][$tbl2]))    $this->kidMap[$tbl1][$tbl2] = [];
+            if (!isset($this->kidMap[$tbl1])) {
+                $this->kidMap[$tbl1] = [];
+            }
+            if (!isset($this->kidMap[$tbl1][$tbl2])) {
+                $this->kidMap[$tbl1][$tbl2] = [];
+            }
             if ($tbl2Ind < 0) {
                 $tbl2Ind = $this->getRowInd($tbl2, $tbl2ID);
                 if ($tbl2Ind < 0) { // not presuming it's about to be loaded
@@ -557,13 +563,17 @@ class SurvData
             if (isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
                 && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
                 foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
-                    if ($tbl1ID == $map[$type . "1"]) return $map[$type . "2"];
+                    if ($tbl1ID == $map[$type . "1"]) {
+                        return $map[$type . "2"];
+                    }
                 }
             }
             if (isset($this->kidMap[$tbl2]) && isset($this->kidMap[$tbl2][$tbl1]) 
                 && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
                 foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
-                    if ($tbl1ID == $map[$type . "2"]) return $map[$type . "1"];
+                    if ($tbl1ID == $map[$type . "2"]) {
+                        return $map[$type . "1"];
+                    }
                 }
             }
         }
@@ -573,7 +583,9 @@ class SurvData
     public function getChildRow($tbl1, $tbl1ID, $tbl2)
     {
         $childID = $this->getChild($tbl1, $tbl1ID, $tbl2);
-        if ($childID > 0) return $this->getRowById($tbl2, $childID);
+        if ($childID > 0) {
+            return $this->getRowById($tbl2, $childID);
+        }
         return [];
     }
     
@@ -584,12 +596,16 @@ class SurvData
             if (isset($this->kidMap[$tbl1]) && isset($this->kidMap[$tbl1][$tbl2]) 
                 && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
                 foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
-                    if ($tbl1ID == $map["id1"]) $retArr[] = $this->getRowById($tbl2, $map["id2"]);
+                    if ($tbl1ID == $map["id1"]) {
+                        $retArr[] = $this->getRowById($tbl2, $map["id2"]);
+                    }
                 }
             } elseif (isset($this->kidMap[$tbl2]) && isset($this->kidMap[$tbl2][$tbl1]) 
                 && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
                 foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
-                    if ($tbl1ID == $map["id2"]) $retArr[] = $this->getRowById($tbl1, $map["id1"]);
+                    if ($tbl1ID == $map["id2"]) {
+                        $retArr[] = $this->getRowById($tbl1, $map["id1"]);
+                    }
                 }
             }
         }
@@ -606,8 +622,11 @@ class SurvData
             if (trim($tbl2fld) != '') {
                 foreach ($this->dataSets[$tbl2] as $i => $row) {
                     if (isset($row->{ $tbl2fld }) && $row->{ $tbl2fld } == $this->dataBranches[$bInd]["itemID"]) {
-                        if ($idOnly) $ret[] = $row->getKey();
-                        else $ret[] = $row;
+                        if ($idOnly) {
+                            $ret[] = $row->getKey();
+                        } else {
+                            $ret[] = $row;
+                        }
                     }
                 }
             }
@@ -653,8 +672,11 @@ class SurvData
                 $ret[$i] = [ "id" => $recObj->getKey() ];
                 if (sizeof($flds) > 0) {
                     foreach ($flds as $i => $fld) {
-                        if (isset($recObj->{ $fld })) $ret[$i][$fld] = $recObj->{ $fld };
-                        else $ret[$i][$fld] = null;
+                        if (isset($recObj->{ $fld })) {
+                            $ret[$i][$fld] = $recObj->{ $fld };
+                        } else {
+                            $ret[$i][$fld] = null;
+                        }
                     }
                 }
             }

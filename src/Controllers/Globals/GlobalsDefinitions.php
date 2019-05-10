@@ -48,7 +48,9 @@ class GlobalsDefinitions
     
     public function getValById($id = -3)
     {
-        if ($id <= 0) return '';
+        if ($id <= 0) {
+            return '';
+        }
         $def = SLDefinitions::find($id);
         if ($def && isset($def->DefValue)) {
             return trim($def->DefValue);

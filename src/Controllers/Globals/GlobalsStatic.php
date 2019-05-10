@@ -1030,4 +1030,17 @@ class GlobalsStatic
         return date($format, $newTime);
     }
     
+    public function arrStandardDeviation($dat = [])
+    {
+        $avg = $diffs = 0;
+        if (sizeof($dat) > 0) {
+            $avg = array_sum($dat)/sizeof($dat);
+            foreach ($dat as $value) {
+                $diffs += ($value-$avg)*($value-$avg);
+            }
+            return abs(sqrt($diffs/sizeof($dat)));
+        }
+        return 0;
+    }
+    
 }

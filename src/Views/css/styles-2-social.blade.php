@@ -48,12 +48,12 @@ a.socialFace:link span, a.socialFace:visited span, a.socialFace:active span, a.s
 	left: 26px;
 }
 a.socialTwit:link img, a.socialTwit:visited img, a.socialTwit:active img, a.socialTwit:hover img,
-a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.socialFace:hover img,
+a.socialFace:link img, a.socialFace:visited img, a.socialFace:active img, a.socialFace:hover img /* ,
 a.socialTwit:link div, a.socialTwit:visited div, a.socialTwit:active div, a.socialTwit:hover div,
-a.socialFace:link div, a.socialFace:visited div, a.socialFace:active div, a.socialFace:hover div {
+a.socialFace:link div, a.socialFace:visited div, a.socialFace:active div, a.socialFace:hover div */ {
     width: 61px;
     height: 20px;
-    opacity:0.0; filter:alpha(opacity=0);
+    /* opacity:0.0; filter:alpha(opacity=0); */
 }
 
 a.facebookShareBig:link, a.facebookShareBig:visited, a.facebookShareBig:active, a.facebookShareBig:hover {

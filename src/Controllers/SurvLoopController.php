@@ -696,13 +696,8 @@ class SurvLoopController extends Controller
     
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
     {
-        if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
-                . '<hr><hr></div>';
-            return true;
-        }
         if (!isset($repTo[0]) || trim($repTo[0]) == '') {
-            $repTo[0] = 'info@' . $GLOBALS["SL"]->getParentDomain();
+            $repTo[0] = 'info@' . strtolower($GLOBALS["SL"]->getParentDomain());
         }
         if (!isset($repTo[1]) || trim($repTo[1]) == '') {
             $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
@@ -732,6 +727,11 @@ class SurvLoopController extends Controller
                 }
         $mail .= "->replyTo('" . $repTo[0] . "'" 
             . ((trim($repTo[1]) != '') ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
+        if ($GLOBALS["SL"]->isHomestead()) {
+            echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
+                . '<hr><hr></div><pre>' . $mail . '</pre><hr><br />';
+            return true;
+        }
         eval($mail);
         return true;
     }
@@ -739,6 +739,22 @@ class SurvLoopController extends Controller
     // This function should be migrated to sendEmail() ...
     protected function sendNewEmailSimple($body, $subject, $emailTo = '', 
         $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    {
+        $emaTo = $this->getEmailTo($emailTo);
+        $this->sendEmail($body, $subject, $emaTo);
+        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+    }
+    
+    protected function sendNewEmailFromCurrUser($body, $subject, $emailTo = '', 
+        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    {
+        $emaTo = $this->getEmailTo($emailTo);
+        $emaFrom = $this->getEmailFromCurrUser();
+        $this->sendEmail($body, $subject, $emaTo, [$emaFrom], [], $emaFrom);
+        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+    }
+    
+    protected function getEmailTo($emailTo = '')
     {
         $emaTo = [];
         if (is_array($emailTo)) {
@@ -750,12 +766,19 @@ class SurvLoopController extends Controller
                 $emaTo[] = [$emailTo, $emaUsr->name];
             }
         }
-        if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<div class="container"><h2>' . $subject . '</h2>' . $body . '<hr><hr></div>';
-        } else {
-            $this->sendEmail($body, $subject, $emaTo);
+        return $emaTo;
+    }
+    
+    protected function getEmailFromCurrUser()
+    {
+        $emaFrom = [];
+        if (Auth::user()) {
+            $emaFrom = [
+                ((isset(Auth::user()->email)) ? Auth::user()->email : ''),
+                ((isset(Auth::user()->name)) ? Auth::user()->name : '')
+            ];
         }
-        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+        return $emaFrom;
     }
     
     protected function logEmailSent($body, $subject, $emailTo = '', 

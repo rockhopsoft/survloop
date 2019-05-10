@@ -295,21 +295,23 @@ class GlobalsImportExport extends GlobalsTables
             if ($this->treeRow && isset($this->treeRow->TreeDatabase)) {
                 $searchTrees = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
                     ->where('TreeType', 'Page')
-                    ->whereRaw("TreeOpts%" . Globals::TREEOPT_SEARCH . " = 0")
+                    //->whereRaw("TreeOpts%" . Globals::TREEOPT_SEARCH . " = 0")
                     ->orderBy('TreeID', 'asc')
                     ->get();
                 if ($searchTrees->isNotEmpty()) {
                     foreach ($searchTrees as $tree) {
-                        if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0) {
-                            $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->TreeSlug;
-                        } elseif ($tree->TreeOpts%Globals::TREEOPT_STAFF == 0) {
-                            $this->x["srchUrls"]["staff"] = '/dash/' . $tree->TreeSlug;
-                        } elseif ($tree->TreeOpts%Globals::TREEOPT_PARTNER == 0) {
-                            $this->x["srchUrls"]["partner"] = '/dash/' . $tree->TreeSlug;
-                        } elseif ($tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
-                            $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->TreeSlug;
-                        } else {
-                            $this->x["srchUrls"]["public"] = '/' . $tree->TreeSlug;
+                        if ($tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
+                            if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0) {
+                                $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->TreeSlug;
+                            } elseif ($tree->TreeOpts%Globals::TREEOPT_STAFF == 0) {
+                                $this->x["srchUrls"]["staff"] = '/dash/' . $tree->TreeSlug;
+                            } elseif ($tree->TreeOpts%Globals::TREEOPT_PARTNER == 0) {
+                                $this->x["srchUrls"]["partner"] = '/dash/' . $tree->TreeSlug;
+                            } elseif ($tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+                                $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->TreeSlug;
+                            } else {
+                                $this->x["srchUrls"]["public"] = '/' . $tree->TreeSlug;
+                            }
                         }
                     }
                 }
@@ -623,10 +625,14 @@ class GlobalsImportExport extends GlobalsTables
             ->get();
     }
     
-    public function loadSlParents()
+    public function loadSlParents($dbIN = -3)
     {
+        $dbID = $this->dbID;
+        if ($dbIN > 0) {
+            $dbID = $dbIN;
+        }
         $this->x["slTrees"] = $this->x["slNodes"] = $this->x["slConds"] = [];
-        $chk = SLTree::where('TreeDatabase', $this->dbID)
+        $chk = SLTree::where('TreeDatabase', $dbID)
             ->select('TreeID')
             ->get();
         if ($chk->isNotEmpty()) {
@@ -642,7 +648,7 @@ class GlobalsImportExport extends GlobalsTables
                 $this->x["slNodes"][] = $node->NodeID;
             }
         }
-        $chk = SLConditions::where('CondDatabase', $this->dbID)
+        $chk = SLConditions::where('CondDatabase', $dbID)
             ->select('CondID')
             ->get();
         if ($chk->isNotEmpty()) {
@@ -692,7 +698,7 @@ class GlobalsImportExport extends GlobalsTables
             $dbID = $dbIN;
         }
         if (!isset($this->x["slTrees"])) {
-            $this->loadSlParents();
+            $this->loadSlParents($dbID);
         }
         $eval = "";
         if (isset($tbl->TblName)) {
