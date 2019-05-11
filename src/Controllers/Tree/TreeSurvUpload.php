@@ -14,10 +14,10 @@ use Auth;
 use Storage;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
-use Storage\App\Models\User;
-use Storage\App\Models\SLUploads;
-use Storage\App\Models\SLNode;
-use Storage\App\Models\SLNodeResponses;
+use SurvLoop\Models\User;
+use SurvLoop\Models\SLUploads;
+use SurvLoop\Models\SLNode;
+use SurvLoop\Models\SLNodeResponses;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurv;
 

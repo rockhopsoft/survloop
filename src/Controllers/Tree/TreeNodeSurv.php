@@ -9,11 +9,11 @@
   */
 namespace SurvLoop\Controllers\Tree;
 
-use Storage\App\Models\SLNode;
-use Storage\App\Models\SLNodeResponses;
-use Storage\App\Models\SLConditions;
-use Storage\App\Models\SLConditionsNodes;
-use Storage\App\Models\SLFields;
+use SurvLoop\Models\SLNode;
+use SurvLoop\Models\SLNodeResponses;
+use SurvLoop\Models\SLConditions;
+use SurvLoop\Models\SLConditionsNodes;
+use SurvLoop\Models\SLFields;
 use SurvLoop\Controllers\Tree\TreeNodeCore;
 
 class TreeNodeSurv extends TreeNodeCore

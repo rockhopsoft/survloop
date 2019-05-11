@@ -19,16 +19,16 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Routing\Controller;
 use Illuminate\Database\QueryException;
-use Storage\App\Models\User;
-use Storage\App\Models\SLDatabases;
-use Storage\App\Models\SLDefinitions;
-use Storage\App\Models\SLEmailed;
-use Storage\App\Models\SLNode;
-use Storage\App\Models\SLTree;
-use Storage\App\Models\SLTables;
-use Storage\App\Models\SLTokens;
-use Storage\App\Models\SLUsersActivity;
-use Storage\App\Models\SLSess;
+use SurvLoop\Models\User;
+use SurvLoop\Models\SLDatabases;
+use SurvLoop\Models\SLDefinitions;
+use SurvLoop\Models\SLEmailed;
+use SurvLoop\Models\SLNode;
+use SurvLoop\Models\SLTree;
+use SurvLoop\Models\SLTables;
+use SurvLoop\Models\SLTokens;
+use SurvLoop\Models\SLUsersActivity;
+use SurvLoop\Models\SLSess;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\Globals\Globals;
 
@@ -388,7 +388,7 @@ class SurvLoopController extends Controller
     
     protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
     {
-        $eval = "\$recs = Storage\\App\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
+        $eval = "\$recs = SurvLoop\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
             . implode("', '", $filtIn) . "' ])->orderBy('created_at', 'desc')->get();";
         eval($eval);
         //echo $eval . '<br />';
@@ -401,7 +401,7 @@ class SurvLoopController extends Controller
         $this->v["recTots"] = [];
         if (sizeof($filts) > 0) {
             foreach ($filts as $filt) {
-                eval("\$totChk = Storage\\App\\Models\\" . $tblMdl . "::where('" . $filtFld . "', '" . $filt 
+                eval("\$totChk = SurvLoop\\Models\\" . $tblMdl . "::where('" . $filtFld . "', '" . $filt 
                     . "')->select('" . $idFld . "')->get();");
                 $this->v["recTots"][$filt] = (($totChk->isNotEmpty()) ? $totChk->count() : 0);
             }

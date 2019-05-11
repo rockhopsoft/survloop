@@ -11,9 +11,9 @@
 namespace SurvLoop\Controllers\Tree;
 
 use DB;
-use Storage\App\Models\SLNode;
-use Storage\App\Models\SLNodeSavesPage;
-use Storage\App\Models\SLSessLoops;
+use SurvLoop\Models\SLNode;
+use SurvLoop\Models\SLNodeSavesPage;
+use SurvLoop\Models\SLSessLoops;
 use SurvLoop\Controllers\Tree\TreeSurvProgBar;
 
 class TreeSurvBasicNav extends TreeSurvProgBar

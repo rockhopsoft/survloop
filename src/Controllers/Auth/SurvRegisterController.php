@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Auth\RegisterController;
 
-use Storage\App\Models\User;
-use Storage\App\Models\SLUsersRoles;
-use Storage\App\Models\SLUsersActivity;
-use Storage\App\Models\SLDefinitions;
+use SurvLoop\Models\User;
+use SurvLoop\Models\SLUsersRoles;
+use SurvLoop\Models\SLUsersActivity;
+use SurvLoop\Models\SLDefinitions;
 
 class SurvRegisterController extends RegisterController
 {

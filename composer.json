@@ -39,10 +39,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SurvLoop\\": "src/",
-            "MatthiasMullie\\Minify\\": "vendor/matthiasmullie/minify/src/",
-            "MatthiasMullie\\PathConverter\\": "vendor/matthiasmullie/path-converter/src/",
-            "Storage\\App\\Models\\": "storage/app/models/"
+            "SurvLoop\\": "src/"
         }
     },
     "extra": {

@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Models;
+<?php namespace SurvLoop\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

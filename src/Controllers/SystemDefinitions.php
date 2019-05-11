@@ -10,7 +10,7 @@
 namespace SurvLoop\Controllers;
 
 use Illuminate\Http\Request;
-use Storage\App\Models\SLDefinitions;
+use SurvLoop\Models\SLDefinitions;
 
 class SystemDefinitions
 {
