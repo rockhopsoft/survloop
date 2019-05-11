@@ -54,7 +54,6 @@ $(document).ready(function(){
     });
     
     $(".hshoo").on('click', function(event) {
-console.log("hshoo");
         event.preventDefault();
         var hash = '';
         if ($(this).attr("id") && $(this).attr("id").substring(0, 6) == 'admLnk') {
@@ -64,9 +63,9 @@ console.log("hshoo");
         }
         var hashDivID = hash.replace('#', '');
         if (document.getElementById(hashDivID)) {
-            slideToHshooPos(hash);
+            setTimeout(function() { slideToHshooPos(hashDivID); }, 100);
             hshooCurr = getHshooInd(hash);
-            setTimeout(function() { updateHshooActive(hshooCurr); }, 900);
+            setTimeout(function() { updateHshooActive(hshooCurr); }, 1000);
         }
         return false;
     });
@@ -125,6 +124,37 @@ console.log("hshoo");
     setTimeout(function() { chkHshoosPos(); }, 10);
     setTimeout(function() { chkHshooScroll(); }, 50);
     $(document).scroll(function() { chkHshooScroll(); });
+    
+    function chkMatchCols(timeout) {
+        if (matchingColRunning) {
+            if (window.innerWidth > 992) {
+                for (var i = 0; i < matchingColHgtsLg.length; i++) {
+                    var tallest = 0;
+                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
+                        if (document.getElementById(matchingColHgtsLg[i][j]) && tallest < $('#'+matchingColHgtsLg[i][j]+'').height()) {
+                            tallest = $('#'+matchingColHgtsLg[i][j]+'').height();
+                        }
+                    }
+                    var newHgt = ''+Math.round(tallest+40)+'px';
+                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
+                        if (document.getElementById(matchingColHgtsLg[i][j])) {
+                            document.getElementById(matchingColHgtsLg[i][j]).style.minHeight=newHgt;
+                        }
+                    }
+                }
+            } else {
+                for (var i = 0; i < matchingColHgtsLg.length; i++) {
+                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
+                        document.getElementById(matchingColHgtsLg[i][j]).style.minHeight='1px';
+                    }
+                }
+            }
+        }
+        timeout=Math.round(1.2*timeout);
+        setTimeout(function() { chkMatchCols(timeout); }, timeout);
+        return true;
+    }
+    setTimeout(function() { chkMatchCols(500); }, 300);
     
 {!! view('vendor.survloop.js.scripts-ajax-forms')->render() !!}
     

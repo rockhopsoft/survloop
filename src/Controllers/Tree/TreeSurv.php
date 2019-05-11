@@ -12,12 +12,12 @@ namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use App\Models\User;
-use App\Models\SLDefinitions;
-use App\Models\SLNode;
-use App\Models\SLFields;
-use App\Models\SLTokens;
-use App\Models\SLUsersActivity;
+use Storage\App\Models\User;
+use Storage\App\Models\SLDefinitions;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLFields;
+use Storage\App\Models\SLTokens;
+use Storage\App\Models\SLUsersActivity;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Tree\TreeSurvReport;
@@ -870,6 +870,7 @@ class TreeSurv extends TreeSurvReport
         }
         $this->survLoopInit($request, '');
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
+        $GLOBALS["SL"]->x["pageView"] = 'sensitive';
         return $this->retrieveUploadFile($upID);
     }
     

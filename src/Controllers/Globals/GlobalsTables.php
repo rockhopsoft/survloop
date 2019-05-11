@@ -13,20 +13,20 @@ namespace SurvLoop\Controllers\Globals;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Models\SLDatabases;
-use App\Models\SLDefinitions;
-use App\Models\SLFields;
-use App\Models\SLTables;
-use App\Models\SLTree;
-use App\Models\SLNode;
-use App\Models\SLNodeResponses;
-use App\Models\SLDataLoop;
-use App\Models\SLDataSubsets;
-use App\Models\SLDataHelpers;
-use App\Models\SLDataLinks;
-use App\Models\SLConditions;
-use App\Models\SLConditionsVals;
-use App\Models\SLConditionsArticles;
+use Storage\App\Models\SLDatabases;
+use Storage\App\Models\SLDefinitions;
+use Storage\App\Models\SLFields;
+use Storage\App\Models\SLTables;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLNodeResponses;
+use Storage\App\Models\SLDataLoop;
+use Storage\App\Models\SLDataSubsets;
+use Storage\App\Models\SLDataHelpers;
+use Storage\App\Models\SLDataLinks;
+use Storage\App\Models\SLConditions;
+use Storage\App\Models\SLConditionsVals;
+use Storage\App\Models\SLConditionsArticles;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\GlobalsDefinitions;
 use SurvLoop\Controllers\Globals\GlobalsStatic;
@@ -229,15 +229,15 @@ class GlobalsTables extends GlobalsStatic
     public function modelPath($tbl = '', $forceFile = false)
     {
         if (strtolower($tbl) == 'users') {
-            return "App\\Models\\User";
+            return "Storage\\App\\Models\\User";
         }
         if (isset($this->tblModels[$tbl])) {
-            $path = "App\\Models\\" . $this->tblModels[$tbl];
+            $path = "Storage\\App\\Models\\" . $this->tblModels[$tbl];
             $this->chkTblModel($tbl, $path, $forceFile);
             return $path;
         }
-        if (file_exists('../app/Models/SL' . $tbl . '.php')) {
-            return "App\\Models\\SL" . $tbl;
+        if (file_exists('../storage/models/SL' . $tbl . '.php')) {
+            return "Storage\\App\\Models\\SL" . $tbl;
         }
         return '';
     }
@@ -249,8 +249,10 @@ class GlobalsTables extends GlobalsStatic
     
     public function chkTblModel($tbl, $path, $forceFile = false)
     {
-        if (in_array(strtolower(trim($tbl)), ['', 'uers'])) return false;
-        $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
+        if (in_array(strtolower(trim($tbl)), ['', 'uers'])) {
+            return false;
+        }
+        $modelFilename = str_replace('Storage\\App\\Models\\', '../storage/app/models/', $path) . '.php';
         if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) { // copied from AdminDatabaseInstall...
             $modelFile = '';
             $tbl = SLTables::where('TblDatabase', $this->dbID)

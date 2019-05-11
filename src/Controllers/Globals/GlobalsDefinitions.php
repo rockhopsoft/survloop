@@ -9,7 +9,7 @@
   */
 namespace SurvLoop\Controllers\Globals;
 
-use App\Models\SLDefinitions;
+use Storage\App\Models\SLDefinitions;
 
 class GlobalsDefinitions
 {   

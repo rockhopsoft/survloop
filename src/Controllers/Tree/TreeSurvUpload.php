@@ -14,10 +14,10 @@ use Auth;
 use Storage;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
-use App\Models\User;
-use App\Models\SLUploads;
-use App\Models\SLNode;
-use App\Models\SLNodeResponses;
+use Storage\App\Models\User;
+use Storage\App\Models\SLUploads;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLNodeResponses;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurv;
 
@@ -298,7 +298,9 @@ class TreeSurvUpload extends TreeSurv
     
     protected function loadUpDeetPrivacy($upRow = NULL)
     {
-        if ($upRow && isset($upRow->UpPrivacy)) return $upRow->UpPrivacy;
+        if ($upRow && isset($upRow->UpPrivacy)) {
+            return $upRow->UpPrivacy;
+        }
         return 'Private';
     }
     

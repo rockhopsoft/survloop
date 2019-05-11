@@ -10,7 +10,7 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
-use App\Models\SLSessEmojis;
+use Storage\App\Models\SLSessEmojis;
 use SurvLoop\Controllers\Tree\TreeSurvBasicNav;
 
 class TreeSurvReport extends TreeSurvBasicNav

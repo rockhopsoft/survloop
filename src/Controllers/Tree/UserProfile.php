@@ -11,9 +11,9 @@ namespace SurvLoop\Controllers\Tree;
 
 use Auth;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\SLTree;
-use App\Models\SLSess;
+use Storage\App\Models\User;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLSess;
 use SurvLoop\Controllers\Tree\TreeSurvInput;
 
 class UserProfile extends TreeSurvInput

@@ -158,6 +158,24 @@ function isInViewport(node) {
     );
 }
 
+var matchingColRunning = false;
+var matchingColHgtsLg = new Array();
+function addMatchingColsLg(col1, col2) {
+    if (document.getElementById(col1) && document.getElementById(col2)) {
+        var found = false;
+        for (var i = 0; i < matchingColHgtsLg.length; i++) {
+            if ((matchingColHgtsLg[i][0] == col1 && matchingColHgtsLg[i][1] == col2) || (matchingColHgtsLg[i][1] == col1 && matchingColHgtsLg[i][0] == col2)) {
+                found = true;
+            }
+        }
+        if (!found) {
+            matchingColHgtsLg[matchingColHgtsLg.length] = new Array(col1, col2);
+            matchingColRunning = true;
+        }
+    }
+    return true;
+}
+
 function setPopDiaTxt(title, desc) {
     return true;
 }

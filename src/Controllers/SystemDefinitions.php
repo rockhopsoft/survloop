@@ -10,7 +10,7 @@
 namespace SurvLoop\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SLDefinitions;
+use Storage\App\Models\SLDefinitions;
 
 class SystemDefinitions
 {
@@ -216,7 +216,7 @@ class SystemDefinitions
         foreach ($grps as $i => $grp) {
             $chk = SLDefinitions::where('DefDatabase', $dbID)
                 ->where('DefSet', 'User Roles')
-                ->where('DefSubset', $grp)
+                ->where('DefSubset', $grp[0])
                 ->first();
             if (!$chk || !isset($chk->DefSet)) {
                 $chk = new SLDefinitions;

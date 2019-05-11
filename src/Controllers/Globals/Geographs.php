@@ -10,10 +10,10 @@
   */
 namespace SurvLoop\Controllers\Globals;
 
-use App\Models\SLZips;
-use App\Models\SLZipAshrae;
-use App\Models\SLAddyGeo;
-use App\Models\SLNodeResponses;
+use Storage\App\Models\SLZips;
+use Storage\App\Models\SLZipAshrae;
+use Storage\App\Models\SLAddyGeo;
+use Storage\App\Models\SLNodeResponses;
 
 class Geographs
 {

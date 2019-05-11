@@ -11,9 +11,9 @@ namespace SurvLoop\Controllers;
 
 use DB;
 use Illuminate\Routing\Controller;
-use App\Models\SLTree;
-use App\Models\SLNode;
-use App\Models\SLDefinitions;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLDefinitions;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SystemDefinitions;
 
@@ -26,64 +26,72 @@ class SurvLoopInstaller extends Controller
         $chkSysDef->checkDefInstalls();
         foreach ([ Globals::TREEOPT_HOMEPAGE, Globals::TREEOPT_SEARCH ] as $keyOptType) {
             $typeName = (($keyOptType == Globals::TREEOPT_HOMEPAGE) ? 'Dashboard' : 'Search');
-            $chk = SLTree::where('TreeType', 'Page')
-                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
-                ->first();
-            if (!$chk || !isset($chk->TreeID)) {
+            if (!$this->chkPagePerm($keyOptType)) {
                 $this->installPageSimpl('Home', $keyOptType);
             }
-            $chk = SLTree::where('TreeType', 'Page')
-                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
-                ->first();
-            if (!$chk || !isset($chk->TreeID)) {
+            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_ADMIN)) {
                 $this->installPageSimpl($typeName, ($keyOptType*Globals::TREEOPT_ADMIN));
             }
-            $chk = SLTree::where('TreeType', 'Page')
-                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
-                ->first();
-            if (!$chk || !isset($chk->TreeID)) {
+            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_STAFF)) {
                 $this->installPageSimpl('Staff ' . $typeName, ($keyOptType*Globals::TREEOPT_STAFF));
             }
-            $chk = SLTree::where('TreeType', 'Page')
-                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0")
-                ->first();
-            if (!$chk || !isset($chk->TreeID)) {
+            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_PARTNER)) {
                 $this->installPageSimpl('Partner ' . $typeName, ($keyOptType*Globals::TREEOPT_PARTNER));
             }
-            $chk = SLTree::where('TreeType', 'Page')
-                ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
-                ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " = 0")
-                ->first();
-            if (!$chk || !isset($chk->TreeID)) {
+            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_VOLUNTEER)) {
                 $this->installPageSimpl('Volunteer ' . $typeName, ($keyOptType*Globals::TREEOPT_VOLUNTEER));
             }
         }
-        $chk = SLTree::where('TreeType', 'Page')
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PROFILE  . " = 0")
-            ->first();
-        if (!$chk || !isset($chk->TreeID)) {
+        if (!$this->chkPagePerm(Globals::TREEOPT_PROFILE)) {
             $this->installPageMyProfile();
         }
         return true;
+    }
+    
+    public function chkPagePerm($keyOptType, $perm = 0)
+    {
+        $adm = Globals::TREEOPT_ADMIN;
+        $stf = Globals::TREEOPT_STAFF;
+        $prt = Globals::TREEOPT_PARTNER;
+        $vol = Globals::TREEOPT_VOLUNTEER;
+        $chk = SLTree::where('TreeType', 'Page')
+            /* ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
+            ->whereRaw("TreeOpts%" . $adm  . " > 0")
+            ->whereRaw("TreeOpts%" . $stf  . " > 0")
+            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
+            ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0") */
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $tree) {
+                if (isset($tree->TreeOpts) && $tree->TreeOpts%$keyOptType == 0) {
+                    if ($perm <= 1) {
+                        return true;
+                    }
+                    if ($perm == $adm) {
+                        if ($tree->TreeOpts%$adm == 0 && $tree->TreeOpts%$stf > 0 
+                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol > 0) {
+                            return true;
+                        }
+                    } elseif ($perm == $stf) {
+                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf == 0 
+                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol > 0) {
+                            return true;
+                        }
+                    } elseif ($perm == $prt) {
+                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf > 0 
+                            && $tree->TreeOpts%$prt == 0 && $tree->TreeOpts%$vol > 0) {
+                            return true;
+                        }
+                    } elseif ($perm == $vol) {
+                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf > 0 
+                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol == 0) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
     
     public function installPageSimpl($name = 'Home', $opts = 1, $slug = '')

@@ -14,14 +14,14 @@ use Auth;
 use Storage;
 use Illuminate\Http\Request;
 use MatthiasMullie\Minify;
-use App\Models\User;
-use App\Models\SLDatabases;
-use App\Models\SLDefinitions;
-use App\Models\SLTree;
-use App\Models\SLNode;
-use App\Models\SLNodeResponses;
-use App\Models\SLContact;
-use App\Models\SLEmails;
+use Storage\App\Models\User;
+use Storage\App\Models\SLDatabases;
+use Storage\App\Models\SLDefinitions;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLNodeResponses;
+use Storage\App\Models\SLContact;
+use Storage\App\Models\SLEmails;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Admin\AdminMenu;
 use SurvLoop\Controllers\PageLoadUtils;
@@ -316,17 +316,22 @@ class AdminController extends SurvLoopController
         if ($prime <= 1) {
             return $this->redir('/login');
         }
-        $tree = SLTree::where('TreeType', 'Page')
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
-            ->whereRaw("TreeOpts%" . $prime . " = 0")
+        $trees = SLTree::where('TreeType', 'Page')
+            //->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
+            //->whereRaw("TreeOpts%" . $prime . " = 0")
             ->orderBy('TreeID', 'asc')
-            ->first();
-        if ($tree && isset($tree->TreeID)) {
-            $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-            $this->loadCustLoop($request, $tree->TreeID);
-            $this->v["content"] = $this->custReport->index($request);
-            return $this->loader->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg(
-                view('vendor.survloop.master', $this->v)->render()));
+            ->get();
+        if ($trees->isNotEmpty()) {
+            foreach ($trees as $tree) {
+                if (isset($tree->TreeOpts) && $tree->TreeOpts%$prime == 0
+                    && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                    $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                    $this->loadCustLoop($request, $tree->TreeID);
+                    $this->v["content"] = $this->custReport->index($request);
+                    return $this->loader->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg(
+                        view('vendor.survloop.master', $this->v)->render()));
+                }
+            }
         }
         return $this->custReport->redir('/');
     }

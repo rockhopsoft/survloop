@@ -12,20 +12,20 @@ namespace SurvLoop\Controllers\Admin;
 
 use DB;
 use Illuminate\Http\Request;
-use App\Models\SLDatabases;
-use App\Models\SLTables;
-use App\Models\SLDefinitions;
-use App\Models\SLTree;
-use App\Models\SLNode;
-use App\Models\SLDataSubsets;
-use App\Models\SLDataHelpers;
-use App\Models\SLDataLinks;
-use App\Models\SLConditions;
-use App\Models\SLConditionsVals;
-use App\Models\SLConditionsArticles;
-use App\Models\SLUsersRoles;
-use App\Models\SLNodeSaves;
-use App\Models\SLNodeSavesPage;
+use Storage\App\Models\SLDatabases;
+use Storage\App\Models\SLTables;
+use Storage\App\Models\SLDefinitions;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLNode;
+use Storage\App\Models\SLDataSubsets;
+use Storage\App\Models\SLDataHelpers;
+use Storage\App\Models\SLDataLinks;
+use Storage\App\Models\SLConditions;
+use Storage\App\Models\SLConditionsVals;
+use Storage\App\Models\SLConditionsArticles;
+use Storage\App\Models\SLUsersRoles;
+use Storage\App\Models\SLNodeSaves;
+use Storage\App\Models\SLNodeSavesPage;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SessAnalysis;
 use SurvLoop\Controllers\Globals\Globals;
@@ -363,27 +363,32 @@ class AdminTreeController extends AdminController
                 }
             }
         } else { // not Redirect
-            $this->v["myPages"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-                ->whereRaw('TreeOpts%' . Globals::TREEOPT_SURVREPORT . ' ' 
-                    . (($pageType == 'Report') ? '=' : '>') . ' 0')
+            $this->v["myPages"] = [];
+            $chk = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
+               // ->whereRaw('TreeOpts%' . Globals::TREEOPT_SURVREPORT . ' ' 
+               //     . (($pageType == 'Report') ? '=' : '>') . ' 0')
                 ->where('TreeType', 'LIKE', 'Page')
                 ->orderBy('TreeName', 'asc')
                 ->get();
-            if ($this->v["myPages"]->isNotEmpty()) {
-                foreach ($this->v["myPages"] as $i => $tree) {
-                    if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
-                        $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/dashboard';
-                    } else {
-                        $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/' 
-                            . (($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 
-                                || $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0 
-                                || $tree->TreeOpts%Globals::TREEOPT_PARTNER == 0 
-                                || $tree->TreeOpts%Globals::TREEOPT_STAFF == 0) ? 'dash/' : '') . $tree->TreeSlug;
+            if ($chk->isNotEmpty()) {
+                foreach ($chk as $i => $tree) {
+                    if (($pageType == 'Report' && $tree->TreeOpts%Globals::TREEOPT_SURVREPORT == 0)
+                        || ($pageType != 'Report' && $tree->TreeOpts%Globals::TREEOPT_SURVREPORT > 0)) {
+                        $this->v["myPages"][] = $tree;
+                        if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                            $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/dashboard';
+                        } else {
+                            $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/' 
+                                . (($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 
+                                    || $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0 
+                                    || $tree->TreeOpts%Globals::TREEOPT_PARTNER == 0 
+                                    || $tree->TreeOpts%Globals::TREEOPT_STAFF == 0) ? 'dash/' : '') . $tree->TreeSlug;
+                        }
                     }
                 }
             }
             $this->v["autopages"] = [ "contact" => false ];
-            if ($this->v["myPages"]->isNotEmpty()) {
+            if (sizeof($this->v["myPages"]) > 0) {
                 foreach ($this->v["myPages"] as $page) {
                     if ($page->TreeOpts%Globals::TREEOPT_CONTACT == 0) {
                         $this->v["autopages"]["contact"] = true;

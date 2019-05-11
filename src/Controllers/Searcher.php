@@ -13,8 +13,8 @@ use DB;
 use Auth;
 use Session;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\SLSearchRecDump;
+use Storage\App\Models\User;
+use Storage\App\Models\SLSearchRecDump;
 use SurvLoop\Controllers\SurvCustLoop;
 
 class Searcher extends SurvCustLoop

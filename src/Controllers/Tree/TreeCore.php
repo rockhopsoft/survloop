@@ -10,8 +10,8 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
-use App\Models\SLTree;
-use App\Models\SLNode;
+use Storage\App\Models\SLTree;
+use Storage\App\Models\SLNode;
 use SurvLoop\Controllers\Tree\TreeNodeCore;
 use SurvLoop\Controllers\SurvLoopController;
 
