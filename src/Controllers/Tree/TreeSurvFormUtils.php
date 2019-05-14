@@ -11,7 +11,7 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
-use SurvLoop\Models\SLNodeResponses;
+use App\Models\SLNodeResponses;
 use SurvLoop\Controllers\Tree\TreeSurvFormLoops;
 
 class TreeSurvFormUtils extends TreeSurvFormLoops

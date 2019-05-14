@@ -24,6 +24,7 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__.'/Views/auth'           => base_path('resources/views/auth'),
             __DIR__.'/Views/auth/passwords' => base_path('resources/views/auth/passwords'),
             __DIR__.'/Uploads'              => base_path('storage/app/up/survloop'),
+            __DIR__.'/Models'               => base_path('app/models'),
 
             __DIR__.'/Controllers/Middleware/routes-api.php'
                 => base_path('routes/api.php'),

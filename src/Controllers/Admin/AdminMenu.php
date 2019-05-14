@@ -9,8 +9,8 @@
   */
 namespace SurvLoop\Controllers\Admin;
 
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLContact;
+use App\Models\SLTree;
+use App\Models\SLContact;
 
 class AdminMenu
 {

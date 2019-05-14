@@ -13,16 +13,16 @@ namespace SurvLoop\Controllers\Tree;
 use DB;
 use Cache;
 use Illuminate\Http\Request;
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeSaves;
-use SurvLoop\Models\SLNodeResponses;
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLDataLoop;
-use SurvLoop\Models\SLConditionsNodes;
-use SurvLoop\Models\SLEmails;
+use App\Models\User;
+use App\Models\SLDefinitions;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLNodeSaves;
+use App\Models\SLNodeResponses;
+use App\Models\SLConditions;
+use App\Models\SLDataLoop;
+use App\Models\SLConditionsNodes;
+use App\Models\SLEmails;
 use SurvLoop\Controllers\Tree\TreeSurvForm;
 
 class TreeSurvNodeEdit extends TreeSurvForm

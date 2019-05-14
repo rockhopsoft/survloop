@@ -11,7 +11,7 @@ namespace SurvLoop\Controllers;
 
 use Auth;
 use Storage;
-use SurvLoop\Models\SLImages;
+use App\Models\SLImages;
 
 class SurvLoopImages
 {

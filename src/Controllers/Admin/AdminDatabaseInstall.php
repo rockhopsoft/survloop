@@ -14,11 +14,11 @@ use Storage;
 use Illuminate\Http\Request;
 use League\Flysystem\Filesystem;
 use League\Flysystem\ZipArchive\ZipArchiveAdapter;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLConditions;
+use App\Models\SLTree;
+use App\Models\SLTables;
+use App\Models\SLFields;
+use App\Models\SLNode;
+use App\Models\SLConditions;
 use SurvLoop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController

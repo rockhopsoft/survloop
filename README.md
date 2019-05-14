@@ -136,7 +136,7 @@ $ cd SurvLoop
 $ php artisan key:generate
 $ php artisan make:auth
 $ composer require wikiworldorder/survloop
-$ sed -i 's/App\\User::class/SurvLoop\\Models\\User::class/g' config/auth.php
+$ sed -i 's/App\\User::class/App\\Models\\User::class/g' config/auth.php
 ```
 
 * Update composer, publish the package migrations, etc...

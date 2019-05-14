@@ -12,12 +12,12 @@ namespace SurvLoop\Controllers\Tree;
 
 use Storage;
 use Illuminate\Http\Request;
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLContact;
-use SurvLoop\Models\SLEmails;
-use SurvLoop\Models\SLTokens;
-use SurvLoop\Models\SLUsersRoles;
+use App\Models\User;
+use App\Models\SLNode;
+use App\Models\SLContact;
+use App\Models\SLEmails;
+use App\Models\SLTokens;
+use App\Models\SLUsersRoles;
 use SurvLoop\Controllers\Tree\TreeSurvUpload;
 
 class TreeSurvInput extends TreeSurvUpload

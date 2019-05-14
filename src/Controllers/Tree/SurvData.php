@@ -12,8 +12,8 @@ namespace SurvLoop\Controllers\Tree;
 
 use DB;
 use Auth;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLNodeSaves;
+use App\Models\SLFields;
+use App\Models\SLNodeSaves;
 use SurvLoop\Controllers\Tree\SurvDataTestsAB;
 
 class SurvData

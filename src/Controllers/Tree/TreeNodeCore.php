@@ -10,7 +10,7 @@
 namespace SurvLoop\Controllers\Tree;
 
 use DB;
-use SurvLoop\Models\SLNode;
+use App\Models\SLNode;
 
 class TreeNodeCore
 {

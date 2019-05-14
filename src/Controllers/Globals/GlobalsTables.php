@@ -13,20 +13,20 @@ namespace SurvLoop\Controllers\Globals;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeResponses;
-use SurvLoop\Models\SLDataLoop;
-use SurvLoop\Models\SLDataSubsets;
-use SurvLoop\Models\SLDataHelpers;
-use SurvLoop\Models\SLDataLinks;
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLConditionsVals;
-use SurvLoop\Models\SLConditionsArticles;
+use App\Models\SLDatabases;
+use App\Models\SLDefinitions;
+use App\Models\SLFields;
+use App\Models\SLTables;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLNodeResponses;
+use App\Models\SLDataLoop;
+use App\Models\SLDataSubsets;
+use App\Models\SLDataHelpers;
+use App\Models\SLDataLinks;
+use App\Models\SLConditions;
+use App\Models\SLConditionsVals;
+use App\Models\SLConditionsArticles;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\GlobalsDefinitions;
 use SurvLoop\Controllers\Globals\GlobalsStatic;
@@ -229,18 +229,15 @@ class GlobalsTables extends GlobalsStatic
     public function modelPath($tbl = '', $forceFile = false)
     {
         if (strtolower($tbl) == 'users') {
-            return "SurvLoop\\Models\\User";
+            return "App\\Models\\User";
         }
         if (isset($this->tblModels[$tbl])) {
-            $path = ((isset($this->sysOpts["cust-abbr"])) ? $this->sysOpts["cust-abbr"] : 'SurvLoop')
-                . "\\Models\\" . $this->tblModels[$tbl];
+            $path = "App\\Models\\" . $this->tblModels[$tbl];
             $this->chkTblModel($tbl, $path, $forceFile);
             return $path;
         }
-        if (file_exists('../vendor/' . ((isset($this->sysOpts["cust-package"])) 
-            ? $this->sysOpts["cust-package"] : 'wikiworldorder/survloop') . '/src/Models/SL' . $tbl . '.php')) {
-            return ((isset($this->sysOpts["cust-abbr"])) ? $this->sysOpts["cust-abbr"] : 'SurvLoop') 
-                . "\\Models\\SL" . $tbl;
+        if (file_exists('../app/Models/SL' . $tbl . '.php')) {
+            return "App\\Models\\SL" . $tbl;
         }
         return '';
     }
@@ -255,11 +252,9 @@ class GlobalsTables extends GlobalsStatic
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) {
             return false;
         }
-        $modelFilename = str_replace(((isset($this->sysOpts["cust-abbr"])) 
-            ? $this->sysOpts["cust-abbr"] : 'SurvLoop') . '\\Models\\', '../vendor/' . 
-            ((isset($this->sysOpts["cust-package"])) ? $this->sysOpts["cust-package"] 
-                : 'wikiworldorder/survloop') . '/src/Models/', $path) . '.php';
-        if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) { // copied from AdminDatabaseInstall...
+        $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path) . '.php';
+        if ($this->isAdmin && (!file_exists($modelFilename) || $forceFile)) {
+            // copied from AdminDatabaseInstall...
             $modelFile = '';
             $tbl = SLTables::where('TblDatabase', $this->dbID)
                 ->where('TblName', $tbl)

@@ -13,8 +13,8 @@ namespace SurvLoop\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLDefinitions;
+use App\Models\SLTree;
+use App\Models\SLDefinitions;
 use SurvLoop\Controllers\Admin\AdminController;
 
 class SystemUpdate extends AdminController

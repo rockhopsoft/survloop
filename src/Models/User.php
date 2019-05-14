@@ -1,7 +1,6 @@
-<?php namespace SurvLoop\Models;
+<?php namespace App\Models;
 
 use DB;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -10,10 +9,8 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
-
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLUsersRoles;
-
+use App\Models\SLDefinitions;
+use App\Models\SLUsersRoles;
 use SurvLoop\Controllers\DatabaseLookups;
 
 class User extends Model implements AuthenticatableContract,

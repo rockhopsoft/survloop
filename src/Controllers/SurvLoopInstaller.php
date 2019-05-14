@@ -11,9 +11,9 @@ namespace SurvLoop\Controllers;
 
 use DB;
 use Illuminate\Routing\Controller;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLDefinitions;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLDefinitions;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SystemDefinitions;
 

@@ -1,8 +1,8 @@
-<?php namespace SurvLoop\Models;
+<?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-use SurvLoop\Models\SLConditionsVals;
+use App\Models\SLConditionsVals;
 
 class SLConditions extends Model
 {

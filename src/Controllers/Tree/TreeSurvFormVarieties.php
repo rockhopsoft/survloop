@@ -11,8 +11,8 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLTree;
+use App\Models\User;
+use App\Models\SLTree;
 use SurvLoop\Controllers\Tree\UserProfile;
 
 class TreeSurvFormVarieties extends UserProfile

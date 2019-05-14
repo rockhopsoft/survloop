@@ -16,13 +16,13 @@ use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Database\Migrations\Migration;
 
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLBusRules;
-use SurvLoop\Models\SLLogActions;
-use SurvLoop\Models\SLDatabases;
+use App\Models\SLTree;
+use App\Models\SLTables;
+use App\Models\SLFields;
+use App\Models\SLDefinitions;
+use App\Models\SLBusRules;
+use App\Models\SLLogActions;
+use App\Models\SLDatabases;
 
 use SurvLoop\Controllers\Tree\SurvData;
 use SurvLoop\Controllers\Globals\Globals;

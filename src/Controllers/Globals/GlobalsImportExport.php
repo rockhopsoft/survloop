@@ -11,20 +11,20 @@
 namespace SurvLoop\Controllers\Globals;
 
 use DB;
-use SurvLoop\Models\User;
+use App\Models\User;
 use Storage;
 use Illuminate\Http\Request;
 use MatthiasMullie\Minify;
-use SurvLoop\Models\SLDatabases;
-use SurvLoop\Models\SLTables;
-use SurvLoop\Models\SLFields;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLDefinitions;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLConditionsNodes;
-use SurvLoop\Models\SLZips;
-use SurvLoop\Models\SLTokens;
+use App\Models\SLDatabases;
+use App\Models\SLTables;
+use App\Models\SLFields;
+use App\Models\SLTree;
+use App\Models\SLDefinitions;
+use App\Models\SLNode;
+use App\Models\SLConditions;
+use App\Models\SLConditionsNodes;
+use App\Models\SLZips;
+use App\Models\SLTokens;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Globals\GlobalsTables;
 

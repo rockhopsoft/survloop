@@ -9,8 +9,8 @@
   */
 namespace SurvLoop\Controllers\Tree;
 
-use SurvLoop\Models\SLConditions;
-use SurvLoop\Models\SLConditionsArticles;
+use App\Models\SLConditions;
+use App\Models\SLConditionsArticles;
 use SurvLoop\Controllers\Tree\TreeSurvAPI;
 
 class TreeSurvConds extends TreeSurvAPI

@@ -10,11 +10,11 @@
 namespace SurvLoop\Controllers;
 
 use DB;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLNodeSaves;
-use SurvLoop\Models\SLNodeSavesPage;
-use SurvLoop\Models\SLSess;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLNodeSaves;
+use App\Models\SLNodeSavesPage;
+use App\Models\SLSess;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 
 class SessAnalysis

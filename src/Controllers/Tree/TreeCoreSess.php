@@ -12,12 +12,12 @@ namespace SurvLoop\Controllers\Tree;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use SurvLoop\Models\User;
-use SurvLoop\Models\SLTree;
-use SurvLoop\Models\SLNode;
-use SurvLoop\Models\SLSess;
-use SurvLoop\Models\SLSessLoops;
-use SurvLoop\Models\SLTokens;
+use App\Models\User;
+use App\Models\SLTree;
+use App\Models\SLNode;
+use App\Models\SLSess;
+use App\Models\SLSessLoops;
+use App\Models\SLTokens;
 use SurvLoop\Controllers\Tree\SurvData;
 use SurvLoop\Controllers\Tree\TreeCore;
 
