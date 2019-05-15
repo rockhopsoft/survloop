@@ -706,7 +706,7 @@ class TreeSurvInput extends TreeSurvUpload
     protected function processPageForm($nID = -3, $tmpSubTier = [], $slTable = '', $dumpFld = '')
     {
         if (trim($slTable) == '') return false;
-        eval("\$this->pageCoreRow = new SurvLoop\\Models\\" . $slTable . ";");
+        eval("\$this->pageCoreRow = new App\\Models\\" . $slTable . ";");
         $extraData = $this->processPageFormInner($nID, $tmpSubTier);
         if (trim($extraData) != '' && trim($dumpFld) != '') {
             $this->pageCoreRow->{ $dumpFld } = $this->pageCoreRow->{ $dumpFld } . $extraData;

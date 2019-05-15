@@ -663,7 +663,7 @@ class GlobalsImportExport extends GlobalsTables
     {
         $seedCnt = 0;
         if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedCnt = SurvLoop\\Models\\" . $tblClean . "::" . $eval . "count();");
+            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" . $eval . "count();");
         }
         return (($seedCnt && intVal($seedCnt) > 0) ? intVal($seedCnt) : 0);
     }
@@ -678,7 +678,7 @@ class GlobalsImportExport extends GlobalsTables
     {
         $seedChk = [];
         if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedChk = SurvLoop\\Models\\" . $tblClean . "::" . $eval . "orderBy('created_at', 'asc')->get();");
+            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "orderBy('created_at', 'asc')->get();");
         }
         return $seedChk;
     }

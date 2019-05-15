@@ -388,7 +388,7 @@ class SurvLoopController extends Controller
     
     protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
     {
-        $eval = "\$recs = SurvLoop\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
+        $eval = "\$recs = App\\Models\\" . $tblMdl . "::whereIn('" . $filtFld . "', [ '" 
             . implode("', '", $filtIn) . "' ])->orderBy('created_at', 'desc')->get();";
         eval($eval);
         //echo $eval . '<br />';
@@ -401,7 +401,7 @@ class SurvLoopController extends Controller
         $this->v["recTots"] = [];
         if (sizeof($filts) > 0) {
             foreach ($filts as $filt) {
-                eval("\$totChk = SurvLoop\\Models\\" . $tblMdl . "::where('" . $filtFld . "', '" . $filt 
+                eval("\$totChk = App\\Models\\" . $tblMdl . "::where('" . $filtFld . "', '" . $filt 
                     . "')->select('" . $idFld . "')->get();");
                 $this->v["recTots"][$filt] = (($totChk->isNotEmpty()) ? $totChk->count() : 0);
             }

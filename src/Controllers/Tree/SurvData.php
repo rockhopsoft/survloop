@@ -1107,7 +1107,7 @@ class SurvData
         if (isset($GLOBALS["SL"]->closestLoop["itemID"]) && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
             $qryWheres .= "where('NodeSaveLoopItemID', " . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
         }
-        eval("\$nodeSave = SurvLoop\\Models\\SLNodeSaves::" . $qryWheres . "orderBy('created_at', 'desc')->first();"); 
+        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres . "orderBy('created_at', 'desc')->first();"); 
         if ($nodeSave && isset($nodeSave->NodeSaveNewVal)) {
             return $nodeSave->NodeSaveNewVal;
         }
