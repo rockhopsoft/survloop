@@ -859,7 +859,13 @@ class GlobalsStatic
 	        }
 	    }
 	    return 0;
-	}
+    }
+    
+    public function textSaferHtml($strIN)
+    {
+        return '<p>' . str_replace("\n", '</p><p>', str_replace("\n\n", "\n", str_replace("\n\n", "\n", 
+            strip_tags($strIN, '<b><i><u>')))) . '</p>';
+    }
     
     public function makeXMLSafe($strIN)
     {

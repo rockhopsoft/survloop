@@ -11,6 +11,13 @@ a.socialIco:link img, a.socialIco:visited img, a.socialIco:active img, a.socialI
     margin: 0px;
 }
 
+a.socialFacePng:link, a.socialFacePng:visited, a.socialFacePng:active, a.socialFacePng:hover,
+a.socialTwitPng:link, a.socialTwitPng:visited, a.socialTwitPng:active, a.socialTwitPng:hover,
+a.socialFacePng:link img, a.socialFacePng:visited img, a.socialFacePng:active img, a.socialFacePng:hover img,
+a.socialTwitPng:link img, a.socialTwitPng:visited img, a.socialTwitPng:active img, a.socialTwitPng:hover img {
+    height: 20px;
+}
+
 a.socialTwit:link, a.socialTwit:visited, a.socialTwit:active, a.socialTwit:hover,
 a.socialFace:link, a.socialFace:visited, a.socialFace:active, a.socialFace:hover {
 	position: relative;

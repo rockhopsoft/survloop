@@ -10,6 +10,7 @@
 
 table.repDeetsBlock, .slReport table.repDeetsBlock, table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
 	width: 100%;
+    margin-bottom: 15px;
 }
 table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     word-wrap: break-word;
@@ -17,6 +18,7 @@ table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     padding: 10px 15px;
     vertical-align: top;
     width: 50%;
+    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
 }
 table.repDeetsBlock tr td span, table.repDeetsBlock tr td div span, 
 .slReport table.repDeetsBlock tr td span, .slReport table.repDeetsBlock tr td div span, 
@@ -97,11 +99,15 @@ table.detailList tr th {
 	font-weight: bold;
 }
 table.detailList tr td {
-	padding-bottom: 40px;
 	border-top: 1px {!! $css["color-main-on"] !!} solid;
 }
 
-.glossaryList { margin: 0px 15px; }
+.glossaryList {
+    margin: 0px 15px;
+}
+.glossaryList .row {
+    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
+}
 
 .scoreLabel {
 	font-size: 20pt;

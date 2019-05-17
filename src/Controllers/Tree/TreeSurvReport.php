@@ -179,12 +179,14 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     protected function printGlossary()
     {
-        if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) $this->fillGlossary();
+        if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) {
+            $this->fillGlossary();
+        }
         if (sizeof($this->v["glossaryList"]) > 0) {
             $ret = '<h3 class="mT0 mB20 slBlueDark">Glossary of Terms</h3><div class="glossaryList">';
             foreach ($this->v["glossaryList"] as $i => $gloss) {
-                $ret .= '<div class="row' . (($i%2 == 0) ? ' row2' : '') . ' pT15 pB15"><div class="col-md-3">' 
-                    . $gloss[0] . '</div><div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '') 
+                $ret .= '<div class="row' /* . (($i%2 == 0) ? ' row2' : '') */ . ' pT15 pB15"><div class="col-md-3">' 
+                    . $gloss[0] . '</div><div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '')
                     . '</div></div>';
             }
             return $ret . '</div>';

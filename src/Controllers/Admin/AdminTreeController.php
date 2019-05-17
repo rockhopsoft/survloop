@@ -231,12 +231,11 @@ class AdminTreeController extends AdminController
                     $this->v["content"] .= $custHeader . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() 
                         . '</div></div><div class="p10"></div>' . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
                 }
-                
             } else {
                 $this->v["content"] .= view('vendor.survloop.elements.logo-print', [
                         "sysOpts" => $GLOBALS["SL"]->sysOpts,
                         "w100" => true
-                        ])->render()
+                    ])->render()
                     . '<h2>' . $GLOBALS["SL"]->treeRow->TreeName . ': Specifications</h2>'
                     . view('vendor.survloop.elements.print-tree-map-desc')->render()
                     . '<div class="p10"></div>'
@@ -244,12 +243,12 @@ class AdminTreeController extends AdminController
             }
             $this->v["content"] .= str_replace('Content Chunk, WYSIWYG', 'Content Chunk', 
                     $this->v["treeClassAdmin"]->adminPrintFullTree($request, true))
-                . '<a name="licenseInfo"></a><div class="mT20 mB20 p20">' . view('vendor.survloop.elements.dbdesign-legal', [
+                . '<a name="licenseInfo"></a><div class="mT20 mB20 p20">' 
+                . view('vendor.survloop.elements.dbdesign-legal', [
                     "sysOpts" => $GLOBALS["SL"]->sysOpts
-                    ])->render() . '</div></div>';
+                ])->render() . '</div></div>';
             $this->saveCache();
         }
-        $this->v["isPrint"] = true;
         return view('vendor.survloop.master', $this->v);
     }
     

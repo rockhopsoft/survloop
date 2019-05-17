@@ -411,12 +411,15 @@ class TreeSurvUpload extends TreeSurv
     protected function getUploads($nID, $isAdmin = false, $isOwner = false)
     {
         $this->prepPrevUploads($nID);
-        if (empty($this->uploads)) return [];
+        if (empty($this->uploads)) {
+            return [];
+        }
         $treeID = $this->getUpTree();
         $vidTypeID = -1;
+        $upTypes = [];
         if (isset($GLOBALS["SL"]->sysOpts["tree-" . $treeID . "-upload-types"])) {
-            $vidTypeID = $GLOBALS["SL"]->def->getID($GLOBALS["SL"]->sysOpts["tree-" . $treeID 
-                . "-upload-types"], 'Video');
+            $upTypes = $GLOBALS["SL"]->sysOpts["tree-" . $treeID . "-upload-types"];
+            $vidTypeID = $GLOBALS["SL"]->def->getID($upTypes, 'Video');
         }
         $ups = [];
         if (sizeof($this->uploads) > 0) {
@@ -429,15 +432,20 @@ class TreeSurvUpload extends TreeSurv
                     "upRow"       => $upRow, 
                     "upDeets"     => $this->upDeets[$i], 
                     "uploadTypes" => $this->uploadTypes, 
-                    "vidTypeID"   => $GLOBALS["SL"]->def->getID($GLOBALS["SL"]->sysOpts["tree-" . $treeID 
-                        . "-upload-types"], 'Video'),
-                    "v"           => $this->v,
+                    "vidTypeID"   => $vidTypeID,
                     "isAdmin"     => $isAdmin,
-                    "isOwner"     => $isOwner
+                    "isOwner"     => $isOwner,
+                    "canShow"     => $this->canShowUpload($nID, $this->upDeets[$i], $isAdmin, $isOwner),
+                    "v"           => $this->v
                 ])->render();
             }
         }
         return $ups;
+    }
+    
+    protected function canShowUpload($nID, $upDeets, $isAdmin = false, $isOwner = false)
+    {
+        return ($isAdmin || $isOwner);
     }
     
     protected function getUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
@@ -448,7 +456,9 @@ class TreeSurvUpload extends TreeSurv
                 $tmpUps = $this->getUploads($nID, $isAdmin, $isOwner);
                 if (sizeof($tmpUps) > 0) {
                     foreach ($tmpUps as $up) {
-                        if (!in_array($up, $ups)) $ups[] = $up;
+                        if (!in_array($up, $ups)) {
+                            $ups[] = $up;
+                        }
                     }
                 }
             }
@@ -459,8 +469,8 @@ class TreeSurvUpload extends TreeSurv
     protected function reportUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
     {
         return view('vendor.survloop.reports.inc-uploads', [
-                "uploads" => $this->getUploadsMultNodes($nIDs, $isAdmin, $isOwner)
-            ])->render();
+            "uploads" => $this->getUploadsMultNodes($nIDs, $isAdmin, $isOwner)
+        ])->render();
     }
     
     protected function postUploadTool($nID)

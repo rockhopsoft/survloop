@@ -23,6 +23,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdFnt    { border: 1px {!! $css["color-main-faint"] !!} solid; }
 .brdRed    { border: 1px {!! $css["color-danger-on"] !!} solid; }
 .brdBlk    { border: 1px {!! $css["color-main-text"] !!} solid; }
+.brdInfo   { border: 1px {!! $css["color-info-on"] !!} solid; }
 
 .brdTop, table tr.brdTop td, table tr.brdTop th, table tr td.brdTop, table tr th.brdTop { border-top: 1px {!! $css["color-main-on"] !!} solid; }
 .brdBot, table tr.brdBot td, table tr.brdBot th, table tr td.brdBot, table tr th.brdBot { border-bottom: 1px {!! $css["color-main-on"] !!} solid; }
