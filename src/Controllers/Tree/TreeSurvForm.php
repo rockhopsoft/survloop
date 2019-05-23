@@ -1049,7 +1049,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         if ($this->hasSpreadsheetParent($nID)) {
                             $ret .= '">' . "\n";
                         } elseif ($mobileCheckbox) {
-                            $ret .= '" style="margin-top: 20px;">' . "\n";
+                            $ret .= '" style="margin-top: 7px;">' . "\n";
                         } else {
                             $ret .= $isOneLiner . ' pB0 mBn5">' . "\n";
                         }
@@ -1166,7 +1166,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                                             $grankids .= (($k > 0) ? ', ' : '') . $granNode[0];
                                             $ret .= $this->printNodePublic($granNode[0], $granNode, $boxChecked);
                                         }
-                                        if ($branchRowID > 0) $this->sessData->endTmpDataBranch($tbl);
+                                        if ($branchRowID > 0) {
+                                            $this->sessData->endTmpDataBranch($tbl);
+                                        }
                                         $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];
                                         $ret .= '</div>';
                                         $GLOBALS["SL"]->pageAJAX .= view(
@@ -1297,7 +1299,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         ["F", "Female" ],
                         ["M", "Male"   ],
                         ["O", "Other: "]
-                        ];
+                    ];
                     if ($curr->nodeType == 'Gender Not Sure') {
                         $coreResponses[] = ["?", "Not Sure"];
                     }
@@ -1314,7 +1316,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         "coreResponses"     => $coreResponses,
                         "currNodeSessData"  => $currNodeSessData,
                         "currSessDataOther" => $currSessDataOther
-                        ])->render();
+                    ])->render();
                     $genderSuggest = '';
                     foreach ($GLOBALS["SL"]->def->getSet('Gender Identity') as $i => $gen) {
                         if (!in_array($gen->DefValue, ['Female', 'Male', 'Other', 'Not sure'])) {

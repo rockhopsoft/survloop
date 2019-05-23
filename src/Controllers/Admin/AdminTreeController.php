@@ -68,6 +68,7 @@ class AdminTreeController extends AdminController
             $this->allStdCondition('#IsNotAdmin', 'The user is not currently logged in as an administrator.');
             $this->allStdCondition('#IsStaff', 'The user is currently logged in as a staff user.');
             $this->allStdCondition('#IsStaffOrAdmin', 'The user is currently logged in as a staff or admin user.');
+            $this->allStdCondition('#IsPartnerStaffOrAdmin', 'The user is currently logged in as a partner, staff, or admin user.');
             $this->allStdCondition('#IsPartner', 'The user is currently logged in as a partner.');
             $this->allStdCondition('#IsVolunteer', 'The user is currently logged in as a volunteer.');
             $this->allStdCondition('#IsBrancher', 'The user is currently logged in as a database manager.');
@@ -226,7 +227,7 @@ class AdminTreeController extends AdminController
                     . '>About this map</a><div id="hidivReadMore" class="disNon">';
                 if (strpos($custHeader, '[[TreeStats]]') !== false) {
                     $this->v["content"] .= str_replace('[[TreeStats]]', $GLOBALS["SL"]->printTreeNodeStats(true, true, true), $custHeader) 
-                        . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() . '</div></div>';
+                         . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() . '</div></div>';
                 } else {
                     $this->v["content"] .= $custHeader . $readMore . view('vendor.survloop.elements.print-tree-map-desc')->render() 
                         . '</div></div><div class="p10"></div>' . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);

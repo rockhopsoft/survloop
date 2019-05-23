@@ -26,7 +26,7 @@ class TreeCoreSess extends TreeCore
     /*****************
     // Some More Generalized Session Processes
     *****************/
-    protected function loadSessInfo($coreTbl)
+    protected function loadSessInfo($coreTbl = '')
     {
         if (!isset($this->v["currPage"])) {
             $this->survLoopInit($GLOBALS["SL"]->REQ); // not sure why this
@@ -34,6 +34,10 @@ class TreeCoreSess extends TreeCore
         if (isset($GLOBALS["SL"]->formTree->TreeID)) {
             return false;
         }
+        if (trim($coreTbl) == '') {
+            $coreTbl = $GLOBALS["SL"]->coreTbl;
+        }
+        
         // If we're loading a Page that doesn't even have a Core Table, then we skip all the session checks...
         if ((!isset($GLOBALS["SL"]->treeRow->TreeCoreTable) || intVal($GLOBALS["SL"]->treeRow->TreeCoreTable) <= 0)
             && isset($GLOBALS["SL"]->treeRow->TreeType) && $GLOBALS["SL"]->treeRow->TreeType == 'Page') {
@@ -60,30 +64,7 @@ class TreeCoreSess extends TreeCore
                 $this->coreID = $this->sessInfo->SessCoreID;
             }
         } elseif (isset($this->v) && $this->v["uID"] > 0) {
-            //$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
-            $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
-                ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
-                ->where('SessCoreID', (($cid > 0) ? '=' : '>'), (($cid > 0) ? $cid : 0))
-                ->where('SessIsActive', 1)
-                //->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
-                ->orderBy('updated_at', 'desc')
-                ->first();
-            if ($this->sessInfo && isset($this->sessInfo->SessID)) {
-                if ($this->isAdminUser() && $cid > 0 && $cid != $this->sessInfo->SessCoreID) {
-                    $this->sessInfo = new SLSess;
-                    $this->sessInfo->SessUserID   = $this->v["uID"];
-                    $this->sessInfo->SessTree     = $GLOBALS["SL"]->sessTree;
-                    $this->sessInfo->SessCoreID   = $this->coreID = $cid;
-                    $this->sessInfo->SessIsActive = 1;
-                    $this->sessInfo->save();
-                    $this->sessID = $this->sessInfo->SessID;
-                } elseif ($this->isAdminUser() || $this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
-                    $this->sessID = $this->sessInfo->SessID;
-                    $this->coreID = $this->sessInfo->SessCoreID;
-                } else {
-                    $this->sessInfo = [];
-                }
-            }
+            $this->chkUserTreeSess($coreTbl, $cid);
         } else {
             $this->chkTreeSess($GLOBALS["SL"]->sessTree);
         }
@@ -171,6 +152,35 @@ class TreeCoreSess extends TreeCore
                 }
             }
         } // end $this->coreID > 0
+        return true;
+    }
+    
+    protected function chkUserTreeSess($coreTbl, $cid)
+    {
+        //$recentSessTime = mktime(date('H')-2, date('i'), date('s'), date('m'), date('d'), date('Y'));
+        $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
+            ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
+            ->where('SessCoreID', (($cid > 0) ? '=' : '>'), (($cid > 0) ? $cid : 0))
+            ->where('SessIsActive', 1)
+            //->where('updated_at', '>', date('Y-m-d H:i:s', $recentSessTime))
+            ->orderBy('updated_at', 'desc')
+            ->first();
+        if ($this->sessInfo && isset($this->sessInfo->SessID)) {
+            if ($this->isAdminUser() && $cid > 0 && $cid != $this->sessInfo->SessCoreID) {
+                $this->sessInfo = new SLSess;
+                $this->sessInfo->SessUserID   = $this->v["uID"];
+                $this->sessInfo->SessTree     = $GLOBALS["SL"]->sessTree;
+                $this->sessInfo->SessCoreID   = $this->coreID = $cid;
+                $this->sessInfo->SessIsActive = 1;
+                $this->sessInfo->save();
+                $this->sessID = $this->sessInfo->SessID;
+            } elseif ($this->isAdminUser() || $this->recordIsEditable($coreTbl, $this->sessInfo->SessCoreID)) {
+                $this->sessID = $this->sessInfo->SessID;
+                $this->coreID = $this->sessInfo->SessCoreID;
+            } else {
+                $this->sessInfo = [];
+            }
+        }
         return true;
     }
     

@@ -347,7 +347,7 @@ class AdminDatabaseInstall extends AdminDBController
         }
         if ($request->has('refreshVendor')) {
             $this->v["content"] = $GLOBALS["SL"]->copyDirFiles(
-                '../vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]),
+                '../app/Models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]),
                 '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models')
                 . $GLOBALS["SL"]->copyDirFiles('../storage/app/database/migrations',
                     '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Database') . $this->v["content"];
@@ -375,8 +375,7 @@ class AdminDatabaseInstall extends AdminDBController
     
     protected function saveModelFile()
     {
-        $newModelFilename = '../vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '/' 
-            . $this->v["tblClean"] . '.php';
+        $newModelFilename = '../app/Models/' . $this->v["tblClean"] . '.php';
         $this->v["fileListModel"][] = $newModelFilename;
         $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
         $this->v["dumpOut"]["Models"] .= $fullFileOut;
@@ -392,7 +391,7 @@ class AdminDatabaseInstall extends AdminDBController
         file_put_contents($newModelFilename, $fullFileOut);
         try {
             copy($newModelFilename, 
-                str_replace('/vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '/',
+                str_replace('/app/models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '/',
                     '/app/Models/', $newModelFilename));
         } catch (Exception $e) {
             //echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -608,12 +607,6 @@ class AdminDatabaseInstall extends AdminDBController
     {
         if (!file_exists('../app/Models')) {
             mkdir('../app/Models');
-        }
-        if (!file_exists('../vendor/wikiworldorder/survloop-models')) {
-            mkdir('../vendor/wikiworldorder/survloop-models');
-        }
-        if (!file_exists('../vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]))) {
-            mkdir('../vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]));
         }
         return true;
     }

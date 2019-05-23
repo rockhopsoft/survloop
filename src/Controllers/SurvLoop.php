@@ -67,7 +67,7 @@ class SurvLoop extends SurvCustLoop
     {
         $redir = $this->chkPageRedir($pageSlug);
         if ($redir != $pageSlug) {
-            redirect($redir);
+            redirect($redir, 301);
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
             if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {

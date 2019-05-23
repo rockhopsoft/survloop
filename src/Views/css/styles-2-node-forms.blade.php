@@ -84,10 +84,6 @@
 	font-size: 16px;
 	color: {!! $css["color-main-text"] !!};
 }
-.nPrompt h1, .nPrompt h2, .nPrompt h3, .nFld h1, .nFld h2, .nFld h3, .nFld h4, .nFld h5, .nFld h6 {
-    padding: 0px;
-    margin: 0px;
-}
 .nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, .nPrompt h3.slBlueDark {
 	color: {!! $css["color-main-on"] !!};
 }
@@ -99,7 +95,7 @@
     padding-top: 15px;
 }
 .nFld {
-    margin-top: 20px;
+    margin-top: 10px;
 }
 /* .nFld, .nFld input, .nFld select, .nFld textarea {
 	font-size: 16px;

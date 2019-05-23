@@ -805,5 +805,18 @@ $(document).ready(function(){
             $(this).css("background-color", "{!! $css['color-main-bg'] !!}");
         }
     }, ".clickBox");
+    
+    function toggleNodeSimple(node) {
+        if (node && document.getElementById('node'+node+'')) {
+            if (!document.getElementById('node'+node+'').style.display || document.getElementById('node'+node+'').style.display == 'none') {
+                $("#node"+node+"").slideDown(300);
+            } else {
+                $("#node"+node+"").slideUp(300);
+            }
+            return true;
+        }
+        return false;
+    }
+    $(document).on("click", ".toglNodeSmpl", function() { toggleNodeSimple($(this).attr("data-tog-node")); });
 	
 });

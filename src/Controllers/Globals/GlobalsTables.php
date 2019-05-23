@@ -383,6 +383,9 @@ class GlobalsTables extends GlobalsStatic
         if ($coreTbl == '') {
             $coreTbl = $this->coreTbl;
         }
+        if (!isset($this->tblI[$coreTbl])) {
+            return NULL;
+        }
         $reportTree = SLTree::where('TreeType', 'Page')
             ->where('TreeDatabase', $this->dbID)
             ->where('TreeCoreTable', $this->tblI[$coreTbl])

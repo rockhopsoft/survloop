@@ -83,8 +83,15 @@ class GlobalsDefinitions
         return '';
     }
     
-    public function getSet($subset = '')
+    public function getSet($subset = '', $fullRecs = false)
     {
+        if ($fullRecs) {
+            return SLDefinitions::where('DefDatabase', $this->dbID)
+                ->where('DefSubset', $subset)
+                ->where('DefSet', 'Value Ranges')
+                ->orderBy('DefOrder', 'asc')
+                ->get();
+        }
         $this->loadDefs($subset);
         return $this->defValues[$subset];
     }
