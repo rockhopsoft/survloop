@@ -47,7 +47,7 @@ class SessAnalysis
                     "perc" => intVal($custReport->rawOrderPercent($n->NodeID)),
                     "name" => ((isset($tmp->extraOpts["meta-title"]) && trim($tmp->extraOpts["meta-title"]) != '')
                         ? $tmp->extraOpts["meta-title"] : $n->NodePromptNotes)
-                    ];
+                ];
                 $this->v["nodeSort"][$this->v["nodeTots"][$n->NodeID]["perc"]] = $n->NodeID;
             }
         }
@@ -75,7 +75,7 @@ class SessAnalysis
             "mobl" => false,
             "cmpl" => false, 
             "log" => []
-            ];
+        ];
         eval("\$coreRec = " . $GLOBALS["SL"]->modelPathTblID($tree->TreeCoreTable) . "::find(" . intVal($coreID) .");");
         if (!$coreRec || !isset($coreRec->updated_at)) {
             return $this->coreTots;
@@ -85,7 +85,7 @@ class SessAnalysis
         $cacheFile = '../storage/app/anlyz/t' . $this->treeID . '/c' . $coreID . '.php';
         if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (in_array($coreID, $allPublicIDs)) {
+            if (in_array($GLOBALS["SL"]->getTblRecPublicID($coreRec), $allPublicIDs)) {
                 $this->coreTots["cmpl"] = true;
             }
             $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();

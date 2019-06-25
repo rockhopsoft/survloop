@@ -66,7 +66,6 @@
 	background: none;
 	display: block;
 	padding: 0px;
-	-moz-border-radius: 8px; border-radius: 8px;
 	overflow: visible;
 	box-shadow: 0px 0px 0px none;
 }
@@ -95,14 +94,14 @@
     padding-top: 15px;
 }
 .nFld {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 /* .nFld, .nFld input, .nFld select, .nFld textarea {
 	font-size: 16px;
 } */
 .subRes {
     padding-left: 20px;
-    margin-bottom: 20px;
+    margin: 10px 0px 20px 0px;
 }
 .subRes .nodeWrap {
     margin-top: -15px;

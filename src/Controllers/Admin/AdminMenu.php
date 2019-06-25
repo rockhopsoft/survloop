@@ -36,10 +36,22 @@ class AdminMenu
         return $this->admMenuLnk('/dashboard', 'Dashboard', '<i class="fa fa-home" aria-hidden="true"></i>');
     }
     
+    protected function addAdmMenuCollapse()
+    {
+        return $this->admMenuLnk('javascript:;" id="admMenuClpsBtn', 'Collapse', 
+            '<i id="admMenuClpsArr" class="fa fa-arrow-left" aria-hidden="true"></i>');
+    }
+    
     protected function addAdmMenuBasics($treeMenu = [])
     {
         list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
-        $treeMenu[] = $this->admMenuLnk('javascript:;', 'Site Content', 
+        $treeOut = [ $this->addAdmMenuCollapse() ];
+        if (sizeof($treeMenu) > 0) {
+            foreach ($treeMenu as $lnk) {
+                $treeOut[] = $lnk;
+            }
+        }
+        $treeOut[] = $this->admMenuLnk('javascript:;', 'Site Content', 
             '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 1, [
             $this->admMenuLnk('/dashboard/pages',              'Pages & Reports', '', 1, [
                 $this->admMenuLnk('/dashboard/pages',          'Web Content Pages'),
@@ -62,7 +74,7 @@ class AdminMenu
                 $this->admMenuLnk('/dashboard/sent-emails', 'Sent Emails')
                 ])
             ]);
-        $treeMenu[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
+        $treeOut[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
             $this->admMenuLnk('/dashboard/db', 'Data Tables', '', 1, [
                 $this->admMenuLnk('/dashboard/db',           'Full Table List'),
                 $this->admMenuLnk('/dashboard/db/addTable',  'Add A New Table'),
@@ -91,12 +103,12 @@ class AdminMenu
                 ]),
             $this->admMenuLnk('/dashboard/db/switch', '<span class="fPerc80">All Databases</span>')
             ]);
-        $treeMenu[] = $this->admMenuLnk('/dashboard/users', 'Users', '<i class="fa fa-users"></i>', 1, [
+        $treeOut[] = $this->admMenuLnk('/dashboard/users', 'Users', '<i class="fa fa-users"></i>', 1, [
             $this->admMenuLnk('/dashboard/users', 'All Users'),
             $this->admMenuLnk('/my-profile', 'My Profile'),
             $this->admMenuLnkContact(false)
             ]);
-        $treeMenu[] = $this->admMenuLnk('javascript:;', 'Settings', '<i class="fa fa-cogs"></i>', 1, [
+        $treeOut[] = $this->admMenuLnk('javascript:;', 'Settings', '<i class="fa fa-cogs"></i>', 1, [
             $this->admMenuLnk('/dashboard/settings',      'System Settings', '', 1, [
                 $this->admMenuLnk('/dashboard/settings#search',   'Search Engines'),
                 $this->admMenuLnk('/dashboard/settings#general',  'General Settings'),
@@ -111,7 +123,7 @@ class AdminMenu
             $this->admMenuLnk('/dashboard/systems-check',     'System Check'),
             $this->admMenuLnk('/dashboard/systems-update',    'System Updates')
             ]);
-        return $treeMenu;
+        return $treeOut;
     }
     
     static public function admMenuLnk($url = '', $text = '', $ico = '', $opt = 1, $children = [])

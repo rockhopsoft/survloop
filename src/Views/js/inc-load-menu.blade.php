@@ -2,18 +2,10 @@
 <script defer type="text/javascript">
 function loadTopSideNavs() {
 @if (isset($username) && trim($username) != '')
-    addTopNavItem('{{ $username }}',      '/my-profile" id="loginLnk'); 
-    addSideNavItem('Logout',              '/logout');
-    addSideNavItem('My Profile',          '/my-profile');
-    @if (Auth::user()->hasRole('administrator'))
-        addTopNavItem('Dashboard',        '/dashboard');
-        addSideNavItem('Admin Dashboard', '/dashboard');
-    @endif
+    addTopUserBurger('{{ $username }}');
 @else
-    addTopNavItem('Sign Up',  '/register" id="loginLnk');
-    addTopNavItem('Login',    '/login');
-    addSideNavItem('Login',   '/login');
-    addSideNavItem('Sign Up', '/register');
+    addTopNavItem('Sign Up',  '/register{!! $previousUrl !!}" id="signupLnk');
+    addTopNavItem('Login',    '/login{!! $previousUrl !!}" id="loginLnk');
 @endif
     return true;
 }

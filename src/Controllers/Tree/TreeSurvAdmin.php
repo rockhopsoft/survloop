@@ -185,7 +185,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 if ($nodeSaves->isNotEmpty()) {
                     foreach ($nodeSaves as $save) {
                         if (strlen($save->NodeSaveNewVal) > 100) {
-                            $save->NodeSaveNewVal = substr($save->NodeSaveNewVal, 0, 100) . '...';
+                            $save->NodeSaveNewVal = trim(substr($save->NodeSaveNewVal, 0, 100)) . '...';
                         }
                         $responses = [];
                         $str2arr = $GLOBALS["SL"]->str2arr($save->NodeSaveNewVal);
@@ -364,7 +364,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 }
                 $nodeName = $this->allNodes[$nID]->nodeRow->NodePromptText;
                 $retVal .= '<option value="' . $nID . '" ' . ((intVal($preSel) == $nID) ? 'SELECTED' : '') . ' >' 
-                    . $indent . ((strlen($nodeName) > 70) ? substr($nodeName, 0, 70).'...' : $nodeName) . '</option>';
+                    . $indent . ((strlen($nodeName) > 70) ? trim(substr($nodeName, 0, 70)) . '...' : $nodeName) . '</option>';
                 if (sizeof($tierNode[1]) > 0) {
                     foreach ($tierNode[1] as $next) {
                         $retVal .= $this->adminBasicDropdownNode($next, $tierDepth, $preSel);

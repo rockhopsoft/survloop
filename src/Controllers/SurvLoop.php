@@ -76,7 +76,7 @@ class SurvLoop extends SurvCustLoop
                 exit;
             }
             $this->loadLoop($request);
-            if ($view == 'pdf') {
+            if (in_array($view, ['pdf', 'full-pdf'])) {
                 $this->custLoop->v["isPrint"] = 1;
                 $GLOBALS["SL"]->x["isPrintPDF"] = true;
             }
@@ -176,15 +176,19 @@ class SurvLoop extends SurvCustLoop
     
     public function showProfile(Request $request, $uname = '')
     {
-        $tree = SLTree::where('TreeType', 'Page')
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PROFILE . " = 0")
+        $trees = SLTree::where('TreeType', 'Page')
+            //->whereRaw("TreeOpts%" . Globals::TREEOPT_PROFILE . " = 0")
             ->orderBy('TreeID', 'asc')
-            ->first();
-        if ($tree && isset($tree->TreeID)) {
-            $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-            $this->loadLoop($request);
-            $this->custLoop->setCurrUserProfile($uname);
-            return $this->custLoop->index($request);
+            ->get();
+        if ($trees->isNotEmpty()) {
+            foreach ($trees as $tree) {
+                if (isset($tree->TreeOpts) && $tree->TreeOpts%Globals::TREEOPT_PROFILE == 0) {
+                    $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                    $this->loadLoop($request);
+                    $this->custLoop->setCurrUserProfile($uname);
+                    return $this->custLoop->index($request);
+                }
+            }
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -256,10 +260,19 @@ class SurvLoop extends SurvCustLoop
                         ->get();
                     if ($chk->isNotEmpty()) {
                         foreach ($chk as $tree) {
-                            if (session()->has('sessID' . $tree->TreeID) && session()->has('coreID' . $tree->TreeID)
+                            if (session()->has('sessID' . $tree->TreeID) 
+                                && session()->has('coreID' . $tree->TreeID)
                                 && intVal(session()->get('sessID' . $tree->TreeID)) > 0) {
-                                SLSess::find(session()->get('sessID' . $tree->TreeID))
-                                    ->update([ 'SessUserID' => Auth::user()->id ]);
+                                $sess = SLSess::find(session()->get('sessID' . $tree->TreeID));
+                                if ($sess && isset($sess->SessCoreID) && intVal($sess->SessCoreID) > 0) {
+                                    $sess->SessUserID = Auth::user()->id;
+                                    $sess->save();
+                                    $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                                    eval($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
+                                        . $sess->SessCoreID . ")->update([ '" 
+                                        . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
+                                        . "UserID' => " . Auth::user()->id . " ]);");
+                                }
                             }
                         }
                     }
@@ -571,7 +584,17 @@ class SurvLoop extends SurvCustLoop
                 $username = substr(Auth::user()->email, 0, strpos(Auth::user()->email, '@'));
             }
         }
-        return view('vendor.survloop.js.inc-load-menu', [ "username" => $username ]);
+        $previousUrl = '?';
+        if ($request->has('currPage')) {
+            $previousUrl .= 'previousUrl=' . urlencode(trim($request->get('currPage'))) . '&';
+        }
+        if ($request->has('nd')) {
+            $previousUrl .= 'nd=' . urlencode(trim($request->get('nd'))) . '&';
+        }
+        return view('vendor.survloop.js.inc-load-menu', [
+            "username"    => $username,
+            "previousUrl" => $previousUrl
+        ]);
     }
     
     public function timeOut(Request $request)

@@ -598,8 +598,10 @@ class Globals extends GlobalsImportExport
     public function loadStates()
     {
         if (!$this->states) {
-            $this->states = new Geographs(isset($this->sysOpts['has-canada'])
+            $hasCanada = (isset($this->sysOpts['has-canada']) 
                 && intVal($this->sysOpts['has-canada']) == 1);
+            $this->states = new Geographs($hasCanada);
+            $this->states->loadStates();
         }
         return true;
     }

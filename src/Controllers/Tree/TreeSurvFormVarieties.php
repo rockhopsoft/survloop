@@ -46,6 +46,11 @@ class TreeSurvFormVarieties extends UserProfile
         return $extraOpts;
     }
     
+    protected function autoLabelClass($nIDtxt = '')
+    {
+        return 'slBlueDark';
+    }
+    
     protected function swapLabels($nIDtxt = '', $str = '', $itemID = -3, $itemInd = -3)
     {
         if (trim($str) == '') {
@@ -60,7 +65,8 @@ class TreeSurvFormVarieties extends UserProfile
                 if (strpos($str, '[LoopItemLabel]') !== false && isset($GLOBALS["SL"]->closestLoop["loop"])) {
                     $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
                         $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
-                    $str = str_replace('[LoopItemLabel]', '<span class="slBlueDark">' . $label . '</span>', $str);
+                    $str = str_replace('[LoopItemLabel]', '<span class="' . $this->autoLabelClass($nIDtxt)
+                        . '">' . $label . '</span>', $str);
                 }
                 $cnt = 1+$itemInd;
                 if (isset($GLOBALS["SL"]->closestLoop["loop"])) {
@@ -73,7 +79,8 @@ class TreeSurvFormVarieties extends UserProfile
                         }
                     }
                 }
-                $str = str_replace('[LoopItemCnt]', '<span class="slBlueDark">' . $cnt . '</span>', $str);
+                $str = str_replace('[LoopItemCnt]', '<span class="' . $this->autoLabelClass($nIDtxt)
+                    . '">' . $cnt . '</span>', $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
             if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {
@@ -85,7 +92,8 @@ class TreeSurvFormVarieties extends UserProfile
                 $loopRows = $this->sessData->getLoopRows($loopName);
                 if (sizeof($loopRows) == 1) {
                     $label = $this->getLoopItemLabel($loopName, $loopRows[0], $itemInd);
-                    $str = $strPre . '<span class="slBlueDark">' . $label . '</span>' . $strPost;
+                    $str = $strPre . '<span class="' . $this->autoLabelClass($nIDtxt) . '">'
+                        . $label . '</span>' . $strPost;
                 }
             }
         }
@@ -100,31 +108,35 @@ class TreeSurvFormVarieties extends UserProfile
     
     protected function cleanLabel($str = '')
     {
-        $span = '<span class="slBlueDark">';
+        $cls = $this->autoLabelClass();
+        $span = '<span class="' . $cls . '">';
         $str = str_replace($span . 'You</span>', $span . 'you</span>', $str);
         $str = str_replace($span . 'you</span>&#39;s', $span . 'your</span>', $str);
-        $str = str_replace('Was <span class="slBlueDark">you</span>', 'Were <span class="slBlueDark">you</span>', $str);
-        $str = str_replace('was <span class="slBlueDark">you</span>', 'were <span class="slBlueDark">you</span>', $str);
+        $str = str_replace('Was <span class="' . $cls . '">you</span>', 'Were <span class="' . $cls . '">you</span>', $str);
+        $str = str_replace('was <span class="' . $cls . '">you</span>', 'were <span class="' . $cls . '">you</span>', $str);
         $str = str_replace($span . 'you</span>\'s', $span . 'your</span>', $str);
         $str = str_replace($span . 'you</span> was', $span . 'you</span> were', $str);
-        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="slBlueDark">[LoopItemLabel]</span>:',
+        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="' . $cls . '">[LoopItemLabel]</span>:',
             ':', $str));
-        $str = str_replace(', <span class="slBlueDark"></span>:', ':', 
-            str_replace(', <span class="slBlueDark">&nbsp;</span>:', ':', $str));
+        $str = str_replace(', <span class="' . $cls . '"></span>:', ':', 
+            str_replace(', <span class="' . $cls . '">&nbsp;</span>:', ':', $str));
         $str = trim(str_replace(', :', ':', $str));
-        if (strpos(strip_tags($str), 'you') === 0) $str = str_replace($span . 'you', $span . 'You', $str);
-        
+        if (strpos(strip_tags($str), 'you') === 0) {
+            $str = str_replace($span . 'you', $span . 'You', $str);
+        }
         $str = str_replace('you&#39;s', 'your', str_replace('You&#39;s', 'Your', $str));
         $str = str_replace('Was you', 'Were you', str_replace('Was You', 'Were you', $str));
         $str = str_replace('was you', 'were you', str_replace('was You', 'were you', $str));
         $str = str_replace('you\'s', 'your', str_replace('You\'s', 'Your', $str));
         $str = str_replace('you was', 'you were', str_replace('You was', 'You were', $str));
-        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="slBlueDark">[LoopItemLabel]:',
+        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="' . $cls . '">[LoopItemLabel]:',
             ':', $str));
-        $str = str_replace(', <span class="slBlueDark">:', ':', 
-            str_replace(', <span class="slBlueDark">&nbsp;:', ':', $str));
+        $str = str_replace(', <span class="' . $cls . '">:', ':', 
+            str_replace(', <span class="' . $cls . '">&nbsp;:', ':', $str));
         $str = trim(str_replace(', :', ':', $str));
-        if (strpos(strip_tags($str), 'you') === 0) $str = str_replace('you', 'You', $str);
+        if (strpos(strip_tags($str), 'you') === 0) {
+            $str = str_replace('you', 'You', $str);
+        }
         return $str;
     }
     

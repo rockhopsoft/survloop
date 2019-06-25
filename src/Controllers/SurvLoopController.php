@@ -553,23 +553,11 @@ class SurvLoopController extends Controller
     
     
     // this should really be done using migrations, includes SurvLoop database changes since Feb 15, 2017
-    protected function doublecheckSurvTables()
+    protected function survSysChecks()
     {
-        if (!session()->has('doublecheckSurvTables')) {
-            $chks = [];
-            $chks[] = "ALTER TABLE `SL_Tree` CHANGE `TreeRootURL` `TreeSlug` VARCHAR(255)";
-            $chks[] = "ALTER TABLE `SL_Tree` ADD `TreeOpts` INT(11) DEFAULT 1 AFTER `TreeCoreTable`";
-            $chks[] = "ALTER TABLE `SL_DesignTweaks` ADD `TweakUniqueStr` INT(11) DEFAULT NULL AFTER `TweakVersionAB`";
-            $chks[] = "ALTER TABLE `SL_DesignTweaks` ADD `TweakIsMobile` VARCHAR(50) DEFAULT NULL AFTER "
-                . "`TweakUniqueStr`";
-            ob_start();
-            try {
-                foreach ($chks as $chk) {
-                    DB::select($chk);
-                }
-            } catch (QueryException $e) { }
-            ob_end_clean();
-            session()->put('doublecheckSurvTables', 1);
+        if (!session()->has('survSysChecks') || $GLOBALS["SL"]->REQ->has('refresh')) {
+            $GLOBALS["SL"]->clearOldDynascript();
+            session()->put('survSysChecks', 1);
         }
         return true;
     }

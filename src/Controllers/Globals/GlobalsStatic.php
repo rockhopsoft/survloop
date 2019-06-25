@@ -66,7 +66,7 @@ class GlobalsStatic
         for ($i=0; $i<$wordLimit; $i++) {
             $ret .= $strs[$i] . ' ';
         }
-        return $ret . '...';
+        return trim($ret) . '...';
     }
     
     public function splitNumDash($str, $delim = '-')
@@ -661,6 +661,14 @@ class GlobalsStatic
             return 'D';
         }
         return 'F';
+    }
+    
+    public function convertAllCallToUp1stChars($str)
+    {
+        if (strtoupper($str) == $str) {
+            return $this->allCapsToUp1stChars($str);
+        }
+        return $str;
     }
     
     public function allCapsToUp1stChars($str)

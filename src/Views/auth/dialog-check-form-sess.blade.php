@@ -1,5 +1,4 @@
 <!-- resources/views/auth/dialog-check-form-sess.blade.php -->
-
 <div class="p10"></div>
 <center>
 @if ($req->has('login'))

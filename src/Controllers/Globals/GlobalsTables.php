@@ -31,7 +31,7 @@ use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\GlobalsDefinitions;
 use SurvLoop\Controllers\Globals\GlobalsStatic;
 
-class GlobalsTables extends GlobalsStatic
+class GlobalsTables extends GlobalsElements
 {
     public $def            = null;
     public $isAdmin        = false;
@@ -1824,6 +1824,25 @@ class GlobalsTables extends GlobalsStatic
             }
         }
         return $this->x["tblHasPublicID"][$tbl];
+    }
+    
+    public function getTblRecPublicID($rec, $tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if ($rec) {
+            if ($this->tblHasPublicID($tbl)) {
+                if (isset($rec->{ $this->tblAbbr[$tbl] . 'PublicID' })) {
+                    return $rec->{ $this->tblAbbr[$tbl] . 'PublicID' };
+                }
+            } else {
+                if (isset($rec->{ $this->tblAbbr[$tbl] . 'ID' })) {
+                    return $rec->{ $this->tblAbbr[$tbl] . 'ID' };
+                }
+            }
+        }
+        return 0;
     }
     
     public function chkInPublicID($pubID = -3, $tbl = '')

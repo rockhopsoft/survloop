@@ -37,9 +37,9 @@
 <div id="node004" class="nodeWrap">
     <div class="nodeHalfGap"></div>
     <div id="nLabel004" class="nPrompt"><label for="emailID">
-        Username or Email: <span class="red">*required</span>
+        Username or Email <span class="red">*required</span>
     </label></div>
-    <div class="nFld" style="margin-top: 20px;">
+    <div class="nFld">
         <input id="emailID" name="email" value="{{ old('email') }}" type="text" class="form-control">
         @if ($errors->has('email'))
             <span class="form-text"><strong>{{ $errors->first('email') }}</strong></span>
@@ -52,9 +52,9 @@
 <div id="node003" class="nodeWrap">
     <div class="nodeHalfGap"></div>
     <div id="nLabel003" class="nPrompt"><label for="password">
-        Password: <span class="red">*required</span>
+        Password <span class="red">*required</span>
     </label></div>
-    <div class="nFld" style="margin-top: 20px;">
+    <div class="nFld">
         <input id="password" name="password" value="" type="password" class="form-control">
         @if ($errors->has('password'))
             <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>

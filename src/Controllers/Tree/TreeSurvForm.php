@@ -1044,12 +1044,13 @@ class TreeSurvForm extends TreeSurvFormUtils
                     if (sizeof($curr->responses) > 0) {
                         $ret .= (($curr->isOneLiner()) ? '<div class="pB20">' : '') 
                             . str_replace('<label for="n' . $nIDtxt . 'FldID">', '', 
-                                str_replace('</label>', '', $nodePrompt))
+                                str_replace('<label for="n' . $nIDtxt . 'FldID" >', '', 
+                                str_replace('</label>', '', $nodePrompt)))
                             . '<div class="nFld';
                         if ($this->hasSpreadsheetParent($nID)) {
                             $ret .= '">' . "\n";
                         } elseif ($mobileCheckbox) {
-                            $ret .= '" style="margin-top: 7px;">' . "\n";
+                            $ret .= '" style="margin-top: 12px;">' . "\n";
                         } else {
                             $ret .= $isOneLiner . ' pB0 mBn5">' . "\n";
                         }

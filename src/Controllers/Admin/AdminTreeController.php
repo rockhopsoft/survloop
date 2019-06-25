@@ -740,7 +740,7 @@ class AdminTreeController extends AdminController
                 "date" => [ 0, 0, 0, [] ], // incomplete time tot, complete time tot, start date, totals by date
                 "cmpl" => [ 0, 0 ], // incomplete (I), complete (C)
                 "mobl" => [ 0, 0, [ 0, 0 ], [ 0, 0 ] ] // desktop (D), mobile (M), [ DI, DC ], [ MI, MC ]
-                ];
+            ];
             $nodeTots = $lines = [];
             if ($this->v["last100ids"]->isNotEmpty()) {
                 foreach ($this->v["last100ids"] as $i => $rec) {
@@ -765,7 +765,7 @@ class AdminTreeController extends AdminController
                             $this->v["graph1data"][] = [
                                 (($coreTots["cmpl"]) ? 100 : $this->v["nodeTots"][$coreTots["node"]]["perc"]),
                                 $min
-                                ];
+                            ];
                         }
                     }
                 }
@@ -782,7 +782,7 @@ class AdminTreeController extends AdminController
                 "yAxes"       => 'Minutes',
                 "data"        => $this->v["graph1data"],
                 "css"         => $this->v["css"]
-                ])->render();
+            ])->render();
             
             $this->v["graph2"] = [ "dat" => '', "lab" => '', "bg" => '', "brd" => '' ];
             $cnt = 0;
@@ -806,8 +806,9 @@ class AdminTreeController extends AdminController
                 "title"       => '<h3 class="mT0 mB10">Number of Submission Attempts by Date</h3>',
                 "graph"       => $this->v["graph2"],
                 "css"         => $this->v["css"]
-                ])->render();
-            $this->v["content"] = view('vendor.survloop.admin.tree.tree-sessions-stats', $this->v)->render();
+            ])->render();
+            $this->v["content"] = view('vendor.survloop.admin.tree.tree-sessions-stats', $this->v)
+                ->render();
             $this->saveCache();
         }
         $this->v["needsCharts"] = true;
@@ -931,8 +932,12 @@ class AdminTreeController extends AdminController
     public function loadCondArticles($cid = -3)
     {
         $this->v["condArticles"] = $arts = [];
-        if ($cid > 0) $arts = SLConditionsArticles::where('ArticleCondID', $cid)->get();
-        else $arts = SLConditionsArticles::get();
+        if ($cid > 0) {
+            $arts = SLConditionsArticles::where('ArticleCondID', $cid)
+                ->get();
+        } else {
+            $arts = SLConditionsArticles::get();
+        }
         if ($arts && sizeof($arts) > 0) {
             foreach ($arts as $i => $art) {
                 if (!isset($this->v["condArticles"][$art->ArticleCondID])) {

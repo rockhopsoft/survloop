@@ -208,7 +208,9 @@ class TreeSurvLoad extends TreeSurvConds
             $cache3 = $this->loadNodePageTiersCache();
             eval($cache3);
             
-            if (file_exists($cacheFile)) Storage::delete($cacheFile);
+            if (file_exists($cacheFile)) {
+                Storage::delete($cacheFile);
+            }
             Storage::put($cacheFile, $cache . $cache2 . $cache3);
         }
         return true;

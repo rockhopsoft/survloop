@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-edit-type.blade.php -->
 <h4 class="slBlueDark m0"><i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type</h4>
 <div id="nodeTypeFld1" class="nFld w100 mT10 pT5">
-    <select name="nodeType" id="nodeTypeID" class="form-control form-control-lg" 
+    <select name="nodeType" id="nodeTypeID" class="form-control" 
         autocomplete="off" onChange="return changeNodeType(this.value);" {{ $nodeTypeSel }} >
     
     @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
@@ -62,7 +62,7 @@
 </div>
 <div id="responseType" class="@if ($node->isSpecial()) disNon @else disBlo @endif ">
     <div class="nFld m0"><select name="nodeTypeQ" id="nodeTypeQID" 
-        class="form-control form-control-lg slBlueDark w100" 
+        class="form-control slBlueDark w100" 
         onChange="return changeResponseType(this.value);" autocomplete="off" >
     @foreach ($nodeTypes as $type)
         <option value="{{ $type }}" @if (isset($node->nodeRow->NodeType) 
@@ -79,7 +79,7 @@
 </div>
 <div id="dataPrintType" class="@if ($node->isDataPrint()) disBlo @else disNon @endif ">
     <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" autocomplete="off" 
-        class="form-control form-control-lg slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
+        class="form-control slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
         <option value="Data Print Row" @if (!isset($node->nodeRow->NodeType) 
             || in_array(trim($node->nodeRow->NodeType), ['', 'Data Print Row', 'Instructions'])) 
             SELECTED @endif >Data Block Row</option>
@@ -95,7 +95,7 @@
 </div>
 <div id="widgetType" class="@if ($node->isWidget()) disBlo @else disNon @endif nFld mT0 ">
     <select name="nodeSurvWidgetType" id="nodeSurvWidgetTypeID" autocomplete="off" 
-        class="form-control form-control-lg w100" onChange="return changeWidgetType();" >
+        class="form-control w100" onChange="return changeWidgetType();" >
         
         <option value="Record Full" 
             @if ($node->nodeType == 'Record Full') SELECTED @endif 

@@ -3,9 +3,8 @@
 .slCard {
     width: 100%;
     padding: 20px;
-    -moz-border-radius: 6px; border-radius: 6px;
     background: {!! $css["color-main-bg"] !!};
-    box-shadow: 0px 1px 4px {!! $css["color-main-grey"] !!};
+    box-shadow: 0px 2px 4px {!! $css["color-main-grey"] !!};
 }
 .slCard.nodeWrap {
     margin-bottom: 30px;
@@ -57,6 +56,21 @@
 .hugTmbRound, .hugTmbRoundDiv { width: 175px; height: 175px; -moz-border-radius: 87px; border-radius: 87px; overflow: hidden; }
 .hugTmbRoundDiv img { width: 175px; min-height: 175px; }
 .hugTmbRoundDiv { border: 2px {!! $css["color-main-bg"] !!} solid; box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; }
+
+.litRedDot {
+    background: {!! $css["color-danger-on"] !!};
+    width: 10px;
+    height: 10px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.litRedDot .img {
+    width: 10px;
+    height: 10px;
+    display: inline;
+    border: 0px none;
+}
 
 .icoBig, i.icoBig, .icoBig i { font-size: 54px; }
 .icoHuge, i.icoHuge, .icoHuge i { font-size: 82px; }
@@ -156,3 +170,16 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     .embedMapA, .embedMapDescA { height: 260px; }
 }
 
+.slAccord, .slAccordBig {
+    min-height: 56px;
+}
+.slAccord div fL, .slAccord div fR, .slAccordBig div fL, .slAccordBig div fR {
+    height: 56px;
+    padding-top: 15px;
+}
+.slAccord div .fR {
+    font-size: 16px;
+}
+.slAccordBig div .fR {
+    font-size: 22px;
+}

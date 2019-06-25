@@ -39,6 +39,7 @@ class Searcher extends SurvCustLoop
     {
         $this->treeID = $treeID;
         $this->initExtra();
+        $this->v["sort"] = [ 'created_at', 'desc' ];
     }
     
     public function initExtra()

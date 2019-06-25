@@ -160,8 +160,10 @@ $(document).ready(function(){
     
 	function hideMajNav(majInd) {
         if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
-            $("#majSect"+majInd+"Vert2").slideUp(50);
-            $("#minorNav"+majInd+"").slideUp(50);
+            document.getElementById("minorNav"+majInd+"").style.display='none';
+            document.getElementById("majSect"+majInd+"Vert2").style.display='none';
+            //$("#majSect"+majInd+"Vert2").slideUp(50);
+            //$("#minorNav"+majInd+"").slideUp(50);
         }
         return true;
 	}
@@ -180,16 +182,22 @@ $(document).ready(function(){
 		    if (document.getElementById("minorNav"+majInd+"").style.display == 'block') {
 		        hideMajNav(majInd);
             } else {
-                setTimeout(function() {
-                    $("#minorNav"+majInd+"").slideDown("fast");
-                    $("#majSect"+majInd+"Vert2").slideDown("fast");
-                }, 50);
+                document.getElementById("minorNav"+majInd+"").style.display='block';
+                document.getElementById("majSect"+majInd+"Vert2").style.display='block';
+                //setTimeout(function() {
+                //    $("#minorNav"+majInd+"").slideDown("fast");
+                //    $("#majSect"+majInd+"Vert2").slideDown("fast");
+                //}, 50);
             }
         }
         $(this).blur();
 	    return false;
 	});
 	
+    $(document).on("click", "#userMenuBtn", function() {
+        toggleNav();
+    });
+
 	$(document).on("click", "#navMobToggle", function() {
 	    if (document.getElementById("navMobBurger1").style.display!="none") {
             document.getElementById("navMobBurger1").style.display="none";
@@ -321,8 +329,20 @@ $(document).ready(function(){
         if (document.getElementById("hidiv"+fldGrp+"")) {
             if (document.getElementById("hidiv"+fldGrp+"").style.display!="block") {
                 $("#hidiv"+fldGrp+"").slideDown("fast");
+                if (document.getElementById("hidivBtnArr"+fldGrp+"")) {
+                    document.getElementById("hidivBtnArr"+fldGrp+"").className="fa fa-caret-up";
+                }
+                if (document.getElementById("hidivBtnAcc"+fldGrp+"")) {
+                    document.getElementById("hidivBtnAcc"+fldGrp+"").className="fa fa-chevron-up";
+                }
             } else {
                 $("#hidiv"+fldGrp+"").slideUp("fast");
+                if (document.getElementById("hidivBtnArr"+fldGrp+"")) {
+                    document.getElementById("hidivBtnArr"+fldGrp+"").className="fa fa-caret-down";
+                }
+                if (document.getElementById("hidivBtnAcc"+fldGrp+"")) {
+                    document.getElementById("hidivBtnAcc"+fldGrp+"").className="fa fa-chevron-down";
+                }
             }
         }
         return true;
@@ -399,8 +419,10 @@ $(document).ready(function(){
 	});
     
 	function chkMenuLoad() {
-	    if (!document.getElementById('loginLnk') && document.getElementById('headClear')) {
-	        $("#headClear").load("/js-load-menu");
+	    if ((!document.getElementById('loginLnk') && !document.getElementById('userMenu')) && document.getElementById('headClear')) {
+            var redirUrl = "/js-load-menu";
+            if (currTreeType == 'Survey' && currPage[1].trim() != '') redirUrl += "?currPage="+encodeURIComponent(currPage[1])+'&nd='+currTreeNode+'';
+	        $("#headClear").load(redirUrl);
 	    }
 	}
     setTimeout(function() { chkMenuLoad(); }, 500);
@@ -726,71 +748,64 @@ $(document).ready(function(){
         }
     });
     
-    function chkFixedHeader() {
-        if (document.getElementById('fixedHeader')) {
-            var newW = Math.round($("#mainBody").outerWidth())-4;
-            if (document.getElementById('fixedHeadWidth')) {
-                newW = Math.round($("#fixedHeadWidth").outerWidth())+30;
-            }
-            document.getElementById('fixedHeader').style.width = ''+newW+'px';
-            setTimeout(function() { chkFixedHeader(); }, 1000);
-        } else {
-            setTimeout(function() { chkFixedHeader(); }, 5000);
+    function chkFixedHeader(newW, divID) {
+        if (document.getElementById(divID)) {
+            document.getElementById(divID).style.width = newW;
+            document.getElementById(divID).style.minWidth = newW;
+            document.getElementById(divID).style.maxWidth = newW;
         }
+        return true;
     }
-    setTimeout(function() { chkFixedHeader(); }, 10);
+    function chkFixedHeaders(chkAgain) {
+        var newW = Math.round($("#main").outerWidth());
+        newW = ''+newW+'px';
+        chkFixedHeader(newW, 'mainNav');
+        chkFixedHeader(newW, 'fixedHeader');
+        chkFixedHeader(newW, 'fixedHeader2');
+        if (chkAgain) {
+            setTimeout(function() { chkFixedHeaders(true); }, 5000);
+        }
+        return true;
+    }
+    setTimeout(function() { chkFixedHeaders(true); }, 10);
     
     function openAdmMenu() {
-        if (document.getElementById("leftAdmMenu") && document.getElementById("leftAdmMenu").style.display != 'block') {
-            if (document.getElementById("menuUnColpsBtn")) $("#menuUnColpsBtn").slideUp("fast");
-            if (document.getElementById("menuColpsBtn")) $("#menuColpsBtn").slideDown("fast");
-            if (document.getElementById("leftSideWdth")) {
-                $("#leftSideWdth").animate({
-                    width: "200px"
-                }, {
-                    duration: 150,
-                    specialEasing: {
-                        width: 'swing'
-                    }
-                });
-                setTimeout(function() { $("#leftAdmMenu").slideDown(150); }, 150);
-            }
+        if (document.getElementById("leftSide")) {
+            document.getElementById("leftSide").className="leftSide";
         }
+        if (document.getElementById("admMenuClpsArr")) {
+            document.getElementById("admMenuClpsArr").className="fa fa-arrow-left";
+        }
+        chkFixedHeaders(false);
+        return true;
     }
     function closeAdmMenu() {
-        if (document.getElementById("leftAdmMenu") && document.getElementById("leftAdmMenu").style.display != 'none') {
-            if (document.getElementById("menuColpsBtn")) $("#menuColpsBtn").slideUp("fast");
-            if (document.getElementById("menuUnColpsBtn")) $("#menuUnColpsBtn").slideDown("fast");
-               $("#leftAdmMenu").slideUp(150);
-            if (document.getElementById("leftSideWdth")) {
-                setTimeout(function() { 
-                    if (document.getElementById("leftSideWrap")) {
-                        $("#leftSideWrap").animate({
-                            padding: "0px 6px"
-                        }, {
-                            duration: 150,
-                            specialEasing: {
-                                width: 'swing'
-                            }
-                        });
-                    }
-                    $("#leftSideWdth").animate({
-                        width: "24px"
-                    }, {
-                        duration: 150,
-                        specialEasing: {
-                            width: 'swing'
-                        }
-                    });
-                }, 150);
+        if (document.getElementById("leftSide")) {
+            document.getElementById("leftSide").className="leftSideCollapse";
+        }
+        if (document.getElementById("admMenuClpsArr")) {
+            document.getElementById("admMenuClpsArr").className="fa fa-arrow-right";
+        }
+        chkFixedHeaders(false);
+        return true;
+    }
+    $(document).on("click", "#admMenuClpsBtn", function() {
+        if (document.getElementById("leftSide")) {
+            if (document.getElementById("leftSide").className == 'leftSide') {
+                closeAdmMenu();
+            } else {
+                openAdmMenu();
             }
         }
-    }
-    $(document).on("click", "#menuColpsBtn", function() { closeAdmMenu(); });
-    $(document).on("click", "#menuUnColpsBtn", function() { openAdmMenu(); });
+        return false;
+    });
+
     $(window).resize(function() {
-        if ($(window).width() <= 992) closeAdmMenu();
-        else openAdmMenu();
+        setTimeout(function() { 
+            if ($(window).width() <= 992) closeAdmMenu();
+            else openAdmMenu();
+            chkFixedHeaders(false);
+        }, 10);
     });
     
     $(document).on("click", ".clickBox", function() {

@@ -67,6 +67,7 @@ a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.comple
     display: none;
     border-top: 1px {!! $css["color-main-on"] !!} solid;
     padding: 20px 0px;
+    min-height: 150px;
     margin-top: -8px;
     -moz-border-radius: 20px; border-radius: 20px;
 }

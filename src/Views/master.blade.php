@@ -79,7 +79,8 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 @section('headCode')
 @show
 </head>
-<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
+<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif {!! 
+    $GLOBALS['SL']->getBodyParams() !!} >
 <a name="top"></a>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>
@@ -115,10 +116,55 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
     @if (isset($sideNavLinks) && trim($sideNavLinks) != '') {!! $sideNavLinks !!} @endif
     </ul>
 </div>
-<div id="main">
 
-<div id="mainNav" class="row flex-nowrap fixed-top clearfix">
-    <div class="col-md-5 col-sm-10 taL">
+
+@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
+
+<table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
+<td id="leftSide" class="leftSide">
+    <div id="leftSideWdth"></div>
+    <div id="leftSideWrap">
+        <div id="leftAdmMenu">
+            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                <div id="admMenuCustom" class="w100 h100 disBlo">
+                    {!! $GLOBALS["SL"]->x["admMenuCustom"] !!}
+                </div>
+                <div id="admMenuNotCustom" class="w100 disNon">
+            @endif
+            <div class="admMenu w100">
+                @if (isset($admMenu)) {!! $admMenu !!} @endif
+            </div>
+            <div id="adminMenuExtra">
+                @yield('belowAdmMenu')
+                @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
+            </div>
+            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+                </div> <!-- end #admMenuNotCustom -->
+            @endif
+        </div>
+    </div>
+</td><td id="mainBody" class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
+    
+@endif
+
+<div id="main" class="">
+
+<?php /*
+<div id="topNavSearch">
+    <form id="dashSearchFrmID" name="dashSearchForm" method="get"
+        action="{{ $GLOBALS['SL']->getSrchUrl() }}">
+        <div id="dashSearchFrmWrap">
+        <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
+            ><i class="fa fa-search" aria-hidden="true"></i></a></div>
+        <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
+            placeholder="Search...">
+        </div>
+    </form>
+</div>
+*/ ?>
+
+<div id="mainNav">
+    <div class="fL">
     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
         <div id="slLogoWrap"><a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
             ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 
@@ -134,16 +180,11 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
     @endif
     @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
         && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
-        <a id="logoTxt" href="/" class="navbar-brand"
-            >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
+        <a id="logoTxt" href="/" class="navbar-brand">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
-    </div><div class="col-md-7 col-sm-2">
-        <div id="myNavBar">
-            <a id="navBurger" title="Show Navigation Menu" class="float-right disBlo" onClick="toggleNav();"
-                href="javascript:;" ><i class="fa fa-bars" aria-hidden="true"></i></a>
-            <a id="navBurgerClose" class="float-right disNon" onclick="closeNav()" href="javascript:;" 
-                ><i class="fa fa-times" aria-hidden="true"></i></a>
-        </div>
+    </div>
+    <div class="fR taR">
+        <div id="myNavBar"></div>
     </div>
 </div>
 <div id="headClear"></div>
@@ -182,57 +223,16 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
         
     @else
         
-        <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
-        <td id="leftSide">
-            <div id="leftSideWdth"></div>
-            <div id="leftSideWrap">
-                <div id="leftAdmMenu">
-                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
-                        <div id="admMenuCustom" class="w100 h100 disBlo">
-                            {!! $GLOBALS["SL"]->x["admMenuCustom"] !!}
-                        </div>
-                        <div id="admMenuNotCustom" class="w100 disNon">
-                    @endif
-                    <form id="dashSearchFrmID" name="dashSearchForm" method="get"
-                        action="{{ $GLOBALS['SL']->getSrchUrl() }}">
-                        <div id="dashSearchFrmWrap">
-                        <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
-                            ><i class="fa fa-search" aria-hidden="true"></i></a></div>
-                        <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
-                            placeholder="Search...">
-                        </div>
-                    </form>
-                    <div class="admMenu w100">
-                        @if (isset($admMenu)) {!! $admMenu !!} @endif
-                    </div>
-                    <div id="adminMenuExtra">
-                        @yield('belowAdmMenu')
-                        @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
-                    </div>
-                    @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
-                        </div> <!-- end #admMenuNotCustom -->
-                    @endif
-                </div>
-                <div id="menuColpsWrap">
-                    <a id="menuColpsBtn" href="javascript:;"
-                        ><nobr><i class="fa fa-caret-square-o-left" aria-hidden="true"></i> Collapse Menu</nobr></a>
-                    <a id="menuUnColpsBtn" href="javascript:;"
-                        ><i class="fa fa-caret-square-o-right" aria-hidden="true"></i></a>
-                </div>
-            </div>
-        </td><td id="mainBody" class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
-            @if ($isDashLayout && isset($admMenuTabs))
-                <div id="adminMenuTopTabs">{!! $admMenuTabs !!}</div>
+        @if ($isDashLayout && isset($admMenuTabs))
+            <div id="adminMenuTopTabs">{!! $admMenuTabs !!}</div>
+        @endif
+        <div class="container-fluid">
+            @if (isset($content)) {!! $content !!} @endif
+            @yield('content')
+            @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
+                {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
             @endif
-            <div class="container-fluid">
-                @if (isset($content)) {!! $content !!} @endif
-                @yield('content')
-                @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
-                    {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
-                @endif
-            </div>
-        </td>
-    </tr></table>
+        </div>
     @endif
 
 @else
@@ -272,6 +272,16 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 @else
 
 @endif <?php /* end not print or frame */ ?>
+
+
+
+@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
+
+        </td>
+    </tr></table>
+
+@endif
+
 
 <div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
 <div class="imgPreload">

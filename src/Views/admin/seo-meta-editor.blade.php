@@ -121,8 +121,8 @@ function previewPage() {
         @elseif (isset($GLOBALS['SL']->sysOpts['meta-img'])) "{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" @endif ;
         pImg = document.getElementById('npageImgFldID').value.trim();
         if (document.getElementById("metaImgID")) pImg = document.getElementById("metaImgID").value.trim();
-        if (pTitle.length > 60) pTitle = pTitle.substring(0, 60)+"...";
-        if (pDesc.length > 160) pDesc = pDesc.substring(0, 160)+"...";
+        if (pTitle.length > 60) pTitle = pTitle.substring(0, 60).trim()+"...";
+        if (pDesc.length > 160) pDesc = pDesc.substring(0, 160).trim()+"...";
         document.getElementById('pagePrev').innerHTML = '<div class="prevImg"><img src="'+pImg+'"></div><div class="p10 mL5"><h4 class="mT0">'+pTitle+'</h4><div class="pB5">'+pDesc+'</div><a href="'+pUrl+'" target="_blank" class="fPerc80">'+pUrlS+'</a></div>';
     }
     return true;

@@ -821,7 +821,7 @@ class TreeCoreSess extends TreeCore
     
     protected function isPublic()
     {
-        return true;
+        return false;
     }
     
     protected function chkPageToken()
@@ -879,7 +879,7 @@ class TreeCoreSess extends TreeCore
                         Auth::login($this->v["tokenUser"]);
                         $successMsg = '<div class="alert alert-success alert-dismissible" role="alert">'
                             . '<i class="fa-li fa fa-spinner fa-spin"></i> <strong>Access Granted!</strong> '
-                            . '<span class="mL10">Reloading the page ...</span>'
+                            . '<span class="mL10">Reloading the page...</span>'
                             . '<button type="button" class="close" data-dismiss="alert">×</button></div>';
                         session()->put('sessMsg', $successMsg);
                         $resultMsg .= $this->processTokenAccessRedirExtra() . '<script type="text/javascript"> '

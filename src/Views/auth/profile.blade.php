@@ -12,7 +12,8 @@
 @endif
 
         <div class="slCard h100">
-        <a href="/profile/{{ urlencode($profileUser->name) }}"><h1 class="slBlueDark">{{ $profileUser->name }}</h1></a>
+        <a href="/profile/{{ urlencode($profileUser->name) }}"
+            ><h2 class="slBlueDark">{{ $profileUser->name }}</h2></a>
         Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}
         @if ($canEdit)
             <br /><a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"

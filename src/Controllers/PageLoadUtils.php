@@ -69,7 +69,9 @@ class PageLoadUtils extends Controller
             ->where('DefSet', 'System Settings')
             ->where('DefSubset', 'cust-abbr')
             ->first();
-        if ($chk && isset($chk->DefDescription)) $this->custAbbr = trim($chk->DefDescription);
+        if ($chk && isset($chk->DefDescription)) {
+            $this->custAbbr = trim($chk->DefDescription);
+        }
         return $this->custAbbr;
     }
     
@@ -285,7 +287,7 @@ class PageLoadUtils extends Controller
     {
         $extra = '';
         if (Auth::user() && isset(Auth::user()->id) && Auth::user()->hasRole('administrator|staff|brancher')) {
-            $extra .= ' setTimeout(\'addTopNavItem("pencil", "?edit=1")\', 2000); ';
+            $extra .= ' setTimeout(\'addSideNavItem("Edit Page", "?edit=1")\', 2000); ';
         }
         if (trim($extra) != '') {
             $extra = '<script async defer type="text/javascript"> ' . $extra . ' </script>';

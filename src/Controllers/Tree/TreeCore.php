@@ -52,6 +52,11 @@ class TreeCore extends SurvLoopController
         return ( $nID > 0 && isset($this->allNodes[$nID]) );
     }
     
+    public function initAdmMenuExtras()
+    {
+        return '';
+    }
+    
     protected function loadTreeStart($treeIn = -3, Request $request = NULL)
     {
         if ($treeIn > 0) {

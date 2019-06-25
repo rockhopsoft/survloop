@@ -91,10 +91,11 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             . intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) . '">' 
             . (($this->allNodes[$nID]->isStepLoop()) ? '<div id="isStepLoop"></div>' : '');
         if (!$this->allNodes[$nID]->isStepLoop() && empty($this->sessData->loopItemIDs[$loopName])) {
-            $ret .= '<div class="mB20"><h4>No ' . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
+            $ret .= '<div class="pT15 pB15"><h4>No ' 
+                . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
                 . ' added yet.</h4></div>';
         } else {
-            $ret .= '<div class="p10"></div>';
+            $ret .= '<div class="p15"></div>';
         }
         if (sizeof($this->sessData->loopItemIDs[$loopName]) > 0) {
             if (!$this->allNodes[$nID]->isStepLoop() && sizeof($this->sessData->loopItemIDs[$loopName]) > 10) {

@@ -1,6 +1,6 @@
 <!-- resources/views/survloop/forms/formtree-time.blade.php -->
 
-<div class="timeWrap fPerc125 disBlo mTn10"><nobr>
+<div class="timeWrap fPerc125 disBlo"><nobr>
     <select name="n{{ $nID }}fldHr" id="n{{ $nID }}fldHrID" data-nid="{{ $nID }}" 
         class="timeDrop form-control form-control-lg mR5 @if (isset($xtraClass)) {{ $xtraClass }} @endif "
         {!! $GLOBALS["SL"]->tabInd() !!} style="display: inline;" >

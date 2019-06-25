@@ -23,7 +23,7 @@
 @endif
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
 <div class="nPrompt">
-    <h1 class="mT0 mB20">Sign Up</h1>
+    <h2 class="mT0 mB20">Sign Up</h2>
     @if (isset($sysOpts["midsurv-instruct"]) && trim($sysOpts["midsurv-instruct"]) != '')
         {!! $sysOpts["midsurv-instruct"] !!}
     @elseif (isset($sysOpts["signup-instruct"]) && trim($sysOpts["signup-instruct"]) != '')
@@ -36,12 +36,12 @@
 <div id="node004" class="nodeWrap{{ ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
     <div class="nodeHalfGap"></div>
     <div id="nLabel004" class="nPrompt"><label for="nameID">
-        Username: 
+        Username
         @if (isset($sysOpts["user-name-req"]) && intVal($sysOpts["user-name-req"]) == 1)
             <span class="red">*required</span>
         @endif
     </label></div>
-    <div class="nFld" style="margin-top: 20px;">
+    <div class="nFld">
         <input id="nameID" name="name" value="{{ old('name') }}" type="text" class="form-control">
         @if (isset($errors) && $errors->has('name'))
             <span class="form-text"><strong>{{ $errors->first('name') }}</strong></span>
@@ -54,12 +54,12 @@
 <div id="node001" class="nodeWrap{{ ((isset($errors) && $errors->has('email')) ? 'Error' : '') }}">
     <div class="nodeHalfGap"></div>
     <div id="nLabel001" class="nPrompt"><label for="emailID">
-        Email:
+        Email
         @if (!isset($sysOpts["user-email-optional"]) || $sysOpts["user-email-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
-    <div class="nFld" style="margin-top: 20px;">
+    <div class="nFld">
         <input id="emailID" name="email" value="{{ old('email') }}" type="email" class="form-control">
         
         @if (isset($errors) && $errors->has('email'))
@@ -78,10 +78,10 @@
     <div class="nodeHalfGap"></div>
     <div id="node002" class="nodeWrap{{ ((isset($errors) && $errors->has('password')) ? 'Error' : '') }}">
         <div id="nLabel002" class="nPrompt"><label for="password">
-            Password: <span class="red">*required, 8 character minimum</span>
+            Password <span class="red">*required, 8 character minimum</span>
         </label></div>
         <div class="relDiv w100"><div id="passStrng" class="red"></div></div>
-        <div class="nFld" style="margin-top: 20px;">
+        <div class="nFld">
             <input id="password" name="password" value="" type="password" class="form-control">
             @if (isset($errors) && $errors->has('password'))
                 <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
@@ -96,9 +96,9 @@
     <div class="nodeHalfGap"></div>
     <div id="node003" class="nodeWrap">
         <div id="nLabel003" class="nPrompt"><label for="password-confirm">
-            Confirm Password: <span class="red">*required</span>
+            Confirm Password <span class="red">*required</span>
         </label></div>
-        <div class="nFld" style="margin-top: 20px;">
+        <div class="nFld">
             <input id="password_confirmation" name="password_confirmation" type="password" class="form-control"
                  value="">
         </div>

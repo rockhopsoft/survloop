@@ -33,11 +33,15 @@ class Geographs
         if ($state == 'Federal') return 'US';
         $this->loadStates();
         foreach ($this->stateList as $abbr => $name) {
-            if (strtolower($name) == strtolower($state)) return $abbr;
+            if (strtolower($name) == strtolower($state)) {
+                return $abbr;
+            }
         }
         if ($this->hasCanada) {
             foreach ($this->stateListCa as $abbr => $name) {
-                if (strtolower($name) == strtolower($state)) return $abbr;
+                if (strtolower($name) == strtolower($state)) {
+                    return $abbr;
+                }
             }
         }
         return '';
@@ -45,11 +49,19 @@ class Geographs
     
     public function getState($abbr = '')
     {
-        if ($abbr == '') return '';
-        if ($abbr == 'US') return 'Federal';
+        if ($abbr == '') {
+            return '';
+        }
+        if ($abbr == 'US') {
+            return 'Federal';
+        }
         $this->loadStates();
-        if (isset($this->stateList[$abbr])) return $this->stateList[$abbr];
-        if (isset($this->stateListCa[$abbr])) return $this->stateListCa[$abbr];
+        if (isset($this->stateList[$abbr])) {
+            return $this->stateList[$abbr];
+        }
+        if (isset($this->stateListCa[$abbr])) {
+            return $this->stateListCa[$abbr];
+        }
         return '';
     }
     
@@ -58,12 +70,16 @@ class Geographs
         $cnt = 1;
         $this->loadStates();
         foreach ($this->stateList as $abbr => $name) {
-            if ($ind == $cnt) return $abbr;
+            if ($ind == $cnt) {
+                return $abbr;
+            }
             $cnt++;
         }
         if ($this->hasCanada) {
             foreach ($this->stateListCa as $abbr => $name) {
-                if ($ind == $cnt) return $abbr;
+                if ($ind == $cnt) {
+                    return $abbr;
+                }
                 $cnt++;
             }
         }
@@ -74,9 +90,13 @@ class Geographs
     {
         $this->loadStates();
         $retArr = [];
-        foreach ($this->stateList as $abbr => $name) $retArr[] = $abbr;
+        foreach ($this->stateList as $abbr => $name) {
+            $retArr[] = $abbr;
+        }
         if ($this->hasCanada) {
-            foreach ($this->stateListCa as $abbr => $name) $retArr[] = $abbr;
+            foreach ($this->stateListCa as $abbr => $name) {
+                $retArr[] = $abbr;
+            }
         }
         return $retArr;
     }
@@ -99,8 +119,12 @@ class Geographs
     
     public function getZipRow($zip = '')
     {
-        if (trim($zip) == '') return null;
-        if (strlen($zip) > 7) $zip = substr($zip, 0, 5);
+        if (trim($zip) == '') {
+            return null;
+        }
+        if (strlen($zip) > 7) {
+            $zip = substr($zip, 0, 5);
+        }
         return SLZips::where('ZipZip', $zip)
             ->first();
     }
@@ -108,7 +132,9 @@ class Geographs
     public function getZipProperty($zip = '', $fld = 'City')
     {
         $zipRow = $this->getZipRow($zip);
-        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) return $zipRow->{ 'Zip' . $fld };
+        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) {
+            return $zipRow->{ 'Zip' . $fld };
+        }
         return '';
     }
     
@@ -117,22 +143,66 @@ class Geographs
         $chk = SLZips::where('ZipCity', $city)
             ->where('ZipState', $state)
             ->first();
-        if ($chk && isset($chk->ZipCounty)) return $chk->ZipCounty;
+        if ($chk && isset($chk->ZipCounty)) {
+            return $chk->ZipCounty;
+        }
         return '';
+    }
+    
+    public function getTerritoryAbbrs()
+    {
+        return ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'];
     }
     
     public function getAshrae($zipRow = null)
     {
-        if (!$zipRow) return '';
-        if (isset($zipRow->ZipCountry) && $zipRow->ZipCountry == 'Canada') return 'Canada';
+        if (!$zipRow) {
+            return '';
+        }
+        if (isset($zipRow->ZipCountry) && $zipRow->ZipCountry == 'Canada') {
+            return 'Canada';
+        }
         if ((!isset($zipRow->ZipCountry) || trim($zipRow->ZipCountry) == '') && isset($zipRow->ZipState) 
-            && !in_array($zipRow->ZipState, ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'])) {
+            && !in_array($zipRow->ZipState, $this->getTerritoryAbbrs())) {
             $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
                 ->where('AshrCounty', $zipRow->ZipCounty)
                 ->first();
-            if ($ashrae && isset($ashrae->AshrZone)) return $ashrae->AshrZone;
+            if ($ashrae && isset($ashrae->AshrZone)) {
+                return $ashrae->AshrZone;
+            }
         }
         return '';   
+    }
+    
+    public function getAshraeZoneLabel($ashraeZone = '')
+    {
+        switch ($ashraeZone) {
+            case '1A':
+            case '2A':
+            case '2B':
+                return 'Hot-Humid';
+            case '3A':
+            case '3B':
+            case '3C':
+            case '4A':
+            case '4B':
+            case '4C':
+                return 'Mixed-Humid';
+            case '5A':
+            case '5B':
+            case '6A':
+            case '6B':
+                return 'Cold';
+            case '7A':
+            case '7B':
+            case 'Ca':
+            case 'Canada':
+                return 'Very Cold';
+            case '8A':
+            case '8B':
+                return 'Subarctic';
+        }
+        return '';
     }
     
     public function stateDrop($state = '', $all = false)
@@ -144,7 +214,7 @@ class Geographs
             "stateListCa" => $this->stateListCa,
             "hasCanada"   => $this->hasCanada,
             "all"         => $all
-            ])->render();
+        ])->render();
     }
     
     public function stateResponses($all = false)
@@ -174,7 +244,7 @@ class Geographs
         return view('vendor.survloop.forms.inc-drop-opts-ashrae', [
             "fltClimate" => $fltClimate,
             "hasCanada"  => $this->hasCanada
-            ])->render();
+        ])->render();
     }
     
     public function countryDrop($cntry = '')
@@ -183,7 +253,7 @@ class Geographs
         return view('vendor.survloop.forms.inc-drop-opts-countries', [
             "cntry"       => trim($cntry),
             "countryList" => $this->countryList
-            ])->render();
+        ])->render();
     }
     
     public function getStateWhereIn($fltState = '')
@@ -192,9 +262,13 @@ class Geographs
         if (trim($fltState) != '') {
             $this->loadStates();
             if ($fltState == 'US') {
-                foreach ($this->stateList as $abbr => $name) $ret[] = $abbr;
+                foreach ($this->stateList as $abbr => $name) {
+                    $ret[] = $abbr;
+                }
             } elseif ($fltState == 'Canada') {
-                foreach ($this->stateListCa as $abbr => $name) $ret[] = $abbr;
+                foreach ($this->stateListCa as $abbr => $name) {
+                    $ret[] = $abbr;
+                }
             } else {
                 $ret[] = $fltState;
             }
@@ -202,9 +276,9 @@ class Geographs
         return $ret;
     }
     
-    function loadStates()
+    public function loadStates()
     {
-        if (empty($this->stateList)) {
+        if (sizeof($this->stateList) == 0) {
             $this->stateList = [
                 'AL' => "Alabama", 
                 'AK' => "Alaska", 
@@ -258,7 +332,9 @@ class Geographs
                 'WI' => "Wisconsin", 
                 'WY' => "Wyoming"
             ];
-            if ($this->hasCanada) $this->loadCanadaStates();
+            if ($this->hasCanada) {
+                $this->loadCanadaStates();
+            }
         }
         return true;
     }
@@ -279,13 +355,13 @@ class Geographs
             'QC' => "Quebec",
             'SK' => "Saskatchewan",
             'YT' => "Yoken"
-            ];
+        ];
         return true;
     }
     
     public function loadCountries()
     {
-        if (empty($this->countryList)) {
+        if (sizeof($this->countryList) == 0) {
             $this->countryList = [
                 'United States', 
                 'Afghanistan', 
@@ -496,16 +572,22 @@ class Geographs
     
     public function getLatLng($addy = '')
     {
-        if (trim($addy) == '') return [0, 0];
+        if (trim($addy) == '') {
+            return [ 0, 0 ];
+        }
         $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
             ->first();
-        if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong) || $GLOBALS["SL"]->REQ->has('refresh')) {
-            if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"]) && !$GLOBALS["SL"]->isHomestead()) {
-                $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($addy) . '&key=' 
-                    . $GLOBALS["SL"]->sysOpts["google-cod-key"]; // '&sensor=true'
+        if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong) 
+            || $GLOBALS["SL"]->REQ->has('refresh')) {
+            if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"]) 
+                && !$GLOBALS["SL"]->isHomestead()) {
+                $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' 
+                    . urlencode($addy) . '&key=' . $GLOBALS["SL"]->sysOpts["google-cod-key"];
+                    // '&sensor=true'
                 $json = json_decode(file_get_contents($jsonFile),TRUE);
                 if (sizeof($json) > 0 && isset($json["results"]) && sizeof($json["results"]) > 0 
-                    && isset($json["results"][0]["geometry"]) && isset($json["results"][0]["geometry"]["location"])) {
+                    && isset($json["results"][0]["geometry"]) 
+                    && isset($json["results"][0]["geometry"]["location"])) {
                     $chk = new SLAddyGeo;
                     $chk->AdyGeoAddress = $addy;
                     $chk->AdyGeoLat     = $json["results"][0]["geometry"]["location"]["lat"];
@@ -515,9 +597,9 @@ class Geographs
             }
         }
         if ($chk && isset($chk->AdyGeoLat) && isset($chk->AdyGeoLong)) {
-            return [$chk->AdyGeoLat, $chk->AdyGeoLong];
+            return [ $chk->AdyGeoLat, $chk->AdyGeoLong ];
         }
-        return [0, 0];
+        return [ 0, 0 ];
     }
     
     public function embedMapSimpAddy($nID = 0, $addy = '', $label = '', $height = 450, $maptype = 'satellite')
@@ -533,7 +615,7 @@ class Geographs
             "lng"     => $lng,
             "height"  => $height,
             "maptype" => $maptype
-            ])->render();
+        ])->render();
     }
     
     protected $mapMarkTyp = [];
@@ -556,7 +638,9 @@ class Geographs
             $descAjax = false;
             if (sizeof($this->mapMarkers) > 0) {
                 foreach ($this->mapMarkers as $i => $mark) {
-                    if (!$descAjax && trim($mark[5]) != '') $descAjax = true;
+                    if (!$descAjax && trim($mark[5]) != '') {
+                        $descAjax = true;
+                    }
                 }
             }
             $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.reports.embed-google-map-js', [
@@ -564,18 +648,20 @@ class Geographs
                 "filename"  => $filename,
                 "descAjax"  => $descAjax,
                 "mapCenter" => $this->mapCenter
-                ])->render();
+            ])->render();
             return view('vendor.survloop.reports.embed-google-map', [
                 "nID"       => $nID,
                 "docDesc"   => $docDesc
-                ])->render();
+            ])->render();
         }
         return '';
     }
     
     public function addMarkerType($markerName = '', $markerImg = '')
     {
-        if (trim($markerName) != '') $this->mapMarkTyp[$markerName] = $markerImg;
+        if (trim($markerName) != '') {
+            $this->mapMarkTyp[$markerName] = $markerImg;
+        }
         return true;
     }
     

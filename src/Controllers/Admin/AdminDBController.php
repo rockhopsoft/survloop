@@ -197,7 +197,8 @@ class AdminDBController extends AdminController
     
     protected function getDefOpts($item = '', $link = 0)
     {
-        if (empty($this->v["dbDefOpts"])) {
+        if (!isset($this->v["dbDefOpts"]) || !is_array($this->v["dbDefOpts"])
+            || sizeof($this->v["dbDefOpts"]) == 0) {
             $this->loadDefOpts();
         }
         if (isset($this->v["dbDefOpts"][$item]) && isset($this->v["dbDefOpts"][$item][0])) {

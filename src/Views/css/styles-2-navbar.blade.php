@@ -1,6 +1,9 @@
 /* generated from resources/views/vendor/survloop/css/styles-2-navbar.blade.php */
 
 #mainNav {
+    position: fixed;
+    z-index: 99;
+    width: 100%;
 	background: {!! $css["color-nav-bg"] !!};
 }
 #mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, #myNavBar, #myNavBar .navbar {
@@ -15,19 +18,9 @@
     text-align: right;
 }
 #headClear {
+    clear: both;
 	background: {!! $css["color-nav-bg"] !!};
 	margin-left: -1px;
-}
-#navBurger, a#navBurger:link, a#navBurger:active, a#navBurger:visited, a#navBurger:hover,
-#navBurgerClose, a#navBurgerClose:link, a#navBurgerClose:active, a#navBurgerClose:visited, a#navBurgerClose:hover {
-    width: 55px;
-    height: 39px;
-    -moz-border-radius: 4px; border-radius: 4px;
-    font-size: 24px;
-	padding: 3px;
-    margin: 6px 15px 0 0;
-    text-align: center;
-	color: {!! $css["color-nav-text"] !!};
 }
 
 .headGap {
@@ -106,7 +99,7 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 }
 #slLogo {
     display: block;
-    margin: 7px 0px 0px 16px;
+    margin: 7px 0px 0px 30px;
 }
 #slLogoImg, #slLogoImgSm {
     display: inline;

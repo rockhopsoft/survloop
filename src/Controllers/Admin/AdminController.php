@@ -47,7 +47,6 @@ class AdminController extends SurvLoopController
     {
         if (!$this->admInitRun) {
             $this->admInitRun = true;
-            $this->doublecheckSurvTables();
             $this->loadDbLookups($request);
             $this->survLoopInit($request, $currPage, false);
             if (trim($perms) == '') {
@@ -57,6 +56,7 @@ class AdminController extends SurvLoopController
                 echo view('vendor.survloop.js.inc-redirect-home', $this->v)->render();
                 exit;
             }
+            $this->survSysChecks();
             $this->initPowerUser();
             $this->v["isDash"] = true;
             if ($GLOBALS["SL"]->sysOpts["cust-abbr"] == 'survloop') {
@@ -79,7 +79,7 @@ class AdminController extends SurvLoopController
         $this->admMenuData = [
             "adminNav"   => [],
             "currNavPos" => []
-            ];
+        ];
         $admMenu = null;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
             $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
@@ -120,7 +120,12 @@ class AdminController extends SurvLoopController
     
     protected function chkNewAdmMenuPage($currPage = '')
     {
-        if (trim($currPage) != '' && $this->v["currPage"][0] != $currPage) {
+        $custPage = ((isset($this->custReport->treeID)) 
+            ? $this->custReport->initAdmMenuExtras() : '');
+        if (trim($custPage) != '' && $this->v["currPage"][0] != $custPage) {
+            $this->v["currPage"][0] = $custPage;
+            $this->reloadAdmMenu();
+        } elseif (trim($currPage) != '' && $this->v["currPage"][0] != $currPage) {
             $this->v["currPage"][0] = $currPage;
             $this->reloadAdmMenu();
         } elseif (isset($GLOBALS["SL"]->x["currPage"]) && trim($GLOBALS["SL"]->x["currPage"]) != ''
@@ -296,13 +301,15 @@ class AdminController extends SurvLoopController
                 $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
             }
             $this->v["content"] = $this->custReport->index($request);
-            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->loader->isUserAdmin()) {
+            if ($request->has('edit') && intVal($request->get('edit')) == 1 
+                && $this->loader->isUserAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                     . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;
             }
             $this->chkNewAdmMenuPage();
-            return $this->loader->addAdmCodeToPage(view('vendor.survloop.master', $this->v)->render());
+            return $this->loader->addAdmCodeToPage(view('vendor.survloop.master', $this->v)
+                ->render());
         }
         $this->loader->loadDomain();
         return redirect($this->loader->domainPath . '/');
@@ -327,6 +334,7 @@ class AdminController extends SurvLoopController
                     && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
                     $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
                     $this->loadCustLoop($request, $tree->TreeID);
+                    $this->reloadAdmMenu();
                     $this->v["content"] = $this->custReport->index($request);
                     return $this->loader->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg(
                         view('vendor.survloop.master', $this->v)->render()));

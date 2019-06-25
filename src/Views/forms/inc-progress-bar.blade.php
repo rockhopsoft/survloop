@@ -19,7 +19,12 @@
                         @if ($maj == $currMajorSection) <i class="fa fa-hand-o-down" aria-hidden="true"></i>
                         @elseif (in_array($maj, $sessMajorsTouched)) <i class="fa fa-check"></i> @else {{ $cnt }} @endif
                         </div><div class="navVertLine"></div>{{ $majSect[1] }}
-                        <div id="majSect{{ $maj }}Vert2" class="navVertLine2 disNon"></div></center>
+                        @if (sizeof($minorSections[$maj]) > 0)
+                            <div id="majSect{{ $maj }}Vert2" class="navVertLine2
+                                @if ($maj == $currMajorSection) disBlo @else disNon @endif ">
+                            </div>
+                        @endif
+                        </center>
                     </a>
                 </div>
             @endif
@@ -30,7 +35,8 @@
         @foreach ($majorSections as $maj => $majSect)
             @if (sizeof($minorSections[$maj]) > 0)
                 <?php $cnt++; ?>
-                <div id="minorNav{{ $maj }}" class="minorNavWrap">
+                <div id="minorNav{{ $maj }}" class="minorNavWrap
+                    @if ($maj == $currMajorSection) disBlo @endif ">
                     <div class="row">
                         @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
                         @forelse ($minorSections[$maj] as $min => $minSect)

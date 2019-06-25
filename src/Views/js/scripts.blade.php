@@ -50,10 +50,13 @@ function slugify(string) {
     .replace(/^-+/, "").replace(/-+$/, "");
 }
 
-var currPage = new Array();
-function setCurrPage(title, url) {
+var currTreeType = 'Page';
+var currTreeNode = 0;
+var currPage = new Array('', '');
+function setCurrPage(title, url, node) {
     currPage[0] = title;
     currPage[1] = url;
+    currTreeNode = node;
     return true;
 }
 
@@ -211,16 +214,20 @@ function openNav() {
     document.getElementById("mySidenav").style.boxShadow = "0px 0px 40px {!! $css["color-main-faint"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
     document.getElementById("main").style.marginRight = "300px";
-    document.getElementById("navBurger").style.display = "none";
-    document.getElementById("navBurgerClose").style.display = "block";
+    if (document.getElementById("userMenuBtn") && document.getElementById("userMenuArr")) {
+        document.getElementById("userMenuArr").className = "fa fa-caret-up mL3";
+    }
+    return true;
 }
 function closeNav() {
     document.getElementById("mySidenav").style.borderLeft = "0px none";
     document.getElementById("mySidenav").style.boxShadow = "none";
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginRight = "0";
-    document.getElementById("navBurger").style.display = "block";
-    document.getElementById("navBurgerClose").style.display = "none";
+    if (document.getElementById("userMenuBtn") && document.getElementById("userMenuArr")) {
+        document.getElementById("userMenuArr").className = "fa fa-caret-down mL3";
+    }
+    return true;
 }
 function toggleNav() {
     if (document.getElementById("mySidenav").style.width == "300px") return closeNav();
@@ -277,7 +284,7 @@ function logLastProTip() {
 
 function addTopCust(navCode) {
     if (document.getElementById("myNavBar")) {
-        if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0) {
+        if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0 && document.getElementById("myNavBar").innerHTML.indexOf(navCode.replace("fa-caret-down", "fa-caret-up")) < 0) {
             document.getElementById("myNavBar").innerHTML += navCode;
         }
     }
@@ -298,13 +305,17 @@ function addTopCustRight(navCode) {
 }
 function addTopNavItem(navTxt, navLink) {
     if (document.getElementById("myNavBar")) {
-        if (navTxt == 'pencil') navTxt = "<i class=\"fa fa-pencil-square-o\" aria-hidden=\"true\"></i>";
         var newLink = "<a class=\"float-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
         if (document.getElementById("myNavBar").innerHTML.indexOf(newLink) < 0) {
             if (navTxt == 'pencil') document.getElementById("myNavBar").innerHTML = newLink+document.getElementById("myNavBar").innerHTML;
             else document.getElementById("myNavBar").innerHTML += newLink;
         }
     }
+    return true;
+}
+function addTopUserBurger(username) {
+    var navCode = "<a id=\"userMenuBtn\" class=\"float-right slNavLnk\" href=\"javascript:;\">"+username+" <i id=\"userMenuArr\" class=\"fa fa-caret-down mL3\" aria-hidden=\"true\"></i></a>";
+    addTopCust(navCode);
     return true;
 }
 function addSideNavItem(navTxt, navLink) {

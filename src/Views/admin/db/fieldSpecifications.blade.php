@@ -607,7 +607,7 @@
                     <option value="" @if ($defSet == '') SELECTED @endif >[load definition, generic values]</option>
                 @forelse ($defDeets as $set => $def)
                     <option value="{{ $set }}" @if ($defSet == $set) SELECTED @endif 
-                        >{{ $set }} ({{ substr($def[0], 1, 15) }}...)</option>
+                        >{{ $set }} ({{ trim(substr($def[0], 1, 15)) }}...)</option>
                 @empty
                 @endforelse
                 </select>

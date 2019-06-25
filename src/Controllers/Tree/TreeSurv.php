@@ -247,7 +247,9 @@ class TreeSurv extends TreeSurvReport
             $log->UserActCurrPage = $this->v["currPage"][0] . $notes;
             $log->save();
         }
-        $GLOBALS["SL"]->pageJAVA .= 'function loadPageNodes() { 
+        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' . $GLOBALS["SL"]->treeRow->TreeType
+            . '"; setCurrPage("' . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] 
+            . '", ' . $this->currNode() . '); function loadPageNodes() { 
             if (typeof chkNodeVisib === "function") { ' . $this->v["javaNodes"] . ' } 
             else { setTimeout("loadPageNodes()", 500); } 
             return true; } setTimeout("loadPageNodes()", 100); ' . "\n";

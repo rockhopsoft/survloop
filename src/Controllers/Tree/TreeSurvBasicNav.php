@@ -262,13 +262,14 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                         $title = trim($GLOBALS['SL']->treeRow->TreeName);
                     }
                     if (strlen($title) > 40) {
-                        $title = substr($title, 0, 40) . '...';
+                        $title = trim(substr($title, 0, 40)) . '...';
                     }
                     $this->v["currPage"]    = [];
                     $this->v["currPage"][1] = ((trim($title) != '') ? $title . ' - ' : '') 
                         . $GLOBALS["SL"]->sysOpts["site-name"];
                     $this->v["currPage"][0] = '/' . (($GLOBALS["SL"]->treeIsAdmin) ? 'dash' : 'u') . '/' 
                         . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->allNodes[$nID]->nodeRow->NodePromptNotes;
+                    $GLOBALS["SL"]->pageJAVA .= 'setCurrPage("' . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] . '", ' . $this->currNode() . '); ';
                     $GLOBALS["SL"]->pageAJAX .= 'history.pushState( {}, "' . $this->v["currPage"][1] . '", '
                         . '"' . $this->v["currPage"][0] . '");' . "\n" 
                         . 'document.title="' . $this->v["currPage"][1] . '";' . "\n";

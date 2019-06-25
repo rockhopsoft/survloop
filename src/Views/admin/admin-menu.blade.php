@@ -9,7 +9,7 @@
             @if ($GLOBALS['SL']->isAdmMenuHshoo($nav[0])) id="admLnk{{ substr($nav[0], 1+strpos($nav[0], '#')) }}"
             @endif > 
             @if (isset($nav[2]) && trim($nav[2]) != '') <div class="admMenuIco pull-left">{!! $nav[2] !!}</div> @endif
-            {!! $nav[1] !!}</a></div>
+            <div class="admMenuLbl">{!! $nav[1] !!}</div></a></div>
         @else
             <div class="admMenuTier1"><a href="{!! $nav[0] !!}" data-toggle="collapse" class="
             @if ($currNavPos[0] == $i) active @endif @if ($GLOBALS['SL']->isAdmMenuHshoo($nav[0])) hshoo @endif
@@ -17,7 +17,7 @@
             @if ($GLOBALS['SL']->isAdmMenuHshoo($nav[0])) id="admLnk{{ substr($nav[0], 1+strpos($nav[0], '#')) }}"
             @endif > 
             @if (isset($nav[2]) && trim($nav[2]) != '') <div class="admMenuIco pull-left">{!! $nav[2] !!}</div> @endif
-            {!! $nav[1] !!}</a>
+            <div class="admMenuLbl">{!! $nav[1] !!}</div></a>
             <div id="subA{{ $i }}" class="sublinks @if ($currNavPos[0] != $i) collapse @endif ">
             @foreach ($nav[4] as $j => $nA)
                 <div class="admMenuTier2"><a href="{!! $nA[0] !!}" @if ($nA[3]%3 == 0) target="_blank" @endif class="
@@ -25,7 +25,7 @@
                 @if ($GLOBALS['SL']->isAdmMenuHshoo($nA[0])) hshoo" id="admLnk{{ substr($nA[0], 1+strpos($nA[0], '#'))}}
                 @else " @endif > 
                 @if (isset($nA[2]) && trim($nA[2]) != '') <div class="admMenuIco">{!! $nA[2] !!}</div> @endif
-                {!! $nA[1] !!}</a></div>
+                <div class="admMenuLbl">{!! $nA[1] !!}</div></a></div>
             @endforeach
             </div>
             </div>

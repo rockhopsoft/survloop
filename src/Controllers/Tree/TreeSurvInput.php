@@ -690,7 +690,7 @@ class TreeSurvInput extends TreeSurvUpload
                 $emaToArr = [];
                 foreach ($emails as $e) $emaToArr[] = [$e, ''];
                 $emaSubj = strip_tags($this->pageCoreRow->ContSubject);
-                if (strlen($emaSubj) > 30) $emaSubj = substr($emaSubj, 0, 30) . '...'; 
+                if (strlen($emaSubj) > 30) $emaSubj = trim(substr($emaSubj, 0, 30)) . '...'; 
                 $emaSubj = $GLOBALS["SL"]->sysOpts["site-name"] . ' Contact: ' . $emaTitle;
                 $emaContent = view('vendor.survloop.admin.contact-row', [
                     "contact"  => $this->pageCoreRow,

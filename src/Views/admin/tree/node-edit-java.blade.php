@@ -23,7 +23,6 @@ function changeNodeType(newType) {
     document.getElementById('hasSendEmail').style.display='none';
     document.getElementById('emailPreviewStuff').style.display='none';
     document.getElementById('nodeTypeFld1').className='nFld w100 mT10 pT5';
-    document.getElementById('nodeTypeID').className='form-control form-control-lg';
     if (newType == 'branch' || newType == 'data' || newType == 'loop' || newType == 'sort' || newType == 'cycle' 
         || newType == 'page' || newType == 'instruct' || newType == 'instructRaw' || newType == 'heroImg' 
         || newType == 'bigButt' || newType == 'survWidget' || newType == 'sendEmail' || newType == 'layout' 
@@ -42,7 +41,6 @@ function changeNodeType(newType) {
             document.getElementById('dataPrintType').style.display='block';
             document.getElementById('hasDataPrint').style.display='block';
             document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
-            document.getElementById('nodeTypeID').className='form-control pT0';
         }
         else if (newType == 'bigButt') document.getElementById('hasBigButt').style.display='block';
         else if (newType == 'data') document.getElementById('hasDataManip').style.display='block';
@@ -58,7 +56,6 @@ function changeNodeType(newType) {
             document.getElementById('hasSurvWidget').style.display='block';
             document.getElementById('widgetType').style.display='block';
             document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
-            document.getElementById('nodeTypeID').className='form-control pT0';
         }
         else if (newType == 'layout') document.getElementById('hasLayout').style.display='block';
         else if (newType == 'sendEmail') {
@@ -71,7 +68,6 @@ function changeNodeType(newType) {
         document.getElementById('hasResponseLayout').style.display='block';
         document.getElementById('responseType').style.display='block';
         document.getElementById('nodeTypeFld1').className='nFld w100 mT0 pT0';
-        document.getElementById('nodeTypeID').className='form-control pT0';
     }
     if (document.getElementById('isPageBlock')) {
         if (newType == 'instruct' || newType == 'instructRaw' || newType == 'layout') {

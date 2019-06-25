@@ -1,21 +1,21 @@
 /* generated from resources/views/vendor/survloop/css/styles-2-admin.blade.php */
 
-#adminMenu {
-    margin-top: 10px;
-}
 .admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
     display: block;
 }
 .admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, .admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover {
     color: {!! $css["color-main-faint"] !!};
-    background: {!! $css["color-main-grey"] !!};
-    padding: 6px 5px 6px 9px;
+    background: {!! $css["color-main-text"] !!};
+    padding: 16px 5px 17px 9px;
+    font-weight: bold;
+    min-height: 56px;
 }
 .admMenu a.active:link, .admMenu a.active:visited, .admMenu a.active:active, .admMenu a.active:hover,
 .admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-link"] !!};
-    padding: 9px 5px 9px 9px;
+    padding: 16px 5px 17px 9px;
+    font-weight: bold;
 }
 .admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, .admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
@@ -23,18 +23,25 @@
 .admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, .admMenu div a .admMenuIco.pull-left, 
 .admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, .admMenu div a:active .admMenuIco.pull-left, .admMenu div a:hover .admMenuIco.pull-left {
     display: block;
-    width: 30px;
-    text-align: center;
+    width: 40px;
+    margin: -3px 0px 0px 12px;
+    font-size: 120%;
+}
+.admMenuTier2 {
+    height: 42px;
+    max-height: 42px;
 }
 .admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
 .admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover {
-    padding: 10px 5px 10px 23px;
-    font-size: 100%;
+    padding: 10px 5px 10px 62px;
+    font-weight: normal;
 }
 a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:hover,
 .admMenuTier2 a.tier2active:link, .admMenuTier2 a.tier2active:visited, .admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover {
     color: {!! $css["color-main-link"] !!};
     background: {!! $css["color-main-faint"] !!};
+    height: 33px;
+    max-height: 33px;
 }
 
 #slTopTabsWrap {
@@ -45,7 +52,7 @@ a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:h
     width: 100%;
     padding-top: 7px;
     margin-bottom: 25px;
-    background: {!! $css["color-main-grey"] !!};
+    background: {!! $css["color-main-text"] !!};
 }
 .slTopTabs ul.nav.nav-tabs {
     width: 100%;
@@ -96,34 +103,36 @@ a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:h
 #menuColpsWrap {
     margin: 15px -15px 0px 0px;
 }
-a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover,
-a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
-    display: block;
-    width: 100%;
-    padding: 10px 15px;
-    color: {!! $css["color-main-link"] !!};
-}
-a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
-    display: none;
-    margin: 10px 0px 10px -16px;
-}
-#leftSide {
+.leftSide, .leftSideCollapse {
+    width: 240px;
     height: 100%;
     vertical-align: top;
+    overflow-x: visible;
+    overflow-y: hidden;
     color: {!! $css["color-main-faint"] !!};
-    background: {!! $css["color-main-grey"] !!};
+    background: {!! $css["color-main-text"] !!};
 }
-#leftSideWdth {
-    width: 200px;
+#leftSideWdth, .leftSide #leftSideWdth {
+    width: 240px;
 }
-#leftSideWrap {
+#leftSideWrap, .leftSide #leftSideWrap {
     position: fixed;
-    width: 200px;
+    width: 240px;
 	z-index: 0;
 }
 #leftAdmMenu {
     display: block;
     width: 100%;
+}
+.leftSideCollapse, .leftSideCollapse #leftSideWdth, .leftSideCollapse #leftSideWrap {
+    width: 60px;
+    overflow-x: hidden;
+}
+.admMenuLbl {
+    display: inline;
+}
+.leftSideCollapse #leftSideWrap #leftAdmMenu .admMenu #admMenu .admMenuTier1 .admMenuLbl {
+    display: none;
 }
 
 #mainBody {
@@ -137,13 +146,17 @@ a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menu
     padding: 0px;
 }
 body.bodyDash {
-    background: {!! $css["color-main-grey"] !!};
+    background: {!! $css["color-main-text"] !!};
 }
 
 #dashSearchFrmWrap {
     position: relative;
     width: 100%;
     padding: 8px 15px 7px 15px;
+}
+#topNavSearch {
+    
+
 }
 #admSrchFld {
     background: none; 

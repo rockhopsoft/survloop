@@ -617,7 +617,6 @@ function reqFormFldTbl(nID, nIDtxt, maxRow, cols, colsReq) {
 
 function formDateChange(nIDtxt) {
     document.getElementById("n"+nIDtxt+"FldID").value = document.getElementById("n"+nIDtxt+"fldYearID").value+"-"+document.getElementById("n"+nIDtxt+"fldMonthID").value+"-"+document.getElementById("n"+nIDtxt+"fldDayID").value;
-console.log("formDateChange "+nIDtxt+" = "+document.getElementById("n"+nIDtxt+"FldID").value+"");
     chkFormCheck();
     return true;
 }

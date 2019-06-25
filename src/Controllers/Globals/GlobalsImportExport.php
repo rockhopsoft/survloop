@@ -12,7 +12,7 @@ namespace SurvLoop\Controllers\Globals;
 
 use DB;
 use App\Models\User;
-use Storage;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use MatthiasMullie\Minify;
 use App\Models\SLDatabases;
@@ -325,7 +325,9 @@ class GlobalsImportExport extends GlobalsTables
             . ' ];' . "\n";
             eval($cache2);
             
-            if (file_exists($cacheFile)) Storage::delete($cacheFile);
+            if (file_exists($cacheFile)) {
+                Storage::delete($cacheFile);
+            }
             Storage::put($cacheFile, $cache . $cache2);
         }
         return true;
@@ -899,6 +901,37 @@ class GlobalsImportExport extends GlobalsTables
         return $content;
     }
     
+    public function clearOldDynascript($minAge = 0)
+    {
+        if ($minAge <= 0 || $minAge >= mktime(0, 0, 0, date("n"), date("j")+1, date("Y"))) {
+            $minAge = mktime(0, 0, 0, date("n"), date("j")-4, date("Y"));
+        }
+        $safeDates = [];
+        for ($i = mktime(0, 0, 0, date("n"), date("j")+1, date("Y")); $i >= $minAge; $i -= (60*60*24)) {
+            $safeDates[] = date("Ymd", $i);
+        }
+        $cnt = 0;
+        $files = $this->mapDirFilesSlim('../storage/app/cache/dynascript', false);
+        if (sizeof($files) > 0) {
+            foreach ($files as $i => $file) {
+                $cnt++;
+                if ($cnt < 1000) {
+                    $delete = true;
+                    if ($this->getFileExt($file) != 'html') {
+                        $filenameParts = $GLOBALS["SL"]->mexplode('-', $file);
+                        if (isset($filenameParts[0]) && in_array($filenameParts[0], $safeDates)) {
+                            $delete = false;
+                        }
+                    }
+                    if ($delete) {
+                        unlink('../storage/app/cache/dynascript/' . $file);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     public function deferStaticNodePrint($nID, $content = '', $js = '', $ajax = '', $css = '')
     {
         if (!isset($this->x["deferCnt"])) {
@@ -930,6 +963,15 @@ class GlobalsImportExport extends GlobalsTables
             return '<div class="w100 pT20 pB20"><center>' . $ret . '</center></div>';
         }
         return $ret;
+    }
+
+    public function isPrintView()
+    {
+        return ((isset($this->x["isPrintPDF"]) && $this->x["isPrintPDF"])
+            || (isset($this->x["pageView"]) && in_array($this->x["pageView"], ['pdf', 'full-pdf']))
+            || ($this->REQ->has('print') && intVal($this->REQ->get('print')) > 0)
+            || ($this->REQ->has('frame') && intVal($this->REQ->get('frame')) > 0)
+            || ($this->REQ->has('pdf') && intVal($this->REQ->get('pdf')) > 0));
     }
     
 }

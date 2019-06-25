@@ -10,7 +10,7 @@
 @else 
     <div class="wrapLoopItem"><a name="item{{ $setIndex }}"></a>
         <div id="wrapItem{{ $itemID }}On" class="slCard nodeWrap">
-            <h3 class="mT0">{!! $itemLabel !!}</h3>
+            <h4 class="mT0">{!! $itemLabel !!}</h4>
             @if ($canEdit)
                 <div class="mT5">
                 <a href="javascript:;" id="editLoopItem{{ $itemID }}" class="editLoopItem btn btn-secondary loopItemBtn"
