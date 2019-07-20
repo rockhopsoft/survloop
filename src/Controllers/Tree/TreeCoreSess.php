@@ -378,7 +378,7 @@ class TreeCoreSess extends TreeCore
         }
         if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
             $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
-            if ($ownerUser != $this->v["uID"]) {
+            if ($ownerUser != $this->v["uID"] && !$this->isAdminUser()) {
                 return $this->redir('/my-profile');
             }
         }

@@ -1,13 +1,8 @@
 <!-- resources/views/survloop/forms/uploads-print.blade.php -->
 @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->UpID)
     <a name="up{{ $upRow->UpID }}"></a>
-    @if ($GLOBALS['SL']->isPrintView())
-        {!! view('vendor.survloop.forms.uploads-print-title', [
-            "upRow"   => $upRow,
-            "isAdmin" => $isAdmin,
-            "isOwner" => $isOwner
-        ])->render() !!}
-    @endif
+    <div class="pB20 mB20">
+        <div class="mB10">
     @if (intVal($upRow->UpType) == $vidTypeID)
         @if ($canShow)
             {!! view('vendor.survloop.forms.uploads-print-youtube', [
@@ -21,7 +16,7 @@
                 "height"  => $height,
                 "icon"    => '<i class="fa fa-video-camera" aria-hidden="true"></i>',
                 "link"    => ''
-            ])->render() !!}
+            ])->render() !!} 
         @endif
     @elseif (isset($upRow->UpUploadFile) && isset($upRow->UpStoredFile) && trim($upRow->UpUploadFile) != '' 
         && trim($upRow->UpStoredFile) != '')
@@ -49,11 +44,11 @@
             ])->render() !!}
         @endif
     @endif
-    @if (!$GLOBALS['SL']->isPrintView())
+        </div>
         {!! view('vendor.survloop.forms.uploads-print-title', [
             "upRow"   => $upRow,
             "isAdmin" => $isAdmin,
             "isOwner" => $isOwner
         ])->render() !!}
-    @endif
+    </div>
 @endif

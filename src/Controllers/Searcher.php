@@ -40,6 +40,7 @@ class Searcher extends SurvCustLoop
         $this->treeID = $treeID;
         $this->initExtra();
         $this->v["sort"] = [ 'created_at', 'desc' ];
+        $this->v["sortLab"] = 'date';
     }
     
     public function initExtra()
@@ -53,7 +54,8 @@ class Searcher extends SurvCustLoop
             $coreTbl = $GLOBALS["SL"]->coreTbl;
         }
         $this->allPublicCoreIDs = [];
-        eval("\$list = " . $GLOBALS["SL"]->modelPath($coreTbl) . "::orderBy('created_at', 'desc')->get();");
+        eval("\$list = " . $GLOBALS["SL"]->modelPath($coreTbl) 
+            . "::orderBy('created_at', 'desc')->get();");
         if ($list->isNotEmpty()) {
             foreach ($list as $l) {
                 $this->allPublicCoreIDs[] = $l->getKey();
@@ -95,9 +97,9 @@ class Searcher extends SurvCustLoop
             $treeID = intVal($GLOBALS["SL"]->REQ->get('t'));
         }
         $this->getSearchFilts();
-        $GLOBALS["SL"]->pageAJAX .= '$("#searchAdvBtn' . $nID . 't' . $treeID . '").click(function() {
-            $("#searchAdv' . $nID . 't' . $treeID . '").slideToggle("fast");
-        });';
+        $GLOBALS["SL"]->pageAJAX .= '$("#searchAdvBtn' . $nID . 't' . $treeID 
+            . '").click(function() { $("#searchAdv' . $nID . 't' . $treeID 
+            . '").slideToggle("fast"); });';
         return view('vendor.survloop.elements.inc-search-bar', [
             "nID"      => $nID, 
             "treeID"   => $treeID, 
@@ -109,7 +111,7 @@ class Searcher extends SurvCustLoop
             "advanced" => $this->printSearchBarAdvanced($treeID, $nID),
             "advUrl"   => $this->advSearchUrlSffx,
             "advBarJS" => $this->advSearchBarJS
-            ])->render();
+        ])->render();
     }
     
     public function searchCacheName()
@@ -241,19 +243,73 @@ class Searcher extends SurvCustLoop
             } elseif ($GLOBALS["SL"]->REQ->has('mine') && intVal($GLOBALS["SL"]->REQ->get('mine')) == 1) {
                 $this->searchFilts["user"] = $this->v["uID"];
             }
+            $GLOBALS["SL"]->loadStates();
+            if ($GLOBALS["SL"]->REQ->has('state')) {
+                $state = trim($GLOBALS["SL"]->REQ->get('state'));
+                if ($state != '' && (isset($GLOBALS["SL"]->states->stateList[$state])
+                    || isset($GLOBALS["SL"]->states->stateListCa[$state]))) {
+                    $this->searchFilts["state"] = $state;
+                }
+            }
+            if ($GLOBALS["SL"]->REQ->has('states')) {
+                $this->getSearchFiltsStates($GLOBALS["SL"]->REQ->get('states'));
+            }
+            if ($GLOBALS["SL"]->REQ->has('stateClim')) {
+                $stateClim = trim($GLOBALS["SL"]->REQ->get('stateClim'));
+                if ($stateClim != '' && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
+                    || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
+                    || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
+                    $this->searchFilts["stateClim"] = $stateClim;
+                }
+            }
             if ($GLOBALS["SL"]->REQ->has('limit') && trim($GLOBALS["SL"]->REQ->get('limit')) != '') {
                 $this->searchOpts["limit"] = intVal($GLOBALS["SL"]->REQ->get('limit'));
             }
-            $GLOBALS["SL"]->loadStates();
-            if ($GLOBALS["SL"]->REQ->has('state') && trim($GLOBALS["SL"]->REQ->get('state')) != '') {
-                if (!isset($GLOBALS["SL"]->states->stateList[trim($GLOBALS["SL"]->REQ->get('state'))])) {
-                    $this->searchOpts["state"] = trim($GLOBALS["SL"]->REQ->get('state'));
-                }
-            }
+            $this->getSearchBarAdvanced($treeID);
             $this->searchResultsXtra($treeID);
             $this->printSearchBarAdvanced($treeID);
         }
         return true;
+    }
+    
+    public function getSearchFiltsStates($statesStr = '')
+    {
+        $states = $GLOBALS["SL"]->mexplode(',', $statesStr);
+        if (is_array($states) && sizeof($states) > 0) {
+            foreach ($states as $abbr) {
+                if (isset($GLOBALS["SL"]->states->stateList[$abbr])
+                    || isset($GLOBALS["SL"]->states->stateListCa[$abbr])) {
+                    if (!isset($this->searchFilts["states"])) {
+                        $this->searchFilts["states"] = [];
+                    }
+                    $this->searchFilts["states"][] = $abbr;
+                }
+            }
+        }
+        return true;
+    }
+    
+    public function getSearchBarAdvanced($treeID = 1)
+    {
+        if ($GLOBALS["SL"]->REQ->has('sSort') && trim($GLOBALS["SL"]->REQ->get('sSort')) != '') {
+            $this->v["sortLab"] = trim($GLOBALS["SL"]->REQ->get('sSort'));
+        }
+        if ($GLOBALS["SL"]->REQ->has('sSortDir') && trim($GLOBALS["SL"]->REQ->get('sSortDir')) != '') {
+            $this->v["sortDir"] = trim($GLOBALS["SL"]->REQ->get('sSortDir'));
+        }
+        if ($GLOBALS["SL"]->REQ->has('sFilt') && trim($GLOBALS["SL"]->REQ->get('sFilt')) != '') {
+            $tmp = $GLOBALS["SL"]->mexplode('__', $GLOBALS["SL"]->REQ->get('sFilt'));
+            if (sizeof($tmp) > 0) {
+                foreach ($tmp as $tmpFilt) {
+                    $filtParts = $GLOBALS["SL"]->mexplode('_', $tmpFilt);
+                    if (sizeof($filtParts) == 2) {
+                        $this->searchFilts[$filtParts[0]] 
+                            = $GLOBALS["SL"]->mexplode(',', $filtParts[1]);
+                    }
+                }
+            }
+        }
+        return '';
     }
     
     public function processSearchFilts()

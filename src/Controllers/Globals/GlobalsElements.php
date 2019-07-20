@@ -14,20 +14,34 @@ use SurvLoop\Controllers\Globals\GlobalsStatic;
 
 class GlobalsElements extends GlobalsStatic
 {
-	public function printAccordian($title, $body = '', $open = false, $big = false, $isCard = false)
-	{
-		return view('vendor.survloop.elements.inc-accordian', [
-			"accordID" => rand(100000, 1000000),
-			"title"    => $title,
-			"body"     => $body,
-			"big"      => $big,
-			"open"     => $open,
-			"isCard"   => $isCard
-		])->render();
-	}
+    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '')
+    {
+      	return view('vendor.survloop.elements.inc-accordian', [
+        		"accordID" => rand(100000, 1000000),
+        		"title"    => $title,
+        		"body"     => $body,
+        		"big"      => $big,
+        		"open"     => $open,
+            "isCard"   => ($type == 'card'),
+            "isText"   => ($type == 'text')
+      	])->render();
+    }
 
-	public function printAccard($title, $body = '', $open = false)
-	{
-		return $this->printAccordian($title, $body, $open, true, true);
-	}
+    public function printAccard($title, $body = '', $open = false)
+    {
+        return $this->printAccordian($title, $body, $open, true, 'card');
+    }
+
+    public function printAccordTxt($title, $body = '', $open = false)
+    {
+        return $this->printAccordian($title, $body, $open, false, 'text');
+    }
+
+    public function addSideNavItem($title = '', $url = '', $delay = 2000)
+    {
+        $this->pageJAVA .= ' setTimeout(\'addSideNavItem("' . $title . '", "' . $url
+            . '")\', ' . $delay . '); ';
+        return true;
+    }
+
 }

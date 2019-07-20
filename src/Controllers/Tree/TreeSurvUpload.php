@@ -438,7 +438,7 @@ class TreeSurvUpload extends TreeSurv
                 $ups[] = view('vendor.survloop.forms.uploads-print', [
                     "nID"         => $nID,
                     "REQ"         => $GLOBALS["SL"]->REQ,
-                    "height"      => 160,
+                    "height"      => 180,
                     "width"       => 330,
                     "upRow"       => $upRow, 
                     "upDeets"     => $this->upDeets[$i], 

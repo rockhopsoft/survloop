@@ -49,7 +49,29 @@ class GlobalsImportExport extends GlobalsTables
                         . ' "id" => ' . $db->DbID . ', '
                         . ' "name" => "' . str_replace('"', '\\"', $db->DbName) . '", '
                         . ' "prfx" => "' . $db->DbPrefix . '" '
+                    . '];' . "\n";
+                }
+            }
+
+            $cache .= '$'.'this->allCoreTbls = [];' . "\n";
+            $coresDone = [];
+            $allCoreTbls = DB::table('SL_Tree')
+                ->join('SL_Tables', 'SL_Tree.TreeCoreTable', '=', 'SL_Tables.TblID')
+                ->where('SL_Tree.TreeDatabase', $this->dbID)
+                ->where('SL_Tables.TblName', 'NOT LIKE', 'Visitors')
+                ->select('SL_Tree.TreeSlug', 'SL_Tables.TblID', 'SL_Tables.TblEng')
+                ->orderBy('SL_Tree.TreeID', 'asc')
+                ->get();
+            if ($allCoreTbls->isNotEmpty()) {
+                foreach ($allCoreTbls as $tbl) {
+                    if (!in_array($tbl->TblID, $coresDone)) {
+                        $coresDone[] = $tbl->TblID;
+                        $cache .= '$'.'this->allCoreTbls[] = ['
+                            . ' "id" => ' . $tbl->TblID . ', '
+                            . ' "name" => "' . $tbl->TblEng . '", '
+                            . ' "slug" => "' . $tbl->TreeSlug . '" '
                         . '];' . "\n";
+                    }
                 }
             }
             
@@ -69,7 +91,8 @@ class GlobalsImportExport extends GlobalsTables
                         . ' "name" => "' . str_replace('"', '\\"', $tree->TreeName) . '", '
                         . ' "slug" => "' . $tree->TreeSlug . '", '
                         . ' "opts" => ' . ((isset($tree->TreeOpts) && intVal($tree->TreeOpts) > 0) 
-                            ? $tree->TreeOpts : 1) . ' ];' . "\n";
+                            ? $tree->TreeOpts : 1) 
+                    . ' ];' . "\n";
                 }
             }
             
@@ -218,8 +241,24 @@ class GlobalsImportExport extends GlobalsTables
             
             $this->getCoreTblUserFld();
             $cache2 .= '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
-            if ($this->treeRow && isset($this->treeRow->TreeType) && $this->treeRow->TreeType == 'Survey') {
-                $xmlTree = SLTree::where('TreeSlug', $this->treeRow->TreeSlug)
+            $xmlTreeSlug = '';
+            if ($this->treeRow && isset($this->treeRow->TreeType)) {
+                if ($this->treeRow->TreeType == 'Survey') {
+                    $xmlTreeSlug = $this->treeRow->TreeSlug;
+                } elseif ($this->treeRow->TreeType == 'Page' 
+                    && $this->treeRow->TreeOpts%Globals::TREEOPT_SEARCH == 0
+                    && $this->treeRow->TreeCoreTable > 0) {
+                    $chk = SLTree::where('TreeType', 'Survey')
+                        ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
+                        ->orderBy('TreeID', 'asc')
+                        ->first();
+                    if ($chk && isset($chk->TreeSlug)) {
+                        $xmlTreeSlug = trim($chk->TreeSlug);
+                    }
+                }
+            }
+            if ($xmlTreeSlug != '') {
+                $xmlTree = SLTree::where('TreeSlug', $xmlTreeSlug)
                     ->where('TreeDatabase', $this->treeRow->TreeDatabase)
                     ->where('TreeType', 'Survey XML')
                     ->orderBy('TreeID', 'asc')
@@ -258,7 +297,8 @@ class GlobalsImportExport extends GlobalsTables
                         . '"opts" => '  . $reportTree->TreeOpts . ''
                     . ' ];' . "\n";
                 }
-            } elseif ($this->treeRow && isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts%13 == 0) {
+            } elseif ($this->treeRow && isset($this->treeRow->TreeOpts) 
+                && $this->treeRow->TreeOpts%Globals::TREEOPT_REPORT == 0) {
                 $reportTree = SLTree::where('TreeType', 'Survey')
                     ->where('TreeDatabase', $this->dbID)
                     ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
@@ -272,7 +312,7 @@ class GlobalsImportExport extends GlobalsTables
                                 . '"root" => ' . $t->TreeRoot . ', '
                                 . '"slug" => "' . $t->TreeSlug . '", '
                                 . '"opts" => ' . $t->TreeOpts . ''
-                                . ' ];' . "\n";
+                            . ' ];' . "\n";
                         }
                     }
                 }
@@ -291,7 +331,7 @@ class GlobalsImportExport extends GlobalsTables
                 'volunteer'     => '',
                 'partner'       => '', 
                 'staff'         => ''
-                ];
+            ];
             if ($this->treeRow && isset($this->treeRow->TreeDatabase)) {
                 $searchTrees = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
                     ->where('TreeType', 'Page')
@@ -970,7 +1010,6 @@ class GlobalsImportExport extends GlobalsTables
         return ((isset($this->x["isPrintPDF"]) && $this->x["isPrintPDF"])
             || (isset($this->x["pageView"]) && in_array($this->x["pageView"], ['pdf', 'full-pdf']))
             || ($this->REQ->has('print') && intVal($this->REQ->get('print')) > 0)
-            || ($this->REQ->has('frame') && intVal($this->REQ->get('frame')) > 0)
             || ($this->REQ->has('pdf') && intVal($this->REQ->get('pdf')) > 0));
     }
     

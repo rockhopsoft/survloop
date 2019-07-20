@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLSearchRecDump;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Tree\TreeCoreSess;
 
 class TreeSurvAPI extends TreeCoreSess
@@ -188,10 +189,10 @@ class TreeSurvAPI extends TreeCoreSess
         return true;
     }
     
-    public function loadXmlMapTree(Request $request)
+    public function loadXmlMapTree(Request $request, $forceReload = false)
     {
         $this->survLoopInit($request);
-        if (isset($GLOBALS["SL"]->xmlTree["id"]) && empty($this->xmlMapTree)) {
+        if (isset($GLOBALS["SL"]->xmlTree["id"]) && (empty($this->xmlMapTree) || $forceReload)) {
             $this->xmlMapTree = new TreeSurvAPI;
             $this->xmlMapTree->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
         }
@@ -502,25 +503,31 @@ class TreeSurvAPI extends TreeCoreSess
     
     public function genRecDump($coreID, $loadTree = true)
     {
-        $this->loadXmlMapTree($GLOBALS["SL"]->REQ);
-        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
+        $coreTbl = $GLOBALS["SL"]->coreTbl;
+        if ($loadTree) {
+            $this->loadXmlMapTree($GLOBALS["SL"]->REQ, true);
+        }
+        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl 
+            && $GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_SEARCH > 0) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         } else { // XML core table is different from main tree
             $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
+            $coreTbl = $GLOBALS["SL"]->xmlTree["coreTbl"];
         }
+        $treeID = $GLOBALS["SL"]->chkReportCoreTree($coreTbl);
         if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])) {
             return false;
         }
         $dump = $this->genRecDumpNode($this->xmlMapTree->rootID, $this->xmlMapTree->nodeTiers, 
             $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]) . $this->genRecDumpXtra();
-//echo 'dump: <textarea style="width: 100%; height: 300px;">' . $dump . '</textarea><br />'; exit;
         $dumpRec = new SLSearchRecDump;
-        $dumpRec->SchRecDmpTreeID  = $this->treeID;
-        $dumpRec->SchRecDmpRecID   = $coreID;
-        $dumpRec->SchRecDmpRecDump = utf8_encode($GLOBALS["SL"]->stdizeChars(str_replace('  ', ' ', trim($dump))));
+        $dumpRec->SchRecDmpTreeID  = $treeID;
+        $dumpRec->SchRecDmpRecID   = $this->sessData->getDataCoreID();
+        $dumpRec->SchRecDmpRecDump = htmlentities($GLOBALS["SL"]->stdizeChars(
+            str_replace('  ', ' ', trim($dump)))); // utf8_encode
         $dumpRec->save();
-        return true;
+        return $dumpRec;
     }
     
     public function genRecDumpNode($nID, $nodeTiers, $rec, $overV = [])

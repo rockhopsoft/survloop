@@ -126,26 +126,40 @@ class TreeSurvNodeEdit extends TreeSurvForm
                         . $metaDesc . '::M::' . $metaWords . '::M::' . $metaImg;
                 }
                 if ($GLOBALS["SL"]->REQ->nodeType == 'page' || $isPageRoot) {
-                    $node->nodeRow->NodeType        = 'Page';
-                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->get('pageFocusField'));
+                    $node->nodeRow->NodeType      = 'Page';
+                    $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->get('pageFocusField'));
                     if ($isPageRoot) {
-                        if ($GLOBALS["SL"]->REQ->has('reportPage') && intVal($GLOBALS["SL"]->REQ->reportPage) == 13) {
-                            if ($GLOBALS["SL"]->treeRow->TreeOpts%13 > 0) {
-                                $GLOBALS["SL"]->treeRow->TreeOpts *= 13;
-                                $GLOBALS["SL"]->treeRow->save();
-                            }
-                            if ($GLOBALS["SL"]->REQ->has('reportPageTree') 
-                                && intVal($GLOBALS["SL"]->REQ->reportPageTree) > 0) {
-                                $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->reportPageTree;
+                        if ($GLOBALS["SL"]->REQ->has('reportPageTree')
+                            && intVal($GLOBALS["SL"]->REQ->reportPageTree) > 0) {
+                            $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->reportPageTree;
+                            $node->nodeRow->save();
+                            if ($GLOBALS["SL"]->REQ->has('reportPage')
+                                && intVal($GLOBALS["SL"]->REQ->reportPage) == 13) {
+                                if ($GLOBALS["SL"]->treeRow->TreeOpts%13 > 0) {
+                                    $GLOBALS["SL"]->treeRow->TreeOpts *= 13;
+                                    $GLOBALS["SL"]->treeRow->save();
+                                }
                             } else {
-                                $node->nodeRow->NodeResponseSet = null;
+                                if ($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) {
+                                    $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/13;
+                                    $GLOBALS["SL"]->treeRow->save();
+                                }
+                            }
+                            if ($GLOBALS["SL"]->REQ->has('searchPage') 
+                                && intVal($GLOBALS["SL"]->REQ->searchPage) == 31) {
+                                if ($GLOBALS["SL"]->treeRow->TreeOpts%31 > 0) {
+                                    $GLOBALS["SL"]->treeRow->TreeOpts *= 31;
+                                    $GLOBALS["SL"]->treeRow->save();
+                                }
+                            } else {
+                                if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0) {
+                                    $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/31;
+                                    $GLOBALS["SL"]->treeRow->save();
+                                }
                             }
                         } else {
-                            if ($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) {
-                                $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/13;
-                                $GLOBALS["SL"]->treeRow->save();
-                            }
                             $node->nodeRow->NodeResponseSet = null;
+                            $node->nodeRow->save();
                         }
                         if ($GLOBALS["SL"]->REQ->has('pageBg') && intVal($GLOBALS["SL"]->REQ->pageBg) == 67) {
                             if ($GLOBALS["SL"]->treeRow->TreeOpts%67 > 0) {

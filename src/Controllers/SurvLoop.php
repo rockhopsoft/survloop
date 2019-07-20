@@ -513,8 +513,8 @@ class SurvLoop extends SurvCustLoop
                         && sizeof($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0
                         && isset($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)) {
                         $this->custLoop->searcher->searchResults[$i][1] 
-                            += strtotime($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->created_at)
-                                /1000000000000;
+                            += strtotime($this->custLoop->sessData->dataSets[
+                                $GLOBALS["SL"]->coreTbl][0]->created_at)/1000000000000;
                     }
                 }
             }

@@ -580,6 +580,7 @@ class AdminController extends SurvLoopController
                 }
             }
         }
+        $GLOBALS["SL"]->loadStates();
         $scriptsjs = view('vendor.survloop.js.scripts', [ "css" => $css, "treeJs" => $treeJs ])->render()
             . view('vendor.survloop.js.scripts-ajax', [ "css" => $css, "treeJs" => $treeJs ])->render();
         file_put_contents("../storage/app/sys/sys2.js", $scriptsjs);

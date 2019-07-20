@@ -366,15 +366,15 @@ class AdminTreeController extends AdminController
         } else { // not Redirect
             $this->v["myPages"] = [];
             $chk = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-               // ->whereRaw('TreeOpts%' . Globals::TREEOPT_SURVREPORT . ' ' 
+               // ->whereRaw('TreeOpts%' . Globals::TREEOPT_REPORT . ' ' 
                //     . (($pageType == 'Report') ? '=' : '>') . ' 0')
                 ->where('TreeType', 'LIKE', 'Page')
                 ->orderBy('TreeName', 'asc')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $i => $tree) {
-                    if (($pageType == 'Report' && $tree->TreeOpts%Globals::TREEOPT_SURVREPORT == 0)
-                        || ($pageType != 'Report' && $tree->TreeOpts%Globals::TREEOPT_SURVREPORT > 0)) {
+                    if (($pageType == 'Report' && $tree->TreeOpts%Globals::TREEOPT_REPORT == 0)
+                        || ($pageType != 'Report' && $tree->TreeOpts%Globals::TREEOPT_REPORT > 0)) {
                         $this->v["myPages"][] = $tree;
                         if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0 && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
                             $GLOBALS["SL"]->x["pageUrls"][$tree->TreeID] = '/dashboard';
@@ -427,11 +427,15 @@ class AdminTreeController extends AdminController
                 $tree->TreeOpts *= Globals::TREEOPT_VOLUNTEER;
             }
             if ($request->has('pageIsReport') && intVal($request->pageIsReport) == 1) {
-                $tree->TreeOpts *= Globals::TREEOPT_SURVREPORT;
+                $tree->TreeOpts *= Globals::TREEOPT_REPORT;
+            }
+            if ($request->has('pageIsSearch') && intVal($request->pageIsSearch) == 1) {
+                $tree->TreeOpts *= Globals::TREEOPT_SEARCH;
             }
             $tree->save();
-            if ($tree->TreeOpts%Globals::TREEOPT_REPORT == 0 && $request->has('reportPageTree') 
-                && intVal($request->reportPageTree) > 0) {
+            if ($request->has('reportPageTree') && intVal($request->reportPageTree) > 0
+                && ($tree->TreeOpts%Globals::TREEOPT_REPORT == 0 
+                    || $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0)) {
                 $chkTree = SLTree::find($request->reportPageTree);
                 if ($chkTree && isset($chkTree->TreeID)) {
                     $tree->update([ 'TreeCoreTable' => $chkTree->TreeCoreTable ]);
@@ -504,6 +508,7 @@ class AdminTreeController extends AdminController
                 Globals::TREEOPT_HOMEPAGE,
                 Globals::TREEOPT_NOEDITS,
                 Globals::TREEOPT_REPORT,
+                Globals::TREEOPT_SEARCH,
                 Globals::TREEOPT_VOLUNTEER,
                 Globals::TREEOPT_CONTACT, 
                 Globals::TREEOPT_PROFILE,

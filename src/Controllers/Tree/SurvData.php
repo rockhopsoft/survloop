@@ -191,9 +191,21 @@ class SurvData
         return true;
     }
     
+    public function getDataCoreID()
+    {
+        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0
+            && isset($this->dataSets[$this->coreTbl][0]->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' })) {
+            return $this->dataSets[$this->coreTbl][0]->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' };
+        }
+        return -3;
+    }
+    
     protected function getRecordLinks($tbl = '', $extraOutFld = '', $extraOutVal = -3, $skipIncoming = true)
     {
-        $linkages = [ "outgoing" => [], "incoming" => [] ];
+        $linkages = [
+            "outgoing" => [],
+            "incoming" => []
+        ];
         if (trim($extraOutFld) != '') {
             $linkages["outgoing"][] = [$extraOutFld, $extraOutVal];
         }
@@ -1265,7 +1277,11 @@ class SurvData
                 if (!$badBranch) {
                     $chk = $this->getRowById($branches[$i], $branches[$i+1]);
                     if ($chk && isset($chk->created_at)) {
-                        $this->dataBranches[] = ["branch" => $branches[$i], "loop" => '', "itemID" => $branches[$i+1]];
+                        $this->dataBranches[] = [
+                            "branch" => $branches[$i],
+                            "loop"   => '',
+                            "itemID" => $branches[$i+1]
+                        ];
                     } else {
                         // also check for loop first?
                         $badBranch = true;
@@ -1291,7 +1307,8 @@ class SurvData
             if (sizeof($extendFlds) > 0) {
                 foreach ($extendFlds as $i => $fld) {
                     if (isset($rowFrom->{ $fld })) {
-                        $this->dataSets[$tblTo][$ind]->{ $GLOBALS["SL"]->tblAbbr[$tblTo] . $fld } = $rowFrom->{ $fld };
+                        $this->dataSets[$tblTo][$ind]->{ $GLOBALS["SL"]->tblAbbr[$tblTo] . $fld } 
+                            = $rowFrom->{ $fld };
                     }
                 }
             }
@@ -1311,7 +1328,8 @@ class SurvData
     {
         $this->testsAB = new SurvDataTestsAB;
         $params = '';
-        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
+        if (isset($this->dataSets[$this->coreTbl]) 
+            && sizeof($this->dataSets[$this->coreTbl]) > 0) {
             $abField = $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB';
             if (isset($this->dataSets[$this->coreTbl][0]->{ $abField })) {
                 $params = $this->dataSets[$this->coreTbl][0]->{ $abField };
@@ -1321,10 +1339,12 @@ class SurvData
         if ($GLOBALS["SL"]->REQ->has('ab') && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
             $this->testsAB->addParamsAB(trim($GLOBALS["SL"]->REQ->get('ab')));
         }
-        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
+        if (isset($this->dataSets[$this->coreTbl]) 
+            && sizeof($this->dataSets[$this->coreTbl]) > 0) {
             $this->dataSets[$this->coreTbl][0]->update([
-                $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB' => $this->testsAB->printParams()
-                ]);
+                $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'VersionAB'
+                    => $this->testsAB->printParams()
+            ]);
         }
         return true;
     }

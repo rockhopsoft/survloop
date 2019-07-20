@@ -9,6 +9,7 @@
   */
 namespace SurvLoop\Controllers;
 
+use DB;
 use Auth;
 use Storage;
 use Illuminate\Http\Request;
@@ -34,7 +35,9 @@ class PageLoadUtils extends Controller
     public function __construct($isAdminPage = false)
     {
         $this->isAdminPage = $isAdminPage;
-        if ($isAdminPage) $this->dashPrfx = '/dash';
+        if ($isAdminPage) {
+            $this->dashPrfx = '/dash';
+        }
     }
     
     public function loadDomain()
@@ -83,19 +86,67 @@ class PageLoadUtils extends Controller
         return true;
     }
     
+    protected function userHasTreePerms($treeOpts = 1)
+    {
+        if ($treeOpts%Globals::TREEOPT_ADMIN == 0) {
+            return $this->isUserAdmin();
+        }
+        if ($treeOpts%Globals::TREEOPT_STAFF == 0) {
+            return ($this->isUserStaff() || $this->isUserAdmin());
+        }
+        if ($treeOpts%Globals::TREEOPT_PARTNER == 0) {
+            return ($this->isUserPartn() || $this->isUserAdmin());
+        }
+        if ($treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+            return ($this->isUserVolun() || $this->isUserAdmin());
+        }
+        return true;
+    }
+    
     public function getMaxPermsPrime()
     {
         $ret = ((!Auth::user() || !isset(Auth::user()->id)) ? -1 : 0);
-        if (Auth::user() && Auth::user()->hasRole('administrator')) {
-            $ret = Globals::TREEOPT_ADMIN;
-        } elseif (Auth::user() && Auth::user()->hasRole('staff|databaser|brancher')) {
-            $ret = Globals::TREEOPT_STAFF;
-        } elseif (Auth::user() && Auth::user()->hasRole('partner')) {
-            $ret = Globals::TREEOPT_PARTNER;
-        } elseif (Auth::user() && Auth::user()->hasRole('volunteer')) {
-            $ret = Globals::TREEOPT_VOLUNTEER;
+        if (Auth::user()) {
+            if (Auth::user()->hasRole('administrator')) {
+                $ret = Globals::TREEOPT_ADMIN;
+            } elseif (Auth::user()->hasRole('staff|databaser|brancher')) {
+                $ret = Globals::TREEOPT_STAFF;
+            } elseif (Auth::user()->hasRole('partner')) {
+                $ret = Globals::TREEOPT_PARTNER;
+            } elseif (Auth::user()->hasRole('volunteer')) {
+                $ret = Globals::TREEOPT_VOLUNTEER;
+            }
         }
         return $ret;
+    }
+    
+    public function getPermOpts()
+    {
+        $ret = [];
+        if (Auth::user() && isset(Auth::user()->id) && intVal(Auth::user()->id) > 0) {
+            if (Auth::user()->hasRole('administrator')) {
+                $ret[] = Globals::TREEOPT_ADMIN;
+            }
+            if (Auth::user()->hasRole('administrator|staff|databaser|brancher')) {
+                $ret[] = Globals::TREEOPT_STAFF;
+            }
+            if (Auth::user()->hasRole('administrator|staff|databaser|brancher|partner')) {
+                $ret[] = Globals::TREEOPT_PARTNER;
+            }
+            if (Auth::user()->hasRole('administrator|staff|databaser|brancher|partner|volunteer')) {
+                $ret[] = Globals::TREEOPT_VOLUNTEER;
+            }
+        }
+        return $ret;
+    }
+    
+    public function getPageDashPrefix($treeOpts = 1)
+    {
+        if ($treeOpts%Globals::TREEOPT_ADMIN == 0 || $treeOpts%Globals::TREEOPT_STAFF == 0
+            || $treeOpts%Globals::TREEOPT_PARTNER == 0 || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+            return '/dash';
+        }
+        return '';
     }
     
     public function chkNoTreePerms($tree)
@@ -143,6 +194,83 @@ class PageLoadUtils extends Controller
             }
         }
         return false;
+    }
+    
+    public function searchRun(Request $request)
+    {
+        $searchTree = null;
+        if ($request->has('searchData') && is_array($request->get('searchData'))) {
+            $perms = $this->getPermOpts();
+            $searchDataTbl = $request->get('searchData');
+            if (sizeof($searchDataTbl) == 1 && intVal($searchDataTbl[0]) > 0) {
+                $trees = DB::table('SL_Tree')
+                    ->join('SL_Node', function ($join) {
+                        $join->on('SL_Tree.TreeID', '=', 'SL_Node.NodeTree')
+                            ->where('SL_Node.NodeParentID', '<=', 0)
+                            ->where('SL_Node.NodeType', 'Page');
+                    })
+                    ->where('SL_Tree.TreeType', 'Page')
+                    ->where('SL_Tree.TreeCoreTable', intVal($searchDataTbl[0]))
+                    ->select('SL_Tree.*', 'SL_Node.NodeResponseSet')
+                    ->get();
+                $searchTree = $this->chkSearchRunTrees($trees, $perms);
+            }
+            if ($searchTree === null) {
+                $trees = SLTree::where('TreeType', 'Page')
+                    ->get();
+                $searchTree = $this->chkSearchRunTrees($trees, $perms);
+            }
+            if ($searchTree !== null && isset($searchTree->TreeOpts)) {
+                $redir = $this->getPageDashPrefix($searchTree->TreeOpts) . '/' . $searchTree->TreeSlug 
+                    . '?s=' . (($request->has('s')) ? $request->get('s') : '');
+                if ($request->has('sFilt') && trim($request->get('sFilt')) != '') {
+                    $redir .= '&sFilt=' . $request->get('sFilt');
+                }
+                if ($request->has('sSort') && trim($request->get('sSort')) != '') {
+                    $redir .= '&sSort=' . $request->get('sSort');
+                }
+                if ($request->has('sSortDir') && trim($request->get('sSortDir')) != '') {
+                    $redir .= '&sSortDir=' . $request->get('sSortDir');
+                }
+                if ($request->has('sView') && trim($request->get('sView')) != '') {
+                    $redir .= '&sView=' . $request->get('sView');
+                }
+                return redirect($redir);
+            }
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
+    protected function chkSearchRunTrees($trees, $perms)
+    {
+        $searchTree = null;
+        if ($trees->isNotEmpty()) {
+            if (sizeof($perms) > 0) {
+                foreach ($perms as $perm) {
+                    if ($searchTree === null) {
+                        foreach ($trees as $tree) {
+                            if ($searchTree === null && $tree->TreeOpts%$perm == 0
+                                && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
+                                $searchTree = $tree;
+                            }
+                        }
+                    }
+                }
+            }
+            if ($searchTree === null) {
+                foreach ($trees as $tree) {
+                    if ($searchTree === null && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0
+                        && $tree->TreeOpts%Globals::TREEOPT_ADMIN > 0
+                        && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
+                        && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0
+                        && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
+                        $searchTree = $tree;
+                    }
+                }
+            }
+        }
+        return $searchTree;
     }
     
     protected function chkPageRedir($treeSlug = '')
@@ -308,23 +436,6 @@ class PageLoadUtils extends Controller
         }
         return ($treeOpts%Globals::TREEOPT_ADMIN > 0 && $treeOpts%Globals::TREEOPT_STAFF > 0
             && $treeOpts%Globals::TREEOPT_PARTNER > 0 && $treeOpts%Globals::TREEOPT_VOLUNTEER > 0);
-    }
-    
-    protected function userHasTreePerms($treeOpts = 1)
-    {
-        if ($treeOpts%Globals::TREEOPT_ADMIN == 0) {
-            return $this->isUserAdmin();
-        }
-        if ($treeOpts%Globals::TREEOPT_STAFF == 0) {
-            return ($this->isUserStaff() || $this->isUserAdmin());
-        }
-        if ($treeOpts%Globals::TREEOPT_PARTNER == 0) {
-            return ($this->isUserPartn() || $this->isUserAdmin());
-        }
-        if ($treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
-            return ($this->isUserVolun() || $this->isUserAdmin());
-        }
-        return true;
     }
     
     public function isUserAdmin()

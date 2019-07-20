@@ -782,7 +782,8 @@ class TreeSurv extends TreeSurvReport
     public function printReportsPrev($coreID = -3)
     {
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
-        return '<div id="reportPreview' . $coreID . '" class="reportPreview">' . $this->printPreviewReport() . '</div>';
+        return '<div id="reportPreview' . $coreID . '" class="reportPreview">' 
+            . $this->printPreviewReport() . '</div>';
     }
     
     public function unpublishedMessage($coreTbl = '')

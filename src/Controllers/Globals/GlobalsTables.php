@@ -100,13 +100,15 @@ class GlobalsTables extends GlobalsElements
     public $treeSettings   = [];
     public $proTips        = [];
     public $allTrees       = [];
+    public $allCoreTbls    = [];
+    public $currSearchTbls = [];
     
     // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->TreeOpts%TREEOPT_PRIME == 0 )
     // Site Map Architecture and Permissions Flags
     public const TREEOPT_HOMEPAGE   = 7;  // Page Tree acts as home page for site area
     public const TREEOPT_SEARCH     = 31; // Tree acts as search results page for site area 
     public const TREEOPT_PROFILE    = 23; // This page acts as the default Member Profile for the system
-    public const TREEOPT_SURVREPORT = 13; // This page is a report for the records of another Survey Tree
+    public const TREEOPT_REPORT     = 13; // Page Tree is a Report for a survey, so they share data structures
     
     // Site Map Architecture and Permissions Flags
     public const TREEOPT_ADMIN      = 3;  // Tree access limited to admin users
@@ -126,7 +128,6 @@ class GlobalsTables extends GlobalsElements
     public const TREEOPT_ONEBIGLOOP = 5;  // Survey is one big loop through editable records
     
     // Page Tree Options
-    public const TREEOPT_REPORT     = 13; // Page Tree is a Report for a survey, so they share data structures
     public const TREEOPT_NOCACHE    = 29; // Page Tree is currently too complicated to cache
     public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
     public const TREEOPT_CONTACT    = 19; // This page is a SurvLoop standard contact form 
@@ -290,6 +291,10 @@ class GlobalsTables extends GlobalsElements
     {
         if ($treeID != $this->treeID) {
             $this->formTree = SLTree::find($treeID);
+            if ($this->treeRow->TreeOpts%Globals::TREEOPT_SEARCH == 0
+                || $this->treeRow->TreeOpts%Globals::TREEOPT_REPORT == 0) {
+                $this->currSearchTbls[] = $this->treeRow->TreeCoreTable;
+            }
         }
         $this->dataLoops = [];
         $this->dataLoopNames = [];
@@ -414,7 +419,6 @@ class GlobalsTables extends GlobalsElements
             $nodeChk = SLNode::find($this->treeRow->TreeRoot);
             if ($nodeChk && isset($nodeChk->NodeResponseSet) && intVal($nodeChk->NodeResponseSet) > 0
                 && intVal($nodeChk->NodeResponseSet) != $this->treeID) {
-                $chk = SLTree::find(intVal($nodeChk->NodeResponseSet));
                 $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
             }
         }
@@ -1892,15 +1896,17 @@ class GlobalsTables extends GlobalsElements
     
     public function allTreeDropOpts($preSel = -3)
     {
-        $ret = '<option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') . ' >select form tree</option>';
+        $ret = '<option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') 
+            . ' >select form tree</option>';
         if (sizeof($this->allTrees) > 0) {
             foreach ($this->allTrees as $dbID => $trees) {
                 if (sizeof($trees) > 0) {
-                    $ret .= '<option value="-3" DISABLED >' . $this->getDbName($dbID) . ' Database...</option>';
+                    $ret .= '<option value="-3" DISABLED >' . $this->getDbName($dbID) 
+                        . ' Database...</option>';
                     foreach ($trees as $i => $tree) {
-                        $ret .= '<option ' . ((intVal($preSel) == $tree["id"]) ? 'SELECTED' : '') . ' value="' 
-                            . $tree["id"] . '" > - ' . $tree["name"] . (($tree["opts"]%3 == 0) ? ' (Admin)' : '') 
-                            . '</option>';
+                        $ret .= '<option ' . ((intVal($preSel) == $tree["id"]) ? 'SELECTED' : '') 
+                            . ' value="' . $tree["id"] . '" > - ' . $tree["name"]
+                            . (($tree["opts"]%3 == 0) ? ' (Admin)' : '') . '</option>';
                     }
                 }
             }

@@ -17,8 +17,10 @@
                         && (trim($upDeets[$i]["youtube"]) != '' || trim($upDeets[$i]["vimeo"]) != ''))
 
                         {!! view('vendor.survloop.forms.upload-previous-youtube', [
+                            "i"       => $i,
                             "height"  => $height,
-                            "upDeets" => $upDeets
+                            "upDeets" => $upDeets,
+                            "upRow"   => $upRow
                         ])->render() !!}
 
                     @elseif (isset($upRow->UpUploadFile) && isset($upRow->UpStoredFile) 
@@ -26,12 +28,14 @@
 
                         @if (in_array($upDeets[$i]["ext"], array("gif", "jpeg", "jpg", "png")))
                             {!! view('vendor.survloop.forms.upload-previous-image', [
+                                "i"       => $i,
                                 "height"  => $height,
                                 "upDeets" => $upDeets,
                                 "upRow"   => $upRow
                             ])->render() !!}
                         @else
                             {!! view('vendor.survloop.forms.upload-previous-other-file', [
+                                "i"       => $i,
                                 "height"  => $height,
                                 "upDeets" => $upDeets,
                                 "upRow"   => $upRow

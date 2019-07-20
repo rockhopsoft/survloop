@@ -102,3 +102,7 @@ input[type="submit"].btn-danger.btn-lg:hover, input[type="submit"].btn-danger.bt
     border: 1px {!! $css["color-danger-on"] !!} solid;
 }
 
+.dropdown-item.active {
+    color: {!! $css["color-main-bg"] !!};
+    background: {!! $css["color-main-link"] !!};
+}

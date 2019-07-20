@@ -147,6 +147,34 @@ class GlobalsStatic
         return $ret;
     }
     
+    public function getYoutubeUrl($id = '', $link = true, $class = '')
+    {
+        if (trim($id) == '') {
+            return '';
+        }
+        $url = 'https://www.youtube.com/watch?v=' . $id;
+        if (!$link) {
+            return $url;
+        }
+        return '<a href="' . $url . '" target="_blank"' 
+            . (($class != '') ? ' class="' . $class . '"' : '')
+            . ' >' . $url . '</a>';
+    }
+    
+    public function getVimeoUrl($id = '', $link = true, $class = '')
+    {
+        if (trim($id) == '') {
+            return '';
+        }
+        $url = 'https://vimeo.com/' . $id;
+        if (!$link) {
+            return $url;
+        }
+        return '<a href="' . $url . '" target="_blank"' 
+            . (($class != '') ? ' class="' . $class . '"' : '')
+            . ' >' . $url . '</a>';
+    }
+    
     public function getFileExt($file)
     {
         $ext = '';
@@ -837,6 +865,14 @@ class GlobalsStatic
 		curl_close($ch);
 		return $data;
 	}
+
+    public function arrAvg($array = [])
+    {
+        if (is_array($array) && count($array) > 0) {
+            return array_sum($array)/count($array);
+        }
+        return 0;
+    }
 	
 	public function getArrPercentileStr($str, $val, $isGolf = false)
 	{
@@ -982,13 +1018,13 @@ class GlobalsStatic
     
     public function isMobile()
     {
-        if (!isset($_SERVER['HTTP_USER_AGENT'])) {
+        if (!isset($_SERVER["HTTP_USER_AGENT"])) {
             return false;
         }
     	return (preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec'
 			. '|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?'
 			. '|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap'
-			. '|windows (ce|phone)|xda|xiino/i', $_SERVER['HTTP_USER_AGENT'])
+			. '|windows (ce|phone)|xda|xiino/i', $_SERVER["HTTP_USER_AGENT"])
 			|| preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av'
 			. '|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb'
 			. '|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw'
@@ -1006,7 +1042,7 @@ class GlobalsStatic
 			. '|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)'
 			. '|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61'
 			. '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', 
-			substr($_SERVER['HTTP_USER_AGENT'],0,4)));
+			substr($_SERVER["HTTP_USER_AGENT"],0,4)));
     }
     
     public function pausePageScriptCollection()

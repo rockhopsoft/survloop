@@ -149,20 +149,6 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 
 <div id="main" class="">
 
-<?php /*
-<div id="topNavSearch">
-    <form id="dashSearchFrmID" name="dashSearchForm" method="get"
-        action="{{ $GLOBALS['SL']->getSrchUrl() }}">
-        <div id="dashSearchFrmWrap">
-        <div id="dashSearchBtnID"><a onClick="document.dashSearchForm.submit();" href="javascript:;"
-            ><i class="fa fa-search" aria-hidden="true"></i></a></div>
-        <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
-            placeholder="Search...">
-        </div>
-    </form>
-</div>
-*/ ?>
-
 <div id="mainNav">
     <div class="fL">
     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
@@ -183,6 +169,7 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
         <a id="logoTxt" href="/" class="navbar-brand">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
     </div>
+    {!! view('vendor.survloop.master-search')->render() !!}
     <div class="fR taR">
         <div id="myNavBar"></div>
     </div>

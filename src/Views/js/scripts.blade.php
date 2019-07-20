@@ -144,7 +144,7 @@ function hasHshoos() {
 function chkHshooTopTabs() {
     if (hasHshoos() && document.getElementById('slTopTabsWrap') && document.getElementById('adminMenuTopTabs')) {
         document.getElementById('slTopTabsWrap').style.position='fixed';
-        document.getElementById('adminMenuTopTabs').style.marginBottom='70px';
+        //document.getElementById('adminMenuTopTabs').style.marginBottom='70px';
     } else {
         setTimeout("chkHshooTopTabs()", 2000);
     }
@@ -210,8 +210,7 @@ function startCountdown(divID, cntFrom, inc) {
 }
 
 function openNav() {
-    document.getElementById("mySidenav").style.borderLeft = "1px {!! $css["color-main-on"] !!} solid";
-    document.getElementById("mySidenav").style.boxShadow = "0px 0px 40px {!! $css["color-main-faint"] !!}";
+    document.getElementById("mySidenav").style.boxShadow = "0px 2px 4px {!! $css["color-main-grey"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
     document.getElementById("main").style.marginRight = "300px";
     if (document.getElementById("userMenuBtn") && document.getElementById("userMenuArr")) {
@@ -220,7 +219,6 @@ function openNav() {
     return true;
 }
 function closeNav() {
-    document.getElementById("mySidenav").style.borderLeft = "0px none";
     document.getElementById("mySidenav").style.boxShadow = "none";
     document.getElementById("mySidenav").style.width = "0";
     document.getElementById("main").style.marginRight = "0";
@@ -293,19 +291,14 @@ function addTopCust(navCode) {
 function addTopCustRight(navCode) {
     if (document.getElementById("myNavBar")) {
         if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0) {
-            var loginPos = document.getElementById("myNavBar").innerHTML.indexOf('fa fa-times');
-            if (loginPos > 0) {
-                document.getElementById("myNavBar").innerHTML = document.getElementById("myNavBar").innerHTML.substring(0,loginPos+40)+navCode+document.getElementById("myNavBar").innerHTML.substring(loginPos+40);
-            } else {
-                document.getElementById("myNavBar").innerHTML += navCode;
-            }
+            document.getElementById("myNavBar").innerHTML = navCode+document.getElementById("myNavBar").innerHTML;
         }
     }
     return true;
 }
 function addTopNavItem(navTxt, navLink) {
     if (document.getElementById("myNavBar")) {
-        var newLink = "<a class=\"float-right slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
+        var newLink = "<a class=\"fR slNavLnk\" href=\""+navLink+"\">"+navTxt+"</a>";
         if (document.getElementById("myNavBar").innerHTML.indexOf(newLink) < 0) {
             if (navTxt == 'pencil') document.getElementById("myNavBar").innerHTML = newLink+document.getElementById("myNavBar").innerHTML;
             else document.getElementById("myNavBar").innerHTML += newLink;
@@ -337,6 +330,43 @@ function printHeadBar(percIn) {
 function getProgBar() {
     return "<div class=\"progress progress-striped progress-bar-animated\"><div class=\"progress-bar bg-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
 }
+
+function getStateList() {
+    return new Array({!! $GLOBALS["SL"]->states->printAllAbbrs() !!});
+}
+
+var closeAdmMenuOnLoad = false;
+var sView = 'list';
+var resultLoaded = 0;
+var dashHeight = 0;
+var currRightPane = 'preview';
+function updateRightPane() {
+    if (document.getElementById("searchFilts")) {
+        if (currRightPane == 'filters') {
+            document.getElementById("searchFilts").style.display="block";
+        } else {
+            document.getElementById("searchFilts").style.display="none";
+        }
+    }
+    if (document.getElementById("toggleSearchFiltsArr")) {
+        if (currRightPane == 'filters') {
+            document.getElementById("toggleSearchFiltsArr").className="fa fa-caret-up";
+        } else {
+            document.getElementById("toggleSearchFiltsArr").className="fa fa-caret-down";
+        }
+    }
+    if (document.getElementById("reportAdmPreview") && document.getElementById("hidivDashTools")) {
+        if (currRightPane == 'preview') {
+            document.getElementById("reportAdmPreview").style.display="block";
+            document.getElementById("hidivDashTools").style.display="none";
+        } else {
+            document.getElementById("reportAdmPreview").style.display="none";
+            document.getElementById("hidivDashTools").style.display="block";
+        }
+    }
+    return true;
+}
+
 
 @if (isset($treeJs)) {!! $treeJs !!} @endif
 

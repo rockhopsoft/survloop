@@ -148,38 +148,3 @@ a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:h
 body.bodyDash {
     background: {!! $css["color-main-text"] !!};
 }
-
-#dashSearchFrmWrap {
-    position: relative;
-    width: 100%;
-    padding: 8px 15px 7px 15px;
-}
-#topNavSearch {
-    
-
-}
-#admSrchFld {
-    background: none; 
-    background-color: none;
-    z-index: 1;
-}
-#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, #admSrchFld a:active, #admSrchFld a:hover {
-    color: {!! $css["color-main-bg"] !!};
-}
-#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, #admSrchFld::-ms-input-placeholder {
-    color: {!! $css["color-main-bg"] !!};
-}
-
-#dashSearchBtnID {
-    position: absolute;
-    z-index: 99;
-    top: 10px;
-    right: 24px;
-}
-#dashSearchBtnID a:link, #dashSearchBtnID a:active, #dashSearchBtnID a:visited, #dashSearchBtnID a:hover {
-    color: {!! $css["color-main-bg"] !!};
-    font-size: 14px;
-}
-#dashSearchBtnID a:hover {
-    font-size: 16px;
-}

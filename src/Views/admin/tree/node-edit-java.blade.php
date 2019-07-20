@@ -337,6 +337,18 @@ function checkData() {
 }
 setTimeout("checkData()", 100);
 
+function chkPageForTree() {
+    if (document.getElementById('reportPageID') && document.getElementById('searchPageID') && document.getElementById('reportPageTreeID')) {
+        if (document.getElementById('reportPageID').checked || document.getElementById('searchPageID').checked) {
+            document.getElementById('reportPageTreeID').style.display='block';
+        } else {
+            document.getElementById('reportPageTreeID').style.display='none';
+        }
+    }
+    return true;
+}
+setTimeout("chkPageForTree()", 100);
+
 $(document).ready(function(){
 
     function switchTreeOpts(fldID, treeID) {

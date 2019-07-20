@@ -42,17 +42,18 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
-    Route::get( '/defer/{treeID}/{nodeID}',  'SurvLoop\\Controllers\\SurvLoop@deferNode');
+    Route::get( '/defer/{treeID}/{nodeID}',    'SurvLoop\\Controllers\\SurvLoop@deferNode');
     Route::get( '/up/{treeSlug}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
     
     Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
     Route::get( '/search-results/{treeID}',  'SurvLoop\\Controllers\\SurvLoop@searchResultsAjax');
+    Route::get( '/search-run',               'SurvLoop\\Controllers\\SurvLoop@searchRun');
     
     Route::get( '/records-full/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordFulls');
     Route::get( '/record-prevs/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordPreviews');
     Route::get( '/record-check/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxMultiRecordCheck');
-    Route::get( '/record-graph/{gType}/{treeID}/{nID}',     'SurvLoop\\Controllers\\SurvLoop@ajaxGraph');
-    Route::get( '/widget-custom/{treeID}/{nID}',            'SurvLoop\\Controllers\\SurvLoop@widgetCust');
+    Route::get( '/record-graph/{gType}/{treeID}/{nID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxGraph');
+    Route::get( '/widget-custom/{treeID}/{nID}',        'SurvLoop\\Controllers\\SurvLoop@widgetCust');
     
     Route::get( '/ajax-get-flds/{treeID}',                  'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
     Route::get( '/ajax-get-flds/{treeID}/{rSet}',           'SurvLoop\\Controllers\\SurvLoop@getSetFlds');

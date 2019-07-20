@@ -160,14 +160,26 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     min-height: 600px;
 }
 
-.embedMapA, .embedMapDescA { width: 100%; height: 420px; }
-.embedMapDescA { overflow-y: scroll; overflow-x: hidden; }
+.embedMapA, .embedMapDescA {
+    width: 100%;
+    height: 420px;
+}
+.embedMapDescA {
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
 @media screen and (max-width: 992px) {
-    .embedMapA { margin-bottom: 20px; }
-    .embedMapA, .embedMapDescA { height: 340px; }
+    .embedMapA {
+        margin-bottom: 20px;
+    }
+    .embedMapA, .embedMapDescA {
+        height: 340px;
+    }
 }
 @media screen and (max-width: 768px) {
-    .embedMapA, .embedMapDescA { height: 260px; }
+    .embedMapA, .embedMapDescA {
+        height: 260px;
+    }
 }
 
 .slAccord, .slAccordBig {
@@ -177,9 +189,20 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     height: 56px;
     padding-top: 15px;
 }
+.slAccord div .fL {
+    padding-top: 3px;
+}
 .slAccord div .fR {
     font-size: 16px;
 }
 .slAccordBig div .fR {
     font-size: 22px;
+}
+.slAccordTxt {
+    min-height: 32px;
+    margin-bottom: -20px;
+}
+.slAccordTxt div fL, .slAccordTxt div fR {
+    height: 32px;
+    padding-top: 10px;
 }

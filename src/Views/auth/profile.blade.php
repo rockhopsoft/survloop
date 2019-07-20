@@ -1,23 +1,36 @@
 <!-- resources/views/vendor/survloop/profile.blade.php -->
 <div class="row mT20 mB20">
 @if (isset($GLOBALS['SL']->sysOpts['avatar-empty']))
-    <div class="col-md-2 col-sm-3 pT20">
+    <div class="col-3 pT20">
         <a href="/profile/{{ urlencode($profileUser->name) }}"
             ><img id="profilePic" class="tmbRound" src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0
                 alt="Avatar or Profile Picture for {{ $profileUser->name }}"></a>
     </div>
-    <div class="col-md-6 col-sm-9">
+    <div class="col-9">
 @else
-    <div class="col-md-8 col-sm-12">
+    <div class="col-12">
 @endif
 
-        <div class="slCard h100">
-        <a href="/profile/{{ urlencode($profileUser->name) }}"
-            ><h2 class="slBlueDark">{{ $profileUser->name }}</h2></a>
-        Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}
+        <h2 class="slBlueDark">{{ $profileUser->name }}'s Profile</h2>
+        <p>
         @if ($canEdit)
-            <br /><a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"
-                ><i class="fa fa-pencil" aria-hidden="true"></i> Edit User Info</a>
+            Email: {!! $profileUser->email !!}
+            @if ($profileUser->hasVerifiedEmail())
+                <nobr><span class="slGrey">
+                    <i class="fa fa-check-circle-o mL10" aria-hidden="true"></i> verified</span></nobr>
+            @endif <br />
+        @endif
+
+        Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}<br />
+
+        @if (trim($profileUser->listRoles()) != '')
+            Roles: {{ $profileUser->listRoles() }}<br />
+        @endif
+        </p>
+
+        @if ($canEdit)
+            <p><a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"
+                >Edit User Info</a></p>
         @endif
         @if ($canEdit)
             <div id="hidivEditProfile" class="nodeWrap disNon">
@@ -55,51 +68,17 @@
                 <div class="nodeHalfGap"></div>
                 <center><input type="submit" class="nFormBtnSub btn btn-primary btn-lg" value="Save Changes"></center>
                 <div class="nodeHalfGap"></div>
+
+                <p>To change your password, please <a href="/logout">logout</a>
+                then use the <a href="/password/reset">reset password</a>
+                tool from the login page.</p>
+
+                <div class="nodeHalfGap"></div>
                 </form>
             </div>
         @endif
-        </div>
-    </div>
-    <div class="col-md-4 col-sm-12">
-        <div class="slCard h100">
-            @if ($canEdit)
-                <div class="row mB10">
-                    <div class="col-lg-3 col-md-12 col-sm-3">Email:</div>
-                    <div class="col-lg-9 col-md-12 col-sm-9">
-                        {!! str_replace('@', '<div class="disIn mLn5"> </div>@', $profileUser->email) !!}
-                    @if ($profileUser->hasVerifiedEmail())
-                        <nobr><span class="slGrey">
-                            <i class="fa fa-check-circle-o mL10" aria-hidden="true"></i> verified</span></nobr>
-                    @endif
-                    </div>
-                </div>
-            @endif
-            @if (trim($profileUser->listRoles()) != '')
-                <div class="row mB10">
-                    <div class="col-lg-3 col-md-12 col-sm-3">Roles:</div>
-                    <div class="col-lg-9 col-md-12 col-sm-9">{{ $profileUser->listRoles() }}</div>
-                </div>
-            @endif
-            @if (isset($uID) && $profileUser->id == $uID) <a href="/logout" class="pull-right">Logout</a> @endif
-            @if ($canEdit)
-                <a id="hidivBtnChgPass" class="hidivBtn" href="javascript:;">Change Password</a>
-                <div id="hidivChgPass" class="disNon mT0">
-                    <br />Please <a href="/logout">logout</a> then use the <a href="/password/reset">reset password</a>
-                    tool from the login page.
-                    <?php /*
-                    @if (Session::has('success'))
-                        <div class="alert alert-success">{!! Session::get('success') !!}</div>
-                    @endif
-                    @if (Session::has('failure'))
-                        <div class="alert alert-danger">{!!  Session::get('failure') !!}</div>
-                    @endif
-                    <hr>{!! view('vendor.survloop.auth.pass-change-form')->render() !!}
-                    */ ?>
-                </div>
-            @endif
-        </div>
+
     </div>
 </div>
-<div class="p10"></div>
 
 <style> #unfinishedList { display: block; } </style>

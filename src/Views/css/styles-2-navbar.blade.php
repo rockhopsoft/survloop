@@ -11,7 +11,6 @@
 	min-height: 56px;
 	max-height: 56px;
 	padding-top: 1px;
-	overflow: hidden;
 	color: {!! $css["color-nav-text"] !!};
 }
 .navbar, #myNavBar, #myNavBar .navbar {
@@ -21,6 +20,132 @@
     clear: both;
 	background: {!! $css["color-nav-bg"] !!};
 	margin-left: -1px;
+}
+
+#topNavSearchBtn {
+    display: block;
+    margin-left: 30px;
+}
+#dashSearchFrmWrap {
+    position: relative;
+    width: 420px;
+    height: 40px;
+    margin-top: 7px;
+}
+#topNavSearchBtn {
+    display: block;
+    margin-left: 15px;
+}
+#topNavSearch {
+    display: none;
+    position: relative;
+    margin-left: 15px;
+}
+.topNavSearch #dashSearchFrmWrap #dashSearchBg,
+.topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
+    position: absolute;
+    z-index: 10;
+    top: 0px;
+    left: 0px;
+    width: 420px;
+    height: 40px;
+    background: {!! $css["color-main-bg"] !!};
+    opacity:0.1; filter:alpha(opacity=10);
+}
+.topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
+    opacity:0.95; filter:alpha(opacity=95);
+}
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:link, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:active, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:visited, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:hover,
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:link, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:active, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:hover,
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:link, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:hover,
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:link, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:hover {
+    position: absolute;
+    z-index: 99;
+    width: 20px;
+    top: 3px;
+    color: {!! $css["color-main-bg"] !!};
+    padding: 5px;
+}
+.topNavSearch #dashSearchFrmWrap #admSrchFld {
+    color: {!! $css["color-main-bg"] !!};
+}
+
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:link, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:active, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:visited, 
+.topNavSearch #dashSearchFrmWrap a#dashSearchBtn:hover,
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:link, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:active, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:hover {
+    left: 10px;
+}
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:link, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
+.topNavSearch #dashSearchFrmWrap a#hidivBtnSearchOpts:hover,
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:link, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:hover {
+    right: 10px;
+}
+.topNavSearchActive #dashSearchFrmWrap #admSrchFld,
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:link, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:active, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#dashSearchBtn:hover,
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:link, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
+.topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:hover {
+    color: {!! $css["color-main-text"] !!};
+}
+#admSrchFld {
+    position: absolute;
+    left: 40px;
+    top: 5px;
+    border: 0px none;
+    background: none; 
+    background-color: none;
+    z-index: 80;
+    width: 340px;
+}
+#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, #admSrchFld a:active, #admSrchFld a:hover {
+    color: {!! $css["color-main-bg"] !!};
+}
+#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, #admSrchFld::-ms-input-placeholder {
+    color: {!! $css["color-main-bg"] !!};
+}
+#hidivSearchOpts {
+    display: none;
+    position: absolute;
+    z-index: 99;
+    left: -1px;
+    top: 41px;
+    width: 422px;
+    height: 200px;
+    color: {!! $css["color-main-text"] !!};
+    background: {!! $css["color-main-bg"] !!};
+    border: 1px {!! $css["color-nav-bg"] !!} solid;
+}
+.srchOpt {
+    width: 100%;
+    height: 30px;
+    padding: 10px 15px;
+
 }
 
 .headGap {

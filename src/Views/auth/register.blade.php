@@ -12,9 +12,8 @@
     @else value="{{ URL::previous() }}"
     @endif >
 
-<div class="w100"><center><div id="treeWrap" class="treeWrapForm">
-
-<div class="p20"></div>
+<div class="w100" style="padding-top: 30px;"><center><div id="treeWrap" class="treeWrapForm">
+    <div class="slCard">
 
 @if (!isset($sysOpts["signup-instruct"])
     || trim($sysOpts["signup-instruct"]) != '<h2 class="mT5 mB0">Create Admin Account</h2>')
@@ -125,6 +124,7 @@
     <div class="pageBotGap"></div>
 @endif
 
+    </div>
 </div></center></div>
 
 @if (isset($formFooter)) {!! $formFooter !!} @endif

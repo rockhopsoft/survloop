@@ -733,6 +733,9 @@ class Globals extends GlobalsImportExport
         $page = new SLSessPage;
         $page->SessPageSessID = $sess->SiteSessID;
         $page->SessPageURL = ((isset($_SERVER["REQUEST_URI"])) ? $_SERVER["REQUEST_URI"] : '');
+        if (strlen($page->SessPageURL) > 255) {
+            $page->SessPageURL = substr($page->SessPageURL, 0, 255);
+        }
         $page->save();
         return true;
     }
