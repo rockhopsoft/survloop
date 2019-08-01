@@ -867,7 +867,6 @@ class AdminDBController extends AdminController
                 $sorts[] = array($def->DefID, $def->DefValue);
             }
         }
-        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.elements.inc-sortable', [
             'submitURL' => $submitURL,
             'sortID'    => 'definitions',
@@ -916,7 +915,6 @@ class AdminDBController extends AdminController
                 ];
             }
         }
-        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.elements.inc-sortable', [
             'sortID'    => 'tables',
             'sortTitle' => $sortTitle, 
@@ -970,7 +968,6 @@ class AdminDBController extends AdminController
                 ];
             }
         }
-        $this->v["needsJqUi"] = true;
         $this->v["sortable"] = view('vendor.survloop.elements.inc-sortable', [
             'sortID'    => 'fields',
             'sortTitle' => $sortTitle, 

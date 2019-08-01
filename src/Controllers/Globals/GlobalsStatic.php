@@ -614,7 +614,8 @@ class GlobalsStatic
         $min = floor($sec/60);
         $m = ($min%60);
         $h = floor($min/60);
-        return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') . $m . ':' . (($s < 10) ? '0' : '') . $s;
+        return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') 
+            . $m . ':' . (($s < 10) ? '0' : '') . $s;
     }
     
     public function numSupscript($num)
@@ -1065,6 +1066,22 @@ class GlobalsStatic
         unset($this->x["pageAJAX"]);
         unset($this->x["pageCSS"]);
         return true;
+    }
+    
+    public function dateToTime($dateStr = '')
+    {
+        list($month, $day, $year) = ['', '', ''];
+        if (trim($dateStr) != '') {
+            if (strpos($dateStr, '-') > 0) {
+                return strtotime(substr($dateStr, 0, 10));
+            } elseif (strpos($dateStr, '/') > 0) {
+                list($month, $day, $year) = explode('/', $dateStr);
+                if (intVal($month) > 0 && intVal($day) > 0 && intVal($year) > 0) {
+                    return strtotime($year . '-' . $month . '-' . $day);
+                }
+            }
+        }
+        return 0;
     }
     
     public function printTimeZoneShift($timeStr = '', $hourShift = -5, $format = 'n/j g:ia')

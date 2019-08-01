@@ -305,20 +305,34 @@ class SurvLoopController extends Controller
     protected function genCacheKey($baseOverride = '')
     {
         $this->cacheKey = str_replace('/', '.', $this->v["currPage"][0]);
-        if ($baseOverride != '')  $this->cacheKey = $baseOverride;
+        if ($baseOverride != '') {
+            $this->cacheKey = $baseOverride;
+        }
         $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID;
         $this->cacheKey .= '.tree' . $GLOBALS["SL"]->treeID;
-        if ($this->v["isPrint"])  $this->cacheKey .= '.print';
-        if ($this->v["isAll"])    $this->cacheKey .= '.all';
-        if ($this->v["isAlt"])    $this->cacheKey .= '.alt';
-        if ($this->v["isExcel"])  $this->cacheKey .= '.excel';
+        if ($this->v["isPrint"]) {
+            $this->cacheKey .= '.print';
+        }
+        if ($this->v["isAll"]) {
+            $this->cacheKey .= '.all';
+        }
+        if ($this->v["isAlt"]) {
+            $this->cacheKey .= '.alt';
+        }
+        if ($this->v["isExcel"]) {
+            $this->cacheKey .= '.excel';
+        }
         return $this->cacheKey;
     }
     
     protected function checkCache($baseOverride = '')
     {
-        if ($baseOverride != '') $this->genCacheKey($baseOverride);
-        if ($GLOBALS["SL"]->REQ->has('refresh')) Cache::forget($this->cacheKey);
+        if ($baseOverride != '') {
+            $this->genCacheKey($baseOverride);
+        }
+        if ($GLOBALS["SL"]->REQ->has('refresh')) {
+            Cache::forget($this->cacheKey);
+        }
         if (Cache::store('file')->has($this->cacheKey)) {
             $this->v["content"] = Cache::store('file')->get($this->cacheKey);
             return true;
@@ -642,7 +656,9 @@ class SurvLoopController extends Controller
             ->where('TokCoreID', $coreID)
             ->where('TokUserID', $userID)
             ->first();
-        if ($tokRow && isset($tokRow->TokTokToken)) return $tokRow->TokTokToken;
+        if ($tokRow && isset($tokRow->TokTokToken)) {
+            return $tokRow->TokTokToken;
+        }
         return '';
     }
     

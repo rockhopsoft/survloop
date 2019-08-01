@@ -32,7 +32,9 @@
     max-height: 42px;
 }
 .admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
-.admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover {
+.admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover,
+.admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
+.admMenu .admMenuTier2 a.admMenuTier2Lnk:link, .admMenu .admMenuTier2 a.admMenuTier2Lnk:visited, .admMenu .admMenuTier2 a.admMenuTier2Lnk:active, .admMenu .admMenuTier2 a.admMenuTier2Lnk:hover {
     padding: 10px 5px 10px 62px;
     font-weight: normal;
 }
@@ -42,6 +44,13 @@ a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:h
     background: {!! $css["color-main-faint"] !!};
     height: 33px;
     max-height: 33px;
+}
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:link,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:visited,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:active,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:hover {
+    display: none;
 }
 
 #slTopTabsWrap {
@@ -126,7 +135,6 @@ a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:h
 }
 .leftSideCollapse, .leftSideCollapse #leftSideWdth, .leftSideCollapse #leftSideWrap {
     width: 60px;
-    overflow-x: hidden;
 }
 .admMenuLbl {
     display: inline;

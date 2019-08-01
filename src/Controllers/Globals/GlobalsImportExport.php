@@ -944,7 +944,7 @@ class GlobalsImportExport extends GlobalsTables
     public function clearOldDynascript($minAge = 0)
     {
         if ($minAge <= 0 || $minAge >= mktime(0, 0, 0, date("n"), date("j")+1, date("Y"))) {
-            $minAge = mktime(0, 0, 0, date("n"), date("j")-4, date("Y"));
+            $minAge = mktime(0, 0, 0, date("n"), date("j")-3, date("Y"));
         }
         $safeDates = [];
         for ($i = mktime(0, 0, 0, date("n"), date("j")+1, date("Y")); $i >= $minAge; $i -= (60*60*24)) {
@@ -955,9 +955,10 @@ class GlobalsImportExport extends GlobalsTables
         if (sizeof($files) > 0) {
             foreach ($files as $i => $file) {
                 $cnt++;
-                if ($cnt < 1000) {
-                    $delete = true;
+                if ($cnt < 100) {
+                    $delete = false;
                     if ($this->getFileExt($file) != 'html') {
+                        $delete = true;
                         $filenameParts = $GLOBALS["SL"]->mexplode('-', $file);
                         if (isset($filenameParts[0]) && in_array($filenameParts[0], $safeDates)) {
                             $delete = false;

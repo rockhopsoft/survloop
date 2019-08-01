@@ -121,7 +121,7 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
 
 <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
-<td id="leftSide" class="leftSide">
+<td id="leftSide" class="leftSideCollapse">
     <div id="leftSideWdth"></div>
     <div id="leftSideWrap">
         <div id="leftAdmMenu">
@@ -178,7 +178,6 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 <div class="headGap">
     <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
 </div>
-<div id="progWrap"></div>
 
 <noscript><div class="alert alert-dismissible alert-warning">
     <b>Warning: It looks like you have JavaScript disabled.

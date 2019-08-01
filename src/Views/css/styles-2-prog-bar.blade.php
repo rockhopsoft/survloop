@@ -1,14 +1,5 @@
 /* generated from resources/views/vendor/survloop/css/styles-2-prog-bar.blade.php */
 
-#progWrap {
-    display: block;
-	background: {!! $css["color-main-faint"] !!};
-}
-#progWrap .progress {
-    height: 6px;
-    -moz-border-radius: 0px; border-radius: 0px;
-}
-
 .stepNum {
 	display: block;
 	font-size: 12pt;                                      

@@ -344,12 +344,15 @@ class TreeSurvFormVarieties extends UserProfile
     
     public function inputMobileCls($nID)
     {
-        return (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->nodeRow->NodeOpts%2 > 0) ? ' fingerTxt' : '';
+        return (isset($this->allNodes[$nID]) 
+            && $this->allNodes[$nID]->nodeRow->NodeOpts%2 > 0) 
+            ? ' fingerTxt' : '';
     }
     
     protected function isNodeJustH1($nodePrompt)
     {
-        return (substr($nodePrompt, 0, 3) == '<h1' && substr($nodePrompt, strlen($nodePrompt)-5) == '</h1>');
+        return (substr($nodePrompt, 0, 3) == '<h1' 
+            && substr($nodePrompt, strlen($nodePrompt)-5) == '</h1>');
     }
     
     protected function cleanDateVal($dateStr)
@@ -365,9 +368,11 @@ class TreeSurvFormVarieties extends UserProfile
         $ret = '';
         if ($nodeRow->NodeOpts%31 == 0 || $nodeRow->NodeOpts%47 == 0) {
             $ret .= '<div id="currWordCount" class="fL pT15">'
-                . (($nodeRow->NodeOpts%47 == 0) ? 'Word count limit: ' . intVal($nodeRow->NodeCharLimit) . '. ' : '')
+                . (($nodeRow->NodeOpts%47 == 0) ? 'Word count limit: ' 
+                    . intVal($nodeRow->NodeCharLimit) . '. ' : '')
                 . (($nodeRow->NodeOpts%31 == 0) 
-                    ? 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>' : '')
+                    ? 'Current word count: <div id="wordCnt' . $nIDtxt
+                    . '" class="disIn"></div>' : '')
             . '</div><div class="fC"></div>';
         }
         return $ret;
@@ -377,10 +382,10 @@ class TreeSurvFormVarieties extends UserProfile
     {
         list($month, $day, $year) = ['', '', ''];
         if (trim($dateStr) != '') {
-            list($month, $day, $year) = explode('/', $dateStr);
-            if (intVal($month) == 0 || intVal($day) == 0 || intVal($year) == 0) {
-                list($month, $day, $year) = ['', '', ''];
-            }
+            $dateTime = $GLOBALS["SL"]->dateToTime($dateStr);
+            $month = date("m", strtotime($dateTime));
+            $day   = date("d", strtotime($dateTime));
+            $year  = date("Y", strtotime($dateTime));
         }
         return view('vendor.survloop.forms.formtree-date', [
             "nID"            => $nID,
@@ -391,7 +396,7 @@ class TreeSurvFormVarieties extends UserProfile
             "year"           => $year,
             "xtraClass"      => $xtraClass,
             "inputMobileCls" => $this->inputMobileCls($nID)
-            ])->render();
+        ])->render();
     }
     
     protected function formTime($nID, $timeStr = '00:00:00', $xtraClass = '')

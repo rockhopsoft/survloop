@@ -57,7 +57,8 @@ class PageLoadUtils extends Controller
     {
         if (isset($this->domainPath) && strpos($request->fullUrl(), $this->domainPath) === false) {
             if (strpos($this->domainPath, 'https://') !== false 
-                && strpos($request->fullUrl(), str_replace('https://', 'http://', $this->domainPath)) !== false) {
+                && strpos($request->fullUrl(), str_replace('https://', 'http://', $this->domainPath)) 
+                !== false) {
                 header("Location: " . str_replace('http://', 'https://', $request->fullUrl()));
                 exit;
             }
@@ -95,10 +96,11 @@ class PageLoadUtils extends Controller
             return ($this->isUserStaff() || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_PARTNER == 0) {
-            return ($this->isUserPartn() || $this->isUserAdmin());
+            return ($this->isUserPartn() || $this->isUserStaff() || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
-            return ($this->isUserVolun() || $this->isUserAdmin());
+            return ($this->isUserVolun() || $this->isUserPartn() 
+                || $this->isUserStaff() || $this->isUserAdmin());
         }
         return true;
     }
@@ -142,8 +144,10 @@ class PageLoadUtils extends Controller
     
     public function getPageDashPrefix($treeOpts = 1)
     {
-        if ($treeOpts%Globals::TREEOPT_ADMIN == 0 || $treeOpts%Globals::TREEOPT_STAFF == 0
-            || $treeOpts%Globals::TREEOPT_PARTNER == 0 || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+        if ($treeOpts%Globals::TREEOPT_ADMIN == 0 
+            || $treeOpts%Globals::TREEOPT_STAFF == 0
+            || $treeOpts%Globals::TREEOPT_PARTNER == 0 
+            || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
             return '/dash';
         }
         return '';
@@ -154,8 +158,10 @@ class PageLoadUtils extends Controller
         if (!$tree || !isset($tree->TreeOpts)) {
             return false;
         }
-        return ($tree->TreeOpts%Globals::TREEOPT_ADMIN > 0 && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
-            && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0);
+        return ($tree->TreeOpts%Globals::TREEOPT_ADMIN > 0 
+            && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
+            && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 
+            && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0);
     }
     
     public function loadTreeByID(Request $request, $treeID = -3)
@@ -250,7 +256,8 @@ class PageLoadUtils extends Controller
                 foreach ($perms as $perm) {
                     if ($searchTree === null) {
                         foreach ($trees as $tree) {
-                            if ($searchTree === null && $tree->TreeOpts%$perm == 0
+                            if ($searchTree === null 
+                                && $tree->TreeOpts%$perm == 0
                                 && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
                                 $searchTree = $tree;
                             }
@@ -260,10 +267,11 @@ class PageLoadUtils extends Controller
             }
             if ($searchTree === null) {
                 foreach ($trees as $tree) {
-                    if ($searchTree === null && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0
-                        && $tree->TreeOpts%Globals::TREEOPT_ADMIN > 0
-                        && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
-                        && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0
+                    if ($searchTree === null 
+                        && $tree->TreeOpts%Globals::TREEOPT_SEARCH   == 0
+                        && $tree->TreeOpts%Globals::TREEOPT_ADMIN     > 0
+                        && $tree->TreeOpts%Globals::TREEOPT_STAFF     > 0
+                        && $tree->TreeOpts%Globals::TREEOPT_PARTNER   > 0
                         && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
                         $searchTree = $tree;
                     }
@@ -282,8 +290,10 @@ class PageLoadUtils extends Controller
                 ->first();
             if ($redirTree && isset($redirTree->TreeDesc) && trim($redirTree->TreeDesc) != '') {
                 $redirURL = $redirTree->TreeDesc;
-                if (strpos($redirURL, $this->domainPath) === false && substr($redirURL, 0, 1) != '/'
-                    && strpos($redirURL, 'http://') === false && strpos($redirURL, 'https://') === false) {
+                if (strpos($redirURL, $this->domainPath) === false 
+                    && substr($redirURL, 0, 1)           != '/'
+                    && strpos($redirURL, 'http://')      === false 
+                    && strpos($redirURL, 'https://')     === false) {
                     $redirURL = '/' . $redirURL;
                 }
                 return $redirURL;
@@ -313,32 +323,38 @@ class PageLoadUtils extends Controller
                 foreach ($urlTrees as $t) {
                     if ($t && isset($t->TreeOpts) && $this->okToLoadTree($t->TreeOpts)) {
                         $rootNode = SLNode::find($t->TreeFirstPage);
-                        if ($rootNode && isset($t->TreeSlug) && isset($rootNode->NodePromptNotes)) {
-                            $redir = $this->dashPrfx . '/u/' . $t->TreeSlug . '/' . $rootNode->NodePromptNotes;
-                            if ($cid > 0) {
-                                $redir .= '?cid=' . $cid;
-                            } else {
-                                $redir .= '?start=1&new=' . rand(100000000, 1000000000);
-                            }
-                            $paramTxt = str_replace($this->domainPath . '/start/' . $t->TreeSlug, '', 
-                                str_replace($this->domainPath . '/dashboard/start/' . $t->TreeSlug, '', 
-                                $request->fullUrl()));
-                            if (substr($paramTxt, 0, 1) == '/') {
-                                $paramTxt = substr($paramTxt, 1);
-                            }
-                            if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
-                                $redir .= '&' . substr($paramTxt, 1);
-                            }
-                            if (intVal($cid) > 0) {
-                                $this->loadPageCID($request, $t, $cid);
-                            }
-                            return redirect($this->domainPath . $redir);
+                        if ($rootNode && isset($t->TreeSlug) 
+                            && isset($rootNode->NodePromptNotes)) {
+                            return $this->loadNodeTreeURLredir($request, $t, $cid);
                         }
                     }
                 }
             }
         }
         return redirect($this->domainPath . '/');
+    }
+    
+    protected function loadNodeTreeURLredir(Request $request, $tree = [], $cid = -3)
+    {
+        $redir = $this->dashPrfx . '/u/' . $tree->TreeSlug . '/' . $rootNode->NodePromptNotes;
+        if ($cid > 0) {
+            $redir .= '?cid=' . $cid;
+        } else {
+            $redir .= '?start=1&new=' . rand(100000000, 1000000000);
+        }
+        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->TreeSlug, '', 
+            str_replace($this->domainPath . '/dashboard/start/' . $tree->TreeSlug, '', 
+            $request->fullUrl()));
+        if (substr($paramTxt, 0, 1) == '/') {
+            $paramTxt = substr($paramTxt, 1);
+        }
+        if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
+            $redir .= '&' . substr($paramTxt, 1);
+        }
+        if (intVal($cid) > 0) {
+            $this->loadPageCID($request, $tree, $cid);
+        }
+        return redirect($this->domainPath . $redir);
     }
     
     public function loadPageCID(Request $request, $tree, $cid)
@@ -360,7 +376,8 @@ class PageLoadUtils extends Controller
             }
             if ($request->has("n") && intVal($request->get("n")) > 0) {
                 $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
-            } elseif ($sess->SessCurrNode == -86) { // last session deactivate (hopefully completed)
+            } elseif ($sess->SessCurrNode == -86) {
+                // last session deactivate (hopefully completed)
                 $sess->update([ 'SessCurrNode' => $tree->TreeRoot ]);
             }
             session()->put('sessID' . $tree->TreeID, $sess->SessID);
@@ -431,11 +448,15 @@ class PageLoadUtils extends Controller
     protected function treeRightType($treeOpts = 1)
     {
         if ($this->isAdminPage) {
-            return ($treeOpts%Globals::TREEOPT_ADMIN == 0 || $treeOpts%Globals::TREEOPT_STAFF == 0
-                || $treeOpts%Globals::TREEOPT_PARTNER == 0 || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0);
+            return ($treeOpts%Globals::TREEOPT_ADMIN    == 0 
+                || $treeOpts%Globals::TREEOPT_STAFF     == 0
+                || $treeOpts%Globals::TREEOPT_PARTNER   == 0 
+                || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0);
         }
-        return ($treeOpts%Globals::TREEOPT_ADMIN > 0 && $treeOpts%Globals::TREEOPT_STAFF > 0
-            && $treeOpts%Globals::TREEOPT_PARTNER > 0 && $treeOpts%Globals::TREEOPT_VOLUNTEER > 0);
+        return ($treeOpts%Globals::TREEOPT_ADMIN    > 0 
+            && $treeOpts%Globals::TREEOPT_STAFF     > 0
+            && $treeOpts%Globals::TREEOPT_PARTNER   > 0 
+            && $treeOpts%Globals::TREEOPT_VOLUNTEER > 0);
     }
     
     public function isUserAdmin()
@@ -460,6 +481,7 @@ class PageLoadUtils extends Controller
 
     protected function urlNotResourceFile($str)
     {
+        $types = [ 'css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2' ];
         $str = trim($str);
         if ($str == '') {
             return false;
@@ -467,7 +489,7 @@ class PageLoadUtils extends Controller
         $dot = strrpos($str, '.');
         if ($dot > 0) {
             $sffx = substr($str, $dot);
-            if (in_array(strtolower($sffx), ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2'])) {
+            if (in_array(strtolower($sffx), $types)) {
                 return false;
             }
         }

@@ -126,8 +126,7 @@ class TreeSurvProgBar extends TreeSurvLoad
                 "currMinorSection"  => $this->currMinorSection, 
                 "majTot"            => $majTot,
                 "rawPerc"           => $rawPerc
-                ])->render();
-            $GLOBALS['SL']->pageJAVA .= 'document.getElementById("progWrap").style.display = "none";' . "\n";
+            ])->render();
         }
         $GLOBALS['SL']->pageJAVA .= $this->tweakProgBarJS();
         return $ret;

@@ -254,12 +254,12 @@ class Searcher extends SurvCustLoop
             if ($GLOBALS["SL"]->REQ->has('states')) {
                 $this->getSearchFiltsStates($GLOBALS["SL"]->REQ->get('states'));
             }
-            if ($GLOBALS["SL"]->REQ->has('stateClim')) {
-                $stateClim = trim($GLOBALS["SL"]->REQ->get('stateClim'));
+            if ($GLOBALS["SL"]->REQ->has('fltStateClim')) {
+                $stateClim = trim($GLOBALS["SL"]->REQ->get('fltStateClim'));
                 if ($stateClim != '' && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
                     || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
                     || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
-                    $this->searchFilts["stateClim"] = $stateClim;
+                    $this->searchFilts["fltStateClim"] = $stateClim;
                 }
             }
             if ($GLOBALS["SL"]->REQ->has('limit') && trim($GLOBALS["SL"]->REQ->get('limit')) != '') {

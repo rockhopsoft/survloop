@@ -12,7 +12,8 @@
     @else value="{{ URL::previous() }}"
     @endif >
 
-<div class="w100" style="padding-top: 30px;"><center><div id="treeWrap" class="treeWrapForm">
+<div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
+<div id="treeWrap" class="treeWrapForm">
     <div class="slCard">
 
 @if (!isset($sysOpts["signup-instruct"])
@@ -133,10 +134,17 @@
 
 <script type="text/javascript" src="/survloop/zxcvbn.js"></script>
 <script type="text/javascript">
-@if ($GLOBALS["SL"]->sysHas('volunteers'))
-setTimeout(function() { if (findGetParam('volunteer')) document.getElementById('newVolunteerID').checked=true; }, 50);
-@endif
 $(document).ready(function(){
+    setTimeout(function() {
+        if (document.getElementById('nondialog')) {
+            document.getElementById('nondialog').className = "row2"; 
+        }
+    }, 10);
+@if ($GLOBALS["SL"]->sysHas('volunteers'))
+    setTimeout(function() {
+        if (findGetParam('volunteer')) document.getElementById('newVolunteerID').checked=true;
+    }, 50);
+@endif
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
 });</script>
 

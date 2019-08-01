@@ -5,8 +5,12 @@
 }
 @media screen and (max-width: 992px) {
     
-	#navDesktop { display: none; }
-	#navMobile { display: block; }
+	#navDesktop {
+        display: none;
+    }
+	#navMobile {
+        display: block;
+    }
 	
     a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover {
         display: none;
@@ -14,10 +18,19 @@
     a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
 	    display: block;
 	}
-    #leftSideWdth { width: 24px; }
-    #leftSideWrap { width: 24px; padding: 0px 6px; }
-    #leftAdmMenu { display: none; }
-    #mainBody { padding: 0px; }
+    #leftSideWdth {
+        width: 24px;
+    }
+    #leftSideWrap {
+        width: 24px;
+        padding: 0px 6px;
+    }
+    #leftAdmMenu {
+        display: none;
+    }
+    #mainBody {
+        padding: 0px;
+    }
     @media screen and (max-height: 650px) {
         #leftSideWrap { position: static; }
     }
@@ -25,12 +38,33 @@
 }
 @media screen and (max-width: 768px) {
 	
-	input.nFormBtnSub, input.nFormBtnBack { font-size: 20pt; }
-	#logoTxt { padding-left: 0px; margin-top: -2px; margin-left: -5px; }
-	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 { font-size: 18pt; }
-	.nodeWrap .jumbotron, .nPrompt .jumbotron { padding: 30px 20px 30px 20px; }
-    input.otherGender { width: 240px; }
-    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg {
+	input.nFormBtnSub, input.nFormBtnBack {
+        font-size: 20pt;
+    }
+    #slLogo {
+        margin: 7px 0px 0px 12px;
+    }
+	#logoTxt {
+        padding-left: 0px;
+        margin-top: -2px;
+        margin-left: -5px;
+    }
+    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
+    .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
+    .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
+        margin-right: -2px;
+    }
+	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
+        font-size: 18pt;
+    }
+	.nodeWrap .jumbotron, .nPrompt .jumbotron {
+        padding: 30px 20px 30px 20px;
+    }
+    input.otherGender {
+        width: 240px;
+    }
+    table.slSpreadTbl tr td.sprdFld input.form-control-lg,
+    table.slSpreadTbl tr td.sprdFld select.form-control-lg {
         padding: 5px;
     }
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 

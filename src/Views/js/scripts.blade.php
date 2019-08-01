@@ -212,7 +212,7 @@ function startCountdown(divID, cntFrom, inc) {
 function openNav() {
     document.getElementById("mySidenav").style.boxShadow = "0px 2px 4px {!! $css["color-main-grey"] !!}";
     document.getElementById("mySidenav").style.width = "300px";
-    document.getElementById("main").style.marginRight = "300px";
+    /* document.getElementById("main").style.marginRight = "300px"; */
     if (document.getElementById("userMenuBtn") && document.getElementById("userMenuArr")) {
         document.getElementById("userMenuArr").className = "fa fa-caret-up mL3";
     }
@@ -221,7 +221,7 @@ function openNav() {
 function closeNav() {
     document.getElementById("mySidenav").style.boxShadow = "none";
     document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginRight = "0";
+    /* document.getElementById("main").style.marginRight = "0"; */
     if (document.getElementById("userMenuBtn") && document.getElementById("userMenuArr")) {
         document.getElementById("userMenuArr").className = "fa fa-caret-down mL3";
     }
@@ -306,8 +306,17 @@ function addTopNavItem(navTxt, navLink) {
     }
     return true;
 }
+var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars'])) ? $GLOBALS['SL']->sysOpts['has-avatars'] : '') }}";
+
 function addTopUserBurger(username) {
-    var navCode = "<a id=\"userMenuBtn\" class=\"float-right slNavLnk\" href=\"javascript:;\">"+username+" <i id=\"userMenuArr\" class=\"fa fa-caret-down mL3\" aria-hidden=\"true\"></i></a>";
+    if (!document.getElementById("myNavBar") || document.getElementById("myNavBar").innerHTML.indexOf("userMenuBtn") >= 0) {
+        return false;
+    }
+    var navCode = "<a id=\"userMenuBtn\" class=\"float-right slNavLnk\" href=\"javascript:;\"><div id=\"userMenuBtnWrp\">";
+    if (userAvatar.trim() != "") {
+        navCode += "<div id=\"userMenuBtnAvatar\"><img src=\""+userAvatar+"\" border=0 ></div>";
+    }
+    navCode += username+" <i id=\"userMenuArr\" class=\"fa fa-caret-down\" aria-hidden=\"true\"></i></div></a>";
     addTopCust(navCode);
     return true;
 }
@@ -320,22 +329,16 @@ function addSideNavItem(navTxt, navLink) {
     }
     return true;
 }
+var headProgBarPerc = 0;
 function printHeadBar(percIn) {
-    if (percIn > 0) {
-        progressPerc = percIn;
-        if (document.getElementById("progWrap")) document.getElementById("progWrap").innerHTML = getProgBar();
-    }
-    return true;
-}
-function getProgBar() {
-    return "<div class=\"progress progress-striped progress-bar-animated\"><div class=\"progress-bar bg-striped\" role=\"progressbar\" aria-valuenow=\""+progressPerc+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:"+progressPerc+"%\"><span class=\"sr-only\">"+progressPerc+"% Complete</span></div></div>";
+    headProgBarPerc = percIn;
 }
 
 function getStateList() {
     return new Array({!! $GLOBALS["SL"]->states->printAllAbbrs() !!});
 }
 
-var closeAdmMenuOnLoad = false;
+var openAdmMenuOnLoad = false;
 var sView = 'list';
 var resultLoaded = 0;
 var dashHeight = 0;

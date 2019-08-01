@@ -27,6 +27,7 @@ body, p, .slTxt {
     width: 100%;
     min-height: 100%;
     overflow: visible;
+    padding-bottom: 60px;
 }
 #ajaxWrapLoad {
     display: block;
@@ -62,7 +63,6 @@ body, p, .slTxt {
 #footerLinks {
     display: block;
     max-width: 730px;
-    margin: 40px 15px 20px 15px;
 }
 
 {!! view('vendor.survloop.css.styles-2-debug', [ "css" => $css ])->render() !!}

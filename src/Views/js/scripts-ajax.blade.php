@@ -194,10 +194,6 @@ $(document).ready(function(){
 	    return false;
 	});
 	
-    $(document).on("click", "#userMenuBtn", function() {
-        toggleNav();
-    });
-
     var dontHideSearch = false;
     function chkSearchOnLoad() {
         if (document.getElementById("admSrchFld") && document.getElementById("admSrchFld").value && document.getElementById("admSrchFld").value.trim() != '') {
@@ -547,14 +543,34 @@ $(document).ready(function(){
 	});
 	
 	
-	
 	$(document).on("click", ".ajx", function() {
         var ajxUrl = $(this).attr("data-ajx");
         var dest = $(this).attr("data-dst");
         if (document.getElementById(dest)) $("#"+dest+"").load(ajxUrl);
 	});
     
-	function chkMenuLoad() {
+    $(document).on("click", "#userMenuBtn", function() {
+        toggleNav();
+    });
+
+    function chkMenuProgLoad() {
+        if (headProgBarPerc <= 0 || !document.getElementById("myNavBar") || document.getElementById("myNavBar").innerHTML.indexOf("userMenuProg") >= 0) {
+            return false;
+        }
+        document.getElementById("myNavBar").innerHTML += "<canvas id=\"userMenuProg\" class=\"float-right\" width=\"240\" height=\"240\" style=\"width: 120px; height: 120px;\"></canvas>";
+        $('#userMenuProg').radialIndicator({
+            barColor: '{!! $css["color-main-on"] !!}',
+            barWidth: 10,
+            initValue: headProgBarPerc,
+            roundCorner : true,
+            percentage: true
+        });
+        var radialObj = $('#userMenuProg').data('radialIndicator');
+        radialObj.animate(60);
+    }
+    setTimeout(function() { chkMenuProgLoad(); }, 1000);
+
+    function chkMenuLoad(last) {
 	    if ((!document.getElementById('loginLnk') && !document.getElementById('userMenu')) && document.getElementById('headClear')) {
             var redirUrl = "/js-load-menu";
             if (currTreeType == 'Survey' && currPage[1].trim() != '') redirUrl += "?currPage="+encodeURIComponent(currPage[1])+'&nd='+currTreeNode+'';
@@ -562,7 +578,7 @@ $(document).ready(function(){
 	    }
 	}
     setTimeout(function() { chkMenuLoad(); }, 500);
-    setTimeout(function() { chkMenuLoad(); }, 2000);
+    setTimeout(function() { chkMenuLoad(true); }, 2000);
 	
     $(document).on("click", ".adminAboutTog", function() {
         if (document.getElementById('adminAbout')) {
@@ -927,26 +943,29 @@ $(document).ready(function(){
     }
     $(document).on("click", "#admMenuClpsBtn", function() {
         if (document.getElementById("leftSide")) {
-            if (document.getElementById("leftSide").className == 'leftSide') {
-                closeAdmMenu();
+            if (document.getElementById("leftSide").className.localeCompare('leftSideCollapse') == 0) {
+                return openAdmMenu();
             } else {
-                openAdmMenu();
+                return closeAdmMenu();
             }
         }
         return false;
     });
     setTimeout(function() { 
-        if (closeAdmMenuOnLoad) closeAdmMenu();
-    }, 10);
-
-
+        if (openAdmMenuOnLoad) openAdmMenu();
+    }, 500);
     $(window).resize(function() {
-        setTimeout(function() { 
-            if ($(window).width() <= 992) closeAdmMenu();
-            else openAdmMenu();
+        setTimeout(function() {
             chkFixedHeaders(false);
-        }, 10);
+        }, 5);
     });
+    $(document).on("click", ".admMenuTier1Lnk", function() {
+        openAdmMenu();
+    });
+    $(document).on("click", ".admMenuTier2Lnk", function() {
+        openAdmMenu();
+    });
+
     
     $(document).on("click", ".clickBox", function() {
         if ($(this).attr("data-url")) window.location=$(this).attr("data-url");

@@ -9,6 +9,7 @@
   */
 namespace SurvLoop\Controllers\Stats;
 
+use SurvLoop\Controllers\SystemDefinitions;
 use SurvLoop\Controllers\Stats\SurvStatsCore;
 
 class SurvTrends extends SurvStatsCore
@@ -93,7 +94,8 @@ class SurvTrends extends SurvStatsCore
                 if ($dateIndex >= 0) {
                     foreach ($this->datMap as $dLet => $datMap) {
                         if (isset($datMap["rowFld"]) && trim($datMap["rowFld"]) != ''
-                            && isset($statRec->{ $datMap["rowFld"] }) && $statRec->{ $datMap["rowFld"] } !== null) {
+                            && isset($statRec->{ $datMap["rowFld"] }) 
+                            && $statRec->{ $datMap["rowFld"] } !== null) {
                             $this->dataDays[$dLet][$dateIndex] = $statRec->{ $datMap["rowFld"] };
                         }
                     }
@@ -113,18 +115,20 @@ class SurvTrends extends SurvStatsCore
         return true;
     }
     
-    public function printDailyGraph($height = 400)
+    public function printDailyGraph($height = 500)
     {
-//echo 'printDailyGraph(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
-        $GLOBALS["SL"]->x["needsCharts"] = true;
+        $GLOBALS["SL"]->x["needsPlots"] = true;
         $this->loadAxisPastDayLabels();
-        return view('vendor.survloop.reports.graph-trend-lines', [
+//echo 'printDailyGraph(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
+        $sysDef = new SystemDefinitions;
+        return view('vendor.survloop.reports.graph-bar-grouped', [
             "nIDtxt"     => $this->nIDtxt,
             "datMap"     => $this->datMap,
             "axisLabels" => $this->axisLabels,
             "dataDays"   => $this->dataDays,
-            "height"     => $height
-            ])->render();
+            "height"     => $height,
+            "css"        => $sysDef->loadCss()
+        ])->render();
     }
     
 }

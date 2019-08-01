@@ -168,7 +168,7 @@
     height: 100%;
     width: 0;
     position: fixed;
-    z-index: 1;
+    z-index: 99;
     top: 0;
     right: 0;
     border-left: 0px none;
@@ -194,6 +194,9 @@
 @media screen and (max-height: 450px) {
     #mySidenav a {font-size: 18px;}
 } 
+#mySideUL {
+    padding-top: 10px;
+}
 
 a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
 .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
@@ -290,4 +293,32 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 
 a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
 	color: {!! $css["color-nav-text"] !!};
+}
+
+#userMenuBtnWrp {
+    position: relative;
+    padding: 0px 18px 0px 49px;
+}
+#userMenuArr, #userMenuBtnWrp #userMenuArr {
+    position: absolute;
+    top: 3px;
+    right: 0px;
+}
+#userMenuBtnAvatar, #userMenuBtnWrp #userMenuBtnAvatar {
+    position: absolute;
+    top: -6px;
+    left: 2px;
+    border: 1px {!! $css["color-main-grey"] !!} solid;
+    -moz-border-radius: 19px; border-radius: 19px;
+    height: 36px;
+    max-height: 36px;
+    width: 36px;
+    max-width: 36px;
+    overflow: hidden;
+}
+#userMenuBtnAvatar img, #userMenuBtnWrp #userMenuBtnAvatar img {
+    border: 0px none;
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
 }

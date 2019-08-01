@@ -24,7 +24,7 @@ class SurvStatsTbl
         $this->lineCols = $lineCols;
         $this->rows = [
             [ new SurvStatTh(), new SurvStatTh($colPrfx, 0) ]
-            ];
+        ];
     }
     
     public function addHeaderCol($label = '', $cnt = -3)
@@ -63,6 +63,17 @@ class SurvStatTh
     {
         return $this->lab . (($this->cnt >= 0) ? '<sub class="slGrey">' . $this->cnt . '</sub>' : '');
     }
+        
+    public function toExcel($j = 0, $brdRgt = false)
+    {
+        $ret = '<th' . (($j == 0) ? ' align=left ' : '') . '>'
+            . (($this->lab) ? $this->lab : '') . '</th>';
+        if ($j > 0) {
+            $ret .= '<th style="color: #777;' . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
+                . '">(count)</th>';
+        }
+        return $ret;
+    }
 }
 
 class SurvStatTd
@@ -80,8 +91,22 @@ class SurvStatTd
     
     public function __toString()
     {
-        if ($this->val === null) return '<span class="slGrey">0</span>';
+        if ($this->val === null) {
+            return '<span class="slGrey">0</span>';
+        }
         return $GLOBALS["SL"]->sigFigs($this->val, 3) . (($this->unit != '') ? $this->unit : '')
             . (($this->cnt >= 0) ? '<sub class="slGrey">' . $this->cnt . '</sub>' : '');
+    }
+        
+    public function toExcel($j = 0, $brdRgt = false)
+    {
+        if ($this->val === null) {
+            return '<td style="color: #777;"></td>'
+                . '<td style="color: #777;">' . $this->cnt . '</td>';
+        }
+        return '<td>' . $GLOBALS["SL"]->sigFigs($this->val, 3)
+            . (($this->unit != '') ? $this->unit : '') . '</td>'
+            . '<td style="color: #777;' . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
+            . '">' . number_format($this->cnt) . '</td>';
     }
 }

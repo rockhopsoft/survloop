@@ -41,35 +41,35 @@ table.repDeetsBlock tr td span, table.repDeetsBlock tr td div span,
     */
 }
 
-table.repDeetVert {
-    width: 100%;
+table.repDeetsBlock.repDeetVert tr td .relDiv {
+    padding-left: 30px;
 }
-table.repDeetVert, table.repDeetVert tr td, table.repDeetVert tr th {
-    border: 0px;
-    padding: 3px 0px;
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv {
+    top: 2px;
+    left: 0px;
 }
-.vertPrgDone, table.repDeetVert tr td .vertPrgDone,
-.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr {
+.vertPrgDone, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
+.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
     margin: 6px 5px 9px 1px;
 	background: {!! $css["color-main-on"] !!};
 }
-.vertPrgCurr, table.repDeetVert tr td .vertPrgCurr {
+.vertPrgCurr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr {
     margin: 5px 4px 8px 0px;
 	border: 3px {!! $css["color-main-on"] !!} solid;
 }
-.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr {
+.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
     opacity:0.20; filter:alpha(opacity=20);
 }
-.vertPrgDone, table.repDeetVert tr td .vertPrgDone,
-.vertPrgDone img, table.repDeetVert tr td .vertPrgDone img,
-.vertPrgFutr, table.repDeetVert tr td .vertPrgFutr,
-.vertPrgFutr img, table.repDeetVert tr td .vertPrgFutr img {
+.vertPrgDone, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
+.vertPrgDone img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone img,
+.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr,
+.vertPrgFutr img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr img {
     width: 8px;
     height: 8px;
 	-moz-border-radius: 4px; border-radius: 4px;
 }
-.vertPrgCurr, table.repDeetVert tr td .vertPrgCurr, 
-.vertPrgCurr img, table.repDeetVert tr td .vertPrgCurr img {
+.vertPrgCurr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr, 
+.vertPrgCurr img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr img {
     width: 10px;
     height: 10px;
 	-moz-border-radius: 5px; border-radius: 5px;

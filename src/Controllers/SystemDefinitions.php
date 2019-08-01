@@ -284,6 +284,7 @@ class SystemDefinitions
             'user-name-req'   => ['Username Are Required To Register', '1 or 0'], 
             'has-partners'    => ['Has Partners User Area', '1 or 0'], 
             'has-volunteers'  => ['Has Volunteer User Area', '1 or 0'], 
+            'has-avatars'     => ['Default User Avatar Image', '/siteabrv/uploads/avatar-shell.png'], 
             'has-canada'      => ['Has Canadian Maps', '1 or 0'], 
             'parent-company'  => ['Parent Company of This Installation', 'MegaOrg'], 
             'parent-website'  => ['Parent Company\'s Website URL', 'http://www...'], 

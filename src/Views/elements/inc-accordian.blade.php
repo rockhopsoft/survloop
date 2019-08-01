@@ -10,7 +10,10 @@
 			    	@if ($open) class="fa fa-chevron-up" @else class="fa fa-chevron-down" @endif ></i>
 			    </div>
 				<div class="fL">
-					@if ($big) <h4>{!! $title !!}</h4> @elseif ($isText) {!! $title !!} @else <h6>{!! $title !!}</h6> @endif
+					@if ($big) <h4>{!! $title !!}</h4> 
+					@elseif ($isText) {!! $title !!} 
+					@else <h6>{!! $title !!}</h6>
+					@endif
 				</div>
 			    <div class="fC"></div>
 			</div>

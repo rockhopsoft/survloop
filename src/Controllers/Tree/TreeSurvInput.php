@@ -688,9 +688,13 @@ class TreeSurvInput extends TreeSurvUpload
             $emails = $GLOBALS["SL"]->mexplode(';', $rootNode->NodeDefault);
             if (sizeof($emails) > 0) {
                 $emaToArr = [];
-                foreach ($emails as $e) $emaToArr[] = [$e, ''];
+                foreach ($emails as $e) {
+                    $emaToArr[] = [$e, ''];
+                }
                 $emaSubj = strip_tags($this->pageCoreRow->ContSubject);
-                if (strlen($emaSubj) > 30) $emaSubj = trim(substr($emaSubj, 0, 30)) . '...'; 
+                if (strlen($emaSubj) > 30) {
+                    $emaSubj = trim(substr($emaSubj, 0, 30)) . '...'; 
+                }
                 $emaSubj = $GLOBALS["SL"]->sysOpts["site-name"] . ' Contact: ' . $emaTitle;
                 $emaContent = view('vendor.survloop.admin.contact-row', [
                     "contact"  => $this->pageCoreRow,
@@ -705,7 +709,9 @@ class TreeSurvInput extends TreeSurvUpload
     
     protected function processPageForm($nID = -3, $tmpSubTier = [], $slTable = '', $dumpFld = '')
     {
-        if (trim($slTable) == '') return false;
+        if (trim($slTable) == '') {
+            return false;
+        }
         eval("\$this->pageCoreRow = new App\\Models\\" . $slTable . ";");
         $extraData = $this->processPageFormInner($nID, $tmpSubTier);
         if (trim($extraData) != '' && trim($dumpFld) != '') {
@@ -724,7 +730,9 @@ class TreeSurvInput extends TreeSurvUpload
             if (isset($this->allNodes[$nID]->dataStore) 
                 && trim($this->allNodes[$nID]->dataStore) != '') {
                 $storeFld = trim($this->allNodes[$nID]->dataStore);
-                if (strpos($storeFld, ':') !== false) $storeFld = substr($storeFld, strpos($storeFld, ':')+1);
+                if (strpos($storeFld, ':') !== false) {
+                    $storeFld = substr($storeFld, strpos($storeFld, ':')+1);
+                }
                 if (sizeof($this->pageCoreFlds) > 0) {
                     foreach ($this->pageCoreFlds as $fld) {
                         if ($storeFld == $fld) {
@@ -734,7 +742,9 @@ class TreeSurvInput extends TreeSurvUpload
                     }
                 }
             }
-            if (!$found) $extraData .= '<p>' . $newVal . '</p>';
+            if (!$found) {
+                $extraData .= '<p>' . $newVal . '</p>';
+            }
         }
         if (sizeof($tmpSubTier[1]) > 0) {
             foreach ($tmpSubTier[1] as $childNode) {

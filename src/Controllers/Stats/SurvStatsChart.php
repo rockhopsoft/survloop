@@ -266,12 +266,14 @@ class SurvStatsChart extends SurvStats
                             if (!$this->isCurrHid($colLet, $colVal)) {
                                 $cell = -3737;
                                 $cellStr = $this->applyCurrFilt($colLet . $colVal . '-' . $rowStr);
+                                $colStr = $rowStr . '-' . $ratioStr;
                                 if (isset($this->dat[$cellStr]) && isset($this->dat[$cellStr]["dat"][$datLet]) 
                                     && isset($this->dat[$cellStr]["dat"][$datLet]["sum"]) 
-                                    && isset($this->dat[$colStr]) && isset($this->dat[$colStr]["dat"][$datLet]) 
+                                    && isset($this->dat[$colStr]) 
+                                    && isset($this->dat[$colStr]["dat"][$datLet]) 
                                     && $this->dat[$colStr]["dat"][$datLet]["sum"] > 0) {
-                                    $cell = round(100*$this->dat[$cellStr]["dat"][$datLet]["sum"
-                                        ]/$this->dat[$rowStr . '-' . $ratioStr]["dat"][$datLet]["sum"]);
+                                    $cell = round(100*$this->dat[$cellStr]["dat"][$datLet]["sum"]
+                                        /$this->dat[$colStr]["dat"][$datLet]["sum"]);
                                     $row[1] += $cell;
                                     $cell .= '%';
                                 }

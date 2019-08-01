@@ -705,7 +705,6 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
                 $loopCycle = $this->sessData->getLoopRows($loop);
                 if (sizeof($loopCycle) > 0) {
-                    $this->v["needsJqUi"] = true;
                     $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({ 
                         axis: "y", update: function (event, ui) {
                         var url = "/sortLoop/?n=' . $nID . '&"+$(this).sortable("serialize")+"";
@@ -866,7 +865,6 @@ class TreeSurvForm extends TreeSurvFormUtils
                             . '").style.display="none"; ';
                     }
                     if (trim($curr->nodeRow->NodeTextSuggest) != '') {
-                        $this->v["needsJqUi"] = true;
                         $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).autocomplete({ source: [';
                         foreach ($GLOBALS["SL"]->def->getSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
                             $GLOBALS["SL"]->pageAJAX .= (($i > 0) ? ',' : '') . ' ' 
@@ -1224,7 +1222,6 @@ class TreeSurvForm extends TreeSurvFormUtils
                     
                 } elseif ($curr->nodeType == 'Date Picker') {
                     
-                    $this->v["needsJqUi"] = true;
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).datepicker({ maxDate: "+0d" });';
                     $ret .= $nodePrompt . '<div class="nFld' . $isOneLinerFld . '"><input name="n' . $nIDtxt 
                         . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $dateStr . '" autocomplete="off" ' 
@@ -1324,7 +1321,6 @@ class TreeSurvForm extends TreeSurvFormUtils
                             $genderSuggest .= ', "' . $gen->DefValue . '"';
                         }
                     }
-                    $this->v["needsJqUi"] = true;
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'fldOtherID' . $j 
                         . '" ).autocomplete({ source: [' . substr($genderSuggest, 1) . '] });' . "\n";
                     $this->v["javaNodes"] .= 'nodeResTot[' . $nID . '] = ' . sizeof($coreResponses) . '; ';

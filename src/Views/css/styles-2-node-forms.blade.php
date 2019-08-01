@@ -48,7 +48,7 @@
 	background: {!! $css["color-main-bg"] !!};
 	margin: 0px -15px 0px -15px;
 	padding: 15px;
-	top: 47px;
+	top: 56px;
 	border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
 
@@ -154,6 +154,9 @@ label, .nPrompt label {
 	color: {!! $css["color-form-text"] !!};
 	background: {!! $css["color-field-bg"] !!};
 	border: 1px {!! $css["color-main-on"] !!} solid;
+}
+.nFld input.slGrey, .nFld select.slGrey, .nFld textarea.slGrey, .nFld label.slGrey, .nFld .radio label.slGrey, .nFld .checkbox label.slGrey {
+    color: {!! $css["color-main-grey"] !!};
 }
 
 .nFld input.dateFld {

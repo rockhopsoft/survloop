@@ -294,6 +294,11 @@ class GeographyLookups extends GeographyLists
         return '';
     }
     
+    public function isAshraeZoneGroup($zoneGroup = '')
+    {
+        return (in_array($zoneGroup, ['Hot-Humid', 'Mixed-Humid', 'Cold', 'Very Cold', 'Subarctic']));
+    }
+    
     public function getAshraeGroupZones($zoneGroup = '')
     {
         switch ($zoneGroup) {
@@ -309,6 +314,22 @@ class GeographyLookups extends GeographyLists
                 return ['8A', '8A'];
         }
         return [];
+    }
+
+    public function getZoneOrState($str = '')
+    {
+        if ($this->isAshraeZoneGroup($str)) {
+            return $str;
+        }
+        $name = $this->getAshraeZoneLabel($str);
+        if (trim($name) != '') {
+            return $name;
+        }
+        $name = $this->getState($str);
+        if (trim($name) != '') {
+            return $name;
+        }
+        return $str;
     }
     
     public function getAshraeGroupZips($zoneGroup = '')

@@ -44,4 +44,15 @@ class GlobalsElements extends GlobalsStatic
         return true;
     }
 
+    public function printDatePicker($dateStr = '', $fldName = '')
+    {
+        if ($fldName == '') {
+          $fldName = rand(10000000, 100000000);
+        }
+        $this->pageAJAX .= '$( "#' . $fldName . 'ID" ).datepicker({ maxDate: "+0d" });';
+        return '<input type="text" name="' . $fldName . '" id="' . $fldName . 'ID" value="' 
+            . (($dateStr != '') ? date("m/d/Y", strtotime($dateStr)) : '')
+            . '" class="dateFld form-control" ' . $this->tabInd() . ' autocomplete="off" >' . "\n";
+    }
+
 }

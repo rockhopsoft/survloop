@@ -1,6 +1,7 @@
 @extends('vendor.survloop.master')
 @section('content')
 <!-- resources/views/auth/login.blade.php -->
+
 <form name="mainPageForm" method="POST" action="/login">
 <input type="hidden" id="isLoginID" name="isLogin" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
@@ -11,9 +12,9 @@
     @else value="{{ URL::previous() }}"
     @endif >
 
-<div class="w100"><center><div id="treeWrap" class="treeWrapForm">
-
-<div class="p20"></div>
+<div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
+<div id="treeWrap" class="treeWrapForm">
+    <div class="slCard">
 
 <a href="/register{{ (($GLOBALS['SL']->REQ->has('nd')) ? '?nd=' . $GLOBALS['SL']->REQ->get('nd') : '') 
     }}" class="btn btn-secondary pull-right mL20">Sign Up</a>
@@ -83,9 +84,11 @@
     <div class="pageBotGap"></div>
 @endif
 
+    </div>
 </div></center></div>
 
 @if (isset($formFooter)) {!! $formFooter !!} @endif
 
 </form>
+
 @endsection

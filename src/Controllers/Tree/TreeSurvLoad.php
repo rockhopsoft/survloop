@@ -259,12 +259,15 @@ class TreeSurvLoad extends TreeSurvConds
         if ($coreID <= 0) {
             $coreID = $this->coreID; 
         }
+        $this->loadSessionClear($coreTbl, $coreID);
         $this->loadSessInfo($coreTbl);
         $this->loadSessionData($coreTbl, $coreID);
         $this->loadSessionDataSaves();
         $this->runLoopConditions();
         return true;
     }
+
+    protected function loadSessionClear($coreTbl = '', $coreID = -3) { }
     
     protected function loadExtra()
     {

@@ -76,7 +76,7 @@
 <h3 class="slBlueDark"><u>SurvLoop Settings</u></h3>
 <div class="row">
     <div class="col-md-6">
-        @foreach (['has-volunteers', 'has-partners'] as $opt)
+        @foreach (['has-volunteers', 'has-partners', 'has-avatars'] as $opt)
             {!! view('vendor.survloop.admin.system-one-setting', [
                 "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
         @endforeach

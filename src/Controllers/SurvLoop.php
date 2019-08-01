@@ -247,38 +247,12 @@ class SurvLoop extends SurvCustLoop
     public function afterLogin(Request $request)
     {
         $redir = '';
-        if (session()->has('previousUrl') && $this->urlNotResourceFile(session()->get('previousUrl'))) {
+        if (session()->has('previousUrl') 
+            && $this->urlNotResourceFile(session()->get('previousUrl'))) {
             $redir = trim(session()->get('previousUrl'));
-            // check if being redirected back to a survey session, which needs to be associated with new user ID
-            if (strpos($redir, '/u/') == 0 && Auth::user() && isset(Auth::user()->id) && Auth::user()->id > 0) {
-                $treeSlug = substr($redir, 3);
-                $pos = strpos($treeSlug, '/');
-                if ($pos > 0) {
-                    $treeSlug = substr($treeSlug, 0, $pos);
-                    $chk = SLTree::where('TreeType', 'Survey')
-                        ->where('TreeSlug', $treeSlug)
-                        ->get();
-                    if ($chk->isNotEmpty()) {
-                        foreach ($chk as $tree) {
-                            if (session()->has('sessID' . $tree->TreeID) 
-                                && session()->has('coreID' . $tree->TreeID)
-                                && intVal(session()->get('sessID' . $tree->TreeID)) > 0) {
-                                $sess = SLSess::find(session()->get('sessID' . $tree->TreeID));
-                                if ($sess && isset($sess->SessCoreID) && intVal($sess->SessCoreID) > 0) {
-                                    $sess->SessUserID = Auth::user()->id;
-                                    $sess->save();
-                                    $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-                                    eval($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
-                                        . $sess->SessCoreID . ")->update([ '" 
-                                        . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
-                                        . "UserID' => " . Auth::user()->id . " ]);");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } elseif (session()->has('redir2') && $this->urlNotResourceFile(session()->get('redir2'))) {
+            $this->afterLoginSurveyRedir($request, $redir);
+        } elseif (session()->has('redir2') 
+            && $this->urlNotResourceFile(session()->get('redir2'))) {
             $redir = trim(session()->get('redir2'));
         }
         if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0 
@@ -291,12 +265,19 @@ class SurvLoop extends SurvCustLoop
             }
         } elseif (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
             $this->afterLoginLastTree($request);
-        } elseif (session()->has('loginRedir') && $this->urlNotResourceFile(session()->get('loginRedir'))) {
+        } elseif (session()->has('loginRedir') 
+            && $this->urlNotResourceFile(session()->get('loginRedir'))) {
             $redir = trim(session()->get('loginRedir'));
         }
         $this->loadDomain();
-        if (in_array($redir, ['/', '/home', $this->domainPath, $this->domainPath . '/'])) {
-            $redir = '/my-profile';
+        $redir = str_replace($this->domainPath, '', $redir);
+        if (in_array($redir, ['', '/', '/home', '/login', '/register', '/logout'])) {
+            if (Auth::user() 
+                && Auth::user()->hasRole('administrator|staff|databaser|brancher|partner')) {
+                $redir = '/dashboard';
+            } else {
+                $redir = '/my-profile';
+            }
         }
         if ($redir != '') {
             $this->clearSessRedirs();
@@ -304,6 +285,44 @@ class SurvLoop extends SurvCustLoop
         }
         $this->loadLoop($request);
         return $this->custLoop->afterLogin($request);
+    }
+    
+    // check if being redirected back to a survey session, which needs to be associated with new user ID
+    protected function afterLoginSurveyRedir(Request $request, $redir)
+    {
+        if (strpos($redir, '/u/') == 0 && Auth::user() && isset(Auth::user()->id) && Auth::user()->id > 0) {
+            $treeSlug = substr($redir, 3);
+            $pos = strpos($treeSlug, '/');
+            if ($pos > 0) {
+                $treeSlug = substr($treeSlug, 0, $pos);
+                $chk = SLTree::where('TreeType', 'Survey')
+                    ->where('TreeSlug', $treeSlug)
+                    ->get();
+                if ($chk->isNotEmpty()) {
+                    foreach ($chk as $tree) {
+                        if (session()->has('sessID' . $tree->TreeID) && session()->has('coreID' . $tree->TreeID)
+                            && intVal(session()->get('sessID' . $tree->TreeID)) > 0) {
+                            $this->afterLoginUpdateSess($request, $tree);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
+    protected function afterLoginUpdateSess(Request $request, $tree)
+    {
+        $sess = SLSess::find(session()->get('sessID' . $tree->TreeID));
+        if ($sess && isset($sess->SessCoreID) && intVal($sess->SessCoreID) > 0) {
+            $sess->SessUserID = Auth::user()->id;
+            $sess->save();
+            $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+            eval($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
+                . $sess->SessCoreID . ")->update([ '" 
+                . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
+                . "UserID' => " . Auth::user()->id . " ]);");
+        }
     }
     
     protected function afterLoginLastTree(Request $request)

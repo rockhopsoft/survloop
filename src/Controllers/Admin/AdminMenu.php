@@ -40,7 +40,7 @@ class AdminMenu
     protected function addAdmMenuCollapse()
     {
         return $this->admMenuLnk('javascript:;" id="admMenuClpsBtn', 'Collapse', 
-            '<i id="admMenuClpsArr" class="fa fa-arrow-left" aria-hidden="true"></i>');
+            '<i id="admMenuClpsArr" class="fa fa-arrow-right" aria-hidden="true"></i>');
     }
     
     protected function addAdmMenuBasics($treeMenu = [])
@@ -74,8 +74,7 @@ class AdminMenu
             $this->admMenuLnk('/dashboard/emails',          'Email Templates', '', 1, [
                 $this->admMenuLnk('/dashboard/sent-emails', 'Sent Emails')
             ]),
-            $this->admMenuLnkContact(false),
-            $this->admMenuLnk('/dashboard/users', 'Users')
+            $this->admMenuLnkContact(false)
         ]);
         $treeOut[] = $this->admMenuLnk('javascript:;', 'Database', '<i class="fa fa-database"></i>', 1, [
             $this->admMenuLnk('/dashboard/db', 'Data Tables', '', 1, [
@@ -119,7 +118,8 @@ class AdminMenu
                 $this->admMenuLnk('/dashboard/logs/session-stuff', 'Session Stuff')
             ]),
             $this->admMenuLnk('/dashboard/systems-check',     'System Check'),
-            $this->admMenuLnk('/dashboard/systems-update',    'System Updates')
+            $this->admMenuLnk('/dashboard/systems-update',    'System Updates'),
+            $this->admMenuLnk('/dashboard/users', 'Users')
         ]);
         return $treeOut;
     }
