@@ -4,8 +4,8 @@
     <div class="col-8">
     
         <div class="slCard nodeWrap">
-            <h1><span class="slBlueDark"><i class="fa fa-snowflake-o"></i> {{ $GLOBALS['SL']->treeName }}:</span>
-                Users Session Stats</h1>
+            <h1><span class="slBlueDark"><i class="fa fa-snowflake-o"></i>
+                {{ $GLOBALS['SL']->treeName }}:</span> Users Session Stats</h1>
             <div class="w100" style="height: 450px;">
                 @if (isset($graph2print)) {!! $graph2print !!} @endif
             </div>

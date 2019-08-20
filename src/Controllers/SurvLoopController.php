@@ -30,6 +30,7 @@ use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
 use SurvLoop\Controllers\SurvLoopInstaller;
+use SurvLoop\Controllers\Globals\GlobalsCache;
 use SurvLoop\Controllers\Globals\Globals;
 
 class SurvLoopController extends Controller
@@ -61,9 +62,12 @@ class SurvLoopController extends Controller
     protected function loadUserVars()
     {
         $this->v["user"]       = Auth::user();
-        $this->v["uID"]        = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
-        $this->v["isAdmin"]    = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
-        $this->v["isVolun"]    = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
+        $this->v["uID"]        = (($this->v["user"] 
+            && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+        $this->v["isAdmin"]    = ($this->v["user"] 
+            && $this->v["user"]->hasRole('administrator'));
+        $this->v["isVolun"]    = ($this->v["user"] 
+            && $this->v["user"]->hasRole('volunteer'));
         $this->initPowerUser();
         return true;
     }
@@ -73,17 +77,18 @@ class SurvLoopController extends Controller
         if (!$this->survInitRun) {
             $this->survInitRun = true;
             $this->loadUserVars();
-            $this->v["isAll"]      = $request->has('all');
-            $this->v["isAlt"]      = $request->has('alt');
-            $this->v["isPrint"]    = $request->has('print');
-            $this->v["isExcel"]    = $request->has('excel');
-            $this->v["view"]       = (($request->has('view')) ? trim($request->get('view')) : '');
-            $this->v["isDash"]     = false;
-            $this->v["exportDir"]  = 'survloop';
-            $this->v["content"]    = '';
-            $this->v["isOwner"]    = false;
-            if (!isset($GLOBALS["SL"]->x["dataPerms"])) {
-                $GLOBALS["SL"]->x["dataPerms"] = 'public';
+            $this->v["isAll"]     = $request->has('all');
+            $this->v["isAlt"]     = $request->has('alt');
+            $this->v["isPrint"]   = $request->has('print');
+            $this->v["isExcel"]   = $request->has('excel');
+            $this->v["view"]      = (($request->has('view')) 
+                ? trim($request->get('view')) : '');
+            $this->v["isDash"]    = false;
+            $this->v["exportDir"] = 'survloop';
+            $this->v["content"]   = '';
+            $this->v["isOwner"]   = false;
+            if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->dataPerms == '') {
+                $GLOBALS["SL"]->dataPerms = 'public';
             }
             if (!isset($this->v["currPage"])) {
                 $this->v["currPage"] = ['', ''];
@@ -94,7 +99,8 @@ class SurvLoopController extends Controller
             if (trim($this->v["currPage"][0]) == '') {
                 $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
                 if (strpos($this->v["currPage"][0], '?') !== false) {
-                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, strpos($this->v["currPage"][0], '?'));
+                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, 
+                        strpos($this->v["currPage"][0], '?'));
                 }
             }
             
@@ -120,7 +126,8 @@ class SurvLoopController extends Controller
                 $this->checkSystemInit();
             }
             if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
-                $this->v["pastUpDef"] = $this->v["pastUpArr"] = $this->v["updateList"] = [];
+                $this->v["pastUpDef"] = $this->v["pastUpArr"] 
+                    = $this->v["updateList"] = [];
             }
             
             if ($this->coreIDoverride > 0) {
@@ -151,7 +158,8 @@ class SurvLoopController extends Controller
                 $slSess->save();
             }
             session()->put('slSessID', $slSess->SessID);
-        } elseif ($slSess && isset($slSess->SessID) && !isset($slSess->SessUserID) && $this->v["uID"] > 0) {
+        } elseif ($slSess && isset($slSess->SessID) && !isset($slSess->SessUserID)
+            && $this->v["uID"] > 0) {
             $slSess->SessUserID = $this->v["uID"];
             $slSess->save();
         }
@@ -192,7 +200,8 @@ class SurvLoopController extends Controller
             if (!$this->treeFromURL) {
                 if (!isset($this->v["user"])) {
                     $this->v["user"] = Auth::user();
-                    $this->v["uID"]  = (($this->v["user"] && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+                    $this->v["uID"]  = (($this->v["user"] && isset($this->v["user"]->id)) 
+                        ? $this->v["user"]->id : 0);
                 }
                 if ($this->v["uID"] > 0) {
                     $last = SLUsersActivity::where('UserActUser', '=', $this->v["uID"])
@@ -227,7 +236,12 @@ class SurvLoopController extends Controller
             if ($tree && isset($tree->TreeDatabase)) {
                 $this->treeID = $tree->TreeID;
                 $this->dbID = $tree->TreeDatabase;
-                $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
+                $GLOBALS["SL"] = new Globals(
+                    $request, 
+                    $this->dbID, 
+                    $this->treeID, 
+                    $this->treeID
+                );
             }
         }
         return true;
@@ -302,14 +316,33 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    protected function getHighestGroupLabel()
+    {
+        if (Auth::user() && Auth::user()->id > 0) {
+            if (Auth::user()->hasRole('administrator')) {
+                return 'admin';
+            } elseif (Auth::user()->hasRole('staff|databaser|brancher')) {
+                return 'staff';
+            } elseif (Auth::user()->hasRole('partner')) {
+                return 'partner';
+            } elseif (Auth::user()->hasRole('volunteer')) {
+                return 'volun';
+            } else {
+                return 'user';
+            }
+        }
+        return 'visitor';
+    }
+    
     protected function genCacheKey($baseOverride = '')
     {
         $this->cacheKey = str_replace('/', '.', $this->v["currPage"][0]);
         if ($baseOverride != '') {
             $this->cacheKey = $baseOverride;
         }
-        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID;
-        $this->cacheKey .= '.tree' . $GLOBALS["SL"]->treeID;
+        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID
+            . '.tree' . $GLOBALS["SL"]->treeID
+            . '.' . $this->getHighestGroupLabel();
         if ($this->v["isPrint"]) {
             $this->cacheKey .= '.print';
         }
@@ -330,19 +363,27 @@ class SurvLoopController extends Controller
         if ($baseOverride != '') {
             $this->genCacheKey($baseOverride);
         }
+        $cache = new GlobalsCache;
         if ($GLOBALS["SL"]->REQ->has('refresh')) {
-            Cache::forget($this->cacheKey);
+            $cache->forgetCache($this->cacheKey);
         }
-        if (Cache::store('file')->has($this->cacheKey)) {
-            $this->v["content"] = Cache::store('file')->get($this->cacheKey);
+        $ret = $cache->chkCache($this->cacheKey);
+        if ($ret != '') {
+            $this->v["content"] = $ret;
+            $GLOBALS["SL"]->x["pageCacheLoaded"] = true;
             return true;
         }
+        $GLOBALS["SL"]->x["pageCacheLoaded"] = false;
         return false;
     }
     
     protected function saveCache()
     {
-        Cache::store('file')->forever($this->cacheKey, $this->v["content"]);
+        $cache = new GlobalsCache;
+        $cache->putCache(
+            $this->cacheKey, 
+            $this->v["content"]
+        );
         return true;
     }
     
@@ -553,7 +594,8 @@ class SurvLoopController extends Controller
         if (!$js) {
             return redirect($redir);
         } else {
-            echo '<script type="text/javascript"> setTimeout("top.location.href=\'' . $redir . '\'", 10); </script>';
+            echo '<script type="text/javascript"> setTimeout("top.location.href=\''
+                . $redir . '\'", 10); </script>';
             exit;
         }
     }

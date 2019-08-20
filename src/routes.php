@@ -42,7 +42,10 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
     
-    Route::get( '/defer/{treeID}/{nodeID}',    'SurvLoop\\Controllers\\SurvLoop@deferNode');
+    Route::get(
+        '/defer/{treeID}/{nodeID}/{date}/{rand}',
+        'SurvLoop\\Controllers\\SurvLoop@deferNode'
+    );
     Route::get( '/up/{treeSlug}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
     
     Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
@@ -55,9 +58,12 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/record-graph/{gType}/{treeID}/{nID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxGraph');
     Route::get( '/widget-custom/{treeID}/{nID}',        'SurvLoop\\Controllers\\SurvLoop@widgetCust');
     
-    Route::get( '/ajax-get-flds/{treeID}',                  'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
-    Route::get( '/ajax-get-flds/{treeID}/{rSet}',           'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
-    Route::get( '/ajax-emoji-tag/{treeID}/{recID}/{defID}', 'SurvLoop\\Controllers\\SurvLoop@ajaxEmojiTag');
+    Route::get( '/ajax-get-flds/{treeID}', 'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
+    Route::get( '/ajax-get-flds/{treeID}/{rSet}', 'SurvLoop\\Controllers\\SurvLoop@getSetFlds');
+    Route::get(
+        '/ajax-emoji-tag/{treeID}/{recID}/{defID}',
+        'SurvLoop\\Controllers\\SurvLoop@ajaxEmojiTag'
+    );
 
     Route::post('/ajax',         'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
     Route::get( '/ajax',         'SurvLoop\\Controllers\\SurvLoop@ajaxChecks');
@@ -87,8 +93,14 @@ Route::group(['middleware' => ['web']], function () {
     
     ///////////////////////////////////////////////////////////
     
-    Route::post('/login',      [ 'as' => 'login', 'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@postLogin' ]);
-    Route::get( '/login',      [ 'as' => 'login', 'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@getLogin' ]);
+    Route::post('/login', [
+        'as' => 'login',
+        'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@postLogin'
+    ]);
+    Route::get( '/login', [
+        'as' => 'login', 
+        'uses' => 'SurvLoop\\Controllers\\Auth\\AuthController@getLogin'
+    ]);
     Route::post('/register',   'SurvLoop\\Controllers\\Auth\\SurvRegisterController@register');
     Route::get( '/register',   'SurvLoop\\Controllers\\Auth\\AuthController@getRegister');
     Route::post('/afterLogin', 'SurvLoop\\Controllers\\SurvLoop@afterLogin');
@@ -99,15 +111,18 @@ Route::group(['middleware' => ['web']], function () {
     Route::get( '/time-out',   'SurvLoop\\Controllers\\SurvLoop@timeOut');
     Route::get( '/survloop-stats.json',   'SurvLoop\\Controllers\\SurvLoop@getJsonSurvStats');
     
-    Route::get( '/email-confirm/{token}/{tokenB}', 'SurvLoop\\Controllers\\SurvLoop@processEmailConfirmToken');
+    Route::get(
+        '/email-confirm/{token}/{tokenB}',
+        'SurvLoop\\Controllers\\SurvLoop@processEmailConfirmToken'
+    );
     
     Route::get( '/js-load-menu', 'SurvLoop\\Controllers\\SurvLoop@jsLoadMenu');
     
-    Route::get( '/sys{which}.min.{type}', 'SurvLoop\\Controllers\\SurvRoutes@getSysFileMin');
-    Route::get( '/sys{which}.{type}',     'SurvLoop\\Controllers\\SurvRoutes@getSysFile');
-    Route::get( '/tree-{treeID}.js',      'SurvLoop\\Controllers\\SurvRoutes@getSysTreeJs');
-    Route::get( '/dyna-{file}.{type}',    'SurvLoop\\Controllers\\SurvRoutes@getDynaFile');
-    Route::get( '/gen-kml/{kmlfile}.kml', 'SurvLoop\\Controllers\\SurvRoutes@getKml');
+    Route::get( '/sys{which}.min.{type}',  'SurvLoop\\Controllers\\SurvRoutes@getSysFileMin');
+    Route::get( '/sys{which}.{type}',      'SurvLoop\\Controllers\\SurvRoutes@getSysFile');
+    Route::get( '/tree-{treeID}.js',       'SurvLoop\\Controllers\\SurvRoutes@getSysTreeJs');
+    Route::get( '/sys/dyna/{file}.{type}', 'SurvLoop\\Controllers\\SurvRoutes@getDynaFile');
+    Route::get( '/gen-kml/{kmlfile}.kml',  'SurvLoop\\Controllers\\SurvRoutes@getKml');
     
     Route::get( '/jquery.min.js',         'SurvLoop\\Controllers\\SurvRoutes@getJquery');
     Route::get( '/jquery-ui.min.{type}',  'SurvLoop\\Controllers\\SurvRoutes@getJqueryUi');

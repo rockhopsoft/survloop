@@ -11,6 +11,14 @@
 	#navMobile {
         display: block;
     }
+    #dashSearchFrmWrap,
+    .topNavSearch #dashSearchFrmWrap #dashSearchBg,
+    .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
+        width: 300px;
+    }
+    #admSrchFld {
+        width: 240px;
+    }
 	
     a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover {
         display: none;
@@ -23,10 +31,6 @@
     }
     #leftSideWrap {
         width: 24px;
-        padding: 0px 6px;
-    }
-    #leftAdmMenu {
-        display: none;
     }
     #mainBody {
         padding: 0px;
@@ -38,6 +42,30 @@
 }
 @media screen and (max-width: 768px) {
 	
+    <?php /* @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
+        && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg']) */ ?>
+        #slLogoImgSm { display: inline; }
+        #slLogoImg { display: none; }
+    <?php /* @endif */ ?>
+    #userMenuBtnName {
+        display: none;
+    }
+    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
+    .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
+        padding: 15px 5px;
+    }
+    #userMenuBtnAvatar, #userMenuBtnWrp #userMenuBtnAvatar {
+        left: 10px;
+    }
+    #dashSearchFrmWrap,
+    .topNavSearch #dashSearchFrmWrap #dashSearchBg,
+    .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
+        width: 220px;
+    }
+    #admSrchFld {
+        width: 160px;
+    }
+
 	input.nFormBtnSub, input.nFormBtnBack {
         font-size: 20pt;
     }
@@ -52,7 +80,7 @@
     a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
     .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
     .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
-        margin-right: -2px;
+        margin-right: 7px;
     }
 	#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
         font-size: 18pt;
@@ -79,11 +107,6 @@
 }
 @media screen and (max-width: 480px) {
     
-    @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
-        && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
-        #slLogoImgSm { display: inline; }
-        #slLogoImg { display: none; }
-    @endif
 	#logoTxt {
 	    font-size: 28pt; 
 	    padding-left: 0px;

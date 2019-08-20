@@ -210,7 +210,7 @@ class TreeSurv extends TreeSurvReport
                 .= 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();';
             $GLOBALS["SL"]->pageAJAX 
                 .= 'if (document.getElementById("maincontentWrap")) $("#maincontentWrap").fadeIn(50); ';
-            $ret = $GLOBALS["SL"]->genPageDynamicJs($ret) . $GLOBALS["SL"]->pageSCRIPTS;
+            $ret = $GLOBALS["SL"]->pullPageJsCss($ret, $this->coreID) . $GLOBALS["SL"]->pageSCRIPTS;
             $GLOBALS["SL"]->pageSCRIPTS = '';
         }
         return $ret;
@@ -237,8 +237,8 @@ class TreeSurv extends TreeSurvReport
             $this->v["javaNodes"] = '';
         }
         $notes = '';
-        if (isset($GLOBALS["SL"]->x["pageView"]) && trim($GLOBALS["SL"]->x["pageView"]) != '') {
-            $notes .= 'pv.' . $GLOBALS["SL"]->x["pageView"] . ' dp.' . $GLOBALS["SL"]->x["dataPerms"];
+        if (isset($GLOBALS["SL"]->pageView) && trim($GLOBALS["SL"]->pageView) != '') {
+            $notes .= 'pv.' . $GLOBALS["SL"]->pageView . ' dp.' . $GLOBALS["SL"]->dataPerms;
         }
         $this->v["content"] = $this->printTreePublic() . (($notes != '') ? '<!-- ' . $notes . ' -->' : '');
         if ($this->v["currPage"][0] != '/') {
@@ -265,19 +265,23 @@ class TreeSurv extends TreeSurvReport
         
         if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0) { // search results page
             if ($GLOBALS["SL"]->REQ->has('s') && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
-                if ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
-                    || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0 || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0) {
+                if ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0
+                    || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
+                    || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0
+                    || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0) {
                     $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\'if (document.getElementById("admSrchFld")) '
                         . 'document.getElementById("admSrchFld").value=' 
                         . json_encode(trim($GLOBALS["SL"]->REQ->get('s'))) . '\', 10); ';
                 } // else check for the main public search field? 
             }
         }
-        $this->v["content"] = $GLOBALS["SL"]->genPageDynamicJs($this->v["content"]); // scrape scripts
+        $this->v["content"] 
+            = $GLOBALS["SL"]->pullPageJsCss($this->v["content"], $this->coreID);
         if ($GLOBALS["SL"]->treeIsAdmin) {
             return $GLOBALS["SL"]->swapSessMsg($this->v["content"]);
         } else {
-            return $GLOBALS["SL"]->swapSessMsg(view('vendor.survloop.master', $this->v)->render());
+            return $GLOBALS["SL"]->swapSessMsg(view('vendor.survloop.master', $this->v)
+                ->render());
         }
     }
     
@@ -822,7 +826,7 @@ class TreeSurv extends TreeSurvReport
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
     {
         $this->survLoopInit($request, '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '-report-xml/' . $coreID);
-        $GLOBALS["SL"]->x["pageView"] = 'public';
+        $GLOBALS["SL"]->pageView = 'public';
         $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
@@ -837,8 +841,8 @@ class TreeSurv extends TreeSurvReport
     public function getXmlID(Request $request, $coreID, $coreSlug = '')
     {
         $this->maxUserView();
-        $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->x["pageView"];
-        if (isset($GLOBALS["fullAccess"]) && $GLOBALS["fullAccess"] && $GLOBALS["SL"]->x["pageView"] != 'full') {
+        $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
+        if (isset($GLOBALS["fullAccess"]) && $GLOBALS["fullAccess"] && $GLOBALS["SL"]->pageView != 'full') {
             $this->v["content"] = $this->errorDeniedFullXml();
             return view('vendor.survloop.master', $this->v);
         }
@@ -873,7 +877,7 @@ class TreeSurv extends TreeSurvReport
         }
         $this->survLoopInit($request, '');
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
-        $GLOBALS["SL"]->x["pageView"] = 'sensitive';
+        $GLOBALS["SL"]->pageView = 'sensitive';
         return $this->retrieveUploadFile($upID);
     }
     

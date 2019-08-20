@@ -465,6 +465,16 @@ class CreateSurvLoopTables extends Migration
 			$table->integer('UpLinkRecID')->nullable();
 			$table->timestamps();
 		});
+		Schema::create('SL_Caches', function(Blueprint $table)
+		{
+			$table->increments('CachID');
+			$table->string('CachType', 12)->nullable();
+			$table->integer('CachTreeID')->unsigned()->nullable();
+			$table->integer('CachRecID')->nullable();
+			$table->longText('CachKey')->nullable();
+			$table->longText('CachValue')->nullable();
+			$table->timestamps();
+		});
     }
 
     /**
@@ -510,6 +520,7 @@ class CreateSurvLoopTables extends Migration
 		Schema::drop('SL_Zips');
 		Schema::drop('SL_AddyGeo');
 		Schema::drop('SL_Uploads');
-	
+		Schema::drop('SL_Caches');
+		
     }
 }

@@ -322,3 +322,6 @@ a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-bra
     min-width: 34px;
     max-width: 34px;
 }
+#userMenuBtnName {
+    display: inline;
+}

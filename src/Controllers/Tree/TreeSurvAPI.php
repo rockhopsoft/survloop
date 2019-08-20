@@ -380,7 +380,7 @@ class TreeSurvAPI extends TreeCoreSess
             if ($fld->FldOpts%7 > 0 && $fld->FldOpts%11 > 0 && $fld->FldOpts%13 > 0) {
                 return true;
             }
-            if (in_array($GLOBALS["SL"]->x["pageView"], ['full', 'full-pdf', 'full-xml'])) {
+            if (in_array($GLOBALS["SL"]->pageView, ['full', 'full-pdf', 'full-xml'])) {
                 return true;
             }
             if ($fld->FldOpts%13 == 0 || $fld->FldOpts%11 == 0) {
@@ -397,16 +397,16 @@ class TreeSurvAPI extends TreeCoreSess
             if ($fld->FldOpts%7 > 0 && $fld->FldOpts%11 > 0 && $fld->FldOpts%13 > 0) {
                 return true;
             }
-            if ($GLOBALS["SL"]->x["dataPerms"] == 'internal') {
+            if ($GLOBALS["SL"]->dataPerms == 'internal') {
                 return true;
             } elseif ($fld->FldOpts%13 == 0) {
                 return false;
             }
             if ($fld->FldOpts%11 == 0) {
-                return ($GLOBALS["SL"]->x["dataPerms"] == 'sensitive');
+                return ($GLOBALS["SL"]->dataPerms == 'sensitive');
             }
             if ($fld->FldOpts%7 == 0) {
-                return in_array($GLOBALS["SL"]->x["dataPerms"], ['private', 'sensitive']);
+                return in_array($GLOBALS["SL"]->dataPerms, ['private', 'sensitive']);
             }
         }
         return false;

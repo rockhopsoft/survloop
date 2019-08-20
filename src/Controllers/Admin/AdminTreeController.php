@@ -697,7 +697,7 @@ class AdminTreeController extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
 
-    public function treeSessions(Request $request, $treeID = 1, $refresh = false) 
+    public function treeSessions(Request $request, $treeID = 1, $refresh = false, $height = 720) 
     {
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
@@ -777,7 +777,7 @@ class AdminTreeController extends AdminController
             }
             $this->v["graph1print"] = view('vendor.survloop.reports.graph-scatter', [
                 "currGraphID" => 'treeSessScat',
-                "hgt"         => '400px',
+                "hgt"         => $height . 'px',
                 "dotColor"    => $this->v["css"]["color-main-on"],
                 "brdColor"    => $this->v["css"]["color-main-grey"],
                 "title"       => '<h3 class="mT0 mB10">Duration of Attempt by Percent Completion</h3>'

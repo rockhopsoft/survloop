@@ -1,6 +1,6 @@
 <?php
 /**
-  * GlobalsStatic is the bottom-level core class for loading and accessing system information from anywhere.
+  * GlobalsStatic is the mid-level core class for loading and accessing system information from anywhere.
   * This level contains mostly standalone functions which are not SurvLoop-specific.
   *
   * SurvLoop - All Our Data Are Belong
@@ -12,61 +12,24 @@ namespace SurvLoop\Controllers\Globals;
 
 use Auth;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\File\File;
 
-class GlobalsStatic
+use SurvLoop\Controllers\Globals\GlobalsConvert;
+
+class GlobalsStatic extends GlobalsConvert
 {
-    public $uID         = -3;
-    public $REQ         = [];
-    public $sysOpts     = [];
-    public $userRoles   = [];
+    public $uID = -3;
+    public $REQ = [];
     
-    public $pageSCRIPTS = '';
-    public $pageJAVA    = '';
-    public $pageAJAX    = '';
-    public $pageCSS     = '';
+    function __construct(Request $request = NULL)
+    {
+        $this->loadStatic($request);
+    }
     
-    public $currTabInd  = 0;
-    public $x           = [];
-    public $debugOn     = false;
-    
-    public function loadStatic(Request $request)
+    public function loadStatic(Request $request = NULL)
     {
         $this->uID = ((Auth::user()) ? Auth::user()->id : -3);
         $this->REQ = $request;
         return true;
-    }
-    
-    public function mexplode($delim, $str)
-    {
-        $ret = [];
-        if (trim(str_replace($delim, '', $str)) != '') {
-            if (strpos($str, $delim) === false) {
-                $ret[] = $str;
-            } else {
-                if (substr($str, 0, 1) == $delim) {
-                    $str = substr($str, 1);
-                }
-                if (substr($str, strlen($str)-1) == $delim) {
-                    $str = substr($str, 0, strlen($str)-1);
-                }
-                $ret = explode($delim, $str);
-            }
-        }
-        return $ret;
-    }
-    
-    public function wordLimitDotDotDot($str, $wordLimit = 50)
-    {
-        $strs = $this->mexplode(' ', $str);
-        if (sizeof($strs) <= $wordLimit) {
-            return $str;
-        }
-        $ret = '';
-        for ($i=0; $i<$wordLimit; $i++) {
-            $ret .= $strs[$i] . ' ';
-        }
-        return trim($ret) . '...';
     }
     
     public function splitNumDash($str, $delim = '-')
@@ -74,9 +37,14 @@ class GlobalsStatic
         $str = trim($str);
         $pos = strpos($str, $delim);
         if ($pos !== false) {
-            return [ intVal(substr($str, 0, $pos)), intVal(substr($str, (1+$pos))) ];
+            return [
+                intVal(substr($str, 0, $pos)),
+                intVal(substr($str, (1+$pos)))
+            ];
         }
-        if ($str != '') return [ 0, intVal($str) ];
+        if ($str != '') {
+            return [ 0, intVal($str) ];
+        }
         return [ 0, 0 ];
     }
     
@@ -86,103 +54,20 @@ class GlobalsStatic
         if (!$printHttp) {
             $urlPrint = $this->printURLdomain($urlPrint);
         }
-        return '<a href="' . $url . '" target="_blank" class="dont-break-out">' . $urlPrint . '</a>'; 
+        return '<a href="' . $url . '" target="_blank" class="dont-break-out">'
+            . $urlPrint . '</a>'; 
     }
     
     public function printURLdomain($url)
     {
         if (trim($url) != '') {
-            $url = str_replace('http://', '', str_replace('https://', '', str_replace('http://www.', '', 
-                str_replace('https://www.', '', $url))));
+            $url = str_replace('http://', '', str_replace('https://', '', 
+                str_replace('http://www.', '', str_replace('https://www.', '', $url))));
             if (substr($url, strlen($url)-1) == '/') {
                 $url = substr($url, 0, strlen($url)-1);
             }
         }
         return $url;
-    }
-    
-    public function sortArrByKey($arr, $key, $ord = 'asc')
-    {
-        if (sizeof($arr) < 2) {
-            return $arr;
-        }
-        $arrCopy = $arrOrig = $arr;
-        $arr = [];
-        for ($i = 0; $i < sizeof($arrOrig); $i++) {
-            if (sizeof($arrCopy) == 1) {
-                $arr[] = $arrCopy[0];
-            } else {
-                $nextInd = -1;
-                for ($j = 0; $j < sizeof($arrCopy); $j++) {
-                    if ($nextInd < 0) {
-                        $nextInd = $j;
-                    } elseif ($ord == 'asc') {
-                        if ($arrCopy[$j][$key] < $arrCopy[$nextInd][$key]) {
-                            $nextInd = $j;
-                        }
-                    } else {
-                        if ($arrCopy[$j][$key] > $arrCopy[$nextInd][$key]) {
-                            $nextInd = $j;
-                        }
-                    }
-                }
-                $arr[] = $arrCopy[$nextInd];
-                array_splice($arrCopy, $nextInd, 1);
-            }
-        }
-        return $arr;
-    }
-    
-    public function getYoutubeID($url)
-    {
-        $ret = '';
-        $pos = strpos($url, 'v=');
-        if ($pos > 0) {
-            $ret = substr($url, (2+$pos));
-            $pos = strpos($ret, '&');
-            if ($pos > 0) {
-                $ret = substr($ret, 0, $pos);
-            }
-        }
-        return $ret;
-    }
-    
-    public function getYoutubeUrl($id = '', $link = true, $class = '')
-    {
-        if (trim($id) == '') {
-            return '';
-        }
-        $url = 'https://www.youtube.com/watch?v=' . $id;
-        if (!$link) {
-            return $url;
-        }
-        return '<a href="' . $url . '" target="_blank"' 
-            . (($class != '') ? ' class="' . $class . '"' : '')
-            . ' >' . $url . '</a>';
-    }
-    
-    public function getVimeoUrl($id = '', $link = true, $class = '')
-    {
-        if (trim($id) == '') {
-            return '';
-        }
-        $url = 'https://vimeo.com/' . $id;
-        if (!$link) {
-            return $url;
-        }
-        return '<a href="' . $url . '" target="_blank"' 
-            . (($class != '') ? ' class="' . $class . '"' : '')
-            . ' >' . $url . '</a>';
-    }
-    
-    public function getFileExt($file)
-    {
-        $ext = '';
-        if (trim($file) != '') {
-            $tmpExt = $this->mexplode(".", $file);
-            $ext = strtolower($tmpExt[(sizeof($tmpExt)-1)]);
-        }
-        return $ext;
     }
     
     public function searchDeeperDirs($file)
@@ -199,26 +84,6 @@ class GlobalsStatic
         return $file;
     }
     
-    public function convertRel2AbsURL($url)
-    {
-        $u = str_replace('../vendor/', '', trim($url));
-        $dashPos = strpos($u, '/');
-        if ($dashPos > 0) {
-            $u = substr($u, $dashPos+1);
-            $dashPos = strpos($u, '/');
-            if ($dashPos > 0) {
-                $abbr = substr($u, 0, $dashPos);
-                $u = substr($u, $dashPos+1);
-                $dashPos = strpos($u, 'src/Public/');
-                if ($dashPos === 0) {
-                    $u = str_replace('src/Public/', '', $u);
-                    return $this->sysOpts['app-url'] . '/' . $abbr . '/' . $u;
-                }
-            }
-        }
-        return '';
-    }
-    
     public function copyDirFiles($from, $to, $recurse = true)
     {
         if (trim($from) == '' || trim($to) == '' || !file_exists($from)) {
@@ -230,12 +95,16 @@ class GlobalsStatic
         while (false !== ($file = readdir($dir))) {
             if ($file != '.' && $file != '..') {
                 if (is_dir($from . '/' . $file)) {
-                    if ($recurse) copyDirFiles($from . '/' . $file, $to . '/' . $file);
+                    if ($recurse) {
+                        copyDirFiles($from . '/' . $file, $to . '/' . $file);
+                    }
                 } else {
                     if (copy($from . '/' . $file, $to . '/' . $file)) {
-                        $ret .= 'copied ' . $from . '/' . $file . ' to ' . $to . '/' . $file . '<br />' . "\n";
+                        $ret .= 'copied ' . $from . '/' . $file . ' to '
+                            . $to . '/' . $file . '<br />' . "\n";
                     } else {
-                        $ret .= 'didn\'t copy ' . $from . '/' . $file . ' to ' . $to . '/' . $file . '<br />' . "\n";
+                        $ret .= 'didn\'t copy ' . $from . '/' . $file . ' to '
+                            . $to . '/' . $file . '<br />' . "\n";
                     }
                 }
             }
@@ -334,7 +203,9 @@ class GlobalsStatic
         while (false !== ($file = readdir($dir))) {
             if ($file != '.' && $file != '..') {
                 if (is_dir($folder . '/' . $file)) {
-                    if ($recurse) $ret[] = $this->mapDirFiles($folder . '/' . $file, true);
+                    if ($recurse) {
+                        $ret[] = $this->mapDirFiles($folder . '/' . $file, true);
+                    }
                 } else {
                     $ret[] = $folder . '/' . $file;
                 }
@@ -362,90 +233,18 @@ class GlobalsStatic
         return $this->mapDirSlimmer($this->mapDirFiles($folder, $recurse), $folder);
     }
     
-    public function sigFigs($value, $sigFigs = 2)
+    public function slugify($text)
     {
-        $exponent = floor(log10(abs($value))+1);
-        if (pow(10, $exponent) == 0 || pow(10, $sigFigs) == 0) {
-            return $value;
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        $text = trim($text, '-');
+        $text = preg_replace('~-+~', '-', $text);
+        $text = strtolower($text);
+        if (empty($text)) {
+            return 'n-a';
         }
-        $significand = round(($value / pow(10, $exponent)) * pow(10, $sigFigs)) / pow(10, $sigFigs);
-        return $significand * pow(10, $exponent);
-    }
-    
-    public function leadZero($num, $sigFigs = 2)
-    {
-        if ($sigFigs == 2) {
-            return (($num < 10) ? '0' : '') . $num;
-        }
-        if ($sigFigs == 3) {
-            return (($num < 10) ? '00' : (($num < 100) ? '0' : '')) . $num;
-        }
-        return $num;
-    }
-    
-    public function colorHex2Rgba($hex = '#000000', $a = 1)
-    {
-        $hex = str_replace("#", "", $hex);
-        $rgba = [ "r" => 0, "g" => 0, "b" => 0, "a" => $a ];
-        if (strlen($hex) == 3) {
-            $rgba["r"] = hexdec(substr($hex,0,1).substr($hex,0,1));
-            $rgba["g"] = hexdec(substr($hex,1,1).substr($hex,1,1));
-            $rgba["b"] = hexdec(substr($hex,2,1).substr($hex,2,1));
-        } else {
-            $rgba["r"] = hexdec(substr($hex,0,2));
-            $rgba["g"] = hexdec(substr($hex,2,2));
-            $rgba["b"] = hexdec(substr($hex,4,2));
-        }
-        return $rgba;
-    }
-    
-    public function colorRgba2Hex($rgba = [])
-    {
-        return '#' . dechex($rgba["r"]) . dechex($rgba["g"]) . dechex($rgba["b"]);
-    }
-
-    public function printRgba($rgba = [])
-    {
-        if (!isset($rgba["r"])) {
-            return '';
-        }
-        if (!isset($rgba["a"]) || $rgba["a"] == 1) {
-            return 'rgb(' . $rgba["r"] . ', ' . $rgba["g"] . ', ' . $rgba["b"] . ')';
-        }
-        return 'rgba(' . $rgba["r"] . ', ' . $rgba["g"] . ', ' . $rgba["b"] . ', ' . number_format($rgba["a"], 2) . ')';
-    }
-    
-    public function colorFade($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
-    {
-        $c1 = $this->colorHex2Rgba($hex1, $a1);
-        $c2 = $this->colorHex2Rgba($hex2, $a2);
-        if ($perc == 1) {
-            return $c2;
-        } elseif ($perc == 0) {
-            return $c1;
-        }
-        $cNew = [
-            "r" => (($c1["r"] == $c2["r"]) ? $c1["r"] : intVal(($c1["r"]+(($c2["r"]-$c1["r"])*$perc)))),
-            "g" => (($c1["g"] == $c2["g"]) ? $c1["g"] : intVal(($c1["g"]+(($c2["g"]-$c1["g"])*$perc)))),
-            "b" => (($c1["b"] == $c2["b"]) ? $c1["b"] : intVal(($c1["b"]+(($c2["b"]-$c1["b"])*$perc)))),
-            "a" => (($c1["a"] == $c2["a"]) ? $c1["a"] : number_format(($c1["a"]+(($c2["a"]-$c1["a"])*$perc)), 2))
-            ];
-        return $cNew;
-    }
-    
-    public function printColorFade($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
-    {
-        return $this->printRgba($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
-    }
-    
-    public function printColorFadeHex($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
-    {
-        return $this->colorRgba2Hex($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
-    }
-    
-    public function printHex2Rgba($hex = '#000000', $a = 1)
-    {
-        return $this->printRgba($this->colorHex2Rgba($hex, $a));
+        return $text;
     }
     
     public function urlPreview($url)
@@ -459,7 +258,8 @@ class GlobalsStatic
     
     public function urlClean($url)
     {
-        $url = str_replace('m.facebook.com/', 'facebook.com/', str_replace('http://', '', str_replace('https://', '', 
+        $url = str_replace('m.facebook.com/', 'facebook.com/', 
+            str_replace('http://', '', str_replace('https://', '', 
             str_replace('http://www.', '', str_replace('https://www.', '', $url)))));
         $pos = strrpos($url, '/');
         if ($pos !== false && $pos == strlen($url)-1) {
@@ -475,18 +275,6 @@ class GlobalsStatic
             return $altLabel;
         }
         return $shrt;
-    }
-    
-    public function stdizeChars($txt)
-    {
-        return str_replace('“', '"', str_replace('”', '"', str_replace("’", "'", $txt)));
-    }
-
-    public function humanFilesize($bytes, $decimals = 2) 
-    {
-        $sz = 'BKMGTP';
-        $factor = floor((strlen($bytes) - 1) / 3);
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
     }
     
     // takes in and returns rows of [ Record ID, Ranked Value, Rank Order, Percentile ]
@@ -508,227 +296,6 @@ class GlobalsStatic
             $sorted[$i][3] = (100*(sizeof($sorted)-$sorted[$i][2])/sizeof($sorted));
         }
         return $sorted;
-    }
-    
-    // Prints inches in feet and inches
-    public function printHeight($val)
-    {
-        if ($val <= 0) {
-            return '';
-        }
-        return (floor($val/12)) . "' " . floor($val%12) . '"';
-    }
-    
-    public function getColsWidth($sizeof)
-    {
-        $colW = 12;
-        if ($sizeof == 2) {
-            $colW = 6;
-        } elseif ($sizeof == 3) {
-            $colW = 4;
-        } elseif ($sizeof == 4) {
-            $colW = 3;
-        } elseif (in_array($sizeof, [5, 6])) {
-            $colW = 2;
-        } elseif (in_array($sizeof, [7, 8, 9, 10, 11, 12])) {
-            $colW = 1;
-        }
-        return $colW;
-    }
-    
-    public function num2Month3($num = 0)
-    {
-        switch (intVal($num)) {
-            case 1:  return 'Jan'; break;
-            case 2:  return 'Feb'; break;
-            case 3:  return 'Mar'; break;
-            case 4:  return 'Apr'; break;
-            case 5:  return 'May'; break;
-            case 6:  return 'Jun'; break;
-            case 7:  return 'Jul'; break;
-            case 8:  return 'Aug'; break;
-            case 9:  return 'Sep'; break;
-            case 10: return 'Oct'; break;
-            case 11: return 'Nov'; break;
-            case 12: return 'Dec'; break;
-        }
-        return '';
-    }
-    
-    public function printTimeAgo($str)
-    {
-        $date = new \DateTime($str);
-        $now = date ('Y-m-d H:i:s', time());
-        $now = new \DateTime($now);
-        if ($now >= $date) {
-            $timeDifference = date_diff($date , $now);
-            $tense = " ago";
-        } else {
-            $timeDifference = date_diff($now, $date);
-            $tense = " until";
-        }
-        $period = [" second", " minute", " hour", " day", " month", " year" ];
-        $periodValue= [
-            $timeDifference->format('%s'), $timeDifference->format('%i'), $timeDifference->format('%h'), 
-            $timeDifference->format('%d'), $timeDifference->format('%m'), $timeDifference->format('%y')
-            ];
-        for ($i = 0; $i < count($periodValue); $i++) {
-            if ($periodValue[$i] != 1) {
-                $period[$i] .= "s";
-            }
-            if ($periodValue[$i] > 0) {
-                $interval = $periodValue[$i].$period[$i].$tense;
-            }
-        }
-        if (isset($interval)) {
-            return $interval;
-        }
-        return "0 seconds" . $tense;
-    }
-    
-    public function str2arr($str)
-    {
-        $arr = [];
-        if (!is_array($str) && strpos($str, "rray\n") === 1) {
-            if (strpos($str, '=>') !== false) {
-                $split = explode('=>', str_replace("\n", "", str_replace("\n)\n", "", $str)));
-                for ($i = 1; $i < sizeof($split); $i++) {
-                    $val = trim(str_replace('[' . $i . ']', '', $split[$i]));
-                    $arr[] = $val;
-                }
-            } else {
-                $arr[] = 'EMPTY ARRAY';
-            }
-        }
-        return $arr;
-    }
-    
-    public function plainLineBreaks($str)
-    {
-        return str_replace("\n", "<br />", str_replace("\t", "    ", $str));
-    }
-    
-    public function sec2minSec($sec)
-    {
-        $s = ($sec%60);
-        $min = floor($sec/60);
-        $m = ($min%60);
-        $h = floor($min/60);
-        return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') 
-            . $m . ':' . (($s < 10) ? '0' : '') . $s;
-    }
-    
-    public function numSupscript($num)
-    {
-        $numStr = trim($num);
-        $last = intVal(substr($numStr, strlen($numStr)-1));
-        if (in_array($num, [11, 12, 13])) {
-            return '<sup>th</sup>';
-        } elseif ($last == 1) {
-            return '<sup>st</sup>';
-        } elseif ($last == 2) {
-            return '<sup>nd</sup>';
-        } elseif ($last == 3) {
-            return '<sup>rd</sup>';
-        }
-        return '<sup>th</sup>';
-    }
-    
-    public function calcGrade($num = 100)
-    {
-        if ($num >= 97) {
-            return 'A+';
-        }
-        if ($num >= 93) {
-            return 'A';
-        }
-        if ($num >= 90) {
-            return 'A-';
-        }
-        if ($num >= 87) {
-            return 'B+';
-        }
-        if ($num >= 83) {
-            return 'B';
-        }
-        if ($num >= 80) {
-            return 'B-';
-        }
-        if ($num >= 77) {
-            return 'C+';
-        }
-        if ($num >= 73) {
-            return 'C';
-        }
-        if ($num >= 70) {
-            return 'C-';
-        }
-        if ($num >= 67) {
-            return 'D+';
-        }
-        if ($num >= 63) {
-            return 'D';
-        }
-        if ($num >= 60) {
-            return 'D-';
-        }
-        return 'F';
-    }
-    
-    public function calcGradeSmp($num = 100)
-    {
-        if ($num >= 90) {
-            return 'A';
-        }
-        if ($num >= 80) {
-            return 'B';
-        }
-        if ($num >= 70) {
-            return 'C';
-        }
-        if ($num >= 60) {
-            return 'D';
-        }
-        return 'F';
-    }
-    
-    public function convertAllCallToUp1stChars($str)
-    {
-        if (strtoupper($str) == $str) {
-            return $this->allCapsToUp1stChars($str);
-        }
-        return $str;
-    }
-    
-    public function allCapsToUp1stChars($str)
-    {
-        if (strtoupper($str) == $str) {
-            $strOut = '';
-            $words = $this->mexplode(' ', $str);
-            if (sizeof($words) > 0) {
-                foreach ($words as $w) {
-                    if (strlen($w) > 1) {
-                        $strOut .= substr($w, 0, 1) . strtolower(substr($w, 1)) . ' ';
-                    }
-                }
-            }
-            return trim($strOut);
-        }
-        return $str;
-    }
-    
-    public function slugify($text)
-    {
-        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
-        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-        $text = preg_replace('~[^-\w]+~', '', $text);
-        $text = trim($text, '-');
-        $text = preg_replace('~-+~', '-', $text);
-        $text = strtolower($text);
-        if (empty($text)) {
-            return 'n-a';
-        }
-        return $text;
     }
     
     function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
@@ -774,80 +341,6 @@ class GlobalsStatic
         return $ret;
     }
     
-    public function opnAjax()
-    {
-        return '<script type="text/javascript"> $(document).ready(function(){ ';
-    }
-    
-    public function clsAjax()
-    {
-        return ' }); </script>';
-    }
-    
-    public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
-    {
-        return 'http://twitter.com/share?url=' . urlencode($url) 
-            . ((trim($title) != '') ? '&text=' . urlencode($title) : '')
-            . ((trim($hashtags) != '') ? '&hashtags=' . urlencode($hashtags) : '');
-    }
-    
-    public function twitShareBtn($url = '', $title = '', $hashtags = '', $class = '', $btnText = '')
-    {
-        return view('vendor.survloop.elements.inc-social-simple-tweet', [
-            "link"     => $url,
-            "title"    => $title,
-            "hashtags" => $hashtags,
-            "class"    => $class,
-            "btnText"  => $btnText
-            ])->render();
-    }
-    
-    public function getFacebookShareLnk($url = '', $title = '')
-    {
-        return 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($url);
-    }
-    
-    public function faceShareBtn($url = '', $title = '', $class = '', $btnText = '')
-    {
-        return view('vendor.survloop.elements.inc-social-simple-facebook', [
-            "link"    => $url,
-            "title"   => $title,
-            "class"   => $class,
-            "btnText" => $btnText
-            ])->render();
-    }
-    
-    public function getLinkedinShareLnk($url = '', $title = '')
-    {
-        return 'https://www.linkedin.com/shareArticle?mini=true&url=' . urlencode($url) . '&title=' . urlencode($title);
-    }
-    
-    public function linkedinShareBtn($url = '', $title = '', $class = '', $btnText = '')
-    {
-        return view('vendor.survloop.elements.inc-social-simple-linkedin', [
-            "link"    => $url,
-            "title"   => $title,
-            "class"   => $class,
-            "btnText" => $btnText
-            ])->render();
-    }
-    
-    public function tabInd()
-    {
-        $this->currTabInd++;
-        return ' tabindex="' . $this->currTabInd . '" '; 
-    }
-    
-    public function replaceTabInd($str)
-    {
-        $pos = strpos($str, 'tabindex="');
-        if ($pos === false) {
-            return $str . $this->tabInd();
-        }
-        $posEnd = strpos($str, '"', (10+$pos));
-        return substr($str, 0, $pos) . $this->tabInd() . substr($str, (1+$posEnd));
-    }
-    
     public function getCurrUrlBase()
     {
         $url = $_SERVER['REQUEST_URI'];
@@ -866,140 +359,6 @@ class GlobalsStatic
 		curl_close($ch);
 		return $data;
 	}
-
-    public function arrAvg($array = [])
-    {
-        if (is_array($array) && count($array) > 0) {
-            return array_sum($array)/count($array);
-        }
-        return 0;
-    }
-	
-	public function getArrPercentileStr($str, $val, $isGolf = false)
-	{
-	    return $this->getArrPercentile($this->mexplode(',', $str), $val, $isGolf);
-	}
-	
-	public function getArrPercentile($arr, $val, $isGolf = false)
-	{
-	    $pos = 0;
-	    $max = (($isGolf) ? 1000000000 : -1000000000);
-	    if (is_array($arr) && sizeof($arr) > 0) {
-	        if ($isGolf) {
-    	        foreach ($arr as $i => $v) {
-	                if (floatval($val) >= floatval($v) && $max != $v) {
-	                    $pos = $i;
-	                    $max = $v;
-	                }
-	            }
-                return ($pos/sizeof($arr))*100;
-            } else { // higher value is better
-    	        foreach ($arr as $i => $v) {
-	                if (floatval($val) >= floatval($v) && $max != $v) {
-	                    $pos = $i;
-	                    $max = $v;
-	                }
-	            }
-                return (1-($pos/sizeof($arr)))*100;
-	        }
-	    }
-	    return 0;
-    }
-    
-    public function textSaferHtml($strIN)
-    {
-        return '<p>' . str_replace("\n", '</p><p>', str_replace("\n\n", "\n", str_replace("\n\n", "\n", 
-            strip_tags($strIN, '<b><i><u>')))) . '</p>';
-    }
-    
-    public function makeXMLSafe($strIN)
-    {
-        //$strIN = htmlentities($strIN);
-        $strIN = str_replace("�", "'", str_replace('�', '\'', $strIN));
-        $strIN = str_replace("&#146;", "'", str_replace("&#145;", "'", $strIN));
-        $strIN = str_replace("&#148;", "'", str_replace("&#147;", "'", $strIN));
-        //$strIN = str_replace('&amp;', '&', str_replace('&amp;', '&', str_replace('&amp;', '&', $strIN)));
-        $strIN = str_replace("&#39;", "'", str_replace("&apos;", "'", $strIN));
-        $strIN = str_replace('&quot;', '"', $strIN);
-        $strIN = str_replace('&', '&amp;', $strIN);
-        $strIN = str_replace("'", "&apos;", str_replace("\'", "&apos;", str_replace("\\'", "&apos;", $strIN)));
-        $strIN = str_replace('"', '&quot;', str_replace('\"', '&quot;', str_replace('\\"', '&quot;', $strIN)));
-        $strIN = str_replace('<', '&lt;', $strIN);
-        $strIN = str_replace('>', '&gt;', $strIN);
-        return htmlspecialchars(trim($strIN), ENT_XML1, 'UTF-8');
-        //return trim($strIN);
-    }
-	
-    public function extractJava($str = '', $nID = -3, $destroy = false)
-    {
-        if (trim($str) == '') {
-            return '';
-        }
-        $allMeat = '';
-        $str = str_replace('</ script>', '</script>', $str);
-        $orig = $str;
-        $tag1start = strpos($str, '<script');
-        $cnt = 0;
-        while ($tag1start !== false && $cnt < 20) {
-            $cnt++;
-            $tagMeat = '';
-            $tag1end = strpos($str, '>', $tag1start);
-            if ($tag1end !== false && substr($str, $tag1start, 21) != '<script id="noExtract') {
-                $tag2 = strpos($str, '</script>', $tag1end);
-                if ($tag2 !== false) {
-                    $tagMeat = substr($str, ($tag1end+1), ($tag2-$tag1end-1));
-                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
-                }
-            }
-            $offset = $tag1end-strlen($tagMeat);
-            if (0 < $tag1end && 0 < $offset && $offset < strlen($str)) {
-                $tag1start = strpos($str, '<script', $offset);
-            } else {
-                $tag1start = false;
-            }
-            if (trim($tagMeat) != '') {
-                $allMeat .= (($nID >= 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
-                    . $tagMeat . (($nID >= 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
-            }
-        }
-        if (!$destroy) {
-            $this->pageJAVA .= $allMeat;
-        }
-        return $str;
-    }
-    
-    public function extractStyle($str = '', $nID = -3, $destroy = false)
-    {
-        if (trim($str) == '') {
-            return '';
-        }
-        $allMeat = '';
-        $str = str_replace('</ style>', '</style>', $str);
-        $orig = $str;
-        $tag1start = strpos($str, '<style');
-        while ($tag1start !== false) {
-            $tagMeat = '';
-            $tag1end = strpos($str, '>', $tag1start);
-            if ($tag1end !== false && substr($str, $tag1start, 20) != '<style id="noExtract') {
-                $tag2 = strpos($str, '</style>', $tag1end);
-                if ($tag2 !== false) {
-                    $tagMeat = substr($str, ($tag1end+1), ($tag2-$tag1end-1));
-                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+8));
-                }
-            }
-            if ($tag1end > 0) {
-                $tag1start = strpos($str, '<style', $tag1end-strlen($tagMeat));
-            }
-            if (trim($tagMeat) != '') {
-                $allMeat .= (($nID > 0) ? ' /* start extract from node ' . $nID . ': */ ' : '')
-                    . $tagMeat . (($nID > 0) ? ' /* end extract from node ' . $nID . ': */ ' : '');
-            }
-        }
-        if (!$destroy) {
-            $this->pageCSS .= $allMeat;
-        }
-        return $str;
-    }
     
     public function getIP()
     {
@@ -1045,69 +404,29 @@ class GlobalsStatic
 			. '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', 
 			substr($_SERVER["HTTP_USER_AGENT"],0,4)));
     }
-    
-    public function pausePageScriptCollection()
+
+    public function getPastDateTime($days = 3)
     {
-        $this->x["pageSCRIPTS"] = $this->pageSCRIPTS;
-        $this->x["pageJAVA"]    = $this->pageJAVA;
-        $this->x["pageAJAX"]    = $this->pageAJAX;
-        $this->x["pageCSS"]     = $this->pageCSS;
-        return true;
+        return mktime(0, 0, 0, date("n"), date("j")-$days, date("Y"));
     }
 
-    public function resumePageScriptCollection()
+    public function pastDateTimeStr($days = 3)
     {
-        $this->pageSCRIPTS = $this->x["pageSCRIPTS"];
-        $this->pageJAVA    = $this->x["pageJAVA"];
-        $this->pageAJAX    = $this->x["pageAJAX"];
-        $this->pageCSS     = $this->x["pageCSS"];
-        unset($this->x["pageSCRIPTS"]);
-        unset($this->x["pageJAVA"]);
-        unset($this->x["pageAJAX"]);
-        unset($this->x["pageCSS"]);
-        return true;
+        return date("Y-m-d H:i:s", mktime(0, 0, 0, date("n"), date("j")-$days, date("Y")));
     }
-    
-    public function dateToTime($dateStr = '')
+
+    public function getPastDateArray($minAge = 0)
     {
-        list($month, $day, $year) = ['', '', ''];
-        if (trim($dateStr) != '') {
-            if (strpos($dateStr, '-') > 0) {
-                return strtotime(substr($dateStr, 0, 10));
-            } elseif (strpos($dateStr, '/') > 0) {
-                list($month, $day, $year) = explode('/', $dateStr);
-                if (intVal($month) > 0 && intVal($day) > 0 && intVal($year) > 0) {
-                    return strtotime($year . '-' . $month . '-' . $day);
-                }
-            }
+        if ($minAge <= 0 || $minAge >= mktime(0, 0, 0, date("n"), date("j")+1, date("Y"))) {
+            $minAge = $this->getPastDateTime();
         }
-        return 0;
-    }
-    
-    public function printTimeZoneShift($timeStr = '', $hourShift = -5, $format = 'n/j g:ia')
-    {
-        $time = strtotime($timeStr);
-        return $this->printTimeZoneShiftStamp($time, $hourShift, $format);
-    }
-    
-    public function printTimeZoneShiftStamp($time = 0, $hourShift = -5, $format = 'n/j g:ia')
-    {
-        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time), date('s', $time), 
-            date('m', $time), date('d', $time), date('Y', $time));
-        return date($format, $newTime);
-    }
-    
-    public function arrStandardDeviation($dat = [])
-    {
-        $avg = $diffs = 0;
-        if (sizeof($dat) > 0) {
-            $avg = array_sum($dat)/sizeof($dat);
-            foreach ($dat as $value) {
-                $diffs += ($value-$avg)*($value-$avg);
-            }
-            return abs(sqrt($diffs/sizeof($dat)));
+        $start = mktime(0, 0, 0, date("n"), date("j")+1, date("Y"));
+        $dates = [];
+        for ($i = $start; $i >= $minAge; $i -= (60*60*24)) {
+            $dates[] = date("Ymd", $i);
         }
-        return 0;
+        return $dates;
     }
-    
+
+
 }

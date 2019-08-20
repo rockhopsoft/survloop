@@ -52,7 +52,7 @@ function addIsMobile(nID, isMobile) {
 
 function setFormErrs() {
 	if (document.getElementById("formErrorMsg")) {
-	    document.getElementById("formErrorMsg").innerHTML = "<h2>Please complete all required fields. "+formErrorsEng+"</h2>";
+	    document.getElementById("formErrorMsg").innerHTML = "<b>Oops, you missed a required field "+formErrorsEng+"</b>";
 	    document.getElementById("formErrorMsg").style.display = "block";
 	}
 	return true;

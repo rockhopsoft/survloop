@@ -235,7 +235,7 @@ class SurvLoopImages
                     return '<div class="txtDanger p10">File size too large. Please compress to less than 4MB.</div>';
                 } else {
                     $upFold = '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Uploads/';
-                    //if ($this->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
+                    //if ($GLOBALS["SL"]->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
                     //if (file_exists($upFold . $img->ImgFileLoc)) Storage::delete($upFold . $img->ImgFileLoc);
                     if (!file_exists($upFold . $img->ImgFileLoc)) {
                         $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '')->move($upFold, $img->ImgFileLoc);

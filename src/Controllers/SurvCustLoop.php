@@ -34,8 +34,8 @@ class SurvCustLoop extends PageLoadUtils
                 $class = $custClass;
             }
         }
-        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", " . $this->treeID . ", " 
-            . (($skipSessLoad) ? "true" : "false") . ");");
+        eval("\$this->custLoop = new " . $class . "(\$request, -3, " . $this->dbID . ", "
+            . $this->treeID . ", " . (($skipSessLoad) ? "true" : "false") . ");");
         return true;
     }
 }

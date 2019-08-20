@@ -81,7 +81,7 @@ class GlobalsTables extends GlobalsElements
         ];
         
     // User's position within potentially nested loops
-    public $sessTree       = 'Page';
+    public $sessTree       = 0;
     public $sessLoops      = [];
     public $closestLoop    = [];
     public $tblLoops       = [];
@@ -167,7 +167,8 @@ class GlobalsTables extends GlobalsElements
             $this->treeID  = $treeID;
         }
         $this->treeRow = SLTree::find($this->treeID);
-        if (($treeOverride > 0 || $this->treeOverride <= 0) && (!$this->treeRow || !isset($this->treeRow->TreeID))) {
+        if (($treeOverride > 0 || $this->treeOverride <= 0) 
+            && (!$this->treeRow || !isset($this->treeRow->TreeID))) {
             $this->treeRow = SLTree::where('TreeDatabase', $this->dbID)
                 ->where('TreeType', 'Survey')
                 ->orderBy('TreeID', 'asc')
@@ -177,7 +178,8 @@ class GlobalsTables extends GlobalsElements
             }
         }
 
-        if ($dbID == -3 && isset($this->treeRow->TreeDatabase) && intVal($this->treeRow->TreeDatabase) > 0) {
+        if ($dbID == -3 && isset($this->treeRow->TreeDatabase) 
+            && intVal($this->treeRow->TreeDatabase) > 0) {
             $dbID = $this->treeRow->TreeDatabase;
         }
         if ($treeOverride > 0 || $this->treeOverride <= 0) {
@@ -185,23 +187,30 @@ class GlobalsTables extends GlobalsElements
         }
         $this->def = new GlobalsDefinitions($this->dbID);
         $this->dbRow = SLDatabases::find($this->dbID);
-        if (($treeOverride > 0 || $this->treeOverride <= 0) && $dbID == 1 && !$this->dbRow) {
+        if (($treeOverride > 0 || $this->treeOverride <= 0) 
+            && $dbID == 1 && !$this->dbRow) {
         	$this->dbID = 3;
         	$this->dbRow = SLDatabases::find($this->dbID);
         }
-        if ($this->treeRow && isset($this->treeRow->TreeCoreTable) && intVal($this->treeRow->TreeCoreTable) > 0) {
+        if ($this->treeRow && isset($this->treeRow->TreeCoreTable) 
+            && intVal($this->treeRow->TreeCoreTable) > 0) {
             $this->initCoreTable(SLTables::find($this->treeRow->TreeCoreTable));
         }
         $this->treeIsAdmin = false;
-        if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts > 1 && ($this->treeRow->TreeOpts%3 == 0 
-            || $this->treeRow->TreeOpts%17 == 0 || $this->treeRow->TreeOpts%41 == 0 
-            || $this->treeRow->TreeOpts%43 == 0)) {
+        if (isset($this->treeRow->TreeOpts) && $this->treeRow->TreeOpts > 1 
+            && ($this->treeRow->TreeOpts%3 == 0 || $this->treeRow->TreeOpts%17 == 0 
+            || $this->treeRow->TreeOpts%41 == 0 || $this->treeRow->TreeOpts%43 == 0)) {
             $this->treeIsAdmin = true;
         }
         if (isset($this->dbRow->DbName) && isset($this->treeRow->TreeName)) {
-            $this->treeName = str_replace($this->dbRow->DbName, str_replace('_', '', $this->dbRow->DbPrefix), 
+            $this->treeName = str_replace($this->dbRow->DbName, 
+                str_replace('_', '', $this->dbRow->DbPrefix), 
                 $this->treeRow->TreeName);
-            if ($this->treeRow->TreeType != 'Page') {
+            if ($this->treeRow->TreeType == 'Page') {
+                if ($this->treeRow->TreeCoreTable > 0) {
+                    $this->sessTree = $this->chkReportCoreTreeID($this->treeRow->TreeCoreTable);
+                }
+            } else {
                 $this->sessTree = $this->treeRow->TreeID;
             }
         }
@@ -367,18 +376,28 @@ class GlobalsTables extends GlobalsElements
         return $this->sysOpts["app-url"];
     }
     
+    public function chkReportCoreTreeID($coreTblID = 0)
+    {
+        if ($coreTblID > 0) {
+            $coreTree = SLTree::where('TreeType', 'Survey')
+                ->where('TreeDatabase', $this->dbID)
+                ->where('TreeCoreTable', $coreTblID)
+                ->orderBy('TreeID', 'asc')
+                ->first();
+            if ($coreTree && isset($coreTree->TreeID)) {
+                return $coreTree->TreeID;
+            }
+        }
+        return NULL;
+    }
+    
     public function chkReportCoreTree($coreTbl = '')
     {
         if ($coreTbl == '') {
             $coreTbl = $this->coreTbl;
         }
-        $coreTree = SLTree::where('TreeType', 'Survey')
-            ->where('TreeDatabase', $this->dbID)
-            ->where('TreeCoreTable', $this->tblI[$coreTbl])
-            ->orderBy('TreeID', 'asc')
-            ->first();
-        if ($coreTree && isset($coreTree->TreeID)) {
-            return $coreTree->TreeID;
+        if (isset($this->tblI[$coreTbl])) {
+            return $this->chkReportCoreTreeID($this->tblI[$coreTbl]);
         }
         return NULL;
     }
@@ -415,15 +434,16 @@ class GlobalsTables extends GlobalsElements
     
     public function chkReportFormTree()
     {
-        if ($this->treeRow && isset($this->treeRow->TreeType) && $this->treeRow->TreeType == 'Page') {
+        if ($this->treeRow && isset($this->treeRow->TreeType) 
+            && $this->treeRow->TreeType == 'Page') {
             $nodeChk = SLNode::find($this->treeRow->TreeRoot);
             if ($nodeChk && isset($nodeChk->NodeResponseSet) && intVal($nodeChk->NodeResponseSet) > 0
                 && intVal($nodeChk->NodeResponseSet) != $this->treeID) {
                 $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
             }
         }
-        if (!isset($GLOBALS["SL"]->x["pageView"])) {
-            $GLOBALS["SL"]->x["pageView"] = $GLOBALS["SL"]->x["pageSlugSffx"] = '';
+        if (!isset($GLOBALS["SL"]->pageView)) {
+            $GLOBALS["SL"]->pageView = $GLOBALS["SL"]->x["pageSlugSffx"] = '';
         }
         return true;
     }

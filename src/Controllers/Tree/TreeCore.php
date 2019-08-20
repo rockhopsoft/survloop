@@ -35,8 +35,6 @@ class TreeCore extends SurvLoopController
     protected $REQ             = [];
     protected $tmp             = [];
     
-    protected $debugOn         = true;
-    
     protected function loadNode($nodeRow = NULL)
     {
         if ($nodeRow && isset($nodeRow->NodeID) && $nodeRow->NodeID > 0) {

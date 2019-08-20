@@ -11,6 +11,7 @@
 namespace SurvLoop\Controllers\Admin;
 
 use Auth;
+use Cache;
 use Storage;
 use Illuminate\Http\Request;
 use MatthiasMullie\Minify;
@@ -22,6 +23,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLContact;
 use App\Models\SLEmails;
+use App\Models\SLCaches;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Admin\AdminMenu;
 use SurvLoop\Controllers\PageLoadUtils;
@@ -255,8 +257,10 @@ class AdminController extends SurvLoopController
                 }
             }
         }
-        return ($this->admMenuData["currNavPos"][0] > -1 || $this->admMenuData["currNavPos"][1] > -1
-             || $this->admMenuData["currNavPos"][2] > -1 || $this->admMenuData["currNavPos"][3] > -1);
+        return ($this->admMenuData["currNavPos"][0] > -1 
+            || $this->admMenuData["currNavPos"][1]  > -1
+            || $this->admMenuData["currNavPos"][2]  > -1 
+            || $this->admMenuData["currNavPos"][3]  > -1);
     }
     
     public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
@@ -336,8 +340,10 @@ class AdminController extends SurvLoopController
                     $this->loadCustLoop($request, $tree->TreeID);
                     $this->reloadAdmMenu();
                     $this->v["content"] = $this->custReport->index($request);
-                    return $this->loader->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg(
-                        view('vendor.survloop.master', $this->v)->render()));
+                    return $this->loader->addSessAdmCodeToPage($request, 
+
+
+                        view('vendor.survloop.master', $this->v)->render());
                 }
             }
         }
@@ -365,6 +371,23 @@ class AdminController extends SurvLoopController
             return true;
         }
         return false;
+    }
+    
+    protected function cacheFlushOld()
+    {
+        $old = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-5, date("Y"));
+        SLCaches::where('created_at', '<', date('Y-m-d H:i:s', $old))
+            ->delete();
+        Cache::flush();
+        return true;
+    }
+    
+    protected function cacheFlush()
+    {
+        SLCaches::where('created_at', '>', '2000-01-01 00:00:00')
+            ->delete();
+        Cache::flush();
+        return true;
     }
     
     public function switchDB(Request $request, $dbID = -3)
@@ -446,6 +469,8 @@ class AdminController extends SurvLoopController
                 }
             }
             return $this->redir('/dashboard/settings?refresh=1', true);
+        } elseif ($request->has('refresh') && intVal($request->get('refresh')) == 3) {
+            $this->cacheFlush();
         }
         $GLOBALS["SL"]->addAdmMenuHshoos([
             '/dashboard/settings#search',
@@ -459,10 +484,14 @@ class AdminController extends SurvLoopController
         $this->v["sysDef"] = new SystemDefinitions;
         $this->v["sysDef"]->prepSysSettings($request);
         $this->v["currMeta"] = [
-            "title" => ((isset($GLOBALS['SL']->sysOpts['meta-title'])) ? $GLOBALS['SL']->sysOpts['meta-title'] : ''),
-            "desc"  => ((isset($GLOBALS['SL']->sysOpts['meta-desc'])) ? $GLOBALS['SL']->sysOpts['meta-desc'] : ''),
-            "wrds"  => ((isset($GLOBALS['SL']->sysOpts['meta-keywords'])) ?$GLOBALS['SL']->sysOpts['meta-keywords']:''),
-            "img"   => ((isset($GLOBALS['SL']->sysOpts['meta-img'])) ? $GLOBALS['SL']->sysOpts['meta-img'] : ''),
+            "title" => ((isset($GLOBALS['SL']->sysOpts['meta-title'])) 
+                ? $GLOBALS['SL']->sysOpts['meta-title'] : ''),
+            "desc"  => ((isset($GLOBALS['SL']->sysOpts['meta-desc'])) 
+                ? $GLOBALS['SL']->sysOpts['meta-desc'] : ''),
+            "wrds"  => ((isset($GLOBALS['SL']->sysOpts['meta-keywords'])) 
+                ? $GLOBALS['SL']->sysOpts['meta-keywords']:''),
+            "img"   => ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
+                ? $GLOBALS['SL']->sysOpts['meta-img'] : ''),
             "slug"  => false, 
             "base"  => ''
             ];
@@ -850,6 +879,14 @@ class AdminController extends SurvLoopController
                     . '<hr><hr><i class="slBlueDark">to ' . $emaTo . '</i></div>';
             }
             return view('vendor.survloop.admin.systems-check-email', $this->v);
+        }
+        if ($request->has('testCache') && intVal($request->get('testCache')) == 1) {
+            if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1) {
+                Cache::put('testCache', trim($request->get('cacheVal')));
+            }
+            return view('vendor.survloop.admin.systems-check-cache', [
+                "testCache" => ((Cache::has('testCache')) ? Cache::get('testCache') : '')
+            ]);
         }
         $tree1 = SLTree::find(1);
         $this->v["sysChks"] = [];

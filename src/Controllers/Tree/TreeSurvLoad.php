@@ -72,7 +72,7 @@ class TreeSurvLoad extends TreeSurvConds
     
     protected function loadLookups()
     {
-        $this->debugOn = (!isset($_SERVER["REMOTE_ADDR"]) 
+        $GLOBALS["SL"]->debugOn = (!isset($_SERVER["REMOTE_ADDR"]) 
             || in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1', '173.79.192.119']));
         return true;
     }
@@ -113,7 +113,7 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function loadTreeFromCache()
     {
-        $cacheFile = '/cache/tree-load-' . $this->treeID . '.php';
+        $cacheFile = '/cache/php/tree-load-' . $this->treeID . '.php';
         if (!$GLOBALS["SL"]->REQ->has('refresh') && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
@@ -401,7 +401,9 @@ class TreeSurvLoad extends TreeSurvConds
     
     protected function setPublicID($coreTbl = '')
     {
-        if (trim($coreTbl) == '') $coreTbl = $GLOBALS["SL"]->coreTbl;
+        if (trim($coreTbl) == '') {
+            $coreTbl = $GLOBALS["SL"]->coreTbl;
+        }
         if ($GLOBALS["SL"]->tblHasPublicID($coreTbl) && isset($this->sessData->dataSets[$coreTbl])) {
             $fld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'PublicID';
             if (isset($this->sessData->dataSets[$coreTbl][0])
@@ -526,7 +528,7 @@ class TreeSurvLoad extends TreeSurvConds
     public function sessDump($lastNode = -3)
     {
         //return '<!-- ipip: ' . $_SERVER["REMOTE_ADDR"] . ' -->';
-        if ($this->debugOn) { // && true
+        if ($GLOBALS["SL"]->debugOn) { // && true
             $userName = (($this->v["user"]) ? $this->v["user"]->name : '');
             ob_start();
             print_r($GLOBALS["SL"]->REQ->all());
@@ -546,7 +548,7 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function nodeSessDump($nIDtxt = '', $nID = -3)
     {
-        if ($this->debugOn && true) {
+        if ($GLOBALS["SL"]->debugOn && true) {
             if ($nID > 0 && isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->nodeType)
                 && $this->allNodes[$nID]->nodeType == 'Layout Column') {
                 return '';

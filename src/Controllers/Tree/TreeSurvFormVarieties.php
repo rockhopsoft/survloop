@@ -383,9 +383,9 @@ class TreeSurvFormVarieties extends UserProfile
         list($month, $day, $year) = ['', '', ''];
         if (trim($dateStr) != '') {
             $dateTime = $GLOBALS["SL"]->dateToTime($dateStr);
-            $month = date("m", strtotime($dateTime));
-            $day   = date("d", strtotime($dateTime));
-            $year  = date("Y", strtotime($dateTime));
+            $month = date("m", $dateTime);
+            $day   = date("d", $dateTime);
+            $year  = date("Y", $dateTime);
         }
         return view('vendor.survloop.forms.formtree-date', [
             "nID"            => $nID,

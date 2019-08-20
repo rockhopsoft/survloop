@@ -57,7 +57,7 @@
 .hugTmbRoundDiv img { width: 175px; min-height: 175px; }
 .hugTmbRoundDiv { border: 2px {!! $css["color-main-bg"] !!} solid; box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; }
 
-.litRedDot {
+.litRedDot, .litRedDottie {
     background: {!! $css["color-danger-on"] !!};
     width: 10px;
     height: 10px;
@@ -65,11 +65,15 @@
     border-radius: 5px;
     overflow: hidden;
 }
-.litRedDot .img {
+.litRedDot .img, .litRedDottie .img {
     width: 10px;
     height: 10px;
     display: inline;
     border: 0px none;
+}
+.litRedDottie {
+    background: none;
+    border: 1px {!! $css["color-danger-on"] !!} solid;
 }
 
 .icoBig, i.icoBig, .icoBig i { font-size: 54px; }

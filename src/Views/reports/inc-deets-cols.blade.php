@@ -4,10 +4,10 @@
     <h3 class="mT0 mB10 slBlueDark">{!! $blockName !!}</h3>
 @endif
 @if (isset($deetCols) && sizeof($deetCols) > 0)
-    @if (in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf'])) <table border=0 class="w100"><tr>
+    @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) <table border=0 class="w100"><tr>
     @else <div class="row"> @endif
     @foreach ($deetCols as $i => $deets) 
-        @if (in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
+        @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))
             <td class="vaT pL15 pR15 pB15 @if (sizeof($deetCols) == 2) w50 @elseif (sizeof($deetCols) == 3) w33 
                 @elseif (sizeof($deetCols) == 4) w25 @elseif (sizeof($deetCols) == 5) w20 @endif ">
         @else <div class="col-md-{{ $GLOBALS['SL']->getColsWidth(sizeof($deetCols)) }}"> @endif
@@ -19,9 +19,9 @@
                 @endif
             @endforeach
             </table>
-        @if (in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf'])) </td> @else </div> @endif
+        @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) </td> @else </div> @endif
     @endforeach
-    @if (in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf'])) </tr></table>
+    @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) </tr></table>
     @else </div> @endif
 @endif
 </div>

@@ -316,7 +316,7 @@ function addTopUserBurger(username) {
     if (userAvatar.trim() != "") {
         navCode += "<div id=\"userMenuBtnAvatar\"><img src=\""+userAvatar+"\" border=0 ></div>";
     }
-    navCode += username+" <i id=\"userMenuArr\" class=\"fa fa-caret-down\" aria-hidden=\"true\"></i></div></a>";
+    navCode += "<div id=\"userMenuBtnName\">"+username+"</div> <i id=\"userMenuArr\" class=\"fa fa-caret-down\" aria-hidden=\"true\"></i></div></a>";
     addTopCust(navCode);
     return true;
 }
@@ -338,7 +338,7 @@ function getStateList() {
     return new Array({!! $GLOBALS["SL"]->states->printAllAbbrs() !!});
 }
 
-var openAdmMenuOnLoad = false;
+var openAdmMenuOnLoad = true;
 var sView = 'list';
 var resultLoaded = 0;
 var dashHeight = 0;

@@ -62,12 +62,6 @@ class AdminDBController extends AdminController
         return $this->loadTreesPagesBelowAdmMenu();
     }
     
-    protected function cacheFlush()
-    {
-        Cache::flush();
-        return true;
-    }
-    
     protected function loadLookups()
     {
         $runChecks = false;

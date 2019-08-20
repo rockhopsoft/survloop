@@ -68,6 +68,11 @@ class SurvData
         return true;
     }
     
+    public function getCoreID()
+    {
+        return $this->coreID;
+    }
+    
     public function refreshDataSets($isBigSurvLoop = [])
     {
         $this->dataSets = $this->id2ind = $this->kidMap = $this->helpInfo = [];

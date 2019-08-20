@@ -3,7 +3,8 @@
 @section('content')
 <div class="container">
 <div class="slCard nodeWrap">
-    <div class="pull-right"><a href="?testEmail=1">Test Email</a></div>
+    <div class="pull-right btn btn-secondary btn-sm m5"><a href="?testEmail=1">Test Email</a></div>
+    <div class="pull-right btn btn-secondary btn-sm m5"><a href="?testCache=1">Test Cache</a></div>
     <h2><i class="fa fa-heartbeat"></i> Check</h2>
     <p>If these pages are not throwing error messages, or redirecting home, then that is a good thing...</p>
 </div>

@@ -204,9 +204,12 @@ $(document).ready(function(){
     }
     setTimeout(function() { chkSearchOnLoad(); }, 10);
     $(document).on("click", "#topNavSearchBtn", function() {
-        $("#topNavSearchBtn").fadeOut(50);
-        setTimeout(function() { $("#topNavSearch").fadeIn(50); }, 51);
-        setTimeout(function() { $("#admSrchFld").focus(); }, 102);
+        $("#topNavSearchBtn").fadeOut(25);
+        setTimeout(function() { $("#topNavSearch").fadeIn(25); }, 26);
+        setTimeout(function() { $("#admSrchFld").focus(); }, 52);
+        if (document.getElementById("userMenuBtnName")) {
+            document.getElementById("userMenuBtnName").style.display="none";
+        }
     });
     $(document).on("focusin", "#admSrchFld", function() {
         if (document.getElementById("topNavSearch")) {
@@ -952,12 +955,10 @@ $(document).ready(function(){
         return false;
     });
     setTimeout(function() { 
-        if (openAdmMenuOnLoad) openAdmMenu();
-    }, 500);
+        if (!openAdmMenuOnLoad) closeAdmMenu();
+    }, 10);
     $(window).resize(function() {
-        setTimeout(function() {
-            chkFixedHeaders(false);
-        }, 5);
+        setTimeout(function() { chkFixedHeaders(false); }, 5);
     });
     $(document).on("click", ".admMenuTier1Lnk", function() {
         openAdmMenu();

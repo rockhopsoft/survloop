@@ -11,6 +11,7 @@ namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
+use Cache;
 use Storage;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -19,6 +20,7 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
 use App\Models\SLSess;
+use SurvLoop\Controllers\Globals\GlobalsCache;
 use SurvLoop\Controllers\Globals\Globals;
 
 class PageLoadUtils extends Controller
@@ -55,11 +57,14 @@ class PageLoadUtils extends Controller
     
     public function checkHttpsDomain(Request $request)
     {
-        if (isset($this->domainPath) && strpos($request->fullUrl(), $this->domainPath) === false) {
-            if (strpos($this->domainPath, 'https://') !== false 
-                && strpos($request->fullUrl(), str_replace('https://', 'http://', $this->domainPath)) 
-                !== false) {
-                header("Location: " . str_replace('http://', 'https://', $request->fullUrl()));
+        if (isset($this->domainPath) 
+            && strpos($request->fullUrl(), $this->domainPath) === false) {
+            $pos1 = strpos($this->domainPath, 'https://');
+            $pos2 = strpos($request->fullUrl(), 
+                str_replace('https://', 'http://', $this->domainPath));
+            if ($pos1 !== false && $pos2 !== false) {
+                header("Location: " . str_replace('http://', 'https://', 
+                    $request->fullUrl()));
                 exit;
             }
         }
@@ -178,13 +183,13 @@ class PageLoadUtils extends Controller
         return false;
     }
     
+    public function hasParamEdit(Request $request)
+    {
+        return ($request->has('edit') && intVal($request->get('edit')) == 1);
+    }
+    
     public function loadTreeBySlug(Request $request, $treeSlug = '', $type = 'Survey')
     {
-        if (!$request->has('edit') || intVal($request->get('edit')) != 1 || !$this->isUserAdmin()) {
-            if ($this->topCheckCache($request)) {
-                return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
-            }
-        }
         if (trim($treeSlug) != '') {
             $urlTrees = SLTree::where('TreeType', $type)
                 ->where('TreeSlug', $treeSlug)
@@ -250,16 +255,19 @@ class PageLoadUtils extends Controller
     
     protected function chkSearchRunTrees($trees, $perms)
     {
-        $searchTree = null;
+        $searchTree = $searchTreeHome = null;
         if ($trees->isNotEmpty()) {
             if (sizeof($perms) > 0) {
                 foreach ($perms as $perm) {
                     if ($searchTree === null) {
                         foreach ($trees as $tree) {
-                            if ($searchTree === null 
-                                && $tree->TreeOpts%$perm == 0
+                            if ($searchTree === null && $tree->TreeOpts%$perm == 0
                                 && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
-                                $searchTree = $tree;
+                                if ($tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                                    $searchTreeHome = $tree;
+                                } else {
+                                    $searchTree = $tree;
+                                }
                             }
                         }
                     }
@@ -273,10 +281,17 @@ class PageLoadUtils extends Controller
                         && $tree->TreeOpts%Globals::TREEOPT_STAFF     > 0
                         && $tree->TreeOpts%Globals::TREEOPT_PARTNER   > 0
                         && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
-                        $searchTree = $tree;
+                        if ($tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                            $searchTreeHome = $tree;
+                        } else {
+                            $searchTree = $tree;
+                        }
                     }
                 }
             }
+        }
+        if ($searchTree === null && $searchTreeHome !== null) {
+            $searchTree = $searchTreeHome;
         }
         return $searchTree;
     }
@@ -288,7 +303,8 @@ class PageLoadUtils extends Controller
                 ->where('TreeType', 'Redirect')
                 ->orderBy('TreeID', 'asc')
                 ->first();
-            if ($redirTree && isset($redirTree->TreeDesc) && trim($redirTree->TreeDesc) != '') {
+            if ($redirTree && isset($redirTree->TreeDesc) 
+                && trim($redirTree->TreeDesc) != '') {
                 $redirURL = $redirTree->TreeDesc;
                 if (strpos($redirURL, $this->domainPath) === false 
                     && substr($redirURL, 0, 1)           != '/'
@@ -321,11 +337,17 @@ class PageLoadUtils extends Controller
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t && isset($t->TreeOpts) && $this->okToLoadTree($t->TreeOpts)) {
+                    if ($t && isset($t->TreeOpts) 
+                        && $this->okToLoadTree($t->TreeOpts)) {
                         $rootNode = SLNode::find($t->TreeFirstPage);
                         if ($rootNode && isset($t->TreeSlug) 
                             && isset($rootNode->NodePromptNotes)) {
-                            return $this->loadNodeTreeURLredir($request, $t, $cid);
+                            return $this->loadNodeTreeURLredir(
+                                $request, 
+                                $t, 
+                                $rootNode, 
+                                $cid
+                            );
                         }
                     }
                 }
@@ -334,7 +356,7 @@ class PageLoadUtils extends Controller
         return redirect($this->domainPath . '/');
     }
     
-    protected function loadNodeTreeURLredir(Request $request, $tree = [], $cid = -3)
+    protected function loadNodeTreeURLredir(Request $request, $tree, $rootNode, $cid = -3)
     {
         $redir = $this->dashPrfx . '/u/' . $tree->TreeSlug . '/' . $rootNode->NodePromptNotes;
         if ($cid > 0) {
@@ -401,43 +423,120 @@ class PageLoadUtils extends Controller
     
     protected function topGenCacheKey()
     {
-        $this->cacheKey = '/cache/page-' . substr($_SERVER["REQUEST_URI"], 1) . '.html';
+        $sffx = '-visitor';
+        if ($this->isUserAdmin()) {
+            $sffx = '-admin';
+        } elseif ($this->isUserStaff()) {
+            $sffx = '-staff';
+        } elseif ($this->isUserPartn()) {
+            $sffx = '-partner';
+        } elseif ($this->isUserVolun()) {
+            $sffx = '-volun';
+        } elseif (Auth::user() && Auth::user()->id > 0) {
+            $sffx = '-user';
+        }
+        if ($GLOBALS["SL"]->isOwner) {
+            $sffx .= '-owner';
+        }
+        if (isset($GLOBALS["SL"])) {
+            if (isset($GLOBALS["SL"]->coreID)
+                && intVal($GLOBALS["SL"]->coreID) > 0) {
+                $sffx .= '-c_' . $GLOBALS["SL"]->coreID;
+            }
+            if (isset($GLOBALS["SL"]->pageView) 
+                && $GLOBALS["SL"]->pageView != '') {
+                $sffx .= '-v_' . $GLOBALS["SL"]->pageView;
+            }
+            if (isset($GLOBALS["SL"]->dataPerms) 
+                && $GLOBALS["SL"]->dataPerms != '') {
+                $sffx .= '-p_' . $GLOBALS["SL"]->dataPerms;
+            }
+            $GLOBALS["SL"]->cacheSffx = $sffx;
+        }
+        $uri = str_replace('?refresh=1', '', str_replace('&refresh=1', '', 
+            substr($_SERVER["REQUEST_URI"], 1)));
+        $this->cacheKey = 'page-' . $uri . $sffx . '.html';
         return $this->cacheKey;
     }
     
-    public function topCheckCache(Request $request)
+    public function topCheckCache(Request $request, $type = '')
     {
         $this->topGenCacheKey();
+        $cache = new GlobalsCache;
         if ($request->has('refresh')) {
-            if (file_exists($this->cacheKey)) {
-                Storage::delete($this->cacheKey);
-            }
+            $cache->forgetCache($this->cacheKey, $type);
             return false;
         }
-        if (file_exists($this->cacheKey)) {
-            $this->pageContent = Storage::get($this->cacheKey);
+        $content = $cache->chkCache($this->cacheKey, $type);
+        if (!$this->checkCacheProblem($content, $type)) {
+            $this->pageContent = $content;
             return true;
         }
         return false;
     }
     
-    protected function topSaveCache()
+    public function checkCacheProblem($content = '', $type = '')
+    {
+        if (trim(strip_tags($content)) == '') {
+            return true;
+        }
+        $cache = new GlobalsCache;
+        $problem = false;
+        $pos = strpos($content, 'id="dynCss"');
+        if ($pos > 0) {
+            $pos = strpos($content, '/sys/dyna/', $pos);
+            $pos2 = strpos($content, '"', $pos);
+            if ($pos > 0 && $pos2 > 0) {
+                $file = substr($content, $pos+10, $pos2-$pos-10);
+                $chk = trim($cache->getCachePageCss($file));
+                if ($chk == '') {
+                    $problem = true;
+                }
+            }
+        }
+        $pos = strpos($content, 'id="dynJs"');
+        if ($pos > 0) {
+            $pos = strpos($content, '/sys/dyna/', $pos);
+            $pos2 = strpos($content, '"', $pos);
+            if ($pos > 0 && $pos2 > 0) {
+                $file = substr($content, $pos+10, $pos2-$pos-10);
+                $chk = trim($cache->getCachePageJs($file));
+                if ($chk == '') {
+                    $problem = true;
+                }
+            }
+        }
+        return $problem;
+    }
+    
+    protected function topSaveCache($treeID = 0, $treeType = '')
     {
         $this->chkGenCacheKey();
-        Storage::put($this->cacheKey, $this->pageContent);
+        $cache = new GlobalsCache;
+        $cache->putCache($this->cacheKey, $this->pageContent, $treeType, $treeID);
         return true;
     }
     
     public function addAdmCodeToPage($pageContent)
     {
         $extra = '';
-        if (Auth::user() && isset(Auth::user()->id) && Auth::user()->hasRole('administrator|staff|brancher')) {
+        if (Auth::user() && isset(Auth::user()->id) 
+            && Auth::user()->hasRole('administrator|staff|brancher')) {
             $extra .= ' setTimeout(\'addSideNavItem("Edit Page", "?edit=1")\', 2000); ';
         }
         if (trim($extra) != '') {
-            $extra = '<script async defer type="text/javascript"> ' . $extra . ' </script>';
+            $extra = '<script async defer type="text/javascript"> ' 
+                . $extra . ' </script>';
         }
         return str_replace("</body>", $extra . "\n</body>", $pageContent);
+    }
+    
+    public function addSessAdmCodeToPage(Request $request, $pageContent)
+    {
+        if (!isset($GLOBALS["SL"])) {
+            $this->syncDataTrees($request, 1, 1);
+        }
+        return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($pageContent));
     }
     
     protected function okToLoadTree($treeOpts = 1)

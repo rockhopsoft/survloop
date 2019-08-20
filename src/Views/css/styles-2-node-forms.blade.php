@@ -71,7 +71,7 @@
 }
 .nodeWrapError {
 	padding: 10px 5px 10px 5px;
-	border: 3px {!! $css["color-danger-on"] !!} solid;
+	border: 2px {!! $css["color-danger-on"] !!} solid;
 	box-shadow: 0px 0px 20px {!! $css["color-main-grey"] !!};
 }
 .nodeWrap.nGraph {

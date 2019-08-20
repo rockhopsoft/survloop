@@ -9,9 +9,11 @@
   */
 namespace SurvLoop\Controllers;
 
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Routing\Controller;
+use SurvLoop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
 {
@@ -40,7 +42,8 @@ class SurvRoutes extends Controller
     {
         $expires = $this->getSysExpire($size);
         $metaType = $this->getContentType($type);
-        $response = Response::make(file_get_contents('../storage/app/sys/sys' . $which . $size . '.' . $type));
+        $response = Response::make(file_get_contents(
+            '../storage/app/sys/sys' . $which . $size . '.' . $type));
         $response->header('Content-Type', $metaType);
         $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         $response->header('Expires', gmdate('r', time()+$expires));
@@ -60,7 +63,8 @@ class SurvRoutes extends Controller
     public function getSysTreeJs(Request $request, $treeID = 1)
     {
         $expires = $this->getSysExpire(); // expires daily
-        $response = Response::make(file_get_contents('../storage/app/sys/tree-' . $treeID . '.js'));
+        $response = Response::make(file_get_contents(
+            '../storage/app/sys/tree-' . $treeID . '.js'));
         $response->header('Content-Type', 'application/javascript');
         $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         $response->header('Expires', gmdate('r', time()+$expires));
@@ -69,17 +73,29 @@ class SurvRoutes extends Controller
     
     public function getDynaFile(Request $request, $file = '', $type = '')
     {
-        $expires = $this->getSysExpire(''); // expires immediately
+        $cache = new GlobalsCache;
+        $filename = $file . '.' . $type;
+        //$expires = $this->getSysExpire(''); // expires immediately
         $response = null;
         if (strpos($file, '-s') === false || (session()->has('slSessID') 
             && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
-            $response = Response::make(file_get_contents('../storage/app/cache/dynascript/' . $file . '.' . $type));
-        } else {
+            $ret = '';
+            if ($type == 'js') {
+                $ret = $cache->getCachePageJs($filename);
+            } elseif ($type == 'css') {
+                $ret = $cache->getCachePageCss($filename);
+            }
+            if (trim($ret) != '') {
+                $response = Response::make($ret);
+            }
+        }
+        if ($response === null) {
             $response = Response::make('/* */');
         }
-        $response->header('Content-Type', (($type == 'js') ? 'application/javascript' : 'text/css'));
-        $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
-        $response->header('Expires', gmdate('r', time()+$expires));
+        $response->header('Content-Type', (($type == 'css') ? 'text/css'
+            : 'application/javascript'));
+        //$response->header('Cache-Control', 'public, max-age="' . $expires . '"');
+        //$response->header('Expires', gmdate('r', time()+$expires));
         return $response;
     }
     
@@ -87,7 +103,8 @@ class SurvRoutes extends Controller
     {
         $expires = $this->getSysExpire(); // expires daily
         if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
-            $response = Response::make(file_get_contents('../storage/app/gen-kml/' . $kmlfile . '.kml'));
+            $response = Response::make(file_get_contents(
+                '../storage/app/gen-kml/' . $kmlfile . '.kml'));
             $response->header('Content-Type', 'text/xml');
             $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
             $response->header('Expires', gmdate('r', time()+$expires));

@@ -1,10 +1,14 @@
 <?php
 if (!isset($GLOBALS["SL"])) {
-    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(new Illuminate\Http\Request, 1, 1, 1);
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(
+        new Illuminate\Http\Request, 1, 1, 1
+    );
 }
 $GLOBALS["SL"]->logSiteSessPage();
-$isDashLayout = ((isset($admMenu) && trim($admMenu) != '') || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
-$bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
+$isDashLayout = ((isset($admMenu) && trim($admMenu) != '') 
+    || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
+$bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) 
+    && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -121,7 +125,7 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
 @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
 
 <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
-<td id="leftSide" class="leftSideCollapse">
+<td id="leftSide" class="leftSide">
     <div id="leftSideWdth"></div>
     <div id="leftSideWrap">
         <div id="leftAdmMenu">
@@ -287,10 +291,10 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) && $GLOBALS["SL"]->treeRow->
     </script>
 @endif
 
-@if ((isset($GLOBALS["SL"]->x["pageView"]) && in_array($GLOBALS["SL"]->x["pageView"], ['pdf', 'full-pdf']))
+@if ((isset($GLOBALS["SL"]->pageView) && in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))
     || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
     <script id="dynamicJS" type="text/javascript" defer >
-    @if ($GLOBALS["SL"]->x["pageView"] != 'full-pdf')
+    @if ($GLOBALS["SL"]->pageView != 'full-pdf')
         alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
     @endif
     setTimeout("window.print()", 1000);

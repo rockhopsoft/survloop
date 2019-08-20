@@ -40,7 +40,7 @@ class AdminMenu
     protected function addAdmMenuCollapse()
     {
         return $this->admMenuLnk('javascript:;" id="admMenuClpsBtn', 'Collapse', 
-            '<i id="admMenuClpsArr" class="fa fa-arrow-right" aria-hidden="true"></i>');
+            '<i id="admMenuClpsArr" class="fa fa-arrow-left" aria-hidden="true"></i>');
     }
     
     protected function addAdmMenuBasics($treeMenu = [])

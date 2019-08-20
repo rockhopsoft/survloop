@@ -11,6 +11,7 @@
 namespace SurvLoop\Controllers;
 
 use Auth;
+use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
@@ -54,23 +55,26 @@ class SurvLoop extends SurvCustLoop
         return redirect($this->domainPath . '/');
     }
     
-    public function deferNode(Request $request, $treeID = 1, $nodeID = -3)
+    public function deferNode(Request $request, $treeID = 1, $nodeID = 0, $date = '', $rand = 0)
     {
-        $file = '../storage/app/cache/dynascript/t' . $treeID . 'n' . $nodeID . '.html';
-        if ($treeID > 0 && $nodeID > 0 && $this->loadTreeByID($request, $treeID) && file_exists($file)) {
+        $file = '../storage/app/cache/html/' . $date 
+            . '-t' . $treeID . '-n' . $nodeID . '-r' . $rand . '.html';
+        if ($treeID > 0 && $nodeID > 0 && $this->loadTreeByID($request, $treeID) 
+            && file_exists($file)) {
             return file_get_contents($file);
         }
         return '';
     }
     
-    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '', $skipPublic = false)
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = 0, 
+        $view = '', $skipPublic = false)
     {
         $redir = $this->chkPageRedir($pageSlug);
         if ($redir != $pageSlug) {
             redirect($redir, 301);
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
-            if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
+            if ($this->hasParamEdit($request) && $this->isUserAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                     . $this->treeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;
@@ -80,27 +84,44 @@ class SurvLoop extends SurvCustLoop
                 $this->custLoop->v["isPrint"] = 1;
                 $GLOBALS["SL"]->x["isPrintPDF"] = true;
             }
+            $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
+
             if ($cid > 0) {
-                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid, $skipPublic);
+                if (!$skipPublic) {
+                    $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
+                } else {
+                    $GLOBALS["SL"]->coreID = intVal($cid);
+                }
+                $cid = $GLOBALS["SL"]->coreID;
+                $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
+            }
+
+            if ($this->topCheckCache($request, 'page')) {
+                return $this->addSessAdmCodeToPage($request, $this->pageContent);
+            }
+            if ($cid > 0) {
+                $GLOBALS["SL"]->x["pageSlugSffx"] = '/read-' . $cid;
+                if ($GLOBALS["SL"]->pageView != '') {
+                    $GLOBALS["SL"]->x["pageSlugSffx"] .= '/' . $GLOBALS["SL"]->pageView;
+                }
+                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid, true);
                 if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
                     $this->custLoop->hideDisclaim = true;
                 }
-                $GLOBALS["SL"]->x["pageSlugSffx"] = '/read-' . $cid;
-                $GLOBALS["SL"]->x["pageView"] = trim($view); // blank results in user default
-                if ($GLOBALS["SL"]->x["pageView"] != '') {
-                    $GLOBALS["SL"]->x["pageSlugSffx"] .= '/' . $GLOBALS["SL"]->x["pageView"];
-                }
             }
             if (in_array($view, ['xml', 'json'])) {
-                $GLOBALS["SL"]->x["pageView"] = 'public';
+                $GLOBALS["SL"]->pageView = 'public';
                 $this->custLoop->loadXmlMapTree($request);
                 return $this->custLoop->getXmlID($request, $cid, $pageSlug);
             }
             $this->pageContent = $this->custLoop->index($request);
-            if ($GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE > 0 && $cid <= 0) {
-                $this->topSaveCache();
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
+                $this->topSaveCache(
+                    $GLOBALS["SL"]->treeRow->TreeID, 
+                    strtolower($GLOBALS["SL"]->treeRow->TreeType)
+                );
             }
-            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
+            return $this->addSessAdmCodeToPage($request, $this->pageContent);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -108,13 +129,11 @@ class SurvLoop extends SurvCustLoop
     
     public function loadPageHome(Request $request)
     {
-        if ($this->topCheckCache($request) && (!$request->has('edit') || intVal($request->get('edit')) != 1 
-            || !$this->isUserAdmin())) {
-            return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
-        }
+        $this->syncDataTrees($request);
         $this->loadDomain();
         $this->checkHttpsDomain($request);
         $trees = SLTree::where('TreeType', 'Page')
+            ->where('TreeOpts', '>', (Globals::TREEOPT_HOMEPAGE-1))
             /* ->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
             ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN . " > 0")
             ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF . " > 0")
@@ -124,23 +143,30 @@ class SurvLoop extends SurvCustLoop
             ->get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $i => $tree) {
-                if (isset($tree->TreeOpts) && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0 
-                    && $tree->TreeOpts%Globals::TREEOPT_ADMIN > 0 && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
-                    && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
+                if (isset($tree->TreeOpts) 
+                    && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0 
+                    && $tree->TreeOpts%Globals::TREEOPT_ADMIN     > 0 
+                    && $tree->TreeOpts%Globals::TREEOPT_STAFF     > 0
+                    && $tree->TreeOpts%Globals::TREEOPT_PARTNER   > 0 
+                    && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
                     $redir = $this->chkPageRedir($tree->TreeSlug);
                     if ($redir != $tree->TreeSlug) {
                         return redirect($redir);
                     }
-                    if ($request->has('edit') && intVal($request->get('edit')) == 1 && $this->isUserAdmin()) {
+                    if ($request->has('edit') && intVal($request->get('edit')) == 1 
+                        && $this->isUserAdmin()) {
                         echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                             . $tree->TreeID . '?all=1&alt=1&refresh=1"; </script>';
                         exit;
                     }
                     $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+                    if ($this->topCheckCache($request, 'page')) {
+                        return $this->addSessAdmCodeToPage($request, $this->pageContent);
+                    }
                     $this->loadLoop($request);
                     $this->pageContent = $this->custLoop->index($request);
                     if ($tree->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
-                        $this->topSaveCache();
+                        $this->topSaveCache($tree->TreeID, 'page');
                     }
                     return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
                 }
@@ -148,7 +174,6 @@ class SurvLoop extends SurvCustLoop
         }
         
         // else Home Page not found, so let's create one
-        $this->syncDataTrees($request);
         $installer = new SurvLoopInstaller;
         $installer->checkSysInit();
         return '<center><br /><br /><i>Reloading...</i><br /> <iframe src="/css-reload" frameborder=0
