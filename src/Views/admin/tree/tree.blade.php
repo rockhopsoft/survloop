@@ -6,11 +6,10 @@
         <div class="col-8">
             <h2 class="mB5"><span class="slBlueDark">
             @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-                <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
-                @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Page</nobr>
+                <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}</span></nobr>
             @else
-                <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif {{ $GLOBALS['SL']->treeName }}:</span>
-                Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Survey Map</nobr>
+                <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif {{ $GLOBALS['SL']->treeName }}</span>
+                </nobr>
             @endif
             </h2>
         @if ($isPrint)
@@ -18,10 +17,17 @@
             <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
         @else
             <div class="slGrey">
+                <b>Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif 
+                @if ($GLOBALS['SL']->treeRow->TreeType == 'Page') Page
+                @else Survey
+                @endif Map</b><br />
                 A survey (or form) is created as a tree filled with branching nodes. 
-                Click any node's button (with its ID#) to edit, add new nodes, or to move a node. 
-                Click <i class="fa fa-expand fa-flip-horizontal"></i> to show or hide all the node's children.
-                <a class="adminAboutTog" href="javascript:;">Read more about these branching trees.</a> 
+                Click any node's button (with its ID#) to edit, add new nodes, 
+                or to move a node. 
+                Click <i class="fa fa-expand fa-flip-horizontal"></i> to 
+                show or hide all the node's children.
+                <a class="adminAboutTog" href="javascript:;"
+                    >Read more about these branching trees.</a> 
                 <span class="red mL20">*required</span>
             </div>
         @endif

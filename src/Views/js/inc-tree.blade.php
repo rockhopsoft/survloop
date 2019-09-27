@@ -7,16 +7,19 @@ currTree = {{ $GLOBALS["SL"]->treeID }};
 @forelse ($majorSections as $maj => $majSect)
 treeMajorSects[{{ $maj }}] = new Array({{ $majSect[0] }}, "{{ $majSect[1] }}", "/", "disabled");
 treeMinorSects[{{ $maj }}] = new Array();
-    @if (sizeof($minorSections[$maj]) > 0 && isset($GLOBALS['SL']->treeRow->TreeSlug))
+    @if (sizeof($minorSections[$maj]) > 0 
+        && isset($GLOBALS['SL']->treeRow->TreeSlug))
         @forelse ($minorSections[$maj] as $min => $minSect)
             @if (isset($allNodes[$minSect[0]]))
 treeMinorSects[{{ $maj }}][{{ $min }}] = new Array({{ $minSect[0] }}, "{{ $minSect[1] }}", "/", "disabled");
                 @if ($GLOBALS['SL']->treeIsAdmin)
 treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dash/{{ 
-                    $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
+                    $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
+                    $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
                 @else
 treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/u/{{ 
-                    $GLOBALS['SL']->treeRow->TreeSlug }}/{{ $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
+                    $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
+                    $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}";
                 @endif
             @endif
         @empty
@@ -26,7 +29,8 @@ treeMinorSects[{{ $maj }}][{{ $min }}][2] = "{{ $GLOBALS['SL']->sysOpts['app-url
 @endforelse
 
 @forelse ($GLOBALS["SL"]->proTips as $i => $tip)
-treeProTips[{{ $i }}] = '{{ str_replace("'", "&#39;", $tip) }}';
-treeProTipsImg[{{ $i }}] = @if (isset($GLOBALS["SL"]->proTipsImg[$i])) '{{ $GLOBALS["SL"]->proTipsImg[$i] }}'; @else ''; @endif
+treeProTips[{{ $i }}] = '{{ $tip }}';
+treeProTipsImg[{{ $i }}] = @if (isset($GLOBALS["SL"]->proTipsImg[$i])) '{{ 
+    $GLOBALS["SL"]->proTipsImg[$i] }}'; @else ''; @endif
 @empty
 @endforelse

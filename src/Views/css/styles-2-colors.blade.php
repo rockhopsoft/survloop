@@ -5,45 +5,110 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
     color: {!! $css["color-main-bg"] !!};
 }
 
-.blk, a.blk:link, a.blk:active, a.blk:visited, a.blk:hover { color: {!! $css["color-main-text"] !!}; }
-.wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { color: {!! $css["color-main-bg"] !!}; }
-.fnt, b.fnt, a.fnt:link, a.fnt:active, a.fnt:visited, a.fnt:hover { color: {!! $css["color-main-faint"] !!}; }
-.red, .redDrk, h1.red, h2.red, h3.red, label .red { color: {!! $css["color-danger-on"] !!}; }
-.dbColor { color: {!! $css["color-success-on"] !!}; }
+.blk, a.blk:link, a.blk:active, a.blk:visited, a.blk:hover { 
+    color: {!! $css["color-main-text"] !!};
+}
+.wht, b.wht, a.wht:link, a.wht:active, a.wht:visited, a.wht:hover { 
+    color: {!! $css["color-main-bg"] !!};
+}
+.fnt, b.fnt, a.fnt:link, a.fnt:active, a.fnt:visited, a.fnt:hover {
+    color: {!! $css["color-main-faint"] !!};
+}
+.red, .redDrk, h1.red, h2.red, h3.red, label .red {
+    color: {!! $css["color-danger-on"] !!};
+}
+.dbColor {
+    color: {!! $css["color-success-on"] !!};
+}
 
-.bld, a.bld:link, a.bld:active, a.bld:visited, a.bld:hover { font-weight: bold; }
-.nobld { font-weight: normal; }
-.ital { font-style: italic; }
+.bld, a.bld:link, a.bld:active, a.bld:visited, a.bld:hover {
+    font-weight: bold;
+}
+.nobld {
+    font-weight: normal;
+}
+.ital {
+    font-style: italic;
+}
 
-.brdNo, table.brdNo, table.brdNo tr, table.brdNo tr td { border: 0px none; }
-.brd       { border: 1px {!! $css["color-main-on"] !!} solid; }
-.brdDsh    { border: 1px {!! $css["color-main-on"] !!} dashed; }
-.brdDshGry { border: 1px {!! $css["color-main-grey"] !!} dashed; }
-.brdGrey   { border: 1px {!! $css["color-main-grey"] !!} solid; }
-.brdFnt    { border: 1px {!! $css["color-main-faint"] !!} solid; }
-.brdRed    { border: 1px {!! $css["color-danger-on"] !!} solid; }
-.brdBlk    { border: 1px {!! $css["color-main-text"] !!} solid; }
-.brdInfo   { border: 1px {!! $css["color-info-on"] !!} solid; }
+.brdNo, table.brdNo, table.brdNo tr, table.brdNo tr td {
+    border: 0px none;
+}
+.brd       {
+    border: 1px {!! $css["color-main-on"] !!} solid; 
+}
+.brdDsh    {
+    border: 1px {!! $css["color-main-on"] !!} dashed; 
+}
+.brdDshGry { 
+    border: 1px {!! $css["color-main-grey"] !!} dashed; 
+}
+.brdGrey   { 
+    border: 1px {!! $css["color-main-grey"] !!} solid; 
+}
+.brdFnt    { 
+    border: 1px {!! $css["color-main-faint"] !!} solid; 
+}
+.brdRed    { 
+    border: 1px {!! $css["color-danger-on"] !!} solid; 
+}
+.brdBlk    { 
+    border: 1px {!! $css["color-main-text"] !!} solid; 
+}
+.brdInfo   { 
+    border: 1px {!! $css["color-info-on"] !!} solid; 
+}
 
-.brdTop, table tr.brdTop td, table tr.brdTop th, table tr td.brdTop, table tr th.brdTop { border-top: 1px {!! $css["color-main-on"] !!} solid; }
-.brdBot, table tr.brdBot td, table tr.brdBot th, table tr td.brdBot, table tr th.brdBot { border-bottom: 1px {!! $css["color-main-on"] !!} solid; }
-.brdLft, table tr.brdLft td, table tr.brdLft th, table tr td.brdLft, table tr th.brdLft { border-left: 1px {!! $css["color-main-on"] !!} solid; }
-.brdRgt, table tr.brdRgt td, table tr.brdRgt th, table tr td.brdRgt, table tr th.brdRgt { border-right: 1px {!! $css["color-main-on"] !!} solid; }
+.brdTop, table tr.brdTop td, table tr.brdTop th, table tr td.brdTop, table tr th.brdTop {
+    border-top: 1px {!! $css["color-main-on"] !!} solid;
+}
+.brdBot, table tr.brdBot td, table tr.brdBot th, table tr td.brdBot, table tr th.brdBot {
+    border-bottom: 1px {!! $css["color-main-on"] !!} solid;
+}
+.brdLft, table tr.brdLft td, table tr.brdLft th, table tr td.brdLft, table tr th.brdLft {
+    border-left: 1px {!! $css["color-main-on"] !!} solid;
+}
+.brdRgt, table tr.brdRgt td, table tr.brdRgt th, table tr td.brdRgt, table tr th.brdRgt { 
+    border-right: 1px {!! $css["color-main-on"] !!} solid;
+}
 
-.brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th { border-top: 0px none; }
-.brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th { border-bottom: 0px none; }
+.brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th {
+    border-top: 0px none;
+}
+.brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th {
+    border-bottom: 0px none;
+}
 
-.brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th { border-bottom: 1px {!! $css["color-main-text"] !!} solid; }
-.brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th { border-bottom: 2px {!! $css["color-main-text"] !!} solid; }
-.brdBotGrey, table tr.brdBotGrey td, table tr.brdBotGrey th { border-bottom: 1px {!! $css["color-main-grey"] !!} solid; }
+.brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th {
+    border-bottom: 1px {!! $css["color-main-text"] !!} solid;
+}
+.brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th {
+    border-bottom: 2px {!! $css["color-main-text"] !!} solid;
+}
+.brdBotGrey, table tr.brdBotGrey td, table tr.brdBotGrey th {
+    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
+}
 
-.brdRgtGrey, table tr.brdRgtGrey td, table tr.brdRgtGrey th { border-right: 1px {!! $css["color-main-grey"] !!} solid; }
+.brdRgtGrey, table tr.brdRgtGrey td, table tr.brdRgtGrey th {
+    border-right: 1px {!! $css["color-main-grey"] !!} solid;
+}
+.brdLftGrey, table tr.brdLftGrey td, table tr.brdLftGrey th {
+    border-left: 1px {!! $css["color-main-grey"] !!} solid;
+}
 
-.brdTopGrey, table tr.brdTopGrey td, table tr.brdTopGrey th { border-top: 1px {!! $css["color-main-grey"] !!} solid; }
-.brdTopFnt, table tr.brdTopFnt td, table tr.brdTopFnt th { border-top: 1px {!! $css["color-main-faint"] !!} solid; }
+.brdTopGrey, table tr.brdTopGrey td, table tr.brdTopGrey th { 
+    border-top: 1px {!! $css["color-main-grey"] !!} solid; 
+}
+.brdTopFnt, table tr.brdTopFnt td, table tr.brdTopFnt th { 
+    border-top: 1px {!! $css["color-main-faint"] !!} solid; 
+}
 
-.row1, table tr.row1 { background: {!! $css["color-main-bg"] !!}; }
-.row2, table tr.row2, .table-striped>tbody>tr:nth-of-type(odd) { background: {!! $css["color-main-faint"] !!}; }
+.row1, table tr.row1 {
+    background: {!! $css["color-main-bg"] !!};
+}
+.row2, table tr.row2, .table-striped>tbody>tr:nth-of-type(odd) { 
+    background: {!! $css["color-main-faint"] !!}; 
+}
 .bgPrimary { background: {!! $css["color-main-on"] !!}; }
 .bgInfo { background: {!! $css["color-info-on"] !!}; }
 .bgDanger { background: {!! $css["color-danger-on"] !!}; }

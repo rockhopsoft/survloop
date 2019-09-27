@@ -13,7 +13,7 @@
                 <div id="wordCntpageTitle" class="disIn">0</div> characters
             </div>
             <span class="fPerc80 slGrey">
-                Most search engines only display the first 60 characters of the title.
+                Most search engines preview the first 60 characters
             </span>
         </div>
     </div>

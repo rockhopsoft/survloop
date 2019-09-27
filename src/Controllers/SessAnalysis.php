@@ -42,17 +42,18 @@ class SessAnalysis
             foreach ($chk as $n) {
                 $tmp = new TreeNodeSurv($n->NodeID, $n);
                 $tmp->fillNodeRow();
-                $this->v["nodeTots"][$n->NodeID] = [
+                $this->nodeTots[$n->NodeID] = [
                     "cmpl" => [ 0, 0 ],
                     "perc" => intVal($custReport->rawOrderPercent($n->NodeID)),
-                    "name" => ((isset($tmp->extraOpts["meta-title"]) && trim($tmp->extraOpts["meta-title"]) != '')
+                    "name" => ((isset($tmp->extraOpts["meta-title"]) 
+                        && trim($tmp->extraOpts["meta-title"]) != '')
                         ? $tmp->extraOpts["meta-title"] : $n->NodePromptNotes)
                 ];
-                $this->v["nodeSort"][$this->v["nodeTots"][$n->NodeID]["perc"]] = $n->NodeID;
+                $this->nodeSort[$this->nodeTots[$n->NodeID]["perc"]] = $n->NodeID;
             }
         }
-        ksort($this->v["nodeSort"], 1); // SORT_NUMERIC
-        return $this->v["nodeTots"];
+        ksort($this->nodeSort, 1); // SORT_NUMERIC
+        return $this->nodeTots;
     }
 
     public function analyzeCoreSessions($coreID = -3, $allPublicIDs = [])
@@ -109,7 +110,7 @@ class SessAnalysis
                 $lastCreateDate = $durMinus = 0;
                 foreach ($pages as $i => $p) {
                     $dur = strtotime($p->created_at)-$this->coreTots["date"];
-                    if ($dur >= 0 && isset($this->v["nodeTots"][$p->PageSaveNode])) {
+                    if ($dur >= 0 && isset($this->nodeTots[$p->PageSaveNode])) {
                         $coreLog .= ', [ ' . $dur . ', ' . $p->PageSaveNode . ' ]';
                         $this->coreTots["dur"] = $dur;
                         if ($lastCreateDate > 0) {

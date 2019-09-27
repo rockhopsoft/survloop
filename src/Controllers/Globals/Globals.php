@@ -226,9 +226,10 @@ class Globals extends GlobalsImportExport
                         $str = str_replace('{{' . $b . '}}', $blurb, $str);
                         $changesMade = true;
                     }
-                    if (strpos($str, '{{' . str_replace('&', '&amp;', $b) . '}}') !== false) {
+                    $swapStr = '{{' . str_replace('&', '&amp;', $b) . '}}';
+                    if (strpos($str, $swapStr) !== false) {
                         $blurb = $this->getBlurb($b);
-                        $str = str_replace('{{' . str_replace('&', '&amp;', $b) . '}}', $blurb, $str);
+                        $str = str_replace($swapStr, $blurb, $str);
                         $changesMade = true;
                     }
                 }
@@ -271,8 +272,9 @@ class Globals extends GlobalsImportExport
             ->get();
         if ($emas->isNotEmpty()) {
             foreach ($emas as $e) {
-                $ret .= '<option value="' . $e->EmailID . '" ' . (($e->EmailID == $presel) ? 'SELECTED' : '') . ' >' 
-                    . $e->EmailName . '</option>';
+                $ret .= '<option value="' . $e->EmailID . '" ' 
+                    . (($e->EmailID == $presel) ? 'SELECTED' : '') 
+                    . ' >' . $e->EmailName . '</option>';
             }
         }
         return $ret;
@@ -297,20 +299,35 @@ class Globals extends GlobalsImportExport
     public function swapEmailBlurbs($str)
     {
         $this->loadEmailBlurbNames();
-        if (trim($str) != '' && sizeof($this->emaBlurbs) > 0) {
+        if (trim($str) != '') {
             $changesMade = true;
-            while ($changesMade) {
-                $changesMade = false;
-                foreach ($this->emaBlurbs as $b) {
-                    if (strpos($str, '[{ ' . $b . ' }]') !== false) {
-                        $blurb = $this->getEmailBlurb($b);
-                        $str = str_replace('[{ ' . $b . ' }]', $blurb, $str);
-                        $changesMade = true;
+            if (sizeof($this->emaBlurbs) > 0) {
+                while ($changesMade) {
+                    $changesMade = false;
+                    foreach ($this->emaBlurbs as $b) {
+                        if (strpos($str, '[{ ' . $b . ' }]') !== false) {
+                            $blurb = $this->getEmailBlurb($b);
+                            $str = str_replace('[{ ' . $b . ' }]', $blurb, $str);
+                            $changesMade = true;
+                        }
+                        $swapStr = '[{ ' . str_replace('&', '&amp;', $b) . ' }]';
+                        if (strpos($str, $swapStr) !== false) {
+                            $blurb = $this->getEmailBlurb($b);
+                            $str = str_replace($swapStr, $blurb, $str);
+                            $changesMade = true;
+                        }
                     }
-                    if (strpos($str, '[{ ' . str_replace('&', '&amp;', $b) . ' }]') !== false) {
-                        $blurb = $this->getEmailBlurb($b);
-                        $str = str_replace('[{ ' . str_replace('&', '&amp;', $b) . ' }]', $blurb, $str);
-                        $changesMade = true;
+                }
+            }
+            if (sizeof($GLOBALS["SL"]->REQ->all()) > 0) {
+                foreach ($GLOBALS["SL"]->REQ->all() as $param => $value) {
+                    $pos = strpos($param, 'emaSwap');
+                    if ($pos !== false && $pos == 0) {
+                        $swapStr = '[{ ' . str_replace('emaSwap', '', $param) . ' }]';
+                        if (strpos($str, $swapStr) !== false) {
+                            $str = str_replace($swapStr, $value, $str);
+                            $changesMade = true;
+                        }
                     }
                 }
             }

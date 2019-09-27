@@ -96,7 +96,8 @@ class SurvLoop extends SurvCustLoop
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
             }
 
-            if ($this->topCheckCache($request, 'page')) {
+            if ($this->topCheckCache($request, 'page')
+                && $GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
             if ($cid > 0) {

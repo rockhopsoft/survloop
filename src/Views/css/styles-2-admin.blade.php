@@ -59,29 +59,31 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTie
 }
 .slTopTabs {
     width: 100%;
-    padding-top: 7px;
+    padding-top: 2px;
     margin-bottom: 25px;
     background: {!! $css["color-main-text"] !!};
 }
-.slTopTabs ul.nav.nav-tabs {
+.slTopTabs ul.nav.nav-pills {
     width: 100%;
     border: 0px none;
     border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
 }
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:link,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:visited,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:active,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link:hover {
+.slTopTabs ul.nav.nav-pills li {
+    margin-bottom: 2px;
+}
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:link,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:visited,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:active,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-on"] !!};
     border: 0px none;
-    border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
     margin-right: 7px;
 }
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:link,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:visited,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:active,
-.slTopTabs ul.nav.nav-tabs li.nav-item a.nav-link.active:hover {
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:link,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:visited,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:active,
+.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:hover {
     color: {!! $css["color-main-link"] !!};
     background: {!! $css["color-main-faint"] !!};
     border: 0px none;

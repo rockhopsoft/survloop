@@ -71,7 +71,9 @@ class AdminMenu
             ]), 
             $this->admMenuLnk('/dashboard/pages/menus',     'Navigation Menus'), 
             $this->admMenuLnk('/dashboard/images/gallery',  'Media Gallery'),
-            $this->admMenuLnk('/dashboard/emails',          'Email Templates', '', 1, [
+            $this->admMenuLnk('/dashboard/send-email',      'Send Emails', '', 1, [
+                $this->admMenuLnk('/dashboard/send-email',  'Send Email'),
+                $this->admMenuLnk('/dashboard/emails',      'Manage Templates'),
                 $this->admMenuLnk('/dashboard/sent-emails', 'Sent Emails')
             ]),
             $this->admMenuLnkContact(false)

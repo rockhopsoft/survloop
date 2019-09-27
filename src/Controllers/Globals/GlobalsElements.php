@@ -17,14 +17,30 @@ class GlobalsElements extends GlobalsCache
     public $currTabInd  = 0;
     public $debugOn     = false;
 
+    public function getReqParams()
+    {
+        $params = [
+            'frame',
+            'wdg',
+            'refresh'
+        ];
+        $ret = '';
+        foreach ($params as $param) {
+            if ($this->REQ->has($param)) {
+                $ret .= '&' . $param . '=' . $this->REQ->get($param);
+            }
+        }
+        return $ret;
+    }
+
     public function printAccordian($title, $body = '', $open = false, $big = false, $type = '')
     {
       	return view('vendor.survloop.elements.inc-accordian', [
-        		"accordID" => rand(100000, 1000000),
-        		"title"    => $title,
-        		"body"     => $body,
-        		"big"      => $big,
-        		"open"     => $open,
+    		"accordID" => rand(100000, 1000000),
+    		"title"    => $title,
+    		"body"     => $body,
+    		"big"      => $big,
+    		"open"     => $open,
             "isCard"   => ($type == 'card'),
             "isText"   => ($type == 'text')
       	])->render();
@@ -55,7 +71,8 @@ class GlobalsElements extends GlobalsCache
         $this->pageAJAX .= '$( "#' . $fldName . 'ID" ).datepicker({ maxDate: "+0d" });';
         return '<input type="text" name="' . $fldName . '" id="' . $fldName . 'ID" value="' 
             . (($dateStr != '') ? date("m/d/Y", strtotime($dateStr)) : '')
-            . '" class="dateFld form-control" ' . $this->tabInd() . ' autocomplete="off" >' . "\n";
+            . '" class="dateFld form-control" ' . $this->tabInd() 
+            . ' autocomplete="off" >' . "\n";
     }
     
     public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
@@ -93,7 +110,8 @@ class GlobalsElements extends GlobalsCache
     
     public function getLinkedinShareLnk($url = '', $title = '')
     {
-        return 'https://www.linkedin.com/shareArticle?mini=true&url=' . urlencode($url) . '&title=' . urlencode($title);
+        return 'https://www.linkedin.com/shareArticle?mini=true&url=' 
+            . urlencode($url) . '&title=' . urlencode($title);
     }
     
     public function linkedinShareBtn($url = '', $title = '', $class = '', $btnText = '')
@@ -167,7 +185,12 @@ class GlobalsElements extends GlobalsCache
     public function colorHex2Rgba($hex = '#000000', $a = 1)
     {
         $hex = str_replace("#", "", $hex);
-        $rgba = [ "r" => 0, "g" => 0, "b" => 0, "a" => $a ];
+        $rgba = [
+            "r" => 0,
+            "g" => 0,
+            "b" => 0,
+            "a" => $a
+        ];
         if (strlen($hex) == 3) {
             $rgba["r"] = hexdec(substr($hex,0,1).substr($hex,0,1));
             $rgba["g"] = hexdec(substr($hex,1,1).substr($hex,1,1));

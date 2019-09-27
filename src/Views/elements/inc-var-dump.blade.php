@@ -56,13 +56,14 @@
 </div>
 </center> 
 <div id="hidivDbgPop2">
-    <br />kidMap:
     <div class="row">
-        <div class="col-6">
-            <pre>{!! print_r($sessData->kidMap) !!}</pre>
+        <div class="col-8">
+            kidMap: <pre>{!! str_replace("\n", '  ', 
+                print_r($sessData->kidMap)) !!}</pre>
         </div>
-        <div class="col-6">
-            loopItemIDs: <pre>{!! print_r($sessData->loopItemIDs) !!}</pre>
+        <div class="col-4">
+            loopItemIDs: <pre>{!! str_replace("\n", '  ', 
+                print_r($sessData->loopItemIDs)) !!}</pre>
         </div>
     </div>
     dataSets: <pre>{!! print_r($sessData->dataSets) !!}</pre>

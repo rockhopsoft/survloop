@@ -35,6 +35,7 @@ use SurvLoop\Controllers\Globals\Globals;
 
 class SurvLoopController extends Controller
 {
+    public $isLoaded             = true;
     protected $custReport        = [];
     
     protected $dbID              = 1;
@@ -87,9 +88,6 @@ class SurvLoopController extends Controller
             $this->v["exportDir"] = 'survloop';
             $this->v["content"]   = '';
             $this->v["isOwner"]   = false;
-            if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->dataPerms == '') {
-                $GLOBALS["SL"]->dataPerms = 'public';
-            }
             if (!isset($this->v["currPage"])) {
                 $this->v["currPage"] = ['', ''];
             }
@@ -498,7 +496,8 @@ class SurvLoopController extends Controller
     protected function loadCustSearcher()
     {
         $loaded = false;
-        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
+        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
+            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
             $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Searcher";
             if (class_exists($custClass)) {
@@ -594,8 +593,9 @@ class SurvLoopController extends Controller
         if (!$js) {
             return redirect($redir);
         } else {
-            echo '<script type="text/javascript"> setTimeout("top.location.href=\''
-                . $redir . '\'", 10); </script>';
+            echo '<script type="text/javascript"> '
+                . 'setTimeout("top.location.href=\'' . $redir . '\'", 10); '
+                . '</script>';
             exit;
         }
     }
@@ -755,26 +755,27 @@ class SurvLoopController extends Controller
             ], function (\$m) { \$m->subject('" . str_replace("'", "\\'", $emaSubject) . "')";
                 if (sizeof($emaTo) > 0) {
                     foreach ($emaTo as $i => $eTo) {
-                        $mail .= "->to('" . $eTo[0] . "'" 
-                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                        $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
                 if (sizeof($emaCC) > 0) {
                     foreach ($emaCC as $eTo) {
-                        $mail .= "->cc('" . $eTo[0] . "'" 
-                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                        $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
                 if (sizeof($emaBCC) > 0) {
                     foreach ($emaBCC as $eTo) {
-                        $mail .= "->bcc('" . $eTo[0] . "'" 
-                            . ((trim($eTo[1]) != '') ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                        $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
                     }
                 }
-        $mail .= "->replyTo('" . $repTo[0] . "'" 
-            . ((trim($repTo[1]) != '') ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
+        $mail .= "->replyTo('" . $repTo[0] . "'" . ((trim($repTo[1]) != '') 
+            ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
         if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<br /><br /><br /><div class="container"><h2>' . $emaSubject . '</h2>' . $emaContent 
+            echo '<br /><br /><br /><div class="container"><h2>' 
+                . $emaSubject . '</h2>' . $emaContent 
                 . '<hr><hr></div><pre>' . $mail . '</pre><hr><br />';
             return true;
         }
@@ -786,18 +787,49 @@ class SurvLoopController extends Controller
     protected function sendNewEmailSimple($body, $subject, $emailTo = '', 
         $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
     {
-        $emaTo = $this->getEmailTo($emailTo);
+        $emaTo = [$this->getEmailTo($emailTo)];
         $this->sendEmail($body, $subject, $emaTo);
-        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+        return $this->logEmailSent(
+            $body, 
+            $subject, 
+            $emailTo, 
+            $emailID, 
+            $treeID, 
+            $coreID, 
+            $userTo
+        );
     }
     
     protected function sendNewEmailFromCurrUser($body, $subject, $emailTo = '', 
-        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3, $cc = '', $bcc = '')
     {
-        $emaTo = $this->getEmailTo($emailTo);
+        $emaTo = [$this->getEmailTo($emailTo)];
+        $emaCC = $emaBCC = [];
         $emaFrom = $this->getEmailFromCurrUser();
-        $this->sendEmail($body, $subject, $emaTo, [$emaFrom], [], $emaFrom);
-        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+        $emaCC[] = $this->getEmailTo($emaFrom);
+        if (trim($cc) != '') {
+            $emaCC[] = $this->getEmailTo($cc);
+        }
+        if (trim($bcc) != '') {
+            $emaBCC[] = $this->getEmailTo($bcc);
+        }
+        $this->sendEmail(
+            $body, 
+            $subject, 
+            $emaTo, 
+            $emaCC, 
+            $emaBCC, 
+            $emaFrom
+        );
+        return $this->logEmailSent(
+            $body, 
+            $subject, 
+            $emailTo, 
+            $emailID, 
+            $treeID, 
+            $coreID, 
+            $userTo
+        );
     }
     
     protected function getEmailTo($emailTo = '')
@@ -809,7 +841,9 @@ class SurvLoopController extends Controller
         } elseif (trim($emailTo) != '') {
             $emaUsr = User::where('email', $emailTo)->first();
             if ($emaUsr && isset($emaUsr->name)) {
-                $emaTo[] = [$emailTo, $emaUsr->name];
+                $emaTo = [$emailTo, $emaUsr->name];
+            } else {
+                $emaTo = [$emailTo, ''];
             }
         }
         return $emaTo;
@@ -836,7 +870,8 @@ class SurvLoopController extends Controller
         $emailRec->EmailedRecID    = (($coreID > 0)  ? $coreID  : 0);
         $emailRec->EmailedTo       = trim($emailTo);
         $emailRec->EmailedToUser   = (($userTo > 0)  ? $userTo  : 0);
-        $emailRec->EmailedFromUser = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
+        $emailRec->EmailedFromUser 
+            = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
         $emailRec->EmailedSubject  = $subject;
         $emailRec->EmailedBody     = $body;
         $emailRec->save();

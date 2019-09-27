@@ -25,46 +25,63 @@
             value="{{ $GLOBALS['SL']->REQ->ordAfter }}" @else value="-3" @endif >
 @endif
 
+<div class="slCard nodeWrap">
+    @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
+        <b>Editing <nobr>Node #{{ $node->nodeRow->NodeID }}</nobr></b>
+    @else
+        <b>Adding Node</b>
+    @endif
+    <a class="pull-right fPerc66" 
+        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+            href="/dashboard/page/{{ $treeID }}?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
+        @elseif (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
+            href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
+        @else
+            href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1" 
+        @endif
+        >Back to Form-Tree Map</a>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="pR15">
+                {!! view('vendor.survloop.admin.tree.node-edit-type', [
+                    "node"        => $node,
+                    "nodeTypes"   => $nodeTypes,
+                    "parentNode"  => $parentNode,
+                    "nodeTypeSel" => $nodeTypeSel
+                ])->render() !!}
+            </div>
+        </div>
+        <div class="col-md-4 mBn10 slGreenDark">
+            <label>
+                <b><i class="fa fa-database mR5"></i> Data Family
+                @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot)
+                    <nobr>(Core Table)</nobr>
+                @endif </b>
+                <div class="nFld mT0">
+                    <select name="nodeDataBranch" id="nodeDataBranchID" 
+                        class="form-control slGreenDark" autocomplete="off">
+                        {!! $dataBranchDrop !!}
+                    </select>
+                </div>
+                <div class="fPerc66 mBn15">
+                    node's whole family tree relates
+                </div>
+            </label>
+        </div>
+        <div class="col-md-4">
+            <input type="submit" value="Save Changes" 
+                class="btn btn-primary btn-block mT20" 
+                @if (!$canEditTree) DISABLED @endif >
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-4 mB10">
 
-
-        <div class="slCard nodeWrap">
-            @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-                <h3 class="m0 slBlueDark">Editing <nobr>Node #{{ $node->nodeRow->NodeID }}</nobr></h3>
-            @else <h3 class="m0 slBlueDark">Adding Node</h3> @endif
-            <a class="fPerc66 mTn10" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-                    href="/dashboard/page/{{ $treeID }}?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
-                @elseif (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-                    href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1#n{{ $node->nodeRow->NodeID }}" 
-                @else
-                    href="/dashboard/surv-{{ $treeID }}/map?all=1&alt=1&refresh=1" 
-                @endif >Back to Form-Tree Map</a>
-        
-            {!! view('vendor.survloop.admin.tree.node-edit-type', [
-                "node"        => $node,
-                "nodeTypes"   => $nodeTypes,
-                "parentNode"  => $parentNode,
-                "nodeTypeSel" => $nodeTypeSel
-                ])->render() !!}
-                    
-            <div class="mT20 slGreenDark">
-                <label>
-                    <h4 class="m0 slGreenDark"><i class="fa fa-database mR5"></i> Data Family
-                    @if ($node->nodeID == $GLOBALS['SL']->treeRow->TreeRoot) : Core Table @endif </h4>
-                    <span class="fPerc66">Node's whole family tree can store data fields related to table.</span>
-                    <div class="nFld mT0"><select name="nodeDataBranch" id="nodeDataBranchID" autocomplete="off" 
-                        class="form-control slGreenDark">
-                        {!! $dataBranchDrop !!}
-                    </select></div>
-                </label>
-            </div>
-            <div id="saveBtnGapTop" class="p10"></div>
-            <input type="submit" value="Save Changes" class="btn btn-lg btn-primary btn-block" 
-                @if (!$canEditTree) DISABLED @endif >
-        </div>
-    
-        <div id="pagePreview" class=" @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
+        <div id="pagePreview" class=" 
+            @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
             <div class="slCard nodeWrap">
                 <h4 class="mT0">Social Sharing Preview</h4>
                 {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}

@@ -1,8 +1,11 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-edit-type.blade.php -->
-<h4 class="slBlueDark m0"><i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type</h4>
-<div id="nodeTypeFld1" class="nFld w100 mT10 pT5">
+<div class="slBlueDark mBn20"><b>
+    <i class="fa fa-cube mR5" aria-hidden="true"></i> Node Type
+</b></div>
+<div id="nodeTypeFld1" class="nFld w100 pT5">
     <select name="nodeType" id="nodeTypeID" class="form-control" 
-        autocomplete="off" onChange="return changeNodeType(this.value);" {{ $nodeTypeSel }} >
+        autocomplete="off" onChange="return changeNodeType(this.value);" 
+        {{ $nodeTypeSel }} >
     
     @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
     
@@ -60,37 +63,52 @@
     
     </select>
 </div>
-<div id="responseType" class="@if ($node->isSpecial()) disNon @else disBlo @endif ">
-    <div class="nFld m0"><select name="nodeTypeQ" id="nodeTypeQID" 
-        class="form-control slBlueDark w100" 
-        onChange="return changeResponseType(this.value);" autocomplete="off" >
+<div id="responseType" 
+    class="@if ($node->isSpecial()) disNon @else disBlo @endif ">
+    <div class="nFld m0">
+        <select name="nodeTypeQ" id="nodeTypeQID" 
+            class="form-control slBlueDark w100" autocomplete="off" 
+            onChange="return changeResponseType(this.value);" >
     @foreach ($nodeTypes as $type)
-        <option value="{{ $type }}" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == $type) SELECTED @endif >{{ $type }}</option>
+        <option value="{{ $type }}"
+            @if (isset($node->nodeRow->NodeType) 
+                && $node->nodeRow->NodeType == $type) 
+                SELECTED
+            @endif >{{ $type }}</option>
     @endforeach
-    </select></div>
-    @if (isset($parentNode->NodeType) && in_array($parentNode->NodeType, ['Checkbox']))
+        </select>
+    </div>
+    @if (isset($parentNode->NodeType) 
+        && in_array($parentNode->NodeType, ['Checkbox']))
         <div class="mT5 mB10 slGrey fPerc80">
-            <i>Select <span class="blk">Layout Sub-Response</span> to make this node's children appear within 
-            each of the parent's responses to a <span class="blk">Checkbox</span>.</i>
+            <i>Select <span class="blk">Layout Sub-Response</span> 
+            to make this node's children appear within 
+            each of the parent's responses to a 
+            <span class="blk">Checkbox</span>.</i>
         </div>
     @else <div class="m5"></div>
     @endif
 </div>
-<div id="dataPrintType" class="@if ($node->isDataPrint()) disBlo @else disNon @endif ">
-    <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" autocomplete="off" 
-        class="form-control slBlueDark w100" onChange="return changeDataPrintType(this.value);" >
+<div id="dataPrintType" 
+    class="@if ($node->isDataPrint()) disBlo @else disNon @endif ">
+    <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" 
+        class="form-control slBlueDark w100" autocomplete="off"
+        onChange="return changeDataPrintType(this.value);" >
         <option value="Data Print Row" @if (!isset($node->nodeRow->NodeType) 
             || in_array(trim($node->nodeRow->NodeType), ['', 'Data Print Row', 'Instructions'])) 
             SELECTED @endif >Data Block Row</option>
         <option value="Data Print Block" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print Block') SELECTED @endif >One Block of Data Rows</option>
+            && $node->nodeRow->NodeType == 'Data Print Block') SELECTED @endif 
+            >One Block of Data Rows</option>
         <option value="Data Print Columns" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print Columns') SELECTED @endif >Columns of Data Rows</option>
+            && $node->nodeRow->NodeType == 'Data Print Columns') SELECTED @endif 
+            >Columns of Data Rows</option>
         <option value="Print Vert Progress" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Print Vert Progress') SELECTED @endif >Column of Progress</option>
+            && $node->nodeRow->NodeType == 'Print Vert Progress') SELECTED @endif 
+            >Column of Progress</option>
         <option value="Data Print" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print') SELECTED @endif >Plain Data Printout</option>
+            && $node->nodeRow->NodeType == 'Data Print') SELECTED @endif 
+            >Plain Data Printout</option>
     </select></div>
 </div>
 <div id="widgetType" class="@if ($node->isWidget()) disBlo @else disNon @endif nFld mT0 ">

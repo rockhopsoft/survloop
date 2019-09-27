@@ -13,6 +13,7 @@ namespace SurvLoop\Controllers\Globals;
 use Storage;
 use MatthiasMullie\Minify;
 use App\Models\SLCaches;
+use App\Models\SLTree;
 use SurvLoop\Controllers\Globals\GlobalsStatic;
 
 class GlobalsCache extends GlobalsStatic
@@ -22,7 +23,7 @@ class GlobalsCache extends GlobalsStatic
 
     public $coreID      = 0;
     public $pageView    = '';
-    public $dataPerms   = '';
+    public $dataPerms   = 'public';
     public $cacheSffx   = '';
     public $isOwner     = false;
 
@@ -93,10 +94,28 @@ class GlobalsCache extends GlobalsStatic
     public function forgetCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
         $type = $this->chkCacheType($type);
-        $chk = $this->getCache($key, $type, $treeID, $coreID);
-        if ($chk && isset($chk->CachID)) {
-            Storage::delete($this->cachePath . '/html/' . $chk->CachValue);
-            $chk->delete();
+        $cache = $this->getCache($key, $type, $treeID, $coreID);
+        return $this->deleteCacheFile($cache);
+    }
+
+    public function forgetAllItemCaches($treeID = 0, $coreID = 0)
+    {
+        $chk = SLCaches::where('CachTreeID', $treeID)
+            ->where('CachRecID', $coreID)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
+        return true;
+    }
+
+    public function deleteCacheFile($cache)
+    {
+        if ($cache && isset($cache->CachID)) {
+            Storage::delete($this->cachePath . '/html/' . $cache->CachValue);
+            $cache->delete();
             return true;
         }
         return false;
@@ -105,10 +124,16 @@ class GlobalsCache extends GlobalsStatic
     public function putCache($key = '', $content = '', $type = '', $treeID = 0, $coreID = 0)
     {
         $file = date("Ymd") . '-t' . $treeID . (($coreID > 0) ? '-c' . $coreID : '');
-     /* if ($this->treeRow->TreeType != 'Page' 
-            || $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
+        $treeRow = false;
+        if (isset($this->treeRow) && isset($this->treeRow->TreeType)) {
+            $treeRow = $this->treeRow;
+        } elseif ($treeID > 0) {
+            $treeRow = SLTree::find($treeID);
+        }
+        if (isset($treeRow->TreeType) && $treeRow->TreeType == 'Page' 
+            && $treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
             $file .= '-s' . session()->get('slSessID');
-        } */
+        }
         $file .= '-' . str_replace('.html', '', str_replace('?', '_', 
                 str_replace('&', '_', str_replace('/', '_', $key))))
             . '-r' . rand(10000000, 100000000) . '.html';
@@ -253,8 +278,8 @@ class GlobalsCache extends GlobalsStatic
         }
         $minPath = '../storage/app/' . $this->cachePath;
         $fileCss = date("Ymd") . '-t' . $this->treeID;
-        if ($this->treeRow->TreeType != 'Page' 
-            || $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
+        if ($this->treeRow->TreeType == 'Page' 
+            && $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
             $fileCss .= '-s' . session()->get('slSessID');
         }
         $fileCss .= '-r' . rand(10000000, 100000000) . '.css';

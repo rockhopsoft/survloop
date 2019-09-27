@@ -513,7 +513,13 @@ class PageLoadUtils extends Controller
     {
         $this->chkGenCacheKey();
         $cache = new GlobalsCache;
-        $cache->putCache($this->cacheKey, $this->pageContent, $treeType, $treeID);
+        $cache->putCache(
+            $this->cacheKey, 
+            $this->pageContent, 
+            $treeType, 
+            $treeID, 
+            ((isset($GLOBALS["SL"]->coreID)) ? $GLOBALS["SL"]->coreID : 0)
+        );
         return true;
     }
     

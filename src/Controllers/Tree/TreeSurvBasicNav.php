@@ -90,7 +90,8 @@ class TreeSurvBasicNav extends TreeSurvProgBar
         }
         $this->loopCnt = 0;
         while (!$this->isDisplayableNode($nID) && $this->loopCnt < 1000) {
-            if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage && $direction == 'next') {
+            if ($nID == $GLOBALS["SL"]->treeRow->TreeLastPage 
+                && $direction == 'next') {
                 return -37;
             }
             $nIDbranch = $this->checkBranchCondition($nID, $direction);
@@ -104,14 +105,17 @@ class TreeSurvBasicNav extends TreeSurvProgBar
             $this->loopCnt++;
         }
         if (trim($this->loadingError) != '') {
-            $ret .= '<div class="p10"><i>loadNodeSubTier() - ' . $this->loadingError . '</i></div>';
+            $ret .= '<div class="p10"><i>loadNodeSubTier() - ' 
+                . $this->loadingError . '</i></div>';
         }
         return $nID;
     }
     
     protected function checkBranchCondition($nID, $direction = 'next')
     {
-        if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->isBranch() && !$this->checkNodeConditions($nID)) {
+        if (isset($this->allNodes[$nID]) 
+            && $this->allNodes[$nID]->isBranch() 
+            && !$this->checkNodeConditions($nID)) {
             if ($direction == 'next') {
                 $nID = $this->nextNodeSibling($nID);
             } else {
@@ -128,7 +132,8 @@ class TreeSurvBasicNav extends TreeSurvProgBar
             if ($this->allNodes[$parent]->isPage()) {
                 return true;
             }
-            if ($this->allNodes[$parent]->isBranch() || $this->allNodes[$parent]->isLoopRoot()) {
+            if ($this->allNodes[$parent]->isBranch() 
+                || $this->allNodes[$parent]->isLoopRoot()) {
                 return false;
             }
             $parent = $this->allNodes[$parent]->getParent();
@@ -139,9 +144,11 @@ class TreeSurvBasicNav extends TreeSurvProgBar
     protected function hasAncestPrintBlock($nID)
     {
         $found = false;
-        if (isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->parentID)) {
+        if (isset($this->allNodes[$nID]) 
+            && isset($this->allNodes[$nID]->parentID)) {
             $parent = $this->allNodes[$nID]->parentID;
-            while ($parent > 0 && isset($this->allNodes[$parent]) && isset($this->allNodes[$parent]->parentID)) {
+            while ($parent > 0 && isset($this->allNodes[$parent]) 
+                && isset($this->allNodes[$parent]->parentID)) {
                 if ($this->allNodes[$parent]->isDataPrint()) {
                     $found = true;
                 }
@@ -153,13 +160,16 @@ class TreeSurvBasicNav extends TreeSurvProgBar
     
     protected function isDisplayableNode($nID, $exception = '')
     {
-        if (!$this->hasNode($nID) || !$this->checkNodeConditions($nID)) {
+        if (!$this->hasNode($nID) 
+            || !$this->checkNodeConditions($nID)) {
             return false;
         }
-        if ($this->allNodes[$nID]->isDataManip() && !$this->nodeIsWithinPage($nID)) {
+        if ($this->allNodes[$nID]->isDataManip() 
+            && !$this->nodeIsWithinPage($nID)) {
             $this->runDataManip($nID, true);
         }
-        if (!$this->allNodes[$nID]->isPage() && !$this->allNodes[$nID]->isLoopRoot()) {
+        if (!$this->allNodes[$nID]->isPage() 
+            && !$this->allNodes[$nID]->isLoopRoot()) {
             return false;
         }
         if (!$this->checkParentBranchConditions($nID)) {
@@ -246,7 +256,8 @@ class TreeSurvBasicNav extends TreeSurvProgBar
             if (isset($this->allNodes[$nID]->nodeRow->NodePromptNotes) 
                 && trim($this->allNodes[$nID]->nodeRow->NodePromptNotes) != '') {
                 $this->pushCurrNodeVisit($nID);
-                if ($this->hasREQ && ($GLOBALS["SL"]->REQ->has('ajax') || $GLOBALS["SL"]->REQ->has('frame'))) {
+                if ($this->hasREQ && ($GLOBALS["SL"]->REQ->has('ajax') 
+                    || $GLOBALS["SL"]->REQ->has('frame'))) {
                     $title = $this->allNodes[$nID]->nodeRow->NodePromptText;
                     if (strpos($title, '</h1>') > 0) {
                         $title = substr($title, 0, strpos($title, '</h1>'));
@@ -267,12 +278,14 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                     $this->v["currPage"]    = [];
                     $this->v["currPage"][1] = ((trim($title) != '') ? $title . ' - ' : '') 
                         . $GLOBALS["SL"]->sysOpts["site-name"];
-                    $this->v["currPage"][0] = '/' . (($GLOBALS["SL"]->treeIsAdmin) ? 'dash' : 'u') . '/' 
-                        . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->allNodes[$nID]->nodeRow->NodePromptNotes;
-                    $GLOBALS["SL"]->pageJAVA .= 'setCurrPage("' . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] . '", ' . $this->currNode() . '); ';
-                    $GLOBALS["SL"]->pageAJAX .= 'history.pushState( {}, "' . $this->v["currPage"][1] . '", '
-                        . '"' . $this->v["currPage"][0] . '");' . "\n" 
-                        . 'document.title="' . $this->v["currPage"][1] . '";' . "\n";
+                    $this->v["currPage"][0] = '/' . (($GLOBALS["SL"]->treeIsAdmin) ? 'dash' : 'u') 
+                        . '/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' 
+                        . $this->allNodes[$nID]->nodeRow->NodePromptNotes;
+                    $GLOBALS["SL"]->pageJAVA .= 'setCurrPage("' . $this->v["currPage"][1] . '", "' 
+                        . $this->v["currPage"][0] . '", ' . $this->currNode() . '); ';
+                    $GLOBALS["SL"]->pageAJAX .= 'history.pushState( {}, "' 
+                        . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] . '");' 
+                        . "\n" . 'document.title="' . $this->v["currPage"][1] . '";' . "\n";
                 }
             }
         }
@@ -281,7 +294,8 @@ class TreeSurvBasicNav extends TreeSurvProgBar
     
     public function pushCurrNodeVisit($nID)
     {
-        if (isset($this->sessInfo->SessID) && $nID > 0 && !$GLOBALS["SL"]->REQ->has('preview')) {
+        if (isset($this->sessInfo->SessID) && $nID > 0 
+            && !$GLOBALS["SL"]->REQ->has('preview')) {
             $pagsSave = new SLNodeSavesPage;
             $pagsSave->PageSaveSession = $this->sessInfo->SessID;
             $pagsSave->PageSaveNode    = $nID;
@@ -317,8 +331,9 @@ class TreeSurvBasicNav extends TreeSurvProgBar
         $this->allNodes[$curr]->fillNodeRow();
         if (isset($this->allNodes[$curr]) && $this->allNodes[$curr]->isPage()
             && trim($this->allNodes[$curr]->nodeRow->NodePromptNotes) != '') {
-            return '/' . (($GLOBALS["SL"]->treeIsAdmin) ? 'dash' : 'u') . '/' 
-                . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $this->allNodes[$curr]->nodeRow->NodePromptNotes;
+            return '/' . (($GLOBALS["SL"]->treeIsAdmin) ? 'dash' : 'u') 
+                . '/' . $GLOBALS["SL"]->treeRow->TreeSlug 
+                . '/' . $this->allNodes[$curr]->nodeRow->NodePromptNotes;
         }
         return '';
     }
@@ -334,9 +349,11 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                 })
                 ->first();
             if ($loadNode && isset($loadNode->NodeID)) {
-                if (!$GLOBALS["SL"]->REQ->has('preview') && !$GLOBALS["SL"]->REQ->has('popStateUrl')) {
+                if (!$GLOBALS["SL"]->REQ->has('preview') 
+                    && !$GLOBALS["SL"]->REQ->has('popStateUrl')) {
                     $loadNodeChk = DB::table('SL_NodeSavesPage')
-                        ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', '=', 'SL_Sess.SessID')
+                        ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', 
+                            '=', 'SL_Sess.SessID')
                         ->where('SL_Sess.SessTree', '=', $this->treeID)
                         ->where('SL_Sess.SessCoreID', '=', $this->coreID)
                         ->where('SL_NodeSavesPage.PageSaveNode', $loadNode->NodeID)
@@ -349,12 +366,15 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                 //$this->leavingTheLoop();
                 $prevNode = $this->currNode();
                 $this->updateCurrNode($loadNode->NodeID);
-                if (sizeof($GLOBALS["SL"]->dataLoops) > 0 && sizeof($GLOBALS["SL"]->sessLoops) > 0) {
+                if (sizeof($GLOBALS["SL"]->dataLoops) > 0 
+                    && sizeof($GLOBALS["SL"]->sessLoops) > 0) {
                     foreach ($GLOBALS["SL"]->sessLoops as $sessLoop) {
                         foreach ($GLOBALS["SL"]->dataLoops as $loop) {
-                            if ($sessLoop->SessLoopName == $loop->DataLoopPlural) {
+                            if ($sessLoop->SessLoopName == $loop->DataLoopPlural
+                                && isset($this->allNodes[$loop->DataLoopRoot])) {
                                 $path = $this->allNodes[$loop->DataLoopRoot]->nodeTierPath;
-                                if ($this->allNodes[$prevNode]->checkBranch($path)
+                                if (isset($this->allNodes[$prevNode]) 
+                                    && $this->allNodes[$prevNode]->checkBranch($path)
                                     && !$this->allNodes[$this->currNode()]->checkBranch($path)) {
                                     $this->leavingTheLoop($loop->DataLoopPlural);
                                 }

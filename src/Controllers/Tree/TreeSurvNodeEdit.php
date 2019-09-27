@@ -89,7 +89,8 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 } elseif ($node->nodeRow->NodeOpts%2 == 0) {
                     $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
                 }
-                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101];
+                $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 
+                    53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o
@@ -100,21 +101,25 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     }
                 }
                 $isPageRoot = ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $node->nodeRow->NodeParentID <= 0);
-                $node->nodeRow->NodePromptText      = trim($GLOBALS["SL"]->REQ->get('nodePromptText'));
-                $node->nodeRow->NodePromptNotes     = trim($GLOBALS["SL"]->REQ->get('nodePromptNotes'));
-                $node->nodeRow->NodePromptAfter     = trim($GLOBALS["SL"]->REQ->get('nodePromptAfter'));
-                $node->nodeRow->NodeInternalNotes   = trim($GLOBALS["SL"]->REQ->get('nodeInternalNotes'));
-                $node->nodeRow->NodeDefault         = trim($GLOBALS["SL"]->REQ->get('nodeDefault'));
-                $node->nodeRow->NodeTextSuggest     = trim($GLOBALS["SL"]->REQ->get('nodeTextSuggest'));
-                $node->nodeRow->NodeDataBranch      = trim($GLOBALS["SL"]->REQ->get('nodeDataBranch'));
-                $node->nodeRow->NodeDataStore       = trim($GLOBALS["SL"]->REQ->get('nodeDataStore'));
-                $node->nodeRow->NodeCharLimit       = intVal($GLOBALS["SL"]->REQ->get('nodeCharLimit'));
+                $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->nodePromptText);
+                $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->nodePromptNotes);
+                $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->nodePromptAfter);
+                $node->nodeRow->NodeInternalNotes = trim($GLOBALS["SL"]->REQ->nodeInternalNotes);
+                $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->nodeDefault);
+                $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->nodeTextSuggest);
+                $node->nodeRow->NodeDataBranch  = trim($GLOBALS["SL"]->REQ->nodeDataBranch);
+                $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->nodeDataStore);
+                $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->nodeCharLimit);
                 if (in_array($GLOBALS["SL"]->REQ->nodeType, ['page', 'loop']) || $isPageRoot) {
-                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->get('nodeSlug'));
+                    $node->nodeRow->NodePromptNotes = trim($GLOBALS["SL"]->REQ->nodeSlug);
                     $metaDesc = trim($GLOBALS["SL"]->REQ->get('pageDesc'));
-                    if ($metaDesc == $GLOBALS["SL"]->sysOpts["meta-desc"]) $metaDesc = '';
+                    if ($metaDesc == $GLOBALS["SL"]->sysOpts["meta-desc"]) {
+                        $metaDesc = '';
+                    }
                     $metaWords = trim($GLOBALS["SL"]->REQ->get('pageKey'));
-                    if ($metaWords == $GLOBALS["SL"]->sysOpts["meta-keywords"]) $metaWords = '';
+                    if ($metaWords == $GLOBALS["SL"]->sysOpts["meta-keywords"]) {
+                        $metaWords = '';
+                    }
                     $metaImg = trim($GLOBALS["SL"]->REQ->get('pageImg'));
                     if (strpos($metaImg, $GLOBALS['SL']->sysOpts['app-url']) === 0) {
                         $metaImg = str_replace($GLOBALS['SL']->sysOpts['app-url'], '', $metaImg);
@@ -122,12 +127,13 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     if ($metaImg == $GLOBALS["SL"]->sysOpts["meta-img"]) {
                         $metaImg = '';
                     }
-                    $node->nodeRow->NodePromptAfter  = trim($GLOBALS["SL"]->REQ->get('pageTitle')) . '::M::' 
-                        . $metaDesc . '::M::' . $metaWords . '::M::' . $metaImg;
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('pageTitle')) 
+                        . '::M::' . $metaDesc . '::M::' . $metaWords . '::M::' . $metaImg;
                 }
                 if ($GLOBALS["SL"]->REQ->nodeType == 'page' || $isPageRoot) {
                     $node->nodeRow->NodeType      = 'Page';
-                    $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->get('pageFocusField'));
+                    $node->nodeRow->NodeCharLimit 
+                        = intVal($GLOBALS["SL"]->REQ->get('pageFocusField'));
                     if ($isPageRoot) {
                         if ($GLOBALS["SL"]->REQ->has('reportPageTree')
                             && intVal($GLOBALS["SL"]->REQ->reportPageTree) > 0) {
@@ -141,7 +147,8 @@ class TreeSurvNodeEdit extends TreeSurvForm
                                 }
                             } else {
                                 if ($GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) {
-                                    $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/13;
+                                    $GLOBALS["SL"]->treeRow->TreeOpts 
+                                        = $GLOBALS["SL"]->treeRow->TreeOpts/13;
                                     $GLOBALS["SL"]->treeRow->save();
                                 }
                             }
@@ -153,7 +160,8 @@ class TreeSurvNodeEdit extends TreeSurvForm
                                 }
                             } else {
                                 if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0) {
-                                    $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/31;
+                                    $GLOBALS["SL"]->treeRow->TreeOpts 
+                                        = $GLOBALS["SL"]->treeRow->TreeOpts/31;
                                     $GLOBALS["SL"]->treeRow->save();
                                 }
                             }
@@ -161,17 +169,33 @@ class TreeSurvNodeEdit extends TreeSurvForm
                             $node->nodeRow->NodeResponseSet = null;
                             $node->nodeRow->save();
                         }
-                        if ($GLOBALS["SL"]->REQ->has('pageBg') && intVal($GLOBALS["SL"]->REQ->pageBg) == 67) {
+                        if ($GLOBALS["SL"]->REQ->has('pageBg') 
+                            && intVal($GLOBALS["SL"]->REQ->pageBg) == 67) {
                             if ($GLOBALS["SL"]->treeRow->TreeOpts%67 > 0) {
                                 $GLOBALS["SL"]->treeRow->TreeOpts *= 67;
                                 $GLOBALS["SL"]->treeRow->save();
                             }
                         } else {
                             if ($GLOBALS["SL"]->treeRow->TreeOpts%67 == 0) {
-                                $GLOBALS["SL"]->treeRow->TreeOpts = $GLOBALS["SL"]->treeRow->TreeOpts/67;
+                                $GLOBALS["SL"]->treeRow->TreeOpts 
+                                    = $GLOBALS["SL"]->treeRow->TreeOpts/67;
                                 $GLOBALS["SL"]->treeRow->save();
                             }
                         }
+                        if ($GLOBALS["SL"]->REQ->has('noCache') 
+                            && intVal($GLOBALS["SL"]->REQ->noCache) == 29) {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%29 > 0) {
+                                $GLOBALS["SL"]->treeRow->TreeOpts *= 29;
+                                $GLOBALS["SL"]->treeRow->save();
+                            }
+                        } else {
+                            if ($GLOBALS["SL"]->treeRow->TreeOpts%29 == 0) {
+                                $GLOBALS["SL"]->treeRow->TreeOpts 
+                                    = $GLOBALS["SL"]->treeRow->TreeOpts/29;
+                                $GLOBALS["SL"]->treeRow->save();
+                            }
+                        }
+
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'branch') {
                     $node->nodeRow->NodeType = 'Branch Title';
@@ -179,9 +203,10 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 } elseif (in_array($GLOBALS["SL"]->REQ->nodeType, ['instruct', 'instructRaw'])) {
                     $node->nodeRow->NodeType        = 'Instructions' 
                         . (($GLOBALS["SL"]->REQ->nodeType == 'instructRaw') ? ' Raw' : '');
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeInstruct'));
-                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('instrPromptAfter'));
-                    if ($GLOBALS["SL"]->REQ->has('opts37') && intVal($GLOBALS["SL"]->REQ->get('opts37')) == 37) {
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->nodeInstruct);
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->instrPromptAfter);
+                    if ($GLOBALS["SL"]->REQ->has('opts37') 
+                        && intVal($GLOBALS["SL"]->REQ->get('opts37')) == 37) {
                         if ($node->nodeRow->NodeOpts%37 > 0) {
                             $node->nodeRow->NodeOpts *= 37;
                         }
@@ -189,64 +214,69 @@ class TreeSurvNodeEdit extends TreeSurvForm
                         $node->nodeRow->NodeOpts    = $node->nodeRow->NodeOpts/37;
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'dataPrint') {
-                    $node->nodeRow->NodeType        = trim($GLOBALS["SL"]->REQ->get('nodeTypeD'));
-                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('nodeDataPull'));
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeDataBlcTitle'));
-                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('nodeDataHideIf'));
+                    $node->nodeRow->NodeType        = trim($GLOBALS["SL"]->REQ->nodeTypeD);
+                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->nodeDataPull);
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->nodeDataBlcTitle);
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->nodeDataHideIf);
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'heroImg') {
                     $node->nodeRow->NodeType        = 'Hero Image';
-                    $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->get('pageHeroImg'));
-                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->get('pageHeroImgTxt'));
-                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('pageHeroImgBtn'));
-                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->get('pageHeroImgUrl'));
+                    $node->nodeRow->NodeTextSuggest = trim($GLOBALS["SL"]->REQ->pageHeroImg);
+                    $node->nodeRow->NodePromptAfter = trim($GLOBALS["SL"]->REQ->pageHeroImgTxt);
+                    $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->pageHeroImgBtn);
+                    $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->pageHeroImgUrl);
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'loop') {
                     $node->nodeRow->NodeType        = 'Loop Root';
-                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->get('nodeLoopInstruct'));
+                    $node->nodeRow->NodePromptText  = trim($GLOBALS["SL"]->REQ->nodeLoopInstruct);
                     $node->nodeRow->NodeDataBranch  = $loop = trim($GLOBALS["SL"]->REQ->get('nodeDataLoop'));
                     if (!isset($GLOBALS["SL"]->dataLoops[$loop])) {
                         $GLOBALS["SL"]->dataLoops[$loop] = new SLDataLoop;
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTree = $this->treeID;
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopRoot = $node->nodeRow->NodeID;
                     } elseif (trim($GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable) != ''
-                        && isset($GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable])) {
-                        $node->nodeRow->NodeDataStore = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable . ':' 
-                            . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable] . 'ID';
+                        && isset($GLOBALS["SL"]->tblAbbr[
+                            $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable])) {
+                        $node->nodeRow->NodeDataStore = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable . ':' . $GLOBALS["SL"]->tblAbbr[
+                                $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable] . 'ID';
                     }
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 0;
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 1;
                     $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld = '';
-                    if ($GLOBALS["SL"]->REQ->has('stepLoop') && intVal($GLOBALS["SL"]->REQ->get('stepLoop')) == 1) {
+                    if ($GLOBALS["SL"]->REQ->has('stepLoop') 
+                        && intVal($GLOBALS["SL"]->REQ->stepLoop) == 1) {
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopIsStep = 1;
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
                         if ($GLOBALS["SL"]->REQ->has('stepLoopDoneField') 
-                            && trim($GLOBALS["SL"]->REQ->get('stepLoopDoneField')) != '') {
+                            && trim($GLOBALS["SL"]->REQ->stepLoopDoneField) != '') {
                             $GLOBALS["SL"]->dataLoops[$loop]->DataLoopDoneFld 
-                                = trim($GLOBALS["SL"]->REQ->get('stepLoopDoneField'));
+                                = trim($GLOBALS["SL"]->REQ->stepLoopDoneField);
                         }
                     } elseif (!$GLOBALS["SL"]->REQ->has('stdLoopAuto') 
-                        || intVal($GLOBALS["SL"]->REQ->get('stdLoopAuto')) == 0) {
+                        || intVal($GLOBALS["SL"]->REQ->stdLoopAuto) == 0) {
                         $GLOBALS["SL"]->dataLoops[$loop]->DataLoopAutoGen = 0;
                     }
                     $GLOBALS["SL"]->dataLoops[$loop]->save();
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'cycle') {
-                    $loop = trim($GLOBALS["SL"]->REQ->get('nodeDataCycle'));
-                    $node->nodeRow->NodeType        = 'Loop Cycle';
+                    $loop = trim($GLOBALS["SL"]->REQ->nodeDataCycle);
+                    $node->nodeRow->NodeType = 'Loop Cycle';
                     $node->nodeRow->NodeResponseSet = 'LoopItems::' . $loop;
                     if (trim($node->nodeRow->NodeDataBranch) == '' && $loop != '') {
                         $node->nodeRow->NodeDataBranch = $GLOBALS["SL"]->getLoopTable($loop);
                     }
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'sort') {
-                    $node->nodeRow->NodeType        = 'Loop Sort';
-                    $node->nodeRow->NodeResponseSet = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->get('nodeDataSort'));
-                    $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('DataStoreSort'));
+                    $node->nodeRow->NodeType = 'Loop Sort';
+                    $node->nodeRow->NodeResponseSet 
+                        = 'LoopItems::' . trim($GLOBALS["SL"]->REQ->nodeDataSort);
+                    $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->DataStoreSort);
                 } elseif ($GLOBALS["SL"]->REQ->nodeType == 'data') {
-                    $node->nodeRow->NodeType        = 'Data Manip: ' . $GLOBALS["SL"]->REQ->get('dataManipType');
+                    $node->nodeRow->NodeType = 'Data Manip: ' 
+                        . $GLOBALS["SL"]->REQ->dataManipType;
                     if ($GLOBALS["SL"]->REQ->get('dataManipType') == 'Close Sess') {
-                        $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->get('dataManipCloseSessTree');
+                        $node->nodeRow->NodeResponseSet 
+                            = $GLOBALS["SL"]->REQ->dataManipCloseSessTree;
                     } else {
-                        $node->nodeRow->NodeDataStore   = trim($GLOBALS["SL"]->REQ->get('manipMoreStore'));
-                        $node->nodeRow->NodeDefault     = trim($GLOBALS["SL"]->REQ->get('manipMoreVal'));
-                        $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->get('manipMoreSet'));
+                        $node->nodeRow->NodeDataStore = trim($GLOBALS["SL"]->REQ->manipMoreStore);
+                        $node->nodeRow->NodeDefault = trim($GLOBALS["SL"]->REQ->manipMoreVal);
+                        $node->nodeRow->NodeResponseSet = trim($GLOBALS["SL"]->REQ->manipMoreSet);
                         for ($i=0; $i < $resLimit; $i++) {
                             if (trim($GLOBALS["SL"]->REQ->get('manipMore' . $i . 'Store')) != '') {
                                 if (!isset($node->dataManips[$i])) {
@@ -271,14 +301,15 @@ class TreeSurvNodeEdit extends TreeSurvForm
                         }
                     }
                 } elseif (in_array($GLOBALS["SL"]->REQ->nodeType, ['survWidget', 'sendEmail'])) {
-                    $node->nodeRow->NodeType        = (($GLOBALS["SL"]->REQ->nodeType == 'sendEmail') ? 'Send Email'
-                        : $GLOBALS["SL"]->REQ->nodeSurvWidgetType);
+                    $node->nodeRow->NodeType = (($GLOBALS["SL"]->REQ->nodeType == 'sendEmail') 
+                        ? 'Send Email' : $GLOBALS["SL"]->REQ->nodeSurvWidgetType);
                     $node->nodeRow->NodeResponseSet = $GLOBALS["SL"]->REQ->nodeSurvWidgetTree;
-                    $node->nodeRow->NodeCharLimit   = intVal($GLOBALS["SL"]->REQ->nodeSurvWidgetLimit);
-                    $node->nodeRow->NodePromptText  = $GLOBALS["SL"]->REQ->nodeSurvWidgetPre;
+                    $node->nodeRow->NodeCharLimit = intVal($GLOBALS["SL"]->REQ->nodeSurvWidgetLimit);
+                    $node->nodeRow->NodePromptText = $GLOBALS["SL"]->REQ->nodeSurvWidgetPre;
                     $node->nodeRow->NodePromptAfter = $GLOBALS["SL"]->REQ->nodeSurvWidgetPost;
                     if ($node->nodeRow->NodeType == 'Send Email') {
-                        $node->nodeRow->NodePromptNotes = '::TO::' . (($GLOBALS["SL"]->REQ->has('widgetEmailTo')) 
+                        $node->nodeRow->NodePromptNotes = '::TO::' 
+                            . (($GLOBALS["SL"]->REQ->has('widgetEmailTo')) 
                                 ? implode(',', $GLOBALS["SL"]->REQ->widgetEmailTo) : '')
                             . '::CC::' . (($GLOBALS["SL"]->REQ->has('widgetEmailCC')) 
                                 ? implode(',', $GLOBALS["SL"]->REQ->widgetEmailCC) : '')

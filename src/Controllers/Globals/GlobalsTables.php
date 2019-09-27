@@ -78,7 +78,7 @@ class GlobalsTables extends GlobalsElements
         "cyc" => ['', '', -3],
         "res" => ['', '', -3],
         "tbl" => ['', '', -3]
-        ];
+    ];
         
     // User's position within potentially nested loops
     public $sessTree       = 0;
@@ -96,7 +96,7 @@ class GlobalsTables extends GlobalsElements
             "pub" => [],
             "adm" => []
             ]
-        ];
+    ];
     public $treeSettings   = [];
     public $proTips        = [];
     public $allTrees       = [];
@@ -111,10 +111,10 @@ class GlobalsTables extends GlobalsElements
     public const TREEOPT_REPORT     = 13; // Page Tree is a Report for a survey, so they share data structures
     
     // Site Map Architecture and Permissions Flags
-    public const TREEOPT_ADMIN      = 3;  // Tree access limited to admin users
-    public const TREEOPT_STAFF      = 43; // Tree access limited to staff users
-    public const TREEOPT_PARTNER    = 41; // Tree access limited to partner users
-    public const TREEOPT_VOLUNTEER  = 17; // Tree access limited to volunteer users
+    public const TREEOPT_ADMIN      = 3;  // Access limited to admin users
+    public const TREEOPT_STAFF      = 43; // Access limited to staff users (and higher)
+    public const TREEOPT_PARTNER    = 41; // Access limited to partner users (and higher)
+    public const TREEOPT_VOLUNTEER  = 17; // Access limited to volunteer users (and higher)
     
     // Tree Options
     public const TREEOPT_SKINNY     = 2;  // Tree's contents are wrapped in the skinny page width 
@@ -437,7 +437,8 @@ class GlobalsTables extends GlobalsElements
         if ($this->treeRow && isset($this->treeRow->TreeType) 
             && $this->treeRow->TreeType == 'Page') {
             $nodeChk = SLNode::find($this->treeRow->TreeRoot);
-            if ($nodeChk && isset($nodeChk->NodeResponseSet) && intVal($nodeChk->NodeResponseSet) > 0
+            if ($nodeChk && isset($nodeChk->NodeResponseSet) 
+                && intVal($nodeChk->NodeResponseSet) > 0
                 && intVal($nodeChk->NodeResponseSet) != $this->treeID) {
                 $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
             }
@@ -615,7 +616,8 @@ class GlobalsTables extends GlobalsElements
     
     public function getForeignLnkName($tbl1, $tbl2 = '')
     {
-        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
+        if (trim($tbl1) == '' || trim($tbl2) == '' 
+            || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
             return '';
         }
         return $this->getForeignLnk($this->tblI[$tbl1], $this->tblI[$tbl2]);
@@ -632,7 +634,8 @@ class GlobalsTables extends GlobalsElements
     
     public function getForeignLnkNameFldName($tbl1, $tbl2 = '')
     {
-        if (trim($tbl1) == '' || trim($tbl2) == '' || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
+        if (trim($tbl1) == '' || trim($tbl2) == '' 
+            || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
             return '';
         }
         return $this->getForeignLnkFldName($this->tblI[$tbl1], $this->tblI[$tbl2]);
@@ -640,8 +643,8 @@ class GlobalsTables extends GlobalsElements
     
     public function getForeignOpts($preSel = '', $opts = 'Subset')
     {
-        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') . ' >parent - field - child</option>'
-            . '<option value=""></option>' . "\n";
+        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') 
+            . ' >parent - field - child</option><option value=""></option>' . "\n";
         $flds = SLFields::select('SL_Fields.FldTable', 'SL_Fields.FldName', 'SL_Fields.FldForeignTable')
             ->join('SL_Tables', 'SL_Tables.TblID', '=', 'SL_Fields.FldForeignTable')
             ->where('FldDatabase',         $this->dbID)
@@ -680,7 +683,8 @@ class GlobalsTables extends GlobalsElements
                     if (isset($this->tbl[$fld->FldTable]) && isset($this->tbl[$fld->FldForeignTable])) {
                         $lnkMap = $this->tbl[$fld->FldTable] . ':' . $this->tblAbbr[$this->tbl[$fld->FldTable]] 
                             . $fld->FldName . ':' . $this->tbl[$fld->FldForeignTable] . ':';
-                        $ret .= '<option value="' . $lnkMap . '" ' . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
+                        $ret .= '<option value="' . $lnkMap . '" ' 
+                            . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
                             . $this->tbl[$fld->FldTable] . ' &rarr; ' 
                             . $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName 
                             . ' &rarr; ' . $this->tbl[$fld->FldForeignTable] . '
@@ -761,8 +765,8 @@ class GlobalsTables extends GlobalsElements
             . (($disableBlank) ? ' DISABLED ' : '') . ' >' . $instruct . '</option>' . "\n";
         foreach ($this->tblAbbr as $tblName => $tblAbbr) {
             $ret .= '<option value="' . $tblName.'" ' 
-                . (($preSel == $tblName || $preSel == $this->tblI[$tblName] || $loopTbl == $tblName) ? 'SELECTED' : '')
-                . ' >' . $prefix . $tblName.'</option>' . "\n";
+                . (($preSel == $tblName || $preSel == $this->tblI[$tblName] || $loopTbl == $tblName) 
+                    ? 'SELECTED' : '') . ' >' . $prefix . $tblName.'</option>' . "\n";
         }
         return $ret;
     }
@@ -781,8 +785,8 @@ class GlobalsTables extends GlobalsElements
         $flds = null;
         $qman = "SELECT t.`TblName`, t.`TblAbbr`, f.`FldID`, f.`FldName`, f.`FldType`, f.`FldForeignTable` 
             FROM `SL_Fields` f LEFT OUTER JOIN `SL_Tables` t ON f.`FldTable` LIKE t.`TblID` 
-            WHERE f.`FldTable` > '0' AND t.`TblName` IS NOT NULL AND f.`FldDatabase` LIKE '" . $this->dbID . "' 
-            [[EXTRA]] ORDER BY t.`TblName`, f.`FldName`";
+            WHERE f.`FldTable` > '0' AND t.`TblName` IS NOT NULL AND f.`FldDatabase` LIKE '" . $this->dbID 
+            . "' [[EXTRA]] ORDER BY t.`TblName`, f.`FldName`";
         if ($keys == -1) {
             $flds = DB::select( DB::raw( str_replace("[[EXTRA]]", "AND f.`FldForeignTable` > '0'", $qman) ) );
         } else {
@@ -830,14 +834,18 @@ class GlobalsTables extends GlobalsElements
             $fld->TblAbbr = $this->tblAbbr[$this->tbl[$fld->FldTable]];
         }
         if ($valID) {
-            return '<option value="' . $fld->FldID . '"' . ((intVal($preSel) != 0 && intVal($preSel) == $fld->FldID) 
-                    ? ' SELECTED' : '') . ' >' . $prfx . $fld->TblName . ' : '. $fld->TblAbbr . $fld->FldName 
-                . ' ('. (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) . ')</option>' . "\n";
+            return '<option value="' . $fld->FldID . '"' 
+                . ((intVal($preSel) != 0 && intVal($preSel) == $fld->FldID) 
+                    ? ' SELECTED' : '') . ' >' . $prfx . $fld->TblName . ' : '
+                . $fld->TblAbbr . $fld->FldName 
+                . ' (' . (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) 
+                . ')</option>' . "\n";
         } else {
             $fldStr = $fld->TblName . ':' . $fld->TblAbbr . $fld->FldName;
-            return '<option value="' . $fldStr . '"' . ((trim($preSel) == $fldStr) ? ' SELECTED' : '') . ' >' . $prfx 
-                . str_replace(':', ' : ', $fldStr) . ' (' . (($fld->FldForeignTable > 0) ? 'foreign key' 
-                    : strtolower($fld->FldType)) . ')</option>' . "\n";
+            return '<option value="' . $fldStr . '"' . ((trim($preSel) == $fldStr) ? ' SELECTED' : '') 
+                . ' >' . $prfx . str_replace(':', ' : ', $fldStr) . ' (' 
+                . (($fld->FldForeignTable > 0) ? 'foreign key' : strtolower($fld->FldType)) 
+                . ')</option>' . "\n";
         }
         return '';
     }
@@ -852,7 +860,8 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($defs->isNotEmpty()) {
             foreach ($defs as $def) {
-                $ret .= '<option value="' . $def->DefID.'" ' . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
+                $ret .= '<option value="' . $def->DefID.'" ' 
+                    . (($preSel == $def->DefID) ? 'SELECTED' : '') . ' >' 
                     . $def->DefSubset . ': ' . $def->DefValue . '</option>' . "\n";
             }
         }
@@ -937,8 +946,8 @@ class GlobalsTables extends GlobalsElements
                     if (isset($cond->CondField) && intVal($cond->CondField) > 0) {
                         $vals = SLConditionsVals::where('CondValCondID', $cond->CondID)
                             ->get();
-                        if ($vals->isNotEmpty() && $vals->count() == 1 && isset($vals[0]->CondValValue) 
-                            && trim($vals[0]->CondValValue) != '') {
+                        if ($vals->isNotEmpty() && $vals->count() == 1 
+                            && isset($vals[0]->CondValValue) && trim($vals[0]->CondValValue) != '') {
                             $fld = SLFields::find($cond->CondField);
                             if ($fld && isset($fld->FldName) && isset($this->tbl[$cond->CondTable])) {
                                 $tblAbbr = $this->tblAbbr[$this->tbl[$cond->CondTable]];
@@ -962,7 +971,8 @@ class GlobalsTables extends GlobalsElements
         if (strpos($tblIn, 'loop-') !== false && sizeof($this->dataLoops) > 0) {
             $loopID = intVal(str_replace('loop-', '', $tblIn));
             foreach ($this->dataLoops as $loopName => $loopRow) {
-                if ($loopRow->id == $loopID && isset($this->tblI[$loopRow->DataLoopTable])) {
+                if ($loopRow->id == $loopID 
+                    && isset($this->tblI[$loopRow->DataLoopTable])) {
                     $tblID = $this->tblI[$loopRow->DataLoopTable];
                 }
             }
@@ -1001,7 +1011,8 @@ class GlobalsTables extends GlobalsElements
     {
         if (isset($this->dataHelpers) && sizeof($this->dataHelpers) > 0) {
             foreach ($this->dataHelpers as $helper) {
-                if (isset($helper->DataHelpValueField) && $helper->DataHelpValueField == $fld) {
+                if (isset($helper->DataHelpValueField) 
+                    && $helper->DataHelpValueField == $fld) {
                     return true;
                 }
             }
@@ -1130,7 +1141,8 @@ class GlobalsTables extends GlobalsElements
     public function getTblFlds($tbl)
     {
         $ret = [];
-        if (isset($this->tblI[$tbl]) && isset($this->fldTypes[$tbl]) && is_array($this->fldTypes[$tbl]) 
+        if (isset($this->tblI[$tbl]) && isset($this->fldTypes[$tbl]) 
+            && is_array($this->fldTypes[$tbl]) 
             && sizeof($this->fldTypes[$tbl]) > 0) {
             foreach ($this->fldTypes[$tbl] as $fld => $type) {
                 $ret[] = $fld;
@@ -1151,11 +1163,13 @@ class GlobalsTables extends GlobalsElements
     
     public function copyTblRecFromRow($tbl, $row)
     {
-        if (!isset($this->tblAbbr[$tbl]) || !$row || !isset($row->{ $this->tblAbbr[$tbl] . 'ID' })) {
+        if (!isset($this->tblAbbr[$tbl]) || !$row 
+            || !isset($row->{ $this->tblAbbr[$tbl] . 'ID' })) {
             return '';
         }
         $abbr = $this->tblAbbr[$tbl];
-        eval("\$cpyTo = " . $this->modelPath($tbl) . "::find(" . $row->{ $abbr . 'ID' } . ");");
+        eval("\$cpyTo = " . $this->modelPath($tbl) 
+            . "::find(" . $row->{ $abbr . 'ID' } . ");");
         if (!$cpyTo || !isset($cpyTo->{ $abbr . 'ID' })) {
             eval("\$cpyTo = new " . $this->modelPath($tbl) . ";");
             $cpyTo->{ $abbr . 'ID' } = $row->{ $abbr . 'ID' };
@@ -1212,7 +1226,8 @@ class GlobalsTables extends GlobalsElements
         }
         $defSet = $this->getFldDefSet($tbl, $fld, $fldRow);
         if ($defSet != '') {
-            if (!is_array($val) && $val != '' && substr($val, 0, 1) == ';' && substr($val, strlen($val)-1) == ';') {
+            if (!is_array($val) && $val != '' && substr($val, 0, 1) == ';' 
+                && substr($val, strlen($val)-1) == ';') {
                 $val = $this->mexplode(';;', substr($val, 1, strlen($val)-2));
             }
         }
@@ -1233,12 +1248,15 @@ class GlobalsTables extends GlobalsElements
                 }
             }
         } else { // not array
-            if (strpos(strtolower($fld), 'gender') !== false && strtoupper($val) == 'M') {
+            if (strpos(strtolower($fld), 'gender') !== false 
+                && strtoupper($val) == 'M') {
                 $ret = 'Male';
-            } elseif (strpos(strtolower($fld), 'gender') !== false && strtoupper($val) == 'F') {
+            } elseif (strpos(strtolower($fld), 'gender') !== false 
+                && strtoupper($val) == 'F') {
                 $ret = 'Female';
             } elseif (trim($defSet) == '') {
-                if ($val != '' && isset($this->fldTypes[$tbl]) && isset($this->fldTypes[$tbl][$fld])
+                if ($val != '' && isset($this->fldTypes[$tbl]) 
+                    && isset($this->fldTypes[$tbl][$fld])
                     && in_array($this->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
                     $ret = number_format(1*floatval($val));
                 } else {
@@ -1401,14 +1419,20 @@ class GlobalsTables extends GlobalsElements
     public function getFldResponsesByID($fldID)
     {
         if (intVal($fldID) <= 0) {
-            return [ "prompt" => '', "vals" => [] ];
+            return [
+                "prompt" => '', 
+                "vals"   => []
+            ];
         }
         return $this->getFldResponses($this->getFullFldNameFromID($fldID));
     }
     
     public function getFldResponses($fldName)
     {
-        $ret = array( "prompt" => '', "vals" => [] );
+        $ret = [
+            "prompt" => '', 
+            "vals"   => []
+        ];
         $tmpVals = array( [], [] );
         $nodes = SLNode::where('NodeDataStore', $fldName)->get();
         if (trim($fldName) != '' && $nodes->isNotEmpty()) {
@@ -1455,7 +1479,8 @@ class GlobalsTables extends GlobalsElements
     public function getCondByID($id)
     {
         $this->getCondLookup();
-        return ((isset($this->condTags[intVal($id)])) ? $this->condTags[intVal($id)] : '');
+        return ((isset($this->condTags[intVal($id)])) 
+            ? $this->condTags[intVal($id)] : '');
     }
     
     public function getCondList()
@@ -1477,7 +1502,8 @@ class GlobalsTables extends GlobalsElements
         } else {
             $cond->CondDatabase = $this->dbID;
         }
-        if ($request->has('condHash') && trim($request->condHash) != '' && trim($request->condHash) != '#') {
+        if ($request->has('condHash') && trim($request->condHash) != '' 
+            && trim($request->condHash) != '#') {
             $cond->CondTag      = (($request->has('condHash')) ? $request->condHash : '#');
             if (substr($cond->CondTag, 0, 1) != '#') {
                 $cond->CondTag  = '#' . $cond->CondTag;
@@ -1491,7 +1517,8 @@ class GlobalsTables extends GlobalsElements
             if ($request->has('condType') && $request->condType == 'complex') {
                 $cond->CondOperator = 'COMPLEX';
                 $cond->save();
-                if ($request->has('multConds') && is_array($request->multConds) && sizeof($request->multConds) > 0) {
+                if ($request->has('multConds') && is_array($request->multConds) 
+                    && sizeof($request->multConds) > 0) {
                     foreach ($request->multConds as $val) {
                         $chk = SLConditionsVals::where('CondValCondID', $cond->CondID)
                             ->where('CondValValue', $val)
@@ -1500,7 +1527,8 @@ class GlobalsTables extends GlobalsElements
                             $tmpVal = new SLConditionsVals;
                             $tmpVal->CondValCondID    = $cond->CondID;
                             $tmpVal->CondValValue     = $val;
-                            if ($request->has('multCondsNot') && in_array($val, $request->multCondsNot)) {
+                            if ($request->has('multCondsNot') 
+                                && in_array($val, $request->multCondsNot)) {
                                 $tmpVal->CondValValue = (-1*$val);
                             }
                             $tmpVal->save();
@@ -1542,7 +1570,8 @@ class GlobalsTables extends GlobalsElements
                     $tmpVal->CondValCondID = $cond->CondID;
                     $tmpVal->CondValValue  = $request->paramVal;
                     $tmpVal->save();
-                } elseif ($request->has('vals') && is_array($request->vals) && sizeof($request->vals) > 0) {
+                } elseif ($request->has('vals') && is_array($request->vals) 
+                    && sizeof($request->vals) > 0) {
                     foreach ($request->vals as $val) {
                         $tmpVal = new SLConditionsVals;
                         $tmpVal->CondValCondID = $cond->CondID;
@@ -1552,14 +1581,17 @@ class GlobalsTables extends GlobalsElements
                 }
             }
             
-            if ($request->has('CondPublicFilter') && intVal($request->get('CondPublicFilter')) == 1) {
+            if ($request->has('CondPublicFilter') 
+                && intVal($request->get('CondPublicFilter')) == 1) {
                 $cond->CondOpts *= 2;
             }
             $artsIn = [];
             for ($j=0; $j < 10; $j++) {
-                if ($request->has('condArtUrl' . $j . '') && trim($request->get('condArtUrl' . $j . '')) != '') {
+                if ($request->has('condArtUrl' . $j . '') 
+                    && trim($request->get('condArtUrl' . $j . '')) != '') {
                     $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
-                    if ($request->has('condArtTitle' . $j . '') && trim($request->get('condArtTitle' . $j . '')) != ''){
+                    if ($request->has('condArtTitle' . $j . '') 
+                        && trim($request->get('condArtTitle' . $j . '')) != ''){
                         $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
                     }
                 }
@@ -1607,7 +1639,10 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cond) {
-                $this->condABs[] = [$cond->CondID, $cond->CondDesc];
+                $this->condABs[] = [
+                    $cond->CondID, 
+                    $cond->CondDesc
+                ];
             }
         }
         return $this->condABs;
@@ -1653,14 +1688,17 @@ class GlobalsTables extends GlobalsElements
         $ret = '';
         if (in_array($pubPri, ['pub', 'all']) && sizeof($this->sysTree[$type]['pub']) > 0) {
             foreach ($this->sysTree[$type]['pub'] as $tree) {
-                $ret .= '<option value="' . $tree[0] . '" ' . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
+                $ret .= '<option value="' . $tree[0] . '" ' 
+                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
                     . $tree[1] . (($type == 'page') ? ' (Page)' : '') . '</option>';
             }
         }
         if (in_array($pubPri, ['adm', 'all']) && sizeof($this->sysTree[$type]['adm']) > 0) {
             foreach ($this->sysTree[$type]['adm'] as $tree) {
-                $ret .= '<option value="' . $tree[0] . '" ' . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
-                    . $tree[1] . ' (' . (($type == 'page') ? 'Page, ' : '') . 'Admin)</option>';
+                $ret .= '<option value="' . $tree[0] . '" ' 
+                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
+                    . $tree[1] . ' (' . (($type == 'page') ? 'Page, ' : '') 
+                    . 'Admin)</option>';
             }
         }
         return $ret;
@@ -1677,8 +1715,8 @@ class GlobalsTables extends GlobalsElements
         if ($chk->isNotEmpty()) {
             foreach ($chk as $set) {
                 if (trim($set->DefDescription) != '') {
-                    $cache .= '$'.'this->proTips[] = \'' . str_replace("'", "&#39;", $set->DefDescription) . '\';' 
-                        . "\n";
+                    $cache .= '$'.'this->proTips[] = ' 
+                        . json_encode($set->DefDescription) . ';' . "\n";
                 }
             }
         }
@@ -1689,7 +1727,8 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $set) {
-                $cache .= '$'.'this->proTipsImg[] = \'' . str_replace("'", "&#39;", $set->DefDescription) . '\';' ."\n";
+                $cache .= '$'.'this->proTipsImg[] = ' 
+                    . json_encode($set->DefDescription) . ';' ."\n";
             }
         }
         return $cache;
@@ -1878,7 +1917,8 @@ class GlobalsTables extends GlobalsElements
             return $pubID;
         }
         $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
-        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
+        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" 
+            . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
         if ($idChk) {
             return $idChk->getKey();
         }
@@ -1892,8 +1932,10 @@ class GlobalsTables extends GlobalsElements
         }
         if (isset($this->tblAbbr[$tbl])) {
             $pubIdFld = $this->tblAbbr[$tbl] . 'PublicID';
-            eval("\$idChk = " . $this->modelPath($tbl) . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
-            if (!$idChk || !isset($idChk->{ $pubIdFld }) || intVal($idChk->{ $pubIdFld }) <= 0) {
+            eval("\$idChk = " . $this->modelPath($tbl) 
+                . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
+            if (!$idChk || !isset($idChk->{ $pubIdFld }) 
+                || intVal($idChk->{ $pubIdFld }) <= 0) {
                 return 1;
             }
             return (1+intVal($idChk->{ $pubIdFld }));
@@ -1953,8 +1995,8 @@ class GlobalsTables extends GlobalsElements
     {
         $url = (($incDomain) ? $this->sysOpts["app-url"] : '');
         if ($hideHttp) {
-            $url = str_replace('http://', '', str_replace('http://www.', '', str_replace('https://', '', 
-                str_replace('https://www.', '', $url))));
+            $url = str_replace('http://', '', str_replace('http://www.', '', 
+                str_replace('https://', '', str_replace('https://www.', '', $url))));
         }
         if ($this->treeRow->TreeType == 'Page') {
             if ($this->treeIsAdmin) {
@@ -1987,7 +2029,8 @@ class GlobalsTables extends GlobalsElements
                     $node = new TreeNodeSurv();
                     $node->fillNodeRow($currNode, $row);
                     if (isset($node->nodeRow) && isset($node->nodeRow->NodeID)) {
-                        if (isset($node->extraOpts["meta-title"]) && trim($node->extraOpts["meta-title"]) != '') {
+                        if (isset($node->extraOpts["meta-title"]) 
+                            && trim($node->extraOpts["meta-title"]) != '') {
                             $this->x["nodeNames"][$currNode] = $node->extraOpts["meta-title"];
                         }
                         if (isset($node->NodePromptNotes)) {
@@ -2149,7 +2192,8 @@ class GlobalsTables extends GlobalsElements
             }
         }
         if (trim($ret) != '') {
-            $ret = '<div class="mT20"><b>Fields Missing From Primary Survey:</b>' . substr($ret, 1) . '</div>';
+            $ret = '<div class="mT20"><b>Fields Missing From Primary Survey:</b>' 
+                . substr($ret, 1) . '</div>';
         }
         return $ret;
     }
@@ -2164,7 +2208,8 @@ class GlobalsTables extends GlobalsElements
     
     public function getParentDomain()
     {
-        if (isset($this->sysOpts["parent-website"]) && trim($this->sysOpts["parent-website"]) != '') {
+        if (isset($this->sysOpts["parent-website"]) 
+            && trim($this->sysOpts["parent-website"]) != '') {
             return $this->printURLdomain($this->sysOpts["parent-website"]);
         }
         return '';
@@ -2172,7 +2217,8 @@ class GlobalsTables extends GlobalsElements
     
     public function sysHas($type)
     {
-        return (isset($this->sysOpts["has-" . $type]) && intVal($this->sysOpts["has-" . $type]) == 1);
+        return (isset($this->sysOpts["has-" . $type]) 
+            && intVal($this->sysOpts["has-" . $type]) == 1);
     }
     
     public function loadUsrTblRow()

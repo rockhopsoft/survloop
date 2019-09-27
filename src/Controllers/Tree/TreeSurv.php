@@ -433,20 +433,25 @@ class TreeSurv extends TreeSurvReport
                 if (isset($GLOBALS["SL"]->dataLoops[$sessLoop->SessLoopName])) {
                     $currLoops[$sessLoop->SessLoopName] = $sessLoop->SessLoopItemID;
                     $loop = $GLOBALS["SL"]->dataLoops[$sessLoop->SessLoopName];
-                    if ($this->allNodes[$prevNode]->checkBranch($this->allNodes[$loop->DataLoopRoot]->nodeTierPath)
-                        && !$this->allNodes[$newNode]->checkBranch($this->allNodes[$loop->DataLoopRoot]->nodeTierPath)){
+                    if (isset($this->allNodes[$prevNode]) && isset($this->allNodes[$newNode])
+                        && isset($this->allNodes[$loop->DataLoopRoot])
+                        && $this->allNodes[$prevNode]->checkBranch(
+                            $this->allNodes[$loop->DataLoopRoot]->nodeTierPath)
+                        && !$this->allNodes[$newNode]->checkBranch(
+                            $this->allNodes[$loop->DataLoopRoot]->nodeTierPath)) {
                         // Then we are now trying to leave this loop
                         if (in_array($this->REQstep, ['back', 'exitLoopBack'])) { 
                             // Then leaving the loop backwards, always allowed
                             $this->leavingTheLoop($loop->DataLoopPlural);
                         } elseif ($this->REQstep != 'save') { // Check for conditions before moving leaving forward
                             if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
-                                if (sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) > 1) {
+                                if (sizeof($this->sessData->loopItemIDs[
+                                    $loop->DataLoopPlural]) > 1) {
                                     $backToRoot = true;
                                 }
                             } elseif (intVal($loop->DataLoopMaxLimit) == 0 
-                                || sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) 
-                                    < $loop->DataLoopMaxLimit) {
+                                || sizeof($this->sessData->loopItemIDs[
+                                    $loop->DataLoopPlural]) < $loop->DataLoopMaxLimit) {
                                 // Then sure, we can add another item to this loop, back at the root node
                                 $backToRoot = true;
                             }
@@ -460,21 +465,24 @@ class TreeSurv extends TreeSurvReport
                             }
                         }
                     } elseif ($newNode == $loop->DataLoopRoot) {
+                        $loopCnt = sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]);
                         $skipRoot = false;
                         if ($this->allNodes[$newNode]->isStepLoop()) {
-                            if (sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) == 1 
-                                || ($loop->DataLoopMinLimit == 1 && $loop->DataLoopMaxLimit == 1)) {
+                            if ($loopCnt == 1 || ($loop->DataLoopMinLimit == 1 
+                                && $loop->DataLoopMaxLimit == 1)) {
                                 $skipRoot = true;
                             }
-                        } elseif ($loop->DataLoopMinLimit > 0 
-                            && sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) == 0) {
+                        } elseif ($loop->DataLoopMinLimit > 0 && $loopCnt == 0) {
                             $skipRoot = true;
                         }
                         if ($skipRoot) {
                             $this->pushCurrNodeVisit($newNode);
                             if ($this->REQstep == 'back') {
                                 $this->leavingTheLoop($loop->DataLoopPlural);
-                                $prev = $this->getNextNonBranch($this->prevNode($loop->DataLoopRoot), 'prev');
+                                $prev = $this->getNextNonBranch(
+                                    $this->prevNode($loop->DataLoopRoot), 
+                                    'prev'
+                                );
                                 $this->updateCurrNodeNB($prev, 'prev');
                             } elseif ($this->REQstep != 'save') {
                                 $this->updateCurrNodeNB($this->nextNode($loop->DataLoopRoot));
@@ -488,31 +496,37 @@ class TreeSurv extends TreeSurvReport
         // If we haven't already tried to leave our loop, nor returned back to its root node...
         if (!$backToRoot && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             foreach ($GLOBALS["SL"]->dataLoops as $loop) {
-                if (!isset($currLoops[$loop->DataLoopPlural]) && isset($this->allNodes[$loop->DataLoopRoot])) {
+                if (!isset($currLoops[$loop->DataLoopPlural]) 
+                    && isset($this->allNodes[$loop->DataLoopRoot])) {
                     // Then this is a new loop we weren't previously in
                     $path = $this->allNodes[$loop->DataLoopRoot]->nodeTierPath;
-                    if (isset($this->allNodes[$prevNode]) && !$this->allNodes[$prevNode]->checkBranch($path)
+                    if (isset($this->allNodes[$prevNode]) 
+                        && !$this->allNodes[$prevNode]->checkBranch($path)
                         && $this->allNodes[$newNode]->checkBranch($path)) {
                         // Then we have just entered this loop from outside
                         if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop() 
                             && (!isset($this->sessData->loopItemIDs[$loop->DataLoopPlural]) 
                                 || empty($this->sessData->loopItemIDs[$loop->DataLoopPlural]))) {
                             $this->leavingTheLoop($loop->DataLoopPlural);
-                            if (isset($this->REQstep) && in_array($this->REQstep, ['back', 'exitLoopBack'])) {
-                                $prevRoot = $this->getNextNonBranch($this->prevNode($loop->DataLoopRoot), 'prev');
+                            if (isset($this->REQstep) 
+                                && in_array($this->REQstep, ['back', 'exitLoopBack'])) {
+                                $prevRoot = $this->getNextNonBranch(
+                                    $this->prevNode($loop->DataLoopRoot), 
+                                    'prev'
+                                );
                                 $this->updateCurrNodeNB($prevRoot);
                             } elseif (!isset($this->REQstep) || $this->REQstep != 'save') {
                                 $this->updateCurrNodeNB($this->nextNodeSibling($newNode));
                             }
                         } else { // This loop is active
+                            $loopCnt = sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]);
                             $skipRoot = false;
                             if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
-                                if (sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) == 1 
-                                    || ($loop->DataLoopMinLimit == 1 && $loop->DataLoopMaxLimit == 1)) {
+                                if ($loopCnt == 1 || ($loop->DataLoopMinLimit == 1 
+                                    && $loop->DataLoopMaxLimit == 1)) {
                                     $skipRoot = true;
                                 }
-                            } elseif ($loop->DataLoopMinLimit > 0 
-                                && sizeof($this->sessData->loopItemIDs[$loop->DataLoopPlural]) == 0) {
+                            } elseif ($loop->DataLoopMinLimit > 0 && $loopCnt == 0) {
                                 $skipRoot = true;
                             }
                             $this->settingTheLoop($loop->DataLoopPlural);
@@ -523,7 +537,8 @@ class TreeSurv extends TreeSurvReport
                                     $this->pushCurrNodeVisit($newNode);
                                     $itemID = -3;
                                     if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
-                                        $itemID = $this->sessData->loopItemIDs[$loop->DataLoopPlural][0];
+                                        $itemID = $this->sessData->loopItemIDs[
+                                            $loop->DataLoopPlural][0];
                                     } elseif ($loop->DataLoopAutoGen == 1) {
                                         $itemID = $this->sessData->createNewDataLoopItem($loop->DataLoopRoot);
                                         $this->afterCreateNewDataLoopItem($loop->DataLoopPlural, $itemID);
@@ -540,7 +555,8 @@ class TreeSurv extends TreeSurvReport
                                     $this->pushCurrNodeVisit($newNode);
                                     if ($this->allNodes[$loop->DataLoopRoot]->isStepLoop()) {
                                         $this->settingTheLoop($loop->DataLoopPlural, 
-                                            $this->sessData->loopItemIDs[$loop->DataLoopPlural][0]);
+                                            $this->sessData->loopItemIDs[
+                                                $loop->DataLoopPlural][0]);
                                     }
                                 } else {
                                     $this->updateCurrNode($loop->DataLoopRoot);

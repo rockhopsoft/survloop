@@ -678,7 +678,8 @@ class AdminTreeController extends AdminController
         }
         $this->admControlInit($request, $currPage);
         $this->v["content"] = $this->v["treeClassAdmin"]->adminNodeEdit($nID, $request, $currPage);
-        if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
+        if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) 
+            && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
         }
         return view('vendor.survloop.master', $this->v);
@@ -724,7 +725,7 @@ class AdminTreeController extends AdminController
                 }
             }
             
-            $analyze = new SessAnalysis($this->custReport->treeID);
+            $analyze = new SessAnalysis($treeID);
             $this->v["nodeTots"] = $analyze->loadNodeTots($this->custReport);
             $this->v["nodeSort"] = $analyze->nodeSort;
             $this->v["coreTots"] = [];
@@ -739,17 +740,22 @@ class AdminTreeController extends AdminController
                 ->select('SL_Sess.SessCoreID', 'SL_Sess.SessCurrNode', 'SL_Sess.created_at')
                 ->distinct()
                 ->get([ 'SL_Sess.SessCoreID' ]);
-            
+
             $this->v["graph1data"] = [];
             $this->v["genTots"] = [
-                "date" => [ 0, 0, 0, [] ], // incomplete time tot, complete time tot, start date, totals by date
+                // incomplete time tot, complete time tot, start date, totals by date
+                "date" => [ 0, 0, 0, [] ], 
                 "cmpl" => [ 0, 0 ], // incomplete (I), complete (C)
-                "mobl" => [ 0, 0, [ 0, 0 ], [ 0, 0 ] ] // desktop (D), mobile (M), [ DI, DC ], [ MI, MC ]
+                "mobl" => [ 0, 0, [ 0, 0 ], [ 0, 0 ] ] 
+                // desktop (D), mobile (M), [ DI, DC ], [ MI, MC ]
             ];
             $nodeTots = $lines = [];
             if ($this->v["last100ids"]->isNotEmpty()) {
                 foreach ($this->v["last100ids"] as $i => $rec) {
-                    $coreTots = $analyze->analyzeCoreSessions($rec->SessCoreID, $this->v["allPublicCoreIDs"]);
+                    $coreTots = $analyze->analyzeCoreSessions(
+                        $rec->SessCoreID, 
+                        $this->v["allPublicCoreIDs"]
+                    );
                     if ($coreTots["node"] > 0 && isset($this->v["nodeTots"][$coreTots["node"]])) {
                         $this->v["coreTots"][] = $coreTots;
                         $cmpl = (($coreTots["cmpl"]) ? 1 : 0);
@@ -759,7 +765,8 @@ class AdminTreeController extends AdminController
                         $this->v["genTots"]["mobl"][$mobl]++;
                         $this->v["genTots"]["mobl"][(2+$mobl)][$cmpl]++;
                         $this->v["genTots"]["date"][2] = $coreTots["date"];
-                        $this->v["genTots"]["date"][$cmpl] = $this->v["genTots"]["date"][$cmpl]+$coreTots["dur"];
+                        $this->v["genTots"]["date"][$cmpl] 
+                            = $this->v["genTots"]["date"][$cmpl]+$coreTots["dur"];
                         $date = date("Y-m-d", $coreTots["date"]);
                         if (!isset($this->v["genTots"]["date"][3][$date])) {
                             $this->v["genTots"]["date"][3][$date] = 0;
@@ -767,10 +774,11 @@ class AdminTreeController extends AdminController
                         $this->v["genTots"]["date"][3][$date]++;
                         $min = $coreTots["dur"]/60;
                         if ($min < 70) {
-                            $this->v["graph1data"][] = [
-                                (($coreTots["cmpl"]) ? 100 : $this->v["nodeTots"][$coreTots["node"]]["perc"]),
-                                $min
-                            ];
+                            $perc = 100;
+                            if (!$coreTots["cmpl"]) {
+                                $perc = $this->v["nodeTots"][$coreTots["node"]]["perc"];
+                            }
+                            $this->v["graph1data"][] = [ $perc, $min ];
                         }
                     }
                 }
@@ -781,7 +789,8 @@ class AdminTreeController extends AdminController
                 "dotColor"    => $this->v["css"]["color-main-on"],
                 "brdColor"    => $this->v["css"]["color-main-grey"],
                 "title"       => '<h3 class="mT0 mB10">Duration of Attempt by Percent Completion</h3>'
-                    . '<div class="mTn10 mB10"><i>Based on the final page saved during incomplete submission attempts.'
+                    . '<div class="mTn10 mB10"><i>'
+                    . 'Based on the final page saved during incomplete submission attempts.'
                     . '</i></div>',
                 "xAxes"       => '% Complete',
                 "yAxes"       => 'Minutes',

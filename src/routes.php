@@ -239,27 +239,42 @@ Route::group(['middleware' => ['web']], function () {
     
     
     Route::get( '/dashboard/contact', [
-        'uses'       => 'SurvLoop\Controllers\Admin\AdminController@manageContact', 
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@manageContact', 
         'middleware' => ['auth']
     ]);
     
     Route::post('/dashboard/emails', [
-        'uses'       => 'SurvLoop\Controllers\Admin\AdminController@manageEmails', 
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@manageEmails', 
         'middleware' => ['auth']
     ]);
     
     Route::get( '/dashboard/emails', [
-        'uses'       => 'SurvLoop\Controllers\Admin\AdminController@manageEmails', 
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@manageEmails', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/sent-emails', [
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@printSentEmails', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::post('/dashboard/send-email', [
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@sendEmailPage', 
+        'middleware' => ['auth']
+    ]);
+    
+    Route::get( '/dashboard/send-email', [
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@sendEmailPage', 
         'middleware' => ['auth']
     ]);
     
     Route::post('/dashboard/email/{emailID}', [
-        'uses'       => 'SurvLoop\Controllers\Admin\AdminController@manageEmailsPost', 
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@manageEmailsPost', 
         'middleware' => ['auth']
     ]);
     
     Route::get( '/dashboard/email/{emailID}', [
-        'uses'       => 'SurvLoop\Controllers\Admin\AdminController@manageEmailsForm', 
+        'uses'       => 'SurvLoop\Controllers\Admin\AdminEmailController@manageEmailsForm', 
         'middleware' => ['auth']
     ]);
     

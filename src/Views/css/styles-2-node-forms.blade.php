@@ -132,7 +132,7 @@
     margin: 20px 0px 0px 20px;
 }  */
 ul li, ol li, .nPrompt ul li, .nPrompt ol li {
-    margin: 0px 0px 10px 0px;
+    margin: 0px 0px 5px 0px;
 }
 
 .nPromptHeader {
@@ -291,9 +291,6 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
     padding: 1px 9px;
 }
 
-.subNote, .nPrompt .subNote {
-    margin-top: 10px;
-}
 .subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p, .finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
 }

@@ -77,13 +77,16 @@ class SurvData
     {
         $this->dataSets = $this->id2ind = $this->kidMap = $this->helpInfo = [];
         $this->loadData($this->coreTbl, $this->coreID);
-        // if (Auth::user() && Auth::user()->id) $this->loadData('users', Auth::user()->id);
-        // check for data needed for root data loop which isn't connected to the core record
+// if (Auth::user() && Auth::user()->id) $this->loadData('users', Auth::user()->id);
+// check for data needed for root data loop which isn't connected to the core record
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
-            eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) . "::orderBy('" 
-                . $isBigSurvLoop[1] . "', '" . $isBigSurvLoop[2] . "')->get();");
+            eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) 
+                . "::orderBy('" . $isBigSurvLoop[1] . "', '" 
+                . $isBigSurvLoop[2] . "')->get();");
             if ($rows->isNotEmpty()) {
-                foreach ($rows as $row) $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
+                foreach ($rows as $row) {
+                    $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
+                }
             }
         }
         return true;
@@ -92,8 +95,11 @@ class SurvData
     protected function initDataSet($tbl)
     {
         $setInd = 0;
-        if (!isset($this->dataSets[$tbl])) $this->dataSets[$tbl] = $this->id2ind[$tbl] = [];
-        else $setInd = sizeof($this->dataSets[$tbl]);
+        if (!isset($this->dataSets[$tbl])) {
+            $this->dataSets[$tbl] = $this->id2ind[$tbl] = [];
+        } else {
+            $setInd = sizeof($this->dataSets[$tbl]);
+        }
         return $setInd;
     }
     
@@ -103,8 +109,11 @@ class SurvData
         $GLOBALS["SL"]->modelPath($tbl);
         $subObj = [];
         if (trim($tbl) != '' && $rowID > 0) {
-            if (!$recObj) $recObj = $this->dataFind($tbl, $rowID);
-            if ($tbl == $this->coreTbl && $rowID > 0 && $rowID == $this->coreID && !$recObj) {
+            if (!$recObj) {
+                $recObj = $this->dataFind($tbl, $rowID);
+            }
+            if ($tbl == $this->coreTbl && $rowID > 0 
+                && $rowID == $this->coreID && !$recObj) {
                 $this->newDataRecord($tbl, '', -3, true, $this->coreID);
             }
             if ($recObj) {
@@ -114,72 +123,141 @@ class SurvData
                 $this->id2ind[$tbl][$recObj->getKey()] = $setInd;
                 
                 // Recurse through this parent's families...
-                if (isset($GLOBALS["SL"]->dataSubsets) && sizeof($GLOBALS["SL"]->dataSubsets) > 0) {
+                if (isset($GLOBALS["SL"]->dataSubsets) 
+                    && sizeof($GLOBALS["SL"]->dataSubsets) > 0) {
                     foreach ($GLOBALS["SL"]->dataSubsets as $subset) {
                         if ($subset->DataSubTbl == $tbl) {
                             $subObjs = [];
-                            if (trim($subset->DataSubTblLnk) != '' && intVal($recObj->{ $subset->DataSubTblLnk }) > 0) {
-                                $subObjs = $this->dataFind($subset->DataSubSubTbl, $recObj->{ $subset->DataSubTblLnk });
+                            if (trim($subset->DataSubTblLnk) != '' 
+                                && intVal($recObj->{ $subset->DataSubTblLnk }) > 0) {
+                                $subObjs = $this->dataFind(
+                                    $subset->DataSubSubTbl, 
+                                    $recObj->{ $subset->DataSubTblLnk }
+                                );
                                 if ($subObjs) $subObjs = [$subObjs];
                             } elseif (trim($subset->DataSubSubLnk) != '') {
-                                $subObjs = $this->dataWhere($subset->DataSubSubTbl, $subset->DataSubSubLnk, $rowID);
+                                $subObjs = $this->dataWhere(
+                                    $subset->DataSubSubTbl, 
+                                    $subset->DataSubSubLnk, 
+                                    $rowID
+                                );
                             }
                             if (empty($subObjs) && $subset->DataSubAutoGen == 1) {
-                                $subObjs = [$this->newDataRecordInner($subset->DataSubSubTbl)];
+                                $subObjs = [
+                                    $this->newDataRecordInner($subset->DataSubSubTbl)
+                                ];
                                 if (trim($subset->DataSubTblLnk) != '') {
-                                    $recObj->update([ $subset->DataSubTblLnk => $subObjs[0]->getKey() ]);
+                                    $recObj->update([
+                                        $subset->DataSubTblLnk => $subObjs[0]->getKey()
+                                    ]);
                                     $recObj->save();
                                 } elseif (trim($subset->DataSubSubLnk) != '') {
-                                    $subObjs[0]->update([ $subset->DataSubSubLnk => $rowID ]);
+                                    $subObjs[0]->update([
+                                        $subset->DataSubSubLnk => $rowID
+                                    ]);
                                     $subObjs[0]->save();
                                 }
                             }
-                            $this->processSubObjs($tbl, $rowID, $setInd, $subset->DataSubSubTbl, $subObjs);
+                            $this->processSubObjs(
+                                $tbl, 
+                                $rowID, 
+                                $setInd, 
+                                $subset->DataSubSubTbl, 
+                                $subObjs
+                            );
                         }
                     }
                 }
                 
                 // checking loops...
                 if ($tbl == $this->coreTbl
-                    && isset($GLOBALS["SL"]->dataLoops) && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
+                    && isset($GLOBALS["SL"]->dataLoops) 
+                    && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
                     foreach ($GLOBALS["SL"]->dataLoops as $loopName => $loop) {
-                        if (isset($loop->DataLoopTable)) {
-                            $keyField = $GLOBALS["SL"]->getForeignLnk($GLOBALS["SL"]->tblI[$loop->DataLoopTable], 
+                        if (isset($loop->DataLoopTable) 
+                            && isset($GLOBALS["SL"]->tblI[$tbl])
+                            && isset($GLOBALS["SL"]->tblI[$loop->DataLoopTable])) {
+                            $keyField = $GLOBALS["SL"]->getForeignLnk(
+                                $GLOBALS["SL"]->tblI[$loop->DataLoopTable], 
                                 $GLOBALS["SL"]->tblI[$tbl]);
                             if (trim($keyField) != '') {
-                                $subObjs = $this->dataWhere($loop->DataLoopTable, 
-                                    $GLOBALS["SL"]->tblAbbr[$loop->DataLoopTable] . $keyField, $rowID);
-                                $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $loop->DataLoopTable, $subObjs);
+                                $keyField = $GLOBALS["SL"]->tblAbbr[$loop->DataLoopTable] 
+                                    . $keyField;
+                                $subObjs = $this->dataWhere(
+                                    $loop->DataLoopTable, 
+                                    $keyField, 
+                                    $rowID
+                                );
+                                $this->processSubObjs(
+                                    $tbl, 
+                                    $recObj->getKey(), 
+                                    $setInd, 
+                                    $loop->DataLoopTable, 
+                                    $subObjs
+                                );
                             }
                         }
                     }
                 }
                 
                 // checking helpers...
-                if (isset($GLOBALS["SL"]->dataHelpers) && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+                if (isset($GLOBALS["SL"]->dataHelpers) 
+                    && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
                     foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
                         if ($helper->DataHelpParentTable == $tbl) {
-                            $subObjs = $this->dataWhere($helper->DataHelpTable, $helper->DataHelpKeyField, $rowID);
-                            $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $helper->DataHelpTable, $subObjs);
+                            $subObjs = $this->dataWhere(
+                                $helper->DataHelpTable, 
+                                $helper->DataHelpKeyField, 
+                                $rowID
+                            );
+                            $this->processSubObjs(
+                                $tbl, 
+                                $recObj->getKey(), 
+                                $setInd, 
+                                $helper->DataHelpTable, 
+                                $subObjs
+                            );
                         }
                     }
                 }
                 
                 // checking linkages...
-                if (isset($GLOBALS["SL"]->dataLinksOn) && sizeof($GLOBALS["SL"]->dataLinksOn) > 0) {
+                if (isset($GLOBALS["SL"]->dataLinksOn) 
+                    && sizeof($GLOBALS["SL"]->dataLinksOn) > 0) {
                     foreach ($GLOBALS["SL"]->dataLinksOn as $linkage) {
                         if ($tbl == $linkage[4]) {
-                            $linkage = array($linkage[4], $linkage[3], $linkage[2], $linkage[1], $linkage[0]);
+                            $linkage = [
+                                $linkage[4], 
+                                $linkage[3], 
+                                $linkage[2], 
+                                $linkage[1], 
+                                $linkage[0]
+                            ];
                         }
                         if ($tbl == $linkage[0]) {
                             $lnkObjs = $this->dataWhere($linkage[2], $linkage[1], $rowID);
                             if ($lnkObjs && sizeof($lnkObjs) > 0) {
-                                $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $linkage[2], $lnkObjs);
+                                $this->processSubObjs(
+                                    $tbl, 
+                                    $recObj->getKey(), 
+                                    $setInd, 
+                                    $linkage[2], 
+                                    $lnkObjs
+                                );
                                 foreach ($lnkObjs as $lnkObj) {
-                                    $findObj = $this->dataFind($linkage[4], $lnkObj->{ $linkage[3] });
+                                    $findObj = $this->dataFind(
+                                        $linkage[4], 
+                                        $lnkObj->{ $linkage[3] }
+                                    );
                                     if ($findObj) {
                                         $subObjs = array($findObj);
-                                        $this->processSubObjs($tbl, $recObj->getKey(), $setInd, $linkage[4], $subObjs);
+                                        $this->processSubObjs(
+                                            $tbl, 
+                                            $recObj->getKey(), 
+                                            $setInd, 
+                                            $linkage[4], 
+                                            $subObjs
+                                        );
                                     } elseif (intVal($lnkObj->{ $linkage[3] }) > 0) {
                                         // If this is a bad linkage, let's delete it
                                         $lnkObj->{ $linkage[3] } = NULL;
@@ -198,9 +276,12 @@ class SurvData
     
     public function getDataCoreID()
     {
-        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0
-            && isset($this->dataSets[$this->coreTbl][0]->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' })) {
-            return $this->dataSets[$this->coreTbl][0]->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' };
+        if (isset($this->dataSets[$this->coreTbl]) 
+            && sizeof($this->dataSets[$this->coreTbl]) > 0
+            && isset($this->dataSets[$this->coreTbl][0]
+                ->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' })) {
+            return $this->dataSets[$this->coreTbl][0]
+                ->{ $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'ID' };
         }
         return -3;
     }
@@ -226,11 +307,17 @@ class SurvData
             foreach ($flds as $fldKey) {
                 $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldForeignTable];
                 if ($fldKey->FldForeignTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
-                    $linkages["outgoing"][] = [$GLOBALS["SL"]->tblAbbr[$tbl] . $fldKey->FldName, $this->coreID];
+                    $linkages["outgoing"][] = [
+                        $GLOBALS["SL"]->tblAbbr[$tbl] . $fldKey->FldName, 
+                        $this->coreID
+                    ];
                 } else { // not the special Core case, so find an ancestor
                     list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
                     if ($loopID > 0) {
-                        $newLink = [$GLOBALS["SL"]->tblAbbr[$tbl] . $fldKey->FldName, $loopID];
+                        $newLink = [
+                            $GLOBALS["SL"]->tblAbbr[$tbl] . $fldKey->FldName, 
+                            $loopID
+                        ];
                         if (!in_array($newLink, $linkages["outgoing"])) {
                             $linkages["outgoing"][] = $newLink;
                         }
@@ -250,13 +337,22 @@ class SurvData
                 foreach ($flds as $fldKey) {
                     if (isset($GLOBALS["SL"]->tbl[$fldKey->FldTable])) {
                         $foreignTbl = $GLOBALS["SL"]->tbl[$fldKey->FldTable];
-                        $foreignFldName = $GLOBALS["SL"]->tblAbbr[$foreignTbl] . $fldKey->FldName;
+                        $foreignFldName = $GLOBALS["SL"]->tblAbbr[$foreignTbl] 
+                            . $fldKey->FldName;
                         if ($fldKey->FldTable == $GLOBALS["SL"]->treeRow->TreeCoreTable) {
-                            $linkages["incoming"][] = [$foreignTbl, $foreignFldName, $this->coreID];
+                            $linkages["incoming"][] = [
+                                $foreignTbl, 
+                                $foreignFldName, 
+                                $this->coreID
+                            ];
                         } else { // not the special Core case, so find an ancestor
                             list($loopInd, $loopID) = $this->currSessDataPos($foreignTbl);
                             if ($loopID > 0) {
-                                $newLink = [$foreignTbl, $foreignFldName, $loopID];
+                                $newLink = [
+                                    $foreignTbl, 
+                                    $foreignFldName, 
+                                    $loopID
+                                ];
                                 if (!in_array($newLink, $linkages["incoming"])) {
                                     $linkages["incoming"][] = $newLink;
                                 }
@@ -275,9 +371,15 @@ class SurvData
         foreach ($linkages["outgoing"] as $i => $link) {
             $eval .= "where('" . $link[0] . "', '" . $link[1] . "')->";
         }
-        $eval = "\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::" . $eval . "first();";
-        eval($eval);
-        return $recObj;
+        $model = $GLOBALS["SL"]->modelPath($tbl);
+        if (trim($model) != '') {
+            $eval = "\$recObj = " . $model . "::" . $eval . "first();";
+            eval($eval);
+            return $recObj;
+        } else {
+            echo 'did not find model path for ' . $tbl; exit;
+        }
+        return false;
     }
     
     public function newDataRecordInner($tbl = '', $linkages = [], $recID = -3)
@@ -340,7 +442,10 @@ class SurvData
                 $incomingInd = $this->getRowInd($link[0], intVal($link[2]));
                 if (isset($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }) 
                     && intVal($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }) > 0) {
-                    $recInd = $this->getRowInd($tbl, intVal($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }));
+                    $recInd = $this->getRowInd(
+                        $tbl, 
+                        intVal($this->dataSets[$link[0]][$incomingInd]->{ $link[1] })
+                    );
                     if ($recInd >= 0) {
                         $recObj = $this->dataSets[$tbl][$recInd];
                     }
@@ -357,8 +462,9 @@ class SurvData
     
     public function getNextRecID($tbl = '')
     {
-        eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::select('" . $GLOBALS["SL"]->tblAbbr[$tbl] 
-            . "ID')->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "ID', 'desc')->first();");
+        eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::select('" 
+            . $GLOBALS["SL"]->tblAbbr[$tbl] . "ID')->orderBy('" 
+            . $GLOBALS["SL"]->tblAbbr[$tbl] . "ID', 'desc')->first();");
         if ($recObj && isset($recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID' })) {
             return (1+$recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID' });
         }
@@ -375,7 +481,10 @@ class SurvData
             foreach ($linkages["incoming"] as $link) {
                 $incomingInd = $this->getRowInd($link[0], intVal($link[2]));
                 if (isset($this->dataSets[$link[0]][$incomingInd]->{ $link[1] })) {
-                    $recInd = $this->getRowInd($tbl, intVal($this->dataSets[$link[0]][$incomingInd]->{ $link[1] }));
+                    $recInd = $this->getRowInd(
+                        $tbl, 
+                        intVal($this->dataSets[$link[0]][$incomingInd]->{ $link[1] })
+                    );
                     if ($recInd >= 0) {
                         $this->dataSets[$tbl][$recInd]->delete();
                         $this->dataSets[$link[0]][$incomingInd]->{ $link[1] } = NULL;
@@ -390,29 +499,43 @@ class SurvData
     
     public function deleteDataRecordByID($tbl = '', $id = -3, $refresh = true)
     {
-        if ($tbl == '' || $id <= 0) return false;
+        if ($tbl == '' || $id <= 0) {
+            return false;
+        }
         $recInd = $this->getRowInd($tbl, $id);
-        if ($recInd >= 0) $this->dataSets[$tbl][$recInd]->delete();
-        if ($refresh) $this->refreshDataSets();
-        return true;
-    }
-    
-    public function addRemoveSubsets($tbl, $newTot = -3)
-    {
-        if (trim($tbl) == '' || $newTot < 0) return false;
-        $currTot = ((isset($this->dataSets[$tbl])) ? sizeof($this->dataSets[$tbl]) : 0);
-        if ($newTot > $currTot) {
-            for ($i = $currTot; $i < $newTot; $i++) $this->newDataRecord($tbl, '', -3, true);
-        } elseif ($newTot < $currTot) {
-            for ($i = $newTot; $i < $currTot; $i++) $this->dataSets[$tbl][$i]->delete();
+        if ($recInd >= 0) {
+            $this->dataSets[$tbl][$recInd]->delete();
+        }
+        if ($refresh) {
             $this->refreshDataSets();
         }
         return true;
     }
     
-    protected function dataFind($tbl, $rowID)
+    public function addRemoveSubsets($tbl, $newTot = -3)
     {
-        if ($rowID <= 0) return [];
+        if (trim($tbl) == '' || $newTot < 0) {
+            return false;
+        }
+        $currTot = ((isset($this->dataSets[$tbl])) ? sizeof($this->dataSets[$tbl]) : 0);
+        if ($newTot > $currTot) {
+            for ($i = $currTot; $i < $newTot; $i++) {
+                $this->newDataRecord($tbl, '', -3, true);
+            }
+        } elseif ($newTot < $currTot) {
+            for ($i = $newTot; $i < $currTot; $i++) {
+                $this->dataSets[$tbl][$i]->delete();
+            }
+            $this->refreshDataSets();
+        }
+        return true;
+    }
+    
+    public function dataFind($tbl, $rowID)
+    {
+        if ($rowID <= 0) {
+            return [];
+        }
         eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::find(" . $rowID . ");");
         return $recObj;
     }
@@ -428,9 +551,12 @@ class SurvData
     
     public function dataHas($tbl, $rowID = -3)
     {
-        if ($rowID <= 0) return (isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0);
+        if ($rowID <= 0) {
+            return (isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0);
+        }
         $rowInd = $this->getRowInd($tbl, $rowID);
-        if ($rowInd >= 0 && isset($this->dataSets[$tbl]) && $this->dataSets[$tbl][$rowInd]->getKey() == $rowID) {
+        if ($rowInd >= 0 && isset($this->dataSets[$tbl]) 
+            && $this->dataSets[$tbl][$rowInd]->getKey() == $rowID) {
             return true;
         }
         return false;
@@ -438,11 +564,15 @@ class SurvData
     
     public function getRowInd($tbl, $rowID)
     {
-        if ($rowID > 0 && isset($this->id2ind[$tbl]) && isset($this->id2ind[$tbl][$rowID])) {
-            if (intVal($this->id2ind[$tbl][$rowID]) >= 0) return $this->id2ind[$tbl][$rowID];
+        if ($rowID > 0 && isset($this->id2ind[$tbl]) 
+            && isset($this->id2ind[$tbl][$rowID])) {
+            if (intVal($this->id2ind[$tbl][$rowID]) >= 0) {
+                return $this->id2ind[$tbl][$rowID];
+            }
         }
         // else double-check
-        if ($rowID > 0 && isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0) {
+        if ($rowID > 0 && isset($this->dataSets[$tbl]) 
+            && sizeof($this->dataSets[$tbl]) > 0) {
             foreach ($this->dataSets[$tbl] as $ind => $d) {
                 if ($d->getKey() == $rowID) {
                     $this->initDataSet($tbl);
@@ -469,7 +599,8 @@ class SurvData
     public function getRowIDsByFldVal($tbl, $fldVals = [], $getRow = false)
     {
         $ret = [];
-        if (sizeof($fldVals) > 0 && isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0) {
+        if (sizeof($fldVals) > 0 && isset($this->dataSets[$tbl]) 
+            && sizeof($this->dataSets[$tbl]) > 0) {
             foreach ($this->dataSets[$tbl] as $ind => $d) {
                 $found = true;
                 foreach ($fldVals as $fld => $val) {
@@ -498,9 +629,13 @@ class SurvData
     public function getLoopRows($loopName)
     {
         $rows = [];
-        if (isset($this->loopItemIDs[$loopName]) && sizeof($this->loopItemIDs[$loopName]) > 0) {
+        if (isset($this->loopItemIDs[$loopName]) 
+            && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $itemID) {
-                $rows[] = $this->getRowById($GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable, $itemID);
+                $rows[] = $this->getRowById(
+                    $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable, 
+                    $itemID
+                );
             }
         }
         return $rows;
@@ -516,7 +651,8 @@ class SurvData
     
     public function getLoopIndFromID($loopName, $itemID)
     {
-        if (isset($this->loopItemIDs[$loopName]) && sizeof($this->loopItemIDs[$loopName]) > 0) {
+        if (isset($this->loopItemIDs[$loopName]) 
+            && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $ind => $id) {
                 if ($id == $itemID) {
                     return $ind;
@@ -548,8 +684,11 @@ class SurvData
     
     public function addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $tbl2ID, $tbl2Ind = -3, $lnkTbl = '')
     {
-        if ($tbl1Ind < 0) $tbl1Ind = $this->getRowInd($tbl1, $tbl1ID);
-        if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
+        if ($tbl1Ind < 0) {
+            $tbl1Ind = $this->getRowInd($tbl1, $tbl1ID);
+        }
+        if (trim($tbl1) != '' && trim($tbl2) != '' 
+            && $tbl1ID > 0 && $tbl1Ind >= 0 && $tbl2ID > 0) {
             if (!isset($this->kidMap[$tbl1])) {
                 $this->kidMap[$tbl1] = [];
             }
@@ -559,7 +698,8 @@ class SurvData
             if ($tbl2Ind < 0) {
                 $tbl2Ind = $this->getRowInd($tbl2, $tbl2ID);
                 if ($tbl2Ind < 0) { // not presuming it's about to be loaded
-                    $tbl2Ind = (isset($this->dataSets[$tbl2])) ? sizeof($this->dataSets[$tbl2]) : 0;
+                    $tbl2Ind = (isset($this->dataSets[$tbl2])) 
+                        ? sizeof($this->dataSets[$tbl2]) : 0;
                 }
             }
             if ($tbl1ID > 0 && $tbl2ID > 0) {
@@ -568,7 +708,7 @@ class SurvData
                     "id2" => $tbl2ID,
                     "ind1" => $tbl1Ind,
                     "ind2" => $tbl2Ind
-                    ];
+                ];
             }
         }
         return false;
@@ -633,12 +773,16 @@ class SurvData
     {
         $ret = [];
         $bInd = sizeof($this->dataBranches)-1;
-        if ($bInd >= 0 && trim($this->dataBranches[$bInd]["branch"]) != '' && isset($this->dataSets[$tbl2])
-            && sizeof($this->dataSets[$tbl2]) > 0) {
-            $tbl2fld = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl2, $this->dataBranches[$bInd]["branch"]);
+        if ($bInd >= 0 && trim($this->dataBranches[$bInd]["branch"]) != '' 
+            && isset($this->dataSets[$tbl2]) && sizeof($this->dataSets[$tbl2]) > 0) {
+            $tbl2fld = $GLOBALS["SL"]->getForeignLnkNameFldName(
+                $tbl2, 
+                $this->dataBranches[$bInd]["branch"]
+            );
             if (trim($tbl2fld) != '') {
                 foreach ($this->dataSets[$tbl2] as $i => $row) {
-                    if (isset($row->{ $tbl2fld }) && $row->{ $tbl2fld } == $this->dataBranches[$bInd]["itemID"]) {
+                    if (isset($row->{ $tbl2fld }) 
+                        && $row->{ $tbl2fld } == $this->dataBranches[$bInd]["itemID"]) {
                         if ($idOnly) {
                             $ret[] = $row->getKey();
                         } else {
@@ -655,7 +799,11 @@ class SurvData
     {
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if ($this->dataBranches[$i]["branch"] != $tbl2) {
-                $tbl2ID = $this->getChild($this->dataBranches[$i]["branch"], $this->dataBranches[$i]["itemID"], $tbl2);
+                $tbl2ID = $this->getChild(
+                    $this->dataBranches[$i]["branch"], 
+                    $this->dataBranches[$i]["itemID"], 
+                    $tbl2
+                );
                 if ($tbl2ID > 0) {
                     return $tbl2ID;
                 }
@@ -724,7 +872,8 @@ class SurvData
     {
         $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
         if (trim($fld) == '') {
-            list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($GLOBALS["SL"]->dataLoops[$loopName]->DataLoopDoneFld);
+            list($tbl, $fld) = $GLOBALS["SL"]
+                ->splitTblFld($GLOBALS["SL"]->dataLoops[$loopName]->DataLoopDoneFld);
         }
         $this->loopItemIDsDone = $saves = [];
         $saves = DB::table('SL_NodeSaves')
@@ -744,7 +893,8 @@ class SurvData
         $this->loopItemsNextID = -3;
         if (sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $id) {
-                if ($this->loopItemsNextID <= 0 && !in_array($id, $this->loopItemIDsDone)) {
+                if ($this->loopItemsNextID <= 0 
+                    && !in_array($id, $this->loopItemIDsDone)) {
                     $this->loopItemsNextID = $id;
                 }
             }
@@ -765,8 +915,9 @@ class SurvData
                     && sizeof($GLOBALS["SL"]->closestLoop["obj"]->conds) > 0) {
                     foreach ($GLOBALS["SL"]->closestLoop["obj"]->conds as $i => $cond) {
                         $fld = $GLOBALS["SL"]->getFullFldNameFromID($cond->CondField, false);
-                        if (trim($newFld) == '' && trim($fld) != '' && $cond->CondOperator == '{' 
-                            && sizeof($cond->condVals) == 1 && $GLOBALS["SL"]->tbl[$cond->CondTable] 
+                        if (trim($newFld) == '' && trim($fld) != '' 
+                            && $cond->CondOperator == '{' && sizeof($cond->condVals) == 1 
+                            && $GLOBALS["SL"]->tbl[$cond->CondTable] 
                                 == $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable) {
                             $newFld = $fld;
                             $newVal = $cond->condVals[0];
@@ -774,12 +925,22 @@ class SurvData
                     }
                 }
             }
-            $recObj = $this->newDataRecord($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $newFld, $newVal, true);
-            $GLOBALS["SL"]->sessLoops[0]->SessLoopItemID = $GLOBALS["SL"]->closestLoop["itemID"] = $recObj->getKey();
+            $recObj = $this->newDataRecord(
+                $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, 
+                $newFld, 
+                $newVal, 
+                true
+            );
+            $GLOBALS["SL"]->sessLoops[0]->SessLoopItemID 
+                = $GLOBALS["SL"]->closestLoop["itemID"] = $recObj->getKey();
             $GLOBALS["SL"]->sessLoops[0]->save();
-            $this->logDataSave($nID, $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, 
-                $GLOBALS["SL"]->closestLoop["itemID"], 'AddingItem #' 
-                . $GLOBALS["SL"]->closestLoop["itemID"], $GLOBALS["SL"]->closestLoop["loop"]);
+            $this->logDataSave(
+                $nID, 
+                $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, 
+                $GLOBALS["SL"]->closestLoop["itemID"], 
+                'AddingItem #' . $GLOBALS["SL"]->closestLoop["itemID"], 
+                $GLOBALS["SL"]->closestLoop["loop"]
+            );
             return $recObj->getKey();
         }
         return -3;
@@ -805,7 +966,8 @@ class SurvData
     public function getLatestDataBranchRow()
     {
         $branch = $this->getLatestDataBranch();
-        if (sizeof($branch) > 0 && isset($branch["branch"]) && isset($branch["itemID"])) {
+        if (sizeof($branch) > 0 && isset($branch["branch"]) 
+            && isset($branch["itemID"])) {
             return $this->getRowById($branch["branch"], $branch["itemID"]);
         }
         return null;
@@ -827,7 +989,8 @@ class SurvData
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if ($this->dataBranches[$i]["branch"] == $tbl) {
                 $foundBranch = true;
-                if (intVal($this->dataBranches[$i]["itemID"]) <= 0 && intVal($itemID) > 0) {
+                if (intVal($this->dataBranches[$i]["itemID"]) <= 0 
+                    && intVal($itemID) > 0) {
                     $this->dataBranches[$i]["itemID"] = $itemID;
                 }
             }
@@ -840,7 +1003,7 @@ class SurvData
                 "branch" => $tbl,
                 "loop"   => '',
                 "itemID" => $itemID
-                ];
+            ];
         }
         return true;
     }
@@ -871,7 +1034,10 @@ class SurvData
         $tblNew = $this->isCheckboxHelperTable($tbl);
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
-                list($itemInd, $itemID) = $this->currSessDataPosBranch($tblNew, $this->dataBranches[$i]);
+                list($itemInd, $itemID) = $this->currSessDataPosBranch(
+                    $tblNew, 
+                    $this->dataBranches[$i]
+                );
                 if (intVal($itemID) > 0) {
                     return [$itemInd, $itemID];
                 }
@@ -879,15 +1045,20 @@ class SurvData
         }
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
-                list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $this->dataBranches[$i]);
+                list($itemInd, $itemID) = $this->currSessDataPosBranch(
+                    $tbl, 
+                    $this->dataBranches[$i]
+                );
             }
         }
-        if (intVal($itemID) <= 0 && !$hasParManip && trim($GLOBALS["SL"]->currCyc["res"][1]) == '') {
+        if (intVal($itemID) <= 0 && !$hasParManip 
+            && trim($GLOBALS["SL"]->currCyc["res"][1]) == '') {
             $itemID = $this->sessChildIDFromParent($tbl);
             if ($itemID > 0) {
                 $itemInd = $this->getRowInd($tbl, $itemID);
                 for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
-                    if ($this->dataBranches[$i]["branch"] == $tbl && $this->dataBranches[$i]["loop"] == '') {
+                    if ($this->dataBranches[$i]["branch"] == $tbl 
+                        && $this->dataBranches[$i]["loop"] == '') {
                         $this->dataBranches[$i]["itemID"] = $itemID;
                     }
                 }
@@ -918,7 +1089,10 @@ class SurvData
         $tbl = $this->isCheckboxHelperTable($tbl);
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if ($itemID <= 0) {
-                list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $this->dataBranches[$i]);
+                list($itemInd, $itemID) = $this->currSessDataPosBranch(
+                    $tbl, 
+                    $this->dataBranches[$i]
+                );
             }
         }
         return [$itemInd, $itemID];
@@ -931,10 +1105,12 @@ class SurvData
         if (trim($tbl) == '' || trim($fld) == '' || !$this->loaded) {
             return '';
         }
-        if (in_array($nID, $this->checkboxNodes) && $GLOBALS["SL"]->isFldCheckboxHelper($fld)) {
+        if (in_array($nID, $this->checkboxNodes) 
+            && $GLOBALS["SL"]->isFldCheckboxHelper($fld)) {
             $tblFld = $tbl . '-' . $fld;
             $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
-            if ($this->helpInfo[$tblFld]["link"] && isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
+            if ($this->helpInfo[$tblFld]["link"] 
+                && isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
                 return $this->currSessDataCheckbox($nID, $tbl, $fld);
             }
         }
@@ -948,9 +1124,11 @@ class SurvData
             if ($this->dataFieldExists($tbl, $itemInd, $fld)) {
                 return $this->dataSets[$tbl][$itemInd]->{ $fld };
             }
-        } elseif ($action == 'update' && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
+        } elseif ($action == 'update' 
+            && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            if (trim($newVal) == '' && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
+            if (trim($newVal) == '' 
+                && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
                 $newVal = null;
             } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
                 $newVal = intVal($newVal);
@@ -975,9 +1153,18 @@ class SurvData
     {
         $tblFld = $tbl . '-' . $fld;
         $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
-        if (!$this->helpInfo[$tblFld]["link"] || !isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
-            return $this->currSessData($nID, $tbl, $fld, $action, ';' . implode(';;', $newVals) . ';', false, 
-                $itemInd, $itemID);
+        if (!$this->helpInfo[$tblFld]["link"] 
+            || !isset($this->helpInfo[$tblFld]["link"]->DataHelpValueField)) {
+            return $this->currSessData(
+                $nID, 
+                $tbl, 
+                $fld, 
+                $action, 
+                ';' . implode(';;', $newVals) . ';', 
+                false, 
+                $itemInd, 
+                $itemID
+            );
         }
         if ($action == 'get') {
             if (sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) {
@@ -985,7 +1172,13 @@ class SurvData
             }
             return '';
         } elseif ($action == 'update') {
-            $this->logDataSave($nID, $tbl, $this->helpInfo[$tblFld]["parentID"], $fld, $newVals);
+            $this->logDataSave(
+                $nID, 
+                $tbl, 
+                $this->helpInfo[$tblFld]["parentID"], 
+                $fld, 
+                $newVals
+            );
             // check for newly submitted responses...
             if (is_array($newVals) && sizeof($newVals) > 0) {
                 foreach ($newVals as $i => $val) {
@@ -993,17 +1186,19 @@ class SurvData
                         && isset($this->helpInfo[$tblFld]["link"]->DataHelpTable)) {
                         if ($this->helpInfo[$tblFld]["parentID"] <= 0 
                             && $this->helpInfo[$tblFld]["link"]->DataHelpParentTable == 'users') {
-                            $this->helpInfo[$tblFld]["parentID"] = ((Auth::user() && Auth::user()->id) 
-                                ? Auth::user()->id : -3);
+                            $this->helpInfo[$tblFld]["parentID"] 
+                                = ((Auth::user() && Auth::user()->id) 
+                                    ? Auth::user()->id : -3);
                         }
                         if ($val && trim($val) != '') {
-                            eval("\$newObj = new " 
-                                . $GLOBALS["SL"]->modelPath($this->helpInfo[$tblFld]["link"]->DataHelpTable) . ";");
+                            eval("\$newObj = new " . $GLOBALS["SL"]->modelPath(
+                                $this->helpInfo[$tblFld]["link"]->DataHelpTable) . ";");
                             $newObj->save();
                             $newObj->update([
                                 $this->helpInfo[$tblFld]["link"]->DataHelpKeyField 
                                     => $this->helpInfo[$tblFld]["parentID"],
-                                $this->helpInfo[$tblFld]["link"]->DataHelpValueField => strip_tags($val)
+                                $this->helpInfo[$tblFld]["link"]->DataHelpValueField 
+                                    => strip_tags($val)
                                 ]);
                             $setInd = $this->initDataSet($tbl);
                             $this->dataSets[$tbl][$setInd] = $newObj;
@@ -1016,8 +1211,11 @@ class SurvData
                 foreach ($curr->responses as $j => $res) {
                     if ((!is_array($newVals) || !in_array($res->NodeResValue, $newVals)) 
                         && isset($this->helpInfo[$tblFld]["pastValToID"][$res->NodeResValue])) {
-                        $this->deleteDataItem($nID, $this->helpInfo[$tblFld]["link"]->DataHelpTable, 
-                            $this->helpInfo[$tblFld]["pastValToID"][$res->NodeResValue]);
+                        $this->deleteDataItem(
+                            $nID, 
+                            $this->helpInfo[$tblFld]["link"]->DataHelpTable, 
+                            $this->helpInfo[$tblFld]["pastValToID"][$res->NodeResValue]
+                        );
                     }
                 }
             }
@@ -1036,19 +1234,27 @@ class SurvData
                 "pastObjs"    => [],
                 "pastValToID" => []
                 ];
-            if (isset($GLOBALS["SL"]->dataHelpers) && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+            if (isset($GLOBALS["SL"]->dataHelpers) 
+                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
                 foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
-                    if ($helper->DataHelpTable == $tbl && $helper->DataHelpValueField == $fld) {
+                    if ($helper->DataHelpTable == $tbl 
+                        && $helper->DataHelpValueField == $fld) {
                         $this->helpInfo[$tblFld]["link"] = $helper;
                         //BranchOnly
                         list($parentInd, $this->helpInfo[$tblFld]["parentID"]) 
                             = $this->currSessDataPos($helper->DataHelpParentTable);
-                        $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere($helper->DataHelpTable, 
-                            $helper->DataHelpKeyField, $this->helpInfo[$tblFld]["parentID"]);
-                        if ($this->helpInfo[$tblFld]["pastObjs"] && sizeof($this->helpInfo[$tblFld]["pastObjs"]) > 0) {
+                        $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere(
+                            $helper->DataHelpTable, 
+                            $helper->DataHelpKeyField, 
+                            $this->helpInfo[$tblFld]["parentID"]
+                        );
+                        if ($this->helpInfo[$tblFld]["pastObjs"] 
+                            && sizeof($this->helpInfo[$tblFld]["pastObjs"]) > 0) {
                             foreach ($this->helpInfo[$tblFld]["pastObjs"] as $obj) {
-                                $this->helpInfo[$tblFld]["pastVals"][] = $obj->{ $helper->DataHelpValueField };
-                                $this->helpInfo[$tblFld]["pastValToID"][$obj->{ $helper->DataHelpValueField }] 
+                                $this->helpInfo[$tblFld]["pastVals"][] 
+                                    = $obj->{ $helper->DataHelpValueField };
+                                $this->helpInfo[$tblFld]["pastValToID"][
+                                    $obj->{ $helper->DataHelpValueField }] 
                                     = $obj->getKey();
                             }
                         }
@@ -1077,7 +1283,8 @@ class SurvData
             foreach ($this->dataSets as $tbl => $rows) {
                 if (sizeof($rows) > 0) {
                     foreach ($rows as $row) {
-                        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" . intVal($row->getKey()) . ")->delete();");
+                        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" 
+                            . intVal($row->getKey()) . ")->delete();");
                     }
                 }
             }
@@ -1121,10 +1328,13 @@ class SurvData
             $qryWheres .= "where('NodeSaveTblFld', '" . $tbl . ":" . $fld 
                 . ((trim($set) != '') ? "[" . $set . "]" : "") . "')->";
         }
-        if (isset($GLOBALS["SL"]->closestLoop["itemID"]) && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
-            $qryWheres .= "where('NodeSaveLoopItemID', " . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
+        if (isset($GLOBALS["SL"]->closestLoop["itemID"]) 
+            && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
+            $qryWheres .= "where('NodeSaveLoopItemID', " 
+                . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
         }
-        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres . "orderBy('created_at', 'desc')->first();"); 
+        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres 
+            . "orderBy('created_at', 'desc')->first();"); 
         if ($nodeSave && isset($nodeSave->NodeSaveNewVal)) {
             return $nodeSave->NodeSaveNewVal;
         }
@@ -1136,7 +1346,8 @@ class SurvData
         $passed = true;
         if ($cond && isset($cond->CondDatabase) && $cond->CondOperator != 'CUSTOM') {
             $cond->loadVals();
-            $loopName = ((intVal($cond->CondLoop) > 0 && isset($GLOBALS["SL"]->dataLoopNames[$cond->CondLoop])) 
+            $loopName = ((intVal($cond->CondLoop) > 0 
+                && isset($GLOBALS["SL"]->dataLoopNames[$cond->CondLoop])) 
                 ? $GLOBALS["SL"]->dataLoopNames[$cond->CondLoop] : '');
             if (intVal($cond->CondTable) <= 0 && trim($loopName) != '' 
                 && isset($GLOBALS["SL"]->dataLoops[$loopName])) {
@@ -1148,11 +1359,16 @@ class SurvData
             if ($cond->CondOperator == 'EXISTS=') {
                 if (!isset($this->dataSets[$tblName]) || (intVal($cond->CondLoop) > 0 
                     && !isset($this->loopItemIDs[$loopName]))) {
-                    if (intVal($cond->CondOperDeet) == 0) $passed = true;
-                    else $passed = false;
+                    if (intVal($cond->CondOperDeet) == 0) {
+                        $passed = true;
+                    } else {
+                        $passed = false;
+                    }
                 } else {
                     $existCnt = sizeof($this->dataSets[$tblName]);
-                    if (intVal($cond->CondLoop) > 0) $existCnt = sizeof($this->loopItemIDs[$loopName]);
+                    if (intVal($cond->CondLoop) > 0) {
+                        $existCnt = sizeof($this->loopItemIDs[$loopName]);
+                    }
                     $passed = ($existCnt == intVal($cond->CondOperDeet));
                 }
             } elseif ($cond->CondOperator == 'EXISTS>') {
@@ -1176,9 +1392,11 @@ class SurvData
                 $fldName = $GLOBALS["SL"]->getFullFldNameFromID($cond->CondField, false);
                 if ($cond->CondOperator == '{{') { // find any match in any row for this table
                     $passed = false;
-                    if (isset($this->dataSets[$tblName]) && sizeof($this->dataSets[$tblName]) > 0) {
+                    if (isset($this->dataSets[$tblName]) 
+                        && sizeof($this->dataSets[$tblName]) > 0) {
                         foreach ($this->dataSets[$tblName] as $ind => $row) {
-                            if (isset($row->{ $fldName }) && trim($row->{ $fldName }) != '' 
+                            if (isset($row->{ $fldName }) 
+                                && trim($row->{ $fldName }) != '' 
                                 && in_array($row->{ $fldName }, $cond->condVals)) {
                                 $passed = true;
                             }
@@ -1191,9 +1409,11 @@ class SurvData
                     } elseif ($nID > 0) {
                         $currSessData = $this->currSessData($nID, $tblName, $fldName);
                     } else { // not a node, but general filter of entire core record's data set
-                        if (isset($this->dataSets[$tblName]) && sizeof($this->dataSets[$tblName]) > 0) {
+                        if (isset($this->dataSets[$tblName]) 
+                            && sizeof($this->dataSets[$tblName]) > 0) {
                             foreach ($this->dataSets[$tblName] as $ind => $row) {
-                                if (isset($row->{ $fldName }) && trim($row->{ $fldName }) != '') {
+                                if (isset($row->{ $fldName }) 
+                                    && trim($row->{ $fldName }) != '') {
                                     $currSessData = $row->{ $fldName };
                                 }
                             }
@@ -1224,9 +1444,11 @@ class SurvData
     {
         $tbl = $helperTbl;
         if (trim($helperTbl) != '' && trim($GLOBALS["SL"]->currCyc["res"][1]) == '') {
-            if (isset($GLOBALS["SL"]->dataHelpers) && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+            if (isset($GLOBALS["SL"]->dataHelpers) 
+                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
                 foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
-                    if ($helper->DataHelpTable == $helperTbl && trim($helper->DataHelpValueField) != '') {
+                    if ($helper->DataHelpTable == $helperTbl 
+                        && trim($helper->DataHelpValueField) != '') {
                         $tbl = $helper->DataHelpParentTable;
                     }
                 }
@@ -1245,16 +1467,24 @@ class SurvData
         $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
         if ($zipRow && isset($zipRow->ZipZip) && isset($this->dataSets[$tbl])) {
             if (trim($fldState) != '') {
-                $this->dataSets[$tbl][$setInd]->update([ $fldState  => $zipRow->ZipState  ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldState  => $zipRow->ZipState  
+                ]);
             }
             if (trim($fldCounty) != '') {
-                $this->dataSets[$tbl][$setInd]->update([ $fldCounty => $zipRow->ZipCounty ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldCounty => $zipRow->ZipCounty 
+                ]);
             }
             if (trim($fldCountry) != '' && isset($zipRow->ZipCountry)) {
-                $this->dataSets[$tbl][$setInd]->update([ $fldCountry => $zipRow->ZipCountry ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldCountry => $zipRow->ZipCountry 
+                ]);
             }
             if (trim($fldAshrae) != '') {
-                $this->dataSets[$tbl][$setInd]->update([ $fldAshrae => $GLOBALS["SL"]->states->getAshrae($zipRow) ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldAshrae => $GLOBALS["SL"]->states->getAshrae($zipRow) 
+                ]);
             }
             return true;
         }
@@ -1266,8 +1496,8 @@ class SurvData
         $url = '&branch=';
         if (sizeof($this->dataBranches) > 1) {
             for ($i = 1; $i < sizeof($this->dataBranches); $i++) {
-                $url .= (($i > 1) ? '-' : '') . $this->dataBranches[$i]["branch"] . '-' 
-                    . $this->dataBranches[$i]["itemID"];
+                $url .= (($i > 1) ? '-' : '') . $this->dataBranches[$i]["branch"] 
+                    . '-' . $this->dataBranches[$i]["itemID"];
             }
         }
         return $url;
@@ -1276,7 +1506,8 @@ class SurvData
     public function loadDataBranchFromUrl($url)
     {
         $badBranch = false;
-        $branches = ((trim($url) != '' && strpos($url, '-') !== false) ? explode('-', $url) : []);
+        $branches = ((trim($url) != '' && strpos($url, '-') !== false) 
+            ? explode('-', $url) : []);
         if (sizeof($branches) > 0) {
             for ($i = 0; $i < sizeof($branches); $i+=2) {
                 if (!$badBranch) {
@@ -1312,8 +1543,8 @@ class SurvData
             if (sizeof($extendFlds) > 0) {
                 foreach ($extendFlds as $i => $fld) {
                     if (isset($rowFrom->{ $fld })) {
-                        $this->dataSets[$tblTo][$ind]->{ $GLOBALS["SL"]->tblAbbr[$tblTo] . $fld } 
-                            = $rowFrom->{ $fld };
+                        $abbr = $GLOBALS["SL"]->tblAbbr[$tblTo];
+                        $this->dataSets[$tblTo][$ind]->{ $abbr . $fld } = $rowFrom->{ $fld };
                     }
                 }
             }
@@ -1341,7 +1572,8 @@ class SurvData
             }
         }
         $this->testsAB->addParamsAB($params);
-        if ($GLOBALS["SL"]->REQ->has('ab') && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
+        if ($GLOBALS["SL"]->REQ->has('ab') 
+            && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
             $this->testsAB->addParamsAB(trim($GLOBALS["SL"]->REQ->get('ab')));
         }
         if (isset($this->dataSets[$this->coreTbl]) 
@@ -1355,4 +1587,3 @@ class SurvData
     }
     
 }
-

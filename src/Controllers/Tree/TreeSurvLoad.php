@@ -72,8 +72,13 @@ class TreeSurvLoad extends TreeSurvConds
     
     protected function loadLookups()
     {
+        $localIPs = [
+            '172.19.0.1',
+            '192.168.10.1', 
+            '173.79.192.119'
+        ];
         $GLOBALS["SL"]->debugOn = (!isset($_SERVER["REMOTE_ADDR"]) 
-            || in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1', '173.79.192.119']));
+            || in_array($_SERVER["REMOTE_ADDR"], $localIPs));
         return true;
     }
     
@@ -84,8 +89,10 @@ class TreeSurvLoad extends TreeSurvConds
 
     public function constructor(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false)
     {
-        $this->dbID = (($dbID > 0) ? $dbID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->dbID : 1));
-        $this->treeID = (($treeID > 0) ? $treeID : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->treeID : 1));
+        $this->dbID = (($dbID > 0) ? $dbID 
+            : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->dbID : 1));
+        $this->treeID = (($treeID > 0) ? $treeID 
+            : ((isset($GLOBALS["SL"])) ? $GLOBALS["SL"]->treeID : 1));
         $this->survLoopInit($request);
         $this->coreIDoverride = -3;
         if ($sessIn > 0) {
@@ -135,8 +142,10 @@ class TreeSurvLoad extends TreeSurvConds
                     if (in_array($row->NodeType, ['Page', 'Loop Root'])) {
                         $this->pageCnt++;
                     }
-                    if ($GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 && $row->NodeParentID == $rootID 
-                        && $row->NodeType == 'Loop Root' && trim($row->NodeDataBranch) != ''
+                    if ($GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 
+                        && $row->NodeParentID == $rootID 
+                        && $row->NodeType == 'Loop Root' 
+                        && trim($row->NodeDataBranch) != ''
                         && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch])
                         && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch]->DataLoopTable)) {
                         $tbl = $GLOBALS["SL"]->dataLoops[$row->NodeDataBranch]->DataLoopTable;
@@ -187,15 +196,18 @@ class TreeSurvLoad extends TreeSurvConds
                     foreach ($responses as $j => $res) {
                         if (!isset($this->kidMaps[$res->NodeResNode])) {
                             $this->kidMaps[$res->NodeResNode] = [];
-                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '] = [];' . "\n";
+                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode 
+                                . '] = [];' . "\n";
                         }
-                        if (!isset($this->kidMaps[$res->NodeResNode][intVal($res->NodeResShowKids)])) {
-                            $this->kidMaps[$res->NodeResNode][intVal($res->NodeResShowKids)] = [];
-                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' . $res->NodeResShowKids . '] = [];' 
-                                . "\n";
+                        $showKids = intVal($res->NodeResShowKids);
+                        if (!isset($this->kidMaps[$res->NodeResNode][$showKids])) {
+                            $this->kidMaps[$res->NodeResNode][$showKids] = [];
+                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
+                                . $res->NodeResShowKids . '] = [];' . "\n";
                         }
-                        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' . $res->NodeResShowKids . '][] = [ ' 
-                            . $res->NodeResOrd . ', "' . $res->NodeResValue . '" ];' . "\n";
+                        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
+                            . $res->NodeResShowKids . '][] = [ ' . $res->NodeResOrd
+                            . ', "' . $res->NodeResValue . '" ];' . "\n";
                     }
                 }
                 $cache .= '$'.'this->treeSize = sizeof($'.'this->allNodes);' . "\n"
@@ -218,7 +230,8 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function hasParentPage($nID)
     {
-        if (isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->parentID) 
+        if (isset($this->allNodes[$nID]) 
+            && isset($this->allNodes[$nID]->parentID) 
             && intVal($this->allNodes[$nID]->parentID) > 0) {
             if (isset($this->allNodes[$this->allNodes[$nID]->parentID]) 
                 && $this->allNodes[$this->allNodes[$nID]->parentID]->isPage()) {
@@ -236,7 +249,8 @@ class TreeSurvLoad extends TreeSurvConds
         if ($this->rootID > 0 && sizeof($this->allNodes) > 0) {
             foreach ($this->allNodes as $nID => $node) {
                 if ($this->hasParentPage($nID)) {
-                    $cache .= '$'.'this->allNodes[' . $node->nodeID . ']->hasPageParent = true;' . "\n";
+                    $cache .= '$'.'this->allNodes[' . $node->nodeID 
+                        . ']->hasPageParent = true;' . "\n";
                 }
             }
         }
@@ -292,7 +306,9 @@ class TreeSurvLoad extends TreeSurvConds
     // returns array of DataBranch tables, [0] being the closest related to the current node's data
     protected function loadNodeDataBranch($nID = -3)
     {
-        $this->sessData->setCoreID($GLOBALS["SL"]->coreTbl, $this->coreID); // not sure why this is needed
+        $this->sessData->setCoreID($GLOBALS["SL"]->coreTbl, $this->coreID);
+        // not sure why this is needed
+
         $nIDtmp = $nID;
         $parents = [$nID];
         while ($this->hasNode($nIDtmp)) {
@@ -301,11 +317,13 @@ class TreeSurvLoad extends TreeSurvConds
                 $parents[] = $nIDtmp;
             }
         }
-        $this->sessData->dataBranches = [ [
-            "branch" => $GLOBALS["SL"]->coreTbl, 
-            "loop"   => '', 
-            "itemID" => $this->coreID 
-        ] ];
+        $this->sessData->dataBranches = [
+            [
+                "branch" => $GLOBALS["SL"]->coreTbl, 
+                "loop"   => '', 
+                "itemID" => $this->coreID 
+            ]
+        ];
         if (sizeof($parents) > 1) {
             for ($i = (sizeof($parents)-2); $i >= 0; $i--) {
                 if ($this->allNodes[$parents[$i]]->nodeType == 'Data Manip: New') {
@@ -314,50 +332,65 @@ class TreeSurvLoad extends TreeSurvConds
                     $nBranch = $this->allNodes[$parents[$i]]->dataBranch;
                     $addBranch = $addLoop = '';
                     $itemID = -3;
-                    if ($this->allNodes[$parents[$i]]->isLoopRoot()) {
+                    if ($this->allNodes[$parents[$i]]->isLoopRoot()
+                        && isset($GLOBALS["SL"]->dataLoops[$nBranch])) {
                         $addBranch = $GLOBALS["SL"]->dataLoops[$nBranch]->DataLoopTable;
                         $addLoop = $nBranch;
                         $itemID = $GLOBALS["SL"]->getSessLoopID($nBranch);
                     } else {
                         $addBranch = $nBranch;
-                        list($itemInd, $itemID) = $this->sessData->currSessDataPos($nBranch, 
-                            $this->allNodes[$parents[$i]]->isDataManip());
+                        list($itemInd, $itemID) = $this->sessData->currSessDataPos(
+                            $nBranch, 
+                            $this->allNodes[$parents[$i]]->isDataManip()
+                        );
                         if ($itemID <= 0) {
                             if (isset($GLOBALS["SL"]->tblAbbr[$nBranch])) {
                                 $lastInd = sizeof($this->sessData->dataBranches)-1;
                                 $parBranch = $this->sessData->dataBranches[$lastInd]["branch"];
-                                $lnkFld = $GLOBALS["SL"]->getForeignLnk($GLOBALS["SL"]->tblI[$parBranch],
-                                    $GLOBALS["SL"]->tblI[$nBranch]);
+                                $lnkFld = $GLOBALS["SL"]->getForeignLnk(
+                                    $GLOBALS["SL"]->tblI[$parBranch],
+                                    $GLOBALS["SL"]->tblI[$nBranch]
+                                );
                                 if ($lnkFld != '') {
                                     $lnkFld = $GLOBALS["SL"]->tblAbbr[$parBranch] . $lnkFld;
-                                    $row = $this->sessData->getRowById($parBranch, 
-                                        $this->sessData->dataBranches[$lastInd]["itemID"]);
+                                    $row = $this->sessData->getRowById(
+                                        $parBranch, 
+                                        $this->sessData->dataBranches[$lastInd]["itemID"]
+                                    );
                                     if ($row && isset($row->{ $lnkFld })) {
                                         $itemID = $row->{ $lnkFld };
                                     }
                                 }
                                 if ($lnkFld == '' || $itemID <= 0) {
-                                    $lnkFld = $GLOBALS["SL"]->getForeignLnk($GLOBALS["SL"]->tblI[$nBranch], 
-                                        $GLOBALS["SL"]->tblI[$parBranch]);
+                                    $lnkFld = $GLOBALS["SL"]->getForeignLnk(
+                                        $GLOBALS["SL"]->tblI[$nBranch], 
+                                        $GLOBALS["SL"]->tblI[$parBranch]
+                                    );
                                     if ($lnkFld != '') {
                                         $lnkFld = $GLOBALS["SL"]->tblAbbr[$nBranch] . $lnkFld;
-                                        $row = $this->sessData->getRowById($nBranch, 
-                                            $this->sessData->dataBranches[$lastInd]["itemID"]);
+                                        $row = $this->sessData->getRowById(
+                                            $nBranch, 
+                                            $this->sessData->dataBranches[$lastInd]["itemID"]
+                                        );
                                         if ($row && isset($row->{ $lnkFld })) {
                                             $itemID = $row->{ $lnkFld };
                                         }
                                     }
                                 }
                                 if ($lnkFld == '' || $itemID <= 0) {
-                                    $lnkFld = $GLOBALS["SL"]->getForeignLnk($GLOBALS["SL"]->tblI[$nBranch], 
-                                        $GLOBALS["SL"]->tblI[$parBranch]);
+                                    $lnkFld = $GLOBALS["SL"]->getForeignLnk(
+                                        $GLOBALS["SL"]->tblI[$nBranch], 
+                                        $GLOBALS["SL"]->tblI[$parBranch]
+                                    );
                                     if ($parBranch == 'users' && $lnkFld == 'UserID' 
                                         && isset($this->sessData->dataSets[$nBranch]) 
                                         && sizeof($this->sessData->dataSets[$nBranch]) > 0) {
                                         $lnkFld = $GLOBALS["SL"]->tblAbbr[$nBranch] . $lnkFld;
+                                        $branchID = $this->sessData
+                                            ->dataBranches[$lastInd]["itemID"];
                                         foreach ($this->sessData->dataSets[$nBranch] as $row) {
-                                            if (isset($row->{ $lnkFld }) && $row->{ $lnkFld } 
-                                                == $this->sessData->dataBranches[$lastInd]["itemID"] ) {
+                                            if (isset($row->{ $lnkFld }) 
+                                                && $row->{ $lnkFld } == $branchID) {
                                                 $itemID = $row->getKey();
                                             }
                                         }
@@ -366,7 +399,8 @@ class TreeSurvLoad extends TreeSurvConds
                             }
                         }
                     }
-                    $foundBranch = false; // $this->sessData->chkDataBranch($addBranch, $dataBranch);
+                    $foundBranch = false; 
+                    // $this->sessData->chkDataBranch($addBranch, $dataBranch);
                     if (!$foundBranch) {
                         $this->sessData->dataBranches[] = [
                             "branch" => $addBranch,
@@ -424,7 +458,12 @@ class TreeSurvLoad extends TreeSurvConds
                 $this->coreID = $this->corePublicID = $coreID;
             }
         }
-        $this->sessData->loadCore($coreTbl, $this->coreID, $this->checkboxNodes, $this->isBigSurvLoop);
+        $this->sessData->loadCore(
+            $coreTbl, 
+            $this->coreID, 
+            $this->checkboxNodes, 
+            $this->isBigSurvLoop
+        );
         $this->loadExtra();
         $this->setPublicID();
         $this->v["isOwner"] = $this->isCoreOwner($this->coreID);
@@ -474,7 +513,8 @@ class TreeSurvLoad extends TreeSurvConds
     protected function fldToLog($fldName)
     {
         if (trim($fldName) != '' && $GLOBALS["SL"]->REQ->has($fldName)) {
-            if (is_array($GLOBALS["SL"]->REQ->input($fldName)) && is_array($GLOBALS["SL"]->REQ->input($fldName))
+            if (is_array($GLOBALS["SL"]->REQ->input($fldName)) 
+                && is_array($GLOBALS["SL"]->REQ->input($fldName))
                 && sizeof($GLOBALS["SL"]->REQ->input($fldName)) > 0) {
                 return implode(';;', $GLOBALS["SL"]->REQ->input($fldName));
             } else {
@@ -549,7 +589,8 @@ class TreeSurvLoad extends TreeSurvConds
     public function nodeSessDump($nIDtxt = '', $nID = -3)
     {
         if ($GLOBALS["SL"]->debugOn && true) {
-            if ($nID > 0 && isset($this->allNodes[$nID]) && isset($this->allNodes[$nID]->nodeType)
+            if ($nID > 0 && isset($this->allNodes[$nID]) 
+                && isset($this->allNodes[$nID]->nodeType)
                 && $this->allNodes[$nID]->nodeType == 'Layout Column') {
                 return '';
             }

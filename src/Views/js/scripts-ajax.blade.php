@@ -310,6 +310,10 @@ $(document).ready(function(){
         if (document.getElementById("hidivDashTools")) {
             document.getElementById("hidivDashTools").style.height=''+newHeight+'px';
         }
+        if (document.getElementById("reportAdmPreviewFull")) {
+            newHeight += 60;
+            document.getElementById("reportAdmPreviewFull").style.height=''+newHeight+'px';
+        }
         setTimeout(function() { chkDashHeight(); }, 5000);
         return true;
     }

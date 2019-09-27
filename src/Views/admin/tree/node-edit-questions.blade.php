@@ -7,7 +7,8 @@
         <div class="nFld">
             <textarea name="nodePromptText" id="nodePromptTextID" class="form-control" 
                 style="height: 200px; font-family: Courier New;" autocomplete="off" 
-                >@if(isset($node->nodeRow->NodePromptText)){!! $node->nodeRow->NodePromptText !!}@endif</textarea>
+                >@if(isset($node->nodeRow->NodePromptText)){!! 
+                    $node->nodeRow->NodePromptText !!}@endif</textarea>
         </div>
         <div class="row mT20">
             <div class="col-md-6">
@@ -193,8 +194,8 @@
                             @if ($node->nodeRow->NodeOpts%47 == 0) CHECKED @endif 
                             onClick="return toggleWordCntLimit();" > Limit Word Count
                     </h4></label>
-                    <div id="resWordLimit" class="mB20 @if ($node->nodeRow->NodeOpts%47 == 0) disBlo 
-                        @else disNon @endif ">
+                    <div id="resWordLimit" class="mB20 
+                        @if ($node->nodeRow->NodeOpts%47 == 0) disBlo @else disNon @endif ">
                         <label class="w100">
                             <div class="nFld mT0 mL20"><input name="nodeCharLimit" id="nodeCharLimitID" 
                                 type="number" class="form-control w50" autocomplete="off" 
@@ -288,124 +289,41 @@
                 </label>
             </div>
             
-            <div class="row pB10 mT20">
-                <div class="col-4">
-                    <h4 class="mT0">What User Will See</h4><div class="slGrey fPerc80">[Text/HTML]</div>
+            <div class="slGrey fPerc80 mT20 pB20">
+                <div class="disIn">
+                    <i title="Children displayed only with certain responses"
+                        class="fa fa-code-fork fa-flip-vertical mR5"></i>
+                        Reveals Child Nodes
                 </div>
-                <div class="col-8">
-                    <h4 class="mT0">Value Stored In Database</h4>
-                    <div class="disIn slGrey fPerc80">
-                        <i title="Children displayed only with certain responses"
-                            class="fa fa-code-fork fa-flip-vertical mR5"></i>
-                            Reveals Child Nodes</div>
-                    <div class="disIn slGrey fPerc80 mL20">
-                        <i class="fa fa-circle-o mR0"></i><i class="fa fa-circle mL0 mR5"></i>
-                        Mutually Exclusive (De-selects other responses)
-                    </div>
+                <div class="disIn mL20">
+                    <i class="fa fa-circle-o mR0"></i><i class="fa fa-circle mL0 mR5"></i>
+                    Mutually Exclusive (De-selects other responses)
                 </div>
             </div>
             
             @forelse ($node->responses as $r => $res)
-                <div id="r{{ $r }}" class="row pB20">
-                    <div class="col-4">
-                        <div class="nFld m0"><textarea name="response{{ $r }}" id="response{{ $r }}ID" 
-                            type="text" class="form-control" style="height: 65px;" autocomplete="off" 
-                            onKeyUp="return checkRes();" @if ($node->hasDefSet()) DISABLED @endif 
-                            >{{ $res->NodeResEng }}</textarea></div>
-                    </div>
-                    <div class="col-8">
-                        <div class="nFld m0">
-                            <input name="response{{ $r }}Val" id="response{{ $r }}vID" 
-                                type="text" value="{{ $res->NodeResValue }}" onKeyUp="return checkRes();" 
-                                class="form-control" autocomplete="off" 
-                                @if ($node->hasDefSet()) DISABLED @endif >
-                        </div>
-                        <div class="row mT5">
-                            <div class="col-6">
-                                <label class="mL5">
-                                    <input type="checkbox"  value="1" class="showKidBox" autocomplete="off"
-                                        name="response{{ $r }}ShowKids" id="r{{ $r }}showKID"
-                                        @if ($node->indexShowsKid($r)) CHECKED @endif >
-                                        <i title="Children displayed only with certain responses"
-                                        class="fa fa-code-fork fa-flip-vertical mL5 fPerc133"></i>
-                                </label>
-                                <div id="kidFork{{ $r }}" class="mL5 
-                                    @if ($node->indexShowsKid($r)) disIn @else disNon @endif ">
-                                    @if (isset($childNodes) && sizeof($childNodes) > 0)
-                                        @if (sizeof($childNodes) == 1)
-                                            #{{ $childNodes[0]->NodeID }}
-                                            <input type="hidden" name="kidForkSel{{ $r }}" 
-                                                value="{{ $childNodes[0]->NodeID }}">
-                                        @else
-                                            <select name="kidForkSel{{ $r }}" autocomplete="off"
-                                                class="form-control input-xs disIn" style="width: 70px;">
-                                            @foreach ($childNodes as $k => $kidNode)
-                                                <option value="{{ $kidNode->NodeID }}"
-                                                    @if ($node->indexShowsKidNode($r) == $kidNode->NodeID) 
-                                                    SELECTED @endif >#{{ $kidNode->NodeID }}</option>
-                                            @endforeach
-                                            </select>
-                                        @endif
-                                    @else
-                                        <input type="hidden" name="kidForkSel{{ $r }}" value="1000000000">
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label id="resMutEx{{ $r }}" class="mL5 @if (isset($node->nodeRow->NodeType)
-                                    && $node->nodeRow->NodeType == 'Checkbox')) disBlo @else disNon @endif "
-                                    ><nobr><input type="checkbox" name="response{{ $r }}MutEx" value="1" 
-                                        @if ($node->indexMutEx($r)) CHECKED @endif autocomplete="off" >
-                                        <i class="fa fa-circle-o mL10 mR0 fPerc133"></i> 
-                                        <i class="fa fa-circle mLn5 fPerc133"></i></nobr>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {!! view('vendor.survloop.admin.tree.node-edit-question-responses', [
+                    "r"          => $r,
+                    "resEng"     => $res->NodeResEng,
+                    "resVal"     => $res->NodeResValue,
+                    "node"       => $node,
+                    "childNodes" => $childNodes
+                ])->render() !!}
             @empty
             @endforelse
+
             @if (!$node->hasDefSet())
                 @for ($r = sizeof($node->responses); $r < $resLimit; $r++)
-                    <div id="r{{ $r }}" class="row pB20 
-                        @if ($r == sizeof($node->responses)) disBlo @else disNon @endif ">
-                        <div class="col-4">
-                            <div class="nFld m0">
-                                <textarea name="response{{ $r }}" id="response{{ $r }}ID" 
-                                    type="text" class="form-control" style="height: 65px;" 
-                                    autocomplete="off" onKeyUp="return checkRes();" 
-                                    @if ($node->hasDefSet()) DISABLED @endif ></textarea>
-                            </div>
-                        </div>
-                        <div class="col-8">
-                            <div class="nFld m0">
-                                <input type="text" name="response{{ $r }}Val" id="response{{ $r }}vID" 
-                                    value="" onKeyUp="return checkRes();" class="form-control mB5" 
-                                    autocomplete="off" @if ($node->hasDefSet()) DISABLED @endif >
-                                <div class="row mT5">
-                                    <div class="col-6">
-                                        <label class="disIn mR20"><input name="response{{ $r }}ShowKids" 
-                                            type="checkbox" autocomplete="off" value="1" >
-                                             <i title="Children displayed only with certain responses"
-                                            class="fa fa-code-fork fa-flip-vertical mL10"></i></label>
-                                    </div>
-                                    <div class="col-6">
-                                        <label id="resMutEx{{ $r }}" 
-                                            class=" @if (isset($node->nodeRow->NodeType) 
-                                            && $node->nodeRow->NodeType == 'Checkbox')) disIn @else disNon 
-                                            @endif "><nobr>
-                                            <input type="checkbox" name="response{{ $r }}MutEx" value="1" 
-                                                autocomplete="off" >
-                                                <i class="fa fa-circle-o mL10 mR0"></i> 
-                                                <i class="fa fa-circle mLn5"></i></nobr>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {!! view('vendor.survloop.admin.tree.node-edit-question-responses', [
+                        "r"          => $r,
+                        "resEng"     => '',
+                        "resVal"     => '',
+                        "node"       => $node,
+                        "childNodes" => $childNodes
+                    ])->render() !!}
                 @endfor
             @endif
+
         </div> <!-- end resOpts -->
     </div> <!-- end Response Options panel -->
 </div> <!-- end hasResponse -->
