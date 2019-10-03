@@ -50,6 +50,7 @@ body, p, .slTxt {
 }
 #dialog .card .card-header .dialogClose {
     float: right;
+    display: block;
 }
 #dialog .card .card-body {
     text-align: left;

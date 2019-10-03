@@ -277,14 +277,17 @@ class AdminController extends AdminEmailController
         
         $treeJs = '';
         $chk = SLTree::whereIn('TreeType', ['Page', 'Survey'])
-            ->select('TreeID')
+            ->select('TreeID', 'TreeType')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
                 $treeFile = '../storage/app/sys/tree-' . $tree->TreeID . '.js';
                 if (file_exists($treeFile)) {
                     $treeJs .= "\n" . 'function treeLoad' . $tree->TreeID . '() {' . "\n" 
-                        . str_replace("\t", "", str_replace("\n", "\n", file_get_contents($treeFile))) . "\n\t"
+                        . 'treeID = ' . $tree->TreeID . ';' . "\n"
+                        . 'treeType = "' . $tree->TreeType . '";' . "\n"
+                        . str_replace("\t", "", str_replace("\n", "\n", 
+                            file_get_contents($treeFile))) . "\n\t"
                         . 'return true;' . "\n" . '}' . "\n";
                 }
             }

@@ -977,7 +977,10 @@ class SurvData
     {
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if ($this->dataBranches[$i]["branch"] == $tbl) {
-                return $this->getRowById($tbl, $this->dataBranches[$i]["itemID"]);
+                return $this->getRowById(
+                    $tbl, 
+                    $this->dataBranches[$i]["itemID"]
+                );
             }
         }
         return null;

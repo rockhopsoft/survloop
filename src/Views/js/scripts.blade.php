@@ -8,7 +8,8 @@ function debugTxt(txt) {
 }
 
 var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
-var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
+var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
+    ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 

@@ -98,16 +98,23 @@ class AdminCoreController extends SurvLoopController
     
     protected function getAdmMenuTopTabs()
     {
-        $tabs = view('vendor.survloop.admin.admin-menu-tabs', $this->admMenuData)
-            ->render();
-        $subTabs = view('vendor.survloop.admin.admin-menu-tabs-sub', $this->admMenuData)
-            ->render();
+        $tabs = view(
+            'vendor.survloop.admin.admin-menu-tabs', 
+            $this->admMenuData
+        )->render();
         if (trim($tabs) == '') {
             return '<div class="w100" style="margin-bottom: 15px;"> </div>';
         }
-        return '<div id="slTopTabsWrap" class="slTopTabs">' . $tabs . '</div>'
-            . ((trim($subTabs) != '') 
-                ? '<div class="slTopTabsSub">' . $subTabs . '</div>' : '');
+        $tabs = '<div id="slTopTabsWrap" class="slTopTabs"><div class="container">'
+            . $tabs . '</div></div>';
+        $subTabs = view(
+            'vendor.survloop.admin.admin-menu-tabs-sub', 
+            $this->admMenuData
+        )->render();
+        if (trim($subTabs) != '') {
+            $tabs .= '<div class="slTopTabsSub">' . $subTabs . '</div>';
+        }
+        return $tabs;
     }
     
     protected function reloadAdmMenu()
@@ -306,10 +313,10 @@ class AdminCoreController extends SurvLoopController
                     $this->loadCustLoop($request, $tree->TreeID);
                     $this->reloadAdmMenu();
                     $this->v["content"] = $this->custReport->index($request);
-                    return $this->loader->addSessAdmCodeToPage($request, 
-
-
-                        view('vendor.survloop.master', $this->v)->render());
+                    return $this->loader->addSessAdmCodeToPage(
+                        $request, 
+                        view('vendor.survloop.master', $this->v)->render()
+                    );
                 }
             }
         }

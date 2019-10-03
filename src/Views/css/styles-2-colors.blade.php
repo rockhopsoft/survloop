@@ -58,6 +58,12 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdInfo   { 
     border: 1px {!! $css["color-info-on"] !!} solid; 
 }
+.brdGrn     {
+    border: 1px {!! $css["color-success-on"] !!} solid; 
+}
+.brdWarn     {
+    border: 1px {!! $css["color-warn-on"] !!} solid; 
+}
 
 .brdTop, table tr.brdTop td, table tr.brdTop th, table tr td.brdTop, table tr th.brdTop {
     border-top: 1px {!! $css["color-main-on"] !!} solid;

@@ -739,8 +739,10 @@ class GlobalsImportExport extends GlobalsTables
     public function chkTableSeedCnt($tblClean = '', $eval = '')
     {
         $seedCnt = 0;
-        if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" . $eval . "count();");
+        if (trim($tblClean) != '' 
+            && file_exists('../app/Models/' . $tblClean . '.php')) {
+            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" 
+                . $eval . "count();");
         }
         return (($seedCnt && intVal($seedCnt) > 0) ? intVal($seedCnt) : 0);
     }
@@ -754,8 +756,10 @@ class GlobalsImportExport extends GlobalsTables
     public function getTableSeedDump($tblClean = '', $eval = '', $limit = 10000, $start = 0)
     {
         $seedChk = [];
-        if (trim($tblClean) != '' && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedChk = App\\Models\\" . $tblClean . "::" . $eval . "orderBy('created_at', 'asc')->get();");
+        if (trim($tblClean) != '' 
+            && file_exists('../app/Models/' . $tblClean . '.php')) {
+            eval("\$seedChk = App\\Models\\" . $tblClean . "::" 
+                . $eval . "orderBy('created_at', 'asc')->get();");
         }
         return $seedChk;
     }
@@ -786,7 +790,10 @@ class GlobalsImportExport extends GlobalsTables
             } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
                 $eval = "where('" . $tbl->TblAbbr . "Database', " . $dbID . ")->";
                 if ($tbl->TblName == 'Definitions') {
-                    $eval = "whereNotIn('DefSubset', ['google-analytic', 'google-cod-key', 'google-cod-key2', 'google-map-key', 'google-map-key2', 'google-maps-key', 'google-maps-key2'])->";
+                    $eval = "whereNotIn('DefSubset', ['facebook-app-id', 'google-analytic', 
+                        'google-cod-key', 'google-cod-key2', 'google-map-key', 'google-map-key2', 
+                        'google-maps-key', 'google-maps-key2', 
+                        'matomo-analytic-url', 'matomo-analytic-site-id'])->";
                 }
             } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
                 'Emails'])) {

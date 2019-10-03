@@ -772,6 +772,9 @@ class TreeSurv extends TreeSurvReport
                 }
             }
         }
+        if ($ret == '') {
+            $ret = '<p><i class="slGrey">None found.</i></p>';
+        }
         return $ret;
     }
     

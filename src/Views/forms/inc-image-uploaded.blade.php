@@ -3,7 +3,8 @@
 <script type="text/javascript"> $(document).ready(function(){
     setTimeout( function() {
         document.getElementById("dialogBody").innerHTML=getSpinnerAjaxWrap();
-        $("#dialogBody").load("/ajax/img-sel?nID={{ $nID }}&presel={{ urlencode($presel) }}&newUp={{ urlencode($imgID) 
+        $("#dialogBody").load("/ajax/img-sel?nID={{ $nID }}&presel={{ 
+            urlencode($presel) }}&newUp={{ urlencode($imgID) 
             }}");
     }, 500);
 }); </script>

@@ -59,35 +59,74 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTie
 }
 .slTopTabs {
     width: 100%;
-    padding-top: 2px;
-    margin-bottom: 25px;
-    background: {!! $css["color-main-text"] !!};
+    margin-bottom: 23px;
+    background: none;
+    border-bottom: 1px {!! $css["color-line-hr"] !!} solid;
 }
-.slTopTabs ul.nav.nav-pills {
+.slTopTabs div.container {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+.slTopTabs div ul.nav.nav-pills {
     width: 100%;
     border: 0px none;
-    border-bottom: 1px {!! $css["color-main-faint"] !!} solid;
+    background: none;
+    background-color: none;
 }
-.slTopTabs ul.nav.nav-pills li {
-    margin-bottom: 2px;
+.slTopTabs div ul.nav.nav-pills li {
+    margin-bottom: 0px;
 }
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:link,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:visited,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:active,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link:hover {
-    color: {!! $css["color-main-faint"] !!};
-    background: {!! $css["color-main-on"] !!};
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:link,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:visited,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:active,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:hover,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:link,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:visited,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:active,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:hover {
     border: 0px none;
-    margin-right: 7px;
+    background: none;
+    background-color: none;
+    -moz-border-radius: 0px; border-radius: 0px;
+    margin-left: -20px;
+    margin-right: 30px;
+    padding: .5rem 1rem 0rem 1rem;
 }
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:link,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:visited,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:active,
-.slTopTabs ul.nav.nav-pills li.nav-item a.nav-link.active:hover {
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:link,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:visited,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:active,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:hover {
     color: {!! $css["color-main-link"] !!};
-    background: {!! $css["color-main-faint"] !!};
-    border: 0px none;
 }
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:link,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:visited,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:active,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:hover {
+    color: {!! $css["color-main-on"] !!};
+}
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:link div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:visited div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:active div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link:hover div {
+    display: block;
+    height: 3px;
+    width: 3px;
+    margin-top: 4px;
+    margin-left: 49%;
+    border-bottom: 3px {!! $css["color-main-link"] !!} solid;
+}
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:link div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:visited div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:active div,
+.slTopTabs div ul.nav.nav-pills li.nav-item a.nav-link.active:hover div {
+    display: block;
+    height: 3px;
+    width: 100%;
+    margin-top: 4px;
+    margin-left: 0px;
+    border-bottom: 3px {!! $css["color-main-on"] !!} solid;
+}
+
 .slTopTabsSub {
     margin-top: -20px;
 }

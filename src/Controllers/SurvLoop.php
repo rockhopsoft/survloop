@@ -32,7 +32,8 @@ class SurvLoop extends SurvCustLoop
      */
     public function mainSub(Request $request, $type = '', $val = '')
     {
-        if ($request->has('step') && $request->has('tree') && intVal($request->get('tree')) > 0) {
+        if ($request->has('step') && $request->has('tree') 
+            && intVal($request->get('tree')) > 0) {
             $this->loadTreeByID($request, $request->tree);
         }
         $this->loadLoop($request);
@@ -169,7 +170,9 @@ class SurvLoop extends SurvCustLoop
                     if ($tree->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
                         $this->topSaveCache($tree->TreeID, 'page');
                     }
-                    return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($this->pageContent));
+                    return $this->addAdmCodeToPage(
+                        $GLOBALS["SL"]->swapSessMsg($this->pageContent)
+                    );
                 }
             }
         }

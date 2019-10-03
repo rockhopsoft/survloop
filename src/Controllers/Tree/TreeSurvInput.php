@@ -758,15 +758,17 @@ class TreeSurvInput extends TreeSurvUpload
     
     protected function getRawFormDate($nIDtxt)
     {
-        if ($GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldMonth') 
-            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldMonth')) != ''
-            && $GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldDay')
-            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldDay')) != ''
-            && $GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldYear')
-            && trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldYear')) != '') {
-            return trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldYear'))
-                . '-' . trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldMonth'))
-                . '-' . trim($GLOBALS["SL"]->REQ->get('n' . $nIDtxt . 'fldDay'));
+        $nIDtxt = 'n' . $nIDtxt;
+        if ($GLOBALS["SL"]->REQ->has($nIDtxt . 'fldMonth') 
+            && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldMonth')) != ''
+            && $GLOBALS["SL"]->REQ->has($nIDtxt . 'fldDay')
+            && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldDay')) != ''
+            && $GLOBALS["SL"]->REQ->has($nIDtxt . 'fldYear')
+            && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldYear')) != ''
+            && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldYear')) != '0000') {
+            return trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldYear'))
+                . '-' . trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldMonth'))
+                . '-' . trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldDay'));
         }
         return '';
     }

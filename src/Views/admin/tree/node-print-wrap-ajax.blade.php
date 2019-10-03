@@ -41,14 +41,12 @@ $(document).on("click", ".adminNodeShowMove", function() {
     return true;
 });
 $(document).on("click", ".adminNodeMoveTo", function() {
-    var loc = $(this).attr("id").replace("moveTo", "").split("ord");
-    document.getElementById("moveToParentID").value = loc[0];
-    document.getElementById("moveToOrderID").value = loc[1];
     @if (!$canEditTree) 
         alert("Sorry, you do not have permissions to actually edit the tree.");
     @else
-        document.mainPageForm.action+="#n"+document.getElementById("moveNodeID").value+""; 
-        document.mainPageForm.submit();
+        var nodeID = document.getElementById("moveNodeID").value;
+        var loc = $(this).attr("id").replace("moveTo", "").split("ord");
+        window.location="?all=1&alt=1&refresh=1&manip=1&moveNode="+nodeID+"&moveToParent="+loc[0]+"&moveToOrder="+loc[1]+"#n"+nodeID+""; 
     @endif
     return true;
 });

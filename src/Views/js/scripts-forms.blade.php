@@ -1,5 +1,8 @@
 /* generated from resources/views/vendor/survloop/js/scripts-forms.blade.php */
 
+var treeID = 0;
+var treeType = "";
+
 var foundForm = true;
 var formActionUrl = "/sub";
 var pressedSubmit = false;

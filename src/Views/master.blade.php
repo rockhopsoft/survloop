@@ -1,45 +1,19 @@
 <?php
+// Check for globals required to load this master template
 if (!isset($GLOBALS["SL"])) {
-    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(
-        new Illuminate\Http\Request, 1, 1, 1
-    );
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(new Illuminate\Http\Request, 1, 1, 1);
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') 
     || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
 $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) 
     && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
+
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-@if (isset($GLOBALS["SL"]) && isset($GLOBALS["SL"]->sysOpts) && isset($GLOBALS["SL"]->sysOpts["meta-title"]))
-    <title>{{ $GLOBALS["SL"]->sysOpts["meta-title"] }}</title>
-    <meta name="description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
-    <meta name="keywords" content="{{ $GLOBALS['SL']->sysOpts['meta-keywords'] }}" />
-    
-    <link rel="shortcut icon" href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}{{ $GLOBALS['SL']->sysOpts['shortcut-icon'] }}" />
-    <link rel="image_src" href="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
-    
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}" />
-    <meta property="og:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
-    <meta property="og:url" content="https://{{ $_SERVER['HTTP_HOST'] }}{!! $_SERVER['REQUEST_URI'] !!}" />
-    <meta property="og:site_name" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}" />
-    <meta property="og:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}" />
-    
-    <meta name="twitter:card" content="summary_large_image">
-    @if (isset($GLOBALS['SL']->sysOpts['twitter']) && !in_array(trim($GLOBALS['SL']->sysOpts['twitter']), ['', '@']))
-    <meta name="twitter:site" content="{{ $GLOBALS['SL']->sysOpts['twitter'] }}">
-    <meta name="twitter:creator" content="{{ $GLOBALS['SL']->sysOpts['twitter'] }}">
-    @endif
-    <meta name="twitter:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}"/>
-    <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
-    <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
-    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
-@endif
+    {!! view('vendor.survloop.elements.inc-meta-seo')->render() !!}
 @if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
     <link href="/sys1.min.css" rel="stylesheet" type="text/css">
     <link href="/sys2.min.css" rel="stylesheet" type="text/css">
@@ -82,28 +56,27 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
 @endif
 @section('headCode')
 @show
+@if (!isset($admMenu))
+    {!! view('vendor.survloop.elements.inc-matomo-analytics')->render() !!}
+@endif
 </head>
-<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif {!! 
-    $GLOBALS['SL']->getBodyParams() !!} >
+<body @if ($isDashLayout) class="bodyDash" 
+    @elseif ($bodyBg) class="bgFnt" 
+    @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
 <a name="top"></a>
-<div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
+<div class="hidden">
+    <a href="#maincontent">Skip to Main Content</a>
+</div>
 <div id="absDebug"></div>
 <div id="dialogPop" title=""></div>
-@if (isset($hasFbWidget) && $hasFbWidget)
-    <div id="fb-root"></div>
-    <script>(function(d, s, id) {
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) return;
-      js = d.createElement(s); js.id = id;
-      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=234775309892416";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));</script>
-@endif
 @if (isset($bodyTopCode)) {!! $bodyTopCode !!} @endif
 
-@if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame)
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
-    && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
+@if ((!isset($isPrint) || !$isPrint) 
+    && (!isset($isFrame) || !$isFrame)
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
+        || !$GLOBALS["SL"]->x["isPrintPDF"])
+    && (!$GLOBALS["SL"]->REQ->has("frame") 
+        || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
     <div class="headGap">
@@ -113,23 +86,31 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
     @if (isset($navMenu) && sizeof($navMenu) > 0)
         @foreach ($navMenu as $i => $arr)
             @if (trim($arr[0]) != '' && trim($arr[1]) != '')
-                <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li>
+                <li class="nav-item">
+                    <a href="{{ $arr[1] }}">{{ $arr[0] }}</a>
+                </li>
             @endif
         @endforeach
     @endif
-    @if (isset($sideNavLinks) && trim($sideNavLinks) != '') {!! $sideNavLinks !!} @endif
+    @if (isset($sideNavLinks) && trim($sideNavLinks) != '') 
+        {!! $sideNavLinks !!}
+    @endif
     </ul>
 </div>
 
 
-@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
+@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) 
+    && (!isset($isPrint) || !$isPrint) 
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
+        || !$GLOBALS["SL"]->x["isPrintPDF"]))
 
 <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
 <td id="leftSide" class="leftSide">
     <div id="leftSideWdth"></div>
     <div id="leftSideWrap">
         <div id="leftAdmMenu">
-            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
+                && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
                 <div id="admMenuCustom" class="w100 h100 disBlo">
                     {!! $GLOBALS["SL"]->x["admMenuCustom"] !!}
                 </div>
@@ -142,12 +123,14 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
                 @yield('belowAdmMenu')
                 @if (isset($belowAdmMenu)) {!! $belowAdmMenu !!} @endif
             </div>
-            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
+            @if (isset($GLOBALS["SL"]->x["admMenuCustom"]) 
+                && trim($GLOBALS["SL"]->x["admMenuCustom"]) != '')
                 </div> <!-- end #admMenuNotCustom -->
             @endif
         </div>
     </div>
-</td><td id="mainBody" class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
+</td><td id="mainBody" 
+    class="w100 h100 @if ($isDashLayout) mainBodyDash @endif ">
     
 @endif
 
@@ -250,7 +233,8 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
         <div class="card">
             <div class="card-header">
                 <h2 id="dialogTitle"></h2>
-                <a class="dialogClose btn btn-sm btn-secondary" href="javascript:;"
+                <a id="dialogCloseID" href="javascript:;"
+                    class="dialogClose btn btn-sm btn-secondary" 
                     ><i class="fa fa-times" aria-hidden="true"></i></a>
                 <div class="fC"></div>
             </div>
@@ -258,11 +242,10 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
         </div>
     </div>
 </div> <!-- end #main (non-offcanvas-menu) -->
-    
+
 @else
 
 @endif <?php /* end not print or frame */ ?>
-
 
 
 @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
@@ -273,9 +256,14 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
 @endif
 
 
-<div class="disNon"><iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe></div>
+<div class="disNon">
+    <iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe>
+</div>
 <div class="imgPreload">
-@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src) <img src="{{ $src }}" border=0 alt="" > @empty @endforelse
+@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src)
+    <img src="{{ $src }}" border=0 alt="" >
+@empty
+@endforelse
 </div>
 @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
     {!! $GLOBALS['SL']->pageSCRIPTS !!}
@@ -313,21 +301,8 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
     <?php /* <link href="/summernote.css" rel="stylesheet"> <script defer src="/summernote.min.js"></script> */ ?>
 @endif
-@if (isset($hasFbWidget) && $hasFbWidget)
-    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-@endif
-@if (!isset($admMenu) && isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["google-analytic"])
-    && trim($GLOBALS['SL']->sysOpts["google-analytic"]) != '' 
-    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false)
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script defer src="https://www.googletagmanager.com/gtag/js?id={!! $GLOBALS['SL']->sysOpts['google-analytic'] 
-        !!}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '{!! $GLOBALS["SL"]->sysOpts["google-analytic"] !!}');
-    </script>
+@if (!isset($admMenu))
+    {!! view('vendor.survloop.elements.inc-google-analytics')->render() !!}
 @endif
 </body>
 </html>

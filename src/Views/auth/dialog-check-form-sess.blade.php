@@ -2,25 +2,34 @@
 <div class="p10"></div>
 <center>
 @if ($req->has('login'))
-    <h3>To protect your privacy, we need to reload this page...</h3>
+    <h3>
+        This page has timed out.<br />
+        Please reload this page, and login if neccessary.
+    </h3>
     <div id="reloadSpinner"></div>
     <script type="text/javascript">
         document.getElementById("reloadSpinner").innerHTML=getSpinner(); 
         setTimeout("location.reload()", 3000);
     </script>
 @else
-    <h3>To protect your privacy, we need to save your changes and reload this page.</h3>
-    <p>It will be reloaded automatically in <span id="reloadCntDwn">60</span> seconds...</p>
+    <h3>
+        The form on this page has timed out.<br />
+        Please reload this page, and login if neccessary.
+    </h3>
+    <p id="reloadDesc"></p>
     <div class="p10"></div>
-    <div class="row">
-        <div class="col-6 taC">
-            <a class="dialogClose btn btn-lg btn-secondary" href="javascript:;">Cancel Reload</a>
-        </div>
-        <div class="col-6 taC">
-            <a class="nFormSaveReload btn btn-lg btn-primary" href="javascript:;">Save & Reload</a>
-        </div>
-    </div>
-    <script type="text/javascript"> startCountdown('reloadCntDwn', 60, 1); </script>
+    <a id="dialogCloseID" class="dialogClose btn btn-xl btn-primary" 
+        onClick="setTimeout('location.reload()', 1);"
+        href="javascript:;">Reload</a>
+    <script type="text/javascript"> 
+        function checkTreeTypeWarning() {
+            if (treeType == 'Survey') {
+                document.getElementById('reloadDesc').innerHTML="Don't worry, we were auto-saving all your responses once per minute.";
+            }
+            return true;
+        }
+        setTimeout("checkTreeTypeWarning()", 1);
+    </script>
 @endif
 </center>
 <div class="p10"></div>

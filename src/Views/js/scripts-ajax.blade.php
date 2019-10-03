@@ -2,6 +2,10 @@
 
 $(document).ready(function(){
     
+    function isAdmDash() {
+        return ($( "#mainBody" ).hasClass( "mainBodyDash" ));
+    }
+    
     function popDialog(title, desc) {
         if (document.getElementById("dialogPop")) {
             document.getElementById("dialogPop").title=title;
@@ -22,22 +26,23 @@ $(document).ready(function(){
     $(document).on("click", ".unPopDialog", function() { unPopDialog(); });
     
     function chkFormSess() {
-        /*
         if (document.getElementById("csrfTok")) {
+            if (document.getElementById("isLoginID") || document.getElementById("isSignupID")) {
+                setTimeout("window.location='/login'", 10);
+                return true;
+            }
+            document.getElementById('dialogCloseID').style.display='none';
             var src = "/time-out";
             if (document.getElementById("postNodeForm") && document.getElementById("stepID") && document.getElementById("treeID")) {
                 src += "?form="+document.getElementById("treeID").value;
-            } else if (document.getElementById("isLoginID") || document.getElementById("isSignupID")) {
-                src += "?login=1";
             }
             $("#dialogBody").load(src);
             $("#nondialog").fadeOut(300);
             $("#dialog").fadeIn(300);
         }
-        */
         return true;
     }
-    setTimeout(function() { chkFormSess(); }, (115*60000));
+    setTimeout(function() { chkFormSess(); }, (45*60000));
     
     function slideToHshooPos(hash) {
         if (document.getElementById(hash)) {
@@ -906,7 +911,7 @@ $(document).ready(function(){
             $("#admSrchFld").focus();
         }
     });
-    
+
     function chkFixedHeader(newW, divID) {
         if (document.getElementById(divID)) {
             document.getElementById(divID).style.width = newW;
@@ -919,8 +924,11 @@ $(document).ready(function(){
         var newW = Math.round($("#main").outerWidth());
         newW = ''+newW+'px';
         chkFixedHeader(newW, 'mainNav');
-        chkFixedHeader(newW, 'fixedHeader');
         chkFixedHeader(newW, 'fixedHeader2');
+        if (isAdmDash()) {
+            newW -= 60;
+        }
+        chkFixedHeader(newW, 'fixedHeader');
         if (chkAgain) {
             setTimeout(function() { chkFixedHeaders(true); }, 5000);
         }

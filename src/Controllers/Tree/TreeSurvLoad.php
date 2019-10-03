@@ -125,13 +125,15 @@ class TreeSurvLoad extends TreeSurvConds
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
-            $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/TreeSurv.php' . "\n\n";
+            $cache = '// Auto-generated loading cache from '
+                . '/SurvLoop/Controllers/TreeSurv.php' . "\n\n";
             $this->pageCnt = 0;
             $this->kidMaps = $nodeIDs = [];
             if (isset($GLOBALS["SL"]->treeRow->TreeOpts)) {
                 $nodes = SLNode::where('NodeTree', $this->treeID)
-                    ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeType', 'NodeOpts', 
-                        'NodeDataBranch', 'NodeDataStore', 'NodeResponseSet', 'NodeDefault')
+                    ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 
+                        'NodeType', 'NodeOpts', 'NodeDataBranch', 
+                        'NodeDataStore', 'NodeResponseSet', 'NodeDefault')
                     ->get();
                 foreach ($nodes as $row) {
                     $nodeIDs[] = $row->NodeID;
@@ -142,72 +144,14 @@ class TreeSurvLoad extends TreeSurvConds
                     if (in_array($row->NodeType, ['Page', 'Loop Root'])) {
                         $this->pageCnt++;
                     }
-                    if ($GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 
-                        && $row->NodeParentID == $rootID 
-                        && $row->NodeType == 'Loop Root' 
-                        && trim($row->NodeDataBranch) != ''
-                        && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch])
-                        && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch]->DataLoopTable)) {
-                        $tbl = $GLOBALS["SL"]->dataLoops[$row->NodeDataBranch]->DataLoopTable;
-                        $cache .= '$'.'this->isBigSurvLoop = [\'' . $tbl . '\', \'';
-                        if (trim($row->NodeDefault) != '') {
-                            $cache .= $row->NodeDefault . '\', \'asc\'];' . "\n";
-                        } else {
-                            $cache .= $GLOBALS["SL"]->tblAbbr[$tbl] . 'ID\', \'desc\'];' . "\n";
-                        }
-                    }
-                    if ($row->NodeType == 'Checkbox' 
-                        || (in_array($row->NodeType, ['Drop Down', 'U.S. States']) && $row->NodeOpts%53 == 0)) {
-                        $cache .= '$'.'this->checkboxNodes[] = ' . $row->NodeID . ';' . "\n";
-                    } elseif (in_array($row->NodeType, ['Data Print', 'Data Print Row']) && isset($row->NodeDataStore)
-                        && trim($row->NodeDataStore) != '') {
-                        list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($row->NodeDataStore);
-                        if ($GLOBALS["SL"]->origFldCheckbox($tbl, $fld) > 0) {
-                            $cache .= '$'.'this->checkboxNodes[] = ' . $row->NodeID . ';' . "\n";
-                        }
-                    }
-                    $includeNode = true;
-                    if ($row->NodeType == 'Data Manip: Update') {
-                        // add unless this node is data manip update which is under a new record manip
-                        $includeNode = (!isset($this->allNodes[$row->NodeParentID]) 
-                            || $this->allNodes[$row->NodeParentID]->nodeType != 'Data Manip: New');
-                    }
-                    if ($includeNode) {
-                        $cacheNode = '$'.'this->allNodes[' . $row->NodeID . '] = '
-                            . 'new SurvLoop\\Controllers\\Tree\\TreeNodeSurv(' 
-                            . $row->NodeID . ', [], ['
-                                . '"pID" => '     . intVal($row->NodeParentID)    . ', '
-                                . '"pOrd" => '    . intVal($row->NodeParentOrder) . ', '
-                                . '"opts" => '    . intVal($row->NodeOpts)        . ', '
-                                . '"type" => "'   . $row->NodeType                . '", '
-                                . '"branch" => "' . $row->NodeDataBranch          . '", '
-                                . '"store" => "'  . $row->NodeDataStore           . '", '
-                                . '"set" => "'    . $row->NodeResponseSet         . '", '
-                                . '"def" => "'    . str_replace('"', '\\"', $row->NodeDefault) . '"'
-                            . ']);' . "\n";
-                        eval($cacheNode);
-                        $cache .= $cacheNode;
-                    }
+                    $cache .= $this->loadTreeFromCacheRow($row);
                 }
                 $responses = SLNodeResponses::whereIn('NodeResNode', $nodeIDs)
                     ->where('NodeResShowKids', '>', 0)
                     ->get();
                 if ($responses->isNotEmpty()) {
                     foreach ($responses as $j => $res) {
-                        if (!isset($this->kidMaps[$res->NodeResNode])) {
-                            $this->kidMaps[$res->NodeResNode] = [];
-                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode 
-                                . '] = [];' . "\n";
-                        }
-                        $showKids = intVal($res->NodeResShowKids);
-                        if (!isset($this->kidMaps[$res->NodeResNode][$showKids])) {
-                            $this->kidMaps[$res->NodeResNode][$showKids] = [];
-                            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
-                                . $res->NodeResShowKids . '] = [];' . "\n";
-                        }
-                        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
-                            . $res->NodeResShowKids . '][] = [ ' . $res->NodeResOrd
-                            . ', "' . $res->NodeResValue . '" ];' . "\n";
+                        $cache .= $this->loadTreeFromCacheResponse($res);
                     }
                 }
                 $cache .= '$'.'this->treeSize = sizeof($'.'this->allNodes);' . "\n"
@@ -226,6 +170,81 @@ class TreeSurvLoad extends TreeSurvConds
             Storage::put($cacheFile, $cache . $cache2 . $cache3);
         }
         return true;
+    }
+    
+    protected function loadTreeFromCacheRow($row)
+    {
+        $cache = '';
+        if ($GLOBALS["SL"]->treeRow->TreeOpts%5 == 0 
+            && $row->NodeParentID == $rootID 
+            && $row->NodeType == 'Loop Root' 
+            && trim($row->NodeDataBranch) != ''
+            && isset($GLOBALS["SL"]->dataLoops[$row->NodeDataBranch])) {
+            $loop = $GLOBALS["SL"]->dataLoops[$row->NodeDataBranch];
+            if (isset($loop->DataLoopTable)) {
+                $tbl = $loop->DataLoopTable;
+                $cache .= '$'.'this->isBigSurvLoop = [\'' . $tbl . '\', \'';
+                if (trim($row->NodeDefault) != '') {
+                    $cache .= $row->NodeDefault . '\', \'asc\'];' . "\n";
+                } else {
+                    $cache .= $GLOBALS["SL"]->tblAbbr[$tbl] 
+                        . 'ID\', \'desc\'];' . "\n";
+                }
+            }
+        }
+        if ($row->NodeType == 'Checkbox' 
+            || (in_array($row->NodeType, ['Drop Down', 'U.S. States']) && $row->NodeOpts%53 == 0)) {
+            $cache .= '$'.'this->checkboxNodes[] = ' . $row->NodeID . ';' . "\n";
+        } elseif (in_array($row->NodeType, ['Data Print', 'Data Print Row']) && isset($row->NodeDataStore)
+            && trim($row->NodeDataStore) != '') {
+            list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($row->NodeDataStore);
+            if ($GLOBALS["SL"]->origFldCheckbox($tbl, $fld) > 0) {
+                $cache .= '$'.'this->checkboxNodes[] = ' . $row->NodeID . ';' . "\n";
+            }
+        }
+        $includeNode = true;
+        if ($row->NodeType == 'Data Manip: Update') {
+            // add unless this node is data manip update which is under a new record manip
+            $includeNode = (!isset($this->allNodes[$row->NodeParentID]) 
+                || $this->allNodes[$row->NodeParentID]->nodeType != 'Data Manip: New');
+        }
+        if ($includeNode) {
+            $cacheNode = '$'.'this->allNodes[' . $row->NodeID . '] = '
+                . 'new SurvLoop\\Controllers\\Tree\\TreeNodeSurv(' 
+                . $row->NodeID . ', [], ['
+                    . '"pID" => '     . intVal($row->NodeParentID)    . ', '
+                    . '"pOrd" => '    . intVal($row->NodeParentOrder) . ', '
+                    . '"opts" => '    . intVal($row->NodeOpts)        . ', '
+                    . '"type" => "'   . $row->NodeType                . '", '
+                    . '"branch" => "' . $row->NodeDataBranch          . '", '
+                    . '"store" => "'  . $row->NodeDataStore           . '", '
+                    . '"set" => "'    . $row->NodeResponseSet         . '", '
+                    . '"def" => "'    . str_replace('"', '\\"', $row->NodeDefault) . '"'
+                . ']);' . "\n";
+            eval($cacheNode);
+            $cache .= $cacheNode;
+        }
+        return $cache;
+    }
+    
+    protected function loadTreeFromCacheResponse($res)
+    {
+        $cache = '';
+        if (!isset($this->kidMaps[$res->NodeResNode])) {
+            $this->kidMaps[$res->NodeResNode] = [];
+            $cache .= '$'.'this->kidMaps[' 
+                . $res->NodeResNode . '] = [];' . "\n";
+        }
+        $showKids = intVal($res->NodeResShowKids);
+        if (!isset($this->kidMaps[$res->NodeResNode][$showKids])) {
+            $this->kidMaps[$res->NodeResNode][$showKids] = [];
+            $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
+                . $res->NodeResShowKids . '] = [];' . "\n";
+        }
+        $cache .= '$'.'this->kidMaps[' . $res->NodeResNode . '][' 
+            . $res->NodeResShowKids . '][] = [ ' . $res->NodeResOrd
+            . ', "' . $res->NodeResValue . '" ];' . "\n";
+        return $cache;
     }
     
     public function hasParentPage($nID)

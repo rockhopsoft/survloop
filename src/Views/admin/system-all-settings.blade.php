@@ -96,13 +96,20 @@
 <h3 class="slBlueDark"><u>Social Settings</u></h3>
 <div class="row">
     <div class="col-md-6">
-        {!! view('vendor.survloop.admin.system-one-setting', [
-            "opt" => 'twitter', "val" => $sysDef->v["settingsList"]["twitter"] ])->render() !!}
+        @foreach (['twitter', 'matomo-analytic-url', 'matomo-analytic-site-id'] as $opt)
+            {!! view('vendor.survloop.admin.system-one-setting', [
+                "opt" => $opt,
+                "val" => $sysDef->v["settingsList"][$opt]
+            ])->render() !!}
+        @endforeach
     </div>
     <div class="col-md-6">
-        @foreach (['google-analytic', 'google-map-key', 'google-map-key2', 'google-cod-key', 'google-cod-key2'] as $opt)
+        @foreach (['google-analytic', 'google-map-key', 'google-map-key2', 
+            'google-cod-key', 'google-cod-key2'] as $opt)
             {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+                "opt" => $opt, 
+                "val" => $sysDef->v["settingsList"][$opt] 
+            ])->render() !!}
         @endforeach
     </div>
 </div>
@@ -115,7 +122,9 @@
 <h3 class="slBlueDark"><u>License Settings</u></h3>
 @foreach (['app-license', 'app-license-url', 'app-license-img', 'app-license-snc'] as $opt)
     {!! view('vendor.survloop.admin.system-one-setting', [
-        "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+        "opt" => $opt, 
+        "val" => $sysDef->v["settingsList"][$opt]
+    ])->render() !!}
 @endforeach
 </div>
 

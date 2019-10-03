@@ -490,6 +490,13 @@ class TreeSurvFormVarieties extends UserProfile
         return '';
     }
     
+    /**
+     * Provides customization of values reported in detail blocks.
+     *
+     * @param  int $nID
+     * @param  string $val
+     * @return string
+     */
     protected function printValCustom($nID, $val)
     {
         return $val;
@@ -498,7 +505,8 @@ class TreeSurvFormVarieties extends UserProfile
     public function chkEmail()
     {
         $ret = '';
-        if ($GLOBALS["SL"]->REQ->has('email') && trim($GLOBALS["SL"]->REQ->email) != '') {
+        if ($GLOBALS["SL"]->REQ->has('email') 
+            && trim($GLOBALS["SL"]->REQ->email) != '') {
             $chk = User::where('email', 'LIKE', $GLOBALS["SL"]->REQ->email)
                 ->get();
             if ($chk->isNotEmpty()) {
@@ -527,16 +535,25 @@ class TreeSurvFormVarieties extends UserProfile
         return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     }
     
-    public function printMonthlyCalculator($nIDtxt = '', $presel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], $extraJS = '')
+    public function printMonthlyCalculator(
+        $nIDtxt = '', 
+        $presel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 
+        $extraJS = '')
     {
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.forms.formtree-monthly-calculator-ajax', [
-            "nIDtxt"  => $nIDtxt,
-            "extraJS" => $extraJS
-            ])->render();
-        return view('vendor.survloop.forms.formtree-monthly-calculator', [
-            "nIDtxt" => $nIDtxt,
-            "presel" => $presel
-            ])->render();
+        $GLOBALS["SL"]->pageAJAX .= view(
+            'vendor.survloop.forms.formtree-monthly-calculator-ajax', 
+            [
+                "nIDtxt"  => $nIDtxt,
+                "extraJS" => $extraJS
+            ]
+        )->render();
+        return view(
+            'vendor.survloop.forms.formtree-monthly-calculator', 
+            [
+                "nIDtxt" => $nIDtxt,
+                "presel" => $presel
+            ]
+        )->render();
     }
     
 }
