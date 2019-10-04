@@ -59,10 +59,12 @@
                     </div>
                 </div>
             </div>
-            <label class="mT10 mB10"><input type="checkbox" name="opts71" id="opts71ID" value="71" 
-                autocomplete="off" onClick="return checkPageBlock();" 
-                @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
-                > <span class="fPerc133">Background</span></label>
+            <label class="mT10 mB10">
+                <input type="checkbox" name="opts71" id="opts71ID" value="71" 
+                    autocomplete="off" onClick="return checkPageBlock();" 
+                    @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
+                    > <span class="fPerc133">Background</span>
+                </label>
             <div id="pageBlockOpts" class="pT5 
                 @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
                 <div class="row">
@@ -138,10 +140,22 @@
                 @if ($node->nodeRow->NodeOpts%89 == 0) CHECKED @endif
                 > <span class="fPerc133">Card Wrapper</span></label>
             </div>
-            <div><label class="mT10 mB10"><input type="checkbox" name="opts97" id="opts97ID" value="97" 
-                autocomplete="off" onClick="return checkPageBlock();" 
-                @if ($node->nodeRow->NodeOpts%97 == 0) CHECKED @endif
-                > <span class="fPerc133">Deferred Load of Node</span></label>
+            <div>
+                <label class="mT10 mB10">
+                    <input type="checkbox" name="opts97" id="opts97ID" value="97" 
+                        autocomplete="off" onClick="return checkPageBlock();" 
+                        @if ($node->nodeRow->NodeOpts%97 == 0) CHECKED @endif
+                        > <span class="fPerc133">Deferred Load of Node</span>
+                </label>
+            </div>
+            <div id="nodeCachingOpt" class="
+                @if ($node->nodeRow->NodeOpts%97 == 0) disBlo @else disNon @endif ">
+                <label class="mT10 mB10">
+                    <input type="checkbox" name="opts103" id="opts103ID" value="103" 
+                        autocomplete="off" onClick="return checkPageBlock();" 
+                        @if ($node->nodeRow->NodeOpts%103 == 0) CHECKED @endif
+                        > <span class="fPerc133">No Caching This Node</span>
+                </label>
             </div>
         </div>
     </div>

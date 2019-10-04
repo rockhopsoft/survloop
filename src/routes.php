@@ -1,4 +1,12 @@
 <?php
+/**
+  * routes.php register all the paths used by core SurvLoop behavior.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 
 /*
 |--------------------------------------------------------------------------
@@ -13,44 +21,109 @@
 
 Route::group(['middleware' => ['web']], function () {
     
-    Route::post('/',             'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
-    Route::get( '/',             'SurvLoop\\Controllers\\SurvLoop@loadPageHome');
-    Route::post('/sub',          'SurvLoop\\Controllers\\SurvLoop@mainSub');
-    
-    Route::get( '/sortLoop',     'SurvLoop\\Controllers\\SurvLoop@sortLoop');
-    Route::get( '/holdSess',     'SurvLoop\\Controllers\\SurvLoop@holdSess');
-    Route::get( '/restart',      'SurvLoop\\Controllers\\SurvLoop@restartSess');
-    Route::get( '/sessDump',     'SurvLoop\\Controllers\\SurvLoop@sessDump');
-    Route::get( '/test',         'SurvLoop\\Controllers\\SurvRoutes@testHome');
-    
-    Route::get( '/switch/{treeID}/{cid}',  'SurvLoop\\Controllers\\SurvLoop@switchSess');
-    Route::get( '/delSess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@delSess');
-    Route::get( '/cpySess/{treeID}/{cid}', 'SurvLoop\\Controllers\\SurvLoop@cpySess');
-    
-    Route::get( '/{abbr}/uploads/{file}', 'SurvLoop\\Controllers\\SurvLoop@getUploadFile');
-    
-    // main survey process for primary database, primary tree
-    Route::post('/u/{nodeSlug}', 'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
-    Route::get( '/u/{nodeSlug}', 'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
-    
-    // survey process for any database or tree
-    Route::get( '/start/{treeSlug}',         'SurvLoop\\Controllers\\SurvLoop@loadNodeTreeURL');
-    Route::get( '/start-{cid}/{treeSlug}', [
-        'uses'       => 'SurvLoop\Controllers\SurvLoop@loadNodeTreeURLedit', 
-        'middleware' => ['auth']
-    ]);
-    Route::post('/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
-    Route::get( '/u/{treeSlug}/{nodeSlug}',  'SurvLoop\\Controllers\\SurvLoop@loadNodeURL');
+    Route::post(
+        '/',
+        'SurvLoop\\Controllers\\SurvLoop@loadPageHome'
+    );
+    Route::get(
+        '/',
+        'SurvLoop\\Controllers\\SurvLoop@loadPageHome'
+    );
+    Route::post(
+        '/sub',
+        'SurvLoop\\Controllers\\SurvLoop@mainSub'
+    );
     
     Route::get(
-        '/defer/{treeID}/{nodeID}/{date}/{rand}',
+        '/sortLoop',
+        'SurvLoop\\Controllers\\SurvLoop@sortLoop'
+    );
+    Route::get(
+        '/holdSess',
+        'SurvLoop\\Controllers\\SurvLoop@holdSess'
+    );
+    Route::get(
+        '/restart',
+        'SurvLoop\\Controllers\\SurvLoop@restartSess'
+    );
+    Route::get(
+        '/sessDump',
+        'SurvLoop\\Controllers\\SurvLoop@sessDump'
+    );
+    Route::get(
+        '/test',
+        'SurvLoop\\Controllers\\SurvRoutes@testHome'
+    );
+    
+    Route::get(
+        '/switch/{treeID}/{cid}',
+        'SurvLoop\\Controllers\\SurvLoop@switchSess'
+    );
+    Route::get(
+        '/delSess/{treeID}/{cid}',
+        'SurvLoop\\Controllers\\SurvLoop@delSess'
+    );
+    Route::get(
+        '/cpySess/{treeID}/{cid}',
+        'SurvLoop\\Controllers\\SurvLoop@cpySess'
+    );
+    
+    Route::get(
+        '/{abbr}/uploads/{file}',
+        'SurvLoop\\Controllers\\SurvLoop@getUploadFile'
+    );
+    
+    // main survey process for primary database, primary tree
+    Route::post(
+        '/u/{nodeSlug}',
+        'SurvLoop\\Controllers\\SurvLoop@loadNodeURL'
+    );
+    Route::get(
+        '/u/{nodeSlug}',
+        'SurvLoop\\Controllers\\SurvLoop@loadNodeURL'
+    );
+    
+    // survey process for any database or tree
+    Route::get(
+        '/start/{treeSlug}',
+        'SurvLoop\\Controllers\\SurvLoop@loadNodeTreeURL'
+    );
+    Route::get(
+        '/start-{cid}/{treeSlug}', [
+            'uses' => 'SurvLoop\Controllers\SurvLoop@loadNodeTreeURLedit', 
+            'middleware' => ['auth']
+        ]
+    );
+    Route::post(
+        '/u/{treeSlug}/{nodeSlug}',
+        'SurvLoop\\Controllers\\SurvLoop@loadNodeURL'
+    );
+    Route::get(
+        '/u/{treeSlug}/{nodeSlug}',
+        'SurvLoop\\Controllers\\SurvLoop@loadNodeURL'
+    );
+    
+    Route::get(
+        '/defer/{treeID}/{cid}/{nID}/{date}/{rand}',
         'SurvLoop\\Controllers\\SurvLoop@deferNode'
     );
-    Route::get( '/up/{treeSlug}/{cid}/{upID}', 'SurvLoop\\Controllers\\SurvLoop@retrieveUpload');
+    Route::get(
+        '/up/{treeSlug}/{cid}/{upID}',
+        'SurvLoop\\Controllers\\SurvLoop@retrieveUpload'
+    );
     
-    Route::get( '/search-bar',               'SurvLoop\\Controllers\\SurvLoop@searchBar');
-    Route::get( '/search-results/{treeID}',  'SurvLoop\\Controllers\\SurvLoop@searchResultsAjax');
-    Route::get( '/search-run',               'SurvLoop\\Controllers\\SurvLoop@searchRun');
+    Route::get(
+        '/search-bar',
+        'SurvLoop\\Controllers\\SurvLoop@searchBar'
+    );
+    Route::get(
+        '/search-results/{treeID}',
+        'SurvLoop\\Controllers\\SurvLoop@searchResultsAjax'
+    );
+    Route::get(
+        '/search-run',
+        'SurvLoop\\Controllers\\SurvLoop@searchRun'
+    );
     
     Route::get( '/records-full/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordFulls');
     Route::get( '/record-prevs/{treeID}',    'SurvLoop\\Controllers\\SurvLoop@ajaxRecordPreviews');

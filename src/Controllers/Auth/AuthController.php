@@ -1,4 +1,12 @@
 <?php
+/**
+  * AuthController customizes some of the standard Laravel behavior.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers\Auth;
 
 use Auth;

@@ -1,12 +1,12 @@
 <?php
 /**
-  * GlobalsTables is a bottom-level class for loading and accessing system information from anywhere.
+  * GlobalsConvert is a bottom-level class for loading and accessing system information from anywhere.
   * This level contains the simplest conversion functions, etc.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 2.4
+  * @since v0.2.5
   */
 namespace SurvLoop\Controllers\Globals;
 

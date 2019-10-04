@@ -268,6 +268,11 @@ function checkPageBlock() {
     } else {
         document.getElementById('pageBlockOpts').style.display = 'none';
     }
+    if (document.getElementById('opts97ID').checked) {
+        document.getElementById('nodeCachingOpt').style.display = 'block';
+    } else {
+        document.getElementById('nodeCachingOpt').style.display = 'none';
+    }
     return true;
 }
 function previewPageBlock() {

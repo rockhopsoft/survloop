@@ -1,6 +1,16 @@
 <?php
+/**
+  * Authenticate assists with the login redirect process.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace App\Http\Middleware;
+
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+
 class Authenticate extends Middleware
 {
     /**

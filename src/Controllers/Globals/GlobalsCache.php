@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 2.4
+  * @since v0.2.5
   */
 namespace SurvLoop\Controllers\Globals;
 
@@ -272,8 +272,8 @@ class GlobalsCache extends GlobalsStatic
     
     public function pullPageJsCss($content = '', $coreID = 0)
     {
-        if (isset($GLOBALS["SL"]->x["pageCacheLoaded"]) 
-            && $GLOBALS["SL"]->x["pageCacheLoaded"]) {
+        if (isset($this->x["pageCacheLoaded"]) 
+            && $this->x["pageCacheLoaded"]) {
             return $content;
         }
         $minPath = '../storage/app/' . $this->cachePath;
@@ -298,7 +298,7 @@ class GlobalsCache extends GlobalsStatic
         
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
-        $java = $this->pageJAVA . $GLOBALS["SL"]->getXtraJs();
+        $java = $this->pageJAVA . $this->getXtraJs();
         if (trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') {
             $java .= ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ';
         }
@@ -341,7 +341,7 @@ class GlobalsCache extends GlobalsStatic
                 foreach ($files as $i => $file) {
                     if ($cnt < 5000) {
                         $delete = true;
-                        $filenameParts = $GLOBALS["SL"]->mexplode('-', $file);
+                        $filenameParts = $this->mexplode('-', $file);
                         if (isset($filenameParts[0]) 
                             && in_array($filenameParts[0], $safeDates)) {
                             $delete = false;
@@ -359,16 +359,37 @@ class GlobalsCache extends GlobalsStatic
             ->delete();
         return true;
     }
+
+    public function getCacheSffxAdds()
+    {
+        $sffx = '';
+        if ($this->isOwner) {
+            $sffx .= '-owner';
+        }
+        if (isset($this->coreID) && intVal($this->coreID) > 0) {
+            $sffx .= '-c_' . $this->coreID;
+        }
+        if (isset($this->pageView) && $this->pageView != '') {
+            $sffx .= '-v_' . $this->pageView;
+        }
+        if (isset($this->dataPerms) && $this->dataPerms != '') {
+            $sffx .= '-p_' . $this->dataPerms;
+        }
+        return $sffx;
+    }
     
-    public function deferStaticNodePrint($nID, $content = '', $js = '', $ajax = '', $css = '')
+    public function deferStaticNodePrint($nID, $content = '', $coreID = 0, $js = '', $ajax = '', $css = '')
     {
         if (!isset($this->x["deferCnt"])) {
             $this->x["deferCnt"] = 0;
         }
+        if ($coreID < 0) {
+            $coreID = 0;
+        }
         $this->x["deferCnt"]++;
         $rand = rand(100000000, 1000000000);
-        $file = $this->cachePath . '/html/' . date("Ymd") . '-t' 
-            . $this->treeID . '-n' . $nID . '-r' . $rand . '.html';
+        $file = $this->cachePath . '/html/' . date("Ymd") . '-t' . $this->treeID
+            . '-c' . $coreID . '-n' . $nID . '-r' . $rand . '.html';
         if (trim($js) != '' || trim($ajax) != '') {
             $content .= '<script type="text/javascript"> ' . $js . ' ';
             if (trim($ajax) != '') {
@@ -381,7 +402,8 @@ class GlobalsCache extends GlobalsStatic
         }
         Storage::put($file, $content);
         $this->pageAJAX .= 'setTimeout(function() { $("#deferNode' . $nID 
-            . '").load("/defer/' . $this->treeID . '/' . $nID . '/' . date("Ymd")
+            . '").load("/defer/' . $this->treeID . '/' . $coreID . '/' . $nID 
+            . '/' . date("Ymd")
             . '/' . $rand . '"); }, ' . (500+(500*$this->x["deferCnt"])) . '); ';
         return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center>'
             . '<div id="deferAnim' . $nID . '" class="p20 m20">'

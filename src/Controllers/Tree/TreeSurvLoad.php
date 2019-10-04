@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.18
   */
 namespace SurvLoop\Controllers\Tree;
 
@@ -466,6 +466,11 @@ class TreeSurvLoad extends TreeSurvConds
             }
         }
         return false;
+    }
+    
+    public function loadSessionDataRawCid($coreID = -3)
+    {
+        return $this->loadSessionData($GLOBALS["SL"]->coreTbl, $coreID, true);
     }
     
     public function loadSessionData($coreTbl, $coreID = -3, $skipPublic = false)

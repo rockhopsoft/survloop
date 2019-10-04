@@ -5,7 +5,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.18
   */
 namespace SurvLoop\Controllers\Tree;
 
@@ -1623,12 +1623,15 @@ class TreeSurvForm extends TreeSurvFormUtils
             if ($curr->nodeType == 'Gallery Slider' && sizeof($tmpSubTier[1]) > 0) {
                 $GLOBALS["SL"]->pageJAVA .= 'initGalSlider("' . $nIDtxt . '", "';
                 $ret .= '<div id="sliNavDiv' . $nIDtxt . '" class="sliNavDiv">'
-                    . '<a href="javascript:;" class="sliLft" id="sliLft' . $nIDtxt . '"><div id="sliLftHvr' . $nIDtxt
+                    . '<a href="javascript:;" class="sliLft" id="sliLft' . $nIDtxt 
+                    . '"><div id="sliLftHvr' . $nIDtxt
                     . '"></div><i class="fa fa-chevron-left" aria-hidden="true"></i></a>'
-                    . '<a href="javascript:;" class="sliRgt" id="sliRgt' . $nIDtxt . '"><div id="sliRgtHvr' . $nIDtxt
+                    . '<a href="javascript:;" class="sliRgt" id="sliRgt' . $nIDtxt 
+                    . '"><div id="sliRgtHvr' . $nIDtxt
                     . '"></div><i class="fa fa-chevron-right" aria-hidden="true"></i></a><div class="pT5">';
                 foreach ($tmpSubTier[1] as $j => $kid) {
-                    $ret .= '<a href="javascript:;" class="sliNav' . (($j == 0) ? 'Act' : '') . '" id="sliNav' . $nIDtxt
+                    $ret .= '<a href="javascript:;" class="sliNav' 
+                        . (($j == 0) ? 'Act' : '') . '" id="sliNav' . $nIDtxt
                         . 'dot' . $j . '"><i class="fa fa-dot-circle-o" aria-hidden="true"></i></a>';
                     $GLOBALS["SL"]->pageJAVA .= (($j > 0) ? ',' : '') . $kid[0];
                 }
@@ -1662,7 +1665,7 @@ class TreeSurvForm extends TreeSurvFormUtils
     protected function wrapNodePrint($ret, $nID)
     {
         if ($this->allNodes[$nID]->chkCurrOpt('DEFERLOAD')) {
-            return $GLOBALS["SL"]->deferStaticNodePrint($nID, $ret);
+            return $GLOBALS["SL"]->deferStaticNodePrint($nID, $ret, $this->coreID);
         }
         return $ret;
     }

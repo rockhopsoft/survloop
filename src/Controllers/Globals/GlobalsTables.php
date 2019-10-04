@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.18
   */
 namespace SurvLoop\Controllers\Globals;
 
@@ -443,10 +443,19 @@ class GlobalsTables extends GlobalsElements
                 $this->loadDataMap(intVal($nodeChk->NodeResponseSet));
             }
         }
-        if (!isset($GLOBALS["SL"]->pageView)) {
-            $GLOBALS["SL"]->pageView = $GLOBALS["SL"]->x["pageSlugSffx"] = '';
+        if (!isset($this->x["pageSlugSffx"])) {
+            $this->x["pageSlugSffx"] = '';
         }
         return true;
+    }
+
+    public function initPageReadSffx($cid = 0)
+    {
+        $this->x["pageSlugSffx"] = '/read-' . $cid;
+        if ($this->pageView != '') {
+            $this->x["pageSlugSffx"] .= '/' . $this->pageView;
+        }
+        return $this->x["pageSlugSffx"];
     }
     
     public function getFldRowExtendID($tblExtend)

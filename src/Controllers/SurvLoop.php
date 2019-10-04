@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.1
   */
 namespace SurvLoop\Controllers;
 
@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\File;
 use App\Models\User;
 use App\Models\SLSess;
 use App\Models\SLTree;
+use App\Models\SLNode;
+use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SurvCustLoop;
@@ -56,13 +58,27 @@ class SurvLoop extends SurvCustLoop
         return redirect($this->domainPath . '/');
     }
     
-    public function deferNode(Request $request, $treeID = 1, $nodeID = 0, $date = '', $rand = 0)
+    public function deferNode(Request $request, $treeID = 1, $cid = 0, $nID = 0, $date = '', $rand = 0)
     {
-        $file = '../storage/app/cache/html/' . $date 
-            . '-t' . $treeID . '-n' . $nodeID . '-r' . $rand . '.html';
-        if ($treeID > 0 && $nodeID > 0 && $this->loadTreeByID($request, $treeID) 
-            && file_exists($file)) {
-            return file_get_contents($file);
+        $file = '../storage/app/cache/html/' . $date . '-t' . $treeID
+            . '-c' . $cid . '-n' . $nID . '-r' . $rand . '.html';
+        if ($treeID > 0 && $nID > 0 && $this->loadTreeByID($request, $treeID)) {
+            $node = SLNode::find($nID);
+            if ($node && isset($node->NodeOpts) && intVal($node->NodeOpts) > 0) {
+                if ($node->NodeOpts%TreeNodeSurv::OPT_NONODECACH > 0) {
+                    if (file_exists($file)) {
+                        return file_get_contents($file);
+                    }
+                } else { // No caching allow for this node
+                    $this->loadLoop($request);
+                    if ($cid > 0) {
+                        $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
+                        $GLOBALS["SL"]->initPageReadSffx($cid);
+                        $this->custLoop->loadSessionDataRawCid($cid);
+                    }
+                    return $this->custLoop->printTreeNodePublic($nID);
+                }
+            }
         }
         return '';
     }
@@ -102,11 +118,8 @@ class SurvLoop extends SurvCustLoop
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
             if ($cid > 0) {
-                $GLOBALS["SL"]->x["pageSlugSffx"] = '/read-' . $cid;
-                if ($GLOBALS["SL"]->pageView != '') {
-                    $GLOBALS["SL"]->x["pageSlugSffx"] .= '/' . $GLOBALS["SL"]->pageView;
-                }
-                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid, true);
+                $GLOBALS["SL"]->initPageReadSffx($cid);
+                $this->custLoop->loadSessionDataRawCid($cid);
                 if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
                     $this->custLoop->hideDisclaim = true;
                 }

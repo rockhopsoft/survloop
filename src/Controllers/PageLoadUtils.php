@@ -5,7 +5,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.18
   */
 namespace SurvLoop\Controllers;
 
@@ -435,26 +435,12 @@ class PageLoadUtils extends Controller
         } elseif (Auth::user() && Auth::user()->id > 0) {
             $sffx = '-user';
         }
-        if ($GLOBALS["SL"]->isOwner) {
-            $sffx .= '-owner';
-        }
         if (isset($GLOBALS["SL"])) {
-            if (isset($GLOBALS["SL"]->coreID)
-                && intVal($GLOBALS["SL"]->coreID) > 0) {
-                $sffx .= '-c_' . $GLOBALS["SL"]->coreID;
-            }
-            if (isset($GLOBALS["SL"]->pageView) 
-                && $GLOBALS["SL"]->pageView != '') {
-                $sffx .= '-v_' . $GLOBALS["SL"]->pageView;
-            }
-            if (isset($GLOBALS["SL"]->dataPerms) 
-                && $GLOBALS["SL"]->dataPerms != '') {
-                $sffx .= '-p_' . $GLOBALS["SL"]->dataPerms;
-            }
+            $sffx .= $GLOBALS["SL"]->getCacheSffxAdds();
             $GLOBALS["SL"]->cacheSffx = $sffx;
         }
-        $uri = str_replace('?refresh=1', '', str_replace('&refresh=1', '', 
-            substr($_SERVER["REQUEST_URI"], 1)));
+        $uri = substr(str_replace('?refresh=1', '', str_replace('&refresh=1', '', 
+            $_SERVER["REQUEST_URI"])), 1);
         $this->cacheKey = 'page-' . $uri . $sffx . '.html';
         return $this->cacheKey;
     }

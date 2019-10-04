@@ -5,7 +5,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.0.18
   */
 namespace SurvLoop\Controllers\Tree;
 
@@ -36,15 +36,32 @@ class TreeNodeSurv extends TreeNodeCore
     ];
     
     // Tree Nodes are assigned an optional property when ( SLNode->NodeOpts%OPT_PRIME == 0 )
+    // (Coding style originally adopted for native cross-language compatibility.
+    // Yes, the plan is to swap strategies.)
+   
     // Node Options
-    public const OPT_DROPTAGGER = 53;  // This node's dropdown stores like a checkbox, associating tags
+    public const OPT_DROPTAGGER = 53;  
+    // This node's dropdown stores like a checkbox, associating tags
 
     // Node Visual Layout Options
-    public const OPT_SKINNY     = 67;  // This node's contents are wrapped in the skinny page width 
-    public const OPT_JUMBOTRON  = 37;  // Wrap the contents of this node inside bootstrap's Jumbotron
-    public const OPT_BLOCKBACKG = 71;  // Node has content block background and color properties
-    public const OPT_CARDWRAP   = 89;  // Wrap the contents of this node inside a Card
-    public const OPT_DEFERLOAD  = 97;  // Defer loading the contents of this load until after the rest of the page
+    public const OPT_SKINNY     = 67;
+    // This node's contents are wrapped in the skinny page width 
+
+    public const OPT_JUMBOTRON  = 37;
+    // Wrap the contents of this node inside bootstrap's Jumbotron
+
+    public const OPT_BLOCKBACKG = 71;
+    // Node has content block background and color properties
+
+    public const OPT_CARDWRAP   = 89;
+    // Wrap the contents of this node inside a Card
+
+    public const OPT_DEFERLOAD  = 97;
+    // Defer loading the contents of this load until after the rest of the page
+
+    public const OPT_NONODECACH = 103;
+    // The deferred loading of this node's contents should not pull from a cache
+    
     
     // Node Form Field Layout Options
     public const OPT_CUSTOMLAY  = 2;   // Node uses some layout overrides instead of default

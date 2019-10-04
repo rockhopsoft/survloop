@@ -1,5 +1,12 @@
 <?php
-
+/**
+  * SurvRegisterController customizes new user registration.
+  *
+  * SurvLoop - All Our Data Are Belong
+  * @package  wikiworldorder/survloop
+  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @since 0.0
+  */
 namespace SurvLoop\Controllers\Auth;
 
 use Auth;

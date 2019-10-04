@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since 0.0
+  * @since v0.1.12
   */
 namespace SurvLoop\Controllers\Tree;
 
@@ -90,7 +90,7 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     $node->nodeRow->NodeOpts = $node->nodeRow->NodeOpts/2;
                 }
                 $opts = [5, 11, 13, 17, 23, 29, 31, 37, 41, 43, 47, 
-                    53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101];
+                    53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103];
                 $optsDesktop = [11, 17];
                 foreach ($opts as $o) {
                     if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') && intVal($GLOBALS["SL"]->REQ->get('opts'.$o.'')) == $o
