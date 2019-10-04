@@ -83,7 +83,8 @@
 	font-size: 16px;
 	color: {!! $css["color-main-text"] !!};
 }
-.nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, .nPrompt h3.slBlueDark {
+.nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, 
+.nPrompt h3.slBlueDark {
 	color: {!! $css["color-main-on"] !!};
 }
 .nPrompt p, .nPrompt ul {
@@ -144,10 +145,12 @@ label, .nPrompt label {
 .nodeWrap .jumbotron, .nPrompt .jumbotron {
     padding: 30px 40px 30px 40px;
 }
-.nPrompt .jumbotron p, .nPrompt .jumbotron h1, .nPrompt .jumbotron h2, .nPrompt .jumbotron h3 {
+.nPrompt .jumbotron p, .nPrompt .jumbotron h1, 
+.nPrompt .jumbotron h2, .nPrompt .jumbotron h3 {
     padding: 0px 0px 20px 0px;
 }
-.nFld input, .nFld select, .nFld textarea, .nFld label, .nFld .radio label, .nFld .checkbox label {
+.nFld input, .nFld select, .nFld textarea, .nFld label, 
+.nFld .radio label, .nFld .checkbox label {
 	color: {!! $css["color-form-text"] !!};
 }
 .nFld input, .nFld select, .nFld textarea {
@@ -155,7 +158,9 @@ label, .nPrompt label {
 	background: {!! $css["color-field-bg"] !!};
 	border: 1px {!! $css["color-main-on"] !!} solid;
 }
-.nFld input.slGrey, .nFld select.slGrey, .nFld textarea.slGrey, .nFld label.slGrey, .nFld .radio label.slGrey, .nFld .checkbox label.slGrey {
+.nFld input.slGrey, .nFld select.slGrey, .nFld textarea.slGrey, 
+.nFld label.slGrey, .nFld .radio label.slGrey, 
+.nFld .checkbox label.slGrey {
     color: {!! $css["color-main-grey"] !!};
 }
 
@@ -193,13 +198,15 @@ input.nFormBtnSub, input.nFormBtnBack {
     font-size: 26pt;
 }
 
-input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
+input.otherFld, input.form-control.otherFld, 
+label input.otherFld, label input.form-control.otherFld {
     width: 400px;
 }
 .form-control.pT0, .form-control.form-control-lg.pT0 {
     padding-top: 0px;
 }
-.nodeSub, .nodeWrap.w100 label, .nodeWrap.w100 .nPrompt, .nodeWrap.w100 .nPrompt label {
+.nodeSub, .nodeWrap.w100 label, .nodeWrap.w100 .nPrompt, 
+.nodeWrap.w100 .nPrompt label {
     width: 100%;
 }
 
@@ -216,8 +223,10 @@ label.finger, label.fingerAct {
     border: 1px {!! $css["color-main-on"] !!} solid;
     background: {!! $css["color-main-faint"] !!};
 }
-label.fingerAct, label.fingerAct:active, input.fingerAct:active+label, 
-label.fingerAct:hover, input.fingerAct:hover+label, label.finger:active, input.finger:active+label {
+label.fingerAct, 
+label.fingerAct:active, input.fingerAct:active+label, 
+label.fingerAct:hover, input.fingerAct:hover+label, 
+label.finger:active, input.finger:active+label {
     border: 1px {!! $css["color-main-on"] !!} solid;
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-on"] !!};
@@ -230,8 +239,10 @@ label.finger i.float-right, label.fingerAct i.float-right {
     margin-top: 3px;
 }
 
-input.fingerTxt, input.form-control.fingerTxt, .nFld input.form-control.fingerTxt, 
-textarea.fingerTxt, textarea.form-control.fingerTxt, .nFld textarea.form-control.fingerTxt {
+input.fingerTxt, input.form-control.fingerTxt, 
+.nFld input.form-control.fingerTxt, 
+textarea.fingerTxt, textarea.form-control.fingerTxt, 
+.nFld textarea.form-control.fingerTxt {
     cursor: pointer;
     width: 100%;
     border: 1px {!! $css["color-main-on"] !!} solid;
@@ -265,7 +276,8 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
     margin: -30px 0px 20px 0px;
 	-moz-border-radius: 5px; border-radius: 5px;
 }
-#formErrorMsg, #formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
+#formErrorMsg, #formErrorMsg h1, 
+#formErrorMsg h2, #formErrorMsg h3 {
     color: {!! $css["color-main-bg"] !!};
 }
 #formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
@@ -273,14 +285,18 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
     padding: 0px;
 }
 
-a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
-.nPrompt a.nFldBtn, .nPrompt a.nFldBtn:link, .nPrompt a.nFldBtn:active, .nPrompt a.nFldBtn:visited, .nPrompt a.nFldBtn:hover {
+a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, 
+a.nFldBtn:visited, a.nFldBtn:hover,
+.nPrompt a.nFldBtn, 
+.nPrompt a.nFldBtn:link, .nPrompt a.nFldBtn:active, 
+.nPrompt a.nFldBtn:visited, .nPrompt a.nFldBtn:hover {
     width: 100%;
     font-size: 125%;
     white-space: normal;
 }
 
-.nFormNext, a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover, {
+.nFormNext, a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, 
+a.nFldBtn:visited, a.nFldBtn:hover, {
     white-space: normal;
 }
 .btn.btn-xl, .btn.btn-lg, .btn.btn-md {
@@ -291,14 +307,17 @@ a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, a.nFldBtn:visited, a.nFldBtn:hover,
     padding: 1px 9px;
 }
 
-.subNote, .nPrompt .subNote, .nPrompt .subNote p, .nWrap .nPrompt .subNote p, .finger .subNote, .fingerAct .subNote {
+.subNote, .nPrompt .subNote, 
+.nPrompt .subNote p, .nWrap .nPrompt .subNote p, 
+.finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
 }
 .finger .subNote, .fingerAct .subNote {
     margin-top: 0px;
     padding-left: 20px;
 }
-label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .nFld label.fingerAct .subNote {
+label.finger .subNote, .nFld label.finger .subNote, 
+label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 	font-size: 14px;
 	color: {!! $css["color-main-text"] !!};
 }
@@ -308,12 +327,14 @@ label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .n
 	width: 100%; 
 	position: relative; 
 }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+.ui-state-default, .ui-widget-content .ui-state-default, 
+.ui-widget-header .ui-state-default {
     border: 1px solid {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-on"] !!};
     color: {!! $css["color-main-faint"] !!};
 }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.ui-state-active, .ui-widget-content .ui-state-active, 
+.ui-widget-header .ui-state-active {
     border: 1px solid {!! $css["color-main-on"] !!};
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-on"] !!};
@@ -340,15 +361,18 @@ label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .n
 .slSortable li.sortOn { 
 	background: {!! $css["color-main-faint"] !!}; 
 }
-.slSortable li i, .slSortable li.sortOn i, .slSortable li.sortOff i { 
+.slSortable li i, .slSortable li.sortOn i, 
+.slSortable li.sortOff i { 
     margin: 0px 20px;
 }
 @media screen and (max-width: 768px) {
-    .slSortable li, .slSortable li.sortOn, .slSortable li.sortOff {
+    .slSortable li, .slSortable li.sortOn, 
+    .slSortable li.sortOff {
         font-size: 14pt;
         padding: 10px 5px;
     }
-    .slSortable li i, .slSortable li.sortOn i, .slSortable li.sortOff i { 
+    .slSortable li i, .slSortable li.sortOn i, 
+    .slSortable li.sortOff i { 
         margin: 0px 10px;
     }
 }
@@ -358,17 +382,20 @@ label.finger .subNote, .nFld label.finger .subNote, label.fingerAct .subNote, .n
     background: {!! $css["color-main-text"] !!};
     color: {!! $css["color-main-bg"] !!};
 }
-.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+.ui-state-default, .ui-widget-content .ui-state-default, 
+.ui-widget-header .ui-state-default {
     border: 1px solid {!! $css["color-main-grey"] !!};
     background: {!! $css["color-main-bg"] !!};
     color: {!! $css["color-main-on"] !!};
 }
-.ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+.ui-state-active, .ui-widget-content .ui-state-active, 
+.ui-widget-header .ui-state-active {
     border: 1px solid {!! $css["color-main-bg"] !!};
     background: {!! $css["color-main-on"] !!};
     color: {!! $css["color-main-bg"] !!};
 }
-.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, 
+.ui-widget-header .ui-state-highlight {
     border: 1px solid {!! $css["color-main-text"] !!};
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-text"] !!};

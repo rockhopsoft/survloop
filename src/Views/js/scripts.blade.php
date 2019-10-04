@@ -12,6 +12,7 @@ var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img']))
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+var fixedHeaderOffset = 0;
 
 function findGetParam(paramName) {
     var result = null,

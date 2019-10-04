@@ -6,7 +6,7 @@
   * SurvLoop - All Our Data Are Belong
   * @package  wikiworldorder/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
-  * @since v0.0.1
+  * @since  v0.0.1
   */
 namespace SurvLoop\Controllers;
 
@@ -42,6 +42,14 @@ class SurvLoop extends SurvCustLoop
         return $this->custLoop->index($request, $type, $val);
     }
     
+    /**
+     * Process a confirmation token emailed to a user, and clicked.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $token
+     * @param  string  $tokenB
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
     public function processEmailConfirmToken(Request $request, $token = '', $tokenB = '')
     { 
         $this->loadLoop($request);

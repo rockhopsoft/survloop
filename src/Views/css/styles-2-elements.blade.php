@@ -50,12 +50,38 @@
     border: 0px none;
 }
 
-.tmbRound { width: 140px; height: 140px; -moz-border-radius: 70px; border-radius: 70px; }
-.bigTmbRound, .bigTmbRoundDiv { width: 125px; height: 125px; -moz-border-radius: 62px; border-radius: 62px; overflow: hidden; }
-.bigTmbRoundDiv img { width: 125px; min-height: 125px; }
-.hugTmbRound, .hugTmbRoundDiv { width: 175px; height: 175px; -moz-border-radius: 87px; border-radius: 87px; overflow: hidden; }
-.hugTmbRoundDiv img { width: 175px; min-height: 175px; }
-.hugTmbRoundDiv { border: 2px {!! $css["color-main-bg"] !!} solid; box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; }
+.tmbRound { 
+    width: 140px; 
+    height: 140px; 
+    -moz-border-radius: 70px; 
+    border-radius: 70px; 
+}
+.bigTmbRound, .bigTmbRoundDiv {
+    width: 125px;
+    height: 125px; 
+    -moz-border-radius: 62px; 
+    border-radius: 62px; 
+    overflow: hidden; 
+}
+.bigTmbRoundDiv img {
+    width: 125px; 
+    min-height: 125px; 
+}
+.hugTmbRound, .hugTmbRoundDiv { 
+    width: 175px; 
+    height: 175px; 
+    -moz-border-radius: 87px; 
+    border-radius: 87px; 
+    overflow: hidden; 
+}
+.hugTmbRoundDiv img { 
+    width: 175px; 
+    min-height: 175px; 
+}
+.hugTmbRoundDiv { 
+    border: 2px {!! $css["color-main-bg"] !!} solid; 
+    box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; 
+}
 
 .litRedDot, .litRedDottie {
     background: {!! $css["color-danger-on"] !!};
@@ -76,9 +102,15 @@
     border: 1px {!! $css["color-danger-on"] !!} solid;
 }
 
-.icoBig, i.icoBig, .icoBig i { font-size: 54px; }
-.icoHuge, i.icoHuge, .icoHuge i { font-size: 82px; }
-.icoMssv, i.icoMssv, .icoMssv i { font-size: 120px; }
+.icoBig, i.icoBig, .icoBig i { 
+    font-size: 54px; 
+}
+.icoHuge, i.icoHuge, .icoHuge i { 
+    font-size: 82px; 
+}
+.icoMssv, i.icoMssv, .icoMssv i { 
+    font-size: 120px; 
+}
 
 .responsive-video, .nPrompt .responsive-video {
     width: 100%;
@@ -86,9 +118,12 @@
     padding-bottom: 56.25%;
     padding-top: 60px; overflow: hidden;
 }
-iframe.responsive-video, .responsive-video iframe, .nPrompt .responsive-video iframe,
-object.responsive-video, .responsive-video object, .nPrompt .responsive-video object,
-embed.responsive-video, .responsive-video embed, .nPrompt .responsive-video embed {
+iframe.responsive-video, .responsive-video iframe, 
+.nPrompt .responsive-video iframe,
+object.responsive-video, .responsive-video object, 
+.nPrompt .responsive-video object,
+embed.responsive-video, .responsive-video embed, 
+.nPrompt .responsive-video embed {
     position: absolute;
     top: 0;
     left: 0;
@@ -105,17 +140,25 @@ embed.responsive-video, .responsive-video embed, .nPrompt .responsive-video embe
     height: 30px;
     text-align: center;
 }
-a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover,
-a.sliNavAct, .sliNavDiv a.sliNavAct, .sliNavDiv a.sliNavAct:link, .sliNavDiv a.sliNavAct:active, .sliNavDiv a.sliNavAct:visited, .sliNavDiv a.sliNavAct:hover {
+a.sliNav, .sliNavDiv a.sliNav, 
+.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, 
+.sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover,
+a.sliNavAct, .sliNavDiv a.sliNavAct, 
+.sliNavDiv a.sliNavAct:link, .sliNavDiv a.sliNavAct:active, 
+.sliNavDiv a.sliNavAct:visited, .sliNavDiv a.sliNavAct:hover {
     color: {!! $css["color-main-on"] !!};
     font-size: 12pt;
     margin: 5px;
 }
-a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover {
+a.sliNav, .sliNavDiv a.sliNav, 
+.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, 
+.sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover {
     opacity:0.33; filter:alpha(opacity=33);
 }
-.sliNavDiv a.sliLft:link, .sliNavDiv a.sliLft:active, .sliNavDiv a.sliLft:visited, .sliNavDiv a.sliLft:hover, 
-.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
+.sliNavDiv a.sliLft:link, .sliNavDiv a.sliLft:active, 
+.sliNavDiv a.sliLft:visited, .sliNavDiv a.sliLft:hover, 
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, 
+.sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
     width: 20%;
     height: 30px;
     padding: 0px;
@@ -125,16 +168,25 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
     float: left;
     text-align: left;
 }
-.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, 
+.sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
     float: right;
     text-align: right;
 }
-.sliNavDiv a.sliLft i, .sliNavDiv a.sliLft:link i, .sliNavDiv a.sliLft:active i, .sliNavDiv a.sliLft:visited i, .sliNavDiv a.sliLft:hover i, 
-.sliNavDiv a.sliRgt i, .sliNavDiv a.sliRgt:link i, .sliNavDiv a.sliRgt:active i, .sliNavDiv a.sliRgt:visited i, .sliNavDiv a.sliRgt:hover i {
+.sliNavDiv a.sliLft i, 
+.sliNavDiv a.sliLft:link i, .sliNavDiv a.sliLft:active i, 
+.sliNavDiv a.sliLft:visited i, .sliNavDiv a.sliLft:hover i, 
+.sliNavDiv a.sliRgt i, 
+.sliNavDiv a.sliRgt:link i, .sliNavDiv a.sliRgt:active i, 
+.sliNavDiv a.sliRgt:visited i, .sliNavDiv a.sliRgt:hover i {
     margin: 10px;
 }
-.sliNavDiv a.sliLft div, .sliNavDiv a.sliLft:link div, .sliNavDiv a.sliLft:active div, .sliNavDiv a.sliLft:visited div, .sliNavDiv a.sliLft:hover div, 
-.sliNavDiv a.sliRgt div, .sliNavDiv a.sliRgt:link div, .sliNavDiv a.sliRgt:active div, .sliNavDiv a.sliRgt:visited div, .sliNavDiv a.sliRgt:hover div {
+.sliNavDiv a.sliLft div, 
+.sliNavDiv a.sliLft:link div, .sliNavDiv a.sliLft:active div, 
+.sliNavDiv a.sliLft:visited div, .sliNavDiv a.sliLft:hover div, 
+.sliNavDiv a.sliRgt div, 
+.sliNavDiv a.sliRgt:link div, .sliNavDiv a.sliRgt:active div, 
+.sliNavDiv a.sliRgt:visited div, .sliNavDiv a.sliRgt:hover div {
     display: block;
     width: 100%;
     height: 1px;
@@ -189,7 +241,8 @@ a.sliNav, .sliNavDiv a.sliNav, .sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:act
 .slAccord, .slAccordBig {
     min-height: 56px;
 }
-.slAccord div fL, .slAccord div fR, .slAccordBig div fL, .slAccordBig div fR {
+.slAccord div fL, .slAccord div fR, 
+.slAccordBig div fL, .slAccordBig div fR {
     height: 56px;
     padding-top: 15px;
 }

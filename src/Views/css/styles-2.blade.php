@@ -66,34 +66,79 @@ body, p, .slTxt {
     max-width: 730px;
 }
 
-{!! view('vendor.survloop.css.styles-2-debug', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-debug', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-navbar', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-navbar', 
+    [ "css" => $css ]
+    )->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-prog-bar', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-prog-bar', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-social', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-social', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-node-forms', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-node-forms', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-reports', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-reports', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-elements', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-elements', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-tree-print', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-tree-print', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-tables', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-tables', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-bootstrap', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-bootstrap', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-admin', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-admin', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-utils', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-utils', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-other-overs', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-other-overs', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-colors', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-colors', 
+    [ "css" => $css ]
+)->render() !!}
 
-{!! view('vendor.survloop.css.styles-2-responsive', [ "css" => $css ])->render() !!}
+{!! view(
+    'vendor.survloop.css.styles-2-responsive', 
+    [ "css" => $css ]
+)->render() !!}
 
 {!! $css["raw"] !!}

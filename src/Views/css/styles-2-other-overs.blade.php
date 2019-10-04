@@ -1,5 +1,13 @@
 /* generated from resources/views/vendor/survloop/css/styles-2-other-overs.blade.php */
 
+#passStrng {
+    position: absolute;
+    right: 10px;
+    top: 27px;
+    font-size: 80%;
+    font-style: italic;
+}
+
 .card {
     background-color: {!! $css["color-main-faintr"] !!};
     background: {!! $css["color-main-faintr"] !!};
@@ -8,12 +16,13 @@
     background-image: none;
     background-color: {!! $css["color-info-on"] !!};
 }
-.card > .card-header, .card > .card-header h1, .card > .card-header h2, .card > .card-header h3, 
-.card > .card-header h4, .card > .card-header h5, .card > .card-header h6 {
+.card > .card-header, .card > .card-header h1, .card > .card-header h2, 
+.card > .card-header h3, .card > .card-header h4, 
+.card > .card-header h5, .card > .card-header h6 {
     color: {!! $css["color-main-bg"] !!};
 }
 
-/* Pagination styling */ 
+/* Pagination styling (Bootstrap Overrides) */ 
 .pagination { display: inline-block; padding-right: 0; margin: 10px 0; border-radius: 4px; } 
 .pagination>li { display: inline } 
 .pagination>li>a, .pagination>li>span { position: relative; float: left; padding: 6px 12px; line-height: 1.428571429; text-decoration: none; color: #333333; background-color: {!! $css["color-main-bg"] !!}; border: 1px solid {!! $css["color-main-faint"] !!}; } 
@@ -28,12 +37,4 @@
 .pagination-sm>li>a, .pagination-sm>li>span { padding: 5px 10px; font-size: 12px } 
 .pagination-sm>li:first-child>a, .pagination-sm>li:first-child>span { border-bottom-right-radius: 3px; border-top-rightt-radius: 3px; } 
 .pagination-sm>li:last-child>a, .pagination-sm>li:last-child>span { border-bottom-left-radius: 3px; border-top-left-radius: 3px; }
-
-#passStrng {
-    position: absolute;
-    right: 10px;
-    top: 27px;
-    font-size: 80%;
-    font-style: italic;
-}
 

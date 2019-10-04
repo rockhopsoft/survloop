@@ -21,7 +21,11 @@ class Geographs extends GeographyLookups
     protected $kmlMarkers = '';
     
     protected $custCenter = false;
-    protected $mapCenter  = [ 38.5, -97, 4 ]; // initial loading (lat, lng, zoom)
+    protected $mapCenter  = [
+        38.5, // lat
+        -97,  // lng
+        4     // zoom
+    ];
     
     protected $kmlPath    = '../storage/app/gen-kml';
     

@@ -8,7 +8,8 @@
 	-moz-border-radius: 20px; border-radius: 20px;
 }
 
-table.repDeetsBlock, .slReport table.repDeetsBlock, table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
+table.repDeetsBlock, .slReport table.repDeetsBlock, 
+table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
 	width: 100%;
     margin-bottom: 15px;
 }
@@ -20,14 +21,19 @@ table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     width: 50%;
     border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
 }
-table.repDeetsBlock tr td span, table.repDeetsBlock tr td div span, 
-.slReport table.repDeetsBlock tr td span, .slReport table.repDeetsBlock tr td div span, 
-.slReport table.repDeetsBlock tr td span a.hidivBtn:link, .slReport table.repDeetsBlock tr td span a.hidivBtn:visited, 
-.slReport table.repDeetsBlock tr td span a.hidivBtn:active, .slReport table.repDeetsBlock tr td span a.hidivBtn:hover {
+table.repDeetsBlock tr td span, 
+table.repDeetsBlock tr td div span, 
+.slReport table.repDeetsBlock tr td span, 
+.slReport table.repDeetsBlock tr td div span, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:link, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:visited, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:active, 
+.slReport table.repDeetsBlock tr td span a.hidivBtn:hover {
 	color: {!! $css["color-main-grey"] !!};
 }
 
-.dontBreakOut, table.repDeetsBlock tr td, table.repDeetsBlock tr th {
+.dontBreakOut, 
+table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     overflow-wrap: break-word;
     word-wrap: break-word;
     /*
@@ -48,28 +54,33 @@ table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv {
     top: 2px;
     left: 0px;
 }
-.vertPrgDone, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
-.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
+.vertPrgDone, .vertPrgFutr, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
     margin: 6px 5px 9px 1px;
 	background: {!! $css["color-main-on"] !!};
 }
-.vertPrgCurr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr {
+.vertPrgCurr, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr {
     margin: 5px 4px 8px 0px;
 	border: 3px {!! $css["color-main-on"] !!} solid;
 }
-.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
+.vertPrgFutr, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
     opacity:0.20; filter:alpha(opacity=20);
 }
-.vertPrgDone, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
-.vertPrgDone img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone img,
-.vertPrgFutr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr,
-.vertPrgFutr img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr img {
+.vertPrgDone, .vertPrgDone img, .vertPrgFutr, .vertPrgFutr img, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone img,
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr,
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr img {
     width: 8px;
     height: 8px;
 	-moz-border-radius: 4px; border-radius: 4px;
 }
-.vertPrgCurr, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr, 
-.vertPrgCurr img, table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr img {
+.vertPrgCurr, .vertPrgCurr img, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr, 
+table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr img {
     width: 10px;
     height: 10px;
 	-moz-border-radius: 5px; border-radius: 5px;

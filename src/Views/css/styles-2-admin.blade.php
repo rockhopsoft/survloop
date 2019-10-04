@@ -1,27 +1,35 @@
 /* generated from resources/views/vendor/survloop/css/styles-2-admin.blade.php */
 
-.admMenu a:link, .admMenu a:visited, .admMenu a:active, .admMenu a:link {
+.admMenu a:link, .admMenu a:visited, 
+.admMenu a:active, .admMenu a:link {
     display: block;
 }
-.admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, .admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover {
+.admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, 
+.admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-text"] !!};
     padding: 16px 5px 17px 9px;
     font-weight: bold;
     min-height: 56px;
 }
-.admMenu a.active:link, .admMenu a.active:visited, .admMenu a.active:active, .admMenu a.active:hover,
-.admMenu div a.active:link, .admMenu div a.active:visited, .admMenu div a.active:active, .admMenu div a.active:hover {
+.admMenu a.active:link, .admMenu a.active:visited, 
+.admMenu a.active:active, .admMenu a.active:hover,
+.admMenu div a.active:link, .admMenu div a.active:visited, 
+.admMenu div a.active:active, .admMenu div a.active:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-link"] !!};
     padding: 16px 5px 17px 9px;
     font-weight: bold;
 }
-.admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, .admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
+.admMenuIco, .admMenu .admMenuIco, .admMenu div a .admMenuIco, 
+.admMenu div a:link .admMenuIco, .admMenu div a:visited .admMenuIco, 
+.admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
 }
-.admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, .admMenu div a .admMenuIco.pull-left, 
-.admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, .admMenu div a:active .admMenuIco.pull-left, .admMenu div a:hover .admMenuIco.pull-left {
+.admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, 
+.admMenu div a .admMenuIco.pull-left, 
+.admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, .admMenu div a:active .admMenuIco.pull-left, 
+.admMenu div a:hover .admMenuIco.pull-left {
     display: block;
     width: 40px;
     margin: -3px 0px 0px 12px;
@@ -31,15 +39,23 @@
     height: 42px;
     max-height: 42px;
 }
-.admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
-.admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, .admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover,
-.admMenuTier2 a:link, .admMenuTier2 a:visited, .admMenuTier2 a:active, .admMenuTier2 a:hover,
-.admMenu .admMenuTier2 a.admMenuTier2Lnk:link, .admMenu .admMenuTier2 a.admMenuTier2Lnk:visited, .admMenu .admMenuTier2 a.admMenuTier2Lnk:active, .admMenu .admMenuTier2 a.admMenuTier2Lnk:hover {
+.admMenuTier2 a:link, .admMenuTier2 a:visited, 
+.admMenuTier2 a:active, .admMenuTier2 a:hover,
+.admMenu .admMenuTier2 a:link, .admMenu .admMenuTier2 a:visited, 
+.admMenu .admMenuTier2 a:active, .admMenu .admMenuTier2 a:hover,
+.admMenuTier2 a:link, .admMenuTier2 a:visited, 
+.admMenuTier2 a:active, .admMenuTier2 a:hover,
+.admMenu .admMenuTier2 a.admMenuTier2Lnk:link, 
+.admMenu .admMenuTier2 a.admMenuTier2Lnk:visited, 
+.admMenu .admMenuTier2 a.admMenuTier2Lnk:active, 
+.admMenu .admMenuTier2 a.admMenuTier2Lnk:hover {
     padding: 10px 5px 10px 62px;
     font-weight: normal;
 }
-a.tier2active:link, a.tier2active:visited, a.tier2active:active, a.tier2active:hover,
-.admMenuTier2 a.tier2active:link, .admMenuTier2 a.tier2active:visited, .admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover {
+a.tier2active:link, a.tier2active:visited, 
+a.tier2active:active, a.tier2active:hover,
+.admMenuTier2 a.tier2active:link, .admMenuTier2 a.tier2active:visited, 
+.admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover {
     color: {!! $css["color-main-link"] !!};
     background: {!! $css["color-main-faint"] !!};
     height: 33px;
@@ -174,7 +190,8 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTie
     display: block;
     width: 100%;
 }
-.leftSideCollapse, .leftSideCollapse #leftSideWdth, .leftSideCollapse #leftSideWrap {
+.leftSideCollapse, .leftSideCollapse #leftSideWdth, 
+.leftSideCollapse #leftSideWrap {
     width: 60px;
 }
 .admMenuLbl {

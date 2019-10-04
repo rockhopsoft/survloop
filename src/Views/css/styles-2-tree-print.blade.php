@@ -22,11 +22,23 @@
 .basicTier0, .basicTier0.basicTierBranch {
 	border: 2px {!! $css["color-success-on"] !!} dashed;
 }
-.basicTierBranch, .basicTier1.basicTierBranch, .basicTier2.basicTierBranch, .basicTier3.basicTierBranch, .basicTier4.basicTierBranch, .basicTier5.basicTierBranch, .basicTier6.basicTierBranch, .basicTier7.basicTierBranch, .basicTier8.basicTierBranch {
+.basicTierBranch, .basicTier1.basicTierBranch, 
+.basicTier2.basicTierBranch, .basicTier3.basicTierBranch, 
+.basicTier4.basicTierBranch, .basicTier5.basicTierBranch, 
+.basicTier6.basicTierBranch, .basicTier7.basicTierBranch, 
+.basicTier8.basicTierBranch {
 	border: 1px {!! $css["color-main-grey"] !!} dashed;
 }
-.basicTierPage, .basicTier1.basicTierPage, .basicTier2.basicTierPage, .basicTier3.basicTierPage, .basicTier4.basicTierPage, .basicTier5.basicTierPage, .basicTier6.basicTierPage, .basicTier7.basicTierPage, .basicTier8.basicTierPage,
-.basicTierLoop, .basicTier1.basicTierLoop, .basicTier2.basicTierLoop, .basicTier3.basicTierLoop, .basicTier4.basicTierLoop, .basicTier5.basicTierLoop, .basicTier6.basicTierLoop, .basicTier7.basicTierLoop, .basicTier8.basicTierLoop {
+.basicTierPage, .basicTier1.basicTierPage, 
+.basicTier2.basicTierPage, .basicTier3.basicTierPage, 
+.basicTier4.basicTierPage, .basicTier5.basicTierPage, 
+.basicTier6.basicTierPage, .basicTier7.basicTierPage, 
+.basicTier8.basicTierPage,
+.basicTierLoop, .basicTier1.basicTierLoop, 
+.basicTier2.basicTierLoop, .basicTier3.basicTierLoop, 
+.basicTier4.basicTierLoop, .basicTier5.basicTierLoop, 
+.basicTier6.basicTierLoop, .basicTier7.basicTierLoop, 
+.basicTier8.basicTierLoop {
 	border: 4px {!! $css["color-info-on"] !!} double;
 	background: {!! $css["color-main-bg"] !!};
 	margin: 15px 5px 15px 5px;
@@ -35,13 +47,25 @@
 .basicTierLoop, .basicTier0.basicTierBranch, .basicTier0.basicTierBranch.basicTierData {
 	border: 4px {!! $css["color-main-on"] !!} dotted;
 }
-.basicTierData, .basicTier1.basicTierData, .basicTier2.basicTierData, .basicTier3.basicTierData, .basicTier4.basicTierData, .basicTier5.basicTierData, .basicTier6.basicTierData, .basicTier7.basicTierData, .basicTier8.basicTierData {
+.basicTierData, .basicTier1.basicTierData, 
+.basicTier2.basicTierData, .basicTier3.basicTierData, 
+.basicTier4.basicTierData, .basicTier5.basicTierData, 
+.basicTier6.basicTierData, .basicTier7.basicTierData, 
+.basicTier8.basicTierData {
 	border-right: 2px {!! $css["color-success-on"] !!} dashed;
 }
-.basicTierLoop.basicTierData, .basicTier1.basicTierLoop.basicTierData, .basicTier2.basicTierLoop.basicTierData, .basicTier3.basicTierLoop.basicTierData, .basicTier4.basicTierLoop.basicTierData, .basicTier5.basicTierLoop.basicTierData {
+.basicTierLoop.basicTierData, 
+.basicTier1.basicTierLoop.basicTierData, 
+.basicTier2.basicTierLoop.basicTierData, 
+.basicTier3.basicTierLoop.basicTierData, 
+.basicTier4.basicTierLoop.basicTierData, 
+.basicTier5.basicTierLoop.basicTierData {
 	border-right: 2px {!! $css["color-success-on"] !!} dashed;
 }
-.basicTier1.slCard, .basicTier2.slCard, .basicTier3.slCard, .basicTier4.slCard, .basicTier5.slCard, .basicTier6.slCard, .basicTier7.slCard, .basicTier8.slCard {
+.basicTier1.slCard, .basicTier2.slCard, 
+.basicTier3.slCard, .basicTier4.slCard, 
+.basicTier5.slCard, .basicTier6.slCard, 
+.basicTier7.slCard, .basicTier8.slCard {
     border: 0px none;
     padding: 10px 5px;
     margin-right: 5px;
@@ -52,11 +76,16 @@
     opacity:0.25; filter:alpha(opacity=25);
 }
 
-.circleBtn, a.circleBtn:link, a.circleBtn:active, a.circleBtn:visited, a.circleBtn:hover,
-.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover,
-.circleBtn1, a.circleBtn1:link, a.circleBtn1:active, a.circleBtn1:visited, a.circleBtn1:hover,
-.circleBtn2, a.circleBtn2:link, a.circleBtn2:active, a.circleBtn2:visited, a.circleBtn2:hover,
-.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
+.circleBtn, a.circleBtn:link, a.circleBtn:active, 
+a.circleBtn:visited, a.circleBtn:hover,
+.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, 
+a.circleBtn0:visited, a.circleBtn0:hover,
+.circleBtn1, a.circleBtn1:link, a.circleBtn1:active, 
+a.circleBtn1:visited, a.circleBtn1:hover,
+.circleBtn2, a.circleBtn2:link, a.circleBtn2:active, 
+a.circleBtn2:visited, a.circleBtn2:hover,
+.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, 
+a.circleBtn3:visited, a.circleBtn3:hover {
     display: block;
 	text-align: center;
 	width: 20px;
@@ -69,17 +98,20 @@
 	background: {!! $css["color-main-on"] !!};
     opacity:0.25; filter:alpha(opacity=25);
 }
-a.circleBtn:hover, a.circleBtn0:hover, a.circleBtn1:hover, a.circleBtn2:hover, a.circleBtn3:hover {
+a.circleBtn:hover, a.circleBtn0:hover, a.circleBtn1:hover, 
+a.circleBtn2:hover, a.circleBtn3:hover {
 	background: {!! $css["color-main-on"] !!};
     opacity:1.00; filter:alpha(opacity=100);
 }
-.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, a.circleBtn0:visited, a.circleBtn0:hover {
+.circleBtn0, a.circleBtn0:link, a.circleBtn0:active, 
+a.circleBtn0:visited, a.circleBtn0:hover {
 	background: {!! $css["color-info-on"] !!};
 }
 a.circleBtn0:hover {
 	background: {!! $css["color-info-on"] !!};
 }
-.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, a.circleBtn3:visited, a.circleBtn3:hover {
+.circleBtn3, a.circleBtn3:link, a.circleBtn3:active, 
+a.circleBtn3:visited, a.circleBtn3:hover {
 	background: {!! $css["color-success-on"] !!};
 }
 a.circleBtn3:hover {

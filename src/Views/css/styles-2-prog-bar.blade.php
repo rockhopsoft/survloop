@@ -47,10 +47,14 @@ a.navDeskMin:link, a.navDeskMin:visited, a.navDeskMin:active, a.navDeskMin:hover
     cursor: not-allowed;
     color: {!! $css["color-main-grey"] !!};
 }
-a.navDeskMaj.active:link, a.navDeskMaj.active:visited, a.navDeskMaj.active:active, a.navDeskMaj.active:hover,
-a.navDeskMaj.completed:link, a.navDeskMaj.completed:visited, a.navDeskMaj.completed:active, a.navDeskMaj.completed:hover,
-a.navDeskMin.active:link, a.navDeskMin.active:visited, a.navDeskMin.active:active, a.navDeskMin.active:hover,
-a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.completed:active, a.navDeskMin.completed:hover {
+a.navDeskMaj.active:link, a.navDeskMaj.active:visited, 
+a.navDeskMaj.active:active, a.navDeskMaj.active:hover,
+a.navDeskMaj.completed:link, a.navDeskMaj.completed:visited, 
+a.navDeskMaj.completed:active, a.navDeskMaj.completed:hover,
+a.navDeskMin.active:link, a.navDeskMin.active:visited, 
+a.navDeskMin.active:active, a.navDeskMin.active:hover,
+a.navDeskMin.completed:link, a.navDeskMin.completed:visited, 
+a.navDeskMin.completed:active, a.navDeskMin.completed:hover {
     cursor: pointer;
     color: {!! $css["color-main-link"] !!};
 }
@@ -63,9 +67,12 @@ a.navDeskMin.completed:link, a.navDeskMin.completed:visited, a.navDeskMin.comple
     -moz-border-radius: 20px; border-radius: 20px;
 }
 
-a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover,
-a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActive:hover,
-a.navMobDone:link, a.navMobDone:active, a.navMobDone:visited, a.navMobDone:hover {
+a.navMobOff:link, a.navMobOff:active, 
+a.navMobOff:visited, a.navMobOff:hover,
+a.navMobActive:link, a.navMobActive:active, 
+a.navMobActive:visited, a.navMobActive:hover,
+a.navMobDone:link, a.navMobDone:active, 
+a.navMobDone:visited, a.navMobDone:hover {
 	display: block;
 	font-size: 12pt;
 	line-height: 10px;
@@ -75,13 +82,15 @@ a.navMobDone:link, a.navMobDone:active, a.navMobDone:visited, a.navMobDone:hover
 	-moz-border-radius: 20px; border-radius: 20px;
 	border: 1px {!! $css["color-main-on"] !!} solid;
 }
-a.navMobOff:link, a.navMobOff:active, a.navMobOff:visited, a.navMobOff:hover {
+a.navMobOff:link, a.navMobOff:active, 
+a.navMobOff:visited, a.navMobOff:hover {
 	color: {!! $css["color-main-on"] !!};
 	border: 1px {!! $css["color-main-faint"] !!} solid;
 	pointer-events: none;
 	text-decoration: none;
 }
-a.navMobActive:link, a.navMobActive:active, a.navMobActive:visited, a.navMobActive:hover {
+a.navMobActive:link, a.navMobActive:active, 
+a.navMobActive:visited, a.navMobActive:hover {
 	color: {!! $css["color-main-bg"] !!};
 	background: {!! $css["color-main-on"] !!};
 }

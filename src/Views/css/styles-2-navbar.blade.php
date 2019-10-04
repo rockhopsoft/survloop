@@ -6,7 +6,8 @@
     width: 100%;
 	background: {!! $css["color-nav-bg"] !!};
 }
-#mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, #myNavBar, #myNavBar .navbar {
+#mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, 
+#myNavBar, #myNavBar .navbar {
     height: 56px;
 	min-height: 56px;
 	max-height: 56px;
@@ -123,10 +124,12 @@
     z-index: 80;
     width: 340px;
 }
-#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, #admSrchFld a:active, #admSrchFld a:hover {
+#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, 
+#admSrchFld a:active, #admSrchFld a:hover {
     color: {!! $css["color-main-bg"] !!};
 }
-#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, #admSrchFld::-ms-input-placeholder {
+#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, 
+#admSrchFld::-ms-input-placeholder {
     color: {!! $css["color-main-bg"] !!};
 }
 #hidivSearchOpts {
@@ -198,8 +201,11 @@
     padding-top: 10px;
 }
 
-a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
-.slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
+a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, 
+a.slNavLnk:visited, a.slNavLnk:hover, 
+.slNavRight a, 
+.slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
+.slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
     display: block;
     padding: 15px 15px;
     margin-right: 10px;
@@ -215,7 +221,8 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
 #slNavMain .card-body, #slNavMain div .card .card-body .list-group {
     margin: 0px;
 }
-.list-group-item.completed, .list-group-item.completed:hover, .list-group-item.completed:focus {
+.list-group-item.completed, .list-group-item.completed:hover, 
+.list-group-item.completed:focus {
     z-index: 2;
     color: {!! $css["color-main-text"] !!};
     background-color: {!! $css["color-main-faint"] !!};
@@ -249,7 +256,8 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     height: auto;
     width: 100%;
 }
-.slPrint #slLogo, .slPrint #slLogo.w100, .slPrint #slLogoImg, .slPrint #slLogoImg.w100 {
+.slPrint #slLogo, .slPrint #slLogo.w100, 
+.slPrint #slLogoImg, .slPrint #slLogoImg.w100 {
     height: 100px;
     width: auto;
 }
@@ -291,7 +299,8 @@ a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:h
     margin-right: -2px;
 }
 
-a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-brand:hover {
+a.navbar-brand:link, a.navbar-brand:visited, 
+a.navbar-brand:active, a.navbar-brand:hover {
 	color: {!! $css["color-nav-text"] !!};
 }
 
@@ -316,7 +325,8 @@ a.navbar-brand:link, a.navbar-brand:visited, a.navbar-brand:active, a.navbar-bra
     max-width: 36px;
     overflow: hidden;
 }
-#userMenuBtnAvatar img, #userMenuBtnWrp #userMenuBtnAvatar img {
+#userMenuBtnAvatar img, 
+#userMenuBtnWrp #userMenuBtnAvatar img {
     border: 0px none;
     width: 34px;
     min-width: 34px;

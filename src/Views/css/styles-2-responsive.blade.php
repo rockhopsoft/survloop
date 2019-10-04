@@ -20,10 +20,12 @@
         width: 240px;
     }
 	
-    a#menuColpsBtn:link, a#menuColpsBtn:visited, a#menuColpsBtn:active, a#menuColpsBtn:hover {
+    a#menuColpsBtn:link, a#menuColpsBtn:visited, 
+    a#menuColpsBtn:active, a#menuColpsBtn:hover {
         display: none;
     }
-    a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
+    a#menuUnColpsBtn:link, a#menuUnColpsBtn:visited, 
+    a#menuUnColpsBtn:active, a#menuUnColpsBtn:hover {
 	    display: block;
 	}
     #leftSideWdth {
@@ -50,8 +52,11 @@
     #userMenuBtnName {
         display: none;
     }
-    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
-    .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
+    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, 
+    a.slNavLnk:visited, a.slNavLnk:hover, 
+    .slNavRight a, 
+    .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
+    .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
         padding: 15px 5px;
     }
     #userMenuBtnAvatar, #userMenuBtnWrp #userMenuBtnAvatar {
@@ -77,8 +82,10 @@
         margin-top: -2px;
         margin-left: -5px;
     }
-    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
-    .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
+    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, 
+    a.slNavLnk:visited, a.slNavLnk:hover, 
+    .slNavRight a, 
+    .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
     .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
         margin-right: 7px;
     }
@@ -99,7 +106,8 @@
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { 
         font-size: 14px; 
     }
-    input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
+    input.otherFld, input.form-control.otherFld, 
+    label input.otherFld, label input.form-control.otherFld {
         width: 270px;
     }
     .glossaryList .col-10 { padding-top: 0px; margin-top: -5px; }
@@ -113,43 +121,78 @@
 	    margin-top: -9px 0px -9px -5px;
 	}
 
-    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, a.slNavLnk:visited, a.slNavLnk:hover, 
-    .slNavRight a, .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
+    a.slNavLnk, a.slNavLnk:link, a.slNavLnk:active, 
+    a.slNavLnk:visited, a.slNavLnk:hover, 
+    .slNavRight a, 
+    .slNavRight a.slNavLnk:link, .slNavRight a.slNavLnk:active, 
+    .slNavRight a.slNavLnk:visited, .slNavRight a.slNavLnk:hover {
         padding: 15px 5px 15px 5px;
         margin-right: 5px;
     }
     
     table.slAdmTable tr td, table.slAdmTable tr th, 
-    table.slAdmTable tr td a:link, table.slAdmTable tr td a:active, table.slAdmTable tr td a:visited, table.slAdmTable tr td a:hover, 
-    table.slAdmTable tr th a:link, table.slAdmTable tr th a:active, table.slAdmTable tr th a:visited, table.slAdmTable tr th a:hover {
+    table.slAdmTable tr td a:link, table.slAdmTable tr td a:active, 
+    table.slAdmTable tr td a:visited, table.slAdmTable tr td a:hover,
+    table.slAdmTable tr th a:link, table.slAdmTable tr th a:active, 
+    table.slAdmTable tr th a:visited, table.slAdmTable tr th a:hover {
         font-size: 10pt;
     }
-    table.slAdmTable tr td.fPerc133, table.slAdmTable tr th.fPerc133, 
-    table.slAdmTable tr td a.fPerc133:link, table.slAdmTable tr td a.fPerc133:active, table.slAdmTable tr td a.fPerc133:visited, table.slAdmTable tr td a.fPerc133:hover, 
-    table.slAdmTable tr th a.fPerc133:link, table.slAdmTable tr th a.fPerc133:active, table.slAdmTable tr th a.fPerc133:visited, table.slAdmTable tr th a.fPerc133:hover {
+    table.slAdmTable tr td.fPerc133, 
+    table.slAdmTable tr th.fPerc133, 
+    table.slAdmTable tr td a.fPerc133:link, 
+    table.slAdmTable tr td a.fPerc133:active, 
+    table.slAdmTable tr td a.fPerc133:visited, 
+    table.slAdmTable tr td a.fPerc133:hover, 
+    table.slAdmTable tr th a.fPerc133:link, 
+    table.slAdmTable tr th a.fPerc133:active, 
+    table.slAdmTable tr th a.fPerc133:visited, 
+    table.slAdmTable tr th a.fPerc133:hover {
         font-size: 13pt;
     }
-    table.slAdmTable tr td.fPerc66, table.slAdmTable tr th.fPerc66, 
-    table.slAdmTable tr td a.fPerc66:link, table.slAdmTable tr td a.fPerc66:active, table.slAdmTable tr td a.fPerc66:visited, table.slAdmTable tr td a.fPerc66:hover, 
-    table.slAdmTable tr th a.fPerc66:link, table.slAdmTable tr th a.fPerc66:active, table.slAdmTable tr th a.fPerc66:visited, table.slAdmTable tr th a.fPerc66:hover {
+    table.slAdmTable tr td.fPerc66, 
+    table.slAdmTable tr th.fPerc66, 
+    table.slAdmTable tr td a.fPerc66:link, 
+    table.slAdmTable tr td a.fPerc66:active, 
+    table.slAdmTable tr td a.fPerc66:visited, 
+    table.slAdmTable tr td a.fPerc66:hover, 
+    table.slAdmTable tr th a.fPerc66:link, 
+    table.slAdmTable tr th a.fPerc66:active, 
+    table.slAdmTable tr th a.fPerc66:visited, 
+    table.slAdmTable tr th a.fPerc66:hover {
         font-size: 7pt;
     }
 
-	.nodeSub .btn-lg { font-size: 18pt; }
+	.nodeSub .btn-lg { 
+        font-size: 18pt; 
+    }
 	
-	.fixed, #fixedHeader.fixed { padding-top: 10px; top: 30px; }
-	.jumbotron { padding: 20px; }
+	.fixed, #fixedHeader.fixed {
+        padding-top: 10px; top: 30px; 
+    }
+	.jumbotron {
+        padding: 20px; 
+    }
 	
-	.unitFld { width: 70px; }
-    input.otherFld, input.form-control.otherFld, label input.otherFld, label input.form-control.otherFld {
+	.unitFld {
+        width: 70px; 
+    }
+    input.otherFld, input.form-control.otherFld, 
+    label input.otherFld, label input.form-control.otherFld {
         width: 100%;
     }
     
-    .nFld textarea.form-control-lg { font-size: 1rem; }
+    .nFld textarea.form-control-lg { 
+        font-size: 1rem; 
+    }
     
-    table.slSpreadTbl tr td.sprdFld input.form-control-lg, table.slSpreadTbl tr td.sprdFld select.form-control-lg { padding: 5px; }
-    table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
-        table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th {
+    table.slSpreadTbl tr td.sprdFld input.form-control-lg, 
+    table.slSpreadTbl tr td.sprdFld select.form-control-lg {
+        padding: 5px; 
+    }
+    table.slSpreadTbl tr td.sprdRowLab, 
+    table.slSpreadTbl tr th.sprdRowLab, 
+    table.slSpreadTbl tr th, 
+    .nFld table.slSpreadTbl tr th {
         padding: 12px 6px 0px 6px;
     }
 	
