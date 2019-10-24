@@ -86,7 +86,10 @@ function exitLoop(whichWay) {
 }
 
 function checkNodeForm() {
-    if (document.getElementById("stepID") && document.getElementById("stepID").value == "back") return true;
+    var stepID = document.getElementById("stepID");
+    if (stepID && stepID.value == "back") {
+        return true;
+    }
     hasAttemptedSubmit = true;
     totFormErrors = 0;
     formErrorsEng = "";
@@ -124,6 +127,9 @@ function checkNodeForm() {
             }
         }
     }
+    if (typeof reqFormFldCustom === "function") {
+        reqFormFldCustom();
+    }
     if (totFormErrors > 0) {
         setFormErrs();
         return false;
@@ -131,6 +137,22 @@ function checkNodeForm() {
     clearFormErrs();
     return true; 
 }
+
+/*
+// Client extension can include custom form 
+// validation scripts with a function like this...
+function reqFormFldCustom() {
+    var nIDtxt = '701';
+    var fld = document.getElementById('custFldID');
+    if (fld && fld.value.trim() == "") {
+        setFormLabelRed(nIDtxt);
+        totFormErrors++;
+        return 1;
+    }
+    setFormLabelBlack(nIDtxt);
+    return 0;
+}
+*/
 
 function checkForm() {
     if (!foundForm) {
@@ -513,7 +535,9 @@ function reqFormFldLesser(nIDtxt, max) {
 function reqFormFldRadio(nIDtxt, maxOpts) {
     var foundCheck = false;
     for (var j=0; j < maxOpts; j++) {
-        if (document.getElementById("n"+nIDtxt+"fld"+j+"") && document.getElementById("n"+nIDtxt+"fld"+j+"").checked) foundCheck = true;
+        if (document.getElementById("n"+nIDtxt+"fld"+j+"") && document.getElementById("n"+nIDtxt+"fld"+j+"").checked) {
+            foundCheck = true;
+        }
     }
     if (!foundCheck) {
         setFormLabelRed(nIDtxt);

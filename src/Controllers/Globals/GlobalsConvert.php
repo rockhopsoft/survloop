@@ -31,6 +31,11 @@ class GlobalsConvert
         }
         return $ret;
     }
+
+    public function mexplodeSize($delim, $str)
+    {
+        return sizeof($this->mexplode($delim, $str));
+    }
     
     public function wordLimitDotDotDot($str, $wordLimit = 50)
     {
@@ -51,7 +56,8 @@ class GlobalsConvert
         if (pow(10, $exponent) == 0 || pow(10, $sigFigs) == 0) {
             return $value;
         }
-        $significand = round(($value / pow(10, $exponent)) * pow(10, $sigFigs)) / pow(10, $sigFigs);
+        $significand = round(($value / pow(10, $exponent)) 
+            * pow(10, $sigFigs)) / pow(10, $sigFigs);
         return $significand * pow(10, $exponent);
     }
     
@@ -61,7 +67,8 @@ class GlobalsConvert
             return (($num < 10) ? '0' : '') . $num;
         }
         if ($sigFigs == 3) {
-            return (($num < 10) ? '00' : (($num < 100) ? '0' : '')) . $num;
+            return (($num < 10) ? '00' 
+                : (($num < 100) ? '0' : '')) . $num;
         }
         return $num;
     }
@@ -110,14 +117,16 @@ class GlobalsConvert
     
     public function stdizeChars($txt)
     {
-        return str_replace('“', '"', str_replace('”', '"', str_replace("’", "'", $txt)));
+        return str_replace('“', '"', str_replace('”', '"', 
+            str_replace("’", "'", $txt)));
     }
 
     public function humanFilesize($bytes, $decimals = 2) 
     {
         $sz = 'BKMGTP';
         $factor = floor((strlen($bytes) - 1) / 3);
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$sz[$factor];
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) 
+            . @$sz[$factor];
     }
     
     // Prints inches in feet and inches
@@ -173,8 +182,10 @@ class GlobalsConvert
                 return strtotime(substr($dateStr, 0, 10));
             } elseif (strpos($dateStr, '/') > 0) {
                 list($month, $day, $year) = explode('/', $dateStr);
-                if (intVal($month) > 0 && intVal($day) > 0 && intVal($year) > 0) {
-                    return strtotime($year . '-' . $month . '-' . $day . ' 00:00:00');
+                if (intVal($month) > 0 && intVal($day) > 0 
+                    && intVal($year) > 0) {
+                    return strtotime($year . '-' . $month 
+                        . '-' . $day . ' 00:00:00');
                 }
             }
         }
@@ -189,8 +200,9 @@ class GlobalsConvert
     
     public function printTimeZoneShiftStamp($time = 0, $hourShift = -5, $format = 'n/j g:ia')
     {
-        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time), date('s', $time), 
-            date('m', $time), date('d', $time), date('Y', $time));
+        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time), 
+            date('s', $time), date('m', $time), 
+            date('d', $time), date('Y', $time));
         return date($format, $newTime);
     }
     
@@ -234,7 +246,8 @@ class GlobalsConvert
         $arr = [];
         if (!is_array($str) && strpos($str, "rray\n") === 1) {
             if (strpos($str, '=>') !== false) {
-                $split = explode('=>', str_replace("\n", "", str_replace("\n)\n", "", $str)));
+                $split = explode('=>', str_replace("\n", "", 
+                    str_replace("\n)\n", "", $str)));
                 for ($i = 1; $i < sizeof($split); $i++) {
                     $val = trim(str_replace('[' . $i . ']', '', $split[$i]));
                     $arr[] = $val;
@@ -257,7 +270,8 @@ class GlobalsConvert
         $min = floor($sec/60);
         $m = ($min%60);
         $h = floor($min/60);
-        return (($h > 0) ? $h . ':' : '') . (($h > 0 && $m < 10) ? '0' : '') 
+        return (($h > 0) ? $h . ':' : '') 
+            . (($h > 0 && $m < 10) ? '0' : '') 
             . $m . ':' . (($s < 10) ? '0' : '') . $s;
     }
     
@@ -351,7 +365,8 @@ class GlobalsConvert
             if (sizeof($words) > 0) {
                 foreach ($words as $w) {
                     if (strlen($w) > 1) {
-                        $strOut .= substr($w, 0, 1) . strtolower(substr($w, 1)) . ' ';
+                        $strOut .= substr($w, 0, 1) 
+                            . strtolower(substr($w, 1)) . ' ';
                     }
                 }
             }
@@ -366,6 +381,11 @@ class GlobalsConvert
             return array_sum($array)/count($array);
         }
         return 0;
+    }
+
+    public function commaListAvg($commas = ',,')
+    {
+        return $this->arrAvg($this->mexplode(',', $commas));
     }
     
     public function arrStandardDeviation($dat = [])
@@ -383,33 +403,32 @@ class GlobalsConvert
     
     public function getArrPercentileStr($str, $val, $isGolf = false)
     {
-        return $this->getArrPercentile($this->mexplode(',', $str), $val, $isGolf);
+        return $this->getArrPercentile(
+            $this->mexplode(',', $str), 
+            $val, 
+            $isGolf
+        );
     }
     
     public function getArrPercentile($arr, $val, $isGolf = false)
     {
-        $pos = 0;
+        $ret = $pos = 0;
         $max = (($isGolf) ? 1000000000 : -1000000000);
         if (is_array($arr) && sizeof($arr) > 0) {
+            foreach ($arr as $i => $v) {
+                if (floatval($val) >= floatval($v) 
+                    && $max != $v) {
+                    $pos = $i;
+                    $max = $v;
+                }
+            }
             if ($isGolf) {
-                foreach ($arr as $i => $v) {
-                    if (floatval($val) >= floatval($v) && $max != $v) {
-                        $pos = $i;
-                        $max = $v;
-                    }
-                }
-                return ($pos/sizeof($arr))*100;
+                $ret = (1-($pos/sizeof($arr)))*100;
             } else { // higher value is better
-                foreach ($arr as $i => $v) {
-                    if (floatval($val) >= floatval($v) && $max != $v) {
-                        $pos = $i;
-                        $max = $v;
-                    }
-                }
-                return (1-($pos/sizeof($arr)))*100;
+                $ret = ($pos/sizeof($arr))*100;
             }
         }
-        return 0;
+        return $ret;
     }
     
     public function textSaferHtml($strIN)

@@ -65,10 +65,12 @@ class TreeSurvForm extends TreeSurvFormUtils
 
         if ($curr->isPage()) {
             $extraOpts = $this->swapIDsSEO($curr->extraOpts);
-            $GLOBALS['SL']->setSEO($this->swapLabels($nID . '', $extraOpts["meta-title"]), 
+            $GLOBALS['SL']->setSEO(
+                $this->swapLabels($nID . '', $extraOpts["meta-title"]), 
                 $this->swapLabels($nID . '', $extraOpts["meta-desc"]), 
                 $this->swapLabels($nID . '', $extraOpts["meta-keywords"]), 
-                $this->swapLabels($nID . '', $extraOpts["meta-img"]) );
+                $this->swapLabels($nID . '', $extraOpts["meta-img"])
+            );
         }
         
         // if ($currVisib == 1 && $curr->nodeType == 'Data Manip: New') $this->runDataManip($nID);
@@ -77,69 +79,110 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         $hasParManip = $this->hasParentDataManip($nID);
         
+        $nSffx = $GLOBALS["SL"]->getCycSffx();
+        $nIDtxt = trim($nID . $nSffx);
+
         if ($curr->isPage() || $curr->isLoopRoot()) {
-            // print the button, and form initialization which only happens once per page
-            // make sure these are reset, in case of redirect
+
+            $ret = $this->customNodePrint(
+                $nID, 
+                $tmpSubTier, 
+                $nIDtxt, 
+                $nSffx
+            );
+            if (!is_array($ret) && trim($ret) != '') {
+                return $ret;
+            }
+            // print the button, and form initialization 
+            // which only happens once per page make sure 
+            // these are reset, in case of redirect
             $this->pageJSvalid = $this->pageHasReqs = '';
-            $this->pageHasUpload = $this->pageFldList = $this->hideKidNodes = [];
+            $this->pageHasUpload = $this->pageFldList 
+                = $this->hideKidNodes = [];
             $this->runPageExtra($nID);
             $this->runPageLoad($nID);
             if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
-                $ret .= '<div id="pageTopGapID" class="pageTopGap"></div>';
+                $ret .= '<div id="pageTopGapID" '
+                    . 'class="pageTopGap"></div>';
             }
             if ($curr->isLoopRoot()) {
                 $ret .= ((isset($curr->nodeRow->NodePromptText) 
                         && trim($curr->nodeRow->NodePromptText) != '')
-                        ? '<div class="nPrompt">' . $curr->nodeRow->NodePromptText . '</div>' : '')
+                        ? '<div class="nPrompt">' 
+                            . $curr->nodeRow->NodePromptText . '</div>' 
+                        : '')
                     . $this->printSetLoopNav($nID, $curr->dataBranch);
             } else { // isPage()
-                if (sizeof($tmpSubTier[1]) > 0) {
-                    foreach ($tmpSubTier[1] as $childNode) { // recurse deez!..
+                if (sizeof($tmpSubTier[1]) > 0) { // recurse deez!..
+                    foreach ($tmpSubTier[1] as $childNode) { 
                         if (!$this->allNodes[$childNode[0]]->isPage()) {
-                            $ret .= $this->printNodePublic($childNode[0], $childNode, $currVisib);
+                            $ret .= $this->printNodePublic(
+                                $childNode[0], 
+                                $childNode, 
+                                $currVisib
+                            );
                         }
                     } 
                 }
             }
             if (intVal($curr->nodeRow->NodeCharLimit) > 0) {
                 $GLOBALS["SL"]->pageJAVA .= 'setTimeout("focusNodeID(' 
-                    . $curr->nodeRow->NodeCharLimit . ').focus()", 100);' . "\n";
-            } elseif (trim($this->page1stVisib) != '' && intVal($curr->nodeRow->NodeCharLimit) == 0) {
-                $GLOBALS["SL"]->pageJAVA .= 'setTimeout("if (document.getElementById(\''
-                    . $this->page1stVisib . '\')) document.getElementById(\'' . $this->page1stVisib 
+                    . $curr->nodeRow->NodeCharLimit 
+                    . ').focus()", 100);' . "\n";
+            } elseif (trim($this->page1stVisib) != '' 
+                && intVal($curr->nodeRow->NodeCharLimit) == 0) {
+                $GLOBALS["SL"]->pageJAVA .= 'setTimeout("'
+                    . 'if (document.getElementById(\''
+                    . $this->page1stVisib 
+                    . '\')) document.getElementById(\'' 
+                    . $this->page1stVisib 
                     . '\').focus()", 100);' . "\n";
             }
             return $this->printNodePublicFormStart($nID) . $ret 
                 . '<div id="pageBtns"><div id="formErrorMsg"></div>' 
-                . $this->nodePrintButton($nID, $tmpSubTier, '' /* $promptNotesSpecial */) . '</div>' 
-                . $this->printNodePublicFormEnd($nID, '' /* $promptNotesSpecial */)
-                . (($GLOBALS["SL"]->treeRow->TreeType != 'Page') ? '<div class="pageBotGap"></div>' : '');
+                . $this->nodePrintButton($nID, $tmpSubTier, ''
+                    /* $promptNotesSpecial */) . '</div>' 
+                . $this->printNodePublicFormEnd($nID, ''
+                    /* $promptNotesSpecial */)
+                . (($GLOBALS["SL"]->treeRow->TreeType != 'Page') 
+                    ? '<div class="pageBotGap"></div>' : '');
+
         } // else not Page or Loop Root
         
         $itemInd = $itemID = -3;
         if ($this->hasActiveParentCyc($nID, $tbl)) {
-            list($itemInd, $itemID) = $this->chkParentCycInds($nID, $tbl);
+            list($itemInd, $itemID) = $this
+                ->chkParentCycInds($nID, $tbl);
         } else { // default logic, not LoopCycle, not SpreadTable 
-            list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl, $hasParManip);
-            if ($itemInd < 0 && isset($GLOBALS["SL"]->closestLoop["loop"]) 
+            list($itemInd, $itemID) = $this->sessData
+                ->currSessDataPos($tbl, $hasParManip);
+            if ($itemInd < 0 
+                && isset($GLOBALS["SL"]->closestLoop["loop"]) 
                 && trim($GLOBALS["SL"]->closestLoop["loop"]) != '' 
                 && $tbl == $this->sessData->isCheckboxHelperTable($tbl)) {
-                // In this context, relevant item index is item's index with the loop, not table's whole data set
+                // In this context, relevant item index is item's 
+                // index with the loop, not table's whole data set
                 $itemInd = $this->sessData->getLoopIndFromID(
                     $GLOBALS["SL"]->closestLoop["loop"], 
                     $itemID
                 );
             }
         }
-        $currNodeSessData = $this->sessData
-            ->currSessData($nID, $tbl, $fld, 'get', '', $hasParManip, $itemInd, $itemID);
+        $currNodeSessData = $this->sessData->currSessData(
+            $nID, 
+            $tbl, 
+            $fld, 
+            'get', 
+            '', 
+            $hasParManip, 
+            $itemInd, 
+            $itemID
+        );
         //if ($itemID <= 0) $currNodeSessData = ''; // override false profit ;-P
-        if ($currNodeSessData == '' && trim($curr->nodeRow->NodeDefault) != '') {
+        if ($currNodeSessData == '' 
+            && trim($curr->nodeRow->NodeDefault) != '') {
             $currNodeSessData = $curr->nodeRow->NodeDefault;
         }
-        
-        $nSffx = $GLOBALS["SL"]->getCycSffx();
-        $nIDtxt = trim($nID . $nSffx);
         
         // check for extra custom PHP code stored with the node; check for standardized techniques
         $nodeOverrides = $this->printNodeSessDataOverride(
@@ -148,9 +191,11 @@ class TreeSurvForm extends TreeSurvFormUtils
             $nIDtxt, 
             $currNodeSessData
         );
-        if (is_array($nodeOverrides) && sizeof($nodeOverrides) > 1) {
+        if (is_array($nodeOverrides) 
+            && sizeof($nodeOverrides) > 1) {
             $currNodeSessData = $nodeOverrides;
-        } elseif (is_array($nodeOverrides) && sizeof($nodeOverrides) == 1 
+        } elseif (is_array($nodeOverrides) 
+            && sizeof($nodeOverrides) == 1 
             && isset($nodeOverrides[0])) {
             $currNodeSessData = $nodeOverrides[0];
         }
@@ -164,7 +209,8 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         $this->v["javaNodes"] .= 'nodeParents[' . $nID . '] = ' 
             . $curr->parentID . ';' . "\n" . (($nSffx != '') 
-                ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" : '');
+                ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" 
+                : '');
         $condKids = $showMoreNodes = [];
         if (sizeof($tmpSubTier[1]) > 0) {
             if ($curr->nodeType == 'Countries') {
@@ -178,7 +224,8 @@ class TreeSurvForm extends TreeSurvFormUtils
                     }
                 }
             }
-            if ($curr->hasShowKids && sizeof($curr->responses) > 0) { // displaying children on page is conditional
+            if ($curr->hasShowKids && sizeof($curr->responses) > 0) {
+                // displaying children on page is conditional
                 foreach ($curr->responses as $j => $res) {
                     if (intVal($res->NodeResShowKids) > 0) {
                         if (!isset($condKids[$res->NodeResShowKids])) {
@@ -191,24 +238,31 @@ class TreeSurvForm extends TreeSurvFormUtils
                     foreach ($condKids as $condNode => $condVals) {
                         $condHide = true;
                         foreach ($condVals as $cVal) {
-                            if ($this->isCurrDataSelected($currNodeSessData, $cVal, $curr)) {
+                            if ($this->isCurrDataSelected(
+                                $currNodeSessData, 
+                                $cVal, 
+                                $curr)) {
                                 $condHide = false;
                             }
                         }
                         if ($condHide) $this->hideKidNodes[] = $condNode;
                     }
                 }
-                $this->v["javaNodes"] .= 'conditionNodes[' . $nID . '] = true;' . "\n";
+                $this->v["javaNodes"] .= 'conditionNodes[' . $nID . '] = true;' 
+                    . "\n";
                 $typeList = [
-                    'Page Block', 'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap', 
-                    'Instructions', 'Instructions Raw', 'Layout Row', 'Gallery Slider'
+                    'Page Block', 'Data Manip: New', 'Data Manip: Update', 
+                    'Data Manip: Wrap', 'Instructions', 'Instructions Raw', 
+                    'Layout Row', 'Gallery Slider'
                 ];
                 $childList = [];
                 foreach ($tmpSubTier[1] as $childNode) {
                     $childList[] = $childNode[0];
-                    if (isset($this->kidMaps[$nID]) && sizeof($this->kidMaps[$nID]) > 0) {
+                    if (isset($this->kidMaps[$nID]) 
+                        && sizeof($this->kidMaps[$nID]) > 0) {
                         foreach ($this->kidMaps[$nID] as $nKid => $ress) {
-                            if ($nKid == $childNode[0] && sizeof($childNode[1]) > 0
+                            if ($nKid == $childNode[0] 
+                                && sizeof($childNode[1]) > 0
                                 && in_array($this->allNodes[$nKid]->nodeType, $typeList)) {
                                 foreach ($childNode[1] as $grandNode) {
                                     if (!isset($showMoreNodes[$childNode[0]])) {
@@ -445,7 +499,12 @@ class TreeSurvForm extends TreeSurvFormUtils
                     }
                     if ($printRow) {
                         $deetLabel = (($fldRow && isset($fldRow->FldEng)) ? $fldRow->FldEng : '');
-                        $deetLabel = $this->swapLabels($nIDtxt, $deetLabel, $itemID, $itemInd);
+                        $deetLabel = $this->swapLabels(
+                            $nIDtxt, 
+                            $deetLabel, 
+                            $itemID, 
+                            $itemInd
+                        );
                         
                         $deetVal = $GLOBALS["SL"]->printResponse(
                             $tbl, 
@@ -1080,7 +1139,8 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $ret .= '</div>' . "\n";
                     if ($curr->nodeType == 'Slider') {
                         $GLOBALS["SL"]->pageAJAX .= '$("#n' . $nIDtxt . 'slider").slider({ '
-                            . ((isset($curr->extraOpts["incr"]) && intVal($curr->extraOpts["incr"]) > 0) 
+                            . ((isset($curr->extraOpts["incr"]) 
+                                && intVal($curr->extraOpts["incr"]) > 0) 
                                 ? 'step: ' . $curr->extraOpts["incr"] . ', ' : '') 
                             . 'change: function( event, ui ) {
                             var newVal = $("#n' . $nIDtxt . 'slider").slider("value");
@@ -1098,17 +1158,20 @@ class TreeSurvForm extends TreeSurvFormUtils
                             || $curr->extraOpts["minVal"] === false)
                             && (!isset($curr->extraOpts["maxVal"]) 
                             || $curr->extraOpts["maxVal"] === false)) {
-                            $this->pageJSvalid .= "addReqNode('" . $nIDtxt . "', 'reqFormFld');\n";
+                            $this->pageJSvalid .= "addReqNode('" 
+                                . $nIDtxt . "', 'reqFormFld');\n";
                         } else {
                             if (isset($curr->extraOpts["minVal"]) 
                                 && $curr->extraOpts["minVal"] !== false) {
-                                $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt 
-                                    . "', 'reqFormFldGreater', " . $curr->extraOpts["minVal"] . ");\n";
+                                $this->pageJSvalid .= "addReqNodeRadio('" 
+                                    . $nIDtxt . "', 'reqFormFldGreater', " 
+                                    . $curr->extraOpts["minVal"] . ");\n";
                             }
                             if (isset($curr->extraOpts["maxVal"]) 
                                 && $curr->extraOpts["maxVal"] !== false) {
-                                $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt 
-                                    . "', 'reqFormFldLesser', " . $curr->extraOpts["maxVal"] . ");\n";
+                                $this->pageJSvalid .= "addReqNodeRadio('" 
+                                    . $nIDtxt . "', 'reqFormFldLesser', " 
+                                    . $curr->extraOpts["maxVal"] . ");\n";
                             }
                         }
                     }

@@ -21,10 +21,55 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        session()->put('loginRedir', $_SERVER["REQUEST_URI"]);
-        session()->put('loginRedirTime', time());
+        if (!$this->redirectIsBad($_SERVER["REQUEST_URI"])) {
+            session()->put('loginRedir', $_SERVER["REQUEST_URI"]);
+            session()->put('loginRedirTime', time());
+        }
         if (!$request->expectsJson()) {
             return route('login');
         }
     }
+
+    /**
+     * Check for pitfalls which are probably not the user's intent.
+     *
+     * @param  string  $redir
+     * @return boolean
+     */
+    protected function redirectIsBad($redir)
+    {
+        $badRedir = false;
+        $bads = [
+            '/css/', 
+            '/font/',
+            '/gen-kml/', 
+            '/sys/dyna/',
+            '/survloop/uploads/'
+        ];
+        foreach ($bads as $fold) {
+            if (strpos($redir, $fold) !== false) {
+                $badRedir = true;
+            }
+        }
+        $bads = [
+            '.js', 
+            '.css',
+            '.kml',
+            '.eot'
+        ];
+        $ext = $redir;
+        $pos = strpos($ext, '?');
+        if ($pos > 0) {
+            $ext = substr($ext, 0, $pos);
+        }
+        $pos = strrpos($ext, '.');
+        if ($pos > 0) {
+            $ext = substr($ext, $pos);
+        }
+        if (in_array($ext, $bads)) {
+            $badRedir = true;
+        }
+        return $badRedir;
+    }
+
 }

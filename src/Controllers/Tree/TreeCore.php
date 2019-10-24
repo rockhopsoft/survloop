@@ -50,6 +50,11 @@ class TreeCore extends SurvLoopController
         return ( $nID > 0 && isset($this->allNodes[$nID]) );
     }
     
+    /**
+     * Override current page as represented in the admin menu.
+     *
+     * @return string
+     */
     public function initAdmMenuExtras()
     {
         return '';

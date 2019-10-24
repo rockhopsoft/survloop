@@ -43,8 +43,12 @@ class AdminCoreController extends SurvLoopController
             if (trim($perms) == '') {
                 $perms = 'administrator|staff|databaser|brancher|partner|volunteer';
             }
-            if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole($perms)) {
-                echo view('vendor.survloop.js.inc-redirect-home', $this->v)->render();
+            if ($this->v["uID"] <= 0 
+                || !$this->v["user"]->hasRole($perms)) {
+                echo view(
+                    'vendor.survloop.js.inc-redirect-home', 
+                    $this->v
+                )->render();
                 exit;
             }
             $this->survSysChecks();
@@ -73,27 +77,32 @@ class AdminCoreController extends SurvLoopController
             "currNavPos" => []
         ];
         $admMenu = null;
-        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
-            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-            $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
-                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "AdminMenu";
-            if (class_exists($custClass)) {
-                eval("\$admMenu = new " . $custClass . ";");
+        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"])) {
+            $abbr = $GLOBALS["SL"]->sysOpts["cust-abbr"];
+            if ($abbr != 'SurvLoop') {
+                $custClass = $abbr . "\\Controllers\\" 
+                    . $abbr . "AdminMenu";
+                if (class_exists($custClass)) {
+                    eval("\$admMenu = new " . $custClass . ";");
+                }
             }
         }
         if (!$admMenu) {
             $admMenu = new AdminMenu;
         }
         if ($admMenu) {
-            $this->admMenuData["adminNav"] 
-                = $admMenu->loadAdmMenu($this->v["user"], $currPage);
+            $this->admMenuData["adminNav"] = $admMenu
+                ->loadAdmMenu($this->v["user"], $currPage);
         }
         $this->tweakAdmMenu($currPage);
-        if (!$this->getAdmMenuLoc($currPage) && $currPage != '') {
+        if (!$this->getAdmMenuLoc($currPage) 
+            && $currPage != '') {
             $this->getAdmMenuLoc($currPage);
         }
-        return view('vendor.survloop.admin.admin-menu', $this->admMenuData)
-            ->render();
+        return view(
+            'vendor.survloop.admin.admin-menu', 
+            $this->admMenuData
+        )->render();
     }
     
     protected function getAdmMenuTopTabs()
@@ -103,16 +112,17 @@ class AdminCoreController extends SurvLoopController
             $this->admMenuData
         )->render();
         if (trim($tabs) == '') {
-            return '<div class="w100" style="margin-bottom: 15px;"> </div>';
+            return '<div class="w100 mB15"> </div>';
         }
-        $tabs = '<div id="slTopTabsWrap" class="slTopTabs"><div class="container">'
-            . $tabs . '</div></div>';
+        $tabs = '<div id="slTopTabsWrap" class="slTopTabs">'
+            . $tabs . '</div>';
         $subTabs = view(
             'vendor.survloop.admin.admin-menu-tabs-sub', 
             $this->admMenuData
         )->render();
         if (trim($subTabs) != '') {
-            $tabs .= '<div class="slTopTabsSub">' . $subTabs . '</div>';
+            $tabs .= '<div class="slTopTabsSub">' 
+                . $subTabs . '</div>';
         }
         return $tabs;
     }
@@ -129,10 +139,12 @@ class AdminCoreController extends SurvLoopController
     {
         $custPage = ((isset($this->custReport->treeID)) 
             ? $this->custReport->initAdmMenuExtras() : '');
-        if (trim($custPage) != '' && $this->v["currPage"][0] != $custPage) {
+        if (trim($custPage) != '' 
+            && $this->v["currPage"][0] != $custPage) {
             $this->v["currPage"][0] = $custPage;
             $this->reloadAdmMenu();
-        } elseif (trim($currPage) != '' && $this->v["currPage"][0] != $currPage) {
+        } elseif (trim($currPage) != '' 
+            && $this->v["currPage"][0] != $currPage) {
             $this->v["currPage"][0] = $currPage;
             $this->reloadAdmMenu();
         } elseif (isset($GLOBALS["SL"]->x["currPage"]) 
@@ -162,20 +174,33 @@ class AdminCoreController extends SurvLoopController
                     if ($nav[0] == $currPage) {
                         $this->admMenuData["currNavPos"] = [$i, -1, -1, -1];
                     }
-                    if (isset($nav[4]) && is_array($nav[4]) && sizeof($nav[4]) > 0) {
+                    if (isset($nav[4]) && is_array($nav[4]) 
+                        && sizeof($nav[4]) > 0) {
                         foreach ($nav[4] as $j => $nA) {
                             if ($nA[0] == $currPage) {
                                 $this->admMenuData["currNavPos"] = [$i, $j, -1, -1];
                             }
-                            if (isset($nA[4]) && is_array($nA[4]) && sizeof($nA[4]) > 0) {
+                            if (isset($nA[4]) && is_array($nA[4]) 
+                                && sizeof($nA[4]) > 0) {
                                 foreach ($nA[4] as $k => $nB) {
                                     if ($nB[0] == $currPage) {
-                                        $this->admMenuData["currNavPos"] = [$i, $j, $k, -1];
+                                        $this->admMenuData["currNavPos"] = [
+                                            $i, 
+                                            $j, 
+                                            $k, 
+                                            -1
+                                        ];
                                     }
-                                    if (isset($nB[4]) && is_array($nB[4]) && sizeof($nB[4]) > 0) {
+                                    if (isset($nB[4]) && is_array($nB[4]) 
+                                        && sizeof($nB[4]) > 0) {
                                         foreach ($nB[4] as $l => $nC) {
                                             if ($nC[0] == $currPage) {
-                                                $this->admMenuData["currNavPos"] = [$i, $j, $k, $l];
+                                                $this->admMenuData["currNavPos"] = [
+                                                    $i, 
+                                                    $j, 
+                                                    $k, 
+                                                    $l
+                                                ];
                                             }
                                         }
                                     }
@@ -209,12 +234,16 @@ class AdminCoreController extends SurvLoopController
     
     public function admRedirEdit(Request $request)
     {
-        if ($request->has('t') && intVal($request->get('t')) > 0) {
+        if ($request->has('t') 
+            && intVal($request->get('t')) > 0) {
             $tree = SLTree::find(intVal($request->get('t')));
             if ($tree && isset($tree->TreeID)) {
-                return view('vendor.survloop.admin.tree.ajax-redir-edit', [
-                    "tree" => $tree
-                ])->render();
+                return view(
+                    'vendor.survloop.admin.tree.ajax-redir-edit', 
+                    [
+                        "tree" => $tree
+                    ]
+                )->render();
             }
         }
         return '';
@@ -229,7 +258,8 @@ class AdminCoreController extends SurvLoopController
     // Override in custom admin class
     protected function clearEmpties()
     {
-        if (!session()->has('chkClearEmpties') || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('chkClearEmpties') 
+            || $GLOBALS["SL"]->REQ->has('refresh')) {
             // something can be automated by default...
             session()->put('chkClearEmpties', 1);
         }
@@ -244,7 +274,9 @@ class AdminCoreController extends SurvLoopController
             $this->treeID = $this->loader->treeID;
             $this->admControlInit($request, '/dashboard/start/' . $treeSlug);
             $this->loadCustLoop($request, $this->treeID);
-            $this->v["content"] = '<div class="pT20">' . $this->custReport->loadNodeURL($request, $nodeSlug) . '</div>';
+            $this->v["content"] = '<div class="pT20">' 
+                . $this->custReport->loadNodeURL($request, $nodeSlug) 
+                . '</div>';
             $this->chkNewAdmMenuPage();
             return view('vendor.survloop.master', $this->v);
         }
@@ -280,13 +312,16 @@ class AdminCoreController extends SurvLoopController
             $this->v["content"] = $this->custReport->index($request);
             if ($request->has('edit') && intVal($request->get('edit')) == 1 
                 && $this->loader->isUserAdmin()) {
-                echo '<script type="text/javascript"> window.location="/dashboard/page/' 
-                    . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1"; </script>';
+                echo '<script type="text/javascript"> '
+                    . 'window.location="/dashboard/page/' 
+                    . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1";'
+                    . ' </script>';
                 exit;
             }
             $this->chkNewAdmMenuPage();
-            return $this->loader->addAdmCodeToPage(view('vendor.survloop.master', $this->v)
-                ->render());
+            return $this->loader->addAdmCodeToPage(
+                view('vendor.survloop.master', $this->v)->render()
+            );
         }
         $this->loader->loadDomain();
         return redirect($this->loader->domainPath . '/');

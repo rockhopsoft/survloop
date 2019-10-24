@@ -26,8 +26,6 @@ use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLZips;
 use App\Models\SLTokens;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Globals\GlobalsTables;
 
 class GlobalsImportExport extends GlobalsTables
 {
@@ -896,7 +894,8 @@ class GlobalsImportExport extends GlobalsTables
     	$types = $this->loadTreeNodeStatTypes();
     	$stats = [
             "Date"    => date("Y-m-d"),
-            "IconUrl" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"]
+            "IconUrl" => $this->sysOpts["app-url"] 
+                . $this->sysOpts["shortcut-icon"]
         ];
     	$survs = $pages = [];
     	$stats["DbTables"] = SLTables::where('TblDatabase', $this->dbID)

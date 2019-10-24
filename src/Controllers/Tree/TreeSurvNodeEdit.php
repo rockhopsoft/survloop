@@ -575,47 +575,68 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 }
             }
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.admin.tree.widget-email-edit-java', [
-            "emailList"  => $emailList
-            ]);
-        $widgetEmail = view('vendor.survloop.admin.tree.widget-email-edit', [
-            "node"       => $node, 
-            "emailList"  => $emailList,
-            "emailUsers" => $emailUsers
-            ])->render();
+        $GLOBALS["SL"]->pageJAVA .= view(
+            'vendor.survloop.admin.tree.widget-email-edit-java', 
+            [
+                "emailList"  => $emailList
+            ]
+        );
+        $widgetEmail = view(
+            'vendor.survloop.admin.tree.widget-email-edit', 
+            [
+                "node"       => $node, 
+                "emailList"  => $emailList,
+                "emailUsers" => $emailUsers
+            ]
+        )->render();
         $treeList = SLTree::where('TreeType', 'Survey')
             ->where('TreeDatabase', $this->dbID)
             ->select('TreeID', 'TreeName')
             ->orderBy('TreeName', 'asc')
             ->get();
-        $childNodes = SLNode::where('NodeParentID', ((isset($node->nodeRow->NodeID)) ? $node->nodeRow->NodeID : 0))
+        $childNodes = SLNode::where('NodeParentID', 
+                ((isset($node->nodeRow->NodeID)) 
+                    ? $node->nodeRow->NodeID : 0))
             ->orderBy('NodeParentOrder', 'asc')
             ->get();
         
-        $currMeta = [ "title" => '', "slug" => '', "desc" => '', "wrds" => '', "img" => '', "base" => '' ];
-        if (isset($node->extraOpts["meta-title"]) && trim($node->extraOpts["meta-title"]) != '') {
+        $currMeta = [
+            "title" => '', 
+            "slug"  => '', 
+            "desc"  => '', 
+            "wrds"  => '', 
+            "img"   => '', 
+            "base"  => ''
+        ];
+        if (isset($node->extraOpts["meta-title"]) 
+            && trim($node->extraOpts["meta-title"]) != '') {
             $currMeta["title"] = $node->extraOpts["meta-title"];
         } else {
             $currMeta["title"] = $GLOBALS['SL']->treeRow->TreeName;
         }
-        if ($GLOBALS['SL']->treeRow->TreeType == 'Page' && isset($GLOBALS['SL']->treeRow->TreeSlug)) {
+        if ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
+            && isset($GLOBALS['SL']->treeRow->TreeSlug)) {
             $currMeta["slug"] = $GLOBALS['SL']->treeRow->TreeSlug;
         } elseif (isset($node->nodeRow->NodePromptNotes)) {
             $currMeta["slug"] = $node->nodeRow->NodePromptNotes;
         }
-        if (isset($node->extraOpts["meta-desc"]) && trim($node->extraOpts["meta-desc"]) != '') {
+        if (isset($node->extraOpts["meta-desc"]) 
+            && trim($node->extraOpts["meta-desc"]) != '') {
             $currMeta["desc"] = $node->extraOpts["meta-desc"];
         } else {
             $currMeta["desc"] = $GLOBALS['SL']->sysOpts['meta-desc'];
         }
-        if (isset($node->extraOpts["meta-keywords"]) && trim($node->extraOpts["meta-keywords"]) != '') {
+        if (isset($node->extraOpts["meta-keywords"]) 
+            && trim($node->extraOpts["meta-keywords"]) != '') {
             $currMeta["wrds"] = $node->extraOpts["meta-keywords"];
         } else {
             $currMeta["wrds"] = $GLOBALS['SL']->sysOpts['meta-keywords'];
         }
-        if (isset($node->extraOpts["meta-img"]) && trim($node->extraOpts["meta-img"]) != '') {
+        if (isset($node->extraOpts["meta-img"]) 
+            && trim($node->extraOpts["meta-img"]) != '') {
             $currMeta["img"] = ((substr($node->extraOpts["meta-img"], 0, 1) == '/') 
-                ? $GLOBALS['SL']->sysOpts['app-url'] : '') . $node->extraOpts["meta-img"];
+                    ? $GLOBALS['SL']->sysOpts['app-url'] : '') 
+                . $node->extraOpts["meta-img"];
         } else {
             $currMeta["img"] = $GLOBALS['SL']->sysOpts['meta-img'];
         }
@@ -625,15 +646,22 @@ class TreeSurvNodeEdit extends TreeSurvForm
         if ($node->isInstruct()) {
             $this->v["needsWsyiwyg"] = true;
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.admin.tree.node-edit-java', [
-            "node"           => $node, 
-            "resLimit"       => $resLimit
-            ])->render();
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.tree.node-edit-ajax', [
-            "node"           => $node
-            ])->render();
+        $GLOBALS["SL"]->pageJAVA .= view(
+            'vendor.survloop.admin.tree.node-edit-java', 
+            [
+                "node"     => $node, 
+                "resLimit" => $resLimit
+            ]
+        )->render();
+        $GLOBALS["SL"]->pageAJAX .= view(
+            'vendor.survloop.admin.tree.node-edit-ajax', 
+            [
+                "node"           => $node
+            ]
+        )->render();
         if ($node->isInstruct()) {
-            $GLOBALS["SL"]->pageAJAX .= ' $("#nodeInstructID").summernote({ height: 350 });';
+            $GLOBALS["SL"]->pageAJAX .= ' $("#nodeInstructID")'
+                . '.summernote({ height: 350 });';
         }
         return view('vendor.survloop.admin.tree.node-edit', [
             "canEditTree"    => $this->canEditTree, 

@@ -5,13 +5,21 @@
         <div class="fR pT5 slGrey">eg. "{!! $val[1] !!}"</div>
     @endif
     <div class="fC"></div>
-    @if (in_array($opt, ['header-code', 'css-extra-files', 'spinner-code'])) 
-        <textarea name="sys-{{ $opt }}" class="form-control w100 ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} 
-            autocomplete="off" style="height: 100px; font-family: Courier New; "
-            >@if (isset($GLOBALS["SL"]->sysOpts[$opt])){!! $GLOBALS["SL"]->sysOpts[$opt] !!}@endif</textarea>
+    @if (in_array($opt, ['header-code', 'css-extra-files', 'spinner-code',
+        'sys-cust-js', 'sys-cust-ajax'])) 
+        <textarea name="sys-{{ $opt }}" autocomplete="off"
+            class="form-control w100 ntrStp slTab" 
+            {!! $GLOBALS["SL"]->tabInd() !!} 
+            style="height: 100px; font-family: Courier New; "
+            >@if (isset($GLOBALS["SL"]->sysOpts[$opt])){!! 
+                $GLOBALS["SL"]->sysOpts[$opt] 
+            !!}@endif</textarea>
     @else
-        <input type="text" name="sys-{{ $opt }}" class="form-control w100 ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}
-            autocomplete="off" @if (isset($GLOBALS["SL"]->sysOpts[$opt])) value="{!! $GLOBALS["SL"]->sysOpts[$opt] !!}"
+        <input type="text" name="sys-{{ $opt }}" autocomplete="off" 
+            class="form-control w100 ntrStp slTab" 
+            {!! $GLOBALS["SL"]->tabInd() !!}
+            @if (isset($GLOBALS["SL"]->sysOpts[$opt])) 
+                value="{!! $GLOBALS["SL"]->sysOpts[$opt] !!}"
             @endif >
     @endif
 </label></div>

@@ -33,48 +33,67 @@
                 >Edit User Info</a></p>
         @endif
         @if ($canEdit)
-            <div id="hidivEditProfile" class="nodeWrap disNon">
-                <hr>
-                <form name="mainPageForm" action="/profile/{{ urlencode($profileUser->name) }}?edit=sub" method="post">
-                <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="uID" value="{{ $profileUser->id }}">
-                <div class="row mT20">
-                    <div class="col-md-6">
-                        <div class="nPrompt"><label for="nameID">Username:</label></div>
-                        <div class="nFld">
-                            <input type="text" name="name" id="nameID" value="{{ $profileUser->name }}"
-                                class="form-control">
+            <div id="hidivEditProfile" class="disNon">
+                <div class="nodeWrap">
+                    <hr>
+                    <form name="mainPageForm" action="/profile/{{ urlencode($profileUser->name) }}?edit=sub" method="post">
+                    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="uID" 
+                        value="{{ $profileUser->id }}">
+                    <div class="row mT20">
+                        <div class="col-md-6">
+                            <div class="nPrompt">
+                                <label for="nameID">
+                                    Username:
+                                </label>
+                            </div>
+                            <div class="nFld">
+                                <input name="name" id="nameID" 
+                                    value="{{ $profileUser->name }}"
+                                    type="text" class="form-control">
+                            </div>
+                            <div class="nodeHalfGap mT20"></div>
+                            <div class="nPrompt">
+                                <label for="emailID">
+                                    Email:
+                                </label>
+                            </div>
+                            <div class="nFld mB10">
+                                <input name="email" id="emailID" 
+                                    value="{{ $profileUser->email }}"
+                                    type="email" class="form-control">
+                            </div>
+                        </div><div class="col-md-2">
+                        </div><div class="col-md-4">
+                        @if ($GLOBALS["SL"]->isAdmin)
+                            <div class="nPrompt">Roles:</div>
+                            <div class="nFldRadio">
+                            @foreach ($profileUser->roles as $i => $role)
+                                <input name="roles[]" id="role{{ $i }}" 
+                                    type="checkbox" value="{{ $role->DefID }}" 
+                                    @if ($profileUser->hasRole($role->DefSubset)) CHECKED @endif autocomplete="off" >
+                                <label for="role{{ $i }}">{{ $role->DefValue }}</label><br />
+                            @endforeach
+                            </div>
+                        @endif
                         </div>
-                        <div class="nodeHalfGap mT20"></div>
-                        <div class="nPrompt"><label for="emailID">Email:</label></div>
-                        <div class="nFld mB10">
-                            <input type="email" name="email" id="emailID" value="{{ $profileUser->email }}"
-                                class="form-control">
-                        </div>
-                    </div><div class="col-md-2">
-                    </div><div class="col-md-4">
-                    @if ($GLOBALS["SL"]->isAdmin)
-                        <div class="nPrompt">Roles:</div>
-                        <div class="nFldRadio">
-                        @foreach ($profileUser->roles as $i => $role)
-                            <input type="checkbox" name="roles[]" id="role{{ $i }}" value="{{ $role->DefID }}" 
-                                @if ($profileUser->hasRole($role->DefSubset)) CHECKED @endif autocomplete="off" >
-                            <label for="role{{ $i }}">{{ $role->DefValue }}</label><br />
-                        @endforeach
-                        </div>
-                    @endif
                     </div>
+                    <div class="nodeHalfGap"></div>
+                    <center><input type="submit" value="Save Changes" 
+                        class="nFormBtnSub btn btn-primary btn-lg"></center>
+                    <div class="nodeHalfGap"></div>
+
+                    <p>
+                        To change your password, please 
+                        <a href="/logout">logout</a>
+                        then use the <a href="/password/reset"
+                        >reset password</a>
+                        tool from the login page.
+                    </p>
+
+                    <div class="nodeHalfGap"></div>
+                    </form>
                 </div>
-                <div class="nodeHalfGap"></div>
-                <center><input type="submit" class="nFormBtnSub btn btn-primary btn-lg" value="Save Changes"></center>
-                <div class="nodeHalfGap"></div>
-
-                <p>To change your password, please <a href="/logout">logout</a>
-                then use the <a href="/password/reset">reset password</a>
-                tool from the login page.</p>
-
-                <div class="nodeHalfGap"></div>
-                </form>
             </div>
         @endif
 

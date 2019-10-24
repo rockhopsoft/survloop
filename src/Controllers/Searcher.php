@@ -291,13 +291,16 @@ class Searcher extends SurvCustLoop
     
     public function getSearchBarAdvanced($treeID = 1)
     {
-        if ($GLOBALS["SL"]->REQ->has('sSort') && trim($GLOBALS["SL"]->REQ->get('sSort')) != '') {
+        if ($GLOBALS["SL"]->REQ->has('sSort') 
+            && trim($GLOBALS["SL"]->REQ->get('sSort')) != '') {
             $this->v["sortLab"] = trim($GLOBALS["SL"]->REQ->get('sSort'));
         }
-        if ($GLOBALS["SL"]->REQ->has('sSortDir') && trim($GLOBALS["SL"]->REQ->get('sSortDir')) != '') {
+        if ($GLOBALS["SL"]->REQ->has('sSortDir') 
+            && trim($GLOBALS["SL"]->REQ->get('sSortDir')) != '') {
             $this->v["sortDir"] = trim($GLOBALS["SL"]->REQ->get('sSortDir'));
         }
-        if ($GLOBALS["SL"]->REQ->has('sFilt') && trim($GLOBALS["SL"]->REQ->get('sFilt')) != '') {
+        if ($GLOBALS["SL"]->REQ->has('sFilt') 
+            && trim($GLOBALS["SL"]->REQ->get('sFilt')) != '') {
             $tmp = $GLOBALS["SL"]->mexplode('__', $GLOBALS["SL"]->REQ->get('sFilt'));
             if (sizeof($tmp) > 0) {
                 foreach ($tmp as $tmpFilt) {

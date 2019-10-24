@@ -62,18 +62,25 @@
     position: absolute;
     top: -50px;
 }
-.nodeWrap, .nodeWrapError {
+.nodeWrap, .nodeWrapError, #formErrorMsg {
 	background: none;
 	display: block;
 	padding: 0px;
 	overflow: visible;
 	box-shadow: 0px 0px 0px none;
 }
-.nodeWrapError {
+.nodeWrapError, #formErrorMsg {
 	padding: 10px 5px 10px 5px;
 	border: 2px {!! $css["color-danger-on"] !!} solid;
 	box-shadow: 0px 0px 20px {!! $css["color-main-grey"] !!};
 }
+
+#formErrorMsg {
+    display: none;
+    padding: 20px;
+    margin: -30px 0px 20px 0px;
+}
+
 .nodeWrap.nGraph {
     padding: 10px;
     border: 2px {!! $css["color-main-faint"] !!} dashed;
@@ -266,23 +273,6 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
 #pageBtns {
     margin-top: 15px;
     width: 100%;
-}
-#formErrorMsg {
-    display: none;
-    width: 100%;
-    text-align: center;
-    background: {!! $css["color-danger-on"] !!};
-    padding: 10px 20px;
-    margin: -30px 0px 20px 0px;
-	-moz-border-radius: 5px; border-radius: 5px;
-}
-#formErrorMsg, #formErrorMsg h1, 
-#formErrorMsg h2, #formErrorMsg h3 {
-    color: {!! $css["color-main-bg"] !!};
-}
-#formErrorMsg h1, #formErrorMsg h2, #formErrorMsg h3 {
-    margin: 0px;
-    padding: 0px;
 }
 
 a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, 

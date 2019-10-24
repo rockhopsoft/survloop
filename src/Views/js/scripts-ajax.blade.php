@@ -1006,4 +1006,7 @@ $(document).ready(function(){
     }
     $(document).on("click", ".toglNodeSmpl", function() { toggleNodeSimple($(this).attr("data-tog-node")); });
 	
+    @if (isset($GLOBALS['SL']->sysOpts['sys-cust-ajax']))
+        {!! $GLOBALS['SL']->sysOpts['sys-cust-ajax'] !!}
+    @endif
 });

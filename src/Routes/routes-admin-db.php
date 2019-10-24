@@ -274,16 +274,6 @@ Route::get( '/dashboard/sl/export/laravel', [
     'middleware' => ['auth']
 ]);
 
-Route::post('/dashboard/db/db/db', [
-    'uses'       => $path . 'Admin\\AdminDatabaseInstall@manualMySql', 
-    'middleware' => ['auth']
-]);
-
-Route::get( '/dashboard/db/db/db', [
-    'uses'       => $path . 'Admin\\AdminDatabaseInstall@manualMySql', 
-    'middleware' => ['auth']
-]);
-
 Route::get( '/dashboard/db/switch/{dbID}', [
     'uses'       => $path . 'Admin\\AdminDBController@switchDB', 
     'middleware' => ['auth']

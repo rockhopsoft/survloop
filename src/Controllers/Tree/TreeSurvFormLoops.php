@@ -100,13 +100,16 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopMaxLimit . ' '
                 . $GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural . '</div>';
         }
-        $ret = '<div class="nPrompt"><input type="hidden" id="isLoopNav" name="loopNavRoot" value="' . intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) . '">' 
-            . (($this->allNodes[$nID]->isStepLoop()) ? '<div id="isStepLoop"></div>' : '');
+        $ret = '<div class="nPrompt">'
+            . '<input type="hidden" id="isLoopNav" name="loopNavRoot" value="' 
+            . intVal($GLOBALS['SL']->closestLoop['obj']->DataLoopRoot) 
+            . '">' . (($this->allNodes[$nID]->isStepLoop()) 
+                ? '<div id="isStepLoop"></div>' : '');
         if (!$this->allNodes[$nID]->isStepLoop() 
             && empty($this->sessData->loopItemIDs[$loopName])) {
-            $ret .= '<div class="pT15 pB15"><h4>No ' 
+            $ret .= '<div class="pT15 pB15"><b>No ' 
                 . strtolower($GLOBALS["SL"]->closestLoop["obj"]->DataLoopPlural) 
-                . ' added yet.</h4></div>';
+                . ' added yet.</b></div>';
         } else {
             $ret .= '<div class="p15"></div>';
         }
@@ -117,7 +120,8 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
                     . $this->printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet) 
                     . '</div>';
             }
-            foreach ($this->sessData->loopItemIDs[$loopName] as $setIndex => $loopItem) {
+            foreach ($this->sessData->loopItemIDs[$loopName] 
+                as $setIndex => $loopItem) {
                 $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->DataLoopTable;
                 $ret .= $this->printSetLoopNavRow(
                     $nID, 

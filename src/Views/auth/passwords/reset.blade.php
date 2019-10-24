@@ -14,13 +14,10 @@ $v = $surv->custLoop->v;
 
 <div class="p20"></div>
 
-<div class="row loginTitles">
-    <div class="col-6">
-        <h1 class="mT0">Reset Password</h1>
-    </div>
-    <div class="col-6 taR pT5">
-        <a href="/login" class="btn btn-secondary">Login</a>
-    </div>
+<div class="loginTitles">
+    <a class="btn btn-secondary pull-right"
+        href="/login" >Login</a>
+    <h1 class="mT0">Reset Password</h1>
 </div>
 
 @if (session('status'))
@@ -38,9 +35,12 @@ $v = $surv->custLoop->v;
 @endif
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="emailID">Email:</label></div>
+    <div class="nPrompt">
+        <label for="emailID">Email:</label>
+    </div>
     <div class="nFld">
-        <input id="emailID" name="email" value="{{ $email or old('email') }}" type="email" 
+        <input id="emailID" name="email" type="email" 
+            value="{{ $email or old('email') }}" 
             class="form-control form-control-lg" required autofocus >
     </div>
 </div>

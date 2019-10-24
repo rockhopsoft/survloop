@@ -55,31 +55,42 @@ class TreeSurvConds extends TreeSurvAPI
                         }
                     } elseif ($cond->CondOperator == 'COMPLEX') {
                         $cond->loadVals();
-                        if (isset($cond->condVals) && sizeof($cond->condVals) > 0) {
+                        if (isset($cond->condVals) 
+                            && sizeof($cond->condVals) > 0) {
                             foreach ($cond->condVals as $i => $val) {
                                 if ($val > 0) {
                                     $subCond = SLConditions::find($val);
-                                    if ($subCond && isset($subCond->CondOperator)) {
-                                        if (!$this->sessData
-                                            ->parseCondition($subCond, $recObj, $nID)) {
+                                    if ($subCond 
+                                        && isset($subCond->CondOperator)) {
+                                        if (!$this->sessData->parseCondition(
+                                            $subCond, 
+                                            $recObj, 
+                                            $nID)) {
                                             $retTF = false;
                                         }
                                     }
                                 } else { // opposite
                                     $subCond = SLConditions::find(-1*$val);
-                                    if ($subCond && isset($subCond->CondOperator)) {
-                                        if ($this->sessData
-                                            ->parseCondition($subCond, $recObj, $nID)) {
+                                    if ($subCond 
+                                        && isset($subCond->CondOperator)) {
+                                        if ($this->sessData->parseCondition(
+                                            $subCond, 
+                                            $recObj, 
+                                            $nID)) {
                                             $retTF = false;
                                         }
                                     }
                                 }
                             }
                         }
-                    } elseif (!$this->sessData->parseCondition($cond, $recObj, $nID)) {
+                    } elseif (!$this->sessData
+                        ->parseCondition($cond, $recObj, $nID)) {
                         $retTF = false; 
                     }
-                    $custom = $this->checkNodeConditionsCustom($nID, trim($cond->CondTag));
+                    $custom = $this->checkNodeConditionsCustom(
+                        $nID, 
+                        trim($cond->CondTag)
+                    );
                     if ($custom == 0) {
                         $retTF = false;
                     } elseif ($custom == 1) {
@@ -103,63 +114,76 @@ class TreeSurvConds extends TreeSurvAPI
             if (trim($cond->CondTag) == '#NodeDisabled') {
                 $retTF = false;
             } elseif (trim($cond->CondTag) == '#IsLoggedIn') {
-                if ($this->v["uID"] <= 0) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsNotLoggedIn') {
-                if ($this->v["uID"] > 0) {
+                if (isset($this->v["uID"]) && $this->v["uID"] > 0) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsAdmin') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('administrator')) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasRole('administrator')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsNotAdmin') {
-                if ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator')) {
+                if (isset($this->v["uID"]) && $this->v["uID"] > 0 
+                    && $this->v["user"]->hasRole('administrator')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsStaff') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('staff')) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasRole('staff')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsStaffOrAdmin') {
-                if ($this->v["uID"] <= 0 
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('administrator|staff')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsPartnerStaffOrAdmin') {
-                if ($this->v["uID"] <= 0 
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('administrator|staff|partner')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsPartner') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('partner')) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasRole('partner')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsVolunteer') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('volunteer')) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasRole('volunteer')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsBrancher') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole('databaser')) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasRole('databaser')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsOwner') {
-                if ($this->v["uID"] <= 0 || !$this->v["isOwner"]) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !$this->v["isOwner"]) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsProfileOwner') {
-                if ($this->v["uID"] <= 0 || !isset($this->v["profileUser"]) || !$this->v["profileUser"]
-                    || !isset($this->v["profileUser"]->id) || $this->v["uID"] != $this->v["profileUser"]->id) {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+                    || !isset($this->v["profileUser"]) 
+                    || !isset($this->v["profileUser"]->id) 
+                    || !$this->v["profileUser"]
+                    || $this->v["uID"] != $this->v["profileUser"]->id) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsPrintable') {
-                if (!$GLOBALS["SL"]->REQ->has('print') && (!isset($GLOBALS["SL"]->pageView) 
-                    || !in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))) {
+                $types = ['pdf', 'full-pdf'];
+                if (!$GLOBALS["SL"]->REQ->has('print') 
+                    && (!isset($GLOBALS["SL"]->pageView) 
+                    || !in_array($GLOBALS["SL"]->pageView, $types))) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#IsPrintInFrame') {
-                if (!$GLOBALS["SL"]->REQ->has('ajax') && !$GLOBALS["SL"]->REQ->has('frame') 
+                if (!$GLOBALS["SL"]->REQ->has('ajax') 
+                    && !$GLOBALS["SL"]->REQ->has('frame') 
                     && !$GLOBALS["SL"]->REQ->has('wdg')) {
                     $retTF = false;
                 }
@@ -189,11 +213,13 @@ class TreeSurvConds extends TreeSurvAPI
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#EmailVerified') {
-                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasVerifiedEmail()) {
+                if ($this->v["uID"] <= 0 
+                    || !$this->v["user"]->hasVerifiedEmail()) {
                     $retTF = false;
                 }
             } elseif (trim($cond->CondTag) == '#NextButton') {
-                if (!isset($this->REQstep) || $this->REQstep != 'next') {
+                if (!isset($this->REQstep) 
+                    || $this->REQstep != 'next') {
                     $retTF = false;
                 }
             //} elseif (trim($cond->CondTag) == '#HasUploads') {

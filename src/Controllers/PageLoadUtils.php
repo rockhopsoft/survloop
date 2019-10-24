@@ -101,7 +101,8 @@ class PageLoadUtils extends Controller
             return ($this->isUserStaff() || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_PARTNER == 0) {
-            return ($this->isUserPartn() || $this->isUserStaff() || $this->isUserAdmin());
+            return ($this->isUserPartn() 
+                || $this->isUserStaff() || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
             return ($this->isUserVolun() || $this->isUserPartn() 
@@ -131,16 +132,20 @@ class PageLoadUtils extends Controller
     {
         $ret = [];
         if (Auth::user() && isset(Auth::user()->id) && intVal(Auth::user()->id) > 0) {
-            if (Auth::user()->hasRole('administrator')) {
+            $list = 'administrator';
+            if (Auth::user()->hasRole($list)) {
                 $ret[] = Globals::TREEOPT_ADMIN;
             }
-            if (Auth::user()->hasRole('administrator|staff|databaser|brancher')) {
+            $list .= '|staff|databaser|brancher';
+            if (Auth::user()->hasRole($list)) {
                 $ret[] = Globals::TREEOPT_STAFF;
             }
-            if (Auth::user()->hasRole('administrator|staff|databaser|brancher|partner')) {
+            $list .= '|partner';
+            if (Auth::user()->hasRole($list)) {
                 $ret[] = Globals::TREEOPT_PARTNER;
             }
-            if (Auth::user()->hasRole('administrator|staff|databaser|brancher|partner|volunteer')) {
+            $list .= '|volunteer';
+            if (Auth::user()->hasRole($list)) {
                 $ret[] = Globals::TREEOPT_VOLUNTEER;
             }
         }
@@ -175,7 +180,11 @@ class PageLoadUtils extends Controller
             $tree = SLTree::find($treeID);
             if ($tree && isset($tree->TreeOpts)) {
                 if ($this->okToLoadTree($tree->TreeOpts)) {
-                    $this->syncDataTrees($request, $tree->TreeDatabase, $treeID);
+                    $this->syncDataTrees(
+                        $request, 
+                        $tree->TreeDatabase, 
+                        $treeID
+                    );
                     return true;
                 }
             }
@@ -185,7 +194,8 @@ class PageLoadUtils extends Controller
     
     public function hasParamEdit(Request $request)
     {
-        return ($request->has('edit') && intVal($request->get('edit')) == 1);
+        return ($request->has('edit') 
+            && intVal($request->get('edit')) == 1);
     }
     
     public function loadTreeBySlug(Request $request, $treeSlug = '', $type = 'Survey')
@@ -197,8 +207,13 @@ class PageLoadUtils extends Controller
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t && isset($t->TreeOpts) && $this->okToLoadTree($t->TreeOpts)) {
-                        $this->syncDataTrees($request, $t->TreeDatabase, $t->TreeID);
+                    if ($t && isset($t->TreeOpts) 
+                        && $this->okToLoadTree($t->TreeOpts)) {
+                        $this->syncDataTrees(
+                            $request, 
+                            $t->TreeDatabase, 
+                            $t->TreeID
+                        );
                         return true;
                     }
                 }
@@ -231,19 +246,26 @@ class PageLoadUtils extends Controller
                     ->get();
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
-            if ($searchTree !== null && isset($searchTree->TreeOpts)) {
-                $redir = $this->getPageDashPrefix($searchTree->TreeOpts) . '/' . $searchTree->TreeSlug 
-                    . '?s=' . (($request->has('s')) ? $request->get('s') : '');
-                if ($request->has('sFilt') && trim($request->get('sFilt')) != '') {
+            if ($searchTree !== null 
+                && isset($searchTree->TreeOpts)) {
+                $redir = $this->getPageDashPrefix($searchTree->TreeOpts) 
+                    . '/' . $searchTree->TreeSlug 
+                    . '?s=' . (($request->has('s')) 
+                        ? $request->get('s') : '');
+                if ($request->has('sFilt') 
+                    && trim($request->get('sFilt')) != '') {
                     $redir .= '&sFilt=' . $request->get('sFilt');
                 }
-                if ($request->has('sSort') && trim($request->get('sSort')) != '') {
+                if ($request->has('sSort') 
+                    && trim($request->get('sSort')) != '') {
                     $redir .= '&sSort=' . $request->get('sSort');
                 }
-                if ($request->has('sSortDir') && trim($request->get('sSortDir')) != '') {
+                if ($request->has('sSortDir') 
+                    && trim($request->get('sSortDir')) != '') {
                     $redir .= '&sSortDir=' . $request->get('sSortDir');
                 }
-                if ($request->has('sView') && trim($request->get('sView')) != '') {
+                if ($request->has('sView') 
+                    && trim($request->get('sView')) != '') {
                     $redir .= '&sView=' . $request->get('sView');
                 }
                 return redirect($redir);
@@ -261,7 +283,8 @@ class PageLoadUtils extends Controller
                 foreach ($perms as $perm) {
                     if ($searchTree === null) {
                         foreach ($trees as $tree) {
-                            if ($searchTree === null && $tree->TreeOpts%$perm == 0
+                            if ($searchTree === null 
+                                && $tree->TreeOpts%$perm == 0
                                 && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
                                 if ($tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
                                     $searchTreeHome = $tree;
@@ -307,9 +330,9 @@ class PageLoadUtils extends Controller
                 && trim($redirTree->TreeDesc) != '') {
                 $redirURL = $redirTree->TreeDesc;
                 if (strpos($redirURL, $this->domainPath) === false 
-                    && substr($redirURL, 0, 1)           != '/'
-                    && strpos($redirURL, 'http://')      === false 
-                    && strpos($redirURL, 'https://')     === false) {
+                    && substr($redirURL, 0, 1)       != '/'
+                    && strpos($redirURL, 'http://')  === false 
+                    && strpos($redirURL, 'https://') === false) {
                     $redirURL = '/' . $redirURL;
                 }
                 return $redirURL;
@@ -358,7 +381,8 @@ class PageLoadUtils extends Controller
     
     protected function loadNodeTreeURLredir(Request $request, $tree, $rootNode, $cid = -3)
     {
-        $redir = $this->dashPrfx . '/u/' . $tree->TreeSlug . '/' . $rootNode->NodePromptNotes;
+        $redir = $this->dashPrfx . '/u/' . $tree->TreeSlug 
+            . '/' . $rootNode->NodePromptNotes;
         if ($cid > 0) {
             $redir .= '?cid=' . $cid;
         } else {
@@ -381,8 +405,10 @@ class PageLoadUtils extends Controller
     
     public function loadPageCID(Request $request, $tree, $cid)
     {
-        if ($cid > 0 && $tree && isset($tree->TreeID)) {
-            $sess = SLSess::where('SessUserID', Auth::user()->id)
+        if ($cid > 0 && $tree 
+            && isset($tree->TreeID)) {
+            $sess = SLSess::where('SessUserID', 
+                    Auth::user()->id)
                 ->where('SessTree', $tree->TreeID)
                 ->where('SessCoreID', $cid)
                 ->where('SessIsActive', 1)
@@ -396,8 +422,11 @@ class PageLoadUtils extends Controller
                 $sess->SessIsActive = 1;
                 $sess->save();
             }
-            if ($request->has("n") && intVal($request->get("n")) > 0) {
-                $sess->update([ 'SessCurrNode' => intVal($request->get("n")) ]);
+            if ($request->has("n") 
+                && intVal($request->get("n")) > 0) {
+                $sess->update([
+                    'SessCurrNode' => intVal($request->get("n"))
+                ]);
             } elseif ($sess->SessCurrNode == -86) {
                 // last session deactivate (hopefully completed)
                 $sess->update([ 'SessCurrNode' => $tree->TreeRoot ]);
@@ -439,7 +468,8 @@ class PageLoadUtils extends Controller
             $sffx .= $GLOBALS["SL"]->getCacheSffxAdds();
             $GLOBALS["SL"]->cacheSffx = $sffx;
         }
-        $uri = substr(str_replace('?refresh=1', '', str_replace('&refresh=1', '', 
+        $uri = substr(str_replace('?refresh=1', '', 
+            str_replace('&refresh=1', '', 
             $_SERVER["REQUEST_URI"])), 1);
         $this->cacheKey = 'page-' . $uri . $sffx . '.html';
         return $this->cacheKey;
@@ -504,7 +534,8 @@ class PageLoadUtils extends Controller
             $this->pageContent, 
             $treeType, 
             $treeID, 
-            ((isset($GLOBALS["SL"]->coreID)) ? $GLOBALS["SL"]->coreID : 0)
+            ((isset($GLOBALS["SL"]->coreID)) 
+                ? $GLOBALS["SL"]->coreID : 0)
         );
         return true;
     }
@@ -514,7 +545,8 @@ class PageLoadUtils extends Controller
         $extra = '';
         if (Auth::user() && isset(Auth::user()->id) 
             && Auth::user()->hasRole('administrator|staff|brancher')) {
-            $extra .= ' setTimeout(\'addSideNavItem("Edit Page", "?edit=1")\', 2000); ';
+            $extra .= ' setTimeout(\'addSideNavItem('
+                . '"Edit Page", "?edit=1")\', 2000); ';
         }
         if (trim($extra) != '') {
             $extra = '<script async defer type="text/javascript"> ' 
@@ -533,7 +565,8 @@ class PageLoadUtils extends Controller
     
     protected function okToLoadTree($treeOpts = 1)
     {
-        return ($this->treeRightType($treeOpts) && $this->userHasTreePerms($treeOpts));
+        return ($this->treeRightType($treeOpts) 
+            && $this->userHasTreePerms($treeOpts));
     }
     
     protected function treeRightType($treeOpts = 1)
@@ -572,7 +605,17 @@ class PageLoadUtils extends Controller
 
     protected function urlNotResourceFile($str)
     {
-        $types = [ 'css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'woff', 'woff2' ];
+        $types = [
+            'css', 
+            'js', 
+            'png', 
+            'jpg', 
+            'jpeg', 
+            'gif', 
+            'svg', 
+            'woff', 
+            'woff2' 
+        ];
         $str = trim($str);
         if ($str == '') {
             return false;

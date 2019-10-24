@@ -69,15 +69,23 @@ function clearFormErrs() {
 }
 
 function stripN(nIDtxt) {
-    if (nIDtxt.substring(0, 1) == "n") nIDtxt = nIDtxt.substring(1);
+    if (nIDtxt.substring(0, 1) == "n") {
+        nIDtxt = nIDtxt.substring(1);
+    }
     return nIDtxt;
 }
 
 function txt2nID(nIDtxt) {
     nIDtxt = stripN(nIDtxt);
-    if (nIDtxt.indexOf('cyc') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('cyc'))));
-    if (nIDtxt.indexOf('res') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('res'))));
-    if (nIDtxt.indexOf('tbl') > 0) return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('tbl'))));
+    if (nIDtxt.indexOf('cyc') > 0) {
+        return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('cyc'))));
+    }
+    if (nIDtxt.indexOf('res') > 0) {
+        return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('res'))));
+    }
+    if (nIDtxt.indexOf('tbl') > 0) {
+        return parseInt(nIDtxt.substring(0, (1+nIDtxt.indexOf('tbl'))));
+    }
     return parseInt(nIDtxt);
 }
 

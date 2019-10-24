@@ -376,3 +376,7 @@ function updateRightPane() {
 @if (isset($treeJs)) {!! $treeJs !!} @endif
 
 @if (isset($jsXtra)) {!! $jsXtra !!} @endif
+
+@if (isset($GLOBALS['SL']->sysOpts['sys-cust-js']))
+    {!! $GLOBALS['SL']->sysOpts['sys-cust-js'] !!}
+@endif

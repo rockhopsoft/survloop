@@ -238,19 +238,22 @@ a.sliNav, .sliNavDiv a.sliNav,
     }
 }
 
-.slAccord, .slAccordBig {
-    min-height: 56px;
+.slAccord {
+    min-height: 36px;
 }
-.slAccord div fL, .slAccord div fR, 
-.slAccordBig div fL, .slAccordBig div fR {
-    height: 56px;
-    padding-top: 15px;
-}
-.slAccord div .fL {
-    padding-top: 3px;
+.slAccord div fL, .slAccord div fR {
+    height: 36px;
+    padding-top: 5px;
 }
 .slAccord div .fR {
     font-size: 16px;
+}
+.slAccordBig {
+    min-height: 56px;
+}
+.slAccordBig div fL, .slAccordBig div fR {
+    height: 56px;
+    padding-top: 15px;
 }
 .slAccordBig div .fR {
     font-size: 22px;

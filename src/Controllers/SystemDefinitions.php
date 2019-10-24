@@ -55,7 +55,8 @@ class SystemDefinitions extends SystemDefinitionsInit
     {
         $GLOBALS["SL"]->loadStates();
         $GLOBALS["SL"]->importZipsUS();
-        if (isset($GLOBALS["SL"]->sysOpts["has-canada"]) && intVal($GLOBALS["SL"]->sysOpts["has-canada"]) == 1) {
+        if (isset($GLOBALS["SL"]->sysOpts["has-canada"]) 
+            && intVal($GLOBALS["SL"]->sysOpts["has-canada"]) == 1) {
             $GLOBALS["SL"]->importZipsCanada();
         }
         return true;
@@ -68,7 +69,8 @@ class SystemDefinitions extends SystemDefinitionsInit
         }
         $this->v["settingsList"] = $this->getDefaultSys();
         $this->v["stylesList"] = $this->getDefaultStyles();
-        if (!session()->has('chkSysVars') || $request->has('refresh')) {
+        if (!session()->has('chkSysVars') 
+            || $request->has('refresh')) {
             $this->checkSysDefs();
             $this->checkStyleDefs();
             $this->chkSysReqs();
@@ -82,7 +84,8 @@ class SystemDefinitions extends SystemDefinitionsInit
             ->where('DefSet', 'Style CSS')
             ->where('DefSubset', 'main')
             ->first();
-        if (!$this->v["custCSS"] || !isset($this->v["custCSS"]->DefID)) {
+        if (!$this->v["custCSS"] 
+            || !isset($this->v["custCSS"]->DefID)) {
             $this->v["custCSS"] = new SLDefinitions;
             $this->v["custCSS"]->DefDatabase = $dbID;
             $this->v["custCSS"]->DefSet      = 'Style CSS';
@@ -93,14 +96,16 @@ class SystemDefinitions extends SystemDefinitionsInit
             ->where('DefSet', 'Style CSS')
             ->where('DefSubset', 'email')
             ->first();
-        if (!$this->v["custCSSemail"] || !isset($this->v["custCSSemail"]->DefID)) {
+        if (!$this->v["custCSSemail"] 
+            || !isset($this->v["custCSSemail"]->DefID)) {
             $this->v["custCSSemail"] = new SLDefinitions;
             $this->v["custCSSemail"]->DefDatabase = $dbID;
             $this->v["custCSSemail"]->DefSet      = 'Style CSS';
             $this->v["custCSSemail"]->DefSubset   = 'email';
             $this->v["custCSSemail"]->save();
         }
-        $this->v["rawSettings"] = SLDefinitions::where('DefSet', 'Custom Settings')
+        $this->v["rawSettings"] = SLDefinitions::where(
+                'DefSet', 'Custom Settings')
             ->orderBy('DefOrder', 'asc')
             ->get();
         if ($request->has('sub')) {
@@ -110,13 +115,17 @@ class SystemDefinitions extends SystemDefinitionsInit
                     if ($request->has('sys-' . $opt)) {
                         $new = $request->get('sys-' . $opt);
                     }
-                    if ($opt == 'meta-title' && $request->has('pageTitle')) {
+                    if ($opt == 'meta-title' 
+                        && $request->has('pageTitle')) {
                         $new = $request->get('pageTitle');
-                    } elseif ($opt == 'meta-desc' && $request->has('pageDesc')) {
+                    } elseif ($opt == 'meta-desc' 
+                        && $request->has('pageDesc')) {
                         $new = $request->get('pageDesc');
-                    } elseif ($opt == 'meta-keywords' && $request->has('pageKey')) {
+                    } elseif ($opt == 'meta-keywords' 
+                        && $request->has('pageKey')) {
                         $new = $request->get('pageKey');
-                    } elseif ($opt == 'meta-img' && $request->has('pageImg')) {
+                    } elseif ($opt == 'meta-img' 
+                        && $request->has('pageImg')) {
                         $new = $request->get('pageImg');
                     }
                     if ($new != '') {
@@ -129,14 +138,18 @@ class SystemDefinitions extends SystemDefinitionsInit
                 }
             }
             foreach ($this->v["sysStyles"] as $opt) {
-                if (isset($this->v["stylesList"][$opt->DefSubset]) && $request->has('sty-' . $opt->DefSubset)) {
-                    $opt->DefDescription = $request->get('sty-' . $opt->DefSubset);
+                if (isset($this->v["stylesList"][$opt->DefSubset]) 
+                    && $request->has('sty-' . $opt->DefSubset)) {
+                    $opt->DefDescription = $request
+                        ->get('sty-' . $opt->DefSubset);
                     $opt->save();
                 }
             }
-            $this->v["custCSS"]->DefDescription = trim($request->get('sys-cust-css'));
+            $this->v["custCSS"]->DefDescription 
+                = trim($request->get('sys-cust-css'));
             $this->v["custCSS"]->save();
-            $this->v["custCSSemail"]->DefDescription = trim($request->get('sys-cust-css-email'));
+            $this->v["custCSSemail"]->DefDescription
+                = trim($request->get('sys-cust-css-email'));
             $this->v["custCSSemail"]->save();
             foreach ($this->v["rawSettings"] as $i => $s) {
                 if ($request->has('setting' . $i . '')) {
@@ -207,13 +220,29 @@ class SystemDefinitions extends SystemDefinitionsInit
             }
         }
         $grps = [
-            ['administrator', 'Administrator',
-                'Highest system administrative privileges, can add, remove, and change permissions of other users'],
-            ['databaser',     'Database Designer',      'Permissions to make edits in the database designing tools'],
-            ['staff',         'Staff/Analyst',          'Full staff priveleges, can view but not edit technical specs'],
-            ['partner',       'Partner Member',         'Basic permission to pages and tools just for partners'],
-            ['volunteer',     'Volunteer',              'Basic permission to pages and tools just for volunteers']
-            ];
+            [
+                'administrator', 
+                'Administrator',
+                'Highest system administrative privileges, can add, '
+                    . 'remove, and change permissions of other users'
+            ], [
+                'databaser',
+                'Database Designer',
+                'Permissions to make edits in the database designing tools'
+            ], [
+                'staff',
+                'Staff/Analyst',
+                'Full staff priveleges, can view but not edit technical specs'
+            ], [
+                'partner',
+                'Partner Member',
+                'Basic permission to pages and tools just for partners'
+            ], [
+                'volunteer', 
+                'Volunteer', 
+                'Basic permission to pages and tools just for volunteers'
+            ]
+        ];
         foreach ($grps as $i => $grp) {
             $chk = SLDefinitions::where('DefDatabase', $dbID)
                 ->where('DefSet', 'User Roles')
@@ -248,7 +277,8 @@ class SystemDefinitions extends SystemDefinitionsInit
             $appUrl->DefSet = 'System Settings';
             $appUrl->DefSubset = 'app-url';
             $appUrl->DefDescription = $_SERVER["APP_URL"];
-        } elseif (!isset($appUrl->DefDescription) || trim($appUrl->DefDescription) == '') {
+        } elseif (!isset($appUrl->DefDescription) 
+            || trim($appUrl->DefDescription) == '') {
             $appUrl->DefDescription = $_SERVER["APP_URL"];
         }
         $appUrl->save();

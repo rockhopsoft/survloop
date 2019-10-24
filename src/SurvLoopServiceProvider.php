@@ -17,7 +17,7 @@ class SurvLoopServiceProvider extends ServiceProvider
     public function boot()
     {
         //require __DIR__ . '/routes.php';
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->loadRoutesFrom(__DIR__.'/Routes/routes.php');
         $this->loadViewsFrom(__DIR__.'/Views', 'survloop');
         $this->publishes([
             __DIR__.'/Views'                => base_path('resources/views/vendor/survloop'),

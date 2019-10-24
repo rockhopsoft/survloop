@@ -13,8 +13,6 @@ namespace SurvLoop\Controllers\Globals;
 use Auth;
 use Illuminate\Http\Request;
 
-use SurvLoop\Controllers\Globals\GlobalsConvert;
-
 class GlobalsStatic extends GlobalsConvert
 {
     public $uID = -3;
@@ -27,9 +25,62 @@ class GlobalsStatic extends GlobalsConvert
     
     public function loadStatic(Request $request = NULL)
     {
-        $this->uID = ((Auth::user()) ? Auth::user()->id : -3);
+        $this->uID = -3;
+        if (Auth::user()) {
+            $this->uID = Auth::user()->id;
+        }
         $this->REQ = $request;
         return true;
+    }
+
+    public function getStdReqParams()
+    {
+        return [
+            'frame',
+            'ajax',
+            'wdg',
+            'refresh'
+        ];
+    }
+
+    public function getReqParams()
+    {
+        $params = $this->getStdReqParams();
+        $ret = '';
+        foreach ($params as $param) {
+            if ($this->REQ->has($param)) {
+                $ret .= '&' . $param . '=' 
+                    . $this->REQ->get($param);
+            }
+        }
+        return $ret;
+    }
+
+    public function getReqHiddenInputs()
+    {
+        $params = $this->getStdReqParams();
+        $ret = '';
+        foreach ($params as $param) {
+            if ($this->REQ->has($param)) {
+                $ret .= '<input type="hidden" name="' . $param 
+                    . '" value="' . $this->REQ->get($param) . '">';
+            }
+        }
+        return $ret;
+    }
+
+    public function getAnyReqParams()
+    {
+        $ret = '';
+        if (sizeof($this->REQ->all()) > 0) {
+            foreach ($this->REQ->all() as $param => $val) {
+                if (!is_array($val)) {
+                    $ret .= '&' . $param . '=' 
+                        . urlencode(urldecode($val));
+                }
+            }
+        }
+        return $ret;
     }
     
     public function splitNumDash($str, $delim = '-')
@@ -139,10 +190,11 @@ class GlobalsStatic extends GlobalsConvert
         $dir = opendir($dirPath);
         while (false !== ($file = readdir($dir))) {
             if ($file != '.' && $file != '..') {
-                if (is_dir($dirPath . '/' . $file)) {
-                    $lines += $this->getDirLinesCount($dirPath . '/' . $file, $type);
+                $path = $dirPath . '/' . $file;
+                if (is_dir($path)) {
+                    $lines += $this->getDirLinesCount($path, $type);
                 } elseif ($type == '' || strpos($file, $type) > 0) {
-                    $cnt = $this->getFileLineCount($dirPath . '/' . $file);
+                    $cnt = $this->getFileLineCount($path);
                     $lines += $cnt;
                 }
             }

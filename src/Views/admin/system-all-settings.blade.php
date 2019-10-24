@@ -201,12 +201,16 @@
 <div class="slCard nodeWrap">
 <h2>Hard Code HTML, CSS, JS</h2>
 {!! view('vendor.survloop.admin.system-one-setting', [
-    "opt" => 'header-code', "val" => $sysDef->v["settingsList"]["header-code"] ])->render() !!}
+    "opt" => 'header-code', 
+    "val" => $sysDef->v["settingsList"]["header-code"] 
+])->render() !!}
 {!! view('vendor.survloop.admin.system-one-setting', [
-    "opt" => 'css-extra-files', "val" => $sysDef->v["settingsList"]["css-extra-files"] ])->render() !!}
-    
+    "opt" => 'css-extra-files', 
+    "val" => $sysDef->v["settingsList"]["css-extra-files"] 
+])->render() !!}
+
 <div class="mB20"><label class="w100">
-    <h4 class="m0">Open-Ended Custom CSS:</h4>
+    <h4 class="m0">System-Wide Custom CSS:</h4>
     <textarea name="sys-cust-css" class="form-control" autocomplete="off"
         style="height: 400px; font-family: Courier New;">{!! $sysDef->v["custCSS"]->DefDescription !!}</textarea>
 </label></div>
@@ -215,6 +219,17 @@
     <textarea name="sys-cust-css-email" class="form-control" autocomplete="off" 
         style="height: 200px; font-family: Courier New;">{!! $sysDef->v["custCSSemail"]->DefDescription !!}</textarea>
 </label></div>
+
+{!! view('vendor.survloop.admin.system-one-setting', [
+    "opt" => 'sys-cust-js', 
+    "val" => $sysDef->v["settingsList"]["sys-cust-js"] 
+])->render() !!}
+
+{!! view('vendor.survloop.admin.system-one-setting', [
+    "opt" => 'sys-cust-ajax', 
+    "val" => $sysDef->v["settingsList"]["sys-cust-ajax"] 
+])->render() !!}
+
 </div>
 
 @if (sizeof($sysDef->v["rawSettings"]) > 0)

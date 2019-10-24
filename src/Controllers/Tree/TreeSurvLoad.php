@@ -11,25 +11,10 @@
 namespace SurvLoop\Controllers\Tree;
 
 use DB;
-use Auth;
 use Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
-use App\Models\User;
-use App\Models\SLDatabases;
-use App\Models\SLDefinitions;
-use App\Models\SLTree;
 use App\Models\SLNode;
-use App\Models\SLNodeSaves;
-use App\Models\SLNodeSavesPage;
 use App\Models\SLNodeResponses;
-use App\Models\SLFields;
-use App\Models\SLSess;
-use App\Models\SLSessLoops;
-use App\Models\SLSessEmojis;
-use App\Models\SLSearchRecDump;
-use App\Models\SLContact;
-use App\Models\SLUsersActivity;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\SurvData;
 use SurvLoop\Controllers\Globals\Globals;
@@ -98,13 +83,16 @@ class TreeSurvLoad extends TreeSurvConds
         if ($sessIn > 0) {
             $this->coreIDoverride = $sessIn;
         }
-        if (isset($GLOBALS["SL"]) && $GLOBALS["SL"]->REQ->has('step') && $GLOBALS["SL"]->REQ->has('tree') 
+        if (isset($GLOBALS["SL"]) 
+            && $GLOBALS["SL"]->REQ->has('step') 
+            && $GLOBALS["SL"]->REQ->has('tree') 
             && intVal($GLOBALS["SL"]->REQ->get('tree')) > 0) {
             $this->hasREQ = true;
             $this->REQstep = $GLOBALS["SL"]->REQ->get('step');
         }
         $this->loadLookups();
-        $this->isPage = (isset($GLOBALS["SL"]->treeRow->TreeType) && $GLOBALS["SL"]->treeRow->TreeType == 'Page');
+        $this->isPage = (isset($GLOBALS["SL"]->treeRow->TreeType) 
+            && $GLOBALS["SL"]->treeRow->TreeType == 'Page');
         $this->sessData = new SurvData;
         return true;
     }
@@ -120,8 +108,10 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function loadTreeFromCache()
     {
-        $cacheFile = '/cache/php/tree-load-' . $this->treeID . '.php';
-        if (!$GLOBALS["SL"]->REQ->has('refresh') && file_exists($cacheFile)) {
+        $cacheFile = '/cache/php/tree-load-' 
+            . $this->treeID . '.php';
+        if (!$GLOBALS["SL"]->REQ->has('refresh') 
+            && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
@@ -131,15 +121,18 @@ class TreeSurvLoad extends TreeSurvConds
             $this->kidMaps = $nodeIDs = [];
             if (isset($GLOBALS["SL"]->treeRow->TreeOpts)) {
                 $nodes = SLNode::where('NodeTree', $this->treeID)
-                    ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 
-                        'NodeType', 'NodeOpts', 'NodeDataBranch', 
-                        'NodeDataStore', 'NodeResponseSet', 'NodeDefault')
+                    ->select('NodeID', 'NodeParentID', 
+                        'NodeParentOrder', 'NodeType', 
+                        'NodeOpts', 'NodeDataBranch', 
+                        'NodeDataStore', 'NodeDefault',
+                        'NodeResponseSet')
                     ->get();
                 foreach ($nodes as $row) {
                     $nodeIDs[] = $row->NodeID;
                     if ($row->NodeParentID <= 0) {
                         $rootID = $row->NodeID;
-                        $cache .= '$'.'this->rootID = ' . $row->NodeID . ';' . "\n";
+                        $cache .= '$'.'this->rootID = ' 
+                            . $row->NodeID . ';' . "\n";
                     }
                     if (in_array($row->NodeType, ['Page', 'Loop Root'])) {
                         $this->pageCnt++;
@@ -300,8 +293,21 @@ class TreeSurvLoad extends TreeSurvConds
         return true;
     }
 
-    protected function loadSessionClear($coreTbl = '', $coreID = -3) { }
+    /**
+     * Run anything else extra needed to clear data in between sessions.
+     *
+     * @return boolean
+     */
+    protected function loadSessionClear($coreTbl = '', $coreID = -3)
+    {
+        
+    }
     
+    /**
+     * Load anything else needed after default loading of a Tree Session.
+     *
+     * @return boolean
+     */
     protected function loadExtra()
     {
         return true;
@@ -501,7 +507,8 @@ class TreeSurvLoad extends TreeSurvConds
             $this->sessMinorsTouched[$s] = [];
         }
         $nodeSave = DB::table('SL_NodeSaves')
-            ->join('SL_Sess', 'SL_NodeSaves.NodeSaveSession', '=', 'SL_Sess.SessID')
+            ->join('SL_Sess', 'SL_NodeSaves.NodeSaveSession', 
+                '=', 'SL_Sess.SessID')
             ->where('SL_Sess.SessTree', '=', $this->treeID)
             ->where('SL_Sess.SessCoreID', '=', $this->coreID)
             ->distinct()
@@ -593,7 +600,8 @@ class TreeSurvLoad extends TreeSurvConds
     {
         //return '<!-- ipip: ' . $_SERVER["REMOTE_ADDR"] . ' -->';
         if ($GLOBALS["SL"]->debugOn) { // && true
-            $userName = (($this->v["user"]) ? $this->v["user"]->name : '');
+            $userName = ((isset($this->v["user"]) && $this->v["user"])
+                ? $this->v["user"]->name : '');
             ob_start();
             print_r($GLOBALS["SL"]->REQ->all());
             $this->v["requestDeets"] = ob_get_contents();
@@ -605,7 +613,10 @@ class TreeSurvLoad extends TreeSurvConds
             $this->v["sessData"]           = $this->sessData;
             $this->v["dataSets"]           = $this->sessData->dataSets;
             $this->v["currNodeDataBranch"] = $this->sessData->dataBranches;
-            return view('vendor.survloop.elements.inc-var-dump', $this->v)->render();
+            return view(
+                'vendor.survloop.elements.inc-var-dump', 
+                $this->v
+            )->render();
         }
         return '';
     }

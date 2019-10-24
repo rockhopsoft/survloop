@@ -33,8 +33,6 @@ use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
 use SurvLoop\Controllers\SurvLoopImages;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Globals\Geographs;
-use SurvLoop\Controllers\Globals\GlobalsImportExport;
 
 class Globals extends GlobalsImportExport
 {

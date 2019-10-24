@@ -28,35 +28,55 @@ class TreeSurv extends TreeSurvReport
     {
         $ret = '';
         $this->loadTree();
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' && $this->coreID <= 0) {
-            return $this->redir($GLOBALS["SL"]->getCurrTreeUrl(), true);
+        if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' 
+            && $this->coreID <= 0) {
+            return $this->redir(
+                $GLOBALS["SL"]->getCurrTreeUrl(), 
+                true
+            );
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.js.inc-check-tree-load', [
-            "treeID" => $this->treeID
-        ])->render();
+        $GLOBALS["SL"]->pageJAVA .= view(
+            'vendor.survloop.js.inc-check-tree-load', 
+            [
+                "treeID" => $this->treeID
+            ]
+        )->render();
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '<div id="ajaxWrap">';
         }
-        $ret .= '<a name="maincontent" id="maincontent"></a>' . "\n";
+        $ret .= '<a name="maincontent" '
+            . 'id="maincontent"></a>' . "\n";
         if (!$this->isPage) {
-            $ret .= '<div id="maincontentWrap" style="display: none;">' . "\n";
+            $ret .= '<div id="maincontentWrap" '
+                . 'style="display: none;">' . "\n";
         }
-        if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('node') 
-            && $GLOBALS["SL"]->REQ->input('node') > 0) {
-            $this->updateCurrNode($GLOBALS["SL"]->REQ->input('node'));
+        if ($this->hasREQ 
+            && $GLOBALS["SL"]->REQ->has('node')) {
+            $nodeIn = intVal($GLOBALS["SL"]->REQ
+                ->input('node'));
+            if ($nodeIn > 0) {
+                $this->updateCurrNode($nodeIn);
+            }
         }
         
         $lastNode = $this->currNode();
-        if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('superHardJump')) {
-            $this->updateCurrNode(intVal($GLOBALS["SL"]->REQ->superHardJump));
+        if ($this->hasREQ 
+            && $GLOBALS["SL"]->REQ->has('superHardJump')) {
+            $this->updateCurrNode(intVal(
+                $GLOBALS["SL"]->REQ->superHardJump));
         }
-        if (session()->has('redirLoginSurvey') || $GLOBALS["SL"]->REQ->has('test')) {
-            $next = $this->nextNode($this->currNode(), $this->currNodeSubTier);
+        if (session()->has('redirLoginSurvey') 
+            || $GLOBALS["SL"]->REQ->has('test')) {
+            $next = $this->nextNode(
+                $this->currNode(), 
+                $this->currNodeSubTier
+            );
             $this->updateCurrNodeNB($next);
             $this->setNodeIdURL($this->currNode());
             session()->forget('redirLoginSurvey');
         }
-        if ($this->currNode() < 0 || !isset($this->allNodes[$this->currNode()])) {
+        if ($this->currNode() < 0 
+            || !isset($this->allNodes[$this->currNode()])) {
             $this->updateCurrNode($GLOBALS["SL"]->treeRow->TreeRoot);
             //return '<h1>Sorry, Page Not Found.</h1>';
         }
@@ -64,12 +84,15 @@ class TreeSurv extends TreeSurvReport
         if (isset($this->allNodes[$this->currNode()]) 
             && !$this->allNodes[$this->currNode()]->isPage() 
             && !$this->allNodes[$this->currNode()]->isLoopRoot()) {
-            $this->updateCurrNode($this->allNodes[$this->currNode()]->getParent());
+            $this->updateCurrNode(
+                $this->allNodes[$this->currNode()]->getParent()
+            );
         }
         
         $this->loadAncestry($this->currNode());
         
-        if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
+        if ($this->hasREQ 
+            && $GLOBALS["SL"]->REQ->has('step')) {
             if (!$this->sessInfo) {
                 $this->createNewSess();
             }
@@ -264,7 +287,8 @@ class TreeSurv extends TreeSurvReport
             return $chk;
         }
         $this->checkPageViewPerms();
-        if ($GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_REPORT == 0) {
+        if ($GLOBALS["SL"]->treeRow->TreeOpts
+            %Globals::TREEOPT_REPORT == 0) {
             $this->fillGlossary(); // is report
         }
         //if ($this->v["uID"] > 0) $this->loadAllSessData();
@@ -283,7 +307,7 @@ class TreeSurv extends TreeSurvReport
         }
         $this->v["content"] = $this->printTreePublic() 
             . (($notes != '') ? '<!-- ' . $notes . ' -->' : '');
-        if ($this->v["currPage"][0] != '/') {
+        if ($this->v["currPage"][0] != '/' && isset($this->v["uID"])) {
             $log = new SLUsersActivity;
             $log->UserActUser = $this->v["uID"];
             $log->UserActCurrPage = $this->v["currPage"][0] . $notes;
@@ -293,7 +317,8 @@ class TreeSurv extends TreeSurvReport
             . $GLOBALS["SL"]->treeRow->TreeType . '"; setCurrPage("'
             . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] 
             . '", ' . $this->currNode() . '); function loadPageNodes() { 
-            if (typeof chkNodeVisib === "function") { ' . $this->v["javaNodes"] . ' } 
+            if (typeof chkNodeVisib === "function") { ' 
+            . $this->v["javaNodes"] . ' } 
             else { setTimeout("loadPageNodes()", 500); } 
             return true; } setTimeout("loadPageNodes()", 100); ' . "\n";
         if ($request->has('ajax') && $request->ajax == 1) {
@@ -314,15 +339,18 @@ class TreeSurv extends TreeSurvReport
                     || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
                     || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0
                     || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0) {
-                    $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\'if (document.getElementById("admSrchFld")) '
+                    $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\''
+                        . 'if (document.getElementById("admSrchFld")) '
                         . 'document.getElementById("admSrchFld").value=' 
                         . json_encode(trim($GLOBALS["SL"]->REQ->get('s')))
                         . '\', 10); ';
                 } // else check for the main public search field? 
             }
         }
-        $this->v["content"] 
-            = $GLOBALS["SL"]->pullPageJsCss($this->v["content"], $this->coreID);
+        $this->v["content"] = $GLOBALS["SL"]->pullPageJsCss(
+            $this->v["content"], 
+            $this->coreID
+        );
         if ($GLOBALS["SL"]->treeIsAdmin) {
             return $GLOBALS["SL"]->swapSessMsg($this->v["content"]);
         } else {
@@ -332,6 +360,12 @@ class TreeSurv extends TreeSurvReport
         }
     }
     
+    /**
+     * Override the default behavior for wrapping a tree which has
+     * been called through an ajax call.
+     *
+     * @return string
+     */
     protected function ajaxContentWrapCustom($str, $nID = -3)
     {
         return $str;

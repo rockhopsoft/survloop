@@ -10,28 +10,8 @@
   */
 namespace SurvLoop\Controllers\Globals;
 
-use SurvLoop\Controllers\Globals\GlobalsCache;
-
 class GlobalsElements extends GlobalsCache
 {
-    public $currTabInd  = 0;
-    public $debugOn     = false;
-
-    public function getReqParams()
-    {
-        $params = [
-            'frame',
-            'wdg',
-            'refresh'
-        ];
-        $ret = '';
-        foreach ($params as $param) {
-            if ($this->REQ->has($param)) {
-                $ret .= '&' . $param . '=' . $this->REQ->get($param);
-            }
-        }
-        return $ret;
-    }
 
     public function printAccordian($title, $body = '', $open = false, $big = false, $type = '')
     {
@@ -58,8 +38,8 @@ class GlobalsElements extends GlobalsCache
 
     public function addSideNavItem($title = '', $url = '', $delay = 2000)
     {
-        $this->pageJAVA .= ' setTimeout(\'addSideNavItem("' . $title . '", "' 
-            . $url . '")\', ' . $delay . '); ';
+        $this->pageJAVA .= ' setTimeout(\'addSideNavItem("' 
+            . $title . '", "' . $url . '")\', ' . $delay . '); ';
         return true;
     }
 
@@ -68,9 +48,11 @@ class GlobalsElements extends GlobalsCache
         if ($fldName == '') {
             $fldName = rand(10000000, 100000000);
         }
-        $this->pageAJAX .= '$( "#' . $fldName . 'ID" ).datepicker({ maxDate: "+0d" });';
-        return '<input type="text" name="' . $fldName . '" id="' . $fldName . 'ID" value="' 
-            . (($dateStr != '') ? date("m/d/Y", strtotime($dateStr)) : '')
+        $this->pageAJAX .= '$( "#' . $fldName 
+            . 'ID" ).datepicker({ maxDate: "+0d" });';
+        return '<input type="text" name="' . $fldName . '" id="' 
+            . $fldName . 'ID" value="' . (($dateStr != '') 
+                ? date("m/d/Y", strtotime($dateStr)) : '')
             . '" class="dateFld form-control" ' . $this->tabInd() 
             . ' autocomplete="off" >' . "\n";
     }
@@ -78,8 +60,10 @@ class GlobalsElements extends GlobalsCache
     public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
     {
         return 'http://twitter.com/share?url=' . urlencode($url) 
-            . ((trim($title) != '') ? '&text=' . urlencode($title) : '')
-            . ((trim($hashtags) != '') ? '&hashtags=' . urlencode($hashtags) : '');
+            . ((trim($title) != '') 
+                ? '&text=' . urlencode($title) : '')
+            . ((trim($hashtags) != '') 
+                ? '&hashtags=' . urlencode($hashtags) : '');
     }
     
     public function twitShareBtn($url = '', $title = '', $hashtags = '', $class = '', $btnText = '')
@@ -95,7 +79,8 @@ class GlobalsElements extends GlobalsCache
     
     public function getFacebookShareLnk($url = '', $title = '')
     {
-        return 'https://www.facebook.com/sharer/sharer.php?u=' . urlencode($url);
+        return 'https://www.facebook.com/sharer/sharer.php?u=' 
+            . urlencode($url);
     }
     
     public function faceShareBtn($url = '', $title = '', $class = '', $btnText = '')
@@ -205,7 +190,9 @@ class GlobalsElements extends GlobalsCache
     
     public function colorRgba2Hex($rgba = [])
     {
-        return '#' . dechex($rgba["r"]) . dechex($rgba["g"]) . dechex($rgba["b"]);
+        return '#' . dechex($rgba["r"]) 
+            . dechex($rgba["g"]) 
+            . dechex($rgba["b"]);
     }
 
     public function printRgba($rgba = [])
@@ -214,9 +201,11 @@ class GlobalsElements extends GlobalsCache
             return '';
         }
         if (!isset($rgba["a"]) || $rgba["a"] == 1) {
-            return 'rgb(' . $rgba["r"] . ', ' . $rgba["g"] . ', ' . $rgba["b"] . ')';
+            return 'rgb(' . $rgba["r"] . ', ' 
+                . $rgba["g"] . ', ' . $rgba["b"] . ')';
         }
-        return 'rgba(' . $rgba["r"] . ', ' . $rgba["g"] . ', ' . $rgba["b"] . ', '
+        return 'rgba(' . $rgba["r"] . ', ' 
+            . $rgba["g"] . ', ' . $rgba["b"] . ', '
             . number_format($rgba["a"], 2) . ')';
     }
     
@@ -244,12 +233,14 @@ class GlobalsElements extends GlobalsCache
     
     public function printColorFade($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
     {
-        return $this->printRgba($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
+        return $this->printRgba(
+            $this->colorFade($perc, $hex1, $hex2, $a1, $a2));
     }
     
     public function printColorFadeHex($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
     {
-        return $this->colorRgba2Hex($this->colorFade($perc, $hex1, $hex2, $a1, $a2));
+        return $this->colorRgba2Hex(
+            $this->colorFade($perc, $hex1, $hex2, $a1, $a2));
     }
     
     public function printHex2Rgba($hex = '#000000', $a = 1)
@@ -270,7 +261,8 @@ class GlobalsElements extends GlobalsCache
                 $dashPos = strpos($u, 'src/Public/');
                 if ($dashPos === 0) {
                     $u = str_replace('src/Public/', '', $u);
-                    return $this->sysOpts['app-url'] . '/' . $abbr . '/' . $u;
+                    return $this->sysOpts['app-url'] 
+                        . '/' . $abbr . '/' . $u;
                 }
             }
         }

@@ -17,8 +17,14 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .red, .redDrk, h1.red, h2.red, h3.red, label .red {
     color: {!! $css["color-danger-on"] !!};
 }
-.dbColor {
+.dbColor, .grn, h1.grn, h2.grn, h3.grn, label .grn {
     color: {!! $css["color-success-on"] !!};
+}
+.clrInfo { 
+    color: {!! $css["color-info-on"] !!}; 
+}
+.clrWarn { 
+    color: {!! $css["color-warn-on"] !!}; 
 }
 
 .bld, a.bld:link, a.bld:active, a.bld:visited, a.bld:hover {

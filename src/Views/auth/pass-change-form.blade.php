@@ -1,13 +1,22 @@
 <!-- resources/views/vendor/survloop/auth/pass-change-form.blade.php -->
-<form name="changePass" action="/change-my-password" method="post">
-<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+<form action="/change-my-password" 
+    name="changePass" method="post">
+<input type="hidden" id="csrfTok" 
+    name="_token" value="{{ csrf_token() }}">
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="old">Old Password</label></div>
+    <div class="nPrompt">
+        <label for="old">
+            Old Password
+        </label>
+    </div>
     <div class="nFld">
-        <input id="old" type="password" class="form-control passChgSub" name="old">
+        <input id="old" type="password" name="old"
+            class="form-control passChgSub">
         @if ($errors->has('old'))
-            <span class="form-text"><strong>{{ $errors->first('old') }}</strong></span>
+            <span class="form-text"><strong>{{ 
+                $errors->first('old') 
+            }}</strong></span>
         @endif
     </div>
 </div>
@@ -15,12 +24,19 @@
 <div class="nodeHalfGap"></div>
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="password">Password</label></div>
+    <div class="nPrompt">
+        <label for="password">
+            Password
+        </label>
+    </div>
     <div class="nFld">
         <span id="passStrng" class="mR20 red"></span>
-        <input id="password" type="password" class="form-control passChgSub" name="password">
+        <input id="password" type="password" name="password"
+            class="form-control passChgSub">
         @if ($errors->has('password'))
-            <span class="form-text"><strong>{{ $errors->first('password') }}</strong></span>
+            <span class="form-text"><strong>{{ 
+                $errors->first('password') 
+            }}</strong></span>
         @endif
     </div>
 </div>
@@ -28,11 +44,19 @@
 <div class="nodeHalfGap"></div>
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="password-confirm">Confirm Password</label></div>
+    <div class="nPrompt">
+        <label for="password-confirm">
+            Confirm Password
+        </label>
+    </div>
     <div class="nFld">
-        <input id="password-confirm" type="password" class="form-control passChgSub" name="password_confirmation">
+        <input id="password-confirm" type="password" 
+            class="form-control passChgSub" 
+            name="password_confirmation">
         @if ($errors->has('password_confirmation'))
-            <span class="form-text"><strong>{{ $errors->first('password_confirmation') }}</strong></span>
+            <span class="form-text"><strong>{{ 
+                $errors->first('password_confirmation') 
+            }}</strong></span>
         @endif
     </div>
 </div>
@@ -41,11 +65,14 @@
 
 <div id="passChgErrs" class="red"></div>
 <div class="nodeHalfGap"></div>
-<center><a id="passChgSub" class="btn btn-primary btn-xl" href="javascript:;">Change Password</a></center>
+<center><a id="passChgSub" href="javascript:;"
+    class="btn btn-primary btn-xl"
+    >Change Password</a></center>
 <div class="nodeHalfGap"></div>
 </form>
 
-<script async defer type="text/javascript" src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
+<script async defer type="text/javascript" src="{{ 
+    $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/zxcvbn.js">
 </script>
 <script async defer type="text/javascript"> $(document).ready(function(){
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}

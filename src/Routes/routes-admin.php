@@ -101,7 +101,7 @@ Route::get(
 )->name('password.reset');
 Route::get(
     'password/reset', 
-    'Auth\ForgotPasswordController@showLinkRequestForm'
+    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@showLinkRequestForm'
 )->name('password.update');
 //Route::post(
 //    'password/reset', 

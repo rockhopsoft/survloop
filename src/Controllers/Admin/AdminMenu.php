@@ -54,8 +54,12 @@ class AdminMenu
     
     protected function addAdmMenuCollapse()
     {
-        return $this->admMenuLnk('javascript:;" id="admMenuClpsBtn', 'Collapse', 
-            '<i id="admMenuClpsArr" class="fa fa-arrow-left" aria-hidden="true"></i>');
+        return $this->admMenuLnk(
+            'javascript:;" id="admMenuClpsBtn', 
+            'Collapse', 
+            '<i id="admMenuClpsArr" class="fa fa-arrow-left" '
+                . 'aria-hidden="true"></i>'
+        );
     }
     
     protected function addAdmMenuBasics($treeMenu = [])
@@ -67,6 +71,7 @@ class AdminMenu
                 $treeOut[] = $lnk;
             }
         }
+        $survLnk = '/dashboard/surv-' . $treeID;
         $treeOut[] = $this->admMenuLnk(
             'javascript:;', 
             'Site Content', 
@@ -104,27 +109,27 @@ class AdminMenu
                     1, 
                     [
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/map?all=1&alt=1', 
-                            '<b>' . $treeLabel . ':</b> Full Survey Map'
+                            $survLnk . '/map?all=1&alt=1', 
+                            'Full Map'
                         ), 
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/settings',
+                            $survLnk . '/settings',
                             'Settings'
                         ), 
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/sessions',
+                            $survLnk . '/sessions',
                             'Sessions'
                         ), 
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/stats?all=1',
+                            $survLnk . '/stats?all=1',
                             'Responses'
                         ),
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/data',
+                            $survLnk . '/data',
                             'Data Structures'
                         ), 
                         $this->admMenuLnk(
-                            '/dashboard/surv-' . $treeID . '/xmlmap',
+                            $survLnk . '/xmlmap',
                             'XML Map'
                         )
                     ]
@@ -345,15 +350,27 @@ class AdminMenu
     
     static public function admMenuLnk($url = '', $text = '', $ico = '', $opt = 1, $children = [])
     {
-        return [ $url, $text, $ico, $opt, $children ];
+        return [ 
+            $url, 
+            $text, 
+            $ico, 
+            $opt, 
+            $children 
+        ];
     }
     
     protected function admMenuLnkContact($icon = true)
     {
         $cnt = $this->admMenuLnkContactCnt();
         $lnk = 'Contact Form' . (($cnt > 0) 
-            ? '<sup id="contactPush" class="red mL5">' . $cnt . '</sup> ' : '');
-        $ico = (($icon) ? '<i class="fa fa-envelope-o" aria-hidden="true"></i> ' : '');
+            ? '<sup id="contactPush" class="red mL5">' 
+                . $cnt . '</sup> ' 
+            : '');
+        $ico = '';
+        if ($icon) {
+            $ico = '<i class="fa fa-envelope-o" '
+                . 'aria-hidden="true"></i> ';
+        }
         $ret = [ '/dashboard/contact', $lnk, $ico, 1, [
                 $this->admMenuLnk(
                     '/dashboard/contact?tab=unread', 
@@ -382,13 +399,25 @@ class AdminMenu
     
     protected function loadDbTreeShortNames()
     {
-        $dbName = ((isset($GLOBALS["SL"]->dbRow->DbName)) ? $GLOBALS["SL"]->dbRow->DbName : '');
-        if (strlen($dbName) > 20 && isset($GLOBALS["SL"]->dbRow->DbName)) {
-            $dbName = str_replace($GLOBALS["SL"]->dbRow->DbName, 
-                str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix), $dbName);
+        $dbName = '';
+        if (isset($GLOBALS["SL"]->dbRow->DbName)) {
+            $dbName = $GLOBALS["SL"]->dbRow->DbName;
+        }
+        $prefix = str_replace('_', '', 
+            $GLOBALS["SL"]->dbRow->DbPrefix);
+        if (strlen($dbName) > 20 
+            && isset($GLOBALS["SL"]->dbRow->DbName)) {
+            $dbName = str_replace(
+                $GLOBALS["SL"]->dbRow->DbName, 
+                $prefix, 
+                $dbName
+            );
         }
         $treeID = $GLOBALS["SL"]->treeRow->TreeID;
-        $treeName = ((isset($GLOBALS["SL"]->treeName)) ? $GLOBALS["SL"]->treeName : '');
+        $treeName = '';
+        if (isset($GLOBALS["SL"]->treeName)) {
+            $treeName = $GLOBALS["SL"]->treeName;
+        }
         if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
             $tree = SLTree::find(1);
             $treeID = $tree->TreeID;

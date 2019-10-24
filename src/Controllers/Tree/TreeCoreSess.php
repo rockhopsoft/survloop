@@ -48,7 +48,9 @@ class TreeCoreSess extends TreeCore
             $GLOBALS["SL"]->setClosestLoop();
             return false;
         }
-        $cid = (($GLOBALS["SL"]->REQ->has('cid') && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) 
+        $uID = ((isset($this->v["uID"])) ? $this->v["uID"] : 0);
+        $cid = (($GLOBALS["SL"]->REQ->has('cid') 
+            && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) 
             ? intVal($GLOBALS["SL"]->REQ->get('cid')) : 0);
         if ($GLOBALS["SL"]->REQ->has('start') && $GLOBALS["SL"]->REQ->has('new')
             && !session()->has('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'))) {
@@ -56,7 +58,7 @@ class TreeCoreSess extends TreeCore
             $this->newCoreRow($coreTbl);
             session()->put('t' . $GLOBALS["SL"]->treeID . 'new' . $GLOBALS["SL"]->REQ->get('new'), time());
         } elseif ($GLOBALS["SL"]->REQ->has('core') && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
-            $this->sessInfo = SLSess::where('SessUserID', $this->v["uID"])
+            $this->sessInfo = SLSess::where('SessUserID', $uID)
                 ->where('SessTree', $GLOBALS["SL"]->sessTree) //$this->treeID)
                 ->where('SessCoreID', '=', intVal($GLOBALS["SL"]->REQ->get('core')))
                 ->orderBy('updated_at', 'desc')
@@ -65,19 +67,20 @@ class TreeCoreSess extends TreeCore
                 $this->sessID = $this->sessInfo->SessID;
                 $this->coreID = $this->sessInfo->SessCoreID;
             }
-        } elseif (isset($this->v) && $this->v["uID"] > 0) {
+        } elseif (isset($this->v) && $uID > 0) {
             $this->chkUserTreeSess($coreTbl, $cid);
         } else {
             $this->chkTreeSess($GLOBALS["SL"]->sessTree);
         }
         // Check for and load core record's ID
-        if ($this->coreID <= 0 && $this->sessInfo && isset($this->sessInfo->SessCoreID) 
+        if ($this->coreID <= 0 && $this->sessInfo 
+            && isset($this->sessInfo->SessCoreID) 
             && intVal($this->sessInfo->SessCoreID) > 0) {
             $this->coreID = $this->sessInfo->SessCoreID;
         }
         $this->chkIfCoreIsEditable($this->coreID);
-        if ($this->coreID <= 0 && $this->v["uID"] > 0) {
-            $pastUserSess = SLSess::where('SessUserID', $this->v["uID"])
+        if ($this->coreID <= 0 && $uID > 0) {
+            $pastUserSess = SLSess::where('SessUserID', $uID)
                 ->where('SessTree', $this->treeID)
                 ->where('SessCoreID', '>', '0')
                 ->orderBy('updated_at', 'desc')
@@ -99,10 +102,11 @@ class TreeCoreSess extends TreeCore
             }
             $this->setSessCore($this->coreID);
             if ((!isset($this->sessInfo->SessUserID) 
-                || intVal($this->sessInfo->SessUserID) <= 0) && $this->v["uID"] > 0) {
-                $this->sessInfo->SessUserID = $this->v["uID"];
+                || intVal($this->sessInfo->SessUserID) <= 0) 
+                && $uID > 0) {
+                $this->sessInfo->SessUserID = $uID;
                 $msg = 'Assigning Sess#' . $this->sessID . ' to U#'
-                    . $this->v["uID"] . ' <i>(loadSessInfo)</i>';
+                    . $uID . ' <i>(loadSessInfo)</i>';
                 $this->logAdd('session-stuff', $msg);
             }
             $chkNode = false;
@@ -114,7 +118,8 @@ class TreeCoreSess extends TreeCore
             if (!$chkNode) {
                 $this->sessInfo->SessCurrNode = 0;
                 $nodeSaves = DB::table('SL_NodeSavesPage')
-                    ->join('SL_Node', 'SL_Node.NodeID', '=', 'SL_NodeSavesPage.PageSaveNode')
+                    ->join('SL_Node', 'SL_Node.NodeID', 
+                        '=', 'SL_NodeSavesPage.PageSaveNode')
                     ->where('SL_NodeSavesPage.PageSaveSession', $this->coreID)
                     ->where('SL_Node.NodeTree', $this->treeID)
                     ->select('SL_NodeSavesPage.*')
@@ -122,13 +127,15 @@ class TreeCoreSess extends TreeCore
                     ->get();
                 if ($nodeSaves->isNotEmpty()) {
                     foreach ($nodeSaves as $i => $s) {
-                        if ($this->sessInfo->SessCurrNode <= 0 && isset($s->PageSaveNode) 
+                        if ($this->sessInfo->SessCurrNode <= 0 
+                            && isset($s->PageSaveNode) 
                             && isset($this->allNodes[$s->PageSaveNode])) {
                             $this->sessInfo->SessCurrNode = $s->PageSaveNode;
                         }
                     }
                 }
-                if ($this->sessInfo->SessCurrNode <= 0 && isset($GLOBALS["SL"]->treeRow->TreeRoot)) {
+                if ($this->sessInfo->SessCurrNode <= 0 
+                    && isset($GLOBALS["SL"]->treeRow->TreeRoot)) {
                     $this->sessInfo->SessCurrNode = $GLOBALS["SL"]->treeRow->TreeRoot;
                 }
             }
@@ -143,12 +150,14 @@ class TreeCoreSess extends TreeCore
             // Initialize currNode
             if ($coreTbl != '' && isset($GLOBALS["SL"]->tblAbbr[$coreTbl])) {
                 $subFld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'SubmissionProgress';
-                if (isset($this->sessData->dataSets[$coreTbl]) 
-                    && isset($this->sessData->dataSets[$coreTbl][0])
-                    && isset($this->sessData->dataSets[$coreTbl][0]->{ $subFld })
-                    && intVal($this->sessData->dataSets[$coreTbl][0]->{ $subFld }) > 0) {
-                    $this->updateCurrNode($this->sessData->dataSets[$coreTbl][0]->{ $subFld });
-                } elseif (isset($this->sessInfo->SessCurrNode) && intVal($this->sessInfo->SessCurrNode) > 0) {
+                if (isset($this->sessData->dataSets[$coreTbl])) {
+                    $coreRec = $this->sessData->dataSets[$coreTbl][0];
+                    if (isset($coreRec->{ $subFld }) 
+                        && intVal($coreRec->{ $subFld }) > 0) {
+                        $this->updateCurrNode($coreRec->{ $subFld });
+                    }
+                } elseif (isset($this->sessInfo->SessCurrNode) 
+                    && intVal($this->sessInfo->SessCurrNode) > 0) {
                     $this->updateCurrNode($this->sessInfo->SessCurrNode);
                 } else {
                     $this->updateCurrNode($this->rootID);
@@ -208,7 +217,8 @@ class TreeCoreSess extends TreeCore
         if ($coreID <= 0) {
             $coreID = $this->coreID;
         }
-        if ($coreRec && $this->v["uID"] > 0 && trim($GLOBALS["SL"]->coreTblUserFld) != '') {
+        if ($coreRec && isset($this->v["uID"]) && $this->v["uID"] > 0 
+            && trim($GLOBALS["SL"]->coreTblUserFld) != '') {
             $msg = 'Assigning ' . $GLOBALS["SL"]->coreTbl . '#' . $coreID . ' from U#' 
                 . $coreRec->{ $GLOBALS["SL"]->coreTblAbbr() . 'UserID' } . ' to U#' 
                 . $this->v["uID"] . ' <i>(setCoreRecUser)</i>';
@@ -290,7 +300,8 @@ class TreeCoreSess extends TreeCore
             eval("\$recObj = new " . $modelPath . ";");
             if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey') {
                 $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
-                $recObj->{ $coreAbbr . 'UserID' } = $this->v["uID"];
+                $recObj->{ $coreAbbr . 'UserID' } = ((isset($this->v["uID"]))
+                    ? $this->v["uID"] : 0);
                 $recObj->{ $coreAbbr . 'IPaddy' } = $GLOBALS["SL"]->hashIP();
                 $recObj->{ $coreAbbr . 'IsMobile' } = $GLOBALS["SL"]->isMobile();
                 $recObj->{ $coreAbbr . 'UniqueStr' }
@@ -603,27 +614,37 @@ class TreeCoreSess extends TreeCore
     
     public function multiRecordCheckIntro($cnt = 1)
     {
-        return '<h3 class="slBlueDark">' . $this->v["user"]->name . ', You Have ' 
-            . (($cnt == 1) ? 'An Unfinished Session' : 'Unfinished Sessions') . '</h3>';
+        return '<h3 class="slBlueDark">' 
+            . $this->v["user"]->name . ', You Have ' 
+            . (($cnt == 1) 
+                ? 'An Unfinished Session' : 'Unfinished Sessions')
+            . '</h3>';
     }
     
     public function multiRecordCheckRow($i, $coreRecord)
     {
-        if ($this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreRecord[1]->getKey(), $coreRecord[1])) {
-            return view('vendor.survloop.forms.unfinished-record-row', [
-                "tree"    => $this->treeID,
-                "cID"     => $coreRecord[1]->getKey(),
-                "title"   => $this->multiRecordCheckRowTitle($coreRecord), 
-                "desc"    => $this->multiRecordCheckRowSummary($coreRecord),
-                "warning" => $this->multiRecordCheckDelWarn()
-                ])->render();
+        if ($this->recordIsEditable(
+            $GLOBALS["SL"]->coreTbl, 
+            $coreRecord[1]->getKey(), 
+            $coreRecord[1])) {
+            return view(
+                'vendor.survloop.forms.unfinished-record-row', 
+                [
+                    "tree"    => $this->treeID,
+                    "cID"     => $coreRecord[1]->getKey(),
+                    "title"   => $this->multiRecordCheckRowTitle($coreRecord), 
+                    "desc"    => $this->multiRecordCheckRowSummary($coreRecord),
+                    "warning" => $this->multiRecordCheckDelWarn()
+                ]
+            )->render();
         }
         return '';
     }
     
     public function multiRecordCheckRowTitle($coreRecord)
     {
-        $recSingVar = 'tree-' . $GLOBALS["SL"]->treeID . '-core-record-singular';
+        $recSingVar = 'tree-' . $GLOBALS["SL"]->treeID 
+            . '-core-record-singular';
         $recName = ' #' . $coreRecord[1]->getKey();
         if (isset($GLOBALS["SL"]->sysOpts[$recSingVar])) {
             $recName = $GLOBALS["SL"]->sysOpts[$recSingVar] . $recName;
@@ -633,7 +654,8 @@ class TreeCoreSess extends TreeCore
     
     public function multiRecordCheckRowSummary($coreRecord)
     {
-        return 'Started ' . date('M j, Y, g:ia', strtotime($coreRecord[1]->created_at));
+        return 'Started ' . date('M j, Y, g:ia', strtotime(
+            $coreRecord[1]->created_at));
     }
     
     public function multiRecordCheckDelWarn()
@@ -666,14 +688,22 @@ class TreeCoreSess extends TreeCore
     public function delSess(Request $request, $coreID)
     {
         $this->survLoopInit($request);
-        if ($this->isCoreOwner($coreID) || $this->isAdminUser()) {
+        if ($this->isCoreOwner($coreID) 
+            || $this->isAdminUser()) {
             if ($coreID != $this->coreID) {
-                $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $coreID);
+                $this->sessData->loadCore(
+                    $GLOBALS["SL"]->coreTbl, 
+                    $coreID
+                );
             }
             $this->sessData->deleteEntireCore();
             if ($coreID != $this->coreID) {
-                $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $this->coreID);
+                $this->sessData->loadCore(
+                    $GLOBALS["SL"]->coreTbl, 
+                    $this->coreID
+                );
             }
+            $core = 'coreID' . $GLOBALS["SL"]->sessTree;
             $sess = false;
             if ($this->v["uID"] > 0) {
                 $sess = SLSess::where('SessUserID', $this->v["uID"])
@@ -681,11 +711,12 @@ class TreeCoreSess extends TreeCore
                     ->where('SessCoreID', $coreID)
                     ->where('SessIsActive', 1)
                     ->first();
-            } elseif (session()->has('coreID' . $GLOBALS["SL"]->sessTree) 
-                && $coreID == session()->get('coreID' . $GLOBALS["SL"]->sessTree)) {
+            } elseif (session()->has($core) 
+                && $coreID == session()->get($core)) {
                 $sess = SLSess::find($coreID);
             }
-            $msg = 'Deleting Sess#' . (($sess && isset($sess->SessID)) ? $sess->SessID : 0) 
+            $msg = 'Deleting Sess#' 
+                . (($sess && isset($sess->SessID)) ? $sess->SessID : 0) 
                 . ' to U#' . $this->v["uID"] . ' <i>(delSess)</i>';
             $this->logAdd('session-stuff', $msg);
             if ($sess && isset($sess->SessID)) {
@@ -698,8 +729,8 @@ class TreeCoreSess extends TreeCore
             session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
             session()->put('sessMsg', $this->delSessMsg($coreID));
             $newCoreID = $this->findUserCoreID();
-            if ($this->coreIncompletes && sizeof($this->coreIncompletes) == 1 
-                && $newCoreID > 0) {
+            if ($newCoreID > 0 && $this->coreIncompletes 
+                && sizeof($this->coreIncompletes) == 1) {
                 $this->createNewSess();
                 $this->setSessCore($newCoreID);
             }
@@ -722,13 +753,16 @@ class TreeCoreSess extends TreeCore
         if ($coreID <= 0) {
             $coreID = $this->coreID;
         }
-        if ($this->v["uID"] <= 0) {
-            if (session()->has('coreID' . $GLOBALS["SL"]->sessTree)
-                && $coreID == intVal(session()->get('coreID' . $GLOBALS["SL"]->sessTree))
-                && session()->has('sessID' . $GLOBALS["SL"]->sessTree)
-                && intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree)) > 0) {
-                $chk = SLSess::where('SessID', intVal(session()->get('sessID' . $GLOBALS["SL"]->sessTree)))
-                    ->whereIn('SessTree', [$this->treeID, $GLOBALS["SL"]->sessTree])
+        $core = 'coreID' . $GLOBALS["SL"]->sessTree;
+        $sess = 'sessID' . $GLOBALS["SL"]->sessTree;
+        if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
+            if (session()->has($core)
+                && $coreID == intVal(session()->get($core))
+                && session()->has($sess)
+                && intVal(session()->get($sess)) > 0) {
+                $trees = [$this->treeID, $GLOBALS["SL"]->sessTree];
+                $chk = SLSess::where('SessID', intVal(session()->get($sess)))
+                    ->whereIn('SessTree', $trees)
                     ->where('SessCoreID', $coreID)
                     ->where('SessIsActive', 1)
                     ->get();
@@ -740,9 +774,12 @@ class TreeCoreSess extends TreeCore
         }
         // else user is already logged in
         if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
-            $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                . "::where('" . $GLOBALS["SL"]->coreTblIdFld() . "', " . intVal($coreID) . ")"
-                . "->where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] . ")"
+            $eval = "\$chk = " 
+                . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                . "::where('" . $GLOBALS["SL"]->coreTblIdFld() 
+                    . "', " . intVal($coreID) . ")"
+                . "->where('" . $GLOBALS["SL"]->coreTblUserFld 
+                    . "', " . $this->v["uID"] . ")"
                 . "->first();";
             eval($eval);
             if ($chk) {
@@ -792,16 +829,19 @@ class TreeCoreSess extends TreeCore
         if ($GLOBALS["SL"]->dataPerms == '') {
             $GLOBALS["SL"]->dataPerms = 'public';
         }
-        if ($this->v["uID"] > 0 && $this->v["user"]) {
+        if (isset($this->v["uID"]) && $this->v["uID"] > 0 
+            && isset($this->v["user"])) {
             if (in_array($GLOBALS["SL"]->pageView, ['', 'default'])) {
                 $GLOBALS["SL"]->pageView = 'public';
-                if ($this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                if ($this->v["user"]
+                    ->hasRole('administrator|databaser|staff|partner')) {
                     $GLOBALS["SL"]->pageView = 'full';
                 }
             } elseif (!$this->isCoreOwner()) {
                 if (in_array($GLOBALS["SL"]->pageView, 
                     ['full', 'full-pdf', 'full-xml'])) {
-                    if (!$this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                    if (!$this->v["user"]
+                        ->hasRole('administrator|databaser|staff|partner')) {
                         switch ($GLOBALS["SL"]->pageView) {
                             case 'full-pdf':
                                 $GLOBALS["SL"]->pageView = 'pdf';
@@ -840,6 +880,11 @@ class TreeCoreSess extends TreeCore
         return true;
     }
     
+    /**
+     * Override the default data permissions for this page load.
+     *
+     * @return boolean
+     */
     protected function tweakPageViewPerms()
     {
         return true;
@@ -871,19 +916,24 @@ class TreeCoreSess extends TreeCore
         if (!isset($this->v["pageToken"])) {
             $this->v["pageToken"] = [];
         }
-        if (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '') {
+        if (isset($this->v["tokenIn"]) 
+            && $this->v["tokenIn"] != '') {
             $this->v["mfaMsg"] = $this->processTokenAccess();
         }
-        return (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0);
+        return (isset($this->v["pageToken"]) 
+            && sizeof($this->v["pageToken"]) > 0);
     }
     
     public function pageLoadHasToken()
     {
         return ( (isset($GLOBALS["SL"]->pageView) 
                 && trim($GLOBALS["SL"]->pageView) == 'token')
-            || (isset($this->v["mfaMsg"]) && trim($this->v["mfaMsg"]) != '')
-            || (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '')
-            || (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0) );
+            || (isset($this->v["mfaMsg"]) 
+                && trim($this->v["mfaMsg"]) != '')
+            || (isset($this->v["tokenIn"]) 
+                && $this->v["tokenIn"] != '')
+            || (isset($this->v["pageToken"]) 
+                && sizeof($this->v["pageToken"]) > 0) );
     }
     
     protected function processTokenAccess($showLabel = 'Enter Key Code:')
@@ -902,7 +952,8 @@ class TreeCoreSess extends TreeCore
             if ($this->v["tokenUser"] && isset($this->v["tokenUser"]->id)) {
                 $mfaTools = true;
                 $resultMsg = '';
-                if ($GLOBALS["SL"]->REQ->has('sub') && $GLOBALS["SL"]->REQ->has('t2') 
+                if ($GLOBALS["SL"]->REQ->has('sub') 
+                    && $GLOBALS["SL"]->REQ->has('t2') 
                     && trim($GLOBALS["SL"]->REQ->get('t2')) != '') {
                     $chk = SLTokens::where('TokType', 'MFA')
                         ->where('TokCoreID', $this->coreID)
@@ -952,14 +1003,17 @@ class TreeCoreSess extends TreeCore
         $btnText   = 'Access Full Details', 
         $btnSz     = '-lg')
     {
-        return view('vendor.survloop.elements.inc-sensitive-access-mfa-form', [
-            "cID"       => $this->coreID,
-            "showLabel" => $showLabel,
-            "btnText"   => $btnText,
-            "btnSz"     => $btnSz, 
-            "user"      => ((isset($this->v["tokenUser"])) 
-                ? $this->v["tokenUser"] : null)
-        ])->render();
+        return view(
+            'vendor.survloop.elements.inc-sensitive-access-mfa-form', 
+            [
+                "cID"       => $this->coreID,
+                "showLabel" => $showLabel,
+                "btnText"   => $btnText,
+                "btnSz"     => $btnSz, 
+                "user"      => ((isset($this->v["tokenUser"])) 
+                    ? $this->v["tokenUser"] : null)
+            ]
+        )->render();
     }
     
     protected function processTokenAccessRedirExtra()

@@ -83,6 +83,14 @@ Route::get( '/dash/{pageSlug}/read-{cid}', [
     'uses'       => $path . 'Admin\\AdminController@loadPageURL', 
     'middleware' => ['auth']
 ]);
+Route::post('/dash/{pageSlug}/readi-{cid}', [
+    'uses'       => $path . 'Admin\\AdminController@loadPageURL', 
+    'middleware' => ['auth']
+]);
+Route::get( '/dash/{pageSlug}/readi-{cid}', [
+    'uses'       => $path . 'Admin\\AdminController@loadPageURL', 
+    'middleware' => ['auth']
+]);
 Route::post('/dash/{pageSlug}', [
     'uses'       => $path . 'Admin\\AdminController@loadPageURL', 
     'middleware' => ['auth']

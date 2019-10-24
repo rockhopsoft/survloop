@@ -1,13 +1,24 @@
 <?php
 // Check for globals required to load this master template
 if (!isset($GLOBALS["SL"])) {
-    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(new Illuminate\Http\Request, 1, 1, 1);
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(
+        new Illuminate\Http\Request, 1, 1, 1);
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') 
     || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
 $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) 
     && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
+
+$isWsyiwyg = false;
+if (isset($needsWsyiwyg) && $needsWsyiwyg) {
+    $isWsyiwyg = true;
+}
+if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
+    && $GLOBALS["SL"]->x["needsWsyiwyg"]) {
+    $isWsyiwyg = true;
+}
+
 
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -21,21 +32,25 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
     <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
     <script id="sysJs2" src="/sys2.min.js" type="text/javascript"></script>
 @else
-    <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
+    <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
+        }}" rel="stylesheet" type="text/css">
     <link href="/jquery-ui.min.css" rel="stylesheet" type="text/css">
     <link href="/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
+    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{
+        $GLOBALS['SL']->sysOpts['log-css-reload'] 
         }}" rel="stylesheet" type="text/css">
     <script src="/jquery.min.js" type="text/javascript"></script>
     <script src="/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/bootstrap.min.js" type="text/javascript"></script>
-    <!--- <script src="/survloop/parallax.min.js" type="text/javascript"></script> --->
-    <script id="sysJs" src="/survloop/scripts-lib.js" type="text/javascript"></script>
+<?php /* <script src="/survloop/parallax.min.js" type="text/javascript"></script> */ ?>
+    <script id="sysJs" src="/survloop/scripts-lib.js" 
+        type="text/javascript"></script>
     {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
-    <script id="sysJs2" src="/sys2.min.js?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    <script id="sysJs2" src="/sys2.min.js?v={{ 
+        $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
 @endif
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+@if ($isWsyiwyg)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
         crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
         </script>
@@ -48,7 +63,7 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
     || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
     <script src="/plotly.min.js"></script>
 @endif
-<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
+<?php /* @if ($isWsyiwyg)
     <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
 @endif */ ?>
 @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
@@ -290,13 +305,13 @@ $bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts)
 @endif
 
 
-<?php /* @if (isset($needsWsyiwyg) && $needsWsyiwyg)
+<?php /* @if ($isWsyiwyg)
     <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
     <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
         }}/survloop/ContentTools-master/build/editor.js"></script>
 @endif */ ?>
-@if (isset($needsWsyiwyg) && $needsWsyiwyg)
+@if ($isWsyiwyg)
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
     <?php /* <link href="/summernote.css" rel="stylesheet"> <script defer src="/summernote.min.js"></script> */ ?>

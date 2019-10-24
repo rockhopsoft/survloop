@@ -200,6 +200,14 @@ class SystemDefinitionsInit
             'header-code' => [
                 '< head > Header Code < / head >', 
                 '&lt;div&gt;Anything&lt;/div&gt;'
+            ],
+            'sys-cust-js' => [
+                'System-Wide Javascript', 
+                'var custom = 1;'
+            ],
+            'sys-cust-ajax' => [
+                'System-Wide jQuery/AJAX', 
+                'function reqFormFldCustom() { return 0; }'
             ]
         ];
     }

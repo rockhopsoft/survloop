@@ -13,7 +13,6 @@ namespace SurvLoop\Controllers\Globals;
 use App\Models\SLZips;
 use App\Models\SLZipAshrae;
 use App\Models\SLNodeResponses;
-use SurvLoop\Controllers\Globals\GeographyLists;
 
 class GeographyLookups extends GeographyLists
 {
@@ -145,10 +144,13 @@ class GeographyLookups extends GeographyLists
         if (!$zipRow) {
             return '';
         }
-        if (isset($zipRow->ZipCountry) && $zipRow->ZipCountry == 'Canada') {
+        if (isset($zipRow->ZipCountry) 
+            && $zipRow->ZipCountry == 'Canada') {
             return 'Canada';
         }
-        if ((!isset($zipRow->ZipCountry) || trim($zipRow->ZipCountry) == '') && isset($zipRow->ZipState) 
+        if ((!isset($zipRow->ZipCountry) 
+            || trim($zipRow->ZipCountry) == '') 
+            && isset($zipRow->ZipState) 
             && !in_array($zipRow->ZipState, $this->getTerritoryAbbrs())) {
             $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
                 ->where('AshrCounty', $zipRow->ZipCounty)
@@ -163,22 +165,28 @@ class GeographyLookups extends GeographyLists
     public function countryDrop($cntry = '')
     {
         $this->loadCountries();
-        return view('vendor.survloop.forms.inc-drop-opts-countries', [
-            "cntry"       => trim($cntry),
-            "countryList" => $this->countryList
-        ])->render();
+        return view(
+            'vendor.survloop.forms.inc-drop-opts-countries', 
+            [
+                "cntry"       => trim($cntry),
+                "countryList" => $this->countryList
+            ]
+        )->render();
     }
     
     public function stateDrop($state = '', $all = false)
     {
         $this->loadStates();
-        return view('vendor.survloop.forms.inc-drop-opts-states', [
-            "state"       => trim($state),
-            "stateList"   => $this->stateList,
-            "stateListCa" => $this->stateListCa,
-            "hasCanada"   => $this->hasCanada,
-            "all"         => $all
-        ])->render();
+        return view(
+            'vendor.survloop.forms.inc-drop-opts-states', 
+            [
+                "state"       => trim($state),
+                "stateList"   => $this->stateList,
+                "stateListCa" => $this->stateListCa,
+                "hasCanada"   => $this->hasCanada,
+                "all"         => $all
+            ]
+        )->render();
     }
     
     public function stateResponses($all = false)
@@ -189,14 +197,16 @@ class GeographyLookups extends GeographyLists
         foreach ($this->stateList as $abbr => $name) {
             $responses[$cnt] = new SLNodeResponses;
             $responses[$cnt]->NodeResValue = $abbr;
-            $responses[$cnt]->NodeResEng = $name . ' (' . $abbr . ')';
+            $responses[$cnt]->NodeResEng = $name 
+                . ' (' . $abbr . ')';
             $cnt++;
         }
         if ($this->hasCanada) {
             foreach ($this->stateListCa as $abbr => $name) {
                 $responses[$cnt] = new SLNodeResponses;
                 $responses[$cnt]->NodeResValue = $abbr;
-                $responses[$cnt]->NodeResEng = $name . ' (' . $abbr . ')';
+                $responses[$cnt]->NodeResEng = $name 
+                    . ' (' . $abbr . ')';
                 $cnt++;
             }
         }
@@ -205,22 +215,29 @@ class GeographyLookups extends GeographyLists
     
     public function climateZoneDrop($fltClimate = '')
     {
-        return view('vendor.survloop.forms.inc-drop-opts-ashrae', [
-            "fltClimate" => $fltClimate,
-            "hasCanada"  => $this->hasCanada
-        ])->render();
+        return view(
+            'vendor.survloop.forms.inc-drop-opts-ashrae', 
+            [
+                "fltClimate" => $fltClimate,
+                "hasCanada"  => $this->hasCanada
+            ]
+        )->render();
     }
     
     public function climateGroupDrop($fltClimate = '')
     {
-        return view('vendor.survloop.forms.inc-drop-opts-ashrae-groups', [
-            "fltClimate" => $fltClimate
-        ])->render();
+        return view(
+            'vendor.survloop.forms.inc-drop-opts-ashrae-groups', 
+            [
+                "fltClimate" => $fltClimate
+            ]
+        )->render();
     }
     
     public function stateClimateDrop($state = '', $all = false)
     {
-        return $this->climateGroupDrop($state) . '<option disabled ></option>'
+        return $this->climateGroupDrop($state) 
+            . '<option disabled ></option>'
             . $this->stateDrop($state, $all);
     }
     
@@ -296,7 +313,14 @@ class GeographyLookups extends GeographyLists
     
     public function isAshraeZoneGroup($zoneGroup = '')
     {
-        return (in_array($zoneGroup, ['Hot-Humid', 'Mixed-Humid', 'Cold', 'Very Cold', 'Subarctic']));
+        $zones = [
+            'Hot-Humid', 
+            'Mixed-Humid', 
+            'Cold', 
+            'Very Cold', 
+            'Subarctic'
+        ];
+        return (in_array($zoneGroup, $zones));
     }
     
     public function getAshraeGroupZones($zoneGroup = '')
@@ -340,8 +364,10 @@ class GeographyLookups extends GeographyLists
         if (!isset($this->zoneZips[$zoneGroup])) {
             $this->zoneZips[$zoneGroup] = [];
             $zips = DB::table('SL_Zips')
-                ->join('SL_ZipAshrae', 'SL_Zips.ZipCounty', 'LIKE', 'SL_ZipAshrae.AshrCounty')
-                ->whereIn('SL_ZipAshrae.AshrZone', $this->getAshraeGroupZones($zoneGroup))
+                ->join('SL_ZipAshrae', 'SL_Zips.ZipCounty', 
+                    'LIKE', 'SL_ZipAshrae.AshrCounty')
+                ->whereIn('SL_ZipAshrae.AshrZone', 
+                    $this->getAshraeGroupZones($zoneGroup))
                 ->select('SL_Zips.ZipZip')
                 ->get();
             if ($zips->isNotEmpty()) {

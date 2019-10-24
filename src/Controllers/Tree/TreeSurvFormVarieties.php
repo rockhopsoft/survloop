@@ -144,9 +144,11 @@ class TreeSurvFormVarieties extends UserProfile
     {
         $ret = '';
         $blockWidget = false;
-        if ($curr->nodeType == 'Incomplete Sess Check' && isset($this->v["profileUser"]) 
+        if ($curr->nodeType == 'Incomplete Sess Check' 
+            && isset($this->v["profileUser"]) 
             && isset($this->v["profileUser"]->id)) {
-            if (!isset($this->v["uID"]) || $this->v["uID"] != $this->v["profileUser"]->id) {
+            if (!isset($this->v["uID"]) 
+                || $this->v["uID"] != $this->v["profileUser"]->id) {
                 $blockWidget = true;
             }
         }
@@ -173,13 +175,18 @@ class TreeSurvFormVarieties extends UserProfile
                     $this->searcher->advSearchUrlSffx .= '&mine=1';
                 }
                 if (in_array($curr->nodeType, ['Record Full', 'Record Full Public'])) {
-                    $cid = (($GLOBALS["SL"]->REQ->has('i')) ? intVal($GLOBALS["SL"]->REQ->get('i')) 
-                        : (($this->treeID == $widgetTreeID && $this->coreID > 0) ? $this->coreID : -3));
+                    $cid = (($GLOBALS["SL"]->REQ->has('i')) 
+                        ? intVal($GLOBALS["SL"]->REQ->get('i')) 
+                        : (($this->treeID == $widgetTreeID && $this->coreID > 0) 
+                            ? $this->coreID : -3));
                     //$loadURL .= '?i=' . $cid . (($search != '') ? '&s=' . $search : '');
                     $wTree = SLTree::find($widgetTreeID);
                     if ($cid > 0 && $wTree) {
-                        $loadURL = '/' . $wTree->TreeSlug . '/read-' . $cid . '/full?ajax=1&wdg=1'
-                            . (($curr->nodeType == 'Record Full Public') ? '&publicView=1' : '');
+                        $loadURL = '/' . $wTree->TreeSlug 
+                            . '/read-' . $cid . '/full?ajax=1&wdg=1'
+                            . (($curr->nodeType == 'Record Full Public') 
+                                ? '&publicView=1' : '')
+                            . $GLOBALS["SL"]->getAnyReqParams();
                         $spinner = '<br /><br /><center>' . $spinner . '</center><br />';
                     }
                 } elseif ($curr->nodeType == 'Search Featured') {

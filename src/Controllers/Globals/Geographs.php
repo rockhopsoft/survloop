@@ -11,7 +11,6 @@
 namespace SurvLoop\Controllers\Globals;
 
 use App\Models\SLAddyGeo;
-use SurvLoop\Controllers\Globals\GeographyLookups;
 
 class Geographs extends GeographyLookups
 {   
@@ -36,8 +35,8 @@ class Geographs extends GeographyLookups
         }
         $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
             ->first();
-        if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong) 
-            || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong)) {
+            // || $GLOBALS["SL"]->REQ->has('refresh')
             if (isset($GLOBALS["SL"]->sysOpts["google-cod-key"]) 
                 && !$GLOBALS["SL"]->isHomestead()) {
                 $jsonFile = 'https://maps.googleapis.com/maps/api/geocode/json?address=' 
@@ -47,6 +46,8 @@ class Geographs extends GeographyLookups
                 if (sizeof($json) > 0 && isset($json["results"]) && sizeof($json["results"]) > 0 
                     && isset($json["results"][0]["geometry"]) 
                     && isset($json["results"][0]["geometry"]["location"])) {
+                    $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
+                        ->delete();
                     $chk = new SLAddyGeo;
                     $chk->AdyGeoAddress = $addy;
                     $chk->AdyGeoLat     = $json["results"][0]["geometry"]["location"]["lat"];
@@ -79,11 +80,11 @@ class Geographs extends GeographyLookups
     
     public function embedMap($nID = 0, $filename = '', $docName = '', $docDesc = '')
     {
-        if ($GLOBALS["SL"]->isHomestead()) {
-            return '<div style="height: 420px; padding-top: 200px;">(Map)</div>';
-        }
         if (sizeof($this->mapMarkers) > 0) {
             $this->kmlMarkersFull($filename);
+            if ($GLOBALS["SL"]->isHomestead()) {
+                return '<div style="height: 420px; padding-top: 200px;">(Map)</div>';
+            }
             $descAjax = false;
             if (sizeof($this->mapMarkers) > 0) {
                 foreach ($this->mapMarkers as $i => $mark) {
@@ -160,9 +161,12 @@ class Geographs extends GeographyLookups
             $finalKML = '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' . "\n"
                 . '<kml xmlns="http://www.opengis.net/kml/2.2">' . "\n\t"
               //. '<refreshMode>onChange</refreshMode>' . "\n\t"
-                . '<Document>' . "\n\t" . '<name>' . $GLOBALS["SL"]->makeXMLSafe($docName) . '</name>' . "\n\t"
-                . '<description>' . $GLOBALS["SL"]->makeXMLSafe($docDesc) . '</description>' . "\n\t"
-                . $this->kmlMarkerStyles() . "\n\t" . $this->kmlMapMarkers() . '</Document>' . "\n" . '</kml>';
+                . '<Document>' . "\n\t" . '<name>' 
+                . $GLOBALS["SL"]->makeXMLSafe($docName) . '</name>' . "\n\t"
+                . '<description>' . $GLOBALS["SL"]->makeXMLSafe($docDesc) 
+                . '</description>' . "\n\t"
+                . $this->kmlMarkerStyles() . "\n\t" . $this->kmlMapMarkers() 
+                . '</Document>' . "\n" . '</kml>';
 //echo 'kmlMarkersFull(' . $filename . '<br /><pre>' . $finalKML . '</pre>'; exit;
             if (file_exists($fullpath)) {
                 unlink($fullpath); 

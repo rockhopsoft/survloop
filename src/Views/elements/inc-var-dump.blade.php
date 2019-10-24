@@ -7,10 +7,14 @@
 <div id="hidivDbgPop">
     <center>
     <div class="fPerc133 bld">lastNode: {{ $lastNode }} -> currNode: {{ $currNode }}</div>
-    <div class="pL10 pB20"><i>coreID: {{ $coreID }}, @if ($user && isset($user->id)) userID: {{ $user->id }}, 
-        @if (isset($user->name)) {{ $user->name }} @endif @endif , 
+    <div class="pL10 pB20"><i>coreID: {{ $coreID }}, 
+        @if (isset($user) && isset($user->id))
+            userID: {{ $user->id }}, 
+            @if (isset($user->name)) {{ $user->name }} @endif ,
+        @endif
         @if (isset($dataSets["Complaints"]) && $dataSets["Complaints"][0]) 
-            {{ $dataSets["Complaints"][0]->ComAwardMedallion }} @endif
+            {{ $dataSets["Complaints"][0]->ComAwardMedallion }}
+        @endif
         </i></div>
     </center>
     <div class="row">

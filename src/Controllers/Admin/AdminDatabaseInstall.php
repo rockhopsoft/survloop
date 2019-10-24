@@ -561,48 +561,6 @@ class AdminDatabaseInstall extends AdminDBController
         return view('vendor.survloop.admin.db.install', $this->v);
     }
     
-    // for emergency cases with questionable database access, this should only be temporarily included
-    public function manualMySql(Request $request)
-    {
-        $this->admControlInit($request, '/dashboard/db/all');
-        if ($this->v["uID"] == 1) { // && in_array($_SERVER["REMOTE_ADDR"], ['192.168.10.1'])) {
-    		$this->v["manualMySql"] = 'Connected successfully<br />';
-            $db = mysqli_connect(env('DB_HOST', 'localhost'), env('DB_USERNAME', 'homestead'), 
-                env('DB_PASSWORD', 'secret'), env('DB_DATABASE', 'homestead'));
-            if ($db->connect_error) {
-                $this->v["manualMySql"] = "Connection failed: " . $db->connect_error . '<br />';
-            }
-    		$this->v["lastSql"] = '';
-    		$this->v["lastResults"] = [];
-    		if ($request->has('mys') && trim($request->mys) != '') {
-    		    $this->v["lastSql"] = trim($request->mys);
-    		    $this->v["manualMySql"] .= '<b>Statements submitted...</b><br />';
-    		    $statements = $GLOBALS["SL"]->mexplode(';', $request->mys);
-    		    foreach ($statements as $sql) {
-    		        $cnt = 0;
-    		        if (trim($sql) != '') {
-                        ob_start();
-                        $res = mysqli_query($db, $sql);
-                        $errorCatch = ob_get_contents();
-                        ob_end_clean();
-                        $this->v["lastResults"][$cnt][0] = $sql;
-                        $this->v["lastResults"][$cnt][1] = $errorCatch;
-                        if ($res->isNotEmpty()) {
-                            ob_start();
-                            print_r($res);
-                            $this->v["lastResults"][$cnt][2] = ob_get_contents();
-                            ob_end_clean();
-                        }
-                        $cnt++;
-                    }
-                }
-    		}
-    		mysqli_close($db);
-    		return view('vendor.survloop.admin.db.manualMySql', $this->v);
-    	}
-        return $this->redir('/dashboard/db/export');
-    }
-    
     protected function chkModelsFolder()
     {
         if (!file_exists('../app/Models')) {

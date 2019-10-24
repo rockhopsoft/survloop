@@ -14,26 +14,9 @@ use Storage;
 use MatthiasMullie\Minify;
 use App\Models\SLCaches;
 use App\Models\SLTree;
-use SurvLoop\Controllers\Globals\GlobalsStatic;
 
-class GlobalsCache extends GlobalsStatic
+class GlobalsCache extends GlobalsBasic
 {
-    public $x           = [];
-    public $sysOpts     = [];
-
-    public $coreID      = 0;
-    public $pageView    = '';
-    public $dataPerms   = 'public';
-    public $cacheSffx   = '';
-    public $isOwner     = false;
-
-    public $pageSCRIPTS = '';
-    public $pageJAVA    = '';
-    public $pageAJAX    = '';
-    public $pageCSS     = '';
-
-    public $cachePath   = 'cache'; // ../storage/app/
-
     public function getCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
         $type = $this->chkCacheType($type);
@@ -68,7 +51,8 @@ class GlobalsCache extends GlobalsStatic
 
     public function chkCacheType($type = '')
     {
-        if ($type == '' && isset($this->treeRow) && isset($this->treeRow->TreeType)) {
+        if ($type == '' && isset($this->treeRow) 
+            && isset($this->treeRow->TreeType)) {
             $type = strtolower($this->treeRow->TreeType);
         }
         return $type;
@@ -78,9 +62,11 @@ class GlobalsCache extends GlobalsStatic
     {
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
-        if ($chk && isset($chk->CachValue) && trim($chk->CachValue) != '') {
-            if (Storage::exists($this->cachePath . '/html/' . $chk->CachValue)) {
-                return trim(Storage::get($this->cachePath . '/html/' . $chk->CachValue));
+        if ($chk && isset($chk->CachValue) 
+            && trim($chk->CachValue) != '') {
+            $file = $this->cachePath . '/html/' . $chk->CachValue;
+            if (Storage::exists($file)) {
+                return trim(Storage::get($file));
             }
         }
         return '';
@@ -114,7 +100,8 @@ class GlobalsCache extends GlobalsStatic
     public function deleteCacheFile($cache)
     {
         if ($cache && isset($cache->CachID)) {
-            Storage::delete($this->cachePath . '/html/' . $cache->CachValue);
+            $file = $this->cachePath . '/html/' . $cache->CachValue;
+            Storage::delete($file);
             $cache->delete();
             return true;
         }
@@ -123,9 +110,10 @@ class GlobalsCache extends GlobalsStatic
 
     public function putCache($key = '', $content = '', $type = '', $treeID = 0, $coreID = 0)
     {
-        $file = date("Ymd") . '-t' . $treeID . (($coreID > 0) ? '-c' . $coreID : '');
+        $file = date("Ymd") . '-t' . $treeID 
+            . (($coreID > 0) ? '-c' . $coreID : '');
         $treeRow = false;
-        if (isset($this->treeRow) && isset($this->treeRow->TreeType)) {
+        if (isset($this->treeRow->TreeType)) {
             $treeRow = $this->treeRow;
         } elseif ($treeID > 0) {
             $treeRow = SLTree::find($treeID);
@@ -134,9 +122,12 @@ class GlobalsCache extends GlobalsStatic
             && $treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
             $file .= '-s' . session()->get('slSessID');
         }
-        $file .= '-' . str_replace('.html', '', str_replace('?', '_', 
-                str_replace('&', '_', str_replace('/', '_', $key))))
-            . '-r' . rand(10000000, 100000000) . '.html';
+        $fileDeets = '-' . str_replace('.html', '', str_replace('?', '_', 
+                str_replace('&', '_', str_replace('/', '_', $key))));
+        if (strlen($fileDeets) > 60) {
+            $fileDeets = substr($fileDeets, 0, 60);
+        }
+        $file .= $fileDeets . '-r' . rand(10000000, 100000000) . '.html';
         Storage::put($this->cachePath . '/html/' . $file, $content);
 
         $type = $this->chkCacheType($type);
@@ -153,7 +144,8 @@ class GlobalsCache extends GlobalsStatic
     
     public function opnAjax()
     {
-        return '<script type="text/javascript"> $(document).ready(function(){ ';
+        return '<script type="text/javascript"> '
+            . '$(document).ready(function(){ ';
     }
     
     public function clsAjax()
@@ -166,7 +158,8 @@ class GlobalsCache extends GlobalsStatic
         $ret = ((isset($this->sysOpts["spinner-code"])) 
             ? $this->sysOpts["spinner-code"] : '<b>...</b>');
         if ($center) {
-            return '<div class="w100 pT20 pB20"><center>' . $ret . '</center></div>';
+            return '<div class="w100 pT20 pB20"><center>' 
+                . $ret . '</center></div>';
         }
         return $ret;
     }
@@ -208,25 +201,27 @@ class GlobalsCache extends GlobalsStatic
             $tagMeat = '';
             $tag1end = strpos($str, '>', $tag1start);
             if ($tag1end !== false 
-                && substr($str, $tag1start, 21) != '<script id="noExtract') {
+                && substr($str, $tag1start, 21) 
+                    != '<script id="noExtract') {
                 $tag2 = strpos($str, '</script>', $tag1end);
                 if ($tag2 !== false) {
-                    $tagMeat = substr($str, ($tag1end+1), ($tag2-$tag1end-1));
-                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+9));
+                    $tagMeat = substr(
+                        $str, 
+                        ($tag1end+1), 
+                        ($tag2-$tag1end-1)
+                    );
+                    $str = substr($str, 0, $tag1start) 
+                        . substr($str, ($tag2+9));
                 }
             }
             $offset = $tag1end-strlen($tagMeat);
-            if (0 < $tag1end && 0 < $offset && $offset < strlen($str)) {
+            if (0 < $tag1end && 0 < $offset 
+                && $offset < strlen($str)) {
                 $tag1start = strpos($str, '<script', $offset);
             } else {
                 $tag1start = false;
             }
-            if (trim($tagMeat) != '') {
-                $allMeat .= (($nID >= 0) 
-                        ? ' /* start extract from node ' . $nID . ': */ ' : '')
-                    . $tagMeat . (($nID >= 0) 
-                        ? ' /* end extract from node ' . $nID . ': */ ' : '');
-            }
+            $allMeat .= $this->wrapScriptMeat($tagMeat, $nID);
         }
         if (!$destroy) {
             $this->pageJAVA .= $allMeat;
@@ -247,27 +242,45 @@ class GlobalsCache extends GlobalsStatic
             $tagMeat = '';
             $tag1end = strpos($str, '>', $tag1start);
             if ($tag1end !== false 
-                && substr($str, $tag1start, 20) != '<style id="noExtract') {
+                && substr($str, $tag1start, 20) 
+                    != '<style id="noExtract') {
                 $tag2 = strpos($str, '</style>', $tag1end);
                 if ($tag2 !== false) {
-                    $tagMeat = substr($str, ($tag1end+1), ($tag2-$tag1end-1));
-                    $str = substr($str, 0, $tag1start) . substr($str, ($tag2+8));
+                    $tagMeat = substr(
+                        $str, 
+                        ($tag1end+1), 
+                        ($tag2-$tag1end-1)
+                    );
+                    $str = substr($str, 0, $tag1start) 
+                        . substr($str, ($tag2+8));
                 }
             }
             if ($tag1end > 0) {
-                $tag1start = strpos($str, '<style', $tag1end-strlen($tagMeat));
+                $tag1start = strpos(
+                    $str, 
+                    '<style', 
+                    $tag1end-strlen($tagMeat)
+                );
             }
-            if (trim($tagMeat) != '') {
-                $allMeat .= (($nID > 0) 
-                        ? ' /* start extract from node ' . $nID . ': */ ' : '')
-                    . $tagMeat . (($nID > 0) 
-                        ? ' /* end extract from node ' . $nID . ': */ ' : '');
-            }
+            $allMeat .= $this->wrapScriptMeat($tagMeat, $nID);
         }
         if (!$destroy) {
             $this->pageCSS .= $allMeat;
         }
         return $str;
+    }
+    
+    public function wrapScriptMeat($tagMeat = '', $nID = 0)
+    {
+        if (trim($tagMeat) != '') {
+            if ($nID <= 0) {
+                return $tagMeat;
+            }
+            return ' /* start extract from node ' . $nID . ': */ ' 
+                . $tagMeat 
+                . '/* end extract from node ' . $nID . ': */ ';
+        }
+        return '';
     }
     
     public function pullPageJsCss($content = '', $coreID = 0)
@@ -319,6 +332,10 @@ class GlobalsCache extends GlobalsStatic
 
     public function getCachePageJs($filename = '')
     {
+        if (!Storage::has($this->cachePath . '/js/' . $filename)) {
+            return '<!-- not found ' . $this->cachePath . '/js/' . $filename 
+                . ' -->';
+        }
         return trim(Storage::get($this->cachePath . '/js/' . $filename));
     }
 
@@ -388,8 +405,9 @@ class GlobalsCache extends GlobalsStatic
         }
         $this->x["deferCnt"]++;
         $rand = rand(100000000, 1000000000);
-        $file = $this->cachePath . '/html/' . date("Ymd") . '-t' . $this->treeID
-            . '-c' . $coreID . '-n' . $nID . '-r' . $rand . '.html';
+        $file = $this->cachePath . '/html/' . date("Ymd") 
+            . '-t' . $this->treeID . '-c' . $coreID . '-n' . $nID 
+            . '-r' . $rand . '.html';
         if (trim($js) != '' || trim($ajax) != '') {
             $content .= '<script type="text/javascript"> ' . $js . ' ';
             if (trim($ajax) != '') {
@@ -401,13 +419,19 @@ class GlobalsCache extends GlobalsStatic
             $content .= '<style> ' . $css . ' </style>';
         }
         Storage::put($file, $content);
-        $this->pageAJAX .= 'setTimeout(function() { $("#deferNode' . $nID 
-            . '").load("/defer/' . $this->treeID . '/' . $coreID . '/' . $nID 
-            . '/' . date("Ymd")
-            . '/' . $rand . '"); }, ' . (500+(500*$this->x["deferCnt"])) . '); ';
-        return '<div id="deferNode' . $nID . '" class="w100 ovrSho"><center>'
-            . '<div id="deferAnim' . $nID . '" class="p20 m20">'
-            . $this->spinner() . '</div></center></div>';
+        $loadUrl = '/defer/' . $this->treeID . '/' . $coreID 
+            . '/' . $nID . '/' . date("Ymd") . '/' . $rand;
+        $params = $this->getAnyReqParams();
+        if ($params != '') {
+            $loadUrl .= '?' . substr($params, 1);
+        }
+        $this->pageAJAX .= 'setTimeout(function() { '
+            . '$("#deferNode' . $nID . '").load("' . $loadUrl . '"); '
+            . '}, ' . (500+(500*$this->x["deferCnt"])) . '); ';
+        return '<div id="deferNode' . $nID . '" class="w100 ovrSho">'
+            . '<center><div id="deferAnim' . $nID . '" class="p20 m20">'
+            . $this->spinner() . '</div></center>'
+            . '</div>';
     }
 
 }
