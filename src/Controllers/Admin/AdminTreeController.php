@@ -42,7 +42,8 @@ class AdminTreeController extends AdminController
     	if ($this->v["uID"] > 0) {
     		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
         }
-        $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) ? session()->get('adminOverOpts') : '');
+        $this->v["adminOverOpts"] = ((session()->has('adminOverOpts')) 
+            ? session()->get('adminOverOpts') : '');
         if (trim($this->v["currPage"][0]) == '') {
             $this->v["currPage"][0] = '/dashboard/tree';
         }

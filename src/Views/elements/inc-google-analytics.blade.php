@@ -2,7 +2,7 @@
 @if (isset($GLOBALS['SL']->sysOpts) 
     && isset($GLOBALS['SL']->sysOpts["google-analytic"])
     && trim($GLOBALS['SL']->sysOpts["google-analytic"]) != '' 
-    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false)
+    && !$GLOBALS['SL']->isHomestead())
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script defer src="https://www.googletagmanager.com/gtag/js?id={!! 
         $GLOBALS['SL']->sysOpts['google-analytic'] !!}"></script>

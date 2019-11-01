@@ -4,7 +4,7 @@
     && trim($GLOBALS['SL']->sysOpts["matomo-analytic-url"]) != '' 
     && isset($GLOBALS['SL']->sysOpts["matomo-analytic-site-id"])
     && trim($GLOBALS['SL']->sysOpts["matomo-analytic-site-id"]) != '' 
-    && strpos($GLOBALS['SL']->sysOpts["app-url"], 'homestead.test') === false)
+    && !$GLOBALS['SL']->isHomestead())
 <!-- Matomo -->
 <script type="text/javascript">
   var _paq = window._paq || [];

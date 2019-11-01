@@ -27,7 +27,7 @@ class PageLoadUtils extends Controller
 {
     protected $isAdminPage = false;
     public $dashPrfx       = '';
-    public $domainPath     = 'http://homestead.test';
+    public $domainPath     = 'http://survloop.local';
     public $custAbbr       = 'SurvLoop';
     public $dbID           = 1;
     public $treeID         = 1;

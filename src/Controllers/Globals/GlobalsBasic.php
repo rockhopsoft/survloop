@@ -466,7 +466,9 @@ class GlobalsBasic extends GlobalsVars
     public function isHomestead()
     {
         return (strpos($this->sysOpts["app-url"], '.test') !== false 
+            || strpos($this->sysOpts["app-url"], '.app') !== false
             || strpos($this->sysOpts["app-url"], '.dev') !== false
+            || strpos($this->sysOpts["app-url"], '.local') !== false
             || strpos($this->sysOpts["app-url"], 'localhost') !== false
             || strpos($this->sysOpts["app-url"], 'homestead') !== false);
     }

@@ -264,6 +264,9 @@ class SystemDefinitions extends SystemDefinitionsInit
     
     protected function chkAppUrl($dbID = 1)
     {
+        if (!isset($_SERVER["APP_URL"])) {
+            return false;
+        }
         if ($dbID <= 0) {
             $dbID = $this->dbID;
         }
