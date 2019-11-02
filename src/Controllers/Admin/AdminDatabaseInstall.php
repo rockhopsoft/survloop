@@ -29,8 +29,10 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $this->v["dateStmp"]     = date("Y_m_d");
         $this->v["dateStamp"]    = date("Y_m_d_His");
-        $this->v["zipFileMig"]   = $this->v["exportDir"] . '/' . $this->v["dateStmp"] . '_LaravelMigrations.zip';
-        $this->v["zipFileModel"] = $this->v["exportDir"] . '/' . $this->v["dateStmp"] . '_LaravelModels.zip';
+        $this->v["zipFileMig"]   = $this->v["exportDir"] . '/' 
+            . $this->v["dateStmp"] . '_LaravelMigrations.zip';
+        $this->v["zipFileModel"] = $this->v["exportDir"] . '/' 
+            . $this->v["dateStmp"] . '_LaravelModels.zip';
         return true;
     }
     
@@ -44,7 +46,8 @@ class AdminDatabaseInstall extends AdminDBController
             }
             $this->v["export"] .= $GLOBALS["SL"]->x["indexesEnd"]; 
         }
-        if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"]) {
+        if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
+            && $GLOBALS["SL"]->x["exportAsPackage"]) {
             $GLOBALS["SL"]->exportMysqlSl();
             $this->v["export"] .= $GLOBALS["SL"]->x["export"];
             $GLOBALS["SL"]->x["export"] = '';
@@ -59,13 +62,20 @@ class AdminDatabaseInstall extends AdminDBController
     
     public function printExport(Request $request, $asPackage = false)
     {
-        $this->admControlInit($request, (($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export'));
+        $asPack = (($asPackage) ? '/dashboard/sl/export/laravel' 
+            : '/dashboard/db/export');
+        $this->admControlInit($request, $asPack);
         if ($asPackage) {
             $GLOBALS["SL"]->x["exportAsPackage"] = true;
         }
-        if (!$this->checkCache((($asPackage) ? '/dashboard/sl/export' : '/dashboard/db/export'))) {
+        $cacheName = (($asPackage) ? '/dashboard/sl/export' 
+            : '/dashboard/db/export');
+        if (!$this->checkCache()) {
             $this->exportMysql();
-            $this->v["content"] = view('vendor.survloop.admin.db.export-mysql', $this->v)->render();
+            $this->v["content"] = view(
+                'vendor.survloop.admin.db.export-mysql', 
+                $this->v
+            )->render();
             $this->saveCache();
         }
         return view('vendor.survloop.master', $this->v);
@@ -85,7 +95,8 @@ class AdminDatabaseInstall extends AdminDBController
             "Zip Files"  => ''
         ];
 		$this->v["fileListModel"] = [];
-		$this->v["migrationFileUp"] = $this->v["migrationFileDown"] = $this->v["tblClean"] = '';
+		$this->v["migrationFileUp"] = $this->v["migrationFileDown"] 
+            = $this->v["tblClean"] = '';
         if (!isset($this->v["modelFile"])) {
             $this->v["modelFile"] = "";
         }
@@ -95,7 +106,8 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExportLaravel(Request $request, $asPackage = false) 
     {
         ini_set('max_execution_time', 180);
-        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' : '/dashboard/db/export');
+        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' 
+            : '/dashboard/db/export');
         $this->admControlInit($request, $currPage);
         if ($asPackage) {
             $GLOBALS["SL"]->x["exportAsPackage"] = true;
@@ -106,9 +118,11 @@ class AdminDatabaseInstall extends AdminDBController
                 $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
             }
             
-			$newMigFilename = 'database/migrations/' . $this->v["dateStmp"] . '_000000_create_' 
+			$newMigFilename = 'database/migrations/' 
+                . $this->v["dateStmp"] . '_000000_create_' 
 				. strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
-			$newSeedFilename = 'database/seeds/' . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
+			$newSeedFilename = 'database/seeds/' 
+                . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
 				. 'Seeder.php';
 		    $migEnds = '';
             $tbls = $this->exportQryTbls();
@@ -122,9 +136,10 @@ class AdminDatabaseInstall extends AdminDBController
 					foreach ($tbls as $tbl) {
 						$indexes = "";
 						$this->loadTbl($tbl);
-						$this->v["migrationFileUp"] .= "\t"."Schema::create('" . $GLOBALS["SL"]->dbRow->DbPrefix 
-							. $tbl->TblName . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
-							."$"."table->increments('" . $tbl->TblAbbr . "ID');";
+						$this->v["migrationFileUp"] .= "\t" . "Schema::create('" 
+                            . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                            . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
+							. "$"."table->increments('" . $tbl->TblAbbr . "ID');";
 						$this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
 						$flds = $GLOBALS["SL"]->getTableFields($tbl);
 						if ($flds->isNotEmpty()) {
@@ -133,25 +148,29 @@ class AdminDatabaseInstall extends AdminDBController
 								$this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
 								$this->v["migrationFileUp"] .=  "\n\t\t\t"."$"."table->";
 								if (strpos($fld->FldValues, 'Def::') !== false) {
-									$this->v["migrationFileUp"] .=  "integer('" . $fldName . "')->unsigned()";
+									$this->v["migrationFileUp"] .=  "integer('" 
+                                        . $fldName . "')->unsigned()";
 								} elseif ($fld->FldType == 'INT') {
 									if ($fld->FldValues == '0;1') {
 										$this->v["migrationFileUp"] .=  "boolean('" . $fldName . "')";
 									} else {
 										$this->v["migrationFileUp"] .=  "integer('" . $fldName . "')";
 									}
-									if (intVal($fld->FldForeignTable) > 0 && intVal($fld->FldDefault) >= 0) {
+									if (intVal($fld->FldForeignTable) > 0 
+                                        && intVal($fld->FldDefault) >= 0) {
 										$this->v["migrationFileUp"] .=  "->unsigned()";
 									}
 								} elseif ($fld->FldType == 'DOUBLE') {
 									$this->v["migrationFileUp"] .=  "double('" . $fldName . "')";
 								} elseif ($fld->FldType == 'VARCHAR') {
-									if ($fld->FldDataLength == 1 || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
+									if ($fld->FldDataLength == 1 
+                                        || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
 										|| $fld->FldValues == 'Y;N;?' || $fld->FldValues == 'M;F;?') {
 										$this->v["migrationFileUp"] .=  "char('" . $fldName . "', 1)";
 									} else {
 										$this->v["migrationFileUp"] .=  "string('" . $fldName . "'" 
-											. (($fld->FldDataLength > 0) ? ", ".$fld->FldDataLength : "") . ")";
+											. (($fld->FldDataLength > 0) ? ", " . $fld->FldDataLength : "") 
+                                            . ")";
 									}
 								} elseif ($fld->FldType == 'TEXT') {
 									$this->v["migrationFileUp"] .=  "longText('" . $fldName . "')";
@@ -161,12 +180,26 @@ class AdminDatabaseInstall extends AdminDBController
 									$this->v["migrationFileUp"] .=  "dateTime('" . $fldName . "')";
 								}
 								if (trim($fld->FldDefault) != '') {
-									$this->v["migrationFileUp"] .=  "->default(" 
-										. (($fld->FldDefault == 'NULL') ? "NULL" : "'".$fld->FldDefault."'") . ")";
+									$this->v["migrationFileUp"] .=  "->default(";
+									if ($fld->FldDefault == 'NULL') {
+                                        $this->v["migrationFileUp"] .= "NULL";
+                                    } else {
+                                        if ($fld->FldValues == '0;1') {
+                                            if (intVal($fld->FldDefault) == 1) {
+                                                $this->v["migrationFileUp"] .= "1";
+                                            } else {
+                                                $this->v["migrationFileUp"] .= "0";
+                                            }
+                                        } else {
+                                            $this->v["migrationFileUp"] .= "'" . $fld->FldDefault . "'";
+                                        }
+                                    }
+                                    $this->v["migrationFileUp"] .= ")";
 								}
 								$this->v["migrationFileUp"] .=  "->nullable();";
 								if ($fld->FldIsIndex == 1) {
-									$this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->index('" . $fldName . "');";
+									$this->v["migrationFileUp"] .= "\n\t\t\t"
+                                        . "$"."table->index('" . $fldName . "');";
 								}
 								/* // This is throwing errors
 								if (intVal($fld->FldForeignTable) > 0) {
@@ -178,22 +211,31 @@ class AdminDatabaseInstall extends AdminDBController
 								*/
 							}
 						}
-						$this->v["migrationFileUp"] .= "\n\t\t\t"."$"."table->timestamps();"."\n\t\t"."});"."\n\t";
-						$this->v["migrationFileDown"] .= "\t"."Schema::drop('" . $GLOBALS["SL"]->dbRow->DbPrefix 
-							. $tbl->TblName . "');"."\n\t";
+						$this->v["migrationFileUp"] .= "\n\t\t\t"
+                            . "$"."table->timestamps();" . "\n\t\t" . "});" . "\n\t";
+						$this->v["migrationFileDown"] .= "\t" . "Schema::drop('"
+                            . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
 						$this->saveModelFile();
 					}
 				}
 				if (trim($migEnds) != '') {
 				    $this->v["migrationFileUp"] .= $migEnds;
 				}
-				Storage::put($newMigFilename, 
-                    view('vendor.survloop.admin.db.export-laravel-gen-migration', $this->v)->render());
+				Storage::put(
+                    $newMigFilename, 
+                    view(
+                        'vendor.survloop.admin.db.export-laravel-gen-migration', 
+                        $this->v
+                    )->render()
+                );
 				$this->v["nextUrl"] = '?refresh=2';
                 if ($tbls->isNotEmpty() && isset($tbls[0]->TblName)) {
                     $this->v["nextUrl"] .= '&tbl=' . $tbls[0]->TblName;
                 }
-				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+				$this->v["content"] = view(
+                    'vendor.survloop.admin.db.export-laravel-progress', 
+                    $this->v
+                )->render();
 				return view('vendor.survloop.master', $this->v);
                 
             // Phase 2) Create seeder files for custom system's database
@@ -201,7 +243,8 @@ class AdminDatabaseInstall extends AdminDBController
                 
                 $found = -1;
                 $seedCnt = $finishedTable = 1;
-                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') ? trim($request->get('tbls')) : ',');
+                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+                    ? trim($request->get('tbls')) : ',');
                 $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
                 $limit = 1000;
                 if ($tbls->isNotEmpty()) {
@@ -209,11 +252,14 @@ class AdminDatabaseInstall extends AdminDBController
                         $this->loadCustLoop($request, $this->treeID);
                     }
                     foreach ($tbls as $i => $tbl) {
-                        $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) . $tbl->TblName;
-                        if (in_array($tbl->TblName, $this->custReport->tblsInPackage()) && $found < 0 
-                            && strpos($done, ',' . $tbl->TblName . ',') === false) {
+                        $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
+                            . $tbl->TblName;
+                        if (in_array($tbl->TblName, $this->custReport->tblsInPackage())  
+                            && strpos($done, ',' . $tbl->TblName . ',') === false
+                            && $found < 0) {
                             $this->loadTbl($tbl);
-                            $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
+                            $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', 
+                                $newSeedFilename);
                             /*
                             if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
                                 $tblSeeds = '';
@@ -242,9 +288,14 @@ class AdminDatabaseInstall extends AdminDBController
                         }
                     }
                 }
-                $this->v["nextUrl"] = '?refresh=' . (($found >= 0) ? '2&tbls=' . $done 
-                    . (($finishedTable == 0) ? '&page=' . $page : '') : (($asPackage) ? '3' : '4'));
-                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+                $this->v["nextUrl"] = '?refresh=' 
+                    . (($found >= 0) ? '2&tbls=' . $done 
+                        . (($finishedTable == 0) ? '&page=' . $page : '') 
+                            : (($asPackage) ? '3' : '4'));
+                $this->v["content"] = view(
+                    'vendor.survloop.admin.db.export-laravel-progress', 
+                    $this->v
+                )->render();
                 return view('vendor.survloop.master', $this->v);
                 
             // Phase 3) Create seeder files for custom system's SurvLoop configurations
@@ -252,7 +303,8 @@ class AdminDatabaseInstall extends AdminDBController
                 
                 $found = -1;
                 $seedCnt = $finishedTable = 1;
-                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') ? trim($request->get('tbls')) : ',');
+                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+                    ? trim($request->get('tbls')) : ',');
                 $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
                 $limit = 1000;
                 if (true || $asPackage) {
