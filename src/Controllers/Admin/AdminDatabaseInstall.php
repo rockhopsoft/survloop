@@ -38,7 +38,9 @@ class AdminDatabaseInstall extends AdminDBController
     
     protected function exportMysql()
     {
-        if (!isset($this->v["export"])) $this->v["export"] = '';
+        if (!isset($this->v["export"])) {
+            $this->v["export"] = '';
+        }
         $tbls = $this->tblQryStd();
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $i => $tbl) {
@@ -62,14 +64,13 @@ class AdminDatabaseInstall extends AdminDBController
     
     public function printExport(Request $request, $asPackage = false)
     {
-        $asPack = (($asPackage) ? '/dashboard/sl/export/laravel' 
-            : '/dashboard/db/export');
+        $asPack = $cacheName = '/dashboard/db/export';
         $this->admControlInit($request, $asPack);
         if ($asPackage) {
             $GLOBALS["SL"]->x["exportAsPackage"] = true;
+            $asPack = '/dashboard/sl/export/laravel';
+            $cacheName = '/dashboard/sl/export';
         }
-        $cacheName = (($asPackage) ? '/dashboard/sl/export' 
-            : '/dashboard/db/export');
         if (!$this->checkCache()) {
             $this->exportMysql();
             $this->v["content"] = view(
@@ -255,11 +256,14 @@ class AdminDatabaseInstall extends AdminDBController
                         $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
                             . $tbl->TblName;
                         if (in_array($tbl->TblName, $this->custReport->tblsInPackage())  
-                            && strpos($done, ',' . $tbl->TblName . ',') === false
+                            && strpos($done, ',' . $tbl->TblName . ',') === false 
                             && $found < 0) {
                             $this->loadTbl($tbl);
-                            $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', 
-                                $newSeedFilename);
+                            $newSeedFilename = str_replace(
+                                '.php', 
+                                '-' . $tbl->TblName . '.php', 
+                                $newSeedFilename
+                            );
                             /*
                             if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
                                 $tblSeeds = '';
@@ -387,12 +391,16 @@ class AdminDatabaseInstall extends AdminDBController
 				
                 $this->v["dumpOut"]["Migrations"] = $newMigFilename;
                 $this->v["dumpOut"]["Seeders"] = $newSeedFilename;
-				if (isset($GLOBALS['SL']->x['exportAsPackage']) && $GLOBALS['SL']->x['exportAsPackage']) {
+				if (isset($GLOBALS['SL']->x['exportAsPackage']) 
+                    && $GLOBALS['SL']->x['exportAsPackage']) {
 				    $this->v["nextUrl"] = '/dashboard/sl/export/laravel';
 				} else {
 				    $this->v["nextUrl"] = '/dashboard/db/export/laravel';
 				}
-				$this->v["content"] = view('vendor.survloop.admin.db.export-laravel', $this->v)->render();
+				$this->v["content"] = view(
+                    'vendor.survloop.admin.db.export-laravel', 
+                    $this->v
+                )->render();
 				$this->saveCache();
 				
 			}
@@ -402,7 +410,8 @@ class AdminDatabaseInstall extends AdminDBController
                 '../app/Models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]),
                 '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models')
                 . $GLOBALS["SL"]->copyDirFiles('../storage/app/database/migrations',
-                    '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Database') . $this->v["content"];
+                    '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Database') 
+                . $this->v["content"];
         }
         return view('vendor.survloop.master', $this->v);
     }
@@ -417,19 +426,25 @@ class AdminDatabaseInstall extends AdminDBController
         $flds = $GLOBALS["SL"]->getTableFields($tbl);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                $this->v["modelFile"] .= "\n\t\t'" . trim($tbl->TblAbbr . $fld->FldName) . "', ";
+                $this->v["modelFile"] .= "\n\t\t'" 
+                    . trim($tbl->TblAbbr . $fld->FldName) . "', ";
             }
         }
         $this->saveModelFile();
-        return ':)' . (($request->has('redir64')) ? '<script type="text/javascript"> setTimeout("window.location=\'' 
-            . base64_decode($request->get('redir64')) . '\'", 100); </script>' : '');
+        return ':)' . (($request->has('redir64')) 
+            ? '<script type="text/javascript"> setTimeout("window.location=\'' 
+                . base64_decode($request->get('redir64')) . '\'", 100); </script>' 
+            : '');
     }
     
     protected function saveModelFile()
     {
         $newModelFilename = '../app/Models/' . $this->v["tblClean"] . '.php';
         $this->v["fileListModel"][] = $newModelFilename;
-        $fullFileOut = view('vendor.survloop.admin.db.export-laravel-gen-model' , $this->v);
+        $fullFileOut = view(
+            'vendor.survloop.admin.db.export-laravel-gen-model' , 
+            $this->v
+        );
         $this->v["dumpOut"]["Models"] .= $fullFileOut;
         if (file_exists($newModelFilename)) {
             $oldFile = file_get_contents($newModelFilename);
@@ -441,10 +456,15 @@ class AdminDatabaseInstall extends AdminDBController
             }
         }
         file_put_contents($newModelFilename, $fullFileOut);
+        $abbr = strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]);
         try {
-            copy($newModelFilename, 
-                str_replace('/app/models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]) . '/',
-                    '/app/Models/', $newModelFilename));
+            copy(
+                $newModelFilename, 
+                str_replace(
+                    '/app/models/' . $abbr . '/',
+                    '/app/Models/', $newModelFilename
+                )
+            );
         } catch (Exception $e) {
             //echo 'Caught exception: ',  $e->getMessage(), "\n";
         }
@@ -454,7 +474,12 @@ class AdminDatabaseInstall extends AdminDBController
     protected function printSeedTbl($eval = '', $limit = 10000, $start = 0)
     {
     	$ret = '';
-        $seedChk = $GLOBALS["SL"]->getTableSeedDump($this->v["tblClean"], $eval, $limit, $start);
+        $seedChk = $GLOBALS["SL"]->getTableSeedDump(
+            $this->v["tblClean"], 
+            $eval, 
+            $limit, 
+            $start
+        );
         if ($seedChk->isNotEmpty()) {
             foreach ($seedChk as $seed) {
                 $ret .= $this->printSeedTblRow($seed);
@@ -471,7 +496,8 @@ class AdminDatabaseInstall extends AdminDBController
         if ($flds->isNotEmpty()) {
             foreach ($flds as $i => $fld) {
                 $fldName = trim($this->v["tbl"]->TblAbbr . $fld->FldName);
-                if (isset($seed->{ $fldName }) && trim($seed->{ $fldName }) != trim($fld->FldDefault)) {
+                if (isset($seed->{ $fldName }) 
+                    && trim($seed->{ $fldName }) != trim($fld->FldDefault)) {
                     $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
                         . str_replace("'", "\'", $seed->{ $fldName }) . "'";
                 }
@@ -479,8 +505,10 @@ class AdminDatabaseInstall extends AdminDBController
         }
         if (trim($fldData) != '') {
             $ret .= "\tDB::table('" 
-                . (($this->v["tbl"]->TblDatabase == 3) ? 'SL_' : $GLOBALS["SL"]->dbRow->DbPrefix)
-                . $this->v["tbl"]->TblName . "')->insert([" . $fldData . "\n\t\t"."]);"."\n\t";
+                . (($this->v["tbl"]->TblDatabase == 3) 
+                    ? 'SL_' : $GLOBALS["SL"]->dbRow->DbPrefix)
+                . $this->v["tbl"]->TblName . "')->insert([" 
+                . $fldData . "\n\t\t"."]);"."\n\t";
         }
         return $ret;
     }
@@ -505,7 +533,10 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExportLaravelProgress(Request $request) 
     {
         
-        $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
+        $this->v["content"] = view(
+            'vendor.survloop.admin.db.export-laravel-progress', 
+            $this->v
+        )->render();
         return view('vendor.survloop.master', $this->v);
     }
     
@@ -521,7 +552,8 @@ class AdminDatabaseInstall extends AdminDBController
                 if ($tbls->isNotEmpty()) {
                     foreach ($tbls as $tbl) {
                         $this->loadTbl($tbl);
-                        $newModelFilename = '../vendor/wikiworldorder/survloop-models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"])
+                        $newModelFilename = '../vendor/wikiworldorder/survloop-models/' 
+                            . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"])
                             . '/' . $this->v["tblClean"] . '.php';
                         if (file_exists($newModelFilename)) {
                             $ret .= file_get_contents($newModelFilename) . "\n\n";

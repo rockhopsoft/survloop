@@ -692,10 +692,14 @@ class GlobalsImportExport extends GlobalsTables
     
     public function tblQrySlExports()
     {
+        $exportTbls = [
+            'BusRules', 'Conditions', 'ConditionsArticles', 'ConditionsNodes', 
+            'ConditionsVals', 'Databases', 'DataHelpers', 'DataLinks', 
+            'DataLoop', 'DataSubsets', 'Definitions', 'Emails', 'Fields', 
+            'Images', 'Node', 'NodeResponses', 'Tables', 'Tree'
+        ];
         return SLTables::where('TblDatabase', 3)
-            ->whereIn('TblName', ['BusRules', 'Conditions', 'ConditionsArticles', 'ConditionsNodes', 'ConditionsVals', 
-                'Databases', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 'Definitions', 'Emails', 'Fields', 
-                'Images', 'Node', 'NodeResponses', 'Tables', 'Tree'])
+            ->whereIn('TblName', $exportTbls)
             ->orderBy('TblOrd', 'asc')
             ->get();
     }
@@ -783,23 +787,35 @@ class GlobalsImportExport extends GlobalsTables
         if (isset($tbl->TblName)) {
             if ($tbl->TblName == 'Databases') {
                 $eval = "where('DbID', " . $dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['Images'])) {
+            } elseif ($tbl->TblName == 'Images') {
                 $eval = "where('" . $tbl->TblAbbr . "DatabaseID', " . $dbID . ")->";
-            } elseif (in_array($tbl->TblName, ['BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'])) {
+            } elseif (in_array($tbl->TblName, [
+                'BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'
+            ])) {
                 $eval = "where('" . $tbl->TblAbbr . "Database', " . $dbID . ")->";
                 if ($tbl->TblName == 'Definitions') {
-                    $eval = "whereNotIn('DefSubset', ['facebook-app-id', 'google-analytic', 
-                        'google-cod-key', 'google-cod-key2', 'google-map-key', 'google-map-key2', 
+                    $eval = "whereNotIn('DefSubset', [
+                        'facebook-app-id', 'google-analytic', 
+                        'google-cod-key', 'google-cod-key2', 
+                        'google-map-key', 'google-map-key2', 
                         'google-maps-key', 'google-maps-key2', 
-                        'matomo-analytic-url', 'matomo-analytic-site-id'])->";
+                        'matomo-analytic-url', 'matomo-analytic-site-id'
+                    ])->";
                 }
-            } elseif (in_array($tbl->TblName, ['Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 
-                'Emails'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" . implode(", ", $this->x["slTrees"]) . "])->";
+            } elseif (in_array($tbl->TblName, [
+                'Node', 'DataHelpers', 'DataLinks', 'DataLoop', 
+                'DataSubsets', 'Emails'
+            ])) {
+                $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" 
+                    . implode(", ", $this->x["slTrees"]) . "])->";
             } elseif (in_array($tbl->TblName, ['NodeResponses'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Node', [" . implode(", ", $this->x["slNodes"]) . "])->";
-            } elseif (in_array($tbl->TblName, ['ConditionsArticles', 'ConditionsNodes', 'ConditionsVals'])) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "CondID', [" . implode(", ", $this->x["slConds"]) ."])->";
+                $eval = "whereIn('" . $tbl->TblAbbr . "Node', [" 
+                    . implode(", ", $this->x["slNodes"]) . "])->";
+            } elseif (in_array($tbl->TblName, [
+                'ConditionsArticles', 'ConditionsNodes', 'ConditionsVals'
+            ])) {
+                $eval = "whereIn('" . $tbl->TblAbbr . "CondID', [" 
+                    . implode(", ", $this->x["slConds"]) ."])->";
             }
         }
         return $eval;
@@ -822,10 +838,13 @@ class GlobalsImportExport extends GlobalsTables
                     . $this->exportMysqlTbl($tbl);
                 $flds = $this->getTableFields($tbl);
                 if ($flds->isNotEmpty()) {
-                    $seedChk = $this->getTableSeedDump($this->x["tblClean"], $this->loadSlSeedEval($tbl));
+                    $seedChk = $this->getTableSeedDump(
+                        $this->x["tblClean"], 
+                        $this->loadSlSeedEval($tbl)
+                    );
                     if ($seedChk->isNotEmpty()) {
-                        $this->x["tblInsertStart"] = "\nINSERT INTO `" . $this->x["tblName"] . "` (`" 
-                            . $tbl->TblAbbr . "ID`";
+                        $this->x["tblInsertStart"] = "\nINSERT INTO `" . $this->x["tblName"] 
+                            . "` (`" . $tbl->TblAbbr . "ID`";
                         foreach ($flds as $i => $fld) {
                             $this->x["tblInsertStart"] .= ", `" . $tbl->TblAbbr . $fld->FldName . "`";
                         }
@@ -842,13 +861,15 @@ class GlobalsImportExport extends GlobalsTables
                                 if (isset($seed->{ $tbl->TblAbbr . $fld->FldName })) {
                                     $this->x["export"] .= ", '" . str_replace("'", "\'", 
                                         $seed->{ $tbl->TblAbbr . $fld->FldName }) . "'";
-                                } elseif ($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1) {
+                                } elseif ($fld->FldNullSupport 
+                                    && intVal($fld->FldNullSupport) == 1) {
                                     $this->x["export"] .= ", NULL";
                                 } else {
                                     $this->x["export"] .= ", ''";
                                 }
                             }
-                            $this->x["export"] .= ", '" . $seed->created_at . "', '" . $seed->updated_at . "')";
+                            $this->x["export"] .= ", '" . $seed->created_at 
+                                . "', '" . $seed->updated_at . "')";
                         }
                         $this->x["export"] .= "; \n";
                     }
@@ -856,7 +877,11 @@ class GlobalsImportExport extends GlobalsTables
             }
         }
         while (strpos($this->x["export"], ") VALUES \n,\n") !== false) {
-            $this->x["export"] = str_replace(") VALUES \n,\n", ") VALUES \n", $this->x["export"]);
+            $this->x["export"] = str_replace(
+                ") VALUES \n,\n", 
+                ") VALUES \n", 
+                $this->x["export"]
+            );
         }
         //$this->tmpDbSwitchBack();
         return true;

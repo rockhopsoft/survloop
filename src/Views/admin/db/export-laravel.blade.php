@@ -4,22 +4,36 @@
 
 <nobr><span class="float-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
 <h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>: 
-    @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"])
-        Export for SurvLoop Extension Package @else Export for Laravel @endif
+    <span class="slBlueDark"><i class="fa fa-database"></i> 
+        {{ $GLOBALS['SL']->dbRow->DbName }}</span>: 
+    @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
+        && $GLOBALS["SL"]->x["exportAsPackage"])
+        Export for SurvLoop Extension Package @else Export for Laravel 
+    @endif
 </h1>
 
-@if (isset($GLOBALS["SL"]->x["exportAsPackage"]) && $GLOBALS["SL"]->x["exportAsPackage"])
-	{!! view('vendor.survloop.admin.db.export-sl-tabs', [ "curr" => 'laravel' ])->render() !!}
-@else {!! view('vendor.survloop.admin.db.export-tabs', [ "curr" => 'laravel' ])->render() !!} @endif
+@if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
+    && $GLOBALS["SL"]->x["exportAsPackage"])
+	{!! view(
+        'vendor.survloop.admin.db.export-sl-tabs', 
+        [ "curr" => 'laravel' ]
+    )->render() !!}
+@else
+    {!! view(
+        'vendor.survloop.admin.db.export-tabs', 
+        [ "curr" => 'laravel' ]
+    )->render() !!} 
+@endif
 <div id="myTabContent" class="tab-content">
     <div class="pT10">
         <!--- <a href="{{ $zipFileMig }}" target="_blank" class="btn btn-sm btn-secondary mR10" disabled 
             >Download Migrations.zip</a>
         <a href="{{ $zipFileModel }}" target="_blank" class="btn btn-sm btn-secondary mR10" disabled 
             >Download Models.zip</a> --->
-        <a href="?refreshVendor=1" class="btn btn-sm btn-secondary mR10" >Push Models to Vendor Folder</a>
-        <a href="?refresh=1" class="btn btn-sm btn-secondary mR10" >Force Refresh</a>
+        <a href="?refreshVendor=1" class="btn btn-sm btn-secondary mR10" 
+            >Push Models to Vendor Folder</a>
+        <a href="?refresh=1" class="btn btn-sm btn-secondary mR10" 
+            >Force Refresh</a>
     </div>
     <div class="p5"></div>
     <h3 class="mB0">Laravel Migration</h3>
