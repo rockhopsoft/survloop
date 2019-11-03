@@ -64,99 +64,132 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 
 # <a name="getting-started"></a>Getting Started
 
-## Installing SurvLoop with Laradock
 
-First, <a href="https://www.docker.com/get-started" target="_blank">install Docker</a> on Mac, Windows, or an online server. 
-Then grab a copy of Laravel (last tested with v5.8.3)...
-```
-$ git clone https://github.com/laravel/laravel.git opc
-$ cd opc
-```
+### Install Laravel Using Composer
 
-Next, install and boot up Laradock (last tested with v7.14).
-```
-$ git submodule add https://github.com/Laradock/laradock.git
-$ cd laradock
-$ cp env-example .env
-$ docker-compose up -d nginx mysql phpmyadmin redis workspace
-```
-
-After Docker finishes booting up your containers, enter the mysql container with the root password, "root". This seems to fix things for the latest version of MYSQL.
-```
-$ docker-compose exec mysql bash
-# mysql --user=root --password=root default
-mysql> ALTER USER 'default'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
-mysql> exit;
-$ exit
-```
-
-At this point, you can optionally browse to <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> for PhpMyAdmin.
-```
-Server: mysql
-Username: default
-Password: secret
-```
-
-Finally, enter Laradock's workspace container to download and run the SurvLoop installation script.
-```
-$ docker-compose exec workspace bash
-# git clone https://github.com/wikiworldorder/docker-survloop.git
-# chmod +x ./docker-survloop/bin/*.sh
-# ./docker-survloop/bin/survloop-laradock-postinstall.sh
-```
-And if all has gone well, you'll be asked to create a master admin user account when you browse to <a href="http://localhost/" target="_blank">http://localhost/</a>. If it loads, but looks janky (without CSS), reload the page once... and hopefully it looks like a fresh install.
-
-
-## Installing SurvLoop without Laradock
-
-The instructions below include the needed steps to install Laravel and SurvLoop.
-For more on creating environments to host Laravel, you can find more instructions 
-<a href="https://survloop.org/how-to-install-laravel-on-a-digital-ocean-server" target="_blank">on SurvLoop.org</a>.
-
-### Use SurvLoop Install Script
-
-If you've got PHP running, and Composer installed, you can just run this install script...
+<a href="https://survloop.org/how-to-install-survloop" target="_blank">Full install instructions</a> also describe how to set up a development environment using VirutalBox, Vargrant, and Laravel's Homestead.
 
 ```
-$ git clone https://github.com/wikiworldorder/docker-survloop.git
-$ chmod +x ./docker-survloop/bin/*.sh
-$ ./docker-survloop/bin/survloop-compose-install.sh ProjectFolderName
-```
-
-* Load in the browser to create super admin account and get started.
-
-### Copy & Paste Install Commands
-
-* Use Composer to install Laravel with default user authentication, one required package:
+$ composer create-project laravel/laravel survloop "5.8.*"
+$ cd survloop
 
 ```
-$ composer global require "laravel/installer"
-$ composer create-project laravel/laravel SurvLoop "5.8.*"
-$ cd SurvLoop
-$ php artisan key:generate
+
+Edit the environment file to connect the default MYSQL database:
+```
+$ nano .env
+```
+```
+DB_DATABASE=homestead
+DB_USERNAME=homestead
+DB_PASSWORD=secret
+```
+
+You could do things like install Laravel's out-of-the-box user authentication tools, and push the vendor file copies where they need to be:
+```
 $ php artisan make:auth
-$ composer require wikiworldorder/survloop
-$ sed -i 's/App\\User::class/App\\Models\\User::class/g' config/auth.php
+$ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 ```
 
-* Update composer, publish the package migrations, etc...
+### Install WikiWorldOrder/SurvLoop
 
+From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
+```
+$ nano composer.json
+```
+```
+...
+"require": {
+    ...
+    "wikiworldorder/survloop": "^0.2.7",
+    ...
+},
+...
+"autoload": {
+    ...
+    "psr-4": {
+        ...
+        "SurvLoop\\": "vendor/wikiworldorder/survloop/src/",
+    }
+    ...
+}, ...
+```
+
+After saving the file, run the update to download OpenPolice, and any missing dependencies.
+```
+$ composer update
+```
+
+Add the package to your application service providers in `config/app.php`.
+```
+$ nano config/app.php
+```
+```
+...
+'providers' => [
+    ...
+    SurvLoop\SurvLoopServiceProvider::class,
+    ...
+],
+...
+'aliases' => [
+    ...
+    'SurvLoop' => 'WikiWorldOrder\SurvLoop\SurvLoopFacade',
+    ...
+], ...
+```
+
+Swap out the OpenPolice user model in `config/auth.php`.
+```
+$ nano config/auth.php
+```
+```
+...
+'model' => App\Models\User::class,
+...
+```
+
+Update composer, publish the package migrations, etc...
 ```
 $ echo "0" | php artisan vendor:publish --force
+$ cd ~/homestead
+$ vagrant up
+$ vagrant ssh
+$ cd code/survloop
 $ php artisan migrate
 $ composer dump-autoload
 $ php artisan db:seed --class=SurvLoopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
+$ php artisan optimize:clear
 ```
 
-* For now, to apply database design changes to the same installation you are working in, depending on your server, 
-you might also need something like this...
-
+For now, to apply database design changes to the same installation you are working in, depending on your server, you might also need something like this...
 ```
+$ chown -R www-data:33 app/Models
 $ chown -R www-data:33 database
 ```
 
-* Load in the browser to create super admin account and get started.
+You might need to re-run some things outside the virtual box too, e.g.
+```
+$ exit
+$ cd ~/homestead/code/survloop
+$ php artisan optimize:clear
+$ composer dump-autoload
+```
+
+### Initialize SurvLoop Installation
+
+Then browsing to the home page should prompt you to create the first admin user account:
+
+http://survloop.local
+
+If everything looks janky, then manually load the style sheets, etc:
+
+http://survloop.local/css-reload
+
+After logging in as an admin, this link rebuilds many supporting files:
+
+http://survloop.local/dashboard/settings?refresh=2
 
 # <a name="documentation"></a>Documentation
 
