@@ -12,17 +12,22 @@
 </center>
 
 @if ($GLOBALS["SL"]->REQ->has('tbls') && trim($GLOBALS["SL"]->REQ->get('tbls')) != '')
-    <div class="row"><div class="col-md-5"> </div><div class="col-md-7"><ul>
-    @forelse ($GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->get('tbls')) as $i => $done)
-        <li>{{ $done }}</li>
-    @empty
-    @endforelse
-    </ul></div></div>
+    <div class="row">
+        <div class="col-md-5"> </div>
+        <div class="col-md-7"><ul>
+        @forelse ($GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->get('tbls')) as $i => $done)
+            <li>{{ $done }}</li>
+        @empty
+        @endforelse
+        </ul></div>
+    </div>
 @endif
-
 
 </div></div>
 
-<script type="text/javascript">
-setTimeout("window.location='{!! $nextUrl !!}'", 3000);
-</script>
+@if (isset($nextUrl) && !$GLOBALS["SL"]->REQ->has('done'))
+    nextUrl: {{ $nextUrl }}
+    <script type="text/javascript">
+    setTimeout("window.location='{!! $nextUrl !!}'", 3000);
+    </script>
+@endif

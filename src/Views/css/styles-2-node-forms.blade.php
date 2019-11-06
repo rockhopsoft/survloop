@@ -301,6 +301,7 @@ a.nFldBtn:visited, a.nFldBtn:hover, {
 .nPrompt .subNote p, .nWrap .nPrompt .subNote p, 
 .finger .subNote, .fingerAct .subNote {
 	font-size: 14px;
+    margin-top: 10px;
 }
 .finger .subNote, .fingerAct .subNote {
     margin-top: 0px;

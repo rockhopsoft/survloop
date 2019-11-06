@@ -255,10 +255,10 @@ class AdminMenu
                     '/dashboard/db/fieldXML',
                     'Field Privacy Settings'
                 ), 
-                $this->admMenuLnk(
-                    '/dashboard/db/workflows',
-                    'Process Workflows'
-                ),
+                //$this->admMenuLnk(
+                //    '/dashboard/db/workflows',
+                //    'Process Workflows'
+                //),
                 $this->admMenuLnk(
                     '/dashboard/db/export',
                     'Export', 

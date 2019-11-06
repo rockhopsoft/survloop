@@ -62,8 +62,7 @@ class GlobalsCache extends GlobalsBasic
     {
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
-        if ($chk && isset($chk->CachValue) 
-            && trim($chk->CachValue) != '') {
+        if ($chk && isset($chk->CachValue) && trim($chk->CachValue) != '') {
             $file = $this->cachePath . '/html/' . $chk->CachValue;
             if (Storage::exists($file)) {
                 return trim(Storage::get($file));

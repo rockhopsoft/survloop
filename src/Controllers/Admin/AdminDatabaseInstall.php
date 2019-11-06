@@ -23,8 +23,6 @@ use SurvLoop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
 {
-    protected $dbMysql = false;
-    
     protected function tweakAdmMenu($currPage = '')
     {
         $this->v["dateStmp"]     = date("Y_m_d");
@@ -48,8 +46,7 @@ class AdminDatabaseInstall extends AdminDBController
             }
             $this->v["export"] .= $GLOBALS["SL"]->x["indexesEnd"]; 
         }
-        if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
-            && $GLOBALS["SL"]->x["exportAsPackage"]) {
+        if ($this->v["asPackage"]) {
             $GLOBALS["SL"]->exportMysqlSl();
             $this->v["export"] .= $GLOBALS["SL"]->x["export"];
             $GLOBALS["SL"]->x["export"] = '';
@@ -66,8 +63,8 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $asPack = $cacheName = '/dashboard/db/export';
         $this->admControlInit($request, $asPack);
+        $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
         if ($asPackage) {
-            $GLOBALS["SL"]->x["exportAsPackage"] = true;
             $asPack = '/dashboard/sl/export/laravel';
             $cacheName = '/dashboard/sl/export';
         }
@@ -96,7 +93,7 @@ class AdminDatabaseInstall extends AdminDBController
             "Zip Files"  => ''
         ];
 		$this->v["fileListModel"] = [];
-		$this->v["migrationFileUp"] = $this->v["migrationFileDown"] 
+		$this->v["migratFileUp"] = $this->v["migratFileDown"] 
             = $this->v["tblClean"] = '';
         if (!isset($this->v["modelFile"])) {
             $this->v["modelFile"] = "";
@@ -107,313 +104,368 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExportLaravel(Request $request, $asPackage = false) 
     {
         ini_set('max_execution_time', 180);
-        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' 
+        $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
+        $currPage = (($asPackage) 
+            ? '/dashboard/sl/export/laravel' 
             : '/dashboard/db/export');
         $this->admControlInit($request, $currPage);
-        if ($asPackage) {
-            $GLOBALS["SL"]->x["exportAsPackage"] = true;
-        }
-        if (!$this->checkCache($currPage)) {
-        	$this->v["refresh"] = 1;
-            if ($GLOBALS["SL"]->REQ->has('refresh')) {
-                $this->v["refresh"] = intVal($GLOBALS["SL"]->REQ->refresh);
-            }
-            
-			$newMigFilename = 'database/migrations/' 
-                . $this->v["dateStmp"] . '_000000_create_' 
-				. strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
-			$newSeedFilename = 'database/seeds/' 
-                . str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
-				. 'Seeder.php';
-		    $migEnds = '';
-            $tbls = $this->exportQryTbls();
-            
-            // Phase 1) Create migration files
-            if ($this->v["refresh"] == 1) {
-                
-            	$this->prepLaravelExport();
-				$this->chkModelsFolder();
-				if ($tbls->isNotEmpty()) {
-					foreach ($tbls as $tbl) {
-						$indexes = "";
-						$this->loadTbl($tbl);
-						$this->v["migrationFileUp"] .= "\t" . "Schema::create('" 
-                            . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
-                            . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
-							. "$"."table->increments('" . $tbl->TblAbbr . "ID');";
-						$this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
-						$flds = $GLOBALS["SL"]->getTableFields($tbl);
-						if ($flds->isNotEmpty()) {
-							foreach ($flds as $fld) {
-								$fldName = trim($tbl->TblAbbr . $fld->FldName);
-								$this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
-								$this->v["migrationFileUp"] .=  "\n\t\t\t"."$"."table->";
-								if (strpos($fld->FldValues, 'Def::') !== false) {
-									$this->v["migrationFileUp"] .=  "integer('" 
-                                        . $fldName . "')->unsigned()";
-								} elseif ($fld->FldType == 'INT') {
-									if ($fld->FldValues == '0;1') {
-										$this->v["migrationFileUp"] .=  "boolean('" . $fldName . "')";
-									} else {
-										$this->v["migrationFileUp"] .=  "integer('" . $fldName . "')";
-									}
-									if (intVal($fld->FldForeignTable) > 0 
-                                        && intVal($fld->FldDefault) >= 0) {
-										$this->v["migrationFileUp"] .=  "->unsigned()";
-									}
-								} elseif ($fld->FldType == 'DOUBLE') {
-									$this->v["migrationFileUp"] .=  "double('" . $fldName . "')";
-								} elseif ($fld->FldType == 'VARCHAR') {
-									if ($fld->FldDataLength == 1 
-                                        || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
-										|| $fld->FldValues == 'Y;N;?' || $fld->FldValues == 'M;F;?') {
-										$this->v["migrationFileUp"] .=  "char('" . $fldName . "', 1)";
-									} else {
-										$this->v["migrationFileUp"] .=  "string('" . $fldName . "'" 
-											. (($fld->FldDataLength > 0) ? ", " . $fld->FldDataLength : "") 
-                                            . ")";
-									}
-								} elseif ($fld->FldType == 'TEXT') {
-									$this->v["migrationFileUp"] .=  "longText('" . $fldName . "')";
-								} elseif ($fld->FldType == 'DATE') {
-									$this->v["migrationFileUp"] .=  "date('" . $fldName . "')";
-								} elseif ($fld->FldType == 'DATETIME') {
-									$this->v["migrationFileUp"] .=  "dateTime('" . $fldName . "')";
-								}
-								if (trim($fld->FldDefault) != '') {
-									$this->v["migrationFileUp"] .=  "->default(";
-									if ($fld->FldDefault == 'NULL') {
-                                        $this->v["migrationFileUp"] .= "NULL";
-                                    } else {
-                                        if ($fld->FldValues == '0;1') {
-                                            if (intVal($fld->FldDefault) == 1) {
-                                                $this->v["migrationFileUp"] .= "1";
-                                            } else {
-                                                $this->v["migrationFileUp"] .= "0";
-                                            }
-                                        } else {
-                                            $this->v["migrationFileUp"] .= "'" . $fld->FldDefault . "'";
-                                        }
-                                    }
-                                    $this->v["migrationFileUp"] .= ")";
-								}
-								$this->v["migrationFileUp"] .=  "->nullable();";
-								if ($fld->FldIsIndex == 1) {
-									$this->v["migrationFileUp"] .= "\n\t\t\t"
-                                        . "$"."table->index('" . $fldName . "');";
-								}
-								/* // This is throwing errors
-								if (intVal($fld->FldForeignTable) > 0) {
-									list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->FldForeignTable);
-                                    $migEnds .= "\t"."Schema::table('" . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
-                                        . "', function($"."table) { $"."table->foreign('" . $fldName 
-                                        . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
-								}
-								*/
-							}
-						}
-						$this->v["migrationFileUp"] .= "\n\t\t\t"
-                            . "$"."table->timestamps();" . "\n\t\t" . "});" . "\n\t";
-						$this->v["migrationFileDown"] .= "\t" . "Schema::drop('"
-                            . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
-						$this->saveModelFile();
-					}
-				}
-				if (trim($migEnds) != '') {
-				    $this->v["migrationFileUp"] .= $migEnds;
-				}
-				Storage::put(
-                    $newMigFilename, 
-                    view(
-                        'vendor.survloop.admin.db.export-laravel-gen-migration', 
-                        $this->v
-                    )->render()
-                );
-				$this->v["nextUrl"] = '?refresh=2';
-                if ($tbls->isNotEmpty() && isset($tbls[0]->TblName)) {
-                    $this->v["nextUrl"] .= '&tbl=' . $tbls[0]->TblName;
-                }
-				$this->v["content"] = view(
-                    'vendor.survloop.admin.db.export-laravel-progress', 
-                    $this->v
-                )->render();
-				return view('vendor.survloop.master', $this->v);
-                
-            // Phase 2) Create seeder files for custom system's database
-            } elseif ($this->v["refresh"] == 2) {
-                
-                $found = -1;
-                $seedCnt = $finishedTable = 1;
-                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
-                    ? trim($request->get('tbls')) : ',');
-                $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
-                $limit = 1000;
-                if ($tbls->isNotEmpty()) {
-                    if (is_array($this->custReport)) {
-                        $this->loadCustLoop($request, $this->treeID);
-                    }
-                    foreach ($tbls as $i => $tbl) {
-                        $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
-                            . $tbl->TblName;
-                        if (in_array($tbl->TblName, $this->custReport->tblsInPackage())  
-                            && strpos($done, ',' . $tbl->TblName . ',') === false 
-                            && $found < 0) {
-                            $this->loadTbl($tbl);
-                            $newSeedFilename = str_replace(
-                                '.php', 
-                                '-' . $tbl->TblName . '.php', 
-                                $newSeedFilename
-                            );
-                            /*
-                            if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
-                                $tblSeeds = '';
-                                list($seedCnt, $seedChk) = $GLOBALS["SL"]->getTableSeedDumpLimit($tblClean, '', $limit, $page);
-                                if ($seedChk->isNotEmpty()) {
-                                    foreach ($seedChk as $seed) {
-                                        $tblSeeds .= $this->printSeedTblRow($seed);
-                                    }
-                                }
-                                $newSeedFilename = str_replace('.php', '-' . $page . '.php', $newSeedFilename);
-                                //Storage::delete('file.jpg');
-                                Storage::put($newSeedFilename, $tblSeeds);
-                                if ($seedChk->count() < $limit) {
-                                    $done .= $tbl->TblName . ',';
-                                } else {
-                                    $page++;
-                                    $finishedTable = 0;
-                                }
-                            } else { // dump whole table at once
-                                */
-                                $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl));
-                                Storage::put($newSeedFilename, $tblSeeds);
-                                $done .= $tbl->TblName . ',';
-                            //}
-                            $found = $i;
-                        }
-                    }
-                }
-                $this->v["nextUrl"] = '?refresh=' 
-                    . (($found >= 0) ? '2&tbls=' . $done 
-                        . (($finishedTable == 0) ? '&page=' . $page : '') 
-                            : (($asPackage) ? '3' : '4'));
-                $this->v["content"] = view(
-                    'vendor.survloop.admin.db.export-laravel-progress', 
-                    $this->v
-                )->render();
-                return view('vendor.survloop.master', $this->v);
-                
-            // Phase 3) Create seeder files for custom system's SurvLoop configurations
-            } elseif ($this->v["refresh"] == 3) {
-                
-                $found = -1;
-                $seedCnt = $finishedTable = 1;
-                $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
-                    ? trim($request->get('tbls')) : ',');
-                $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
-                $limit = 1000;
-                if (true || $asPackage) {
-                    $prevDb = $GLOBALS["SL"]->dbID;
-                    $prevTree = $GLOBALS["SL"]->treeID;
-                    $this->initLoader();
-                    $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, 3, 3);
-                    $tbls = $GLOBALS["SL"]->tblQrySlExports();
-                    if ($tbls->isNotEmpty()) {
-                        foreach ($tbls as $i => $tbl) {
-                            $this->v["tblClean"] = 'SL' . $tbl->TblName;
-                            if ($found < 0 && strpos($done, ',' . $tbl->TblName . ',') === false) {
-                                $this->loadTbl($tbl);
-                                $newSeedFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
-                                $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl, $prevDb));
-                                Storage::put($newSeedFilename, $tblSeeds);
-                                $done .= $tbl->TblName . ',';
-                                $found = $i;
-                            }
-                        }
-                    }
-                    $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, $prevDb, $prevTree);
-                }
-                $this->v["nextUrl"] = '?refresh=' . (($found >= 0) ? '3&tbls=' . $done 
-                    . (($finishedTable == 0) ? '&page=' . $page : '') : '4');
-                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
-                return view('vendor.survloop.master', $this->v);
-                
-            // Phase 4) Merge all seeder files into one ready for package
-            } elseif ($this->v["refresh"] == 4) {
-                
-                Storage::put($newSeedFilename, view('vendor.survloop.admin.db.export-laravel-gen-seeder', [
-                        "wholeSeed" => false
-                        ])->render());
-                $tbls = $this->exportQryTbls();
-                if (is_array($this->custReport)) {
-                    $this->loadCustLoop($request, $this->treeID);
-                }
-                foreach ($tbls as $i => $tbl) {
-                    if (in_array($tbl->TblName, $this->custReport->tblsInPackage())) {
-                        $tblFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
-                        if (Storage::exists($tblFilename)) {
-                            Storage::append($newSeedFilename, Storage::get($tblFilename));
-                        }
-                    }
-                }
-                $tbls = $GLOBALS["SL"]->tblQrySlExports();
-                if ($tbls->isNotEmpty()) {
-                    foreach ($tbls as $i => $tbl) {
-                        $tblFilename = str_replace('.php', '-' . $tbl->TblName . '.php', $newSeedFilename);
-                        if (Storage::exists($tblFilename)) {
-                            Storage::append($newSeedFilename, Storage::get($tblFilename));
-                        }
-                    }
-                }
-                Storage::append($newSeedFilename, ' } }');
-                
-                $this->v["nextUrl"] = '?refresh=5';
-                $this->v["content"] = view('vendor.survloop.admin.db.export-laravel-progress', $this->v)->render();
-                return view('vendor.survloop.master', $this->v);
-                
-            // Phase 5) Display resulting exports
-            } elseif ($this->v["refresh"] > 4) {
-				
-				/* NOT MVP!
-				$zip = new ZipArchive();
-				if (file_exists($this->v["zipFileMig"])) unlink($this->v["zipFileMig"]);
-				if ($zip->open($this->v["zipFileMig"], ZipArchive::CREATE)!==TRUE) {
-					exit("cannot open ".$this->v["zipFileMig"]."\n");
-				}
-				foreach ($this->v["fileListMig"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
-				foreach ($this->v["fileListModel"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
-				$zip->addFile($this->v["exportDir"]."/Model-Namespaces.php", "Model-Namespaces.php");
-				$this->v["dumpOut"]["Zip Files"] .= "\n\n\n\n numfiles: " . $zip->numFiles 
-					. "\n status:" . $zip->status . "\n";
-				$zip->close();
-				//$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__ . $this->v["exportDir"] 
-					. "/SurvLoop2Laravel-Export-" . date("Y-m-d") . ".zip"));
-				*/
-				
-                $this->v["dumpOut"]["Migrations"] = $newMigFilename;
-                $this->v["dumpOut"]["Seeders"] = $newSeedFilename;
-				if (isset($GLOBALS['SL']->x['exportAsPackage']) 
-                    && $GLOBALS['SL']->x['exportAsPackage']) {
-				    $this->v["nextUrl"] = '/dashboard/sl/export/laravel';
-				} else {
-				    $this->v["nextUrl"] = '/dashboard/db/export/laravel';
-				}
-				$this->v["content"] = view(
-                    'vendor.survloop.admin.db.export-laravel', 
-                    $this->v
-                )->render();
-				$this->saveCache();
-				
-			}
+        if (!$this->checkCache($currPage) || $request->has('generate')) {
+            $this->printExportLaravelRefresh($request);
         }
         if ($request->has('refreshVendor')) {
+            $abbr = strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]);
+            $pakg = $GLOBALS["SL"]->sysOpts["cust-package"];
             $this->v["content"] = $GLOBALS["SL"]->copyDirFiles(
-                '../app/Models/' . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]),
-                '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Models')
-                . $GLOBALS["SL"]->copyDirFiles('../storage/app/database/migrations',
-                    '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Database') 
-                . $this->v["content"];
+                '../app/Models/' . $abbr,
+                '../vendor/' . $pakg . '/src/Models'
+                ) . $GLOBALS["SL"]->copyDirFiles(
+                    '../storage/app/database/migrations',
+                    '../vendor/' . $pakg . '/src/Database'
+                ) . $this->v["content"];
         }
         return view('vendor.survloop.master', $this->v);
+    }
+    
+    public function printExportLaravelRefresh(Request $request) 
+    {
+        $this->v["generate"] = 1;
+        if ($request->has('generate')) {
+            $this->v["generate"] = intVal($request->get('generate'));
+        }
+        $this->v["newMigFile"] = 'database/migrations/' . $this->v["dateStmp"] 
+            . '_000000_create_' . strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
+        $this->v["seedFile"] = 'database/seeds/' 
+            . $GLOBALS["SL"]->dbRow->DbName . 'Seeder.php';
+        $this->v["tbls"] = $this->exportQryTbls();
+        
+        if ($this->v["generate"] == 1) {
+            // Phase 1) Create migration files
+            $this->runExportLaravCreateMigrate();
+            
+        } elseif ($this->v["generate"] == 2) {
+            // Phase 2) Create seeder files for custom system's database
+            $this->runExportLaravCreateSeeds($request);
+            
+        } elseif ($this->v["generate"] == 3) {
+            // Phase 3) Create seeder files for custom system's SurvLoop configurations
+            $this->runExportLaravCreateSeedsConfig($request);
+            
+        } elseif ($this->v["generate"] == 4) {
+            // Phase 4) Merge all seeder files into one ready for package
+            $this->runExportLaravMergeSeeds($request);
+            
+        } elseif ($this->v["generate"] > 4) {
+            // Phase 5) Display resulting exports
+            $this->runExportLaravDisplayExports();
+        }
+
+        $this->v["content"] = view(
+            'vendor.survloop.admin.db.export-laravel-progress', 
+            $this->v
+        )->render();
+        if ($this->v["generate"] > 4) {
+            $this->saveCache();
+        }
+        return true;
+    }
+
+    protected function runExportLaravCreateMigrate()
+    {
+        $this->prepLaravelExport();
+        $this->chkModelsFolder();
+        if ($this->v["tbls"]->isNotEmpty()) {
+            foreach ($this->v["tbls"] as $tbl) {
+                $indexes = "";
+                $this->loadTbl($tbl);
+                $this->v["migratFileUp"] .= "\t" . "Schema::create('" 
+                    . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                    . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
+                    . "$"."table->increments('" . $tbl->TblAbbr . "ID');";
+                $this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
+                $flds = $GLOBALS["SL"]->getTableFields($tbl);
+                if ($flds->isNotEmpty()) {
+                    foreach ($flds as $fld) {
+                        $fldName = trim($tbl->TblAbbr . $fld->FldName);
+                        $this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
+                        $this->runExportLaravMigrateFld($fldName, $fld);
+                    }
+                }
+                $this->v["migratFileUp"] .= "\n\t\t\t"
+                    . "$"."table->timestamps();" . "\n\t\t" . "});" . "\n\t";
+                $this->v["migratFileDown"] .= "\t" . "Schema::drop('"
+                    . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
+                $this->saveModelFile();
+            }
+        }
+        if (isset($this->v["migrateEnd"]) && trim($this->v["migrateEnd"]) != '') {
+            $this->v["migratFileUp"] .= $this->v["migrateEnd"];
+        }
+        Storage::put(
+            $this->v["newMigFile"], 
+            view(
+                'vendor.survloop.admin.db.export-laravel-gen-migration', 
+                $this->v
+            )->render()
+        );
+        $this->v["nextUrl"] = '?generate=2';
+        if ($this->v["tbls"]->isNotEmpty() 
+            && isset($this->v["tbls"][0]->TblName)) {
+            $this->v["nextUrl"] .= '&tbl=' . $this->v["tbls"][0]->TblName;
+        }
+        return true;
+    }
+    
+    protected function runExportLaravMigrateFld($fldName = '', $fld = null)
+    {
+        $this->v["migratFileUp"] .=  "\n\t\t\t"."$"."table->";
+        if (strpos($fld->FldValues, 'Def::') !== false) {
+            $this->v["migratFileUp"] .=  "integer('" . $fldName . "')->unsigned()";
+        } elseif ($fld->FldType == 'INT') {
+            if ($fld->FldValues == '0;1') {
+                $this->v["migratFileUp"] .=  "boolean('" . $fldName . "')";
+            } else {
+                $this->v["migratFileUp"] .=  "integer('" . $fldName . "')";
+            }
+            if (intVal($fld->FldForeignTable) > 0 && intVal($fld->FldDefault) >= 0) {
+                $this->v["migratFileUp"] .=  "->unsigned()";
+            }
+        } elseif ($fld->FldType == 'DOUBLE') {
+            $this->v["migratFileUp"] .=  "double('" . $fldName . "')";
+        } elseif ($fld->FldType == 'VARCHAR') {
+            if ($fld->FldDataLength == 1 
+                || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
+                || $fld->FldValues == 'Y;N;?' || $fld->FldValues == 'M;F;?') {
+                $this->v["migratFileUp"] .=  "char('" . $fldName . "', 1)";
+            } else {
+                $this->v["migratFileUp"] .=  "string('" . $fldName . "'" 
+                    . (($fld->FldDataLength > 0) ? ", " . $fld->FldDataLength : "") 
+                    . ")";
+            }
+        } elseif ($fld->FldType == 'TEXT') {
+            $this->v["migratFileUp"] .=  "longText('" . $fldName . "')";
+        } elseif ($fld->FldType == 'DATE') {
+            $this->v["migratFileUp"] .=  "date('" . $fldName . "')";
+        } elseif ($fld->FldType == 'DATETIME') {
+            $this->v["migratFileUp"] .=  "dateTime('" . $fldName . "')";
+        }
+        if (trim($fld->FldDefault) != '') {
+            $this->v["migratFileUp"] .=  "->default(";
+            if ($fld->FldDefault == 'NULL') {
+                $this->v["migratFileUp"] .= "NULL";
+            } else {
+                if ($fld->FldValues == '0;1') {
+                    if (intVal($fld->FldDefault) == 1) {
+                        $this->v["migratFileUp"] .= "1";
+                    } else {
+                        $this->v["migratFileUp"] .= "0";
+                    }
+                } else {
+                    $this->v["migratFileUp"] .= "'" 
+                        . $fld->FldDefault . "'";
+                }
+            }
+            $this->v["migratFileUp"] .= ")";
+        }
+        $this->v["migratFileUp"] .=  "->nullable();";
+        if ($fld->FldIsIndex == 1) {
+            $this->v["migratFileUp"] .= "\n\t\t\t"
+                . "$"."table->index('" . $fldName . "');";
+        }
+        /* // This is throwing errors
+        if (intVal($fld->FldForeignTable) > 0) {
+            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->FldForeignTable);
+            $this->v["migrateEnd"] .= "\t"."Schema::table('" 
+                . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                . "', function($"."table) { $"."table->foreign('" . $fldName 
+                . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
+        }
+        */
+        return true;
+    }
+
+    protected function runExportLaravCreateSeeds(Request $request)
+    {
+        $found = -1;
+        $seedCnt = $finishedTable = 1;
+        $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+            ? trim($request->get('tbls')) 
+            : ',');
+        $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
+        $limit = 1000;
+        if ($this->v["tbls"]->isNotEmpty()) {
+            if (is_array($this->custReport)) {
+                $this->loadCustLoop($GLOBALS["SL"]->REQ, $this->treeID);
+            }
+            foreach ($this->v["tbls"] as $i => $tbl) {
+                $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
+                    . $tbl->TblName;
+                if (in_array($tbl->TblName, $this->custReport->tblsInPackage())  
+                    && strpos($done, ',' . $tbl->TblName . ',') === false 
+                    && $found < 0) {
+                    $this->loadTbl($tbl);
+                    $tblSffx = '-' . $tbl->TblName . '.php';
+                    $this->v["seedFile"] = str_replace('.php', $tblSffx, $this->v["seedFile"]);
+                    /*
+                    if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
+                        $tblSeeds = '';
+                        list($seedCnt, $seedChk) = $GLOBALS["SL"]->getTableSeedDumpLimit(
+                            $tblClean, 
+                            '', 
+                            $limit, 
+                            $page
+                        );
+                        if ($seedChk->isNotEmpty()) {
+                            foreach ($seedChk as $seed) {
+                                $tblSeeds .= $this->printSeedTblRow($seed);
+                            }
+                        }
+                        $this->v["seedFile"] = str_replace(
+                            '.php', 
+                            '-' . $page . '.php', 
+                            $this->v["seedFile"]
+                        );
+                        //Storage::delete('file.jpg');
+                        Storage::put($this->v["seedFile"], $tblSeeds);
+                        if ($seedChk->count() < $limit) {
+                            $done .= $tbl->TblName . ',';
+                        } else {
+                            $page++;
+                            $finishedTable = 0;
+                        }
+                    } else { // dump whole table at once
+                        */
+                        $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl));
+                        Storage::put($this->v["seedFile"], $tblSeeds);
+                        $done .= $tbl->TblName . ',';
+                    //}
+                    $found = $i;
+                }
+            }
+        }
+        $this->v["nextUrl"] = '?generate=';
+        if ($found >= 0) {
+            $this->v["nextUrl"] .= '2&tbls=' . $done;
+            if ($finishedTable == 0) {
+                $this->v["nextUrl"] .= '&page=' . $page;
+            }
+        } else {
+            if ($this->v["asPackage"]) {
+                $this->v["nextUrl"] .= '3';
+            } else { 
+                $this->v["nextUrl"] .= '4';
+            }
+        }
+        return true;
+    }
+
+    protected function runExportLaravCreateSeedsConfig(Request $request)
+    {
+        $found = -1;
+        $seedCnt = $finishedTable = 1;
+        $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+            ? trim($request->get('tbls')) : ',');
+        $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
+        $limit = 1000;
+        //if ($this->v["asPackage"]) {
+            $prevDb = $GLOBALS["SL"]->dbID;
+            $prevTree = $GLOBALS["SL"]->treeID;
+            $this->initLoader();
+            $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, 3, 3);
+            $this->v["tbls"] = $GLOBALS["SL"]->tblQrySlExports();
+            if ($this->v["tbls"]->isNotEmpty()) {
+                foreach ($this->v["tbls"] as $i => $tbl) {
+                    $this->v["tblClean"] = 'SL' . $tbl->TblName;
+                    if ($found < 0 && strpos($done, ',' . $tbl->TblName . ',') === false) {
+                        $this->loadTbl($tbl);
+                        $tblSffx = '-' . $tbl->TblName . '.php';
+                        $this->v["seedFile"] = str_replace('.php', $tblSffx, $this->v["seedFile"]);
+                        $tblSeeds = $this->printSeedTbl(
+                            $GLOBALS["SL"]->loadSlSeedEval($tbl, $prevDb)
+                        );
+                        Storage::put($this->v["seedFile"], $tblSeeds);
+                        $done .= $tbl->TblName . ',';
+                        $found = $i;
+                    }
+                }
+            }
+            $this->loader->syncDataTrees($GLOBALS["SL"]->REQ, $prevDb, $prevTree);
+        //}
+        $this->v["nextUrl"] = '?generate=';
+        if ($found >= 0) {
+            $this->v["nextUrl"] .= '3&tbls=' . $done;
+            if ($finishedTable == 0) {
+                $this->v["nextUrl"] .= '&page=' . $page;
+            }
+        } else {
+            $this->v["nextUrl"] .= '4';
+        }
+        return true;
+    }
+
+    protected function runExportLaravMergeSeeds(Request $request)
+    {
+        Storage::put(
+            $this->v["seedFile"], 
+            view(
+                'vendor.survloop.admin.db.export-laravel-gen-seeder', 
+                [
+                    "wholeSeed" => false
+                ]
+            )->render()
+        );
+        $tbls = $this->exportQryTbls();
+        if (is_array($this->custReport)) {
+            $this->loadCustLoop($request, $this->treeID);
+        }
+        foreach ($tbls as $i => $tbl) {
+            if (in_array($tbl->TblName, $this->custReport->tblsInPackage())) {
+                $tblSffx = '-' . $tbl->TblName . '.php';
+                $tblFilename = str_replace('.php', $tblSffx, $this->v["seedFile"]);
+                if (Storage::exists($tblFilename)) {
+                    Storage::append($this->v["seedFile"], Storage::get($tblFilename));
+                }
+            }
+        }
+        $tbls = $GLOBALS["SL"]->tblQrySlExports();
+        if ($tbls->isNotEmpty()) {
+            foreach ($tbls as $i => $tbl) {
+                $tblSffx = '-' . $tbl->TblName . '.php';
+                $tblFilename = str_replace('.php', $tblSffx, $this->v["seedFile"]);
+                if (Storage::exists($tblFilename)) {
+                    Storage::append($this->v["seedFile"], Storage::get($tblFilename));
+                }
+            }
+        }
+        Storage::append($this->v["seedFile"], ' } }');
+        $this->v["nextUrl"] = '?generate=5';
+        return true;
+    }
+
+    protected function runExportLaravDisplayExports()
+    {   
+        /* NOT MVP!
+        $zip = new ZipArchive();
+        if (file_exists($this->v["zipFileMig"])) unlink($this->v["zipFileMig"]);
+        if ($zip->open($this->v["zipFileMig"], ZipArchive::CREATE)!==TRUE) {
+            exit("cannot open ".$this->v["zipFileMig"]."\n");
+        }
+        foreach ($this->v["fileListMig"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
+        foreach ($this->v["fileListModel"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
+        $zip->addFile($this->v["exportDir"]."/Model-Namespaces.php", "Model-Namespaces.php");
+        $this->v["dumpOut"]["Zip Files"] .= "\n\n\n\n numfiles: " . $zip->numFiles 
+            . "\n status:" . $zip->status . "\n";
+        $zip->close();
+        //$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__ . $this->v["exportDir"] 
+            . "/SurvLoop2Laravel-Export-" . date("Y-m-d") . ".zip"));
+        */
+        
+        $this->v["dumpOut"]["Migrations"] = $this->v["newMigFile"];
+        $this->v["dumpOut"]["Seeders"] = $this->v["seedFile"];
+        $this->v["nextUrl"] = '/dashboard/db/export/laravel?done=1';
+        if ($this->v["asPackage"]) {
+            $this->v["nextUrl"] = '/dashboard/sl/export/laravel?done=1';
+        }
+        return true;
     }
     
     protected function refreshTableModel(Request $request, $tbl = '')
@@ -474,12 +526,15 @@ class AdminDatabaseInstall extends AdminDBController
     protected function printSeedTbl($eval = '', $limit = 10000, $start = 0)
     {
     	$ret = '';
+//if ($tbl->TblName == 'Definitions') { echo 'eval: ' . $eval . '<br />'; exit; }
+//echo '<pre>'; print_r($eval); echo '</pre>';
         $seedChk = $GLOBALS["SL"]->getTableSeedDump(
             $this->v["tblClean"], 
             $eval, 
             $limit, 
             $start
         );
+//echo '<pre>'; print_r($seedChk); echo '</pre>'; exit;
         if ($seedChk->isNotEmpty()) {
             foreach ($seedChk as $seed) {
                 $ret .= $this->printSeedTblRow($seed);
@@ -528,16 +583,6 @@ class AdminDatabaseInstall extends AdminDBController
         $this->v["tblName"] = $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName;
         $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
         return true;
-    }
-    
-    public function printExportLaravelProgress(Request $request) 
-    {
-        
-        $this->v["content"] = view(
-            'vendor.survloop.admin.db.export-laravel-progress', 
-            $this->v
-        )->render();
-        return view('vendor.survloop.master', $this->v);
     }
     
     public function exportDump(Request $request)

@@ -17,12 +17,12 @@
 
 # <a name="about"></a>About
 
-* PHP Controllers ~ 1.2 MB (on disk)
-* Blade HTML Template Views ~ 572 KB
-* Javascript/jQuery within Blade Templates ~ 131 KB
-* CSS within Blade Templates ~ 131 KB
-* SurvLoop-Generated PHP Eloquent Data Table Models ~ 172 KB
-* SurvLoop-Generated PHP Laravel Database Migration & Seeders ~ 229 KB
+* PHP Controllers ~ 1.25 MB (on disk)
+* Blade HTML Template Views ~ 1.31 MB 
+* Javascript/jQuery within Blade Templates ~ 147 KB
+* CSS within Blade Templates ~ 139 KB
+* SurvLoop-Generated PHP Eloquent Data Table Models ~ 176 KB
+* SurvLoop-Generated PHP Laravel Database Migration & Seeders ~ 274 KB
 
 SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
 This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
@@ -101,7 +101,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "wikiworldorder/survloop": "^0.2.8",
+    "wikiworldorder/survloop": "^0.2.10",
     ...
 },
 ...
