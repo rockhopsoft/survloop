@@ -978,14 +978,14 @@ class GlobalsImportExport extends GlobalsTables
     		    $pages[] = $t->TreeID;
     		}
     	}
-    	$stats["Pages"] = sizeof($pages);
-    	$stats["PageNodes"] = SLNode::whereIn('NodeTree', $pages)->count();
+    	$stats["Pages"]                = sizeof($pages);
+    	$stats["PageNodes"]            = SLNode::whereIn('NodeTree', $pages)->count();
     	$stats["CodeLinesControllers"] = $this->getPackageLineCount('Controllers', $pkg);
-    	$stats["CodeLinesViews"] = $this->getPackageLineCount('Views', $pkg);
-    	$stats["BytesControllers"] = $this->getPackageByteCount('Controllers', $pkg);
-    	$stats["BytesDatabase"] = $this->getPackageByteCount('Database', $pkg);
-    	$stats["BytesUploads"] = $this->getPackageByteCount('Uploads', $pkg);
-    	$stats["BytesViews"] = $this->getPackageByteCount('Views', $pkg);
+    	$stats["CodeLinesViews"]       = $this->getPackageLineCount('Views', $pkg);
+    	$stats["BytesControllers"]     = $this->getPackageByteCount('Controllers', $pkg);
+    	$stats["BytesDatabase"]        = $this->getPackageByteCount('Database', $pkg);
+    	$stats["BytesUploads"]         = $this->getPackageByteCount('Uploads', $pkg);
+    	$stats["BytesViews"]           = $this->getPackageByteCount('Views', $pkg);
     	$stats["Users"] = User::select('id')->count();
     	return $stats;
     }

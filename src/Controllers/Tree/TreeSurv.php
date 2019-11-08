@@ -44,8 +44,7 @@ class TreeSurv extends TreeSurvReport
         if ($this->hasAjaxWrapPrinting()) {
             $ret .= '<div id="ajaxWrap">';
         }
-        $ret .= '<a name="maincontent" '
-            . 'id="maincontent"></a>' . "\n";
+        $ret .= '<a name="maincontent" id="maincontent"></a>' . "\n";
         if (!$this->isPage) {
             $ret .= '<div id="maincontentWrap" '
                 . 'style="display: none;">' . "\n";
@@ -305,22 +304,17 @@ class TreeSurv extends TreeSurvReport
             $notes .= 'pv.' . $GLOBALS["SL"]->pageView 
                 . ' dp.' . $GLOBALS["SL"]->dataPerms;
         }
-        $this->v["content"] = $this->printTreePublic() 
-            . (($notes != '') ? '<!-- ' . $notes . ' -->' : '');
+        $this->v["content"] = $this->printTreePublic();
+        if ($notes != '') {
+            $this->v["content"] .= '<!-- ' . $notes . ' -->';
+        }
         if ($this->v["currPage"][0] != '/' && isset($this->v["uID"])) {
             $log = new SLUsersActivity;
             $log->UserActUser = $this->v["uID"];
             $log->UserActCurrPage = $this->v["currPage"][0] . $notes;
             $log->save();
         }
-        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' 
-            . $GLOBALS["SL"]->treeRow->TreeType . '"; setCurrPage("'
-            . $this->v["currPage"][1] . '", "' . $this->v["currPage"][0] 
-            . '", ' . $this->currNode() . '); function loadPageNodes() { 
-            if (typeof chkNodeVisib === "function") { ' 
-            . $this->v["javaNodes"] . ' } 
-            else { setTimeout("loadPageNodes()", 500); } 
-            return true; } setTimeout("loadPageNodes()", 100); ' . "\n";
+        $this->loadTreePageJava();
         if ($request->has('ajax') && $request->ajax == 1) {
             // tree form ajax submission
             echo $this->ajaxContentWrapCustom($this->v["content"]);
@@ -330,22 +324,6 @@ class TreeSurv extends TreeSurvReport
         $this->v["currInReport"] = $this->currInReport();
         if ($type == 'testRun') {
             return $this->redir('/');
-        }
-        
-        if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0) { // search results page
-            if ($GLOBALS["SL"]->REQ->has('s') 
-                && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
-                if ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0
-                    || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
-                    || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0
-                    || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0) {
-                    $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\''
-                        . 'if (document.getElementById("admSrchFld")) '
-                        . 'document.getElementById("admSrchFld").value=' 
-                        . json_encode(trim($GLOBALS["SL"]->REQ->get('s')))
-                        . '\', 10); ';
-                } // else check for the main public search field? 
-            }
         }
         $this->v["content"] = $GLOBALS["SL"]->pullPageJsCss(
             $this->v["content"], 
@@ -358,6 +336,36 @@ class TreeSurv extends TreeSurvReport
                 view('vendor.survloop.master', $this->v)->render()
             );
         }
+    }
+    
+    /**
+     * Load the current tree and page in the Javascript load.
+     *
+     * @return boolean
+     */
+    protected function loadTreePageJava()
+    {
+        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' . $GLOBALS["SL"]->treeRow->TreeType 
+            . '"; setCurrPage("' . $this->v["currPage"][1] . '", "' 
+            . $this->v["currPage"][0] . '", ' . $this->currNode() 
+            . '); function loadPageNodes() { if (typeof chkNodeVisib === "function") { ' 
+            . $this->v["javaNodes"] . ' } else { setTimeout("loadPageNodes()", 500); } '
+            . 'return true; } setTimeout("loadPageNodes()", 100); ' . "\n";
+        // Check if search results page
+        if ($GLOBALS["SL"]->treeRow->TreeOpts%31 == 0 && $GLOBALS["SL"]->REQ->has('s') 
+            && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
+            if ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0
+                || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
+                || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0
+                || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0) {
+                $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\''
+                    . 'if (document.getElementById("admSrchFld")) '
+                    . 'document.getElementById("admSrchFld").value=' 
+                    . json_encode(trim($GLOBALS["SL"]->REQ->get('s')))
+                    . '\', 10); ';
+            } // else check for the main public search field? 
+        }
+        return true;
     }
     
     /**

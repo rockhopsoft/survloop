@@ -120,8 +120,7 @@ class SurvLoop extends SurvCustLoop
      * @param  boolean  $skipPublic
      * @return string
      */
-    public function loadPageURL(Request $request, $pageSlug = '', $cid = 0, 
-        $view = '', $skipPublic = false)
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = 0, $view = '', $skipPublic = false)
     {
         $redir = $this->chkPageRedir($pageSlug);
         if ($redir != $pageSlug) {

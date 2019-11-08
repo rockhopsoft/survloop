@@ -275,7 +275,7 @@ class AdminEmailController extends AdminCoreController
                 $emaTo, 
                 $emaCC, 
                 $emaBCC, 
-                $emaCC[0]
+                [((isset($emaCC[0])) ? $emaCC[0] : ''), '']
             );
             if ($request->has('redir') && trim($request->get('redir')) != '') {
                 return $this->redir($request->get('redir'), true);
