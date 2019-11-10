@@ -13,7 +13,7 @@
             @endif
             </h2>
         @if ($isPrint)
-            {!! view('vendor.survloop.print-header-legal', [])->render() !!}
+            {!! view('vendor.survloop.elements.print-header-legal', [])->render() !!}
             <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
         @else
             <div class="slGrey">

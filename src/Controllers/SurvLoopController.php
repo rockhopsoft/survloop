@@ -439,13 +439,16 @@ class SurvLoopController extends Controller
         $this->survLoopInit($request, '/fresh/creator');
         $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">Create Admin Account</h2>';
         $content = '<center><div class="treeWrapForm mT20 mBn20">
-            <h1 class="slBlueDark">' . ((isset($GLOBALS["SL"]->sysOpts["site-name"])) ? $GLOBALS["SL"]->sysOpts["site-name"] : 'SurvLoop') 
+            <h1 class="slBlueDark">' . ((isset($GLOBALS["SL"]->sysOpts["site-name"])) 
+                    ? $GLOBALS["SL"]->sysOpts["site-name"] : 'SurvLoop') 
                 . ' Installed!</h1><h4>All Out Data Are Belong...</h4>
             <p>Please create the first admin super user account.</p></div></center>';
         if (!$request->has('cssLoaded')) {
             $content = '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
                 <style> body, #registerLoginLnk { display: none; } </style>
-                <script type="text/javascript"> setTimeout("window.location=\'?cssLoaded=1\'", 2000); </script>';
+                <script type="text/javascript"> 
+                setTimeout("window.location=\'?cssLoaded=1\'", 2000); 
+                </script>';
         }
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
             if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $_SERVER["HTTP_HOST"]
@@ -500,9 +503,8 @@ class SurvLoopController extends Controller
         }
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
             && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-            $eval = "\$this->custReport = new "
-                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
-                . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
+            $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
+                . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "(\$request, -3, \$dbID, \$treeID);";
             eval($eval);
         } else {

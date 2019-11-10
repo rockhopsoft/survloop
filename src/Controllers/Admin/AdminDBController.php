@@ -314,8 +314,9 @@ class AdminDBController extends AdminController
             }
         }
         $this->survLoopInit($request, '/db/' . str_replace('_', '', $dbPrefix));
-        $this->v["content"] = view('vendor.survloop.print-header-legal', [])->render() . '<div class="pL20"><h2>' 
-            . $GLOBALS["SL"]->dbRow->DbName . ': Database Design Specs</h2></div><div class="p20">' 
+        $this->v["content"] = view('vendor.survloop.elements.print-header-legal')->render()
+            . '<div class="pL20"><h2>' . $GLOBALS["SL"]->dbRow->DbName 
+            . ': Database Design Specs</h2></div><div class="p20">' 
             . $this->full($request, true) . '</div>';
         $this->v["isPrint"] = true;
         return view('vendor.survloop.master', $this->v);
