@@ -40,10 +40,13 @@
 <h2 class="mB10">Search Engine Optimization</h2>
 <div class="row">
     <div class="col-8">
-        {!! view('vendor.survloop.admin.seo-meta-editor', [ "currMeta" => $currMeta ])->render() !!}
+        {!! view(
+            'vendor.survloop.admin.seo-meta-editor', 
+            [ "currMeta" => $currMeta ]
+        )->render() !!}
     </div><div class="col-4">
         <h3 class="slBlueDark" style="margin-top: -40px;">Social Sharing Preview</h3>
-        {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}
+        {!! view('vendor.survloop.admin.seo-meta-editor-preview')->render() !!}
     </div>
 </div>
 </div>
@@ -57,13 +60,23 @@
 <div class="row">
     <div class="col-md-6">
         @foreach (['site-name', 'cust-abbr', 'cust-package', 'parent-company'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt] 
+                ]
+            )->render() !!}
         @endforeach
     </div><div class="col-md-6">
         @foreach (['app-url', 'logo-url', 'parent-website'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt]
+                ]
+            )->render() !!}
         @endforeach
     </div>
 </div>
@@ -77,13 +90,23 @@
 <div class="row">
     <div class="col-md-6">
         @foreach (['has-volunteers', 'has-partners', 'has-avatars'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt]
+                ]
+            )->render() !!}
         @endforeach
     </div><div class="col-md-6">
         @foreach (['has-canada', 'users-create-db'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt]
+                ]
+            )->render() !!}
         @endforeach
     </div>
 </div>
@@ -97,19 +120,25 @@
 <div class="row">
     <div class="col-md-6">
         @foreach (['twitter', 'matomo-analytic-url', 'matomo-analytic-site-id'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt,
-                "val" => $sysDef->v["settingsList"][$opt]
-            ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt,
+                    "val" => $sysDef->v["settingsList"][$opt]
+                ]
+            )->render() !!}
         @endforeach
     </div>
     <div class="col-md-6">
         @foreach (['google-analytic', 'google-map-key', 'google-map-key2', 
             'google-cod-key', 'google-cod-key2'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, 
-                "val" => $sysDef->v["settingsList"][$opt] 
-            ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt] 
+                ]
+            )->render() !!}
         @endforeach
     </div>
 </div>
@@ -121,10 +150,13 @@
 <div class="slCard nodeWrap">
 <h3 class="slBlueDark"><u>License Settings</u></h3>
 @foreach (['app-license', 'app-license-url', 'app-license-img', 'app-license-snc'] as $opt)
-    {!! view('vendor.survloop.admin.system-one-setting', [
-        "opt" => $opt, 
-        "val" => $sysDef->v["settingsList"][$opt]
-    ])->render() !!}
+    {!! view(
+        'vendor.survloop.admin.system-one-setting', 
+        [
+            "opt" => $opt, 
+            "val" => $sysDef->v["settingsList"][$opt]
+        ]
+    )->render() !!}
 @endforeach
 </div>
 
@@ -137,21 +169,37 @@
     <div class="col-md-6">
         <h3 class="slBlueDark"><u>Logos</u></h3>
         @foreach (['logo-img-lrg', 'logo-img-md', 'logo-img-sm', 'show-logo-title', 'shortcut-icon'] as $opt)
-            {!! view('vendor.survloop.admin.system-one-setting', [
-                "opt" => $opt, "val" => $sysDef->v["settingsList"][$opt] ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $sysDef->v["settingsList"][$opt] 
+                ]
+            )->render() !!}
         @endforeach
     </div>
     <div class="col-md-6">
         <h3 class="slBlueDark"><u>Fonts</u></h3>
-        {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-            "opt" => 'font-main', "val" => $sysDef->v["stylesList"]["font-main"] ])->render() !!}
+        {!! view(
+            'vendor.survloop.admin.system-one-style', 
+            [
+                "sysStyles" => $sysDef->v["sysStyles"],
+                "opt" => 'font-main', 
+                "val" => $sysDef->v["stylesList"]["font-main"]
+            ]
+        )->render() !!}
     </div>
 </div>
 <div class="row">
     <div class="col-md-6">
-        {!! view('vendor.survloop.admin.system-one-setting', [
-            "opt" => 'spinner-code', "val" => ((isset($sysDef->v["settingsList"]["spinner-code"]))
-            ? $sysDef->v["settingsList"]["spinner-code"] : '') ])->render() !!}
+        {!! view(
+            'vendor.survloop.admin.system-one-setting', 
+            [
+                "opt" => 'spinner-code', 
+                "val" => ((isset($sysDef->v["settingsList"]["spinner-code"]))
+                    ? $sysDef->v["settingsList"]["spinner-code"] : '')
+            ]
+        )->render() !!}
     </div><div class="col-md-6">
         {!! $GLOBALS["SL"]->spinner() !!}
     </div>
@@ -169,16 +217,28 @@
         @foreach (['color-main-bg', 'color-main-text', 'color-main-link', 'color-main-grey', 
                 'color-main-faint', 'color-main-faintr'] as $opt)
             @if (isset($sysDef->v["stylesList"][$opt]))
-                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+                {!! view(
+                    'vendor.survloop.admin.system-one-style', 
+                    [ 
+                        "sysStyles" => $sysDef->v["sysStyles"],
+                        "opt" => $opt, 
+                        "val" => $sysDef->v["stylesList"][$opt]
+                    ]
+                )->render() !!}
             @endif
         @endforeach
         </div>
         <div class="col-md-4">
         @foreach (['color-field-bg', 'color-form-text', 'color-line-hr', 'color-nav-bg', 'color-nav-text'] as $opt)
             @if (isset($sysDef->v["stylesList"][$opt]))
-                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+                {!! view(
+                    'vendor.survloop.admin.system-one-style', 
+                    [ 
+                        "sysStyles" => $sysDef->v["sysStyles"],
+                        "opt" => $opt, 
+                        "val" => $sysDef->v["stylesList"][$opt]
+                    ]
+                )->render() !!}
             @endif
         @endforeach
         </div>
@@ -186,8 +246,14 @@
         @foreach (['color-main-on', 'color-info-on', 'color-success-on', 'color-danger-on', 'color-warn-on',] 
                 as $opt)
             @if (isset($sysDef->v["stylesList"][$opt]))
-                {!! view('vendor.survloop.admin.system-one-style', [ "sysStyles" => $sysDef->v["sysStyles"],
-                    "opt" => $opt, "val" => $sysDef->v["stylesList"][$opt] ])->render() !!}
+                {!! view(
+                    'vendor.survloop.admin.system-one-style', 
+                    [ 
+                        "sysStyles" => $sysDef->v["sysStyles"],
+                        "opt" => $opt, 
+                        "val" => $sysDef->v["stylesList"][$opt]
+                    ]
+                )->render() !!}
             @endif
         @endforeach
         </div>
@@ -200,24 +266,32 @@
 
 <div class="slCard nodeWrap">
 <h2>Hard Code HTML, CSS, JS</h2>
-{!! view('vendor.survloop.admin.system-one-setting', [
-    "opt" => 'header-code', 
-    "val" => $sysDef->v["settingsList"]["header-code"] 
-])->render() !!}
-{!! view('vendor.survloop.admin.system-one-setting', [
-    "opt" => 'css-extra-files', 
-    "val" => $sysDef->v["settingsList"]["css-extra-files"] 
-])->render() !!}
+{!! view(
+    'vendor.survloop.admin.system-one-setting', 
+    [
+        "opt" => 'header-code', 
+        "val" => $sysDef->v["settingsList"]["header-code"] 
+    ]
+)->render() !!}
+{!! view(
+    'vendor.survloop.admin.system-one-setting', 
+    [
+        "opt" => 'css-extra-files', 
+        "val" => $sysDef->v["settingsList"]["css-extra-files"] 
+    ]
+)->render() !!}
 
 <div class="mB20"><label class="w100">
     <h4 class="m0">System-Wide Custom CSS:</h4>
     <textarea name="sys-cust-css" class="form-control" autocomplete="off"
-        style="height: 400px; font-family: Courier New;">{!! $sysDef->v["custCSS"]->DefDescription !!}</textarea>
+        style="height: 400px; font-family: Courier New;"
+        >{!! $sysDef->v["custCSS"]->def_description !!}</textarea>
 </label></div>
 <div class="mB20"><label class="w100">
     <h4 class="m0">Custom CSS for Emails:</h4>
     <textarea name="sys-cust-css-email" class="form-control" autocomplete="off" 
-        style="height: 200px; font-family: Courier New;">{!! $sysDef->v["custCSSemail"]->DefDescription !!}</textarea>
+        style="height: 200px; font-family: Courier New;"
+        >{!! $sysDef->v["custCSSemail"]->def_description !!}</textarea>
 </label></div>
 
 {!! view('vendor.survloop.admin.system-one-setting', [

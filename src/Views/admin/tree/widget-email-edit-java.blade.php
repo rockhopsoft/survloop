@@ -1,7 +1,7 @@
 /* resources/views/vendor/survloop/admin/tree/widget-email-edit-java.blade.php */
 var emailListIDs = new Array();
 @forelse ($emailList as $i => $email)
-    emailListIDs[emailListIDs.length] = {{ $email->EmailID }};
+    emailListIDs[emailListIDs.length] = {{ $email->email_id }};
 @empty
 @endforelse
 function changeWidgetEmailDef(newID) {

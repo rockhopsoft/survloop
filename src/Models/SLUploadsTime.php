@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLUploadsTime extends Model
 {
-    protected $table      = 'SL_UploadsTime';
-    protected $primaryKey = 'UpTiID';
+    protected $table      = 'sl_uploads_time';
+    protected $primaryKey = 'up_ti_id';
     public $timestamps    = true;
     protected $fillable   = 
     [
-		'UpTiUploadID', 
-		'UpTiTimestamp', 
-		'UpTiDescription', 
-		'UpTiLinkFldID', 
-		'UpTiLinkRecID', 
+		'up_ti_upload_id', 
+		'up_ti_timestamp', 
+		'up_ti_description', 
+		'up_ti_link_fld_id', 
+		'up_ti_link_rec_id', 
     ];
     
     // END SurvLoop auto-generated portion of Model

@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.25
   */
-namespace SurvLoop\Controllers;
+namespace SurvLoop\Controllers\Stats;
 
 use DB;
 use App\Models\SLTree;
@@ -29,27 +29,28 @@ class SessAnalysis
         $this->treeID = $treeID;
     }
     
-    public function loadNodeTots($custReport = null)
+    public function loadNodeTots(&$custReport = null)
     {
         if ($custReport === null) {
             return [];
         }
         $this->nodeTots = $this->nodeSort = $this->coreTots = [];
-        $chk = SLNode::where('NodeTree', $this->treeID)
-            ->whereIn('NodeType', [ 'Page', 'Loop Root' ])
+        $chk = SLNode::where('node_tree', $this->treeID)
+            ->whereIn('node_type', [ 'Page', 'Loop Root' ])
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $n) {
-                $tmp = new TreeNodeSurv($n->NodeID, $n);
+                $tmp = new TreeNodeSurv($n->node_id, $n);
                 $tmp->fillNodeRow();
-                $this->nodeTots[$n->NodeID] = [
+                $this->nodeTots[$n->node_id] = [
                     "cmpl" => [ 0, 0 ],
-                    "perc" => intVal($custReport->rawOrderPercent($n->NodeID)),
+                    "perc" => intVal($custReport->rawOrderPercent($n->node_id)),
                     "name" => ((isset($tmp->extraOpts["meta-title"]) 
                         && trim($tmp->extraOpts["meta-title"]) != '')
-                        ? $tmp->extraOpts["meta-title"] : $n->NodePromptNotes)
+                        ? $tmp->extraOpts["meta-title"] 
+                        : $n->node_prompt_notes)
                 ];
-                $this->nodeSort[$this->nodeTots[$n->NodeID]["perc"]] = $n->NodeID;
+                $this->nodeSort[$this->nodeTots[$n->node_id]["perc"]] = $n->node_id;
             }
         }
         ksort($this->nodeSort, 1); // SORT_NUMERIC
@@ -72,46 +73,49 @@ class SessAnalysis
             "core" => $coreID,
             "node" => -3,
             "date" => 0,
-            "dur" => 0,
+            "dur"  => 0,
             "mobl" => false,
             "cmpl" => false, 
-            "log" => []
+            "log"  => []
         ];
-        eval("\$coreRec = " . $GLOBALS["SL"]->modelPathTblID($tree->TreeCoreTable) . "::find(" . intVal($coreID) .");");
+        eval("\$coreRec = " . $GLOBALS["SL"]->modelPathTblID($tree->tree_core_table) 
+            . "::find(" . intVal($coreID) .");");
         if (!$coreRec || !isset($coreRec->updated_at)) {
             return $this->coreTots;
         }
         
         $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-3, date("Y"));
         $cacheFile = '../storage/app/anlyz/t' . $this->treeID . '/c' . $coreID . '.php';
-        if (!file_exists($cacheFile) || strtotime($coreRec->updated_at) > $this->v["dayold"]
+        if (!file_exists($cacheFile) 
+            || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             if (in_array($GLOBALS["SL"]->getTblRecPublicID($coreRec), $allPublicIDs)) {
                 $this->coreTots["cmpl"] = true;
             }
             $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
-            if (isset($coreRec->{ $coreAbbr . 'SubmissionProgress' })) {
-                $this->coreTots["node"] = $coreRec->{ $coreAbbr . 'SubmissionProgress' };
+            if (isset($coreRec->{ $coreAbbr . 'submission_progress' })) {
+                $this->coreTots["node"] = $coreRec->{ $coreAbbr . 'submission_progress' };
                 $this->coreTots["date"] = strtotime($coreRec->created_at);
-                if (isset($coreRec->{ $coreAbbr . 'IsMobile' }) && intVal($coreRec->{ $coreAbbr . 'IsMobile' }) == 1) {
+                if (isset($coreRec->{ $coreAbbr . 'is_mobile' }) 
+                    && intVal($coreRec->{ $coreAbbr . 'is_mobile' }) == 1) {
                     $this->coreTots["mobl"] = true;
                 }
             }
             $coreLog = '';
-            $pages = DB::table('SL_NodeSavesPage')
-                ->join('SL_Sess', 'SL_NodeSavesPage.PageSaveSession', '=', 'SL_Sess.SessID')
-                ->where('SL_Sess.SessTree', '=', $this->treeID)
-                ->where('SL_Sess.SessCoreID', '=', $coreID)
-                ->orderBy('SL_NodeSavesPage.created_at', 'asc')
-                ->select('SL_NodeSavesPage.PageSaveNode', 'SL_NodeSavesPage.created_at')
+            $pages = DB::table('sl_node_saves_page')
+                ->join('sl_sess', 'sl_node_saves_page.page_save_session', '=', 'sl_sess.sess_id')
+                ->where('sl_sess.sess_tree', '=', $this->treeID)
+                ->where('sl_sess.sess_core_id', '=', $coreID)
+                ->orderBy('sl_node_saves_page.created_at', 'asc')
+                ->select('sl_node_saves_page.page_save_node', 'sl_node_saves_page.created_at')
                 ->distinct()
-                ->get([ 'SL_Sess.SessCoreID' ]);
+                ->get([ 'sl_sess.sess_core_id' ]);
             if ($pages->isNotEmpty()) {
                 $lastCreateDate = $durMinus = 0;
                 foreach ($pages as $i => $p) {
                     $dur = strtotime($p->created_at)-$this->coreTots["date"];
-                    if ($dur >= 0 && isset($this->nodeTots[$p->PageSaveNode])) {
-                        $coreLog .= ', [ ' . $dur . ', ' . $p->PageSaveNode . ' ]';
+                    if ($dur >= 0 && isset($this->nodeTots[$p->page_save_node])) {
+                        $coreLog .= ', [ ' . $dur . ', ' . $p->page_save_node . ' ]';
                         $this->coreTots["dur"] = $dur;
                         if ($lastCreateDate > 0) {
                             $lastGap = strtotime($p->created_at)-$lastCreateDate;

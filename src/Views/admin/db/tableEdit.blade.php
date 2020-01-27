@@ -4,11 +4,11 @@
 <div class="container">
     <div class="slCard nodeWrap">
 
-        <a href="/dashboard/db/table/{{ $tbl->TblName }}" 
+        <a href="/dashboard/db/table/{{ $tbl->tbl_name }}" 
             class="btn btn-sm btn-secondary pull-right">View Table</a>
         <h3>
             <span class="slBlueDark"><i class="fa fa-database"></i> 
-            @if (isset($tbl->TblEng) && trim($tbl->TblEng) != '') Edit Table: {{ $tbl->TblEng }}
+            @if (isset($tbl->tbl_eng) && trim($tbl->tbl_eng) != '') Edit Table: {{ $tbl->tbl_eng }}
             @else Add New Table
             @endif
         </h3>
@@ -26,19 +26,19 @@
 
                 <fieldset class="form-group">
                     <label for="TblEngID">Plain English Name</label>
-                    <input id="TblEngID" name="TblEng" value="{{ $tbl->TblEng }}" 
+                    <input id="TblEngID" name="TblEng" value="{{ $tbl->tbl_eng }}" 
                         type="text" class="form-control" > 
                 </fieldset>
                 <div class="p5"></div>
                 <fieldset class="form-group">
                     <label for="TblNameID">Database Name</label>
-                    <input id="TblNameID" name="TblName" value="{{ $tbl->TblName }}" 
+                    <input id="TblNameID" name="TblName" value="{{ $tbl->tbl_name }}" 
                         type="text" class="form-control" > 
                 </fieldset>
                 <div class="p5"></div>
                 <fieldset class="form-group">
                     <label for="TblAbbrID">Abbreviation</label>
-                    <input id="TblAbbrID" name="TblAbbr" value="{{ $tbl->TblAbbr }}" 
+                    <input id="TblAbbrID" name="TblAbbr" value="{{ $tbl->tbl_abbr }}" 
                         type="text" class="form-control" > 
                 </fieldset>
                 <div class="p5"></div>
@@ -46,23 +46,24 @@
                     <label for="TblTypeID">Type</label>
                     <select id="TblTypeID" name="TblType" class="form-control" > 
                         <option value="Data" 
-                            @if ($tbl->TblType == 'Data') SELECTED @endif 
+                            @if ($tbl->tbl_type == 'Data') SELECTED @endif 
                             >Data</option>
                         <option value="Subset" 
-                            @if ($tbl->TblType == 'Subset') SELECTED @endif 
+                            @if ($tbl->tbl_type == 'Subset') SELECTED @endif 
                             >Subset</option>
                         <option value="Linking" 
-                            @if ($tbl->TblType == 'Linking') SELECTED @endif 
+                            @if ($tbl->tbl_type == 'Linking') SELECTED @endif 
                             >Linking</option>
                         <option value="Validation" 
-                            @if ($tbl->TblType == 'Validation') SELECTED @endif 
+                            @if ($tbl->tbl_type == 'Validation') SELECTED @endif 
                             >Validation</option>
                     </select>
                 </fieldset>
                 <div class="p5"></div>
                 <fieldset class="form-group">
                     <label for="TblGroupID">Table Group</label>
-                    <input id="TblGroupID" name="TblGroup" value="{{ $tbl->TblGroup }}"     type="text" class="form-control" > 
+                    <input id="TblGroupID" name="TblGroup" value="{{ $tbl->tbl_group }}" 
+                        type="text" class="form-control" > 
                 </fieldset>
                 
             </div>
@@ -71,13 +72,13 @@
                 <fieldset class="form-group">
                     <label for="TblDescID">Description</label>
                     <textarea id="TblDescID" name="TblDesc" class="form-control" 
-                        style="height: 170px;">{{ $tbl->TblDesc }}</textarea>
+                        style="height: 170px;">{{ $tbl->tbl_desc }}</textarea>
                 </fieldset>
                 <div class="p5"></div>
                 <fieldset class="form-group">
                     <label for="TblNotesID">Notes</label>
                     <textarea id="TblNotesID" name="TblNotes" class="form-control" 
-                        style="height: 170px;">{{ $tbl->TblNotes }}</textarea>
+                        style="height: 170px;">{{ $tbl->tbl_notes }}</textarea>
                 </fieldset>
                 
             </div>

@@ -19,18 +19,18 @@
                 <xs:sequence>
     @endif
     @forelse ($tblFlds as $i => $fld)
-        @if ($fld->FldOpts%13 > 0)
-            <xs:element name="{{ $tblAbbr . $fld->FldName }}" 
-                @if (!$tblFldEnum[$fld->FldID]) type="{{ $GLOBALS['SL']->fld2SchemaType($fld) }}" @endif
-                @if (!isset($fld->FldRequired) || intVal($fld->FldRequired) == 0) minOccurs="0" @endif >
+        @if ($fld->fld_opts%13 > 0)
+            <xs:element name="{{ $tblAbbr . $fld->fld_name }}" 
+                @if (!$tblFldEnum[$fld->fld_id]) type="{{ $GLOBALS['SL']->fld2SchemaType($fld) }}" @endif
+                @if (!isset($fld->fld_required) || intVal($fld->fld_required) == 0) minOccurs="0" @endif >
                 <xs:annotation>
-                    <xs:appinfo>{{ htmlspecialchars($fld->FldEng) }}</xs:appinfo>
-                    <xs:documentation xml:lang="en"><![CDATA[{{ htmlspecialchars($fld->FldDesc) }}]]></xs:documentation>
+                    <xs:appinfo>{{ htmlspecialchars($fld->fld_eng) }}</xs:appinfo>
+                    <xs:documentation xml:lang="en"><![CDATA[{{ htmlspecialchars($fld->fld_desc) }}]]></xs:documentation>
                 </xs:annotation>
-                @if ($tblFldEnum[$fld->FldID])
+                @if ($tblFldEnum[$fld->fld_id])
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            @foreach ($tblFldDefs[$fld->FldID] as $i => $def)
+                            @foreach ($tblFldDefs[$fld->fld_id] as $i => $def)
                                 <xs:enumeration value="{{ htmlspecialchars($def) }}"/>
                             @endforeach
                         </xs:restriction>

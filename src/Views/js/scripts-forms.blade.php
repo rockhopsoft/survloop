@@ -31,6 +31,7 @@ var nodeTagList = new Array();
 
 var loopItemsNextID = 0;
 var currItemCnt = 0;
+var addingLoopItem = 0;
 var maxItemCnt = 0;
 var uploadTypeVid = -1;
 
@@ -55,7 +56,12 @@ function addIsMobile(nID, isMobile) {
 
 function setFormErrs() {
 	if (document.getElementById("formErrorMsg")) {
-	    document.getElementById("formErrorMsg").innerHTML = "<b>Oops, you missed a required field "+formErrorsEng+"</b>";
+        var errTxt = "<b>Oops, you missed a required field";
+        formErrorsEng = formErrorsEng.trim();
+        if (formErrorsEng.length == 0) {
+            errTxt += " "+formErrorsEng;
+        }
+	    document.getElementById("formErrorMsg").innerHTML = errTxt+"</b>";
 	    document.getElementById("formErrorMsg").style.display = "block";
 	}
 	return true;
@@ -492,12 +498,56 @@ function updateTagList(nIDtxt) {
     return true;
 }
 
+function disableElement(fldID) {
+console.log("disableElement fld "+fldID+" :)");
+    if (document.getElementById(fldID)) {
+        document.getElementById(fldID).style.background = "#DDD";
+        document.getElementById(fldID).style.color = "#AAA";
+        if (document.getElementById(fldID).disabled) {
+console.log("disableElement fld "+fldID+" disabled");
+            document.getElementById(fldID).disabled = true;
+        }
+    }
+    return true;
+}
+
+var disableSpreadKids = new Array();
+function disableSpreadsheetRow(nID, row) {
+    var rowID = "n"+nID+"tbl"+row+"row";
+    disableElement(rowID);
+    if (nodeKidList[nID] && nodeKidList[nID].length > 0) {
+        for (var k = 0; k < nodeKidList[nID].length; k++) {
+            disableSprdRowKids(nID, row, nodeKidList[nID][k]);
+        }
+    }
+    if (disableSpreadKids[nID] && disableSpreadKids[nID].length > 0) {
+        for (var k = 0; k < disableSpreadKids[nID].length; k++) {
+            disableSprdRowKids(nID, row, disableSpreadKids[nID][k]);
+        }
+    }
+    return true;
+}
+function disableSprdRowKids(nID, row, kid) {
+    var fldID = "n"+kid+"tbl"+row+"FldID";
+console.log("disableSprdRowKids visib "+fldID+" ...");
+    disableElement(fldID);
+    fldID = "n"+kid+"tbl"+row+"VisibleID";
+console.log("disableSprdRowKids visib "+fldID+" ?");
+    if (document.getElementById(fldID)) {
+console.log("disableSprdRowKids visib "+fldID+" :)");
+        document.getElementById(fldID).value = 0;
+    }
+    return true;
+}
+
 function styBlock(id) {
     if (document.getElementById(id)) document.getElementById(id).style.display="block";
+    if (document.getElementById(id+"kids")) document.getElementById(id+"kids").style.display="block";
 }
 
 function styNone(id) {
     if (document.getElementById(id)) document.getElementById(id).style.display="none";
+    if (document.getElementById(id+"kids")) document.getElementById(id+"kids").style.display="none";
 }
 
 function kidsVisible(nID, nSffx, onOff) {
@@ -539,7 +589,6 @@ function setSubResponses(nID, nSffx, onOff, kids) {
 /* console.log("node kids[k] = "+kids[k]+" , nSffx = "+nSffx+""); */
 /* will need styFlex( */
                     styBlock("node"+kids[k]+nSffx+"");
-                    
                 } else {
                     styNone("node"+kids[k]+nSffx+"");
                 }

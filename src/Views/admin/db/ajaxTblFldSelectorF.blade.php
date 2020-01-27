@@ -2,9 +2,7 @@
 
 <input type="hidden" name="RuleFields" id="RuleFieldsID" value="{{ urldecode($rF) }}">
 @forelse ($fldList as $i => $fld)
-    @if ($i > 0)
-        ,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    @endif
+    @if ($i > 0) ,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; @endif
     <nobr>{!! $fld[1] !!}
     <a href="javascript:;" onClick="return delFld({{ $fld[0] }});" 
         class="red f12 mL5"><span class="glyphicon glyphicon-remove"></span></a></nobr>

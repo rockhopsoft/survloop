@@ -6,9 +6,9 @@
         <div class="nFld mT0">
             <select type="radio" name="changeResponseMobile" id="changeResponseMobileID" autocomplete="off"
                 onChange="changeResponseMobileType();" class="form-control form-control-lg" >
-                <option value="mobile" @if ($node->nodeRow->NodeOpts%2 > 0) SELECTED @endif 
+                <option value="mobile" @if ($node->nodeRow->node_opts%2 > 0) SELECTED @endif 
                     > Mobile default</option>
-                <option value="desktop" @if ($node->nodeRow->NodeOpts%2 == 0) SELECTED @endif
+                <option value="desktop" @if ($node->nodeRow->node_opts%2 == 0) SELECTED @endif
                     > Customize</option>
             </select>
         </div>
@@ -17,7 +17,7 @@
         </div>
 
         <div id="responseCheckOpts" 
-            class=" @if ($node->nodeRow->NodeOpts%2 == 0) disBlo @else disNon @endif ">
+            class=" @if ($node->nodeRow->node_opts%2 == 0) disBlo @else disNon @endif ">
             <div class="checkbox">
                 <label for="opts11ID">
                     <input type="checkbox" name="opts11" id="opts11ID" value="11" autocomplete="off" 
@@ -39,17 +39,17 @@
             <div class="checkbox">
                 <label for="opts61ID">
                     <input type="checkbox" name="opts61" id="opts61ID" value="61" autocomplete="off" 
-                        @if ($node->nodeRow->NodeOpts%61 == 0) CHECKED @endif 
+                        @if ($node->nodeRow->node_opts%61 == 0) CHECKED @endif 
                         > Responses In Columns
                 </label>
             </div>
         </div>
     
         <div id="taggerOpts" class="p10 mB10 
-            @if (in_array($node->nodeRow->NodeType, ['Drop Down', 'U.S. States'])) disBlo @else disNon @endif ">
+            @if (in_array($node->nodeRow->node_type, ['Drop Down', 'U.S. States'])) disBlo @else disNon @endif ">
             <b>Empty/Non-Response Option:</b> 
             <div class="nFld"><input type="text" name="dropDownSuggest" class="form-control" 
-                @if (isset($node->nodeRow->NodeTextSuggest)) value="{{ $node->nodeRow->NodeTextSuggest }}"
+                @if (isset($node->nodeRow->node_text_suggest)) value="{{ $node->nodeRow->node_text_suggest }}"
                 @endif ></div>
             
             <label for="opts53ID" class="mT20">
@@ -61,7 +61,7 @@
         <div class="checkbox m10">
             <label for="opts37ID">
                 <input type="checkbox" name="opts37" id="opts37ID" value="37" autocomplete="off" 
-                    @if ($node->nodeRow->NodeOpts%37 == 0) CHECKED @endif class="mR10" > Wrap node in 
+                    @if ($node->nodeRow->node_opts%37 == 0) CHECKED @endif class="mR10" > Wrap node in 
                     <a href="http://getbootstrap.com/examples/jumbotron-narrow/" target="_blank">jumbotron</a>
             </label>
         </div>
@@ -70,7 +70,7 @@
             <div class="checkbox">
                 <label for="opts13ID">
                     <input type="checkbox" name="opts13" id="opts13ID" value="13" autocomplete="off" 
-                    @if ($node->nodeRow->NodeOpts%13 == 0) CHECKED @endif 
+                    @if ($node->nodeRow->node_opts%13 == 0) CHECKED @endif 
                     > <span class="red">*Required</span> displayed on it's own separate line
                 </label>
             </div>

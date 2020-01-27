@@ -25,7 +25,8 @@ class TreeSurvFormVarieties extends UserProfile
     protected function swapIDs($nIDtxt = '', $str = '')
     {
         $str = str_replace('[[nID]]', $nIDtxt, $str);
-        $str = str_replace('[[coreID]]', $this->coreID, str_replace('[[cID]]', $this->coreID, $str));
+        $str = str_replace('[[cID]]', $this->coreID, $str);
+        $str = str_replace('[[coreID]]', $this->coreID, $str);
         $str = str_replace('[[corePubID]]', $this->getCurrPubID(), $str);
         $str = str_replace('[[DOMAIN]]', $GLOBALS["SL"]->sysOpts["app-url"], $str);
         return $str;
@@ -62,11 +63,15 @@ class TreeSurvFormVarieties extends UserProfile
         $str = $this->swapIDs($nIDtxt, $str);
         if (!isset($this->v["printFullTree"]) || !$this->v["printFullTree"]) {
             if ($itemID > 0 && $itemInd >= 0) {
-                if (strpos($str, '[LoopItemLabel]') !== false && isset($GLOBALS["SL"]->closestLoop["loop"])) {
-                    $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
-                        $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), $itemInd);
-                    $str = str_replace('[LoopItemLabel]', '<span class="' . $this->autoLabelClass($nIDtxt)
-                        . '">' . $label . '</span>', $str);
+                if (strpos($str, '[LoopItemLabel]') !== false 
+                    && isset($GLOBALS["SL"]->closestLoop["loop"])) {
+                    $loop = $GLOBALS["SL"]->closestLoop["loop"];
+                    $loopTbl = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
+                    $itemRowID = $this->sessData->getRowById($loopTbl, $itemID);
+                    $label = $this->getLoopItemLabel($loop, $itemRowID, $itemInd);
+                    $labelSwap = '<span class="' . $this->autoLabelClass($nIDtxt) 
+                        . '">' . $label . '</span>';
+                    $str = str_replace('[LoopItemLabel]', $labelSwap, $str);
                 }
                 $cnt = 1+$itemInd;
                 if (isset($GLOBALS["SL"]->closestLoop["loop"])) {
@@ -79,21 +84,22 @@ class TreeSurvFormVarieties extends UserProfile
                         }
                     }
                 }
-                $str = str_replace('[LoopItemCnt]', '<span class="' . $this->autoLabelClass($nIDtxt)
-                    . '">' . $cnt . '</span>', $str);
+                $labelSwap = '<span class="' . $this->autoLabelClass($nIDtxt) 
+                    . '">' . $cnt . '</span>';
+                $str = str_replace('[LoopItemCnt]', $labelSwap, $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
             if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {
-                $strPre = substr($str, 0, $labelPos);
-                $loopName = substr($str, $labelPos+15);
+                $strPre      = substr($str, 0, $labelPos);
+                $loopName    = substr($str, $labelPos+15);
                 $labelEndPos = strpos($loopName, ']');
-                $strPost = substr($loopName, $labelEndPos+1);
-                $loopName = substr($loopName, 0, $labelEndPos);
-                $loopRows = $this->sessData->getLoopRows($loopName);
+                $strPost     = substr($loopName, $labelEndPos+1);
+                $loopName    = substr($loopName, 0, $labelEndPos);
+                $loopRows    = $this->sessData->getLoopRows($loopName);
                 if (sizeof($loopRows) == 1) {
                     $label = $this->getLoopItemLabel($loopName, $loopRows[0], $itemInd);
-                    $str = $strPre . '<span class="' . $this->autoLabelClass($nIDtxt) . '">'
-                        . $label . '</span>' . $strPost;
+                    $str = $strPre . '<span class="' . $this->autoLabelClass($nIDtxt) 
+                        . '">' . $label . '</span>' . $strPost;
                 }
             }
         }
@@ -112,14 +118,22 @@ class TreeSurvFormVarieties extends UserProfile
         $span = '<span class="' . $cls . '">';
         $str = str_replace($span . 'You</span>', $span . 'you</span>', $str);
         $str = str_replace($span . 'you</span>&#39;s', $span . 'your</span>', $str);
-        $str = str_replace('Was <span class="' . $cls . '">you</span>', 'Were <span class="' . $cls . '">you</span>', $str);
-        $str = str_replace('was <span class="' . $cls . '">you</span>', 'were <span class="' . $cls . '">you</span>', $str);
+        $str = str_replace(
+            'Was <span class="' . $cls . '">you</span>', 
+            'Were <span class="' . $cls . '">you</span>', 
+            $str
+        );
+        $str = str_replace(
+            'was <span class="' . $cls . '">you</span>', 
+            'were <span class="' . $cls . '">you</span>', 
+            $str
+        );
         $str = str_replace($span . 'you</span>\'s', $span . 'your</span>', $str);
         $str = str_replace($span . 'you</span> was', $span . 'you</span> were', $str);
-        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="' . $cls . '">[LoopItemLabel]</span>:',
-            ':', $str));
-        $str = str_replace(', <span class="' . $cls . '"></span>:', ':', 
-            str_replace(', <span class="' . $cls . '">&nbsp;</span>:', ':', $str));
+        $str = str_replace(', <span class="' . $cls . '">[LoopItemLabel]</span>:', ':', $str);
+        $str = str_replace(', [LoopItemLabel]:', ':', $str);
+        $str = str_replace(', <span class="' . $cls . '">&nbsp;</span>:', ':', $str);
+        $str = str_replace(', <span class="' . $cls . '"></span>:', ':', $str);
         $str = trim(str_replace(', :', ':', $str));
         if (strpos(strip_tags($str), 'you') === 0) {
             $str = str_replace($span . 'you', $span . 'You', $str);
@@ -129,15 +143,23 @@ class TreeSurvFormVarieties extends UserProfile
         $str = str_replace('was you', 'were you', str_replace('was You', 'were you', $str));
         $str = str_replace('you\'s', 'your', str_replace('You\'s', 'Your', $str));
         $str = str_replace('you was', 'you were', str_replace('You was', 'You were', $str));
-        $str = str_replace(', [LoopItemLabel]:', ':', str_replace(', <span class="' . $cls . '">[LoopItemLabel]:',
-            ':', $str));
-        $str = str_replace(', <span class="' . $cls . '">:', ':', 
-            str_replace(', <span class="' . $cls . '">&nbsp;:', ':', $str));
+        $str = str_replace(', <span class="' . $cls . '">[LoopItemLabel]:', ':', $str);
+        $str = str_replace(', [LoopItemLabel]:', ':', $str);
+        $str = str_replace(', <span class="' . $cls . '">&nbsp;:', ':', $str);
+        $str = str_replace(', <span class="' . $cls . '">:', ':', $str);
         $str = trim(str_replace(', :', ':', $str));
         if (strpos(strip_tags($str), 'you') === 0) {
             $str = str_replace('you', 'You', $str);
         }
         return $str;
+    }
+    
+    protected function wrapNodePrint($ret, $nID)
+    {
+        if ($this->allNodes[$nID]->chkCurrOpt('DEFERLOAD')) {
+            return $GLOBALS["SL"]->deferStaticNodePrint($nID, $ret, $this->coreID);
+        }
+        return $ret;
     }
     
     protected function printWidget($nID, $nIDtxt, $curr)
@@ -147,8 +169,7 @@ class TreeSurvFormVarieties extends UserProfile
         if ($curr->nodeType == 'Incomplete Sess Check' 
             && isset($this->v["profileUser"]) 
             && isset($this->v["profileUser"]->id)) {
-            if (!isset($this->v["uID"]) 
-                || $this->v["uID"] != $this->v["profileUser"]->id) {
+            if (!isset($this->v["uID"]) || $this->v["uID"] != $this->v["profileUser"]->id) {
                 $blockWidget = true;
             }
         }
@@ -158,35 +179,42 @@ class TreeSurvFormVarieties extends UserProfile
             $ret .= $this->showProfileBasics();
         } elseif ($curr->nodeType == 'MFA Dialogue') {
             $ret .= ((isset($this->v["mfaMsg"])) ? $this->v["mfaMsg"] : '');
-        } elseif (intVal($curr->nodeRow->NodeResponseSet) > 0) {
-            $widgetTreeID = $curr->nodeRow->NodeResponseSet;
-            $widgetLimit  = intVal($curr->nodeRow->NodeCharLimit);
+        } elseif (intVal($curr->nodeRow->node_response_set) > 0) {
+            $widgetTreeID = $curr->nodeRow->node_response_set;
+            $widgetLimit  = intVal($curr->nodeRow->node_char_limit);
             $this->initSearcher();
             if ($curr->nodeType == 'Search') {
-                $ret .= $this->searcher->printSearchBar('', $widgetTreeID, trim($curr->nodeRow->NodePromptText), 
-                    trim($curr->nodeRow->NodePromptAfter), $nID, 0);
+                $ret .= $this->searcher->printSearchBar(
+                    '', 
+                    $widgetTreeID, 
+                    trim($curr->nodeRow->node_prompt_text), 
+                    trim($curr->nodeRow->node_prompt_after), 
+                    $nID, 
+                    0
+                );
             } else { // this widget loads via ajax
                 $spinner = (($curr->nodeType != 'Incomplete Sess Check') ? $GLOBALS["SL"]->spinner() : '');
                 $loadURL = '/records-full/' . $widgetTreeID;
                 $search = (($GLOBALS["SL"]->REQ->has('s')) ? trim($GLOBALS["SL"]->REQ->get('s')) : '');
                 if (isset($this->v["profileUser"]) && isset($this->v["profileUser"]->id)) {
                     $this->searcher->advSearchUrlSffx .= '&u=' . $this->v["profileUser"]->id;
-                } elseif (isset($curr->nodeRow->NodeDataBranch) && trim($curr->nodeRow->NodeDataBranch) == 'users') {
+                } elseif (isset($curr->nodeRow->node_data_branch) 
+                    && trim($curr->nodeRow->node_data_branch) == 'users') {
                     $this->searcher->advSearchUrlSffx .= '&mine=1';
                 }
                 if (in_array($curr->nodeType, ['Record Full', 'Record Full Public'])) {
-                    $cid = (($GLOBALS["SL"]->REQ->has('i')) 
-                        ? intVal($GLOBALS["SL"]->REQ->get('i')) 
-                        : (($this->treeID == $widgetTreeID && $this->coreID > 0) 
-                            ? $this->coreID : -3));
+                    $cid = -3;
+                    if ($GLOBALS["SL"]->REQ->has('i')) {
+                        $cid = intVal($GLOBALS["SL"]->REQ->get('i'));
+                    } elseif ($this->treeID == $widgetTreeID && $this->coreID > 0) {
+                        $cid = $this->coreID;
+                    }
                     //$loadURL .= '?i=' . $cid . (($search != '') ? '&s=' . $search : '');
                     $wTree = SLTree::find($widgetTreeID);
                     if ($cid > 0 && $wTree) {
-                        $loadURL = '/' . $wTree->TreeSlug 
-                            . '/read-' . $cid . '/full?ajax=1&wdg=1'
-                            . (($curr->nodeType == 'Record Full Public') 
-                                ? '&publicView=1' : '')
-                            . $GLOBALS["SL"]->getAnyReqParams();
+                        $xtra = (($curr->nodeType == 'Record Full Public') ? '&publicView=1' : '');
+                        $loadURL = '/' . $wTree->tree_slug . '/read-' . $cid . '/full?ajax=1&wdg=1'
+                            . $xtra . $GLOBALS["SL"]->getAnyReqParams();
                         $spinner = '<br /><br /><center>' . $spinner . '</center><br />';
                     }
                 } elseif ($curr->nodeType == 'Search Featured') {
@@ -197,29 +225,34 @@ class TreeSurvFormVarieties extends UserProfile
                     $this->searcher->getSearchFilts();
                     $loadURL = '/search-results/' . $widgetTreeID . '?s=' . urlencode($this->searcher->searchTxt) 
                         . $this->searcher->searchFiltsURL() . $this->searcher->advSearchUrlSffx;
-                    $curr->nodeRow->NodePromptText = $GLOBALS["SL"]->extractJava(str_replace('[[search]]', $search, 
-                        $curr->nodeRow->NodePromptText), $nID);
-                    $curr->nodeRow->NodePromptAfter = $GLOBALS["SL"]->extractJava(str_replace('[[search]]', $search, 
-                        $curr->nodeRow->NodePromptAfter), $nID);
+                    $tmp = str_replace('[[search]]', $search, $curr->nodeRow->node_prompt_text);
+                    $curr->nodeRow->node_prompt_text = $GLOBALS["SL"]->extractJava($tmp, $nID);
+                    $tmp = str_replace('[[search]]', $search, $curr->nodeRow->node_prompt_after);
+                    $curr->nodeRow->node_prompt_after = $GLOBALS["SL"]->extractJava($tmp, $nID);
                 } elseif ($curr->nodeType == 'Record Previews') {
                     $loadURL = '/record-prevs/' . $widgetTreeID . '?limit=' . $widgetLimit;
                 } elseif ($curr->nodeType == 'Incomplete Sess Check') {
                     $loadURL = '/record-check/' . $widgetTreeID;
                 } elseif ($curr->isGraph()) {
                     $GLOBALS["SL"]->x["needsCharts"] = true;
-                    $loadURL = '/record-graph/' . str_replace(' ', '-', strtolower($curr->nodeType)) . '/' 
-                        . $widgetTreeID . '/' . $curr->nodeID;
+                    $loadURL = '/record-graph/' . str_replace(' ', '-', strtolower($curr->nodeType)) 
+                        . '/' . $widgetTreeID . '/' . $curr->nodeID;
                     $GLOBALS["SL"]->pageAJAX .= 'addGraph("' . $nIDtxt . '", "' . $loadURL.'");'."\n";
                 } elseif ($curr->nodeType == 'Widget Custom') {
                     $loadURL = '/widget-custom/' . $widgetTreeID . '/' . $nID . '?txt=' 
                         . str_replace($nID, '', $nIDtxt) . $this->sessData->getDataBranchUrl();
                     $loadURL .= $this->widgetCustomLoadUrl($nID, $nIDtxt, $curr);
                 }
-                $ret .= ((trim($curr->nodeRow->NodePromptText) != '') ? '<div>' 
-                    . $GLOBALS["SL"]->extractJava($curr->nodeRow->NodePromptText, $nID) 
-                    . '</div>' : '') . '<div id="n' . $nID . 'ajaxLoad" class="w100">' . $spinner . '</div>'
-                    . ((trim($curr->nodeRow->NodePromptAfter) != '') ? '<div>' 
-                    . $GLOBALS["SL"]->extractJava($curr->nodeRow->NodePromptAfter, $nID) . '</div>' : '');
+                $promptText = trim($curr->nodeRow->node_prompt_text);
+                if ($promptText != '') {
+                    $promptText = '<div>' . $GLOBALS["SL"]->extractJava($promptText, $nID) . '</div>';
+                }
+                $afterPrompt = trim($curr->nodeRow->node_prompt_after);
+                if ($afterPrompt != '') {
+                    $afterPrompt = '<div>' . $GLOBALS["SL"]->extractJava($afterPrompt, $nID) . '</div>';
+                }
+                $ret .= $promptText . '<div id="n' . $nID . 'ajaxLoad" class="w100">' . $spinner
+                    . '</div>' . $afterPrompt;
                 $GLOBALS["SL"]->pageAJAX .= '$("#n' . $nID . 'ajaxLoad").load("' . $loadURL . '");' . "\n";
             }
         }
@@ -259,13 +292,19 @@ class TreeSurvFormVarieties extends UserProfile
             return null;
         }
         if (!$curr) {
-            if (!isset($this->allNodes[$nID])) return null;
+            if (!isset($this->allNodes[$nID])) {
+                return null;
+            }
             $curr = $this->allNodes[$nID];
         }
-        if ($curr->nodeType == 'Big Button') return null;
+        if ($curr->nodeType == 'Big Button') {
+            return null;
+        }
         $nIDtxt = $nID . $GLOBALS["SL"]->getCycSffx();
-        $newVal = (($GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fld')) 
-            ? $GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fld') : null);
+        $newVal = null;
+        if ($GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fld')) {
+            $newVal = $GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fld');
+        }
         if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
             $newVal = [];
             if ($GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fld')) {
@@ -293,21 +332,21 @@ class TreeSurvFormVarieties extends UserProfile
     
     public function addPromptTextRequired($currNode = NULL, $nodePromptText = '', $nIDtxt = 'noNID')
     {
-        if (!$currNode || !isset($currNode->nodeRow->NodeOpts)) {
+        if (!$currNode || !isset($currNode->nodeRow->node_opts)) {
             return '';
         }
         $txt = '*required';
         /* This needs to be limited in the form, before any validation
         if ($this->nodeHasDateRestriction($currNode->nodeRow)) {
-            if ($currNode->nodeRow->NodeCharLimit < 0) {
+            if ($currNode->nodeRow->node_char_limit < 0) {
                 $txt = '*past date required';
-            } elseif ($currNode->nodeRow->NodeCharLimit > 0) {
+            } elseif ($currNode->nodeRow->node_char_limit > 0) {
                 $txt = '*future date required';
             }
         }
         */
         $txt = '<nobr>' . $txt . '</nobr>';
-        if ($currNode->nodeRow->NodeOpts%13 == 0) {
+        if ($currNode->nodeRow->node_opts%13 == 0) {
             return $nodePromptText . '<p id="req' . $nIDtxt . '" class="rqd">' . $txt . '</p>';
         } else {
             $swapPos = -1;
@@ -333,8 +372,8 @@ class TreeSurvFormVarieties extends UserProfile
                     $swapPos = $lastH1;
                 }
                 if ($swapPos > 0) {
-                    return substr($nodePromptText, 0, $swapPos) . ' <small id="req' . $nIDtxt . '" class="rqd">' 
-                        . $txt . '</small>' . substr($nodePromptText, $swapPos);
+                    return substr($nodePromptText, 0, $swapPos) . ' <small id="req' . $nIDtxt 
+                        . '" class="rqd">' . $txt . '</small>' . substr($nodePromptText, $swapPos);
                 }
             }
             return $nodePromptText . ' <span id="req' . $nIDtxt . '" class="rqd">' . $txt . '</span>';
@@ -344,16 +383,17 @@ class TreeSurvFormVarieties extends UserProfile
     
     public function nodeHasDateRestriction($nodeRow)
     {
-        return (in_array($nodeRow->NodeType, ['Date', 'Date Picker', 'Date Time']) 
-            && $nodeRow->NodeOpts%31 > 0 // Character limit means word count, if enabled
-            && $nodeRow->NodeCharLimit != 0);
+        return (in_array($nodeRow->node_type, ['Date', 'Date Picker', 'Date Time']) 
+            && $nodeRow->node_opts%31 > 0 // Character limit means word count, if enabled
+            && $nodeRow->node_char_limit != 0);
     }
     
     public function inputMobileCls($nID)
     {
-        return (isset($this->allNodes[$nID]) 
-            && $this->allNodes[$nID]->nodeRow->NodeOpts%2 > 0) 
-            ? ' fingerTxt' : '';
+        if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->nodeRow->node_opts%2 > 0) {
+            return ' fingerTxt';
+        }
+        return '';
     }
     
     protected function isNodeJustH1($nodePrompt)
@@ -373,37 +413,41 @@ class TreeSurvFormVarieties extends UserProfile
     protected function printWordCntStuff($nIDtxt, $nodeRow)
     {
         $ret = '';
-        if ($nodeRow->NodeOpts%31 == 0 || $nodeRow->NodeOpts%47 == 0) {
-            $ret .= '<div id="currWordCount" class="fL pT15">'
-                . (($nodeRow->NodeOpts%47 == 0) ? 'Word count limit: ' 
-                    . intVal($nodeRow->NodeCharLimit) . '. ' : '')
-                . (($nodeRow->NodeOpts%31 == 0) 
-                    ? 'Current word count: <div id="wordCnt' . $nIDtxt
-                    . '" class="disIn"></div>' : '')
-            . '</div><div class="fC"></div>';
+        if ($nodeRow->node_opts%31 == 0 || $nodeRow->node_opts%47 == 0) {
+            $ret .= '<div id="currWordCount" class="fL pT15">';
+            if ($nodeRow->node_opts%47 == 0) {
+                $ret .= 'Word count limit: ' . intVal($nodeRow->node_char_limit) . '. ';
+            }
+            if ($nodeRow->node_opts%31 == 0) {
+                $ret .= 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>';
+            }
+            $ret .= '</div><div class="fC"></div>';
         }
         return $ret;
     }
     
     protected function formDate($nID, $nIDtxt, $dateStr = '00/00/0000', $xtraClass = '')
     {
-        list($month, $day, $year) = ['', '', ''];
+        list($month, $day, $year) = [ '', '', '' ];
         if (trim($dateStr) != '') {
             $dateTime = $GLOBALS["SL"]->dateToTime($dateStr);
             $month = date("m", $dateTime);
             $day   = date("d", $dateTime);
             $year  = date("Y", $dateTime);
         }
-        return view('vendor.survloop.forms.formtree-date', [
-            "nID"            => $nID,
-            "nIDtxt"         => $nIDtxt,
-            "dateStr"        => $dateStr,
-            "month"          => $month,
-            "day"            => $day,
-            "year"           => $year,
-            "xtraClass"      => $xtraClass,
-            "inputMobileCls" => $this->inputMobileCls($nID)
-        ])->render();
+        return view(
+            'vendor.survloop.forms.formtree-date', 
+            [
+                "nID"            => $nID,
+                "nIDtxt"         => $nIDtxt,
+                "dateStr"        => $dateStr,
+                "month"          => $month,
+                "day"            => $day,
+                "year"           => $year,
+                "xtraClass"      => $xtraClass,
+                "inputMobileCls" => $this->inputMobileCls($nID)
+            ]
+        )->render();
     }
     
     protected function formTime($nID, $timeStr = '00:00:00', $xtraClass = '')
@@ -432,12 +476,15 @@ class TreeSurvFormVarieties extends UserProfile
             $timeArr[0] = -1; 
             $timeArr[1] = 0; 
         }
-        return view('vendor.survloop.forms.formtree-time', [
-            "nID"            => $nID,
-            "timeArr"        => $timeArr,
-            "xtraClass"      => $xtraClass,
-            "inputMobileCls" => $this->inputMobileCls($nID)
-            ])->render();
+        return view(
+            'vendor.survloop.forms.formtree-time', 
+            [
+                "nID"            => $nID,
+                "timeArr"        => $timeArr,
+                "xtraClass"      => $xtraClass,
+                "inputMobileCls" => $this->inputMobileCls($nID)
+            ]
+        )->render();
     }
     
     protected function postFormTimeStr($nID)
@@ -455,7 +502,8 @@ class TreeSurvFormVarieties extends UserProfile
             $hr += 12;
         }
         $min = intVal($GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fldMin'));
-        return ((intVal($hr) < 10) ? '0' : '') . $hr . ':' . ((intVal($min) < 10) ? '0' : '') . $min . ':00';
+        return ((intVal($hr) < 10) ? '0' : '') . $hr . ':' 
+            . ((intVal($min) < 10) ? '0' : '') . $min . ':00';
     }
     
     
@@ -490,6 +538,9 @@ class TreeSurvFormVarieties extends UserProfile
         }
         if ($val == 'F') {
             return 'Female';
+        }
+        if ($val == 'O') {
+            return 'Other ';
         }
         if ($val == '?') {
             return 'Not sure';
@@ -539,7 +590,7 @@ class TreeSurvFormVarieties extends UserProfile
     
     public function monthlyCalcPreselections($nID, $nIDtxt = '')
     {
-        return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        return [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
     }
     
     public function printMonthlyCalculator(

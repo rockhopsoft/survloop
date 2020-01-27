@@ -5,12 +5,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDataLinks extends Model
 {
-    protected $table         = 'SL_DataLinks';
-    protected $primaryKey     = 'DataLinkID';
+    protected $table         = 'sl_data_links';
+    protected $primaryKey     = 'data_link_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'DataLinkTree', 
-        'DataLinkTable', 
+        'data_link_tree', 
+        'data_link_table', 
     ];
 }

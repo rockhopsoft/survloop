@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class {{ $tblClean }} extends Model
 {
     protected $table      = '{{ $tblName }}';
-    protected $primaryKey = '{{ $tbl->TblAbbr }}ID';
+    protected $primaryKey = '{{ $tbl->tbl_abbr }}id';
     public $timestamps    = true;
     protected $fillable   = 
     [    {!! $modelFile !!}

@@ -5,37 +5,37 @@
 @section('content')
 
 <h2>Switch Current User Experience To Design</h2>
-<h4>Experiences for Database: {{ $GLOBALS['SL']->dbRow->DbName }}</h4>
+<h4>Experiences for Database: {{ $GLOBALS['SL']->dbRow->db_name }}</h4>
 <hr>
 
 @forelse ($myTrees as $tree)
-    <div class="p10 @if ($GLOBALS['SL']->treeID == $tree->TreeID) row2 @endif ">
-        @if ($GLOBALS['SL']->treeID == $tree->TreeID)
+    <div class="p10 @if ($GLOBALS['SL']->treeID == $tree->tree_id) row2 @endif ">
+        @if ($GLOBALS['SL']->treeID == $tree->tree_id)
             <a href="javascript:;" class="btn btn-lg btn-primary float-right" DISABLED 
                 ><i class="fa fa-snowflake-o mR5" aria-hidden="true"></i> Current User Experience</a>
         @else
-            <a href="/dashboard/tree/switch/{{ $tree->TreeID }}" class="btn btn-lg btn-primary float-right"
+            <a href="/dashboard/tree/switch/{{ $tree->tree_id }}" class="btn btn-lg btn-primary float-right"
                 ><i class="fa fa-arrow-left mR5" aria-hidden="true"></i> Design This User Experience</a>
         @endif
-        <h2 class="mT0 @if ($GLOBALS['SL']->treeID == $tree->TreeID) slBlueDark @endif ">{{ $tree->TreeName }}</h2>
-        @if (isset($tree->TreeDesc)) <p><b>{{ $tree->TreeDesc }}</b></p> @endif
-        <a id="treeEdit{{ $tree->TreeID }}btn" class="treeEditbtn" href="javascript:;"
+        <h2 class="mT0 @if ($GLOBALS['SL']->treeID == $tree->tree_id) slBlueDark @endif ">
+            {{ $tree->tree_name }}
+        </h2>
+        @if (isset($tree->tree_desc)) <p><b>{{ $tree->tree_desc }}</b></p> @endif
+        <a id="treeEdit{{ $tree->tree_id }}btn" class="treeEditbtn" href="javascript:;"
             ><i class="fa fa-pencil fa-flip-horizontal mR5" aria-hidden="true"></i></a>
-        {{ $myTreeNodes[$tree->TreeID] }} Nodes
-        @if ($tree->TreeType == 'Survey' && $GLOBALS['SL']->treeID == $tree->TreeID) 
-            - <a href="/dashboard/surv-{{ $tree->TreeID }}/xmlmap">XML Map for data sharing</a>
+        {{ $myTreeNodes[$tree->tree_id] }} Nodes
+        @if ($tree->tree_type == 'Survey' && $GLOBALS['SL']->treeID == $tree->tree_id) 
+            - <a href="/dashboard/surv-{{ $tree->tree_id }}/xmlmap">XML Map for data sharing</a>
         @endif
         <br />Tree URL: 
-        @if ($GLOBALS['SL']->treeIsAdmin)
-            /dash/{{ $tree->TreeSlug }}/node-slug
-        @else
-            /u/{{ $tree->TreeSlug }}/node-slug
+        @if ($GLOBALS['SL']->treeIsAdmin) /dash/{{ $tree->tree_slug }}/node-slug
+        @else /u/{{ $tree->tree_slug }}/node-slug
         @endif
         <br />
-        <div id="treeEdit{{ $tree->TreeID }}" class="disNon">
-            <form name="treeForm{{ $tree->TreeID }}" method="post" action="/dashboard/tree/switch">
+        <div id="treeEdit{{ $tree->tree_id }}" class="disNon">
+            <form name="treeForm{{ $tree->tree_id }}" method="post" action="/dashboard/tree/switch">
             <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="treeID" value="{{ $tree->TreeID }}">
+            <input type="hidden" name="treeID" value="{{ $tree->tree_id }}">
             
             
             </form>

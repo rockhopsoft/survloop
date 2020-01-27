@@ -49,6 +49,9 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdDshGry { 
     border: 1px {!! $css["color-main-grey"] !!} dashed; 
 }
+.brdDotGry { 
+    border: 1px {!! $css["color-main-grey"] !!} dotted; 
+}
 .brdGrey { 
     border: 1px {!! $css["color-main-grey"] !!} solid; 
 }

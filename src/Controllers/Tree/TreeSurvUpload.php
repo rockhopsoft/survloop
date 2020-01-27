@@ -32,17 +32,19 @@ class TreeSurvUpload extends TreeSurv
     {
         $this->v["vidTypeID"] = -1;
         if (isset($GLOBALS["SL"]->sysOpts["tree-" . $treeID . "-upload-types"])) {
-            $this->v["vidTypeID"] = $GLOBALS["SL"]->def->getID(
-                $GLOBALS["SL"]->sysOpts["tree-" . $treeID . "-upload-types"], 'Video');
+            $defSet = $GLOBALS["SL"]->sysOpts["tree-" . $treeID . "-upload-types"];
+            $this->v["vidTypeID"] = $GLOBALS["SL"]->def->getID($defSet, 'Video');
         }
         return $this->v["vidTypeID"];
     }
     
     protected function genRandStr($len)
     {
-        return substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 1) 
-             . substr(str_shuffle(
-                "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, ($len-1));
+        $part1 = str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        $part1 = substr($part1, 0, 1);
+        $part2 = str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        $part2 = substr($part2, 0, ($len-1));
+        return $part1 . $part2;
     }
     
     protected function checkRandStr($tbl, $fld, $str)
@@ -112,29 +114,30 @@ class TreeSurvUpload extends TreeSurv
         }
         $fold = '../storage/app/up/evidence/' 
             . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) . '/' 
-            . $coreRow->{ $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'UniqueStr' } . '/';
+            . $coreRow->{ $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'unique_str' } . '/';
         return $fold;
     }
     
     protected function getUploadFile($nID)
     {
-        return $this->getRandStr('Uploads', 'UpStoredFile', 30);
+        return $this->getRandStr('uploads', 'up_stored_file', 30);
     }
     
     protected function cleanUploadList()
     {
         $treeID = $this->getUpTree();
-        $chk = SLUploads::where('UpTreeID', $treeID)
-            ->where('UpCoreID', $this->coreID)
+        $chk = SLUploads::where('up_tree_id', $treeID)
+            ->where('up_core_id', $this->coreID)
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $up) {
-                if (trim($up->UpTitle) == '' 
-                    && trim($up->UpEvidenceDesc) == '' 
-                    && trim($up->UpUploadFile)   == '' 
-                    && trim($up->UpStoredFile)   == '' 
-                    && trim($up->UpVideoLink)    == '') {
-                    SLUploads::find($up->UpID)->delete();
+                if (trim($up->up_title) == '' 
+                    && trim($up->up_evidence_desc) == '' 
+                    && trim($up->up_upload_file)   == '' 
+                    && trim($up->up_stored_file)   == '' 
+                    && trim($up->up_video_link)    == '') {
+                    SLUploads::find($up->up_id)
+                        ->delete();
                 }
             }
         }
@@ -154,8 +157,7 @@ class TreeSurvUpload extends TreeSurv
                 $this->v["upNodes"][$nID] = null;
                 $nodeRow = SLNode::find($nID);
                 if ($nodeRow) {
-                    $this->v["upNodes"][$nID] 
-                        = new TreeNodeSurv($nID, $nodeRow);
+                    $this->v["upNodes"][$nID] = new TreeNodeSurv($nID, $nodeRow);
                 }
             }
             return $this->v["upNodes"][$nID];
@@ -173,35 +175,35 @@ class TreeSurvUpload extends TreeSurv
             $fldID = $node->getTblFldID();
             if ($fldID > 0) {
                 list($tbl, $fld) = $node->getTblFld();
-                list($linkRecInd, $linkRecID) 
-                    = $this->sessData->currSessDataPos($tbl);
+                list($linkRecInd, $linkRecID) = $this->sessData->currSessDataPos($tbl);
                 if ($linkRecID > 0) {
-                    $chk = SLUploads::where('UpTreeID', $treeID)
-                        ->where('UpCoreID', $this->coreID)
-                        ->where('UpNodeID', $nID)
-                        ->where('UpLinkFldID', $fldID)
-                        ->where('UpLinkRecID', $linkRecID)
+                    $chk = SLUploads::where('up_tree_id', $treeID)
+                        ->where('up_core_id', $this->coreID)
+                        ->where('up_node_id', $nID)
+                        ->where('up_link_fld_id', $fldID)
+                        ->where('up_link_rec_id', $linkRecID)
                         ->orderBy('created_at', 'asc')
                         ->get();
                 }
             } else {
-                $chk = SLUploads::where('UpTreeID', $treeID)
-                    ->where('UpCoreID', $this->coreID)
-                    ->where('UpNodeID', $nID)
+                $chk = SLUploads::where('up_tree_id', $treeID)
+                    ->where('up_core_id', $this->coreID)
+                    ->where('up_node_id', $nID)
                     ->orderBy('created_at', 'asc')
                     ->get();
             }
         } else {
-            $chk = SLUploads::where('UpTreeID', $treeID)
-                ->where('UpCoreID', $this->coreID)
+            $chk = SLUploads::where('up_tree_id', $treeID)
+                ->where('up_core_id', $this->coreID)
                 ->orderBy('created_at', 'asc')
                 ->get();
         }
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $up) {
-                if ((isset($up->UpUploadFile) && trim($up->UpUploadFile) != '' 
-                    && isset($up->UpStoredFile) && trim($up->UpStoredFile) != '')
-                    || (isset($up->UpVideoLink) && trim($up->UpVideoLink) != '')) {
+                $hasUpload = (isset($up->up_upload_file) && trim($up->up_upload_file) != '');
+                $hasStored = (isset($up->up_stored_file) && trim($up->up_stored_file) != '');
+                $hasVidLnk = (isset($up->up_video_link) && trim($up->up_video_link) != '');
+                if (($hasUpload && $hasStored) || $hasVidLnk) {
                     $ret[] = $up;
                 }
             }
@@ -224,14 +226,15 @@ class TreeSurvUpload extends TreeSurv
             list($fileRoot, $fileExt) = explode('.', $upID);
         }
         $fileExt = strtolower($fileExt);
-        $upRow = SLUploads::where('UpTreeID', $treeID)
-            ->where('UpCoreID', $this->coreID)
-            ->where('UpStoredFile', $fileRoot)
+        $upRow = SLUploads::where('up_tree_id', $treeID)
+            ->where('up_core_id', $this->coreID)
+            ->where('up_stored_file', $fileRoot)
             ->first();
         if ($upRow) {
             $deet = $this->loadUpDeets($upRow);
             if (sizeof($deet) > 0) {
-                if ($deet["privacy"] == 'Block') { // != 'Public' && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
+                if ($deet["privacy"] == 'Block') {
+                // != 'Public' && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
                     return $this->retrieveUploadFail();
                 }
                 return $this->previewImg($deet);
@@ -269,7 +272,8 @@ class TreeSurvUpload extends TreeSurv
                 'Etag'                => $header_etag
             );
             // Is the resource cached?
-            $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
+            $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
+                && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
             $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
                 && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
             if ($h1 || $h2) {
@@ -294,17 +298,20 @@ class TreeSurvUpload extends TreeSurv
             . '$("#uploadAjax").load("?ajax=1&upNode=' . $nID . '"); }' . "\n";
         $GLOBALS["SL"]->pageJAVA .= "addResTot(" . $nID . ", 4);\n";
         foreach ($this->uploadTypes as $j => $ty) {
-            if (in_array(strtolower($ty->DefValue), ['video', 'videos'])) {
+            if (in_array(strtolower($ty->def_value), ['video', 'videos'])) {
                 $GLOBALS["SL"]->pageJAVA .= 'uploadTypeVid = ' . $j . ';' . "\n";
             }
         }
-        $ret = view('vendor.survloop.forms.upload-tool', [
-            "nID"            => $nID,
-            "uploadTypes"    => $this->uploadTypes,
-            "uploadWarn"     => $this->uploadWarning($nID),
-            "isPublic"       => $this->isPublic(), 
-            "getPrevUploads" => $this->getPrevUploads($nID, $nIDtxt, true)
-        ])->render();
+        $ret = view(
+            'vendor.survloop.forms.upload-tool', 
+            [
+                "nID"            => $nID,
+                "uploadTypes"    => $this->uploadTypes,
+                "uploadWarn"     => $this->uploadWarning($nID),
+                "isPublic"       => $this->isPublic(), 
+                "getPrevUploads" => $this->getPrevUploads($nID, $nIDtxt, true)
+            ]
+        )->render();
         if (!$GLOBALS["SL"]->REQ->has('ajax')) {
             $ret = '<div id="uploadAjax">' . $ret . '</div>';
         }
@@ -318,8 +325,8 @@ class TreeSurvUpload extends TreeSurv
     
     protected function loadUpDeetPrivacy($upRow = NULL)
     {
-        if ($upRow && isset($upRow->UpPrivacy)) {
-            return $upRow->UpPrivacy;
+        if ($upRow && isset($upRow->up_privacy)) {
+            return $upRow->up_privacy;
         }
         return 'Private';
     }
@@ -330,16 +337,15 @@ class TreeSurvUpload extends TreeSurv
         $treeID = $this->getUpTree();
         $ret["ind"]      = $i;
         $ret["privacy"]  = $this->loadUpDeetPrivacy($upRow);
-        $ret["ext"]      = $GLOBALS["SL"]->getFileExt($upRow->UpUploadFile);
-        $ret["filename"] = $upRow->UpStoredFile . '.' . $ret["ext"];
-        $ret["file"]     = $this->getUploadFolder() 
-            . $upRow->UpStoredFile . '.' . $ret["ext"];
-        $ret["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->TreeSlug 
-            . '/' . $this->coreID . '/' . $upRow->UpStoredFile 
+        $ret["ext"]      = $GLOBALS["SL"]->getFileExt($upRow->up_upload_file);
+        $ret["filename"] = $upRow->up_stored_file . '.' . $ret["ext"];
+        $ret["file"]     = $this->getUploadFolder() . $upRow->up_stored_file 
             . '.' . $ret["ext"];
-        $ret["fileOrig"] = $upRow->UpUploadFile;
-        $ret["fileLnk"]  = '<a href="' . $ret["filePub"] 
-            . '" target="_blank">' . $upRow->UpUploadFile . '</a>';
+        $ret["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->tree_slug . '/'
+            . $this->coreID . '/' . $upRow->up_stored_file . '.' . $ret["ext"];
+        $ret["fileOrig"] = $upRow->up_upload_file;
+        $ret["fileLnk"]  = '<a href="' . $ret["filePub"] . '" target="_blank">' 
+            . $upRow->up_upload_file . '</a>';
         $ret["youtube"]  = '';
         $ret["vimeo"]    = '';
         $ret["imgWidth"] = $ret["imgHeight"] = 0;
@@ -348,35 +354,32 @@ class TreeSurvUpload extends TreeSurv
         if ($GLOBALS["SL"]->REQ->has('step') 
             && $GLOBALS["SL"]->REQ->step == 'uploadDel' 
             && $GLOBALS["SL"]->REQ->has('alt') 
-            && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->UpID) {
-            if (file_exists($ret["file"]) 
-                && trim($upRow->UpType) != $vidTypeID) {
+            && intVal($GLOBALS["SL"]->REQ->alt) == $upRow->up_id) {
+            if (file_exists($ret["file"]) && trim($upRow->up_type) != $vidTypeID) {
                 unlink($ret["file"]);
             }
-            SLUploads::find($upRow->UpID)->delete();
+            SLUploads::find($upRow->up_id)->delete();
         } else {
             $imgTypes = ['png', 'gif', 'jpg', 'jpeg'];
-            if (intVal($upRow->UpType) == $vidTypeID) {
-                if (stripos($upRow->UpVideoLink, 'youtube') !== false 
-                    || stripos($upRow->UpVideoLink, 'youtu.be') !== false) {
-                    $ret["youtube"] = $this->getYoutubeID($upRow->UpVideoLink);
-                    $ret["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
+            if (intVal($upRow->up_type) == $vidTypeID) {
+                if (stripos($upRow->up_video_link, 'youtube') !== false 
+                    || stripos($upRow->up_video_link, 'youtu.be') !== false) {
+                    $ret["youtube"] = $this->getYoutubeID($upRow->up_video_link);
+                    $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
                         . '" target="_blank">youtube/' . $ret["youtube"] . '</a>';
-                } elseif (stripos($upRow->UpVideoLink, 'vimeo.com') !== false) {
-                    $ret["vimeo"] = $this->getVimeoID($upRow->UpVideoLink);
-                    $ret["fileLnk"] = '<a href="' . $upRow->UpVideoLink 
+                } elseif (stripos($upRow->up_video_link, 'vimeo.com') !== false) {
+                    $ret["vimeo"] = $this->getVimeoID($upRow->up_video_link);
+                    $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
                         . '" target="_blank">vimeo/' . $ret["vimeo"] . '</a>';
                 }
-            } elseif (isset($upRow->UpStoredFile) 
-                && trim($upRow->UpStoredFile) != '') {
+            } elseif (isset($upRow->up_stored_file) && trim($upRow->up_stored_file) != '') {
                 $ret["file"] = $GLOBALS["SL"]->searchDeeperDirs($ret["file"]);
                 if (!file_exists($ret["file"])) {
                     $ret["fileLnk"] .= ' &nbsp;&nbsp;<span class="txtDanger">'
                         . '<i class="fa fa-exclamation-triangle"></i> '
                         . '<i>File Not Found</i></span>';
                 } elseif (in_array(strtolower($ret["ext"]), $imgTypes)) {
-                    list($ret["imgWidth"], $ret["imgHeight"]) 
-                        = getimagesize($ret["file"]);
+                    list($ret["imgWidth"], $ret["imgHeight"]) = getimagesize($ret["file"]);
                     if ($ret["imgWidth"] > $ret["imgHeight"]) {
                         $ret["imgClass"] = 'h100';
                     }
@@ -412,18 +415,21 @@ class TreeSurvUpload extends TreeSurv
     {
         $this->prepPrevUploads($nID);
         $treeID = $this->getUpTree();
-        return view('vendor.survloop.forms.upload-previous', [
-            "nID"         => $nID,
-            "nIDtxt"      => $nIDtxt,
-            "REQ"         => $GLOBALS["SL"]->REQ,
-            "height"      => 160,          
-            "width"       => 330,
-            "uploads"     => $this->uploads, 
-            "upDeets"     => $this->upDeets, 
-            "uploadTypes" => $this->uploadTypes, 
-            "vidTypeID"   => $this->getVidType($treeID),
-            "v"           => $this->v
-        ])->render();
+        return view(
+            'vendor.survloop.forms.upload-previous', 
+            [
+                "nID"         => $nID,
+                "nIDtxt"      => $nIDtxt,
+                "REQ"         => $GLOBALS["SL"]->REQ,
+                "height"      => 160,          
+                "width"       => 330,
+                "uploads"     => $this->uploads, 
+                "upDeets"     => $this->upDeets, 
+                "uploadTypes" => $this->uploadTypes, 
+                "vidTypeID"   => $this->getVidType($treeID),
+                "v"           => $this->v
+            ]
+        )->render();
     }
     
     protected function getUploads($nID, $isAdmin = false, $isOwner = false)
@@ -447,12 +453,12 @@ class TreeSurvUpload extends TreeSurv
         $ups = [];
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                if (intVal($upRow->UpType) == $vidTypeID) {
+                if (intVal($upRow->up_type) == $vidTypeID) {
                     $this->v["uploadPrintMap"]["vid"][] = sizeof($ups);
-                } elseif (isset($upRow->UpUploadFile) 
-                    && isset($upRow->UpStoredFile) 
-                    && trim($upRow->UpUploadFile) != '' 
-                    && trim($upRow->UpStoredFile) != '') {
+                } elseif (isset($upRow->up_upload_file) 
+                    && isset($upRow->up_stored_file) 
+                    && trim($upRow->up_upload_file) != '' 
+                    && trim($upRow->up_stored_file) != '') {
                     $imgTypes = ['png', 'gif', 'jpg', 'jpeg'];
                     if (in_array($this->upDeets[$i]["ext"], $imgTypes)) {
                         $this->v["uploadPrintMap"]["img"][] = sizeof($ups);
@@ -466,20 +472,23 @@ class TreeSurvUpload extends TreeSurv
                     $isAdmin, 
                     $isOwner
                 );
-                $ups[] = view('vendor.survloop.forms.uploads-print', [
-                    "nID"         => $nID,
-                    "REQ"         => $GLOBALS["SL"]->REQ,
-                    "height"      => 180,
-                    "width"       => 330,
-                    "upRow"       => $upRow, 
-                    "upDeets"     => $this->upDeets[$i], 
-                    "uploadTypes" => $this->uploadTypes, 
-                    "vidTypeID"   => $this->getVidType($treeID),
-                    "isAdmin"     => $isAdmin,
-                    "isOwner"     => $isOwner,
-                    "canShow"     => $canShow,
-                    "v"           => $this->v
-                ])->render();
+                $ups[] = view(
+                    'vendor.survloop.forms.uploads-print', 
+                    [
+                        "nID"         => $nID,
+                        "REQ"         => $GLOBALS["SL"]->REQ,
+                        "height"      => 180,
+                        "width"       => 330,
+                        "upRow"       => $upRow, 
+                        "upDeets"     => $this->upDeets[$i], 
+                        "uploadTypes" => $this->uploadTypes, 
+                        "vidTypeID"   => $this->getVidType($treeID),
+                        "isAdmin"     => $isAdmin,
+                        "isOwner"     => $isOwner,
+                        "canShow"     => $canShow,
+                        "v"           => $this->v
+                    ]
+                )->render();
             }
         }
         return $ups;
@@ -524,10 +533,13 @@ class TreeSurvUpload extends TreeSurv
     protected function reportUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
     {
         $ups = $this->getUploadsMultNodes($nIDs, $isAdmin, $isOwner);
-        return view('vendor.survloop.reports.inc-uploads', [
-            "uploads" => $ups,
-            "upMap"   => $this->v["uploadPrintMultiMap"]
-        ])->render();
+        return view(
+            'vendor.survloop.reports.inc-uploads', 
+            [
+                "uploads" => $ups,
+                "upMap"   => $this->v["uploadPrintMultiMap"]
+            ]
+        )->render();
     }
     
     protected function postUploadTool($nID)
@@ -538,23 +550,19 @@ class TreeSurvUpload extends TreeSurv
         $vidTypeID = -1;
         $opt = "tree-" . $treeID . "-upload-types";
         if (isset($GLOBALS["SL"]->sysOpts[$opt])) {
-            $vidTypeID = $GLOBALS["SL"]->def
-                ->getID($GLOBALS["SL"]->sysOpts[$opt], 'Video');
+            $vidTypeID = $GLOBALS["SL"]->def->getID($GLOBALS["SL"]->sysOpts[$opt], 'Video');
         }
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
-                $visibFld = 'up' . $upRow->UpID . 'EditVisib';
-                if ($GLOBALS["SL"]->REQ->has($visibFld) 
-                    && intVal($GLOBALS["SL"]->REQ->input($visibFld)) == 1) {
-                    $upRow = SLUploads::find($upRow->UpID);
+                $fldBase = 'up' . $upRow->up_id . 'Edit';
+                if ($GLOBALS["SL"]->REQ->has($fldBase . 'Visib') 
+                    && intVal($GLOBALS["SL"]->REQ->input($fldBase . 'Visib')) == 1) {
+                    $upRow = SLUploads::find($upRow->up_id);
                     if ($upRow) {
-                        $upRow->UpType = $GLOBALS["SL"]
-                            ->REQ->input('up'.$upRow->UpID.'EditType');
-                        $upRow->UpPrivacy = $GLOBALS["SL"]
-                            ->REQ->input('up'.$upRow->UpID.'EditPrivacy');
-                        $upRow->UpTitle = $GLOBALS["SL"]
-                            ->REQ->input('up'.$upRow->UpID.'EditTitle');
-                        //$upRow->UpDesc  = $GLOBALS["SL"]->REQ->input('up'.$upRow->UpID.'EditDesc');
+                        $upRow->up_type = $GLOBALS["SL"]->REQ->input($fldBase . 'Type');
+                        $upRow->up_privacy = $GLOBALS["SL"]->REQ->input($fldBase . 'Privacy');
+                        $upRow->up_title = $GLOBALS["SL"]->REQ->input($fldBase . 'Title');
+                        //$upRow->up_desc  = $GLOBALS["SL"]->REQ->input('up'.$upRow->up_id.'EditDesc');
                         $upRow->save();
                     }
                 }
@@ -563,30 +571,29 @@ class TreeSurvUpload extends TreeSurv
         if ($GLOBALS["SL"]->REQ->has('step') 
             && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
             $upRow = new SLUploads;
-            $upRow->UpTreeID    = $treeID;
-            $upRow->UpCoreID    = $this->coreID;
-            $upRow->UpNodeID    = $nID;
-            $upRow->UpLinkFldID = $this->allNodes[$nID]->getTblFldID();
-            $upRow->UpLinkRecID = -3;
-            if ($upRow->UpLinkFldID > 0) {
+            $upRow->up_tree_id    = $treeID;
+            $upRow->up_core_id    = $this->coreID;
+            $upRow->up_node_id    = $nID;
+            $upRow->up_link_fld_id = $this->allNodes[$nID]->getTblFldID();
+            $upRow->up_link_rec_id = -3;
+            if ($upRow->up_link_fld_id > 0) {
                 list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
                 list($loopInd, $loopID) = $this->sessData->currSessDataPos($tbl);
                 if ($loopID > 0) {
-                    $upRow->UpLinkRecID = $loopID;
+                    $upRow->up_link_rec_id = $loopID;
                 }
             }
-            $upRow->UpType    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
-            $upRow->UpPrivacy = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy');
-            $upRow->UpTitle   = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title');
-            //$upRow->UpDesc  = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc');
+            $upRow->up_type    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
+            $upRow->up_privacy = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy');
+            $upRow->up_title   = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title');
+            //$upRow->up_desc  = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc');
             $file = 'up' . $nID . 'File';
             if ($GLOBALS["SL"]->REQ->has('up' . $nID . 'Vid') 
                 && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
-                $upRow->UpVideoLink = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
-                $upRow->UpVideoDuration = $this->getYoutubeDuration($upRow->UpVideoLink);
+                $upRow->up_video_link = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
+                $upRow->up_video_duration = $this->getYoutubeDuration($upRow->up_video_link);
             } elseif ($GLOBALS["SL"]->REQ->hasFile($file)) { // file upload
-                $upRow->UpUploadFile = $GLOBALS["SL"]->REQ->file($file)
-                    ->getClientOriginalName();
+                $upRow->up_upload_file = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalName();
                 $extension = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalExtension();
                 $mimetype = $GLOBALS["SL"]->REQ->file($file)->getMimeType();
                 $size = $GLOBALS["SL"]->REQ->file($file)->getSize();
@@ -603,8 +610,8 @@ class TreeSurvUpload extends TreeSurv
                     } else {
                         $upFold = $this->getUploadFolder();
                         $this->mkNewFolder($upFold);
-                        $upRow->UpStoredFile = $this->getUploadFile($nID);
-                        $filename = $upRow->UpStoredFile . '.' . strtolower($extension);
+                        $upRow->up_stored_file = $this->getUploadFile($nID);
+                        $filename = $upRow->up_stored_file . '.' . strtolower($extension);
                         //if ($GLOBALS["SL"]->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
                         if (file_exists($upFold . $filename)) {
                             Storage::delete($upFold . $filename);
@@ -612,8 +619,8 @@ class TreeSurvUpload extends TreeSurv
                         $GLOBALS["SL"]->REQ->file($file)->move($upFold, $filename);
                     }
                 } else {
-                    $ret .= '<div class="txtDanger">Invalid file. '
-                        . 'Please check the format and try again.</div>';
+                    $ret .= '<div class="txtDanger">'
+                        . 'Invalid file. Please check the format and try again.</div>';
                 }
             }
             $upRow->save();

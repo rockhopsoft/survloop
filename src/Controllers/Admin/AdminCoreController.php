@@ -70,8 +70,9 @@ class AdminCoreController extends SurvLoopController
     
     protected function getAdmMenu($currPage = '')
     {
-        $GLOBALS["SL"]->sysOpts["footer-admin"] 
-            = view('vendor.survloop.inc-footer-admin')->render();
+        $GLOBALS["SL"]->sysOpts["footer-admin"] = view(
+            'vendor.survloop.inc-footer-admin'
+        )->render();
         $this->admMenuData = [
             "adminNav"   => [],
             "currNavPos" => []
@@ -114,15 +115,13 @@ class AdminCoreController extends SurvLoopController
         if (trim($tabs) == '') {
             return '<div class="w100 mB15"> </div>';
         }
-        $tabs = '<div id="slTopTabsWrap" class="slTopTabs">'
-            . $tabs . '</div>';
+        $tabs = '<div id="slTopTabsWrap" class="slTopTabs">' . $tabs . '</div>';
         $subTabs = view(
             'vendor.survloop.admin.admin-menu-tabs-sub', 
             $this->admMenuData
         )->render();
         if (trim($subTabs) != '') {
-            $tabs .= '<div class="slTopTabsSub">' 
-                . $subTabs . '</div>';
+            $tabs .= '<div class="slTopTabsSub">' . $subTabs . '</div>';
         }
         return $tabs;
     }
@@ -237,12 +236,10 @@ class AdminCoreController extends SurvLoopController
         if ($request->has('t') 
             && intVal($request->get('t')) > 0) {
             $tree = SLTree::find(intVal($request->get('t')));
-            if ($tree && isset($tree->TreeID)) {
+            if ($tree && isset($tree->tree_id)) {
                 return view(
                     'vendor.survloop.admin.tree.ajax-redir-edit', 
-                    [
-                        "tree" => $tree
-                    ]
+                    [ "tree" => $tree ]
                 )->render();
             }
         }
@@ -262,6 +259,7 @@ class AdminCoreController extends SurvLoopController
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             // something can be automated by default...
             session()->put('chkClearEmpties', 1);
+            session()->save();
         }
         return true;
     }
@@ -335,17 +333,17 @@ class AdminCoreController extends SurvLoopController
         if ($prime <= 1) {
             return $this->redir('/login');
         }
-        $trees = SLTree::where('TreeType', 'Page')
-            //->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
-            //->whereRaw("TreeOpts%" . $prime . " = 0")
-            ->orderBy('TreeID', 'asc')
+        $trees = SLTree::where('tree_type', 'Page')
+            //->whereRaw("tree_opts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
+            //->whereRaw("tree_opts%" . $prime . " = 0")
+            ->orderBy('tree_id', 'asc')
             ->get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $tree) {
-                if (isset($tree->TreeOpts) && $tree->TreeOpts%$prime == 0
-                    && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
-                    $this->loader->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
-                    $this->loadCustLoop($request, $tree->TreeID);
+                if (isset($tree->tree_opts) && $tree->tree_opts%$prime == 0
+                    && $tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0) {
+                    $this->loader->syncDataTrees($request, $tree->tree_database, $tree->tree_id);
+                    $this->loadCustLoop($request, $tree->tree_id);
                     $this->reloadAdmMenu();
                     $this->v["content"] = $this->custReport->index($request);
                     return $this->loader->addSessAdmCodeToPage(

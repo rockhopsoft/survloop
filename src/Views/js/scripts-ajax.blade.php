@@ -1,7 +1,7 @@
 /* generated from resources/views/vendor/survloop/js/scripts-ajax.blade.php */
 
 $(document).ready(function(){
-    
+
     function isAdmDash() {
         return ($( "#mainBody" ).hasClass( "mainBodyDash" ));
     }
@@ -38,7 +38,7 @@ $(document).ready(function(){
             }
             $("#dialogBody").load(src);
             $("#nondialog").fadeOut(300);
-            $("#dialog").fadeIn(300);
+            setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
         }
         return true;
     }
@@ -393,13 +393,13 @@ $(document).ready(function(){
             document.getElementById("dialogTitle").innerHTML=title;
             $("#dialogBody").load(src);
             $("#nondialog").fadeOut(300);
-            $("#dialog").fadeIn(300);
+            setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
         }
 		return false;
 	});
 	$(document).on("click", ".dialogClose", function() {
 		$("#dialog").fadeOut(300);
-		$("#nondialog").fadeIn(300);
+		setTimeout(function() { $("#nondialog").fadeIn(300); }, 301);
 	});
 	
 	function showColorList(fldName) {
@@ -628,7 +628,7 @@ $(document).ready(function(){
         $("#nondialog").fadeOut(300);
         window.scrollTo(0, 0);
         $("#dialogBody").load("/ajax/img-sel?nIDtxt="+nIDtxt+"&presel="+encodeURIComponent(presel));
-        $("#dialog").fadeIn(300);
+        setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
         return true;
     }
 	$(document).on("click", ".openImgSelect", function() {
@@ -662,7 +662,7 @@ $(document).ready(function(){
     function imgChoose(imgID) {
         var nIDtxt = getImgNode(imgID);
         $("#nondialog").fadeIn(300);
-        $("#dialog").fadeOut(300);
+        setTimeout(function() { $("#dialog").fadeOut(300); }, 301);
 	    var url = "";
 	    if (document.getElementById("imgUrl"+imgID+"ID")) url = document.getElementById("imgUrl"+imgID+"ID").value;
         if (document.getElementById("n"+nIDtxt+"FldID")) {
@@ -1004,8 +1004,10 @@ $(document).ready(function(){
         }
         return false;
     }
-    $(document).on("click", ".toglNodeSmpl", function() { toggleNodeSimple($(this).attr("data-tog-node")); });
-	
+    $(document).on("click", ".toglNodeSmpl", function() {
+        toggleNodeSimple($(this).attr("data-tog-node")); 
+    });
+
     @if (isset($GLOBALS['SL']->sysOpts['sys-cust-ajax']))
         {!! $GLOBALS['SL']->sysOpts['sys-cust-ajax'] !!}
     @endif

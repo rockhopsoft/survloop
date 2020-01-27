@@ -4,19 +4,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLEmailed extends Model
 {
-    protected $table = 'SL_Emailed';
-    protected $primaryKey = 'EmailedID';
+    protected $table = 'sl_emailed';
+    protected $primaryKey = 'emailed_id';
     
     protected $fillable = [
-        'EmailedTree', 
-        'EmailedRecID', 
-        'EmailedEmailID', 
-        'EmailedTo', 
-        'EmailedToUser', 
-        'EmailedFromUser', 
-        'EmailedSubject', 
-        'EmailedBody', 
-        'EmailedOpts',  
+        'emailed_tree', 
+        'emailed_rec_id', 
+        'emailed_email_id', 
+        'emailed_to', 
+        'emailed_to_user', 
+        'emailed_from_user', 
+        'emailed_subject', 
+        'emailed_body', 
+        'emailed_opts',  
     ];
     
     

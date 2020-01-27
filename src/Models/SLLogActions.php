@@ -5,17 +5,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLLogActions extends Model
 {
-    protected $table         = 'SL_LogActions';
-    protected $primaryKey     = 'LogID';
+    protected $table         = 'sl_log_actions';
+    protected $primaryKey     = 'log_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'LogUser', 
-        'LogDatabase', 
-        'LogTable', 
-        'LogField', 
-        'LogAction', 
-        'LogOldName', 
-        'LogNewName', 
+        'log_user', 
+        'log_database', 
+        'log_table', 
+        'log_field', 
+        'log_action', 
+        'log_old_name', 
+        'log_new_name', 
     ];
 }

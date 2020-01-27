@@ -10,7 +10,7 @@
         <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
             placeholder="Search the database" 
             @if ($GLOBALS['SL']->REQ->has('s') && trim($GLOBALS['SL']->REQ->get('s')) != '')
-                    value="{{ trim($GLOBALS['SL']->REQ->get('s')) }}" @endif >
+                value="{{ trim($GLOBALS['SL']->REQ->get('s')) }}" @endif >
         <a id="hidivBtnSearchOpts" class="hidivBtn" href="javascript:;"
             ><i id="hidivBtnArrSearchOpts" class="fa fa-caret-down" aria-hidden="true"></i></a>
         <div id="hidivSearchOpts">

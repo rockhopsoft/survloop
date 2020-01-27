@@ -1,7 +1,7 @@
 /* resources/views/vendor/survloop/js/formtree-ajax.blade.php */
-@if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' 
-    || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
-    || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0)
+@if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' 
+    || $GLOBALS["SL"]->treeRow->tree_opts%19 == 0 
+    || $GLOBALS["SL"]->treeRow->tree_opts%53 == 0)
 
 @if ($hasFixedHeader)
     var mainFixed = function(){

@@ -16,8 +16,11 @@
                         @if (!isset($minorSections[$maj]) || sizeof($minorSections[$maj]) == 0)
                             data-jumpnode="{{ $majSect[0] }}" @endif >
                         <center><div class="stepNum">
-                        @if ($maj == $currMajorSection) <i class="fa fa-hand-o-down" aria-hidden="true"></i>
-                        @elseif (in_array($maj, $sessMajorsTouched)) <i class="fa fa-check"></i> @else {{ $cnt }} @endif
+                        @if ($maj == $currMajorSection) 
+                            <i class="fa fa-hand-o-down" aria-hidden="true"></i>
+                        @elseif (in_array($maj, $sessMajorsTouched)) 
+                            <i class="fa fa-check"></i> @else {{ $cnt }} 
+                        @endif
                         </div><div class="navVertLine"></div>{{ $majSect[1] }}
                         @if (sizeof($minorSections[$maj]) > 0)
                             <div id="majSect{{ $maj }}Vert2" class="navVertLine2
@@ -35,40 +38,49 @@
         @foreach ($majorSections as $maj => $majSect)
             @if (sizeof($minorSections[$maj]) > 0)
                 <?php $cnt++; ?>
-                <div id="minorNav{{ $maj }}" class="minorNavWrap
-                    @if ($maj == $currMajorSection) disBlo @endif ">
+                <div id="minorNav{{ $maj }}" class="minorNavWrap"
+                    @if ($maj == $currMajorSection) style="display: block;" @endif >
                     <div class="row">
                         @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
                         @forelse ($minorSections[$maj] as $min => $minSect)
                             <div class="col-{{ floor(12/sizeof($minorSections[$maj])) }}">
                                 <a id="maj{{ $maj }}" class="navDeskMin
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) active 
-                                    @elseif (in_array($min, $sessMinorsTouched[$maj])) completed @endif "
-                                    @if ((!isset($sessMinorsTouched[$maj]) || !in_array($min, $sessMinorsTouched[$maj])) 
-                                        && ($maj != $currMajorSection || $min != $currMinorSection))
+                                    @elseif (in_array($min, $sessMinorsTouched[$maj])) completed 
+                                    @endif "
+                                    @if ((!isset($sessMinorsTouched[$maj]) 
+                                            || !in_array($min, $sessMinorsTouched[$maj])) 
+                                        && ($maj != $currMajorSection 
+                                            || $min != $currMinorSection))
                                         href="javascript:;"
                                     @elseif (isset($allNodes[$minSect[0]]))
                                         @if ($GLOBALS['SL']->treeIsAdmin)
-                                            href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
-                                                $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 
+                                            href="/dash/{{ $GLOBALS['SL']->treeRow->tree_slug }}/{{ 
+                                                $allNodes[$minSect[0]]->nodeRow->node_prompt_notes }}" 
                                         @else
-                                            href="/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
-                                                $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 
+                                            href="/u/{{ $GLOBALS['SL']->treeRow->tree_slug }}/{{ 
+                                                $allNodes[$minSect[0]]->nodeRow->node_prompt_notes }}" 
                                         @endif
                                     @endif >
                                     <center><div class="stepNum">
                                     @if ($maj == $currMajorSection && $min == $currMinorSection) 
                                         <i class="fa fa-hand-o-down" aria-hidden="true"></i>
-                                    @elseif (in_array($min, $sessMinorsTouched[$maj]) && ($maj != $currMajorSection 
-                                        || $min != $currMinorSection)) <i class="fa fa-check"></i>
-                                    @else {{ $cnt }}.{{ (1+$min) }}
+                                    @elseif (in_array($min, $sessMinorsTouched[$maj]) 
+                                        && ($maj != $currMajorSection || $min != $currMinorSection)) 
+                                        <i class="fa fa-check"></i>
+                                    @else
+                                        {{ $cnt }}.{{ (1+$min) }}
                                     @endif
-                                    </div><div class="navVertLine"></div>{{ $minSect[1] }}<center>
+                                    </div>
+                                    <div class="navVertLine"></div>
+                                    {{ $minSect[1] }}<center>
                                 </a>
                             </div>
                         @empty
                         @endforelse
-                        @if (sizeof($minorSections[$maj]) == 5) <div class="col-1"></div> @endif
+                        @if (sizeof($minorSections[$maj]) == 5)
+                            <div class="col-1"></div>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -99,17 +111,22 @@
                     <div class="pL20">
                     @forelse ($minorSections[$maj] as $min => $minSect)
                         @if (in_array($min, $sessMinorsTouched[$maj]))
-                            <a @if (isset($allNodes[$minSect[0]]))
+                            <a 
+                            @if (isset($allNodes[$minSect[0]]))
                                 @if ($GLOBALS['SL']->treeIsAdmin)
-                                    href="/dash/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
-                                    $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 
+                                    href="/dash/{{ $GLOBALS['SL']->treeRow->tree_slug }}/{{ 
+                                    $allNodes[$minSect[0]]->nodeRow->node_prompt_notes }}" 
                                 @else
-                                    href="/u/{{ $GLOBALS['SL']->treeRow->TreeSlug }}/{{ 
-                                    $allNodes[$minSect[0]]->nodeRow->NodePromptNotes }}" 
+                                    href="/u/{{ $GLOBALS['SL']->treeRow->tree_slug }}/{{ 
+                                    $allNodes[$minSect[0]]->nodeRow->node_prompt_notes }}" 
                                 @endif
-                            @endif class=" @if ($maj == $currMajorSection && $min == $currMinorSection) navMobActive 
-                                @else navMobDone @endif " >
-                            @if ($maj != $currMajorSection || $min != $currMinorSection) <i class="fa fa-check"></i> @endif 
+                            @endif class="
+                            @if ($maj == $currMajorSection && $min == $currMinorSection) navMobActive 
+                            @else navMobDone
+                            @endif " >
+                            @if ($maj != $currMajorSection || $min != $currMinorSection) 
+                                <i class="fa fa-check"></i> 
+                            @endif 
                         @else
                             <a href="javascript:;" class="navMobOff" >
                         @endif

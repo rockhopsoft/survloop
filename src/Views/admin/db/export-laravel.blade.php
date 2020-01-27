@@ -5,10 +5,11 @@
 <nobr><span class="float-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-        {{ $GLOBALS['SL']->dbRow->DbName }}</span>: 
+        {{ $GLOBALS['SL']->dbRow->db_name }}</span>: 
     @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
         && $GLOBALS["SL"]->x["exportAsPackage"])
-        Export for SurvLoop Extension Package @else Export for Laravel 
+        Export for SurvLoop Extension Package 
+    @else Export for Laravel 
     @endif
 </h1>
 
@@ -30,18 +31,23 @@
             >Download Migrations.zip</a>
         <a href="{{ $zipFileModel }}" target="_blank" class="btn btn-sm btn-secondary mR10" disabled 
             >Download Models.zip</a> --->
-        <a href="?refreshVendor=1" class="btn btn-sm btn-secondary mR10" 
+        <a href="?refreshVendor=1" 
+            class="btn btn-sm btn-secondary mR10" 
             >Push Models to Vendor Folder</a>
-        <a href="?refresh=1" class="btn btn-sm btn-secondary mR10" 
+        <a href="?refresh=1" 
+            class="btn btn-sm btn-secondary mR10" 
             >Force Refresh</a>
     </div>
     <div class="p5"></div>
     <h3 class="mB0">Laravel Migration</h3>
-    <textarea id="lMigr" class="form-control w100" style="height: 250px;"></textarea>
+    <textarea id="lMigr" class="form-control w100" 
+        style="height: 250px;"></textarea>
     <h3 class="mB0">Laravel Seeder</h3>
-    <textarea id="lSeed" class="form-control w100" style="height: 250px;"></textarea>
+    <textarea id="lSeed" class="form-control w100" 
+        style="height: 250px;"></textarea>
     <h3 class="mB0">Model Files</h3>
-    <textarea id="lModl" class="form-control w100" style="height: 250px;"></textarea>
+    <textarea id="lModl" class="form-control w100" 
+        style="height: 250px;"></textarea>
     <div class="p20"></div>
     <script type="text/javascript"> $(document).ready(function(){
         setTimeout(function() { $.get('/dashboard/db/export/dump?which=migrations&url={{ 

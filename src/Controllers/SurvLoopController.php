@@ -97,19 +97,19 @@ class SurvLoopController extends Controller
             if (trim($this->v["currPage"][0]) == '') {
                 $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
                 if (strpos($this->v["currPage"][0], '?') !== false) {
-                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, 
-                        strpos($this->v["currPage"][0], '?'));
+                    $pos = strpos($this->v["currPage"][0], '?');
+                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, $pos);
                 }
             }
             
             $this->loadSlSess();
-            if ($request->has('sessmsg') 
-                && trim($request->get('sessmsg')) != '') {
+            if ($request->has('sessmsg') && trim($request->get('sessmsg')) != '') {
                 session()->put('sessMsg', trim($request->get('sessmsg')));
+                session()->save();
             }
             
             if (!isset($this->v["currState"])) {
-                $this->v["currState"]    = '';
+                $this->v["currState"] = '';
             }
             if (!isset($this->v["yourUserInfo"])) {
                 $this->v["yourUserInfo"] = [];
@@ -121,12 +121,10 @@ class SurvLoopController extends Controller
             $this->loadNavMenu();
             $this->loadDbLookups($request);
             
-            if ($request->has('refresh') 
-                && trim($request->get('refresh')) != '') {
+            if ($request->has('refresh') && trim($request->get('refresh')) != '') {
                 $this->checkSystemInit();
             }
-            if (isset($GLOBALS["slRunUpdates"]) 
-                && $GLOBALS["slRunUpdates"]) {
+            if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
                 $this->v["pastUpDef"] = $this->v["pastUpArr"] 
                     = $this->v["updateList"] = [];
             }
@@ -149,23 +147,23 @@ class SurvLoopController extends Controller
     {
         $slSess = null;
         if (isset($this->v["uID"])) {
-            $slSess = SLSess::where('SessUserID', $this->v["uID"])
-                ->where('SessTree', 0)
-                ->where('SessIsActive', 1)
+            $slSess = SLSess::where('sess_user_id', $this->v["uID"])
+                ->where('sess_tree', 0)
+                ->where('sess_is_active', 1)
                 ->first();
             if (!session()->has('slSessID') 
                 || intVal(session()->get('slSessID')) == 0) {
-                if (!$slSess || !isset($slSess->SessID)) {
+                if (!$slSess || !isset($slSess->sess_id)) {
                     $slSess = new SLSess;
-                    $slSess->SessUserID = $this->v["uID"];
-                    $slSess->SessTree   = 0;
+                    $slSess->sess_user_id = $this->v["uID"];
+                    $slSess->sess_tree   = 0;
                     $slSess->save();
                 }
-                session()->put('slSessID', $slSess->SessID);
-            } elseif ($slSess && isset($slSess->SessID) 
-                && !isset($slSess->SessUserID)
-                && $this->v["uID"] > 0) {
-                $slSess->SessUserID = $this->v["uID"];
+                session()->put('slSessID', $slSess->sess_id);
+                session()->save();
+            } elseif ($slSess && isset($slSess->sess_id) 
+                && !isset($slSess->sess_user_id) && $this->v["uID"] > 0) {
+                $slSess->sess_user_id = $this->v["uID"];
                 $slSess->save();
             }
         }
@@ -174,13 +172,13 @@ class SurvLoopController extends Controller
     
     protected function loadSysSettings()
     {
-        $settings = SLDefinitions::where('DefSet', 'Custom Settings')
-            ->orderBy('DefOrder', 'asc')
+        $settings = SLDefinitions::where('def_set', 'Custom Settings')
+            ->orderBy('def_order', 'asc')
             ->get();
         $this->v["settings"] = [];
         if ($settings->isNotEmpty()) {
             foreach ($settings as $s) {
-                $this->v["settings"][$s->DefSubset] = $s->DefValue;
+                $this->v["settings"][$s->def_subset] = $s->def_value;
             }
         }
         return true;
@@ -189,12 +187,12 @@ class SurvLoopController extends Controller
     protected function loadTreeURL($treeSlug = '')
     {
         if (trim($treeSlug) != '' 
-            && $treeSlug != $GLOBALS["SL"]->treeRow->TreeSlug) {
-            $urlTree = SLTree::where('TreeSlug', $treeSlug)
+            && $treeSlug != $GLOBALS["SL"]->treeRow->tree_slug) {
+            $urlTree = SLTree::where('tree_slug', $treeSlug)
                 ->first();
             if ($urlTree) {
-                $this->dbID = $urlTree->TreeDatabase;
-                $this->treeID = $urlTree->TreeID;
+                $this->dbID = $urlTree->tree_database;
+                $this->treeID = $urlTree->tree_id;
                 $this->treeFromURL = true;
             }
         }
@@ -203,36 +201,35 @@ class SurvLoopController extends Controller
     
     protected function loadDbLookups(Request $request)
     {
-        if (!isset($GLOBALS["SL"]) 
-            || !isset($GLOBALS["SL"]->sysOpts["cust-abbr"])) {
+        if (!isset($GLOBALS["SL"]) || !isset($GLOBALS["SL"]->sysOpts["cust-abbr"])) {
             if (!$this->treeFromURL) {
                 if (!isset($this->v["user"])) {
                     $this->v["user"] = Auth::user();
-                    $this->v["uID"]  = (($this->v["user"] 
-                        && isset($this->v["user"]->id)) 
+                    $this->v["uID"]  = (($this->v["user"] && isset($this->v["user"]->id)) 
                         ? $this->v["user"]->id : 0);
                 }
                 if ($this->v["uID"] > 0) {
-                    $last = SLUsersActivity::where('UserActUser', '=', $this->v["uID"])
-                        ->where('UserActVal', 'LIKE', '%;%')
+                    $last = SLUsersActivity::where('user_act_user', '=', $this->v["uID"])
+                        ->where('user_act_val', 'LIKE', '%;%')
                         ->where(function ($query) {
-                            $query->where('UserActCurrPage', 'LIKE', '/fresh/database%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/fresh/survey%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/switch%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/tree/new%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/db/switch%')
-                                ->orWhere('UserActCurrPage', 'LIKE', '/dashboard/db/new%');
+                            $query->where('user_act_curr_page', 'LIKE', '/fresh/database%')
+                                ->orWhere('user_act_curr_page', 'LIKE', '/fresh/survey%')
+                                ->orWhere('user_act_curr_page', 'LIKE', '/dashboard/tree/switch%')
+                                ->orWhere('user_act_curr_page', 'LIKE', '/dashboard/tree/new%')
+                                ->orWhere('user_act_curr_page', 'LIKE', '/dashboard/db/switch%')
+                                ->orWhere('user_act_curr_page', 'LIKE', '/dashboard/db/new%');
                         })
                         ->orderBy('created_at', 'desc')
                         ->first();
-                    if ($last && isset($last->UserActVal)) {
-                        list($this->dbID, $this->treeID) = explode(';', $last->UserActVal);
+                    if ($last && isset($last->user_act_val)) {
+                        list($this->dbID, $this->treeID) = explode(';', $last->user_act_val);
                         $this->dbID = intVal($this->dbID);
                         $this->treeID = intVal($this->treeID);
                     }
                 }
             }
             $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID);
+            $GLOBALS["SL"]->microLog();
         }
         return true;
     }
@@ -240,11 +237,11 @@ class SurvLoopController extends Controller
     protected function loadDbFromNode(Request $request, $nID)
     {
         $node = SLNode::find($nID);
-        if ($node && isset($node->NodeTree)) {
-            $tree = SLTree::find($node->NodeTree);
-            if ($tree && isset($tree->TreeDatabase)) {
-                $this->treeID = $tree->TreeID;
-                $this->dbID = $tree->TreeDatabase;
+        if ($node && isset($node->node_tree)) {
+            $tree = SLTree::find($node->node_tree);
+            if ($tree && isset($tree->tree_database)) {
+                $this->treeID = $tree->tree_id;
+                $this->dbID = $tree->tree_database;
                 $GLOBALS["SL"] = new Globals(
                     $request, 
                     $this->dbID, 
@@ -259,15 +256,22 @@ class SurvLoopController extends Controller
     // Check For Basic System Setup First
     public function checkSystemInit()
     {
-        if (!session()->has('chkSysInit') 
-            || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('chkSysInit') || $GLOBALS["SL"]->REQ->has('refresh')) {
+            if (!$GLOBALS["SL"]->REQ->has('cssLoaded')
+                && !file_exists('../storage/app/sys/sys2.min.js')) {
+                echo '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
+                    <script type="text/javascript"> 
+                    setTimeout("window.location=\'?cssLoaded=1\'", 2000); 
+                    </script>';
+                exit;
+            }
             $sysChk = User::select('id')
                 ->get();
             if ($sysChk->isEmpty()) {
                 return $this->freshUser($GLOBALS["SL"]->REQ);
             }
-            $sysChk = SLDatabases::select('DbID')
-                ->where('DbUser', '>', 0)
+            $sysChk = SLDatabases::select('db_id')
+                ->where('db_user', '>', 0)
                 ->get();
             if ($sysChk->isEmpty()) {
                 return $this->redir('/fresh/database', true);
@@ -278,6 +282,7 @@ class SurvLoopController extends Controller
             $survInst = new SurvLoopInstaller;
             $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
+            session()->save();
         }
         return '';
     }
@@ -285,7 +290,7 @@ class SurvLoopController extends Controller
     protected function chkHasTreeOne($dbID = 1)
     {
         $sysChk = SLTree::find(1);
-        return ($sysChk && isset($sysChk->TreeID));
+        return ($sysChk && isset($sysChk->tree_id));
     }
     
     public function getCoreID()
@@ -301,8 +306,7 @@ class SurvLoopController extends Controller
     
     public function getCurrPage()
     {
-        return ((isset($this->v["currPage"][0])) 
-            ? $this->v["currPage"][0] : '/');
+        return ((isset($this->v["currPage"][0])) ? $this->v["currPage"][0] : '/');
     }
     
     /**
@@ -324,13 +328,13 @@ class SurvLoopController extends Controller
     
     public function initCustViews()
     {
-        $chk = SLDefinitions::where('DefDatabase', 1)
-            ->where('DefSet', 'Blurbs')
-            ->where('DefSubset', 'Footer')
+        $chk = SLDefinitions::where('def_database', 1)
+            ->where('def_set', 'Blurbs')
+            ->where('def_subset', 'Footer')
             ->first();
-        if ($chk && isset($chk->DefDescription) 
-            && trim($chk->DefDescription) != '') {
-            $GLOBALS["SL"]->sysOpts["footer-master"] = $chk->DefDescription;
+        if ($chk && isset($chk->def_description) 
+            && trim($chk->def_description) != '') {
+            $GLOBALS["SL"]->sysOpts["footer-master"] = $chk->def_description;
         }
         return true;
     }
@@ -359,9 +363,8 @@ class SurvLoopController extends Controller
         if ($baseOverride != '') {
             $this->cacheKey = $baseOverride;
         }
-        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID
-            . '.tree' . $GLOBALS["SL"]->treeID
-            . '.' . $this->getHighestGroupLabel();
+        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID . '.tree'
+            . $GLOBALS["SL"]->treeID . '.' . $this->getHighestGroupLabel();
         if ($this->v["isPrint"]) {
             $this->cacheKey .= '.print';
         }
@@ -399,10 +402,7 @@ class SurvLoopController extends Controller
     protected function saveCache()
     {
         $cache = new GlobalsCache;
-        $cache->putCache(
-            $this->cacheKey, 
-            $this->v["content"]
-        );
+        $cache->putCache($this->cacheKey, $this->v["content"]);
         return true;
     }
     
@@ -412,8 +412,8 @@ class SurvLoopController extends Controller
         if (trim($currPage) == '') {
             $currPage = $this->v["currPage"][0];
         }
-        $chk = SLUsersActivity::where('UserActUser', Auth::user()->id)
-            ->where('UserActCurrPage', 'LIKE', '%'.$currPage)
+        $chk = SLUsersActivity::where('user_act_user', Auth::user()->id)
+            ->where('user_act_curr_page', 'LIKE', '%' . $currPage)
             ->get();
         if ($chk->isNotEmpty()) {
             return false;
@@ -424,12 +424,12 @@ class SurvLoopController extends Controller
     protected function logPageVisit($currPage = '', $val = '')
     {
         $log = new SLUsersActivity;
-        $log->UserActUser = Auth::user()->id;
-        $log->UserActCurrPage = $_SERVER["REQUEST_URI"];
-        if (strlen($log->UserActCurrPage) > 255) {
-            $log->UserActCurrPage = substr($log->UserActCurrPage, 0, 255);
+        $log->user_act_user = Auth::user()->id;
+        $log->user_act_curr_page = $_SERVER["REQUEST_URI"];
+        if (strlen($log->user_act_curr_page) > 255) {
+            $log->user_act_curr_page = substr($log->user_act_curr_page, 0, 255);
         }
-        $log->UserActVal = $val;
+        $log->user_act_val = $val;
         $log->save();
         return true;
     }
@@ -443,20 +443,13 @@ class SurvLoopController extends Controller
                     ? $GLOBALS["SL"]->sysOpts["site-name"] : 'SurvLoop') 
                 . ' Installed!</h1><h4>All Out Data Are Belong...</h4>
             <p>Please create the first admin super user account.</p></div></center>';
-        if (!$request->has('cssLoaded')) {
-            $content = '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
-                <style> body, #registerLoginLnk { display: none; } </style>
-                <script type="text/javascript"> 
-                setTimeout("window.location=\'?cssLoaded=1\'", 2000); 
-                </script>';
-        }
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
             if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $_SERVER["HTTP_HOST"]
                 && $GLOBALS["SL"]->sysOpts["app-url"] != 'https://' . $_SERVER["HTTP_HOST"]) {
-                SLDefinitions::where('DefDatabase', 1)
-                    ->where('DefSet', 'System Settings')
-                    ->whereIn('DefSubset', ['app-url', 'logo-url'])
-                    ->update([ "DefDescription" =>  'http://' . $_SERVER["HTTP_HOST"] ]);
+                SLDefinitions::where('def_database', 1)
+                    ->where('def_set', 'System Settings')
+                    ->whereIn('def_subset', ['app-url', 'logo-url'])
+                    ->update([ "def_description" =>  'http://' . $_SERVER["HTTP_HOST"] ]);
             }
 
         }
@@ -469,9 +462,8 @@ class SurvLoopController extends Controller
     protected function getRecsOneFilt($tblMdl = '', $filtFld = '', $filtIn = [], $idFld = '')
     {
         $eval = "\$recs = App\\Models\\" . $tblMdl 
-            . "::whereIn('" . $filtFld . "', [ '" 
-            . implode("', '", $filtIn) 
-            . "' ])->orderBy('created_at', 'desc')->get();";
+            . "::whereIn('" . $filtFld . "', [ '" . implode("', '", $filtIn) . "' ])"
+            . "->orderBy('created_at', 'desc')->get();";
         eval($eval);
         //echo $eval . '<br />';
         $this->v["recs"] = $recs;
@@ -484,10 +476,10 @@ class SurvLoopController extends Controller
         if (sizeof($filts) > 0) {
             foreach ($filts as $filt) {
                 eval("\$totChk = App\\Models\\" . $tblMdl 
-                    . "::where('" . $filtFld . "', '" . $filt 
-                    . "')->select('" . $idFld . "')->get();");
-                $this->v["recTots"][$filt] = (($totChk->isNotEmpty()) 
-                    ? $totChk->count() : 0);
+                    . "::where('" . $filtFld . "', '" . $filt . "')"
+                    . "->select('" . $idFld . "')"
+                    . "->get();");
+                $this->v["recTots"][$filt] = (($totChk->isNotEmpty()) ? $totChk->count() : 0);
             }
         }
         return true;
@@ -603,24 +595,17 @@ class SurvLoopController extends Controller
     protected function switchDatabase(Request $request, $dbID = -3, $currPage = '')
     {
         if ($dbID > 0) {
-            $dbRow = SLDatabases::where('DbID', $dbID)
-                //->whereIn('DbUser', [ 0, $this->v["uID"] ])
+            $dbRow = SLDatabases::where('db_id', $dbID)
+                //->whereIn('db_user', [ 0, $this->v["uID"] ])
                 ->first();
-            if ($dbRow && $dbRow->DbID) {
-                $treeRow = SLTree::where('TreeDatabase', $dbID)
-                    ->where('TreeType', 'Survey')
+            if ($dbRow && $dbRow->db_id) {
+                $treeRow = SLTree::where('tree_database', $dbID)
+                    ->where('tree_type', 'Survey')
                     ->first();
-                if ($treeRow && isset($treeRow->TreeID)) {
-                    $GLOBALS["SL"] = new Globals(
-                        $request, 
-                        $dbID, 
-                        $treeRow->TreeID, 
-                        $treeRow->TreeID
-                    );
-                    $this->logPageVisit(
-                        $currPage, 
-                        $dbID . ';' . $treeRow->TreeID
-                    );
+                if ($treeRow && isset($treeRow->tree_id)) {
+                    $treeID = $treeRow->tree_id;
+                    $GLOBALS["SL"] = new Globals($request, $dbID, $treeID, $treeID);
+                    $this->logPageVisit($currPage, $dbID . ';' . $treeID);
                 }
             }
             return true;
@@ -631,20 +616,14 @@ class SurvLoopController extends Controller
     protected function switchTree($treeID = -3, $currPage = '', Request $request)
     {
         if ($treeID > 0) {
-            $treeRow = SLTree::where('TreeID', $treeID)
-                //->where('TreeDatabase', $GLOBALS["SL"]->dbID)
+            $treeRow = SLTree::where('tree_id', $treeID)
+                //->where('tree_database', $GLOBALS["SL"]->dbID)
                 ->first();
-            if ($treeRow && isset($treeRow->TreeID)) {
-                $GLOBALS["SL"] = new Globals(
-                    $request, 
-                    $treeRow->TreeDatabase, 
-                    $treeID, 
-                    $treeID
-                );
-                $this->logPageVisit(
-                    $currPage, 
-                    $treeRow->TreeDatabase . ';' . $treeID
-                );
+            if ($treeRow && isset($treeRow->tree_id)) {
+                $db = $treeRow->tree_database;
+                $GLOBALS["SL"] = new Globals($request, $db, $treeID, $treeID);
+                $dbTr = $treeRow->tree_database . ';' . $treeID;
+                $this->logPageVisit($currPage, $dbTr);
             }
             return true;
         }
@@ -659,13 +638,13 @@ class SurvLoopController extends Controller
             && strpos($path, $GLOBALS["SL"]->sysOpts["app-url"]) != 0) {
             $redir = $GLOBALS["SL"]->sysOpts["app-url"] . $path;
         } else {
-            $appUrl = SLDefinitions::where('DefDatabase', 1)
-                ->where('DefSet', 'System Settings')
-                ->where('DefSubset', 'app-url')
+            $appUrl = SLDefinitions::where('def_database', 1)
+                ->where('def_set', 'System Settings')
+                ->where('def_subset', 'app-url')
                 ->first();
-            if ($appUrl && isset($appUrl->DefDescription) 
-                && strpos($path, $appUrl->DefDescription) != 0) {
-                $redir = $appUrl->DefDescription . $path;
+            if ($appUrl && isset($appUrl->def_description) 
+                && strpos($path, $appUrl->def_description) != 0) {
+                $redir = $appUrl->def_description . $path;
             }
         }
         if (!$js) {
@@ -682,38 +661,43 @@ class SurvLoopController extends Controller
     {
         session()->put('sessMsg',     $msg);
         session()->put('sessMsgType', 'alert-' . $type);
+        session()->save();
         return true;
     }
     
     
-    // this should really be done using migrations, includes SurvLoop database changes since Feb 15, 2017
+    // this should really be done using migrations
     protected function survSysChecks()
     {
-        if (!session()->has('survSysChecks') 
-            || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('survSysChecks') || $GLOBALS["SL"]->REQ->has('refresh')) {
             $GLOBALS["SL"]->clearOldDynascript();
             session()->put('survSysChecks', 1);
+            session()->save();
         }
         return true;
     }
     
     protected function loadNavMenu()
     {
-        $settings = SLDefinitions::where('DefSet', 'Menu Settings')
-            ->where('DefSubset', 'main-navigation')
-            ->where('DefDatabase', 1)
-            ->orderBy('DefOrder', 'asc')
+        $settings = SLDefinitions::where('def_set', 'Menu Settings')
+            ->where('def_subset', 'main-navigation')
+            ->where('def_database', 1)
+            ->orderBy('def_order', 'asc')
             ->get();
         $this->v["navMenu"] = [];
         if ($settings->isNotEmpty()) {
             foreach ($settings as $s) {
-                $this->v["navMenu"][] = [$s->DefValue, $s->DefDescription];
+                $this->v["navMenu"][] = [
+                    $s->def_value,
+                    $s->def_description
+                ];
             }
         }
         return true;
     }
     
-    public function generateRandomString($length = 10) {
+    public function generateRandomString($length = 10)
+    {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
@@ -731,17 +715,17 @@ class SurvLoopController extends Controller
         }
         if ($type == 'Confirm Email') {
             if ($userID > 0) {
-                $tokRow = SLTokens::where('TokType', $type)
-                    ->where('TokUserID', $userID)
+                $tokRow = SLTokens::where('tok_type', $type)
+                    ->where('tok_user_id', $userID)
                     ->first();
-                if (!$tokRow || !isset($tokRow->TokTokToken)) {
+                if (!$tokRow || !isset($tokRow->tok_tok_token)) {
                     $tokRow = new SLTokens;
-                    $tokRow->TokType = $type;
-                    $tokRow->TokUserID = $userID;
+                    $tokRow->tok_type = $type;
+                    $tokRow->tok_user_id = $userID;
                 }
-                $tokRow->TokTokToken = $this->generateRandomString(50);
+                $tokRow->tok_tok_token = $this->generateRandomString(50);
                 $tokRow->save();
-                return $tokRow->TokTokToken;
+                return $tokRow->tok_tok_token;
             }
         } elseif ($type == 'Sensitive') {
             $token = $this->chkBasicToken($type, $treeID, $coreID, $userID);
@@ -749,36 +733,36 @@ class SurvLoopController extends Controller
                 return $token;
             }
             $tokRow = $this->makeBasicToken($type, $treeID, $coreID, $userID);
-            return $tokRow->TokTokToken;
+            return $tokRow->tok_tok_token;
         } elseif ($type == 'MFA') {
             $token = $this->chkBasicToken($type, $treeID, $coreID, $userID);
             if (trim($token) != '') {
-                $tokRow = SLTokens::where('TokType', $type)
-                    ->where('TokTreeID', $treeID)
-                    ->where('TokCoreID', $coreID)
-                    ->where('TokUserID', $userID)
+                $tokRow = SLTokens::where('tok_type', $type)
+                    ->where('tok_tree_id', $treeID)
+                    ->where('tok_core_id', $coreID)
+                    ->where('tok_user_id', $userID)
                     ->first();
-                if ($tokRow && isset($tokRow->TokTokToken)) {
-                    $tokRow->TokTokToken = $this->genTokenStr($type);
+                if ($tokRow && isset($tokRow->tok_tok_token)) {
+                    $tokRow->tok_tok_token = $this->genTokenStr($type);
                     $tokRow->save();
-                    return $tokRow->TokTokToken;
+                    return $tokRow->tok_tok_token;
                 }
             }
             $tokRow = $this->makeBasicToken($type, $treeID, $coreID, $userID);
-            return $tokRow->TokTokToken;
+            return $tokRow->tok_tok_token;
         }
         return '';
     }
     
     protected function chkBasicToken($type, $treeID = -3, $coreID = -3, $userID = -3)
     {
-        $tokRow = SLTokens::where('TokType', $type)
-            ->where('TokTreeID', $treeID)
-            ->where('TokCoreID', $coreID)
-            ->where('TokUserID', $userID)
+        $tokRow = SLTokens::where('tok_type', $type)
+            ->where('tok_tree_id', $treeID)
+            ->where('tok_core_id', $coreID)
+            ->where('tok_user_id', $userID)
             ->first();
-        if ($tokRow && isset($tokRow->TokTokToken)) {
-            return $tokRow->TokTokToken;
+        if ($tokRow && isset($tokRow->tok_tok_token)) {
+            return $tokRow->tok_tok_token;
         }
         return '';
     }
@@ -786,11 +770,11 @@ class SurvLoopController extends Controller
     protected function makeBasicToken($type, $treeID = -3, $coreID = -3, $userID = -3, $strlen = 50, $delim = '-')
     {
         $tokRow = new SLTokens;
-        $tokRow->TokType = $type;
-        $tokRow->TokTreeID = $treeID;
-        $tokRow->TokCoreID = $coreID;
-        $tokRow->TokUserID = $userID;
-        $tokRow->TokTokToken = $this->genTokenStr($type);
+        $tokRow->tok_type = $type;
+        $tokRow->tok_tree_id = $treeID;
+        $tokRow->tok_core_id = $coreID;
+        $tokRow->tok_user_id = $userID;
+        $tokRow->tok_tok_token = $this->genTokenStr($type);
         $tokRow->save();
         return $tokRow;
     }
@@ -815,9 +799,11 @@ class SurvLoopController extends Controller
         if ($type == 'Confirm Email') {
             $hrs = 24*28;
         }
-        return date("Y-m-d H:i:s", 
+        return date(
+            "Y-m-d H:i:s", 
             mktime(intVal(date('H'))-$hrs, date('i'), date('s'), 
-                date('m'), date('d'), date('Y')));
+                date('m'), date('d'), date('Y'))
+        );
     }
     
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
@@ -869,15 +855,7 @@ class SurvLoopController extends Controller
     {
         $emaTo = [$this->getEmailTo($emailTo)];
         $this->sendEmail($body, $subject, $emaTo);
-        return $this->logEmailSent(
-            $body, 
-            $subject, 
-            $emailTo, 
-            $emailID, 
-            $treeID, 
-            $coreID, 
-            $userTo
-        );
+        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
     }
     
     protected function sendNewEmailFromCurrUser($body, $subject, $emailTo = '', 
@@ -893,23 +871,8 @@ class SurvLoopController extends Controller
         if (trim($bcc) != '') {
             $emaBCC[] = $this->getEmailTo($bcc);
         }
-        $this->sendEmail(
-            $body, 
-            $subject, 
-            $emaTo, 
-            $emaCC, 
-            $emaBCC, 
-            $emaFrom
-        );
-        return $this->logEmailSent(
-            $body, 
-            $subject, 
-            $emailTo, 
-            $emailID, 
-            $treeID, 
-            $coreID, 
-            $userTo
-        );
+        $this->sendEmail($body, $subject, $emaTo, $emaCC, $emaBCC, $emaFrom);
+        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
     }
     
     protected function getEmailTo($emailTo = '')
@@ -921,9 +884,9 @@ class SurvLoopController extends Controller
         } elseif (trim($emailTo) != '') {
             $emaUsr = User::where('email', $emailTo)->first();
             if ($emaUsr && isset($emaUsr->name)) {
-                $emaTo = [$emailTo, $emaUsr->name];
+                $emaTo = [ $emailTo, $emaUsr->name ];
             } else {
-                $emaTo = [$emailTo, ''];
+                $emaTo = [ $emailTo, '' ];
             }
         }
         return $emaTo;
@@ -945,15 +908,15 @@ class SurvLoopController extends Controller
         $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
     {
         $emailRec = new SLEmailed;
-        $emailRec->EmailedEmailID  = (($emailID > 0) ? $emailID : 0);
-        $emailRec->EmailedTree     = (($treeID > 0)  ? $treeID  : 0);
-        $emailRec->EmailedRecID    = (($coreID > 0)  ? $coreID  : 0);
-        $emailRec->EmailedTo       = trim($emailTo);
-        $emailRec->EmailedToUser   = (($userTo > 0)  ? $userTo  : 0);
-        $emailRec->EmailedFromUser = ((Auth::user() 
-            && isset(Auth::user()->id)) ? Auth::user()->id : 0);
-        $emailRec->EmailedSubject  = $subject;
-        $emailRec->EmailedBody     = $body;
+        $emailRec->emailed_email_id  = (($emailID > 0) ? $emailID : 0);
+        $emailRec->emailed_tree      = (($treeID > 0)  ? $treeID  : 0);
+        $emailRec->emailed_rec_id    = (($coreID > 0)  ? $coreID  : 0);
+        $emailRec->emailed_to        = trim($emailTo);
+        $emailRec->emailed_to_user   = (($userTo > 0)  ? $userTo  : 0);
+        $emailRec->emailed_from_user = ((Auth::user() && isset(Auth::user()->id))
+            ? Auth::user()->id : 0);
+        $emailRec->emailed_Subject   = $subject;
+        $emailRec->emailed_Body      = $body;
         $emailRec->save();
         return true;
     }
@@ -990,19 +953,13 @@ class SurvLoopController extends Controller
         $this->checkFolder('../storage/app/log');
         $fold = '../storage/app/';
         $file = 'log/' . $log . '.html';
-        $uID = ((Auth::user() && isset(Auth::user()->id)) 
-            ? Auth::user()->id : 0);
+        $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
         if (!isset($GLOBALS["SL"])) {
-            $GLOBALS["SL"] = new Globals(
-                new Request, 
-                $this->dbID, 
-                $this->treeID
-            );
+            $GLOBALS["SL"] = new Globals(new Request, $this->dbID, $this->treeID);
         }
-        $content = '<p>' . date("Y-m-d H:i:s") 
-            . ' <b>U#' . $uID . '</b> - ' . $content 
-            . '<br /><span class="slGrey fPerc80">' 
-            . $GLOBALS["SL"]->hashIP() . '</span></p>';
+        $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' . $content 
+            . '<br /><span class="slGrey fPerc80">' . $GLOBALS["SL"]->hashIP()
+            . '</span></p>';
         if (!file_exists($fold . $file)) {
             Storage::disk('local')->put($file, ' ');
         }
@@ -1041,15 +998,15 @@ class SurvLoopController extends Controller
     
     public function getCoreDef($set, $subset, $dbID = 1)
     {
-        $def = SLDefinitions::where('DefDatabase', $dbID)
-            ->where('DefSet',    '=', $set)
-            ->where('DefSubset', '=', $subset)
+        $def = SLDefinitions::where('def_database', $dbID)
+            ->where('def_set',    '=', $set)
+            ->where('def_subset', '=', $subset)
             ->first();
-        if (!$def || !isset($def->DefID)) {
+        if (!$def || !isset($def->def_id)) {
             $def = new SLDefinitions;
-            $def->DefDatabase = $dbID;
-            $def->DefSet      = $set;
-            $def->DefSubset   = $subset;
+            $def->def_database = $dbID;
+            $def->def_set      = $set;
+            $def->def_subset   = $subset;
             $def->save();
         }
         return $def;
@@ -1057,14 +1014,9 @@ class SurvLoopController extends Controller
     
     public function loadSysUpdates()
     {
-        $this->v["pastUpDef"] = $this->getCoreDef(
-            'System Checks', 
-            'system-updates'
-        );
-        $this->v["pastUpArr"] = $GLOBALS["SL"]->mexplode(
-            ';;', 
-            $this->v["pastUpDef"]->DefDescription
-        );
+        $this->v["pastUpDef"] = $this->getCoreDef('System Checks', 'system-updates');
+        $desc = $this->v["pastUpDef"]->def_description;
+        $this->v["pastUpArr"] = $GLOBALS["SL"]->mexplode(';;', $desc);
         return true;
     }
     
@@ -1099,19 +1051,19 @@ class SurvLoopController extends Controller
     public function tblsInPackage()
     {
         if ($this->dbID == 3) {
-            return ['ZipAshrae', 'Zips'];
+            return ['zip_ashrae', 'zips'];
         }
         $ret = $this->tblsInPackageCustom();
         if (sizeof($ret) > 0) {
             return $ret;
         }
-        $chk = SLTables::where('TblDatabase', $this->dbID)
-            ->whereRaw("TblOpts%5 LIKE 0")
-            ->select('TblName')
+        $chk = SLTables::where('tbl_database', $this->dbID)
+            ->whereRaw("tbl_opts%5 LIKE 0")
+            ->select('tbl_name')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tbl) {
-                $ret[] = $tbl->TblName;
+                $ret[] = $tbl->tbl_name;
             }
         }
         return $ret;

@@ -33,42 +33,44 @@ class GlobalsImportExport extends GlobalsTables
     
     public function loadDBFromCache(Request $request = NULL)
     {
-        $cacheFile = '/cache/php/db-load-' . $this->dbID . '-' . $this->treeID . '.php';
+        $cacheFile = '/cache/php/db-load-' 
+            . $this->dbID . '-' . $this->treeID . '.php';
         if ((!$request || !$request->has('refresh')) && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
-            $cache = '// Auto-generated loading cache from /SurvLoop/Controllers/Globals.php' . "\n\n";
+            $cache = '// Auto-generated loading cache from '
+                . '/SurvLoop/Controllers/Globals.php' . "\n\n";
             
             $cache .= '$'.'this->allDbs = [];' . "\n";
             $allDbs = SLDatabases::get();
             if ($allDbs->isNotEmpty()) {
                 foreach ($allDbs as $db) {
                     $cache .= '$'.'this->allDbs[] = ['
-                        . ' "id" => ' . $db->DbID . ', '
-                        . ' "name" => "' . str_replace('"', '\\"', $db->DbName) . '", '
-                        . ' "prfx" => "' . $db->DbPrefix . '" '
+                        . ' "id" => ' . $db->db_id . ', '
+                        . ' "name" => "' . str_replace('"', '\\"', $db->db_name) . '", '
+                        . ' "prfx" => "' . $db->db_prefix . '" '
                     . '];' . "\n";
                 }
             }
 
             $cache .= '$'.'this->allCoreTbls = [];' . "\n";
             $coresDone = [];
-            $allCoreTbls = DB::table('SL_Tree')
-                ->join('SL_Tables', 'SL_Tree.TreeCoreTable', '=', 'SL_Tables.TblID')
-                ->where('SL_Tree.TreeDatabase', $this->dbID)
-                ->where('SL_Tables.TblName', 'NOT LIKE', 'Visitors')
-                ->select('SL_Tree.TreeSlug', 'SL_Tables.TblID', 'SL_Tables.TblEng')
-                ->orderBy('SL_Tree.TreeID', 'asc')
+            $allCoreTbls = DB::table('sl_tree')
+                ->join('sl_tables', 'sl_tree.tree_core_table', '=', 'sl_tables.tbl_id')
+                ->where('sl_tree.tree_database', $this->dbID)
+                ->where('sl_tables.tbl_name', 'NOT LIKE', 'Visitors')
+                ->select('sl_tree.tree_slug', 'sl_tables.tbl_id', 'sl_tables.tbl_eng')
+                ->orderBy('sl_tree.tree_id', 'asc')
                 ->get();
             if ($allCoreTbls->isNotEmpty()) {
                 foreach ($allCoreTbls as $tbl) {
-                    if (!in_array($tbl->TblID, $coresDone)) {
-                        $coresDone[] = $tbl->TblID;
+                    if (!in_array($tbl->tbl_id, $coresDone)) {
+                        $coresDone[] = $tbl->tbl_id;
                         $cache .= '$'.'this->allCoreTbls[] = ['
-                            . ' "id" => ' . $tbl->TblID . ', '
-                            . ' "name" => "' . $tbl->TblEng . '", '
-                            . ' "slug" => "' . $tbl->TreeSlug . '" '
+                            . ' "id" => ' . $tbl->tbl_id . ', '
+                            . ' "name" => "' . $tbl->tbl_eng . '", '
+                            . ' "slug" => "' . $tbl->tree_slug . '" '
                         . '];' . "\n";
                     }
                 }
@@ -76,130 +78,133 @@ class GlobalsImportExport extends GlobalsTables
             
             $this->allTrees = [];
             $cache .= '$'.'this->allTrees = [];' . "\n";
-            $allTrees = SLTree::where('TreeType', 'Survey')
-                ->orderBy('TreeName', 'asc')
+            $allTrees = SLTree::where('tree_type', 'Survey')
+                ->orderBy('tree_name', 'asc')
                 ->get();
             if ($allTrees->isNotEmpty()) {
                 foreach ($allTrees as $tree) {
-                    if (!isset($this->allTrees[$tree->TreeDatabase])) {
-                        $this->allTrees[$tree->TreeDatabase] = [];
-                        $cache .= '$'.'this->allTrees[' . $tree->TreeDatabase . '] = [];' . "\n";
+                    if (!isset($this->allTrees[$tree->tree_database])) {
+                        $this->allTrees[$tree->tree_database] = [];
+                        $cache .= '$'.'this->allTrees[' . $tree->tree_database . '] = [];' . "\n";
                     }
-                    $cache .= '$'.'this->allTrees[' . $tree->TreeDatabase . '][] = ['
-                        . ' "id" => ' . $tree->TreeID . ', '
-                        . ' "name" => "' . str_replace('"', '\\"', $tree->TreeName) . '", '
-                        . ' "slug" => "' . $tree->TreeSlug . '", '
-                        . ' "opts" => ' . ((isset($tree->TreeOpts) && intVal($tree->TreeOpts) > 0) 
-                            ? $tree->TreeOpts : 1) 
+                    $cache .= '$'.'this->allTrees[' . $tree->tree_database . '][] = ['
+                        . ' "id" => ' . $tree->tree_id . ', '
+                        . ' "name" => "' . str_replace('"', '\\"', $tree->tree_name) . '", '
+                        . ' "slug" => "' . $tree->tree_slug . '", '
+                        . ' "opts" => ' . ((isset($tree->tree_opts) && intVal($tree->tree_opts) > 0) 
+                            ? $tree->tree_opts : 1) 
                     . ' ];' . "\n";
                 }
             }
             
-            if ($this->treeRow && isset($this->treeRow->TreeRoot)) {
-                if ($this->treeRow->TreeRoot > 0) {
-                    $chk = SLConditionsNodes::select('SL_ConditionsNodes.CondNodeID')
-                        ->join('SL_Conditions', 'SL_Conditions.CondID', '=', 'SL_ConditionsNodes.CondNodeCondID')
-                        ->where('SL_Conditions.CondTag', '#IsAdmin')
-                        ->where('SL_ConditionsNodes.CondNodeNodeID', $this->treeRow->TreeRoot)
+            if ($this->treeRow && isset($this->treeRow->tree_root)) {
+                if ($this->treeRow->tree_root > 0) {
+                    $chk = SLConditionsNodes::select('sl_conditions_nodes.cond_node_id')
+                        ->join('sl_conditions', 'sl_conditions.cond_id', 
+                            '=', 'sl_conditions_nodes.cond_node_cond_id')
+                        ->where('sl_conditions.cond_tag', '#IsAdmin')
+                        ->where('sl_conditions_nodes.cond_node_node_id', $this->treeRow->tree_root)
                         ->first();
-                    if ($chk && isset($chk->CondNodeID)) {
-                        if ($this->treeRow->TreeOpts%Globals::TREEOPT_ADMIN > 0) {
-                            $this->treeRow->TreeOpts *= 3;
+                    if ($chk && isset($chk->cond_node_id)) {
+                        if ($this->treeRow->tree_opts%Globals::TREEOPT_ADMIN > 0) {
+                            $this->treeRow->tree_opts *= 3;
                             $this->treeRow->save();
                         }
                     }
                 }
-                if ($this->treeRow->TreeOpts%Globals::TREEOPT_ADMIN == 0
-                    || $this->treeRow->TreeOpts%Globals::TREEOPT_STAFF == 0
-                    || $this->treeRow->TreeOpts%Globals::TREEOPT_PARTNER == 0
-                    || $this->treeRow->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
+                if ($this->treeRow->tree_opts%Globals::TREEOPT_ADMIN == 0
+                    || $this->treeRow->tree_opts%Globals::TREEOPT_STAFF == 0
+                    || $this->treeRow->tree_opts%Globals::TREEOPT_PARTNER == 0
+                    || $this->treeRow->tree_opts%Globals::TREEOPT_VOLUNTEER == 0) {
                     $cache .= '$'.'this->treeIsAdmin = true;' . "\n"
                         . '$'.'this->treeBaseSlug = "/dash/' 
-                        . $this->treeRow->TreeSlug . '/";' . "\n";
+                        . $this->treeRow->tree_slug . '/";' . "\n";
                 } else {
                     $cache .= '$'.'this->treeBaseSlug = "/u/' 
-                    . $this->treeRow->TreeSlug . '/";' . "\n";
+                        . $this->treeRow->tree_slug . '/";' . "\n";
                 }
             }
 
-            //$sys = SLDefinitions::where('DefDatabase', $this->dbID)
-            //    ->where('DefSet', 'System Settings')
+            //$sys = SLDefinitions::where('def_database', $this->dbID)
+            //    ->where('def_set', 'System Settings')
             //    ->get(); 
             //if (!$sys || sizeof($sys) == 0) {
-                $sys = SLDefinitions::where('DefDatabase', 1)
-                    ->where('DefSet', 'System Settings')
+                $sys = SLDefinitions::where('def_database', 1)
+                    ->where('def_set', 'System Settings')
                     ->get();
             //}
             if ($sys->isNotEmpty()) {
                 foreach ($sys as $s) {
-                    $cache .= '$'.'this->sysOpts[\'' . $s->DefSubset . '\'] = \''
-                        . str_replace("'", "\\'", trim($s->DefDescription)) . '\';' . "\n";
+                    $cache .= '$'.'this->sysOpts[\'' . $s->def_subset . '\'] = \''
+                        . str_replace("'", "\\'", trim($s->def_description)) . '\';' . "\n";
                 }
             }
-            if (isset($this->dbRow->DbPrefix)) {
+            if (isset($this->dbRow->db_prefix)) {
                 $coreTbl = '';
                 // Establishing database table-field lookup arrays
-                $tbls = SLTables::where('TblDatabase', $this->dbID)
-                    ->orderBy('TblOrd', 'asc')
+                $tbls = SLTables::where('tbl_database', $this->dbID)
+                    ->orderBy('tbl_ord', 'asc')
                     ->get();
                 foreach ($tbls as $tbl) {
-                    if (isset($this->treeRow->TreeCoreTable) 
-                        && $tbl->TblID == $this->treeRow->TreeCoreTable) {
-                        $coreTbl = $tbl->TblName;
+                    if (isset($this->treeRow->tree_core_table) 
+                        && $tbl->tbl_id == $this->treeRow->tree_core_table) {
+                        $coreTbl = $tbl->tbl_name;
                         $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
                     }
-                    $cache .= '$'.'this->tbls[] = ' . $tbl->TblID . ';' . "\n"
-                        . '$'.'this->tblI[\'' . $tbl->TblName . '\'] = ' 
-                            . intVal($tbl->TblID) . ';' . "\n"
-                        . '$'.'this->tbl[' . $tbl->TblID . '] = \'' 
-                            . $tbl->TblName . '\';' . "\n"
-                        . '$'.'this->tblEng[' . $tbl->TblID . '] = \'' 
-                            . str_replace("'", "\\'", $tbl->TblEng).'\';'."\n"
-                        . '$'.'this->tblOpts[' . $tbl->TblID . '] = ' 
-                            . intVal($tbl->TblOpts) . ';' . "\n"
-                        . '$'.'this->tblAbbr[\'' . $tbl->TblName . '\'] = \'' 
-                            . $tbl->TblAbbr . '\';' . "\n"
-                        . '$'.'this->fldTypes[\'' . $tbl->TblName . '\'] = [];' . "\n"
-                        . '$'.'this->fldTypes[\'' . $tbl->TblName . '\'][\'' 
-                            . $tbl->TblAbbr . 'ID\'] = \'INT\';' . "\n"
-                        . '$'.'this->tblModels[\'' . $tbl->TblName . '\'] = \'' 
-                        . str_replace('_', '', $this->dbRow->DbPrefix . $tbl->TblName) 
-                        . '\';' . "\n";
-                    if ($this->treeRow && isset($this->treeRow->TreeCoreTable) 
-                        && $tbl->TblID == $this->treeRow->TreeCoreTable) {
-                    	$coreType = '$'.'this->fldTypes[\'' . $tbl->TblName 
-                            . '\'][\'' . $tbl->TblAbbr;
-                        $cache .= $coreType . 'UserID\'] = \'INT\';' . "\n"
-                        	. $coreType . 'SubmissionProgress\'] = \'INT\';' . "\n"
-                        	. $coreType . 'TreeVersion\'] = \'VARCHAR\';' . "\n"
-                        	. $coreType . 'VersionAB\'] = \'VARCHAR\';' . "\n"
-                        	. $coreType . 'UniqueStr\'] = \'VARCHAR\';' . "\n"
-                        	. $coreType . 'IPaddy\'] = \'VARCHAR\';' . "\n"
-                        	. $coreType . 'IsMobile\'] = \'INT\';' . "\n";
+                    $cache .= '$'.'this->tbls[] = ' . $tbl->tbl_id . ';' . "\n"
+                        . '$'.'this->tblI[\'' . $tbl->tbl_name 
+                            . '\'] = ' . intVal($tbl->tbl_id) . ';' . "\n"
+                        . '$'.'this->tbl[' . $tbl->tbl_id 
+                            . '] = \'' . $tbl->tbl_name . '\';' . "\n"
+                        . '$'.'this->tblEng[' . $tbl->tbl_id 
+                            . '] = \'' . str_replace("'", "\\'", $tbl->tbl_eng).'\';'."\n"
+                        . '$'.'this->tblOpts[' . $tbl->tbl_id 
+                            . '] = ' . intVal($tbl->tbl_opts) . ';' . "\n"
+                        . '$'.'this->tblAbbr[\'' . $tbl->tbl_name 
+                            . '\'] = \'' . $tbl->tbl_abbr . '\';' . "\n"
+                        . '$'.'this->fldTypes[\'' . $tbl->tbl_name . '\'] = [];' . "\n"
+                        . '$'.'this->fldTypes[\'' . $tbl->tbl_name 
+                            . '\'][\'' . $tbl->tbl_abbr . 'id\'] = \'INT\';' . "\n"
+                        . '$'.'this->tblModels[\'' . $tbl->tbl_name . '\'] = \'' 
+                            . $this->strFullTblModel($tbl->tbl_name) . '\';' . "\n";
+                    if ($this->treeRow 
+                        && isset($this->treeRow->tree_core_table) 
+                        && $tbl->tbl_id == $this->treeRow->tree_core_table) {
+                    	$coreType = '$'.'this->fldTypes[\'' . $tbl->tbl_name 
+                            . '\'][\'' . $tbl->tbl_abbr;
+                        $cache .= $coreType . 'user_id\'] = \'INT\';' . "\n"
+                        	. $coreType . 'submission_progress\'] = \'INT\';' . "\n"
+                        	. $coreType . 'tree_version\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'version_ab\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'unique_str\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'ip_addy\'] = \'VARCHAR\';' . "\n"
+                        	. $coreType . 'is_mobile\'] = \'INT\';' . "\n";
                     }
                     // temporarily loading for the sake of cache creation...
-                    $this->tbl[$tbl->TblID] = $tbl->TblName;
-                    $this->tblAbbr[$tbl->TblName] = $tbl->TblAbbr;
+                    $this->tbl[$tbl->tbl_id] = $tbl->tbl_name;
+                    $this->tblAbbr[$tbl->tbl_name] = $tbl->tbl_abbr;
                 }
                 $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
                 
                 $fldNames = [];
                 $flds = SLFields::select()
-                    ->where('FldDatabase', $this->dbID)
-                    ->where('FldTable', '>', 0)
-                    ->orderBy('FldOrd', 'asc')
+                    ->where('fld_database', $this->dbID)
+                    ->where('fld_table', '>', 0)
+                    ->orderBy('fld_ord', 'asc')
                     ->get();
                 foreach ($flds as $fld) {
-                    if (isset($this->tbl[$fld->FldTable])) {
-                        $fldName = $this->tblAbbr[$this->tbl[$fld->FldTable]] . $fld->FldName;
+                    if (isset($this->tbl[$fld->fld_table])) {
+                        $fldName = $this->tblAbbr[$this->tbl[$fld->fld_table]] 
+                            . $fld->fld_name;
                         $fldNames[] = $fldName;
-                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->FldTable] 
-                            . '\'][\'' . $fldName . '\'] = \'' . $fld->FldType . '\';' . "\n";
-                        if (strtolower(substr($fldName, strlen($fldName)-5)) == 'other') {
-                            $othFld = substr($fldName, 0, strlen($fldName)-5);
+                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->fld_table] 
+                            . '\'][\'' . $fldName . '\'] = \'' . $fld->fld_type 
+                            . '\';' . "\n";
+                        if (strtolower(substr($fldName, strlen($fldName)-6)) == '_other') {
+                            $othFld = substr($fldName, 0, strlen($fldName)-6);
                             if (trim($othFld) != '' && in_array($othFld, $fldNames)) {
                                 $cache .= '$'.'this->fldOthers[\'' . $fldName . '\'] = '
-                                    . $fld->FldID . ';' . "\n";
+                                    . $fld->fld_id . ';' . "\n";
                             }
                         }
                     }
@@ -208,46 +213,45 @@ class GlobalsImportExport extends GlobalsTables
                 $cache .= $this->loadDataMapLinks($this->treeID);
                 
                 $cache .= '$'.'this->nodeCondInvert = [];' . "\n";
-                $inv = SLConditionsNodes::where('CondNodeNodeID', '>', 0)
-                    ->where('CondNodeLoopID', '<', 0)
+                $inv = SLConditionsNodes::where('cond_node_node_id', '>', 0)
+                    ->where('cond_node_loop_id', '<', 0)
                     ->get();
                 if ($inv->isNotEmpty()) {
                     foreach ($inv as $invert) {
-                        $invNode = $invert["CondNodeNodeID"];
-                        $invCond = $invert["CondNodeCondID"];
+                        $invNode = $invert["cond_node_node_id"];
+                        $invCond = $invert["cond_node_cond_id"];
                         if (!isset($this->nodeCondInvert[$invNode])) {
                             $cache .= '$'.'this->nodeCondInvert[' . $invNode . '] = [];' . "\n";
                             $this->nodeCondInvert[$invNode] = [];
                         }
                         if (!isset($this->nodeCondInvert[$invNode][$invCond])) {
-                            $cache .= '$'.'this->nodeCondInvert[' 
-                                . $invNode . '][' . $invCond . '] = true;' . "\n";
+                            $cache .= '$'.'this->nodeCondInvert[' . $invNode 
+                                . '][' . $invCond . '] = true;' . "\n";
                             $this->nodeCondInvert[$invNode][$invCond] = true;
                         }
                     }
                 }
-            } // end if (isset($this->dbRow->DbPrefix))
+            } // end if (isset($this->dbRow->db_prefix))
 
             eval($cache);
             
             $cache2 = '';
-            $extends = SLTables::where('TblDatabase', $this->dbID)
-                ->where('TblExtend', '>', 0)
-                ->select('TblID', 'TblAbbr', 'TblExtend')
+            $extends = SLTables::where('tbl_database', $this->dbID)
+                ->where('tbl_extend', '>', 0)
+                ->select('tbl_id', 'tbl_abbr', 'tbl_extend')
                 ->get();
             if ($extends->isNotEmpty()) {
                 foreach ($extends as $tbl) {
-                    if (isset($this->tbl[$tbl->TblID]) 
-                        && isset($this->fldTypes[$this->tbl[$tbl->TblExtend]])
-                        && is_array($this->fldTypes[$this->tbl[$tbl->TblExtend]])
-                        && sizeof($this->fldTypes[$this->tbl[$tbl->TblExtend]]) > 0) {
-                        $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->TblID] . '\'][\'' 
-                            . $tbl->TblAbbr . $this->tblAbbr[$this->tbl[$tbl->TblExtend]] 
+                    if (isset($this->tbl[$tbl->tbl_id]) 
+                        && isset($this->fldTypes[$this->tbl[$tbl->tbl_extend]])
+                        && is_array($this->fldTypes[$this->tbl[$tbl->tbl_extend]])
+                        && sizeof($this->fldTypes[$this->tbl[$tbl->tbl_extend]]) > 0) {
+                        $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id] . '\'][\'' 
+                            . $tbl->tbl_abbr . $this->tblAbbr[$this->tbl[$tbl->tbl_extend]] 
                             . 'ID\'] = \'INT\';' . "\n";
-                        foreach ($this->fldTypes[$this->tbl[$tbl->TblExtend]]
-                            as $fldName => $fldType) {
-                            $fldName2 = $this->tblAbbr[$this->tbl[$tbl->TblID]] . $fldName;
-                            $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->TblID] 
+                        foreach ($this->fldTypes[$this->tbl[$tbl->tbl_extend]] as $fldName => $fldType) {
+                            $fldName2 = $this->tblAbbr[$this->tbl[$tbl->tbl_id]] . $fldName;
+                            $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id] 
                                 . '\'][\'' . $fldName2 . '\'] = \'' . $fldType . '\';' . "\n";
                             $fldNames[] = $fldName2;
                         }
@@ -258,78 +262,78 @@ class GlobalsImportExport extends GlobalsTables
             $this->getCoreTblUserFld();
             $cache2 .= '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
             $xmlTreeSlug = '';
-            if ($this->treeRow && isset($this->treeRow->TreeType)) {
-                if ($this->treeRow->TreeType == 'Survey') {
-                    $xmlTreeSlug = $this->treeRow->TreeSlug;
-                } elseif ($this->treeRow->TreeType == 'Page' 
-                    && $this->treeRow->TreeOpts%Globals::TREEOPT_SEARCH == 0
-                    && $this->treeRow->TreeCoreTable > 0) {
-                    $chk = SLTree::where('TreeType', 'Survey')
-                        ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
-                        ->orderBy('TreeID', 'asc')
+            if ($this->treeRow && isset($this->treeRow->tree_type)) {
+                if ($this->treeRow->tree_type == 'Survey') {
+                    $xmlTreeSlug = $this->treeRow->tree_slug;
+                } elseif ($this->treeRow->tree_type == 'Page' 
+                    && $this->treeRow->tree_opts%Globals::TREEOPT_SEARCH == 0
+                    && $this->treeRow->tree_core_table > 0) {
+                    $chk = SLTree::where('tree_type', 'Survey')
+                        ->where('tree_core_table', $this->treeRow->tree_core_table)
+                        ->orderBy('tree_id', 'asc')
                         ->first();
-                    if ($chk && isset($chk->TreeSlug)) {
-                        $xmlTreeSlug = trim($chk->TreeSlug);
+                    if ($chk && isset($chk->tree_slug)) {
+                        $xmlTreeSlug = trim($chk->tree_slug);
                     }
                 }
             }
             if ($xmlTreeSlug != '') {
-                $xmlTree = SLTree::where('TreeSlug', $xmlTreeSlug)
-                    ->where('TreeDatabase', $this->treeRow->TreeDatabase)
-                    ->where('TreeType', 'Survey XML')
-                    ->orderBy('TreeID', 'asc')
+                $xmlTree = SLTree::where('tree_slug', $xmlTreeSlug)
+                    ->where('tree_database', $this->treeRow->tree_database)
+                    ->where('tree_type', 'Survey XML')
+                    ->orderBy('tree_id', 'asc')
                     ->first();
-                if ($xmlTree && isset($xmlTree->TreeID)) {
-                    if (!isset($xmlTree->TreeRoot) || intVal($xmlTree->TreeRoot) <= 0) {
-                        if (intVal($xmlTree->TreeCoreTable) > 0) {
+                if ($xmlTree && isset($xmlTree->tree_id)) {
+                    if (!isset($xmlTree->tree_root) || intVal($xmlTree->tree_root) <= 0) {
+                        if (intVal($xmlTree->tree_core_table) > 0) {
                             $xmlRootNode = new SLNode;
-                            $xmlRootNode->NodeTree        = $xmlTree->TreeID;
-                            $xmlRootNode->NodeParentID    = -3;
-                            $xmlRootNode->NodeType        = 'XML';
-                            $xmlRootNode->NodePromptText  = $this->tbl[$xmlTree->TreeCoreTable];
-                            $xmlRootNode->NodePromptNotes = $xmlTree->TreeCoreTable;
+                            $xmlRootNode->node_tree         = $xmlTree->tree_id;
+                            $xmlRootNode->node_parent_id    = -3;
+                            $xmlRootNode->node_type         = 'XML';
+                            $xmlRootNode->node_prompt_text  = $this->tbl[$xmlTree->tree_core_table];
+                            $xmlRootNode->node_prompt_notes = $xmlTree->tree_core_table;
                             $xmlRootNode->save();
-                            $xmlTree->TreeRoot = $xmlRootNode->NodeID;
+                            $xmlTree->tree_root = $xmlRootNode->node_id;
                             $xmlTree->save();
                         }
                     }
                     $cache2 .= '$'.'this->xmlTree = [ '
-                        . '"id" => ' . $xmlTree->TreeID . ', '
-                        . '"root" => ' . ((intVal($xmlTree->TreeRoot) > 0) 
-                            ? $xmlTree->TreeRoot : 0) . ', '
-                        . '"coreTblID" => ' . ((intVal($xmlTree->TreeCoreTable) > 0) 
-                            ? $xmlTree->TreeCoreTable : 0) . ', '
-                        . '"coreTbl" => "' . ((isset($this->tbl[$xmlTree->TreeCoreTable])) 
-                            ? $this->tbl[$xmlTree->TreeCoreTable] : '') . '", '
-                        . '"opts" => ' . ((isset($xmlTree->TreeOpts) 
-                            && intVal($xmlTree->TreeOpts) > 0) ? $xmlTree->TreeOpts : 0)
+                        . '"id" => ' . $xmlTree->tree_id . ', '
+                        . '"root" => ' . ((intVal($xmlTree->tree_root) > 0) 
+                            ? $xmlTree->tree_root : 0) . ', '
+                        . '"coreTblID" => ' . ((intVal($xmlTree->tree_core_table) > 0) 
+                            ? $xmlTree->tree_core_table : 0) . ', '
+                        . '"coreTbl" => "' . ((isset($this->tbl[$xmlTree->tree_core_table])) 
+                            ? $this->tbl[$xmlTree->tree_core_table] : '') . '", '
+                        . '"opts" => ' . ((isset($xmlTree->tree_opts) 
+                            && intVal($xmlTree->tree_opts) > 0) ? $xmlTree->tree_opts : 0)
                     . ' ];' . "\n";
                 }
                 $reportTree = $this->chkReportTree();
                 if ($reportTree) {
                     $cache2 .= '$'.'this->reportTree = [ '
-                        . '"id" => '    . $reportTree->TreeID . ', '
-                        . '"root" => '  . $reportTree->TreeRoot . ', '
-                        . '"slug" => "' . $reportTree->TreeSlug . '", '
-                        . '"opts" => '  . $reportTree->TreeOpts . ''
+                        . '"id" => '    . $reportTree->tree_id . ', '
+                        . '"root" => '  . $reportTree->tree_root . ', '
+                        . '"slug" => "' . $reportTree->tree_slug . '", '
+                        . '"opts" => '  . $reportTree->tree_opts . ''
                     . ' ];' . "\n";
                 }
-            } elseif ($this->treeRow && isset($this->treeRow->TreeOpts) 
-                && $this->treeRow->TreeOpts%Globals::TREEOPT_REPORT == 0) {
-                $reportTree = SLTree::where('TreeType', 'Survey')
-                    ->where('TreeDatabase', $this->dbID)
-                    ->where('TreeCoreTable', $this->treeRow->TreeCoreTable)
+            } elseif ($this->treeRow && isset($this->treeRow->tree_opts) 
+                && $this->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
+                $reportTree = SLTree::where('tree_type', 'Survey')
+                    ->where('tree_database', $this->dbID)
+                    ->where('tree_core_table', $this->treeRow->tree_core_table)
                     ->get();
                 if ($reportTree->isNotEmpty()) {
                     foreach ($reportTree as $t) {
-                        if ($t->TreeOpts%13 > 0) {
+                        if ($t->tree_opts%13 > 0) {
                             $foundRepTree = true;
                             $cache2 .= '$'.'this->reportTree = [ '
-                                . '"id" => '    . $t->TreeID . ', '
-                                . '"root" => '  . $t->TreeRoot . ', '
-                                . '"slug" => "' . $t->TreeSlug . '", '
-                                . '"opts" => '  . $t->TreeOpts . ''
-                            . ' ];' . "\n";
+                                . '"id" => '    . $t->tree_id . ', '
+                                . '"root" => '  . $t->tree_root . ', '
+                                . '"slug" => "' . $t->tree_slug . '", '
+                                . '"opts" => '  . $t->tree_opts . ''
+                                . ' ];' . "\n";
                         }
                     }
                 }
@@ -338,8 +342,8 @@ class GlobalsImportExport extends GlobalsTables
             if (sizeof($this->condABs) > 0) {
                 $cache2 .= '$'.'this->condABs = [];' . "\n";
                 foreach ($this->condABs as $i => $ab) {
-                    $cache2 .= '$'.'this->condABs[] = [ ' . $ab[0]
-                        . ', "' . $ab[1] . '" ];' . "\n";
+                    $cache2 .= '$'.'this->condABs[] = [ ' 
+                        . $ab[0] . ', "' . $ab[1] . '" ];' . "\n";
                 }
             }
             
@@ -350,25 +354,25 @@ class GlobalsImportExport extends GlobalsTables
                 'partner'       => '', 
                 'staff'         => ''
             ];
-            if ($this->treeRow && isset($this->treeRow->TreeDatabase)) {
-                $searchTrees = SLTree::where('TreeDatabase', $this->treeRow->TreeDatabase)
-                    ->where('TreeType', 'Page')
-                    //->whereRaw("TreeOpts%" . Globals::TREEOPT_SEARCH . " = 0")
-                    ->orderBy('TreeID', 'asc')
+            if ($this->treeRow && isset($this->treeRow->tree_database)) {
+                $searchTrees = SLTree::where('tree_database', $this->treeRow->tree_database)
+                    ->where('tree_type', 'Page')
+                    //->whereRaw("tree_opts%" . Globals::TREEOPT_SEARCH . " = 0")
+                    ->orderBy('tree_id', 'asc')
                     ->get();
                 if ($searchTrees->isNotEmpty()) {
                     foreach ($searchTrees as $tree) {
-                        if ($tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
-                            if ($tree->TreeOpts%Globals::TREEOPT_ADMIN == 0) {
-                                $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->TreeSlug;
-                            } elseif ($tree->TreeOpts%Globals::TREEOPT_STAFF == 0) {
-                                $this->x["srchUrls"]["staff"] = '/dash/' . $tree->TreeSlug;
-                            } elseif ($tree->TreeOpts%Globals::TREEOPT_PARTNER == 0) {
-                                $this->x["srchUrls"]["partner"] = '/dash/' . $tree->TreeSlug;
-                            } elseif ($tree->TreeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
-                                $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->TreeSlug;
+                        if ($tree->tree_opts%Globals::TREEOPT_SEARCH == 0) {
+                            if ($tree->tree_opts%Globals::TREEOPT_ADMIN == 0) {
+                                $this->x["srchUrls"]["administrator"] = '/dash/' . $tree->tree_slug;
+                            } elseif ($tree->tree_opts%Globals::TREEOPT_STAFF == 0) {
+                                $this->x["srchUrls"]["staff"] = '/dash/' . $tree->tree_slug;
+                            } elseif ($tree->tree_opts%Globals::TREEOPT_PARTNER == 0) {
+                                $this->x["srchUrls"]["partner"] = '/dash/' . $tree->tree_slug;
+                            } elseif ($tree->tree_opts%Globals::TREEOPT_VOLUNTEER == 0) {
+                                $this->x["srchUrls"]["volunteer"] = '/dash/' . $tree->tree_slug;
                             } else {
-                                $this->x["srchUrls"]["public"] = '/' . $tree->TreeSlug;
+                                $this->x["srchUrls"]["public"] = '/' . $tree->tree_slug;
                             }
                         }
                     }
@@ -393,15 +397,15 @@ class GlobalsImportExport extends GlobalsTables
     
     public function getGenericRows($tbl, $fld = '', $val = '', $oper = '', $ordFld = '')
     {
-        eval("\$rows = " . $this->modelPath($tbl) . "::" . ((trim($fld) != '') 
-            ? "where('" . $fld . "'" . ((trim($oper) != '') 
+        eval("\$rows = " . $this->modelPath($tbl) . "::" 
+            . ((trim($fld) != '') ? "where('" . $fld . "'" . ((trim($oper) != '') 
                 ? ", '" . $oper . "'" : "") . ", '" . $val . "')->" : "")
             . ((in_array($oper, ['<>', 'NOT LIKE']) && strtolower($val) != 'null') 
                 ? "orWhere('" . $fld . "', NULL)->" : "")
             . ((trim($ordFld) != '') ? "orderBy('" . $ordFld . "', 'asc')->" : "") 
             . ((isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
-                && intVal($this->exprtProg["tok"]->TokCoreID) > 0) 
-                ? "offset(" . $this->exprtProg["tok"]->TokCoreID . ")->" : "")
+                && intVal($this->exprtProg["tok"]->tok_core_id) > 0) 
+                ? "offset(" . $this->exprtProg["tok"]->tok_core_id . ")->" : "")
             . "limit(50000)->get();");
         return $rows;
     }
@@ -424,11 +428,11 @@ class GlobalsImportExport extends GlobalsTables
             if ($this->REQ->has('export')) {
                 $this->exprtProg["fileCnt"] = $this->REQ->get('export');
                 if ($this->exprtProg["fileCnt"] == 1) {
-                    $this->exprtProg["tok"]->TokCoreID = 0;
+                    $this->exprtProg["tok"]->tok_core_id = 0;
                 }
             } elseif (isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
-                && intVal($this->exprtProg["tok"]->TokTreeID) > 0) {
-                $this->exprtProg["fileCnt"] = $this->exprtProg["tok"]->TokTreeID;
+                && intVal($this->exprtProg["tok"]->tok_tree_id) > 0) {
+                $this->exprtProg["fileCnt"] = $this->exprtProg["tok"]->tok_tree_id;
             }
             $hasMore = $fail = 1;
             $this->exprtProg["fileContent"] = $this->genCsvHeader($tbl, $flds);
@@ -442,9 +446,11 @@ class GlobalsImportExport extends GlobalsTables
                             $rowCsv .= ',' . ((isset($row->{ $fld })) 
                                 ? str_replace(',', '!;!', $row->{ $fld }) : '');
                         }
-                        if (trim($rowCsv) != '') $rowCsv = substr($rowCsv, 1) . "\n";
+                        if (trim($rowCsv) != '') {
+                            $rowCsv = substr($rowCsv, 1) . "\n";
+                        }
                         $this->exprtProg["fileContent"] .= $rowCsv;
-                        $this->exprtProg["tok"]->TokCoreID++;
+                        $this->exprtProg["tok"]->tok_core_id++;
                         if (strlen($this->exprtProg["fileContent"]) > 9000000) {
                             $this->genCsvStore();
                             echo '<html><body><br /><br /><center>' 
@@ -453,7 +459,7 @@ class GlobalsImportExport extends GlobalsTables
                                 . 'setTimeout("window.location=\'' 
                                 . $this->getCurrUrlBase() . '?export=' 
                                 . $this->exprtProg["fileCnt"] . '&off=' 
-                                . $this->exprtProg["tok"]->TokCoreID 
+                                . $this->exprtProg["tok"]->tok_core_id 
                                 . '\'", 1000); </script></body></html>';
                             exit;
                         }
@@ -465,6 +471,7 @@ class GlobalsImportExport extends GlobalsTables
             }
             $this->genCsvStore();
             session()->put('sessMsg', '<h2 class="slBlueDark">Export Complete!</h2>');
+            session()->save();
             echo '<html><body><br /><br /><center>' . $this->spinner() . '<br /></center>'
                 . "\n" . '<script type="text/javascript"> setTimeout("window.location=\'' 
                 . $this->getCurrUrlBase() . '\'", 1000); </script></body></html>';
@@ -489,15 +496,17 @@ class GlobalsImportExport extends GlobalsTables
     
     public function genCsvStore()
     {
-        $filename = str_replace('.csv',
+        $filename = str_replace(
+            '.csv',
             '-' . $this->leadZero($this->exprtProg["fileCnt"]) . '.csv', 
-            $this->exprtProg["fileName"]);
+            $this->exprtProg["fileName"]
+        );
         if (file_exists($filename)) {
             unlink($filename);
         }
         file_put_contents($filename, $this->exprtProg["fileContent"]);
         $this->exprtProg["fileCnt"]++;
-        $this->exprtProg["tok"]->TokTreeID = $this->exprtProg["fileCnt"];
+        $this->exprtProg["tok"]->tok_tree_id = $this->exprtProg["fileCnt"];
         $this->exprtProg["tok"]->save();
         $this->exprtProg["fileContent"] = '';
         return true;
@@ -505,18 +514,18 @@ class GlobalsImportExport extends GlobalsTables
     
     public function getExportProgress($filebase, $expImp = 'Export')
     {
-        $twoDaysAgo = date("Y-m-d H:i:s", mktime(0,0,0,date("n"),date("j")-2,date("Y")));
-        $this->exprtProg["tok"] = SLTokens::where('TokType', $expImp . ' Progress')
-            ->where('TokTokToken', $filebase)
-            ->where('TokUserID', $this->uID)
+        $twoDaysAgo = date("Y-m-d H:i:s", mktime(0, 0, 0, date("n"), date("j")-2, date("Y")));
+        $this->exprtProg["tok"] = SLTokens::where('tok_type', $expImp . ' Progress')
+            ->where('tok_tok_token', $filebase)
+            ->where('tok_user_id', $this->uID)
             ->where('created_at', '>', $twoDaysAgo)
             ->first();
         if (!$this->exprtProg["tok"]) {
             $this->exprtProg["tok"] = new SLTokens;
-            $this->exprtProg["tok"]->TokType     = $expImp . ' Progress';
-            $this->exprtProg["tok"]->TokTokToken = $filebase;
-            $this->exprtProg["tok"]->TokUserID   = $this->uID;
-            $this->exprtProg["tok"]->TokCoreID   = 0;
+            $this->exprtProg["tok"]->tok_type     = $expImp . ' Progress';
+            $this->exprtProg["tok"]->tok_tok_token = $filebase;
+            $this->exprtProg["tok"]->tok_user_id   = $this->uID;
+            $this->exprtProg["tok"]->tok_core_id   = 0;
         }
         return true;
     }
@@ -541,8 +550,8 @@ class GlobalsImportExport extends GlobalsTables
     	}
         $flds = $this->getTblFldTypes($tbl);
         $this->getExportProgress($filebase, 'Import');
-        $this->exprtProg["tok"]->TokTreeID = 1;
-        $tokSffx = '-' . $this->leadZero($this->exprtProg["tok"]->TokTreeID) . '.csv';
+        $this->exprtProg["tok"]->tok_tree_id = 1;
+        $tokSffx = '-' . $this->leadZero($this->exprtProg["tok"]->tok_tree_id) . '.csv';
     	$this->exprtProg["fileName"] = str_replace('-01.csv', $tokSffx, $filebase);
         if (sizeof($flds) > 0) {
 			$lines = $this->openFileLines($this->exprtProg["fileName"]);
@@ -566,9 +575,9 @@ class GlobalsImportExport extends GlobalsTables
 						}
 					}
 				}
-				$this->exprtProg["tok"]->TokTreeID++;
+				$this->exprtProg["tok"]->tok_tree_id++;
 				$this->exprtProg["tok"]->save();
-                $tokSffx = '-' . $this->leadZero($this->exprtProg["tok"]->TokTreeID) . '.csv';
+                $tokSffx = '-' . $this->leadZero($this->exprtProg["tok"]->tok_tree_id) . '.csv';
 				$this->exprtProg["fileName"] = str_replace('-01.csv', $tokSffx, $filebase);
             }
         }
@@ -577,8 +586,8 @@ class GlobalsImportExport extends GlobalsTables
     
     public function importZipsUS()
     {
-        $chk = SLZips::where('ZipCountry', 'IS', NULL)
-        	->orWhere('ZipCountry', 'LIKE', '')
+        $chk = SLZips::where('zip_country', 'IS', NULL)
+        	->orWhere('zip_country', 'LIKE', '')
             ->first();
         if (!$chk) {
         	$this->importCsv(
@@ -594,7 +603,7 @@ class GlobalsImportExport extends GlobalsTables
     public function importZipsCanada()
     {
         $sql = "";
-        $chk = SLZips::where('ZipCountry', 'Canada')
+        $chk = SLZips::where('zip_country', 'Canada')
             ->first();
         if (!$chk) {
         	$this->importCsv(
@@ -609,9 +618,9 @@ class GlobalsImportExport extends GlobalsTables
     public function mysqlTblCoreStart($tbl)
     {
         return "CREATE TABLE IF NOT EXISTS `" 
-            . (($tbl->TblDatabase == 3) ? 'SL_' : $this->dbRow->DbPrefix) 
-            . $tbl->TblName . "` ( `" . $tbl->TblAbbr 
-            . "ID` int(11) NOT NULL AUTO_INCREMENT, \n";
+            . (($tbl->tbl_database == 3) ? 'sl_' : $this->dbRow->db_prefix) 
+            . $tbl->tbl_name . "` ( `" . $tbl->tbl_abbr
+            . "id` int(11) NOT NULL AUTO_INCREMENT, \n";
     }
     
     public function mysqlTblCoreFinish($tbl)
@@ -619,7 +628,7 @@ class GlobalsImportExport extends GlobalsTables
         return "  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP , \n"
             . "  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP "
                 . "ON UPDATE CURRENT_TIMESTAMP , \n"
-            . "  PRIMARY KEY (`" . $tbl->TblAbbr . "ID`) )"
+            . "  PRIMARY KEY (`" . $tbl->tbl_abbr . "id`) )"
             . "  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
     }
     
@@ -628,68 +637,68 @@ class GlobalsImportExport extends GlobalsTables
         if (!isset($this->x["indexesEnd"])) {
             $this->x["indexesEnd"] = '';
         }
-        if (strtolower($tbl->TblEng) == 'users') {
+        if (strtolower($tbl->tbl_eng) == 'users') {
             return "";
         }
         
         $tblQuery = $this->mysqlTblCoreStart($tbl);
         $indexes = "";
-        $flds = SLFields::where('FldTable', $tbl->TblID)
-            ->orderBy('FldOrd', 'asc')
-            ->orderBy('FldEng', 'asc')
+        $flds = SLFields::where('fld_table', $tbl->tbl_id)
+            ->orderBy('fld_ord', 'asc')
+            ->orderBy('fld_eng', 'asc')
             ->get();
-        if (isset($tbl->TblExtend) && intVal($tbl->TblExtend) > 0) {
-            $flds = $this->addFldRowExtends($flds, $tbl->TblExtend);
+        if (isset($tbl->tbl_extend) && intVal($tbl->tbl_extend) > 0) {
+            $flds = $this->addFldRowExtends($flds, $tbl->tbl_extend);
         }
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                $tblQuery .= "  `" . $tbl->TblAbbr . $fld->FldName . "` ";
-                if ($fld->FldType == 'INT') {
-                    if (intVal($fld->FldForeignTable) > 0 
-                        && isset($this->tbl[$fld->FldForeignTable])
-                        && strtolower($this->tbl[$fld->FldForeignTable]) == 'users') {
+                $tblQuery .= "  `" . $tbl->tbl_abbr . $fld->fld_name . "` ";
+                if ($fld->fld_type == 'INT') {
+                    if (intVal($fld->fld_foreign_table) > 0 
+                        && isset($this->tbl[$fld->fld_foreign_table])
+                        && strtolower($this->tbl[$fld->fld_foreign_table]) == 'users') {
                         $tblQuery .= "BIGINT(20) unsigned ";
                     } else {
-                        $tblQuery .= "INT(" . (($fld->FldDataLength > 0) 
-                            ? $fld->FldDataLength : 11) . ") ";
+                        $tblQuery .= "INT(" . (($fld->fld_data_length > 0) 
+                            ? $fld->fld_data_length : 11) . ") ";
                     }
-                } elseif ($fld->FldType == 'DOUBLE') {
+                } elseif ($fld->fld_type == 'DOUBLE') {
                     $tblQuery .= "DOUBLE ";
-                } elseif ($fld->FldType == 'VARCHAR') {
-                    if ($fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F') {
+                } elseif ($fld->fld_type == 'VARCHAR') {
+                    if ($fld->fld_values == 'Y;N' || $fld->fld_values == 'M;F') {
                         $tblQuery .= "VARCHAR(1) ";
                     } else {
-                        $tblQuery .= "VARCHAR(" . (($fld->FldDataLength > 0) 
-                            ? $fld->FldDataLength : 255) . ") ";
+                        $tblQuery .= "VARCHAR(" . (($fld->fld_data_length > 0) 
+                            ? $fld->fld_data_length : 255) . ") ";
                     }
-                } elseif ($fld->FldType == 'TEXT') {
+                } elseif ($fld->fld_type == 'TEXT') {
                     $tblQuery .= "TEXT ";
-                } elseif ($fld->FldType == 'DATE') {
+                } elseif ($fld->fld_type == 'DATE') {
                     $tblQuery .= "DATE ";
-                } elseif ($fld->FldType == 'DATETIME') {
+                } elseif ($fld->fld_type == 'DATETIME') {
                     $tblQuery .= "DATETIME ";
                 }
-                if (($fld->FldNullSupport && intVal($fld->FldNullSupport) == 1)
-                    || ($fld->FldDefault && trim($fld->FldDefault) == 'NULL')) {
+                if (($fld->fld_null_support && intVal($fld->fld_null_support) == 1)
+                    || ($fld->fld_default && trim($fld->fld_default) == 'NULL')) {
                     $tblQuery .= "NULL ";
                 }
-                if ($fld->FldDefault && trim($fld->FldDefault) != '') {
-                    if (in_array($fld->FldDefault, ['NULL', 'NOW()'])) {
-                        $tblQuery .= "DEFAULT " . $fld->FldDefault . " ";
+                if ($fld->fld_default && trim($fld->fld_default) != '') {
+                    if (in_array($fld->fld_default, ['NULL', 'NOW()'])) {
+                        $tblQuery .= "DEFAULT " . $fld->fld_default . " ";
                     } else {
-                        $tblQuery .= "DEFAULT '" . $fld->FldDefault . "' ";
+                        $tblQuery .= "DEFAULT '" . $fld->fld_default . "' ";
                     }
                 }
                 $tblQuery .= ", \n";
-                if ($fld->FldIsIndex && intVal($fld->FldIsIndex) == 1) {
-                    $indexes .= "  , KEY `" . $tbl->TblAbbr . $fld->FldName . "` "
-                        . "(`" . $tbl->TblAbbr . $fld->FldName . "`) \n";
+                if ($fld->fld_is_index && intVal($fld->fld_is_index) == 1) {
+                    $indexes .= "  , KEY `" . $tbl->tbl_abbr . $fld->fld_name . "` "
+                        . "(`" . $tbl->tbl_abbr . $fld->fld_name . "`) \n";
                 }
-                if (intVal($fld->FldForeignTable) > 0) {
-                    list($forTbl, $forID) = $this->chkForeignKey($fld->FldForeignTable);
+                if (intVal($fld->fld_foreign_table) > 0) {
+                    list($forTbl, $forID) = $this->chkForeignKey($fld->fld_foreign_table);
                     $this->x["indexesEnd"] .= "ALTER TABLE `" 
-                        . $this->dbRow->DbPrefix . $tbl->TblName 
-                        . "` ADD FOREIGN KEY (`" . $tbl->TblAbbr . $fld->FldName . "`) "
+                        . $this->dbRow->db_prefix . $tbl->tbl_name 
+                        . "` ADD FOREIGN KEY (`" . $tbl->tbl_abbr . $fld->fld_name . "`) "
                         . "REFERENCES `" . $forTbl . "` (`" . $forID . "`); \n";
                 }
             }
@@ -701,14 +710,14 @@ class GlobalsImportExport extends GlobalsTables
     public function tblQrySlExports()
     {
         $exportTbls = [
-            'BusRules', 'Conditions', 'ConditionsArticles', 'ConditionsNodes', 
-            'ConditionsVals', 'Databases', 'DataHelpers', 'DataLinks', 
-            'DataLoop', 'DataSubsets', 'Definitions','Emails', 'Fields', 
-            'Images', 'Node', 'NodeResponses', 'Tables', 'Tree'
+            'bus_rules', 'conditions', 'conditions_articles', 'conditions_nodes', 
+            'conditions_vals', 'databases', 'data_helpers', 'data_links', 
+            'data_loop', 'data_subsets', 'definitions','emails', 'fields', 
+            'images', 'node', 'node_responses', 'tables', 'tree'
         ];
-        return SLTables::where('TblDatabase', 3)
-            ->whereIn('TblName', $exportTbls)
-            ->orderBy('TblOrd', 'asc')
+        return SLTables::where('tbl_database', 3)
+            ->whereIn('tbl_name', $exportTbls)
+            ->orderBy('tbl_ord', 'asc')
             ->get();
     }
     
@@ -724,28 +733,28 @@ class GlobalsImportExport extends GlobalsTables
             $dbIDs[] = 0;
         }
         $this->x["slTrees"] = $this->x["slNodes"] = $this->x["slConds"] = [];
-        $chk = SLTree::whereIn('TreeDatabase', $dbIDs)
-            ->select('TreeID')
+        $chk = SLTree::whereIn('tree_database', $dbIDs)
+            ->select('tree_id')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
-                $this->x["slTrees"][] = $tree->TreeID;
+                $this->x["slTrees"][] = $tree->tree_id;
             }
         }
-        $chk = SLNode::whereIn('NodeTree', $this->x["slTrees"])
-            ->select('NodeID')
+        $chk = SLNode::whereIn('node_tree', $this->x["slTrees"])
+            ->select('node_id')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $node) {
-                $this->x["slNodes"][] = $node->NodeID;
+                $this->x["slNodes"][] = $node->node_id;
             }
         }
-        $chk = SLConditions::whereIn('CondDatabase', $dbIDs)
-            ->select('CondID')
+        $chk = SLConditions::whereIn('cond_database', $dbIDs)
+            ->select('cond_id')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cond) {
-                $this->x["slConds"][] = $cond->CondID;
+                $this->x["slConds"][] = $cond->cond_id;
             }
         }
         return true;
@@ -756,8 +765,7 @@ class GlobalsImportExport extends GlobalsTables
         $seedCnt = 0;
         if (trim($tblClean) != '' 
             && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" 
-                . $eval . "count();");
+            eval("\$seedCnt = App\\Models\\" . $tblClean . "::" . $eval . "count();");
         }
         return (($seedCnt && intVal($seedCnt) > 0) ? intVal($seedCnt) : 0);
     }
@@ -798,24 +806,24 @@ class GlobalsImportExport extends GlobalsTables
             $this->loadSlParents($dbID);
         }
         $eval = "";
-        if (isset($tbl->TblName)) {
+        if (isset($tbl->tbl_name)) {
             $dbStandards = [
-                'BusRules', 'Conditions', 'Definitions', 'Fields', 'Tables', 'Tree'
+                'bus_rules', 'conditions', 'definitions', 'fields', 'tables', 'tree'
             ];
             $treeChildren = [
-                'Node', 'DataHelpers', 'DataLinks', 'DataLoop', 'DataSubsets', 'Emails'
+                'node', 'data_helpers', 'data_links', 'data_loop', 'data_subsets', 'emails'
             ];
             $condChildren = [
-                'ConditionsArticles', 'ConditionsNodes', 'ConditionsVals'
+                'conditions_articles', 'conditions_nodes', 'conditions_vals'
             ];
-            if ($tbl->TblName == 'Databases') {
-                $eval = "whereIn('DbID', " . $dbIDs . ")->";
-            } elseif ($tbl->TblName == 'Images') {
-                $eval = "whereIn('" . $tbl->TblAbbr . "DatabaseID', " . $dbIDs . ")->";
-            } elseif (in_array($tbl->TblName, $dbStandards)) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Database', " . $dbIDs . ")->";
-                if ($tbl->TblName == 'Definitions') {
-                    $eval .= "whereNotIn('DefSubset', [
+            if ($tbl->tbl_name == 'databases') {
+                $eval = "whereIn('db_id', " . $dbIDs . ")->";
+            } elseif ($tbl->tbl_name == 'images') {
+                $eval = "whereIn('" . $tbl->tbl_abbr . "database_id', " . $dbIDs . ")->";
+            } elseif (in_array($tbl->tbl_name, $dbStandards)) {
+                $eval = "whereIn('" . $tbl->tbl_abbr . "database', " . $dbIDs . ")->";
+                if ($tbl->tbl_name == 'definitions') {
+                    $eval .= "whereNotIn('def_subset', [
                         'facebook-app-id', 'google-analytic', 
                         'google-cod-key', 'google-cod-key2', 
                         'google-map-key', 'google-map-key2', 
@@ -823,14 +831,14 @@ class GlobalsImportExport extends GlobalsTables
                         'matomo-analytic-url', 'matomo-analytic-site-id'
                     ])->";
                 }
-            } elseif (in_array($tbl->TblName, $treeChildren)) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Tree', [" 
+            } elseif (in_array($tbl->tbl_name, $treeChildren)) {
+                $eval = "whereIn('" . $tbl->tbl_abbr . "tree', [" 
                     . implode(", ", $this->x["slTrees"]) . "])->";
-            } elseif (in_array($tbl->TblName, $condChildren)) {
-                $eval = "whereIn('" . $tbl->TblAbbr . "CondID', [" 
+            } elseif (in_array($tbl->tbl_name, $condChildren)) {
+                $eval = "whereIn('" . $tbl->tbl_abbr . "cond_id', [" 
                     . implode(", ", $this->x["slConds"]) ."])->";
-            } elseif ($tbl->TblName == 'NodeResponses') {
-                $eval = "whereIn('" . $tbl->TblAbbr . "Node', [" 
+            } elseif ($tbl->tbl_name == 'NodeResponses') {
+                $eval = "whereIn('" . $tbl->tbl_abbr . "node', [" 
                     . implode(", ", $this->x["slNodes"]) . "])->";
             }
         }
@@ -848,7 +856,7 @@ class GlobalsImportExport extends GlobalsTables
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $i => $tbl) {
                 $this->x["tbl"] = $tbl;
-                $this->x["tblName"] = 'SL_' . $tbl->TblName;
+                $this->x["tblName"] = 'sl_' . $tbl->tbl_name;
                 $this->x["tblClean"] = str_replace('_', '', $this->x["tblName"]);
                 $this->x["export"] .= "\nDROP TABLE IF EXISTS `" 
                     . $this->x["tblName"] . "`;\n" . $this->exportMysqlTbl($tbl);
@@ -860,10 +868,10 @@ class GlobalsImportExport extends GlobalsTables
                     );
                     if ($seedChk->isNotEmpty()) {
                         $this->x["tblInsertStart"] = "\nINSERT INTO `" 
-                            . $this->x["tblName"] . "` (`" . $tbl->TblAbbr . "ID`";
+                            . $this->x["tblName"] . "` (`" . $tbl->tbl_abbr . "id`";
                         foreach ($flds as $i => $fld) {
                             $this->x["tblInsertStart"] .= ", `" 
-                                . $tbl->TblAbbr . $fld->FldName . "`";
+                                . $tbl->tbl_abbr . $fld->fld_name . "`";
                         }
                         $this->x["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
                         $this->x["export"] .= $this->x["tblInsertStart"];
@@ -875,11 +883,11 @@ class GlobalsImportExport extends GlobalsTables
                             }
                             $this->x["export"] .= "(" . $seed->getKey();
                             foreach ($flds as $fld) {
-                                if (isset($seed->{ $tbl->TblAbbr . $fld->FldName })) {
+                                if (isset($seed->{ $tbl->tbl_abbr . $fld->fld_name })) {
                                     $this->x["export"] .= ", '" . str_replace("'", "\'", 
-                                        $seed->{ $tbl->TblAbbr . $fld->FldName }) . "'";
-                                } elseif ($fld->FldNullSupport 
-                                    && intVal($fld->FldNullSupport) == 1) {
+                                        $seed->{ $tbl->tbl_abbr . $fld->fld_name }) . "'";
+                                } elseif ($fld->fld_null_support 
+                                    && intVal($fld->fld_null_support) == 1) {
                                     $this->x["export"] .= ", NULL";
                                 } else {
                                     $this->x["export"] .= ", ''";
@@ -906,7 +914,7 @@ class GlobalsImportExport extends GlobalsTables
     
     public function createTableIfNotExists($coreTbl, $userTbl = null)
     {
-        $this->modelPath($coreTbl->TblName, true);
+        $this->modelPath($coreTbl->tbl_name, true);
         if (!$this->chkTableExists($coreTbl, $userTbl)) {
             $tblQuery = $this->exportMysqlTbl($coreTbl, true);
             $chk = DB::select( DB::raw( $tblQuery ) );
@@ -939,47 +947,47 @@ class GlobalsImportExport extends GlobalsTables
             "IconUrl" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"]
         ];
     	$survs = $pages = [];
-    	$stats["DbTables"] = SLTables::where('TblDatabase', $this->dbID)
+    	$stats["DbTables"] = SLTables::where('tbl_database', $this->dbID)
     	   ->count();
-    	$stats["DbFields"] = SLFields::where('FldDatabase', $this->dbID)
-    	   ->where('FldTable', '>', 0)
+    	$stats["DbFields"] = SLFields::where('fld_database', $this->dbID)
+    	   ->where('fld_table', '>', 0)
     	   ->count();
-    	$stats["DbLinks"] = SLFields::where('FldDatabase', $this->dbID)
-    	   ->where('FldForeignTable', '>', 0)
-    	   ->where('FldTable', '>', 0)
+    	$stats["DbLinks"] = SLFields::where('fld_database', $this->dbID)
+    	   ->where('fld_foreign_table', '>', 0)
+    	   ->where('fld_table', '>', 0)
     	   ->count();
-    	$chk = SLTree::where('TreeType', 'Survey')
-    		->where('TreeDatabase', $this->dbID)
-    		->select('TreeID')
+    	$chk = SLTree::where('tree_type', 'Survey')
+    		->where('tree_database', $this->dbID)
+    		->select('tree_id')
     		->get();
     	if ($chk->isNotEmpty()) {
     		foreach ($chk as $t) {
-    		    $survs[] = $t->TreeID;
+    		    $survs[] = $t->tree_id;
     		}
     	}
     	$stats["Surveys"] = sizeof($survs);
-    	$stats["SurveyNodes"] = SLNode::whereIn('NodeTree', $survs)
+    	$stats["SurveyNodes"] = SLNode::whereIn('node_tree', $survs)
             ->count();
-    	$stats["SurveyNodesMult"] = SLNode::whereIn('NodeTree', $survs)
-            ->whereIn('NodeType', $types["choic"])
+    	$stats["SurveyNodesMult"] = SLNode::whereIn('node_tree', $survs)
+            ->whereIn('node_type', $types["choic"])
             ->count();
-    	$stats["SurveyNodesOpen"] = SLNode::whereIn('NodeTree', $survs)
-            ->whereIn('NodeType', $types["quali"])
+    	$stats["SurveyNodesOpen"] = SLNode::whereIn('node_tree', $survs)
+            ->whereIn('node_type', $types["quali"])
             ->count();
-    	$stats["SurveyNodesNumb"] = SLNode::whereIn('NodeTree', $survs)
-            ->whereIn('NodeType', $types["quant"])
+    	$stats["SurveyNodesNumb"] = SLNode::whereIn('node_tree', $survs)
+            ->whereIn('node_type', $types["quant"])
             ->count();
-    	$chk = SLTree::where('TreeType', 'Page')
-    		->where('TreeDatabase', $this->dbID)
-    		->select('TreeID')
+    	$chk = SLTree::where('tree_type', 'Page')
+    		->where('tree_database', $this->dbID)
+    		->select('tree_id')
     		->get();
     	if ($chk->isNotEmpty()) {
     		foreach ($chk as $t) {
-    		    $pages[] = $t->TreeID;
+    		    $pages[] = $t->tree_id;
     		}
     	}
     	$stats["Pages"]                = sizeof($pages);
-    	$stats["PageNodes"]            = SLNode::whereIn('NodeTree', $pages)->count();
+    	$stats["PageNodes"]            = SLNode::whereIn('node_tree', $pages)->count();
     	$stats["CodeLinesControllers"] = $this->getPackageLineCount('Controllers', $pkg);
     	$stats["CodeLinesViews"]       = $this->getPackageLineCount('Views', $pkg);
     	$stats["BytesControllers"]     = $this->getPackageByteCount('Controllers', $pkg);

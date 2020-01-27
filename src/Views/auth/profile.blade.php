@@ -3,7 +3,8 @@
 @if (isset($GLOBALS['SL']->sysOpts['avatar-empty']))
     <div class="col-3 pT20">
         <a href="/profile/{{ urlencode($profileUser->name) }}"
-            ><img id="profilePic" class="tmbRound" src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0
+            ><img id="profilePic" class="tmbRound" 
+                src="{{ $GLOBALS['SL']->sysOpts['avatar-empty'] }}" border=0
                 alt="Avatar or Profile Picture for {{ $profileUser->name }}"></a>
     </div>
     <div class="col-9">
@@ -69,10 +70,10 @@
                             <div class="nPrompt">Roles:</div>
                             <div class="nFldRadio">
                             @foreach ($profileUser->roles as $i => $role)
-                                <input name="roles[]" id="role{{ $i }}" 
-                                    type="checkbox" value="{{ $role->DefID }}" 
-                                    @if ($profileUser->hasRole($role->DefSubset)) CHECKED @endif autocomplete="off" >
-                                <label for="role{{ $i }}">{{ $role->DefValue }}</label><br />
+                                <input name="roles[]" id="role{{ $i }}" autocomplete="off" 
+                                    type="checkbox" value="{{ $role->def_id }}" 
+                                    @if ($profileUser->hasRole($role->def_subset)) CHECKED @endif >
+                                <label for="role{{ $i }}">{{ $role->def_value }}</label><br />
                             @endforeach
                             </div>
                         @endif
@@ -84,11 +85,8 @@
                     <div class="nodeHalfGap"></div>
 
                     <p>
-                        To change your password, please 
-                        <a href="/logout">logout</a>
-                        then use the <a href="/password/reset"
-                        >reset password</a>
-                        tool from the login page.
+                        To change your password, please <a href="/logout">logout</a> then use the 
+                        <a href="/password/reset">reset password</a> tool from the login page.
                     </p>
 
                     <div class="nodeHalfGap"></div>

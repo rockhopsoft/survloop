@@ -78,7 +78,7 @@
 #formErrorMsg {
     display: none;
     padding: 20px;
-    margin: -30px 0px 20px 0px;
+    margin: -15px 0px 20px 0px;
 }
 
 .nodeWrap.nGraph {
@@ -89,6 +89,10 @@
 	display: block;
 	font-size: 16px;
 	color: {!! $css["color-main-text"] !!};
+}
+label, .nPrompt label {
+    margin: 0px;
+    font-size: 16px;
 }
 .nPrompt h1.slBlueDark, .nPrompt h2.slBlueDark, 
 .nPrompt h3.slBlueDark {
@@ -145,9 +149,6 @@ ul li, ol li, .nPrompt ul li, .nPrompt ol li {
 
 .nPromptHeader {
 	color: {!! $css["color-main-on"] !!};
-}
-label, .nPrompt label {
-    margin: 0px;
 }
 .nodeWrap .jumbotron, .nPrompt .jumbotron {
     padding: 30px 40px 30px 40px;
@@ -206,8 +207,12 @@ input.nFormBtnSub, input.nFormBtnBack {
 }
 
 input.otherFld, input.form-control.otherFld, 
-label input.otherFld, label input.form-control.otherFld {
-    width: 400px;
+label input.otherFld, label input.form-control.otherFld,
+input.otherFld.form-control.form-control-lg, 
+label input.otherFld.form-control.form-control-lg {
+    display: inline;
+    width: 300px;
+    margin-left: 15px;
 }
 .form-control.pT0, .form-control.form-control-lg.pT0 {
     padding-top: 0px;
@@ -313,6 +318,21 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 	color: {!! $css["color-main-text"] !!};
 }
 
+.loopRootPromptText {
+    margin-top: 30px;
+}
+.loopRootPromptText h2 {
+    margin-bottom: 28px;
+}
+.loopItemBtn {
+    width: 90px;
+    margin: 5px 10px 0px 0px;
+}
+
+.uploadedWrap {
+    margin-top: 40px;
+}
+
 
 .slSlider {
 	width: 100%; 
@@ -399,19 +419,3 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 /* .ui-datepicker-prev.ui-corner-all.ui-state-hover.ui-datepicker-prev-hover .ui-icon.ui-icon-circle-triangle-w {
     background: {!! $css["color-main-on"] !!};
 } */
-
-.wrapItemOff {
-	display: none;
-	background: {!! $css["color-main-faint"] !!};
-	color: {!! $css["color-main-grey"] !!};
-	padding: 15px;
-	-moz-border-radius: 5px; border-radius: 5px;
-}
-.loopItemBtn {
-    width: 90px;
-    margin: 5px 10px 0px 0px;
-}
-
-.uploadedWrap {
-    margin-top: 40px;
-}

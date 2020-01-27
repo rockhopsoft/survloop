@@ -7,10 +7,8 @@ $v = $surv->custLoop->v;
 @section('content')
 <!-- resources/views/vendor/survloop/auth/passwords/email.blade.php -->
 <form name="mainPageForm" class="form-horizontal" 
-    role="form" method="POST" 
-    action="{{ url('/password/email') }}">
-<input type="hidden" id="csrfTok" 
-    name="_token" value="{{ csrf_token() }}">
+    role="form" method="POST" action="{{ url('/password/email') }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="w100"><center>
     <div id="treeWrap" class="treeWrapForm">
@@ -18,8 +16,7 @@ $v = $surv->custLoop->v;
         <div class="p20"></div>
 
         <div class="loginTitles">
-            <a class="btn btn-secondary pull-right"
-                href="/login" >Login</a>
+            <a class="btn btn-secondary pull-right" href="/login" >Login</a>
             <h1 class="mT0">Reset Password</h1>
         </div>
 
@@ -38,9 +35,8 @@ $v = $surv->custLoop->v;
                 <label for="emailID"><b>Email:</b></label>
             </div>
             <div class="nFld">
-                <input id="emailID" name="email" 
-                    value="{{ old('email') }}" type="email" 
-                    class="form-control form-control-lg">
+                <input id="emailID" name="email" class="form-control form-control-lg"
+                    value="{{ old('email') }}" type="email">
             </div>
         </div>
         @if ($errors->has('email'))
@@ -51,8 +47,7 @@ $v = $surv->custLoop->v;
 
         <div class="nodeGap"></div>
 
-        <center><button type="submit" 
-            class="btn btn-lg btn-primary mT20">
+        <center><button type="submit" class="btn btn-lg btn-primary mT20">
             Send Password Reset Link
         </button></center>
 

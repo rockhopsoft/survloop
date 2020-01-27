@@ -53,18 +53,14 @@
                 <div class="nodeHalfGap"></div>
                 <div id="nLabel004" class="nPrompt">
                     <label for="emailID">
-                        Username or Email 
-                        <span class="red">*required</span>
+                        Username or Email <span class="red">*required</span>
                     </label>
                 </div>
                 <div class="nFld">
-                    <input id="emailID" name="email" 
-                        value="{{ old('email') }}" 
+                    <input id="emailID" name="email" value="{{ old('email') }}" 
                         type="text" class="form-control">
                     @if ($errors->has('email'))
-                        <span class="form-text"><b>{{ 
-                            $errors->first('email') 
-                        }}</b></span>
+                        <span class="form-text"><b>{{ $errors->first('email') }}</b></span>
                     @endif
                 </div>
                 <div class="nodeHalfGap"></div>
@@ -83,9 +79,7 @@
                     <input id="password" name="password" value="" 
                         type="password" class="form-control">
                     @if ($errors->has('password'))
-                        <span class="form-text"><b>{{ 
-                            $errors->first('password') 
-                        }}</b></span>
+                        <span class="form-text"><b>{{ $errors->first('password') }}</b></span>
                     @endif
                 </div>
                 <div class="nodeHalfGap"></div>
@@ -93,8 +87,7 @@
 
             <div class="nFldRadio fL">
                 <label for="rememberID">
-                    <input name="remember" id="rememberID"
-                        type="checkbox" > Remember Me
+                    <input name="remember" id="rememberID" type="checkbox" > Remember Me
                 </label>
             </div>
             <a href="/password/reset" class="fR"
@@ -108,9 +101,8 @@
             <div id="pageBtns">
                 <div id="formErrorMsg"></div>
                 <div id="nodeSubBtns" class="nodeSub">
-                    <input type="submit" value="Login"
-                        class="fR btn btn-primary btn-lg" >
-                    <a href="{{ $midSurvBack }}" id="nFormBack"
+                    <input type="submit" value="Login" class="fR btn btn-primary btn-lg" >
+                    <a href="{{ $midSurvBack }}" id="nFormBack" 
                         class="fL btn btn-secondary btn-lg">Back</a>
                     <div class="fC p5"></div>
                 </div>

@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLConditionsArticles extends Model
 {
-    protected $table         = 'SL_ConditionsArticles';
-    protected $primaryKey     = 'ArticleID';
+    protected $table         = 'sl_conditions_articles';
+    protected $primaryKey     = 'article_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'ArticleCondID', 
-        'ArticleURL', 
-        'ArticleTitle', 
+        'article_cond_id', 
+        'article_url', 
+        'article_title', 
     ];
 }

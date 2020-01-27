@@ -33,36 +33,38 @@ class SurvRegisterController extends RegisterController
     {
         $survUser = User::find($user->id);
         $log = new SLUsersActivity;
-        $log->UserActUser = $survUser->id;
+        $log->user_act_user = $survUser->id;
         $adminRoleID = 15; // but let's double-check this system
-        $admDef = SLDefinitions::where('DefDatabase', 1)
-            ->where('DefSet', 'User Roles')
-            ->where('DefSubset', 'administrator')
+        $admDef = SLDefinitions::where('def_database', 1)
+            ->where('def_set', 'User Roles')
+            ->where('def_subset', 'administrator')
             ->first();
-        if ($admDef && isset($admDef->DefID)) {
-            $adminRoleID = $admDef->DefID;
+        if ($admDef && isset($admDef->def_id)) {
+            $adminRoleID = $admDef->def_id;
         }
-        $hasAdmins = SLUsersRoles::where('RoleUserRID', $adminRoleID) // role id of 'administrator'
-            ->get();
+        $hasAdmins = SLUsersRoles::where('role_user_rid', $adminRoleID) 
+            ->get(); // role id of 'administrator'
         if ($hasAdmins->isEmpty()) {
             $survUser->assignRole('administrator');
-            $log->UserActCurrPage = 'NEW SYSTEM ADMINISTRATOR!';
-        } elseif ($request->has('newVolunteer') && intVal($request->newVolunteer) == 1) {
+            $log->user_act_curr_page = 'NEW SYSTEM ADMINISTRATOR!';
+        } elseif ($request->has('newVolunteer') 
+            && intVal($request->newVolunteer) == 1) {
             $survUser->assignRole('volunteer');
-            $log->UserActCurrPage = 'NEW VOLUNTEER!';
+            $log->user_act_curr_page = 'NEW VOLUNTEER!';
         }
         $log->save();
         $domainPath = '';
-        $appUrl = SLDefinitions::where('DefDatabase', 1)
-            ->where('DefSet', 'System Settings')
-            ->where('DefSubset', 'app-url')
+        $appUrl = SLDefinitions::where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) {
-            $domainPath = $appUrl->DefDescription;
+        if ($appUrl && isset($appUrl->def_description)) {
+            $domainPath = $appUrl->def_description;
         }
         if ($request->has('previous') && trim($request->get('previous')) != '') {
             session()->put('redirLoginSurvey', time());
             session()->put('previousUrl', trim($request->get('previous')));
+            session()->save();
         }
         return redirect($domainPath . '/afterLogin');
     }

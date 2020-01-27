@@ -40,7 +40,7 @@
             <div class="row">
                 <div class="col-9 pL20"><h4 class="disIn mL20">{{ $GLOBALS['SL']->tbl[$tblID] }} Unique ID</h4></div>
                 <div class="col-3 taR slGrey pR20">
-                    <div>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] }}ID</div>
+                    <div>{{ $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$tblID]] }}id</div>
                     Number, Indexed, Primary Key
                 </div>
             </div>

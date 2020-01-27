@@ -65,19 +65,19 @@ class TreeNodeCore
             $this->nodeRow = $nRow;
         } elseif ($nID > 0) {
             $this->nodeRow = SLNode::find($nID)
-                ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeOpts', 'NodeType');
+                ->select('node_id', 'node_parent_id', 'node_parent_order', 'node_opts', 'node_type');
         } elseif ($this->nodeID > 0) {
             $this->nodeRow = SLNode::find($this->nodeID)
-                ->select('NodeID', 'NodeParentID', 'NodeParentOrder', 'NodeOpts', 'NodeType');
+                ->select('node_id', 'node_parent_id', 'node_parent_order', 'node_opts', 'node_type');
         }
         if (!$this->nodeRow) {
             $this->nodeRow = new SLNode;
             return false;
         }
-        $this->parentID  = $this->nodeRow->NodeParentID;
-        $this->parentOrd = $this->nodeRow->NodeParentOrder;
-        $this->nodeOpts  = $this->nodeRow->NodeOpts;
-        $this->nodeType  = $this->nodeRow->NodeType;
+        $this->parentID  = $this->nodeRow->node_parent_id;
+        $this->parentOrd = $this->nodeRow->node_parent_order;
+        $this->nodeOpts  = $this->nodeRow->node_opts;
+        $this->nodeType  = $this->nodeRow->node_type;
         //$this->fillNodeRow();
         return true;
     }

@@ -74,26 +74,23 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         $this->loadSessionData($GLOBALS["SL"]->coreTbl, $recID);
         $this->loadEmojiTags($defID);
-        if (sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 
-            && $recID > 0) {
-            foreach ($GLOBALS["SL"]->treeSettings['emojis'] 
-                as $i => $emo) {
+        if (sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 && $recID > 0) {
+            foreach ($GLOBALS["SL"]->treeSettings['emojis'] as $i => $emo) {
                 if ($emo["id"] == $defID) {
                     if (isset($this->emojiTagUsrs[$emo["id"]]) 
-                        && in_array($this->v["uID"], 
-                            $this->emojiTagUsrs[$emo["id"]])) {
-                        SLSessEmojis::where('SessEmoRecID', $this->coreID)
-                            ->where('SessEmoDefID', $emo["id"])
-                            ->where('SessEmoTreeID', $this->treeID)
-                            ->where('SessEmoUserID', $this->v["uID"])
+                        && in_array($this->v["uID"], $this->emojiTagUsrs[$emo["id"]])) {
+                        SLSessEmojis::where('sess_emo_rec_id', $this->coreID)
+                            ->where('sess_emo_def_id', $emo["id"])
+                            ->where('sess_emo_tree_id', $this->treeID)
+                            ->where('sess_emo_user_id', $this->v["uID"])
                             ->delete();
                         $this->emojiTagOff($emo["id"]);
                     } else {
                         $newTag = new SLSessEmojis;
-                        $newTag->SessEmoRecID  = $this->coreID;
-                        $newTag->SessEmoDefID  = $emo["id"];
-                        $newTag->SessEmoTreeID = $this->treeID;
-                        $newTag->SessEmoUserID = $this->v["uID"];
+                        $newTag->sess_emo_rec_id  = $this->coreID;
+                        $newTag->sess_emo_def_id  = $emo["id"];
+                        $newTag->sess_emo_tree_id = $this->treeID;
+                        $newTag->sess_emo_user_id = $this->v["uID"];
                         $newTag->save();
                         $this->emojiTagOn($emo["id"]);
                     }
@@ -109,12 +106,10 @@ class TreeSurvReport extends TreeSurvBasicNav
                     if ($emo["id"] == $defID) {
                         if ($this->v["uID"] > 0 
                             && isset($this->emojiTagUsrs[$defID])
-                            && in_array($this->v["uID"], 
-                                $this->emojiTagUsrs[$defID])) {
+                            && in_array($this->v["uID"], $this->emojiTagUsrs[$defID])) {
                             $isActive = true;
                         }
-                        $spot = 't' . $this->treeID 
-                            . 'r' . $this->coreID;
+                        $spot = 't' . $this->treeID . 'r' . $this->coreID;
                         $cnt = sizeof($this->emojiTagUsrs[$defID]);
                         return view(
                             'vendor.survloop.elements.inc-emoji-tag', 
@@ -144,22 +139,19 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     protected function loadEmojiTags($defID = -3)
     {
-        if ($this->coreID > 0 
-            && isset($GLOBALS["SL"]->treeSettings["emojis"])) {
+        if ($this->coreID > 0 && isset($GLOBALS["SL"]->treeSettings["emojis"])) {
             $emos = $GLOBALS["SL"]->treeSettings["emojis"];
             if (sizeof($emos) > 0) {
                 foreach ($emos as $emo) {
                     if ($defID <= 0 || $emo["id"] == $defID) {
                         $this->emojiTagUsrs[$emo["id"]] = [];
-                        $chk = SLSessEmojis::where('SessEmoRecID', 
-                                $this->coreID)
-                            ->where('SessEmoDefID', $emo["id"])
-                            ->where('SessEmoTreeID', $this->treeID)
+                        $chk = SLSessEmojis::where('sess_emo_rec_id', $this->coreID)
+                            ->where('sess_emo_def_id', $emo["id"])
+                            ->where('sess_emo_tree_id', $this->treeID)
                             ->get();
                         if ($chk->isNotEmpty()) {
                             foreach ($chk as $tag) {
-                                $this->emojiTagUsrs[$emo["id"]][] 
-                                    = $tag->SessEmoUserID;
+                                $this->emojiTagUsrs[$emo["id"]][] = $tag->SessEmoUserID;
                             }
                         }
                     }
@@ -176,28 +168,25 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (isset($GLOBALS["SL"]->treeSettings['emojis']) 
             && sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 
             && $this->coreID > 0) {
-            $admPower = ($this->v["user"] 
-                && $this->v["user"]->hasRole('administrator|staff'));
+            $admPower = ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff'));
             $spot = 't' . $this->treeID . 'r' . $this->coreID;
             foreach ($GLOBALS["SL"]->treeSettings['emojis'] as $emo) {
                 if (!$emo["admin"] || $admPower) {
-                    $GLOBALS["SL"]->pageAJAX .= '$(document)'
-                        . '.on("click", "#' 
-                        . $spot . 'e' . $emo["id"] 
-                        . '", function() { $("#' 
-                        . $spot . 'e' . $emo["id"] 
-                        . 'Tag").load("/ajax-emoji-tag/' 
-                        . $this->treeID . '/' . $this->coreID 
-                        . '/' . $emo["id"] . '"); });' . "\n";
+                    $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#' . $spot . 'e' . $emo["id"] 
+                        . '", function() { $("#' . $spot . 'e' . $emo["id"] . 'Tag").load("/ajax-emoji-tag/' 
+                        . $this->treeID . '/' . $this->coreID . '/' . $emo["id"] . '"); });' . "\n";
                 }
             }
-            $ret .= view('vendor.survloop.elements.inc-emoji-tags', [
-                "spot"     => $spot, 
-                "emojis"   => $GLOBALS["SL"]->treeSettings["emojis"], 
-                "users"    => $this->emojiTagUsrs,
-                "uID"      => (($this->v["uID"] > 0) ? $this->v["uID"] : -3),
-                "admPower" => $admPower
-            ])->render();
+            $ret .= view(
+                'vendor.survloop.elements.inc-emoji-tags', 
+                [
+                    "spot"     => $spot, 
+                    "emojis"   => $GLOBALS["SL"]->treeSettings["emojis"], 
+                    "users"    => $this->emojiTagUsrs,
+                    "uID"      => (($this->v["uID"] > 0) ? $this->v["uID"] : -3),
+                    "admPower" => $admPower
+                ]
+            )->render();
         }
         return $ret;
     }
@@ -210,18 +199,14 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     protected function printGlossary()
     {
-        if (!isset($this->v["glossaryList"]) 
-            || sizeof($this->v["glossaryList"]) == 0) {
+        if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) {
             $this->fillGlossary();
         }
         if (sizeof($this->v["glossaryList"]) > 0) {
-            $ret = '<h3 class="mT0 mB20 slBlueDark">'
-                . 'Glossary of Terms</h3><div class="glossaryList">';
+            $ret = '<h3 class="mT0 mB20 slBlueDark">Glossary of Terms</h3><div class="glossaryList">';
             foreach ($this->v["glossaryList"] as $i => $gloss) {
-                $ret .= '<div class="row pT15 pB15"><div class="col-md-3">' 
-                    . $gloss[0] . '</div><div class="col-md-9">' 
-                    . ((isset($gloss[1])) ? $gloss[1] : '')
-                    . '</div></div>';
+                $ret .= '<div class="row pT15 pB15"><div class="col-md-3">' . $gloss[0] . '</div>'
+                    . '<div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '') . '</div></div>';
             }
             return $ret . '</div>';
         }
@@ -230,20 +215,17 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     protected function swapSeo($str)
     {
-        return str_replace('[coreID]', $this->corePublicID, 
-            str_replace('[cID]', $this->corePublicID, 
-            str_replace('#1111', '#' . $this->corePublicID, 
-            $str)));
+        $str = str_replace('#1111', '#' . $this->corePublicID, $str);
+        $str = str_replace('[cID]', $this->corePublicID, $str);
+        $str = str_replace('[coreID]', $this->corePublicID, $str);
+        return $str;
     }
     
     protected function runPageLoad($nID)
     {
-        if (!$this->isPage 
-            && $GLOBALS["SL"]->treeRow->TreeOpts%13 == 0) { // report
-            $GLOBALS["SL"]->sysOpts['meta-title'] 
-                = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-title']);
-            $GLOBALS["SL"]->sysOpts['meta-desc'] 
-                = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-desc']);
+        if (!$this->isPage && $GLOBALS["SL"]->treeRow->tree_opts%13 == 0) { // report
+            $GLOBALS["SL"]->sysOpts['meta-title'] = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-title']);
+            $GLOBALS["SL"]->sysOpts['meta-desc'] = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-desc']);
         }
         return true;
     }
@@ -270,17 +252,17 @@ class TreeSurvReport extends TreeSurvBasicNav
         $recDesc = '';
         if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) 
             && sizeof($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0) {
-            $recDesc = trim($this->getTableRecLabel($GLOBALS["SL"]->coreTbl, 
-                $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]));
+            $rec = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];
+            $recDesc = trim($this->getTableRecLabel($GLOBALS["SL"]->coreTbl, $rec));
         }
         $isUser = (isset($this->v["uID"]) && $this->v["uID"] > 0);
+        $multiRecs = ((isset($this->v["multipleRecords"])) ? $this->v["multipleRecords"] : '');
         return view(
             'vendor.survloop.forms.foot-record-mgmt', 
             [
                 "coreID"          => $this->coreID,
                 "treeID"          => $this->treeID,
-                "multipleRecords" => ((isset($this->v["multipleRecords"])) 
-                    ? $this->v["multipleRecords"] : ''),
+                "multipleRecords" => $multiRecs,
                 "isUser"          => $isUser,
                 "recDesc"         => $recDesc
             ]
@@ -292,8 +274,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $new = [];
         if (sizeof($deets) > 0) {
             foreach ($deets as $i => $deet) {
-                if (isset($deet[0]) 
-                    && trim($deet[0]) != '') {
+                if (isset($deet[0]) && trim($deet[0]) != '') {
                     $new[] = $deet;
                 }
             }
@@ -322,8 +303,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (sizeof($deets) > 0) {
             foreach ($deets as $i => $deet) {
                 $size = 0; //strlen($deet[0]);
-                if (sizeof($deet) > 1 && isset($deet[1]) 
-                    && $size < strlen($deet[1])) {
+                if (sizeof($deet) > 1 && isset($deet[1]) && $size < strlen($deet[1])) {
                     $size = strlen($deet[1]);
                 }
                 if ($size > $colChars) {
@@ -348,7 +328,8 @@ class TreeSurvReport extends TreeSurvBasicNav
             $c = $deetsTotCols[0][1] = 0;
             foreach ($deets as $i => $deet) {
                 $chk = 1+$c;
-                if ($chk < $cols && $deetsTotCols[$chk][1] < 0 
+                if ($chk < $cols 
+                    && $deetsTotCols[$chk][1] < 0 
                     && $deetsTotCols[$chk][0] < $deetsTots[$i]
                     && sizeof($deetCols[$c]) > 0) {
                     $deetsTotCols[$chk][1] = $i;
@@ -357,12 +338,15 @@ class TreeSurvReport extends TreeSurvBasicNav
                 $deetCols[$c][] = $deet;
             }
         }
-        return view('vendor.survloop.reports.inc-deets-cols', [
-            "nID"       => $nID,
-            "deetCols"  => $deetCols,
-            "blockName" => $blockName,
-            "colWidth"  => $GLOBALS["SL"]->getColsWidth($cols)
-        ])->render();
+        return view(
+            'vendor.survloop.reports.inc-deets-cols', 
+            [
+                "nID"       => $nID,
+                "deetCols"  => $deetCols,
+                "blockName" => $blockName,
+                "colWidth"  => $GLOBALS["SL"]->getColsWidth($cols)
+            ]
+        )->render();
     }
     
     public function printReportDeetsVertProg($deets, $blockName = '', $nID = -3)

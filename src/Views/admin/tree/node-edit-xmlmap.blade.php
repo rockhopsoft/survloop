@@ -5,8 +5,8 @@
 <div class="p10 fC"></div>
 
 <form name="mainPageForm" method="post" 
-    @if (isset($node->nodeRow) && isset($node->nodeRow->NodeID))
-        action="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->NodeID }}"
+    @if (isset($node->nodeRow) && isset($node->nodeRow->node_id))
+        action="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/{{ $node->nodeRow->node_id }}"
     @else
         action="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-3"
     @endif >
@@ -22,23 +22,21 @@
     @else value="" @endif >
 <input type="hidden" name="orderBefore" 
     @if ($REQ->has('ordBefore') && intVal($REQ->ordBefore) > 0) value="{{ $REQ->ordBefore }}"
-    @else value="-3"
-    @endif >
+    @else value="-3" @endif >
 <input type="hidden" name="orderAfter" 
     @if ($REQ->has('ordAfter') && intVal($REQ->ordAfter) > 0) value="{{ $REQ->ordAfter }}"
-    @else value="-3"
-    @endif >
+    @else value="-3" @endif >
 
 <div class="card">
     <div class="card-header">
-        @if (isset($node->nodeRow->NodeID) && $node->nodeRow->NodeID > 0) 
-            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ $node->nodeRow->NodeID }}" 
-                class="float-right">Back to XML Map</a>
-            <h2 class="disIn"><span class="fPerc133 mR20">
-                #{{ $node->nodeRow->NodeID }}</span> Editing Node</h2>
+        @if (isset($node->nodeRow->node_id) && $node->nodeRow->node_id > 0) 
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1#n{{ 
+                $node->nodeRow->node_id }}" class="float-right">Back to XML Map</a>
+            <h2 class="disIn"><span class="mR20">
+                #{{ $node->nodeRow->node_id }}</span> Editing Node</h2>
         @else 
-            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" class="float-right"
-                >Back to XML Map</a>
+            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" 
+                class="float-right">Back to XML Map</a>
             <h2 class="disIn">Adding Node</h2>
         @endif
     </div>
@@ -47,20 +45,20 @@
             <div class="col-2">
                 <label class="mB20">
                     <input type="radio" name="xmlNodeType" id="xmlNodeTypeTbl" class="xmlDataChng" autocomplete="off" 
-                        value="dataTbl" @if (intVal($node->nodeRow->NodePromptNotes) > 0) CHECKED @endif >
+                        value="dataTbl" @if (intVal($node->nodeRow->node_prompt_notes) > 0) CHECKED @endif >
                     <h3 class="disIn m0 slBlueDark"><nobr>Data Table:</nobr></h3>
                 </label>
                 <label>
                     <input type="radio" name="xmlNodeType" id="xmlNodeTypeWrap" class="xmlDataChng" autocomplete="off" 
-                        value="dataWrap" @if (intVal($node->nodeRow->NodePromptNotes) <= 0) CHECKED @endif >
+                        value="dataWrap" @if (intVal($node->nodeRow->node_prompt_notes) <= 0) CHECKED @endif >
                     <h3 class="disIn m0 slBlueDark"><nobr>Extra Wrap:</nobr></h3>
                 </label>
             </div>
             <div class="col-6">
                 <div id="xmlDataTbl" class=" 
-                    @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disNon @else disBlo @endif ">
+                    @if (intVal($node->nodeRow->node_prompt_notes) <= 0) disNon @else disBlo @endif ">
                     <select name="nodePromptText" id="nodePromptTextID" class="form-control">
-                        {!! $GLOBALS['SL']->tablesDropdown($node->nodeRow->NodePromptText) !!}
+                        {!! $GLOBALS['SL']->tablesDropdown($node->nodeRow->node_prompt_text) !!}
                     </select>
                     <div class="p10"></div>
                     <label class="mR20 mL20">
@@ -80,9 +78,9 @@
                     </label>
                 </div>
                 <div id="xmlDataWrap" class="mT20 pT20 
-                    @if (intVal($node->nodeRow->NodePromptNotes) <= 0) disBlo @else disNon @endif ">
+                    @if (intVal($node->nodeRow->node_prompt_notes) <= 0) disBlo @else disNon @endif ">
                     <input type="text" name="wrapPromptText" id="wrapPromptTextID" class="form-control" 
-                        value="{{ $node->nodeRow->NodePromptText }}">
+                        value="{{ $node->nodeRow->node_prompt_text }}">
                 </div>
             </div>
             <div class="col-4 taR">
@@ -92,7 +90,7 @@
         </div>
     </div>
 </div>
-@if ($node->nodeRow->NodeID > 0)
+@if ($node->nodeRow->node_id > 0)
     <br /><input type="checkbox" name="deleteNode" id="deleteNodeID" value="1" > 
     <label for="deleteNodeID">Delete This Node</label><br />
 @endif

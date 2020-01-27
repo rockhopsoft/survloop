@@ -25,9 +25,9 @@ class AdminDatabaseInstall extends AdminDBController
 {
     protected function tweakAdmMenu($currPage = '')
     {
-        $this->v["dateStmp"]     = date("Y_m_d");
-        $this->v["dateStamp"]    = date("Y_m_d_His");
-        $this->v["zipFileMig"]   = $this->v["exportDir"] . '/' 
+        $this->v["dateStmp"] = date("Y_m_d");
+        $this->v["dateStamp"] = date("Y_m_d_His");
+        $this->v["zipFileMig"] = $this->v["exportDir"] . '/' 
             . $this->v["dateStmp"] . '_LaravelMigrations.zip';
         $this->v["zipFileModel"] = $this->v["exportDir"] . '/' 
             . $this->v["dateStmp"] . '_LaravelModels.zip';
@@ -93,8 +93,7 @@ class AdminDatabaseInstall extends AdminDBController
             "Zip Files"  => ''
         ];
 		$this->v["fileListModel"] = [];
-		$this->v["migratFileUp"] = $this->v["migratFileDown"] 
-            = $this->v["tblClean"] = '';
+		$this->v["migratFileUp"] = $this->v["migratFileDown"] = $this->v["tblClean"] = '';
         if (!isset($this->v["modelFile"])) {
             $this->v["modelFile"] = "";
         }
@@ -105,8 +104,7 @@ class AdminDatabaseInstall extends AdminDBController
     {
         ini_set('max_execution_time', 180);
         $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
-        $currPage = (($asPackage) 
-            ? '/dashboard/sl/export/laravel' 
+        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' 
             : '/dashboard/db/export');
         $this->admControlInit($request, $currPage);
         if (!$this->checkCache($currPage) || $request->has('generate')) {
@@ -132,10 +130,11 @@ class AdminDatabaseInstall extends AdminDBController
         if ($request->has('generate')) {
             $this->v["generate"] = intVal($request->get('generate'));
         }
-        $this->v["newMigFile"] = 'database/migrations/' . $this->v["dateStmp"] 
-            . '_000000_create_' . strtolower($GLOBALS["SL"]->dbRow->DbName) . '_tables.php';
+        $this->v["newMigFile"] = 'database/migrations/' 
+            . $this->v["dateStmp"] . '_000000_create_' 
+            . strtolower($GLOBALS["SL"]->dbRow->db_name) . '_tables.php';
         $this->v["seedFile"] = 'database/seeds/' 
-            . $GLOBALS["SL"]->dbRow->DbName . 'Seeder.php';
+            . $GLOBALS["SL"]->dbRow->db_name . 'Seeder.php';
         $this->v["tbls"] = $this->exportQryTbls();
         
         if ($this->v["generate"] == 1) {
@@ -178,14 +177,14 @@ class AdminDatabaseInstall extends AdminDBController
                 $indexes = "";
                 $this->loadTbl($tbl);
                 $this->v["migratFileUp"] .= "\t" . "Schema::create('" 
-                    . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                    . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name 
                     . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
-                    . "$"."table->increments('" . $tbl->TblAbbr . "ID');";
+                    . "$"."table->increments('" . $tbl->tbl_abbr . "id');";
                 $this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
                 $flds = $GLOBALS["SL"]->getTableFields($tbl);
                 if ($flds->isNotEmpty()) {
                     foreach ($flds as $fld) {
-                        $fldName = trim($tbl->TblAbbr . $fld->FldName);
+                        $fldName = trim($tbl->tbl_abbr . $fld->fld_name);
                         $this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
                         $this->runExportLaravMigrateFld($fldName, $fld);
                     }
@@ -193,7 +192,7 @@ class AdminDatabaseInstall extends AdminDBController
                 $this->v["migratFileUp"] .= "\n\t\t\t"
                     . "$"."table->timestamps();" . "\n\t\t" . "});" . "\n\t";
                 $this->v["migratFileDown"] .= "\t" . "Schema::drop('"
-                    . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName . "');"."\n\t";
+                    . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name . "');"."\n\t";
                 $this->saveModelFile();
             }
         }
@@ -208,9 +207,8 @@ class AdminDatabaseInstall extends AdminDBController
             )->render()
         );
         $this->v["nextUrl"] = '?generate=2';
-        if ($this->v["tbls"]->isNotEmpty() 
-            && isset($this->v["tbls"][0]->TblName)) {
-            $this->v["nextUrl"] .= '&tbl=' . $this->v["tbls"][0]->TblName;
+        if ($this->v["tbls"]->isNotEmpty() && isset($this->v["tbls"][0]->tbl_name)) {
+            $this->v["nextUrl"] .= '&tbl=' . $this->v["tbls"][0]->tbl_name;
         }
         return true;
     }
@@ -218,64 +216,62 @@ class AdminDatabaseInstall extends AdminDBController
     protected function runExportLaravMigrateFld($fldName = '', $fld = null)
     {
         $this->v["migratFileUp"] .=  "\n\t\t\t"."$"."table->";
-        if (strpos($fld->FldValues, 'Def::') !== false) {
+        if (strpos($fld->fld_values, 'Def::') !== false) {
             $this->v["migratFileUp"] .=  "integer('" . $fldName . "')->unsigned()";
-        } elseif ($fld->FldType == 'INT') {
-            if ($fld->FldValues == '0;1') {
+        } elseif ($fld->fld_type == 'INT') {
+            if ($fld->fld_values == '0;1') {
                 $this->v["migratFileUp"] .=  "boolean('" . $fldName . "')";
             } else {
                 $this->v["migratFileUp"] .=  "integer('" . $fldName . "')";
             }
-            if (intVal($fld->FldForeignTable) > 0 && intVal($fld->FldDefault) >= 0) {
+            if (intVal($fld->fld_foreign_table) > 0 && intVal($fld->fld_default) >= 0) {
                 $this->v["migratFileUp"] .=  "->unsigned()";
             }
-        } elseif ($fld->FldType == 'DOUBLE') {
+        } elseif ($fld->fld_type == 'DOUBLE') {
             $this->v["migratFileUp"] .=  "double('" . $fldName . "')";
-        } elseif ($fld->FldType == 'VARCHAR') {
-            if ($fld->FldDataLength == 1 
-                || $fld->FldValues == 'Y;N' || $fld->FldValues == 'M;F' 
-                || $fld->FldValues == 'Y;N;?' || $fld->FldValues == 'M;F;?') {
+        } elseif ($fld->fld_type == 'VARCHAR') {
+            if ($fld->fld_data_length == 1 
+                || $fld->fld_values == 'Y;N' || $fld->fld_values == 'M;F' 
+                || $fld->fld_values == 'Y;N;?' || $fld->fld_values == 'M;F;?') {
                 $this->v["migratFileUp"] .=  "char('" . $fldName . "', 1)";
             } else {
                 $this->v["migratFileUp"] .=  "string('" . $fldName . "'" 
-                    . (($fld->FldDataLength > 0) ? ", " . $fld->FldDataLength : "") 
+                    . (($fld->fld_data_length > 0) ? ", " . $fld->fld_data_length : "") 
                     . ")";
             }
-        } elseif ($fld->FldType == 'TEXT') {
+        } elseif ($fld->fld_type == 'TEXT') {
             $this->v["migratFileUp"] .=  "longText('" . $fldName . "')";
-        } elseif ($fld->FldType == 'DATE') {
+        } elseif ($fld->fld_type == 'DATE') {
             $this->v["migratFileUp"] .=  "date('" . $fldName . "')";
-        } elseif ($fld->FldType == 'DATETIME') {
+        } elseif ($fld->fld_type == 'DATETIME') {
             $this->v["migratFileUp"] .=  "dateTime('" . $fldName . "')";
         }
-        if (trim($fld->FldDefault) != '') {
+        if (trim($fld->fld_default) != '') {
             $this->v["migratFileUp"] .=  "->default(";
-            if ($fld->FldDefault == 'NULL') {
+            if ($fld->fld_default == 'NULL') {
                 $this->v["migratFileUp"] .= "NULL";
             } else {
-                if ($fld->FldValues == '0;1') {
-                    if (intVal($fld->FldDefault) == 1) {
+                if ($fld->fld_values == '0;1') {
+                    if (intVal($fld->fld_default) == 1) {
                         $this->v["migratFileUp"] .= "1";
                     } else {
                         $this->v["migratFileUp"] .= "0";
                     }
                 } else {
-                    $this->v["migratFileUp"] .= "'" 
-                        . $fld->FldDefault . "'";
+                    $this->v["migratFileUp"] .= "'" . $fld->fld_default . "'";
                 }
             }
             $this->v["migratFileUp"] .= ")";
         }
         $this->v["migratFileUp"] .=  "->nullable();";
-        if ($fld->FldIsIndex == 1) {
-            $this->v["migratFileUp"] .= "\n\t\t\t"
-                . "$"."table->index('" . $fldName . "');";
+        if ($fld->fld_is_index == 1) {
+            $this->v["migratFileUp"] .= "\n\t\t\t$"."table->index('" . $fldName . "');";
         }
         /* // This is throwing errors
-        if (intVal($fld->FldForeignTable) > 0) {
-            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->FldForeignTable);
+        if (intVal($fld->fld_foreign_table) > 0) {
+            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->fld_foreign_table);
             $this->v["migrateEnd"] .= "\t"."Schema::table('" 
-                . $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName 
+                . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name 
                 . "', function($"."table) { $"."table->foreign('" . $fldName 
                 . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
         }
@@ -288,8 +284,7 @@ class AdminDatabaseInstall extends AdminDBController
         $found = -1;
         $seedCnt = $finishedTable = 1;
         $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
-            ? trim($request->get('tbls')) 
-            : ',');
+            ? trim($request->get('tbls')) : ',');
         $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
         $limit = 1000;
         if ($this->v["tbls"]->isNotEmpty()) {
@@ -297,13 +292,11 @@ class AdminDatabaseInstall extends AdminDBController
                 $this->loadCustLoop($GLOBALS["SL"]->REQ, $this->treeID);
             }
             foreach ($this->v["tbls"] as $i => $tbl) {
-                $this->v["tblClean"] = str_replace('_', '', $GLOBALS["SL"]->dbRow->DbPrefix) 
-                    . $tbl->TblName;
-                if (in_array($tbl->TblName, $this->custReport->tblsInPackage())  
-                    && strpos($done, ',' . $tbl->TblName . ',') === false 
-                    && $found < 0) {
+                $this->v["tblClean"] = $GLOBALS["SL"]->strFullTblModel($tbl->tbl_name);
+                if (in_array($tbl->tbl_name, $this->custReport->tblsInPackage())  
+                    && strpos($done, ',' . $tbl->tbl_name . ',') === false && $found < 0) {
                     $this->loadTbl($tbl);
-                    $tblSffx = '-' . $tbl->TblName . '.php';
+                    $tblSffx = '-' . $tbl->tbl_name . '.php';
                     $this->v["seedFile"] = str_replace('.php', $tblSffx, $this->v["seedFile"]);
                     /*
                     if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
@@ -327,7 +320,7 @@ class AdminDatabaseInstall extends AdminDBController
                         //Storage::delete('file.jpg');
                         Storage::put($this->v["seedFile"], $tblSeeds);
                         if ($seedChk->count() < $limit) {
-                            $done .= $tbl->TblName . ',';
+                            $done .= $tbl->tbl_name . ',';
                         } else {
                             $page++;
                             $finishedTable = 0;
@@ -336,7 +329,7 @@ class AdminDatabaseInstall extends AdminDBController
                         */
                         $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl));
                         Storage::put($this->v["seedFile"], $tblSeeds);
-                        $done .= $tbl->TblName . ',';
+                        $done .= $tbl->tbl_name . ',';
                     //}
                     $found = $i;
                 }
@@ -374,16 +367,14 @@ class AdminDatabaseInstall extends AdminDBController
             $this->v["tbls"] = $GLOBALS["SL"]->tblQrySlExports();
             if ($this->v["tbls"]->isNotEmpty()) {
                 foreach ($this->v["tbls"] as $i => $tbl) {
-                    $this->v["tblClean"] = 'SL' . $tbl->TblName;
-                    if ($found < 0 && strpos($done, ',' . $tbl->TblName . ',') === false) {
+                    $this->v["tblClean"] = 'SL' . $GLOBALS["SL"]->strTblToModel($tbl->tbl_name);
+                    if ($found < 0 && strpos($done, ',' . $tbl->tbl_name . ',') === false) {
                         $this->loadTbl($tbl);
-                        $tblSffx = '-' . $tbl->TblName . '.php';
+                        $tblSffx = '-' . $tbl->tbl_name . '.php';
                         $this->v["seedFile"] = str_replace('.php', $tblSffx, $this->v["seedFile"]);
-                        $tblSeeds = $this->printSeedTbl(
-                            $GLOBALS["SL"]->loadSlSeedEval($tbl, $prevDb)
-                        );
+                        $tblSeeds = $this->printSeedTbl($GLOBALS["SL"]->loadSlSeedEval($tbl, $prevDb));
                         Storage::put($this->v["seedFile"], $tblSeeds);
-                        $done .= $tbl->TblName . ',';
+                        $done .= $tbl->tbl_name . ',';
                         $found = $i;
                     }
                 }
@@ -408,9 +399,7 @@ class AdminDatabaseInstall extends AdminDBController
             $this->v["seedFile"], 
             view(
                 'vendor.survloop.admin.db.export-laravel-gen-seeder', 
-                [
-                    "wholeSeed" => false
-                ]
+                [ "wholeSeed" => false ]
             )->render()
         );
         $tbls = $this->exportQryTbls();
@@ -418,8 +407,8 @@ class AdminDatabaseInstall extends AdminDBController
             $this->loadCustLoop($request, $this->treeID);
         }
         foreach ($tbls as $i => $tbl) {
-            if (in_array($tbl->TblName, $this->custReport->tblsInPackage())) {
-                $tblSffx = '-' . $tbl->TblName . '.php';
+            if (in_array($tbl->tbl_name, $this->custReport->tblsInPackage())) {
+                $tblSffx = '-' . $tbl->tbl_name . '.php';
                 $tblFilename = str_replace('.php', $tblSffx, $this->v["seedFile"]);
                 if (Storage::exists($tblFilename)) {
                     Storage::append($this->v["seedFile"], Storage::get($tblFilename));
@@ -429,7 +418,7 @@ class AdminDatabaseInstall extends AdminDBController
         $tbls = $GLOBALS["SL"]->tblQrySlExports();
         if ($tbls->isNotEmpty()) {
             foreach ($tbls as $i => $tbl) {
-                $tblSffx = '-' . $tbl->TblName . '.php';
+                $tblSffx = '-' . $tbl->tbl_name . '.php';
                 $tblFilename = str_replace('.php', $tblSffx, $this->v["seedFile"]);
                 if (Storage::exists($tblFilename)) {
                     Storage::append($this->v["seedFile"], Storage::get($tblFilename));
@@ -472,14 +461,14 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $this->admControlInit($request, '/dashboard/db/export/laravel/table-model');
         $this->prepLaravelExport();
-        $tbl = SLTables::where('TblName', $tbl)
+        $tbl = SLTables::where('tbl_name', $tbl)
             ->first();
         $this->loadTbl($tbl);
         $flds = $GLOBALS["SL"]->getTableFields($tbl);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
                 $this->v["modelFile"] .= "\n\t\t'" 
-                    . trim($tbl->TblAbbr . $fld->FldName) . "', ";
+                    . trim($tbl->tbl_abbr . $fld->fld_name) . "', ";
             }
         }
         $this->saveModelFile();
@@ -526,7 +515,7 @@ class AdminDatabaseInstall extends AdminDBController
     protected function printSeedTbl($eval = '', $limit = 10000, $start = 0)
     {
     	$ret = '';
-//if ($tbl->TblName == 'Definitions') { echo 'eval: ' . $eval . '<br />'; exit; }
+//if ($tbl->tbl_name == 'Definitions') { echo 'eval: ' . $eval . '<br />'; exit; }
 //echo '<pre>'; print_r($eval); echo '</pre>';
         $seedChk = $GLOBALS["SL"]->getTableSeedDump(
             $this->v["tblClean"], 
@@ -546,13 +535,13 @@ class AdminDatabaseInstall extends AdminDBController
     protected function printSeedTblRow($seed)
     {
         $ret = '';
-        $fldData = "\n\t\t\t'" . $this->v["tbl"]->TblAbbr . "ID' => " . $seed->getKey();
+        $fldData = "\n\t\t\t'" . $this->v["tbl"]->tbl_abbr . "id' => " . $seed->getKey();
         $flds = $GLOBALS["SL"]->getTableFields($this->v["tbl"]);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $i => $fld) {
-                $fldName = trim($this->v["tbl"]->TblAbbr . $fld->FldName);
+                $fldName = trim($this->v["tbl"]->tbl_abbr . $fld->fld_name);
                 if (isset($seed->{ $fldName }) 
-                    && trim($seed->{ $fldName }) != trim($fld->FldDefault)) {
+                    && trim($seed->{ $fldName }) != trim($fld->fld_default)) {
                     $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
                         . str_replace("'", "\'", $seed->{ $fldName }) . "'";
                 }
@@ -560,9 +549,9 @@ class AdminDatabaseInstall extends AdminDBController
         }
         if (trim($fldData) != '') {
             $ret .= "\tDB::table('" 
-                . (($this->v["tbl"]->TblDatabase == 3) 
-                    ? 'SL_' : $GLOBALS["SL"]->dbRow->DbPrefix)
-                . $this->v["tbl"]->TblName . "')->insert([" 
+                . (($this->v["tbl"]->tbl_database == 3) 
+                    ? 'sl_' : $GLOBALS["SL"]->dbRow->db_prefix)
+                . $this->v["tbl"]->tbl_name . "')->insert([" 
                 . $fldData . "\n\t\t"."]);"."\n\t";
         }
         return $ret;
@@ -570,18 +559,18 @@ class AdminDatabaseInstall extends AdminDBController
     
     protected function exportQryTbls()
     {
-        return SLTables::where('TblDatabase', $this->dbID)
-            ->where('TblName', 'NOT LIKE', 'Users')
-            ->where('TblName', 'NOT LIKE', 'users')
-            ->orderBy('TblOrd')
+        return SLTables::where('tbl_database', $this->dbID)
+            ->where('tbl_name', 'NOT LIKE', 'Users')
+            ->where('tbl_name', 'NOT LIKE', 'users')
+            ->orderBy('tbl_ord')
             ->get();
     }
     
     protected function loadTbl($tbl = [])
     {
         $this->v["tbl"] = $tbl;
-        $this->v["tblName"] = $GLOBALS["SL"]->dbRow->DbPrefix . $tbl->TblName;
-        $this->v["tblClean"] = str_replace('_', '', $this->v["tblName"]);
+        $this->v["tblName"] = $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name;
+        $this->v["tblClean"] = $GLOBALS["SL"]->strFullTblModel($tbl->tbl_name);
         return true;
     }
     
@@ -617,7 +606,7 @@ class AdminDatabaseInstall extends AdminDBController
         
         $this->v["oldTables"] = [];
         
-        $this->v["DbPrefix"] = $GLOBALS["SL"]->dbRow->DbPrefix;
+        $this->v["DbPrefix"] = $GLOBALS["SL"]->dbRow->db_prefix;
         $this->v["tbls"] = $this->tblQryStd();
         
         $this->v["log"] = '';
@@ -642,7 +631,7 @@ class AdminDatabaseInstall extends AdminDBController
             foreach ($GLOBALS["SL"]->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
                 if (!in_array(strtolower($GLOBALS["SL"]->tbl[$createTbl]), ['users'])) {
-                    DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->DbPrefix 
+                    DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->db_prefix 
                         . $GLOBALS["SL"]->tbl[$createTbl] . '`');
                     $createQry = $GLOBALS["SL"]->exportMysqlTbl($tbl, true);
                     echo $createQry . '<br />';
@@ -659,12 +648,12 @@ class AdminDatabaseInstall extends AdminDBController
                         if (isset($transferData[$copyTbl]) && is_array($transferData[$copyTbl]) 
                             && sizeof($transferData[$copyTbl]) > 0) {
                             $newFlds = [];
-                            $flds = SLFields::where('FldTable', $copyTbl)
-                                ->where('FldDatabase', $this->dbID)
+                            $flds = SLFields::where('fld_table', $copyTbl)
+                                ->where('fld_database', $this->dbID)
                                 ->get();
                             if ($flds->isNotEmpty()) {
                                 $tblAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$copyTbl]];
-                                foreach ($flds as $fld) $newFlds[] = $fld->FldName;
+                                foreach ($flds as $fld) $newFlds[] = $fld->fld_name;
                                 foreach ($transferData[$copyTbl] as $oldRec) {
                                     eval("\$newRec = new " 
                                         . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl]) . ";");

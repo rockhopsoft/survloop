@@ -21,15 +21,18 @@ class SurvStatsChart extends SurvStats
         $this->tblOut[] = $this->tblSimpStatRow($fLet, $dLet, 'avg');
         $this->tblOut[] = $this->tblSimpStatRow($fLet, $dLet);
         $this->tblApplyScale();
-        return view('vendor.survloop.reports.inc-stat-tbl-avgtot', [
-            "tblOut" => $this->tblOut
-        ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-avgtot', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblFltRowsCalc($fltCol, $fltRow, $datAbbr, $typ = 'sum', $datLabOvr = '', $totTop = true)
     {
         $this->tblOut = [];
-        if (trim($datLabOvr) != '') $this->opts["datLabOvr"] = $datLabOvr;
+        if (trim($datLabOvr) != '') {
+            $this->opts["datLabOvr"] = $datLabOvr;
+        }
         $colLet = $this->fAbr($fltCol);
         $rowLet = $this->fAbr($fltRow);
         $datLet = $this->dAbr($datAbbr);
@@ -44,7 +47,9 @@ class SurvStatsChart extends SurvStats
             }
             $row[0] = $this->opts["datLabPrfx"] . $row[0];
             $colStr = $this->applyCurrFilt('1');
-            if ($typ != "avg" && isset($this->dat[$colStr]) && isset($this->dat[$colStr]["dat"][$datLet]) 
+            if ($typ != "avg" 
+                && isset($this->dat[$colStr]) 
+                && isset($this->dat[$colStr]["dat"][$datLet]) 
                 && isset($this->dat[$colStr]["dat"][$datLet][$typ])) {
                 $row[1] = $this->dat[$colStr]["dat"][$datLet][$typ];
             }
@@ -53,7 +58,8 @@ class SurvStatsChart extends SurvStats
                     if (!$this->isCurrHid($colLet, $colVal)) {
                         $cell = -3737;
                         $colStr = $this->applyCurrFilt($colLet . $colVal);
-                        if (isset($this->dat[$colStr]) && isset($this->dat[$colStr]["dat"][$datLet]) 
+                        if (isset($this->dat[$colStr]) 
+                            && isset($this->dat[$colStr]["dat"][$datLet]) 
                             && isset($this->dat[$colStr]["dat"][$datLet][$typ])) {
                             $cell = $this->dat[$colStr]["dat"][$datLet][$typ];
                             if ($typ == "avg") {
@@ -71,7 +77,8 @@ class SurvStatsChart extends SurvStats
         }
         if ($rowLet != '' && isset($this->filts[$rowLet]) && sizeof($this->filts[$rowLet]["val"]) > 0) {
             foreach ($this->filts[$rowLet]["val"] as $i => $rowVal) {
-                if (!$this->isCurrHid($rowLet, $rowVal) && isset($this->filts[$rowLet]["vlu"][$i]) 
+                if (!$this->isCurrHid($rowLet, $rowVal) 
+                    && isset($this->filts[$rowLet]["vlu"][$i]) 
                     && trim($this->filts[$rowLet]["vlu"][$i]) != '') {
                     $row = $this->tblInitSimpStatRow($typ);
                     if (trim($this->opts["datLabOvr"]) != '') {
@@ -81,7 +88,9 @@ class SurvStatsChart extends SurvStats
                     }
                     $row[0] = $this->opts["datLabPrfx"] . $row[0] . ' ' . $this->filts[$rowLet]["vlu"][$i];
                     $rowStr = $this->applyCurrFilt($rowLet . $rowVal);
-                    if ($typ != "avg" && isset($this->dat[$rowStr]) && isset($this->dat[$rowStr]["dat"][$datLet]) 
+                    if ($typ != "avg" 
+                        && isset($this->dat[$rowStr]) 
+                        && isset($this->dat[$rowStr]["dat"][$datLet]) 
                         && isset($this->dat[$rowStr]["dat"][$datLet][$typ])) {
                         $row[1] = $this->dat[$rowStr]["dat"][$datLet][$typ];
                     }
@@ -90,7 +99,8 @@ class SurvStatsChart extends SurvStats
                             if (!$this->isCurrHid($colLet, $colVal)) {
                                 $cell = -3737;
                                 $cellStr = $this->applyCurrFilt($colLet . $colVal . '-' . $rowStr);
-                                if (isset($this->dat[$cellStr]) && isset($this->dat[$cellStr]["dat"][$datLet]) 
+                                if (isset($this->dat[$cellStr]) 
+                                    && isset($this->dat[$cellStr]["dat"][$datLet]) 
                                     && isset($this->dat[$cellStr]["dat"][$datLet][$typ])) {
                                     $cell = $this->dat[$cellStr]["dat"][$datLet][$typ];
                                     if ($typ == "avg") {
@@ -108,7 +118,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        $ret = view('vendor.survloop.reports.inc-stat-tbl-avgtot', [ "tblOut" => $this->tblOut ])->render();
+        $ret = view(
+            'vendor.survloop.reports.inc-stat-tbl-avgtot', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
         if (trim($datLabOvr) != '') {
             $this->opts["datLabOvr"] = '';
         }
@@ -135,18 +148,22 @@ class SurvStatsChart extends SurvStats
             foreach ($this->filts[$rowLet]["val"] as $i => $rowVal) {
                 if (!$this->isCurrHid($rowLet, $rowVal) && isset($this->filts[$rowLet]["vlu"][$i]) 
                     && trim($this->filts[$rowLet]["vlu"][$i]) != '') {
-                    $row = [ 'Percent of ' . $datSfx . ' ' . $this->filts[$rowLet]["vlu"][$i], 0 ];
+                    $row = [
+                        'Percent of ' . $datSfx . ' ' . $this->filts[$rowLet]["vlu"][$i], 
+                        0 
+                    ];
                     if (trim($label) != '') {
                         $row[0] = $label . ' ' . $this->filts[$rowLet]["vlu"][$i];
                     }
                     $row[0] = $this->opts["datLabPrfx"] . $row[0];
                     $rowStr = $this->applyCurrFilt($rowLet . $rowVal);
                     $filtStr = $this->applyCurrFilt('1');
-                    if (isset($this->dat[$rowStr]) && isset($this->dat[$rowStr]["dat"][$datLet])
+                    if (isset($this->dat[$rowStr]) 
+                        && isset($this->dat[$rowStr]["dat"][$datLet])
                         && isset($this->dat[$filtStr]["dat"][$datLet]["sum"]) 
                         && $this->dat[$filtStr]["dat"][$datLet]["sum"] > 0) {
-                        $row[1] = round(100*$this->dat[$rowStr]["dat"][$datLet]["sum"
-                            ]/$this->dat[$filtStr]["dat"][$datLet]["sum"]) . '%';
+                        $row[1] = round(100*$this->dat[$rowStr]["dat"][$datLet]["sum"]
+                            /$this->dat[$filtStr]["dat"][$datLet]["sum"]) . '%';
                     }
                     if (isset($this->filts[$colLet]) && sizeof($this->filts[$colLet]["val"]) > 0) {
                         foreach ($this->filts[$colLet]["val"] as $colVal) {
@@ -155,12 +172,14 @@ class SurvStatsChart extends SurvStats
                                 $colStr = $colLet . $colVal;
                                 if (isset($this->dat[$colStr]) && isset($this->dat[$colStr]["cnt"])) {
                                     $cellStr = $this->applyCurrFilt($colStr . '-' . $rowStr);
-                                    if (isset($this->dat[$cellStr]) && isset($this->dat[$cellStr]["dat"][$datLet]) 
+                                    if (isset($this->dat[$cellStr]) 
+                                        && isset($this->dat[$cellStr]["dat"][$datLet]) 
                                         && isset($this->dat[$cellStr]["dat"][$datLet]["sum"]) 
-                                        && isset($this->dat[$colStr]) && isset($this->dat[$colStr]["dat"][$datLet]) 
+                                        && isset($this->dat[$colStr]) 
+                                        && isset($this->dat[$colStr]["dat"][$datLet]) 
                                         && $this->dat[$colStr]["dat"][$datLet]["sum"] > 0) {
-                                        $cell = round(100*$this->dat[$cellStr]["dat"][$datLet]["sum"
-                                            ]/$this->dat[$colStr]["dat"][$datLet]["sum"]) . '%';
+                                        $cell = round(100*$this->dat[$cellStr]["dat"][$datLet]["sum"]
+                                            /$this->dat[$colStr]["dat"][$datLet]["sum"]) . '%';
                                     }
                                 }
                                 $row[] = $cell;
@@ -171,9 +190,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.reports.inc-stat-tbl-percs', [
-            "tblOut" => $this->tblOut
-        ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-percs', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblFltDatRowPerc($fltCol, $fltRow, $datAbbr, $label = '')
@@ -183,13 +203,17 @@ class SurvStatsChart extends SurvStats
         $rowLet = $this->fAbr($fltRow);
         $datLet = $this->dAbr($datAbbr);
         $datSfx = ((isset($this->datMap[$datLet])) ? ' ' . $this->datMap[$datLet]["lab"] : '');
-        if ($rowLet != '' && isset($this->filts[$rowLet]) 
+        if ($rowLet != '' 
+            && isset($this->filts[$rowLet]) 
             && sizeof($this->filts[$rowLet]["val"]) > 0) {
             foreach ($this->filts[$rowLet]["val"] as $i => $rowVal) {
-                if (!$this->isCurrHid($rowLet, $rowVal) && isset($this->filts[$rowLet]["vlu"][$i]) 
+                if (!$this->isCurrHid($rowLet, $rowVal) 
+                    && isset($this->filts[$rowLet]["vlu"][$i]) 
                     && trim($this->filts[$rowLet]["vlu"][$i]) != '') {
                     $row = [ 'Percent of ' . $datSfx . ' ' . $this->filts[$rowLet]["vlu"][$i], '100%' ];
-                    if (trim($label) != '') $row[0] = $label . ' ' . $this->filts[$rowLet]["vlu"][$i];
+                    if (trim($label) != '') {
+                        $row[0] = $label . ' ' . $this->filts[$rowLet]["vlu"][$i];
+                    }
                     $row[0] = $this->opts["datLabPrfx"] . $row[0];
                     $rowStr = $this->applyCurrFilt($rowLet . $rowVal);
                     if (isset($this->filts[$colLet]) && sizeof($this->filts[$colLet]["val"]) > 0) {
@@ -214,7 +238,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-percs', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblFltDatRatio2Col($fltCol, $fltRow, $datAbbr, $ratioVal, $label = '', $totTop = true)
@@ -226,7 +253,10 @@ class SurvStatsChart extends SurvStats
         $datLet = $this->dAbr($datAbbr);
         $datSfx = ((isset($this->datMap[$datLet])) ? ' ' . $this->datMap[$datLet]["lab"] : '');
         if ($totTop) {
-            $row = [ 'Ratio' . $datSfx, 0 ];
+            $row = [
+                'Ratio' . $datSfx, 
+                0 
+            ];
             if (trim($label) != '') {
                 $row[0] = $label;
             }
@@ -236,12 +266,14 @@ class SurvStatsChart extends SurvStats
                     if (!$this->isCurrHid($colLet, $colVal)) {
                         $cell = -3737;
                         $colStr = $this->applyCurrFilt($colLet . $colVal);
-                        if (isset($this->dat[$colStr]) && isset($this->dat[$colStr]["dat"][$datLet]) 
+                        if (isset($this->dat[$colStr]) 
+                            && isset($this->dat[$colStr]["dat"][$datLet]) 
                             && isset($this->dat[$colStr]["dat"][$datLet]["sum"]) 
-                            && isset($this->dat[$ratioStr]) && isset($this->dat[$ratioStr]["dat"][$datLet]) 
+                            && isset($this->dat[$ratioStr]) 
+                            && isset($this->dat[$ratioStr]["dat"][$datLet]) 
                             && $this->dat[$ratioStr]["dat"][$datLet]["sum"] > 0) {
-                            $cell = round(100*$this->dat[$colStr]["dat"][$datLet]["sum"
-                                ]/$this->dat[$ratioStr]["dat"][$datLet]["sum"]);
+                            $cell = round(100*$this->dat[$colStr]["dat"][$datLet]["sum"]
+                                /$this->dat[$ratioStr]["dat"][$datLet]["sum"]);
                             $row[1] += $cell;
                             $cell .= '%';
                         }
@@ -255,7 +287,10 @@ class SurvStatsChart extends SurvStats
         if ($rowLet != '' && isset($this->filts[$rowLet]) && sizeof($this->filts[$rowLet]["val"]) > 0) {
             foreach ($this->filts[$rowLet]["val"] as $i => $rowVal) {
                 if (isset($this->filts[$rowLet]["vlu"][$i]) && trim($this->filts[$rowLet]["vlu"][$i]) != '') {
-                    $row = [ 'Ratio' . $datSfx . ' ' . $this->filts[$rowLet]["vlu"][$i], 0 ];
+                    $row = [
+                        'Ratio' . $datSfx . ' ' . $this->filts[$rowLet]["vlu"][$i], 
+                        0 
+                    ];
                     if (trim($label) != '') {
                         $row[0] = $label . ' ' . $this->filts[$rowLet]["vlu"][$i];
                     }
@@ -267,7 +302,8 @@ class SurvStatsChart extends SurvStats
                                 $cell = -3737;
                                 $cellStr = $this->applyCurrFilt($colLet . $colVal . '-' . $rowStr);
                                 $colStr = $rowStr . '-' . $ratioStr;
-                                if (isset($this->dat[$cellStr]) && isset($this->dat[$cellStr]["dat"][$datLet]) 
+                                if (isset($this->dat[$cellStr]) 
+                                    && isset($this->dat[$cellStr]["dat"][$datLet]) 
                                     && isset($this->dat[$cellStr]["dat"][$datLet]["sum"]) 
                                     && isset($this->dat[$colStr]) 
                                     && isset($this->dat[$colStr]["dat"][$datLet]) 
@@ -286,7 +322,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-percs', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblPercHas($fltCol, $fltRow, $tot = 'filt')
@@ -297,7 +336,8 @@ class SurvStatsChart extends SurvStats
         $totCnt = $this->getFiltTot($fltCol);
         if ($rowLet != '' && isset($this->filts[$rowLet]) && sizeof($this->filts[$rowLet]["val"]) > 0) {
             foreach ($this->filts[$rowLet]["val"] as $i => $rowVal) {
-                if (!$this->isCurrHid($rowLet, $rowVal) && isset($this->filts[$rowLet]["vlu"][$i]) 
+                if (!$this->isCurrHid($rowLet, $rowVal) 
+                    && isset($this->filts[$rowLet]["vlu"][$i]) 
                     && trim($this->filts[$rowLet]["vlu"][$i]) != '') {
                     $row = [ $this->filts[$rowLet]["vlu"][$i], 0 ];
                     $row[0] = $this->opts["datLabPrfx"] . $row[0];
@@ -315,8 +355,10 @@ class SurvStatsChart extends SurvStats
                                 $cell = -3737;
                                 $colStr = $this->applyCurrFilt($colLet . $colVal);
                                 $cellStr = $this->applyCurrFilt($colLet . $colVal . '-' . $rowStr);
-                                if (isset($this->dat[$colStr]) && isset($this->dat[$cellStr])
-                                    && isset($this->dat[$colStr]["cnt"]) && intVal($this->dat[$colStr]["cnt"]) > 0) {
+                                if (isset($this->dat[$colStr]) 
+                                    && isset($this->dat[$cellStr])
+                                    && isset($this->dat[$colStr]["cnt"]) 
+                                    && intVal($this->dat[$colStr]["cnt"]) > 0) {
                                     $cell = round(100*$this->dat[$cellStr]["cnt"]/$this->dat[$colStr]["cnt"]);
                                     if ($cell > 0) {
                                         $cell = $cell . '% <sub class="slGrey">' 
@@ -331,7 +373,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-percs', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblFltRowsBlksCalc($fltCol, $fltRow, $fltBlk, $datAbbr, $typ = 'sum', $headRows = true)
@@ -343,7 +388,8 @@ class SurvStatsChart extends SurvStats
                 if (!$this->isCurrHid($blkLet, $blkVal)) {
                     $this->addCurrFilt($fltBlk, $blkVal);
                     $this->opts["datLabPrfx"] = $this->fValLab($fltBlk, $blkVal) . ' ';
-                    $ret .= $this->tblSpacerRow($fltCol) . (($headRows) ? $this->tblHeaderRow($fltCol) : '')
+                    $ret .= $this->tblSpacerRow($fltCol) 
+                        . (($headRows) ? $this->tblHeaderRow($fltCol) : '')
                         . $this->tblFltRowsCalc($fltCol, $fltRow, $datAbbr, $typ);
                     $this->opts["datLabPrfx"] = '';
                 }
@@ -379,11 +425,12 @@ class SurvStatsChart extends SurvStats
                                 $colStr = $this->applyCurrFilt($colLet . $colVal);
                                 if (isset($this->dat[$colStr]["dat"][$dLet]["sum"]) 
                                     && $this->dat[$colStr]["cnt"] > 0) {
-                                    $cell = round(100*$this->dat[$colStr]["dat"][$dLet]["sum"
-                                        ]/$this->dat[$colStr]["cnt"]);
+                                    $cell = round(100*$this->dat[$colStr]["dat"][$dLet]["sum"]
+                                        /$this->dat[$colStr]["cnt"]);
                                     if ($cell > 0) {
                                         $cell = $cell . '% <sub class="slGrey">' 
-                                            . number_format($this->dat[$colStr]["dat"][$dLet]["sum"]) . '</sub>';
+                                            . number_format($this->dat[$colStr]["dat"][$dLet]["sum"]) 
+                                            . '</sub>';
                                     }
                                 }
                                 $row[] = $cell;
@@ -394,7 +441,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        return view('vendor.survloop.reports.inc-stat-tbl-percs', [ "tblOut" => $this->tblOut ])->render();
+        return view(
+            'vendor.survloop.reports.inc-stat-tbl-percs', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
     }
     
     public function tblFltBlksPercHasDat($fltCol, $fltBlk, $datTypes = [])
@@ -402,7 +452,9 @@ class SurvStatsChart extends SurvStats
         $ret = '';
         $colLet = $this->fAbr($fltCol);
         $blkLet = $this->fAbr($fltBlk);
-        if (sizeof($datTypes) > 0 && isset($this->filts[$colLet]) && isset($this->filts[$blkLet])
+        if (sizeof($datTypes) > 0 
+            && isset($this->filts[$colLet]) 
+            && isset($this->filts[$blkLet])
             && sizeof($this->filts[$blkLet]["val"]) > 0) {
             foreach ($this->filts[$blkLet]["val"] as $b => $blkVal) {
                 if (!$this->isCurrHid($blkLet, $blkVal)) {
@@ -428,8 +480,10 @@ class SurvStatsChart extends SurvStats
                                     if (!$this->isCurrHid($colLet, $colVal)) {
                                         $cell = -3737;
                                         $str = $this->applyCurrFilt($blkStr . '-' . $colLet . $colVal);
-                                        if (isset($this->dat[$str]["dat"][$dLet]["sum"]) && $this->dat[$str]["cnt"] > 0) {
-                                            $cell = round(100*$this->dat[$str]["dat"][$dLet]["sum"]/$this->dat[$str]["cnt"]);
+                                        if (isset($this->dat[$str]["dat"][$dLet]["sum"]) 
+                                            && $this->dat[$str]["cnt"] > 0) {
+                                            $cell = round(100*$this->dat[$str]["dat"][$dLet]["sum"]
+                                                /$this->dat[$str]["cnt"]);
                                             if ($cell > 0) {
                                                 $cell = $cell . '% <sub class="slGrey">' 
                                                     . number_format($this->dat[$str]["dat"][$dLet]["sum"])
@@ -444,9 +498,10 @@ class SurvStatsChart extends SurvStats
                         }
                     }
                 }
-                $ret .= view('vendor.survloop.reports.inc-stat-tbl-percs', [
-                    "tblOut" => $this->tblOut
-                ])->render();
+                $ret .= view(
+                    'vendor.survloop.reports.inc-stat-tbl-percs', 
+                    [ "tblOut" => $this->tblOut ]
+                )->render();
             }
         }
         return $ret;
@@ -454,8 +509,11 @@ class SurvStatsChart extends SurvStats
     
     public function tblHeaderRow($fltAbbr, $lnk = '', $tots = true)
     {
-        $ret = '<tr><th>&nbsp;</th><th class="brdRgt">Total' 
-            . (($tots) ? '<sub class="slGrey">' . $this->getDatCnt($this->applyCurrFilt('1')) . '</sub>' : '') . '</th>';
+        $ret = '<tr><th>&nbsp;</th><th class="brdRgt">Total';
+        if ($tots) {
+            $ret .= '<sub class="slGrey">' . $this->getDatCnt($this->applyCurrFilt('1')) . '</sub>';
+        }
+        $ret .= '</th>';
         $fLet = $this->fAbr($fltAbbr);
         if ($fLet != '' && isset($this->filts[$fLet]) && sizeof($this->filts[$fLet]["val"]) > 0) {
             foreach ($this->filts[$fLet]["val"] as $i => $val) {
@@ -469,8 +527,11 @@ class SurvStatsChart extends SurvStats
                 if (trim($lnk) != '') {
                     $lab = '<a href="' . str_replace('[[val]]', $val, $lnk) . '" target="_blank">' . $lab . '</a>';
                 }
-                $ret .= '<th>' . $lab 
-                    . (($tots) ? '<sub class="slGrey">' . $this->getDatCnt($this->applyCurrFilt($fLet . $val)) . '</sub>' : '') . '</th>';
+                $ret .= '<th>' . $lab;
+                if ($tots) {
+                    $ret .= '<sub class="slGrey">' . $this->getDatCnt($this->applyCurrFilt($fLet . $val)) . '</sub>';
+                }
+                $ret .= '</th>';
             }
         }
         return $ret . '</tr>';
@@ -491,7 +552,7 @@ class SurvStatsChart extends SurvStats
         $this->tblOut = [];
         $datLet = $this->dAbr($datAbbr);
         if ($tagAbbr == '1') {
-            $row = ['All', 0, 0];
+            $row = [ 'All', 0, 0 ];
             for ($i = 0; $i < sizeof($this->datMap[$datLet]["row"]); $i++) {
                 $row[] = 0;
             }
@@ -507,8 +568,12 @@ class SurvStatsChart extends SurvStats
             $this->tblOut[] = $row;
         } else {
             $tagLet = $this->tAbr($tagAbbr);
-            if ($datLet != '' && isset($this->datMap[$datLet]) && isset($this->tagTot[$datLet]) 
-                && $tagLet != '' && isset($this->tagMap[$tagLet]) && isset($this->tagMap[$tagLet]["val"]) 
+            if ($datLet != '' 
+                && isset($this->datMap[$datLet]) 
+                && isset($this->tagTot[$datLet]) 
+                && $tagLet != '' 
+                && isset($this->tagMap[$tagLet]) 
+                && isset($this->tagMap[$tagLet]["val"]) 
                 && sizeof($this->tagMap[$tagLet]["val"]) > 0) {
                 foreach ($this->tagMap[$tagLet]["val"] as $v => $tagVal) {
                     $row = ['', 0, 0];
@@ -530,9 +595,10 @@ class SurvStatsChart extends SurvStats
                 }
             }
         }
-        $ret = view('vendor.survloop.reports.inc-stat-tag-avgtot', [
-            "tblOut" => $this->tblOut
-        ])->render();
+        $ret = view(
+            'vendor.survloop.reports.inc-stat-tag-avgtot', 
+            [ "tblOut" => $this->tblOut ]
+        )->render();
         return $ret;
     }
     
@@ -541,13 +607,18 @@ class SurvStatsChart extends SurvStats
         $ret = '';
         $datLet = $this->dAbr($datAbbr);
         if ($datLet != '' && isset($this->datMap[$datLet]) && sizeof($this->datMap[$datLet]["row"]) > 0) {
-            $ret .= '<tr><th>&nbsp;</th><th class="brdRgt">' . $this->datMap[$datLet]["lab"] 
-                . ((trim($this->datMap[$datLet]["unt"]) != '') ? ' <span class="slGrey fPerc80">' 
-                    . $this->datMap[$datLet]["unt"] . '</span>' : '') . '</th>';
+            $ret .= '<tr><th>&nbsp;</th><th class="brdRgt">' . $this->datMap[$datLet]["lab"];
+            if (trim($this->datMap[$datLet]["unt"]) != '') {
+                $ret .= ' <span class="slGrey fPerc80">' . $this->datMap[$datLet]["unt"] . '</span>';
+            }
+            $ret .= '</th>';
             foreach ($this->datMap[$datLet]["row"] as $r) {
                 if (is_array($r) && sizeof($r) == 2) {
-                    $ret .= '<th>' . $r[0] . ((trim($r[1]) != '') ? ' <span class="slGrey fPerc80">' . $r[1] . '</span>'
-                        : '') . '</th>';
+                    $ret .= '<th>' . $r[0];
+                    if (trim($r[1]) != '') {
+                        $ret .= ' <span class="slGrey fPerc80">' . $r[1] . '</span>';
+                    }
+                    $ret .= '</th>';
                 } else {
                     $ret .= '<th>' . $r . '</th>';
                 }

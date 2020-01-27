@@ -25,11 +25,11 @@ class SurvStatsFilts extends SurvStatsCore
     {
         $let = chr(97+(sizeof($this->filts))); // assign a, b, c,..
         $vals = $values;
-        if (sizeof($values) > 0 && isset($values[0]->DefID)) {
+        if (sizeof($values) > 0 && isset($values[0]->def_id)) {
             $vals = $valLab = [];
             foreach ($values as $def) {
-                $vals[]   = $def->DefID;
-                $valLab[] = $def->DefValue;
+                $vals[]   = $def->def_id;
+                $valLab[] = $def->def_value;
             }
         }
         $this->filts[$let] = [
@@ -37,7 +37,7 @@ class SurvStatsFilts extends SurvStatsCore
             "lab" => $label,
             "val" => $vals,
             "vlu" => $valLab
-            ];
+        ];
         return true;
     }
     
@@ -85,14 +85,19 @@ class SurvStatsFilts extends SurvStatsCore
     {
         $let = chr(97+(sizeof($this->tagMap))); // assign a, b, c,..
         $vals = $values;
-        if (sizeof($values) > 0 && isset($values[0]->DefID)) {
+        if (sizeof($values) > 0 && isset($values[0]->def_id)) {
             $vals = $valLab = [];
             foreach ($values as $def) {
-                $vals[]   = $def->DefID;
-                $valLab[] = $def->DefValue;
+                $vals[]   = $def->def_id;
+                $valLab[] = $def->def_value;
             }
         }
-        $this->tagMap[$let] = [ "abr" => $abbr, "lab" => $label, "val" => $vals, "vlu" => $valLab ];
+        $this->tagMap[$let] = [
+            "abr" => $abbr, 
+            "lab" => $label, 
+            "val" => $vals, 
+            "vlu" => $valLab 
+        ];
         return true;
     }
     
@@ -125,7 +130,13 @@ class SurvStatsFilts extends SurvStatsCore
         $this->raw = $this->tagTot = [];
         if (sizeof($this->datMap) > 0) {
             foreach ($this->datMap as $datLet => $d) { // parallel columns
-                $this->raw[$datLet] = [ "raw" => [], "flt" => [], "ids" => [], "tag" => [], "row" => [] ];
+                $this->raw[$datLet] = [ 
+                    "raw" => [], 
+                    "flt" => [], 
+                    "ids" => [], 
+                    "tag" => [], 
+                    "row" => [] 
+                ];
                 $this->tagTot[$datLet] = [ '1' => $this->loadMapTagRow() ];
                 if (sizeof($this->tagMap) > 0) {
                     foreach ($this->tagMap as $tagLet => $t) {
@@ -248,7 +259,10 @@ class SurvStatsFilts extends SurvStatsCore
     
     public function isCurrHid($let = '', $val = -3737)
     {
-        return ($val != -3737 && trim($let) != '' && isset($this->hidCurr[$let]) && $this->hidCurr[$let] == $val);
+        return ($val != -3737 
+            && trim($let) != '' 
+            && isset($this->hidCurr[$let]) 
+            && $this->hidCurr[$let] == $val);
     }
     
     public function addRecFilt($abbr = '', $value = -3737, $recID = -3, $replace = 1)

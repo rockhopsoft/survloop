@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLUsersActivity extends Model
 {
-    protected $table         = 'SL_UsersActivity';
-    protected $primaryKey     = 'UserActID';
+    protected $table         = 'sl_users_activity';
+    protected $primaryKey     = 'user_act_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'UserActUser', 
-        'UserActCurrPage', 
-        'UserActVal', 
+        'user_act_user', 
+        'user_act_curr_page', 
+        'user_act_val', 
     ];
 }

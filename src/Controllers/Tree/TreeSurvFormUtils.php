@@ -12,14 +12,17 @@ namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\SLNodeResponses;
+use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Tree\TreeSurvFormLoops;
 
 class TreeSurvFormUtils extends TreeSurvFormLoops
 {
     protected function customNodePrintWrap($nID, $bladeRender = '')
     {
-        return $this->printNodePublicFormStart($nID) . $bladeRender . $this->nodePrintButton($nID) 
-            . $this->printNodePublicFormEnd($nID) . '<div class="fC p20"></div>';
+        return $this->printNodePublicFormStart($nID) 
+            . $bladeRender . $this->nodePrintButton($nID) 
+            . $this->printNodePublicFormEnd($nID)
+            . '<div class="fC p20"></div>';
     }
 
     protected function customNodePrint($nID = -3, $tmpSubTier = [], $nIDtxt = '', $nSffx = '', $currVisib = 1)
@@ -37,42 +40,54 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($this->skipFormForPreview($nID)) {
             return '';
         }
-        $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.js.formtree', [
-            "currPage"       => $this->v["currPage"],
-            "pageJSvalid"    => $this->pageJSvalid,
-            "pageFldList"    => $this->pageFldList
-            ])->render();
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.js.formtree-ajax', [
-            "hasFixedHeader" => $this->v["hasFixedHeader"]
-            ])->render();
         $ret = '';
+        $GLOBALS["SL"]->pageJAVA .= view(
+            'vendor.survloop.js.formtree', 
+            [
+                "currPage"    => $this->v["currPage"],
+                "pageJSvalid" => $this->pageJSvalid,
+                "pageFldList" => $this->pageFldList
+            ]
+        )->render();
+        $GLOBALS["SL"]->pageAJAX .= view(
+            'vendor.survloop.js.formtree-ajax', 
+            [ "hasFixedHeader" => $this->v["hasFixedHeader"] ]
+        )->render();
         $loopRootJustLeft = -3;
-        if (isset($this->sessInfo->SessLoopRootJustLeft) && intVal($this->sessInfo->SessLoopRootJustLeft) > 0) {
-            $loopRootJustLeft = $this->sessInfo->SessLoopRootJustLeft;
-            $this->sessInfo->SessLoopRootJustLeft = 0;
+        if (isset($this->sessInfo->sess_loop_root_just_left) 
+            && intVal($this->sessInfo->sess_loop_root_just_left) > 0) {
+            $loopRootJustLeft = $this->sessInfo->sess_loop_root_just_left;
+            $this->sessInfo->sess_loop_root_just_left = 0;
             $this->sessInfo->save();
         }
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
             $ret .= '<div id="isPage"></div>';
         }
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->chkCurrTreeOpt('PAGEFORM')
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' 
+            || $GLOBALS["SL"]->chkCurrTreeOpt('PAGEFORM')
             || $GLOBALS["SL"]->chkCurrTreeOpt('CONTACT')) {
             $formAction = $this->currNodeFormAction();
+            $isAjax = (($GLOBALS['SL']->treeRow->tree_type == 'Page') ? 0 : 1);
+            $pageHasUpload = ((sizeof($this->pageHasUpload) > 0) 
+                ? 'enctype="multipart/form-data"' : '');
             $GLOBALS["SL"]->pageJAVA .= 'formActionUrl = "' . $formAction . '"; ';
-            $ret .= view('vendor.survloop.forms.formtree-start', [
-                "nID"              => $nID, 
-                "coreID"           => $this->coreID, 
-                "nSlug"            => $this->allNodes[$nID]->nodeRow->NodePromptNotes, 
-                "currPage"         => $this->v["currPage"],
-                "action"           => $formAction, 
-                "abTest"           => $formAction, 
-                "isAjax"           => (($GLOBALS['SL']->treeRow->TreeType == 'Page') ? 0 : 1), 
-                "pageHasUpload"    => ((sizeof($this->pageHasUpload) > 0) ? 'enctype="multipart/form-data"' : ''),
-                "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
-                "loopRootJustLeft" => $loopRootJustLeft
-                //"zoomPref"         => ((isset($this->sessInfo->SessZoomPref)) 
-                //    ? intVal($this->sessInfo->SessZoomPref) : 0)
-                ])->render();
+            $ret .= view(
+                'vendor.survloop.forms.formtree-start', 
+                [
+                    "nID"              => $nID, 
+                    "coreID"           => $this->coreID, 
+                    "nSlug"            => $this->allNodes[$nID]->nodeRow->node_prompt_notes, 
+                    "currPage"         => $this->v["currPage"],
+                    "action"           => $formAction, 
+                    "abTest"           => $formAction, 
+                    "isAjax"           => $isAjax, 
+                    "pageHasUpload"    => $pageHasUpload,
+                    "nodePrintJumpTo"  => $this->nodePrintJumpTo($nID), 
+                    "loopRootJustLeft" => $loopRootJustLeft
+                    //"zoomPref"         => ((isset($this->sessInfo->sess_zoom_pref)) 
+                    //    ? intVal($this->sessInfo->sess_zoom_pref) : 0)
+                ]
+            )->render();
         }
         return $ret;
     }
@@ -82,8 +97,9 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($this->skipFormForPreview($nID)) {
             return '';
         }
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Survey' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
-            || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0) {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' 
+            || $GLOBALS["SL"]->treeRow->tree_opts%19 == 0 
+            || $GLOBALS["SL"]->treeRow->tree_opts%53 == 0) {
             return '</form>';
         }
     }
@@ -94,7 +110,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($ret != '') {
             return $ret;
         }
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
             return '';
         }
         $btnSize = 'btn-lg' . ((in_array($this->pageCnt, [1, 2])) ? ' btn-xl' : '');
@@ -103,7 +119,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         $ret .= '<div class="fC"></div><div id="nodeSubBtns" class="nodeSub">';
         if (isset($this->loopItemsCustBtn) && $this->loopItemsCustBtn != '') {
             $ret .= $this->loopItemsCustBtn;
-        } elseif ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0) {
+        } elseif ($this->allNodes[$nID]->nodeType != 'Page' 
+            || $this->allNodes[$nID]->nodeOpts%29 > 0) {
             $nextLabel = 'Next';
             if ($this->nodePrintJumpTo($nID) > 0
                 || ($this->allNodes[$nID]->nodeType == 'Instructions' && empty($tmpSubTier[1]))) {
@@ -117,18 +134,22 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                 && isset($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]])) {
                 $itemCnt = sizeof($this->sessData->loopItemIDs[$GLOBALS["SL"]->closestLoop["loop"]]);
             }
-            if ($this->allNodes[$nID]->isStepLoop() && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' slTab nFormNext" '
-                    . 'id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() . ' ><i class="fa fa-arrow-circle-o-right"></i> '
-                    . $nextLabel . '</a>';
+            if ($this->allNodes[$nID]->isStepLoop() 
+                && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize 
+                    . ' slTab nFormNext" id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() 
+                    . ' ><i class="fa fa-arrow-circle-o-right"></i> ' . $nextLabel . '</a>';
             } else {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize . ' slTab nFormNext" '
-                    . 'id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() . ' >' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize 
+                    . ' slTab nFormNext" id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() 
+                    . ' >' . $nextLabel . '</a>';
                 //$ret .= '<input type="button" value="' . $nextLabel 
                 //    . '" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn">';
             }
         }
-        if ($this->nodePrintJumpTo($nID) <= 0 && $printBack && $GLOBALS["SL"]->treeRow->TreeFirstPage != $nID
+        if ($this->nodePrintJumpTo($nID) <= 0 
+            && $printBack 
+            && $GLOBALS["SL"]->treeRow->tree_first_page != $nID
             && ($this->allNodes[$nID]->nodeType != 'Page' || $this->allNodes[$nID]->nodeOpts%29 > 0)) {
             $ret .= '<a href="javascript:;" class="fL btn btn-secondary ' . $btnSize 
                 . ' slTab nFormBack" id="nFormBack" ' . $GLOBALS["SL"]->tabInd() . ' >Back</a>';
@@ -140,8 +161,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     protected function currNodeFormAction()
     {
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-            $ret = '/' . $GLOBALS["SL"]->treeRow->TreeSlug;
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
+            $ret = '/' . $GLOBALS["SL"]->treeRow->tree_slug;
             if ($GLOBALS["SL"]->treeIsAdmin) {
                 $ret = '/dash' . $ret;
             }
@@ -176,7 +197,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         return '';
     }
     
-    protected function customResponses($nID, $curr)
+    protected function customResponses($nID, &$curr)
     {
         return $curr;
     }
@@ -188,7 +209,9 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     protected function loadAncestXtnd($nID)
     {
-        if (isset($this->v["ancestors"]) && is_array($this->v["ancestors"]) && sizeof($this->v["ancestors"]) > 0) {
+        if (isset($this->v["ancestors"]) 
+            && is_array($this->v["ancestors"]) 
+            && sizeof($this->v["ancestors"]) > 0) {
             for ($i = (sizeof($this->v["ancestors"])-1); $i >= 0; $i--) {
                 $parent = $this->v["ancestors"][$i];
                 if (isset($this->allNodes[$parent]) && $this->allNodes[$parent]->isDataManip()) {
@@ -201,10 +224,15 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     protected function shouldPrintHalfGap($curr)
     {
-        return (($GLOBALS["SL"]->treeRow->TreeType != 'Page' || $GLOBALS["SL"]->treeRow->TreeOpts%19 == 0 
-            || $GLOBALS["SL"]->treeRow->TreeOpts%53 == 0)
-            && !$curr->isPage() && !$curr->isLoopRoot() && !$curr->isLoopCycle() && !$curr->isDataManip()
-            && !$curr->isLayout() && trim($GLOBALS["SL"]->currCyc["res"][1]) == '' 
+        $isContactPage = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_CONTACT == 0);
+        $isFormPage = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_PAGEFORM == 0);
+        return (($GLOBALS["SL"]->treeRow->tree_type != 'Page' || $isContactPage || $isFormPage)
+            && !$curr->isPage() 
+            && !$curr->isLoopRoot() 
+            && !$curr->isLoopCycle() 
+            && !$curr->isDataManip()
+            && !$curr->isLayout() 
+            && trim($GLOBALS["SL"]->currCyc["res"][1]) == '' 
             && !$this->hasSpreadsheetParent($curr->nodeID));
     }
     
@@ -214,7 +242,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         $resValCyc = $value . trim($GLOBALS["SL"]->currCyc["cyc"][1]);
         $resValCyc2 = trim($GLOBALS["SL"]->currCyc["cyc"][1]) . $value;
         if (is_array($currNodeSessData)) {
-            $selected = (in_array($value, $currNodeSessData) || in_array($resValCyc, $currNodeSessData) 
+            $selected = (in_array($value, $currNodeSessData) 
+                || in_array($resValCyc, $currNodeSessData) 
                 || in_array($resValCyc2, $currNodeSessData));
         } else {
             if ($node->nodeType == 'Checkbox' || $node->isDropdownTagger()) {
@@ -222,7 +251,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                     || strpos(';' . $currNodeSessData . ';', ';' . $resValCyc . ';') !== false
                     || strpos(';' . $currNodeSessData . ';', ';' . $resValCyc2 . ';') !== false);
             } else {
-                $selected = ($currNodeSessData == trim($value) || $currNodeSessData == trim($resValCyc) 
+                $selected = ($currNodeSessData == trim($value) 
+                    || $currNodeSessData == trim($resValCyc) 
                     || $currNodeSessData == trim($resValCyc2));
             }
         }
@@ -251,6 +281,11 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     public function loadTableDat($curr, $currNodeSessData = [], $tmpSubTier = [])
     {
+        $req = [
+            $curr->isRequired(), 
+            false, 
+            [] 
+        ];
         $this->tableDat = [
             "tbl"    => '', 
             "defSet" => '', 
@@ -260,10 +295,11 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             "cols"   => [], 
             "blnk"   => [],
             "maxRow" => 10, 
-            "req"    => [ $curr->isRequired(), false, [] ]
-            ];
-        if (isset($curr->nodeRow->NodeDataBranch) && trim($curr->nodeRow->NodeDataBranch) != '') {
-            $this->tableDat["tbl"] = $curr->nodeRow->NodeDataBranch;
+            "req"    => $req
+        ];
+        if (isset($curr->nodeRow->node_data_branch) 
+            && trim($curr->nodeRow->node_data_branch) != '') {
+            $this->tableDat["tbl"] = $curr->nodeRow->node_data_branch;
         }
         $rowSet = $curr->parseResponseSet();
         if ($rowSet["type"] == 'Definition') { // lookup id based on rowCol and currNodeSessData
@@ -271,7 +307,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             $defs = $GLOBALS["SL"]->def->getSet($rowSet["set"]);
             if (sizeof($defs) > 0) {
                 foreach ($defs as $i => $def) {
-                    $this->tableDat["rows"][] = $this->addTableDatRow(-3, $def->DefValue, $def->DefID);
+                    $this->tableDat["rows"][] = $this->addTableDatRow(-3, $def->def_value, $def->def_id);
                 }
             }
         } elseif ($rowSet["type"] == 'LoopItems') {
@@ -286,7 +322,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             }
         } elseif ($rowSet["type"] == 'Table') {
             $this->tableDat["tbl"] = $rowSet["set"];
-            if (isset($this->dataSets[$this->tableDat["tbl"]]) && sizeof($this->dataSets[$this->tableDat["tbl"]]) > 0) {
+            if (isset($this->dataSets[$this->tableDat["tbl"]]) 
+                && sizeof($this->dataSets[$this->tableDat["tbl"]]) > 0) {
                 foreach ($this->dataSets[$this->tableDat["tbl"]] as $i => $tblItem) {
                     $label = $this->getTableRecLabel($rowSet["set"], $tblItem, $i);
                     $this->tableDat["rows"][] = $this->addTableDatRow($tblItem->getKey(), $label);
@@ -308,8 +345,9 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             }
         }
         $this->tableDat["maxRow"] = sizeof($this->tableDat["rows"]);
-        if (isset($curr->nodeRow->NodeCharLimit) && intVal($curr->nodeRow->NodeCharLimit) > 0) {
-            $this->tableDat["maxRow"] = $curr->nodeRow->NodeCharLimit;
+        if (isset($curr->nodeRow->node_char_limit) 
+            && intVal($curr->nodeRow->node_char_limit) > 0) {
+            $this->tableDat["maxRow"] = $curr->nodeRow->node_char_limit;
         }
         if (sizeof($tmpSubTier) > 0) {
             foreach ($tmpSubTier[1] as $k => $kidNode) {
@@ -330,12 +368,13 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             "leftTxt" => $leftTxt, // displayed in the left column of this row
             "leftVal" => $leftVal, // in addition to unique row ID
             "cols"    => $cols     // filled with nested field printings
-            ];
+        ];
     }
     
     protected function hasParentType($nID = -3, $type = '', $types = [])
     {
-        if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->parentID > 0
+        if (isset($this->allNodes[$nID]) 
+            && $this->allNodes[$nID]->parentID > 0
             && isset($this->allNodes[$this->allNodes[$nID]->parentID])) {
             $p = $this->allNodes[$this->allNodes[$nID]->parentID];
             return (isset($p->nodeType) && (($type != '' && $p->nodeType == $type) 
@@ -408,8 +447,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             $loops = [];
             foreach ($this->allNodes as $nID => $node) {
                 $GLOBALS["SL"]->logTreeNodeStat($node);
-                if (isset($node->nodeType) 
-                    && in_array($node->nodeType, ['Loop Root', 'Loop Cycle', 'Spreadsheet Table'])) {
+                $types = ['Loop Root', 'Loop Cycle', 'Spreadsheet Table'];
+                if (isset($node->nodeType) && in_array($node->nodeType, $types)) {
                     $loops[] = $node->nodeID;
                 }
             }
@@ -426,11 +465,17 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     public function loadTreeNodeStatsRecursLoop($tmpSubTier = [])
     {
         if (sizeof($tmpSubTier) > 1 && sizeof($tmpSubTier[1]) > 0) {
+            $types = [
+                'Spreadsheet Table', 
+                'User Sign Up', 
+                'Hidden Field', 
+                'Spambot Honey Pot'
+            ];
             foreach ($tmpSubTier[1] as $childNode) {
-                if (isset($this->allNodes[$childNode[0]]) && isset($this->allNodes[$childNode[0]]->nodeType)) {
+                if (isset($this->allNodes[$childNode[0]]) 
+                    && isset($this->allNodes[$childNode[0]]->nodeType)) {
                     $curr = $this->allNodes[$childNode[0]];
-                    if (in_array($curr->nodeType, $this->nodeTypes) && !in_array($curr->nodeType, ['Spreadsheet Table', 
-                        'User Sign Up', 'Hidden Field', 'Spambot Honey Pot'])) {
+                    if (in_array($curr->nodeType, $this->nodeTypes) && !in_array($curr->nodeType, $types)) {
                         $GLOBALS["SL"]->x["qTypeStats"]["nodes"]["loopNodes"]++;
                     }
                 }
@@ -448,8 +493,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             if (sizeof($currLoopItems) > 0) {
                 foreach ($currLoopItems as $i => $row) {
                     $curr->responses[$i] = new SLNodeResponses;
-                    $curr->responses[$i]->NodeResValue = $row->getKey();
-                    $curr->responses[$i]->NodeResEng = $this->getLoopItemLabel($loop, $row, $i);
+                    $curr->responses[$i]->node_res_value = $row->getKey();
+                    $curr->responses[$i]->node_res_eng = $this->getLoopItemLabel($loop, $row, $i);
                 }
             }
         } elseif (isset($curr->responseSet) && strpos($curr->responseSet, 'Table::') !== false) {
@@ -459,13 +504,14 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                     $recName = $this->getTableRecLabel($tbl, $row, $i);
                     if (trim($recName) != '') {
                         $curr->responses[$i] = new SLNodeResponses;
-                        $curr->responses[$i]->NodeResValue = $row->getKey();
-                        $curr->responses[$i]->NodeResEng = $recName;
+                        $curr->responses[$i]->node_res_value = $row->getKey();
+                        $curr->responses[$i]->node_res_eng = $recName;
                     }
                 }
             }
         } elseif (isset($curr->responseSet) && strpos($curr->responseSet, 'TableAll::') !== false) {
-            list($tbl, $condID) = $GLOBALS["SL"]->mexplode('::', str_replace('TableAll::', '', $curr->responseSet));
+            $responseSet = str_replace('TableAll::', '', $curr->responseSet);
+            list($tbl, $condID) = $GLOBALS["SL"]->mexplode('::', $responseSet);
             if ($this->v["isAdmin"]) {
                 eval("\$chk = " . $GLOBALS["SL"]->modelPath($tbl) . "::orderBy('created_at', 'desc')->get();");
                 if ($chk->isNotEmpty()) {
@@ -473,8 +519,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                         $recName = $this->getTableRecLabel($tbl, $row, $i);
                         if (trim($recName) != '') {
                             $curr->responses[$i] = new SLNodeResponses;
-                            $curr->responses[$i]->NodeResValue = $row->getKey();
-                            $curr->responses[$i]->NodeResEng = $recName;
+                            $curr->responses[$i]->node_res_value = $row->getKey();
+                            $curr->responses[$i]->node_res_eng = $recName;
                         }
                     }
                 }
@@ -490,8 +536,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                     ? $GLOBALS["SL"]->tblLoops[$fldForeignTbl] : $fldForeignTbl);
                 // what about tables with multiple loops??
                 $curr->responses[$i] = new SLNodeResponses;
-                $curr->responses[$i]->NodeResValue = $row->getKey();
-                $curr->responses[$i]->NodeResEng = $this->getLoopItemLabel($loop, $row, $i);
+                $curr->responses[$i]->node_res_value = $row->getKey();
+                $curr->responses[$i]->node_res_eng = $this->getLoopItemLabel($loop, $row, $i);
             }
         }
         return $curr;

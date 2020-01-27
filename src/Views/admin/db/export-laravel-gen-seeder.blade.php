@@ -4,7 +4,7 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class {{ str_replace('_', '', $GLOBALS['SL']->dbRow->DbPrefix) }}Seeder extends Seeder
+class {{ str_replace('_', '', $GLOBALS['SL']->dbRow->db_prefix) }}Seeder extends Seeder
 {
     /**
      * Run the database seeds.

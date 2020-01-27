@@ -8,7 +8,7 @@
 </ul> */ ?>
 @if ($recs->isNotEmpty())
     @foreach ($recs as $contact)
-        <div class="slCard nodeWrap"><div id="wrapItem{{ $contact->ContID }}" class="row">
+        <div class="slCard nodeWrap"><div id="wrapItem{{ $contact->cont_id }}" class="row">
             {!! view('vendor.survloop.admin.contact-row', [ "contact" => $contact ])->render() !!}
         </div></div>
     @endforeach

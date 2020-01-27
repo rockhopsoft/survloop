@@ -8,13 +8,7 @@
     font-size: 10pt;
     position: fixed;
 }
-#hidivBtnDbgPop, #hidivBtnDbgPop2 {
-	color: {!! $css["color-main-faint"] !!};
-}
-#hidivBtnDbgPop {
-    margin-right: 20px;
-}
-#hidivDbgPop, #hidivDbgPop2 {
+#hidivDbgPop, #hidivDbgPop2, #hidivDbgPop3 {
     border: 1px {!! $css["color-main-on"] !!} solid;
     padding: 20px;
     margin: 0px 0px 10px 0px;

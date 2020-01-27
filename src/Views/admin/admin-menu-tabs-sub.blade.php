@@ -10,7 +10,9 @@
                         @foreach ($nB[4] as $l => $nC)
                             <li class="nav-item"><a href="{!! $nC[0] !!}" class="nav-link
                             @if ($GLOBALS['SL']->isAdmMenuHshoo($nC[0])) hshoo @endif 
-                            @if ($currNavPos[0] == $i && $currNavPos[1] == $j && $currNavPos[2] == $k 
+                            @if ($currNavPos[0] == $i 
+                                && $currNavPos[1] == $j 
+                                && $currNavPos[2] == $k 
                                 && $currNavPos[3] == $l) active @endif
                             " @if ($nC[3]%3 == 0) target="_blank" @endif 
                             @if ($GLOBALS['SL']->isAdmMenuHshoo($nC[0])) 

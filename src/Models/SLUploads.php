@@ -5,23 +5,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLUploads extends Model
 {
-    protected $table         = 'SL_Uploads';
-    protected $primaryKey     = 'UpID';
+    protected $table         = 'sl_uploads';
+    protected $primaryKey     = 'up_ip';
     public $timestamps         = true;
     protected $fillable     = 
     [
-		'UpTreeID', 
-		'UpCoreID', 
-		'UpType', 
-		'UpPrivacy', 
-		'UpTitle', 
-		'UpDesc', 
-		'UpUploadFile', 
-		'UpStoredFile', 
-		'UpVideoLink', 
-		'UpVideoDuration', 
-		'UpNodeID', 
-		'UpLinkFldID', 
-		'UpLinkRecID', 
+		'up_tree_id', 
+		'up_core_id', 
+		'up_type', 
+		'up_privacy', 
+		'up_title', 
+		'up_desc', 
+		'up_upload_file', 
+		'up_stored_file', 
+		'up_video_link', 
+		'up_video_duration', 
+		'up_node_id', 
+		'up_link_fld_id', 
+		'up_link_rec_id', 
     ];
 }

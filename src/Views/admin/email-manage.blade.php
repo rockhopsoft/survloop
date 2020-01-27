@@ -21,40 +21,43 @@
 @forelse ($emailList as $i => $email)
     <div class="row pT10 pB10 @if ($i%2 == 0) row2 @endif ">
         <div class="col-1 taR">
-            <a href="/dashboard/email/{{ $email->EmailID }}"
+            <a href="/dashboard/email/{{ $email->email_id }}"
                 ><i class="fa fa-pencil fa-flip-horizontal" aria-hidden="true"></i></a>
         </div>
         <div class="col-10">
-            <h5><a class="emailLnk" id="showEmail{{ $email->EmailID }}" 
-                href="javascript:;"><b>{{ $email->EmailSubject }}</b></a></h5>
-            @if ($email->EmailType == 'Blurb')
-                [{ <a class="emailLnk" id="showEmail{{ $email->EmailID }}" 
-                    href="javascript:;"><i>{{ $email->EmailName }}</i></a> }]
+            <h5><a class="emailLnk" id="showEmail{{ $email->email_id }}" 
+                href="javascript:;"><b>{{ $email->email_subject }}</b></a></h5>
+            @if ($email->email_type == 'Blurb')
+                [{ <a class="emailLnk" id="showEmail{{ $email->email_id }}" 
+                    href="javascript:;"><i>{{ $email->email_name }}</i></a> }]
             @else
-                {{ $email->EmailName }}
+                {{ $email->email_name }}
             @endif
-            ({{ $email->EmailType }})
-            <div id="emailBody{{ $email->EmailID }}" 
+            ({{ $email->email_type }})
+            <div id="emailBody{{ $email->email_id }}" 
                 class="emailBody mB20 @if ($i%2 == 0) row2 @endif 
                 @if ($isAll) disBlo @else disNon @endif ">
                 <div class="slCard">{!! 
-                    view('vendor.survloop.emails.master', [ 
-                        "emaTitle"   => $email->EmailName,
-                        "emaContent" => $email->EmailBody,
-                        "cssColors"  => $cssColors
-                    ])->render()
+                    view(
+                        'vendor.survloop.emails.master', 
+                        [ 
+                            "emaTitle"   => $email->email_name,
+                            "emaContent" => $email->email_body,
+                            "cssColors"  => $cssColors
+                        ]
+                    )->render()
                 !!}</div>
             </div>
         </div>
         <div class="col-1 taC">
-            @if ($email->EmailType != 'Blurb')
-                <nobr>{{ number_format($email->EmailTotSent, 0) }} 
+            @if ($email->email_type != 'Blurb')
+                <nobr>{{ number_format($email->email_tot_sent, 0) }} 
                 <a href="#"><i class="fa fa-paper-plane" aria-hidden="true"></i></a></nobr>
             @endif
         </div>
     </div>
 @empty
-    <i>No emails found!?!</i>
+    <i>No emails found.</i>
 @endforelse
 </div>
 </div>

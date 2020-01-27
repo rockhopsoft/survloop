@@ -23,20 +23,20 @@ class GlobalsCache extends GlobalsBasic
         $chk = null;
         if ($treeID > 0) {
             if ($coreID > 0) {
-                $chk = SLCaches::where('CachType', $type)
-                    ->where('CachTreeID', $treeID)
-                    ->where('CachRecID', $coreID)
-                    ->where('CachKey', $key)
+                $chk = SLCaches::where('cach_type', $type)
+                    ->where('cach_tree_id', $treeID)
+                    ->where('cach_rec_id', $coreID)
+                    ->where('cach_Key', $key)
                     ->first();
             } else {
-                $chk = SLCaches::where('CachType', $type)
-                    ->where('CachTreeID', $treeID)
-                    ->where('CachKey', $key)
+                $chk = SLCaches::where('cach_type', $type)
+                    ->where('cach_tree_id', $treeID)
+                    ->where('cach_key', $key)
                     ->first();
             }
         } else {
-            $chk = SLCaches::where('CachType', $type)
-                ->where('CachKey', $key)
+            $chk = SLCaches::where('cach_type', $type)
+                ->where('cach_key', $key)
                 ->first();
         }
         return $chk;
@@ -46,14 +46,15 @@ class GlobalsCache extends GlobalsBasic
     {
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
-        return ($chk && isset($chk->CachID));
+        return ($chk && isset($chk->cach_id));
     }
 
     public function chkCacheType($type = '')
     {
-        if ($type == '' && isset($this->treeRow) 
-            && isset($this->treeRow->TreeType)) {
-            $type = strtolower($this->treeRow->TreeType);
+        if ($type == '' 
+            && isset($this->treeRow) 
+            && isset($this->treeRow->tree_type)) {
+            $type = strtolower($this->treeRow->tree_type);
         }
         return $type;
     }
@@ -62,8 +63,8 @@ class GlobalsCache extends GlobalsBasic
     {
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
-        if ($chk && isset($chk->CachValue) && trim($chk->CachValue) != '') {
-            $file = $this->cachePath . '/html/' . $chk->CachValue;
+        if ($chk && isset($chk->cach_value) && trim($chk->cach_value) != '') {
+            $file = $this->cachePath . '/html/' . $chk->cach_value;
             if (Storage::exists($file)) {
                 return trim(Storage::get($file));
             }
@@ -85,8 +86,8 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllItemCaches($treeID = 0, $coreID = 0)
     {
-        $chk = SLCaches::where('CachTreeID', $treeID)
-            ->where('CachRecID', $coreID)
+        $chk = SLCaches::where('cach_tree_id', $treeID)
+            ->where('cach_rec_id', $coreID)
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cache) {
@@ -98,7 +99,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function deleteCacheFile($cache)
     {
-        if ($cache && isset($cache->CachID)) {
+        if ($cache && isset($cache->cach_id)) {
             $file = $this->cachePath . '/html/' . $cache->CachValue;
             Storage::delete($file);
             $cache->delete();
@@ -109,20 +110,20 @@ class GlobalsCache extends GlobalsBasic
 
     public function putCache($key = '', $content = '', $type = '', $treeID = 0, $coreID = 0)
     {
-        $file = date("Ymd") . '-t' . $treeID 
-            . (($coreID > 0) ? '-c' . $coreID : '');
+        $file = date("Ymd") . '-t' . $treeID . (($coreID > 0) ? '-c' . $coreID : '');
         $treeRow = false;
-        if (isset($this->treeRow->TreeType)) {
+        if (isset($this->treeRow->tree_type)) {
             $treeRow = $this->treeRow;
         } elseif ($treeID > 0) {
             $treeRow = SLTree::find($treeID);
         }
-        if (isset($treeRow->TreeType) && $treeRow->TreeType == 'Page' 
-            && $treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
+        if (isset($treeRow->tree_type) 
+            && $treeRow->tree_type == 'Page' 
+            && $treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0) {
             $file .= '-s' . session()->get('slSessID');
         }
         $fileDeets = '-' . str_replace('.html', '', str_replace('?', '_', 
-                str_replace('&', '_', str_replace('/', '_', $key))));
+            str_replace('&', '_', str_replace('/', '_', $key))));
         if (strlen($fileDeets) > 60) {
             $fileDeets = substr($fileDeets, 0, 60);
         }
@@ -132,19 +133,35 @@ class GlobalsCache extends GlobalsBasic
         $type = $this->chkCacheType($type);
         $this->forgetCache($key, $type, $treeID, $coreID);
         $cache = new SLCaches;
-        $cache->CachType   = $type;
-        $cache->CachTreeID = $treeID;
-        $cache->CachRecID  = $coreID;
-        $cache->CachKey    = $key;
-        $cache->CachValue  = $file;
+        $cache->cach_type    = $type;
+        $cache->cach_tree_id = $treeID;
+        $cache->cach_rec_id  = $coreID;
+        $cache->cach_key     = $key;
+        $cache->cach_value   = $file;
         $cache->save();
-        return $cache->CachID;
+        return $cache->cach_id;
+    }
+
+    public function hasCacheSearch($key = '', $treeID = 0)
+    {
+        $chk = $this->getCache($key, 'search', $treeID);
+        return ($chk && isset($chk->cach_id));
+    }
+
+    public function putCacheSearch($key = '', $ids = '', $treeID = 0)
+    {
+        $cache = new SLCaches;
+        $cache->cach_type    = 'search';
+        $cache->cach_tree_id = $treeID;
+        $cache->cach_key     = $key;
+        $cache->cach_value   = $ids;
+        $cache->save();
+        return $cache->cach_id;
     }
     
     public function opnAjax()
     {
-        return '<script type="text/javascript"> '
-            . '$(document).ready(function(){ ';
+        return '<script type="text/javascript"> $(document).ready(function(){ ';
     }
     
     public function clsAjax()
@@ -214,8 +231,7 @@ class GlobalsCache extends GlobalsBasic
                 }
             }
             $offset = $tag1end-strlen($tagMeat);
-            if (0 < $tag1end && 0 < $offset 
-                && $offset < strlen($str)) {
+            if (0 < $tag1end && 0 < $offset && $offset < strlen($str)) {
                 $tag1start = strpos($str, '<script', $offset);
             } else {
                 $tag1start = false;
@@ -255,11 +271,12 @@ class GlobalsCache extends GlobalsBasic
                 }
             }
             if ($tag1end > 0) {
-                $tag1start = strpos(
-                    $str, 
-                    '<style', 
-                    $tag1end-strlen($tagMeat)
-                );
+                $offset = $tag1end-strlen($tagMeat);
+                if ($offset >=0 && $offset < strlen($str)) {
+                    $tag1start = strpos($str, '<style', $offset);
+                } else {
+                    $tag1start = false;
+                }
             }
             $allMeat .= $this->wrapScriptMeat($tagMeat, $nID);
         }
@@ -290,8 +307,8 @@ class GlobalsCache extends GlobalsBasic
         }
         $minPath = '../storage/app/' . $this->cachePath;
         $fileCss = date("Ymd") . '-t' . $this->treeID;
-        if ($this->treeRow->TreeType == 'Page' 
-            && $this->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE == 0) {
+        if ($this->treeRow->tree_type == 'Page' 
+            && $this->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0) {
             $fileCss .= '-s' . session()->get('slSessID');
         }
         $fileCss .= '-r' . rand(10000000, 100000000) . '.css';
@@ -315,6 +332,7 @@ class GlobalsCache extends GlobalsBasic
             $java .= ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ';
         }
         if (trim($java) != '' && trim($java) != '/* */') {
+            $java .= ' pageDynaLoaded = true; ';
             Storage::put($this->cachePath . '/js/' . $fileJs, $java);
             $fileMin = str_replace('.js', '-min.js', $fileJs);
             $minifier = new Minify\JS;
@@ -332,8 +350,8 @@ class GlobalsCache extends GlobalsBasic
     public function getCachePageJs($filename = '')
     {
         if (!Storage::has($this->cachePath . '/js/' . $filename)) {
-            return '<!-- not found ' . $this->cachePath . '/js/' . $filename 
-                . ' -->';
+            return '<!-- not found ' . $this->cachePath 
+                . '/js/' . $filename . ' -->';
         }
         return trim(Storage::get($this->cachePath . '/js/' . $filename));
     }
@@ -371,7 +389,8 @@ class GlobalsCache extends GlobalsBasic
                 }
             }
         }
-        $chk = SLCaches::where('created_at', '<', date('Y-m-d H:i:s', $this->getPastDateTime()))
+        $postDateTime = date('Y-m-d H:i:s', $this->getPastDateTime());
+        $chk = SLCaches::where('created_at', '<', $postDateTime)
             ->delete();
         return true;
     }
@@ -431,6 +450,16 @@ class GlobalsCache extends GlobalsBasic
             . '<center><div id="deferAnim' . $nID . '" class="p20 m20">'
             . $this->spinner() . '</div></center>'
             . '</div>';
+    }
+
+    public function microLog($label = 'Start Page Load')
+    {
+        return $GLOBALS["SL-Micro"]->microLog($label);
+    }
+
+    public function printMicroLog()
+    {
+        return $GLOBALS["SL-Micro"]->printMicroLog();
     }
 
 }

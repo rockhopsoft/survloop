@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLCaches extends Model
 {
-    protected $table      = 'SL_Caches';
-    protected $primaryKey = 'CachID';
+    protected $table      = 'sl_caches';
+    protected $primaryKey = 'cach_id';
     public $timestamps    = true;
     protected $fillable   = 
     [    
-		'CachType', 
-		'CachTreeID', 
-		'CachRecID', 
-		'CachKey', 
-        'CachValue', 
+		'cach_type', 
+		'cach_tree_id', 
+		'cach_rec_id', 
+		'cach_key', 
+        'cach_value', 
     ];
      
     // END SurvLoop auto-generated portion of Model

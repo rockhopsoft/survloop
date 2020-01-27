@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSessLoops extends Model
 {
-    protected $table         = 'SL_SessLoops';
-    protected $primaryKey     = 'SessLoopID';
+    protected $table         = 'sl_sess_loops';
+    protected $primaryKey     = 'sess_loop_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'SessLoopSessID', 
-        'SessLoopName', 
-        'SessLoopItemID', 
+        'sess_loop_sess_id', 
+        'sess_loop_name', 
+        'sess_loop_item_id', 
     ];
 }

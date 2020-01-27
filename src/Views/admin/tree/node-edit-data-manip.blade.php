@@ -11,8 +11,8 @@
             <label>
                 <input type="radio" name="dataManipType" id="dataManipTypeNew" value="New" 
                     onClick="return checkDataManipFlds();" autocomplete="off" 
-                    @if (isset($node->nodeRow->NodeType) 
-                        && $node->nodeRow->NodeType == 'Data Manip: New') CHECKED @endif >
+                    @if (isset($node->nodeRow->node_type) 
+                        && $node->nodeRow->node_type == 'Data Manip: New') CHECKED @endif >
                     <h4 class="disIn pL5 mT0">Create New Record in 
                     <span class="slGreenDark">Data Family</span></h4>
             </label>
@@ -21,8 +21,8 @@
             <label>
                 <input type="radio" name="dataManipType" id="dataManipTypeUpdate" value="Update" 
                     onClick="return checkDataManipFlds();" autocomplete="off" 
-                    @if (isset($node->nodeRow->NodeType) 
-                        && $node->nodeRow->NodeType == 'Data Manip: Update') CHECKED @endif >
+                    @if (isset($node->nodeRow->node_type) 
+                        && $node->nodeRow->node_type == 'Data Manip: Update') CHECKED @endif >
                     <h4 class="disIn pL5 mT0">Update Family Record in 
                     <span class="slGreenDark">Data Family</span></h4>
             </label>
@@ -31,8 +31,8 @@
             <label>
                 <input type="radio" name="dataManipType" id="dataManipTypeWrap" value="Wrap" 
                     onClick="return checkDataManipFlds();" autocomplete="off" 
-                    @if (isset($node->nodeRow->NodeType) 
-                        && $node->nodeRow->NodeType == 'Data Manip: Wrap') CHECKED @endif >
+                    @if (isset($node->nodeRow->node_type) 
+                        && $node->nodeRow->node_type == 'Data Manip: Wrap') CHECKED @endif >
                     <h4 class="disIn pL5 mT0">Just Wrap Children in 
                     <span class="slGreenDark">Data Family</span></h4>
             </label>
@@ -41,25 +41,25 @@
             <label>
                 <input type="radio" name="dataManipType" id="dataManipTypeCloseSess" value="Close Sess"
                     onClick="return checkDataManipFlds();" autocomplete="off" 
-                    @if (isset($node->nodeRow->NodeType) 
-                        && $node->nodeRow->NodeType == 'Data Manip: Close Sess') CHECKED @endif >
+                    @if (isset($node->nodeRow->node_type) 
+                        && $node->nodeRow->node_type == 'Data Manip: Close Sess') CHECKED @endif >
                     <h4 class="disIn pL5 mB0 mT0 slGrey">End User Session for Form Tree</h4>
-                    <div id="manipCloseSess" class=" @if (isset($node->nodeRow->NodeType) 
-                        && $node->nodeRow->NodeType == 'Data Manip: Close Sess') disBlo 
+                    <div id="manipCloseSess" class=" @if (isset($node->nodeRow->node_type) 
+                        && $node->nodeRow->node_type == 'Data Manip: Close Sess') disBlo 
                         @else disNon @endif "><select name="dataManipCloseSessTree" class="form-control"
                             style="width: 250px;" autocomplete="off" >
                             @forelse ($treeList as $t)
-                                <option value="{{ $t->TreeID }}" 
-                                    @if ($t->TreeID == $node->nodeRow->NodeResponseSet) SELECTED @endif
-                                    >{{ $t->TreeName }}</option>
+                                <option value="{{ $t->tree_id }}" 
+                                    @if ($t->tree_id == $node->nodeRow->node_response_set) SELECTED @endif
+                                    >{{ $t->tree_name }}</option>
                             @empty
                             @endforelse
                         </select>
                     </div>
             </label>
         </div>
-        <div id="dataNewRecord" class=" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Manip: Close Sess') disNon @else disBlo @endif ">
+        <div id="dataNewRecord" class=" @if (isset($node->nodeRow->node_type) 
+            && $node->nodeRow->node_type == 'Data Manip: Close Sess') disNon @else disBlo @endif ">
             <div class="row pT5">
                 <div class="col-5">
                     <label class="w100"><h4 class="mT0">Set Record Field</h4></label>
@@ -78,8 +78,8 @@
                         <div class="nFld mT0">
                             <select name="manipMoreStore" id="manipMoreStoreID"
                             class="form-control form-control-lg" autocomplete="off" onClick="return checkData();" >
-                            {!! $GLOBALS['SL']->fieldsDropdown((isset($node->nodeRow->NodeDataStore)) 
-                                ? trim($node->nodeRow->NodeDataStore) : '') !!}
+                            {!! $GLOBALS['SL']->fieldsDropdown((isset($node->nodeRow->node_data_store)) 
+                                ? trim($node->nodeRow->node_data_store) : '') !!}
                             </select>
                         </div>
                     </label>
@@ -89,8 +89,8 @@
                 </div>
                 <div class="col-2">
                     <div class="nFld mT0"><input type="text" name="manipMoreVal" 
-                        class="form-control form-control-lg" @if (isset($node->nodeRow->NodeDefault)) 
-                            value="{{ $node->nodeRow->NodeDefault }}" @endif >
+                        class="form-control form-control-lg" @if (isset($node->nodeRow->node_default)) 
+                            value="{{ $node->nodeRow->node_default }}" @endif >
                     </div>
                 </div>
                 <div class="col-1 taC">
@@ -99,8 +99,8 @@
                 <div class="col-3">
                     <div class="nFld mT0"><select name="manipMoreSet" class="form-control form-control-lg" 
                         autocomplete="off" >
-                        {!! $GLOBALS['SL']->allDefsDropdown((isset($node->nodeRow->NodeResponseSet)) 
-                            ? $node->nodeRow->NodeResponseSet : '') !!}
+                        {!! $GLOBALS['SL']->allDefsDropdown((isset($node->nodeRow->node_response_set)) 
+                            ? $node->nodeRow->node_response_set : '') !!}
                     </select></div>
                 </div>
             </div>
@@ -114,8 +114,8 @@
                                 <select name="manipMore{{ $i }}Store" id="manipMore{{ $i }}StoreID" 
                                     class="form-control form-control-lg" autocomplete="off" 
                                     onClick="return checkData();" >
-                                @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeDataStore))
-                                    {!! $GLOBALS['SL']->fieldsDropdown($node->dataManips[$i]->NodeDataStore) !!}
+                                @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->node_data_store))
+                                    {!! $GLOBALS['SL']->fieldsDropdown($node->dataManips[$i]->node_data_store) !!}
                                 @else {!! $GLOBALS['SL']->fieldsDropdown() !!} @endif
                                 </select>
                             </div>
@@ -127,8 +127,8 @@
                             <div class="nFld mT0">
                                 <input type="text" name="manipMore{{ $i }}Val" 
                                     class="form-control form-control-lg" @if (isset($node->dataManips[$i]) 
-                                        && isset($node->dataManips[$i]->NodeDefault))
-                                        value="{!! $node->dataManips[$i]->NodeDefault !!}"
+                                        && isset($node->dataManips[$i]->node_default))
+                                        value="{!! $node->dataManips[$i]->node_default !!}"
                                     @else value="" @endif >
                             </div>
                         </div>
@@ -139,8 +139,8 @@
                             <div class="nFld mT0">
                                 <select name="manipMore{{ $i }}Set" 
                                     class="form-control form-control-lg" autocomplete="off" >
-                                    @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->NodeResponseSet))
-                                        {!! $GLOBALS['SL']->allDefsDropdown($node->dataManips[$i]->NodeResponseSet) !!}
+                                    @if (isset($node->dataManips[$i]) && isset($node->dataManips[$i]->node_response_set))
+                                        {!! $GLOBALS['SL']->allDefsDropdown($node->dataManips[$i]->node_response_set) !!}
                                     @else {!! $GLOBALS['SL']->allDefsDropdown() !!} @endif
                                 </select>
                             </div>

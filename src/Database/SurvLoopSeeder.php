@@ -17,7 +17,7 @@ class SurvLoopSeeder extends Seeder
 	DB::table('SL_Databases')->insert([
 			'DbID' => 3,
 			'DbUser' => '0',
-			'DbPrefix' => 'SL_',
+			'DbPrefix' => 'sl_',
 			'DbName' => 'SurvLoop',
 			'DbDesc' => 'All The Data Are Belong',
 			'DbMission' => 'Empower you to design your complex databases, collect data with an easy user experience, and create an API to share the data with the world!',
@@ -6508,7 +6508,7 @@ pre { background: #FCFBFF; padding: 20px; }
 			'DefDatabase' => '1',
 			'DefSet' => 'Blurbs',
 			'DefSubset' => 'Footer',
-			'DefIsActive' => '3',
+			'DefOrder' => '3',
 			'DefDescription' => '<div id="pubFooter"><div class="container">
     <div class="row">
         <div class="col-md-3 pB20">

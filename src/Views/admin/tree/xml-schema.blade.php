@@ -10,15 +10,15 @@ https://creativecommons.org/licenses/by-sa/3.0/
 
 {{ $GLOBALS['SL']->sysOpts['logo-url'] }}
 
-XML Example: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example
+XML Example: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example
 
 This XML was auto-generated from the SurvLoop engine, built on Laravel,
 resources/views/survloop/admin/tree/xml-schema.blade.php
 -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema"
-    xmlns="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema"
+    targetNamespace="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema"
+    xmlns="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema"
     elementFormDefault="qualified" >
     
     @if (isset($nestedNodes)) {!! $nestedNodes !!} @endif

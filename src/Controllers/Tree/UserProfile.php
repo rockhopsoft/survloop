@@ -21,35 +21,33 @@ class UserProfile extends TreeSurvInput
     public function afterLogin(Request $request)
     {
         $this->survLoopInit($request, '');
-        if ($this->v["user"] 
-            && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+        if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
             //return redirect()->intended('dashboard');
             return $this->redir('/dashboard');
-        } elseif ($this->v["user"] 
-            && $this->v["user"]->hasRole('volunteer|partner')) {
+        } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer|partner')) {
             $opt = ($this->v["user"]->hasRole('partner')) ? 41 : 17;
-            $trees = SLTree::where('TreeDatabase', 1)
-                ->where('TreeOpts', '>', 1)
+            $trees = SLTree::where('tree_database', 1)
+                ->where('tree_opts', '>', 1)
                 ->get();
             if ($trees->isNotEmpty()) {
                 foreach ($trees as $tree) {
-                    if ($tree->TreeOpts%$opt == 0 && $tree->TreeOpts%7 == 0) {
-                        //return redirect()->intended('dash/' . $tree->TreeSlug);
-                        return $this->redir('/dash/' . $tree->TreeSlug, true);
+                    if ($tree->tree_opts%$opt == 0 && $tree->tree_opts%7 == 0) {
+                        //return redirect()->intended('dash/' . $tree->tree_slug);
+                        return $this->redir('/dash/' . $tree->tree_slug, true);
                     }
                 }
             }
         } else {
-            $hasCoreTbl = (isset($GLOBALS["SL"]->coreTbl) 
-                && $GLOBALS["SL"]->coreTblAbbr() != '');
-            $sessTree = ((session()->has('sessTreeReg')) 
-                ? session()->get('sessTreeReg') : $GLOBALS["SL"]->sessTree);
+            $hasCoreTbl = (isset($GLOBALS["SL"]->coreTbl) && $GLOBALS["SL"]->coreTblAbbr() != '');
+            $sessTree = $GLOBALS["SL"]->sessTree;
+            if (session()->has('sessTreeReg')) {
+                $sessTree = session()->get('sessTreeReg');
+            }
             $sessInfo = null;
-            $coreAbbr = (($hasCoreTbl) 
-                ? $GLOBALS["SL"]->coreTblAbbr() : '');
-            $minute = mktime(date("H"), date("i")-1, date("s"), 
-                date('n'), date('j'), date('Y'));
-            if ($this->v["user"] && isset($this->v["user"]->created_at) 
+            $coreAbbr = (($hasCoreTbl) ? $GLOBALS["SL"]->coreTblAbbr() : '');
+            $minute = mktime(date("H"), date("i")-1, date("s"), date('n'), date('j'), date('Y'));
+            if ($this->v["user"] 
+                && isset($this->v["user"]->created_at) 
                 && $minute < strtotime($this->v["user"]->created_at)) {
                 // signed up in the past minute
                 $firstUser = User::select('id')->get();
@@ -57,8 +55,7 @@ class UserProfile extends TreeSurvInput
                     $this->v["user"]->assignRole('administrator');
                     $this->logAdd(
                         'session-stuff', 
-                        'New System Administrator #' 
-                            . $this->v["user"]->id . ' Registered'
+                        'New System Administrator #' . $this->v["user"]->id . ' Registered'
                     );
                 } elseif ($request->has('newVolunteer') 
                     && intVal($request->newVolunteer) == 1) {
@@ -76,26 +73,22 @@ class UserProfile extends TreeSurvInput
                 if (session()->has('coreID' . $sessTree) && $hasCoreTbl) {
                     eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
                         . "::find(" . session()->get('coreID' . $sessTree) . ");");
-                    if ($chkRec && isset($chkRec->{ $coreAbbr . 'IPaddy' })) {
-                        if ($chkRec->{ $coreAbbr . 'IPaddy' } == $GLOBALS["SL"]->hashIP() 
-                            && (!isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) 
-                                || intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) <= 0)) {
-                            $chkRec->update([ 
-                                $GLOBALS["SL"]->coreTblUserFld => $this->v["uID"]
-                            ]);
-                            $log = 'Assigning ' . $GLOBALS["SL"]->coreTbl 
-                                . '#' . $chkRec->getKey() . ' to U#'
-                                . $this->v["uID"] . ' <i>(afterLogin)</i>';
+                    if ($chkRec && isset($chkRec->{ $coreAbbr . 'ip_addy' })) {
+                        $badUserField = (!isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) 
+                            || intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) <= 0);
+                        if ($chkRec->{ $coreAbbr . 'ip_addy' } == $GLOBALS["SL"]->hashIP() && $badUserField) {
+                            $chkRec->update([ $GLOBALS["SL"]->coreTblUserFld => $this->v["uID"] ]);
+                            $log = 'Assigning ' . $GLOBALS["SL"]->coreTbl . '#' . $chkRec->getKey() 
+                                . ' to U#' . $this->v["uID"] . ' <i>(afterLogin)</i>';
                             $this->logAdd('session-stuff', $log);
                         }
                     }
                 }
                 if (session()->has('sessID' . $sessTree)) {
                     $sessInfo = SLSess::find(session()->get('sessID' . $sessTree));
-                    if ($sessInfo && isset($sessInfo->SessTree)) {
-                        if (!isset($sessInfo->SessUserID) 
-                            || intVal($sessInfo->SessUserID) <= 0) {
-                            $sessInfo->update([ 'SessUserID' => $this->v["uID"] ]);
+                    if ($sessInfo && isset($sessInfo->sess_tree)) {
+                        if (!isset($sessInfo->sess_user_id) || intVal($sessInfo->sess_user_id) <= 0) {
+                            $sessInfo->update([ 'sess_user_id' => $this->v["uID"] ]);
                             $log = 'Assigning Sess#' . $sessInfo->getKey() . ' to U#' 
                                 . $this->v["uID"] . ' <i>(afterLogin)</i>';
                             $this->logAdd('session-stuff', $log);
@@ -104,21 +97,21 @@ class UserProfile extends TreeSurvInput
                 }
             }
             //$this->loadSessInfo($GLOBALS["SL"]->coreTbl);
-            if (!session()->has('coreID' . $sessTree) 
-                || $this->coreID <= 0) {
+            if (!session()->has('coreID' . $sessTree) || $this->coreID <= 0) {
                 $this->coreID = $this->findUserCoreID();
                 if ($this->coreID > 0) {
                     session()->put('coreID' . $sessTree, $this->coreID);
-                    $log = 'Putting Cookie ' . $GLOBALS["SL"]->coreTbl 
-                        . '#' . $this->coreID . ' for U#' 
-                        . $this->v["uID"] . ' <i>(afterLogin)</i>';
+                    session()->save();
+                    $log = 'Putting Cookie ' . $GLOBALS["SL"]->coreTbl . '#' . $this->coreID 
+                        . ' for U#' . $this->v["uID"] . ' <i>(afterLogin)</i>';
                     $this->logAdd('session-stuff', $log);
                 }
             }
-            if ($sessInfo && isset($sessInfo->SessCurrNode) 
-                && intVal($sessInfo->SessCurrNode) > 0) {
+            if ($sessInfo 
+                && isset($sessInfo->sess_curr_node) 
+                && intVal($sessInfo->sess_curr_node) > 0) {
                 $this->loadTree();
-                $nodeURL = $this->currNodeURL($this->sessInfo->SessCurrNode);
+                $nodeURL = $this->currNodeURL($this->sessInfo->sess_curr_node);
                 if (trim($nodeURL) != '') {
                     return $this->redir($nodeURL, true);
                 }
@@ -133,15 +126,14 @@ class UserProfile extends TreeSurvInput
     public function findUserCoreID()
     {
         $this->coreIncompletes = [];
-        if (isset($this->v["uID"]) && $this->v["uID"] > 0 
+        if (isset($this->v["uID"]) 
+            && $this->v["uID"] > 0 
             && isset($GLOBALS["SL"]->coreTbl) 
             && trim($GLOBALS["SL"]->coreTbl) != '') {
             $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl);
             if (trim($model) != '') {
-                eval("\$incompletes = " . $model . "::where('" 
-                    . $GLOBALS["SL"]->coreTblUserFld 
-                    . "', " . $this->v["uID"] 
-                    . ")->orderBy('created_at', 'desc')->get();");
+                eval("\$incompletes = " . $model . "::where('" . $GLOBALS["SL"]->coreTblUserFld 
+                    . "', " . $this->v["uID"] . ")->orderBy('created_at', 'desc')->get();");
                 if ($incompletes->isNotEmpty()) {
                     foreach ($incompletes as $i => $row) {
                         if ($this->recordIsIncomplete(
@@ -185,18 +177,18 @@ class UserProfile extends TreeSurvInput
                         && is_array($GLOBALS["SL"]->REQ->roles)
                         && sizeof($GLOBALS["SL"]->REQ->roles) > 0) {
                         foreach ($user->roles as $i => $role) {
-                            if (in_array($role->DefID, $GLOBALS["SL"]->REQ->roles)) {
-                                if (!$user->hasRole($role->DefSubset)) {
-                                    $user->assignRole($role->DefSubset);
+                            if (in_array($role->def_id, $GLOBALS["SL"]->REQ->roles)) {
+                                if (!$user->hasRole($role->def_subset)) {
+                                    $user->assignRole($role->def_subset);
                                 }
-                            } elseif ($user->hasRole($role->DefSubset)) {
-                                $user->revokeRole($role->DefSubset);
+                            } elseif ($user->hasRole($role->def_subset)) {
+                                $user->revokeRole($role->def_subset);
                             }
                         }
                     } else { // no roles selected, delete all that exist
                         foreach ($user->roles as $i => $role) {
-                            if ($user->hasRole($role->DefSubset)) {
-                                $user->revokeRole($role->DefSubset);
+                            if ($user->hasRole($role->def_subset)) {
+                                $user->revokeRole($role->def_subset);
                             }
                         }
                     }
@@ -211,14 +203,13 @@ class UserProfile extends TreeSurvInput
     public function setCurrUserProfile($uname = '')
     {
         if (trim($uname) != '') {
-            $this->v["profileUser"] = User::where(
-                    'name', 'LIKE', urldecode($uname))
+            $this->v["profileUser"] = User::where('name', 'LIKE', urldecode($uname))
                 ->first();
-            if ($this->v["profileUser"] 
-                && isset($this->v["profileUser"]->id)) {
+            if ($this->v["profileUser"] && isset($this->v["profileUser"]->id)) {
                 return true;
             }
-        } elseif (isset($this->v["uID"]) && $this->v["uID"] > 0 
+        } elseif (isset($this->v["uID"]) 
+            && $this->v["uID"] > 0 
             && isset($this->v["user"]->id)) {
             $this->v["profileUser"] = $this->v["user"];
             return true;
@@ -232,18 +223,17 @@ class UserProfile extends TreeSurvInput
             && isset($this->v["profileUser"]) 
             && isset($this->v["profileUser"]->id)) {
             $this->v["profileUser"]->loadRoles();
-            $this->v["canEdit"] = (isset($this->v["user"]) 
+            $this->v["canEdit"] = false;
+            if (isset($this->v["user"]) 
                 && $this->v["user"] 
                 && ($this->v["user"]->hasRole('administrator') 
-                    || (isset($this->v["uID"]) 
-                        && $this->v["user"]->id 
-                        == $this->v["profileUser"]->id)));
-            if (isset($this->v["uID"]) && $this->v["uID"] > 0) {
-                if ($GLOBALS["SL"]->REQ->has('edit') 
-                    && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
+                    || $this->v["user"]->id == $this->v["profileUser"]->id)) {
+                $this->v["canEdit"] = true;
+            }
+            if (isset($this->v["uID"]) && $this->v["uID"] > 0 && $this->v["canEdit"]) {
+                if ($GLOBALS["SL"]->REQ->has('edit') && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
                     $this->updateProfile();
-                } elseif (session()->has('success') 
-                    && !$GLOBALS["SL"]->isHomestead()) {
+                } elseif (session()->has('success') && !$GLOBALS["SL"]->isHomestead()) {
                     $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] 
                         . ' password has been changed.';
                     $emaContent = '<h3>Password updated</h3><p>Hi ' 
@@ -257,27 +247,19 @@ class UserProfile extends TreeSurvInput
                         . 'we are here to help secure your account, '
                         . 'just contact us.</p><p>–Your friends at ' 
                         . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
-                    $this->sendEmail(
-                        $emaContent, 
-                        $emaSubject, 
+                    $emaTo = [
                         [
-                            [
-                                ((isset($this->v["user"])) 
-                                    ? $this->v["user"]->email : ''), 
-                                '' 
-                            ]
+                            ((isset($this->v["user"])) ? $this->v["user"]->email : ''), 
+                            '' 
                         ]
-                    );
+                    ];
+                    $this->sendEmail($emaContent, $emaSubject, $emaTo);
                 }
             }
-            return view(
-                'vendor.survloop.auth.profile', 
-                $this->v
-            )->render();
+            return view('vendor.survloop.auth.profile', $this->v)->render();
         }
         return '<br /><br /><br /><center><i>User not found.</i></center>'
-            . '<script type="text/javascript"> '
-            . 'setTimeout("window.location=\'/login\'", 1); </script>';
+            . '<script type="text/javascript"> setTimeout("window.location=\'/login\'", 1); </script>';
     }
     
 }

@@ -5,22 +5,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLBusRules extends Model
 {
-    protected $table         = 'SL_BusRules';
-    protected $primaryKey     = 'RuleID';
+    protected $table         = 'sl_bus_rules';
+    protected $primaryKey     = 'rule_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'RuleDatabase', 
-        'RuleStatement', 
-        'RuleConstraint', 
-        'RuleTables', 
-        'RuleFields', 
-        'RuleIsAppOrient', 
-        'RuleIsRelation', 
-        'RuleTestOn', 
-        'RulePhys', 
-        'RuleLogic', 
-        'RuleRel', 
-        'RuleAction', 
+        'rule_database', 
+        'rule_statement', 
+        'rule_constraint', 
+        'rule_tables', 
+        'rule_fields', 
+        'rule_is_app_orient', 
+        'rule_is_relation', 
+        'rule_test_on', 
+        'rule_phys', 
+        'rule_logic', 
+        'rule_rel', 
+        'rule_action', 
     ];
 }

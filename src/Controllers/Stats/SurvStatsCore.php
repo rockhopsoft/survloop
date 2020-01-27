@@ -23,7 +23,7 @@ class SurvStatsCore
         "scaler"     => [ 1, '' ],
         "datLabPrfx" => '',
         "datLabOvr"  => ''
-        ];
+    ];
     
     public function addDataType($abbr = '', $label = '', $unit = '', $rowLabels = [])
     {
@@ -33,7 +33,7 @@ class SurvStatsCore
             "lab" => $label,
             "unt" => $unit,
             "row" => $rowLabels
-            ];
+        ];
         return true;
     }
     
@@ -95,7 +95,7 @@ class SurvStatsCore
                 "sum" => 0,
                 "avg" => 0,
                 "ids" => []
-                ];
+            ];
         }
         return true;
     }
@@ -107,14 +107,14 @@ class SurvStatsCore
             "cnt" => 0,
             "rec" => [],
             "dat" => []
-            ];
+        ];
         if (sizeof($this->datMap) > 0) {
             foreach ($this->datMap as $let => $d) {
                 $ret["dat"][$let] = [
                     "sum" => 0,
                     "avg" => 0,
                     "ids" => []
-                    ];
+                ];
             }
         }
         return $ret;
@@ -127,7 +127,7 @@ class SurvStatsCore
             "avg" => [ "raw" => 0, "row" => [] ],
             "min" => [ "raw" => 0, "row" => [] ],
             "max" => [ "raw" => 0, "row" => [] ]
-            ];
+        ];
     }
     
 }

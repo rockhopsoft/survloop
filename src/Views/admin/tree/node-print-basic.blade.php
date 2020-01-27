@@ -1,27 +1,27 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-print-basic.blade.php -->
 
-@if (isset($node->nodeRow->NodeType) && (!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false 
-    || (!$node->isDataManip() && $node->nodeRow->NodeType != 'Spambot Honey Pot')))
+@if (isset($node->nodeRow->node_type) && (!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false 
+    || (!$node->isDataManip() && $node->nodeRow->node_type != 'Spambot Honey Pot')))
 
-    @if ($node->nodeRow->NodeType == 'Layout Column')
-        <div class="col-{{ $node->nodeRow->NodeCharLimit }}">
+    @if ($node->nodeRow->node_type == 'Layout Column')
+        <div class="col-{{ $node->nodeRow->node_char_limit }}">
     @endif
 
     <div class="nodeAnchor"><a id="n{{ $nID }}" name="n{{ $nID }}"></a></div>
     
-    @if ($canEditTree && $node->nodeRow->NodeParentID > 0 && !$isPrint)
+    @if ($canEditTree && $node->nodeRow->node_parent_id > 0 && !$isPrint)
         <div id="addSib{{ $nID }}" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
-                $node->nodeRow->NodeParentID }}&ordBefore={{ $nID }}"
+            <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ 
+                $node->nodeRow->node_parent_id }}&ordBefore={{ $nID }}"
                 class="btn btn-sm btn-warning opac50 w100 mTn15"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
         </div>
-        @if ($node->nodeRow->NodeParentOrder == 0)
+        @if ($node->nodeRow->node_parent_order == 0)
             <div class="nodeMover disNon pT5 pB5 
                 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
                 <a href="javascript:;" class="btn btn-sm btn-warning opac50 w100 mTn10 adminNodeMoveTo" 
-                    id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ $node->nodeRow->NodeParentOrder }}"
+                    id="moveTo{{ $node->nodeRow->node_parent_id }}ord{{ $node->nodeRow->node_parent_order }}"
                     ><i class="fa fa-bullseye"></i> Move Node Here</a>
             </div>
         @endif
@@ -30,15 +30,15 @@
     <div id="nPrintWrap{{ $nID }}" class=" @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif
         @if ($node->isPage()) basicTierPage 
         @elseif ($node->isLoopRoot()) basicTierLoop 
-        @elseif ($node->nodeRow->NodeOpts%89 == 0) slCard
+        @elseif ($node->nodeRow->node_opts%89 == 0) slCard
         @else 
             @if ($node->isBranch()) basicTierBranch @endif
-            @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0) basicTierData @endif
+            @if (trim($node->nodeRow->node_data_branch) != '' || $node->nodeRow->node_parent_id <= 0) basicTierData @endif
         @endif
         @if (isset($conditionList) && strpos($conditionList, '#NodeDisabled') !== false) basicTierDisabled @endif ">
         
         @if ($node->isPrintBasicTine()) <div class="w100 opac50"> @endif
-        <?php /* /dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/{{ $nID }} */ ?>
+        <?php /* /dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/{{ $nID }} */ ?>
         <table class="w100 mTn5 mB5" cellpadding=0 cellspacing=0 border=0 ><tr><td>
             <a id="showBtns{{ $nID }}" href="javascript:;" class="circleBtn 
                 @if ($node->isPage() || $node->isLoopRoot()) circleBtn0 
@@ -50,31 +50,35 @@
             <span class="slGrey mL5">{!! $node->getIcon() !!} 
             @if ($node->isInstruct()) Content Chunk, WYSIWYG
             @elseif ($node->isInstructRaw()) Content Chunk, Hard-Coded HTML
-            @elseif ($node->nodeRow->NodeType == 'Layout Column') <i>{{ $node->nodeRow->NodeCharLimit }}/12 Wide</i>
-            @elseif ($node->isHnyPot()) <span class="slGrey">Spambot Honey Pot (Only Visible to Robots)</span>
+            @elseif ($node->nodeRow->node_type == 'Layout Column') 
+                <i>{{ $node->nodeRow->node_char_limit }}/12 Wide</i>
+            @elseif ($node->isHnyPot()) 
+                <span class="slGrey">Spambot Honey Pot (Only Visible to Robots)</span>
             @elseif ($node->isPage())
                 Page 
-                @if ($GLOBALS["SL"]->treeRow->TreeType != 'Page')
+                @if ($GLOBALS["SL"]->treeRow->tree_type != 'Page')
                     #{{ $pageCnt }}
-                    @if ($node->nodeRow->NodeOpts%29 == 0)
+                    @if ($node->nodeRow->node_opts%29 == 0)
                         <span class="red mL10"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit</span>
                     @endif
                 @endif
             @elseif ($node->isLoopRoot())
                 Loop Root <b class="slGreenDark mL10">
-                Repeat Child Pages For Each In {{ $node->nodeRow->NodeDataBranch }}</b>
+                Repeat Child Pages For Each In {{ $node->nodeRow->node_default }}</b>
                 <a target="_blank" class="infoOn mL10" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ 
                     $node->extraOpts['page-url'] }}"><i class="fa fa-external-link" aria-hidden="true"></i> {!! 
                     $node->extraOpts["page-url"] !!}</a>
             @elseif ($node->isLoopCycle())
                 Loop <b class="slGreenDark">Repeat For Each {{ 
-                $GLOBALS['SL']->getLoopSingular(str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet)) 
+                $GLOBALS['SL']->getLoopSingular(str_replace('LoopItems::', '', 
+                    $node->nodeRow->node_response_set)) 
                 }}</b>
-            @else {{ $node->nodeRow->NodeType }} @endif
-            @if ($node->isSpreadTbl() && isset($node->nodeRow->NodeResponseSet) 
-                && trim($node->nodeRow->NodeResponseSet) != '')
+            @else {{ $node->nodeRow->node_type }} @endif
+            @if ($node->isSpreadTbl() 
+                && isset($node->nodeRow->node_response_set) 
+                && trim($node->nodeRow->node_response_set) != '')
                 <span class="slGreenDark mL10"><i class="fa fa-refresh"></i> Add & Edit 
-                    {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}</span>
+                    {{ str_replace('LoopItems::', '', $node->nodeRow->node_response_set) }}</span>
             @endif
             @if ($node->isRequired()) <span class="txtDanger" title="required">*</span> @endif
             @if ($isAlt)
@@ -90,29 +94,33 @@
                 <span class="slBlueDark mL10">{{ $nodePromptText }}</span>
             @elseif ($node->isDataManip())
                 <span class="slGreenDark">
-                {{ $node->nodeRow->NodeDataBranch }}
-                @if ($node->nodeRow->NodeType == 'Data Manip: New') Record 
-                @elseif ($node->nodeRow->NodeType == 'Data Manip: Update') Record 
-                @elseif ($node->nodeRow->NodeType == 'Data Manip: Wrap') Table 
+                {{ $node->nodeRow->node_data_branch }}
+                @if ($node->nodeRow->node_type == 'Data Manip: New') Record 
+                @elseif ($node->nodeRow->node_type == 'Data Manip: Update') Record 
+                @elseif ($node->nodeRow->node_type == 'Data Manip: Wrap') Table 
                 @else Close User Session @endif
                 {!! $dataManips !!} </span>
             @endif
         @if (trim($conditionList) != '') {!! $conditionList !!} @endif
         @if (!$REQ->has('opts') || strpos($REQ->opts, 'noData') === false)
             <div class="float-right taR pL20 pR5 slGreenDark">
-                @if (trim($node->nodeRow->NodeDataBranch) != '' || $node->nodeRow->NodeParentID <= 0)
-                    @if ($node->nodeRow->NodeParentID <= 0)
-                        <b>{{ $GLOBALS['SL']->coreTbl }}</b> <i class="fa fa-database fPerc80"></i><br />
-                    @elseif ($node->isLoopRoot() 
-                        && isset($GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]))
-                        {{ $GLOBALS['SL']->dataLoops[$node->nodeRow->NodeDataBranch]->DataLoopTable }}
+                @if (trim($node->nodeRow->node_data_branch) != '' 
+                    || $node->nodeRow->node_parent_id <= 0)
+                    @if ($node->nodeRow->node_parent_id <= 0)
+                        <b>{{ $GLOBALS['SL']->coreTbl }}</b> 
                         <i class="fa fa-database fPerc80"></i><br />
-                    @elseif (trim($node->nodeRow->NodeDataBranch) != '') 
-                        {{ $node->nodeRow->NodeDataBranch }} <i class="fa fa-database fPerc80"></i><br />
+                    @elseif ($node->isLoopRoot() 
+                        && isset($GLOBALS['SL']->dataLoops[$node->nodeRow->node_default]))
+                        {{ $GLOBALS['SL']->dataLoops[$node->nodeRow->node_default]->data_loop_table }}
+                        <i class="fa fa-database fPerc80"></i><br />
+                    @elseif (trim($node->nodeRow->node_data_branch) != '') 
+                        {{ $node->nodeRow->node_data_branch }} 
+                        <i class="fa fa-database fPerc80"></i><br />
                     @endif
                 @endif
-                @if (!$node->isDataManip() && trim($node->nodeRow->NodeDataStore) != '' 
-                    && strpos($node->nodeRow->NodeDataStore, ':') !== false)
+                @if (!$node->isDataManip() 
+                    && trim($node->nodeRow->node_data_store) != '' 
+                    && strpos($node->nodeRow->node_data_store, ':') !== false)
                     <span class="opac50"> {!! $node->getTblFldLink($isPrint) !!}</span>
                 @endif
             </div>
@@ -121,7 +129,7 @@
         
         @if ($node->isInstruct() || $node->isInstructRaw()) 
             @if (isset($nodePromptText) && trim($nodePromptText) != '')
-                <span class="fPerc133">{!! strip_tags($nodePromptText) !!}</span>
+                {!! strip_tags($nodePromptText) !!}
             @endif
             <?php /* <div class="nPrompt">{!! $instructPrint !!}</div> */ ?>
         @elseif ($node->isPage())
@@ -134,38 +142,41 @@
                 @if (isset($node->extraOpts["meta-title"])) {!! 
                     $node->extraOpts["meta-title"] !!} @endif </h2></a>
             @if (isset($nodePromptText) && trim($nodePromptText) != '')
-                <span class="fPerc133">{{ strip_tags($nodePromptText) }}</span>
+                {{ strip_tags($nodePromptText) }}
             @endif
         @elseif ($node->isLoopCycle()) <span class="fPerc125">{{ $nodePromptText }}</span>
         @elseif ($node->isLoopSort())
             <span class="slBlueDark">Sort Loop Items:  
-                {{ str_replace('LoopItems::', '', $node->nodeRow->NodeResponseSet) }}</span>
-        @elseif ($node->nodeRow->NodeType == 'Spambot Honey Pot')
+                {{ str_replace('LoopItems::', '', $node->nodeRow->node_response_set) }}</span>
+        @elseif ($node->nodeRow->node_type == 'Spambot Honey Pot')
             <span class="slGrey">{{ $nodePromptText }}</span>
         @elseif ($node->nodeType == 'Send Email')
-            <div class="fPerc133">{{ $GLOBALS["SL"]->getEmailSubj($node->nodeRow->NodeDefault) }}</div>
+            <div>{{ $GLOBALS["SL"]->getEmailSubj($node->nodeRow->node_default) }}</div>
         @elseif (!$node->isLayout() && !$node->isBranch() && !$node->isDataManip())
             <div class="mL10">
             @if (trim($nodePromptText) != '')
-                <span class="fPerc133 @if ($node->isDataManip()) slGreenDark ital @endif
+                <span class=" @if ($node->isDataManip()) slGreenDark ital @endif
                     @if ($node->isLoopRoot()) slBlueDark @endif ">{{ $nodePromptText }}</span> 
-            @elseif (in_array($node->nodeRow->NodeType, ['Checkbox', 'Radio']) && !$isAlt)
+            @elseif (in_array($node->nodeRow->node_type, ['Checkbox', 'Radio']) && !$isAlt)
                 {!! view('vendor.survloop.admin.tree.node-print-basic-responses', [
                     "node" => $node ])->render() !!}
             @endif
-            @if ($node->nodeRow->NodeType == 'Big Button') 
-                @if ($node->nodeRow->NodeResponseSet == 'HTML') {!! $node->nodeRow->NodeDefault !!}
-                @else <span class="fPerc125 slBlueDark">{!! $node->nodeRow->NodeDefault !!}</span> @endif
+            @if ($node->nodeRow->node_type == 'Big Button') 
+                @if ($node->nodeRow->node_response_set == 'HTML') {!! $node->nodeRow->node_default !!}
+                @else <span class="fPerc125 slBlueDark">{!! $node->nodeRow->node_default !!}</span> @endif
             @endif
             @if ($isAlt)
-                @if (trim($node->nodeRow->NodePromptNotes) != '')
-                    <div class="slGrey">{{ strip_tags($node->nodeRow->NodePromptNotes) }}</div>
+                @if (trim($node->nodeRow->node_prompt_notes) != '')
+                    <div class="slGrey">{{ strip_tags($node->nodeRow->node_prompt_notes) }}</div>
                 @endif
                 @if (sizeof($node->responses) > 0)
-                    {!! view('vendor.survloop.admin.tree.node-print-basic-responses', [ "node" => $node ])->render() !!}
+                    {!! view(
+                        'vendor.survloop.admin.tree.node-print-basic-responses', 
+                        [ "node" => $node ]
+                    )->render() !!}
                 @endif
-                @if (trim($node->nodeRow->NodeInternalNotes) != '')
-                    <div class="slGrey"><i>{{ $node->nodeRow->NodeInternalNotes }}</i></div>
+                @if (trim($node->nodeRow->node_internal_notes) != '')
+                    <div class="slGrey"><i>{{ $node->nodeRow->node_internal_notes }}</i></div>
                 @endif
             @endif
             </div>
@@ -176,7 +187,7 @@
         @if (!$isPrint)
             <div id="addChild{{ $nID }}" class="disNon 
                 @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&start=1"
+                <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ $nID }}&start=1"
                     class="btn btn-sm btn-warning mTn15"><i class="fa fa-plus-square-o"></i> Add Child Node</a>
             </div>
         @endif
@@ -184,14 +195,14 @@
             <div id="nodeKids{{ $nID }}" class=" 
                 @if (session()->get('adminOverOpts')%2 == 0 || $nID == $rootID 
                     || $isPrint) disBlo @else disNon @endif">
-                @if ($node->nodeRow->NodeType == 'Layout Row') <div class="row"> @endif
+                @if ($node->nodeRow->node_type == 'Layout Row') <div class="row"> @endif
                 {!! $childrenPrints !!}
-                @if ($node->nodeRow->NodeType == 'Layout Row') </div> @endif
+                @if ($node->nodeRow->node_type == 'Layout Row') </div> @endif
             </div>
             @if (!$isPrint)
                 <div id="addChild{{ $nID }}B" class="disNon 
                     @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                    <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ $nID }}&end=1"
+                    <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ $nID }}&end=1"
                         class="btn btn-sm btn-warning opac50 w100 mTn15"
                         ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
                 </div>
@@ -207,22 +218,23 @@
         
     </div> <!-- end nPrintWrap{{ $nID }} -->
     
-    @if ($node->nodeRow->NodeParentID > 0 && !$isPrint) 
+    @if ($node->nodeRow->node_parent_id > 0 && !$isPrint) 
         <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
             @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <a href="/dashboard/surv-{{ $node->nodeRow->NodeTree }}/map/node/-37/?parent={{ 
-                $node->nodeRow->NodeParentID }}&ordAfter={{ $nID }}"
+            <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ 
+                $node->nodeRow->node_parent_id }}&ordAfter={{ $nID }}"
                 class="btn btn-sm btn-warning opac50 w100 mTn15"
                 ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
         </div>
-        <div class="nodeMover disNon pT5 pB5 @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
-            <a id="moveTo{{ $node->nodeRow->NodeParentID }}ord{{ (1+$node->nodeRow->NodeParentOrder) }}"
+        <div class="nodeMover disNon pT5 pB5 
+            @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
+            <a id="moveTo{{ $node->nodeRow->node_parent_id }}ord{{ (1+$node->nodeRow->node_parent_order) }}"
                 href="javascript:;" class="btn btn-sm btn-warning opac50 w100 mTn10 adminNodeMoveTo"
                 ><i class="fa fa-bullseye"></i> Move Node Here</a>
         </div>
     @endif
         
-    @if ($node->nodeRow->NodeType == 'Layout Column')
+    @if ($node->nodeRow->node_type == 'Layout Column')
         </div>
     @endif
 

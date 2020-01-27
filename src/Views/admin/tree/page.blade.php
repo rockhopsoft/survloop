@@ -10,7 +10,7 @@
 @endif
 <div class="container"><div class="slCard nodeWrap">
     <h1 class="slBlueDark">
-        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+        @if ($GLOBALS['SL']->treeRow->tree_type == 'Page')
             <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif
             @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif Page:</nobr>
         @else
@@ -56,7 +56,7 @@
 
 {!! $printTree !!}
 
-@if (!isset($GLOBALS['SL']->treeRow->TreeRoot) || intVal($GLOBALS['SL']->treeRow->TreeRoot) <= 0)
+@if (!isset($GLOBALS['SL']->treeRow->tree_root) || intVal($GLOBALS['SL']->treeRow->tree_root) <= 0)
     <a href="?node=-37" class="btn btn-lg btn-primary"><i class="fa fa-plus-square-o"></i> Create Root Node</a>
 @endif
 

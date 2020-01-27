@@ -15,15 +15,18 @@ class GlobalsElements extends GlobalsCache
 
     public function printAccordian($title, $body = '', $open = false, $big = false, $type = '')
     {
-      	return view('vendor.survloop.elements.inc-accordian', [
-    		"accordID" => rand(100000, 1000000),
-    		"title"    => $title,
-    		"body"     => $body,
-    		"big"      => $big,
-    		"open"     => $open,
-            "isCard"   => ($type == 'card'),
-            "isText"   => ($type == 'text')
-      	])->render();
+      	return view(
+            'vendor.survloop.elements.inc-accordian', 
+            [
+        		"accordID" => rand(100000, 1000000),
+        		"title"    => $title,
+        		"body"     => $body,
+        		"big"      => $big,
+        		"open"     => $open,
+                "isCard"   => ($type == 'card'),
+                "isText"   => ($type == 'text')
+          	]
+        )->render();
     }
 
     public function printAccard($title, $body = '', $open = false)
@@ -60,21 +63,22 @@ class GlobalsElements extends GlobalsCache
     public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
     {
         return 'http://twitter.com/share?url=' . urlencode($url) 
-            . ((trim($title) != '') 
-                ? '&text=' . urlencode($title) : '')
-            . ((trim($hashtags) != '') 
-                ? '&hashtags=' . urlencode($hashtags) : '');
+            . ((trim($title) != '') ? '&text=' . urlencode($title) : '')
+            . ((trim($hashtags) != '') ? '&hashtags=' . urlencode($hashtags) : '');
     }
     
     public function twitShareBtn($url = '', $title = '', $hashtags = '', $class = '', $btnText = '')
     {
-        return view('vendor.survloop.elements.inc-social-simple-tweet', [
-            "link"     => $url,
-            "title"    => $title,
-            "hashtags" => $hashtags,
-            "class"    => $class,
-            "btnText"  => $btnText
-        ])->render();
+        return view(
+            'vendor.survloop.elements.inc-social-simple-tweet', 
+            [
+                "link"     => $url,
+                "title"    => $title,
+                "hashtags" => $hashtags,
+                "class"    => $class,
+                "btnText"  => $btnText
+            ]
+        )->render();
     }
     
     public function getFacebookShareLnk($url = '', $title = '')
@@ -85,12 +89,15 @@ class GlobalsElements extends GlobalsCache
     
     public function faceShareBtn($url = '', $title = '', $class = '', $btnText = '')
     {
-        return view('vendor.survloop.elements.inc-social-simple-facebook', [
-            "link"    => $url,
-            "title"   => $title,
-            "class"   => $class,
-            "btnText" => $btnText
-        ])->render();
+        return view(
+            'vendor.survloop.elements.inc-social-simple-facebook', 
+            [
+                "link"    => $url,
+                "title"   => $title,
+                "class"   => $class,
+                "btnText" => $btnText
+            ]
+        )->render();
     }
     
     public function getLinkedinShareLnk($url = '', $title = '')
@@ -101,12 +108,15 @@ class GlobalsElements extends GlobalsCache
     
     public function linkedinShareBtn($url = '', $title = '', $class = '', $btnText = '')
     {
-        return view('vendor.survloop.elements.inc-social-simple-linkedin', [
-            "link"    => $url,
-            "title"   => $title,
-            "class"   => $class,
-            "btnText" => $btnText
-        ])->render();
+        return view(
+            'vendor.survloop.elements.inc-social-simple-linkedin', 
+            [
+                "link"    => $url,
+                "title"   => $title,
+                "class"   => $class,
+                "btnText" => $btnText
+            ]
+        )->render();
     }
     
     public function getYoutubeID($url)
@@ -234,13 +244,15 @@ class GlobalsElements extends GlobalsCache
     public function printColorFade($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
     {
         return $this->printRgba(
-            $this->colorFade($perc, $hex1, $hex2, $a1, $a2));
+            $this->colorFade($perc, $hex1, $hex2, $a1, $a2)
+        );
     }
     
     public function printColorFadeHex($perc = 0, $hex1 = '#ffffff', $hex2 = '#000000', $a1 = 1, $a2 = 1)
     {
         return $this->colorRgba2Hex(
-            $this->colorFade($perc, $hex1, $hex2, $a1, $a2));
+            $this->colorFade($perc, $hex1, $hex2, $a1, $a2)
+        );
     }
     
     public function printHex2Rgba($hex = '#000000', $a = 1)
@@ -261,8 +273,7 @@ class GlobalsElements extends GlobalsCache
                 $dashPos = strpos($u, 'src/Public/');
                 if ($dashPos === 0) {
                     $u = str_replace('src/Public/', '', $u);
-                    return $this->sysOpts['app-url'] 
-                        . '/' . $abbr . '/' . $u;
+                    return $this->sysOpts['app-url'] . '/' . $abbr . '/' . $u;
                 }
             }
         }

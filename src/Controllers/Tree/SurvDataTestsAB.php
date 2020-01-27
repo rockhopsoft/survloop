@@ -21,7 +21,8 @@ class SurvDataTestsAB
             foreach ($abs as $i => $ab) {
                 foreach (['a', 'b'] as $let) {
                     if (strpos($ab, $let) > 0) {
-                        $this->addAB(intVal(str_replace($let, '', $ab)), ($let == 'a'));
+                        $abNum = intVal(str_replace($let, '', $ab));
+                        $this->addAB($abNum, ($let == 'a'));
                     }
                 }
             }

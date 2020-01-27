@@ -9,8 +9,8 @@
 
 @forelse ($emailed as $i => $email)
     {!! $GLOBALS["SL"]->printAccordian(
-        $email->EmailedSubject . ' <span class="slGrey fPerc66">' . $email->EmailedTo . '</span>', 
-        strip_tags($email->EmailedBody, '<p><br><a><i><b>'), 
+        $email->emailed_subject . ' <span class="slGrey fPerc66">' . $email->emailed_to . '</span>', 
+        strip_tags($email->emailed_body, '<p><br><a><i><b>'), 
         false
     ) !!}
 @empty

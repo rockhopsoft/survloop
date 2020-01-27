@@ -3,6 +3,6 @@
     <a href="{{ $upDeets[$i]['filePub'] }}" target="_blank" 
         class="disBlo w100 taC vaM wht" style="height: {{ $height }}px;"
         ><div class="fPerc300 mBn5"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></div>
-        {{ $upRow->UpUploadFile }}
+        {{ $upRow->up_upload_file }}
     </a>
 </div>

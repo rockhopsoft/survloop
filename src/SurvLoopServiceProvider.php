@@ -16,26 +16,24 @@ class SurvLoopServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //require __DIR__ . '/routes.php';
-        $this->loadRoutesFrom(__DIR__.'/Routes/routes.php');
-        $this->loadViewsFrom(__DIR__.'/Views', 'survloop');
+        //require __DIR__ . '/Routes/routes.php';
+        $this->loadRoutesFrom(__DIR__ . '/Routes/routes.php');
+        $this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
         $this->publishes([
-            __DIR__.'/Views'                => base_path('resources/views/vendor/survloop'),
-            __DIR__.'/Views/auth'           => base_path('resources/views/auth'),
-            __DIR__.'/Views/auth/passwords' => base_path('resources/views/auth/passwords'),
-            __DIR__.'/Uploads'              => base_path('storage/app/up/survloop'),
-            __DIR__.'/Models'               => base_path('app/models'),
+            __DIR__ . '/Views'                => base_path('resources/views/vendor/survloop'),
+            __DIR__ . '/Views/auth'           => base_path('resources/views/auth'),
+            __DIR__ . '/Views/auth/passwords' => base_path('resources/views/auth/passwords'),
+            __DIR__ . '/Uploads'              => base_path('storage/app/up/survloop'),
+            __DIR__ . '/Models'               => base_path('app/Models'),
 
-            __DIR__.'/Controllers/Middleware/routes-api.php'
-                => base_path('routes/api.php'),
-            __DIR__.'/Controllers/Middleware/routes-web.php'
-                => base_path('routes/web.php'),
-            __DIR__.'/Controllers/Middleware/Authenticate.php' 
+            __DIR__ . '/Controllers/Middleware/routes-api.php' => base_path('routes/api.php'),
+            __DIR__ . '/Controllers/Middleware/routes-web.php' => base_path('routes/web.php'),
+            __DIR__ . '/Controllers/Middleware/Authenticate.php' 
                 => base_path('app/Http/Middleware/Authenticate.php'),
 
-            __DIR__.'/Database/2019_03_15_000000_create_survloop_tables.php'
+            __DIR__ . '/Database/2019_03_15_000000_create_survloop_tables.php'
                 => base_path('database/migrations/2019_03_15_000000_create_survloop_tables.php'),
-            __DIR__.'/Database/SurvLoopSeeder.php'
+            __DIR__ . '/Database/SurvLoopSeeder.php'
                 => base_path('database/seeds/SurvLoopSeeder.php'),
             base_path('/vendor/wikiworldorder/survloop-libraries/src/geo/ZipCodeSeeder.php')
                 => base_path('database/seeds/ZipCodeSeeder.php'),

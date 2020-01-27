@@ -5,17 +5,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDefinitions extends Model
 {
-    protected $table         = 'SL_Definitions';
-    protected $primaryKey     = 'DefID';
+    protected $table         = 'sl_definitions';
+    protected $primaryKey     = 'def_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'DefDatabase', 
-        'DefSet', 
-        'DefSubset', 
-        'DefOrder', 
-        'DefIsActive', 
-        'DefValue', 
-        'DefDescription', 
+        'def_database', 
+        'def_set', 
+        'def_subset', 
+        'def_order', 
+        'def_is_active', 
+        'def_value', 
+        'def_description', 
     ];
 }

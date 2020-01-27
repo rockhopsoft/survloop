@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLAddyGeo extends Model
 {
-    protected $table         = 'SL_AddyGeo';
-    protected $primaryKey     = 'AdyGeoID';
+    protected $table         = 'sl_addy_geo';
+    protected $primaryKey     = 'ady_geo_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'AdyGeoAddress', 
-        'AdyGeoLat', 
-        'AdyGeoLong', 
+        'ady_geo_address', 
+        'ady_geo_lat', 
+        'ady_geo_long', 
     ];
 }

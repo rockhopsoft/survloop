@@ -182,10 +182,8 @@ class GlobalsConvert
                 return strtotime(substr($dateStr, 0, 10));
             } elseif (strpos($dateStr, '/') > 0) {
                 list($month, $day, $year) = explode('/', $dateStr);
-                if (intVal($month) > 0 && intVal($day) > 0 
-                    && intVal($year) > 0) {
-                    return strtotime($year . '-' . $month 
-                        . '-' . $day . ' 00:00:00');
+                if (intVal($month) > 0 && intVal($day) > 0 && intVal($year) > 0) {
+                    return strtotime($year . '-' . $month . '-' . $day . ' 00:00:00');
                 }
             }
         }

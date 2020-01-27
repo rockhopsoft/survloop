@@ -23,19 +23,22 @@ use SurvLoop\Controllers\Tree\TreeSurvUpload;
 class TreeSurvInput extends TreeSurvUpload
 {
     public $nodeTypes = [
-        'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number', 'Slider', 'Email', 'Password', 
-        'Date', 'Date Picker', 'Date Time', 'Time', 'Gender', 'Gender Not Sure', 'Feet Inches', 
-        'U.S. States', 'Countries', 'Uploads', 'Spreadsheet Table', 'User Sign Up', 'Hidden Field', 
+        'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number', 
+        'Slider', 'Email', 'Password', 'Date', 'Date Picker', 'Date Time', 'Time', 
+        'Gender', 'Gender Not Sure', 'Feet Inches', 'U.S. States', 'Countries', 
+        'Uploads', 'Spreadsheet Table', 'User Sign Up', 'Hidden Field', 
         'Spambot Honey Pot', 'Other/Custom' 
     ];
     
     public $nodeSpecialTypes = [
-        'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 'Loop Cycle', 'Loop Sort', 
-        'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap', 'Data Manip: Close Sess', 'Big Button', 
-        'Search', 'Search Results', 'Search Featured', 'Member Profile Basics', 'Send Email', 'Admin Form',
-        'Record Full', 'Record Full Public', 'Record Previews', 'Incomplete Sess Check', 'Back Next Buttons', 
-        'Data Print', 'Data Print Row', 'Data Print Block', 'Data Print Columns', 'Print Vert Progress', 
-        'Plot Graph', 'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 'MFA Dialogue', 'Widget Custom', 
+        'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 
+        'Loop Cycle', 'Loop Sort', 'Data Manip: New', 'Data Manip: Update', 
+        'Data Manip: Wrap', 'Data Manip: Close Sess', 'Big Button', 'Search', 
+        'Search Results', 'Search Featured', 'Member Profile Basics', 'Send Email', 
+        'Admin Form', 'Record Full', 'Record Full Public', 'Record Previews', 
+        'Incomplete Sess Check', 'Back Next Buttons', 'Data Print', 'Data Print Row', 
+        'Data Print Block', 'Data Print Columns', 'Print Vert Progress', 'Plot Graph', 
+        'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 'MFA Dialogue', 'Widget Custom', 
         'Page Block', 'Layout Row', 'Layout Column', 'Layout Sub-Response', 'Gallery Slider'
     ];
     
@@ -85,35 +88,33 @@ class TreeSurvInput extends TreeSurvUpload
         $currVisib = ($GLOBALS["SL"]->REQ->has('n' . $nID . 'Visible') 
             && intVal($GLOBALS["SL"]->REQ->input('n' . $nID . 'Visible')) == 1);
         // Check for and process special page forms
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' && $this->allNodes[$nID]->nodeType == 'Page') {
-            if ($GLOBALS["SL"]->treeRow->TreeOpts%19 == 0) {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page' 
+            && $this->allNodes[$nID]->nodeType == 'Page') {
+            if ($GLOBALS["SL"]->treeRow->tree_opts%19 == 0) {
                 $ret .= $this->processContactForm($nID, $tmpSubTier);
             }
         }
         if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])) {
-            $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->update(["updated_at" => date("Y-m-d H:i:s")]);
+            $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->update([
+                "updated_at" => date("Y-m-d H:i:s")
+            ]);
         }
         if ($curr->isLoopSort()) { // actual storage happens with with each change /loopSort/
             $list = '';
-            $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+            $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
             $loopCycle = $this->sessData->getLoopRows($loop);
             if (sizeof($loopCycle) > 0) {
                 foreach ($loopCycle as $i => $loopItem) {
                     $list .= ',' . $loopItem->getKey();
                 }
             }
-            $this->sessData->logDataSave($nID, $loop, -3, 'Sorting ' . $loop . ' Items', $list);
+            $logDesc = 'Sorting ' . $loop . ' Items';
+            $this->sessData->logDataSave($nID, $loop, -3, $logDesc, $list);
             $this->closePostNodePublic($nID, $tmpSubTier, $curr);
             return '';
         }
         if ($this->allNodes[$nID]->isPage() || $this->allNodes[$nID]->isLoopRoot()) {
-            // then we're at the page's root, so let's check this once
-            if ($GLOBALS["SL"]->REQ->has('delItem') && sizeof($GLOBALS["SL"]->REQ->input('delItem')) > 0) {
-                foreach ($GLOBALS["SL"]->REQ->input('delItem') as $delID) {
-                    $loopTable = $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable;
-                    $this->sessData->deleteDataItem($GLOBALS["SL"]->REQ->node, $loopTable, $delID);
-                }
-            }
+            $this->checkLoopRootInput($nID);
         }
         
         if ($curr->isDataManip()) {
@@ -124,7 +125,7 @@ class TreeSurvInput extends TreeSurvUpload
         if ($curr->isLoopCycle()) {
             
             list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
-            $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+            $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
             $loopCycle = $this->sessData->getLoopRows($loop);
             if (sizeof($tmpSubTier[1]) > 0 && sizeof($loopCycle) > 0) {
                 $GLOBALS["SL"]->currCyc["cyc"][0] = $GLOBALS["SL"]->getLoopTable($loop);
@@ -151,7 +152,6 @@ class TreeSurvInput extends TreeSurvUpload
             if (sizeof($tmpSubTier[1]) > 0) {
                 $this->tableDat = $this->loadTableDat($curr, [], $tmpSubTier);
                 $GLOBALS["SL"]->currCyc["tbl"][0] = $this->tableDat["tbl"];
-//if ($nID == 589) { echo '<pre>'; print_r($this->tableDat); echo '</pre>'; exit; }
                 for ($i = 0; $i < $this->tableDat["maxRow"]; $i++) {
                     $hasRow = false;
                     $fldVals = [];
@@ -175,18 +175,29 @@ class TreeSurvInput extends TreeSurvUpload
                         }
                     }
                     if (trim($this->tableDat["rowCol"]) != '') {
-                        if (isset($this->tableDat["rows"][$i]) && isset($this->tableDat["rows"][$i]["leftVal"]) 
+                        if (isset($this->tableDat["rows"][$i]) 
+                            && isset($this->tableDat["rows"][$i]["leftVal"]) 
                             && trim($this->tableDat["rows"][$i]["leftVal"]) != '') {
-                            $recObj = $this->sessData->checkNewDataRecord($this->tableDat["tbl"], 
-                                $this->tableDat["rowCol"], $this->tableDat["rows"][$i]["leftVal"]);
+                            $recObj = $this->sessData->checkNewDataRecord(
+                                $this->tableDat["tbl"], 
+                                $this->tableDat["rowCol"], 
+                                $this->tableDat["rows"][$i]["leftVal"]
+                            );
                             if ($hasRow) {
                                 if (!$recObj) {
-                                    $recObj = $this->sessData->newDataRecord($this->tableDat["tbl"], 
-                                        $this->tableDat["rowCol"], $this->tableDat["rows"][$i]["leftVal"], true);
+                                    $recObj = $this->sessData->newDataRecord(
+                                        $this->tableDat["tbl"], 
+                                        $this->tableDat["rowCol"], 
+                                        $this->tableDat["rows"][$i]["leftVal"], 
+                                        true
+                                    );
                                 }
                             } else { // does not have this row
-                                if ($recObj && $curr->nodeRow->NodeOpts%73 > 0) {
-                                    $this->sessData->deleteDataRecordByID($this->tableDat["tbl"], $recObj->getKey());
+                                if ($recObj && $curr->nodeRow->node_opts%73 > 0) {
+                                    $this->sessData->deleteDataRecordByID(
+                                        $this->tableDat["tbl"], 
+                                        $recObj->getKey()
+                                    );
                                 }
                             }
                             if ($recObj) {
@@ -197,11 +208,17 @@ class TreeSurvInput extends TreeSurvUpload
                         }
                     } else { // user adds rows as they go
                         if ($hasRow) {
-                            $matches = $this->sessData->getRowIDsByFldVal($this->tableDat["tbl"], $fldVals, true);
+                            $matches = $this->sessData->getRowIDsByFldVal(
+                                $this->tableDat["tbl"], 
+                                $fldVals, 
+                                true
+                            );
                             if (empty($matches)) {
-                                $recObj = $this->sessData->simpleNewDataRecord($this->tableDat["tbl"]);
+                                $recObj = $this->sessData
+                                    ->simpleNewDataRecord($this->tableDat["tbl"]);
                                 if (trim($this->tableDat["loop"]) != '') {
-                                    $loopLnks = $GLOBALS["SL"]->getLoopConditionLinks($this->tableDat["loop"]);
+                                    $loopLnks = $GLOBALS["SL"]
+                                        ->getLoopConditionLinks($this->tableDat["loop"]);
                                     if (sizeof($loopLnks) > 0) {
                                         foreach ($loopLnks as $lnk) {
                                             $recObj->{ $lnk[0] } = $lnk[1];
@@ -214,8 +231,10 @@ class TreeSurvInput extends TreeSurvUpload
                                 $this->tableDat["rows"][$i]["id"] = -3;
                             }
                         } elseif (isset($this->tableDat["rows"][$i])) {
-                            $this->sessData->deleteDataRecordByID($this->tableDat["tbl"], 
-                                $this->tableDat["rows"][$i]["id"]);
+                            $this->sessData->deleteDataRecordByID(
+                                $this->tableDat["tbl"], 
+                                $this->tableDat["rows"][$i]["id"]
+                            );
                         }
                         
                         
@@ -223,10 +242,14 @@ class TreeSurvInput extends TreeSurvUpload
                     if ($hasRow) {
                         $GLOBALS["SL"]->currCyc["tbl"][1] = 'tbl' . $i;
                         $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
-                        if (isset($this->tableDat["rows"][$i]) && intVal($this->tableDat["rows"][$i]["id"]) > 0) {
+                        if (isset($this->tableDat["rows"][$i]) 
+                            && intVal($this->tableDat["rows"][$i]["id"]) > 0) {
                             $GLOBALS["SL"]->currCyc["tbl"][2] = $this->tableDat["rows"][$i]["id"];
-                            $this->sessData->startTmpDataBranch($this->tableDat["tbl"], 
-                                $this->tableDat["rows"][$i]["id"], false);
+                            $this->sessData->startTmpDataBranch(
+                                $this->tableDat["tbl"], 
+                                $this->tableDat["rows"][$i]["id"], 
+                                false
+                            );
                         }
                         foreach ($tmpSubTier[1] as $k => $kidNode) {
                             $ret .= $this->postNodePublic($kidNode[0], $kidNode, $currVisib);
@@ -246,8 +269,10 @@ class TreeSurvInput extends TreeSurvUpload
             
             if (!$this->postNodePublicCustom($nID, $nIDtxt, $tmpSubTier)) { // then run standard post
                 if ($GLOBALS["SL"]->REQ->has('loop')) {
-                    $this->settingTheLoop(trim($GLOBALS["SL"]->REQ->input('loop')), 
-                        intVal($GLOBALS["SL"]->REQ->loopItem));
+                    $this->settingTheLoop(
+                        trim($GLOBALS["SL"]->REQ->input('loop')), 
+                        intVal($GLOBALS["SL"]->REQ->loopItem)
+                    );
                 }
                 if ($curr->nodeType == 'Uploads') {
                     if ($this->REQstep != 'autoSave') {
@@ -259,8 +284,9 @@ class TreeSurvInput extends TreeSurvUpload
                         //    ])->render();
                     }
                 } elseif ($curr->isDataManip()) {
-                    if ($GLOBALS["SL"]->REQ->has('dataManip' . $nID . '') 
-                        && intVal($GLOBALS["SL"]->REQ->input('dataManip' . $nID . '')) == 1) {
+                    $param = 'dataManip' . $nID;
+                    if ($GLOBALS["SL"]->REQ->has($param) 
+                        && intVal($GLOBALS["SL"]->REQ->input($param)) == 1) {
                         if ($currVisib) {
                             $this->runDataManip($nID);
                         } else {
@@ -271,38 +297,68 @@ class TreeSurvInput extends TreeSurvUpload
                     list($tbl, $fld) = $curr->getTblFld();
                     list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
                     $fldForeignTbl = $GLOBALS["SL"]->fldForeignKeyTbl($tbl, $fld);
-                    if ($GLOBALS["SL"]->REQ->has('loopItem') && intVal($GLOBALS["SL"]->REQ->loopItem) == -37) {
-                        // signal from previous form to start a new row in the current set
-                        $this->newLoopItem($nID);
-                        //$this->updateCurrNode($this->nextNode($this->currNode()));
-                    } elseif (!$curr->isInstruct() && $tbl != '' && $fld != '') {
+                    if (!$curr->isInstruct() && $tbl != '' && $fld != '') {
                         $newVal = $this->getNodeFormFldBasic($nID, $curr);
                         if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
                             $newVal = $this->postNodeTweakNewVal($curr, $newVal);
                             if (sizeof($curr->responses) == 1) { // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
                                 if (is_array($newVal) && sizeof($newVal) == 1) {
-                                    $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal[0], 
-                                        $hasParManip, $itemInd, $itemID);
+                                    $this->sessData->currSessData(
+                                        $nID, 
+                                        $tbl, 
+                                        $fld, 
+                                        'update', 
+                                        $newVal[0], 
+                                        $hasParManip, 
+                                        $itemInd, 
+                                        $itemID
+                                    );
                                 } else {
                                     $tmpVal = '';
                                     $fldRow = $GLOBALS["SL"]->getFldRowFromFullName($tbl, $fld);
-                                    if (isset($fldRow->FldDefault) && trim($fldRow->FldDefault) != '') {
-                                        $tmpVal = $fldRow->FldDefault;
+                                    if (isset($fldRow->fld_default) 
+                                        && trim($fldRow->fld_default) != '') {
+                                        $tmpVal = $fldRow->fld_default;
                                     }
-                                    $this->sessData->currSessData($nID, $tbl, $fld, 'update', $tmpVal, 
-                                        $hasParManip, $itemInd, $itemID);
+                                    $this->sessData->currSessData(
+                                        $nID, 
+                                        $tbl, 
+                                        $fld, 
+                                        'update', 
+                                        $tmpVal, 
+                                        $hasParManip, 
+                                        $itemInd, 
+                                        $itemID
+                                    );
                                 }
                             } else {
                                 $curr = $this->checkResponses($curr, $fldForeignTbl);
-                                $this->sessData->currSessDataCheckbox($nID, $tbl, $fld, 'update', $newVal, $curr, 
-                                    $itemInd, $itemID);
+                                $this->sessData->currSessDataCheckbox(
+                                    $nID, 
+                                    $tbl, 
+                                    $fld, 
+                                    'update', 
+                                    $newVal, 
+                                    $curr, 
+                                    $itemInd, 
+                                    $itemID
+                                );
                             }
                         } else {
-                            if ($curr->nodeType == 'Date' && trim($newVal) == '') { // Redundancy in case JS breaks
+                            if ($curr->nodeType == 'Date' && trim($newVal) == '') {
+                                // Redundancy in case JS breaks
                                 $newVal = $this->getRawFormDate($nIDtxt);
                             }
-                            $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal, $hasParManip, 
-                                $itemInd, $itemID);
+                            $this->sessData->currSessData(
+                                $nID, 
+                                $tbl, 
+                                $fld, 
+                                'update', 
+                                $newVal, 
+                                $hasParManip, 
+                                $itemInd, 
+                                $itemID
+                            );
                         }
                         // Check for Layout Sub-Response between each Checkbox Response
                         if ($curr->nodeType == 'Checkbox' && sizeof($tmpSubTier[1]) > 0 && sizeof($newVal) > 0) {
@@ -311,19 +367,21 @@ class TreeSurvInput extends TreeSurvUpload
                                     if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
                                         && sizeof($childNode[1]) > 0) {
                                         foreach ($curr->responses as $j => $res) {
-                                            if ($res->NodeResValue == $val) {
-                                                $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, 
-                                                    [$fld => $res->NodeResValue]);
+                                            if ($res->node_res_value == $val) {
+                                                $subRowIDs = $this->sessData->getRowIDsByFldVal(
+                                                    $tbl, 
+                                                    [ $fld => $res->node_res_value ]
+                                                );
                                                 if (sizeof($subRowIDs) > 0) {
                                                     $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
                                                     $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
-                                                    $GLOBALS["SL"]->currCyc["res"][2] = $res->NodeResValue;
+                                                    $GLOBALS["SL"]->currCyc["res"][2] = $res->node_res_value;
                                                     $this->sessData->startTmpDataBranch($tbl, $subRowIDs[0]);
                                                     foreach ($childNode[1] as $k => $granNode) {
                                                         $ret .= $this->postNodePublic($granNode[0], $granNode);
                                                     }
                                                     $this->sessData->endTmpDataBranch($tbl);
-                                                    $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];
+                                                    $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
                                                 }
                                             }
                                         }
@@ -331,8 +389,10 @@ class TreeSurvInput extends TreeSurvUpload
                                 }
                             }
                         }
-                        if (in_array($curr->nodeType, ['Checkbox', 'Radio']) && $curr->hasShowKids 
-                            && isset($this->kidMaps[$nID]) && sizeof($this->kidMaps[$nID]) > 0) {
+                        if (in_array($curr->nodeType, ['Checkbox', 'Radio']) 
+                            && $curr->hasShowKids 
+                            && isset($this->kidMaps[$nID]) 
+                            && sizeof($this->kidMaps[$nID]) > 0) {
                             foreach ($this->kidMaps[$nID] as $nKid => $ress) {
                                 $found = false;
                                 if (sizeof($ress) > 0) {
@@ -351,30 +411,49 @@ class TreeSurvInput extends TreeSurvUpload
                                 }
                             }
                         }
-                        if (in_array($curr->nodeType, ['Checkbox', 'Radio', 'Gender', 'Gender Not Sure'])
-                            && sizeof($curr->fldHasOther) > 0) {
+                        $curr->chkFldOther();
+                        if ((in_array($curr->nodeType, ['Checkbox', 'Radio'])
+                                && sizeof($curr->fldHasOther) > 0)
+                            || in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
                             foreach ($curr->responses as $j => $res) {
                                 if (in_array($j, $curr->fldHasOther)) {
-                                    $otherVal = (($GLOBALS["SL"]->REQ->has('n' . $nID . 'fldOther' . $j)) 
-                                        ? $GLOBALS["SL"]->REQ->get('n' . $nID . 'fldOther' . $j) : '');
-                                    $fldVals = [ $fld => $res->NodeResValue ];
+                                    $inFld = 'n' . $nID . 'fldOther' . $j;
+                                    $otherVal = '';
+                                    if ($GLOBALS["SL"]->REQ->has($inFld)) {
+                                        $otherVal = $GLOBALS["SL"]->REQ->get($inFld);
+                                    }
+                                    $fldVals = [ $fld => $res->node_res_value ];
                                     $s = sizeof($this->sessData->dataBranches);
-                                    if ($s > 0 && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
+                                    if ($s > 0 
+                                        && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
                                         $tbl2 = $this->sessData->dataBranches[$s-1]["branch"];
-                                        $branchLnkFld = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl, $tbl2);
+                                        $branchLnkFld = $GLOBALS["SL"]->getForeignLnkNameFldName(
+                                            $tbl, 
+                                            $tbl2
+                                        );
                                         if ($branchLnkFld != '') {
-                                            $fldVals[$branchLnkFld] = $this->sessData->dataBranches[$s-1]["itemID"];
+                                            $fldVals[$branchLnkFld] = $this->sessData
+                                                ->dataBranches[$s-1]["itemID"];
                                         }
                                     }
                                     $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldVals);
                                     $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
                                     if ($branchRowID > 0) {
-                                        $GLOBALS["SL"]->currCyc["res"] = [$tbl, 'res' . $j, $res->NodeResValue];
+                                        $GLOBALS["SL"]->currCyc["res"] = [
+                                            $tbl, 'res' . $j, 
+                                            $res->node_res_value
+                                        ];
                                         $this->sessData->startTmpDataBranch($tbl, $branchRowID);
-                                        $this->sessData->currSessData($nID, $tbl, $fld . 'Other', 'update', $otherVal, 
-                                            $hasParManip);
+                                        $this->sessData->currSessData(
+                                            $nID, 
+                                            $tbl, 
+                                            $fld . '_other', 
+                                            'update', 
+                                            $otherVal, 
+                                            $hasParManip
+                                        );
                                         $this->sessData->endTmpDataBranch($tbl);
-                                        $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];                                    
+                                        $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];                                    
                                     }
                                 }
                             }
@@ -435,11 +514,14 @@ class TreeSurvInput extends TreeSurvUpload
             $nID = intVal($request->n);
             if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->isLoopSort()) {
                 $this->allNodes[$nID]->fillNodeRow();
-                $loop = str_replace('LoopItems::', '', $this->allNodes[$nID]->nodeRow->NodeResponseSet);
-                $loopTbl = $GLOBALS["SL"]->dataLoops[$loop]->DataLoopTable;
-                $sortFld = str_replace($loopTbl . ':', '', $this->allNodes[$nID]->nodeRow->NodeDataStore);
+                $loop = $this->allNodes[$nID]->nodeRow->node_response_set;
+                $loop = str_replace('LoopItems::', '', $loop);
+                $loopTbl = $GLOBALS["SL"]->dataLoops[$loop]->data_loop_table;
+                $sortFld = $this->allNodes[$nID]->nodeRow->node_data_store;
+                $sortFld = str_replace($loopTbl . ':', '', $sortFld);
+                $loopModel = $GLOBALS["SL"]->modelPath($loopTbl);
                 foreach ($GLOBALS["SL"]->REQ->input('item') as $i => $value) {
-                    eval("\$recObj = " . $GLOBALS["SL"]->modelPath($loopTbl) . "::find(" . $value . ");");
+                    eval("\$recObj = " . $loopModel . "::find(" . $value . ");");
                     $recObj->{ $sortFld } = $i;
                     $recObj->save();
                 }
@@ -464,20 +546,23 @@ class TreeSurvInput extends TreeSurvUpload
                             ->first();
                     }
                     if (!$emaUsr || !isset($emaUsr->email)) {
-                        $dataStores = SLNode::where('NodeTree', $this->treeID)
-                            ->where('NodeDataStore', 'NOT LIKE', '')
-                            //->where('NodeDataStore', 'IS NOT', NULL)
-                            ->where('NodeType', 'LIKE', 'Email')
-                            ->select('NodeDataStore')
+                        $dataStores = SLNode::where('node_tree', $this->treeID)
+                            ->where('node_data_store', 'NOT LIKE', '')
+                            //->where('node_data_store', 'IS NOT', NULL)
+                            ->where('node_type', 'LIKE', 'Email')
+                            ->select('node_data_store')
                             ->get();
                         if ($dataStores->isNotEmpty()) {
                             foreach ($dataStores as $ds) {
-                                if (strpos($ds->NodeDataStore, ':') !== false) {
-                                    list($tbl, $fld) = explode(':', $ds->NodeDataStore);
+                                if (strpos($ds->node_data_store, ':') !== false) {
+                                    list($tbl, $fld) = explode(':', $ds->node_data_store);
                                     if (isset($this->sessData->dataSets[$tbl]) 
                                         && isset($this->sessData->dataSets[$tbl][0]->{ $fld })
                                         && trim($this->sessData->dataSets[$tbl][0]->{ $fld }) != '') {
-                                        $emaToList[] = [$this->sessData->dataSets[$tbl][0]->{ $fld }, ''];
+                                        $emaToList[] = [
+                                            $this->sessData->dataSets[$tbl][0]->{ $fld }, 
+                                            ''
+                                        ];
                                     }
                                 }
                             }
@@ -488,7 +573,7 @@ class TreeSurvInput extends TreeSurvUpload
                     
                 }
                 if ($emaUsr && isset($emaUsr->email)) {
-                    $emaToList[] = [$emaUsr->email, $emaUsr->name];
+                    $emaToList[] = [ $emaUsr->email, $emaUsr->name ];
                 }
             }
         }
@@ -502,7 +587,7 @@ class TreeSurvInput extends TreeSurvUpload
     
     protected function postDumpFormEmailSubject()
     {
-        return $GLOBALS["SL"]->sysOpts["site-name"] . ': ' . $GLOBALS["SL"]->treeRow->TreeName;
+        return $GLOBALS["SL"]->sysOpts["site-name"] . ': ' . $GLOBALS["SL"]->treeRow->tree_name;
     }
     
     protected function postNodeLoadEmail($nID)
@@ -531,53 +616,78 @@ class TreeSurvInput extends TreeSurvUpload
     
     protected function postNodeSendEmail($nID)
     {
-        if (sizeof($this->allNodes[$nID]->extraOpts["emailTo"]) > 0 
-            && (intVal($this->allNodes[$nID]->nodeRow->NodeDefault) > 0 
-                || intVal($this->allNodes[$nID]->nodeRow->NodeDefault) == -69)) {
-            $this->postNodeLoadEmail($nID);
-            if (sizeof($this->v["emaTo"]) > 0) {
-                $currEmail = [];
-                $emaSubject = $this->postDumpFormEmailSubject();
-                $emaContent = '';
-                if (intVal($this->allNodes[$nID]->nodeRow->NodeDefault) > 0) {
-                    $currEmail = SLEmails::find($this->allNodes[$nID]->nodeRow->NodeDefault);
-                    if ($currEmail && isset($currEmail->EmailSubject)) {
-                        $emaSubject = $currEmail->EmailSubject;
-                        $emaContent = $this->sendEmailBlurbs($currEmail->EmailBody);
-                    }
-                } elseif (intVal($this->allNodes[$nID]->nodeRow->NodeDefault) == -69) { // dump all form fields
-                    $flds = $GLOBALS["SL"]->REQ->all();
-                    if ($flds && sizeof($flds) > 0) {
-                        foreach ($flds as $key => $val) {
-                            if (is_array($val)) {
-                                $val = implode(', ', $val);
-                            }
-                            if (!in_array($key, [ '_token', 'ajax', 'tree', 'treeSlug', 'node', 'nodeSlug', 
-                                'loop', 'loopItem', 'step', 'alt', 'jumpTo', 'afterJumpTo', 'zoomPref' ])
-                                && strpos($key, 'Visible') === false && trim($val) != '') {
-                                $fldNID = intVal(str_replace('n', '', str_replace('fld', '', $key)));
-                                $line = '';
-                                if (isset($this->allNodes[$fldNID]->nodeRow->NodePromptText) 
-                                    && trim($this->allNodes[$fldNID]->nodeRow->NodePromptText) != '') {
-                                    $line .= '<b>' . strip_tags($this->allNodes[$fldNID]->nodeRow->NodePromptText) 
-                                        . '</b><br />';
+        if (sizeof($this->allNodes[$nID]->extraOpts["emailTo"]) > 0) {
+            $default = intVal($this->allNodes[$nID]->nodeRow->node_default);
+            if ($default > 0 || $default == -69) {
+                $this->postNodeLoadEmail($nID);
+                if (sizeof($this->v["emaTo"]) > 0) {
+                    $currEmail = [];
+                    $emaSubject = $this->postDumpFormEmailSubject();
+                    $emaContent = '';
+                    if ($default > 0) {
+                        $currEmail = SLEmails::find($default);
+                        if ($currEmail && isset($currEmail->email_subject)) {
+                            $emaSubject = $currEmail->email_subject;
+                            $emaContent = $this->sendEmailBlurbs($currEmail->email_body);
+                        }
+                    } elseif ($default == -69) { // dump all form fields
+                        $flds = $GLOBALS["SL"]->REQ->all();
+                        if ($flds && sizeof($flds) > 0) {
+                            foreach ($flds as $key => $val) {
+                                if (is_array($val)) {
+                                    $val = implode(', ', $val);
                                 }
-                                $line .= $val . '<br /><br />';
-                                if (strpos($emaContent, $line) === false) {
-                                    $emaContent .= $line;
+                                $paramKeys = [
+                                    '_token', 'ajax', 'tree', 'treeSlug', 'node', 
+                                    'nodeSlug', 'loop', 'loopItem', 'step', 
+                                    'alt', 'jumpTo', 'afterJumpTo', 'zoomPref'
+                                ];
+                                if (!in_array($key, $paramKeys)
+                                    && strpos($key, 'Visible') === false 
+                                    && trim($val) != '') {
+                                    $fldNID = intVal(str_replace('n', '', 
+                                        str_replace('fld', '', $key)));
+                                    $line = '';
+                                    if (isset($this->allNodes[$fldNID])) {
+                                        $fldNode = $this->allNodes[$fldNID];
+                                        if (isset($fldNode->nodeRow->node_prompt_text)) {
+                                            $promptText = trim($fldNode->nodeRow->node_prompt_text);
+                                            if ($promptText != '') {
+                                                $line .= '<b>' . strip_tags($promptText) 
+                                                    . '</b><br />';
+                                            }
+                                        }
+                                    }
+                                    $line .= $val . '<br /><br />';
+                                    if (strpos($emaContent, $line) === false) {
+                                        $emaContent .= $line;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                if ($emaContent != '') {
-                    $emaContent = $this->emailRecordSwap($emaContent);
-                    $emaSubject = $this->emailRecordSwap($emaSubject);
-                    $this->sendEmail($emaContent, $emaSubject, $this->v["emaTo"], $this->v["emaCC"], $this->v["emaBCC"],
-                        $this->postEmailFrom());
-                    $emaID = ((isset($currEmail->EmailID)) ? $currEmail->EmailID : -3);
-                    $this->logEmailSent($emaContent, $emaSubject, $this->v["toList"], $emaID, $this->treeID, 
-                        $this->coreID, $this->v["uID"]);
+                    if ($emaContent != '') {
+                        $emaContent = $this->emailRecordSwap($emaContent);
+                        $emaSubject = $this->emailRecordSwap($emaSubject);
+                        $this->sendEmail(
+                            $emaContent, 
+                            $emaSubject, 
+                            $this->v["emaTo"], 
+                            $this->v["emaCC"], 
+                            $this->v["emaBCC"],
+                            $this->postEmailFrom()
+                        );
+                        $emaID = ((isset($currEmail->email_id)) ? $currEmail->email_id : -3);
+                        $this->logEmailSent(
+                            $emaContent, 
+                            $emaSubject, 
+                            $this->v["toList"], 
+                            $emaID, 
+                            $this->treeID, 
+                            $this->coreID, 
+                            $this->v["uID"]
+                        );
+                    }
                 }
             }
         }
@@ -592,15 +702,19 @@ class TreeSurvInput extends TreeSurvUpload
     public function sendEmailBlurbs($emailBody)
     {
         if (!isset($this->v["emailList"])) {
-            $this->v["emailList"] = SLEmails::orderBy('EmailName', 'asc')
-                ->orderBy('EmailType', 'asc')
+            $this->v["emailList"] = SLEmails::orderBy('email_name', 'asc')
+                ->orderBy('email_type', 'asc')
                 ->get();
         }
         if (trim($emailBody) != '' && sizeof($this->v["emailList"]) > 0) {
             foreach ($this->v["emailList"] as $i => $e) {
-                $emailTag = '[{ ' . $e->EmailName . ' }]';
+                $emailTag = '[{ ' . $e->email_name . ' }]';
                 if (strpos($emailBody, $emailTag) !== false) {
-                    $emailBody = str_replace($emailTag, $this->sendEmailBlurbs($e->EmailBody), $emailBody);
+                    $emailBody = str_replace(
+                        $emailTag, 
+                        $this->sendEmailBlurbs($e->email_body), 
+                        $emailBody
+                    );
                 }
             }
         }
@@ -609,16 +723,18 @@ class TreeSurvInput extends TreeSurvUpload
             '[{ Login URL }]', 
             '[{ User Email }]', 
             '[{ Email Confirmation URL }]'
-            ];
+        ];
         foreach ($dynamos as $dy) {
             if (strpos($emailBody, $dy) !== false) {
                 $swap = $dy;
                 $dyCore = str_replace('[{ ', '', str_replace(' }]', '', $dy));
                 switch ($dy) {
                     case '[{ Core ID }]':
-                        $swap = ((isset($this->sessData->dataSets["PowerScore"]) 
-                            && isset($this->sessData->dataSets["PowerScore"][0]->PsID))
-                            ? $this->sessData->dataSets["PowerScore"][0]->PsID : 0);
+                        $swap = 0;
+                        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) 
+                            && sizeof($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0) {
+                            $swap = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->getKey();
+                        }
                         break;
                     case '[{ Login URL }]':
                         $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] . '/login');
@@ -628,8 +744,9 @@ class TreeSurvInput extends TreeSurvUpload
                             ? $this->v["user"]->email : '');
                         break;
                     case '[{ Email Confirmation URL }]': 
-                        $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] . '/email-confirm/' 
-                            . $this->createToken('Confirm Email') . '/' . md5($this->v["user"]->email));
+                        $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] 
+                            . '/email-confirm/' . $this->createToken('Confirm Email') 
+                            . '/' . md5($this->v["user"]->email));
                         break;
                 }
                 $emailBody = str_replace($dy, $swap, $emailBody);
@@ -640,19 +757,25 @@ class TreeSurvInput extends TreeSurvUpload
     
     public function processEmailConfirmToken(Request $request, $token = '', $tokenB = '')
     {
-        $tokRow = SLTokens::where('TokTokToken', $token)
+        $tokRow = SLTokens::where('tok_tok_token', $token)
             ->where('updated_at', '>', $this->tokenExpireDate('Confirm Email'))
             ->first();
-        if ($tokRow && isset($tokRow->TokUserID) && intVal($tokRow->TokUserID) > 0 && trim($tokenB) != '') {
-            $usr = User::find($tokRow->TokUserID);
-            if ($usr && isset($usr->email) && trim($usr->email) != '' && md5($usr->email) == $tokenB) {
-                $chk = SLUsersRoles::where('RoleUserUID', $tokRow->TokUserID)
-                    ->where('RoleUserRID', -37)
+        if ($tokRow 
+            && isset($tokRow->tok_user_id) 
+            && intVal($tokRow->tok_user_id) > 0 
+            && trim($tokenB) != '') {
+            $usr = User::find($tokRow->tok_user_id);
+            if ($usr 
+                && isset($usr->email) 
+                && trim($usr->email) != '' 
+                && md5($usr->email) == $tokenB) {
+                $chk = SLUsersRoles::where('role_user_uid', $tokRow->tok_user_id)
+                    ->where('role_user_rid', -37)
                     ->first();
-                if (!$chk || !isset($chk->RoleUserRID)) {
+                if (!$chk || !isset($chk->role_user_rid)) {
                     $chk = new SLUsersRoles;
-                    $chk->RoleUserUID = $tokRow->TokUserID;
-                    $chk->RoleUserRID = -37;
+                    $chk->role_user_uid = $tokRow->tok_user_id;
+                    $chk->role_user_rid = -37;
                     $chk->save();
                 }
             }
@@ -669,37 +792,45 @@ class TreeSurvInput extends TreeSurvUpload
     protected function manualLogContact($nID, $emaContent, $emaSubject, $email = '', $type = '')
     {
         $log = new SLContact;
-        $log->ContFlag = 'Unread';
-        $log->ContType = $type;
-        $log->ContEmail = $email;
-        $log->ContSubject = $emaSubject;
-        $log->ContBody = $emaContent;
+        $log->cont_flag    = 'Unread';
+        $log->cont_type    = $type;
+        $log->cont_email   = $email;
+        $log->cont_subject = $emaSubject;
+        $log->cont_body    = $emaContent;
         $log->save();
         return true;
     }
     
     protected function processContactForm($nID = -3, $tmpSubTier = [])
     {
-        $this->pageCoreFlds = [ 'ContType', 'ContEmail', 'ContSubject', 'ContBody' ];
-        $ret = $this->processPageForm($nID, $tmpSubTier, 'SLContact', 'ContBody');
-        $this->pageCoreRow->update([ 'ContFlag' => 'Unread' ]);
-        $rootNode = SLNode::find($GLOBALS["SL"]->treeRow->TreeRoot);
-        if ($rootNode && isset($rootNode->NodeDefault)) {
-            $emails = $GLOBALS["SL"]->mexplode(';', $rootNode->NodeDefault);
+        $this->pageCoreFlds = [
+            'cont_type', 
+            'cont_email', 
+            'cont_subject', 
+            'cont_body' 
+        ];
+        $ret = $this->processPageForm($nID, $tmpSubTier, 'SLContact', 'cont_body');
+        $this->pageCoreRow->update([ 'cont_flag' => 'Unread' ]);
+        $rootNode = SLNode::find($GLOBALS["SL"]->treeRow->tree_root);
+        if ($rootNode && isset($rootNode->node_default)) {
+            $emails = $GLOBALS["SL"]->mexplode(';', $rootNode->node_default);
             if (sizeof($emails) > 0) {
                 $emaToArr = [];
                 foreach ($emails as $e) {
-                    $emaToArr[] = [$e, ''];
+                    $emaToArr[] = [ $e, '' ];
                 }
-                $emaSubj = strip_tags($this->pageCoreRow->ContSubject);
+                $emaSubj = strip_tags($this->pageCoreRow->cont_subject);
                 if (strlen($emaSubj) > 30) {
                     $emaSubj = trim(substr($emaSubj, 0, 30)) . '...'; 
                 }
                 $emaSubj = $GLOBALS["SL"]->sysOpts["site-name"] . ' Contact: ' . $emaTitle;
-                $emaContent = view('vendor.survloop.admin.contact-row', [
-                    "contact"  => $this->pageCoreRow,
-                    "forEmail" => true
-                ])->render();
+                $emaContent = view(
+                    'vendor.survloop.admin.contact-row', 
+                    [
+                        "contact"  => $this->pageCoreRow,
+                        "forEmail" => true
+                    ]
+                )->render();
                 $this->sendEmail($emaContent, $emaSubj, $emaToArr);
             }
         }
@@ -773,4 +904,18 @@ class TreeSurvInput extends TreeSurvUpload
         return '';
     }
     
+    protected function checkLoopRootInput($nID)
+    {
+        // then we're at the page's root, so let's check this once
+        if ($GLOBALS["SL"]->REQ->has('delLoopItem')) {
+            $delID = intVal($GLOBALS["SL"]->REQ->get('delLoopItem'));
+            if ($delID > 0) {
+                $loopTable = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
+                $this->sessData->deleteDataItem($nID, $loopTable, $delID);
+            }
+        }
+        return true;
+    }
+
+
 }

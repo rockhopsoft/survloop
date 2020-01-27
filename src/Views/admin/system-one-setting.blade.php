@@ -7,10 +7,8 @@
     <div class="fC"></div>
     @if (in_array($opt, ['header-code', 'css-extra-files', 'spinner-code',
         'sys-cust-js', 'sys-cust-ajax'])) 
-        <textarea name="sys-{{ $opt }}" autocomplete="off"
-            class="form-control w100 ntrStp slTab" 
-            {!! $GLOBALS["SL"]->tabInd() !!} 
-            style="height: 100px; font-family: Courier New; "
+        <textarea name="sys-{{ $opt }}" autocomplete="off" class="form-control w100 ntrStp slTab" 
+            {!! $GLOBALS["SL"]->tabInd() !!} style="height: 100px; font-family: Courier New; "
             >@if (isset($GLOBALS["SL"]->sysOpts[$opt])){!! 
                 $GLOBALS["SL"]->sysOpts[$opt] 
             !!}@endif</textarea>

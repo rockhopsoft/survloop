@@ -42,12 +42,14 @@ class UpdatePasswordController extends Controller
             'old' => 'required',
             'password' => 'required|min:8|confirmed',
         ]);
-        if (Auth::attempt(['name' => $user->name, 'password' => $request->old])) {
+        if (Auth::attempt([ 'name' => $user->name, 'password' => $request->old ])) {
             $user->fill([ 'password' => bcrypt($request->password) ])->save();
             $request->session()->flash('success', 'Your password has been changed.');
+            $request->session()->save();
             return redirect('/my-profile');
         }
         $request->session()->flash('failure', 'Your password has not been changed.');
+        $request->session()->save();
         return redirect('/my-profile');
     }
     

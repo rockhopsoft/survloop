@@ -66,7 +66,8 @@ class SurvTrends extends SurvStatsCore
     
     private function getDateIndex($date = '')
     {
-        $time = mktime(0, 0, 0, date("n", strtotime($date)), date("j", strtotime($date)), date("Y", strtotime($date)));
+        $time = strtotime($date);
+        $time = mktime(0, 0, 0, date("n", $time), date("j", $time), date("Y", $time));
         $daysPast = (mktime(0, 0, 0, date("n"), date("j"), date("Y"))-$time)/(60*60*24);
         $ind = $this->pastDays-$daysPast;
         if ($ind >= 0 && $ind <= $this->pastDays) {
@@ -93,7 +94,8 @@ class SurvTrends extends SurvStatsCore
                 $dateIndex = $this->getRawResultDateIndex($statRec);
                 if ($dateIndex >= 0) {
                     foreach ($this->datMap as $dLet => $datMap) {
-                        if (isset($datMap["rowFld"]) && trim($datMap["rowFld"]) != ''
+                        if (isset($datMap["rowFld"]) 
+                            && trim($datMap["rowFld"]) != ''
                             && isset($statRec->{ $datMap["rowFld"] }) 
                             && $statRec->{ $datMap["rowFld"] } !== null) {
                             $this->dataDays[$dLet][$dateIndex] = $statRec->{ $datMap["rowFld"] };
@@ -121,14 +123,17 @@ class SurvTrends extends SurvStatsCore
         $this->loadAxisPastDayLabels();
 //echo 'printDailyGraph(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
         $sysDef = new SystemDefinitions;
-        return view('vendor.survloop.reports.graph-bar-grouped', [
-            "nIDtxt"     => $this->nIDtxt,
-            "datMap"     => $this->datMap,
-            "axisLabels" => $this->axisLabels,
-            "dataDays"   => $this->dataDays,
-            "height"     => $height,
-            "css"        => $sysDef->loadCss()
-        ])->render();
+        return view(
+            'vendor.survloop.reports.graph-bar-grouped', 
+            [
+                "nIDtxt"     => $this->nIDtxt,
+                "datMap"     => $this->datMap,
+                "axisLabels" => $this->axisLabels,
+                "dataDays"   => $this->dataDays,
+                "height"     => $height,
+                "css"        => $sysDef->loadCss()
+            ]
+        )->render();
     }
     
 }

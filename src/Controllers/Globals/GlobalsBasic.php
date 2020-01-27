@@ -35,10 +35,10 @@ class GlobalsBasic extends GlobalsVars
 
     public function chkCurrTreeOpt($type = '')
     {
-        if (!isset($this->treeRow->TreeOpts)) {
+        if (!isset($this->treeRow->tree_opts)) {
             return false;
         }
-        return $this->chkTreeOpt($this->treeRow->TreeOpts, $type);
+        return $this->chkTreeOpt($this->treeRow->tree_opts, $type);
     }
     
     public function hasTreeOverride()
@@ -48,16 +48,16 @@ class GlobalsBasic extends GlobalsVars
     
     public function dbFullSpecs()
     {
-        return ($this->dbRow->DbOpts%3 > 0);
+        return ($this->dbRow->db_opts%3 > 0);
     }
 
     
     public function isCoreTbl($tblID)
     {
-        if (!isset($this->treeRow->TreeCoreTable)) {
+        if (!isset($this->treeRow->tree_core_table)) {
             return false;
         }
-        return ($tblID == $this->treeRow->TreeCoreTable);
+        return ($tblID == $this->treeRow->tree_core_table);
     }
     
     public function coreTblAbbr()
@@ -68,26 +68,139 @@ class GlobalsBasic extends GlobalsVars
     
     public function coreTblIdFld()
     {
-        return $this->coreTblAbbr() . 'ID';
+        return $this->coreTblAbbr() . 'id';
+    }
+    
+    public function coreTblIdFldOrPublicId()
+    {
+        $ret = $this->coreTblAbbr();
+        if ($this->tblHasPublicID()) {
+            $ret .= "public_";
+        }
+        return $ret . "id";
+    }
+    
+    public function swapIfPublicID($pubID = -3, $tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if ($this->tblHasPublicID($tbl)) {
+            return $this->chkInPublicID($pubID, $tbl);
+        }
+        return $pubID;
+    }
+    
+    public function tblHasPublicID($tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if (!isset($this->x["tblHasPublicID"])) {
+            $this->x["tblHasPublicID"] = [];
+        }
+        if (isset($this->x["tblHasPublicID"][$tbl])) {
+            return $this->x["tblHasPublicID"][$tbl];
+        }
+        $this->x["tblHasPublicID"][$tbl] = false;
+        if ((isset($this->treeRow->tree_opts) && $this->treeRow->tree_opts%47 == 0) 
+            || (isset($this->reportTree["opts"]) && $this->reportTree["opts"]%47 == 0)) {
+            $this->x["tblHasPublicID"][$tbl] = true;
+        }
+        if ($this->x["tblHasPublicID"][$tbl] 
+            && isset($this->tblI[$tbl])) {
+            $chk = SLFields::where('fld_table', $this->tblI[$tbl])
+                ->where('fld_name', 'public_id')
+                ->first();
+            if (!$chk) {
+                $this->x["tblHasPublicID"][$tbl] = false;
+            }
+        }
+        return $this->x["tblHasPublicID"][$tbl];
+    }
+    
+    public function getTblRecPublicID($rec, $tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if ($rec) {
+            if ($this->tblHasPublicID($tbl)) {
+                if (isset($rec->{ $this->tblAbbr[$tbl] . 'public_id' })) {
+                    return $rec->{ $this->tblAbbr[$tbl] . 'public_id' };
+                }
+            } else {
+                if (isset($rec->{ $this->tblAbbr[$tbl] . 'id' })) {
+                    return $rec->{ $this->tblAbbr[$tbl] . 'id' };
+                }
+            }
+        }
+        return 0;
+    }
+    
+    public function chkInPublicID($pubID = -3, $tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) {
+            return $pubID;
+        }
+        $pubIdFld = $this->tblAbbr[$tbl] . 'public_id';
+        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" 
+            . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
+        if ($idChk) {
+            return $idChk->getKey();
+        }
+        return $pubID;
+    }
+    
+    public function genNewCorePubID($tbl = '')
+    {
+        if (trim($tbl) == '') {
+            $tbl = $this->coreTbl;
+        }
+        if (isset($this->tblAbbr[$tbl])) {
+            $pubIdFld = $this->tblAbbr[$tbl] . 'public_id';
+            eval("\$idChk = " . $this->modelPath($tbl) 
+                . "::orderBy('" . $pubIdFld . "', 'desc')->first();");
+            if (!$idChk || !isset($idChk->{ $pubIdFld }) 
+                || intVal($idChk->{ $pubIdFld }) <= 0) {
+                return 1;
+            }
+            return (1+intVal($idChk->{ $pubIdFld }));
+        }
+        return 1;
+    }
+    
+    public function getDbName($dbID = -3)
+    {
+        if ($dbID <= 0 || sizeof($this->allDbs) == 0) {
+            return '';
+        }
+        foreach ($this->allDbs as $db) {
+            if ($db["id"] == $dbID) {
+                return $db["name"];
+            }
+        }
+        return '';
     }
     
     public function getCoreTblUserFld()
     {
-        if ((!isset($this->coreTblUserFld) 
-            || trim($this->coreTblUserFld) == '') 
+        if ((!isset($this->coreTblUserFld) || trim($this->coreTblUserFld) == '') 
             && isset($this->tblI[$this->coreTbl])) {
             $coreTblID = $this->tblI[$this->coreTbl];
-            $userTbl = SLTables::where('TblDatabase', $this->dbID)
-                ->whereIn('TblName', ['users', 'Users'])
+            $userTbl = SLTables::where('tbl_database', $this->dbID)
+                ->whereIn('tbl_name', ['users', 'Users'])
                 ->first();
-            if ($userTbl && isset($userTbl->TblID)) {
-                $keyFld = SLFields::where('FldTable', $coreTblID)
-                    ->where('FldForeignTable', $userTbl->TblID)
+            if ($userTbl && isset($userTbl->tbl_id)) {
+                $keyFld = SLFields::where('fld_table', $coreTblID)
+                    ->where('fld_foreign_table', $userTbl->tbl_id)
                     ->first();
-                if ($keyFld && isset($keyFld->FldName)) {
-                    $this->coreTblUserFld 
-                        = $this->tblAbbr[$this->coreTbl] 
-                        . $keyFld->FldName;
+                if ($keyFld && isset($keyFld->fld_name)) {
+                    $this->coreTblUserFld = $this->tblAbbr[$this->coreTbl] 
+                        . $keyFld->fld_name;
                 }
             }
         }
@@ -97,15 +210,14 @@ class GlobalsBasic extends GlobalsVars
     public function getCoreEmailFld()
     {
         if (isset($this->tblI[$this->coreTbl])) {
-            $chk = SLFields::where('FldDatabase', $this->dbID)
-                ->where('FldTable', $this->tblI[$this->coreTbl])
-                ->where('FldName', 'Email')
-                ->orderBy('FldOrd', 'asc')
+            $chk = SLFields::where('fld_database', $this->dbID)
+                ->where('fld_table', $this->tblI[$this->coreTbl])
+                ->where('fld_name', 'Email')
+                ->orderBy('fld_ord', 'asc')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $i => $fld) {
-                    return $this->tblAbbr[$this->coreTbl] 
-                        . $fld->FldName;
+                    return $this->tblAbbr[$this->coreTbl] . $fld->fld_name;
                 }
             }
         }
@@ -115,14 +227,14 @@ class GlobalsBasic extends GlobalsVars
     public function addFldRowExtends($flds, $tblExtend)
     {
         $flds[] = $this->getFldRowExtendID($tblExtend);
-        $exts = SLFields::where('FldTable', $tblExtend)
-            ->where('FldDatabase', $this->dbID)
-            ->orderBy('FldOrd', 'asc')
+        $exts = SLFields::where('fld_table', $tblExtend)
+            ->where('fld_database', $this->dbID)
+            ->orderBy('fld_ord', 'asc')
             ->get();
         if ($exts->isNotEmpty()) {
             foreach ($exts as $ext) {
-                $ext->FldName = $this->tblAbbr[$this->tbl[$tblExtend]] 
-                    . $ext->FldName;
+                $ext->fld_name = $this->tblAbbr[$this->tbl[$tblExtend]] 
+                    . $ext->fld_name;
                 $flds[] = $ext;
             }
         }
@@ -132,21 +244,21 @@ class GlobalsBasic extends GlobalsVars
     public function getFldRowExtendID($tblExtend)
     {
         $fldRow = new SLFields;
-        $fldRow->FldTable = $tblExtend;
+        $fldRow->fld_table = $tblExtend;
         if (isset($this->tbl[$tblExtend])) {
             $t = $this->tbl[$tblExtend];
             if (isset($this->tblAbbr[$t])) {
-                $fldRow->FldName = $this->tblAbbr[$t] . 'ID';
-                $fldRow->FldEng = $this->tbl[$tblExtend] . ' ID';
-                $fldRow->FldDesc = 'Unique ID number of the '
+                $fldRow->fld_name = $this->tblAbbr[$t] . 'ID';
+                $fldRow->fld_eng  = $this->tbl[$tblExtend] . ' ID';
+                $fldRow->fld_desc = 'Unique ID number of the '
                     . 'record from the other table being extended.';
-                $fldRow->FldType = 'INT';
-                $fldRow->FldKeyType = ',Foreign,';
-                $fldRow->FldForeignTable = $tblExtend;
-                $fldRow->FldForeignMin = '0';
-                $fldRow->FldForeignMax = 'N';
-                $fldRow->FldForeign2Min = '1';
-                $fldRow->FldForeign2Max = '1';
+                $fldRow->fld_type = 'INT';
+                $fldRow->fld_key_type = ',Foreign,';
+                $fldRow->fld_foreign_table = $tblExtend;
+                $fldRow->fld_foreign_min   = '0';
+                $fldRow->fld_foreign_max   = 'N';
+                $fldRow->fld_foreign2_min  = '1';
+                $fldRow->fld_foreign2_max  = '1';
             }
         }
         return $fldRow;
@@ -155,17 +267,14 @@ class GlobalsBasic extends GlobalsVars
     public function getTableFields($tbl = [])
     {
         $flds = [];
-        if (isset($tbl->TblID) && intVal($tbl->TblID) > 0) {
-            $flds = SLFields::where('FldTable', $tbl->TblID)
-                ->orderBy('FldOrd', 'asc')
-                ->orderBy('FldEng', 'asc')
+        if (isset($tbl->tbl_id) && intVal($tbl->tbl_id) > 0) {
+            $flds = SLFields::where('fld_table', $tbl->tbl_id)
+                ->orderBy('fld_ord', 'asc')
+                ->orderBy('fld_eng', 'asc')
                 ->get();
-            if (isset($tbl->TblExtend) 
-                && intVal($tbl->TblExtend) > 0) {
-                $flds = $this->addFldRowExtends(
-                    $flds, 
-                    $tbl->TblExtend
-                );
+            if (isset($tbl->tbl_extend) 
+                && intVal($tbl->tbl_extend) > 0) {
+                $flds = $this->addFldRowExtends($flds, $tbl->tbl_extend);
             }
         }
         return $flds;
@@ -179,16 +288,16 @@ class GlobalsBasic extends GlobalsVars
             && sizeof($this->fldTypes[$tbl]) > 0) {
             $flds = $this->fldTypes[$tbl];
         } else {
-            $tblRow = SLTables::where('TblName', $tbl)
+            $tblRow = SLTables::where('tbl_name', $tbl)
                 ->first();
             if ($tblRow) {
-                $chk = SLFields::where('FldTable', $tblRow->TblID)
-                    ->orderBy('FldOrd', 'asc')
+                $chk = SLFields::where('fld_table', $tblRow->tbl_id)
+                    ->orderBy('fld_ord', 'asc')
                     ->get();
                 if ($chk->isNotEmpty()) {
                     foreach ($chk as $fldRow) {
-                        $f = $tblRow->TblAbbr . $fldRow->FldName;
-                        $flds[$f] = $fldRow->FldType;
+                        $f = $tblRow->tbl_abbr . $fldRow->fld_name;
+                        $flds[$f] = $fldRow->fld_type;
                     }
                 }
             }
@@ -198,19 +307,17 @@ class GlobalsBasic extends GlobalsVars
     
     public function fldForeignKeyTbl($tbl, $fld)
     {
-        if (trim($tbl) == '' || trim($fld) == '' 
-            || !isset($this->tblI[$tbl])) {
+        if (trim($tbl) == '' || trim($fld) == '' || !isset($this->tblI[$tbl])) {
             return '';
         }
         $abbr = substr($fld, strlen($this->tblAbbr[$tbl]));
-        $fld = SLFields::select('FldForeignTable')
-            ->where('FldTable', $this->tblI[$tbl])
-            ->where('FldName', $abbr)
-            ->where('FldForeignTable', '>', 0)
+        $fld = SLFields::select('fld_foreign_table')
+            ->where('fld_table', $this->tblI[$tbl])
+            ->where('fld_name', $abbr)
+            ->where('fld_foreign_table', '>', 0)
             ->first();
-        if ($fld 
-            && isset($this->tbl[$fld->FldForeignTable])) {
-            return $this->tbl[$fld->FldForeignTable];
+        if ($fld && isset($this->tbl[$fld->fld_foreign_table])) {
+            return $this->tbl[$fld->fld_foreign_table];
         }
         return '';
     }
@@ -218,7 +325,7 @@ class GlobalsBasic extends GlobalsVars
     public function getForeignLnk($tbl1, $tbl2 = -3)
     {
         if ($tbl2 <= 0) {
-            $tbl2 = $this->treeRow->TreeCoreTable;
+            $tbl2 = $this->treeRow->tree_core_table;
         }
         if (!isset($this->x["foreignLookup"])) {
             $this->x["foreignLookup"] = [];
@@ -226,12 +333,12 @@ class GlobalsBasic extends GlobalsVars
         $t = $tbl1 . '-' . $tbl2;
         if (!isset($this->x["foreignLookup"][$t])) { 
             $this->x["foreignLookup"][$t] = '';
-            $fld = SLFields::select('FldName')
-                ->where('FldTable', $tbl1)
-                ->where('FldForeignTable', $tbl2)
+            $fld = SLFields::select('fld_name')
+                ->where('fld_table', $tbl1)
+                ->where('fld_foreign_table', $tbl2)
                 ->first();
-            if ($fld && isset($fld->FldName)) {
-                $this->x["foreignLookup"][$t] = trim($fld->FldName);
+            if ($fld && isset($fld->fld_name)) {
+                $this->x["foreignLookup"][$t] = trim($fld->fld_name);
             }
         }
         return $this->x["foreignLookup"][$t];
@@ -240,8 +347,7 @@ class GlobalsBasic extends GlobalsVars
     public function getForeignLnkName($tbl1, $tbl2 = '')
     {
         if (trim($tbl1) == '' || trim($tbl2) == '' 
-            || !isset($this->tblI[$tbl1]) 
-            || !isset($this->tblI[$tbl2])) {
+            || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
             return '';
         }
         return $this->getForeignLnk(
@@ -262,8 +368,7 @@ class GlobalsBasic extends GlobalsVars
     public function getForeignLnkNameFldName($tbl1, $tbl2 = '')
     {
         if (trim($tbl1) == '' || trim($tbl2) == '' 
-            || !isset($this->tblI[$tbl1]) 
-            || !isset($this->tblI[$tbl2])) {
+            || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {
             return '';
         }
         return $this->getForeignLnkFldName(
@@ -280,8 +385,8 @@ class GlobalsBasic extends GlobalsVars
                 return ['users', 'id'];
             }
             return [
-                $this->dbRow->DbPrefix . $this->tbl[$foreignKey], 
-                $this->tblAbbr[$GLOBALS['SL']->tbl[$foreignKey]] . "ID"
+                $this->dbRow->db_prefix . $this->tbl[$foreignKey], 
+                $this->tblAbbr[$GLOBALS['SL']->tbl[$foreignKey]] . "id"
             ];
         }
         return ['', ''];
@@ -294,42 +399,45 @@ class GlobalsBasic extends GlobalsVars
     
     public function getLinkingTables()
     {
-        return SLTables::where('TblDatabase', $this->dbID)
-            ->where('TblType', 'Linking')
-            ->orderBy('TblName', 'asc')
+        return SLTables::where('tbl_database', $this->dbID)
+            ->where('tbl_type', 'Linking')
+            ->orderBy('tbl_name', 'asc')
             ->get();
     }
 
     
     public function getFullFldNameFromID($fldID, $full = true)
     {
-        $fld = DB::table('SL_Fields')
-            ->join('SL_Tables', 'SL_Fields.FldTable', 
-                '=', 'SL_Tables.TblID')
-            ->where('SL_Fields.FldID', $fldID)
-            ->select('SL_Tables.TblName', 'SL_Tables.TblAbbr', 
-                'SL_Fields.FldName')
+        $fld = DB::table('sl_fields')
+            ->join('sl_tables', 'sl_fields.fld_table', '=', 'sl_tables.tbl_id')
+            ->where('sl_fields.fld_id', $fldID)
+            ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr', 
+                'sl_fields.fld_name')
             ->first();
-        if ($fld && isset($fld->TblAbbr)) {
-            return (($full) ? $fld->TblName . ':' : '') 
-                . $fld->TblAbbr . $fld->FldName;
+        if ($fld 
+            && isset($fld->tbl_abbr) 
+            && isset($fld->tbl_abbr) 
+            && isset($fld->tbl_name)) {
+            return (($full) ? $fld->tbl_name . ':' : '') 
+                . $fld->tbl_abbr . $fld->fld_name;
         }
         return '';
     }
     
     public function getFldIDFromFullName($fldName)
     {
-        $flds = DB::table('SL_Fields')
-            ->join('SL_Tables', 'SL_Fields.FldTable', 
-                '=', 'SL_Tables.TblID')
-            ->select('SL_Tables.TblName', 'SL_Tables.TblAbbr', 
-                'SL_Fields.FldName', 'SL_Fields.FldID')
+        $flds = DB::table('sl_fields')
+            ->join('sl_tables', 'sl_fields.fld_table', '=', 'sl_tables.tbl_id')
+            ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr', 
+                'sl_fields.fld_name', 'sl_fields.fld_id')
             ->get();
         if ($flds->isNotEmpty()) {
-            foreach ($flds as $f) { // $f->TblName . ':' . 
-                $testName = $f->TblAbbr . $f->FldName;
-                if ($fldName == $testName) {
-                    return $f->FldID;
+            foreach ($flds as $f) { // $f->tbl_name . ':' . 
+                if ($f && isset($f->tbl_abbr) && isset($f->fld_name)) {
+                    $testName = $f->tbl_abbr . $f->fld_name;
+                    if ($fldName == $testName) {
+                        return $f->fld_id;
+                    }
                 }
             }
         }
@@ -338,13 +446,12 @@ class GlobalsBasic extends GlobalsVars
     
     public function getFldRowFromFullName($tbl, $fld)
     {
-        if (!isset($this->tblI[$tbl]) 
-            || !isset($this->tblAbbr[$tbl])) {
+        if (!isset($this->tblI[$tbl]) || !isset($this->tblAbbr[$tbl])) {
             return [];
         }
         $fldName = substr($fld, strlen($this->tblAbbr[$tbl]));
-        return SLFields::where('FldTable', $this->tblI[$tbl])
-            ->where('FldName', $fldName)
+        return SLFields::where('fld_table', $this->tblI[$tbl])
+            ->where('fld_name', $fldName)
             ->first();
     }
     
@@ -360,11 +467,11 @@ class GlobalsBasic extends GlobalsVars
         if (!$fldRow) {
             $fldRow = $this->getFldRowFromFullName($tbl, $fld);
         }
-        if ($fldRow && isset($fldRow->FldValues)) {
-            $yns = ['Y;N', 'N;Y', 'Y;N;?', '0;1', '1;0'];
-            if (strpos($fldRow->FldValues, 'Def::') !== false) {
-                $ret = str_replace('Def::', '', $fldRow->FldValues);
-            } elseif (in_array($fldRow->FldValues, $yns)) {
+        if ($fldRow && isset($fldRow->fld_values)) {
+            $yns = [ 'Y;N', 'N;Y', 'Y;N;?', '0;1', '1;0' ];
+            if (strpos($fldRow->fld_values, 'Def::') !== false) {
+                $ret = str_replace('Def::', '', $fldRow->fld_values);
+            } elseif (in_array($fldRow->fld_values, $yns)) {
                 $ret = 'Yes/No';
             }
         }
@@ -376,18 +483,18 @@ class GlobalsBasic extends GlobalsVars
         if (!$fldRow) {
             $fldRow = $this->getFldRowFromFullName($tbl, $fld);
         }
-        if ($fldRow && isset($fldRow->FldEng)) {
-            return $fldRow->FldEng;
+        if ($fldRow && isset($fldRow->fld_eng)) {
+            return $fldRow->fld_eng;
         }
         return '';
     }
     
     public function fld2SchemaType($fld)
     {
-        if (strpos($fld->FldValues, 'Def::') !== false) {
+        if (strpos($fld->fld_values, 'Def::') !== false) {
             return 'xs:string';
         }
-        switch (strtoupper(trim($fld->FldType))) {
+        switch (strtoupper(trim($fld->fld_type))) {
             case 'INT':      return 'xs:integer'; break;
             case 'DOUBLE':   return 'xs:double'; break;
             case 'DATE':     return 'xs:date'; break;
@@ -407,12 +514,12 @@ class GlobalsBasic extends GlobalsVars
                 $ret[] = $fld;
             }
             /*
-            $chk = SLFields::where('FldTable', '=', $this->tblI[$tbl])
+            $chk = SLFields::where('fld_table', '=', $this->tblI[$tbl])
                 ->where('FldSpecType', '=', 'Unique')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $i => $fld) {
-                    $ret[] = $this->tblAbbr[$tbl] . $fld->FldName;
+                    $ret[] = $this->tblAbbr[$tbl] . $fld->fld_name;
                 }
             }
             */
@@ -436,12 +543,12 @@ class GlobalsBasic extends GlobalsVars
         if (trim($tbl) != '' && trim($fld) != '' 
             && isset($this->tblI[$tbl])) {
             $fldName = substr($fld, strlen($this->tblAbbr[$tbl]));
-            $fldRow = SLFields::select('FldID')
-                ->where('FldTable', $this->tblI[$tbl])
-                ->where('FldName', $fldName)
+            $fldRow = SLFields::select('fld_id')
+                ->where('fld_table', $this->tblI[$tbl])
+                ->where('fld_name', $fldName)
                 ->first();
-            if ($fldRow && isset($fldRow->FldID)) {
-                return $fldRow->FldID;
+            if ($fldRow && isset($fldRow->fld_id)) {
+                return $fldRow->fld_id;
             }
         }
         return -3;
@@ -455,8 +562,8 @@ class GlobalsBasic extends GlobalsVars
         if (trim($tbl) != '' && trim($fld) != '' 
             && isset($this->tblI[$tbl])) {
             $fldName = substr($fld, strlen($this->tblAbbr[$tbl]));
-            $fldRow = SLFields::where('FldTable', $this->tblI[$tbl])
-                ->where('FldName', $fldName)
+            $fldRow = SLFields::where('fld_table', $this->tblI[$tbl])
+                ->where('fld_name', $fldName)
                 ->first();
             return $fldRow;
         }
@@ -490,14 +597,14 @@ class GlobalsBasic extends GlobalsVars
     
     public function loadUsrTblRow()
     {
-        return SLTables::where('TblDatabase', $this->dbID)
-            ->where('TblEng', 'Users')
+        return SLTables::where('tbl_database', $this->dbID)
+            ->where('tbl_eng', 'Users')
             ->first();
     }
     
     public function chkTableExists($coreTbl, $userTbl = null)
     {
-        $tbl = $this->dbRow->DbPrefix . $coreTbl->TblName;
+        $tbl = $this->dbRow->db_prefix . $coreTbl->tbl_name;
         return \Schema::hasTable($tbl);
         //$chk = DB::select( DB::raw("SHOW TABLES LIKE '" 
         // . $tbl . "'") );
@@ -515,8 +622,6 @@ class GlobalsBasic extends GlobalsVars
         }
         return $this->x["pageSlugSffx"];
     }
-
-
 
 
 

@@ -1,11 +1,13 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-edit-loop-list.blade.php -->
 <div class="row">
     <div class="col-6 nFld mT0">
-        <select name="{{ $fld }}Type" id="{{ $fld }}TypeID" class="form-control form-control-lg" autocomplete="off" 
+        <select name="{{ $fld }}Type" id="{{ $fld }}TypeID" 
+            class="form-control form-control-lg" autocomplete="off" 
             onChange="changeLoopListType('{{ $fld }}');" >
             @if ($manualOpt) 
-                <option value="manual" @if ($currDefinition == '' && $currLoopItems == '' && $currTblRecs == '') 
-                SELECTED @endif > Manually type options below </option>
+                <option value="manual" 
+                @if ($currDefinition == '' && $currLoopItems == '' && $currTblRecs == '') SELECTED @endif
+                > Manually type options below </option>
             @endif
             <option value="auto-def" @if ($currDefinition != '') SELECTED @endif
                 > Pull from Definition Set </option>
@@ -21,16 +23,21 @@
         <div id="{{ $fld }}Defs" class=" @if ($currDefinition != '') disBlo @else disNon @endif ">
             <select name="{{ $fld }}Definition" id="{{ $fld }}DefinitionID" autocomplete="off"
                 class="form-control form-control-lg" onChange="changeLoopListType('{{ $fld }}');" >
-                <option value="" @if ($currDefinition == '') SELECTED @endif > Select Definition Set... </option>
+                <option value="" @if ($currDefinition == '') SELECTED @endif
+                    > Select Definition Set... </option>
                 @forelse ($defs as $def)
-                    @if (trim($def->DefSubset) != '')
-                        <option value="{{ $def->DefSubset }}" @if ($currDefinition == $def->DefSubset) SELECTED @endif 
-                            >{{ $def->DefSubset }}</option>
+                    @if (trim($def->def_subset) != '')
+                        <option value="{{ $def->def_subset }}" 
+                            @if ($currDefinition == $def->def_subset) SELECTED @endif 
+                            >{{ $def->def_subset }}</option>
                     @endif
                 @empty
                 @endforelse
-                <option value="--STATES--" @if ($currDefinition == '--STATES--') SELECTED @endif >
-                    @if ($GLOBALS["SL"]->sysOpts['has-canada']) U.S. & Canadian States @else U.S. States @endif
+                <option value="--STATES--" 
+                    @if ($currDefinition == '--STATES--') SELECTED @endif >
+                    @if ($GLOBALS["SL"]->sysOpts['has-canada']) U.S. & Canadian States 
+                    @else U.S. States 
+                    @endif
                     </option>
             </select>
         </div>
@@ -45,12 +52,14 @@
                 @endforelse
             </select>
         </div>
-        <div id="{{ $fld }}Tbls" class=" @if ($currTblRecs != '' || $currTblAll != '') disBlo @else disNon @endif ">
+        <div id="{{ $fld }}Tbls" 
+            class=" @if ($currTblRecs != '' || $currTblAll != '') disBlo @else disNon @endif ">
             <select name="{{ $fld }}Tables" id="{{ $fld }}TablesID" autocomplete="off"
                 class="form-control form-control-lg" onChange="changeLoopListType('{{ $fld }}');" >
                 <option value="" @if ($currTblRecs == '' && $currTblAll == '') SELECTED @endif > Select Data Table... </option>
                 @forelse ($GLOBALS['SL']->tbl as $tID => $tblName)
-                    <option value="{{ $tblName }}" @if ($currTblRecs == $tblName || $currTblAll == $tblName) SELECTED @endif >
+                    <option value="{{ $tblName }}" 
+                        @if ($currTblRecs == $tblName || $currTblAll == $tblName) SELECTED @endif >
                         @if ($GLOBALS['SL']->tblEng[$tID] != $tblName)
                             {{ $GLOBALS['SL']->tblEng[$tID] }} ({{ $tblName }})
                         @else {{ $GLOBALS['SL']->tblEng[$tID] }} @endif </option>
@@ -63,8 +72,8 @@
                     <option value="0" @if (intVal($currTblAllCond) == 0) SELECTED @endif 
                         >Select a condition related to this table</option>
                 @forelse ($GLOBALS['SL']->getCondList() as $c)
-                    <option value="{{ $c->CondID }}" @if (intVal($currTblAllCond) == $c->CondID) SELECTED @endif 
-                        >{{ $c->CondTag }} - {{ $c->CondDesc }}</option>
+                    <option value="{{ $c->cond_id }}" @if (intVal($currTblAllCond) == $c->cond_id) SELECTED @endif 
+                        >{{ $c->cond_tag }} - {{ $c->cond_desc }}</option>
                 @empty
                 @endforelse
                 </select>

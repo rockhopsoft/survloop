@@ -9,7 +9,7 @@
 <a @if ($isAdminList) href="/dashboard/volun/stars" @else href="/volunteer/stars" @endif 
     class="btn btn-sm btn-secondary mR10">Back to List</a>
 
-<a name="recentEdits"></a>
+<div class="nodeAnchor"><a name="recentEdits"></a></div>
 <h2>All Department Edits</h2>
 <table class="table table-striped" border=0 cellpadding=10 >
     <tr><th>Edit Details</th><th>Department Info</th><th>Internal Affairs</th><th>Civilian Oversight</th></tr>

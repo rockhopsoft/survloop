@@ -8,7 +8,7 @@
     <a href="{{ $upDeets['filePub'] }}" target="_blank" class="disBlo w100" 
         ><img src="{{ $upDeets['filePub'] }}" class="w100"
     	@if ($GLOBALS['SL']->isPrintView()) border=0 @else border=1 @endif
-        alt="{{ ((isset($upRow->UpStoredFile)) ? $upRow->UpStoredFile : 'Uploaded Image') }}"
+        alt="{{ ((isset($upRow->up_stored_file)) ? $upRow->up_stored_file : 'Uploaded Image') }}"
         ></a>
 @if (!$GLOBALS['SL']->isPrintView())
 	</div>

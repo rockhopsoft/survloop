@@ -5,8 +5,8 @@
         <div id="pageBlock" class="slBg slTxt p20">
             <div class="row">
                 <div class="col-md-4">
-                    <select name="blockAlign" id="blockAlignID" class="form-control form-control-lg mB20" 
-                        autocomplete="off">
+                    <select name="blockAlign" id="blockAlignID" autocomplete="off"
+                        class="form-control form-control-lg mB20">
                         <option value="left" @if (!isset($node->colors["blockAlign"]) 
                             || $node->colors["blockAlign"] == 'left') SELECTED @endif 
                             >Align Left</option>
@@ -19,8 +19,8 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <select name="blockHeight" id="blockHeightID" class="form-control form-control-lg mB20" 
-                        autocomplete="off">
+                    <select name="blockHeight" id="blockHeightID" autocomplete="off"
+                        class="form-control form-control-lg mB20">
                         <option value="auto" @if (!isset($node->colors["blockHeight"]) 
                             || $node->colors["blockHeight"] == 'auto') SELECTED @endif 
                             >Auto Height, Default Padding</option>
@@ -45,15 +45,17 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <div class=" @if ($GLOBALS['SL']->treeRow->TreeType == 'Page' 
+                    <div class=" @if ($GLOBALS['SL']->treeRow->tree_type == 'Page' 
                         /* && $GLOBALS['SL']->REQ->has('parent') 
-                        && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->TreeRoot */) disBlo
+                        && $GLOBALS['SL']->REQ->get('parent') == $GLOBALS['SL']->treeRow->tree_root */) disBlo
                         @else disNon @endif ">
-                        <select name="opts67" id="opts67ID" class="form-control form-control-lg mB20" 
-                            autocomplete="off">
-                            <option value="1" @if ($node->nodeRow->NodeOpts%67 > 0) SELECTED @endif 
+                        <select name="opts67" id="opts67ID" autocomplete="off"
+                            class="form-control form-control-lg mB20">
+                            <option value="1" 
+                                @if ($node->nodeRow->node_opts%67 > 0) SELECTED @endif 
                                 >Full Content Width</option>
-                            <option value="67" @if ($node->nodeRow->NodeOpts%67 == 0) SELECTED @endif 
+                            <option value="67" 
+                                @if ($node->nodeRow->node_opts%67 == 0) SELECTED @endif 
                                 >Skinny Content Width</option>
                         </select>
                     </div>
@@ -62,11 +64,11 @@
             <label class="mT10 mB10">
                 <input type="checkbox" name="opts71" id="opts71ID" value="71" 
                     autocomplete="off" onClick="return checkPageBlock();" 
-                    @if ($node->nodeRow->NodeOpts%71 == 0) CHECKED @endif
-                    > <span class="fPerc133">Background</span>
+                    @if ($node->nodeRow->node_opts%71 == 0) CHECKED @endif
+                    > Background
                 </label>
             <div id="pageBlockOpts" class="pT5 
-                @if ($node->nodeRow->NodeOpts%71 == 0) disBlo @else disNon @endif ">
+                @if ($node->nodeRow->node_opts%71 == 0) disBlo @else disNon @endif ">
                 <div class="row">
                     <div class="col-md-5">
                         <label for="blockBGID"><h4 class="mT0">Background Color</h4></label>
@@ -93,8 +95,9 @@
                     <div class="col-md-6">
                         <label for="blockImgID"><h4 class="mT0">Background Image</h4></label>
                         <input type="text" class="form-control form-control-lg w100 mB20 mR20"
-                            id="blockImgID" name="blockImg" value="{{ ((isset($node->colors['blockImg'])) 
-                                ? $node->colors['blockImg'] : '') }}">
+                            id="blockImgID" name="blockImg" value="{{ 
+                            ((isset($node->colors['blockImg'])) ? $node->colors['blockImg'] : '')
+                            }}">
                         <div class="disIn mL10 mR10"><label class="disIn">
                             <input type="radio" name="blockImgType" id="blockImgTypeA" 
                                 value="w100" class="mR5" autocomplete="off" 
@@ -135,26 +138,29 @@
                     </div>
                 </div>
             </div>
-            <div><label class="mT10 mB10"><input type="checkbox" name="opts89" id="opts89ID" value="89" 
-                autocomplete="off" onClick="return checkPageBlock();" 
-                @if ($node->nodeRow->NodeOpts%89 == 0) CHECKED @endif
-                > <span class="fPerc133">Card Wrapper</span></label>
+            <div>
+                <label class="mT10 mB10"><input type="checkbox" 
+                    name="opts89" id="opts89ID" value="89" 
+                    autocomplete="off" onClick="return checkPageBlock();" 
+                    @if ($node->nodeRow->node_opts%89 == 0) CHECKED @endif
+                    > Card Wrapper
+                </label>
             </div>
             <div>
                 <label class="mT10 mB10">
                     <input type="checkbox" name="opts97" id="opts97ID" value="97" 
                         autocomplete="off" onClick="return checkPageBlock();" 
-                        @if ($node->nodeRow->NodeOpts%97 == 0) CHECKED @endif
-                        > <span class="fPerc133">Deferred Load of Node</span>
+                        @if ($node->nodeRow->node_opts%97 == 0) CHECKED @endif
+                        > Deferred Load of Node
                 </label>
             </div>
             <div id="nodeCachingOpt" class="
-                @if ($node->nodeRow->NodeOpts%97 == 0) disBlo @else disNon @endif ">
+                @if ($node->nodeRow->node_opts%97 == 0) disBlo @else disNon @endif ">
                 <label class="mT10 mB10">
                     <input type="checkbox" name="opts103" id="opts103ID" value="103" 
                         autocomplete="off" onClick="return checkPageBlock();" 
-                        @if ($node->nodeRow->NodeOpts%103 == 0) CHECKED @endif
-                        > <span class="fPerc133">No Caching This Node</span>
+                        @if ($node->nodeRow->node_opts%103 == 0) CHECKED @endif
+                        > No Caching This Node
                 </label>
             </div>
         </div>

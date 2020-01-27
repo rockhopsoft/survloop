@@ -5,13 +5,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSearchRecDump extends Model
 {
-    protected $table         = 'SL_SearchRecDump';
-    protected $primaryKey     = 'SchRecDmpID';
+    protected $table         = 'sl_search_rec_dump';
+    protected $primaryKey     = 'sch_rec_dmp_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'SchRecDmpTreeID', 
-        'SchRecDmpRecID', 
-        'SchRecDmpRecDump',
+        'sch_rec_dmp_tree_id', 
+        'sch_rec_dmp_rec_id', 
+        'sch_rec_dmp_rec_dump',
     ];
 }

@@ -40,30 +40,28 @@
                         @if ($node->indexShowsKid($r)) disIn @else disNon @endif ">
                         @if (isset($childNodes) && sizeof($childNodes) > 0)
                             @if (sizeof($childNodes) == 1)
-                                #{{ $childNodes[0]->NodeID }}
+                                #{{ $childNodes[0]->node_id }}
                                 <input type="hidden" name="kidForkSel{{ $r }}" 
-                                    value="{{ $childNodes[0]->NodeID }}">
+                                    value="{{ $childNodes[0]->node_id }}">
                             @else
                                 <select name="kidForkSel{{ $r }}" autocomplete="off"
                                     class="form-control input-xs disIn" 
                                     style="width: 70px;">
                                 @foreach ($childNodes as $k => $kidNode)
-                                    <option value="{{ $kidNode->NodeID }}"
-                                    @if ($node->indexShowsKidNode($r) == $kidNode->NodeID) 
-                                    SELECTED @endif >#{{ $kidNode->NodeID }}</option>
+                                    <option value="{{ $kidNode->node_id }}"
+                                    @if ($node->indexShowsKidNode($r) == $kidNode->node_id) 
+                                    SELECTED @endif >#{{ $kidNode->node_id }}</option>
                                 @endforeach
                                 </select>
                             @endif
                         @else
-                            <input type="hidden" name="kidForkSel{{ $r }}" 
-                                value="1000000000">
+                            <input type="hidden" name="kidForkSel{{ $r }}" value="1000000000">
                         @endif
                     </div>
                 </div>
                 <div class="col-6">
                     <label id="resMutEx{{ $r }}" class="mL5 
-                        @if (isset($node->nodeRow->NodeType)
-                            && $node->nodeRow->NodeType == 'Checkbox')) disBlo 
+                        @if (isset($node->nodeRow->node_type) && $node->nodeRow->node_type == 'Checkbox')) disBlo 
                         @else disNon @endif "
                         ><nobr><input name="response{{ $r }}MutEx" 
                             type="checkbox" value="1" autocomplete="off" 

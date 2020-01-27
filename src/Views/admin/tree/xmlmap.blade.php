@@ -14,15 +14,15 @@
     </div>
     <div class="col-4">
         <h3>XML Schema</h3>
-        <a href="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema" target="_blank"
+        <a href="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
-            /{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema</a>
+            /{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema</a>
     </div>
     <div class="col-4">
         <h3>XML Example</h3>
-        <a href="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example" target="_blank"
+        <a href="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
-            /{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example</a>
+            /{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example</a>
     </div>
 </div>
 <div class="row">
@@ -30,10 +30,10 @@
         {!! $adminPrintFullTree !!}
     </div>
     <div class="col-4">
-        <iframe src="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema" class="w100" style="height: 1000px;"></iframe>
+        <iframe src="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema" class="w100" style="height: 1000px;"></iframe>
     </div>
     <div class="col-4">
-        <iframe src="/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-example" class="w100" style="height: 1000px;"></iframe>
+        <iframe src="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example" class="w100" style="height: 1000px;"></iframe>
     </div>
 </div>
 

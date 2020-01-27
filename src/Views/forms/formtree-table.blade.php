@@ -7,8 +7,8 @@
     @if (trim($tableDat["rowCol"]) != '') <th class="sprdRowLab">&nbsp;</th> @endif
     @forelse ($tableDat["cols"] as $k => $col)
         <th class=" @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif " >
-        @if (isset($col->nodeRow->NodePromptText)) {!! $col->nodeRow->NodePromptText !!} @endif
-        @if (isset($col->NodePromptText)) {!! $col->NodePromptText !!} @endif
+        @if (isset($col->nodeRow->node_prompt_text)) {!! $col->nodeRow->node_prompt_text !!} @endif
+        @if (isset($col->node_prompt_text)) {!! $col->node_prompt_text !!} @endif
         </th>
     @empty @endforelse
     @if (trim($tableDat["rowCol"]) == '') <th class="c1">&nbsp;</th> @endif
@@ -17,14 +17,16 @@
         <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif " >
             @if (trim($tableDat["rowCol"]) != '')
                 <td id="n{{ $nIDtxt }}tbl{{ $j }}rowLab" class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
-                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
+                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" 
+                    id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
                     value="{{ $row['leftVal'] }}" >
             @else
-                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
+                <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" 
+                    id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
                     value="{{ $row['id'] }}" >
             @endif
             @forelse ($row["cols"] as $k => $col)
-                <td class="sprdFld @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
+                <td id="n{{ $nIDtxt }}tbl{{ $j }}row{{ $k }}col" class="sprdFld @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
                     {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col)) !!}</td>
             @empty
             @endforelse
@@ -37,14 +39,15 @@
     @empty
     @endforelse
     @if (trim($tableDat["rowCol"]) == '')
-        @for ($j = sizeof($tableDat["rows"]); $j < $node->nodeRow->NodeCharLimit; $j++)
+        @for ($j = sizeof($tableDat["rows"]); $j < $node->nodeRow->node_char_limit; $j++)
             <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif 
                 @if ($j < sizeof($tableDat['rows']) || ($j == 0 && sizeof($tableDat['rows']) == 0)) disRow 
                 @else disNon @endif " >
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
                     value="-3">
                 @forelse ($tableDat["cols"] as $k => $col)
-                    <td class="sprdFld @if ($k > 0) cl1 @endif ">{!! str_replace('tbl?', 'tbl' . $j, 
+                    <td id="n{{ $nIDtxt }}tbl{{ $j }}row{{ $k }}col" class="sprdFld 
+                        @if ($k > 0) cl1 @endif ">{!! str_replace('tbl?', 'tbl' . $j, 
                         $GLOBALS["SL"]->replaceTabInd($tableDat["blnk"][$k])) !!}</td>
                 @empty
                 @endforelse

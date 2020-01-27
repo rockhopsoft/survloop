@@ -13,24 +13,25 @@
     <th><i>ID#</i></th>
     <th>Date</th>
     @foreach ($coreFlds as $i => $fld)
-        <th>{{ $fld->FldName }}</th>
+        <th>{{ $fld->fld_name }}</th>
     @endforeach
 </tr>
 @forelse ($subsList as $sub)
     <tr>
         <td>
-            <a href="/dashboard/subs/{{ $com->ComID }}/review" class="btn btn-lg btn-secondary slBlueDark"
-                >#{{ number_format( $sub->{ $coreAbbr.'ID' } ) }}</a>
+            <a href="/dashboard/subs/{{ $sub->getKey() }}/review" 
+                class="btn btn-lg btn-secondary slBlueDark"
+                >#{{ number_format( $sub->getKey() ) }}</a>
         </td>
         <td>
             {{ date('n/j/y', strtotime( $sub->created_at )) }}
         </td>
         @foreach ($coreFlds as $i => $fld)
             <td>
-                @if ($fld->FldForeignTable > 0)
-                    {{ $GLOBALS['SL']->tbl[$fld->FldForeignTable] }} #
+                @if ($fld->fld_foreign_table > 0)
+                    {{ $GLOBALS['SL']->tbl[$fld->fld_foreign_table] }} #
                 @endif
-                {{ $sub->{ $coreAbbr.$fld->FldName } }}
+                {{ $sub->{ $coreAbbr.$fld->fld_name } }}
             </td>
         @endforeach
     </tr>

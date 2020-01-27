@@ -371,7 +371,12 @@ class AdminMenu
             $ico = '<i class="fa fa-envelope-o" '
                 . 'aria-hidden="true"></i> ';
         }
-        $ret = [ '/dashboard/contact', $lnk, $ico, 1, [
+        $ret = [
+            '/dashboard/contact', 
+            $lnk, 
+            $ico, 
+            1, 
+            [
                 $this->admMenuLnk(
                     '/dashboard/contact?tab=unread', 
                     'Unread'
@@ -391,8 +396,8 @@ class AdminMenu
     
     protected function admMenuLnkContactCnt()
     {
-        $chk = SLContact::where('ContFlag', 'Unread')
-            ->select('ContID')
+        $chk = SLContact::where('cont_flag', 'Unread')
+            ->select('cont_id')
             ->get();
         return $chk->count();
     }
@@ -400,28 +405,29 @@ class AdminMenu
     protected function loadDbTreeShortNames()
     {
         $dbName = '';
-        if (isset($GLOBALS["SL"]->dbRow->DbName)) {
-            $dbName = $GLOBALS["SL"]->dbRow->DbName;
+        if (isset($GLOBALS["SL"]->dbRow->db_name)) {
+            $dbName = $GLOBALS["SL"]->dbRow->db_name;
         }
-        $prefix = str_replace('_', '', 
-            $GLOBALS["SL"]->dbRow->DbPrefix);
-        if (strlen($dbName) > 20 
-            && isset($GLOBALS["SL"]->dbRow->DbName)) {
+        $prefix = str_replace('_', '', $GLOBALS["SL"]->dbRow->db_prefix);
+        if (strlen($dbName) > 20 && isset($GLOBALS["SL"]->dbRow->db_name)) {
             $dbName = str_replace(
-                $GLOBALS["SL"]->dbRow->DbName, 
+                $GLOBALS["SL"]->dbRow->db_name, 
                 $prefix, 
                 $dbName
             );
         }
-        $treeID = $GLOBALS["SL"]->treeRow->TreeID;
+        $treeID = 1;
         $treeName = '';
+        if (isset($GLOBALS["SL"]->treeRow->tree_id)) {
+            $treeID = $GLOBALS["SL"]->treeRow->tree_id;
+        }
         if (isset($GLOBALS["SL"]->treeName)) {
             $treeName = $GLOBALS["SL"]->treeName;
         }
-        if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
             $tree = SLTree::find(1);
-            $treeID = $tree->TreeID;
-            $treeName = 'Tree: ' . $tree->TreeName;
+            $treeID = $tree->tree_id;
+            $treeName = 'Tree: ' . $tree->tree_name;
         }
         return [ $treeID, $treeName, $dbName ];
     }

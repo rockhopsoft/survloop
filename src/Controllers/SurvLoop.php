@@ -91,8 +91,8 @@ class SurvLoop extends SurvCustLoop
             . '-c' . $cid . '-n' . $nID . '-r' . $rand . '.html';
         if ($treeID > 0 && $nID > 0 && $this->loadTreeByID($request, $treeID)) {
             $node = SLNode::find($nID);
-            if ($node && isset($node->NodeOpts) && intVal($node->NodeOpts) > 0) {
-                if ($node->NodeOpts%TreeNodeSurv::OPT_NONODECACH > 0) {
+            if ($node && isset($node->node_opts) && intVal($node->node_opts) > 0) {
+                if ($node->node_opts%TreeNodeSurv::OPT_NONODECACH > 0) {
                     if (file_exists($file)) {
                         return file_get_contents($file);
                     }
@@ -124,7 +124,7 @@ class SurvLoop extends SurvCustLoop
     {
         $redir = $this->chkPageRedir($pageSlug);
         if ($redir != $pageSlug) {
-            redirect($redir, 301);
+            return redirect($redir, 301);
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
             if ($this->hasParamEdit($request) && $this->isUserAdmin()) {
@@ -139,6 +139,9 @@ class SurvLoop extends SurvCustLoop
             }
             $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
 
+            if ($cid <= 0 && $request->has('cid')) {
+                $cid = intVal($request->get('cid'));
+            }
             if ($cid > 0) {
                 if (!$skipPublic) {
                     $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
@@ -150,7 +153,7 @@ class SurvLoop extends SurvCustLoop
             }
 
             if ($this->topCheckCache($request, 'page')
-                && $GLOBALS["SL"]->treeRow->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
+                && $GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE > 0) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
             if ($cid > 0) {
@@ -167,11 +170,11 @@ class SurvLoop extends SurvCustLoop
                 return $this->custLoop->getXmlID($request, $cid, $pageSlug);
             }
             $this->pageContent = $this->custLoop->index($request);
-            if ($GLOBALS["SL"]->treeRow->TreeOpts
+            if ($GLOBALS["SL"]->treeRow->tree_opts
                 %Globals::TREEOPT_NOCACHE > 0) {
                 $this->topSaveCache(
-                    $GLOBALS["SL"]->treeRow->TreeID, 
-                    strtolower($GLOBALS["SL"]->treeRow->TreeType)
+                    $GLOBALS["SL"]->treeRow->tree_id, 
+                    strtolower($GLOBALS["SL"]->treeRow->tree_type)
                 );
             }
             return $this->addSessAdmCodeToPage(
@@ -194,40 +197,39 @@ class SurvLoop extends SurvCustLoop
         $this->syncDataTrees($request);
         $this->loadDomain();
         $this->checkHttpsDomain($request);
-        $trees = SLTree::where('TreeType', 'Page')
-            ->where('TreeOpts', '>', (Globals::TREEOPT_HOMEPAGE-1))
-            /* ->whereRaw("TreeOpts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_ADMIN . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_STAFF . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER . " > 0") */
-            ->orderBy('TreeID', 'asc')
+        $trees = SLTree::where('tree_type', 'Page')
+            ->where('tree_opts', '>', (Globals::TREEOPT_HOMEPAGE-1))
+            /* ->whereRaw("tree_opts%" . Globals::TREEOPT_HOMEPAGE . " = 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_ADMIN . " > 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_STAFF . " > 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_PARTNER . " > 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_VOLUNTEER . " > 0") */
+            ->orderBy('tree_id', 'asc')
             ->get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $i => $tree) {
-                if (isset($tree->TreeOpts) 
-                    && $tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0 
-                    && $tree->TreeOpts%Globals::TREEOPT_ADMIN     > 0 
-                    && $tree->TreeOpts%Globals::TREEOPT_STAFF     > 0
-                    && $tree->TreeOpts%Globals::TREEOPT_PARTNER   > 0 
-                    && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
-                    $redir = $this->chkPageRedir($tree->TreeSlug);
-                    if ($redir != $tree->TreeSlug) {
+                if (isset($tree->tree_opts) 
+                    && $tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0 
+                    && $tree->tree_opts%Globals::TREEOPT_ADMIN     > 0 
+                    && $tree->tree_opts%Globals::TREEOPT_STAFF     > 0
+                    && $tree->tree_opts%Globals::TREEOPT_PARTNER   > 0 
+                    && $tree->tree_opts%Globals::TREEOPT_VOLUNTEER > 0) {
+                    $redir = $this->chkPageRedir($tree->tree_slug);
+                    if ($redir != $tree->tree_slug) {
                         return redirect($redir);
                     }
-                    if ($request->has('edit') 
-                        && intVal($request->get('edit')) == 1 
+                    if ($request->has('edit') && intVal($request->get('edit')) == 1 
                         && $this->isUserAdmin()) {
                         echo '<script type="text/javascript"> '
                             . 'window.location="/dashboard/page/' 
-                            . $tree->TreeID . '?all=1&alt=1&refresh=1";'
+                            . $tree->tree_id . '?all=1&alt=1&refresh=1";'
                             . ' </script>';
                         exit;
                     }
                     $this->syncDataTrees(
                         $request, 
-                        $tree->TreeDatabase, 
-                        $tree->TreeID
+                        $tree->tree_database, 
+                        $tree->tree_id
                     );
                     if ($this->topCheckCache($request, 'page')) {
                         return $this->addSessAdmCodeToPage(
@@ -237,8 +239,8 @@ class SurvLoop extends SurvCustLoop
                     }
                     $this->loadLoop($request);
                     $this->pageContent = $this->custLoop->index($request);
-                    if ($tree->TreeOpts%Globals::TREEOPT_NOCACHE > 0) {
-                        $this->topSaveCache($tree->TreeID, 'page');
+                    if ($tree->tree_opts%Globals::TREEOPT_NOCACHE > 0) {
+                        $this->topSaveCache($tree->tree_id, 'page');
                     }
                     return $this->addAdmCodeToPage(
                         $GLOBALS["SL"]->swapSessMsg($this->pageContent)
@@ -277,19 +279,18 @@ class SurvLoop extends SurvCustLoop
     
     public function showProfile(Request $request, $uname = '')
     {
-        $trees = SLTree::where('TreeType', 'Page')
-            //->whereRaw("TreeOpts%" . Globals::TREEOPT_PROFILE . " = 0")
-            ->orderBy('TreeID', 'asc')
+        $trees = SLTree::where('tree_type', 'Page')
+            //->whereRaw("tree_opts%" . Globals::TREEOPT_PROFILE . " = 0")
+            ->orderBy('tree_id', 'asc')
             ->get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $tree) {
-                if (isset($tree->TreeOpts) 
-                    && $tree->TreeOpts
-                        %Globals::TREEOPT_PROFILE == 0) {
+                if (isset($tree->tree_opts) 
+                    && $tree->tree_opts%Globals::TREEOPT_PROFILE == 0) {
                     $this->syncDataTrees(
                         $request, 
-                        $tree->TreeDatabase, 
-                        $tree->TreeID
+                        $tree->tree_database, 
+                        $tree->tree_id
                     );
                     $this->loadLoop($request);
                     $this->custLoop->setCurrUserProfile($uname);
@@ -393,8 +394,8 @@ class SurvLoop extends SurvCustLoop
         ];
         $redir = str_replace($this->domainPath, '', $redir);
         if (in_array($redir, $nonRedirs)) {
-            if (Auth::user() && Auth::user()->hasRole(
-                'administrator|staff|databaser|brancher|partner')) {
+            if (Auth::user() 
+                && Auth::user()->hasRole('administrator|staff|databaser|brancher|partner')) {
                 $redir = '/dashboard';
             } else {
                 $redir = '/my-profile';
@@ -411,22 +412,20 @@ class SurvLoop extends SurvCustLoop
     // check if being redirected back to a survey session, which needs to be associated with new user ID
     protected function afterLoginSurveyRedir(Request $request, $redir)
     {
-        if (strpos($redir, '/u/') == 0 
-            && Auth::user() 
-            && isset(Auth::user()->id) 
-            && Auth::user()->id > 0) {
+        if (strpos($redir, '/u/') == 0 && Auth::user() 
+            && isset(Auth::user()->id) && Auth::user()->id > 0) {
             $treeSlug = substr($redir, 3);
             $pos = strpos($treeSlug, '/');
             if ($pos > 0) {
                 $treeSlug = substr($treeSlug, 0, $pos);
-                $chk = SLTree::where('TreeType', 'Survey')
-                    ->where('TreeSlug', $treeSlug)
+                $chk = SLTree::where('tree_type', 'Survey')
+                    ->where('tree_slug', $treeSlug)
                     ->get();
                 if ($chk->isNotEmpty()) {
                     foreach ($chk as $tree) {
-                        if (session()->has('sessID' . $tree->TreeID) 
-                            && session()->has('coreID' . $tree->TreeID)
-                            && intVal(session()->get('sessID' . $tree->TreeID)) > 0) {
+                        if (session()->has('sessID' . $tree->tree_id) 
+                            && session()->has('coreID' . $tree->tree_id)
+                            && intVal(session()->get('sessID' . $tree->tree_id)) > 0) {
                             $this->afterLoginUpdateSess($request, $tree);
                         }
                     }
@@ -438,16 +437,15 @@ class SurvLoop extends SurvCustLoop
     
     protected function afterLoginUpdateSess(Request $request, $tree)
     {
-        $sess = SLSess::find(session()->get('sessID' . $tree->TreeID));
-        if ($sess && isset($sess->SessCoreID) 
-            && intVal($sess->SessCoreID) > 0) {
-            $sess->SessUserID = Auth::user()->id;
+        $sess = SLSess::find(session()->get('sessID' . $tree->tree_id));
+        if ($sess && isset($sess->sess_core_id) && intVal($sess->sess_core_id) > 0) {
+            $sess->sess_user_id = Auth::user()->id;
             $sess->save();
-            $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+            $this->syncDataTrees($request, $tree->tree_database, $tree->tree_id);
             eval($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                . "::find(" . $sess->SessCoreID . ")->update([ '" 
-                . $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] 
-                . "UserID' => " . Auth::user()->id . " ]);");
+                . "::find(" . $sess->sess_core_id . ")->update([ '" 
+                . $GLOBALS["SL"]->getCoreTblUserFld() 
+                . "' => " . Auth::user()->id . " ]);");
         }
     }
     
@@ -455,8 +453,8 @@ class SurvLoop extends SurvCustLoop
     {
         if (session()->has('lastTree')) {
             $tree = SLTree::find(session()->get('lastTree'));
-            if ($tree && isset($tree->TreeDatabase)) {
-                $this->syncDataTrees($request, $tree->TreeDatabase, $tree->TreeID);
+            if ($tree && isset($tree->tree_database)) {
+                $this->syncDataTrees($request, $tree->tree_database, $tree->tree_id);
             }
         }
         if (session()->has('sessID') && session()->get('sessID') > 0) {
@@ -473,6 +471,7 @@ class SurvLoop extends SurvCustLoop
         session()->forget('lastTreeTime');
         session()->forget('loginRedir');
         session()->forget('loginRedirTime');
+        session()->save();
         return true;
     }
     
@@ -660,21 +659,14 @@ class SurvLoop extends SurvCustLoop
                         $GLOBALS["SL"]->coreTbl, 
                         $rec[0]
                     );
-                    $this->custLoop->searcher->searchResults[$i][2] 
-                        = '<div class="reportPreview">' 
-                        . $this->custLoop->printPreviewReport() 
-                        . '</div>';
-                    if (isset($this->custLoop->sessData
-                            ->dataSets[$GLOBALS["SL"]->coreTbl])
-                        && sizeof($this->custLoop->sessData
-                            ->dataSets[$GLOBALS["SL"]->coreTbl]) > 0
-                        && isset($this->custLoop->sessData
-                            ->dataSets[$GLOBALS["SL"]->coreTbl][0]
-                            ->created_at)) {
-                        $this->custLoop->searcher->searchResults[$i][1] 
-                            += strtotime($this->custLoop->sessData
-                                ->dataSets[$GLOBALS["SL"]->coreTbl][0]
-                                ->created_at)/1000000000000;
+                    $this->custLoop->searcher->searchResults[$i][2] = '<div class="reportPreview">' 
+                        . $this->custLoop->printPreviewReport() . '</div>';
+                    if (isset($this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl])) {
+                        $setRecs = $this->custLoop->sessData->dataSets[$GLOBALS["SL"]->coreTbl];
+                        if (sizeof($setRecs) > 0 && isset($setRecs[0]->created_at)) {
+                            $this->custLoop->searcher->searchResults[$i][1] 
+                                += strtotime($setRecs[0]->created_at)/1000000000000;
+                        }
                     }
                 }
             }
@@ -722,11 +714,9 @@ class SurvLoop extends SurvCustLoop
         
         // Is the resource cached?
         $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
-            && $_SERVER['HTTP_IF_MODIFIED_SINCE'] 
-                == $header_last_modified);
+            && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_last_modified);
         $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
-            && str_replace('"', '', 
-                stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) 
+            && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) 
                 == $header_etag);
         if (($h1 || $h2) && !$request->has('refresh')) {
             return Response::make('', 304, $headers); 
@@ -760,22 +750,22 @@ class SurvLoop extends SurvCustLoop
                 . urlencode(trim($request->get('currPage'))) . '&';
         }
         if ($request->has('nd')) {
-            $previousUrl .= 'nd=' 
-                . urlencode(trim($request->get('nd'))) . '&';
+            $previousUrl .= 'nd=' . urlencode(trim($request->get('nd'))) . '&';
         }
-        return view('vendor.survloop.js.inc-load-menu', [
-            "username"    => $username,
-            "previousUrl" => $previousUrl
-        ]);
+        return view(
+            'vendor.survloop.js.inc-load-menu', 
+            [
+                "username"    => $username,
+                "previousUrl" => $previousUrl
+            ]
+        );
     }
     
     public function timeOut(Request $request)
     {
         return view(
             'auth.dialog-check-form-sess',
-            [
-                "req" => $request
-            ]
+            [ "req" => $request ]
         );
     }
     

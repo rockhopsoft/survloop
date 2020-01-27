@@ -10,12 +10,13 @@ https://creativecommons.org/licenses/by-sa/3.0/
 
 {{ $GLOBALS['SL']->sysOpts['logo-url'] }}
 
-XML Schema: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema
+XML Schema: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema
 
 This XML was auto-generated from the SurvLoop engine, built on Laravel,
 resources/views/survloop/admin/tree/xml-schema.blade.php
 -->
 
-<{{ $GLOBALS["SL"]->coreTbl }} xmlns="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->TreeSlug }}-xml-schema">
+<{{ $GLOBALS["SL"]->coreTbl }} xmlns="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+    }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema">
 @if (isset($nestedNodes)) {!! $nestedNodes !!} @endif
 </{{ $GLOBALS["SL"]->coreTbl }}>

@@ -1,6 +1,6 @@
 /* SurvLoop-generated from resources/views/vendor/survloop/admin/fresh-install-class-admin.blade.php */
 
-namespace App\Http\Controllers\{{ $abbr }};
+namespace {{ $abbr }}\Controllers;
 
 use Illuminate\Http\Request;
 

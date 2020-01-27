@@ -53,8 +53,8 @@ class TreeSurvForm extends TreeSurvFormUtils
         list($tbl, $fld) = $curr->getTblFld();
         $fldForeignTbl = $GLOBALS["SL"]->fldForeignKeyTbl($tbl, $fld);
         if (($curr->isPage() || $curr->isInstruct()) 
-            && isset($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable)) {
-            $tbl = $GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable;
+            && isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_table)) {
+            $tbl = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
         }
         if ($tbl == '' && $this->hasCycleAncestorActive($nID)) {
             $tbl = $GLOBALS["SL"]->currCyc["cyc"][0];
@@ -84,78 +84,65 @@ class TreeSurvForm extends TreeSurvFormUtils
 
         if ($curr->isPage() || $curr->isLoopRoot()) {
 
-            $ret = $this->customNodePrint(
-                $nID, 
-                $tmpSubTier, 
-                $nIDtxt, 
-                $nSffx
-            );
+            $ret = $this->customNodePrint($nID, $tmpSubTier, $nIDtxt, $nSffx);
             if (!is_array($ret) && trim($ret) != '') {
                 return $ret;
             }
+            $this->checkLoopRootInput($nID);
             // print the button, and form initialization 
             // which only happens once per page make sure 
             // these are reset, in case of redirect
             $this->pageJSvalid = $this->pageHasReqs = '';
-            $this->pageHasUpload = $this->pageFldList 
-                = $this->hideKidNodes = [];
+            $this->pageHasUpload = $this->pageFldList = $this->hideKidNodes = [];
             $this->runPageExtra($nID);
             $this->runPageLoad($nID);
-            if ($GLOBALS["SL"]->treeRow->TreeType != 'Page') {
-                $ret .= '<div id="pageTopGapID" '
-                    . 'class="pageTopGap"></div>';
+            if ($GLOBALS["SL"]->treeRow->tree_type != 'Page') {
+                $ret .= '<div id="pageTopGapID" class="pageTopGap"></div>';
             }
             if ($curr->isLoopRoot()) {
-                $ret .= ((isset($curr->nodeRow->NodePromptText) 
-                        && trim($curr->nodeRow->NodePromptText) != '')
-                        ? '<div class="nPrompt">' 
-                            . $curr->nodeRow->NodePromptText . '</div>' 
-                        : '')
-                    . $this->printSetLoopNav($nID, $curr->dataBranch);
+                if (isset($curr->nodeRow->node_prompt_text) 
+                    && trim($curr->nodeRow->node_prompt_text) != '') {
+                    $ret .= '<div id="loopRootPromptText' . $nID 
+                        . '" class="nPrompt loopRootPromptText">' 
+                        . stripslashes($curr->nodeRow->node_prompt_text) . '</div>';
+                }
+                $ret .= $this->printSetLoopNav($nID, $curr->defaultVal);
             } else { // isPage()
                 if (sizeof($tmpSubTier[1]) > 0) { // recurse deez!..
-                    foreach ($tmpSubTier[1] as $childNode) { 
-                        if (!$this->allNodes[$childNode[0]]->isPage()) {
-                            $ret .= $this->printNodePublic(
-                                $childNode[0], 
-                                $childNode, 
-                                $currVisib
-                            );
+                    foreach ($tmpSubTier[1] as $cNode) { 
+                        if (!$this->allNodes[$cNode[0]]->isPage()) {
+                            $ret .= $this->printNodePublic($cNode[0], $cNode, $currVisib);
                         }
                     } 
                 }
             }
-            if (intVal($curr->nodeRow->NodeCharLimit) > 0) {
+            if (intVal($curr->nodeRow->node_char_limit) > 0) {
                 $GLOBALS["SL"]->pageJAVA .= 'setTimeout("focusNodeID(' 
-                    . $curr->nodeRow->NodeCharLimit 
-                    . ').focus()", 100);' . "\n";
+                    . $curr->nodeRow->node_char_limit . ').focus()", 100);' . "\n";
             } elseif (trim($this->page1stVisib) != '' 
-                && intVal($curr->nodeRow->NodeCharLimit) == 0) {
+                && intVal($curr->nodeRow->node_char_limit) == 0) {
                 $GLOBALS["SL"]->pageJAVA .= 'setTimeout("'
-                    . 'if (document.getElementById(\''
-                    . $this->page1stVisib 
-                    . '\')) document.getElementById(\'' 
-                    . $this->page1stVisib 
+                    . 'if (document.getElementById(\'' . $this->page1stVisib 
+                    . '\')) document.getElementById(\'' . $this->page1stVisib 
                     . '\').focus()", 100);' . "\n";
+            }
+            $gap = '';
+            if ($GLOBALS["SL"]->treeRow->tree_type != 'Page') {
+                $gap = '<div class="pageBotGap"></div>';
             }
             return $this->printNodePublicFormStart($nID) . $ret 
                 . '<div id="pageBtns"><div id="formErrorMsg"></div>' 
-                . $this->nodePrintButton($nID, $tmpSubTier, ''
-                    /* $promptNotesSpecial */) . '</div>' 
-                . $this->printNodePublicFormEnd($nID, ''
-                    /* $promptNotesSpecial */)
-                . (($GLOBALS["SL"]->treeRow->TreeType != 'Page') 
-                    ? '<div class="pageBotGap"></div>' : '');
+                . $this->nodePrintButton($nID, $tmpSubTier, '' /* $promptNotesSpecial */) 
+                . '</div>' . $this->printNodePublicFormEnd($nID, '' /* $promptNotesSpecial */)
+                . $gap;
 
         } // else not Page or Loop Root
         
         $itemInd = $itemID = -3;
         if ($this->hasActiveParentCyc($nID, $tbl)) {
-            list($itemInd, $itemID) = $this
-                ->chkParentCycInds($nID, $tbl);
+            list($itemInd, $itemID) = $this->chkParentCycInds($nID, $tbl);
         } else { // default logic, not LoopCycle, not SpreadTable 
-            list($itemInd, $itemID) = $this->sessData
-                ->currSessDataPos($tbl, $hasParManip);
+            list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl, $hasParManip);
             if ($itemInd < 0 
                 && isset($GLOBALS["SL"]->closestLoop["loop"]) 
                 && trim($GLOBALS["SL"]->closestLoop["loop"]) != '' 
@@ -168,20 +155,11 @@ class TreeSurvForm extends TreeSurvFormUtils
                 );
             }
         }
-        $currNodeSessData = $this->sessData->currSessData(
-            $nID, 
-            $tbl, 
-            $fld, 
-            'get', 
-            '', 
-            $hasParManip, 
-            $itemInd, 
-            $itemID
-        );
+        $currNodeSessData = $this->sessData
+            ->currSessData($nID, $tbl, $fld, 'get', '', $hasParManip, $itemInd, $itemID);
         //if ($itemID <= 0) $currNodeSessData = ''; // override false profit ;-P
-        if ($currNodeSessData == '' 
-            && trim($curr->nodeRow->NodeDefault) != '') {
-            $currNodeSessData = $curr->nodeRow->NodeDefault;
+        if ($currNodeSessData == '' && trim($curr->nodeRow->node_default) != '') {
+            $currNodeSessData = $curr->nodeRow->node_default;
         }
         
         // check for extra custom PHP code stored with the node; check for standardized techniques
@@ -191,8 +169,7 @@ class TreeSurvForm extends TreeSurvFormUtils
             $nIDtxt, 
             $currNodeSessData
         );
-        if (is_array($nodeOverrides) 
-            && sizeof($nodeOverrides) > 1) {
+        if (is_array($nodeOverrides) && sizeof($nodeOverrides) > 1) {
             $currNodeSessData = $nodeOverrides;
         } elseif (is_array($nodeOverrides) 
             && sizeof($nodeOverrides) == 1 
@@ -207,10 +184,10 @@ class TreeSurvForm extends TreeSurvFormUtils
         if (!isset($this->v["javaNodes"])) {
             $this->v["javaNodes"] = '';
         }
-        $this->v["javaNodes"] .= 'nodeParents[' . $nID . '] = ' 
-            . $curr->parentID . ';' . "\n" . (($nSffx != '') 
-                ? 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n" 
-                : '');
+        $this->v["javaNodes"] .= 'nodeParents[' . $nID . '] = ' . $curr->parentID . ';' . "\n";
+        if ($nSffx != '') {
+            $this->v["javaNodes"] .= 'nodeSffxs[nodeSffxs.length] = "' . $nSffx . '";' . "\n";
+        }
         $condKids = $showMoreNodes = [];
         if (sizeof($tmpSubTier[1]) > 0) {
             if ($curr->nodeType == 'Countries') {
@@ -227,11 +204,11 @@ class TreeSurvForm extends TreeSurvFormUtils
             if ($curr->hasShowKids && sizeof($curr->responses) > 0) {
                 // displaying children on page is conditional
                 foreach ($curr->responses as $j => $res) {
-                    if (intVal($res->NodeResShowKids) > 0) {
-                        if (!isset($condKids[$res->NodeResShowKids])) {
-                            $condKids[$res->NodeResShowKids] = [];
+                    if (intVal($res->node_res_show_kids) > 0) {
+                        if (!isset($condKids[$res->node_res_show_kids])) {
+                            $condKids[$res->node_res_show_kids] = [];
                         }
-                        $condKids[$res->NodeResShowKids][] = $res->NodeResValue;
+                        $condKids[$res->node_res_show_kids][] = $res->node_res_value;
                     }
                 }
                 if (sizeof($condKids) > 0) {
@@ -245,15 +222,15 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 $condHide = false;
                             }
                         }
-                        if ($condHide) $this->hideKidNodes[] = $condNode;
+                        if ($condHide) {
+                            $this->hideKidNodes[] = $condNode;
+                        }
                     }
                 }
-                $this->v["javaNodes"] .= 'conditionNodes[' . $nID . '] = true;' 
-                    . "\n";
+                $this->v["javaNodes"] .= 'conditionNodes[' . $nID . '] = true;' . "\n";
                 $typeList = [
-                    'Page Block', 'Data Manip: New', 'Data Manip: Update', 
-                    'Data Manip: Wrap', 'Instructions', 'Instructions Raw', 
-                    'Layout Row', 'Gallery Slider'
+                    'Page Block', 'Data Manip: New', 'Data Manip: Update', 'Data Manip: Wrap', 
+                    'Instructions', 'Instructions Raw', 'Layout Row', 'Gallery Slider'
                 ];
                 $childList = [];
                 foreach ($tmpSubTier[1] as $childNode) {
@@ -291,9 +268,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                     . implode(', ', $childList).'];' . "\n";
             }
         }
-        if (sizeof($curr->responses) == 3 && $curr->responses[1]->NodeResValue == '...') {
-            $start = intVal($curr->responses[0]->NodeResValue);
-            $finish = intVal($curr->responses[2]->NodeResValue);
+        if (sizeof($curr->responses) == 3 && $curr->responses[1]->node_res_value == '...') {
+            $start = intVal($curr->responses[0]->node_res_value);
+            $finish = intVal($curr->responses[2]->node_res_value);
             $curr->responses = [];
             if ($start < $finish) {
                 for ($i=$start; $i<=$finish; $i++) {
@@ -312,13 +289,15 @@ class TreeSurvForm extends TreeSurvFormUtils
         } elseif ($currVisib == 1 && in_array($nID, $this->hideKidNodes)) {
             $currVisib = 0;
         }
-        $visibilityField = '<input type="hidden" name="n' . $nIDtxt . 'Visible" id="n' 
-            . $nIDtxt . 'VisibleID" value="' . $currVisib . '">';
+        $visibilityField = '<input type="hidden" name="n' 
+            . $nIDtxt . 'Visible" id="n' . $nIDtxt 
+            . 'VisibleID" value="' . $currVisib . '">';
         if ($curr->nodeType == 'Layout Column') {
             $visibilityField = '';
         }
         if ($this->page1stVisib == '' && $currVisib == 1) {
-            if (in_array($curr->nodeType, ['Radio', 'Checkbox', 'Gender', 'Gender Not Sure'])) {
+            if (in_array($curr->nodeType, 
+                ['Radio', 'Checkbox', 'Gender', 'Gender Not Sure'])) {
                 $this->page1stVisib = 'n' . $nID . 'fld0';
             } elseif (in_array($curr->nodeType, ['Date', 'Date Time'])) {
                 $this->page1stVisib = 'n' . $nID . 'fldMonthID';
@@ -326,8 +305,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $this->page1stVisib = 'n' . $nID . 'fldHrID';
             } elseif (in_array($curr->nodeType, ['Feet Inches'])) {
                 $this->page1stVisib = 'n' . $nID . 'fldFeetID';
-            } elseif (in_array($curr->nodeType, ['Drop Down', 'Text', 'Long Text', 'Text:Number', 
-                'Slider', 'Email', 'Password', 'U.S. States', 'Countries'])) {
+            } elseif (in_array($curr->nodeType, ['Drop Down', 'Text', 
+                'Long Text', 'Text:Number', 'Slider', 'Email', 
+                'Password', 'U.S. States', 'Countries'])) {
                 $this->page1stVisib = 'n' . $nID . 'FldID';
             }
         }
@@ -337,7 +317,9 @@ class TreeSurvForm extends TreeSurvFormUtils
         }
         
         $ret = $this->customNodePrint($nID, $tmpSubTier, $nIDtxt, $nSffx, $currVisib);
-        if ($curr->nodeType == 'Data Print Row' && is_array($ret) && sizeof($ret) > 0) {
+        if ($curr->nodeType == 'Data Print Row' 
+            && is_array($ret) 
+            && sizeof($ret) > 0) {
             return $ret; 
         } elseif (!is_array($ret) && $ret != '') {
             return $visibilityField . $this->wrapNodePrint($ret, $nID);
@@ -349,16 +331,18 @@ class TreeSurvForm extends TreeSurvFormUtils
         if ($curr->nodeType != 'Long Text') {
             $xtraClass .= ' ntrStp';
         }
-        if (isset($this->v["graphFilters"]) && intVal($this->v["graphFilters"]) > 0 
+        if (isset($this->v["graphFilters"]) 
+            && intVal($this->v["graphFilters"]) > 0 
             && trim($curr->dataStore) != '') {
-            $typeList = ['Drop Down', 'U.S. States', 'Countries'];
-            $xtraClass .= ' graphUp' . ((in_array($curr->nodeType, $typeList)) ? 'Drp' : '');
+            $typeList = [ 'Drop Down', 'U.S. States', 'Countries' ];
+            $xtraClass .= ' graphUp' 
+                . ((in_array($curr->nodeType, $typeList)) ? 'Drp' : '');
             $GLOBALS["SL"]->pageAJAX .= 'addGraphFld("' . $nIDtxt . '", ' 
                 . $GLOBALS["SL"]->getFldIDFromFullWritName($curr->dataStore) . ', ' 
                 . $this->v["graphFilters"] . ');' . "\n";
         }
         
-        $mobileCheckbox = ($curr->nodeRow->NodeOpts%2 > 0);
+        $mobileCheckbox = ($curr->nodeRow->node_opts%2 > 0);
         /*
         if (in_array($curr->nodeType, ['Radio', 'Checkbox']) && sizeof($curr->responses) > 0 && $mobileCheckbox) {
             $GLOBALS["SL"]->pageJAVA .= 'addIsMobile(' . $nID . ', true); ';
@@ -370,34 +354,40 @@ class TreeSurvForm extends TreeSurvFormUtils
         // check for extra custom HTML/JS/CSS code stored with the node; check for standardized techniques
         $nodePromptAfter = '';
         $onKeyUp = '';
-        if (trim($curr->nodeRow->NodePromptAfter) != '' && !$curr->isWidget()) {
-            if (stripos($curr->nodeRow->NodePromptAfter, '/'.'* formAJAX *'.'/') !== false) {
-                $GLOBALS["SL"]->pageAJAX .= $curr->nodeRow->NodePromptAfter;
+        if (trim($curr->nodeRow->node_prompt_after) != '' && !$curr->isWidget()) {
+            if (stripos($curr->nodeRow->node_prompt_after, '/'.'* formAJAX *'.'/') !== false) {
+                $GLOBALS["SL"]->pageAJAX .= $curr->nodeRow->node_prompt_after;
             } else {
                 if (!$curr->isPage()) {
-                    if (strpos($curr->nodeRow->NodePromptAfter, 'function fldOnKeyUp[[nID]](') !== false) {
+                    $pos = strpos($curr->nodeRow->node_prompt_after, 'function fldOnKeyUp[[nID]](');
+                    if ($pos !== false) {
                         $onKeyUp .= ' fldOnKeyUp' . $nIDtxt . '(); ';
                     }
-                    $nodePromptAfter = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptAfter, $itemID, $itemInd);
+                    $nodePromptAfter = $this->swapLabels(
+                        $nIDtxt, 
+                        $curr->nodeRow->node_prompt_after, 
+                        $itemID, 
+                        $itemInd
+                    );
                     $nodePromptAfter = $GLOBALS["SL"]->extractJava($nodePromptAfter, $nID);
                 }
             }
         }
         $charLimit = '';
-        /* if (intVal($curr->nodeRow->NodeCharLimit) > 0 && $curr->nodeRow->NodeOpts%31 > 0 
+        /* if (intVal($curr->nodeRow->node_char_limit) > 0 && $curr->nodeRow->node_opts%31 > 0 
             && $curr->nodeType != 'Uploads') {
-            $onKeyUp .= ' charLimit(\'' . $nIDtxt . '\', ' . $curr->nodeRow->NodeCharLimit . '); ';
+            $onKeyUp .= ' charLimit(\'' . $nIDtxt . '\', ' . $curr->nodeRow->node_char_limit . '); ';
             $charLimit = "\n" . '<div id="charLimit' . $nID . 'Msg" class="txtDanger f12 opac33"></div>';
             $GLOBALS["SL"]->pageJAVA .= 'setTimeout("charLimit(\'' . $nIDtxt . '\', ' 
-                . $curr->nodeRow->NodeCharLimit . ')", 50);' . "\n";
+                . $curr->nodeRow->node_char_limit . ')", 50);' . "\n";
         } */
-        if ($curr->nodeRow->NodeOpts%31 == 0 || $curr->nodeRow->NodeOpts%47 == 0) {
-            if (intVal($curr->nodeRow->NodeCharLimit) == 0) {
-                $curr->nodeRow->NodeCharLimit = 10000000000;
+        if ($curr->nodeRow->node_opts%31 == 0 || $curr->nodeRow->node_opts%47 == 0) {
+            if (intVal($curr->nodeRow->node_char_limit) == 0) {
+                $curr->nodeRow->node_char_limit = 10000000000;
             }
             $wrdCntKey = 'wordCountKeyUp(\'' . $nIDtxt . '\', ' 
-                . (($curr->nodeRow->NodeOpts%47 == 0) ? $curr->nodeRow->NodeCharLimit : 0) . ', '
-                . intVal($curr->nodeRow->NodeCharLimit) . ')';
+                . (($curr->nodeRow->node_opts%47 == 0) ? $curr->nodeRow->node_char_limit : 0) 
+                . ', ' . intVal($curr->nodeRow->node_char_limit) . ')';
             $onKeyUp .= ' ' . $wrdCntKey . '; ';
             $GLOBALS["SL"]->pageJAVA .= 'setTimeout("' . $wrdCntKey . '", 50);' . "\n";
         }
@@ -414,25 +404,33 @@ class TreeSurvForm extends TreeSurvFormUtils
         
         // check notes settings for any standardized techniques
         $promptNotesSpecial = '';
-        if ($this->isPromptNotesSpecial($curr->nodeRow->NodePromptNotes)) {
-            $promptNotesSpecial = $curr->nodeRow->NodePromptNotes;
-            $curr->nodeRow->NodePromptNotes = '';
+        if ($this->isPromptNotesSpecial($curr->nodeRow->node_prompt_notes)) {
+            $promptNotesSpecial = $curr->nodeRow->node_prompt_notes;
+            $curr->nodeRow->node_prompt_notes = '';
         }
         
         // write basic node field labeling
-        $nodePromptText  = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptText, $itemID, $itemInd);
+        $nodePromptText  = stripslashes($this->swapLabels(
+            $nIDtxt, 
+            $curr->nodeRow->node_prompt_text, 
+            $itemID, 
+            $itemInd
+        ));
         if ($curr->isRequired() && $curr->nodeType != 'Hidden Field') {
             $nodePromptText = $this->addPromptTextRequired($curr, $nodePromptText, $nIDtxt);
         }
-        $nodePromptNotes = $this->swapLabels($nIDtxt, $curr->nodeRow->NodePromptNotes, $itemID, $itemInd);
+
+        $nodePromptNotes = $curr->nodeRow->node_prompt_notes;
+        $nodePromptNotes = $this->swapLabels($nIDtxt, $nodePromptNotes, $itemID, $itemInd);
+        $nodePromptNotes = stripslashes($nodePromptNotes);
         if (trim($nodePromptNotes) != '' && !$curr->isLoopRoot()) {
-            if ($curr->nodeRow->NodeOpts%83 == 0) {
+            if ($curr->nodeRow->node_opts%83 == 0) {
                 $nodePromptText = '<a id="hidivBtnnLabel' . $nIDtxt . 'notes" '
                     . 'class="hidivBtn crsrPntr float-right">'
                     . '<i class="fa fa-info-circle" aria-hidden="true"></i></a>' . $nodePromptText;
             }
             $nodePromptText .= '<div id="hidivnLabel' . $nIDtxt . 'notes" class="subNote'
-                . (($curr->nodeRow->NodeOpts%83 == 0) ? ' disNon' : '') . '">' 
+                . (($curr->nodeRow->node_opts%83 == 0) ? ' disNon' : '') . '">' 
                 . $nodePromptNotes . '</div>' . "\n";
         }
         if (strpos($nodePromptText, 'fixedHeader') !== false) {
@@ -443,20 +441,24 @@ class TreeSurvForm extends TreeSurvFormUtils
         $nodePromptNotes = $GLOBALS["SL"]->extractJava($nodePromptNotes, $nID);
         
         $nodePrompt = '';
-        if (strpos($curr->nodeRow->NodePromptText, '[[PreviewPrivate]]') !== false 
-            || strpos($curr->nodeRow->NodePromptText, '[[PreviewPublic]]') !== false) {
+        if (strpos($curr->nodeRow->node_prompt_text, '[[PreviewPrivate]]') !== false 
+            || strpos($curr->nodeRow->node_prompt_text, '[[PreviewPublic]]') !== false) {
             $nodePrompt = $nodePromptText;
-        } elseif (trim($nodePromptText) != '' && !$curr->isDataPrint() 
+        } elseif (trim($nodePromptText) != '' 
+            && !$curr->isDataPrint() 
             && !$this->hasSpreadsheetParent($nID)) {
             if ($curr->isInstructAny()) {
                 $nodePrompt = '<div id="nLabel' . $nIDtxt . '" class="nPrompt">' 
                     . $nodePromptText . '</div>' . "\n";
             } else {
+                $w100 = '';
+                if (!in_array($curr->nodeType, ['Radio', 'Checkbox']) 
+                    || $curr->nodeRow->node_opts%83 == 0) {
+                    $w100 = ' class="w100"';
+                }
                 $nodePrompt = "\n" . '<div id="nLabel' . $nIDtxt . '" class="nPrompt">'
-                    . '<label for="n' . $nIDtxt . 'FldID"' 
-                    . ((!in_array($curr->nodeType, ['Radio', 'Checkbox']) 
-                        || $curr->nodeRow->NodeOpts%83 == 0) ? ' class="w100"' : '')
-                    . ' >' . $nodePromptText . '</label></div>' . "\n";
+                    . '<label for="n' . $nIDtxt . 'FldID"' . $w100 . ' >'
+                    . $nodePromptText . '</label></div>' . "\n";
             }
         }
         
@@ -464,242 +466,52 @@ class TreeSurvForm extends TreeSurvFormUtils
             
             if (in_array($curr->nodeType, ['Data Print', 'Data Print Row'])) {
                 
-                if (!$this->checkFldDataPerms($curr->getFldRow()) 
-                    || !$this->checkViewDataPerms($curr->getFldRow())) {
-                    if ($curr->nodeType == 'Data Print Row') {
-                        return [];
-                    }
-                } else {
-                    if (isset($GLOBALS["SL"]->formTree->TreeID) 
-                        && in_array($nID, $this->checkboxNodes)) {
-                        $currNodeSessData = $this->valListArr(
-                            $this->sessData->currSessDataCheckbox($nID, $tbl, $fld)
-                        );
-                        if ($this->hasCycleAncestorActive($nID)) {
-                            $cycInd = $GLOBALS["SL"]->currCyc["cyc"][1];
-                            $cycInd = intVal(str_replace('cyc', '', $cycInd));
-                            if (isset($currNodeSessData[$cycInd])) {
-                                $currNodeSessData = $currNodeSessData[$cycInd];
-                            }
-                        }
-                    }
-                    $fldRow = $GLOBALS["SL"]->getFldRowFromFullName($tbl, $fld);
-                    $printRow = true;
-                    if ((!is_array($currNodeSessData) 
-                        && (!$currNodeSessData || trim($currNodeSessData) == ''))
-                        || (is_array($currNodeSessData) && sizeof($currNodeSessData) == 0)) {
-                        $printRow = false;
-                    } elseif (isset($curr->nodeRow->NodeDefault) 
-                        && trim($curr->nodeRow->NodeDefault) != '' 
-                        && ((!is_array($currNodeSessData) && trim($currNodeSessData) != '' 
-                        && trim($currNodeSessData) == trim($curr->nodeRow->NodeDefault)) 
-                        || (is_array($currNodeSessData) && trim($currNodeSessData[0]) 
-                            == trim($curr->nodeRow->NodeDefault)))) {
-                        $printRow = false;
-                    }
-                    if ($printRow) {
-                        $deetLabel = (($fldRow && isset($fldRow->FldEng)) ? $fldRow->FldEng : '');
-                        $deetLabel = $this->swapLabels(
-                            $nIDtxt, 
-                            $deetLabel, 
-                            $itemID, 
-                            $itemInd
-                        );
-                        
-                        $deetVal = $GLOBALS["SL"]->printResponse(
-                            $tbl, 
-                            $fld, 
-                            $currNodeSessData, 
-                            $fldRow
-                        );
-                        $deetVal = $this->printValCustom($nID, $deetVal);
-                        if (isset($GLOBALS["SL"]->formTree->TreeID)) {
-                            $lab = $GLOBALS["SL"]->getFldNodeQuestion(
-                                $tbl, 
-                                $fld, 
-                                $GLOBALS["SL"]->formTree->TreeID
-                            );
-                            if (trim($lab) != '') {
-                                $lab = $this->swapLabels($nIDtxt, $lab, $itemID, $itemInd);
-                                if (strip_tags($deetLabel) != strip_tags($lab)) {
-                                    $deetLabel = '<a id="hidivBtn' . $nIDtxt 
-                                        .'" class="hidivBtn slGrey" href="javascript:;">' 
-                                        . $deetLabel . '</a><div id="hidiv' . $nIDtxt 
-                                        . '" class="disNon">"' . $lab . '"</div>';
-                                }
-                            }
-                        }
-                        if ($curr->nodeType == 'Data Print') {
-                            $ret .= '<div id="nLabel' . $nIDtxt 
-                                . '" class="nPrompt"><span class="slGrey mR10">' 
-                                . $deetLabel . '</span>' . $deetVal . '</div>';
-                        } elseif ($curr->nodeType == 'Data Print Row') {
-                            return [$deetLabel, $deetVal, $nID];
-                        }
-                    } elseif ($curr->nodeType == 'Data Print Row') {
-                        return [];
-                    }
-                }
+                return $this->nodePrintDataRow(
+                    $nID, 
+                    $nIDtxt, 
+                    $curr, 
+                    $tbl, 
+                    $fld, 
+                    $currNodeSessData, 
+                    $itemID, 
+                    $itemInd
+                );
                 
             } elseif (in_array($curr->nodeType, ['Data Print Block', 'Data Print Columns'])) {
                 
-                $deets = [];
-                if (sizeof($tmpSubTier[1]) > 0) {
-                    foreach ($tmpSubTier[1] as $childNode) {
-                        $kidID = $childNode[0];
-                        if ($this->allNodes[$kidID]->nodeType == 'Data Print Row') {
-                            $newDeet = $this->printNodePublic($kidID, $childNode, $currVisib);
-                            if (is_array($newDeet) && sizeof($newDeet) > 0 
-                                && trim($newDeet[0]) != '' && trim($newDeet[1]) != '') {
-                                $deets[] = $newDeet;
-                            }
-                        } elseif ($this->allNodes[$kidID]->isDataManip()) {
-                            $this->loadManipBranch($kidID, ($currVisib == 1));
-                            foreach ($childNode[1] as $granNode) {
-                                if ($this->allNodes[$granNode[0]]->nodeType 
-                                    == 'Data Print Row') {
-                                    $newDeet = $this->printNodePublic(
-                                        $granNode[0], 
-                                        $granNode, 
-                                        $currVisib
-                                    );
-                                    if ($newDeet && is_array($newDeet) 
-                                        && sizeof($newDeet) > 0) {
-                                        $deets[] = $newDeet;
-                                    }
-                                }
-                            }
-                            $this->closeManipBranch($kidID);
-                        } elseif ($this->allNodes[$kidID]->isLoopCycle()) {
-                            list($tbl, $fld, $newVal) = $this->nodeBranchInfo(
-                                $nID, 
-                                $this->allNodes[$kidID]
-                            );
-                            $loop = str_replace('LoopItems::', '', 
-                                $this->allNodes[$kidID]->responseSet);
-                            $loopCycle = $this->sessData->getLoopRows($loop);
-                            // if this is a simple loop of a just a table's rows
-                            if (trim($loop) == '' && isset($this->allNodes[$kidID]->dataBranch)
-                                && trim($this->allNodes[$kidID]->dataBranch) != '') {
-                                $s = sizeof($this->sessData->dataBranches);
-                                if ($s > 0) {
-                                    $branch = $this->sessData->dataBranches[($s-1)];
-                                    if (isset($branch["itemID"]) 
-                                        && intVal($branch["itemID"]) > 0) {
-                                        $loopCycle = $this->sessData->getChildRows(
-                                            $branch["branch"], 
-                                            $branch["itemID"], 
-                                            $this->allNodes[$kidID]->dataBranch);
-                                    }
-                                }
-                            }
-                            if (sizeof($childNode[1]) > 0 && $loopCycle 
-                                && sizeof($loopCycle) > 0) {
-                                $GLOBALS["SL"]->currCyc["cyc"][0] = $tbl;
-                                if ($loop != '') {
-                                    $GLOBALS["SL"]->currCyc["cyc"][0] 
-                                        = $GLOBALS["SL"]->getLoopTable($loop);
-                                }
-                                foreach ($loopCycle as $i => $loopItem) {
-                                    $GLOBALS["SL"]->currCyc["cyc"][1] = 'cyc' . $i;
-                                    $GLOBALS["SL"]->currCyc["cyc"][2] = $loopItem->getKey();
-                                    $this->sessData->startTmpDataBranch($tbl, $loopItem->getKey());
-                                    $label = (1+$i) . ')';
-                                    if ($loop != '') {
-                                        $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
-                                        $label = $this->getLoopItemLabel($loop, $loopItem, $i);
-                                    }
-                                    foreach ($childNode[1] as $granNode) {
-                                        if ($this->allNodes[$granNode[0]]->nodeType 
-                                            == 'Data Print Row') {
-                                            $newDeet = $this->printNodePublic(
-                                                $granNode[0], 
-                                                $granNode, 
-                                                $currVisib
-                                            );
-                                            if (isset($newDeet[0]) && trim($newDeet[0]) != '' 
-                                                && trim($newDeet[1]) != '') {
-                                                $newDeet[0] = $label . ' ' . $newDeet[0];
-                                                $deets[] = $newDeet;
-                                            }
-                                        }
-                                    }
-                                    if ($loop != '') {
-                                        $GLOBALS["SL"]->removeFakeSessLoopCycle(
-                                            $loop, 
-                                            $loopItem->getKey()
-                                        );
-                                    }
-                                    $this->sessData->endTmpDataBranch($tbl);
-                                    $GLOBALS["SL"]->currCyc["cyc"][1] = '';
-                                    $GLOBALS["SL"]->currCyc["cyc"][2] = -3;
-                                }
-                                $GLOBALS["SL"]->currCyc["cyc"][0] = '';
-                            }
-                            
-                        }
-                    }
-                }
-                /* if ($this->allNodes[$curr->parentID]->isLoopCycle()) {
-                    $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
-                        $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->DataLoopTable, $itemID), 
-                        $itemInd);
-                    $nodePromptText = $label . ' ' . $nodePromptText;
-                } */
-                if (sizeof($deets) > 0) {
-                    if ($curr->nodeType == 'Data Print Block') {
-                        $ret .= $this->printReportDeetsBlock(
-                            $deets, 
-                            strip_tags($nodePromptText), 
-                            $nID
-                        );
-                    } else {
-                        $colCnt = 2;
-                        $ret .= $this->printReportDeetsBlockCols(
-                            $deets, 
-                            strip_tags($nodePromptText), 
-                            $colCnt, 
-                            $nID
-                        );
-                    }
-                }
+                return $this->nodePrintDataBlock(
+                    $nID, 
+                    $nIDtxt, 
+                    $curr, 
+                    $tbl, 
+                    $fld, 
+                    $currVisib, 
+                    $tmpSubTier, 
+                    $nodePromptText,
+                    $currNodeSessData
+                );
                 
             } elseif (in_array($curr->nodeType, ['Print Vert Progress'])) {
                 
-                $deets = [];
-                foreach ($tmpSubTier[1] as $childNode) {
-                    if ($this->allNodes[$childNode[0]]->nodeType == 'Data Print Row') {
-                        list($tbl, $fld) = $this->allNodes[$childNode[0]]->getTblFld();
-                        list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
-                        if ($itemID > 0 && isset($this->sessData->dataSets[$tbl])) {
-                            $tblSet = $this->sessData->dataSets[$tbl]; 
-                            if (isset($tblSet[$itemInd]) > 0) {
-                                $dateTime = 0;
-                                if (isset($tblSet[$itemInd]->{ $fld })
-                                    && trim($tblSet[$itemInd]->{ $fld }) != '') {
-                                    $dateTime = strtotime($tblSet[$itemInd]->{ $fld });
-                                }
-                                if (!isset($this->allNodes[$childNode[0]]->nodeRow->NodeDefault)
-                                    || trim($this->allNodes[$childNode[0]]->nodeRow->NodeDefault) != trim($dateTime)) {
-                                    $fldRow = $GLOBALS["SL"]->getTblFldRow('', $tbl, $fld);
-                                    if ($fldRow && isset($fldRow->FldEng)) {
-                                        $deets[] = [ $fldRow->FldEng, $dateTime, $childNode[0] ];
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                $ret .= $this->printReportDeetsVertProg($deets, strip_tags($nodePromptText), $nID);
+                return $this->nodePrintVertProgress(
+                    $nID, 
+                    $tbl, 
+                    $fld, 
+                    $tmpSubTier, 
+                    $nodePromptText
+                );
                 
             }
             
         } else { // not data printing...
         
             if ($curr->nodeType == 'Layout Column') {
-                $ret .= '<div id="col' . $nIDtxt . '" class="col-md-' 
-                    . $curr->nodeRow->NodeCharLimit . '">';
+
+                $cols = $curr->nodeRow->node_char_limit;
+                $ret .= '<div id="col' . $nIDtxt . '" class="col-md-' . $cols . '">';
+
             } else {
+
                 if ($this->hasParentType($nID, 'Gallery Slider') 
                     && isset($curr->colors["blockImg"]) 
                     && trim($curr->colors["blockImg"]) != '') {
@@ -707,14 +519,21 @@ class TreeSurvForm extends TreeSurvFormUtils
                 }
                 $isParallax = (isset($curr->colors["blockImgFix"]) 
                     && trim($curr->colors["blockImgFix"]) == 'P');
-                $ret .= view('vendor.survloop.css.inc-block', [
+                $dis = '';
+                if ($this->hasParentType($nID, 'Gallery Slider')) {
+                    if ($curr->nodeRow->node_parent_order == 0) {
+                        $dis = ' disBlo';
+                    } else {
+                        $dis = ' disNon';
+                    }
+                }
+                $ret .= view(
+                    'vendor.survloop.css.inc-block', [
                         "nIDtxt" => $nIDtxt,
                         "node"   => $curr
-                    ])->render()
-                    . '<div id="blockWrap' . $nIDtxt . '" class="w100' 
-                    . (($this->hasParentType($nID, 'Gallery Slider'))
-                        ? (($curr->nodeRow->NodeParentOrder == 0) 
-                            ? ' disBlo' : ' disNon') : '');
+                    ]
+                )->render();
+                $ret .= '<div id="blockWrap' . $nIDtxt . '" class="w100' . $dis;
                 if ($isParallax) {
                     $imgSrc = '';
                     if (sizeof($curr->colors) > 0) {
@@ -730,16 +549,20 @@ class TreeSurvForm extends TreeSurvFormUtils
                     }
                 }
                 $ret .= '">';
+
             }
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
-                && $curr->parentID == $GLOBALS['SL']->treeRow->TreeRoot) {
+
+            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page' 
+                && $curr->parentID == $GLOBALS['SL']->treeRow->tree_root) {
                 if ($curr->isPageBlockSkinny()) { // wrap page block
-                    $ret .= '<center><div class="treeWrapForm" id="treeWrap' . $nIDtxt . '">'; //  class="container"
+                    $ret .= '<center><div class="treeWrapForm" id="treeWrap' 
+                        . $nIDtxt . '">'; //  class="container"
                 } else{
-                    if ($this->hasFrameLoad() || ($GLOBALS["SL"]->treeRow->TreeOpts%3 == 0 
-                        || $GLOBALS["SL"]->treeRow->TreeOpts%17 == 0 
-                        || $GLOBALS["SL"]->treeRow->TreeOpts%41 == 0 
-                        || $GLOBALS["SL"]->treeRow->TreeOpts%43 == 0)) {
+                    if ($this->hasFrameLoad() 
+                        || ($GLOBALS["SL"]->treeRow->tree_opts%3 == 0 
+                        || $GLOBALS["SL"]->treeRow->tree_opts%17 == 0 
+                        || $GLOBALS["SL"]->treeRow->tree_opts%41 == 0 
+                        || $GLOBALS["SL"]->treeRow->tree_opts%43 == 0)) {
                         $ret .= '<div class="w100 pL15 pR15" id="treeWrap' . $nIDtxt . '">';
                     } else {
                         $ret .= '<div class="container" id="treeWrap' . $nIDtxt . '">';
@@ -756,19 +579,20 @@ class TreeSurvForm extends TreeSurvFormUtils
             if (!in_array($curr->nodeType, ['Layout Row', 'Layout Column'])) {
                 $ret .= '<div id="node' . $nIDtxt . '" class="nodeWrap' 
                     . (($curr->isGraph()) ? ' nGraph' : '')
-                    . (($curr->nodeRow->NodeOpts%89 == 0) ? ' slCard' : '');
-                if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
+                    . (($curr->nodeRow->node_opts%89 == 0) ? ' slCard' : '');
+                if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
                     $ret .= (($curr->isInstructAny()) ? ' w100' : '') 
                         . (($curr->isPage()) ? ' h100' : '');
                 }
-                if ($currVisib != 1 && (trim($GLOBALS["SL"]->currCyc["res"][1]) == '' 
-                    || substr($GLOBALS["SL"]->currCyc["res"][1], 0, 3) != 'res')) {
+                if ($currVisib != 1 
+                    && (trim($GLOBALS["SL"]->currCyc["res"][1]) == '' 
+                        || substr($GLOBALS["SL"]->currCyc["res"][1], 0, 3) != 'res')) {
                     $ret .= ' disNon';
                 }
                 $ret .= '">' . "\n";
             }
             
-            if ($curr->nodeRow->NodeOpts%37 == 0) {
+            if ($curr->nodeRow->node_opts%37 == 0) {
                 $ret .= '<div class="jumbotron">';
             }
             
@@ -781,7 +605,7 @@ class TreeSurvForm extends TreeSurvFormUtils
             } elseif ($curr->isLoopCycle()) {
                 
                 list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
-                $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+                $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
                 $loopCycle = $this->sessData->getLoopRows($loop);
                 if (sizeof($tmpSubTier[1]) > 0 && sizeof($loopCycle) > 0) {
                     $GLOBALS["SL"]->currCyc["cyc"][0] = $GLOBALS["SL"]->getLoopTable($loop);
@@ -835,8 +659,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 false
                             );
                             foreach ($tmpSubTier[1] as $k => $kidNode) {
-                                $printFld = str_replace('nFld', '', str_replace('nFld mT0', '', 
-                                     $this->printNodePublic($kidNode[0], $kidNode, 1)));
+                                $printFld = $this->printNodePublic($kidNode[0], $kidNode, 1);
+                                $printFld = str_replace('nFld', '', 
+                                    str_replace('nFld mT0', '', $printFld));
                                 $this->tableDat["rows"][$i]["cols"][] = $printFld;
                             }
                             $this->sessData->endTmpDataBranch($this->tableDat["tbl"]);
@@ -848,9 +673,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
                     $java = '';
                     foreach ($tmpSubTier[1] as $k => $kidNode) {
+                        $kid = $this->printNodePublic($kidNode[0], $kidNode, 1);
                         $this->tableDat["blnk"][$k] = str_replace('nFld', '', 
-                            str_replace('nFld mT0', '', 
-                            $this->printNodePublic($kidNode[0], $kidNode, 1)));
+                            str_replace('nFld mT0', '', $kid));
                         $java .= (($k > 0) ? ', ' : '') . $kidNode[0];
                     }
                     $this->v["javaNodes"] .= 'nodeTblList[' . $nID 
@@ -866,20 +691,23 @@ class TreeSurvForm extends TreeSurvFormUtils
                             . "', 'reqFormFldTbl', " . $this->tableDat["maxRow"] . ", cols, " 
                             . (($this->tableDat["req"][1]) ? 'true' : 'false') . ");\n";
                     }
-                    $ret .= view('vendor.survloop.forms.formtree-table', [
-                        "nID"             => $nID,
-                        "nIDtxt"          => $nIDtxt,
-                        "node"            => $curr,
-                        "nodePromptText"  => $nodePromptText,
-                        "tableDat"        => $this->tableDat
-                    ])->render();
-                    $GLOBALS["SL"]->currCyc["tbl"] = ['', '', -3];
+                    $ret .= view(
+                        'vendor.survloop.forms.formtree-table', 
+                        [
+                            "nID"             => $nID,
+                            "nIDtxt"          => $nIDtxt,
+                            "node"            => $curr,
+                            "nodePromptText"  => $nodePromptText,
+                            "tableDat"        => $this->tableDat
+                        ]
+                    )->render();
+                    $GLOBALS["SL"]->currCyc["tbl"] = [ '', '', -3 ];
                     $this->tableDat = [];
                 }
                 
             } elseif ($curr->isLoopSort()) {
                 
-                $loop = str_replace('LoopItems::', '', $curr->nodeRow->NodeResponseSet);
+                $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
                 $loopCycle = $this->sessData->getLoopRows($loop);
                 if (sizeof($loopCycle) > 0) {
                     $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({ 
@@ -904,7 +732,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $ret .= '<input type="hidden" name="dataManip' . $nIDtxt . '" value="1">';
                 if ($currVisib == 1) { // run a thing on page load
                     if ($curr->nodeType == 'Data Manip: Close Sess') {
-                        $this->deactivateSess($curr->nodeRow->NodeResponseSet);
+                        $this->deactivateSess($curr->nodeRow->node_response_set);
                     }
                 }
                 
@@ -921,12 +749,14 @@ class TreeSurvForm extends TreeSurvFormUtils
                 
             } elseif (!$curr->isPage()) { // otherwise, the main Node printer...
                 
-                $curr = $this->customResponses($nID, $curr);
+                $this->customResponses($nID, $curr);
                 // Start normal data field checks
                 $dateStr = $timeStr = '';
-                if ($fld != '' && isset($GLOBALS["SL"]->tblAbbr[$tbl]) 
+                if ($fld != '' 
+                    && isset($GLOBALS["SL"]->tblAbbr[$tbl]) 
                     && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')
-                    && !is_array($currNodeSessData) && trim($currNodeSessData) != '' 
+                    && !is_array($currNodeSessData) 
+                    && trim($currNodeSessData) != '' 
                     && isset($GLOBALS["SL"]->fldTypes[$tbl][$fld])) {
                     // convert current session data for dates and times
                     if ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DATETIME') {
@@ -941,7 +771,9 @@ class TreeSurvForm extends TreeSurvFormUtils
                             $dateStr = date("m/d/Y", strtotime($dateStr));
                         }
                     }
-                    if ($dateStr == '12/31/1969') $dateStr = '';
+                    if ($dateStr == '12/31/1969') {
+                        $dateStr = '';
+                    }
                 } // end normal data field checks
                 
                 // check if this field's label and field is to be printed on the same line
@@ -957,8 +789,11 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $isOneLiner = $isOneLinerFld = ' col-6';
                 }
                 if (trim($isOneLiner) != '') {
-                    $nodePrompt = str_replace('class="nPrompt"', 
-                        'class="nPrompt' . $isOneLiner . '"', $nodePrompt);
+                    $nodePrompt = str_replace(
+                        'class="nPrompt"', 
+                        'class="nPrompt' . $isOneLiner . '"', 
+                        $nodePrompt
+                    );
                 }
                 
                 $chk = ['Radio', 'Checkbox', 'Instructions', 'Other/Custom'];
@@ -967,8 +802,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 }
                 
                 // start Q&A on same row
-                if ($curr->isOneLiner() 
-                    && !in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
+                if ($curr->isOneLiner() && !in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
                     $ret .= '<div class="row"> <!-- start one-liner -->';
                 }
 
@@ -983,17 +817,16 @@ class TreeSurvForm extends TreeSurvFormUtils
                     
                     $currNodeSessData = '';
                     $btn = '<div class="nFld"><a id="nBtn' . $nIDtxt . '" class="crsrPntr '
-                        . (($curr->nodeRow->NodeResponseSet == 'Text') ? '' : 'btn btn-lg btn-' 
-                            . (($curr->nodeRow->NodeResponseSet == 'Default') 
+                        . (($curr->nodeRow->node_response_set == 'Text') ? '' : 'btn btn-lg btn-' 
+                            . (($curr->nodeRow->node_response_set == 'Default') 
                                 ? 'secondary' : 'primary') . ' nFldBtn')
-                        . (($curr->nodeRow->NodeOpts%43 == 0) ? '' : ' nFormNext') . '" ' 
-                        . ((trim($curr->nodeRow->NodeDataStore) != '') 
-                            ? 'onClick="' . $curr->nodeRow->NodeDataStore . '"' : '') . ' >' 
-                        . $curr->nodeRow->NodeDefault . '</a></div>';
+                        . (($curr->nodeRow->node_opts%43 == 0) ? '' : ' nFormNext') . '" ' 
+                        . ((trim($curr->nodeRow->node_data_store) != '') 
+                            ? 'onClick="' . $curr->nodeRow->node_data_store . '"' : '') . ' >' 
+                        . $curr->nodeRow->node_default . '</a></div>';
                     $lastDivPos = strrpos($nodePrompt, "</div>\n            </label></div>");
                     if (strpos($nodePrompt, 'jumbotron') > 0 && $lastDivPos > 0) {
-                        $ret .= substr($nodePrompt, 0, $lastDivPos) 
-                            . '<center>' . $btn . '</center>' 
+                        $ret .= substr($nodePrompt, 0, $lastDivPos) . '<center>' . $btn . '</center>' 
                             . substr($nodePrompt, $lastDivPos) 
                             . '<input type="hidden" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt 
                             . 'FldID" value="' . $currNodeSessData . '" class="' . $xtraClass 
@@ -1003,7 +836,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                             . 'fld" id="n' . $nIDtxt . 'FldID" value="' . $currNodeSessData 
                             . '" class="' . $xtraClass . '" data-nid="' . $nID . '">' . $btn . "\n"; 
                     }
-                    if ($curr->nodeRow->NodeOpts%43 == 0) {
+                    if ($curr->nodeRow->node_opts%43 == 0) {
                         $this->allNodes[$nID]->hasShowKids = $curr->hasShowKids = true;
                         $childList = [];
                         if (sizeof($tmpSubTier[1]) > 0) {
@@ -1014,23 +847,13 @@ class TreeSurvForm extends TreeSurvFormUtils
                         }
                         $this->v["javaNodes"] .= 'nodeKidList[' . $nID . '] = [' 
                             . implode(', ', $childList) . ']; ';
-                        $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#nBtn' . $nIDtxt
-                            . '", function() { '
-                            . 'if (document.getElementById("node' . $nIDtxt . 'kids")) { '
-                                . 'if (!document.getElementById("node' . $nIDtxt . 'kids").style.display '
-                                    . '|| document.getElementById("node' . $nIDtxt . 'kids").style.display=="") { '
-                                    . 'document.getElementById("node' . $nIDtxt . 'kids").style.display="none"; } '
-                                . 'if (document.getElementById("node' . $nIDtxt . 'kids").style.display=="none") { '
-                                    . 'kidsVisible("' . $nIDtxt . '", "' . $nSffx . '", true); '
-                                    . 'kidsDisplaySkip("' . $nIDtxt . '", "' . $nSffx . '", true); '
-                                    . '$("#node' . $nIDtxt . 'kids").slideDown("50"); '
-                                . '} else { '
-                                    . '$("#node' . $nIDtxt . 'kids").slideUp("50"); '
-                                    . 'kidsVisible("' . $nIDtxt . '", "' . $nSffx . '", false); '
-                                    . 'setTimeout(function() { kidsDisplaySkip("' . $nIDtxt . '", "' . $nSffx 
-                                        . '", false); }, 100); '
-                                . '} '
-                            . '} });' . "\n";
+                        $GLOBALS["SL"]->pageAJAX .= view(
+                            'vendor.survloop.forms.formtree-button-show-kids-ajax', 
+                            [
+                                "nIDtxt" => $nIDtxt,
+                                "nSffx"  => $nSffx
+                            ]
+                        )->render();
                     }
                     
                 } elseif ($curr->nodeType == 'User Sign Up') {
@@ -1058,11 +881,10 @@ class TreeSurvForm extends TreeSurvFormUtils
                         $GLOBALS["SL"]->pageJAVA .= 'document.getElementById("node"+"' . $nID 
                             . '").style.display="none"; ';
                     }
-                    if (trim($curr->nodeRow->NodeTextSuggest) != '') {
+                    if (trim($curr->nodeRow->node_text_suggest) != '') {
                         $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'FldID" ).autocomplete({ source: [';
-                        foreach ($GLOBALS["SL"]->def->getSet($curr->nodeRow->NodeTextSuggest) as $i => $def) {
-                            $GLOBALS["SL"]->pageAJAX .= (($i > 0) ? ',' : '') . ' ' 
-                                . json_encode($def->DefValue);
+                        foreach ($GLOBALS["SL"]->def->getSet($curr->nodeRow->node_text_suggest) as $i => $def) {
+                            $GLOBALS["SL"]->pageAJAX .= (($i > 0) ? ',' : '') . ' ' . json_encode($def->def_value);
                         }
                         $GLOBALS["SL"]->pageAJAX .= ' ] });' . "\n";
                     }
@@ -1078,24 +900,25 @@ class TreeSurvForm extends TreeSurvFormUtils
                     //$GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("flexAreaAdjust(document.getElementById(\'n' 
                     //    . $nIDtxt . 'FldID\'))", 50);';
                     if ($curr->isRequired()) {
-                        $this->pageJSvalid .= "addReqNode('" . $nIDtxt . "', 'reqFormFld');\n";
+                        $this->pageJSvalid .= "addReqNode('" . $nIDtxt 
+                            . "', 'reqFormFld');\n";
                     }
                     
                 } elseif (in_array($curr->nodeType, [ 'Text:Number', 'Slider' ])) {
                     
                     $attrMin = $attrMax = '';
                     if (isset($curr->extraOpts["minVal"]) && $curr->extraOpts["minVal"] !== false) {
-                        if (isset($curr->nodeRow->NodeDefault) 
-                            && $curr->nodeRow->NodeDefault < $curr->extraOpts["minVal"]) {
-                            $attrMin = 'min="' . $curr->nodeRow->NodeDefault . '" ';
+                        if (isset($curr->nodeRow->node_default) 
+                            && $curr->nodeRow->node_default < $curr->extraOpts["minVal"]) {
+                            $attrMin = 'min="' . $curr->nodeRow->node_default . '" ';
                         } else {
                             $attrMin = 'min="' . $curr->extraOpts["minVal"] . '" ';
                         }
                     }
                     if (isset($curr->extraOpts["maxVal"]) && $curr->extraOpts["maxVal"] !== false) {
-                        if (isset($curr->nodeRow->NodeDefault) 
-                            && $curr->nodeRow->NodeDefault > $curr->extraOpts["maxVal"]) {
-                            $attrMax = 'max="' . $curr->nodeRow->NodeDefault . '" ';
+                        if (isset($curr->nodeRow->node_default) 
+                            && $curr->nodeRow->node_default > $curr->extraOpts["maxVal"]) {
+                            $attrMax = 'max="' . $curr->nodeRow->node_default . '" ';
                         } else {
                             $attrMax = 'max="' . $curr->extraOpts["maxVal"] . '" ';
                         }
@@ -1113,17 +936,22 @@ class TreeSurvForm extends TreeSurvFormUtils
                     if (!$this->hasSpreadsheetParent($nID)) {
                         $ret .= '<div class="row"><div class="col-6">';
                     }
+                    $unitCls = 'w100 ';
+                    if (isset($curr->extraOpts["unit"]) 
+                        && trim($curr->extraOpts["unit"]) != '') {
+                        $unitCls = 'unitFld ';
+                    }
                     $ret .= '<nobr><input type="number" data-nid="' . $nID 
                         . '" class="form-control form-control-lg ' 
-                        . (($curr->nodeType == 'Slider') ? 'slidePercFld ' 
-                            : 'w100 ' . ((isset($curr->extraOpts["unit"]) 
-                                && trim($curr->extraOpts["unit"]) != '') 
-                                ? 'unitFld ' : '')) . $xtraClass 
-                        . '" name="n' . $nIDtxt . 'fld" id="n' . $nIDtxt . 'FldID" value="' 
-                        . $currNodeSessData . '" ' . $onKeyUp . ' ' . $attrIncr 
-                        . $attrMin . $attrMax . $GLOBALS["SL"]->tabInd() . '> ';
-                    if (isset($curr->extraOpts["unit"]) && trim($curr->extraOpts["unit"]) != '') {
-                        if ($curr->nodeType == 'Text:Number' && !$this->hasSpreadsheetParent($nID)) {
+                        . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : $unitCls)
+                        . $xtraClass . '" name="n' . $nIDtxt . 'fld" id="n' 
+                        . $nIDtxt . 'FldID" value="' . $currNodeSessData . '" '
+                        . $onKeyUp . ' ' . $attrIncr . $attrMin . $attrMax
+                        . $GLOBALS["SL"]->tabInd() . '> ';
+                    if (isset($curr->extraOpts["unit"]) 
+                        && trim($curr->extraOpts["unit"]) != '') {
+                        if ($curr->nodeType == 'Text:Number' 
+                            && !$this->hasSpreadsheetParent($nID)) {
                             $ret .= '</nobr></div><div class="col-6 pT10"><nobr>';
                         }
                         $ret .= $curr->extraOpts["unit"] . '&nbsp;&nbsp;';
@@ -1133,8 +961,8 @@ class TreeSurvForm extends TreeSurvFormUtils
                         $ret .= '</div></div>';
                     }
                     if ($curr->nodeType == 'Slider') {
-                        $ret .= '<div class="col-10 slideCol"><div id="n' . $nIDtxt 
-                            . 'slider" class="ui-slider ui-slider-horizontal slSlider"></div></div>';
+                        $ret .= '<div class="col-10 slideCol"><div id="n' . $nIDtxt . 'slider" '
+                            . 'class="ui-slider ui-slider-horizontal slSlider"></div></div>';
                     }
                     $ret .= '</div>' . "\n";
                     if ($curr->nodeType == 'Slider') {
@@ -1155,22 +983,22 @@ class TreeSurvForm extends TreeSurvFormUtils
                     }
                     if ($curr->isRequired()) {
                         if ((!isset($curr->extraOpts["minVal"]) 
-                            || $curr->extraOpts["minVal"] === false)
+                                || $curr->extraOpts["minVal"] === false)
                             && (!isset($curr->extraOpts["maxVal"]) 
-                            || $curr->extraOpts["maxVal"] === false)) {
+                                || $curr->extraOpts["maxVal"] === false)) {
                             $this->pageJSvalid .= "addReqNode('" 
                                 . $nIDtxt . "', 'reqFormFld');\n";
                         } else {
                             if (isset($curr->extraOpts["minVal"]) 
                                 && $curr->extraOpts["minVal"] !== false) {
-                                $this->pageJSvalid .= "addReqNodeRadio('" 
-                                    . $nIDtxt . "', 'reqFormFldGreater', " 
+                                $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt 
+                                    . "', 'reqFormFldGreater', " 
                                     . $curr->extraOpts["minVal"] . ");\n";
                             }
                             if (isset($curr->extraOpts["maxVal"]) 
                                 && $curr->extraOpts["maxVal"] !== false) {
-                                $this->pageJSvalid .= "addReqNodeRadio('" 
-                                    . $nIDtxt . "', 'reqFormFldLesser', " 
+                                $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt 
+                                    . "', 'reqFormFldLesser', " 
                                     . $curr->extraOpts["maxVal"] . ");\n";
                             }
                         }
@@ -1201,22 +1029,26 @@ class TreeSurvForm extends TreeSurvFormUtils
                             . $GLOBALS["SL"]->tabInd() . '>'
                             . '<option class="slGrey" value=""' . ((trim($currNodeSessData) == '' 
                                 || $curr->isDropdownTagger()) ? ' SELECTED' : '') . ' >'
-                            . ((isset($curr->nodeRow->NodeTextSuggest) 
-                                && trim($curr->nodeRow->NodeTextSuggest) != '')
-                                ? $curr->nodeRow->NodeTextSuggest : 'select...') . '</option>' . "\n";
+                            . ((isset($curr->nodeRow->node_text_suggest) 
+                                && trim($curr->nodeRow->node_text_suggest) != '')
+                                ? $curr->nodeRow->node_text_suggest : 'select...') . '</option>' . "\n";
                         if ($curr->nodeType == 'U.S. States' && !$curr->isDropdownTagger()) {
                             $GLOBALS["SL"]->loadStates();
                             $ret .= $GLOBALS["SL"]->states->stateDrop($currNodeSessData);
                         } else {
                             foreach ($curr->responses as $j => $res) {
-                                $val = (($curr->nodeType == 'U.S. States') ? (1+$j) : $res->NodeResValue);
-                                $select = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr);
+                                $val = (($curr->nodeType == 'U.S. States') ? (1+$j) : $res->node_res_value);
+                                $select = $this->isCurrDataSelected(
+                                    $currNodeSessData, 
+                                    $res->node_res_value, 
+                                    $curr
+                                );
                                 $ret .= '<option value="' . $val . '" ' 
-                                    . (($select && !$curr->isDropdownTagger()) 
-                                    ? 'SELECTED' : '') . ' >' . $res->NodeResEng . '</option>' . "\n";
+                                    . (($select && !$curr->isDropdownTagger()) ? 'SELECTED' : '') . ' >'
+                                    . $res->node_res_eng . '</option>' . "\n";
                                 if ($curr->isDropdownTagger()) {
                                     $GLOBALS["SL"]->pageJAVA .= "\n" . 'addTagOpt(\'' . $nIDtxt . '\', ' 
-                                        . json_encode($val) . ', ' . json_encode($res->NodeResEng) . ', ' 
+                                        . json_encode($val) . ', ' . json_encode($res->node_res_eng) . ', ' 
                                         . (($select) ? 1 : 0) . ');';
                                 }
                             }
@@ -1272,43 +1104,62 @@ class TreeSurvForm extends TreeSurvFormUtils
                         $onClickXtra = '';
                         $GLOBALS["SL"]->pageJAVA .= "\n" . 'addResTot("' . $nID . '", ' 
                             . sizeof($curr->responses) . ');';
-                        if ($curr->nodeRow->NodeOpts%79 == 0) {
+                        if ($curr->nodeRow->node_opts%79 == 0) {
                             $onClickXtra = 'chkRadioHide(\'' . $nIDtxt . '\'); ';
                             $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("' . $onClickXtra . '", 100);';
                         }
-                        if ($curr->nodeRow->NodeOpts%61 == 0) {
+                        if ($curr->nodeRow->node_opts%61 == 0) {
                             $ret .= '<div class="row">';
                             $mobileCheckbox = true;
                         }
                         foreach ($curr->responses as $j => $res) {
-                            $otherFld = ['', '', '', ''];
+                            $val = $res->node_res_value;
+                            $otherFld = [ '', '', '', '' ];
                             if (in_array($j, $curr->fldHasOther)) {
-                                $otherFld[0] = $fld . 'Other';
-                                $fldVals = [ $fld => $res->NodeResValue ];
+                                $otherFld[0] = $fld . '_other';
+                                $fldVals = [ $fld => $val ];
                                 $s = sizeof($this->sessData->dataBranches);
-                                if ($s > 0 && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
+                                if ($s > 0 
+                                    && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
                                     $tbl2 = $this->sessData->dataBranches[$s-1]["branch"];
-                                    $branchLnkFld = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl, $tbl2);
+                                    $branchLnkFld = $GLOBALS["SL"]
+                                        ->getForeignLnkNameFldName($tbl, $tbl2);
                                     if ($branchLnkFld != '') {
-                                        $fldVals[$branchLnkFld] 
-                                            = $this->sessData->dataBranches[$s-1]["itemID"];
+                                        $fldVals[$branchLnkFld] = $this->sessData
+                                            ->dataBranches[$s-1]["itemID"];
                                     }
                                 }
-                                $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldVals);
-                                $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
+                                $subRowIDs = $this->sessData
+                                    ->getRowIDsByFldVal($tbl, $fldVals);
+                                $branchRowID = ((sizeof($subRowIDs) > 0) 
+                                    ? $subRowIDs[0] : -3);
                                 if ($branchRowID > 0) {
-                                    $GLOBALS["SL"]->currCyc["res"] = [$tbl, 'res' . $j, $res->NodeResValue];
+                                    $GLOBALS["SL"]->currCyc["res"] = [
+                                        $tbl, 
+                                        'res' . $j, 
+                                        $val
+                                    ];
                                     $this->sessData->startTmpDataBranch($tbl, $branchRowID);
-                                    $otherFld[1] = $this->sessData
-                                        ->currSessData($nID, $tbl, $otherFld[0], 'get', '', $hasParManip);
+                                    $otherFld[1] = $this->sessData->currSessData(
+                                        $nID, 
+                                        $tbl, 
+                                        $otherFld[0], 
+                                        'get', 
+                                        '', 
+                                        $hasParManip
+                                    );
                                     $this->sessData->endTmpDataBranch($tbl);
-                                    $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];                                    
+                                    $GLOBALS["SL"]->currCyc["res"] = [
+                                        '', 
+                                        '', 
+                                        -3 
+                                    ];                                    
                                 } else {
                                     $otherFld[1] = '';
                                 }
                                 $otherFld[2] = '<input type="text" name="n' . $nID . 'fldOther' . $j 
                                     . '" id="n' . $nID . 'fldOtherID' . $j . '" value="' . $otherFld[1] 
-                                    . '" class="form-control disIn ntrStp slTab otherFld slNodeKeyUpOther mL10"' 
+                                    . '" class="form-control ntrStp slTab otherFld slNodeKeyUpOther mL10"' 
                                     . $GLOBALS["SL"]->tabInd() . '>';
                             }
                             
@@ -1317,7 +1168,11 @@ class TreeSurvForm extends TreeSurvFormUtils
                             }
                             $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                             $resNameCheck = '';
-                            $boxChecked = $this->isCurrDataSelected($currNodeSessData, $res->NodeResValue, $curr);
+                            $boxChecked = $this->isCurrDataSelected(
+                                $currNodeSessData, 
+                                $res->node_res_value, 
+                                $curr
+                            );
                             if ($curr->nodeType == 'Radio') {
                                 $resNameCheck = 'name="n' . $nIDtxt . 'fld" ' 
                                     . (($boxChecked) ? 'CHECKED' : '');
@@ -1330,7 +1185,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                                     . (($boxChecked) ? 'CHECKED' : '');
                             }
                             
-                            if ($curr->nodeRow->NodeOpts%61 == 0) {
+                            if ($curr->nodeRow->node_opts%61 == 0) {
                                 $ret .= '<div class="col-' 
                                     . $GLOBALS["SL"]->getColsWidth(sizeof($curr->responses)) . '">';
                             }
@@ -1339,62 +1194,42 @@ class TreeSurvForm extends TreeSurvFormUtils
                                 $onClickFull = ' onClick="' . $onClickFull . '" ';
                             }
                             if ($mobileCheckbox) {
-                                $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt . 'fld' . $j 
-                                    . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') 
-                                    . '"><div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j . '" value="' 
-                                    . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" ' 
-                                    . $resNameCheck . $respKids . ' autocomplete="off" ' . $onClickFull 
-                                    . ' class="slNodeChange" ' . $GLOBALS["SL"]->tabInd() . '></div> ' 
-                                    . $res->NodeResEng . ' ' . $otherFld[2] . '</label>' . "\n";
+                                $ret .= '<label for="n' . $nIDtxt . 'fld' . $j . '" id="n' . $nIDtxt 
+                                    . 'fld' . $j . 'lab" class="finger' . (($boxChecked) ? 'Act' : '') 
+                                    . '"><div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
+                                    . '" value="' . $res->node_res_value . '" type="' 
+                                    . strtolower($curr->nodeType) . '" ' . $resNameCheck . $respKids 
+                                    . ' autocomplete="off" ' . $onClickFull . ' class="slNodeChange" ' 
+                                    . $GLOBALS["SL"]->tabInd() . '></div> ' 
+                                    . $res->node_res_eng . ' ' . $otherFld[2] . '</label>' . "\n";
                             } else {
-                                $ret .= '<div class="' . $isOneLinerFld . '">' . ((strlen($res) < 40) ? '<nobr>' : '') 
+                                $ret .= '<div class="' . $isOneLinerFld . '">' 
+                                    . ((strlen($res) < 40) ? '<nobr>' : '') 
                                     . '<label for="n' . $nIDtxt . 'fld' . $j 
-                                    . '" class="mR10"><div class="disIn mR5"><input id="n' . $nIDtxt . 'fld' . $j 
-                                    . '" value="' . $res->NodeResValue . '" type="' . strtolower($curr->nodeType) . '" '
-                                    . $resNameCheck . $respKids . ' autocomplete="off"' . $onClickFull 
-                                    . ' class="slNodeChange"' . $GLOBALS["SL"]->tabInd() . '></div> ' 
-                                    . $res->NodeResEng . ' ' . $otherFld[2] . '</label>' 
+                                    . '" class="mR10"><div class="disIn mR5"><input id="n' . $nIDtxt 
+                                    . 'fld' . $j . '" value="' . $res->node_res_value . '" type="' 
+                                    . strtolower($curr->nodeType) . '" ' . $resNameCheck . $respKids 
+                                    . ' autocomplete="off"' . $onClickFull . ' class="slNodeChange"' 
+                                    . $GLOBALS["SL"]->tabInd() . '></div> ' 
+                                    . $res->node_res_eng . ' ' . $otherFld[2] . '</label>' 
                                     . ((strlen($res) < 40) ? '</nobr>' : '') . '</div>' . "\n";
                             }
-                            if ($curr->nodeRow->NodeOpts%61 == 0) {
+                            if ($curr->nodeRow->node_opts%61 == 0) {
                                 $ret .= '</div> <!-- end col -->' . "\n";
                             }
                             // Check for Layout Sub-Response between each Checkbox Response
                             if ($curr->nodeType == 'Checkbox' && sizeof($tmpSubTier[1]) > 0) {
-                                foreach ($tmpSubTier[1] as $childNode) {
-                                    if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
-                                        && sizeof($childNode[1]) > 0) {
-                                        $ret .= '<div id="n' . $nIDtxt . 'fld' . $j . 'sub" class="subRes '
-                                            . (($boxChecked) ? 'disBlo' : 'disNon') . '" >';
-                                        $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
-                                        $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
-                                        $GLOBALS["SL"]->currCyc["res"][2] = $res->NodeResValue;
-                                        $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, 
-                                            [ $fld => $res->NodeResValue ]);
-                                        $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
-                                        if ($branchRowID > 0) {
-                                            $this->sessData->startTmpDataBranch($tbl, $branchRowID);
-                                        }
-                                        $grankids = '';
-                                        foreach ($childNode[1] as $k => $granNode) {
-                                            $grankids .= (($k > 0) ? ', ' : '') . $granNode[0];
-                                            $ret .= $this->printNodePublic($granNode[0], $granNode, $boxChecked);
-                                        }
-                                        if ($branchRowID > 0) {
-                                            $this->sessData->endTmpDataBranch($tbl);
-                                        }
-                                        $GLOBALS["SL"]->currCyc["res"] = ['', '', -3];
-                                        $ret .= '</div>';
-                                        $GLOBALS["SL"]->pageAJAX .= view(
-                                            'vendor.survloop.forms.formtree-sub-response-ajax', [
-                                            "nID"      => $nID,
-                                            "nSffx"    => $nSffx,
-                                            "nIDtxt"   => $nIDtxt,
-                                            "j"        => $j,
-                                            "grankids" => $grankids
-                                            ])->render();
-                                    }
-                                }
+                                $ret .= $this->printCheckSubRes(
+                                    $nID, 
+                                    $nSffx, 
+                                    $nIDtxt, 
+                                    $j, 
+                                    $res, 
+                                    $boxChecked,
+                                    $tbl, 
+                                    $fld,
+                                    $tmpSubTier
+                                );
                             }
                             /* if ($curr->nodeType == 'Checkbox' && in_array($j, $curr->fldHasOther)) {
                                 $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' . $nIDtxt . 'fldOtherID' . $j 
@@ -1404,16 +1239,17 @@ class TreeSurvForm extends TreeSurvFormUtils
                             } */
                         }
                         if ($curr->isRequired()) {
-                            $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt . "', 'reqFormFldRadio', " 
-                                . sizeof($curr->responses) . ");\n";
+                            $this->pageJSvalid .= "addReqNodeRadio('" . $nIDtxt 
+                                . "', 'reqFormFldRadio', " . sizeof($curr->responses) . ");\n";
                         }
                         
-                        if ($curr->nodeRow->NodeOpts%61 == 0) {
+                        if ($curr->nodeRow->node_opts%61 == 0) {
                             $ret .= '</div> <!-- end row -->';
                         }
-                        if ($curr->nodeRow->NodeOpts%79 == 0) {
-                            $ret .= '<div id="radioUnHide' . $nIDtxt . '" class="disNon"><a onClick="radioUnHide(\'' 
-                                . $nIDtxt . '\');" class="btn btn-secondary btn-sm opac66" href="javascript:;" '
+                        if ($curr->nodeRow->node_opts%79 == 0) {
+                            $ret .= '<div id="radioUnHide' . $nIDtxt . '" class="disNon">'
+                                . '<a onClick="radioUnHide(\'' . $nIDtxt . '\');" '
+                                . 'class="btn btn-secondary btn-sm opac66" href="javascript:;" '
                                 . '>Show All Options Again</a></div>';
                         }
                         
@@ -1428,7 +1264,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                         if ($curr->isRequired()) {
                             $this->pageJSvalid .= "addReqNodeDateLimit('" . $nIDtxt . "', 'reqFormFldDate" 
                                 . (($curr->isRequired()) ? "And" : "") . "Limit', " 
-                                . $curr->nodeRow->NodeCharLimit . ", '" . date("Y-m-d") . "', 1);\n";
+                                . $curr->nodeRow->node_char_limit . ", '" . date("Y-m-d") . "', 1);\n";
                             
                         }
                     } elseif ($curr->isRequired()) {
@@ -1462,20 +1298,23 @@ class TreeSurvForm extends TreeSurvFormUtils
                 } elseif ($curr->nodeType == 'Date Time') {
                     
                     $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nID . 'FldID" ).datepicker({ maxDate: "+0d" });';
-                    $ret .= view('vendor.survloop.forms.formtree-datetime', [
-                        "nID"            => $nIDtxt,
-                        "dateStr"        => $dateStr,
-                        "onKeyUp"        => $onKeyUp,
-                        "isOneLinerFld"  => $isOneLinerFld,
-                        "xtraClass"      => $xtraClass,
-                        "inputMobileCls" => $this->inputMobileCls($nID),
-                        "formTime"       => $this->formTime($nID, $timeStr),
-                        "nodePrompt"     => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
-                            '<label for="n' . $nIDtxt . 'FldID"><label for="n' . $nIDtxt 
-                            . 'fldHrID"><label for="n' . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt 
-                            . 'fldPMID">', str_replace('</label>', '</label></label></label></label>', 
-                                $nodePrompt))
-                        ])->render();
+                    $nodePrompt = str_replace('</label>', '</label></label></label></label>', $nodePrompt);
+                    $newLabels = '<label for="n' . $nIDtxt . 'FldID"><label for="n' . $nIDtxt . 'fldHrID">'
+                        . '<label for="n' . $nIDtxt . 'fldMinID"><label for="n' . $nIDtxt . 'fldPMID">';
+                    $nodePrompt = str_replace('<label for="n' . $nIDtxt . 'FldID">', $newLabels, $nodePrompt);
+                    $ret .= view(
+                        'vendor.survloop.forms.formtree-datetime', 
+                        [
+                            "nID"            => $nIDtxt,
+                            "dateStr"        => $dateStr,
+                            "onKeyUp"        => $onKeyUp,
+                            "isOneLinerFld"  => $isOneLinerFld,
+                            "xtraClass"      => $xtraClass,
+                            "inputMobileCls" => $this->inputMobileCls($nID),
+                            "formTime"       => $this->formTime($nID, $timeStr),
+                            "nodePrompt"     => $nodePrompt
+                        ]
+                    )->render();
                     $this->pageFldList[] = 'n' . $nIDtxt . 'FldID'; 
                     $this->pageFldList[] = 'n' . $nIDtxt . 'fldHrID'; 
                     $this->pageFldList[] = 'n' . $nIDtxt . 'fldMinID';
@@ -1489,66 +1328,65 @@ class TreeSurvForm extends TreeSurvFormUtils
                     $this->pageFldList[] = 'n' . $nIDtxt . 'fldInchID';
                     $feet = ($currNodeSessData > 0) ? floor($currNodeSessData/12) : 0; 
                     $inch = ($currNodeSessData > 0) ? intVal($currNodeSessData)%12 : 0;
-                    $ret .= view('vendor.survloop.forms.formtree-feetinch', [
-                        "nID"              => $nIDtxt,
-                        "feet"             => $feet,
-                        "inch"             => $inch,
-                        "isOneLinerFld"    => $isOneLinerFld,
-                        "xtraClass"        => $xtraClass,
-                        "currNodeSessData" => $currNodeSessData,
-                        "inputMobileCls"   => $this->inputMobileCls($nID),
-                        "nodePrompt"       => str_replace('<label for="n' . $nIDtxt . 'FldID">', 
-                            '<label for="n' . $nIDtxt . 'fldFeetID"><label for="n' . $nIDtxt . 'fldInchID">', 
-                            str_replace('</label>', '</label></label>', $nodePrompt))
-                        ])->render();
+                    $nodePrompt = str_replace('</label>', '</label></label>', $nodePrompt);
+                    $nodePrompt = str_replace(
+                        '<label for="n' . $nIDtxt . 'FldID">', 
+                        '<label for="n' . $nIDtxt . 'fldFeetID"><label for="n' . $nIDtxt . 'fldInchID">', 
+                        $nodePrompt
+                    );
+                    $ret .= view(
+                        'vendor.survloop.forms.formtree-feetinch', 
+                        [
+                            "nIDtxt"           => $nIDtxt,
+                            "feet"             => $feet,
+                            "inch"             => $inch,
+                            "isOneLinerFld"    => $isOneLinerFld,
+                            "xtraClass"        => $xtraClass,
+                            "currNodeSessData" => $currNodeSessData,
+                            "inputMobileCls"   => $this->inputMobileCls($nID),
+                            "nodePrompt"       => $nodePrompt
+                        ]
+                    )->render();
                     if ($curr->isRequired()) {
                         $this->pageJSvalid .= "addReqNode('" . $nIDtxt . "', 'reqFormFeetInches');\n";
                     }
                     
                 } elseif (in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
                     
-                    $currSessDataOther = $this->sessData->currSessData(
-                        $nID, 
-                        $tbl, 
-                        $fld . 'Other'
-                    );
-                    $coreResponses = [
-                        ["F", "Female" ],
-                        ["M", "Male"   ],
-                        ["O", "Other: "]
-                    ];
-                    if ($curr->nodeType == 'Gender Not Sure') {
-                        $coreResponses[] = ["?", "Not Sure"];
-                    }
-                    foreach ($coreResponses as $j => $res) {
+                    $fldOth = $fld . '_other';
+                    $currSessDataOther = $this->sessData->currSessData($nID, $tbl, $fldOth);
+                    for ($j = 0 ; $j < sizeof($curr->responses); $j++) {
                         $this->pageFldList[] = 'n' . $nIDtxt . 'fld' . $j;
                     }
-                    $ret .= view('vendor.survloop.forms.formtree-gender', [
-                        "nID"               => $nIDtxt,
-                        "nodeRow"           => $curr->nodeRow,
-                        "nodePromptText"    => $nodePromptText,
-                        "nodePromptNotes"   => $nodePromptNotes,
-                        "isOneLinerFld"     => $isOneLinerFld,
-                        "xtraClass"         => $xtraClass,
-                        "coreResponses"     => $coreResponses,
-                        "currNodeSessData"  => $currNodeSessData,
-                        "currSessDataOther" => $currSessDataOther
-                    ])->render();
-                    $gendAllow = ['Female', 'Male', 'Other', 'Not sure'];
+                    $ret .= view(
+                        'vendor.survloop.forms.formtree-gender', 
+                        [
+                            "nID"               => $nIDtxt,
+                            "nodeRow"           => $curr->nodeRow,
+                            "nodePromptText"    => $nodePromptText,
+                            "nodePromptNotes"   => $nodePromptNotes,
+                            "isOneLinerFld"     => $isOneLinerFld,
+                            "xtraClass"         => $xtraClass,
+                            "responses"         => $curr->responses,
+                            "currNodeSessData"  => $currNodeSessData,
+                            "currSessDataOther" => $currSessDataOther
+                        ]
+                    )->render();
+                    $gendAllow = [ 'Female', 'Male', 'Other', 'Not sure' ];
                     $genderSuggest = '';
-                    foreach ($GLOBALS["SL"]->def->getSet('Gender Identity') as $i => $gen) {
-                        if (!in_array($gen->DefValue, $gendAllow)) {
-                            $genderSuggest .= ', "' . $gen->DefValue . '"';
+                    foreach ($GLOBALS["SL"]->def->getOtherGenders() as $gen) {
+                        if (!in_array($gen, $gendAllow)) {
+                            $genderSuggest .= ', "' . $gen . '"';
                         }
                     }
-                    $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt . 'fldOtherID' . $j 
-                        . '" ).autocomplete({ source: [' . substr($genderSuggest, 1) 
-                        . '] });' . "\n";
+                    $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $nIDtxt 
+                        . 'fldOtherID2" ).autocomplete({ source: [' 
+                        . substr($genderSuggest, 1) . '] });' . "\n";
                     $this->v["javaNodes"] .= 'nodeResTot[' . $nID . '] = ' 
-                        . sizeof($coreResponses) . '; ';
+                        . sizeof($curr->responses) . '; ';
                     if ($curr->isRequired()) {
-                        $this->pageJSvalid .= "addReqNode('" . $nIDtxt 
-                            . "', 'reqFormGender');\n";
+                        $this->pageJSvalid .= "addReqNode('" 
+                            . $nIDtxt . "', 'reqFormGender');\n";
                     }
                     
                 } elseif ($curr->nodeType == 'Uploads') {
@@ -1565,7 +1403,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                 
                 // copy input to extra div?
                 if (in_array($curr->nodeType, ['Text', 'Text:Number']) 
-                    && $curr->nodeRow->NodeOpts%41 == 0) { 
+                    && $curr->nodeRow->node_opts%41 == 0) { 
                     $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("copyNodeResponse(\'n' 
                         . $nIDtxt . 'FldID\', \'nodeEcho' . $nIDtxt . '\')", 50);';
                     $GLOBALS["SL"]->pageAJAX .= '$("#n' . $nIDtxt . 'FldID").keyup('
@@ -1573,7 +1411,8 @@ class TreeSurvForm extends TreeSurvFormUtils
                         . 'FldID\', \'nodeEcho' . $nIDtxt . '\'); });' . "\n";
                 }
 
-                if ($curr->hasShowKids && isset($this->kidMaps[$nID]) 
+                if ($curr->hasShowKids 
+                    && isset($this->kidMaps[$nID]) 
                     && sizeof($this->kidMaps[$nID]) > 0) {
                     if (!isset($this->v["nodeKidFunks"])) {
                         $this->v["nodeKidFunks"] = '';
@@ -1584,44 +1423,24 @@ class TreeSurvForm extends TreeSurvFormUtils
                     foreach ($this->kidMaps[$nID] as $nKid => $ress) {
                         $nKidTxt = trim($nKid . $nSffx);
                         if ($ress && sizeof($ress) > 0) {
-                            $GLOBALS["SL"]->pageAJAX .= ' if (';
-                            foreach ($ress as $cnt => $res) {
-                                if (in_array($curr->nodeType, ['Radio', 'Checkbox'])) {
-                                    $GLOBALS["SL"]->pageAJAX .= (($cnt > 0) ? ' || ' : '') 
-                                        . '(document.getElementById("n' . $nIDtxt . 'fld' 
-                                        . $res[0] . '") && document.getElementById("n' 
-                                        . $nIDtxt . 'fld' . $res[0] . '").checked)';
-                                } else {
-                                    $GLOBALS["SL"]->pageAJAX .= (($cnt > 0) ? ' || ' : '')
-                                        . '(document.getElementById("n' . $nIDtxt 
-                                        . 'FldID") && document.getElementById("n' 
-                                        . $nIDtxt . 'FldID").value == "' . $res[1] . '")';
-                                }
+                            $if = $this->getJsShowKidsIf($ress, $nIDtxt, $curr->nodeType);
+                            $grankids = [];
+                            if (isset($showMoreNodes[$nKid]) && sizeof($showMoreNodes[$nKid]) > 0) {
+                                $grankids = $showMoreNodes[$nKid];
                             }
-                            $GLOBALS["SL"]->pageAJAX .= ') { showKids = true; ';
-                            if (isset($showMoreNodes[$nKid]) 
-                                && sizeof($showMoreNodes[$nKid]) > 0) {
-                                foreach ($showMoreNodes[$nKid] as $grandNode) {
-                                    $GLOBALS["SL"]->pageAJAX .= 'styBlock("node' . $grandNode 
-                                        . $nSffx . '"); styBlock("node' . $grandNode . $nSffx 
-                                        . 'kids"); setNodeVisib("' . $grandNode . '", "' 
-                                        . $nSffx . '", true); ';
-                                }
-                            }
-                            $GLOBALS["SL"]->pageAJAX .= 'styBlock("node' . $nKid . $nSffx 
-                                . '"); styBlock("node' . $nKid . $nSffx 
-                                . 'kids"); setNodeVisib("' . $nKid . '", "' . $nSffx 
-                                . '", true); } else { setNodeVisib("' . $nKid . '", "' . $nSffx 
-                                . '", false); $("#node' . $nKid . $nSffx . '").slideUp("50"); ';
-                            if (isset($showMoreNodes[$nKid]) 
-                                && sizeof($showMoreNodes[$nKid]) > 0) {
-                                foreach ($showMoreNodes[$nKid] as $grandNode) {
-                                    $GLOBALS["SL"]->pageAJAX .= '$("#node' . $grandNode . $nSffx
-                                        . '").slideUp("50"); setNodeVisib("' . $grandNode 
-                                        . '", "' . $nSffx . '", false); ';
-                                }
-                            }
-                            $GLOBALS["SL"]->pageAJAX .= '} ';
+                            $GLOBALS["SL"]->pageAJAX .= view(
+                                'vendor.survloop.forms.formtree-show-kids-ajax', 
+                                [
+                                    "nID"        => $nID,
+                                    "nIDtxt"        => $nIDtxt,
+                                    "nSffx"         => $nSffx,
+                                    "curr"          => $curr,
+                                    "nKid"          => $nKid,
+                                    "ress"          => $ress,
+                                    "grankids" => $grankids,
+                                    "if"            => $if
+                                ]
+                            )->render();
                         }
                     }
                     $GLOBALS["SL"]->pageAJAX .= 'if (showKids) { $("#node' . $nIDtxt 
@@ -1657,10 +1476,10 @@ class TreeSurvForm extends TreeSurvFormUtils
             if (sizeof($tmpSubTier[1]) > 0 && !$curr->isLoopCycle() 
                 && !$curr->isSpreadTbl()) {
                 if ($curr->nodeType == 'Big Button' 
-                    && $curr->nodeRow->NodeOpts%43 == 0) {
+                    && $curr->nodeRow->node_opts%43 == 0) {
                     $currVisib = 0;
                 }
-                $retKids .= '<div id="node' . $nID . 'kids" class="'
+                $retKids .= '<div id="node' . $nIDtxt . 'kids" class="'
                     . (($currVisib == 0) ? 'disNon' 
                         : (($curr->nodeType == 'Layout Row') ? 'disFlx row' : 'disBlo'))
                     . (($curr->nodeType == 'Gallery Slider') ? ' h50 ovrNo' : '') . '">';
@@ -1679,7 +1498,7 @@ class TreeSurvForm extends TreeSurvFormUtils
                     }
                 }
                 if ($curr->isGraph()) $this->v["graphFilters"] = false;
-                $retKids .= '</div> <!-- end #node' . $nID . 'kids -->';
+                $retKids .= '</div> <!-- end #node' . $nIDtxt . 'kids -->';
             }
             $ret .= $retKids;
             
@@ -1702,14 +1521,14 @@ class TreeSurvForm extends TreeSurvFormUtils
                 $GLOBALS["SL"]->pageJAVA .= '", \'{ }\'); ' . "\n";
             }
             
-            if ($curr->nodeRow->NodeOpts%37 == 0) {
+            if ($curr->nodeRow->node_opts%37 == 0) {
                 $ret .= '</div> <!-- end jumbotron -->' . "\n";
             }
             if (!in_array($curr->nodeType, ['Layout Row', 'Layout Column'])) {
                 $ret .= "\n" . '</div> <!-- end #node' . $nIDtxt . ' -->' . "\n";
             }
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page' 
-                && $curr->parentID == $GLOBALS['SL']->treeRow->TreeRoot) {
+            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page' 
+                && $curr->parentID == $GLOBALS['SL']->treeRow->tree_root) {
                 $ret .= '</div>' . (($curr->isPageBlockSkinny()) 
                     ? '</center>' : '') . "\n";
             }
@@ -1724,13 +1543,280 @@ class TreeSurvForm extends TreeSurvFormUtils
         
         return $this->wrapNodePrint($ret, $nID);
     }
-    
-    protected function wrapNodePrint($ret, $nID)
+
+    protected function printCheckSubRes($nID, $nSffx, $nIDtxt, $j, $res, $boxChecked, $tbl, $fld, $tmpSubTier)
     {
-        if ($this->allNodes[$nID]->chkCurrOpt('DEFERLOAD')) {
-            return $GLOBALS["SL"]->deferStaticNodePrint($nID, $ret, $this->coreID);
+        $ret = '';
+        foreach ($tmpSubTier[1] as $childNode) {
+            if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
+                && sizeof($childNode[1]) > 0) {
+                $ret .= '<div id="n' . $nIDtxt . 'fld' . $j . 'sub" class="subRes '
+                    . (($boxChecked) ? 'disBlo' : 'disNon') . '" >';
+                $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
+                $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
+                $GLOBALS["SL"]->currCyc["res"][2] = $res->node_res_value;
+                $fldAssign = [ $fld => $res->node_res_value ];
+                $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldAssign);
+                $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
+                if ($branchRowID > 0) {
+                    $this->sessData->startTmpDataBranch($tbl, $branchRowID);
+                }
+                $grankids = '';
+                foreach ($childNode[1] as $k => $granNode) {
+                    $grankids .= (($k > 0) ? ', ' : '') . $granNode[0];
+                    $ret .= $this->printNodePublic($granNode[0], $granNode, $boxChecked);
+                }
+                if ($branchRowID > 0) {
+                    $this->sessData->endTmpDataBranch($tbl);
+                }
+                $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
+                $ret .= '</div>';
+                $GLOBALS["SL"]->pageAJAX .= view(
+                    'vendor.survloop.forms.formtree-sub-response-ajax', 
+                    [
+                        "nID"      => $nID,
+                        "nSffx"    => $nSffx,
+                        "nIDtxt"   => $nIDtxt,
+                        "j"        => $j,
+                        "grankids" => $grankids
+                    ]
+                )->render();
+            }
         }
         return $ret;
     }
+
+
+    protected function getJsShowKidsIf(&$ress, $nIDtxt, $type)
+    {
+        $ret = '';
+        foreach ($ress as $cnt => $res) {
+            if ($cnt > 0) {
+                $ret .= ' || ';
+            }
+            if (in_array($type, ['Radio', 'Checkbox'])) {
+                $ret .= '(document.getElementById("n' . $nIDtxt . 'fld' . $res[0] 
+                    . '") && document.getElementById("n' . $nIDtxt . 'fld' . $res[0] 
+                    . '").checked)';
+            } else {
+                $ret .= '(document.getElementById("n' . $nIDtxt . 'FldID") '
+                    . '&& document.getElementById("n' . $nIDtxt . 'FldID").value == "' 
+                    . $res[1] . '")';
+            }
+        }
+        return $ret;
+    }
+
+    protected function nodePrintDataRow($nID, $nIDtxt, $curr, $tbl, $fld, $currNodeSessData = null, $itemID = 0, $itemInd = 0)
+    {
+        if (!$this->checkFldDataPerms($curr->getFldRow()) 
+            || !$this->checkViewDataPerms($curr->getFldRow())) {
+            if ($curr->nodeType == 'Data Print Row') {
+                return [];
+            }
+        } else {
+            if (isset($GLOBALS["SL"]->formTree->tree_id) 
+                && in_array($nID, $this->checkboxNodes)) {
+                $currNodeSessData = $this->valListArr(
+                    $this->sessData->currSessDataCheckbox($nID, $tbl, $fld)
+                );
+                if ($this->hasCycleAncestorActive($nID)) {
+                    $cycInd = $GLOBALS["SL"]->currCyc["cyc"][1];
+                    $cycInd = intVal(str_replace('cyc', '', $cycInd));
+                    if (isset($currNodeSessData[$cycInd])) {
+                        $currNodeSessData = $currNodeSessData[$cycInd];
+                    }
+                }
+            }
+            $fldRow = $GLOBALS["SL"]->getFldRowFromFullName($tbl, $fld);
+            $printRow = true;
+            if ((!is_array($currNodeSessData) 
+                    && (!$currNodeSessData || trim($currNodeSessData) == ''))
+                || (is_array($currNodeSessData) && sizeof($currNodeSessData) == 0)) {
+                $printRow = false;
+            } else {
+                $isDefaultNonArray = (!is_array($currNodeSessData) 
+                    && trim($currNodeSessData) != '' 
+                    && trim($currNodeSessData) == trim($curr->nodeRow->node_default));
+                $isDefaultArray = (is_array($currNodeSessData) 
+                    && trim($currNodeSessData[0]) == trim($curr->nodeRow->node_default));
+                if (isset($curr->nodeRow->node_default) 
+                    && trim($curr->nodeRow->node_default) != '' 
+                    && ($isDefaultNonArray || $isDefaultArray)) {
+                    $printRow = false;
+                }
+            }
+            if ($printRow) {
+                $deetLabel = (($fldRow && isset($fldRow->fld_eng)) ? $fldRow->fld_eng : '');
+                $deetLabel = $this->swapLabels($nIDtxt, $deetLabel, $itemID, $itemInd);
+                
+                $deetVal = $GLOBALS["SL"]->printResponse($tbl, $fld, $currNodeSessData, $fldRow);
+                $deetVal = $this->printValCustom($nID, $deetVal);
+                if (isset($GLOBALS["SL"]->formTree->tree_id)) {
+                    $tID = $GLOBALS["SL"]->formTree->tree_id;
+                    $lab = $GLOBALS["SL"]->getFldNodeQuestion($tbl, $fld, $tID);
+                    if (trim($lab) != '') {
+                        $lab = $this->swapLabels($nIDtxt, $lab, $itemID, $itemInd);
+                        if (strip_tags($deetLabel) != strip_tags($lab)) {
+                            $deetLabel = '<a id="hidivBtn' . $nIDtxt 
+                                .'" class="hidivBtn slGrey" href="javascript:;">' 
+                                . $deetLabel . '</a><div id="hidiv' . $nIDtxt 
+                                . '" class="disNon">"' . $lab . '"</div>';
+                        }
+                    }
+                }
+                if ($curr->nodeType == 'Data Print') {
+                    $ret .= '<div id="nLabel' . $nIDtxt 
+                        . '" class="nPrompt"><span class="slGrey mR10">' 
+                        . $deetLabel . '</span>' . $deetVal . '</div>';
+                } elseif ($curr->nodeType == 'Data Print Row') {
+                    return [ $deetLabel, $deetVal, $nID ];
+                }
+            } elseif ($curr->nodeType == 'Data Print Row') {
+                return [];
+            }
+        }
+        return [];
+    }
+
+    protected function nodePrintDataBlock($nID, $nIDtxt, $curr, $tbl, $fld, $currVisib, $tmpSubTier, $nodePromptText, $currNodeSessData = null)
+    {
+        $ret = '';
+        $deets = [];
+        if (sizeof($tmpSubTier[1]) > 0) {
+            foreach ($tmpSubTier[1] as $childNode) {
+                $kidID = $childNode[0];
+                if ($this->allNodes[$kidID]->nodeType == 'Data Print Row') {
+
+                    $newDeet = $this->printNodePublic($kidID, $childNode, $currVisib);
+                    if (is_array($newDeet) 
+                        && sizeof($newDeet) > 0 
+                        && trim($newDeet[0]) != '' 
+                        && trim($newDeet[1]) != '') {
+                        $deets[] = $newDeet;
+                    }
+
+                } elseif ($this->allNodes[$kidID]->isDataManip()) {
+
+                    $this->loadManipBranch($kidID, ($currVisib == 1));
+                    foreach ($childNode[1] as $gNode) {
+                        if ($this->allNodes[$gNode[0]]->nodeType == 'Data Print Row') {
+                            $deet = $this->printNodePublic($gNode[0], $gNode, $currVisib);
+                            if ($deet && is_array($deet) && sizeof($deet) > 0) {
+                                $deets[] = $deet;
+                            }
+                        }
+                    }
+                    $this->closeManipBranch($kidID);
+
+                } elseif ($this->allNodes[$kidID]->isLoopCycle()) {
+
+                    list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID, $this->allNodes[$kidID]);
+                    $loop = str_replace('LoopItems::', '', $this->allNodes[$kidID]->responseSet);
+                    $loopCycle = $this->sessData->getLoopRows($loop);
+                    // if this is a simple loop of a just a table's rows
+                    if (trim($loop) == '' 
+                        && isset($this->allNodes[$kidID]->dataBranch)
+                        && trim($this->allNodes[$kidID]->dataBranch) != '') {
+                        $s = sizeof($this->sessData->dataBranches);
+                        if ($s > 0) {
+                            $branch = $this->sessData->dataBranches[($s-1)];
+                            if (isset($branch["itemID"]) && intVal($branch["itemID"]) > 0) {
+                                $loopCycle = $this->sessData->getChildRows(
+                                    $branch["branch"], 
+                                    $branch["itemID"], 
+                                    $this->allNodes[$kidID]->dataBranch
+                                );
+                            }
+                        }
+                    }
+                    if (sizeof($childNode[1]) > 0 && $loopCycle && sizeof($loopCycle) > 0) {
+                        $GLOBALS["SL"]->currCyc["cyc"][0] = $tbl;
+                        if ($loop != '') {
+                            $GLOBALS["SL"]->currCyc["cyc"][0] = $GLOBALS["SL"]
+                                ->getLoopTable($loop);
+                        }
+                        foreach ($loopCycle as $i => $loopItem) {
+                            $GLOBALS["SL"]->currCyc["cyc"][1] = 'cyc' . $i;
+                            $GLOBALS["SL"]->currCyc["cyc"][2] = $loopItem->getKey();
+                            $this->sessData->startTmpDataBranch($tbl, $loopItem->getKey());
+                            $label = (1+$i) . ')';
+                            if ($loop != '') {
+                                $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
+                                $label = $this->getLoopItemLabel($loop, $loopItem, $i);
+                            }
+                            foreach ($childNode[1] as $gNode) {
+                                if ($this->allNodes[$gNode[0]]->nodeType == 'Data Print Row') {
+                                    $deet = $this->printNodePublic($gNode[0], $gNode, $currVisib);
+                                    if (isset($deet[0]) 
+                                        && trim($deet[0]) != '' 
+                                        && trim($deet[1]) != '') {
+                                        $deet[0] = $label . ' ' . $deet[0];
+                                        $deets[] = $deet;
+                                    }
+                                }
+                            }
+                            if ($loop != '') {
+                                $GLOBALS["SL"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
+                            }
+                            $this->sessData->endTmpDataBranch($tbl);
+                            $GLOBALS["SL"]->currCyc["cyc"][1] = '';
+                            $GLOBALS["SL"]->currCyc["cyc"][2] = -3;
+                        }
+                        $GLOBALS["SL"]->currCyc["cyc"][0] = '';
+                    }
+                    
+                }
+            }
+        }
+        //if ($this->allNodes[$curr->parentID]->isLoopCycle()) {
+        //    $label = $this->getLoopItemLabel($GLOBALS["SL"]->closestLoop["loop"], 
+        //        $this->sessData->getRowById($GLOBALS["SL"]->closestLoop["obj"]->data_loop_table, $itemID), 
+        //        $itemInd);
+        //    $nodePromptText = $label . ' ' . $nodePromptText;
+        //}
+        if (sizeof($deets) > 0) {
+            $promptTxt = strip_tags($nodePromptText);
+            if ($curr->nodeType == 'Data Print Block') {
+                $ret .= $this->printReportDeetsBlock($deets, $promptTxt, $nID);
+            } else {
+                $colCnt = 2;
+                $ret .= $this->printReportDeetsBlockCols($deets, $promptTxt, $colCnt, $nID);
+            }
+        }
+        return $ret;
+    }
+
+    protected function nodePrintVertProgress($nID, $tbl, $fld, $tmpSubTier, $nodePromptText)
+    {
+        $deets = [];
+        foreach ($tmpSubTier[1] as $cNode) {
+            $childNode = $this->allNodes[$cNode[0]];
+            if ($childNode->nodeType == 'Data Print Row') {
+                list($tbl, $fld) = $childNode->getTblFld();
+                list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
+                if ($itemID > 0 && isset($this->sessData->dataSets[$tbl])) {
+                    $tblSet = $this->sessData->dataSets[$tbl]; 
+                    if (isset($tblSet[$itemInd]) > 0) {
+                        $dateTime = 0;
+                        if (isset($tblSet[$itemInd]->{ $fld })
+                            && trim($tblSet[$itemInd]->{ $fld }) != '') {
+                            $dateTime = strtotime($tblSet[$itemInd]->{ $fld });
+                        }
+                        if (!isset($childNode->nodeRow->node_default)
+                            || trim($childNode->nodeRow->node_default) != trim($dateTime)) {
+                            $fldRow = $GLOBALS["SL"]->getTblFldRow('', $tbl, $fld);
+                            if ($fldRow && isset($fldRow->fld_eng)) {
+                                $deets[] = [ $fldRow->fld_eng, $dateTime, $cNode[0] ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $this->printReportDeetsVertProg($deets, strip_tags($nodePromptText), $nID);
+    }
+
+
     
 } // end of TreeSurvForm class

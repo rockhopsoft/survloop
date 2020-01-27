@@ -5,20 +5,23 @@
     <div class="row mB15">
         <div class="col-8">
             <h2 class="mB5"><span class="slBlueDark">
-            @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
-                <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif {{ $GLOBALS['SL']->treeName }}</span></nobr>
+            @if ($GLOBALS['SL']->treeRow->tree_type == 'Page')
+                <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif
+                    {{ $GLOBALS['SL']->treeName }}</span></nobr>
             @else
-                <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif {{ $GLOBALS['SL']->treeName }}</span>
+                <nobr>@if (!$isPrint) <i class="fa fa-snowflake-o"></i> @endif 
+                    {{ $GLOBALS['SL']->treeName }}</span>
                 </nobr>
             @endif
             </h2>
         @if ($isPrint)
             {!! view('vendor.survloop.elements.print-header-legal', [])->render() !!}
-            <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->TreeName }} User Form Tree</nobr></h2> 
+            <h2><nobr>Core Specifications of {{ $GLOBALS['SL']->treeRow->tree_name }} 
+                User Form Tree</nobr></h2> 
         @else
             <div class="slGrey">
                 <b>Full @if ($GLOBALS['SL']->treeIsAdmin) Admin @endif 
-                @if ($GLOBALS['SL']->treeRow->TreeType == 'Page') Page
+                @if ($GLOBALS['SL']->treeRow->tree_type == 'Page') Page
                 @else Survey
                 @endif Map</b><br />
                 A survey (or form) is created as a tree filled with branching nodes. 
@@ -62,18 +65,18 @@
 {!! $GLOBALS["SL"]->printTreeNodeStats($isPrint, $isAll, $isAlt) !!}
 
 @if ($GLOBALS['SL']->treeIsAdmin)
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}" 
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}" 
         ><h4 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/dashboard/start/' 
-        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h4></a>
+        . $GLOBALS['SL']->treeRow->tree_slug, false) !!}</h4></a>
 @else
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->TreeSlug }}"
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}"
         ><h4 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
-        . $GLOBALS['SL']->treeRow->TreeSlug, false) !!}</h4></a>
+        . $GLOBALS['SL']->treeRow->tree_slug, false) !!}</h4></a>
 @endif
 
 <div class="mT15">{!! $printTree !!}</div>
 
-@if (!isset($GLOBALS['SL']->treeRow->TreeRoot) || intVal($GLOBALS['SL']->treeRow->TreeRoot) <= 0)
+@if (!isset($GLOBALS['SL']->treeRow->tree_root) || intVal($GLOBALS['SL']->treeRow->tree_root) <= 0)
     <a href="?node=-37" class="btn btn-lg btn-primary"><i class="fa fa-plus-square-o"></i> Create Root Node</a>
 @endif
 

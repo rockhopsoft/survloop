@@ -24,6 +24,7 @@ class Authenticate extends Middleware
         if (!$this->redirectIsBad($_SERVER["REQUEST_URI"])) {
             session()->put('loginRedir', $_SERVER["REQUEST_URI"]);
             session()->put('loginRedirTime', time());
+            session()->save();
         }
         if (!$request->expectsJson()) {
             return route('login');

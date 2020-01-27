@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSessSite extends Model
 {
-    protected $table      = 'SL_SessSite';
-    protected $primaryKey = 'SiteSessID';
+    protected $table      = 'sl_sess_site';
+    protected $primaryKey = 'site_sess_id';
     public $timestamps    = true;
     protected $fillable   = 
     [    
-		'SiteSessIPaddy', 
-		'SiteSessUserID', 
-		'SiteSessIsMobile', 
-		'SiteSessBrowser', 
-		'SiteSessZoomPref', 
+		'site_sess_ip_addy', 
+		'site_sess_user_id', 
+		'site_sess_is_mobile', 
+		'site_sess_browser', 
+		'site_sess_zoom_pref', 
     ];
     
     // END SurvLoop auto-generated portion of Model

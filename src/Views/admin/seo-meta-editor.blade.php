@@ -6,7 +6,9 @@
     <div class="col-9 nFld m0 p0">
         <input type="text" name="pageTitle" id="npageTitleFldID" autocomplete="off" 
             class="form-control mT0 mB0" onBlur="slugOnBlur(this, 'nodeSlugID');"
-            @if (isset($currMeta["title"]) && trim($currMeta["title"]) != '') value="{{ $currMeta['title'] }}" @endif
+            @if (isset($currMeta["title"]) && trim($currMeta["title"]) != '') 
+                value="{{ $currMeta['title'] }}" 
+            @endif
             onKeyUp="charCountKeyUp('pageTitle'); previewPage();" >
         <div>
             <div class="disIn pL5 mR5 row2 fPerc80">
@@ -27,7 +29,9 @@
             @if (isset($currMeta["base"])) <div class="disIn slGrey">{{ $currMeta["base"] }}</div> @endif
             <input type="text" name="nodeSlug" id="nodeSlugID" autocomplete="off" 
                 class="form-control w40 disIn mT0 mB0" onKeyUp="previewPage();"
-                @if (isset($currMeta["slug"]) && trim($currMeta["slug"]) != '') value="{{ $currMeta['slug'] }}" @endif >
+                @if (isset($currMeta["slug"]) && trim($currMeta["slug"]) != '') 
+                    value="{{ $currMeta['slug'] }}" 
+                @endif >
         </div>
     </div>
 @endif
@@ -36,9 +40,11 @@
         <h4 class="mT5 mB0"><label for="npageDescFldID">Page Description:</label></h4>
     </div>
     <div class="col-9 nFld m0 p0">
-        <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" class="form-control mT0 mB0 flexarea" 
+        <textarea name="pageDesc" id="npageDescFldID" autocomplete="off" 
+            class="form-control mT0 mB0 flexarea" 
             onKeyUp="charCountKeyUp('pageDesc'); flexAreaAdjust(this); previewPage();"
-            @if (isset($currMeta["desc"]) && trim($currMeta["desc"]) != '') >{{ $currMeta["desc"] }}</textarea> 
+            @if (isset($currMeta["desc"]) && trim($currMeta["desc"]) != '')
+                >{{ $currMeta["desc"] }}</textarea> 
             @else ></textarea> @endif
         <div>
             <div class="disIn pL5 mR5 row2 fPerc80">
@@ -56,9 +62,11 @@
         <span class="fPerc80 slGrey">(comma separated)</span>
     </div>
     <div class="col-9 nFld m0 p0">
-        <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" class="form-control mT0 mB0 flexarea" 
+        <textarea name="pageKey" id="npageKeyFldID" autocomplete="off" 
+            class="form-control mT0 mB0 flexarea" 
             onKeyUp="keywordCountKeyUp('pageKey'); flexAreaAdjust(this);"
-            @if (isset($currMeta["wrds"]) && trim($currMeta["wrds"]) != '') >{{ $currMeta["wrds"] }}</textarea> 
+            @if (isset($currMeta["wrds"]) && trim($currMeta["wrds"]) != '') 
+                >{{ $currMeta["wrds"] }}</textarea> 
             @else ></textarea> @endif
         <div>
             <div class="disIn pL5 mR5 row2 fPerc80">
@@ -91,9 +99,11 @@
                 @endif ></div>
             </div>
             <div class="col-4 pT10">
-                <a href="javascript:;" class="btn btn-sm btn-secondary btn-block mB10 openImgReset" id="imgResetpageImg"
+                <a href="javascript:;" id="imgResetpageImg"
+                    class="btn btn-sm btn-secondary btn-block mB10 openImgReset"
                     ><i class="fa fa-trash-o" aria-hidden="true"></i> Reset to Default</a>
-                <a href="javascript:;" class="btn btn-secondary btn-block mB10 openImgSelect" id="imgSelectpageImg" 
+                <a href="javascript:;" id="imgSelectpageImg" 
+                    class="btn btn-secondary btn-block mB10 openImgSelect" 
                     data-title="" data-presel="{{ $currMeta['img'] }}" 
                     ><div><i class="fa fa-picture-o" aria-hidden="true"></i> 
                     Select or</div><div>Upload Image</div></a><br />

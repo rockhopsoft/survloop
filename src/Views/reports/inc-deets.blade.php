@@ -5,7 +5,13 @@
 <table class="repDeetsBlock" @if (isset($nID)) id="repNode{{ $nID }}" @endif >
 @if (isset($deets) && sizeof($deets) > 0)
     @foreach ($deets as $i => $deet) 
-        {!! view('vendor.survloop.reports.inc-deets-row', [ "i" => $i, "deet" => $deet ])->render() !!}
+        {!! view(
+            'vendor.survloop.reports.inc-deets-row', 
+            [ 
+                "i" => $i, 
+                "deet" => $deet 
+            ]
+        )->render() !!}
     @endforeach
 @endif
 </table>

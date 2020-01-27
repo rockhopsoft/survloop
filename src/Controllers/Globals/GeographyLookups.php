@@ -97,11 +97,11 @@ class GeographyLookups extends GeographyLists
         $ret = [];
         foreach ($this->countryList as $i => $name) {
             $res = new SLNodeResponses;
-            $res->NodeResNode     = $nID;
-            $res->NodeResOrd      = $i;
-            $res->NodeResEng      = $name;
-            $res->NodeResValue    = $name;
-            $res->NodeResShowKids = ((in_array($name, $showKidsList)) ? 1 : 0);
+            $res->node_res_node      = $nID;
+            $res->node_res_ord       = $i;
+            $res->node_res_eng       = $name;
+            $res->node_res_value     = $name;
+            $res->node_res_show_kids = ((in_array($name, $showKidsList)) ? 1 : 0);
             $ret[] = $res;
         }
         return $ret;
@@ -115,26 +115,26 @@ class GeographyLookups extends GeographyLists
         if (strlen($zip) > 7) {
             $zip = substr($zip, 0, 5);
         }
-        return SLZips::where('ZipZip', $zip)
+        return SLZips::where('zip_zip', $zip)
             ->first();
     }
     
-    public function getZipProperty($zip = '', $fld = 'City')
+    public function getZipProperty($zip = '', $fld = 'city')
     {
         $zipRow = $this->getZipRow($zip);
-        if ($zipRow && isset($zipRow->{ 'Zip' . $fld })) {
-            return $zipRow->{ 'Zip' . $fld };
+        if ($zipRow && isset($zipRow->{ 'zip_' . $fld })) {
+            return $zipRow->{ 'zip_' . $fld };
         }
         return '';
     }
     
     public function getCityCounty($city = '', $state = '')
     {
-        $chk = SLZips::where('ZipCity', $city)
-            ->where('ZipState', $state)
+        $chk = SLZips::where('zip_city', $city)
+            ->where('zip_state', $state)
             ->first();
-        if ($chk && isset($chk->ZipCounty)) {
-            return $chk->ZipCounty;
+        if ($chk && isset($chk->zip_county)) {
+            return $chk->zip_county;
         }
         return '';
     }
@@ -144,19 +144,18 @@ class GeographyLookups extends GeographyLists
         if (!$zipRow) {
             return '';
         }
-        if (isset($zipRow->ZipCountry) 
-            && $zipRow->ZipCountry == 'Canada') {
+        if (isset($zipRow->zip_country) 
+            && $zipRow->zip_country == 'Canada') {
             return 'Canada';
         }
-        if ((!isset($zipRow->ZipCountry) 
-            || trim($zipRow->ZipCountry) == '') 
-            && isset($zipRow->ZipState) 
-            && !in_array($zipRow->ZipState, $this->getTerritoryAbbrs())) {
-            $ashrae = SLZipAshrae::where('AshrState', $zipRow->ZipState)
-                ->where('AshrCounty', $zipRow->ZipCounty)
+        if ((!isset($zipRow->zip_country) || trim($zipRow->zip_country) == '') 
+            && isset($zipRow->zip_state) 
+            && !in_array($zipRow->zip_state, $this->getTerritoryAbbrs())) {
+            $ashrae = SLZipAshrae::where('ashr_state', $zipRow->zip_state)
+                ->where('ashr_county', $zipRow->zip_county)
                 ->first();
-            if ($ashrae && isset($ashrae->AshrZone)) {
-                return $ashrae->AshrZone;
+            if ($ashrae && isset($ashrae->ashr_zone)) {
+                return $ashrae->ashr_zone;
             }
         }
         return '';   
@@ -196,17 +195,15 @@ class GeographyLookups extends GeographyLists
         $cnt = 0;
         foreach ($this->stateList as $abbr => $name) {
             $responses[$cnt] = new SLNodeResponses;
-            $responses[$cnt]->NodeResValue = $abbr;
-            $responses[$cnt]->NodeResEng = $name 
-                . ' (' . $abbr . ')';
+            $responses[$cnt]->node_res_value = $abbr;
+            $responses[$cnt]->node_res_eng = $name . ' (' . $abbr . ')';
             $cnt++;
         }
         if ($this->hasCanada) {
             foreach ($this->stateListCa as $abbr => $name) {
                 $responses[$cnt] = new SLNodeResponses;
-                $responses[$cnt]->NodeResValue = $abbr;
-                $responses[$cnt]->NodeResEng = $name 
-                    . ' (' . $abbr . ')';
+                $responses[$cnt]->node_res_value = $abbr;
+                $responses[$cnt]->node_res_eng = $name . ' (' . $abbr . ')';
                 $cnt++;
             }
         }
@@ -228,16 +225,13 @@ class GeographyLookups extends GeographyLists
     {
         return view(
             'vendor.survloop.forms.inc-drop-opts-ashrae-groups', 
-            [
-                "fltClimate" => $fltClimate
-            ]
+            [ "fltClimate" => $fltClimate ]
         )->render();
     }
     
     public function stateClimateDrop($state = '', $all = false)
     {
-        return $this->climateGroupDrop($state) 
-            . '<option disabled ></option>'
+        return $this->climateGroupDrop($state) . '<option disabled ></option>'
             . $this->stateDrop($state, $all);
     }
     
@@ -363,12 +357,12 @@ class GeographyLookups extends GeographyLists
         }
         if (!isset($this->zoneZips[$zoneGroup])) {
             $this->zoneZips[$zoneGroup] = [];
-            $zips = DB::table('SL_Zips')
-                ->join('SL_ZipAshrae', 'SL_Zips.ZipCounty', 
-                    'LIKE', 'SL_ZipAshrae.AshrCounty')
-                ->whereIn('SL_ZipAshrae.AshrZone', 
+            $zips = DB::table('sl_zips')
+                ->join('sl_zip_ashrae', 'sl_zips.zip_county', 
+                    'LIKE', 'sl_zip_ashrae.ashr_county')
+                ->whereIn('sl_zip_ashrae.ashr_zone', 
                     $this->getAshraeGroupZones($zoneGroup))
-                ->select('SL_Zips.ZipZip')
+                ->select('sl_zips.zip_zip')
                 ->get();
             if ($zips->isNotEmpty()) {
                 foreach ($zips as $zip) {

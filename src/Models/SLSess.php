@@ -5,21 +5,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSess extends Model
 {
-    protected $table      = 'SL_Sess';
-    protected $primaryKey = 'SessID';
+    protected $table      = 'sl_sess';
+    protected $primaryKey = 'sess_id';
     public $timestamps    = true;
     protected $fillable   = 
     [    
-		'SessUserID', 
-		'SessTree', 
-		'SessCoreID', 
-		'SessIsActive', 
-		'SessCurrNode', 
-		'SessLoopRootJustLeft', 
-		'SessAfterJumpTo', 
-		'SessIsMobile', 
-		'SessBrowser', 
-		'SessIP', 
+		'sess_user_id', 
+		'sess_tree', 
+		'sess_core_id', 
+		'sess_is_active', 
+		'sess_curr_node', 
+		'sess_loop_root_just_left', 
+		'sess_after_jump_to', 
+		'sess_is_mobile', 
+		'sess_vrowser', 
+		'sess_ip', 
     ];
     
     // END SurvLoop auto-generated portion of Model

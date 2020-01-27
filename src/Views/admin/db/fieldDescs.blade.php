@@ -3,7 +3,7 @@
 @section('content')
 
 <h1><span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Field Descriptions</h1>
+    {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Field Descriptions</h1>
 @if ($view == 'replicas' || $view == 'generics' || $view == 'uniques')
     <a href="/dashboard/db/fieldDescs" class="btn btn-sm btn-secondary mR10">All Field Descriptions</a>
 @endif
@@ -34,8 +34,10 @@
         <h2 class="m0">All Tables, All Fields</h2>
         {{ ($fldTots[0][0]+$fldTots[1][0]) }}/{{ ($fldTots[0][1]+$fldTots[1][1]) }} described
         <!-- 
-        <a href="/dashboard/db/fieldDescs?view=uniques">Unique Fields Only</a> - 
-        <a href="/dashboard/db/fieldDescs?view=replicas">Replica Fields Only</a>
+        <a href="/dashboard/db/fieldDescs?view=uniques"
+            >Unique Fields Only</a> - 
+        <a href="/dashboard/db/fieldDescs?view=replicas"
+            >Replica Fields Only</a>
         -->
     </div>
     <div class="col-6"><div class="progBar"><div style="width: {{ 
@@ -44,20 +46,21 @@
 @endif
 </div>
 
-<form name="fieldDescForm" action="/dashboard/db/fieldDescs?table={{ $tblNext }}{{ $viewParam }}&save=1#tbl{{ $tblNext 
-    }}" method="post">
+<form name="fieldDescForm" action="/dashboard/db/fieldDescs?table={{ 
+    $tblNext }}{{ $viewParam }}&save=1#tbl{{ $tblNext }}" method="post">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-<input type="hidden" name="changedFLds" id="changedFLdsID" value=",">
-<input type="hidden" name="changedFLdsGen" id="changedFLdsGenID" value=",">
+<input type="hidden" name="changedFlds" id="changedFldsID" value=",">
+<input type="hidden" name="changedFldsGen" id="changedFldsGenID" value=",">
 @foreach ($GLOBALS["SL"]->tbls as $loopTblID)
     @if ($tblID != $loopTblID)
         <div class="card">
-            <a href="/dashboard/db/fieldDescs?table={{ $loopTblID }}{{ $viewParam }}#tbl{{ $loopTblID }}">
+            <a href="/dashboard/db/fieldDescs?table={{ 
+                $loopTblID }}{{ $viewParam }}#tbl{{ $loopTblID }}">
             <div class="card-header">
                 <h3>{{ $GLOBALS["SL"]->tbl[$loopTblID] }} 
-                    ({{ (sizeof($GLOBALS["SL"]->fldTypes[$GLOBALS["SL"]->tbl[$loopTblID]])-1) }} 
-                    {{ $fldLabel }})
-                    <i class="fa fa-chevron-down float-right" aria-hidden="true"></i></h3>
+                ({{ (sizeof($GLOBALS["SL"]->fldTypes[$GLOBALS["SL"]->tbl[$loopTblID]])-1) }} 
+                {{ $fldLabel }})
+                <i class="fa fa-chevron-down float-right" aria-hidden="true"></i></h3>
             </div></a>
         </div>
     @else
@@ -77,44 +80,53 @@
                     <div class="p10 @if ($cnt%2 == 0) row2 @endif ">
                         <div class="row" >
                             <div class="col-4">
-                                <input name="FldEng{{ $fld->FldID }}" class="form-control bordC w100"
-                                    @if ($fld->FldSpecType == 'Generic') 
-                                        onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
-                                    @else onKeyUp="logFldDescChange({{ $fld->FldID }});"
-                                    @endif value="{{ str_replace('"', '\\"', $fld->FldEng) }}" >
+                                <input name="FldEng{{ $fld->fld_id }}" class="form-control bordC w100"
+                                    @if ($fld->fld_spec_type == 'Generic') 
+                                        onKeyUp="logFldGenDescChange({{ $fld->fld_id }});"
+                                    @else onKeyUp="logFldDescChange({{ $fld->fld_id }});"
+                                    @endif value="{{ str_replace('"', '\\"', $fld->fld_eng) }}" >
                                 <div class="fPerc80">
                                     <a href="/dashboard/db/field/{{ 
-                                        $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->FldTable]] 
-                                        }}/{{ $fld->FldName }}"
-                                        class="mR5" target="_blank"><i class="fa fa-pencil fa-flip-horizontal"></i></a>
-                                    <b>{{ $GLOBALS['SL']->tblEng[$fld->FldTable] }} : {{ $fld->FldName }}</b> - 
-                                    {{ $FldDataTypes[$fld->FldType][1] }}
-                                    @if (intVal($fld->FldForeignTable) > 0)
-                                        - <i class="fa fa-link"></i>{!! 
-                                            view('vendor.survloop.admin.db.inc-getTblName', [
-                                                "id" => $fld->FldForeignTable, "link" => 0, "xtraTxt" => ' ID', 
-                                                "xtraLnk" => '' ])->render() !!}
+                                        $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->fld_table]] 
+                                        }}/{{ $fld->fld_name }}" class="mR5" target="_blank"
+                                        ><i class="fa fa-pencil fa-flip-horizontal"></i></a>
+                                    <b>{{ $GLOBALS['SL']->tblEng[$fld->fld_table] }} : {{ $fld->fld_name }}</b> - 
+                                    {{ $FldDataTypes[$fld->fld_type][1] }}
+                                    @if (intVal($fld->fld_foreign_table) > 0)
+                                        - <i class="fa fa-link"></i>{!! view(
+                                            'vendor.survloop.admin.db.inc-getTblName', 
+                                            [
+                                                "id" => $fld->fld_foreign_table, 
+                                                "link" => 0, 
+                                                "xtraTxt" => ' ID', 
+                                                "xtraLnk" => ''
+                                            ]
+                                        )->render() !!}
                                     @endif
-                                    @if (trim($fld->FldValues) != '' || trim($tblFldVals[$fld->FldID]) != '')
-                                        - <span class="slGrey">{{ $tblFldVals[$fld->FldID] }}</span>
+                                    @if (trim($fld->fld_values) != '' || trim($tblFldVals[$fld->fld_id]) != '')
+                                        - <span class="slGrey">{{ $tblFldVals[$fld->fld_id] 
+                                        }}</span>
                                     @endif
                                 </div>
                             </div><div class="col-6">
-                                <textarea name="FldDesc{{ $fld->FldID }}" class="form-control w100" 
-                                @if ($fld->FldSpecType == 'Generic') onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
-                                @else onKeyUp="logFldDescChange({{ $fld->FldID }});"
-                                @endif >{{ $fld->FldDesc }}</textarea>
+                                <textarea name="FldDesc{{ $fld->fld_id }}" 
+                                    class="form-control w100" 
+                                @if ($fld->fld_spec_type == 'Generic') 
+                                    onKeyUp="logFldGenDescChange({{ $fld->fld_id }});"
+                                @else onKeyUp="logFldDescChange({{ $fld->fld_id }});"
+                                @endif >{{ $fld->fld_desc }}</textarea>
                             </div><div class="col-2">
-                                <textarea name="FldNotes{{ $fld->FldID }}" class="form-control w100 slGrey fPerc80"
-                                @if ($fld->FldSpecType == 'Generic') onKeyUp="logFldGenDescChange({{ $fld->FldID }});"
-                                @else onKeyUp="logFldDescChange({{ $fld->FldID }});"
-                                @endif >{{ $fld->FldNotes }}</textarea>
+                                <textarea name="FldNotes{{ $fld->fld_id }}" 
+                                    class="form-control w100 slGrey fPerc80"
+                                @if ($fld->fld_spec_type == 'Generic') onKeyUp="logFldGenDescChange({{ $fld->fld_id }});"
+                                @else onKeyUp="logFldDescChange({{ $fld->fld_id }});"
+                                @endif >{{ $fld->fld_notes }}</textarea>
                             </div>
                         </div>
-                        @if (trim($tblFldQuestion[$fld->FldID]) != '')
+                        @if (trim($tblFldQuestion[$fld->fld_id]) != '')
                             <div class="pT10">
                                 <span class="slGrey">Question:</span>
-                                <span class="slBlueDark">{{ $tblFldQuestion[$fld->FldID] }}</span>
+                                <span class="slBlueDark">{{ $tblFldQuestion[$fld->fld_id] }}</span>
                             </div>
                         @endif
                     </div>
@@ -132,19 +144,19 @@
 
 <script type="text/javascript">
 function logFldDescChange(FldID) {
-    if (document.getElementById("changedFLdsID").value.indexOf(","+FldID+",") < 0) {
-        document.getElementById("changedFLdsID").value += FldID+",";
+    if (document.getElementById("changedFldsID").value.indexOf(","+FldID+",") < 0) {
+        document.getElementById("changedFldsID").value += FldID+",";
     }
 }
 function submitFldDescChanges() {
     document.fieldDescForm.submit();
-    setTimeout("document.getElementById('changedFLdsID').value=','", 1000);
-    setTimeout("document.getElementById('changedFLdsGenID').value=','", 1000);
+    setTimeout("document.getElementById('changedFldsID').value=','", 1000);
+    setTimeout("document.getElementById('changedFldsGenID').value=','", 1000);
 }
 @if ($view == 'generics')
     function logFldGenDescChange(FldID) {
-        if (document.getElementById("changedFLdsGenID").value.indexOf(","+FldID+",") < 0) {
-            document.getElementById("changedFLdsGenID").value += FldID+",";
+        if (document.getElementById("changedFldsGenID").value.indexOf(","+FldID+",") < 0) {
+            document.getElementById("changedFldsGenID").value += FldID+",";
         }
     }
     </script><span class="red">*</span> <b>WARNING:</b> Saving changes to Generic field descriptions here will push 

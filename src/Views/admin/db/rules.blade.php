@@ -9,7 +9,7 @@
         ><i class="fa fa-plus-circle"></i> Add New Rule</a>
 @endif
 <h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Business Rules 
+    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Business Rules 
     <nobr>({!! strip_tags($dbStats) !!})</nobr>
 </h1>
 
@@ -19,11 +19,11 @@
 </div>
 @forelse ($rules as $cnt => $rule)
     <div class="row">
-        <div class="col-1 p20"><a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" class="btn btn-primary">
+        <div class="col-1 p20"><a href="/dashboard/db/bus-rules/edit/{{ $rule->rule_id }}" class="btn btn-primary">
         @if ($dbAllowEdits) Edit @else View @endif
         </a></div>
-        <div class="col-7 p10"><h2 class="mT0">{!! $rule->RuleStatement !!}</h2>
-            <div class="p5 slGrey">{{ $rule->RuleConstraint }}</div></div>
+        <div class="col-7 p10"><h2 class="mT0">{!! $rule->rule_statement !!}</h2>
+            <div class="p5 slGrey">{{ $rule->rule_constraint }}</div></div>
         <div class="col-3 p10">
         @if (isset($ruleTbls[$cnt]) != '' && trim($ruleTbls[$cnt]) != ',')
             {!! $ruleTbls[$cnt] !!}
@@ -32,8 +32,8 @@
         <div class="col-1 p10">
         @if ($dbAllowEdits) 
             <a class="red" href="javascript:;" 
-                onClick="if (confirm('Are you sure you want to delete this rule?')) window.location='?delRule={{ $rule->RuleID }}';" 
-                >Delete</a>
+                onClick="if (confirm('Are you sure you want to delete this rule?')) window.location='?delRule={{ 
+                    $rule->rule_id }}';" >Delete</a>
         @endif
         </div>
     </div>

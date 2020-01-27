@@ -6,7 +6,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>:
+    {{ $GLOBALS['SL']->dbRow->db_name }}</span>:
     Sorting Defintion Set
 </h1>
 

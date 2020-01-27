@@ -14,8 +14,14 @@
             <table class="repDeetsBlock">
             @foreach ($deets as $j => $deet)
                 @if (isset($deet[0]) && trim($deet[0]) != '')
-                   <?php if ($j == 0) { $cnt = $i%2; } else { $cnt++; } ?>
-                   {!! view('vendor.survloop.reports.inc-deets-row', [ "i" => $cnt, "deet" => $deet ])->render() !!}
+                    <?php if ($j == 0) { $cnt = $i%2; } else { $cnt++; } ?>
+                    {!! view(
+                        'vendor.survloop.reports.inc-deets-row', 
+                        [ 
+                            "i"    => $cnt, 
+                            "deet" => $deet 
+                        ]
+                    )->render() !!}
                 @endif
             @endforeach
             </table>

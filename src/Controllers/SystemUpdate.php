@@ -28,10 +28,12 @@ class SystemUpdate extends AdminController
         $this->custReport->loadSysUpdates();
         $this->sysUpdates();
         if ($request->has('sub') && intVal($request->get('sub')) == 1) {
-            $this->custReport->v["msgs"] = '<h3>System Updated!</h3>' . $this->sysUpdates(true);
-            $this->custReport->v["pastUpDef"]->DefDescription = '';
+            $this->custReport->v["msgs"] = '<h3>System Updated!</h3>'
+                . $this->sysUpdates(true);
+            $this->custReport->v["pastUpDef"]->def_description = '';
             foreach ($this->custReport->v["updateList"] as $i => $u) {
-                $this->custReport->v["pastUpDef"]->DefDescription .= (($i > 0) ? ';;' : '') . $u[0];
+                $this->custReport->v["pastUpDef"]->def_description 
+                    .= (($i > 0) ? ';;' : '') . $u[0];
             }
             $this->custReport->v["pastUpDef"]->save();
             $this->custReport->loadSysUpdates();
@@ -39,9 +41,13 @@ class SystemUpdate extends AdminController
         }
         $this->custReport->v["needUpdate"] = false;
         foreach ($this->custReport->v["updateList"] as $i => $u) {
-            if (!$u[1]) $this->custReport->v["needUpdate"] = true;
+            if (!$u[1]) {
+                $this->custReport->v["needUpdate"] = true;
+            }
         }
-        if (isset($this->custReport->v["msgs"])) $this->v["msgs"] = $this->custReport->v["msgs"];
+        if (isset($this->custReport->v["msgs"])) {
+            $this->v["msgs"] = $this->custReport->v["msgs"];
+        }
         $this->v["needUpdate"] = $this->custReport->v["needUpdate"];
         $this->v["updateList"] = $this->custReport->v["updateList"];
         return view('vendor.survloop.admin.systems-update', $this->v);
@@ -66,15 +72,15 @@ class SystemUpdate extends AdminController
         $updateID = [ '2018-03-31', 'Table extension field change in the tables table' ];
         if (!$this->custReport->addSysUpdate($updateID) && $apply) {
             $msgs .= '<b>' . $updateID[0] . ':</b> ' . $updateID[1] . '<br />';
-            $flds = DB::select(DB::raw("ALTER TABLE `SL_Tables` CHANGE COLUMN `TblActive` `TblExtend` INT(11) NULL"));
-            $flds = DB::select(DB::raw("UPDATE `SL_Tables` SET `TblExtend`=0 WHERE 1"));
+            $flds = DB::select(DB::raw("ALTER TABLE `sl_tables` CHANGE COLUMN `tbl_active` `tbl_extend` INT(11) NULL"));
+            $flds = DB::select(DB::raw("UPDATE `sl_tables` SET `tbl_extend`=0 WHERE 1"));
         } // end update '2018-03-31'
         */
         $updateID = [ '2018-03-27', 'Tree Type primary public is now just Survey' ];
         if (!$this->custReport->addSysUpdate($updateID) && $apply) {
             $msgs .= '<b>' . $updateID[0] . ':</b> ' . $updateID[1] . '<br />';
-            SLTree::where('TreeType', 'Primary Public')->update([ 'TreeType' => 'Survey' ]);
-            SLTree::where('TreeType', 'Primary Public XML')->update([ 'TreeType' => 'Survey XML' ]);
+            SLTree::where('tree_type', 'Primary Public')->update([ 'tree_type' => 'Survey' ]);
+            SLTree::where('tree_type', 'Primary Public XML')->update([ 'tree_type' => 'Survey XML' ]);
         } // end update '2018-03-27'
         
         $msgs .= $this->custReport->sysUpdatesCust($apply);

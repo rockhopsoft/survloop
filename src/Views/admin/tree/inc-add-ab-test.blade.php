@@ -10,26 +10,30 @@
             <option value="{{ $ab[0] }}.B">{{ $ab[0] }}.B - NOT</option>
         @empty
         @endforelse
-            <option value="NewAB">Create new test for {{ $GLOBALS["SL"]->treeRow->TreeName }}</option>
+            <option value="NewAB">Create new test for {{ $GLOBALS["SL"]->treeRow->tree_name }}</option>
         </select>
         <div id="addNewTestAB" class="disNon pT10">
             <label for="addTestABdescID">AB Test Description</label>
-            <input type="text" name="addTestABdesc" id="addTestABdescID" class="form-control" autocomplete="off">
+            <input type="text" name="addTestABdesc" id="addTestABdescID" 
+                class="form-control" autocomplete="off">
             <div class="mT5"><label>
-                <input type="radio" name="addTestABwhich" value="A" class="mR5" CHECKED autocomplete="off" >
-                Shows node for test
+                <input type="radio" name="addTestABwhich" value="A" 
+                    class="mR5" CHECKED autocomplete="off">Shows node for test
             </label></div>
             <div class="mT5"><label>
-                <input type="radio" name="addTestABwhich" value="B" class="mR5" autocomplete="off">
-                Show node for non-test
+                <input type="radio" name="addTestABwhich" value="B" 
+                    class="mR5" autocomplete="off">Show node for non-test
             </label></div>
         </div>
     </div>
 </div>
 <script type="text/javascript"> $(document).ready(function(){
 $(document).on("change", "#addTestABID", function() {
-    if (document.getElementById('addTestABID').value == 'NewAB') $("#addNewTestAB").slideDown('fast');
-    else $("#addNewTestAB").slideUp('fast');
+    if (document.getElementById('addTestABID').value == 'NewAB') {
+        $("#addNewTestAB").slideDown('fast');
+    } else {
+        $("#addNewTestAB").slideUp('fast');
+    }
     return true;
 });
 }); </script>

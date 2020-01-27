@@ -6,7 +6,8 @@
             {!! $GLOBALS["SL"]->tabInd() !!}>
     </div><div class="col-5">
         <div id="{{ $fldName }}ColorSwatch" class="round5 slBoxShd crsrPntr colorPickFldSwatch" 
-            style="background: {!! $preSel !!};"><img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" 
+            style="background: {!! $preSel !!};">
+            <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" 
                 border=0 height=35 width=1 style="background: none;" alt="" >
         </div>
     </div><div class="col-2">

@@ -5,24 +5,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLTables extends Model
 {
-    protected $table         = 'SL_Tables';
-    protected $primaryKey     = 'TblID';
+    protected $table         = 'sl_tables';
+    protected $primaryKey     = 'tbl_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'TblDatabase', 
-        'TblAbbr', 
-        'TblName', 
-        'TblEng', 
-        'TblDesc', 
-        'TblNotes', 
-        'TblType', 
-        'TblGroup', 
-        'TblOrd', 
-        'TblOpts', 
-        'TblExtend', 
-        'TblNumFields', 
-        'TblNumForeignKeys', 
-        'TblNumForeignIn', 
+        'tbl_database', 
+        'tbl_abbr', 
+        'tbl_name', 
+        'tbl_eng', 
+        'tbl_desc', 
+        'tbl_notes', 
+        'tbl_type', 
+        'tbl_group', 
+        'tbl_ord', 
+        'tbl_opts', 
+        'tbl_extend', 
+        'tbl_num_fields', 
+        'tbl_num_foreign_keys', 
+        'tbl_num_foreign_in', 
     ];
 }

@@ -4,17 +4,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLEmails extends Model
 {
-    protected $table = 'SL_Emails';
-    protected $primaryKey = 'EmailID';
+    protected $table = 'sl_emails';
+    protected $primaryKey = 'email_id';
     
     protected $fillable = [
-        'EmailTree', 
-        'EmailType', 
-        'EmailName', 
-        'EmailSubject', 
-        'EmailBody', 
-        'EmailOpts', 
-        'EmailTotSent', 
+        'email_tree', 
+        'email_type', 
+        'email_name', 
+        'email_subject', 
+        'email_body', 
+        'email_opts', 
+        'email_tot_sent', 
     ];
     
     

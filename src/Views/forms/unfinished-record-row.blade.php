@@ -1,5 +1,6 @@
 <!-- resources/views/vendor/survloop/forms/unfinished-record-row.blade.php -->
-<div class="wrapLoopItem"><a name="item{{ $cID }}"></a>
+<div class="wrapLoopItem">
+    <div class="nodeAnchor"><a name="item{{ $cID }}"></a></div>
     <div id="wrapItem{{ $cID }}On" class="brdTopFnt pT15 pB15 mT5">
         <a href="/switch/{{ $tree }}/{{ $cID }}"><h5 class="m0">{!! $title !!}</h5></a>
         <div class="pL15 pR15">

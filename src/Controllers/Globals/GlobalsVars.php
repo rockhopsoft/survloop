@@ -102,7 +102,7 @@ class GlobalsVars extends GlobalsStatic
     public $debugOn        = false;
 
     
-    // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->TreeOpts%TREEOPT_PRIME == 0 )
+    // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->tree_opts%TREEOPT_PRIME == 0 )
     // Site Map Architecture and Permissions Flags
     public const TREEOPT_HOMEPAGE   = 7;  // Page Tree acts as home page for site area
     public const TREEOPT_SEARCH     = 31; // Tree acts as search results page for site area 

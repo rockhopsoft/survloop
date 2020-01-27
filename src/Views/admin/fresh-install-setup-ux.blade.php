@@ -7,12 +7,13 @@
 <div class="jumbotron"><center>
 <h1>Create Your First <span class="slBlueDark">Experience</span>!</h1>
 <p>
-A <span class="slBlueDark">User Experience</span> is like one survey, a simple series of questions, <br />
-or an entire series of interactions which must be<br />customized for every special snowflake visitor.
+A <span class="slBlueDark">survey or form</span> is a simple series of questions, 
+or an entire series of interactions which can be customized for each visitor 
+like a choose your own adventure.
 </p>
 <p>
-<span class="slGrey fPerc66">Some databases collect information from more than one person, at more than one time. 
-But for now, <br />please focus on the data you want to collect when visitors land on your main website.</span>
+Some databases collect information from more than one person, at more than one time. 
+But for now, please focus on the data you want to collect when visitors land on your main website.
 </p>
 </center></div>
 
@@ -24,21 +25,22 @@ But for now, <br />please focus on the data you want to collect when visitors la
 
 <div class="nodeWrap">
     <div class="nPrompt"><label for="nameID">
-        <b><span class="slBlueDark">User Experience</span> Name</b>: 
+        <b><span class="slBlueDark">Survey/Form</span> Name</b>: 
         <span class="slGrey fPerc66">(eg. "SurvLoop Main")</span>
     </label></div>
     <div class="nFld"><input id="TreeNameID" name="TreeName" type="text" class="form-control"
         @if ($isFresh && isset($GLOBALS['SL']->sysOpts["site-name"])) 
             value="{{ $GLOBALS['SL']->sysOpts["site-name"] }} Main" 
-        @elseif (isset($GLOBALS['SL']->dbRow->DbName)) 
-            value="{{ $GLOBALS['SL']->dbRow->DbName }} Main" 
+        @elseif (isset($GLOBALS['SL']->dbRow->db_name)) 
+            value="{{ $GLOBALS['SL']->dbRow->db_name }} Main" 
         @endif ></div>
 </div>
 
 <div class="nodeGap"></div>
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="nameID"><b>Describe This Experience</b>: <span class="slGrey fPerc66">(eg. "Visitors can design their own database.")</span></label></div>
+    <div class="nPrompt"><label for="nameID"><b>Describe This Survey</b>: 
+        <span class="slGrey fPerc66">(eg. "Visitors can design their own database.")</span></label></div>
     <div class="nFld"><input id="TreeDescID" name="TreeDesc" type="text" class="form-control"></div>
 </div>
 

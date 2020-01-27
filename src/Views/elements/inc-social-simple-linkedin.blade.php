@@ -7,9 +7,12 @@
                 <i class="fa fa-linkedin" aria-hidden="true"></i> <span>{!! $btnText !!}</span>
             @else <span>Link</span> <i class="fa fa-linkedin" aria-hidden="true"></i> @endif </a>
     @else
-        <a class="socialTwit" target="_blank" href="{{ $GLOBALS['SL']->getLinkedinShareLnk($link,
-            ((isset($title)) ? $title : '')) }}" style="color: #FFF;">
-            <div><img src="/survloop/uploads/spacer.gif" alt=""><i class="fa fa-linkedin" aria-hidden="true"></i> 
-            <span>Link</span><div></a>
+        <a class="socialTwit" target="_blank" style="color: #FFF;"
+            href="{{ $GLOBALS['SL']->getLinkedinShareLnk($link, ((isset($title)) ? $title : '')) }}">
+            <div>
+                <img src="/survloop/uploads/spacer.gif" alt="">
+                <i class="fa fa-linkedin" aria-hidden="true"></i> <span>Link</span>
+            <div>
+        </a>
     @endif
 @endif

@@ -44,13 +44,13 @@ class PageLoadUtils extends Controller
     
     public function loadDomain()
     {
-        $appUrl = SLDefinitions::select('DefDescription')
-            ->where('DefDatabase', 1)
-            ->where('DefSet', 'System Settings')
-            ->where('DefSubset', 'app-url')
+        $appUrl = SLDefinitions::select('def_description')
+            ->where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'app-url')
             ->first();
-        if ($appUrl && isset($appUrl->DefDescription)) {
-            $this->domainPath = $appUrl->DefDescription;
+        if ($appUrl && isset($appUrl->def_description)) {
+            $this->domainPath = $appUrl->def_description;
         }
         return $this->domainPath;
     }
@@ -63,8 +63,9 @@ class PageLoadUtils extends Controller
             $pos2 = strpos($request->fullUrl(), 
                 str_replace('https://', 'http://', $this->domainPath));
             if ($pos1 !== false && $pos2 !== false) {
-                header("Location: " . str_replace('http://', 'https://', 
-                    $request->fullUrl()));
+                header("Location: " 
+                    . str_replace('http://', 'https://', $request->fullUrl())
+                );
                 exit;
             }
         }
@@ -73,13 +74,13 @@ class PageLoadUtils extends Controller
     
     public function loadAbbr()
     {
-        $chk = SLDefinitions::select('DefDescription')
-            ->where('DefDatabase', 1)
-            ->where('DefSet', 'System Settings')
-            ->where('DefSubset', 'cust-abbr')
+        $chk = SLDefinitions::select('def_description')
+            ->where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'cust-abbr')
             ->first();
-        if ($chk && isset($chk->DefDescription)) {
-            $this->custAbbr = trim($chk->DefDescription);
+        if ($chk && isset($chk->def_description)) {
+            $this->custAbbr = trim($chk->def_description);
         }
         return $this->custAbbr;
     }
@@ -89,6 +90,7 @@ class PageLoadUtils extends Controller
         $this->dbID = $dbID;
         $this->treeID = $treeID;
         $GLOBALS["SL"] = new Globals($request, $dbID, $treeID, $treeID);
+        $GLOBALS["SL"]->microLog();
         return true;
     }
     
@@ -165,24 +167,24 @@ class PageLoadUtils extends Controller
     
     public function chkNoTreePerms($tree)
     {
-        if (!$tree || !isset($tree->TreeOpts)) {
+        if (!$tree || !isset($tree->tree_opts)) {
             return false;
         }
-        return ($tree->TreeOpts%Globals::TREEOPT_ADMIN > 0 
-            && $tree->TreeOpts%Globals::TREEOPT_STAFF > 0
-            && $tree->TreeOpts%Globals::TREEOPT_PARTNER > 0 
-            && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0);
+        return ($tree->tree_opts%Globals::TREEOPT_ADMIN > 0 
+            && $tree->tree_opts%Globals::TREEOPT_STAFF > 0
+            && $tree->tree_opts%Globals::TREEOPT_PARTNER > 0 
+            && $tree->tree_opts%Globals::TREEOPT_VOLUNTEER > 0);
     }
     
     public function loadTreeByID(Request $request, $treeID = -3)
     {
         if (intVal($treeID) > 0) {
             $tree = SLTree::find($treeID);
-            if ($tree && isset($tree->TreeOpts)) {
-                if ($this->okToLoadTree($tree->TreeOpts)) {
+            if ($tree && isset($tree->tree_opts)) {
+                if ($this->okToLoadTree($tree->tree_opts)) {
                     $this->syncDataTrees(
                         $request, 
-                        $tree->TreeDatabase, 
+                        $tree->tree_database, 
                         $treeID
                     );
                     return true;
@@ -201,18 +203,18 @@ class PageLoadUtils extends Controller
     public function loadTreeBySlug(Request $request, $treeSlug = '', $type = 'Survey')
     {
         if (trim($treeSlug) != '') {
-            $urlTrees = SLTree::where('TreeType', $type)
-                ->where('TreeSlug', $treeSlug)
-                ->orderBy('TreeID', 'asc')
+            $urlTrees = SLTree::where('tree_type', $type)
+                ->where('tree_slug', $treeSlug)
+                ->orderBy('tree_id', 'asc')
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t && isset($t->TreeOpts) 
-                        && $this->okToLoadTree($t->TreeOpts)) {
+                    if ($t && isset($t->tree_opts) 
+                        && $this->okToLoadTree($t->tree_opts)) {
                         $this->syncDataTrees(
                             $request, 
-                            $t->TreeDatabase, 
-                            $t->TreeID
+                            $t->tree_database, 
+                            $t->tree_id
                         );
                         return true;
                     }
@@ -229,29 +231,28 @@ class PageLoadUtils extends Controller
             $perms = $this->getPermOpts();
             $searchDataTbl = $request->get('searchData');
             if (sizeof($searchDataTbl) == 1 && intVal($searchDataTbl[0]) > 0) {
-                $trees = DB::table('SL_Tree')
-                    ->join('SL_Node', function ($join) {
-                        $join->on('SL_Tree.TreeID', '=', 'SL_Node.NodeTree')
-                            ->where('SL_Node.NodeParentID', '<=', 0)
-                            ->where('SL_Node.NodeType', 'Page');
+                $trees = DB::table('sl_tree')
+                    ->join('sl_node', function ($join) {
+                        $join->on('sl_tree.tree_id', '=', 'sl_node.node_tree')
+                            ->where('sl_node.node_parent_id', '<=', 0)
+                            ->where('sl_node.node_type', 'Page');
                     })
-                    ->where('SL_Tree.TreeType', 'Page')
-                    ->where('SL_Tree.TreeCoreTable', intVal($searchDataTbl[0]))
-                    ->select('SL_Tree.*', 'SL_Node.NodeResponseSet')
+                    ->where('sl_tree.tree_type', 'Page')
+                    ->where('sl_tree.tree_core_table', intVal($searchDataTbl[0]))
+                    ->select('sl_tree.*', 'sl_node.tree_response_set')
                     ->get();
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
             if ($searchTree === null) {
-                $trees = SLTree::where('TreeType', 'Page')
+                $trees = SLTree::where('tree_type', 'Page')
                     ->get();
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
             if ($searchTree !== null 
-                && isset($searchTree->TreeOpts)) {
-                $redir = $this->getPageDashPrefix($searchTree->TreeOpts) 
-                    . '/' . $searchTree->TreeSlug 
-                    . '?s=' . (($request->has('s')) 
-                        ? $request->get('s') : '');
+                && isset($searchTree->tree_opts)) {
+                $redir = $this->getPageDashPrefix($searchTree->tree_opts) 
+                    . '/' . $searchTree->tree_slug . '?s=' 
+                    . (($request->has('s')) ? $request->get('s') : '');
                 if ($request->has('sFilt') 
                     && trim($request->get('sFilt')) != '') {
                     $redir .= '&sFilt=' . $request->get('sFilt');
@@ -284,9 +285,9 @@ class PageLoadUtils extends Controller
                     if ($searchTree === null) {
                         foreach ($trees as $tree) {
                             if ($searchTree === null 
-                                && $tree->TreeOpts%$perm == 0
-                                && $tree->TreeOpts%Globals::TREEOPT_SEARCH == 0) {
-                                if ($tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                                && $tree->tree_opts%$perm == 0
+                                && $tree->tree_opts%Globals::TREEOPT_SEARCH == 0) {
+                                if ($tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0) {
                                     $searchTreeHome = $tree;
                                 } else {
                                     $searchTree = $tree;
@@ -299,12 +300,12 @@ class PageLoadUtils extends Controller
             if ($searchTree === null) {
                 foreach ($trees as $tree) {
                     if ($searchTree === null 
-                        && $tree->TreeOpts%Globals::TREEOPT_SEARCH   == 0
-                        && $tree->TreeOpts%Globals::TREEOPT_ADMIN     > 0
-                        && $tree->TreeOpts%Globals::TREEOPT_STAFF     > 0
-                        && $tree->TreeOpts%Globals::TREEOPT_PARTNER   > 0
-                        && $tree->TreeOpts%Globals::TREEOPT_VOLUNTEER > 0) {
-                        if ($tree->TreeOpts%Globals::TREEOPT_HOMEPAGE == 0) {
+                        && $tree->tree_opts%Globals::TREEOPT_SEARCH   == 0
+                        && $tree->tree_opts%Globals::TREEOPT_ADMIN     > 0
+                        && $tree->tree_opts%Globals::TREEOPT_STAFF     > 0
+                        && $tree->tree_opts%Globals::TREEOPT_PARTNER   > 0
+                        && $tree->tree_opts%Globals::TREEOPT_VOLUNTEER > 0) {
+                        if ($tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0) {
                             $searchTreeHome = $tree;
                         } else {
                             $searchTree = $tree;
@@ -322,13 +323,13 @@ class PageLoadUtils extends Controller
     protected function chkPageRedir($treeSlug = '')
     {
         if (trim($treeSlug) != '') {
-            $redirTree = SLTree::where('TreeSlug', $treeSlug)
-                ->where('TreeType', 'Redirect')
-                ->orderBy('TreeID', 'asc')
+            $redirTree = SLTree::where('tree_slug', $treeSlug)
+                ->where('tree_type', 'Redirect')
+                ->orderBy('tree_id', 'asc')
                 ->first();
-            if ($redirTree && isset($redirTree->TreeDesc) 
-                && trim($redirTree->TreeDesc) != '') {
-                $redirURL = $redirTree->TreeDesc;
+            if ($redirTree && isset($redirTree->tree_desc) 
+                && trim($redirTree->tree_desc) != '') {
+                $redirURL = $redirTree->tree_desc;
                 if (strpos($redirURL, $this->domainPath) === false 
                     && substr($redirURL, 0, 1)       != '/'
                     && strpos($redirURL, 'http://')  === false 
@@ -356,15 +357,17 @@ class PageLoadUtils extends Controller
         $this->loadDomain();
         $this->checkHttpsDomain($request);
         if (trim($treeSlug) != '') {
-            $urlTrees = SLTree::where('TreeSlug', $treeSlug)
+            $urlTrees = SLTree::where('tree_slug', $treeSlug)
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t && isset($t->TreeOpts) 
-                        && $this->okToLoadTree($t->TreeOpts)) {
-                        $rootNode = SLNode::find($t->TreeFirstPage);
-                        if ($rootNode && isset($t->TreeSlug) 
-                            && isset($rootNode->NodePromptNotes)) {
+                    if ($t 
+                        && isset($t->tree_opts) 
+                        && $this->okToLoadTree($t->tree_opts)) {
+                        $rootNode = SLNode::find($t->tree_first_page);
+                        if ($rootNode 
+                            && isset($t->tree_slug) 
+                            && isset($rootNode->node_prompt_notes)) {
                             return $this->loadNodeTreeURLredir(
                                 $request, 
                                 $t, 
@@ -381,15 +384,15 @@ class PageLoadUtils extends Controller
     
     protected function loadNodeTreeURLredir(Request $request, $tree, $rootNode, $cid = -3)
     {
-        $redir = $this->dashPrfx . '/u/' . $tree->TreeSlug 
-            . '/' . $rootNode->NodePromptNotes;
+        $redir = $this->dashPrfx . '/u/' . $tree->tree_slug 
+            . '/' . $rootNode->node_prompt_notes;
         if ($cid > 0) {
             $redir .= '?cid=' . $cid;
         } else {
             $redir .= '?start=1&new=' . rand(100000000, 1000000000);
         }
-        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->TreeSlug, '', 
-            str_replace($this->domainPath . '/dashboard/start/' . $tree->TreeSlug, '', 
+        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '', 
+            str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '', 
             $request->fullUrl()));
         if (substr($paramTxt, 0, 1) == '/') {
             $paramTxt = substr($paramTxt, 1);
@@ -405,34 +408,33 @@ class PageLoadUtils extends Controller
     
     public function loadPageCID(Request $request, $tree, $cid)
     {
-        if ($cid > 0 && $tree 
-            && isset($tree->TreeID)) {
-            $sess = SLSess::where('SessUserID', 
-                    Auth::user()->id)
-                ->where('SessTree', $tree->TreeID)
-                ->where('SessCoreID', $cid)
-                ->where('SessIsActive', 1)
+        if ($cid > 0 && $tree && isset($tree->tree_id)) {
+            $sess = SLSess::where('sess_user_id', Auth::user()->id)
+                ->where('sess_tree', $tree->tree_id)
+                ->where('sess_core_id', $cid)
+                ->where('sess_is_active', 1)
                 ->orderBy('updated_at', 'desc')
                 ->first();
-            if (!$sess || !isset($sess->SessID)) {
+            if (!$sess || !isset($sess->sess_id)) {
                 $sess = new SLSess;
-                $sess->SessUserID   = Auth::user()->id;
-                $sess->SessTree     = $tree->TreeID;
-                $sess->SessCoreID   = $cid;
-                $sess->SessIsActive = 1;
+                $sess->sess_user_id   = Auth::user()->id;
+                $sess->sess_tree      = $tree->tree_id;
+                $sess->sess_core_id   = $cid;
+                $sess->sess_is_active = 1;
                 $sess->save();
             }
             if ($request->has("n") 
                 && intVal($request->get("n")) > 0) {
                 $sess->update([
-                    'SessCurrNode' => intVal($request->get("n"))
+                    'sess_curr_node' => intVal($request->get("n"))
                 ]);
-            } elseif ($sess->SessCurrNode == -86) {
+            } elseif ($sess->sess_curr_node == -86) {
                 // last session deactivate (hopefully completed)
-                $sess->update([ 'SessCurrNode' => $tree->TreeRoot ]);
+                $sess->update([ 'sess_curr_node' => $tree->tree_root ]);
             }
-            session()->put('sessID' . $tree->TreeID, $sess->SessID);
-            session()->put('coreID' . $tree->TreeID, $cid);
+            session()->put('sessID' . $tree->tree_id, $sess->sess_id);
+            session()->put('coreID' . $tree->tree_id, $cid);
+            session()->save();
         }
         return true;
     }
@@ -468,9 +470,10 @@ class PageLoadUtils extends Controller
             $sffx .= $GLOBALS["SL"]->getCacheSffxAdds();
             $GLOBALS["SL"]->cacheSffx = $sffx;
         }
-        $uri = substr(str_replace('?refresh=1', '', 
-            str_replace('&refresh=1', '', 
-            $_SERVER["REQUEST_URI"])), 1);
+        $uri = str_replace('?refresh=1', '', 
+            str_replace('&refresh=1', '', $_SERVER["REQUEST_URI"])
+        );
+        $uri = substr($uri, 1);
         $this->cacheKey = 'page-' . $uri . $sffx . '.html';
         return $this->cacheKey;
     }
@@ -529,14 +532,8 @@ class PageLoadUtils extends Controller
     {
         $this->chkGenCacheKey();
         $cache = new GlobalsCache;
-        $cache->putCache(
-            $this->cacheKey, 
-            $this->pageContent, 
-            $treeType, 
-            $treeID, 
-            ((isset($GLOBALS["SL"]->coreID)) 
-                ? $GLOBALS["SL"]->coreID : 0)
-        );
+        $cid = ((isset($GLOBALS["SL"]->coreID)) ? $GLOBALS["SL"]->coreID : 0);
+        $cache->putCache($this->cacheKey, $this->pageContent, $treeType, $treeID, $cid);
         return true;
     }
     

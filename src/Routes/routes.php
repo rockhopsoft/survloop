@@ -19,6 +19,8 @@
 |
 */
 
+$GLOBALS["SL-Micro"] = new SurvLoop\Controllers\Globals\GlobalsMicroTime;
+
 Route::group(['middleware' => ['web']], function () {
 
     $path = 'SurvLoop\\Controllers\\';

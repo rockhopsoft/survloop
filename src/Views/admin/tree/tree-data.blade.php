@@ -22,7 +22,8 @@
 <p>
 <i>Loop</i>: The group of records which the end user may provide between <i>Min</i> and <i>Max</i> records 
 in the <i>Table</i>. This data loop plays out for the end user within its family's <i>Root Node</i>. 
-New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1">Tree Map</a>.
+New loops can be added by editing any node in the 
+<a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/map?all=1">Tree Map</a>.
 </p>
 <table class="table table-striped">
     <tr>
@@ -34,30 +35,34 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
 @forelse ($GLOBALS['SL']->dataLoops as $loopPlural => $loopRow)
     <tr>
         <td class="taC">
-        @if (intVal($loopRow->DataLoopRoot) > 0)
-            <a href="#n{{ $loopRow->DataLoopRoot }}">{{ $loopRow->DataLoopRoot }}</a>
+        @if (intVal($loopRow->data_loop_root) > 0)
+            <a href="#n{{ $loopRow->data_loop_root }}">{{ $loopRow->data_loop_root }}</a>
         @endif
         </td>
-        <td><a href="#n{{ $loopRow->DataLoopRoot }}">{{ $loopRow->DataLoopPlural }}</a> 
-            <small class="f12 slGrey">({{ $loopRow->DataLoopSingular }})</small></td>
-        <td><a href="/dashboard/db/table/{{ $loopRow->DataLoopTable }}" target="_blank">
+        <td><a href="#n{{ $loopRow->data_loop_root }}">{{ $loopRow->data_loop_plural }}</a> 
+            <small class="f12 slGrey">({{ $loopRow->data_loop_singular }})</small></td>
+        <td><a href="/dashboard/db/table/{{ $loopRow->data_loop_table }}" target="_blank">
         @if (sizeof($loopRow->conds) > 0) 
-            {!! view('vendor.survloop.admin.tree.node-list-conditions', [
-                "conds" => $loopRow->conds
-            ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.tree.node-list-conditions', 
+                [ "conds" => $loopRow->conds ]
+            )->render() !!}
         @else
-            {{ $loopRow->DataLoopTable }}
+            {{ $loopRow->data_loop_table }}
         @endif
         </a></td>
         <td class="slGrey">
-            @if ($loopRow->DataLoopMinLimit > 0) {{ $loopRow->DataLoopMinLimit }} @else - @endif
+            @if ($loopRow->data_loop_min_limit > 0) {{ $loopRow->data_loop_min_limit }}
+            @else -
+            @endif
         </td>
         <td class="slGrey">
-            @if ($loopRow->DataLoopMaxLimit > 0)
-                {{ $loopRow->DataLoopMaxLimit }} 
-                @if ($loopRow->DataLoopWarnLimit > 0) ({{ $loopRow->DataLoopWarnLimit }}) @endif
-            @else
-                -
+            @if ($loopRow->data_loop_max_limit > 0)
+                {{ $loopRow->data_loop_max_limit }} 
+                @if ($loopRow->data_loop_warn_limit > 0)
+                    ({{ $loopRow->data_loop_warn_limit }})
+                @endif
+            @else -
             @endif
         </td>
     </tr>
@@ -86,21 +91,23 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
     </tr>
 @forelse ($GLOBALS['SL']->dataSubsets as $link)
     <tr>
-        <td><a href="/dashboard/db/table/{{ $link->DataSubTbl }}" target="_blank"
-            >{{ $link->DataSubTbl }}</a></td>
-        @if (isset($link->DataSubTblLnk) && trim($link->DataSubTblLnk) != '')
+        <td><a href="/dashboard/db/table/{{ $link->data_sub_tbl }}" target="_blank"
+            >{{ $link->data_sub_tbl }}</a></td>
+        @if (isset($link->data_sub_tbl_lnk) && trim($link->data_sub_tbl_lnk) != '')
             <td class="taR pR20"><nobr>
-            {{ $link->DataSubTblLnk }} <i class="fa fa-long-arrow-right mR5 slBlueDark"></i>
+            {{ $link->data_sub_tbl_lnk }} <i class="fa fa-long-arrow-right mR5 slBlueDark"></i>
             </nobr></td>
         @else
             <td class="taL"><nobr>
             <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $link->DataSubSubLnk }}
             </nobr></td>
         @endif
-        <td><a href="/dashboard/db/table/{{ $link->DataSubSubTbl }}" target="_blank"
-            >{{ $link->DataSubSubTbl }}</a></td>
+        <td><a href="/dashboard/db/table/{{ $link->data_sub_sub_tbl }}" target="_blank"
+            >{{ $link->data_sub_sub_tbl }}</a></td>
         <td class="slGrey">
-            @if (isset($link->DataSubAutoGen) && intVal($link->DataSubAutoGen) == 1) Auto-Gen @else Manual @endif
+            @if (isset($link->data_sub_auto_gen) && intVal($link->data_sub_auto_gen) == 1) Auto-Gen 
+            @else Manual 
+            @endif
         </td>
         <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->DataSubID }}" 
             class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a></td>
@@ -134,9 +141,10 @@ New loops can be added by editing any node in the <a href="/dashboard/surv-{{ $G
 <h2>Data Helpers</h2>
 <p>
 <h4 class="disIn">(one-to-many)</h4>
-Some <i>Tables</i> use <i>Helper Tables</i> to store multiple checkbox responses in their <i>Value Field</i>, 
-linked to momma by their <i>Foreign Key</i>. These can also be created by editing any Node in the Tree Map with a 
-<i>checkbox response</i>. The SurvLoops above also have a one-to-many relation, so there's no need to repeat any 
+Some <i>Tables</i> use <i>Helper Tables</i> to store multiple checkbox responses 
+in their <i>Value Field</i>, linked to momma by their <i>Foreign Key</i>. These can also 
+be created by editing any Node in the Tree Map with a <i>checkbox response</i>. The 
+SurvLoops above also have a one-to-many relation, so there's no need to repeat any 
 basic core-table-to-loop-table relations.
 </p>
 <table class="table table-striped">
@@ -148,15 +156,17 @@ basic core-table-to-loop-table relations.
     </tr>
 @forelse ($GLOBALS['SL']->dataHelpers as $link)
     <tr>
-        <td><a href="/dashboard/db/table/{{ $link->DataHelpParentTable }}" target="_blank"
-            >{{ $link->DataHelpParentTable }}</a></td>
+        <td><a href="/dashboard/db/table/{{ $link->data_help_parent_table }}" target="_blank"
+            >{{ $link->data_help_parent_table }}</a></td>
         <td class="slGrey"><nobr><i class="fa fa-long-arrow-left mR5 slBlueDark"></i> 
             {{ $link->DataHelpKeyField }}</nobr></td>
-        <td><a href="/dashboard/db/table/{{ $link->DataHelpTable }}" target="_blank"
-            >{{ $link->DataHelpTable }}</a></td>
-        <td>{{ $link->DataHelpValueField }}</td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->DataHelpID }}" class="fPerc80 txtDanger"
-            ><i class="fa fa-trash-o"></i></a></td>
+        <td><a href="/dashboard/db/table/{{ $link->data_help_table }}" target="_blank"
+            >{{ $link->data_help_table }}</a></td>
+        <td>{{ $link->data_help_value_field }}</td>
+        <td class="taC">
+            <a href="?refresh=1&all=1&dataStruct=1&delHelper={{ $link->data_help_id }}" 
+                class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a>
+        </td>
     </tr>
 @empty
     <tr><td colspan="4" ><i>none</i></td></tr>
@@ -174,7 +184,8 @@ basic core-table-to-loop-table relations.
             {!! $GLOBALS['SL']->fieldsDropdown('', 0) !!}
             </select>
         </td>
-        <td><a href="javascript:;" class="btn btn-primary" onClick="document.addNewHelper.submit();"
+        <td><a href="javascript:;" class="btn btn-primary" 
+            onClick="document.addNewHelper.submit();"
             ><i class="fa fa-plus"></i></a></td>
     </tr>
     </form>
@@ -185,10 +196,11 @@ basic core-table-to-loop-table relations.
 <h2>Data Linkages</h2>
 <p>
 <h4 class="disIn">(many-to-many)</h4>
-Which other linkage tables should automatically pull related records while this tree is being used? 
+Which other linkage tables should automatically 
+pull related records while this tree is being used? 
 </p><p>
-Whereas the above data structures define the working data hierarchy, these linkages are between tables which don't 
-require a hierarchical relationship. 
+Whereas the above data structures define the working data hierarchy, 
+these linkages are between tables which don't require a hierarchical relationship. 
 </p>
 <table class="table table-striped">
     <tr>
@@ -200,13 +212,25 @@ require a hierarchical relationship.
     </tr>
 @forelse ($GLOBALS['SL']->dataLinksOn as $tblID => $linkMap)
     <tr>
-        <td><a href="/dashboard/db/table/{{ $linkMap[0] }}" target="_blank">{{ $linkMap[0] }}</a></td>
-        <td class="taL slGrey"><i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $linkMap[1] }}</td>
-        <td class="taC"><a href="/dashboard/db/table/{{ $linkMap[2] }}" target="_blank">{{ $linkMap[2] }}</a></td>
-        <td class="taR slGrey">{{ $linkMap[3] }} <i class="fa fa-long-arrow-right mL5 slBlueDark"></i></td>
-        <td><a href="/dashboard/db/table/{{ $linkMap[4] }}" target="_blank">{{ $linkMap[4] }}</a></td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delLinkage={{ $tblID }}" class="fPerc80 txtDanger"
-            ><i class="fa fa-trash-o"></i></a></td>
+        <td>
+            <a href="/dashboard/db/table/{{ $linkMap[0] }}" target="_blank">{{ $linkMap[0] }}</a>
+        </td>
+        <td class="taL slGrey">
+            <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $linkMap[1] }}
+        </td>
+        <td class="taC">
+            <a href="/dashboard/db/table/{{ $linkMap[2] }}" target="_blank">{{ $linkMap[2] }}</a>
+        </td>
+        <td class="taR slGrey">
+            {{ $linkMap[3] }} <i class="fa fa-long-arrow-right mL5 slBlueDark"></i>
+        </td>
+        <td>
+            <a href="/dashboard/db/table/{{ $linkMap[4] }}" target="_blank">{{ $linkMap[4] }}</a>
+        </td>
+        <td class="taC">
+            <a href="?refresh=1&all=1&dataStruct=1&delLinkage={{ $tblID }}" 
+                class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a>
+        </td>
     </tr>
 @empty
     <tr><td colspan="6" ><i>none</i></td></tr>
@@ -218,7 +242,7 @@ require a hierarchical relationship.
             <select name="newLinkage" class="form-control">
             <option value="" SELECTED ></option>
             @forelse ($GLOBALS['SL']->getLinkingTables() as $tbl)
-                <option value="{{ $tbl->TblID }}">{{ $tbl->TblName }}</option>
+                <option value="{{ $tbl->tbl_id }}">{{ $tbl->tbl_name }}</option>
             @empty
             @endforelse
             </select>

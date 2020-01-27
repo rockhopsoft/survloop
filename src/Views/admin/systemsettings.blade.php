@@ -15,7 +15,13 @@
 
         <h1>System Settings</h1>
         @forelse ($settingsList as $opt => $val)
-            {!! view('vendor.survloop.admin.system-one-setting', [ "opt" => $opt, "val" => $val ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-setting', 
+                [
+                    "opt" => $opt, 
+                    "val" => $val 
+                ]
+            )->render() !!}
         @empty
         @endforelse
         
@@ -24,10 +30,12 @@
             @foreach ($rawSettings as $i => $s)
                 <h4 class="m0">{{ $s->setting }}</h4>
                 <label class="mL20">
-                    <input type="radio" name="setting{{ $i }}" value="Y" @if ($s->val == 'Y') CHECKED @endif > Yes
+                    <input type="radio" name="setting{{ $i }}" value="Y" 
+                        @if ($s->val == 'Y') CHECKED @endif > Yes
                 </label>
                 <label class="mL20">
-                    <input type="radio" name="setting{{ $i }}" value="N" @if ($s->val == 'N') CHECKED @endif > No
+                    <input type="radio" name="setting{{ $i }}" value="N" 
+                        @if ($s->val == 'N') CHECKED @endif > No
                 </label>
             @endforeach
         @endif
@@ -39,19 +47,27 @@
 
         <h1>System Styles</h1>
         @forelse ($stylesList as $opt => $val)
-            {!! view('vendor.survloop.admin.system-one-style', [ 
-                "opt" => $opt, "val" => $val, "sysStyles" => $sysStyles ])->render() !!}
+            {!! view(
+                'vendor.survloop.admin.system-one-style', 
+                [ 
+                    "opt" => $opt, 
+                    "val" => $val, 
+                    "sysStyles" => $sysStyles
+                ]
+            )->render() !!}
         @empty
         @endforelse
         <div class="mB20"><label class="w100">
             <h2>Open-Ended Custom CSS:</h2>
             <textarea name="sys-cust-css" class="form-control" autocomplete="off"
-                style="height: 400px; font-family: Courier New;">{!! $custCSS->DefDescription !!}</textarea>
+                style="height: 400px; font-family: Courier New;"
+                >{!! $custCSS->def_description !!}</textarea>
         </label></div>
         <div class="mB20"><label class="w100">
             <h4>Open-Ended Custom CSS for Emails:</h4>
             <textarea name="sys-cust-css-email" class="form-control" autocomplete="off" 
-                style="height: 200px; font-family: Courier New;">{!! $custCSSemail->DefDescription !!}</textarea>
+                style="height: 200px; font-family: Courier New;"
+                >{!! $custCSSemail->def_description !!}</textarea>
         </label></div>
     </div>
 </div>

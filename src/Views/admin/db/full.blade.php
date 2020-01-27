@@ -5,13 +5,15 @@
 <div class="row">
     <div class="col-9">
         <h1><span class="slBlueDark"><i class="fa fa-database"></i> 
-            {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Full Database Design</h1>
-        <nobr><span class="fPerc133">{!! strip_tags($dbStats) !!}</span></nobr>
+            {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Full Database Design</h1>
+        <nobr>{!! strip_tags($dbStats) !!}</nobr>
 @if (!$isPrint)
         <a href="/dashboard/db/addTable" class="btn btn-sm btn-secondary mL10 mTn5"><i class="fa fa-plus"
             ></i> Add a New Table</a>
-        <a href="/dashboard/db/bus-rules" target="_blank" class="btn btn-sm btn-secondary mL10 mTn5">Business Rules</a>
-        <a href="/dashboard/db/field-matrix" target="_blank" class="btn btn-sm btn-secondary mL10 mTn5">Field Matrix</a>
+        <a href="/dashboard/db/bus-rules" target="_blank" 
+            class="btn btn-sm btn-secondary mL10 mTn5">Business Rules</a>
+        <a href="/dashboard/db/field-matrix" target="_blank" 
+            class="btn btn-sm btn-secondary mL10 mTn5">Field Matrix</a>
 @endif
     </div>
 @if (!$isPrint)
@@ -23,8 +25,9 @@
             @if ($isAll) href="/dashboard/db/all?all=1" @else href="/dashboard/db/all" @endif
             ><i class="fa fa-link mR5"></i> Show More Than Just Foreign Keys
         @else
-            @if ($isAll) href="/dashboard/db/all?all=1&onlyKeys=1" @else href="/dashboard/db/all?onlyKeys=1" @endif
-            ><i class="fa fa-link mR5"></i> Show Only Foreign Keys
+            @if ($isAll) href="/dashboard/db/all?all=1&onlyKeys=1" 
+            @else href="/dashboard/db/all?onlyKeys=1" 
+            @endif ><i class="fa fa-link mR5"></i> Show Only Foreign Keys
         @endif
     </a>
     <a class="btn btn-sm btn-info m5" 
@@ -57,8 +60,9 @@
     
 @if (!$isPrint)
 
-    <br /><br /><a href="javascript:;" onClick="document.getElementById('genericFlds').style.display='block'; this.style.display='none';" 
-    class="p20 disBlo" style="border: 1px #0b0b85 solid; -moz-border-radius: 15px; border-radius: 15px;"><b>Show Generic Fields</b></a>
+    <br /><br /><a href="javascript:;" class="p20 disBlo" 
+    onClick="document.getElementById('genericFlds').style.display='block'; this.style.display='none';" 
+    style="border: 1px #0b0b85 solid; -moz-border-radius: 15px; border-radius: 15px;"><b>Show Generic Fields</b></a>
     <br /><br /><div id="genericFlds" class="disNon"><table border=0 cellpadding=5 cellspacing=0 >
     <tr><td colspan=7 class="p5 pL20 row2 slGrey"><i>Generic Fields...</i></td></tr>
     <tr>

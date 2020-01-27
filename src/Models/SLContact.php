@@ -5,15 +5,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLContact extends Model
 {
-    protected $table         = 'SL_Contact';
-    protected $primaryKey     = 'ContID';
+    protected $table         = 'sl_contact';
+    protected $primaryKey     = 'cont_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'ContType', 
-        'ContFlag', 
-        'ContEmail', 
-        'ContSubject', 
-        'ContBody', 
+        'cont_type', 
+        'cont_flag', 
+        'cont_email', 
+        'cont_subject', 
+        'cont_body', 
     ];
 }

@@ -81,20 +81,20 @@ class User extends Model implements AuthenticatableContract,
     public function loadRoles()
     {
         if (empty($this->roles)) {
-            $this->roles = SLDefinitions::select('DefID', 'DefSubset', 'DefValue')
-                ->where('DefDatabase', 1)
-                ->where('DefSet', 'User Roles')
-                ->orderBy('DefOrder')
+            $this->roles = SLDefinitions::select('def_id', 'def_subset', 'def_value')
+                ->where('def_database', 1)
+                ->where('def_set', 'User Roles')
+                ->orderBy('def_order')
                 ->get();
-            $chk = DB::table('SL_UsersRoles')
-                ->join('SL_Definitions', 'SL_UsersRoles.RoleUserRID', '=', 'SL_Definitions.DefID')
-                ->where('SL_UsersRoles.RoleUserUID', $this->id)
-                ->where('SL_Definitions.DefSet', 'User Roles')
-                ->select('SL_Definitions.DefSubset')
+            $chk = DB::table('sl_users_roles')
+                ->join('sl_definitions', 'sl_users_roles.role_user_rid', '=', 'sl_definitions.def_id')
+                ->where('sl_users_roles.role_user_uid', $this->id)
+                ->where('sl_definitions.def_set', 'User Roles')
+                ->select('sl_definitions.def_subset')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $role) {
-                    $this->SLRoles[] = $role->DefSubset;
+                    $this->SLRoles[] = $role->def_subset;
                 }
             } else {
                 $this->SLRoles[] = 'NO-ROLES';
@@ -122,20 +122,20 @@ class User extends Model implements AuthenticatableContract,
     public function assignRole($role)
     {
         $this->loadRoles();
-        $roleDef = SLDefinitions::select('DefID')
-            ->where('DefDatabase', 1)
-            ->where('DefSet', 'User Roles')
-            ->where('DefSubset', $role)
-            ->orderBy('DefOrder')
+        $roleDef = SLDefinitions::select('def_id')
+            ->where('def_database', 1)
+            ->where('def_set', 'User Roles')
+            ->where('def_subset', $role)
+            ->orderBy('def_order')
             ->first();
-        $chk = SLUsersRoles::select('RoleUserID')
-            ->where('RoleUserRID', '=', $roleDef->DefID)
-            ->where('RoleUserUID', '=', $this->id)
+        $chk = SLUsersRoles::select('role_user_id')
+            ->where('role_user_rid', '=', $roleDef->def_id)
+            ->where('role_user_uid', '=', $this->id)
             ->get();
         if ($chk->isEmpty()) {
             $newRole = new SLUsersRoles;
-            $newRole->RoleUserRID = $roleDef->DefID;
-            $newRole->RoleUserUID = $this->id;
+            $newRole->role_user_rid = $roleDef->def_id;
+            $newRole->role_user_uid = $this->id;
             $newRole->save();
             $this->SLRoles[] = $role;
         }
@@ -145,14 +145,14 @@ class User extends Model implements AuthenticatableContract,
     public function revokeRole($role)
     {
         $this->loadRoles();
-        $roleDef = SLDefinitions::select('DefID')
-            ->where('DefDatabase', 1)
-            ->where('DefSet', 'User Roles')
-            ->where('DefSubset', $role)
-            ->orderBy('DefOrder')
+        $roleDef = SLDefinitions::select('def_id')
+            ->where('def_database', 1)
+            ->where('def_set', 'User Roles')
+            ->where('def_subset', $role)
+            ->orderBy('def_order')
             ->first();
-        $chk = SLUsersRoles::where('RoleUserRID', '=', $roleDef->DefID)
-            ->where('RoleUserUID', '=', $this->id)
+        $chk = SLUsersRoles::where('role_user_rid', '=', $roleDef->def_id)
+            ->where('role_user_uid', '=', $this->id)
             ->delete();
         if (sizeof($this->SLRoles) > 0) {
             $roles = $this->SLRoles;
@@ -170,8 +170,8 @@ class User extends Model implements AuthenticatableContract,
     {
         $this->loadRoles();
         foreach ($this->roles as $role) {
-            if ($this->hasRole($role->DefSubset)) {
-                return $role->DefSubset;
+            if ($this->hasRole($role->def_subset)) {
+                return $role->def_subset;
             }
         }
         return '';
@@ -182,8 +182,8 @@ class User extends Model implements AuthenticatableContract,
         $this->loadRoles();
         $retVal = '';
         foreach ($this->roles as $role) { 
-            if ($this->hasRole($role->DefSubset)) {
-                $retVal .= ', ' . ucfirst($role->DefSubset);
+            if ($this->hasRole($role->def_subset)) {
+                $retVal .= ', ' . ucfirst($role->def_subset);
             }
         }
         if ($retVal != '') {
@@ -194,11 +194,11 @@ class User extends Model implements AuthenticatableContract,
     
     public function hasVerifiedEmail()
     {
-        $chk = SLUsersRoles::select('RoleUserID')
-            ->where('RoleUserRID', '=', -37)
-            ->where('RoleUserUID', '=', $this->id)
+        $chk = SLUsersRoles::select('role_user_id')
+            ->where('role_user_rid', '=', -37)
+            ->where('role_user_uid', '=', $this->id)
             ->first();
-        return ($chk && isset($chk->RoleUserID));
+        return ($chk && isset($chk->role_user_id));
     }
     
 }

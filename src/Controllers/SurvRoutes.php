@@ -42,8 +42,8 @@ class SurvRoutes extends Controller
     {
         $expires = $this->getSysExpire($size);
         $metaType = $this->getContentType($type);
-        $response = Response::make(file_get_contents(
-            '../storage/app/sys/sys' . $which . $size . '.' . $type));
+        $file = '../storage/app/sys/sys' . $which . $size . '.' . $type;
+        $response = Response::make(file_get_contents($file));
         $response->header('Content-Type', $metaType);
         $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         $response->header('Expires', gmdate('r', time()+$expires));
@@ -63,8 +63,8 @@ class SurvRoutes extends Controller
     public function getSysTreeJs(Request $request, $treeID = 1)
     {
         $expires = $this->getSysExpire(); // expires daily
-        $response = Response::make(file_get_contents(
-            '../storage/app/sys/tree-' . $treeID . '.js'));
+        $file = '../storage/app/sys/tree-' . $treeID . '.js';
+        $response = Response::make(file_get_contents($file));
         $response->header('Content-Type', 'application/javascript');
         $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         $response->header('Expires', gmdate('r', time()+$expires));
@@ -92,8 +92,8 @@ class SurvRoutes extends Controller
         if ($response === null) {
             $response = Response::make('/* */');
         }
-        $response->header('Content-Type', (($type == 'css') ? 'text/css'
-            : 'application/javascript'));
+        $memeType = (($type == 'css') ? 'text/css' : 'application/javascript');
+        $response->header('Content-Type', $memeType);
         //$response->header('Cache-Control', 'public, max-age="' . $expires . '"');
         //$response->header('Expires', gmdate('r', time()+$expires));
         return $response;
@@ -103,8 +103,8 @@ class SurvRoutes extends Controller
     {
         $expires = $this->getSysExpire(); // expires daily
         if (file_exists('../storage/app/gen-kml/' . $kmlfile . '.kml')) {
-            $response = Response::make(file_get_contents(
-                '../storage/app/gen-kml/' . $kmlfile . '.kml'));
+            $file = '../storage/app/gen-kml/' . $kmlfile . '.kml';
+            $response = Response::make(file_get_contents($file));
             $response->header('Content-Type', 'text/xml');
             $response->header('Cache-Control', 'public, max-age="' . $expires . '"');
             $response->header('Expires', gmdate('r', time()+$expires));
@@ -116,7 +116,8 @@ class SurvRoutes extends Controller
     public function getLibFile($loc = '', $type = 'js')
     {
         $metaType = $this->getContentType($type);
-        $response = Response::make(file_get_contents('../vendor/' . $loc . '.' . $type));
+        $file = '../vendor/' . $loc . '.' . $type;
+        $response = Response::make(file_get_contents($file));
         $response->header('Content-Type', $metaType);
         return $response;
     }
@@ -128,10 +129,11 @@ class SurvRoutes extends Controller
     
     public function getJqueryUi(Request $request, $type = 'js')
     {
+        $path = 'components/jqueryui/';
         if ($type == 'js') {
-            return $this->getLibFile('components/jqueryui/jquery-ui.min', $type);
+            return $this->getLibFile($path . 'jquery-ui.min', $type);
         }
-        return $this->getLibFile('components/jqueryui/themes/base/jquery-ui.min', 'css');
+        return $this->getLibFile($path . 'themes/base/jquery-ui.min', 'css');
     }
     
     public function catchJqueryUiMappingError(Request $request, $file = '')
@@ -151,7 +153,8 @@ class SurvRoutes extends Controller
     
     public function getFont(Request $request, $file = '')
     {
-        $response = Response::make(file_get_contents('../vendor/forkawesome/fork-awesome/fonts/' . $file));
+        $filename = '../vendor/forkawesome/fork-awesome/fonts/' . $file;
+        $response = Response::make(file_get_contents($filename));
         //$response->header('Content-Type', 'text/css');
         return $response;
     }

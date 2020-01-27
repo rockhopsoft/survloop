@@ -5,15 +5,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLDataHelpers extends Model
 {
-    protected $table         = 'SL_DataHelpers';
-    protected $primaryKey     = 'DataHelpID';
+    protected $table         = 'sl_data_helpers';
+    protected $primaryKey     = 'data_help_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'DataHelpTree', 
-        'DataHelpParentTable', 
-        'DataHelpTable', 
-        'DataHelpKeyField', 
-        'DataHelpValueField', 
+        'data_help_tree', 
+        'data_help_parent_table', 
+        'data_help_table', 
+        'data_help_key_field', 
+        'data_help_value_field', 
     ];
 }

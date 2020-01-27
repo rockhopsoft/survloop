@@ -23,12 +23,12 @@
                     onChange="window.location='?emaTemplate='+this.value;">
                 <option value="">Select email template...</option>
                 @forelse ($emailList as $i => $template)
-                    <option value="{{ $template->EmailID }}" 
+                    <option value="{{ $template->email_id }}" 
                         @if ($GLOBALS["SL"]->REQ->has('emaTemplate') 
-                            && intVal($GLOBALS["SL"]->REQ->get('emaTemplate')) == $template->EmailID)
+                            && intVal($GLOBALS["SL"]->REQ->get('emaTemplate')) == $template->email_id)
                             SELECTED
                         @endif
-                        >{{ $template->EmailName }}, "{{ $template->EmailSubject }}"</option>
+                        >{{ $template->email_name }}, "{{ $template->email_subject }}"</option>
                 @empty
                 @endforelse
                 </select>
@@ -42,10 +42,10 @@
             </div>
             <div class="col-6">
                 <input name="ema{{ $type }}" id="ema{{ $type }}ID" 
-                type="text" class="form-control form-control-lg" autocomplete=off
-                @if ($GLOBALS["SL"]->REQ->has('ema' . $type))
-                    value="{{ trim($GLOBALS["SL"]->REQ->get('ema' . $type)) }}"
-                @endif >
+                    type="text" class="form-control form-control-lg" autocomplete=off
+                    @if ($GLOBALS["SL"]->REQ->has('ema' . $type))
+                        value="{{ trim($GLOBALS["SL"]->REQ->get('ema' . $type)) }}"
+                    @endif >
             </div>
             <div class="col-3">
                 <select name="ema{{ $type }}User"
@@ -53,8 +53,9 @@
                     onChange="document.getElementById('ema{{ $type }}ID').value=this.value;">
                 <option value="">Select user's email address...</option>
                 @forelse ($userList as $i => $user)
-                    <option value="{{ $user->email }}" 
-                        >{{ $user->name }}, {{ $user->email }}</option>
+                    <option value="{{ $user->email }}">
+                        {{ $user->name }}, {{ $user->email }}
+                    </option>
                 @empty
                 @endforelse
                 </select>

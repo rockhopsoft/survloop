@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLZips extends Model
 {
-    protected $table      = 'SL_Zips';
-    protected $primaryKey = 'ZipID';
+    protected $table      = 'sl_zips';
+    protected $primaryKey = 'zip_id';
     public $timestamps    = true;
     protected $fillable   = 
     [    
-		'ZipZip', 
-		'ZipLat', 
-		'ZipLong', 
-		'ZipCity', 
-		'ZipState', 
-		'ZipCounty', 
+		'zip_zip', 
+		'zip_lat', 
+		'zip_long', 
+		'zip_city', 
+		'zip_state', 
+		'zip_county', 
     ];
 }

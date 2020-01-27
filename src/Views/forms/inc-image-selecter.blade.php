@@ -10,13 +10,15 @@
                 @foreach ($imgs as $i => $img)
                     @if ($i%6 == 0 && $i > 0) </div><div class="row mB10"> @endif
                     <div class="col-2">
-                        <a id="selectImg{{ $nID }}sel{{ $img->ImgID }}" class="openImgDetail wrdBrkAll" 
-                            href="javascript:;" ><div class="prevImg brdFnt"><img src="{{ $img->ImgFullFilename }}" 
-                                alt="{{ ((isset($img->ImgTitle)) ? $img->ImgTitle : '') }}" class="brd"></div>
-                            @if (isset($img->ImgTitle) && trim($img->ImgTitle) != '') {{ $img->ImgTitle }}
-                            @elseif (strrpos($img->ImgFileLoc, '/') !== false) 
-                                {{ str_replace('_', ' ', substr($img->ImgFileLoc, strrpos($img->ImgFileLoc, '/')+1)) }}
-                            @else {{ str_replace('_', ' ', $img->ImgFileLoc) }} @endif
+                        <a id="selectImg{{ $nID }}sel{{ $img->img_id }}" class="openImgDetail wrdBrkAll" 
+                            href="javascript:;" ><div class="prevImg brdFnt"><img src="{{ $img->img_full_filename }}" 
+                                alt="{{ ((isset($img->img_title)) ? $img->img_title : '') }}" class="brd"></div>
+                            @if (isset($img->img_title) && trim($img->img_title) != '') {{ $img->img_title }}
+                            @elseif (strrpos($img->img_file_loc, '/') !== false) 
+                                {{ str_replace('_', ' ', 
+                                    substr($img->img_file_loc, strrpos($img->img_file_loc, '/')+1)
+                                ) }}
+                            @else {{ str_replace('_', ' ', $img->img_file_loc) }} @endif
                         </a>
                     </div>
                 @endforeach 
@@ -29,11 +31,12 @@
     </div>
     <div class="col-md-4 h100 row2" style="margin: -15px 0px -15px 0px; padding: 15px;">
     
-        <a name="imgFile{{ $nID }}anc"></a>
+        <div class="nodeAnchor"><a name="imgFile{{ $nID }}anc"></a></div>
         <div class="slCard nodeWrap">
-            <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" class="btn btn-lg btn-secondary btn-block hidivBtnSelf 
-                @if (isset($presel) && trim($presel) != '') disBlo @else disNon @endif " style="margin: -10px 0px 20px 0px;"
-                >Upload New Image</a>
+            <a id="hidivBtnImgUp{{ $nID }}" href="javascript:;" 
+                class="btn btn-lg btn-secondary btn-block hidivBtnSelf 
+                @if (isset($presel) && trim($presel) != '') disBlo @else disNon @endif " 
+                style="margin: -10px 0px 20px 0px;">Upload New Image</a>
             <div id="hidivImgUp{{ $nID }}" 
                 class=" @if (isset($presel) && trim($presel) != '') disNon @else disBlo @endif ">
                 <form id="formUpImg{{ $nID }}ID" name="formUpImg{{ $nID }}" method="post" 

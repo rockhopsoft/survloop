@@ -24,22 +24,36 @@ class SurvLoopInstaller extends Controller
     {
         $chkSysDef = new SystemDefinitions;
         $chkSysDef->checkDefInstalls();
-        foreach ([ Globals::TREEOPT_HOMEPAGE, Globals::TREEOPT_SEARCH ] as $keyOptType) {
-            $typeName = (($keyOptType == Globals::TREEOPT_HOMEPAGE) ? 'Dashboard' : 'Search');
+        $specialOpts = [ Globals::TREEOPT_HOMEPAGE, Globals::TREEOPT_SEARCH ];
+        foreach ($specialOpts as $keyOptType) {
+            $typeName = (($keyOptType == Globals::TREEOPT_HOMEPAGE) 
+                ? 'Dashboard' : 'Search');
             if (!$this->chkPagePerm($keyOptType)) {
                 $this->installPageSimpl('Home', $keyOptType);
             }
             if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_ADMIN)) {
-                $this->installPageSimpl($typeName, ($keyOptType*Globals::TREEOPT_ADMIN));
+                $this->installPageSimpl(
+                    $typeName, 
+                    ($keyOptType*Globals::TREEOPT_ADMIN)
+                );
             }
             if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_STAFF)) {
-                $this->installPageSimpl('Staff ' . $typeName, ($keyOptType*Globals::TREEOPT_STAFF));
+                $this->installPageSimpl(
+                    'Staff ' . $typeName, 
+                    ($keyOptType*Globals::TREEOPT_STAFF)
+                );
             }
             if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_PARTNER)) {
-                $this->installPageSimpl('Partner ' . $typeName, ($keyOptType*Globals::TREEOPT_PARTNER));
+                $this->installPageSimpl(
+                    'Partner ' . $typeName, 
+                    ($keyOptType*Globals::TREEOPT_PARTNER)
+                );
             }
             if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_VOLUNTEER)) {
-                $this->installPageSimpl('Volunteer ' . $typeName, ($keyOptType*Globals::TREEOPT_VOLUNTEER));
+                $this->installPageSimpl(
+                    'Volunteer ' . $typeName, 
+                    ($keyOptType*Globals::TREEOPT_VOLUNTEER)
+                );
             }
         }
         if (!$this->chkPagePerm(Globals::TREEOPT_PROFILE)) {
@@ -54,37 +68,46 @@ class SurvLoopInstaller extends Controller
         $stf = Globals::TREEOPT_STAFF;
         $prt = Globals::TREEOPT_PARTNER;
         $vol = Globals::TREEOPT_VOLUNTEER;
-        $chk = SLTree::where('TreeType', 'Page')
-            /* ->whereRaw("TreeOpts%" . $keyOptType  . " = 0")
-            ->whereRaw("TreeOpts%" . $adm  . " > 0")
-            ->whereRaw("TreeOpts%" . $stf  . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_PARTNER  . " > 0")
-            ->whereRaw("TreeOpts%" . Globals::TREEOPT_VOLUNTEER  . " > 0") */
+        $chk = SLTree::where('tree_type', 'Page')
+            /* ->whereRaw("tree_opts%" . $keyOptType  . " = 0")
+            ->whereRaw("tree_opts%" . $adm  . " > 0")
+            ->whereRaw("tree_opts%" . $stf  . " > 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_PARTNER  . " > 0")
+            ->whereRaw("tree_opts%" . Globals::TREEOPT_VOLUNTEER  . " > 0") */
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
-                if (isset($tree->TreeOpts) && $tree->TreeOpts%$keyOptType == 0) {
+                if (isset($tree->tree_opts) 
+                    && $tree->tree_opts%$keyOptType == 0) {
                     if ($perm <= 1) {
                         return true;
                     }
                     if ($perm == $adm) {
-                        if ($tree->TreeOpts%$adm == 0 && $tree->TreeOpts%$stf > 0 
-                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol > 0) {
+                        if ($tree->tree_opts%$adm == 0 
+                            && $tree->tree_opts%$stf > 0 
+                            && $tree->tree_opts%$prt > 0 
+                            && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $stf) {
-                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf == 0 
-                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol > 0) {
+                        if ($tree->tree_opts%$adm > 0 
+                            && $tree->tree_opts%$stf == 0 
+                            && $tree->tree_opts%$prt > 0 
+                            && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $prt) {
-                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf > 0 
-                            && $tree->TreeOpts%$prt == 0 && $tree->TreeOpts%$vol > 0) {
+                        if ($tree->tree_opts%$adm > 0 
+                            && $tree->tree_opts%$stf > 0 
+                            && $tree->tree_opts%$prt == 0 
+                            && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $vol) {
-                        if ($tree->TreeOpts%$adm > 0 && $tree->TreeOpts%$stf > 0 
-                            && $tree->TreeOpts%$prt > 0 && $tree->TreeOpts%$vol == 0) {
+                        if ($tree->tree_opts%$adm > 0 
+                            && $tree->tree_opts%$stf > 0 
+                            && $tree->tree_opts%$prt > 0 
+                            && $tree->tree_opts%$vol == 0) {
                             return true;
                         }
                     }
@@ -96,28 +119,30 @@ class SurvLoopInstaller extends Controller
     
     public function installPageSimpl($name = 'Home', $opts = 1, $slug = '')
     {
-        if (trim($slug) == '') $slug = $GLOBALS["SL"]->slugify($name);
+        if (trim($slug) == '') {
+            $slug = $GLOBALS["SL"]->slugify($name);
+        }
         $newTree = new SLTree;
-        $newTree->TreeType     = 'Page';
-        $newTree->TreeName     = $name;
-        $newTree->TreeSlug     = $slug;
-        $newTree->TreeDatabase = 1;
-        $newTree->TreeUser     = 0;
-        $newTree->TreeOpts     = $opts;
+        $newTree->tree_type      = 'Page';
+        $newTree->tree_name      = $name;
+        $newTree->tree_slug      = $slug;
+        $newTree->tree_database  = 1;
+        $newTree->tree_user      = 0;
+        $newTree->tree_opts      = $opts;
         $newTree->save();
         $node = new SLNode;
-        $node->NodeTree        = $newTree->TreeID;
-        $node->NodeParentID    = -3;
-        $node->NodeType        = 'Page';
-        $node->NodePromptNotes = $slug;
+        $node->node_tree         = $newTree->tree_id;
+        $node->node_parent_id    = -3;
+        $node->node_type         = 'Page';
+        $node->node_prompt_notes = $slug;
         $node->save();
-        $newTree->TreeRoot     = $node->NodeID;
+        $newTree->tree_root      = $node->node_id;
         $newTree->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $node->NodeID;
-        $n->NodeType           = 'Instructions';
-        $n->NodePromptText     = '<center><h1 style="margin-top: 50px;">Coming Soon</h1></center>';
+        $n->node_tree            = $newTree->tree_id;
+        $n->node_parent_id       = $node->node_id;
+        $n->node_type            = 'Instructions';
+        $n->node_prompt_text     = '<center><h1 style="margin-top: 50px;">Coming Soon</h1></center>';
         $n->save();
         return $newTree;
     }
@@ -125,67 +150,67 @@ class SurvLoopInstaller extends Controller
     public function installPageMyProfile()
     {
         $newTree = new SLTree;
-        $newTree->TreeType      = 'Page';
-        $newTree->TreeName      = 'My Profile';
-        $newTree->TreeSlug      = 'my-profile';
-        $newTree->TreeDatabase  = 1;
-        $newTree->TreeUser      = 1;
-        $newTree->TreeOpts      = 23;
+        $newTree->tree_type       = 'Page';
+        $newTree->tree_name       = 'My Profile';
+        $newTree->tree_slug       = 'my-profile';
+        $newTree->tree_database   = 1;
+        $newTree->tree_user       = 1;
+        $newTree->tree_opts       = 23;
         $newTree->save();
         $nPage = new SLNode;
-        $nPage->NodeTree        = $newTree->TreeID;
-        $nPage->NodeParentID    = -3;
-        $nPage->NodeType        = 'Page';
-        $nPage->NodePromptNotes = 'my-profile';
+        $nPage->node_tree         = $newTree->tree_id;
+        $nPage->node_parent_id    = -3;
+        $nPage->node_type         = 'Page';
+        $nPage->node_prompt_notes = 'my-profile';
         $nPage->save();
-        $newTree->TreeRoot      = $nPage->NodeID;
+        $newTree->tree_root       = $nPage->node_id;
         $newTree->save();
         $n = new SLNode;
-        $n->NodeTree            = $newTree->TreeID;
-        $n->NodeParentID        = $nPage->NodeID;
-        $n->NodeParentOrder     = 0;
-        $n->NodeType            = 'Member Profile Basics';
+        $n->node_tree             = $newTree->tree_id;
+        $n->node_parent_id        = $nPage->node_id;
+        $n->node_parent_order     = 0;
+        $n->node_type             = 'Member Profile Basics';
         $n->save();
         $nRow = new SLNode;
-        $nRow->NodeTree         = $newTree->TreeID;
-        $nRow->NodeParentID     = $nPage->NodeID;
-        $nRow->NodeParentOrder  = 1;
-        $nRow->NodeType         = 'Layout Row';
+        $nRow->node_tree         = $newTree->tree_id;
+        $nRow->node_parent_id     = $nPage->node_id;
+        $nRow->node_parent_order  = 1;
+        $nRow->node_type          = 'Layout Row';
         $nRow->save();
         $nColL = new SLNode;
-        $nColL->NodeTree        = $newTree->TreeID;
-        $nColL->NodeParentID    = $nRow->NodeID;
-        $nColL->NodeParentOrder = 0;
-        $nColL->NodeType        = 'Layout Column';
-        $nColL->NodeCharLimit   = 7;
+        $nColL->node_tree         = $newTree->tree_id;
+        $nColL->node_parent_id    = $nRow->node_id;
+        $nColL->node_parent_order = 0;
+        $nColL->node_type         = 'Layout Column';
+        $nColL->node_char_limit   = 7;
         $nColL->save();
         $n = new SLNode;
-        $n->NodeTree            = $newTree->TreeID;
-        $n->NodeParentID        = $nRow->NodeID;
-        $n->NodeParentOrder     = 1;
-        $n->NodeType            = 'Layout Column';
-        $n->NodeCharLimit       = 1;
+        $n->node_tree             = $newTree->tree_id;
+        $n->node_parent_id        = $nRow->node_id;
+        $n->node_parent_order     = 1;
+        $n->node_type             = 'Layout Column';
+        $n->node_char_limit       = 1;
         $n->save();
         $nColR = new SLNode;
-        $nColR->NodeTree        = $newTree->TreeID;
-        $nColR->NodeParentID    = $nRow->NodeID;
-        $nColR->NodeParentOrder = 2;
-        $nColR->NodeType        = 'Layout Column';
-        $nColR->NodeCharLimit   = 4;
+        $nColR->node_tree         = $newTree->tree_id;
+        $nColR->node_parent_id    = $nRow->node_id;
+        $nColR->node_parent_order = 2;
+        $nColR->node_type         = 'Layout Column';
+        $nColR->node_char_limit   = 4;
         $nColR->save();
         $n = new SLNode;
-        $n->NodeTree            = $newTree->TreeID;
-        $n->NodeParentID        = $nColL->NodeID;
-        $n->NodeType            = 'Search Results';
-        $n->NodePromptText      = '<h2>Your Participation</h2>';
-        $n->NodeResponseSet     = 1;
-        $n->NodeDataBranch      = 'users';
+        $n->node_tree             = $newTree->tree_id;
+        $n->node_parent_id        = $nColL->node_id;
+        $n->node_type             = 'Search Results';
+        $n->node_prompt_text      = '<h2>Your Participation</h2>';
+        $n->node_response_set     = 1;
+        $n->node_data_branch      = 'users';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree            = $newTree->TreeID;
-        $n->NodeParentID        = $nColR->NodeID;
-        $n->NodeType            = 'Incomplete Sess Check';
-        $n->NodeResponseSet     = 1;
+        $n->node_tree             = $newTree->tree_id;
+        $n->node_parent_id        = $nColR->node_id;
+        $n->node_type             = 'Incomplete Sess Check';
+        $n->node_response_set     = 1;
         $n->save();
         return $newTree;
     }
@@ -193,93 +218,93 @@ class SurvLoopInstaller extends Controller
     public function installPageContact()
     {
         $newTree = new SLTree;
-        $newTree->TreeType         = 'Page';
-        $newTree->TreeName         = 'Contact';
-        $newTree->TreeSlug         = 'contact';
-        $newTree->TreeDatabase     = 1;
-        $newTree->TreeUser         = 1;
-        $newTree->TreeOpts         = 19; // %19 indicates contact form
+        $newTree->tree_type     = 'Page';
+        $newTree->tree_name     = 'Contact';
+        $newTree->tree_slug     = 'contact';
+        $newTree->tree_database = 1;
+        $newTree->tree_user     = 1;
+        $newTree->tree_opts     = 19; // %19 indicates contact form
         $newTree->save();
         
         $nodePage = new SLNode;
-        $nodePage->NodeTree        = $newTree->TreeID;
-        $nodePage->NodeParentID    = -3;
-        $nodePage->NodeType        = 'Page';
-        $nodePage->NodePromptNotes = 'contact';
-        $nodePage->NodeOpts        = 67;
+        $nodePage->node_tree         = $newTree->tree_id;
+        $nodePage->node_parent_id    = -3;
+        $nodePage->node_type         = 'Page';
+        $nodePage->node_prompt_notes = 'contact';
+        $nodePage->node_opts         = 67;
         $nodePage->save();
-        $newTree->TreeRoot         = $nodePage->NodeID;
+        $newTree->tree_root          = $nodePage->node_id;
         $newTree->save();
         
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 0;
-        $n->NodeType           = 'Instructions';
-        $n->NodePromptText     = '<h2>Contact Us</h2>';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 0;
+        $n->node_type         = 'Instructions';
+        $n->node_prompt_text  = '<h2>Contact Us</h2>';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 1;
-        $n->NodeType           = 'Text';
-        $n->NodePromptText     = 'Your Email Address';
-        $n->NodeDataStore      = 'SLContact:ContEmail';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 1;
+        $n->node_type         = 'Text';
+        $n->node_prompt_text  = 'Your Email Address';
+        $n->node_data_store   = 'SLContact:ContEmail';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 2;
-        $n->NodeType           = 'Text';
-        $n->NodePromptText     = 'Subject Line';
-        $n->NodeDataStore      = 'SLContact:ContSubject';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 2;
+        $n->node_type         = 'Text';
+        $n->node_prompt_text  = 'Subject Line';
+        $n->node_data_store   = 'SLContact:ContSubject';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 3;
-        $n->NodeType           = 'Long Text';
-        $n->NodePromptText     = 'Your Message';
-        $n->NodePromptAfter    = '<style> #n[[nID]]FldID { height: 250px; } </style>';
-        $n->NodeDataStore      = 'SLContact:ContBody';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 3;
+        $n->node_type         = 'Long Text';
+        $n->node_prompt_text  = 'Your Message';
+        $n->node_prompt_after = '<style> #n[[nID]]FldID { height: 250px; } </style>';
+        $n->node_data_store   = 'SLContact:ContBody';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 4;
-        $n->NodeType           = 'Spambot Honey Pot';
-        $n->NodePromptText     = 'Reason For Contact';
-        $n->NodeDataStore      = 'SLContact:ContType';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 4;
+        $n->node_type         = 'Spambot Honey Pot';
+        $n->node_prompt_text  = 'Reason For Contact';
+        $n->node_data_store   = 'SLContact:ContType';
         $n->save();
         $n = new SLNode;
-        $n->NodeTree           = $newTree->TreeID;
-        $n->NodeParentID       = $nodePage->NodeID;
-        $n->NodeParentOrder    = 5;
-        $n->NodeType           = 'Big Button';
-        $n->NodeDefault        = 'Send Your Message';
-        $n->NodeDataStore      = 'document.postNode.submit();';
+        $n->node_tree         = $newTree->tree_id;
+        $n->node_parent_id    = $nodePage->node_id;
+        $n->node_parent_order = 5;
+        $n->node_type         = 'Big Button';
+        $n->node_default      = 'Send Your Message';
+        $n->node_data_store   = 'document.postNode.submit();';
         $n->save();
         
         $def = new SLDefinitions;
-        $def->DefDatabase      = 1;
-        $def->DefSet           = 'Value Ranges';
-        $def->DefSubset        = 'Contact Reasons';
-        $def->DefOrder         = 0;
-        $def->DefValue         = 'General Feedback';
+        $def->def_database = 1;
+        $def->def_set      = 'Value Ranges';
+        $def->def_subset   = 'Contact Reasons';
+        $def->def_order    = 0;
+        $def->def_value    = 'General Feedback';
         $def->save();
         $def = new SLDefinitions;
-        $def->DefDatabase      = 1;
-        $def->DefSet           = 'Value Ranges';
-        $def->DefSubset        = 'Contact Reasons';
-        $def->DefOrder         = 1;
-        $def->DefValue         = 'Website Problems';
+        $def->def_database = 1;
+        $def->def_set      = 'Value Ranges';
+        $def->def_subset   = 'Contact Reasons';
+        $def->def_order    = 1;
+        $def->def_value    = 'Website Problems';
         $def->save();
         $def = new SLDefinitions;
-        $def->DefDatabase      = 1;
-        $def->DefSet           = 'Value Ranges';
-        $def->DefSubset        = 'Contact Reasons';
-        $def->DefOrder         = 2;
-        $def->DefValue         = 'Networking Opportunities';
+        $def->def_database = 1;
+        $def->def_set      = 'Value Ranges';
+        $def->def_subset   = 'Contact Reasons';
+        $def->def_order    = 2;
+        $def->def_value    = 'Networking Opportunities';
         $def->save();
         
         return $newTree;

@@ -1,21 +1,23 @@
 <!-- resources/views/survloop/forms/formtree-feetinch.blade.php -->
 
 {!! $nodePrompt !!}
-<input type="hidden" name="n{{ $nID }}fld" id="n{{ $nID }}FldID" value="{{ $currNodeSessData }}">
+<input name="n{{ $nIDtxt }}fld" id="n{{ $nIDtxt }}FldID" 
+    type="hidden" value="{{ $currNodeSessData }}">
 <div class="nFld{{ $isOneLinerFld }}"><nobr>
-    <select name="n{{ $nID }}fldFeet" id="n{{ $nID }}fldFeetID" 
-        class="tinyDrop form-control form-control-lg @if (isset($xtraClass)) {{ $xtraClass }} @endif " 
-        onChange="return formChangeFeetInches('{{ $nID }}');" data-nid="{{ $nID }}" style="display: inline;"
-        {!! $GLOBALS["SL"]->tabInd() !!}>
+    <select name="n{{ $nIDtxt }}fldFeet" id="n{{ $nIDtxt }}fldFeetID" data-nid-txt="{{ $nIDtxt }}"
+        class="tinyDrop form-control form-control-lg formChangeFeetInches
+        @if (isset($xtraClass)) {{ $xtraClass }} @endif " 
+        style="display: inline;" {!! $GLOBALS["SL"]->tabInd() !!} >
         @for ($i=0; $i<8; $i++)
             <option value="{{ $i }}" @if ($feet == $i) SELECTED @endif >{{ $i }}</option>
         @endfor
     </select> feet,
     </nobr><nobr>
-    <select name="n{{ $nID }}fldInch" id="n{{ $nID }}fldInchID" 
-        class="tinyDrop form-control form-control-lg @if (isset($xtraClass)) {{ $xtraClass }} @endif "
-        onChange="return formChangeFeetInches('{{ $nID }}');" style="display: inline;" {!! $GLOBALS["SL"]->tabInd() !!}
-        ><option value=""></option>
+    <select name="n{{ $nIDtxt }}fldInch" id="n{{ $nIDtxt }}fldInchID" data-nid-txt="{{ $nIDtxt }}"
+        class="tinyDrop form-control form-control-lg formChangeFeetInches
+        @if (isset($xtraClass)) {{ $xtraClass }} @endif formChangeFeetInches" 
+        style="display: inline;" {!! $GLOBALS["SL"]->tabInd() !!} >
+        <option value=""></option>
         @for ($i=0; $i<13; $i++)
             <option value="{{ $i }}" @if ($inch == $i) SELECTED @endif >{{ $i }}</option>
         @endfor

@@ -11,52 +11,59 @@
     @forelse ($tbls as $tbl)
         
         @if ($isExcel)
-            {!! $basicTblDescs[$tbl->TblID] !!}
+            {!! $basicTblDescs[$tbl->tbl_id] !!}
             {!! $basicTblFlds !!}
             <tr><td></td></tr>
         @else 
-            <a name="tbl{{ $tbl->TblID }}"></a>
+            <div class="nodeAnchor"><a name="tbl{{ $tbl->tbl_id }}"></a></div>
             <div class="pT20"></div>
             <div class="card">
                 <div class="card-header">
                     
-                    <h6 class="m0 float-right taR">{{ $tbl->TblName }}<br />({{ $tbl->TblAbbr }})</h6>
-                    @if ($tbl->TblEng != 'Users')
-                        <a href="/dashboard/db/table/{{ $tbl->TblName }}"><h2 class="m0">{{ $tbl->TblEng }}</h2></a>
+                    <h6 class="m0 float-right taR">{{ $tbl->tbl_name }}<br />
+                        ({{ $tbl->tbl_abbr }})</h6>
+                    @if ($tbl->tbl_eng != 'Users')
+                        <a href="/dashboard/db/table/{{ $tbl->tbl_name }}"
+                            ><h2 class="m0">{{ $tbl->tbl_eng }}</h2></a>
                     @else
-                        <h2 class="m0">{{ $tbl->TblEng }}</h2>
+                        <h2 class="m0">{{ $tbl->tbl_eng }}</h2>
                     @endif
-                    <h5 class="mT5">{!! $tbl->TblDesc !!}</h5>
+                    <h5 class="mT5">{!! $tbl->tbl_desc !!}</h5>
                     
                 </div>
                 <div class="card-body">
                     
-                    @if ($tbl->TblNumForeignIn > 0)
-                        @if (isset($tblForeigns[$tbl->TblID]))
-                            <div class="float-right taR"><i>Incoming:</i> {!! $tblForeigns[$tbl->TblID] !!}</div>
+                    @if ($tbl->tbl_num_foreign_in > 0)
+                        @if (isset($tblForeigns[$tbl->tbl_id]))
+                            <div class="float-right taR">
+                                <i>Incoming:</i> {!! $tblForeigns[$tbl->tbl_id] !!}
+                            </div>
                         @endif
-                        <i class="fa fa-link"></i> {{ $tbl->TblNumForeignIn }} 
-                            @if ($tbl->TblNumForeignIn != 1) Tables @else Table @endif
-                            with Foreign Key{{ (($tbl->TblNumForeignIn != 1) ? 's' : '') }}
+                        <i class="fa fa-link"></i> {{ $tbl->tbl_num_foreign_in }} 
+                            @if ($tbl->tbl_num_foreign_in != 1) Tables @else Table @endif
+                            with Foreign Key{{ (($tbl->tbl_num_foreign_in != 1) ? 's' : '') }}
                     @endif
-                    @if (isset($tblRules[$tbl->TblID]))
-                        @forelse ($tblRules[$tbl->TblID] as $rule)
-                            <a href="/dashboard/db/bus-rules/edit/{{ $rule->RuleID }}" target="_blank" 
-                                class="slGrey"><i class="fa fa-university"></i> {{ $rule->RuleStatement }}</a>
+                    @if (isset($tblRules[$tbl->tbl_id]))
+                        @forelse ($tblRules[$tbl->tbl_id] as $rule)
+                            <a href="/dashboard/db/bus-rules/edit/{{ $rule->rule_id }}" 
+                                target="_blank" class="slGrey"><i class="fa fa-university"></i> 
+                                {{ $rule->RuleStatement }}</a>
                         @empty
                         @endforelse
                     @endif
                 
-                    @if ($tbl->TblEng != 'Users')
+                    @if ($tbl->tbl_eng != 'Users')
                         <div class="label label-primary">Group: {{ $group }}</div>
-                        <div class="label label-primary">Type: {{ $tbl->TblType }}</div>
-                        <div class="label label-primary">{{ $tbl->TblNumFields }} Fields Total</div>
-                        @if ($tbl->TblNumForeignKeys > 0)
-                            {{ $tbl->TblNumForeignKeys }} Outgoing 
-                            @if ($tbl->TblNumForeignKeys == 1) Key @else Keys @endif 
+                        <div class="label label-primary">Type: {{ $tbl->tbl_type }}</div>
+                        <div class="label label-primary">
+                            {{ $tbl->tbl_num_fields }} Fields Total
+                        </div>
+                        @if ($tbl->tbl_num_foreign_keys > 0)
+                            {{ $tbl->tbl_num_foreign_keys }} Outgoing 
+                            @if ($tbl->tbl_num_foreign_keys == 1) Key @else Keys @endif 
                         @endif
                     @endif
-                    {!! $basicTblFlds[$tbl->TblID] !!}
+                    {!! $basicTblFlds[$tbl->tbl_id] !!}
                 </div>
             </div>
         @endif

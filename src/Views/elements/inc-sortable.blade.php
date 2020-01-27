@@ -1,5 +1,6 @@
 <!-- resources/views/vendor/survloop/elements/inc-sortable.blade.php -->
-<ul id="sortable{{ $sortID }}" class="slSortable" @if (isset($submitURL)) data-url="{{ $submitURL }}" @endif >
+<ul id="sortable{{ $sortID }}" class="slSortable" 
+    @if (isset($submitURL)) data-url="{{ $submitURL }}" @endif >
 @forelse($sorts as $sort)
     <li id="item-{{ $sort[0] }}">
         <div class="col-11 taL"><i class="fa fa-ellipsis-v slBlueDark mR20"></i> {!! $sort[1] !!}</div>

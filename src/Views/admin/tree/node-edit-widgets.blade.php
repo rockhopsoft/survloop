@@ -4,30 +4,31 @@
         <h4 class="mT0">SurvLoop Widget Options</h4>
         <div class="row mB20">
             <div class="col-md-6">
-                <label class="nPrompt @if ($GLOBALS['SL']->treeRow->TreeType != 'Page') disNon @endif ">
+                <label class="nPrompt @if ($GLOBALS['SL']->treeRow->tree_type != 'Page') disNon @endif ">
                     <h4 class="m0 mB5">Related Tree</h4>
                     <div class="nFld"><select name="nodeSurvWidgetTree" id="nodeSurvWidgetTreeID"
                         class="form-control form-control-lg w100 switchTree" autocomplete="off" >
-                    {!! $GLOBALS["SL"]->sysTreesDrop($node->nodeRow->NodeResponseSet, 'forms', 'all') !!}
+                    {!! $GLOBALS["SL"]->sysTreesDrop($node->nodeRow->node_response_set, 'forms', 'all') !!}
                     </select></div>
                 </label>
             </div>
             <div class="col-md-6">
-                <label id="widgetRecLimitID" class="nPrompt @if (in_array($node->nodeType, [
-                    'Search Results', 'Search Featured', 'Record Previews'
-                    ])) disBlo @else disNon @endif ">
+                <label id="widgetRecLimitID" class="nPrompt 
+                    @if (in_array($node->nodeType, ['Search Results', 'Search Featured', 'Record Previews'])) 
+                        disBlo
+                    @else disNon @endif ">
                     <h4 class="m0 mB5">Record Limit</h4>
-                    <div class="nFld"><input type="number" name="nodeSurvWidgetLimit" 
-                        id="nodeSurvWidgetLimitID" class="form-control form-control-lg w100" autocomplete="off" 
-                        value="{!! intVal($node->nodeRow->NodeCharLimit) !!}" ></div>
+                    <div class="nFld"><input type="number" name="nodeSurvWidgetLimit" autocomplete="off"
+                        id="nodeSurvWidgetLimitID" class="form-control form-control-lg w100" 
+                        value="{!! intVal($node->nodeRow->node_char_limit) !!}" ></div>
                 </label>
             </div>
         </div>
         <label class="w100"><h4 class="m0 mB5">Data Filter Conditions</h4>
         <input type="text" name="nodeWidgConds" id="nodeWidgCondsID" class="form-control form-control-lg"
             @if (isset($node->extraOpts["conds"])) value="{{ $node->extraOpts["conds"] }}" @endif ></label>
-        <div id="widgetGraph" class="mT20 @if (in_array($node->nodeType, ['Plot Graph', 'Line Graph'])) 
-            disBlo @else disNon @endif ">
+        <div id="widgetGraph" class="mT20 
+            @if (in_array($node->nodeType, ['Plot Graph', 'Line Graph'])) disBlo @else disNon @endif ">
             <div class="row">
                 <div class="col-md-4">
                     <label class="nPrompt">
@@ -60,17 +61,18 @@
                     </label>
                     <label class="nPrompt mT10">
                         X-Axis Label
-                        <div class="nFld"><input type="text" name="nodeWidgGrphXlab" id="nodeWidgGrphXlabID"
-                            class="form-control form-control-lg w100" autocomplete="off"
-                            @if (isset($node->extraOpts["x-axis-lab"])) 
-                                value="{{ $node->extraOpts["x-axis-lab"] }}" @endif >
+                        <div class="nFld">
+                            <input type="text" name="nodeWidgGrphXlab" id="nodeWidgGrphXlabID"
+                                class="form-control form-control-lg w100" autocomplete="off"
+                                @if (isset($node->extraOpts["x-axis-lab"])) 
+                                    value="{{ $node->extraOpts["x-axis-lab"] }}" @endif >
                         </select></div>
                     </label>
                 </div>
             </div>
         </div>
-        <div id="widgetBarChart" class="mT20 @if (in_array($node->nodeType, ['Bar Graph'])) disBlo
-            @else disNon @endif ">
+        <div id="widgetBarChart" class="mT20 
+            @if (in_array($node->nodeType, ['Bar Graph'])) disBlo @else disNon @endif ">
             <div class="row">
                 <div class="col-md-6">
                     <label class="nPrompt">
@@ -146,8 +148,8 @@
                 </div>
             </div>
         </div>
-        <div id="widgetPieChart" class="row mT20 @if (in_array($node->nodeType, ['Pie Chart'])) disBlo
-            @else disNon @endif ">
+        <div id="widgetPieChart" class="row mT20 
+            @if (in_array($node->nodeType, ['Pie Chart'])) disBlo @else disNon @endif ">
             <div class="col-md-4">
                 <label class="nPrompt">
                     <h4 class="m0 mB5">Value</h4>
@@ -194,15 +196,15 @@
                     value="{{ $node->extraOpts["hgt"] }}" @else value="420" @endif >
             </select></div>
         </label>
-        <div id="widgetPrePost" class="row mT20 @if ($GLOBALS['SL']->treeRow->TreeType != 'Page'
+        <div id="widgetPrePost" class="row mT20 @if ($GLOBALS['SL']->treeRow->tree_type != 'Page'
             || $node->nodeType == 'Send Email') disNon @else disBlo @endif ">
             <div class="col-md-6">
                 <label class="nPrompt">
                     <h4 class="m0 mB5">Pre-Widget</h4>
                     <div class="nFld"><textarea name="nodeSurvWidgetPre" id="nodeSurvWidgetPreID" 
                         class="form-control w100" style="height: 150px; font-family: Courier New;" autocomplete="off" 
-                        >@if (isset($node->nodeRow->NodePromptText) 
-                            ){!! $node->nodeRow->NodePromptText !!}@endif</textarea></div>
+                        >@if (isset($node->nodeRow->node_prompt_text) 
+                            ){!! $node->nodeRow->node_prompt_text !!}@endif</textarea></div>
                 </label>
             </div>
             <div class="col-md-6">
@@ -210,8 +212,8 @@
                     <h4 class="m0 mB5">Post-Widget</h4>
                     <div class="nFld"><textarea name="nodeSurvWidgetPost" id="nodeSurvWidgetPostID" 
                         class="form-control w100" style="height: 150px; font-family: Courier New;" autocomplete="off" 
-                        >@if (isset($node->nodeRow->NodePromptAfter) 
-                            ){!! $node->nodeRow->NodePromptAfter !!}@endif</textarea></div>
+                        >@if (isset($node->nodeRow->node_prompt_after) 
+                            ){!! $node->nodeRow->node_prompt_after !!}@endif</textarea></div>
                 </label>
             </div>
         </div>

@@ -87,7 +87,19 @@ class GeographyLists
     
     public function getTerritoryAbbrs()
     {
-        return ['PR', 'VI', 'AE', 'MH', 'MP', 'FM', 'PW', 'GU', 'AS', 'AP', 'AA'];
+        return [
+            'PR', 
+            'VI', 
+            'AE', 
+            'MH', 
+            'MP', 
+            'FM', 
+            'PW', 
+            'GU', 
+            'AS', 
+            'AP', 
+            'AA'
+        ];
     }
     
     public function loadCanadaStates()

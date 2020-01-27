@@ -19,8 +19,9 @@
 <div class="row mB20">
     <div class="col-6">
         <nobr><input type="text" name="{{ $fldName }}Custom" id="{{ $fldName }}CustomID" 
-            class="form-control @if (isset($xtraClass)) {{ $xtraClass }} @endif disIn colorPickCustomFld" autocomplete="off"
-            @if ($isCustom) value="{!! $preSel !!}" @endif style="width: 90px;" {!! $GLOBALS["SL"]->tabInd() !!}>
+            class="form-control @if (isset($xtraClass)) {{ $xtraClass }} @endif disIn colorPickCustomFld" 
+            autocomplete="off" style="width: 90px;" {!! $GLOBALS["SL"]->tabInd() !!}
+            @if ($isCustom) value="{!! $preSel !!}" @endif >
         <a href="javascript:;" id="{{ $fldName }}SetCustomColor" 
             class="colorPickCustomBtn btn btn-sm btn-secondary">Set</a></nobr>
     </div>

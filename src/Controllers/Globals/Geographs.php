@@ -33,7 +33,7 @@ class Geographs extends GeographyLookups
         if (trim($addy) == '') {
             return [ 0, 0 ];
         }
-        $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
+        $chk = SLAddyGeo::where('ady_geo_address', $addy)
             ->first();
         if (!$chk || !isset($chk->AdyGeoLat) || !isset($chk->AdyGeoLong)) {
             // || $GLOBALS["SL"]->REQ->has('refresh')
@@ -43,21 +43,26 @@ class Geographs extends GeographyLookups
                     . urlencode($addy) . '&key=' . $GLOBALS["SL"]->sysOpts["google-cod-key"];
                     // '&sensor=true'
                 $json = json_decode(file_get_contents($jsonFile),TRUE);
-                if (sizeof($json) > 0 && isset($json["results"]) && sizeof($json["results"]) > 0 
+                if (sizeof($json) > 0 
+                    && isset($json["results"]) 
+                    && sizeof($json["results"]) > 0 
                     && isset($json["results"][0]["geometry"]) 
                     && isset($json["results"][0]["geometry"]["location"])) {
-                    $chk = SLAddyGeo::where('AdyGeoAddress', $addy)
+                    $chk = SLAddyGeo::where('ady_geo_address', $addy)
                         ->delete();
                     $chk = new SLAddyGeo;
-                    $chk->AdyGeoAddress = $addy;
-                    $chk->AdyGeoLat     = $json["results"][0]["geometry"]["location"]["lat"];
-                    $chk->AdyGeoLong    = $json["results"][0]["geometry"]["location"]["lng"];
+                    $chk->ady_geo_address = $addy;
+                    $chk->ady_geo_lat     = $json["results"][0]["geometry"]["location"]["lat"];
+                    $chk->ady_geo_long    = $json["results"][0]["geometry"]["location"]["lng"];
                     $chk->save();
                 }
             }
         }
-        if ($chk && isset($chk->AdyGeoLat) && isset($chk->AdyGeoLong)) {
-            return [ $chk->AdyGeoLat, $chk->AdyGeoLong ];
+        if ($chk && isset($chk->ady_geo_lat) && isset($chk->ady_geo_long)) {
+            return [
+                $chk->ady_geo_lat, 
+                $chk->ady_geo_long 
+            ];
         }
         return [ 0, 0 ];
     }
@@ -68,14 +73,17 @@ class Geographs extends GeographyLookups
             return '<div style="height: 420px; padding-top: 200px;">(Map)</div>';
         }
         list($lat, $lng) = $this->getLatLng($addy);
-        return view('vendor.survloop.reports.embed-google-map-simple', [
-            "nID"     => $nID,
-            "addy"    => $addy,
-            "lat"     => $lat,
-            "lng"     => $lng,
-            "height"  => $height,
-            "maptype" => $maptype
-        ])->render();
+        return view(
+            'vendor.survloop.reports.embed-google-map-simple', 
+            [
+                "nID"     => $nID,
+                "addy"    => $addy,
+                "lat"     => $lat,
+                "lng"     => $lng,
+                "height"  => $height,
+                "maptype" => $maptype
+            ]
+        )->render();
     }
     
     public function embedMap($nID = 0, $filename = '', $docName = '', $docDesc = '')
@@ -93,16 +101,22 @@ class Geographs extends GeographyLookups
                     }
                 }
             }
-            $GLOBALS["SL"]->pageJAVA .= view('vendor.survloop.reports.embed-google-map-js', [
-                "nID"       => $nID,
-                "filename"  => $filename,
-                "descAjax"  => $descAjax,
-                "mapCenter" => $this->mapCenter
-            ])->render();
-            return view('vendor.survloop.reports.embed-google-map', [
-                "nID"       => $nID,
-                "docDesc"   => $docDesc
-            ])->render();
+            $GLOBALS["SL"]->pageJAVA .= view(
+                'vendor.survloop.reports.embed-google-map-js', 
+                [
+                    "nID"       => $nID,
+                    "filename"  => $filename,
+                    "descAjax"  => $descAjax,
+                    "mapCenter" => $this->mapCenter
+                ]
+            )->render();
+            return view(
+                'vendor.survloop.reports.embed-google-map', 
+                [
+                    "nID"     => $nID,
+                    "docDesc" => $docDesc
+                ]
+            )->render();
         }
         return '';
     }
@@ -117,7 +131,14 @@ class Geographs extends GeographyLookups
     
     public function addMapMarker($lat, $lng, $marker = '', $title = '', $desc = '', $ajaxLoad = '')
     {
-        $this->mapMarkers[] = [$lat, $lng, $marker, $title, $desc, $ajaxLoad];
+        $this->mapMarkers[] = [
+            $lat, 
+            $lng, 
+            $marker, 
+            $title, 
+            $desc, 
+            $ajaxLoad
+        ];
         return true;
     }
     
@@ -126,8 +147,8 @@ class Geographs extends GeographyLookups
         $this->kmlMarkTyp = '';
         if (sizeof($this->mapMarkTyp) > 0) {
             foreach ($this->mapMarkTyp as $type => $img) {
-                $this->kmlMarkTyp .= '<Style id="' . $type . '"><IconStyle><Icon><href>' . $img 
-                    . '</href></Icon></IconStyle></Style>' . "\n\t";
+                $this->kmlMarkTyp .= '<Style id="' . $type . '"><IconStyle><Icon><href>' 
+                    . $img . '</href></Icon></IconStyle></Style>' . "\n\t";
             }
         }
         return $this->kmlMarkTyp;
@@ -140,11 +161,13 @@ class Geographs extends GeographyLookups
             foreach ($this->mapMarkers as $i => $mark) {
                 if ($mark[0] != 0 && $mark[1] != 0) {
                     $this->kmlMarkers .= "\t" . '<Placemark>
-                        <name>' . $GLOBALS["SL"]->makeXMLSafe($mark[3]) . '</name>
-                        <description>' . ((trim($mark[5]) != '') ? $mark[5] : '<![CDATA[' . $mark[4] . ']]>')
-                        . '</description>' . (($mark[2] != '') ? '<styleUrl>#' . $mark[2] . '</styleUrl>'."\n" : '') . '
-                        <Point><coordinates>' . $mark[1] . ',' . $mark[0] . ',0</coordinates></Point>
-                    </Placemark>' . "\n";
+                        <name>' . $GLOBALS["SL"]->makeXMLSafe($mark[3]) 
+                        . '</name><description>' 
+                        . ((trim($mark[5]) != '') ? $mark[5] : '<![CDATA[' . $mark[4] . ']]>')
+                        . '</description>' 
+                        . (($mark[2] != '') ? '<styleUrl>#' . $mark[2] . '</styleUrl>'."\n" : '') 
+                        . '<Point><coordinates>' . $mark[1] . ',' . $mark[0] 
+                        . ',0</coordinates></Point></Placemark>' . "\n";
                 }
             }
         }

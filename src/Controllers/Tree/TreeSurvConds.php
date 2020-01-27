@@ -36,32 +36,32 @@ class TreeSurvConds extends TreeSurvAPI
         if (sizeof($conds) > 0) {
             foreach ($conds as $i => $cond) {
                 if ($retTF) {
-                    if ($cond && isset($cond->CondDatabase) 
-                        && $cond->CondOperator == 'CUSTOM') {
+                    if ($cond && isset($cond->cond_database) 
+                        && $cond->cond_operator == 'CUSTOM') {
                         if (!$this->parseCondPreInstalled($cond)) {
                             $retTF = false;
                         }
-                    } elseif ($cond->CondOperator == 'AB TEST') {
+                    } elseif ($cond->cond_operator == 'AB TEST') {
                         if (!$this->checkActiveTestAB($cond)) {
                             $retTF = false;
                         }
-                    } elseif ($cond->CondOperator == 'URL-PARAM') {
-                        if (trim($cond->CondOperDeet) == '') {
+                    } elseif ($cond->cond_operator == 'URL-PARAM') {
+                        if (trim($cond->cond_oper_deet) == '') {
                             $retTF = false;
-                        } elseif (!$GLOBALS["SL"]->REQ->has($cond->CondOperDeet) 
-                            || trim($GLOBALS["SL"]->REQ->get($cond->CondOperDeet)) 
-                                != trim($cond->condFldResponses["vals"][0][1])) {
-                            $retTF = false;
+                        } else {
+                            $val = trim($cond->condFldResponses["vals"][0][1]);
+                            if (!$GLOBALS["SL"]->REQ->has($cond->cond_oper_deet) 
+                                || trim($GLOBALS["SL"]->REQ->get($cond->cond_oper_deet)) != $val) {
+                                $retTF = false;
+                            }
                         }
-                    } elseif ($cond->CondOperator == 'COMPLEX') {
+                    } elseif ($cond->cond_operator == 'COMPLEX') {
                         $cond->loadVals();
-                        if (isset($cond->condVals) 
-                            && sizeof($cond->condVals) > 0) {
+                        if (isset($cond->condVals) && sizeof($cond->condVals) > 0) {
                             foreach ($cond->condVals as $i => $val) {
                                 if ($val > 0) {
                                     $subCond = SLConditions::find($val);
-                                    if ($subCond 
-                                        && isset($subCond->CondOperator)) {
+                                    if ($subCond && isset($subCond->cond_operator)) {
                                         if (!$this->sessData->parseCondition(
                                             $subCond, 
                                             $recObj, 
@@ -71,8 +71,7 @@ class TreeSurvConds extends TreeSurvAPI
                                     }
                                 } else { // opposite
                                     $subCond = SLConditions::find(-1*$val);
-                                    if ($subCond 
-                                        && isset($subCond->CondOperator)) {
+                                    if ($subCond && isset($subCond->cond_operator)) {
                                         if ($this->sessData->parseCondition(
                                             $subCond, 
                                             $recObj, 
@@ -83,13 +82,12 @@ class TreeSurvConds extends TreeSurvAPI
                                 }
                             }
                         }
-                    } elseif (!$this->sessData
-                        ->parseCondition($cond, $recObj, $nID)) {
+                    } elseif (!$this->sessData->parseCondition($cond, $recObj, $nID)) {
                         $retTF = false; 
                     }
                     $custom = $this->checkNodeConditionsCustom(
                         $nID, 
-                        trim($cond->CondTag)
+                        trim($cond->cond_tag)
                     );
                     if ($custom == 0) {
                         $retTF = false;
@@ -97,8 +95,9 @@ class TreeSurvConds extends TreeSurvAPI
                         $retTF = true;
                     }
                     // This is where all the condition-inversion is applied
-                    if ($nID > 0 && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
-                        && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->CondID])) {
+                    if ($nID > 0 
+                        && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
+                        && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->cond_id])) {
                         $retTF = !$retTF;
                     }
                 }
@@ -110,119 +109,127 @@ class TreeSurvConds extends TreeSurvAPI
     public function parseCondPreInstalled($cond = NULL)
     {
         $retTF = true;
-        if ($cond && isset($cond->CondTag)) {
-            if (trim($cond->CondTag) == '#NodeDisabled') {
+        if ($cond && isset($cond->cond_tag)) {
+            if (trim($cond->cond_tag) == '#NodeDisabled') {
                 $retTF = false;
-            } elseif (trim($cond->CondTag) == '#IsLoggedIn') {
+            } elseif (trim($cond->cond_tag) == '#IsLoggedIn') {
                 if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsNotLoggedIn') {
+            } elseif (trim($cond->cond_tag) == '#IsNotLoggedIn') {
                 if (isset($this->v["uID"]) && $this->v["uID"] > 0) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsAdmin') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsAdmin') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('administrator')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsNotAdmin') {
-                if (isset($this->v["uID"]) && $this->v["uID"] > 0 
+            } elseif (trim($cond->cond_tag) == '#IsNotAdmin') {
+                if (isset($this->v["uID"]) 
+                    && $this->v["uID"] > 0 
                     && $this->v["user"]->hasRole('administrator')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsStaff') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsStaff') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('staff')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsStaffOrAdmin') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsStaffOrAdmin') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('administrator|staff')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsPartnerStaffOrAdmin') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsPartnerStaffOrAdmin') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('administrator|staff|partner')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsPartner') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsPartner') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('partner')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsVolunteer') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsVolunteer') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('volunteer')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsBrancher') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsBrancher') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["user"]->hasRole('databaser')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsOwner') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsOwner') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !$this->v["isOwner"]) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsProfileOwner') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0 
+            } elseif (trim($cond->cond_tag) == '#IsProfileOwner') {
+                if (!isset($this->v["uID"]) 
+                    || $this->v["uID"] <= 0 
                     || !isset($this->v["profileUser"]) 
                     || !isset($this->v["profileUser"]->id) 
                     || !$this->v["profileUser"]
                     || $this->v["uID"] != $this->v["profileUser"]->id) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsPrintable') {
+            } elseif (trim($cond->cond_tag) == '#IsPrintable') {
                 $types = ['pdf', 'full-pdf'];
                 if (!$GLOBALS["SL"]->REQ->has('print') 
                     && (!isset($GLOBALS["SL"]->pageView) 
-                    || !in_array($GLOBALS["SL"]->pageView, $types))) {
+                        || !in_array($GLOBALS["SL"]->pageView, $types))) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsPrintInFrame') {
+            } elseif (trim($cond->cond_tag) == '#IsPrintInFrame') {
                 if (!$GLOBALS["SL"]->REQ->has('ajax') 
                     && !$GLOBALS["SL"]->REQ->has('frame') 
                     && !$GLOBALS["SL"]->REQ->has('wdg')) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#TestLink') {
+            } elseif (trim($cond->cond_tag) == '#TestLink') {
                 if (!$GLOBALS["SL"]->REQ->has('test') 
                     && intVal($GLOBALS["SL"]->REQ->get('test')) < 1) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsDataPermPublic') {
+            } elseif (trim($cond->cond_tag) == '#IsDataPermPublic') {
                 if ($GLOBALS["SL"]->dataPerms != 'public') {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsDataPermPrivate') {
+            } elseif (trim($cond->cond_tag) == '#IsDataPermPrivate') {
                 if ($GLOBALS["SL"]->dataPerms != 'private') {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsDataPermSensitive') {
+            } elseif (trim($cond->cond_tag) == '#IsDataPermSensitive') {
                 if ($GLOBALS["SL"]->dataPerms != 'sensitive') {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#IsDataPermInternal') {
+            } elseif (trim($cond->cond_tag) == '#IsDataPermInternal') {
                 if ($GLOBALS["SL"]->dataPerms != 'internal') {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#HasTokenDialogue') {
+            } elseif (trim($cond->cond_tag) == '#HasTokenDialogue') {
                 if (!$this->pageLoadHasToken()) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#EmailVerified') {
-                if ($this->v["uID"] <= 0 
-                    || !$this->v["user"]->hasVerifiedEmail()) {
+            } elseif (trim($cond->cond_tag) == '#EmailVerified') {
+                if ($this->v["uID"] <= 0 || !$this->v["user"]->hasVerifiedEmail()) {
                     $retTF = false;
                 }
-            } elseif (trim($cond->CondTag) == '#NextButton') {
-                if (!isset($this->REQstep) 
-                    || $this->REQstep != 'next') {
+            } elseif (trim($cond->cond_tag) == '#NextButton') {
+                if (!isset($this->REQstep) || $this->REQstep != 'next') {
                     $retTF = false;
                 }
-            //} elseif (trim($cond->CondTag) == '#HasUploads') {
+            //} elseif (trim($cond->cond_tag) == '#HasUploads') {
             }
         }
         return $retTF;
@@ -234,25 +241,25 @@ class TreeSurvConds extends TreeSurvAPI
         if (isset($GLOBALS["SL"]->dataLoops) && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             $GLOBALS["SL"]->loadLoopConds();
             foreach ($GLOBALS["SL"]->dataLoops as $loopName => $loop) {
-                $this->sessData->loopItemIDs[$loop->DataLoopPlural] = $sortable = [];
-                if (isset($this->sessData->dataSets[$loop->DataLoopTable]) 
-                    && sizeof($this->sessData->dataSets[$loop->DataLoopTable]) > 0) {
-                    foreach ($this->sessData->dataSets[$loop->DataLoopTable] as $recObj) {
+                $this->sessData->loopItemIDs[$loop->data_loop_plural] = $sortable = [];
+                if (isset($this->sessData->dataSets[$loop->data_loop_table]) 
+                    && sizeof($this->sessData->dataSets[$loop->data_loop_table]) > 0) {
+                    foreach ($this->sessData->dataSets[$loop->data_loop_table] as $recObj) {
                         if ($recObj && $this->parseConditions($loop->conds, $recObj)) {
-                            $this->sessData->loopItemIDs[$loop->DataLoopPlural][] 
+                            $this->sessData->loopItemIDs[$loop->data_loop_plural][] 
                                 = $recObj->getKey();
-                            if (trim($loop->DataLoopSortFld) != '') {
+                            if (trim($loop->data_loop_sort_fld) != '') {
                                 $sortable['' . $recObj->getKey() . ''] 
-                                    = $recObj->{ $loop->DataLoopSortFld };
+                                    = $recObj->{ $loop->data_loop_sort_fld };
                             }
                         }
                     }
                 }
-                if (trim($loop->DataLoopSortFld) != '' && sizeof($sortable) > 0) {
-                    $this->sessData->loopItemIDs[$loop->DataLoopPlural] = [];
+                if (trim($loop->data_loop_sort_fld) != '' && sizeof($sortable) > 0) {
+                    $this->sessData->loopItemIDs[$loop->data_loop_plural] = [];
                     asort($sortable);
                     foreach ($sortable as $id => $ord) {
-                        $this->sessData->loopItemIDs[$loop->DataLoopPlural][] = intVal($id);
+                        $this->sessData->loopItemIDs[$loop->data_loop_plural][] = intVal($id);
                     }
                 }
             }
@@ -263,34 +270,37 @@ class TreeSurvConds extends TreeSurvAPI
     // Setting the second parameter to false alternatively returns an array of individual conditions
     public function loadRelatedArticles()
     {
-        $this->v["articles"] = $artCondIDs = [];
-        $this->v["allUrls"] = [ "txt" => [], "vid" => [] ];
+        $this->v["articles"] = $artCondIds = [];
+        $this->v["allUrls"] = [
+            "txt" => [], 
+            "vid" => [] 
+        ];
         $allArticles = SLConditionsArticles::get();
         if ($allArticles->isNotEmpty()) {
             foreach ($allArticles as $i => $a) {
-                $artCondIDs[] = $a->ArticleCondID;
+                $artCondIds[] = $a->article_cond_id;
             }
-            $allConds = SLConditions::whereIn('CondID', $artCondIDs)->get();
+            $allConds = SLConditions::whereIn('cond_id', $artCondIds)
+                ->get();
             if ($allConds->isNotEmpty()) {
                 foreach ($allConds as $i => $c) {
                     if ($this->parseConditions([$c])) {
                         $artLnks = [];
                         foreach ($allArticles as $i => $a) {
-                            if ($a->ArticleCondID == $c->CondID) {
-                                $artLnks[] = [$a->ArticleTitle, $a->ArticleURL];
-                                $set = ((strpos(strtolower($a->ArticleURL), 'youtube.com') 
-                                    !== false) ? 'vid' : 'txt');
+                            if ($a->article_cond_id == $c->cond_id) {
+                                $artLnks[] = [$a->article_title, $a->article_url];
+                                $url = strtolower($a->article_url);
+                                $set = ((strpos($url, 'youtube.com') !== false) ? 'vid' : 'txt');
                                 $found = false;
                                 if (sizeof($this->v["allUrls"][$set]) > 0) {
                                     foreach ($this->v["allUrls"][$set] as $url) {
-                                        if ($url[1] == $a->ArticleURL) {
+                                        if ($url[1] == $a->article_url) {
                                             $found = true;
                                         }
                                     }
                                 }
                                 if (!$found) {
-                                    $this->v["allUrls"][$set][] 
-                                        = [$a->ArticleTitle, $a->ArticleURL];
+                                    $this->v["allUrls"][$set][] = [$a->article_title, $a->article_url];
                                 }
                             }
                         }
@@ -317,8 +327,9 @@ class TreeSurvConds extends TreeSurvAPI
     
     public function checkActiveTestAB($cond = NULL)
     {
-        if (!$cond || !isset($cond->CondID) 
-            || !$this->sessData->testsAB->checkCond($cond->CondID)) {
+        if (!$cond 
+            || !isset($cond->cond_id) 
+            || !$this->sessData->testsAB->checkCond($cond->cond_id)) {
             return false;
         }
         return true;

@@ -15,7 +15,7 @@ function runSaveReload() {
 function chkRunSaveReload() {
     if (cntDownOver) {
         $("#nondialog").fadeIn(300);
-        $("#dialog").fadeOut(300);
+        setTimeout(function() { $("#dialog").fadeOut(300); }, 301);
         cntDownOver = false;
         return runSaveReload();
     }
@@ -290,6 +290,26 @@ $(document).on("click", ".editLoopItem", function() {
     document.getElementById("loopItemID").value=id;
     return runFormSub();
 });
+function checkAutoLoad() {
+console.log("checkAutoLoad");
+    if (pageDynaLoaded) {
+        if (addingLoopItem > 0) {
+            document.getElementById("loopItemID").value=addingLoopItem;
+console.log("checkAutoLoad - "+document.getElementById("loopItemID").value+" ?");
+            return runFormSub();
+        }
+    } else {
+        setTimeout(function() { checkAutoLoad(); }, 500);
+    }
+    return false;
+}
+setTimeout(function() { checkAutoLoad(); }, 1000);
+
+$(document).on("click", "#nFormAdd", function() {
+    if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value="-37";
+    return runFormSub();
+});
+
 var limitTog = false;
 function toggleLineEdit(upID) {
     if (!limitTog) {
@@ -337,32 +357,21 @@ $(document).on("click", "#nFormNextStepItem", function() {
     document.getElementById("stepID").value="next";
     return runFormSub();
 });
-$(document).on("click", "#nFormAdd", function() {
-    if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value="-37";
-    return runFormSub();
-});
-$(document).on("click", ".delLoopItem", function() {
-    var id = $(this).attr("id").replace("delLoopItem", "");
-    document.getElementById("delItem"+id+"").checked=true;
-    document.getElementById("wrapItem"+id+"On").style.display="none";
-    document.getElementById("wrapItem"+id+"Off").style.display="block";
-    updateCnt(-1);
-    return true;
-});
-$(document).on("click", ".unDelLoopItem", function() {
-    var id = $(this).attr("id").replace("unDelLoopItem", "");
-    document.getElementById("delItem"+id+"").checked=false;
-    document.getElementById("wrapItem"+id+"On").style.display="block";
-    document.getElementById("wrapItem"+id+"Off").style.display="none";
-    updateCnt(1);
-    return true;
-});
-function updateCnt(addCnt) {
-    currItemCnt += addCnt;
-    if (maxItemCnt <= 0 || currItemCnt < maxItemCnt) document.getElementById("nFormAdd").style.display="block";
-    else document.getElementById("nFormAdd").style.display="none";
-    return true;
+function delLoopItemPrompt(itemID, itemTitle) {
+    if (!document.getElementById("dialogBody")) {
+        return false;
+    }
+    document.getElementById("dialogBody").innerHTML='<center><h3>Are you sure you want to delete this?<div class="pT10 pB10"><i class="slBlueDark">'+itemTitle+'</i></div></h3><p>Deleting this cannot be undone.<br /><br /></p><a href="?delLoopItem='+itemID+'" class="btn btn-lg btn-danger mL20 mR20">Yes, Delete</a><a href="javascript:;" class="btn btn-lg btn-secondary mL20 mR20 dialogClose">No, Cancel</a></center>';
+    $("#nondialog").fadeOut(300);
+    setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
+    return false;
 }
+$(document).on("click", ".delLoopItem", function() {
+    var id = $(this).attr("data-item-id");
+    var label = $(this).attr("data-item-label");
+    delLoopItemPrompt(id, label);
+    return true;
+});
 
 $(document).on("click", ".upTypeBtn", function() {
     var nIDtxt = $(this).attr("name").replace("n", "").replace("fld", "");
@@ -655,6 +664,9 @@ function dateKeyUp(nIDtxt, which) {
     return true;
 }
 
+$(document).on("change", "select.formChangeFeetInches", function() {
+    return formChangeFeetInches( $(this).attr("data-nid-txt") );
+});
 function formChangeFeetInches(nIDtxt) {
     if (document.getElementById("n"+nIDtxt+"FldID")) document.getElementById("n"+nIDtxt+"FldID").value = (12*parseInt(document.getElementById("n"+nIDtxt+"fldFeetID").value))+parseInt(document.getElementById("n"+nIDtxt+"fldInchID").value);
     chkFormCheck();
@@ -703,14 +715,28 @@ $(".slNodeChange").keyup(function() { return tryCheckNodeUp($(this).attr("id"));
 $(".slNodeChange").click(function() { return tryCheckNodeUp($(this).attr("id")); });
 $("input.slNodeChange").click(function() { return tryCheckNodeUp($(this).attr("id")); });
 
-$(document).on("keyup", "input.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-$(document).on("keyup", "textarea.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-$(document).on("change", "select.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-$(document).on("click", "input.slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
+$(document).on("keyup", "input.slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
+$(document).on("keyup", "textarea.slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
+$(document).on("change", "select.slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
+$(document).on("click", "input.slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
 
-$(document).on("keyup", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-$(document).on("change", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
-$(document).on("click", ".slNodeChange", function() { return tryCheckNodeUp($(this).attr("id")); });
+$(document).on("keyup", ".slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
+$(document).on("change", ".slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
+$(document).on("click", ".slNodeChange", function() {
+    return tryCheckNodeUp($(this).attr("id"));
+});
 
 
 function formKeyUpOther(nIDtxt, j) {

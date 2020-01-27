@@ -99,16 +99,19 @@
 
 <div class="slCard nodeWrap">
     <h2 class="slBlueDark">Recent Submission Attempt History</h2>
-    Each record lists whether desktop or mobile, full estimated duration of the attempt, unique ID#, and a
-    history of the full path of this user's survey experience.
+    Each record lists whether desktop or mobile, full estimated duration of the attempt, 
+    unique ID#, and a history of the full path of this user's survey experience.
     <div class="row">
         <div class="col-6">
         @forelse ($coreTots as $i => $core)
             <div class="p15">
-                {!! view('vendor.survloop.admin.tree.tree-session-attempt-history', [
-                    "core"     => $core,
-                    "nodeTots" => $nodeTots
-                    ])->render() !!}
+                {!! view(
+                    'vendor.survloop.admin.tree.tree-session-attempt-history', 
+                    [
+                        "core"     => $core,
+                        "nodeTots" => $nodeTots
+                    ]
+                )->render() !!}
             </div>
             @if ($i == round(sizeof($coreTots)/2)) </div><div class="col-6"> @endif
         @empty

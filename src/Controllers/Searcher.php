@@ -131,14 +131,14 @@ class Searcher extends SurvCustLoop
                 }
             }
         } else {
-            $chk = SLSearchRecDump::where('SchRecDmpTreeID', $this->treeID)
-                ->whereIn('SchRecDmpRecID', $this->allPublicFiltIDs)
-                ->where('SchRecDmpRecDump', 'LIKE', '%' . $this->searchTxt . '%')
-                ->orderBy('SchRecDmpRecID', 'desc')
+            $chk = SLSearchRecDump::where('sch_rec_dmp_tree_id', $this->treeID)
+                ->whereIn('sch_rec_dmp_rec_id', $this->allPublicFiltIDs)
+                ->where('sch_rec_dmp_rec_dump', 'LIKE', '%' . $this->searchTxt . '%')
+                ->orderBy('sch_rec_dmp_rec_id', 'desc')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $rec) {
-                    $this->addSearchResult($rec->SchRecDmpRecID);
+                    $this->addSearchResult($rec->sch_rec_dmp_rec_id);
                 }
             }
         }
@@ -164,7 +164,8 @@ class Searcher extends SurvCustLoop
                 foreach ($this->searchResults as $r) {
                     if ($currMax == $r[1] && !in_array($r[0], $printed)) {
                         $printed[] = $r[0];
-                        if (!isset($this->searchOpts["limit"]) || sizeof($printed) < $this->searchOpts["limit"]) {
+                        if (!isset($this->searchOpts["limit"]) 
+                            || sizeof($printed) < $this->searchOpts["limit"]) {
                             $ret .= $r[2];
                         }
                     }
@@ -227,20 +228,31 @@ class Searcher extends SurvCustLoop
         if (!$this->checkedSearch) {
             $this->checkedSearch = true;
             $this->searchTxt = '';
-            if ($GLOBALS["SL"]->REQ->has('s') && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
+            if ($GLOBALS["SL"]->REQ->has('s') 
+                && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
                 $this->searchTxt = trim($GLOBALS["SL"]->REQ->get('s'));
             }
             $this->searchParse = $GLOBALS["SL"]->parseSearchWords($this->searchTxt);
             $this->searchFilts = $this->searchOpts = [];
-            if ($GLOBALS["SL"]->REQ->has('d') && trim($GLOBALS["SL"]->REQ->get('d')) != '') {
-                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(',', $GLOBALS["SL"]->REQ->get('d'));
+            if ($GLOBALS["SL"]->REQ->has('d') 
+                && trim($GLOBALS["SL"]->REQ->get('d')) != '') {
+                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(
+                    ',', 
+                    $GLOBALS["SL"]->REQ->get('d')
+                );
             }
-            if ($GLOBALS["SL"]->REQ->has('f') && trim($GLOBALS["SL"]->REQ->get('f')) != '') {
-                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode('__', $GLOBALS["SL"]->REQ->get('f'));
+            if ($GLOBALS["SL"]->REQ->has('f') 
+                && trim($GLOBALS["SL"]->REQ->get('f')) != '') {
+                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode(
+                    '__', 
+                    $GLOBALS["SL"]->REQ->get('f')
+                );
             }
-            if ($GLOBALS["SL"]->REQ->has('u') && intVal($GLOBALS["SL"]->REQ->get('u')) > 0) {
+            if ($GLOBALS["SL"]->REQ->has('u') 
+                && intVal($GLOBALS["SL"]->REQ->get('u')) > 0) {
                 $this->searchFilts["user"] = intVal($GLOBALS["SL"]->REQ->get('u'));
-            } elseif ($GLOBALS["SL"]->REQ->has('mine') && intVal($GLOBALS["SL"]->REQ->get('mine')) == 1) {
+            } elseif ($GLOBALS["SL"]->REQ->has('mine') 
+                && intVal($GLOBALS["SL"]->REQ->get('mine')) == 1) {
                 $this->searchFilts["user"] = $this->v["uID"];
             }
             $GLOBALS["SL"]->loadStates();
@@ -257,8 +269,8 @@ class Searcher extends SurvCustLoop
             if ($GLOBALS["SL"]->REQ->has('fltStateClim')) {
                 $stateClim = trim($GLOBALS["SL"]->REQ->get('fltStateClim'));
                 if ($stateClim != '' && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
-                    || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
-                    || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
+                        || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
+                        || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
                     $this->searchFilts["fltStateClim"] = $stateClim;
                 }
             }
@@ -321,16 +333,18 @@ class Searcher extends SurvCustLoop
         $this->getAllPublicCoreIDs();
         $this->allPublicFiltIDs = $this->allPublicCoreIDs;
         if (sizeof($this->searchFilts) > 0) {
-            if (isset($this->searchFilts["user"]) && Auth::user() && $this->searchFilts["user"] == Auth::user()->id) {
+            if (isset($this->searchFilts["user"]) && Auth::user() 
+                && $this->searchFilts["user"] == Auth::user()->id) {
                 $this->addArchivedCoreIDs();
             }
             $coreAbbr = $GLOBALS["SL"]->coreTblAbbr();
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
-                    eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::whereIn('" . $coreAbbr 
-                        . (($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) ? "Public" : "") 
-                        . "ID', \$this->allPublicFiltIDs)->where('" . $GLOBALS["SL"]->getCoreTblUserFld() . "', "
-                        . $val . ")->select('" . $coreAbbr . "ID')->get();");
+                    $coreIdFld = $GLOBALS["SL"]->coreTblIdFldOrPublicId(); /* test more */
+                    eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                        . "::whereIn('" . $coreIdFld . "', \$this->allPublicFiltIDs)->where('"
+                        . $GLOBALS["SL"]->getCoreTblUserFld() . "', " . $val . ")"
+                        . "->select('" . $coreIdFld . "')->get();");
                     $this->allPublicFiltIDs = [];
                     if ($chk->isNotEmpty()) {
                         foreach ($chk as $lnk) {
@@ -341,8 +355,11 @@ class Searcher extends SurvCustLoop
                     if (sizeof($val) > 0) {
                         foreach ($val as $v) {
                             list($fldID, $value) = explode('|', $v);
-                            $this->allPublicFiltIDs = $GLOBALS["SL"]->processFiltFld($fldID, $value, 
-                                $this->allPublicFiltIDs);
+                            $this->allPublicFiltIDs = $GLOBALS["SL"]->processFiltFld(
+                                $fldID, 
+                                $value, 
+                                $this->allPublicFiltIDs
+                            );
                         }
                     }
                 } else {
@@ -366,25 +383,34 @@ class Searcher extends SurvCustLoop
      
     public function searchFiltsURL()
     {
-        $ret = '';
+        if (isset($this->v["searchFiltsURL"])) {
+            return $this->v["searchFiltsURL"];
+        }
+        $this->v["searchFiltsURL"] = '';
+        if ($GLOBALS["SL"]->REQ->has('refresh')) {
+            $this->v["searchFiltsURL"] .= '&refresh=' . $GLOBALS["SL"]->REQ->refresh;
+        }
         if (sizeof($this->searchFilts) > 0) {
             foreach ($this->searchFilts as $key => $val) {
                 $paramVal = $val;
-                if (is_array($paramVal) && sizeof($paramVal)) {
-                  $paramVal = '';
-                  foreach ($val as $i => $p) {
-                      $paramVal .= (($i > 0) ? ',' : '') . urlencode($p);
-                  }
+                if (is_array($val)) {
+                    $paramVal = '';
+                    if (sizeof($val) > 0) {
+                        foreach ($val as $i => $p) {
+                            $paramVal .= (($i > 0) ? ',' : '') . urlencode($p);
+                        }
+                    }
                 }
-                $ret .= '&' . $key . '=' . $paramVal;
+                $this->v["searchFiltsURL"] .= '&' . $key . '=' . $paramVal;
             }
         }
         if (sizeof($this->searchOpts) > 0) {
             foreach ($this->searchOpts as $key => $val) {
-                $ret .= '&' . $key . '=' . $val;
+                $this->v["searchFiltsURL"] .= '&' . $key . '=' . $val;
             }
         }
-        return $ret . $this->searchFiltsURLXtra();
+        $this->v["searchFiltsURL"] .= $this->searchFiltsURLXtra();
+        return $this->v["searchFiltsURL"];
     }
     
     public function searchFiltsURLXtra()

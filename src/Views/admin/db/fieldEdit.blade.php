@@ -5,18 +5,22 @@
 <div class="container">
 <div class="slCard nodeWrap">
 @if (isset($fldName) && trim($fldName) != '')
-    <h1 class="fL"><i class="fa fa-database"></i> Field: {{ $tbl->TblAbbr }}{{ $fld->FldName }}</h1>
-    <div class="fR taR fPerc125 slGrey">{{ $fld->FldEng }}<br />({{ $fld->FldType }})</i></div>
+    <h1 class="fL"><i class="fa fa-database"></i>
+    Field: {{ $tbl->tbl_abbr }}{{ $fld->fld_name }}</h1>
+    <div class="fR taR fPerc125 slGrey">
+        {{ $fld->fld_eng }}<br />({{ $fld->fld_type }})
+    </div>
     <div class="fC"></div>
 @else
     <h1><i class="fa fa-database"></i> Add New Field</h1>
 @endif
-<a href="/dashboard/db/table/{{ $tbl->TblName }}" class="btn btn-secondary">Back To <i>{{ $tbl->TblName }}</i></a>
+<a href="/dashboard/db/table/{{ $tbl->tbl_name }}" class="btn btn-secondary">Back To <i>{{ $tbl->tbl_name }}</i></a>
 </div>
 
 <form name="fldEdit" method="post" autocomplete="off" 
-@if (!isset($fldName) || trim($fldName) == '') action="/dashboard/db/field/{{ $tbl->TblAbbr }}"
-@else action="/dashboard/db/field/{{ $tbl->TblAbbr }}/{{ $fld->FldName }}"
+@if (!isset($fldName) || trim($fldName) == '') 
+    action="/dashboard/db/field/{{ $tbl->tbl_abbr }}"
+@else action="/dashboard/db/field/{{ $tbl->tbl_abbr }}/{{ $fld->fld_name }}"
 @endif
 >
 <input type="hidden" name="mainPageForm" value="YES">
@@ -25,15 +29,18 @@
 {!! $fullFldSpecs !!}
 
 <div class="slCard nodeWrap">
-@if ($fld->FldSpecType == 'Generic' && $fld->FldTable <= 0)
-    <br /><br /><input type="checkbox" style="width: 40px;" id="pushGenericID" name="pushGeneric" value="1"> 
-    <label for="pushGenericID"><i class="fa fa-retweet"></i> <i>
-    Push Generic Field Changes To All Replicas</i></label><br />
+@if ($fld->fld_spec_type == 'Generic' && $fld->fld_table <= 0)
+    <br /><br /><input type="checkbox" style="width: 40px;" 
+        id="pushGenericID" name="pushGeneric" value="1"> 
+    <label for="pushGenericID">
+        <i class="fa fa-retweet"></i> 
+        <i>Push Generic Field Changes To All Replicas</i>
+    </label><br />
 @endif
 <br /><br />
 <center>
-<input type="submit" value=" @if (trim($fldName) == '') Add Field @else Save Changes @endif " 
-    class="btn btn-lg btn-primary">
+<input type="submit" class="btn btn-lg btn-primary"
+    value=" @if (trim($fldName) == '') Add Field @else Save Changes @endif ">
 <br /><br /><br /><br />
 <input type="checkbox" style="width: 40px;" name="delete" id="deleteID" value="1"> 
 <label for="deleteID">Delete Field</label>

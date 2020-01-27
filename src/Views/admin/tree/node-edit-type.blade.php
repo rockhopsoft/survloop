@@ -7,7 +7,7 @@
         autocomplete="off" onChange="return changeNodeType(this.value);" 
         {{ $nodeTypeSel }} >
     
-    @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+    @if ($GLOBALS['SL']->treeRow->tree_type == 'Page')
     
         <option value="instruct" @if ($node->isInstruct()) SELECTED @endif >
             Content Chunk: Using WYSIWYG Editor</option>
@@ -56,7 +56,7 @@
     
     <option value="page" @if ($node->isPage()) SELECTED @endif 
         >Page Wrapper</option>
-    @if ($GLOBALS['SL']->treeRow->TreeType != 'Page')
+    @if ($GLOBALS['SL']->treeRow->tree_type != 'Page')
         <option value="branch" @if ($node->isBranch()) SELECTED @endif 
             >Navigation Branch Title</option>
     @endif
@@ -66,24 +66,21 @@
 <div id="responseType" 
     class="@if ($node->isSpecial()) disNon @else disBlo @endif ">
     <div class="nFld m0">
-        <select name="nodeTypeQ" id="nodeTypeQID" 
-            class="form-control slBlueDark w100" autocomplete="off" 
-            onChange="return changeResponseType(this.value);" >
+        <select name="nodeTypeQ" id="nodeTypeQID" class="form-control slBlueDark w100"
+            onChange="return changeResponseType(this.value);" autocomplete="off" >
     @foreach ($nodeTypes as $type)
         <option value="{{ $type }}"
-            @if (isset($node->nodeRow->NodeType) 
-                && $node->nodeRow->NodeType == $type) 
+            @if (isset($node->nodeRow->node_type) && $node->nodeRow->node_type == $type) 
                 SELECTED
             @endif >{{ $type }}</option>
     @endforeach
         </select>
     </div>
-    @if (isset($parentNode->NodeType) 
-        && in_array($parentNode->NodeType, ['Checkbox']))
+    @if (isset($parentNode->node_type) 
+        && in_array($parentNode->node_type, ['Checkbox']))
         <div class="mT5 mB10 slGrey fPerc80">
-            <i>Select <span class="blk">Layout Sub-Response</span> 
-            to make this node's children appear within 
-            each of the parent's responses to a 
+            <i>Select <span class="blk">Layout Sub-Response</span> to make this 
+            node's children appear within each of the parent's responses to a 
             <span class="blk">Checkbox</span>.</i>
         </div>
     @else <div class="m5"></div>
@@ -94,20 +91,20 @@
     <div class="nFld m0"><select name="nodeTypeD" id="nodeTypeDID" 
         class="form-control slBlueDark w100" autocomplete="off"
         onChange="return changeDataPrintType(this.value);" >
-        <option value="Data Print Row" @if (!isset($node->nodeRow->NodeType) 
-            || in_array(trim($node->nodeRow->NodeType), ['', 'Data Print Row', 'Instructions'])) 
+        <option value="Data Print Row" @if (!isset($node->nodeRow->node_type) 
+            || in_array(trim($node->nodeRow->node_type), ['', 'Data Print Row', 'Instructions'])) 
             SELECTED @endif >Data Block Row</option>
-        <option value="Data Print Block" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print Block') SELECTED @endif 
+        <option value="Data Print Block" @if (isset($node->nodeRow->node_type) 
+            && $node->nodeRow->node_type == 'Data Print Block') SELECTED @endif 
             >One Block of Data Rows</option>
-        <option value="Data Print Columns" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print Columns') SELECTED @endif 
+        <option value="Data Print Columns" @if (isset($node->nodeRow->node_type) 
+            && $node->nodeRow->node_type == 'Data Print Columns') SELECTED @endif 
             >Columns of Data Rows</option>
-        <option value="Print Vert Progress" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Print Vert Progress') SELECTED @endif 
+        <option value="Print Vert Progress" @if (isset($node->nodeRow->node_type) 
+            && $node->nodeRow->node_type == 'Print Vert Progress') SELECTED @endif 
             >Column of Progress</option>
-        <option value="Data Print" @if (isset($node->nodeRow->NodeType) 
-            && $node->nodeRow->NodeType == 'Data Print') SELECTED @endif 
+        <option value="Data Print" @if (isset($node->nodeRow->node_type) 
+            && $node->nodeRow->node_type == 'Data Print') SELECTED @endif 
             >Plain Data Printout</option>
     </select></div>
 </div>
@@ -121,7 +118,7 @@
         <option value="Record Full Public" 
             @if ($node->nodeType == 'Record Full Public') SELECTED @endif 
             >Record Full Public</option>
-        @if ($GLOBALS['SL']->treeRow->TreeType == 'Page')
+        @if ($GLOBALS['SL']->treeRow->tree_type == 'Page')
         
             <option value="Search" @if ($node->nodeType == 'Search') SELECTED @endif 
                 >Search Bar</option>

@@ -28,6 +28,10 @@ a.btn-danger.btn-xl:link, a.btn-danger.btn-xl:active,
 a.btn-danger.btn-xl:visited, a.btn-danger.btn-xl:hover,
 a.btn-danger.btn-lg.btn-xl:link, a.btn-danger.btn-lg.btn-xl:active, 
 a.btn-danger.btn-lg.btn-xl:visited, a.btn-danger.btn-lg.btn-xl:hover,
+a.btn-success.btn-xl:link, a.btn-success.btn-xl:active, 
+a.btn-success.btn-xl:visited, a.btn-success.btn-xl:hover,
+a.btn-success.btn-lg.btn-xl:link, a.btn-success.btn-lg.btn-xl:active, 
+a.btn-success.btn-lg.btn-xl:visited, a.btn-success.btn-lg.btn-xl:hover,
 input[type="submit"].btn.btn-xl, 
 input[type="submit"].btn.btn-lg.btn-xl, 
 input[type="submit"].btn-primary.btn-xl, 
@@ -36,7 +40,9 @@ input[type="submit"].btn-secondary.btn-xl,
 input[type="submit"].btn-info.btn-xl, 
 input[type="submit"].btn-info.btn-lg.btn-xl, 
 input[type="submit"].btn-danger.btn-xl, 
-input[type="submit"].btn-danger.btn-lg.btn-xl {
+input[type="submit"].btn-danger.btn-lg.btn-xl, 
+input[type="submit"].btn-success.btn-xl, 
+input[type="submit"].btn-success.btn-lg.btn-xl {
     padding: 1rem 1rem;
     font-size: 1.75rem;
 }
@@ -153,6 +159,35 @@ input[type="submit"].btn-danger.btn-sm:hover {
     color: {!! $css["color-danger-on"] !!};
     background: {!! $css["color-main-bg"] !!};
     border: 1px {!! $css["color-danger-on"] !!} solid;
+}
+
+.btn-success-simple, .btn-success, a.btn-success:link, 
+a.btn-success:active, a.btn-success:visited, a.btn-success:hover,
+a.btn-success.btn-xl:link, a.btn-success.btn-xl:active, 
+a.btn-success.btn-xl:visited, a.btn-success.btn-xl:hover,
+a.btn-success.btn-lg:link, a.btn-success.btn-lg:active, 
+a.btn-success.btn-lg:visited, a.btn-success.btn-lg:hover,
+a.btn-success.btn-sm:link, a.btn-success.btn-sm:active, 
+a.btn-success.btn-sm:visited, a.btn-success.btn-sm:hover,
+input[type="submit"].btn-success, 
+input[type="submit"].btn-success.btn-xl, 
+input[type="submit"].btn-success.btn-lg, 
+input[type="submit"].btn-success.btn-sm {
+    background-image: none;
+    color: {!! $css["color-main-bg"] !!};
+    background: {!! $css["color-success-on"] !!};
+    border: 1px {!! $css["color-main-bg"] !!} solid;
+    text-shadow: none;
+}
+a.btn-success:hover, a.btn-success.btn-xl:hover, 
+a.btn-success.btn-lg:hover, a.btn-success.btn-sm:hover,
+input[type="submit"].btn-success:hover, 
+input[type="submit"].btn-success.btn-xl:hover, 
+input[type="submit"].btn-success.btn-lg:hover, 
+input[type="submit"].btn-success.btn-sm:hover {
+    color: {!! $css["color-success-on"] !!};
+    background: {!! $css["color-main-bg"] !!};
+    border: 1px {!! $css["color-success-on"] !!} solid;
 }
 
 .dropdown-item.active {

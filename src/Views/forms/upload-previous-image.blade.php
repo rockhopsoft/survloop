@@ -5,6 +5,6 @@
         class="disBlo {{ $upDeets[$i]['imgClass'] }} " 
         ><img @if ($GLOBALS['SL']->isPrintView()) border=0 @else border=1 @endif
         src="{{ $upDeets[$i]['filePub'] }}" class=" {{ $upDeets[$i]['imgClass'] }} "
-        alt="{{ ((isset($upRow->UpStoredFile)) ? $upRow->UpStoredFile : 'Uploaded Image') 
+        alt="{{ ((isset($upRow->up_stored_file)) ? $upRow->up_stored_file : 'Uploaded Image') 
         }}"></a>
 </div>

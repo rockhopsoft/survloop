@@ -5,14 +5,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLSessEmojis extends Model
 {
-    protected $table         = 'SL_SessEmojis';
-    protected $primaryKey     = 'SessEmoID';
+    protected $table         = 'sl_sess_emojis';
+    protected $primaryKey     = 'sess_emo_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'SessEmoUserID',
-        'SessEmoTreeID', 
-        'SessEmoRecID', 
-        'SessEmoDefID',
+        'sess_emo_user_id',
+        'sess_emo_tree_id', 
+        'sess_emo_rec_id', 
+        'sess_emo_def_id',
     ];
 }

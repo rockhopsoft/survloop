@@ -1,20 +1,19 @@
 <!-- resources/views/vendor/survloop/admin/db/install.blade.php -->
-
 @extends('vendor.survloop.master')
-
 @section('content')
 
 <nobr><span class="float-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
 <h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> {{ $GLOBALS['SL']->dbRow->DbName 
-        }}</span>: Database Installation Process 
+    <span class="slBlueDark"><i class="fa fa-database"></i> 
+        {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Database Installation Process 
 </h1>
 
 {!! view('vendor.survloop.admin.db.export-tabs', [ "curr" => 'install' ])->render() !!}
 <div id="myTabContent" class="tab-content">
 
 @if ($dbAllowEdits)
-    <form name="mainPageForm" action="/dashboard/db/install" method="post" onSubmit="if (confirm('ARE YOU SURE?! Did you ask Morgan?')) { return true; } else { return false; }">
+    <form name="mainPageForm" action="/dashboard/db/install" method="post" 
+    onSubmit="if (confirm('ARE YOU SURE?! Did you ask Morgan?')) { return true; } else { return false; }">
     <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
     <input type="hidden" name="dbConfirm" value="install">
 @endif
@@ -28,11 +27,13 @@
                 <th class="taC">Transfer Old Data</th>
             </tr>
             @forelse ($tbls as $i => $tbl)
-                @if (strtolower($tbl->TblName) != 'users')
+                @if (strtolower($tbl->tbl_name) != 'users')
                     <tr>
-                        <td>{{ $GLOBALS['SL']->dbRow->DbPrefix }}{{ $tbl->TblName }}</td>
-                        <td><input type="checkbox" name="createTable[]" value="{{ $tbl->TblID }}" CHECKED ></td>
-                        <td><input type="checkbox" name="copyData[]" value="{{ $tbl->TblID }}" CHECKED ></td>
+                        <td>{{ $GLOBALS['SL']->dbRow->db_prefix }}{{ $tbl->tbl_name }}</td>
+                        <td><input type="checkbox" name="createTable[]" 
+                            value="{{ $tbl->tbl_id }}" CHECKED ></td>
+                        <td><input type="checkbox" name="copyData[]" 
+                            value="{{ $tbl->tbl_id }}" CHECKED ></td>
                     </tr>
                 @endif
             @empty
@@ -46,7 +47,8 @@
             then it should delete all old tables and create new ones matching current database specifications.
             </div>
             <div class="p20 m20"></div>
-            <input type="submit" class="btn btn-lg btn-primary float-right" value="Yes, Re-Install Database"
+            <input type="submit" class="btn btn-lg btn-primary float-right" 
+                value="Yes, Re-Install Database"
             @if ($dbAllowEdits) ></form> @else DISABLED > @endif
             {!! $log !!}
         </div>

@@ -4,7 +4,7 @@
 <nobr><span class="float-right pT20">{!! strip_tags($dbStats) !!}</span></nobr>
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Export for Laravel 
+    {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Export for Laravel 
 </h1>
 <br /><br />
 <center>

@@ -28,8 +28,8 @@ class AdminEmailController extends AdminCoreController
     
     protected function loadEmails()
     {
-        $this->v["emailList"] = SLEmails::orderBy('EmailName', 'asc')
-            ->orderBy('EmailType', 'asc')
+        $this->v["emailList"] = SLEmails::orderBy('email_name', 'asc')
+            ->orderBy('email_type', 'asc')
             ->get();
         return true;
     }
@@ -44,16 +44,16 @@ class AdminEmailController extends AdminCoreController
         if ($emailID > 0) {
             if (sizeof($this->v["emailList"]) > 0) {
                 foreach ($this->v["emailList"] as $e) {
-                    if ($e->EmailID == $emailID) {
+                    if ($e->email_id == $emailID) {
                         $email["rec"] = $e;
                     }
                 }
-                if ($email["rec"] !== false && isset($email["rec"]->EmailBody) 
-                    && trim($email["rec"]->EmailBody) != '') {
-                    $email["body"] 
-                        = $GLOBALS["SL"]->swapEmailBlurbs($email["rec"]->EmailBody);
-                    $email["subject"] 
-                        = $GLOBALS["SL"]->swapEmailBlurbs($email["rec"]->EmailSubject);
+                if ($email["rec"] !== false && isset($email["rec"]->email_body) 
+                    && trim($email["rec"]->email_body) != '') {
+                    $email["body"] = $GLOBALS["SL"]
+                        ->swapEmailBlurbs($email["rec"]->email_body);
+                    $email["subject"] = $GLOBALS["SL"]
+                        ->swapEmailBlurbs($email["rec"]->email_subject);
                     if (isset($this->custReport->isLoaded)) {
                         $email["body"] = $this->custReport
                             ->sendEmailBlurbsCustom($email["body"]);
@@ -112,27 +112,27 @@ class AdminEmailController extends AdminCoreController
         $this->admControlInit($request, '/dashboard/contact');
         $status = [''];
         $this->v["recs"] = [];
-        $this->getRecFiltTots('SLContact', 'ContFlag', ['Unread', 'Read', 'Trash'], 'ContID');
+        $this->getRecFiltTots('SLContact', 'cont_flag', ['Unread', 'Read', 'Trash'], 'cont_id');
         $this->v["filtStatus"] = 'unread';
         if ($request->has('tab')) {
             $this->v["filtStatus"] = trim($request->get('tab'));
         }
         if (in_array($this->v["filtStatus"], ['', 'unread'])) {
-            $this->v["recs"] = SLContact::where('ContFlag', 'Unread')
+            $this->v["recs"] = SLContact::where('cont_flag', 'Unread')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } elseif ($this->v["filtStatus"] == 'all') {
-            $this->v["recs"] = SLContact::whereIn('ContFlag', ['Read', 'Unread'])
+            $this->v["recs"] = SLContact::whereIn('cont_flag', ['Read', 'Unread'])
                 ->orderBy('created_at', 'desc')
                 ->get();
         } elseif ($this->v["filtStatus"] == 'trash') {
-            $this->v["recs"] = SLContact::where('ContFlag', 'Trash')
+            $this->v["recs"] = SLContact::where('cont_flag', 'Trash')
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
         $this->v["currPage"][1] = 'Contact Form Messages';
         $GLOBALS["SL"]->pageAJAX .= '$(".changeContStatus").change(function(){
-            var cID = $(this).attr( "name" ).replace( "ContFlag", "" );
+            var cID = $(this).attr( "name" ).replace( "cont_flag", "" );
             var postUrl = "/ajadm/contact?' 
                 . ((isset($filtStatus)) ? 'tab=' . $filtStatus . '&' : '') 
                 . 'cid="+cID+"&status="+$(this).val();
@@ -154,7 +154,7 @@ class AdminEmailController extends AdminCoreController
         $emaToUsrID = 0;
         $ret = $emaTo = $emaSubj = $emaCont = '';
         $currEmail = SLEmails::find($emaID);
-        if ($currEmail && isset($currEmail->EmailSubject)) {
+        if ($currEmail && isset($currEmail->email_subject)) {
             if ($coreID > 0) {
                 $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $coreID);
                 $emaFld = $GLOBALS["SL"]->getCoreEmailFld();
@@ -209,7 +209,15 @@ class AdminEmailController extends AdminCoreController
             if ($emaToUsr && isset($emaToUsr->id)) {
                 $emaToUsrID = $emaToUsr->id;
             }
-            $this->custReport->logEmailSent($emaCont, $emaSubj, $emaTo, $emaID, $treeID, $coreID, $emaToUsrID);
+            $this->custReport->logEmailSent(
+                $emaCont, 
+                $emaSubj, 
+                $emaTo, 
+                $emaID, 
+                $treeID, 
+                $coreID, 
+                $emaToUsrID
+            );
         } else {
             $ret .= '<i class="red">Email template not found.</i>';
         }
@@ -222,11 +230,14 @@ class AdminEmailController extends AdminCoreController
     
     public function ajaxContactTabs(Request $request)
     {
-        $this->getRecFiltTots('SLContact', 'ContFlag', ['Unread', 'Read', 'Trash'], 'ContID');
-        return view('vendor.survloop.admin.contact-tabs', [
-            "filtStatus" => (($request->has('tab')) ? $request->get('tab') : 'unread'),
-            "recTots"    => $this->v["recTots"]
-        ])->render();
+        $this->getRecFiltTots('SLContact', 'cont_flag', ['Unread', 'Read', 'Trash'], 'cont_id');
+        return view(
+            'vendor.survloop.admin.contact-tabs', 
+            [
+                "filtStatus" => (($request->has('tab')) ? $request->get('tab') : 'unread'),
+                "recTots"    => $this->v["recTots"]
+            ]
+        )->render();
     }
     
     public function ajaxContact(Request $request)
@@ -262,10 +273,10 @@ class AdminEmailController extends AdminCoreController
             && $request->has('emaTo') && trim($request->emaTo) != '') {
             $emaTo = $emaCC = $emaBCC = [];
             foreach (['To', 'CC', 'BCC'] as $type) {
-                if ($request->has('ema' . $type) 
-                    && trim($request->get('ema' . $type)) != '') {
+                $eType = 'ema' . $type;
+                if ($request->has($eType) && trim($request->get($eType)) != '') {
                     eval("\$ema" . $type . "[] = ['" 
-                        . trim($request->get('ema' . $type)) . "', ''];");
+                        . trim($request->get($eType)) . "', ''];");
                 }
             }
             $this->loadCustLoop($request);
@@ -298,8 +309,8 @@ class AdminEmailController extends AdminCoreController
     public function printSentEmails(Request $request)
     {
         $this->admControlInit($request, '/dashboard/sent-emails');
-        $this->v["emailed"] = SLEmailed::whereNotNull('EmailedTo')
-            ->where('EmailedTo', 'NOT LIKE', '')
+        $this->v["emailed"] = SLEmailed::whereNotNull('emailed_to')
+            ->where('emailed_to', 'NOT LIKE', '')
             ->orderBy('created_at', 'desc')
             ->get();
         return view('vendor.survloop.admin.sent-emails', $this->v);

@@ -2,7 +2,7 @@
 
 <h1>
     <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->DbName }}</span>: Table Diagrams 
+    {{ $GLOBALS['SL']->dbRow->db_name }}</span>: Table Diagrams 
     <nobr>({!! strip_tags($dbStats) !!})</nobr>
 </h1>
 
@@ -13,22 +13,26 @@
 
 @forelse ($diags as $cnt => $dia)
     <div class="container">
-        <a name="dia{{ $dia->DefID }}"></a>
-        <br /><br /><hr><b>{{ $dia->DefSubset }}</b>
-        <a href="/images/diagrams/{{ $GLOBALS['SL']->dbID }}-{{ $dia->DefID }}.png" target="_blank"
-            ><img src="/images/diagrams/{{ $GLOBALS['SL']->dbID }}-{{ $dia->DefID }}.png" border=0 width=80% 
-            alt="Diagram #{{ $dia->DefID }}" ></a>
+        <div class="nodeAnchor"><a name="dia{{ $dia->def_id }}"></a></div>
+        <br /><br /><hr><b>{{ $dia->def_subset }}</b>
+        <a href="/images/diagrams/{{ $GLOBALS['SL']->dbID 
+            }}-{{ $dia->def_id }}.png" target="_blank"
+            ><img src="/images/diagrams/{{ $GLOBALS['SL']->dbID 
+            }}-{{ $dia->def_id }}.png" border=0 width=80% 
+            alt="Diagram #{{ $dia->def_id }}" ></a>
     </div>
 @empty
 @endforelse
 
 
-<a name="tblDiagSimple"></a>
+<div class="nodeAnchor"><a name="tblDiagSimple"></a></div>
 <div class="mT20"><iframe width=100% height=1000 frameborder=0 
-    @if ($GLOBALS["SL"]->REQ->has('refresh')) src="/dashboard/db/network-map?iframe=1&refresh=1"
-    @else src="/dashboard/db/network-map?iframe=1" @endif ></iframe></div>
+    @if ($GLOBALS["SL"]->REQ->has('refresh')) 
+        src="/dashboard/db/network-map?iframe=1&refresh=1"
+    @else src="/dashboard/db/network-map?iframe=1" 
+    @endif ></iframe></div>
 
-<a name="tblMatrix"></a><br /><br /><br /><hr>
+<div class="nodeAnchor"><a name="tblMatrix"></a></div><br /><br /><br /><hr>
 <h2>Table Relationship Matrix</h2>
 
 {!! $printMatrix !!}

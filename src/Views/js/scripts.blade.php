@@ -8,11 +8,30 @@ function debugTxt(txt) {
 }
 
 var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
+var appUrlParams = new Array();
+var appUrlParamKeys = new Array('refresh', 'frame', 'widget', 'ajax', 'print', 'tree', 'tip', 'sub', 't2', 'resend', 'cid', 'core', 'new', 'start', 'redir', 'sView');
 var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
+var pageDynaLoaded = false;
+
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 var fixedHeaderOffset = 0;
+
+function listUrlParams() {
+    var params = "";
+    for (var i = 0; i < appUrlParams.length; i++) {
+        params += "&"+appUrlParams[i][0]+"="+appUrlParams[i][1];
+    }
+    return params;
+}
+function listFullUrlParams() {
+    var params = listUrlParams();
+    if (params.length > 0) {
+        return "?"+params.substing(1);
+    }
+    return params;
+}
 
 function findGetParam(paramName) {
     var result = null,
@@ -24,6 +43,21 @@ function findGetParam(paramName) {
     }
     return result;
 }
+function addGetParam(paramName) {
+    var val = findGetParam(paramName);
+    if (!val || val.trim() == "") return false;
+    var i = appUrlParams.length;
+    appUrlParams[i] = new Array(paramName, val);
+    return true;
+}
+function loadBasicUrlParams() {
+    appUrlParams = new Array();
+    for (var i = 0; i < appUrlParamKeys.length; i++) {
+        addGetParam(appUrlParamKeys[i]);
+    }
+    return true;
+}
+setTimeout(function() { loadBasicUrlParams(); }, 10);
 
 var treeList = new Array();
 @forelse ($GLOBALS["SL"]->getTreeList() as $i => $t)
@@ -210,6 +244,11 @@ function startCountdown(divID, cntFrom, inc) {
     }
     return true;
 }
+
+var colorWht = "{!! $css["color-main-bg"] !!};";
+var colorBlk = "{!! $css["font-main"] !!}";
+var colorGry = "{!! $css["color-main-grey"] !!}";
+var colorFnt = "{!! $css["color-main-faint"] !!}";
 
 function openNav() {
     document.getElementById("mySidenav").style.boxShadow = "0px 2px 4px {!! $css["color-main-grey"] !!}";

@@ -81,8 +81,8 @@ class AdminController extends AdminEmailController
             $this->switchDatabase($request, $dbID, '/dashboard/db/switch');
             return $this->redir('/dashboard/db/all');
         }
-        $this->v["myDbs"] = SLDatabases::orderBy('DbName', 'asc')
-            //->whereIn('DbUser', [ 0, $this->v["user"]->id ])
+        $this->v["myDbs"] = SLDatabases::orderBy('db_name', 'asc')
+            //->whereIn('db_user', [ 0, $this->v["user"]->id ])
             ->get();
         return view('vendor.survloop.admin.db.switch', $this->v);
     }
@@ -92,26 +92,25 @@ class AdminController extends AdminEmailController
         $this->admControlInit($request, '/dashboard/tree/switch');
         if ($treeID > 0) {
             $this->switchTree($treeID, '/dashboard/tree/switch', $request);
-            if ($GLOBALS["SL"]->treeRow->TreeType == 'Page') {
-                return $this->redir('/dashboard/page/' . $treeID 
-                    . '?all=1&alt=1&refresh=1');
+            $redir = '/dashboard/surv-' . $treeID . '/map?all=1&alt=1&refresh=1';
+            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
+                $redir = '/dashboard/page/' . $treeID . '?all=1&alt=1&refresh=1';
             }
-            return $this->redir('/dashboard/surv-' . $treeID 
-                . '/map?all=1&alt=1&refresh=1');
+            return $this->redir($redir);
         }
-        $this->v["myTrees"] = SLTree::where('TreeDatabase', $GLOBALS["SL"]->dbID)
-            ->where('TreeType', 'NOT LIKE', 'Survey XML')
-            ->where('TreeType', 'NOT LIKE', 'Other Public XML')
-            ->where('TreeType', 'NOT LIKE', 'Page')
-            ->orderBy('TreeName', 'asc')
+        $this->v["myTrees"] = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
+            ->where('tree_type', 'NOT LIKE', 'Survey XML')
+            ->where('tree_type', 'NOT LIKE', 'Other Public XML')
+            ->where('tree_type', 'NOT LIKE', 'Page')
+            ->orderBy('tree_name', 'asc')
             ->get();
         $this->v["myTreeNodes"] = [];
         if ($this->v["myTrees"]->isNotEmpty()) {
             foreach ($this->v["myTrees"] as $tree) {
-                $nodes = SLNode::where('NodeTree', $tree->TreeID)
-                    ->select('NodeID')
+                $nodes = SLNode::where('node_tree', $tree->tree_id)
+                    ->select('node_id')
                     ->get();
-                $this->v["myTreeNodes"][$tree->TreeID] = $nodes->count();
+                $this->v["myTreeNodes"][$tree->tree_id] = $nodes->count();
             }
         }
         return view('vendor.survloop.admin.tree.switch', $this->v);
@@ -123,10 +122,10 @@ class AdminController extends AdminEmailController
         if ($request->has('refresh') 
             && intVal($request->get('refresh')) == 2) {
             $this->initLoader();
-            $chk = SLTree::whereIn('TreeType', [ 'Page', 'Survey' ])
-                ->where('TreeDatabase', 1)
-                ->select('TreeID', 'TreeDatabase')
-                ->orderBy('TreeID', 'asc')
+            $chk = SLTree::whereIn('tree_type', [ 'Page', 'Survey' ])
+                ->where('tree_database', 1)
+                ->select('tree_id', 'tree_database')
+                ->orderBy('tree_id', 'asc')
                 ->get();
             if ($chk->isNotEmpty()) {
                 $next = $curr = $found = 0;
@@ -135,24 +134,24 @@ class AdminController extends AdminEmailController
                 }
                 foreach ($chk as $tree) {
                     if ($curr == 0) {
-                        $curr = $tree->TreeID;
+                        $curr = $tree->tree_id;
                     }
                     if ($found == 1 && $next <= 0) {
-                        $next = $tree->TreeID;
+                        $next = $tree->tree_id;
                     }
-                    if ($tree->TreeID == $curr) {
+                    if ($tree->tree_id == $curr) {
                         $found = 1;
                         $this->loader->syncDataTrees(
                             $request, 
-                            $tree->TreeDatabase, 
-                            $tree->TreeID
+                            $tree->tree_database, 
+                            $tree->tree_id
                         );
                         $this->loadCustLoop(
                             $request, 
-                            $tree->TreeID, 
-                            $tree->TreeDatabase
+                            $tree->tree_id, 
+                            $tree->tree_database
                         );
-                        $this->custReport->loadTree($tree->TreeID);
+                        $this->custReport->loadTree($tree->tree_id);
                         $this->custReport->loadProgBar();
                     }
                 }
@@ -169,8 +168,7 @@ class AdminController extends AdminEmailController
                 }
             }
             return $this->redir('/dashboard/settings?refresh=1', true);
-        } elseif ($request->has('refresh') 
-            && intVal($request->get('refresh')) == 3) {
+        } elseif ($request->has('refresh') && intVal($request->get('refresh')) == 3) {
             $this->cacheFlush();
         }
         $GLOBALS["SL"]->addAdmMenuHshoos([
@@ -179,7 +177,7 @@ class AdminController extends AdminEmailController
             '/dashboard/settings#logos',
             '/dashboard/settings#color',
             '/dashboard/settings#hardcode'
-            ]);
+        ]);
         $this->reloadAdmMenu();
         $this->getCSS($request);
         $this->v["sysDef"] = new SystemDefinitions;
@@ -216,9 +214,9 @@ class AdminController extends AdminEmailController
     
     protected function blurbLoad($blurbID)
     {
-        return SLDefinitions::where('DefID', $blurbID)
-            ->where('DefDatabase', $this->dbID)
-            ->where('DefSet', 'Blurbs')
+        return SLDefinitions::where('def_id', $blurbID)
+            ->where('def_database', $this->dbID)
+            ->where('def_set', 'Blurbs')
             ->first();
     }
     
@@ -227,10 +225,8 @@ class AdminController extends AdminEmailController
         $this->admControlInit($request, '/dashboard/pages');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
-        if ($this->v["blurbRow"]->DefIsActive <= 0 
-            || $this->v["blurbRow"]->DefIsActive%3 > 0) {
-            $GLOBALS["SL"]->pageAJAX 
-                .= ' $("#DefDescriptionID").summernote({ height: 500 }); ';
+        if ($this->v["blurbRow"]->def_order <= 0 || $this->v["blurbRow"]->def_order%3 > 0) {
+            $GLOBALS["SL"]->pageAJAX .= ' $("#DefDescriptionID").summernote({ height: 500 }); ';
         }
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
@@ -240,29 +236,26 @@ class AdminController extends AdminEmailController
         if (isset($request->newBlurbName) 
             && trim($request->newBlurbName) != '') {
             $blurb = new SLDefinitions;
-            $blurb->DefDatabase = $this->dbID;
-            $blurb->DefSet      = 'Blurbs';
-            $blurb->DefSubset   = $request->newBlurbName;
+            $blurb->def_database = $this->dbID;
+            $blurb->def_set      = 'Blurbs';
+            $blurb->def_subset   = $request->newBlurbName;
             $blurb->save();
-            return $blurb->DefID;
+            return $blurb->def_id;
         }
         return -3;
     }
     
     public function blurbEditSave(Request $request)
     {
-        $blurb = $this->blurbLoad($request->DefID);
-        $blurb->DefSubset      = $request->DefSubset;
-        $blurb->DefDescription = $request->DefDescription;
-        $blurb->DefIsActive = 1;
-        if ($request->has('optHardCode') 
-            && intVal($request->optHardCode) == 3) {
-            $blurb->DefIsActive *= 3;
+        $blurb = $this->blurbLoad($request->def_id);
+        $blurb->def_subset      = $request->def_subset;
+        $blurb->def_description = $request->def_description;
+        $blurb->def_order = 1;
+        if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) {
+            $blurb->def_order *= 3;
         }
         $blurb->save();
-        return $this->redir(
-            '/dashboard/pages/snippets/' . $blurb->DefID
-        );
+        return $this->redir('/dashboard/pages/snippets/' . $blurb->def_id);
     }
     
     public function getCSS(Request $request)
@@ -273,12 +266,12 @@ class AdminController extends AdminEmailController
         }
         $this->v["sysDef"] = new SystemDefinitions;
         $css = $this->v["sysDef"]->loadCss();
-        $custCSS = SLDefinitions::where('DefDatabase', $this->dbID)
-            ->where('DefSet', 'Style CSS')
-            ->where('DefSubset', 'main')
+        $custCSS = SLDefinitions::where('def_database', $this->dbID)
+            ->where('def_set', 'Style CSS')
+            ->where('def_subset', 'main')
             ->first();
-        $css["raw"] = (($custCSS && isset($custCSS->DefDescription)) 
-            ? $custCSS->DefDescription : '');
+        $css["raw"] = (($custCSS && isset($custCSS->def_description)) 
+            ? $custCSS->def_description : '');
         
         $syscss = view(
             'vendor.survloop.css.styles-1', 
@@ -291,8 +284,10 @@ class AdminController extends AdminEmailController
         //$minifier->add("../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css");
         if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"]) 
             && trim($GLOBALS["SL"]->sysOpts["css-extra-files"]) != '') {
-            $files = $GLOBALS["SL"]->mexplode(',', 
-                $GLOBALS["SL"]->sysOpts["css-extra-files"]);
+            $files = $GLOBALS["SL"]->mexplode(
+                ',', 
+                $GLOBALS["SL"]->sysOpts["css-extra-files"]
+            );
             foreach ($files as $f) {
                 $minifier->add(trim($f));
             }
@@ -318,21 +313,19 @@ class AdminController extends AdminEmailController
         $minifier->minify("../storage/app/sys/sys1.min.js");
         
         $treeJs = '';
-        $chk = SLTree::whereIn('TreeType', ['Page', 'Survey'])
-            ->select('TreeID', 'TreeType')
+        $chk = SLTree::whereIn('tree_type', ['Page', 'Survey'])
+            ->select('tree_id', 'tree_type')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
-                $treeFile = '../storage/app/sys/tree-' 
-                    . $tree->TreeID . '.js';
+                $treeFile = '../storage/app/sys/tree-' . $tree->tree_id . '.js';
                 if (file_exists($treeFile)) {
-                    $treeJs .= "\n" . 'function treeLoad' 
-                        . $tree->TreeID . '() {' . "\n" 
-                        . 'treeID = ' . $tree->TreeID . ';' . "\n"
-                        . 'treeType = "' . $tree->TreeType . '";' . "\n"
-                        . str_replace("\t", "", str_replace("\n", "\n", 
-                            file_get_contents($treeFile))) . "\n\t"
-                        . 'return true;' . "\n" . '}' . "\n";
+                    $tmpJs = file_get_contents($treeFile);
+                    $tmpJs = str_replace("\t", "", str_replace("\n", "\n", $tmpJs));
+                    $treeJs .= "\n" . 'function treeLoad' . $tree->tree_id . '() {' . "\n" 
+                        . 'treeID = ' . $tree->tree_id . ';' . "\n"
+                        . 'treeType = "' . $tree->tree_type . '";' . "\n"
+                        . $tmpJs . "\n\treturn true;\n" . '}' . "\n";
                 }
             }
         }
@@ -354,9 +347,9 @@ class AdminController extends AdminEmailController
         $minifier = new Minify\JS("../storage/app/sys/sys2.js");
         $minifier->minify("../storage/app/sys/sys2.min.js");
         
-        $log = SLDefinitions::where('DefSet', 'System Settings')
-            ->where('DefSubset', 'log-css-reload')
-            ->update([ 'DefDescription' => time() ]);
+        $log = SLDefinitions::where('def_set', 'System Settings')
+            ->where('def_subset', 'log-css-reload')
+            ->update([ 'def_description' => time() ]);
         return ':)';
     }
     
@@ -368,13 +361,15 @@ class AdminController extends AdminEmailController
     protected function eng2abbr($name)
     {
         $abbr = preg_replace("/[^A-Z]+/", "", $name);
-        if (strlen($abbr) > 1) return $abbr;
+        if (strlen($abbr) > 1) {
+            return $abbr;
+        }
         return substr(preg_replace("/[^a-zA-Z0-9]+/", "", $name), 0, 3);
     }
     
     protected function isCoreTbl($tblID)
     {
-        $chkCore = SLTree::where('TreeCoreTable', '=', $tblID)
+        $chkCore = SLTree::where('tree_core_table', '=', $tblID)
             ->get();
         return $chkCore->isNotEmpty();
     }
@@ -408,7 +403,10 @@ class AdminController extends AdminEmailController
             }
             $this->v["printVoluns"][$list][] = $usr;
         }
-        $this->v["disableAdmin"] = ((!$this->v["user"]->hasRole('administrator')) ? ' DISABLED ' : '');
+        $this->v["disableAdmin"] = '';
+        if (!$this->v["user"]->hasRole('administrator'))  {
+            $this->v["disableAdmin"] = ' DISABLED ';
+        }
         return true;
     }
     
@@ -417,9 +415,13 @@ class AdminController extends AdminEmailController
         if ($request->has('step') && $request->has('tree') && intVal($request->tree) > 0) {
             $this->initLoader();
             $this->loader->loadTreeByID($request, $request->tree);
-            $this->admControlInit($request, '/dash/u/' . $GLOBALS["SL"]->treeRow->TreeSlug . '/' . $request->nodeSlug);
+            $url = '/dash/u/' . $GLOBALS["SL"]->treeRow->tree_slug 
+                . '/' . $request->nodeSlug;
+            $this->admControlInit($request, $url);
             $this->loadCustLoop($request, $request->tree);
-            echo '<div class="pT20">' . $this->custReport->loadNodeURL($request, $request->nodeSlug) . '</div>';
+            echo '<div class="pT20">' 
+                . $this->custReport->loadNodeURL($request, $request->nodeSlug) 
+                . '</div>';
         }
         exit;
     }
@@ -452,15 +454,25 @@ class AdminController extends AdminEmailController
                 && $request->has('emailTo') && trim($request->emailTo) != '') {
                 $emaTo = trim($request->emailTo);
                 $emaToArr = [ [ $emaTo, 'Test Message' ] ];
-                $emaSubj = 'Email Flight Test from ' . $GLOBALS["SL"]->sysOpts["site-name"];
+                $emaSubj = 'Email Flight Test from ' 
+                    . $GLOBALS["SL"]->sysOpts["site-name"];
                 $emaCont = '<p>Hi there friend,</p><p>This has been a flight test from ' 
                     . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
                 if (!$GLOBALS["SL"]->isHomestead()) {
                     $this->sendEmail($emaCont, $emaSubj, $emaToArr);
                 }
-                $this->logEmailSent($emaCont, $emaSubj, $emaTo, 0, $this->treeID, $this->coreID, $this->v["uID"]);
-                $this->v["testResults"] .= '<div class="container"><h2>' . $emaSubj . '</h2>' . $emaCont 
-                    . '<hr><hr><i class="slBlueDark">to ' . $emaTo . '</i></div>';
+                $this->logEmailSent(
+                    $emaCont, 
+                    $emaSubj, 
+                    $emaTo, 
+                    0, 
+                    $this->treeID, 
+                    $this->coreID, 
+                    $this->v["uID"]
+                );
+                $this->v["testResults"] .= '<div class="container">'
+                    . '<h2>' . $emaSubj . '</h2>' . $emaCont . '<hr><hr>'
+                    . '<i class="slBlueDark">to ' . $emaTo . '</i></div>';
             }
             return view('vendor.survloop.admin.systems-check-email', $this->v);
         }
@@ -475,12 +487,12 @@ class AdminController extends AdminEmailController
         $tree1 = SLTree::find(1);
         $this->v["sysChks"] = [];
         $this->v["sysChks"][] = ['Home',         '/'];
-        $this->v["sysChks"][] = ['Survey Start', '/start/' . $tree1->TreeSlug . ''];
+        $this->v["sysChks"][] = ['Survey Start', '/start/' . $tree1->tree_slug . ''];
         $this->v["sysChks"][] = ['Search Empty', '/search-results/1?s='];
         $this->v["sysChks"][] = ['Search Test',  '/search-results/1?s=testing'];
-        $this->v["sysChks"][] = ['XML-Example',  '/' . $tree1->TreeSlug . '-xml-example'];
-        $this->v["sysChks"][] = ['XML-All',      '/' . $tree1->TreeSlug . '-xml-all'];
-        $this->v["sysChks"][] = ['XML-Schema',   '/' . $tree1->TreeSlug . '-xml-schema'];
+        $this->v["sysChks"][] = ['XML-Example',  '/' . $tree1->tree_slug . '-xml-example'];
+        $this->v["sysChks"][] = ['XML-All',      '/' . $tree1->tree_slug . '-xml-all'];
+        $this->v["sysChks"][] = ['XML-Schema',   '/' . $tree1->tree_slug . '-xml-schema'];
         return view('vendor.survloop.admin.systems-check', $this->v);
     }
     
@@ -488,7 +500,7 @@ class AdminController extends AdminEmailController
     {
         $this->v["logs"] = [
             "session" => $this->logPreview('session-stuff')
-            ];
+        ];
         return true;
     }
     
@@ -516,29 +528,29 @@ class AdminController extends AdminEmailController
             for ($i = 0; $i < $this->v["cntMax"]; $i++) {
                 if ($i < sizeof($this->v["navMenu"])) {
                     if ($request->has('mainNavTxt' . $i)) {
-                        SLDefinitions::where('DefSet', 'Menu Settings')
-                            ->where('DefSubset', 'main-navigation')
-                            ->where('DefDatabase', 1)
-                            ->where('DefOrder', $i)
+                        SLDefinitions::where('def_set', 'Menu Settings')
+                            ->where('def_subset', 'main-navigation')
+                            ->where('def_database', 1)
+                            ->where('def_order', $i)
                             ->update([
-                                'DefValue'       => $request->get('mainNavTxt' . $i),
-                                'DefDescription' => $request->get('mainNavLnk' . $i)
+                                'def_value'       => $request->get('mainNavTxt' . $i),
+                                'def_description' => $request->get('mainNavLnk' . $i)
                             ]);
                     } else {
-                        SLDefinitions::where('DefSet', 'Menu Settings')
-                            ->where('DefSubset', 'main-navigation')
-                            ->where('DefDatabase', 1)
-                            ->where('DefOrder', $i)
+                        SLDefinitions::where('def_set', 'Menu Settings')
+                            ->where('def_subset', 'main-navigation')
+                            ->where('def_database', 1)
+                            ->where('def_order', $i)
                             ->delete();
                     }
                 } elseif ($request->has('mainNavTxt' . $i)) {
                     $newLnk = new SLDefinitions;
-                    $newLnk->DefSet         = 'Menu Settings';
-                    $newLnk->DefSubset      = 'main-navigation';
-                    $newLnk->DefDatabase    = 1;
-                    $newLnk->DefOrder       = $i;
-                    $newLnk->DefValue       = $request->get('mainNavTxt' . $i);
-                    $newLnk->DefDescription = $request->get('mainNavLnk' . $i);
+                    $newLnk->def_set         = 'Menu Settings';
+                    $newLnk->def_subset      = 'main-navigation';
+                    $newLnk->def_database    = 1;
+                    $newLnk->def_order       = $i;
+                    $newLnk->def_value       = $request->get('mainNavTxt' . $i);
+                    $newLnk->def_description = $request->get('mainNavLnk' . $i);
                     $newLnk->save();
                 }
             }
@@ -563,8 +575,8 @@ class AdminController extends AdminEmailController
     {
         if ($treeID > 0 && $cid > 0) {
             $treeRow = SLTree::find($treeID);
-            if ($treeRow && isset($treeRow->TreeSlug)) {
-                return redirect('/' . $treeRow->TreeSlug . '/read-' . $cid);
+            if ($treeRow && isset($treeRow->tree_slug)) {
+                return redirect('/' . $treeRow->tree_slug . '/read-' . $cid);
             }
         }
         return 'Not found :(';

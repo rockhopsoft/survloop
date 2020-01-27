@@ -1,19 +1,20 @@
 <!-- resources/views/vender/survloop/elements/inc-search-bar.blade.php -->
-<a name="search"></a>
+<div class="nodeAnchor"><a name="search"></a></div>
 @if (isset($pre)) {!! $pre !!} @endif
 <div class="search-bar">
     <input type="text" id="searchBar{{ $nID }}t{{ $treeID }}" name="s{{ $nID }}" 
         class="form-control form-control-lg slTab searchBar" {!! $GLOBALS["SL"]->tabInd() !!}
         @if (isset($search)) value="{{ $search }}" @else value="" @endif >
-    <div class="search-btn-wrap"><a id="searchTxt{{ $nID }}t{{ $treeID }}" href="javascript:;"
-        class="btn btn-info searchBarBtn" 
+    <div class="search-btn-wrap"><a id="searchTxt{{ $nID }}t{{ $treeID }}" 
+        class="btn btn-info searchBarBtn" href="javascript:;"
         @if (!isset($ajax) || intVal($ajax) == 0) target="_parent" @endif 
         ><i class="fa fa-search" aria-hidden="true"></i></a></div>
 </div>
 <input type="hidden" name="advUrl" id="advUrlID" value="{{ $advUrl }}">
 @if (isset($extra) && trim($extra) != '') {!! $extra !!} @endif
 @if (isset($advanced) && trim($advanced) != '')
-    <div class="fR pT15"><a id="searchAdvBtn{{ $nID }}t{{ $treeID }}" class="searchAdvBtn fPerc133" href="javascript:;"
+    <div class="fR pT15"><a id="searchAdvBtn{{ $nID }}t{{ $treeID }}" 
+        class="searchAdvBtn" href="javascript:;"
         >Advanced filters <i class="fa fa-cogs" aria-hidden="true"></i></a></div>
 @endif
 <div class="fC"></div>

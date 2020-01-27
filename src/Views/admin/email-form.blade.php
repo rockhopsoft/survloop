@@ -4,7 +4,7 @@
 
 <div class="container"><div class="slCard nodeWrap">
 @if ($currEmailID > 0) 
-    <h2 class="mB0">Editing Email Template: {{ $currEmail->EmailName }}</h2> 
+    <h2 class="mB0">Editing Email Template: {{ $currEmail->email_name }}</h2> 
 @else
     <h2>Create New Email Template</h2>
 @endif
@@ -22,11 +22,11 @@
         <select name="emailType" class="form-control form-control-lg" 
             onChange="if (this.value == 'Blurb') { document.getElementById('subj').style.display='none'; } else { document.getElementById('subj').style.display='block'; }" >
             <option value="To Complainant" 
-                @if ($currEmail->EmailType == 'To Complainant' || trim($currEmail->EmailType) == '') SELECTED @endif
+                @if ($currEmail->email_type == 'To Complainant' || trim($currEmail->email_type) == '') SELECTED @endif
                 >Sent To Complainant</option>
-            <option value="To Oversight" @if ($currEmail->EmailType == 'To Oversight') SELECTED @endif 
+            <option value="To Oversight" @if ($currEmail->email_type == 'To Oversight') SELECTED @endif 
                 >Sent To Oversight Agency</option>
-            <option value="Blurb" @if ($currEmail->EmailType == 'Blurb') SELECTED @endif 
+            <option value="Blurb" @if ($currEmail->email_type == 'Blurb') SELECTED @endif 
                 >Excerpt used within other emails</option>
         </select>
     </div>
@@ -37,17 +37,17 @@
         <h4 class="m0 slGrey">Internal Name</h4>
     </div>
     <div class="col-9">
-        <input type="text" name="emailName" value="{{ $currEmail->EmailName }}" 
+        <input type="text" name="emailName" value="{{ $currEmail->email_name }}" 
             class="form-control form-control-lg" >
     </div>     
 </div>
 
-<div id="subj" class="row pB20 @if ($currEmail->EmailType == 'Blurb') disNon @else disFlx @endif ">
+<div id="subj" class="row pB20 @if ($currEmail->email_type == 'Blurb') disNon @else disFlx @endif ">
     <div class="col-3">
         <h4 class="m0 slGrey">Email Subject Line</h4>
     </div>
     <div class="col-9">
-        <input type="text" name="emailSubject" value="{{ $currEmail->EmailSubject }}" 
+        <input type="text" name="emailSubject" value="{{ $currEmail->email_subject }}" 
             class="form-control form-control-lg" >
     </div>
 </div>
@@ -60,11 +60,11 @@
     </div>
     <div class="col-9">
         <textarea name="emailBody" id="emailBodyID" class="form-control form-control-lg" style="height: 500px;"
-            >{{ $currEmail->EmailBody }}</textarea>
+            >{{ $currEmail->email_body }}</textarea>
     </div>
 </div>
 </form>
-<!--- {{ $currEmail->EmailOpts }} --->
+<!--- {{ $currEmail->email_opts }} --->
 </div></div>
 <div class="adminFootBuff"></div>
 @endsection

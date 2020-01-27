@@ -1,24 +1,22 @@
 <?php
 // Check for globals required to load this master template
 if (!isset($GLOBALS["SL"])) {
-    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals(
-        new Illuminate\Http\Request, 1, 1, 1);
+    $request = new Illuminate\Http\Request;
+    $GLOBALS["SL"] = new SurvLoop\Controllers\Globals\Globals($request, 1, 1, 1);
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') 
     || (isset($belowAdmMenu) && trim($belowAdmMenu) != ''));
-$bodyBg = (isset($GLOBALS["SL"]->treeRow->TreeOpts) 
-    && $GLOBALS["SL"]->treeRow->TreeOpts%67 == 0);
+$bodyBg = (isset($GLOBALS["SL"]->treeRow->tree_opts) 
+    && $GLOBALS["SL"]->treeRow->tree_opts%67 == 0);
 
 $isWsyiwyg = false;
 if (isset($needsWsyiwyg) && $needsWsyiwyg) {
     $isWsyiwyg = true;
 }
-if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
-    && $GLOBALS["SL"]->x["needsWsyiwyg"]) {
+if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"]) {
     $isWsyiwyg = true;
 }
-
 
 ?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -38,8 +36,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     <link href="/bootstrap.min.css" rel="stylesheet" type="text/css">
     <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{
-        $GLOBALS['SL']->sysOpts['log-css-reload'] 
-        }}" rel="stylesheet" type="text/css">
+        $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
     <script src="/jquery.min.js" type="text/javascript"></script>
     <script src="/jquery-ui.min.js" type="text/javascript"></script>
     <script src="/bootstrap.min.js" type="text/javascript"></script>
@@ -75,23 +72,18 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     {!! view('vendor.survloop.elements.inc-matomo-analytics')->render() !!}
 @endif
 </head>
-<body @if ($isDashLayout) class="bodyDash" 
-    @elseif ($bodyBg) class="bgFnt" 
-    @endif {!! $GLOBALS['SL']->getBodyParams() !!} >
-<a name="top"></a>
-<div class="hidden">
-    <a href="#maincontent">Skip to Main Content</a>
-</div>
+<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif 
+    {!! $GLOBALS['SL']->getBodyParams() !!} >
+<div class="nodeAnchor"><a name="top"></a></div>
+<div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>
 <div id="dialogPop" title=""></div>
 @if (isset($bodyTopCode)) {!! $bodyTopCode !!} @endif
 
 @if ((!isset($isPrint) || !$isPrint) 
     && (!isset($isFrame) || !$isFrame)
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
-        || !$GLOBALS["SL"]->x["isPrintPDF"])
-    && (!$GLOBALS["SL"]->REQ->has("frame") 
-        || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
+    && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
     <div class="headGap">
@@ -101,9 +93,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     @if (isset($navMenu) && sizeof($navMenu) > 0)
         @foreach ($navMenu as $i => $arr)
             @if (trim($arr[0]) != '' && trim($arr[1]) != '')
-                <li class="nav-item">
-                    <a href="{{ $arr[1] }}">{{ $arr[0] }}</a>
-                </li>
+                <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li>
             @endif
         @endforeach
     @endif
@@ -116,8 +106,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 
 @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) 
     && (!isset($isPrint) || !$isPrint) 
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
-        || !$GLOBALS["SL"]->x["isPrintPDF"]))
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
 
 <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
 <td id="leftSide" class="leftSide">
@@ -155,20 +144,22 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     <div class="fL">
     @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["logo-url"]))
         <div id="slLogoWrap"><a id="slLogo" href="{{ $GLOBALS['SL']->sysOpts['logo-url'] }}" 
-            ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" border=0 
-            alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
+            ><img id="slLogoImg" src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" 
+            alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" border=0 
             title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
-         @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
-             && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
-            <img id="slLogoImgSm" src="{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}" border=0 
-                alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" 
+         @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
+            && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
+            && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+            <img id="slLogoImgSm" src="{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}" 
+                alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" border=0 
                 title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
          @endif
          </a></div>
     @endif
     @if (isset($GLOBALS['SL']->sysOpts['show-logo-title']) 
         && intVal($GLOBALS['SL']->sysOpts['show-logo-title']) == 1)
-        <a id="logoTxt" href="/" class="navbar-brand">{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
+        <a id="logoTxt" href="/" class="navbar-brand"
+            >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
     </div>
     {!! view('vendor.survloop.master-search')->render() !!}
@@ -183,7 +174,9 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 
 <noscript><div class="alert alert-dismissible alert-warning">
     <b>Warning: It looks like you have JavaScript disabled.
-    @if (isset($GLOBALS['SL']->sysOpts['site-name'])) {{ $GLOBALS['SL']->sysOpts['site-name'] }} @endif
+    @if (isset($GLOBALS['SL']->sysOpts['site-name'])) 
+        {{ $GLOBALS['SL']->sysOpts['site-name'] }}
+    @endif
     requires JavaScript to give you the best possible experience.</b>
 </div></noscript>
 
@@ -197,13 +190,15 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 
 @if ((!isset($isFrame) || !$isFrame) && $isDashLayout)
 
-    @if ((isset($isPrint) && $isPrint) || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
+    @if ((isset($isPrint) && $isPrint) 
+        || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
     
         <br />
         <div class="container">
             <div class="p5 pL20">
-                <img src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" alt="Link back to main website" 
-                    title="Link back to main website" height=75 border=0 >
+                <img src="{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}" 
+                    alt="Link back to main website" height=75 border=0
+                    title="Link back to main website" >
             </div>
             @if (isset($content)) {!! $content !!} @endif
             @yield('content')
@@ -217,7 +212,8 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
         <div class="container-fluid">
             @if (isset($content)) {!! $content !!} @endif
             @yield('content')
-            @if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
+            @if (isset($GLOBALS['SL']->sysOpts) 
+                && isset($GLOBALS['SL']->sysOpts["footer-admin"]))
                 {!! $GLOBALS['SL']->sysOpts["footer-admin"] !!}
             @endif
         </div>
@@ -283,7 +279,8 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
     {!! $GLOBALS['SL']->pageSCRIPTS !!}
 @endif
-@if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
+@if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') 
+    || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
     <script id="dynamicJS" type="text/javascript" defer >
     @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
         {!! $GLOBALS['SL']->pageJAVA !!}

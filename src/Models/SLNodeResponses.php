@@ -5,16 +5,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class SLNodeResponses extends Model
 {
-    protected $table         = 'SL_NodeResponses';
-    protected $primaryKey     = 'NodeResID';
+    protected $table         = 'sl_node_responses';
+    protected $primaryKey     = 'node_res_id';
     public $timestamps         = true;
     protected $fillable     = 
     [    
-        'NodeResNode', 
-        'NodeResOrd', 
-        'NodeResEng', 
-        'NodeResValue', 
-        'NodeResShowKids', 
-        'NodeResMutEx'
+        'node_res_node', 
+        'node_res_ord', 
+        'node_res_eng', 
+        'node_res_value', 
+        'node_res_show_kids', 
+        'node_res_mut_ex'
     ];
 }

@@ -35,7 +35,10 @@ class SurvStats extends SurvStatsCache
             $this->raw[$datLet]["tag"][$i] = [];
             if (sizeof($tags) > 0) {
                 foreach ($tags as $tag) {
-                    $this->raw[$datLet]["tag"][$i][] = [ $this->tAbr($tag[0]), $tag[1] ];
+                    $this->raw[$datLet]["tag"][$i][] = [
+                        $this->tAbr($tag[0]), 
+                        $tag[1]
+                    ];
                 }
             }
         }
@@ -128,8 +131,8 @@ class SurvStats extends SurvStatsCache
                 foreach ($this->dat as $filtStr => $dat) {
                     if (sizeof($this->dat[$filtStr]["dat"][$datLet]["ids"]) > 0) {
                         $this->dat[$filtStr]["dat"][$datLet]["avg"] 
-                            = $this->dat[$filtStr]["dat"][$datLet]["sum"
-                                ]/sizeof($this->dat[$filtStr]["dat"][$datLet]["ids"]);
+                            = $this->dat[$filtStr]["dat"][$datLet]["sum"]
+                                /sizeof($this->dat[$filtStr]["dat"][$datLet]["ids"]);
                     }
                 }
                 $this->calcTagAvg($datLet, '1');
@@ -187,7 +190,9 @@ class SurvStats extends SurvStatsCache
     
     public function tblApplyScale()
     {
-        if (isset($this->opts["scaler"][0]) && $this->opts["scaler"][0] > 0 && $this->opts["scaler"][0] != 1 
+        if (isset($this->opts["scaler"][0]) 
+            && $this->opts["scaler"][0] > 0 
+            && $this->opts["scaler"][0] != 1 
             && sizeof($this->tblOut) > 0) {
             foreach ($this->tblOut as $i => $row) {
                 if (sizeof($row) > 0) {
@@ -244,7 +249,9 @@ class SurvStats extends SurvStatsCache
         if (isset($this->filts[$fLet]) && sizeof($this->filts[$fLet]["val"]) > 0) {
             foreach ($this->filts[$fLet]["val"] as $v => $val) {
                 $filtStr = $this->applyCurrFilt($fLet . $val);
-                if ($val == $fltVal && isset($this->dat[$filtStr]) && isset($this->dat[$filtStr]["cnt"])) {
+                if ($val == $fltVal 
+                    && isset($this->dat[$filtStr]) 
+                    && isset($this->dat[$filtStr]["cnt"])) {
                     return $this->dat[$filtStr]["cnt"];
                 }
             }
@@ -283,7 +290,9 @@ class SurvStats extends SurvStatsCache
     
     public function getDatLetTot($dLet, $fStr = '1', $typ = 'sum')
     {
-        if ($dLet != '' && isset($this->dat[$fStr]) && isset($this->dat[$fStr]["dat"][$dLet]) 
+        if ($dLet != '' 
+            && isset($this->dat[$fStr]) 
+            && isset($this->dat[$fStr]["dat"][$dLet]) 
             && isset($this->dat[$fStr]["dat"][$dLet][$typ])) {
             return $this->dat[$fStr]["dat"][$dLet][$typ];
         }

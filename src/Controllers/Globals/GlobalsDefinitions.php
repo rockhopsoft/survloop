@@ -23,11 +23,11 @@ class GlobalsDefinitions
     public function loadDefs($subset)
     {
         if (!isset($this->defValues[$subset])) {
-            $this->defValues[$subset] = SLDefinitions::where('DefDatabase', $this->dbID)
-                ->where('DefSubset', $subset)
-                ->where('DefSet', 'Value Ranges')
-                ->orderBy('DefOrder', 'asc')
-                ->select('DefID', 'DefValue')
+            $this->defValues[$subset] = SLDefinitions::where('def_database', $this->dbID)
+                ->where('def_subset', $subset)
+                ->where('def_set', 'Value Ranges')
+                ->orderBy('def_order', 'asc')
+                ->select('def_id', 'def_value')
                 ->get();
         }
         return true;
@@ -38,8 +38,8 @@ class GlobalsDefinitions
         $this->loadDefs($subset);
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $def) {
-                if ($def->DefValue == $value) {
-                    return $def->DefID;
+                if ($def->def_value == $value) {
+                    return $def->def_id;
                 }
             }
         }
@@ -52,8 +52,8 @@ class GlobalsDefinitions
             return '';
         }
         $def = SLDefinitions::find($id);
-        if ($def && isset($def->DefValue)) {
-            return trim($def->DefValue);
+        if ($def && isset($def->def_value)) {
+            return trim($def->def_value);
         }
         return '';
     }
@@ -75,8 +75,8 @@ class GlobalsDefinitions
         $this->loadDefs($subset);
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $def) {
-                if ($def->DefID == $id) {
-                    return $def->DefValue;
+                if ($def->def_id == $id) {
+                    return $def->def_value;
                 }
             }
         }
@@ -86,10 +86,10 @@ class GlobalsDefinitions
     public function getSet($subset = '', $fullRecs = false)
     {
         if ($fullRecs) {
-            return SLDefinitions::where('DefDatabase', $this->dbID)
-                ->where('DefSubset', $subset)
-                ->where('DefSet', 'Value Ranges')
-                ->orderBy('DefOrder', 'asc')
+            return SLDefinitions::where('def_database', $this->dbID)
+                ->where('def_subset', $subset)
+                ->where('def_set', 'Value Ranges')
+                ->orderBy('def_order', 'asc')
                 ->get();
         }
         $this->loadDefs($subset);
@@ -102,9 +102,10 @@ class GlobalsDefinitions
         $this->loadDefs($subset);
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $i => $val) {
-                if (sizeof($skip) == 0 || !in_array($val->DefID, $skip)) {
-                    $ret .= '<option value="' . $val->DefID . '" ' . (($presel == $val->DefID) ? 'SELECTED ' : '')
-                        . '>' . $val->DefValue . '</option>';
+                if (sizeof($skip) == 0 || !in_array($val->def_id, $skip)) {
+                    $ret .= '<option value="' . $val->def_id . '" ' 
+                        . (($presel == $val->def_id) ? 'SELECTED ' : '')
+                        . '>' . $val->def_value . '</option>';
                 }
             }
         }
@@ -113,14 +114,37 @@ class GlobalsDefinitions
     
     public function getDesc($subset = '', $val = '')
     {
-        $chk = SLDefinitions::where('DefDatabase', $this->dbID)
-            ->where('DefSet', 'Value Ranges')
-            ->where('DefSubset', $subset)
-            ->where('DefValue', $val)
+        $chk = SLDefinitions::where('def_database', $this->dbID)
+            ->where('def_set', 'Value Ranges')
+            ->where('def_subset', $subset)
+            ->where('def_value', $val)
             ->first();
-        if ($chk && isset($chk->DefDescription)) {
-            return $chk->DefDescription;
+        if ($chk && isset($chk->def_description)) {
+            return $chk->def_description;
         }
         return '';
     }
+
+    public function getOtherGenders()
+    {
+        $ret = [];
+        $set = $this->getSet('Gender Identity');
+        if (sizeof($set) > 0) {
+            foreach ($set as $i => $gen) {
+                $ret[] = $gen->def_value;
+            }
+        } else {
+            $ret = [
+                'Transgender',
+                'Female to male transgender',
+                'Male to female transgender',
+                'Genderqueer/Androgynous',
+                'Cross-dresser',
+                'Transsexual',
+                'Intersex'
+            ];
+        }
+        return $ret;
+    }
+
 }

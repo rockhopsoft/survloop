@@ -15,12 +15,17 @@
 
 <div id="addCond" style="overflow: hidden;">
     <div class="round10 brd p20 mB20 mTn20" style="padding-top: 40px;">
-        <form name="mainPageForm" method="post" action="/dashboard/db/conds/edit/{{ $cond->CondID }}" >
+        <form name="mainPageForm" method="post" action="/dashboard/db/conds/edit/{{ $cond->cond_id }}" >
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="editCond" value="1">
-        {!! view('vendor.survloop.admin.db.inc-addCondition', [
-            "newOnly" => false, "cond" => $cond, "condArticles" => $condArticles
-        ])->render() !!}
+        {!! view(
+            'vendor.survloop.admin.db.inc-addCondition', 
+            [
+                "newOnly"      => false, 
+                "cond"         => $cond, 
+                "condArticles" => $condArticles
+            ]
+        )->render() !!}
         </form>
     </div>
 </div>

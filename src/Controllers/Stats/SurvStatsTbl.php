@@ -23,7 +23,10 @@ class SurvStatsTbl
         $this->lineRows = $lineRows;
         $this->lineCols = $lineCols;
         $this->rows = [
-            [ new SurvStatTh(), new SurvStatTh($colPrfx, 0) ]
+            [
+                new SurvStatTh(), 
+                new SurvStatTh($colPrfx, 0)
+            ]
         ];
     }
     
@@ -66,8 +69,7 @@ class SurvStatTh
         
     public function toExcel($j = 0, $brdRgt = false)
     {
-        $ret = '<th' . (($j == 0) ? ' align=left ' : '') . '>'
-            . (($this->lab) ? $this->lab : '') . '</th>';
+        $ret = '<th' . (($j == 0) ? ' align=left ' : '') . '>' . (($this->lab) ? $this->lab : '') . '</th>';
         if ($j > 0) {
             $ret .= '<th style="color: #777;' . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
                 . '">(count)</th>';

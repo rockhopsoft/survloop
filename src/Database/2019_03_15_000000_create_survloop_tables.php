@@ -357,12 +357,12 @@ class CreateSurvLoopTables extends Migration
 		});
 		Schema::create('SL_Tokens', function(Blueprint $table)
 		{
-			$table->increments('TokID');
-			$table->string('TokType', 20)->nullable();
-			$table->integer('TokUserID')->unsigned()->nullable();
-			$table->integer('TokTreeID')->unsigned()->nullable();
-			$table->integer('TokCoreID')->nullable();
-			$table->string('TokTokToken', 255)->nullable();
+			$table->increments('tok_id');
+			$table->string('tok_type', 20)->nullable();
+			$table->integer('tok_user_id')->unsigned()->nullable();
+			$table->integer('tok_tree_id')->unsigned()->nullable();
+			$table->integer('tok_core_id')->nullable();
+			$table->string('tok_tok_token', 255)->nullable();
 			$table->timestamps();
 		});
 		Schema::create('SL_UsersRoles', function(Blueprint $table)
