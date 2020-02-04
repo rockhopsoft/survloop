@@ -226,7 +226,11 @@ class TreeSurvInput extends TreeSurvUpload
                                         }
                                     }
                                 }
-                                $this->tableDat["rows"][$i]["id"] = $recObj->getKey();
+                                if ($recObj) {
+                                    $this->tableDat["rows"][$i]["id"] = $recObj->getKey();
+                                } else {
+                                    $this->tableDat["rows"][$i]["id"] = -3;
+                                }
                             } else {
                                 $this->tableDat["rows"][$i]["id"] = -3;
                             }

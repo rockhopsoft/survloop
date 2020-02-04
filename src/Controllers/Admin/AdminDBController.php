@@ -410,18 +410,18 @@ class AdminDBController extends AdminController
                 'log_table'    => $this->v["tbl"]->tbl_id, 
                 'log_field'    => 0, 
                 'log_old_name' => $this->v["tbl"]->tbl_name, 
-                'log_new_name' => $GLOBALS["SL"]->REQ->tbl_name
+                'log_new_name' => $GLOBALS["SL"]->REQ->TblName
             ];
             if (trim($tblName) == '') {
                 $this->v["tbl"]->tbl_database = $this->dbID;
             }
-            $this->v["tbl"]->tbl_name  = $GLOBALS["SL"]->REQ->tbl_name;
-            $this->v["tbl"]->tbl_eng   = $GLOBALS["SL"]->REQ->tbl_eng;
-            $this->v["tbl"]->tbl_abbr  = $GLOBALS["SL"]->REQ->tbl_abbr;
-            $this->v["tbl"]->tbl_desc  = $GLOBALS["SL"]->REQ->tbl_desc;
-            $this->v["tbl"]->tbl_notes = $GLOBALS["SL"]->REQ->tbl_notes;
-            $this->v["tbl"]->tbl_group = $GLOBALS["SL"]->REQ->tbl_group;
-            $this->v["tbl"]->tbl_type  = $GLOBALS["SL"]->REQ->tbl_type;
+            $this->v["tbl"]->tbl_name  = $GLOBALS["SL"]->REQ->TblName;
+            $this->v["tbl"]->tbl_eng   = $GLOBALS["SL"]->REQ->TblEng;
+            $this->v["tbl"]->tbl_abbr  = $GLOBALS["SL"]->REQ->TblAbbr;
+            $this->v["tbl"]->tbl_desc  = $GLOBALS["SL"]->REQ->TblDesc;
+            $this->v["tbl"]->tbl_notes = $GLOBALS["SL"]->REQ->TblNotes;
+            $this->v["tbl"]->tbl_group = $GLOBALS["SL"]->REQ->TblGroup;
+            $this->v["tbl"]->tbl_type  = $GLOBALS["SL"]->REQ->TblType;
             $this->v["tbl"]->save();
             if (trim($tblName) == '' || $GLOBALS["SL"]->REQ->has('forceCreate')) {
                 $logActions["log_action"] = 'New';

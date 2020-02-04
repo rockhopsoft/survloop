@@ -3,22 +3,27 @@
 <div id="uploadErrors" class="txtDanger"></div>
 <div id="up{{ $nID }}Wrap" class="slCard">
     <div class="uploadTypes">
-        <h2><i class="fa fa-cloud-upload"></i> New Upload</h2>
+        <h4 class="mB0"><i class="fa fa-cloud-upload mR5"></i> New Upload</h4>
         
         @if ($uploadTypes->count() > 1)
             @foreach ($uploadTypes as $j => $ty)
-                <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" class="finger">
-                    <div class="disIn mR5"><input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" 
-                        value="{{ $ty->def_id }}" type="radio" autocomplete="off" class="upTypeBtn"></div>    
-                        {{ $ty->def_value }}
+                <label for="n{{ $nID }}fld{{ $j }}" id="n{{ $nID }}fld{{ $j }}lab" 
+                    class="finger">
+                    <div class="disIn mR5">
+                        <input id="n{{ $nID }}fld{{ $j }}" name="n{{ $nID }}fld" 
+                            value="{{ $ty->def_id }}" type="radio" autocomplete="off" 
+                            class="upTypeBtn">
+                    </div>    
+                    {{ $ty->def_value }}
                 </label>
             @endforeach
         @elseif ($uploadTypes->isNotEmpty() > 1)
-            <input type="hidden" autocomplete="off" id="n{{ $nID }}fldID" name="n{{ $nID }}fld" 
-                value="{{ $uploadTypes[0]->def_id }}">
+            <input type="hidden" id="n{{ $nID }}fldID" name="n{{ $nID }}fld" 
+                value="{{ $uploadTypes[0]->def_id }}" autocomplete="off" >
         @endif
         
-        <div id="up{{ $nID }}Info" class=" @if (sizeof($uploadTypes) > 1) disNon @else disBlo @endif ">
+        <div id="up{{ $nID }}Info" 
+            class=" @if (sizeof($uploadTypes) > 1) disNon @else disBlo @endif ">
             <div class="nodeHalfGap"></div>
             <div id="up{{ $nID }}FormVideo" class="disNon">
                 <div class="nPrompt"><label for="up{{ $nID }}VidID">
@@ -28,7 +33,8 @@
                 </label></div>
                 <div class="nFld mT5">
                     <input type="text" id="up{{ $nID }}VidID" name="up{{ $nID }}Vid" 
-                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} >
+                        class="form-control form-control-lg ntrStp slTab" 
+                        {!! $GLOBALS["SL"]->tabInd() !!} >
                 </div>
             </div>
             <div id="up{{ $nID }}FormFile" class="disBlo">
@@ -47,8 +53,9 @@
                     <label for="up{{ $nID }}TitleID">Title of Upload</label>
                 </div>
                 <div class="nFld mT5">
-                    <input type="text" id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" 
-                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!} >
+                    <input id="up{{ $nID }}TitleID" name="up{{ $nID }}Title" value="" 
+                        type="text" class="form-control form-control-lg ntrStp slTab" 
+                        {!! $GLOBALS["SL"]->tabInd() !!} >
                 </div>
             </div>
             <?php /* <div class="nodeHalfGap"></div>
@@ -65,19 +72,24 @@
                 </div> 
                 <div class="nFld mT5">
                     <select name="up{{ $nID }}Privacy" id="up{{ $nID }}PrivacyID" 
-                        class="form-control form-control-lg ntrStp slTab" {!! $GLOBALS["SL"]->tabInd() !!}>
-                        <option value="Public" @if ($isPublic) CHECKED @endif >Public: Visible to whole world</option>
-                        <option value="Private" @if (!$isPublic) CHECKED @endif >Private: Visible only to investigators</option>
+                        class="form-control form-control-lg ntrStp slTab" 
+                        {!! $GLOBALS["SL"]->tabInd() !!} >
+                        <option value="Public" @if ($isPublic) CHECKED @endif 
+                            >Public: Visible to whole world</option>
+                        <option value="Private" @if (!$isPublic) CHECKED @endif 
+                            >Private: Visible only to investigators</option>
                     </select>
                 </div>
                 @if (isset($uploadWarn) && trim($uploadWarn) != '')
-                    <div class="alert alert-danger fade in alert-dismissible show" style="margin-top: 10px;">
+                    <div class="alert alert-danger fade in alert-dismissible show" 
+                        style="margin-top: 10px;">
                         {!! $uploadWarn !!}
                     </div>
                 @endif
             @endif
             <div class="nodeHalfGap"></div>
-            <a id="nFormUpload" href="javascript:;" class="btn btn-lg btn-xl btn-primary btn-block">Upload</a>
+            <a id="nFormUpload" href="javascript:;" 
+                class="btn btn-lg btn-lg btn-primary btn-block">Upload</a>
         </div>
         
         <hr>

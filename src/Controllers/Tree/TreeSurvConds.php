@@ -150,6 +150,13 @@ class TreeSurvConds extends TreeSurvAPI
                     || !$this->v["user"]->hasRole('administrator|staff|partner')) {
                     $retTF = false;
                 }
+            } elseif (trim($cond->cond_tag) == '#IsPartnerStaffAdminOrOwner') {
+                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
+                    $retTF = false;
+                } elseif (!$this->v["user"]->hasRole('administrator|staff|partner')
+                    && !$this->v["isOwner"]) {
+                    $retTF = false;
+                }
             } elseif (trim($cond->cond_tag) == '#IsPartner') {
                 if (!isset($this->v["uID"]) 
                     || $this->v["uID"] <= 0 

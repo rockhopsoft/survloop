@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class SLUploads extends Model
 {
     protected $table         = 'sl_uploads';
-    protected $primaryKey     = 'up_ip';
+    protected $primaryKey     = 'up_id';
     public $timestamps         = true;
     protected $fillable     = 
     [

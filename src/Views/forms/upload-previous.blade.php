@@ -3,7 +3,7 @@
 @if (!isset($uploads) || sizeof($uploads) == 0) 
     <h4><span class="slGrey">Nothing uploaded here.</span></h4>
 @else
-    <h2 style="margin-bottom: 10px;">
+    <h4 class="mB0">
         <i class="fa fa-cloud-upload"></i> {{ sizeof($uploads) }} 
         Previous @if (sizeof($uploads) == 1) Upload: @else Uploads: @endif
     </h2>
@@ -70,9 +70,11 @@
                     </div>
                     
                     <div id="up{{ $upRow->up_id }}InfoEdit" class="disNon pB10">
-                        <input type="hidden" name="up{{ $upRow->up_id }}EditVisib" id="up{{ $upRow->up_id }}EditVisibID" 
-                            value="0">
-                        <div class="nPrompt"><label for="up{{ $upRow->up_id }}EditTitleID">Upload Title:</label></div>
+                        <input name="up{{ $upRow->up_id }}EditVisib" id="up{{ $upRow->up_id }}EditVisibID" 
+                            type="hidden" value="0">
+                        <div class="nPrompt">
+                            <label for="up{{ $upRow->up_id }}EditTitleID">Upload Title:</label>
+                        </div>
                         <div class="nFld mT0">
                             <input type="text" class="form-control form-control-lg ntrStp slTab" 
                                 name="up{{ $upRow->up_id }}EditTitle" id="up{{ $upRow->up_id }}EditTitleID" 
@@ -111,7 +113,7 @@
                                 </select></div>
                         @endif
                         <div class="nodeHalfGap"></div>
-                        <input type="submit" value="Save Changes" 
+                        <input type="submit" value="Save Changes" id="editItemSave{{ $upRow->up_id }}"
                             class="nFormUploadSave btn btn-lg btn-primary btn-block">
                     </div>
                     

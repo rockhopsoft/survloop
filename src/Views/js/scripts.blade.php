@@ -304,7 +304,7 @@ function getProTipImg() {
 function addProTipToAjax() {
     if (treeProTips.length > 0) {
         if (document.getElementById("ajaxWrapLoad")) {
-            document.getElementById("ajaxWrapLoad").innerHTML += '<center><h3 class="slBlueDark pL15 pR15">'+getNextProTipText()+'</h3></center>';
+            document.getElementById("ajaxWrapLoad").innerHTML += '<div class="proTip"><h4 class="slBlueDark">'+getNextProTipText()+'</h4></div>';
             var img = getProTipImg();
             if (img.length > 0) {
                 document.getElementById("ajaxWrapLoad").innerHTML += '<center><img src="'+img+'" border=0 class="mT20" style="min-width: 200px;" ></center>';

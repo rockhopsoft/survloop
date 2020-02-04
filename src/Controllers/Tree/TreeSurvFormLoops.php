@@ -111,8 +111,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         }
         $ret = '';
         if ($addingLoopItem > 0) {
-            $ret .= '<div class="w100 taC pB15 mB15">' 
-                . $GLOBALS["SL"]->spinner() . '</div>';
+            $ret .= $GLOBALS["SL"]->spinner();
         }
         $ret .= '<div id="loopNav' . $nID . '" class="nPrompt"'
             . (($addingLoopItem > 0) ? ' style="display: none;" ' : '') . '>'
@@ -167,14 +166,17 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         }
         $itemDesc = ' ' . strtolower($loopRec->data_loop_singular);
         $dis = 'disNon';
-        $cnt = sizeof($this->sessData->loopItemIDs[$loopName]);
+        $cnt = 0;
+        if (isset($this->sessData->loopItemIDs[$loopName])) {
+            $cnt = sizeof($this->sessData->loopItemIDs[$loopName]);
+        }
         $max = $loopRec->data_loop_max_limit;
         if ($max == 0 || $cnt < $max) {
             $dis = 'disBlo';
         }
         if ($GLOBALS["SL"]->REQ->has('addLoopItem') 
             && intVal($GLOBALS["SL"]->REQ->addLoopItem) == 1) {
-            return '<center><br />' . $GLOBALS["SL"]->spinner() . '<br /></center>';
+            return $GLOBALS["SL"]->spinner();
         }
         $idHref = 'href="javascript:;" id="nFormAdd"';
         if (isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_auto_gen)

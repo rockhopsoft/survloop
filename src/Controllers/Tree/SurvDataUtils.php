@@ -84,17 +84,21 @@ class SurvDataUtils
         if ($rowID <= 0) {
             return [];
         }
-        $model = $GLOBALS["SL"]->modelPath($tbl);
-        if (trim($model) != '') {
-            eval("\$recObj = " . $model . "::find(" . $rowID . ");");
-            return $recObj;
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return [];
         }
-        return [];
+        eval("\$recObj = " . $model . "::find(" . $rowID . ");");
+        return $recObj;
     }
     
     public function dataWhere($tbl, $where, $whereVal, $operator = "=", $getFirst = "get")
     {
-        eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl)
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return null;
+        }
+        eval("\$recObj = " . $model 
             . "::where('" . $where . "', '" . $operator . "', '" . $whereVal . "')"
             . "->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'asc')"
             . "->" . $getFirst . "();");
@@ -107,7 +111,11 @@ class SurvDataUtils
         if ($itemID <= 0 || $itemInd < 0) {
             return false;
         }
-        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" . $itemID . ")->delete();");
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return false;
+        }
+        eval($model . "::find(" . $itemID . ")->delete();");
         unset($this->dataSets[$tbl][$itemInd]);
         unset($this->id2ind[$tbl][$itemID]);
         return true;
@@ -117,7 +125,8 @@ class SurvDataUtils
     {
         if (sizeof($this->dataSets) > 0) {
             foreach ($this->dataSets as $tbl => $rows) {
-                if (sizeof($rows) > 0) {
+                $model = trim($GLOBALS["SL"]->modelPath($tbl));
+                if ($model != '' && sizeof($rows) > 0) {
                     foreach ($rows as $row) {
                         eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" 
                             . intVal($row->getKey()) . ")->delete();");
@@ -270,6 +279,29 @@ class SurvDataUtils
                     "ind1" => $tbl1Ind,
                     "ind2" => $tbl2Ind
                 ];
+            }
+        }
+        return false;
+    }
+    
+    public function removeFromMap($tbl1, $tbl1ID)
+    {
+        if ($tbl1ID > 0 
+            && trim($tbl1) != ''
+            && isset($this->kidMap[$tbl1])
+            && sizeof($this->kidMap[$tbl1]) > 0) {
+            foreach ($this->kidMap[$tbl1] as $tbl2 => $map) {
+                if (sizeof($map) > 0) {
+                    $delInds = [];
+                    foreach ($map as $i => $linkage) {
+                        if ($linkage["id1"] == $tbl1ID) {
+                            $delInds[] = $i;
+                        }
+                    }
+                    for ($i = (sizeof($delInds)-1); $i >= 0; $i--) {
+                        unset($delInds[$i]);
+                    }
+                }
             }
         }
         return false;

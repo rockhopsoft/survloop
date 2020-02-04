@@ -77,6 +77,10 @@ class TreeSurvNodeEdit extends TreeSurvForm
             }
             $node->nodeType = $node->nodeRow->node_type;
         }
+        if (!isset($node->nodeRow->node_opts) || intVal($node->nodeRow->node_opts) <= 0) {
+            $node->nodeRow->node_opts = 1;
+            $node->nodeRow->save();
+        }
         $parent = [];
         if ($node->parentID > 0) {
             $parent = SLNode::find($node->parentID);
@@ -183,6 +187,9 @@ class TreeSurvNodeEdit extends TreeSurvForm
                                 }
                             }
                         } else {
+                            if ($node->nodeRow->node_opts <= 0) {
+                                $node->nodeRow->node_opts = 1;
+                            }
                             $node->nodeRow->node_response_set = null;
                             $node->nodeRow->save();
                         }
@@ -522,6 +529,9 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     } else {
                         $node->nodeRow->node_default = '';
                     }
+                }
+                if ($node->nodeRow->node_opts <= 0) {
+                    $node->nodeRow->node_opts = 1;
                 }
                 $node->nodeRow->node_tree = $this->treeID;
                 $node->nodeRow->save();

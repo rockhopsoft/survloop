@@ -41,12 +41,15 @@ class SurvData extends SurvDataUtils
 // if (Auth::user() && Auth::user()->id) $this->loadData('users', Auth::user()->id);
 // check for data needed for root data loop which isn't connected to the core record
         if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
-            eval("\$rows = " . $GLOBALS["SL"]->modelPath($isBigSurvLoop[0]) 
-                . "::orderBy('" . $isBigSurvLoop[1] . "', '" . $isBigSurvLoop[2] 
-                . "')->get();");
-            if ($rows->isNotEmpty()) {
-                foreach ($rows as $row) {
-                    $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
+            $model = trim($GLOBALS["SL"]->modelPath($isBigSurvLoop[0]));
+            if ($model != '') {
+                eval("\$rows = " . $model 
+                    . "::orderBy('" . $isBigSurvLoop[1] . "', '" . $isBigSurvLoop[2] 
+                    . "')->get();");
+                if ($rows->isNotEmpty()) {
+                    foreach ($rows as $row) {
+                        $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
+                    }
                 }
             }
         }
@@ -296,15 +299,13 @@ class SurvData extends SurvDataUtils
         foreach ($linkages["outgoing"] as $i => $link) {
             $eval .= "where('" . $link[0] . "', '" . $link[1] . "')->";
         }
-        $model = $GLOBALS["SL"]->modelPath($tbl);
-        if (trim($model) != '') {
-            $eval = "\$recObj = " . $model . "::" . $eval . "first();";
-            eval($eval);
-            return $recObj;
-        } else {
-            echo 'did not find model path for ' . $tbl; exit;
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return false;
         }
-        return false;
+        $eval = "\$recObj = " . $model . "::" . $eval . "first();";
+        eval($eval);
+        return $recObj;
     }
     
     public function newDataRecordInner($tbl = '', $linkages = [], $recID = -3, $skipLinks = [])
@@ -312,7 +313,11 @@ class SurvData extends SurvDataUtils
         if (trim($tbl) == '') {
             return [];
         }
-        eval("\$recObj = new " . $GLOBALS["SL"]->modelPath($tbl) . ";");
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return [];
+        }
+        eval("\$recObj = new " . $model . ";");
         if ($recID > 0) {
             $recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'id' } = $recID;
         }
@@ -392,7 +397,11 @@ class SurvData extends SurvDataUtils
     
     public function getNextRecID($tbl = '')
     {
-        eval("\$recObj = " . $GLOBALS["SL"]->modelPath($tbl) . "::select('" 
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return 1;
+        }
+        eval("\$recObj = " . $model . "::select('" 
             . $GLOBALS["SL"]->tblAbbr[$tbl] . "id')->orderBy('" 
             . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'desc')->first();");
         if ($recObj && isset($recObj->{ $GLOBALS["SL"]->tblAbbr[$tbl] . 'id' })) {
@@ -521,8 +530,9 @@ class SurvData extends SurvDataUtils
     {
         if (intVal($GLOBALS["SL"]->closestLoop["obj"]->data_loop_auto_gen) == 1) {
             $loopName = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
+            $loopTbl  = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
             // auto-generate new record in the standard way
-            $loopTbl = $newFld = $newVal = '';
+            $newFld = $newVal = '';
             if (isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_tree)) {
                 $GLOBALS["SL"]->closestLoop["obj"]->loadLoopConds();
             }
@@ -543,19 +553,20 @@ class SurvData extends SurvDataUtils
                     }
                 }
             }
-            $recObj = null;
             $linkages = $this->getRecordLinks($loopTbl, $newFld, $newVal);
             $recObj = $this->newDataRecordInner($loopTbl, $linkages, -3, $skipLinks);
-            $this->loopItemIDs[$loopName][] = $recObj->getKey();
-            //$this->refreshDataSets();
-            $GLOBALS["SL"]->closestLoop["itemID"] = $recObj->getKey();
-            $GLOBALS["SL"]->sessLoops[0]->update([
-                'sess_loop_item_id' => $recObj->getKey()
-            ]);
-            $logDesc = 'AddingItem #' . $recObj->getKey();
-            $loop = $GLOBALS["SL"]->closestLoop["loop"];
-            $this->logDataSave($nID, $loopTbl, $recObj->getKey(), $logDesc, $loop);
-            return $recObj->getKey();
+            if ($recObj) {
+                $this->loopItemIDs[$loopName][] = $recObj->getKey();
+                //$this->refreshDataSets();
+                $GLOBALS["SL"]->closestLoop["itemID"] = $recObj->getKey();
+                $GLOBALS["SL"]->sessLoops[0]->update([
+                    'sess_loop_item_id' => $recObj->getKey()
+                ]);
+                $logDesc = 'AddingItem #' . $recObj->getKey();
+                $loop = $GLOBALS["SL"]->closestLoop["loop"];
+                $this->logDataSave($nID, $loopTbl, $recObj->getKey(), $logDesc, $loop);
+                return $recObj->getKey();
+            }
         }
         return -3;
     }
@@ -752,18 +763,22 @@ class SurvData extends SurvDataUtils
                                 ? Auth::user()->id : -3);
                         }
                         if ($val && trim($val) != '') {
-                            eval("\$newObj = new " . $GLOBALS["SL"]->modelPath(
-                                $this->helpInfo[$tblFld]["link"]->data_help_table) . ";");
-                            $newObj->save();
-                            $newObj->update([
-                                $this->helpInfo[$tblFld]["link"]->data_help_key_field 
-                                    => $this->helpInfo[$tblFld]["parentID"],
-                                $this->helpInfo[$tblFld]["link"]->data_help_value_field 
-                                    => strip_tags($val)
-                            ]);
-                            $setInd = $this->initDataSet($tbl);
-                            $this->dataSets[$tbl][$setInd] = $newObj;
-                            $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+                            $model = trim($GLOBALS["SL"]->modelPath(
+                                $this->helpInfo[$tblFld]["link"]->data_help_table
+                            ));
+                            if ($model != '') {
+                                eval("\$newObj = new " . $model . ";");
+                                $newObj->save();
+                                $newObj->update([
+                                    $this->helpInfo[$tblFld]["link"]->data_help_key_field 
+                                        => $this->helpInfo[$tblFld]["parentID"],
+                                    $this->helpInfo[$tblFld]["link"]->data_help_value_field 
+                                        => strip_tags($val)
+                                ]);
+                                $setInd = $this->initDataSet($tbl);
+                                $this->dataSets[$tbl][$setInd] = $newObj;
+                                $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+                            }
                         }
                     }
                 }
@@ -799,8 +814,8 @@ class SurvData extends SurvDataUtils
                     if ($helper->data_help_table == $tbl && $helper->data_help_value_field == $fld) {
                         $this->helpInfo[$tblFld]["link"] = $helper;
                         //BranchOnly
-                        list($parentInd, $this->helpInfo[$tblFld]["parentID"]) = $this
-                            ->currSessDataPos($helper->data_help_parent_table);
+                        list($parentInd, $this->helpInfo[$tblFld]["parentID"]) 
+                            = $this->currSessDataPos($helper->data_help_parent_table);
                         $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere(
                             $helper->data_help_table, 
                             $helper->data_help_key_field, 

@@ -530,8 +530,7 @@ class GlobalsBasic extends GlobalsVars
     public function splitTblFld($tblFld)
     {
         $tbl = $fld = '';
-        if (trim($tblFld) != '' 
-            && strpos($tblFld, ':') !== false) {
+        if (trim($tblFld) != '' && strpos($tblFld, ':') !== false) {
             list($tbl, $fld) = explode(':', $tblFld);
         }
         return [$tbl, $fld];
@@ -540,8 +539,7 @@ class GlobalsBasic extends GlobalsVars
     public function getTblFldID($tblFld)
     {
         list($tbl, $fld) = $this->splitTblFld($tblFld);
-        if (trim($tbl) != '' && trim($fld) != '' 
-            && isset($this->tblI[$tbl])) {
+        if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
             $fldName = substr($fld, strlen($this->tblAbbr[$tbl]));
             $fldRow = SLFields::select('fld_id')
                 ->where('fld_table', $this->tblI[$tbl])
@@ -559,8 +557,7 @@ class GlobalsBasic extends GlobalsVars
         if ($tbl == '' || $fld == '') {
             list($tbl, $fld) = $this->splitTblFld($tblFld);
         }
-        if (trim($tbl) != '' && trim($fld) != '' 
-            && isset($this->tblI[$tbl])) {
+        if (trim($tbl) != '' && trim($fld) != '' && isset($this->tblI[$tbl])) {
             $fldName = substr($fld, strlen($this->tblAbbr[$tbl]));
             $fldRow = SLFields::where('fld_table', $this->tblI[$tbl])
                 ->where('fld_name', $fldName)
@@ -572,12 +569,12 @@ class GlobalsBasic extends GlobalsVars
     
     public function isHomestead()
     {
-        return (strpos($this->sysOpts["app-url"], '.test') !== false 
-            || strpos($this->sysOpts["app-url"], '.app') !== false
-            || strpos($this->sysOpts["app-url"], '.dev') !== false
-            || strpos($this->sysOpts["app-url"], '.local') !== false
-            || strpos($this->sysOpts["app-url"], 'localhost') !== false
-            || strpos($this->sysOpts["app-url"], 'homestead') !== false);
+        return (strpos($this->sysOpts["app-url"], '.test')     !== false 
+            ||  strpos($this->sysOpts["app-url"], '.app')      !== false
+            ||  strpos($this->sysOpts["app-url"], '.dev')      !== false
+            ||  strpos($this->sysOpts["app-url"], '.local')    !== false
+            ||  strpos($this->sysOpts["app-url"], 'localhost') !== false
+            ||  strpos($this->sysOpts["app-url"], 'homestead') !== false);
     }
     
     public function getParentDomain()
@@ -622,7 +619,5 @@ class GlobalsBasic extends GlobalsVars
         }
         return $this->x["pageSlugSffx"];
     }
-
-
 
 }

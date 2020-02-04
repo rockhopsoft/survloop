@@ -180,6 +180,7 @@ class TreeSurvForm extends TreeSurvFormUtils
             && trim($GLOBALS["SL"]->REQ->get('nv' . $nIDtxt)) != '') {
             $currNodeSessData = $GLOBALS["SL"]->REQ->get('nv' . $nIDtxt);
         }
+        $this->v["currNodeSessData"] = $currNodeSessData; // should migrate in this direction
         
         if (!isset($this->v["javaNodes"])) {
             $this->v["javaNodes"] = '';

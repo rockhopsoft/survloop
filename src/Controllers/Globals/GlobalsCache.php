@@ -447,7 +447,7 @@ class GlobalsCache extends GlobalsBasic
             . '$("#deferNode' . $nID . '").load("' . $loadUrl . '"); '
             . '}, ' . (500+(500*$this->x["deferCnt"])) . '); ';
         return '<div id="deferNode' . $nID . '" class="w100 ovrSho">'
-            . '<center><div id="deferAnim' . $nID . '" class="p20 m20">'
+            . '<center><div id="deferAnim' . $nID . '" class="p20">'
             . $this->spinner() . '</div></center>'
             . '</div>';
     }

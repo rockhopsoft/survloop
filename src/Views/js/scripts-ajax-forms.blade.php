@@ -59,7 +59,7 @@ function runFormSub() {
 }
 
 function getUpID(thisAttr) {
-    return thisAttr.replace("delLoopItem", "").replace("confirmN", "").replace("confirmY", "").replace("editLoopItem", "");
+    return thisAttr.replace("delLoopItem", "").replace("confirmN", "").replace("confirmY", "").replace("editLoopItem", "").replace("editItemSave", "");
 }
 
 $(document).on("click", "#nFormUpload", function() {
@@ -291,11 +291,9 @@ $(document).on("click", ".editLoopItem", function() {
     return runFormSub();
 });
 function checkAutoLoad() {
-console.log("checkAutoLoad");
     if (pageDynaLoaded) {
         if (addingLoopItem > 0) {
             document.getElementById("loopItemID").value=addingLoopItem;
-console.log("checkAutoLoad - "+document.getElementById("loopItemID").value+" ?");
             return runFormSub();
         }
     } else {
@@ -318,11 +316,11 @@ function toggleLineEdit(upID) {
         if (document.getElementById("up"+upID+"InfoEdit").style.display != 'block') {
             $("#up"+upID+"Info").slideUp("fast");
             setTimeout(function() { $("#up"+upID+"InfoEdit").slideDown("fast"); }, 301);
-            document.getElementById("up"+upID+"EditVisibID").value="0";
+            document.getElementById("up"+upID+"EditVisibID").value="1";
         } else {
             $("#up"+upID+"InfoEdit").slideUp("fast");
             setTimeout(function() { $("#up"+upID+"Info").slideDown("fast"); }, 301);
-            document.getElementById("up"+upID+"EditVisibID").value="1";
+            document.getElementById("up"+upID+"EditVisibID").value="0";
         }
     }
     return true;
@@ -651,7 +649,6 @@ function reqFormFldTbl(nID, nIDtxt, maxRow, cols, colsReq) {
 function formDateChange(nIDtxt) {
     document.getElementById("n"+nIDtxt+"FldID").value = document.getElementById("n"+nIDtxt+"fldYearID").value+"-"+document.getElementById("n"+nIDtxt+"fldMonthID").value+"-"+document.getElementById("n"+nIDtxt+"fldDayID").value;
     chkFormCheck();
-console.log(document.getElementById("n"+nIDtxt+"FldID").value);
     return true;
 }
 $(document).on("change", "select.slDateChange", function() {

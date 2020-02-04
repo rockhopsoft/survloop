@@ -84,6 +84,11 @@ class AdminTreeController extends AdminTreeStats
                 'The user is currently logged in as a partner, staff, or admin user.'
             );
             $this->allStdCondition(
+                '#IsPartnerStaffAdminOrOwner', 
+                'The user is currently logged in as a partner, staff, '
+                    . 'admin user, or the owner of core record.'
+            );
+            $this->allStdCondition(
                 '#IsPartner', 
                 'The user is currently logged in as a partner.'
             );
@@ -443,7 +448,8 @@ class AdminTreeController extends AdminTreeStats
             "staff" => [], 
             "admin" => []
         ];
-        $this->v["myPages"] = $GLOBALS["SL"]->x["pageUrls"] = $GLOBALS["SL"]->x["myRedirs"] = [];
+        $this->v["myPages"] = $GLOBALS["SL"]->x["pageUrls"] 
+            = $GLOBALS["SL"]->x["myRedirs"] = [];
         if ($pageType == 'Redirect') {
             $chk = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
                 ->where('tree_type', 'LIKE', 'Redirect')
@@ -477,7 +483,7 @@ class AdminTreeController extends AdminTreeStats
         } else { // not Redirect
             $this->v["myPages"] = [];
             $chk = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
-               // ->whereRaw('TreeOpts%' . Globals::TREEOPT_REPORT . ' ' 
+               // ->whereRaw('tree_opts%' . Globals::TREEOPT_REPORT . ' ' 
                //     . (($pageType == 'Report') ? '=' : '>') . ' 0')
                 ->where('tree_type', 'LIKE', 'Page')
                 ->orderBy('tree_name', 'asc')
@@ -759,13 +765,15 @@ class AdminTreeController extends AdminTreeStats
                     $found->delete();
                     unset($GLOBALS["SL"]->dataLinksOn[$found->data_link_table]);
                 }
-            } elseif ($request->has('newLinkage')) {
+            } elseif ($request->has('newLinkage')
+                && intVal($request->input('newLinkage')) > 0) {
+                $linkTbl = intVal($request->input('newLinkage'));
                 $newLink = new SLDataLinks;
-                $newLink->data_link_tree = $GLOBALS["SL"]->treeID;
-                $newLink->data_link_table = $request->input('newLinkage');
+                $newLink->data_link_tree = intVal($GLOBALS["SL"]->treeID);
+                $newLink->data_link_table = $linkTbl;
                 $newLink->save();
                 $GLOBALS["SL"]->dataLinksOn[$request->input('newLinkage')] 
-                    = $GLOBALS["SL"]->getLinkTblMap($request->input('newLinkage'));
+                    = $GLOBALS["SL"]->getLinkTblMap($linkTbl);
             }
         }
         

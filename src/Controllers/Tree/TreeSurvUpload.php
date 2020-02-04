@@ -49,8 +49,13 @@ class TreeSurvUpload extends TreeSurv
     
     protected function checkRandStr($tbl, $fld, $str)
     {
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return null;
+        }
         $modelObj = [];
-        eval("\$modelObj = " . $GLOBALS["SL"]->modelPath($tbl) 
+//echo 'checkRandStr(' . $tbl . ', ' . $fld . ', ' . $str . ' - ' . $model . '<br />'; exit;
+        eval("\$modelObj = " . $model 
             . "::where('" . $fld . "', '" . $str . "')->get();");
         return $modelObj->isEmpty();
     }
@@ -58,6 +63,10 @@ class TreeSurvUpload extends TreeSurv
     protected function getRandStr($tbl, $fld, $len)
     {
         $str = $this->genRandStr($len);
+        $model = trim($GLOBALS["SL"]->modelPath($tbl));
+        if ($model == '') {
+            return $str;
+        }
         while (!$this->checkRandStr($tbl, $fld, $str)) {
             $str = $this->genRandStr($len);
         }
@@ -559,7 +568,9 @@ class TreeSurvUpload extends TreeSurv
                     && intVal($GLOBALS["SL"]->REQ->input($fldBase . 'Visib')) == 1) {
                     $upRow = SLUploads::find($upRow->up_id);
                     if ($upRow) {
-                        $upRow->up_type = $GLOBALS["SL"]->REQ->input($fldBase . 'Type');
+                        if ($GLOBALS["SL"]->REQ->has($fldBase . 'Type')) {
+                            $upRow->up_type = $GLOBALS["SL"]->REQ->input($fldBase . 'Type');
+                        }
                         $upRow->up_privacy = $GLOBALS["SL"]->REQ->input($fldBase . 'Privacy');
                         $upRow->up_title = $GLOBALS["SL"]->REQ->input($fldBase . 'Title');
                         //$upRow->up_desc  = $GLOBALS["SL"]->REQ->input('up'.$upRow->up_id.'EditDesc');
@@ -568,27 +579,32 @@ class TreeSurvUpload extends TreeSurv
                 }
             }
         }
-        if ($GLOBALS["SL"]->REQ->has('step') 
-            && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
+        if ($this->isStepUpload()) {
             $upRow = new SLUploads;
             $upRow->up_tree_id    = $treeID;
             $upRow->up_core_id    = $this->coreID;
             $upRow->up_node_id    = $nID;
             $upRow->up_link_fld_id = $this->allNodes[$nID]->getTblFldID();
-            $upRow->up_link_rec_id = -3;
+            $upRow->up_link_rec_id = 0;
             if ($upRow->up_link_fld_id > 0) {
                 list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
                 list($loopInd, $loopID) = $this->sessData->currSessDataPos($tbl);
                 if ($loopID > 0) {
                     $upRow->up_link_rec_id = $loopID;
                 }
+            } else {
+                $upRow->up_link_fld_id = 0;
             }
-            $upRow->up_type    = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
+            $upRow->up_type    = 0;
+            if ($GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')) {
+                $upRow->up_type = $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld');
+            }
             $upRow->up_privacy = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Privacy');
             $upRow->up_title   = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Title');
             //$upRow->up_desc  = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Desc');
             $file = 'up' . $nID . 'File';
             if ($GLOBALS["SL"]->REQ->has('up' . $nID . 'Vid') 
+                && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')
                 && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
                 $upRow->up_video_link = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
                 $upRow->up_video_duration = $this->getYoutubeDuration($upRow->up_video_link);

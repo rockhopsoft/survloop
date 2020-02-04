@@ -99,7 +99,7 @@ New loops can be added by editing any node in the
             </nobr></td>
         @else
             <td class="taL"><nobr>
-            <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $link->DataSubSubLnk }}
+            <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $link->data_sub_sub_lnk }}
             </nobr></td>
         @endif
         <td><a href="/dashboard/db/table/{{ $link->data_sub_sub_tbl }}" target="_blank"
@@ -159,7 +159,7 @@ basic core-table-to-loop-table relations.
         <td><a href="/dashboard/db/table/{{ $link->data_help_parent_table }}" target="_blank"
             >{{ $link->data_help_parent_table }}</a></td>
         <td class="slGrey"><nobr><i class="fa fa-long-arrow-left mR5 slBlueDark"></i> 
-            {{ $link->DataHelpKeyField }}</nobr></td>
+            {{ $link->data_help_key_field }}</nobr></td>
         <td><a href="/dashboard/db/table/{{ $link->data_help_table }}" target="_blank"
             >{{ $link->data_help_table }}</a></td>
         <td>{{ $link->data_help_value_field }}</td>

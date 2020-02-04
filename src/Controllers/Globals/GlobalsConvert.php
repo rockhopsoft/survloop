@@ -58,7 +58,11 @@ class GlobalsConvert
         }
         $significand = round(($value / pow(10, $exponent)) 
             * pow(10, $sigFigs)) / pow(10, $sigFigs);
-        return $significand * pow(10, $exponent);
+        $ret = $significand * pow(10, $exponent);
+        if ($value > 999) {
+            return number_format($ret);
+        }
+        return $ret;
     }
     
     public function leadZero($num, $sigFigs = 2)
@@ -155,21 +159,29 @@ class GlobalsConvert
         return $colW;
     }
     
+    public function monthsArray()
+    {
+        return [
+            1  => 'Jan', 
+            2  => 'Feb', 
+            3  => 'Mar', 
+            4  => 'Apr', 
+            5  => 'May', 
+            6  => 'Jun', 
+            7  => 'Jul', 
+            8  => 'Aug', 
+            9  => 'Sep', 
+            10 => 'Oct', 
+            11 => 'Nov', 
+            12 => 'Dec' 
+        ];
+    }
+    
     public function num2Month3($num = 0)
     {
-        switch (intVal($num)) {
-            case 1:  return 'Jan'; break;
-            case 2:  return 'Feb'; break;
-            case 3:  return 'Mar'; break;
-            case 4:  return 'Apr'; break;
-            case 5:  return 'May'; break;
-            case 6:  return 'Jun'; break;
-            case 7:  return 'Jul'; break;
-            case 8:  return 'Aug'; break;
-            case 9:  return 'Sep'; break;
-            case 10: return 'Oct'; break;
-            case 11: return 'Nov'; break;
-            case 12: return 'Dec'; break;
+        $arr = $this->monthsArray();
+        if (isset($arr[$num])) {
+            return $arr[$num];
         }
         return '';
     }

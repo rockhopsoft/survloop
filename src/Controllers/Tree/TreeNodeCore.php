@@ -74,11 +74,29 @@ class TreeNodeCore
             $this->nodeRow = new SLNode;
             return false;
         }
+        $this->chkNodeInvalidFields();
         $this->parentID  = $this->nodeRow->node_parent_id;
         $this->parentOrd = $this->nodeRow->node_parent_order;
         $this->nodeOpts  = $this->nodeRow->node_opts;
         $this->nodeType  = $this->nodeRow->node_type;
         //$this->fillNodeRow();
+        return true;
+    }
+    
+    public function chkNodeInvalidFields()
+    {
+        if ($this->nodeRow && isset($this->nodeRow->node_id)) {
+            if (!isset($this->nodeRow->node_parent_order) 
+                || intVal($this->nodeRow->node_parent_order) < 0) {
+                $this->nodeRow->node_parent_order = 0;
+                $this->nodeRow->save();
+            }
+            if (!isset($this->nodeRow->node_opts) 
+                || intVal($this->nodeRow->node_opts) <= 0) {
+                $this->nodeRow->node_opts = 1;
+                $this->nodeRow->save();
+            }
+        }
         return true;
     }
     
@@ -103,6 +121,7 @@ class TreeNodeCore
             } else {
                 $this->nodeRow = SLNode::find($nID);
             }
+            $this->chkNodeInvalidFields();
             $this->initiateNodeRow();
             $this->nodeRowFilled = true;
         }

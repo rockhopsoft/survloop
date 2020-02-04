@@ -38,8 +38,9 @@ class TreeSurv extends TreeSurvReport
             [ "treeID" => $this->treeID ]
         )->render();
         if ($this->hasAjaxWrapPrinting()) {
-            $ret .= '<div class="nodeAnchor"><a name="maincontent" id="maincontent"></a></div>'
-                . '<div id="ajaxWrap">';
+            $ret .= '<div class="nodeAnchor">'
+                . '<a name="maincontent" id="maincontent"></a>'
+                . '</div><div id="ajaxWrap">';
         }
         if (!$this->isPage) {
             $ret .= '<div id="maincontentWrap" style="display: none;">' . "\n";

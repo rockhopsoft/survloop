@@ -28,6 +28,8 @@
                 @if (trim($deet[1]) && intVal($deet[1]) > 0)
                     <nobr>{{ date(($GLOBALS["SL"]->pageView == 'public') 
                         ? 'F Y' : 'n/j/y', $deet[1]) }}</nobr>
+                @else
+                    <span class="slGrey">pending</span>
                 @endif
             </td>
         </tr>

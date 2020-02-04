@@ -131,6 +131,11 @@ embed.responsive-video, .responsive-video embed,
     height: 100%;
 }
 
+.proTip {
+    width: 100%;
+    text-align: center;
+}
+
 .sliGalSlide {
     width: 100%;
     
