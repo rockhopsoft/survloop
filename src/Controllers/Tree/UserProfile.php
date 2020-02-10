@@ -3,7 +3,7 @@
   * UserProfile is the mid-level class for user profile functions.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.2
   */

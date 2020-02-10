@@ -4,7 +4,7 @@
   * for managing the data, as organized by the database design.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.6
   */

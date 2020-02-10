@@ -3,7 +3,7 @@
   * SurvRoutes is a side-class to handle the smallest routing functions which largely just redirect.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.9
   */

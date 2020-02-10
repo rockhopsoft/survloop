@@ -17,7 +17,7 @@ $v = $surv->custLoop->v;
 
         <div class="loginTitles">
             <a class="btn btn-secondary pull-right" href="/login" >Login</a>
-            <h1 class="mT0">Reset Password</h1>
+            <h2 class="mT0">Reset Password</h2>
         </div>
 
         You will be sent an email with a 

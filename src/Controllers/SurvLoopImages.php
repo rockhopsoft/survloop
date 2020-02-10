@@ -3,7 +3,7 @@
   * SurvLoopImages is a class which manages SurvLoop's uploaded images like a CMS.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.21
   */

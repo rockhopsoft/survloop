@@ -3,7 +3,7 @@
   * routes-admin.php registers all the paths used in the SurvLoop admin area.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */
@@ -83,30 +83,6 @@ Route::get( '/change-my-password', [
     'uses'       => $path . 'Auth\\UpdatePasswordController@runUpdate',
     'middleware' => 'auth'
 ]);
-Route::post(
-    'password/email',
-    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
-)->name('password.email');
-Route::get(
-    '/password/email', 
-    $path . 'Auth\\AuthController@printPassReset'
-);
-Route::get( 
-    '/password/reset', 
-    $path . 'Auth\\AuthController@printPassReset'
-);
-Route::get( 
-    'password/reset/{token}', 
-    'App\\Http\\Controllers\\Auth\\ResetPasswordController@showResetForm'
-)->name('password.reset');
-Route::get(
-    'password/reset', 
-    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@showLinkRequestForm'
-)->name('password.update');
-//Route::post(
-//    'password/reset', 
-//    'Auth\ResetPasswordController@reset'
-//)->name('password.update');
 
 
 

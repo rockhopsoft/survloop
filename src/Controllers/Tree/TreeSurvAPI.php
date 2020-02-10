@@ -3,7 +3,7 @@
   * TreeSurvAPI is extends a standard branching tree, for maps of API exports.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

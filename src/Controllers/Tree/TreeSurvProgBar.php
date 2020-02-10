@@ -3,7 +3,7 @@
   * TreeSurvProgBar is a mid-level class using to report a user's progress through a survey.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.2
   */

@@ -5,18 +5,21 @@ $v = $surv->custLoop->v;
 ?>@extends('vendor.survloop.master')
 
 @section('content')
-<!-- resources/views/OPC/auth/reset.blade.php -->
-<form class="form-horizontal" role="form" method="POST" action="{{ url('/password/reset') }}">
+<!-- resources/views/vendor/survloop/auth/passwords/reset.blade.php -->
+<form class="form-horizontal" role="form" method="POST" 
+    action="{{ url('/password/reset') }}">
 {{ csrf_field() }}
 <input type="hidden" name="token" value="{{ $token }}">
 
-<div class="w100"><center><div id="treeWrap" class="treeWrapForm">
+<div class="w100 row2" 
+    style="padding: 30px 0px 60px 0px;"><center>
+    <div id="treeWrap" class="treeWrapForm">
 
 <div class="p20"></div>
 
 <div class="loginTitles">
     <a class="btn btn-secondary pull-right" href="/login" >Login</a>
-    <h1 class="mT0">Reset Password</h1>
+    <h2 class="mT0">Reset Password</h2>
 </div>
 
 @if (session('status'))

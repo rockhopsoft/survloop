@@ -4,7 +4,7 @@
   * standard branching tree's node for SurvLoop's needs.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */
@@ -136,7 +136,17 @@ class TreeNodeSurvVars extends TreeNodeCore
     
     public function isStepLoop()
     {
-        return ($this->isLoopRoot() && $GLOBALS["SL"]->isStepLoop($this->dataBranch));
+//echo 'isStepLoop() nID: ' . $this->nodeID . ', type: ' . $this->nodeType . ', branch: ' . $this->dataBranch . '<pre>'; print_r($GLOBALS["SL"]->dataLoops[$this->nodeRow->node_default]); echo '</pre>'; exit;
+        if ($this->isLoopRoot()) {
+            if ($GLOBALS["SL"]->isStepLoop($this->dataBranch)) {
+                return true;
+            } // hmmm..
+            if (isset($this->nodeRow->node_default) 
+                && $GLOBALS["SL"]->isStepLoop($this->nodeRow->node_default)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     public function isDataManip()

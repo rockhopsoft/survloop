@@ -3,7 +3,7 @@
   * SessAnalysis runs basic queries to track the activity within a user session.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.25
   */

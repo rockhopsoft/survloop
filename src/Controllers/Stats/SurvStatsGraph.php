@@ -3,7 +3,7 @@
   * SurvStatsGraph builds on SurvStats and SurvStatsChart to present the visually present data.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

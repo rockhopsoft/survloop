@@ -4,7 +4,7 @@
   * but should be replaced by Laravel's migrations.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.5
   */

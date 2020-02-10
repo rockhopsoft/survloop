@@ -4,7 +4,7 @@
   * and SurvTrends for line graphs with fewer filtering needs.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

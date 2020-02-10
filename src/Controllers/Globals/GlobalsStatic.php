@@ -4,7 +4,7 @@
   * This level contains mostly standalone functions which are not SurvLoop-specific.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

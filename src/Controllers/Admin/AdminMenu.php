@@ -3,7 +3,7 @@
   * AdminMenu is responsible for building the menu inside the dashboard area for all user types.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

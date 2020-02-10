@@ -3,11 +3,14 @@
   * routes-core.php registers all the paths used by core SurvLoop behavior.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */
 
+/**
+ * Home Page Routes
+ */
 Route::post(
     '/',
     $path . 'SurvLoop@loadPageHome'
@@ -25,23 +28,9 @@ Route::get(
     $path . 'SurvLoop@loadPageHome'
 );
 
-Route::get(
-    '/holdSess',
-    $path . 'SurvLoop@holdSess'
-);
-Route::get(
-    '/restart',
-    $path . 'SurvLoop@restartSess'
-);
-Route::get(
-    '/sessDump',
-    $path . 'SurvLoop@sessDump'
-);
-Route::get(
-    '/test',
-    $path . 'SurvRoutes@testHome'
-);
-
+/**
+ * Common AJAX/jQuery Requests
+ */
 Route::get(
     '/search-bar',
     $path . 'SurvLoop@searchBar'
@@ -71,7 +60,14 @@ Route::get(
     '/ajax/{type}',
     $path . 'SurvLoop@ajaxChecks'
 );
+Route::get(
+    '/js-load-menu', 
+    $path . 'SurvLoop@jsLoadMenu'
+);
 
+/**
+ * SurvLoop Post-Install System Initialization
+ */
 Route::get(
     '/fresh/creator', 
     $path . 'Admin\\AdminTreeController@freshUser'
@@ -93,6 +89,10 @@ Route::get(
     $path . 'Admin\\AdminTreeController@freshUX'
 );
 
+
+/**
+ * Basic User Authentication
+ */
 Route::post(
     '/login', [
         'as' => 'login',
@@ -130,6 +130,59 @@ Route::get(
     $path . 'SurvLoop@chkEmail'
 );
 
+/**
+ * Password Reset
+ */
+Route::post(
+    'password/email',
+    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
+)->name('password.email');
+
+Route::get(
+    '/password/email', 
+    $path . 'Auth\\AuthController@printPassReset'
+);
+
+Route::get( 
+    '/password/reset', 
+    $path . 'Auth\\AuthController@printPassReset'
+);
+
+Route::get( 
+    'password/reset/{token}', 
+    'App\\Http\\Controllers\\Auth\\ResetPasswordController@showResetForm'
+)->name('password.reset');
+
+Route::get(
+    'password/reset', 
+    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@showLinkRequestForm'
+)->name('password.update');
+
+Route::post(
+    'password/reset', 
+    'Auth\ResetPasswordController@reset'
+)->name('password.update');
+
+
+/**
+ * SurvLoop Auth Helpers
+ */
+Route::get(
+    '/holdSess',
+    $path . 'SurvLoop@holdSess'
+);
+Route::get(
+    '/restart',
+    $path . 'SurvLoop@restartSess'
+);
+Route::get(
+    '/sessDump',
+    $path . 'SurvLoop@sessDump'
+);
+Route::get(
+    '/test',
+    $path . 'SurvRoutes@testHome'
+);
 Route::get(
     '/time-out',
     $path . 'SurvLoop@timeOut'
@@ -144,13 +197,9 @@ Route::get(
     $path . 'SurvLoop@processEmailConfirmToken'
 );
 
-///////////////////////////////////////////////////////////
-
-Route::get(
-    '/js-load-menu', 
-    $path . 'SurvLoop@jsLoadMenu'
-);
-
+/**
+ * System-Level Client-Side File Delivery
+ */
 Route::get( 
     '/sys{which}.min.{type}',  
     $path . 'SurvRoutes@getSysFileMin'
@@ -172,6 +221,9 @@ Route::get(
     $path . 'SurvRoutes@getKml'
 );
 
+/**
+ * External Packages
+ */
 Route::get( 
     '/jquery.min.js',
     $path . 'SurvRoutes@getJquery'
@@ -217,6 +269,6 @@ Route::get(
 );
 
 Route::get( 
-    '/vendor/wikiworldorder/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
+    '/vendor/rockhopsoft/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
     $path . 'SurvRoutes@catchJqueryUiMappingError'
 );

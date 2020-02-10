@@ -3,7 +3,7 @@
   * SurvStatTbl builds on SurvStats data set calculations to present the raw data in tables.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

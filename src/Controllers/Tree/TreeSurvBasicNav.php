@@ -4,7 +4,7 @@
   * But it does house some of the core functions to print the whole of a tree.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.19
   */

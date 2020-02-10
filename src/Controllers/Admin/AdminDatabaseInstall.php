@@ -3,7 +3,7 @@
   * AdminDatabaseInstall is the admin class responsible for building standard SurvLoop components.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */
@@ -586,7 +586,7 @@ class AdminDatabaseInstall extends AdminDBController
                 if ($tbls->isNotEmpty()) {
                     foreach ($tbls as $tbl) {
                         $this->loadTbl($tbl);
-                        $newModelFilename = '../vendor/wikiworldorder/survloop-models/' 
+                        $newModelFilename = '../vendor/rockhopsoft/survloop-models/' 
                             . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"])
                             . '/' . $this->v["tblClean"] . '.php';
                         if (file_exists($newModelFilename)) {
@@ -619,7 +619,7 @@ class AdminDatabaseInstall extends AdminDBController
             if ($GLOBALS["SL"]->REQ->has('copyData') && is_array($GLOBALS["SL"]->REQ->input('copyData')) 
                 && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
                 foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
-                    if (file_exists('../vendor/wikiworldorder/survloop-models/' 
+                    if (file_exists('../vendor/rockhopsoft/survloop-models/' 
                         . strtolower($GLOBALS["SL"]->tblModels[$GLOBALS["SL"]->tbl[$copyTbl]]))) {
                         eval("\$transferData[\$copyTbl] = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl])
                             . "::get();");

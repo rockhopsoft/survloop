@@ -4,7 +4,7 @@
   * This mostly just runs after installation, and perhaps of some other code updates. 
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */
@@ -35,10 +35,10 @@ class SurvLoopServiceProvider extends ServiceProvider
                 => base_path('database/migrations/2019_03_15_000000_create_survloop_tables.php'),
             __DIR__ . '/Database/SurvLoopSeeder.php'
                 => base_path('database/seeds/SurvLoopSeeder.php'),
-            base_path('/vendor/wikiworldorder/survloop-libraries/src/geo/ZipCodeSeeder.php')
+            base_path('/vendor/rockhopsoft/survloop-libraries/src/geo/ZipCodeSeeder.php')
                 => base_path('database/seeds/ZipCodeSeeder.php'),
 
-            base_path('/vendor/wikiworldorder/survloop-libraries/src/js/zxcvbn.js')
+            base_path('/vendor/rockhopsoft/survloop-libraries/src/js/zxcvbn.js')
                 => base_path('public/survloop/zxcvbn.js')
 
         ]);

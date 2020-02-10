@@ -3,7 +3,7 @@
   * TreeSurvConds is a mid-level class focused on checking node conditions.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.2
   */

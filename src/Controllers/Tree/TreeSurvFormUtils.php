@@ -4,7 +4,7 @@
   * lots of smaller functions used by the form generation processes (in TreeSurvForm).
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

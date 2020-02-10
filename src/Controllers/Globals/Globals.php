@@ -4,7 +4,7 @@
   * This is very helpful for processes which may need to be used within Views, etc.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */
@@ -77,6 +77,7 @@ class Globals extends GlobalsImportExport
     public function isStepLoop($loop)
     {
         return (isset($this->dataLoops[$loop]) 
+            && isset($this->dataLoops[$loop]->data_loop_is_step)
             && intVal($this->dataLoops[$loop]->data_loop_is_step) == 1);
     }
     

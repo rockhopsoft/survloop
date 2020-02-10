@@ -3,7 +3,7 @@
   * GlobalsDefinitions is a side-class which loads and gets installation definition sets.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

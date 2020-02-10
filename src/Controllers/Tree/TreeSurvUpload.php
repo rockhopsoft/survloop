@@ -4,7 +4,7 @@
   * uploading functionality in surveys and pages.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */
@@ -441,7 +441,7 @@ class TreeSurvUpload extends TreeSurv
         )->render();
     }
     
-    protected function getUploads($nID, $isAdmin = false, $isOwner = false)
+    protected function getUploads($nID, $isAdmin = false, $isOwner = false, $style = '')
     {
         $this->prepPrevUploads($nID);
         if (empty($this->uploads)) {
@@ -481,8 +481,12 @@ class TreeSurvUpload extends TreeSurv
                     $isAdmin, 
                     $isOwner
                 );
+                $view = 'vendor.survloop.forms.uploads-print';
+                if ($style == 'text') {
+                    $view .= '-text';
+                }
                 $ups[] = view(
-                    'vendor.survloop.forms.uploads-print', 
+                    $view, 
                     [
                         "nID"         => $nID,
                         "REQ"         => $GLOBALS["SL"]->REQ,

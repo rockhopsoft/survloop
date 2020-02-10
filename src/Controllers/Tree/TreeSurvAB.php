@@ -3,7 +3,7 @@
   * TreeSurvAB is a mid-level class which handles the AB test variants of a CoreTree.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.2
   */

@@ -4,7 +4,7 @@
   * according to the database design, and it's settings for a given survey.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */
@@ -514,16 +514,21 @@ class SurvData extends SurvDataUtils
                 }
             }
         }
+        $this->getLoopDoneNextItemID($loopName);
+        return $this->loopItemIDsDone;
+    }
+    
+    public function getLoopDoneNextItemID($loopName)
+    {
         $this->loopItemsNextID = -3;
         if (sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $id) {
-                if ($this->loopItemsNextID <= 0 
-                    && !in_array($id, $this->loopItemIDsDone)) {
+                if ($this->loopItemsNextID <= 0 && !in_array($id, $this->loopItemIDsDone)) {
                     $this->loopItemsNextID = $id;
                 }
             }
         }
-        return $this->loopItemIDsDone;
+        return true;
     }
     
     public function createNewDataLoopItem($nID = -3, $skipLinks = [])
@@ -708,7 +713,7 @@ class SurvData extends SurvDataUtils
                 return $this->dataSets[$tbl][$itemInd]->{ $fld };
             }
         } elseif ($action == 'update' 
-            && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'ID')) {
+            && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'id')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
             if (trim($newVal) == '' 
                 && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {

@@ -4,7 +4,7 @@
   * This level contains access to the database design, its tables, and field details.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */

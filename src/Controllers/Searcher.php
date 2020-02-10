@@ -3,7 +3,7 @@
   * Searcher manages the primary needs of system searches, optionally autoloads client class extension.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

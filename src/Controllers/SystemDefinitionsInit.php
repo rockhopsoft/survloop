@@ -3,7 +3,7 @@
   * SystemDefinitionsInit loads the list of SurvLoop system variables and their defaults.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */
@@ -50,7 +50,7 @@ class SystemDefinitionsInit
             ], 
             'cust-package' => [
                 'Vendor Package Name', 
-                'wikiworldorder/survloop'
+                'rockhopsoft/survloop'
             ], 
             // for files and folder names, no spaces or special characters
             'app-url' => [

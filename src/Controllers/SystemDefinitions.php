@@ -3,7 +3,7 @@
   * SystemDefinitions loads and manages key SurvLoop system variables.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.1
   */

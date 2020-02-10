@@ -3,7 +3,7 @@
   * TreeNodeSurv extends a standard branching tree's node for SurvLoop's needs.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

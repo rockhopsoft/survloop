@@ -3,7 +3,7 @@
   * SurvStatsFilts provides simpler foundations for SurvStats to collect data set calculations.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.24
   */

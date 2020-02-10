@@ -4,7 +4,7 @@
   * processing the input SurvLoop's surveys and pages.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */
@@ -270,8 +270,10 @@ class TreeSurvInput extends TreeSurvUpload
             }
             
         } elseif (!$curr->isDataPrint()) {
-            
-            if (!$this->postNodePublicCustom($nID, $nIDtxt, $tmpSubTier)) { // then run standard post
+            if (!$this->postNodePublicCustom($nID, $nIDtxt, $tmpSubTier)) { 
+                // then run standard post, move all this code in here:
+                //$this->postNodePublicStandards($nID, $nIDtxt, $tmpSubTier);
+
                 if ($GLOBALS["SL"]->REQ->has('loop')) {
                     $this->settingTheLoop(
                         trim($GLOBALS["SL"]->REQ->input('loop')), 
@@ -492,6 +494,11 @@ class TreeSurvInput extends TreeSurvUpload
     protected function closePostNodePublic($nID = -3, $tmpSubTier = [], $curr = [])
     {
         return true;
+    }
+    
+    protected function postNodePublicStandards($nID = -3, $tmpSubTier = [])
+    {
+
     }
     
     protected function postNodeTweakNewVal($curr, $newVal)

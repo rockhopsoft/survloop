@@ -3,7 +3,7 @@
   * TreeSurvForm is the main class for SurvLoop's branching tree, capable of generating complex forms.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.18
   */

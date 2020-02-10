@@ -3,7 +3,7 @@
   * SurvTrends is optimized for generating line graphs, often for trends.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.24
   */

@@ -1,5 +1,5 @@
 
-# WikiWorldOrder/SurvLoop
+# RockHopSoft/SurvLoop
 
 [![Laravel](https://img.shields.io/badge/Laravel-5.8-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -53,14 +53,14 @@ Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabis
 <a href="https://drugstory.me" target="_blank">Drug Story</a> (less active).
 
 The installation used for SurvLoop.org is currently the best example of a bare-bones extenstion of SurvLoop:<br />
-<a href="https://github.com/wikiworldorder/survlooporg" target="_blank">github.com/wikiworldorder/survlooporg</a>
+<a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
 # <a name="requirements"></a>Requirements
 
 * php: >=7.2
 * <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 5.8.*
-* <a href="https://packagist.org/packages/wikiworldorder/survloop-libraries" target="_blank">wikiworldorder/survloop-libraries</a>: 0.1.*
+* <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
 # <a name="getting-started"></a>Getting Started
 
@@ -91,7 +91,7 @@ $ php artisan make:auth
 $ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 ```
 
-### Install WikiWorldOrder/SurvLoop
+### Install RockHopSoft/SurvLoop
 
 From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
 ```
@@ -101,7 +101,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "wikiworldorder/survloop": "^0.2.10",
+    "rockhopsoft/survloop": "^0.2.10",
     ...
 },
 ...
@@ -109,7 +109,7 @@ $ nano composer.json
     ...
     "psr-4": {
         ...
-        "SurvLoop\\": "vendor/wikiworldorder/survloop/src/",
+        "SurvLoop\\": "vendor/rockhopsoft/survloop/src/",
     }
     ...
 }, ...

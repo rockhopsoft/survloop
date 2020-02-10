@@ -3,7 +3,7 @@
   * SurvLoopInstaller initiallizes a basic SurvLoop installation, after command line installation is complete.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.7
   */

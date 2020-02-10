@@ -4,7 +4,7 @@
   * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.1
   */

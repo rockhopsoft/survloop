@@ -3,7 +3,7 @@
   * TreeSurvFormLoops is a mid-level class with functions related to printing the loops within forms.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.2
   */
@@ -69,6 +69,16 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         return -3;
     }
     
+    protected function getLoopItemNextLabelCustom($singular)
+    {
+        return '';
+    }
+    
+    protected function getLoopDoneItemsCustom($loopName)
+    {
+        return false;
+    }
+    
     protected function printSetLoopNav($nID, $loopName)
     {
         if (!isset($GLOBALS["SL"]->closestLoop["obj"])
@@ -78,13 +88,18 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         $labelFirstLet = $limitTxt = '';
         $this->settingTheLoop($loopName);
         if ($this->allNodes[$nID]->isStepLoop()) {
-            $this->sessData->getLoopDoneItems($loopName);
+            if (!$this->getLoopDoneItemsCustom($loopName)) {
+                $this->sessData->getLoopDoneItems($loopName);
+            }
             if ($this->sessData->loopItemsNextID > 0) {
                 $loopSing = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular;
+                $custNext = $this->getLoopItemNextLabelCustom($loopSing);
+                if ($custNext == '') {
+                    $custNext = 'Next ' . $loopSing . ' Details';
+                }
                 $this->loopItemsCustBtn = '<a href="javascript:;" '
                     . 'class="fR btn btn-lg btn-primary" id="nFormNextStepItem">'
-                    . '<i class="fa fa-arrow-circle-o-right"></i> Next ' 
-                    . $loopSing . ' Details</a>';
+                    . '<i class="fa fa-arrow-circle-o-right mR5"></i> ' . $custNext . '</a>';
                 $GLOBALS["SL"]->pageJAVA .= 'loopItemsNextID = ' 
                     . $this->sessData->loopItemsNextID . '; ';
                 $labelFirstLet = strtolower(substr($loopSing, 0, 1));
@@ -152,7 +167,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == sizeof($this->sessData->loopItemIDsDone)) {
             $this->nextBtnOverride = 'Done With ' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
         } */
-        $ret .= '</div> <!-- loopNav' . $nID . ' --> ';
+        $ret .= '</div> <!-- loopNav' . $nID . ' --> <div class="p20"></div>';
         return $ret;
     }
     

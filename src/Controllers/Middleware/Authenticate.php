@@ -3,7 +3,7 @@
   * Authenticate assists with the login redirect process.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since 0.0
   */

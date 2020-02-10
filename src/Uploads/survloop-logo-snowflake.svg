@@ -17,7 +17,7 @@
    version="1.1"
    inkscape:version="0.91 r13725"
    sodipodi:docname="survloop-logo.svg"
-   inkscape:export-filename="/Users/mo/web/sites/Code/OpenPolice/vendor/wikiworldorder/survloop/src/Uploads/survloop-logo.png"
+   inkscape:export-filename="/Users/mo/web/sites/Code/OpenPolice/vendor/rockhopsoft/survloop/src/Uploads/survloop-logo.png"
    inkscape:export-xdpi="192.85001"
    inkscape:export-ydpi="192.85001">
   <defs
@@ -65,7 +65,7 @@
      style="display:none"
      transform="translate(0,-248.03151)">
     <image
-       sodipodi:absref="/Users/mo/web/sites/Code/OpenPolice/vendor/wikiworldorder/survloop/src/Uploads/survloop.png"
+       sodipodi:absref="/Users/mo/web/sites/Code/OpenPolice/vendor/rockhopsoft/survloop/src/Uploads/survloop.png"
        xlink:href="survloop.png"
        y="58.924709"
        x="-3.8392856"

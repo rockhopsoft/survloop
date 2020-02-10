@@ -3,7 +3,7 @@
   * routes-tree.php registers all the paths used by core SurvLoop behavior.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.2.5
   */

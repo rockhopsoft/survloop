@@ -4,7 +4,7 @@
   * of relevant AB Tests, and their active/inactive aka true/false aka pass/fail status.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.1.3
   */

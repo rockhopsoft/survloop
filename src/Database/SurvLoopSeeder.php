@@ -6516,7 +6516,7 @@ pre { background: #FCFBFF; padding: 20px; }
             <a href="/documentation">Documentation</a><br>
             <a href="/site-map">Site Map</a><br>
         </div><div class="col-md-3 pB20">
-            <a href="https://github.com/wikiworldorder/survloop" target="_blank">On GitHub
+            <a href="https://github.com/rockhopsoft/survloop" target="_blank">On GitHub
             <div class="disBlo mTn10" style="font-size: 550%;"><i class="fa fa-github" aria-hidden="true"></i></div></a>
         </div><div class="col-md-3 pB20">
             <span class="slGrey">A project by,<br />and for the toolbox of</span>
@@ -6542,7 +6542,7 @@ pre { background: #FCFBFF; padding: 20px; }
 			'DefDatabase' => '1',
 			'DefSet' => 'System Settings',
 			'DefSubset' => 'cust-package',
-			'DefDescription' => 'wikiworldorder/survlooporg'
+			'DefDescription' => 'rockhopsoft/survlooporg'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 594,
@@ -6591,7 +6591,7 @@ pre { background: #FCFBFF; padding: 20px; }
 			'DefDatabase' => '3',
 			'DefSet' => 'System Settings',
 			'DefSubset' => 'cust-package',
-			'DefDescription' => 'wikiworldorder/survloop'
+			'DefDescription' => 'rockhopsoft/survloop'
 		]);
 		DB::table('SL_Definitions')->insert([
 			'DefID' => 601,

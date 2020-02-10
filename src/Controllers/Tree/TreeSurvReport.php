@@ -3,7 +3,7 @@
   * TreeSurvReport is a mid-level class with functions related to generating reports within a tree.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.19
   */

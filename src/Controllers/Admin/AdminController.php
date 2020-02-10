@@ -4,7 +4,7 @@
   * requires a user to be logged in.
   *
   * SurvLoop - All Our Data Are Belong
-  * @package  wikiworldorder/survloop
+  * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <wikiworldorder@protonmail.com>
   * @since v0.0.1
   */
@@ -304,12 +304,12 @@ class AdminController extends AdminEmailController
         
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
         $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/popper.min.js");
+        $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/popper.min.js");
         $minifier->add("../vendor/twbs/bootstrap/dist/js/bootstrap.min.js");
-        //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/parallax.min.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/typewatch.js");
-        $minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/copy-to-clipboard.js");
-        //$minifier->add("../vendor/wikiworldorder/survloop-libraries/src/js/radialIndicator.min.js");
+        //$minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/parallax.min.js");
+        $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/typewatch.js");
+        $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/copy-to-clipboard.js");
+        //$minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/radialIndicator.min.js");
         $minifier->minify("../storage/app/sys/sys1.min.js");
         
         $treeJs = '';
