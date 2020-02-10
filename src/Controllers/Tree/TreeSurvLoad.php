@@ -5,7 +5,7 @@
   *
   * SurvLoop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
-  * @author   Morgan Lesko <wikiworldorder@protonmail.com>
+  * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
 namespace SurvLoop\Controllers\Tree;

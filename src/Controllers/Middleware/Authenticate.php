@@ -4,7 +4,7 @@
   *
   * SurvLoop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
-  * @author  Morgan Lesko <wikiworldorder@protonmail.com>
+  * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
 namespace App\Http\Middleware;
