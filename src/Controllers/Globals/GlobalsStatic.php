@@ -479,5 +479,35 @@ class GlobalsStatic extends GlobalsConvert
             . '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', 
             substr($_SERVER["HTTP_USER_AGENT"],0,4)));
     }
+    
+    public function cnvrtSqFt2Acr($squareFeet = 0)
+    {
+        return $squareFeet*0.000022956841138659;
+    }
+    
+    public function cnvrtAcr2SqFt($acres = 0)
+    {
+        return $acres*43560;
+    }
+    
+    public function cnvrtLbs2Grm($lbs = 0)
+    {
+        return $lbs*453.59237;
+    }
+    
+    public function cnvrtKwh2Kbtu($kWh = 0)
+    {
+        return $kWh*3.412;
+    }
+    
+    public function cnvrtKwh2Btu($kWh = 0)
+    {
+        return $kWh*3412;
+    }
+    
+    public function cnvrtKbtu2Kwh($btu = 0)
+    {
+        return $btu/3.412;
+    }
 
 }

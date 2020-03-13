@@ -650,9 +650,10 @@ class SurvLoopController extends Controller
         if (!$js) {
             return redirect($redir);
         } else {
-            echo '<script type="text/javascript"> '
-                . 'setTimeout("top.location.href=\'' . $redir . '\'", 10); '
-                . '</script>';
+            echo view(
+                'vendor.survloop.js.redir', 
+                [ "redir" => $redir ]
+            )->render();
             exit;
         }
     }
@@ -669,7 +670,8 @@ class SurvLoopController extends Controller
     // this should really be done using migrations
     protected function survSysChecks()
     {
-        if (!session()->has('survSysChecks') || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('survSysChecks') 
+            || $GLOBALS["SL"]->REQ->has('refresh')) {
             $GLOBALS["SL"]->clearOldDynascript();
             session()->put('survSysChecks', 1);
             session()->save();

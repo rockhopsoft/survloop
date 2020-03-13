@@ -26,7 +26,7 @@ $(document).ready(function(){
     $(document).on("click", ".unPopDialog", function() { unPopDialog(); });
     
     function chkFormSess() {
-        if (document.getElementById("csrfTok")) {
+        if (document.getElementById("csrfTok") && !document.getElementById("csrfTokSkip")) {
             if (document.getElementById("isLoginID") || document.getElementById("isSignupID")) {
                 setTimeout("window.location='/login'", 10);
                 return true;
@@ -876,7 +876,8 @@ $(document).ready(function(){
         sliChange(n[0], n[1]);
         return true;
     });
-    
+
+<?php /*    
 @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
     && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
     function chkLogoResize() {
@@ -891,6 +892,7 @@ $(document).ready(function(){
     }
     setTimeout(function() { chkLogoResize(); }, 1);
 @endif
+*/ ?>
 
     var winResizeHold = false;
     $(window).on('resize', function(){
@@ -898,10 +900,12 @@ $(document).ready(function(){
             winResizeHold = true;
             var win = $(this); //this = window
             sliLoadHgts();
+<?php /*
 @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
     && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
             chkLogoResize();
 @endif
+*/ ?>
             setTimeout(function() { winResizeHold = false; }, 250);
         }
     });
@@ -967,7 +971,9 @@ $(document).ready(function(){
         return false;
     });
     setTimeout(function() { 
-        if (!openAdmMenuOnLoad) closeAdmMenu();
+        var mobile = false;
+        if (window.innerWidth < 768) mobile = true;
+        if (!openAdmMenuOnLoad || mobile) closeAdmMenu();
     }, 10);
     $(window).resize(function() {
         setTimeout(function() { chkFixedHeaders(false); }, 5);

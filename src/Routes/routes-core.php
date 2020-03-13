@@ -160,7 +160,7 @@ Route::get(
 
 Route::post(
     'password/reset', 
-    'Auth\ResetPasswordController@reset'
+    'App\\Http\\Controllers\\Auth\\ResetPasswordController@reset'
 )->name('password.update');
 
 
@@ -266,6 +266,11 @@ Route::get(
 Route::get(
     '/plotly.min.js',
     $path . 'SurvRoutes@getPlotlyJs'
+);
+
+Route::get(
+    '/survloop-libraries/state-flags/{stateFile}.svg',
+    $path . 'SurvRoutes@getStateFlag'
 );
 
 Route::get( 

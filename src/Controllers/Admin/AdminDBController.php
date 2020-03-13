@@ -307,7 +307,7 @@ class AdminDBController extends AdminController
     
     public function adminPrintFullDBPublic(Request $request, $dbPrefix = '')
     {
-        $db = SLDatabases::where('DbPrefix', str_replace('_', '', $dbPrefix) . '_')
+        $db = SLDatabases::where('db_prefix', str_replace('_', '', $dbPrefix) . '_')
             ->get();
         if ($db->isNotEmpty()) {
             foreach ($db as $d) {

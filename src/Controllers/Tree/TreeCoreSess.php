@@ -50,6 +50,7 @@ class TreeCoreSess extends TreeCore
             $GLOBALS["SL"]->setClosestLoop();
             return false;
         }
+
         $uID = ((isset($this->v["uID"])) ? $this->v["uID"] : 0);
         $cid = 0; 
         if ($GLOBALS["SL"]->REQ->has('cid') 
@@ -155,10 +156,10 @@ class TreeCoreSess extends TreeCore
             session()->put('lastTreeTime', time());
             session()->save();
             $this->chkIfCoreIsEditable();
-            $this->updateCurrNode($this->sessInfo->sess_curr_node);
-            
             $GLOBALS["SL"]->loadSessLoops($this->sessID);
             
+            $this->updateCurrNode($this->sessInfo->sess_curr_node);
+                        
             // Initialize currNode
             if ($coreTbl != '' && isset($GLOBALS["SL"]->tblAbbr[$coreTbl])) {
                 $subFld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'submission_progress';

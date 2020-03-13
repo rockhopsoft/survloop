@@ -13,11 +13,10 @@ namespace SurvLoop\Controllers\Tree;
 use DB;
 use Auth;
 use App\Models\SLFields;
-use App\Models\SLNodeSaves;
 use SurvLoop\Controllers\Tree\SurvDataTestsAB;
-use SurvLoop\Controllers\Tree\SurvDataUtils;
+use SurvLoop\Controllers\Tree\SurvDataCheckbox;
 
-class SurvData extends SurvDataUtils
+class SurvData extends SurvDataCheckbox
 {
     
     public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvLoop = [], $dataBranches = [])
@@ -523,7 +522,8 @@ class SurvData extends SurvDataUtils
         $this->loopItemsNextID = -3;
         if (sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $id) {
-                if ($this->loopItemsNextID <= 0 && !in_array($id, $this->loopItemIDsDone)) {
+                if ($this->loopItemsNextID <= 0 
+                    && !in_array($id, $this->loopItemIDsDone)) {
                     $this->loopItemsNextID = $id;
                 }
             }
@@ -575,6 +575,30 @@ class SurvData extends SurvDataUtils
         }
         return -3;
     }
+
+    public function startLoopDataBranch($tbl, $itemID = -3, $loopName = '')
+    {
+        $foundBranch = false;
+        for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
+            if (!$foundBranch 
+                && isset($this->dataBranches[$i]) 
+                && $this->dataBranches[$i]["branch"] == $tbl) {
+                if ($this->dataBranches[$i]["itemID"] <= 0 && $itemID > 0) {
+                    $this->dataBranches[$i]["itemID"] = $itemID;
+                    $this->dataBranches[$i]["loop"] = $loopName;
+                }
+                $foundBranch = true;
+            }
+        }
+        if (!$foundBranch) {
+            $this->dataBranches[] = [
+                "branch" => $tbl,
+                "loop"   => $loopName,
+                "itemID" => $itemID
+            ];
+        }
+        return true;
+    }
     
     public function startTmpDataBranch($tbl, $itemID = -3, $findItemID = true)
     {
@@ -591,6 +615,9 @@ class SurvData extends SurvDataUtils
         if (!$foundBranch) {
             if (intVal($itemID) <= 0 && $findItemID) {
                 $itemID = $this->sessChildIDFromParent($tbl);
+                if (intVal($itemID) <= 0) {
+                    $itemID = $this->startTmpDataBranchChkLoop($tbl);
+                }
             }
             $this->dataBranches[] = [
                 "branch" => $tbl,
@@ -599,6 +626,26 @@ class SurvData extends SurvDataUtils
             ];
         }
         return true;
+    }
+    
+    public function startTmpDataBranchChkLoop($tbl)
+    {
+        if ($GLOBALS["SL"]->REQ->has('loopItem')
+            && intVal($GLOBALS["SL"]->REQ->has('loopItem')) > 0
+            && isset($this->dataSets[$tbl])
+            && sizeof($this->dataSets[$tbl]) > 0) {
+            $found = false;
+            $itemID = intVal($GLOBALS["SL"]->REQ->get('loopItem'));
+            foreach ($this->dataSets[$tbl] as $item) {
+                if ($item->getKey() == $itemID) {
+                    $found = true;
+                }
+            }
+            if ($found) {
+                return $itemID;
+            }
+        }
+        return -3;
     }
 
     public function endTmpDataBranch($tbl)
@@ -624,6 +671,12 @@ class SurvData extends SurvDataUtils
             return [0, $this->coreID];
         }
         $itemID = $itemInd = -3;
+        for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
+            if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
+                $brch = $this->dataBranches[$i];
+                list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $brch);
+            }
+        }
         $tblNew = $this->isCheckboxHelperTable($tbl);
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
@@ -632,12 +685,6 @@ class SurvData extends SurvDataUtils
                 if (intVal($itemID) > 0) {
                     return [ $itemInd, $itemID ];
                 }
-            }
-        }
-        for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
-            if (intVal($itemID) <= 0 && isset($this->dataBranches[$i])) {
-                $brch = $this->dataBranches[$i];
-                list($itemInd, $itemID) = $this->currSessDataPosBranch($tbl, $brch);
             }
         }
         if (intVal($itemID) <= 0 
@@ -661,10 +708,10 @@ class SurvData extends SurvDataUtils
     {
         $itemID = 0;
         if ($tbl == $branch["branch"]) {
-            if (trim($branch["loop"]) != '') {
-                $itemID = $GLOBALS["SL"]->getSessLoopID($branch["loop"]);
-            } elseif (intVal($branch["itemID"]) > 0) {
+            if (intVal($branch["itemID"]) > 0) {
                 $itemID = $branch["itemID"];
+            } elseif (trim($branch["loop"]) != '') {
+                $itemID = $GLOBALS["SL"]->getSessLoopID($branch["loop"]);
          // } elseif (isset($this->dataSets[$tbl]) && isset($this->dataSets[$tbl][0])) {
          //     $itemID = $this->dataSets[$tbl][0]->getKey(); 
             }
@@ -709,22 +756,13 @@ class SurvData extends SurvDataUtils
             return '';
         }
         if ($action == 'get') {
-            if ($this->dataFieldExists($tbl, $itemInd, $fld)) {
+            if ($this->dataFieldExists($tbl, $fld, $itemInd)) {
                 return $this->dataSets[$tbl][$itemInd]->{ $fld };
             }
         } elseif ($action == 'update' 
             && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'id')) {
             $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            if (trim($newVal) == '' 
-                && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
-                $newVal = null;
-            } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
-                $newVal = intVal($newVal);
-            } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DOUBLE') {
-                $newVal = floatval($newVal);
-            } else {
-                $newVal = strip_tags($newVal);
-            }
+            $newVal = $this->currSessDataFormatNewVal($newVal, $tbl, $fld);
             if (isset($this->dataSets[$tbl]) 
                 && isset($this->dataSets[$tbl][$itemInd])) {
                 if ($fld != $GLOBALS["SL"]->tblAbbr[$tbl] . 'id') {
@@ -732,166 +770,34 @@ class SurvData extends SurvDataUtils
                     $this->dataSets[$tbl][$itemInd]->save();
                 }
             } else {
-                $GLOBALS["errors"] .= 'Couldn\'t find dataSets[' 
-                    . $tbl . '][' . $itemInd . '] for ' . $fld . '<br />';
+                $GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl 
+                    . '][' . $itemInd . '] for ' . $fld . '<br />';
             }
         }
         return $newVal;
     }
     
-    public function currSessDataCheckbox($nID, $tbl, $fld = '', $action = 'get', $newVals = [], $curr = [], 
-        $itemInd = -3, $itemID = -3)
+    // Here we're trying to find the closest relative within current tree navigation to the table and field in question. 
+    public function currSessDataFormatNewVal($newVal, $tbl, $fld = '')
     {
-        $tblFld = $tbl . '-' . $fld;
-        $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
-        if (!$this->helpInfo[$tblFld]["link"] 
-            || !isset($this->helpInfo[$tblFld]["link"]->data_help_value_field)) {
-            $v = ';' . implode(';;', $newVals) . ';';
-            return $this->currSessData($nID, $tbl, $fld, $action, $v, false, $itemInd, $itemID);
-        }
-        if ($action == 'get') {
-            if (sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) {
-                return ';' . implode(';;', $this->helpInfo[$tblFld]["pastVals"]) . ';';
-            }
-            return '';
-        } elseif ($action == 'update') {
-            $parentID = $this->helpInfo[$tblFld]["parentID"];
-            $this->logDataSave($nID, $tbl, $parentID, $fld, $newVals);
-            // check for newly submitted responses...
-            if (is_array($newVals) && sizeof($newVals) > 0) {
-                foreach ($newVals as $i => $val) {
-                    if (!in_array($val, $this->helpInfo[$tblFld]["pastVals"]) 
-                        && isset($this->helpInfo[$tblFld]["link"]->data_help_table)) {
-                        if ($this->helpInfo[$tblFld]["parentID"] <= 0 
-                            && $this->helpInfo[$tblFld]["link"]->data_help_parent_table == 'users') {
-                            $this->helpInfo[$tblFld]["parentID"] = ((Auth::user() && Auth::user()->id)
-                                ? Auth::user()->id : -3);
-                        }
-                        if ($val && trim($val) != '') {
-                            $model = trim($GLOBALS["SL"]->modelPath(
-                                $this->helpInfo[$tblFld]["link"]->data_help_table
-                            ));
-                            if ($model != '') {
-                                eval("\$newObj = new " . $model . ";");
-                                $newObj->save();
-                                $newObj->update([
-                                    $this->helpInfo[$tblFld]["link"]->data_help_key_field 
-                                        => $this->helpInfo[$tblFld]["parentID"],
-                                    $this->helpInfo[$tblFld]["link"]->data_help_value_field 
-                                        => strip_tags($val)
-                                ]);
-                                $setInd = $this->initDataSet($tbl);
-                                $this->dataSets[$tbl][$setInd] = $newObj;
-                                $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
-                            }
-                        }
-                    }
-                }
-            }
-            if (isset($curr->responses) && sizeof($curr->responses) > 0) {
-                foreach ($curr->responses as $j => $res) {
-                    if ((!is_array($newVals) || !in_array($res->node_res_value, $newVals)) 
-                        && isset($this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value])) {
-                        $helpTbl = $this->helpInfo[$tblFld]["link"]->data_help_table;
-                        $helpVal = $this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value];
-                        $this->deleteDataItem($nID, $helpTbl, $helpVal);
-                    }
-                }
-            }
-        }
-        return '';
-    }
-    
-    public function getCheckboxHelperInfo($tbl, $fld)
-    {
-        $tblFld = $tbl . '-' . $fld;
-        //if (!isset($this->helpInfo[$tblFld]) || $this->helpInfo[$tblFld]["parentID"] < 0) {
-            $this->helpInfo[$tblFld] = [
-                "link"        => [],
-                "parentID"    => -3,
-                "pastVals"    => [],
-                "pastObjs"    => [],
-                "pastValToID" => []
-            ];
-            if (isset($GLOBALS["SL"]->dataHelpers) 
-                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
-                foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
-                    if ($helper->data_help_table == $tbl && $helper->data_help_value_field == $fld) {
-                        $this->helpInfo[$tblFld]["link"] = $helper;
-                        //BranchOnly
-                        list($parentInd, $this->helpInfo[$tblFld]["parentID"]) 
-                            = $this->currSessDataPos($helper->data_help_parent_table);
-                        $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere(
-                            $helper->data_help_table, 
-                            $helper->data_help_key_field, 
-                            $this->helpInfo[$tblFld]["parentID"]
-                        );
-                        if ($this->helpInfo[$tblFld]["pastObjs"] 
-                            && sizeof($this->helpInfo[$tblFld]["pastObjs"]) > 0) {
-                            foreach ($this->helpInfo[$tblFld]["pastObjs"] as $obj) {
-                                $val = $obj->{ $helper->data_help_value_field };
-                                $this->helpInfo[$tblFld]["pastVals"][] = $val;
-                                $this->helpInfo[$tblFld]["pastValToID"][$val] = $obj->getKey();
-                            }
-                        }
-                    }
-                }
-            }
-        //}
-        return $this->helpInfo[$tblFld];
-    }
-    
-    public function logDataSave($nID = -3, $tbl = '', $itemID = -3, $fld = '', $newVal = '')
-    {
-        $nodeSave = new SLNodeSaves;
-        $nodeSave->node_save_session    = 0;
-        $sessKey = 'sessID' . $GLOBALS["SL"]->sessTree;
-        if (session()->has($sessKey) && intVal(session()->get($sessKey)) > 0) {
-            $nodeSave->node_save_session = session()->get($sessKey);
-        }
-        $nodeSave->node_save_node         = $nID;
-        $nodeSave->node_save_tbl_fld      = $tbl . ':' . $fld;
-        $nodeSave->node_save_loop_item_id = $itemID;
-        if (!is_array($newVal)) {
-            $nodeSave->node_save_new_val = $newVal;
+        if (trim($newVal) == '' 
+            && in_array($GLOBALS["SL"]->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
+            $newVal = null;
+        } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'INT') {
+            $newVal = intVal($newVal);
+        } elseif ($GLOBALS["SL"]->fldTypes[$tbl][$fld] == 'DOUBLE') {
+            $newVal = floatval($newVal);
         } else {
-            ob_start();
-            print_r($newVal);
-            $nodeSave->node_save_new_val = ob_get_contents();
-            ob_end_clean();
+            $newVal = strip_tags($newVal);
         }
-        $nodeSave->save();
-        return true;
-    }
-    
-    protected function loadSessionDataLog($nID = -3, $tbl = '', $fld = '', $set = '')
-    {
-        $sessID = 0;
-        $sessKey = 'sessID' . $GLOBALS["SL"]->sessTree;
-        if (session()->has($sessKey) && intVal(session()->get($sessKey)) > 0) {
-            $sessID = session()->get($sessKey);
-        }
-        $qryWheres = "where('node_save_session', \$sessID)->where('node_save_node', ".$nID.")->";
-        if (trim($tbl) != '' && trim($fld) != '') {
-            $qryWheres .= "where('node_save_tbl_fld', '" . $tbl . ":" . $fld 
-                . ((trim($set) != '') ? "[" . $set . "]" : "") . "')->";
-        }
-        if (isset($GLOBALS["SL"]->closestLoop["itemID"]) 
-            && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
-            $qryWheres .= "where('node_save_loop_item_id', " . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
-        }
-        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres 
-            . "orderBy('created_at', 'desc')->first();"); 
-        if ($nodeSave && isset($nodeSave->node_save_new_val)) {
-            return $nodeSave->node_save_new_val;
-        }
-        return '';
+        return $newVal;
     }
     
     public function parseCondition($cond = [], $recObj = [], $nID = -3)
     {
         $passed = true;
-        if ($cond && isset($cond->cond_database) && $cond->cond_operator != 'CUSTOM') {
+        if ($cond && isset($cond->cond_database) 
+            && $cond->cond_operator != 'CUSTOM') {
             $cond->loadVals();
             $loopName = '';
             if (intVal($cond->cond_loop) > 0 
@@ -940,8 +846,12 @@ class SurvData extends SurvDataUtils
                     }
                 }
             } elseif (intVal($cond->cond_field) > 0) {
-                $fldName = $GLOBALS["SL"]->getFullFldNameFromID($cond->cond_field, false);
-                if ($cond->cond_operator == '{{') { // find any match in any row for this table
+                $fldName = $GLOBALS["SL"]->getFullFldNameFromID(
+                    $cond->cond_field, 
+                    false
+                );
+                if ($cond->cond_operator == '{{') {
+                    // find any match in any row for this table
                     $passed = false;
                     if (isset($this->dataSets[$tblName]) 
                         && sizeof($this->dataSets[$tblName]) > 0) {
@@ -959,10 +869,14 @@ class SurvData extends SurvDataUtils
                         $currSessData = $recObj->{ $fldName };
                     } elseif ($nID > 0) {
                         $currSessData = $this->currSessData($nID, $tblName, $fldName);
-                    } else { // not a node, but general filter of entire core record's data set
-                        if (isset($this->dataSets[$tblName]) && sizeof($this->dataSets[$tblName]) > 0) {
+                    }
+                    // else not a node, but general filter of entire core record's data set
+                    if ($currSessData == '') { 
+                        if (isset($this->dataSets[$tblName]) 
+                            && sizeof($this->dataSets[$tblName]) > 0) {
                             foreach ($this->dataSets[$tblName] as $ind => $row) {
-                                if (isset($row->{ $fldName }) && trim($row->{ $fldName }) != '') {
+                                if (isset($row->{ $fldName }) 
+                                    && trim($row->{ $fldName }) != '') {
                                     $currSessData = $row->{ $fldName };
                                 }
                             }
@@ -989,23 +903,6 @@ class SurvData extends SurvDataUtils
         return $passed;
     }
     
-    public function isCheckboxHelperTable($helperTbl = '')
-    {
-        $tbl = $helperTbl;
-        if (trim($helperTbl) != '' && trim($GLOBALS["SL"]->currCyc["res"][1]) == '') {
-            if (isset($GLOBALS["SL"]->dataHelpers) 
-                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
-                foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
-                    if ($helper->data_help_table == $helperTbl 
-                        && trim($helper->data_help_value_field) != '') {
-                        $tbl = $helper->data_help_parent_table;
-                    }
-                }
-            }
-        }
-        return $tbl;
-    }
-    
     public function updateZipInfo($zipIn = '', $tbl = '', $fldState = '', $fldCounty = '', $fldAshrae = '', $fldCountry = '', $setInd = 0)
     {
         if (trim($zipIn) == '' || trim($tbl) == '') {
@@ -1013,19 +910,28 @@ class SurvData extends SurvDataUtils
         }
         $GLOBALS["SL"]->loadStates();
         $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
-        if ($zipRow && isset($zipRow->zip_zip) && isset($this->dataSets[$tbl])) {
+        if ($zipRow && isset($zipRow->zip_zip) 
+            && isset($this->dataSets[$tbl])) {
             if (trim($fldState) != '' && isset($zipRow->zip_state)) {
-                $this->dataSets[$tbl][$setInd]->update([ $fldState  => $zipRow->zip_state  ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldState  => $zipRow->zip_state  
+                ]);
             }
             if (trim($fldCounty) != '' && isset($zipRow->zip_county)) {
-                $this->dataSets[$tbl][$setInd]->update([ $fldCounty => $zipRow->zip_county ]);
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldCounty => $zipRow->zip_county 
+                ]);
             }
             if (trim($fldCountry) != '' && isset($zipRow->zip_country)) {
-                $this->dataSets[$tbl][$setInd]->update([ $fldCountry => $zipRow->zip_country ]);
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldCountry => $zipRow->zip_country
+                ]);
             }
             if (trim($fldAshrae) != '') {
                 $ashrae = $GLOBALS["SL"]->states->getAshrae($zipRow);
-                $this->dataSets[$tbl][$setInd]->update([ $fldAshrae => $ashrae ]);
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldAshrae => $ashrae
+                ]);
             }
             return true;
         }
@@ -1037,8 +943,9 @@ class SurvData extends SurvDataUtils
         $url = '&branch=';
         if (sizeof($this->dataBranches) > 1) {
             for ($i = 1; $i < sizeof($this->dataBranches); $i++) {
-                $url .= (($i > 1) ? '-' : '') . $this->dataBranches[$i]["branch"] 
-                    . '-' . $this->dataBranches[$i]["itemID"];
+                $url .= (($i > 1) ? '-' : '') 
+                    . $this->dataBranches[$i]["branch"] . '-' 
+                    . $this->dataBranches[$i]["itemID"];
             }
         }
         return $url;
@@ -1105,20 +1012,165 @@ class SurvData extends SurvDataUtils
     {
         $this->testsAB = new SurvDataTestsAB;
         $params = $abField = '';
-        if (isset($this->dataSets[$this->coreTbl]) && sizeof($this->dataSets[$this->coreTbl]) > 0) {
+        if (isset($this->dataSets[$this->coreTbl]) 
+            && sizeof($this->dataSets[$this->coreTbl]) > 0) {
             $abField = $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'version_ab';
             if (isset($this->dataSets[$this->coreTbl][0]->{ $abField })) {
                 $params = $this->dataSets[$this->coreTbl][0]->{ $abField };
             }
         }
         $this->testsAB->addParamsAB($params);
-        if ($GLOBALS["SL"]->REQ->has('ab') && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
+        if ($GLOBALS["SL"]->REQ->has('ab') 
+            && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
             $this->testsAB->addParamsAB(trim($GLOBALS["SL"]->REQ->get('ab')));
         }
         if ($abField != '') {
-            $this->dataSets[$this->coreTbl][0]->update([ $abField => $this->testsAB->printParams() ]);
+            $this->dataSets[$this->coreTbl][0]->update([
+                $abField => $this->testsAB->printParams()
+            ]);
         }
         return true;
     }
     
+
+
+
+
+    public function isCheckboxHelperTable($helperTbl = '')
+    {
+        $tbl = $helperTbl;
+        if (trim($helperTbl) != '' 
+            && trim($GLOBALS["SL"]->currCyc["res"][1]) == '') {
+            if (isset($GLOBALS["SL"]->dataHelpers) 
+                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+                foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
+                    if ($helper->data_help_table == $helperTbl 
+                        && trim($helper->data_help_value_field) != '') {
+                        $tbl = $helper->data_help_parent_table;
+                    }
+                }
+            }
+        }
+        return $tbl;
+    }
+    
+    public function currSessDataCheckbox($nID, $tbl, $fld = '', $action = 'get', $newVals = [], $curr = [], 
+        $itemInd = -3, $itemID = -3)
+    {
+        $tblFld = $tbl . '-' . $fld;
+        $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
+
+        if (!$this->helpInfo[$tblFld]["link"] 
+            || !isset($this->helpInfo[$tblFld]["link"]->data_help_value_field)) {
+            $v = ';' . implode(';;', $newVals) . ';';
+            return $this->currSessData($nID, $tbl, $fld, $action, $v, false, $itemInd, $itemID);
+        }
+        if ($action == 'get') {
+            if (sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) {
+                return ';' . implode(';;', $this->helpInfo[$tblFld]["pastVals"]) . ';';
+            }
+            return '';
+        } elseif ($action == 'update') {
+            $this->currSessDataCheckboxUpdate($nID, $tbl, $fld, $newVals, $curr, $itemInd, $itemID);
+        }
+        return '';
+    }
+    
+    public function currSessDataCheckboxUpdate($nID, $tbl, $fld = '', $newVals = [], $curr = [], 
+        $itemInd = -3, $itemID = -3)
+    {
+        $tblFld = $tbl . '-' . $fld;
+        $parentID = $this->helpInfo[$tblFld]["parentID"];
+        $this->logDataSave($nID, $tbl, $parentID, $fld, $newVals);
+        // check for newly submitted responses...
+        if (is_array($newVals) && sizeof($newVals) > 0) {
+            foreach ($newVals as $i => $val) {
+                if (!in_array($val, $this->helpInfo[$tblFld]["pastVals"]) 
+                    && isset($this->helpInfo[$tblFld]["link"]->data_help_table)) {
+                    $this->currSessDataCheckboxAdd($nID, $tbl, $fld, $val, $curr);
+                }
+            }
+        }
+        if (isset($curr->responses) && sizeof($curr->responses) > 0) {
+            foreach ($curr->responses as $j => $res) {
+                if ((!is_array($newVals) || !in_array($res->node_res_value, $newVals)) 
+                    && isset($this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value])) {
+                    $helpTbl = $this->helpInfo[$tblFld]["link"]->data_help_table;
+                    $helpVal = $this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value];
+                    $this->deleteDataItem($nID, $helpTbl, $helpVal);
+                }
+            }
+        }
+        return true;
+    }
+    
+    public function currSessDataCheckboxAdd($nID, $tbl, $fld = '', $val = '', $curr = [])
+    {
+        $tblFld = $tbl . '-' . $fld;
+        if ($this->helpInfo[$tblFld]["parentID"] <= 0 
+            && $this->helpInfo[$tblFld]["link"]->data_help_parent_table == 'users') {
+            $this->helpInfo[$tblFld]["parentID"] = -3;
+            if (Auth::user() && Auth::user()->id) {
+                $this->helpInfo[$tblFld]["parentID"] = Auth::user()->id;
+            }
+        }
+        if ($val && trim($val) != '') {
+            $model = $this->helpInfo[$tblFld]["link"]->data_help_table;
+            $model = trim($GLOBALS["SL"]->modelPath($model));
+            if ($model != '') {
+                eval("\$newObj = new " . $model . ";");
+                $newObj->save();
+                $keyFld = $this->helpInfo[$tblFld]["link"]->data_help_key_field;
+                $valFld = $this->helpInfo[$tblFld]["link"]->data_help_value_field;
+                $newObj->update([
+                    $keyFld => $this->helpInfo[$tblFld]["parentID"],
+                    $valFld => strip_tags($val)
+                ]);
+                $setInd = $this->initDataSet($tbl);
+                $this->dataSets[$tbl][$setInd] = $newObj;
+                $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+            }
+        }
+        return true;
+    }
+    
+    public function getCheckboxHelperInfo($tbl, $fld)
+    {
+        $tblFld = $tbl . '-' . $fld;
+        //if (!isset($this->helpInfo[$tblFld]) || $this->helpInfo[$tblFld]["parentID"] < 0) {
+            $this->helpInfo[$tblFld] = [
+                "link"        => [],
+                "parentID"    => -3,
+                "pastVals"    => [],
+                "pastObjs"    => [],
+                "pastValToID" => []
+            ];
+            if (isset($GLOBALS["SL"]->dataHelpers) 
+                && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
+                foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
+                    if ($helper->data_help_table == $tbl && $helper->data_help_value_field == $fld) {
+                        $this->helpInfo[$tblFld]["link"] = $helper;
+                        //BranchOnly
+                        list($parentInd, $this->helpInfo[$tblFld]["parentID"]) 
+                            = $this->currSessDataPos($helper->data_help_parent_table);
+                        $this->helpInfo[$tblFld]["pastObjs"] = $this->dataWhere(
+                            $helper->data_help_table, 
+                            $helper->data_help_key_field, 
+                            $this->helpInfo[$tblFld]["parentID"]
+                        );
+                        if ($this->helpInfo[$tblFld]["pastObjs"] 
+                            && sizeof($this->helpInfo[$tblFld]["pastObjs"]) > 0) {
+                            foreach ($this->helpInfo[$tblFld]["pastObjs"] as $obj) {
+                                $val = $obj->{ $helper->data_help_value_field };
+                                $this->helpInfo[$tblFld]["pastVals"][] = $val;
+                                $this->helpInfo[$tblFld]["pastValToID"][$val] = $obj->getKey();
+                            }
+                        }
+                    }
+                }
+            }
+        //}
+        return $this->helpInfo[$tblFld];
+    }
+
 }

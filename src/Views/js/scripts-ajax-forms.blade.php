@@ -286,14 +286,13 @@ function timeoutChecks() {
 setTimeout(function() { timeoutChecks(); }, 500);
 
 $(document).on("click", ".editLoopItem", function() {
-    var id = $(this).attr("id").replace("editLoopItem", "").replace("arrowLoopItem", "");
-    document.getElementById("loopItemID").value=id;
+    setLoopItemID($(this).attr("data-loop-id"));
     return runFormSub();
 });
 function checkAutoLoad() {
     if (pageDynaLoaded) {
         if (addingLoopItem > 0) {
-            document.getElementById("loopItemID").value=addingLoopItem;
+            setLoopItemID(addingLoopItem);
             return runFormSub();
         }
     } else {
@@ -304,7 +303,7 @@ function checkAutoLoad() {
 setTimeout(function() { checkAutoLoad(); }, 1000);
 
 $(document).on("click", "#nFormAdd", function() {
-    if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value="-37";
+    setLoopItemID("-37");
     return runFormSub();
 });
 
@@ -350,7 +349,7 @@ $(document).on("click", "#recMgmtDelX", function() {
 });
 
 $(document).on("click", "#nFormNextStepItem", function() {
-    document.getElementById("loopItemID").value=loopItemsNextID;
+    setLoopItemID(loopItemsNextID);
     document.getElementById("jumpToID").value="-3";
     document.getElementById("stepID").value="next";
     return runFormSub();

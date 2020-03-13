@@ -149,7 +149,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
             title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >
          @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
             && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
-            && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
+            && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != trim($GLOBALS['SL']->sysOpts['logo-img-lrg']))
             <img id="slLogoImgSm" src="{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}" 
                 alt="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" border=0 
                 title="{{ $GLOBALS['SL']->sysOpts['site-name'] }} Home" >

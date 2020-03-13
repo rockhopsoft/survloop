@@ -111,6 +111,10 @@ table tr td.brdRgt, table tr th.brdRgt {
 .brdRgtGrey, table tr.brdRgtGrey td, table tr.brdRgtGrey th {
     border-right: 1px {!! $css["color-main-grey"] !!} solid;
 }
+.brdRgtFnt, table tr.brdRgtFnt td, table tr.brdRgtFnt th {
+    border-right: 1px {!! $css["color-main-faint"] !!} solid;
+}
+
 .brdLftGrey, table tr.brdLftGrey td, table tr.brdLftGrey th {
     border-left: 1px {!! $css["color-main-grey"] !!} solid;
 }

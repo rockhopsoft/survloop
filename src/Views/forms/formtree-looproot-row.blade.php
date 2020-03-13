@@ -1,6 +1,7 @@
 <!-- resources/views/vendor/survloop/forms/formtree-looproot-row.blade.php -->
 @if ($node->isStepLoop())
     <a id="editLoopItem{{ $itemID }}" href="javascript:;"
+        data-loop-id="{{ $itemID }}" data-loop-ind="{{ $setIndex }}"
         class="btn btn-secondary btn-lg btn-block taL mB20 editLoopItem">
         <table border="0" class="w100" ><tr>
         @if (trim($ico) != '')
@@ -26,6 +27,7 @@
         @if ($canEdit)
             <div class="mT5">
                 <a href="javascript:;" id="editLoopItem{{ $itemID }}" 
+                    data-loop-id="{{ $itemID }}" data-loop-ind="{{ $setIndex }}" 
                     class="editLoopItem btn btn-secondary loopItemBtn"
                     ><i class="fa fa-pencil fa-flip-horizontal"></i> Edit</a>
                 <a href="javascript:;" id="delLoopItem{{ $itemID }}" 

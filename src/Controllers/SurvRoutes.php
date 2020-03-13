@@ -186,4 +186,9 @@ class SurvRoutes extends Controller
         return $this->getLibFile('plotly/plotly.js/dist/plotly.min', 'js');
     }
     
+    public function getStateFlag(Request $request, $stateFlag)
+    {
+        return $this->getLibFile('survloop-libraries/src/state-flags/$stateFlag', 'svg');
+    }
+    
 }

@@ -489,12 +489,8 @@ class SurvLoop extends SurvCustLoop
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
-            return $this->custLoop->byID(
-                $request, 
-                $cid, 
-                $coreSlug, 
-                $request->has('ajax')
-            );
+            $hasAjax = $request->has('ajax');
+            return $this->custLoop->byID($request, $cid, $coreSlug, $hasAjax);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');

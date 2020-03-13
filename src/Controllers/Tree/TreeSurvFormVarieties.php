@@ -87,6 +87,7 @@ class TreeSurvFormVarieties extends UserProfile
                 $labelSwap = '<span class="' . $this->autoLabelClass($nIDtxt) 
                     . '">' . $cnt . '</span>';
                 $str = str_replace('[LoopItemCnt]', $labelSwap, $str);
+                $str = str_replace('[LoopItemID]', $itemID, $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
             if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {

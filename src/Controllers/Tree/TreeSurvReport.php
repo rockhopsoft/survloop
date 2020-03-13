@@ -370,4 +370,368 @@ class TreeSurvReport extends TreeSurvBasicNav
         )->render();
     }
     
+    public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
+    {
+        $this->survLoopInit($request, '/report/' . $coreID);
+        if (!$skipPublic) {
+            $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
+        }
+        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
+            $this->hideDisclaim = true;
+        }
+        $this->v["isPublicRead"] = true;
+        $this->v["content"] = $this->printFullReport();
+        if ($skipWrap) {
+            return $this->v["content"];
+        }
+        $this->v["footOver"] = $this->printNodePageFoot();
+        return $GLOBALS["SL"]->swapSessMsg(view('vendor.survloop.master', $this->v)->render());
+    }
+    
+    public function printReports(Request $request, $full = true)
+    {
+        $this->survLoopInit($request, '/reports-full/' . $this->treeID);
+        $this->loadTree();
+        $ret = '';
+        if ($request->has('i') && intVal($request->get('i')) > 0) {
+            $ret .= $this->printReportsRecordPublic($request->get('i'), $full);
+        } elseif ($request->has('ids') && trim($request->get('ids')) != '') {
+            foreach ($GLOBALS["SL"]->mexplode(',', $request->get('ids')) as $id) {
+                $ret .= $this->printReportsRecordPublic($id, $full);
+            }
+        } elseif ($request->has('rawids') && trim($request->get('rawids')) != '') {
+            foreach ($GLOBALS["SL"]->mexplode(',', $request->get('rawids')) as $id) {
+                $ret .= $this->printReportsRecord($id, $full);
+            }
+        } else {
+            $this->getAllPublicCoreIDs();
+            $this->initSearcher();
+            $this->searcher->getSearchFilts();
+            $this->searcher->processSearchFilts();
+            if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
+                foreach ($this->searcher->allPublicFiltIDs as $i => $coreID) {
+                    if (!isset($this->searchOpts["limit"]) 
+                        || intVal($this->searchOpts["limit"]) == 0
+                        || $i < $this->searchOpts["limit"]) {
+                        if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
+                            $ret .= $this->printReportsRecordPublic($coreID, $full);
+                        } else {
+                            $ret .= $this->printReportsRecord($coreID, $full);
+                        }
+                    }
+                }
+            }
+        }
+        if ($ret == '') {
+            $ret = '<p><i class="slGrey">None found.</i></p>';
+        }
+        return $ret;
+    }
+    
+    public function printReportsRecord($coreID = -3, $full = true)
+    {
+        if (!$this->isPublished($GLOBALS["SL"]->coreTbl, $coreID) 
+            && !$this->isCoreOwner($coreID) 
+            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
+            return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
+        }
+        if ($full) {
+            return '<div class="reportWrap">' 
+                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true, true) . '</div>';
+        }
+        return $this->printReportsPrev($coreID);
+    }
+    
+    public function printReportsRecordPublic($coreID = -3, $full = true)
+    {
+        if (!$this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $coreID) 
+            && !$this->isCoreOwnerPublic($coreID) 
+            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
+            return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
+        }
+        if ($full) {
+            return '<div class="reportWrap">' 
+                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) . '</div>';
+        }
+        return $this->printReportsPrev($coreID);
+    }
+    
+    public function printReportsPrev($coreID = -3)
+    {
+        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        return '<div id="reportPreview' . $coreID . '" class="reportPreview">' 
+            . $this->printPreviewReport() . '</div>';
+    }
+    
+    public function unpublishedMessage($coreTbl = '')
+    {
+        if ($this->corePublicID <= 0) {
+            return '<!-- -->';
+        }
+        return '<div class="well well-lg">#' . $this->corePublicID 
+            . ' is no longer published.</div>';
+    }
+    
+    public function xmlAllAccess()
+    {
+        return true; 
+    }
+    
+    public function xmlAll(Request $request)
+    {
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-all';
+        $this->survLoopInit($request, $page);
+        if (!$this->xmlAllAccess()) {
+            return 'Sorry, access not permitted.';
+        }
+        $limit = 20;
+        if ($GLOBALS["SL"]->REQ->has('limit')) { 
+            $limit = intVal($GLOBALS["SL"]->REQ->get('limit'));
+            if ($limit <= 0) {
+                $limit = 20;
+            }
+        }
+        $this->loadXmlMapTree($request);
+        $this->v["nestedNodes"] = '';
+        $coreTbl = $GLOBALS["SL"]->xmlTree["coreTbl"];
+        $this->getAllPublicCoreIDs($coreTbl);
+        if (sizeof($this->searcher->allPublicCoreIDs) > 0) {
+            foreach ($this->searcher->allPublicCoreIDs as $i => $coreID) {
+                if ($i < $limit) {
+                    $this->loadAllSessData($coreTbl, $coreID);
+                    if (isset($this->sessData->dataSets[$coreTbl]) 
+                        && sizeof($this->sessData->dataSets[$coreTbl]) > 0) {
+                        $this->v["nestedNodes"] .= $this->genXmlReportNode(
+                            $this->xmlMapTree->rootID, 
+                            $this->xmlMapTree->nodeTiers, 
+                            $this->sessData->dataSets[$coreTbl][0]
+                        );
+                    }
+                }
+            }
+        }
+        $view = view('vendor.survloop.admin.tree.xml-report', $this->v)->render();
+        return Response::make($view, '200')->header('Content-Type', 'text/xml');
+    }
+    
+    public function xmlByID(Request $request, $coreID, $coreSlug = '')
+    {
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-report-xml/' . $coreID;
+        $this->survLoopInit($request, $page);
+        $GLOBALS["SL"]->pageView = 'public';
+        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
+        $this->loadXmlMapTree($request);
+        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
+            $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        } else { // XML core table is different from main tree
+            $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
+            $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
+        }
+        return $this->getXmlID($request, $coreID, $coreSlug);
+    }
+    
+    public function getXmlID(Request $request, $coreID, $coreSlug = '')
+    {
+        $this->maxUserView();
+        $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
+        if (isset($GLOBALS["fullAccess"]) 
+            && $GLOBALS["fullAccess"] 
+            && $GLOBALS["SL"]->pageView != 'full') {
+            $this->v["content"] = $this->errorDeniedFullXml();
+            return view('vendor.survloop.master', $this->v);
+        }
+        return $this->genXmlReport($request);
+    }
+    
+    public function getXmlExample(Request $request)
+    {
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-example';
+        $this->survLoopInit($request, $page);
+        $coreID = 1;
+        $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
+        $optTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
+        if (isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
+            $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
+        } elseif (isset($GLOBALS["SL"]->sysOpts[$optTree])) {
+            $coreID = intVal($GLOBALS["SL"]->sysOpts[$optTree]);
+        }
+        eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]) 
+            . "::find(" . $coreID . ");");
+        if ($chk) {
+            return $this->xmlByID($request, $coreID);
+        }
+        return $this->redir('/xml-schema');
+    }
+    
+    protected function reloadStats($coreIDs = [])
+    {
+        return true;
+    }
+    
+    public function retrieveUpload(Request $request, $cid = -3, $upID = '')
+    {
+        if ($cid <= 0) {
+            return '';
+        }
+        $this->survLoopInit($request, '');
+        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
+        $GLOBALS["SL"]->pageView = 'sensitive';
+        return $this->retrieveUploadFile($upID);
+    }
+    
+    protected function errorDeniedFullPdf()
+    {
+        $url = $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $this->coreID;
+        return view(
+            'vendor.survloop.reports.inc-error-denied-full-pdf', 
+            [ "url" => $url ]
+        );
+    }
+    
+    protected function errorDeniedFullXml()
+    {
+        return $this->errorDeniedFullPdf();
+    }
+    
+    protected function hasAjaxWrapPrinting()
+    {
+        return (!$this->hasREQ 
+            && (!$GLOBALS["SL"]->REQ->has('ajax') 
+                || intVal($GLOBALS["SL"]->REQ->get('ajax')) == 0));
+    }
+    
+    protected function hasFrameLoad()
+    {
+        return ($GLOBALS["SL"]->REQ->has('frame') 
+            && intVal($GLOBALS["SL"]->REQ->get('frame')) == 1);
+    }
+
+
+
+    
+    public function ajaxGraph(Request $request, $gType = '', $nID = -3)
+    {
+        $this->survLoopInit($request, '');
+        $this->v["currNode"] = new TreeNodeSurv;
+        $this->v["currNode"]->fillNodeRow($nID);
+        $this->v["currGraphID"] = 'nGraph' . $nID;
+        if ($this->v["currNode"] 
+            && trim($gType) != ''
+            && isset($this->v["currNode"]->nodeRow->node_id)) {
+            $this->getAllPublicCoreIDs();
+            $this->searcher->getSearchFilts();
+            $this->searcher->processSearchFilts();
+            $this->v["graphDataPts"] = $this->v["graphMath"] = $rows = $rowsFilt = [];
+            if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
+                if (isset($this->v["currNode"]->extraOpts["y-axis"]) 
+                    && intVal($this->v["currNode"]->extraOpts["y-axis"]) > 0) {
+                    $fldRec = SLFields::find($this->v["currNode"]->extraOpts["y-axis"]);
+                    $lab1Rec = SLFields::find($this->v["currNode"]->extraOpts["lab1"]);
+                    $lab2Rec = SLFields::find($this->v["currNode"]->extraOpts["lab2"]);
+                    if ($fldRec && isset($fldRec->fld_table)) {
+                        $tbl = $GLOBALS["SL"]->tbl[$fldRec->fld_table];
+                        $tblAbbr = $GLOBALS["SL"]->tblAbbr[$tbl];
+                        $fldName = $tblAbbr . $fldRec->fld_name;
+                        $lab1Fld = (($lab1Rec && isset($lab1Rec->fld_name)) 
+                            ? $tblAbbr . $lab1Rec->fld_name : '');
+                        $lab2Fld = (($lab2Rec && isset($lab2Rec->fld_name)) 
+                            ? $tblAbbr . $lab2Rec->fld_name : '');
+                        if ($tbl == $GLOBALS["SL"]->coreTbl) {
+                            eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) 
+                                . "::select('" . $tblAbbr . "ID', '" . $fldName . "'" 
+                                . ((trim($lab1Fld) != '') ? ", '" . $lab1Fld . "'" : "") 
+                                . ((trim($lab2Fld) != '') ? ", '" . $lab2Fld . "'" : "")
+                                . ")->where('" . $fldName . "', 'NOT LIKE', '')->where('"
+                                . $fldName . "', 'NOT LIKE', 0)->whereIn('" . $tblAbbr 
+                                . "id', \$this->searcher->allPublicFiltIDs)->orderBy('" 
+                                . $fldName . "', 'asc')->get();");
+                        } else {
+                            //eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) 
+                            //    . "::orderBy('" . $isBigSurvLoop[1] 
+                            //    . "', '" . $isBigSurvLoop[2] . "')->get();");
+                        }
+                        if ($rows->isNotEmpty()) {
+                            if (isset($this->v["currNode"]->extraOpts["conds"]) 
+                                && strpos('#', $this->v["currNode"]->extraOpts["conds"]) !== false) {
+                                $this->loadCustLoop($request);
+                                foreach ($rows as $i => $row) {
+                                    $this->custReport->loadAllSessData(
+                                        $GLOBALS["SL"]->coreTbl, 
+                                        $row->getKey()
+                                    );
+                                    if ($this->custReport->chkConds(
+                                        $this->v["currNode"]->extraOpts["conds"])) {
+                                        $rowsFilt[] = $row;
+                                    }
+                                }
+                            } else {
+                                $rowsFilt = $rows;
+                            }
+                        }
+                        if (sizeof($rowsFilt) > 0) {
+                            if ($this->v["currNode"]->nodeType == 'Bar Graph') {
+                                $this->v["graphMath"]["absMin"] = $rows[0]->{ $fldName };
+                                $this->v["graphMath"]["absMax"] = $rows[sizeof($rows)-1]->{ $fldName };
+                                $this->v["graphMath"]["absRange"] = $this->v["graphMath"]["absMax"]
+                                        -$this->v["graphMath"]["absMin"];
+                                foreach ($rows as $i => $row) {
+                                    $lab = '';
+                                    if (trim($lab1Fld) != '' 
+                                        && isset($row->{ $lab1Fld })) { 
+                                        $lab .= (($lab1Rec->fld_type == 'DOUBLE') 
+                                            ? $GLOBALS["SL"]->sigFigs($row->{ $lab1Fld }) 
+                                            : $row->{ $lab1Fld }) . ' ';
+                                        if (trim($lab2Fld) != '' 
+                                            && isset($row->{ $lab2Fld })) { 
+                                            $lab .= (($lab2Rec->fld_type == 'DOUBLE') 
+                                               ? $GLOBALS["SL"]->sigFigs($row->{ $lab2Fld }) 
+                                               : $row->{ $lab2Fld }) .' ';
+                                        }
+                                    }
+                                    $perc = ((1+$i)/sizeof($rows));
+                                    $this->v["graphDataPts"][] = [
+                                        "id"  => $row->getKey(),
+                                        "val" => (($fldRec->fld_type == 'DOUBLE') 
+                                            ? $GLOBALS["SL"]->sigFigs($row->{ $fldName }, 4) 
+                                            : $row->{ $fldName }), 
+                                        "lab" => trim($lab),
+                                        "dsc" => '',
+                                        "bg"  => $GLOBALS["SL"]->printColorFade( $perc, 
+                                            $this->v["currNode"]->extraOpts["clr1"], 
+                                            $this->v["currNode"]->extraOpts["clr2"], 
+                                            $this->v["currNode"]->extraOpts["opc1"], 
+                                            $this->v["currNode"]->extraOpts["opc2"] ), 
+                                        "brd" => $GLOBALS["SL"]->printColorFade( $perc, 
+                                            $this->v["currNode"]->extraOpts["clr1"], 
+                                            $this->v["currNode"]->extraOpts["clr2"] )
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+                $this->v["graph"] = [
+                    "dat" => '', 
+                    "lab" => '', 
+                    "bg"  => '', 
+                    "brd" => '' 
+                ];
+                if (sizeof($this->v["graphDataPts"]) > 0) {
+                    foreach ($this->v["graphDataPts"] as $cnt => $dat) {
+                        $cma = (($cnt > 0) ? ", " : "");
+                        $this->v["graph"]["dat"] .= $cma . $dat["val"];
+                        $this->v["graph"]["lab"] .= $cma . "\"" . $dat["lab"] . "\"";
+                        $this->v["graph"]["bg"]  .= $cma . "\"" . $dat["bg"]  . "\"";
+                        $this->v["graph"]["brd"] .= $cma . "\"" . $dat["brd"] . "\"";
+                    }
+                }
+                return view('vendor.survloop.reports.graph-bar', $this->v);
+            }
+        }
+        $this->v["graphFail"] = true;
+        return view('vendor.survloop.reports.graph-bar', $this->v);
+    }
+
+    
 }

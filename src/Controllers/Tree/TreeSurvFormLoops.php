@@ -85,8 +85,101 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             || !isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural)) {
             return '';
         }
-        $labelFirstLet = $limitTxt = '';
         $this->settingTheLoop($loopName);
+        $this->printSetLoopNavInit($nID, $loopName);
+        $loopRows = '';
+        if ($this->v["currLoopSize"] > 0) {
+            foreach ($this->sessData->loopItemIDs[$loopName] as $setIndex => $loopItem) {
+                $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
+                $loopRec = $this->sessData->getRowById($tbl, $loopItem);
+                $loopRows .= $this->printSetLoopNavRow($nID, $loopRec, $setIndex);
+            }
+        }
+        if (!$this->allNodes[$nID]->isStepLoop()) {
+            $GLOBALS["SL"]->pageJAVA .= 'currItemCnt = ' . $this->v["currLoopSize"] 
+                . '; maxItemCnt = ' . $this->v["loopMaxLimit"] . '; ';
+        }
+        /* if ($node->isStepLoop()) {
+             && sizeof($this->sessData->loopItemIDs[$loopName]) 
+                == sizeof($this->sessData->loopItemIDsDone)) {
+            $this->nextBtnOverride = 'Done With ' 
+                . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
+        } */
+        return view(
+            'vendor.survloop.forms.formtree-looproot-nav', 
+            [
+                "nID"            => $nID,
+                "loopName"       => $loopName,
+                "node"           => $this->allNodes[$nID],
+                "addBtn"         => $this->printSetLoopNavAddBtn($nID, $loopName),
+                "addingLoopItem" => $this->v["addingLoopItem"],
+                "currLoopSize"   => $this->v["currLoopSize"],
+                "loopMaxLimit"   => $this->v["loopMaxLimit"],
+                "loopRows"       => $loopRows,
+                "loop"           => $GLOBALS["SL"]->closestLoop["obj"]
+            ]
+        )->render();
+    }
+
+    protected function printSetLoopNavInit($nID, $loopName)
+    {
+        $this->getLoopLabelFirstLet($nID, $loopName);
+        $loop = $GLOBALS["SL"]->closestLoop["obj"];
+        $this->v["loopMaxLimit"] 
+            = $this->v["currLoopSize"] 
+            = $this->v["addingLoopItem"] 
+            = 0;
+        if (isset($loop->data_loop_max_limit)) {
+            $this->v["loopMaxLimit"] = intVal($loop->data_loop_max_limit);
+        }
+        if (isset($this->sessData->loopItemIDs[$loopName])) {
+            $this->v["currLoopSize"] = sizeof($this->sessData->loopItemIDs[$loopName]);
+        }
+        if ($GLOBALS["SL"]->REQ->has('addLoopItem') 
+            && intVal($GLOBALS["SL"]->REQ->addLoopItem) == 1) {
+            // signal from previous form to start a new row in the current set
+            $this->v["addingLoopItem"] = $this->newLoopItem($nID);
+            //$this->updateCurrNode($this->nextNode($this->currNode()));
+        } else {
+            $this->printSetLoopNavCheckAutoAdd($nID, $loopName);
+        }
+        if ($this->v["addingLoopItem"] > 0) {
+            $GLOBALS["SL"]->pageJAVA .= ' addingLoopItem = ' . $this->v["addingLoopItem"] 
+                . '; setLoopItemID(' . $this->v["addingLoopItem"] . ');';
+        } elseif ($GLOBALS["SL"]->REQ->has('editLoopInd')) {
+            $ind = intVal($GLOBALS["SL"]->REQ->editLoopInd);
+            if ($ind < $this->v["currLoopSize"]
+                && isset($this->sessData->loopItemIDs[$loopName][$ind])) {
+                $GLOBALS["SL"]->pageJAVA .= ' addingLoopItem = ' 
+                    . $this->sessData->loopItemIDs[$loopName][$ind] . '; ';
+            }
+        }
+        return true;
+    }
+
+    protected function printSetLoopNavCheckAutoAdd($nID, $loopName)
+    {
+        $loop = $GLOBALS["SL"]->closestLoop["obj"];
+        $loopCnt = sizeof($this->sessData->loopItemIDs[$loopName]);
+        $autoAdd = false;
+        if ($this->allNodes[$nID]->isStepLoop()) {
+            if ($loopCnt == 0 
+                && $loop->data_loop_min_limit == 1 
+                && $loop->data_loop_max_limit == 1) {
+                $autoAdd = true;
+            }
+        } elseif ($loop->data_loop_min_limit > 0 && $loopCnt == 0) {
+            $autoAdd = true;
+        }
+        if ($autoAdd) {
+            $this->v["addingLoopItem"] = $this->newLoopItem($nID);
+        }
+        return true;
+    }
+
+    protected function getLoopLabelFirstLet($nID, $loopName)
+    {
+        $this->v["labelFirstLet"] = '';
         if ($this->allNodes[$nID]->isStepLoop()) {
             if (!$this->getLoopDoneItemsCustom($loopName)) {
                 $this->sessData->getLoopDoneItems($loopName);
@@ -102,82 +195,22 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
                     . '<i class="fa fa-arrow-circle-o-right mR5"></i> ' . $custNext . '</a>';
                 $GLOBALS["SL"]->pageJAVA .= 'loopItemsNextID = ' 
                     . $this->sessData->loopItemsNextID . '; ';
-                $labelFirstLet = strtolower(substr($loopSing, 0, 1));
+                $this->v["labelFirstLet"] = strtolower(substr($loopSing, 0, 1));
             }
         }
-        $maxLimit = $currLoopSize = $addingLoopItem = 0;
-        if (isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_max_limit)) {
-            $maxLimit = intVal($GLOBALS["SL"]->closestLoop["obj"]->data_loop_max_limit);
-        }
-        if (isset($this->sessData->loopItemIDs[$loopName])) {
-            $currLoopSize = sizeof($this->sessData->loopItemIDs[$loopName]);
-        }
-        if ($GLOBALS["SL"]->REQ->has('addLoopItem') 
-            && intVal($GLOBALS["SL"]->REQ->addLoopItem) == 1) {
-            // signal from previous form to start a new row in the current set
-            $addingLoopItem = $this->newLoopItem($nID);
-            //$this->updateCurrNode($this->nextNode($this->currNode()));
-            $GLOBALS["SL"]->pageJAVA .= ' addingLoopItem = ' . $addingLoopItem . '; ';
-        }
-        if ($maxLimit > 0
-            && $currLoopSize > $GLOBALS["SL"]->closestLoop["obj"]->data_loop_warn_limit) {
-            $limitTxt .= '<div class="slGrey pT20">Limit of ' . $maxLimit . ' '
-                . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural . '</div>';
-        }
-        $ret = '';
-        if ($addingLoopItem > 0) {
-            $ret .= $GLOBALS["SL"]->spinner();
-        }
-        $ret .= '<div id="loopNav' . $nID . '" class="nPrompt"'
-            . (($addingLoopItem > 0) ? ' style="display: none;" ' : '') . '>'
-            . '<input type="hidden" id="isLoopNav" name="loopNavRoot" value="' 
-            . intVal($GLOBALS['SL']->closestLoop['obj']->data_loop_root) . '">';
-        if ($this->allNodes[$nID]->isStepLoop()) {
-            $ret .= '<div id="isStepLoop"></div>';
-        }
-        if (!$this->allNodes[$nID]->isStepLoop() && $currLoopSize == 0) {
-            $ret .= '<div class="pT15 pB15"><b>No ' 
-                . strtolower($GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural) 
-                . ' added yet.</b></div>';
-        } else {
-            $ret .= '<div class="p15"></div>';
-        }
-        if ($currLoopSize > 0) {
-            if (!$this->allNodes[$nID]->isStepLoop() && $currLoopSize > 10) {
-                $ret .= '<div class="mTn10 mB20">' 
-                    . $this->printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet) 
-                    . '</div>';
-            }
-            foreach ($this->sessData->loopItemIDs[$loopName] as $setIndex => $loopItem) {
-                $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
-                $loopRec = $this->sessData->getRowById($tbl, $loopItem);
-                $ret .= $this->printSetLoopNavRow($nID, $loopRec, $setIndex);
-            }
-        }
-        if (!$this->allNodes[$nID]->isStepLoop()) {
-            if ($maxLimit <= 0 || $currLoopSize < $maxLimit) {
-                $ret .= $this->printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
-                    . $limitTxt . '<div class="p20"></div>' . "\n";
-            }
-            $GLOBALS["SL"]->pageJAVA .= 'currItemCnt = ' . $currLoopSize 
-                . '; maxItemCnt = ' . $maxLimit . '; ';
-        }
-        /* if (!$this->allNodes[$nID]->isStepLoop()) {
-            $this->nextBtnOverride = 'Done Adding ' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
-        } elseif (sizeof($this->sessData->loopItemIDs[$loopName]) == sizeof($this->sessData->loopItemIDsDone)) {
-            $this->nextBtnOverride = 'Done With ' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
-        } */
-        $ret .= '</div> <!-- loopNav' . $nID . ' --> <div class="p20"></div>';
-        return $ret;
+        return $this->v["labelFirstLet"];
     }
     
-    protected function printSetLoopNavAddBtn($nID, $loopName, $labelFirstLet)
+    protected function printSetLoopNavAddBtn($nID, $loopName)
     {
         $loopRec = $GLOBALS["SL"]->closestLoop["obj"];
         $vowels = [ 'a', 'e', 'i', 'o', 'u' ];
         $itemDesc = 'another';
         if (empty($this->sessData->loopItemIDs[$loopName])) {
-            $itemDesc = 'a' . ((in_array($labelFirstLet, $vowels)) ? 'n' : '');
+            $itemDesc = 'a';
+            if (in_array($this->v["labelFirstLet"], $vowels)) {
+                $itemDesc = 'n';
+            }
         }
         $itemDesc = ' ' . strtolower($loopRec->data_loop_singular);
         $dis = 'disNon';
@@ -217,12 +250,16 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         $loop = $GLOBALS["SL"]->closestLoop["loop"];
         $itemLabel = $this->getLoopItemLabel($loop, $loopItem, $setIndex);
         if (strtolower(strip_tags($itemLabel)) == 'you') {
-            //$itemLabel = 'You (' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular . ' #' . (1+$setIndex) . ')';
+            // $itemLabel = 'You (' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular 
+            //     . ' #' . (1+$setIndex) . ')';
             $canEdit = false;
-        } /* elseif ($itemLabel != $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular . ' #' . (1+$setIndex)) {
-            $itemLabel = $itemLabel . ' (' . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular 
-                . ' #' . (1+$setIndex) . ')';
-        } */
+        }
+        // elseif ($itemLabel != $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular 
+        //    . ' #' . (1+$setIndex)) {
+        //    $itemLabel = $itemLabel . ' (' 
+        //        . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_singular 
+        //        . ' #' . (1+$setIndex) . ')';
+        // }
         $ico = '';
         if ($this->allNodes[$nID]->isStepLoop()) {
             if ($this->sessData->loopItemsNextID > 0 

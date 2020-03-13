@@ -96,11 +96,8 @@ class Globals extends GlobalsImportExport
         if ($this->sessLoops && isset($this->sessLoops[0])) {
             $loop = $this->sessLoops[0]->sess_loop_name;
             if (isset($this->dataLoops[$loop])) {
-                $this->setClosestLoop(
-                    $loop, 
-                    $this->sessLoops[0]->sess_loop_item_id, 
-                    $this->dataLoops[$loop]
-                );
+                $id = $this->sessLoops[0]->sess_loop_item_id;
+                $this->setClosestLoop($loop, $id, $this->dataLoops[$loop]);
             }
         }
         return true;
@@ -139,7 +136,8 @@ class Globals extends GlobalsImportExport
         $this->sessLoops = [];
         if (sizeof($tmpLoops) > 0) {
             foreach ($tmpLoops as $i => $l) {
-                if ($l->sess_loop_name != $loop || $l->sess_loop_item_id != $itemID) {
+                if ($l->sess_loop_name != $loop 
+                    || $l->sess_loop_item_id != $itemID) {
                     $this->sessLoops[] = $l;
                 }
             }
@@ -152,7 +150,8 @@ class Globals extends GlobalsImportExport
     {
         if (sizeof($this->sessLoops) > 0) {
             foreach ($this->sessLoops as $loop) {
-                if ($loop->sess_loop_name == $loopName && intVal($loop->sess_loop_item_id) > 0) {
+                if ($loop->sess_loop_name == $loopName 
+                    && intVal($loop->sess_loop_item_id) > 0) {
                     return $loop->sess_loop_item_id;
                 }
             }

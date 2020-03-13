@@ -354,16 +354,26 @@ function addMutEx(nID, response) {
     return true;
 }
 
-function checkFingerClass(nIDtxt) {
-    for (var j = 0; j < nodeResTot[stripN(nIDtxt)]; j++) {
-        if (document.getElementById(nIDtxt+"fld"+j+"lab") && document.getElementById(nIDtxt+"fld"+j+"")) {
-            if (document.getElementById(nIDtxt+"fld"+j+"").checked) {
-                document.getElementById(nIDtxt+"fld"+j+"lab").className = "fingerAct";
+function checkFingerClassTime(nIDtxt) {
+    var printNidtxt = nIDtxt;
+    if (nIDtxt.substring(0, 1) != 'n') {
+        printNidtxt = "n"+nIDtxt+"";
+    }
+    for (var j = 0; j < nodeResTot[txt2nID(nIDtxt)]; j++) {
+        var fld = ""+printNidtxt+"fld"+j+"";
+        if (document.getElementById(fld+"lab")) {
+            if (document.getElementById(fld) && document.getElementById(fld).checked) {
+                document.getElementById(fld+"lab").className = "fingerAct";
             } else {
-                document.getElementById(nIDtxt+"fld"+j+"lab").className = "finger";
+                document.getElementById(fld+"lab").className = "finger";
             }
         }
     }
+    return true;
+}
+
+function checkFingerClass(nIDtxt) {
+    setTimeout("checkFingerClassTime('"+nIDtxt+"')", 100);
     return true;
 }
 
@@ -499,12 +509,10 @@ function updateTagList(nIDtxt) {
 }
 
 function disableElement(fldID) {
-console.log("disableElement fld "+fldID+" :)");
     if (document.getElementById(fldID)) {
         document.getElementById(fldID).style.background = "#DDD";
         document.getElementById(fldID).style.color = "#AAA";
         if (document.getElementById(fldID).disabled) {
-console.log("disableElement fld "+fldID+" disabled");
             document.getElementById(fldID).disabled = true;
         }
     }
@@ -529,12 +537,9 @@ function disableSpreadsheetRow(nID, row) {
 }
 function disableSprdRowKids(nID, row, kid) {
     var fldID = "n"+kid+"tbl"+row+"FldID";
-console.log("disableSprdRowKids visib "+fldID+" ...");
     disableElement(fldID);
     fldID = "n"+kid+"tbl"+row+"VisibleID";
-console.log("disableSprdRowKids visib "+fldID+" ?");
     if (document.getElementById(fldID)) {
-console.log("disableSprdRowKids visib "+fldID+" :)");
         document.getElementById(fldID).value = 0;
     }
     return true;
@@ -594,6 +599,7 @@ function setSubResponses(nID, nSffx, onOff, kids) {
                 }
             }
             kidsVisible(kids[k], nSffx, onOff);
+            checkFingerClass(kids[k]+nSffx);
         }
     }
     return true;
@@ -676,3 +682,9 @@ function checkBoxAll(fldBase, count, isChecked) {
     }
     return true;
 }
+
+function setLoopItemID(itemID) {
+    if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value=itemID;
+    return true;
+}
+

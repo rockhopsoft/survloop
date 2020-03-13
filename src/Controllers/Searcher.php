@@ -341,10 +341,11 @@ class Searcher extends SurvCustLoop
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
                     $coreIdFld = $GLOBALS["SL"]->coreTblIdFldOrPublicId(); /* test more */
-                    eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                    $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
                         . "::whereIn('" . $coreIdFld . "', \$this->allPublicFiltIDs)->where('"
                         . $GLOBALS["SL"]->getCoreTblUserFld() . "', " . $val . ")"
-                        . "->select('" . $coreIdFld . "')->get();");
+                        . "->select('" . $coreIdFld . "')->get();";
+                    eval($eval);
                     $this->allPublicFiltIDs = [];
                     if ($chk->isNotEmpty()) {
                         foreach ($chk as $lnk) {
@@ -368,6 +369,8 @@ class Searcher extends SurvCustLoop
             }
         }
         $this->processSearchAdvanced();
+//echo '<pre>'; print_r($this->allPublicFiltIDs); echo '</pre>';
+//echo '<pre>'; print_r($this->allPublicCoreIDs); echo '</pre>'; exit;
         return true;
     }
     

@@ -12,27 +12,24 @@
     <div class="col-12">
 @endif
 
-        <h2 class="slBlueDark">{{ $profileUser->name }}'s Profile</h2>
+        <h2 class="slBlueDark">{{ $profileUser->name }}</h2>
         <p>
         @if ($canEdit)
-            Email: {!! $profileUser->email !!}
+            {!! $profileUser->email !!}
             @if ($profileUser->hasVerifiedEmail())
                 <nobr><span class="slGrey">
                     <i class="fa fa-check-circle-o mL10" aria-hidden="true"></i> verified</span></nobr>
             @endif <br />
         @endif
-
         Member since {{ date('F d, Y', strtotime($profileUser->created_at)) }}<br />
-
         @if (trim($profileUser->listRoles()) != '')
-            Roles: {{ $profileUser->listRoles() }}<br />
+            {{ $profileUser->listRoles() }}, 
+        @endif
+        @if ($canEdit)
+            <a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"
+                >Edit User Info</a><br />
         @endif
         </p>
-
-        @if ($canEdit)
-            <p><a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"
-                >Edit User Info</a></p>
-        @endif
         @if ($canEdit)
             <div id="hidivEditProfile" class="disNon">
                 <div class="nodeWrap">
@@ -66,6 +63,7 @@
                             </div>
                         </div><div class="col-md-2">
                         </div><div class="col-md-4">
+                            <div id="profileEditInfoExtra"></div>
                         @if ($GLOBALS["SL"]->isAdmin)
                             <div class="nPrompt">Roles:</div>
                             <div class="nFldRadio">

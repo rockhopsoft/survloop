@@ -91,25 +91,36 @@ New loops can be added by editing any node in the
     </tr>
 @forelse ($GLOBALS['SL']->dataSubsets as $link)
     <tr>
-        <td><a href="/dashboard/db/table/{{ $link->data_sub_tbl }}" target="_blank"
-            >{{ $link->data_sub_tbl }}</a></td>
-        @if (isset($link->data_sub_tbl_lnk) && trim($link->data_sub_tbl_lnk) != '')
+        <td>
+            <a href="/dashboard/db/table/{{ $link->data_sub_tbl }}" 
+                target="_blank">{{ $link->data_sub_tbl }}</a>
+        </td>
+        @if (isset($link->data_sub_tbl_lnk) 
+            && trim($link->data_sub_tbl_lnk) != '')
             <td class="taR pR20"><nobr>
-            {{ $link->data_sub_tbl_lnk }} <i class="fa fa-long-arrow-right mR5 slBlueDark"></i>
+                {{ $link->data_sub_tbl_lnk }} 
+                <i class="fa fa-long-arrow-right mR5 slBlueDark"></i>
             </nobr></td>
         @else
             <td class="taL"><nobr>
-            <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> {{ $link->data_sub_sub_lnk }}
+                <i class="fa fa-long-arrow-left mR5 slBlueDark"></i> 
+                {{ $link->data_sub_sub_lnk }}
             </nobr></td>
         @endif
-        <td><a href="/dashboard/db/table/{{ $link->data_sub_sub_tbl }}" target="_blank"
-            >{{ $link->data_sub_sub_tbl }}</a></td>
+        <td>
+            <a href="/dashboard/db/table/{{ $link->data_sub_sub_tbl }}" 
+                target="_blank">{{ $link->data_sub_sub_tbl }}</a>
+        </td>
         <td class="slGrey">
-            @if (isset($link->data_sub_auto_gen) && intVal($link->data_sub_auto_gen) == 1) Auto-Gen 
-            @else Manual 
+            @if (isset($link->data_sub_auto_gen) 
+                && intVal($link->data_sub_auto_gen) == 1)
+                Auto-Gen 
+            @else
+                Manual 
             @endif
         </td>
-        <td class="taC"><a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->DataSubID }}" 
+        <td class="taC">
+            <a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->data_sub_id }}" 
             class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a></td>
     </tr>
 @empty

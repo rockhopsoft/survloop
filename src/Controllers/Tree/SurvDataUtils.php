@@ -10,6 +10,8 @@
   */
 namespace SurvLoop\Controllers\Tree;
 
+use App\Models\SLNodeSaves;
+
 class SurvDataUtils
 {
     protected $coreID       = -3;
@@ -98,8 +100,8 @@ class SurvDataUtils
         if ($model == '') {
             return null;
         }
-        eval("\$recObj = " . $model 
-            . "::where('" . $where . "', '" . $operator . "', '" . $whereVal . "')"
+        eval("\$recObj = " . $model . "::where('" 
+                . $where . "', '" . $operator . "', '" . $whereVal . "')"
             . "->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'asc')"
             . "->" . $getFirst . "();");
         return $recObj;
@@ -213,11 +215,28 @@ class SurvDataUtils
         return $ret;
     }
     
-    public function dataFieldExists($tbl, $ind, $fld)
+    public function dataFieldExists($tbl, $fld, $ind = 0)
     {
         return (isset($this->dataSets[$tbl]) 
             && isset($this->dataSets[$tbl][$ind])
             && isset($this->dataSets[$tbl][$ind]->{ $fld }));
+    }
+    
+    public function dataFieldIsInt($tbl, $fld, $int = 1, $ind = 0)
+    {
+        if ($this->dataFieldExists($tbl, $fld, $ind)) {
+            return ($int == intVal($this->dataSets[$tbl][$ind]->{ $fld }));
+        }
+        return false;
+    }
+    
+    public function dataFieldIsY($tbl, $fld, $val = 'Y', $ind = 0)
+    {
+        if ($this->dataFieldExists($tbl, $fld, $ind)) {
+            return (strtoupper($val) 
+                == strtoupper(trim($this->dataSets[$tbl][$ind]->{ $fld })));
+        }
+        return false;
     }
     
     public function getLoopRows($loopName)
@@ -498,6 +517,55 @@ class SurvDataUtils
             }
         }
         return null;
+    }
+    
+    public function logDataSave($nID = -3, $tbl = '', $itemID = -3, $fld = '', $newVal = '')
+    {
+        $nodeSave = new SLNodeSaves;
+        $nodeSave->node_save_session    = 0;
+        $sessKey = 'sessID' . $GLOBALS["SL"]->sessTree;
+        if (session()->has($sessKey) && intVal(session()->get($sessKey)) > 0) {
+            $nodeSave->node_save_session = session()->get($sessKey);
+        }
+        $nodeSave->node_save_node         = $nID;
+        $nodeSave->node_save_tbl_fld      = $tbl . ':' . $fld;
+        $nodeSave->node_save_loop_item_id = $itemID;
+        if (!is_array($newVal)) {
+            $nodeSave->node_save_new_val = $newVal;
+        } else {
+            ob_start();
+            print_r($newVal);
+            $nodeSave->node_save_new_val = ob_get_contents();
+            ob_end_clean();
+        }
+        $nodeSave->save();
+        return true;
+    }
+    
+    protected function loadSessionDataLog($nID = -3, $tbl = '', $fld = '', $set = '')
+    {
+        $sessID = 0;
+        $sessKey = 'sessID' . $GLOBALS["SL"]->sessTree;
+        if (session()->has($sessKey) && intVal(session()->get($sessKey)) > 0) {
+            $sessID = session()->get($sessKey);
+        }
+        $qryWheres = "where('node_save_session', \$sessID)->"
+            . "where('node_save_node', " . $nID . ")->";
+        if (trim($tbl) != '' && trim($fld) != '') {
+            $qryWheres .= "where('node_save_tbl_fld', '" . $tbl . ":" . $fld 
+                . ((trim($set) != '') ? "[" . $set . "]" : "") . "')->";
+        }
+        if (isset($GLOBALS["SL"]->closestLoop["itemID"]) 
+            && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
+            $qryWheres .= "where('node_save_loop_item_id', " 
+                . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
+        }
+        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres 
+            . "orderBy('created_at', 'desc')->first();"); 
+        if ($nodeSave && isset($nodeSave->node_save_new_val)) {
+            return $nodeSave->node_save_new_val;
+        }
+        return '';
     }
 
 

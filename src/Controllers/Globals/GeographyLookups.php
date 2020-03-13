@@ -20,7 +20,9 @@ class GeographyLookups extends GeographyLists
 
     public function getStateAbrr($state = '')
     {
-        if ($state == 'Federal') return 'US';
+        if ($state == 'Federal') {
+            return 'US';
+        }
         $this->loadStates();
         foreach ($this->stateList as $abbr => $name) {
             if (strtolower($name) == strtolower($state)) {
@@ -74,6 +76,26 @@ class GeographyLookups extends GeographyLists
             }
         }
         return '';
+    }
+
+    public function getStateFlagImg($abbr)
+    {
+        $file = '';
+        $this->loadStates();
+        if (isset($this->stateList[$abbr])) {
+            $file = strtolower($this->stateList[$abbr]);
+            $file = 'usa_' . str_replace(' ', '_', $file);
+        } else {
+
+            if (isset($this->stateListCa[$abbr])) {
+                $file = strtolower($this->stateListCa[$abbr]);
+                $file = 'canada_' . str_replace(' ', '_', $file);
+            }
+        }
+        if ($file != '') {
+            $file = '/survloop-libraries/state-flags/' . $file . '.svg';
+        }
+        return $file;
     }
     
     public function loadStateResponseVals()

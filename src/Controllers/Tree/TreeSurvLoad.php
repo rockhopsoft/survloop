@@ -133,9 +133,9 @@ class TreeSurvLoad extends TreeSurvConds
             $this->kidMaps = $nodeIDs = [];
             if (isset($GLOBALS["SL"]->treeRow->tree_opts)) {
                 $nodes = SLNode::where('node_tree', $this->treeID)
-                    ->select('node_id', 'node_parent_id', 'node_parent_order', 'node_type', 
-                        'node_opts', 'node_data_branch', 'node_data_store', 
-                        'node_default', 'node_response_set')
+                    ->select('node_id', 'node_parent_id', 'node_parent_order', 
+                        'node_type', 'node_opts', 'node_data_branch', 
+                        'node_data_store', 'node_default', 'node_response_set')
                     ->get();
                 foreach ($nodes as $row) {
                     $nodeIDs[] = $row->node_id;
@@ -213,15 +213,16 @@ class TreeSurvLoad extends TreeSurvConds
         }
         if ($includeNode) {
             $cacheNode = '$'.'this->allNodes[' . $row->node_id . '] = '
-                . 'new SurvLoop\Controllers\Tree\TreeNodeSurv(' . $row->node_id . ', [], ['
+                . 'new SurvLoop\Controllers\Tree\TreeNodeSurv(' 
+                    . $row->node_id . ', [], ['
                     . '"pID" => '      . intVal($row->node_parent_id)        . ', '
                     . '"pOrd" => '     . intVal($row->node_parent_order)     . ', '
-                    . '"opts" => '     . intVal($row->node_opts)            . ', '
-                    . '"type" => "'    . addslashes($row->node_type)        . '", '
+                    . '"opts" => '     . intVal($row->node_opts)             . ', '
+                    . '"type" => "'    . addslashes($row->node_type)         . '", '
                     . '"branch" => "'  . addslashes($row->node_data_branch)  . '", '
                     . '"store" => "'   . addslashes($row->node_data_store)   . '", '
                     . '"set" => "'     . addslashes(stripslashes($row->node_response_set)) . '", '
-                    . '"def" => "'     . addslashes(stripslashes($row->node_default))     . '"'
+                    . '"def" => "'     . addslashes(stripslashes($row->node_default))      . '"'
                 . ']);' . "\n";
             eval($cacheNode);
             $cache .= $cacheNode;
@@ -234,7 +235,8 @@ class TreeSurvLoad extends TreeSurvConds
         $cache = '';
         if (!isset($this->kidMaps[$res->node_res_node])) {
             $this->kidMaps[$res->node_res_node] = [];
-            $cache .= '$'.'this->kidMaps[' . $res->node_res_node . '] = [];' . "\n";
+            $cache .= '$'.'this->kidMaps[' . $res->node_res_node 
+                . '] = [];' . "\n";
         }
         $showKids = intVal($res->node_res_show_kids);
         if (!isset($this->kidMaps[$res->node_res_node][$showKids])) {
@@ -242,8 +244,9 @@ class TreeSurvLoad extends TreeSurvConds
             $cache .= '$'.'this->kidMaps[' . $res->node_res_node . '][' 
                 . $res->node_res_show_kids . '] = [];' . "\n";
         }
-        $cache .= '$'.'this->kidMaps[' . $res->node_res_node . '][' . $res->node_res_show_kids
-            . '][] = [ ' . $res->node_res_ord . ', "' . $res->node_res_value . '" ];' . "\n";
+        $cache .= '$'.'this->kidMaps[' . $res->node_res_node . '][' 
+            . $res->node_res_show_kids . '][] = [ ' . $res->node_res_ord 
+            . ', "' . $res->node_res_value . '" ];' . "\n";
         return $cache;
     }
     
@@ -295,7 +298,6 @@ class TreeSurvLoad extends TreeSurvConds
         if ($coreID <= 0) {
             $coreID = $this->coreID; 
         }
-//echo '<br />loadAllSessData A, coreID: ' . $this->sessData->getCoreID() . ' (' . $coreID . ')<br />';
         $GLOBALS["SL"]->microLog('Start loadAllSessData(');
         $this->loadSessionClear($coreTbl, $coreID);
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessionClear(');
@@ -306,8 +308,6 @@ class TreeSurvLoad extends TreeSurvConds
         $this->loadSessionDataSaves();
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessionDataSaves(');
         $this->runLoopConditions();
-//echo '<br />loadAllSessData E, coreID: ' . $this->sessData->getCoreID() . '<br />';
-//echo '<pre>'; print_r($this->sessData->dataSets); echo '</pre>'; exit;
         $GLOBALS["SL"]->microLog('End loadAllSessData( after runLoopConditions(');
         return true;
     }
@@ -384,7 +384,7 @@ class TreeSurvLoad extends TreeSurvConds
                         $addLoop = $GLOBALS["SL"]->getLoopNameByNodeID($p);
                         if (isset($GLOBALS["SL"]->dataLoops[$addLoop])) {
                             $addBranch = $GLOBALS["SL"]->dataLoops[$addLoop]->data_loop_table;
-                            $itemID = $GLOBALS["SL"]->getSessLoopID($nBranch);
+                            $itemID = $GLOBALS["SL"]->getSessLoopID($addLoop);
                         } else {
                             $addLoop = '';
                         }
@@ -444,15 +444,7 @@ class TreeSurvLoad extends TreeSurvConds
                             }
                         }
                     }
-                    $foundBranch = false; 
-                    // $this->sessData->chkDataBranch($addBranch, $dataBranch);
-                    if (!$foundBranch) {
-                        $this->sessData->dataBranches[] = [
-                            "branch" => $addBranch,
-                            "loop"   => $addLoop,
-                            "itemID" => $itemID
-                        ];
-                    }
+                    $this->sessData->startLoopDataBranch($addBranch, $itemID, $addLoop);
                 }
             }
         }

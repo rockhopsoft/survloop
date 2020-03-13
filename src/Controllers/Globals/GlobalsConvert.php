@@ -37,6 +37,15 @@ class GlobalsConvert
         return sizeof($this->mexplode($delim, $str));
     }
     
+    public function charLimitDotDotDot($str, $charLimit = 20)
+    {
+        $str = trim($str);
+        if (strlen($str) <= $charLimit) {
+            return $str;
+        }
+        return substr($str, 0, ($charLimit-3)) . '...';
+    }
+    
     public function wordLimitDotDotDot($str, $wordLimit = 50)
     {
         $strs = $this->mexplode(' ', $str);
@@ -44,7 +53,7 @@ class GlobalsConvert
             return $str;
         }
         $ret = '';
-        for ($i=0; $i<$wordLimit; $i++) {
+        for ($i = 0; $i < $wordLimit; $i++) {
             $ret .= $strs[$i] . ' ';
         }
         return trim($ret) . '...';
@@ -385,9 +394,20 @@ class GlobalsConvert
         return $str;
     }
 
+    public function arr2nums(&$array = [])
+    {
+        if (sizeof($array) > 0) {
+            foreach ($array as $i => $val) {
+                $array[$i] = floatval($val);
+            }
+        }
+        return $array;
+    }
+
     public function arrAvg($array = [])
     {
         if (is_array($array) && count($array) > 0) {
+            $this->arr2nums($array);
             return array_sum($array)/count($array);
         }
         return 0;

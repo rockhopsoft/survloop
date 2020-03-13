@@ -427,7 +427,8 @@ class GlobalsTables extends GlobalsElements
         return $ret;
     }
     
-    // returns array(Table 1, Foreign Key 1, Linking Table, Foreign Key 2, Table 2)
+    // returns array(Table 1, Foreign Key 1, 
+    // Linking Table, Foreign Key 2, Table 2)
     public function getLinkTblMap($linkTbl = -3)
     {
         if ($linkTbl <= 0) {
@@ -908,7 +909,11 @@ class GlobalsTables extends GlobalsElements
                 if ($val != '' && isset($this->fldTypes[$tbl]) 
                     && isset($this->fldTypes[$tbl][$fld])
                     && in_array($this->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
-                    $ret = number_format(1*floatval($val));
+                    if ($this->fldTypes[$tbl][$fld] == 'DOUBLE') {
+                        $ret = $this->sigFigs($val, 3);
+                    } else {
+                        $ret = number_format(1*floatval($val));
+                    }
                 } else {
                     $ret = $val;
                 }

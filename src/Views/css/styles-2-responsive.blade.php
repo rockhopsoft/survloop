@@ -43,12 +43,13 @@
     
 }
 @media screen and (max-width: 768px) {
-	
-    <?php /* @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
-        && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg']) */ ?>
+
+    @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
+        && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
+        && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != trim($GLOBALS['SL']->sysOpts['logo-img-lrg']))
         #slLogoImgSm { display: inline; }
         #slLogoImg { display: none; }
-    <?php /* @endif */ ?>
+    @endif
     #userMenuBtnName {
         display: none;
     }

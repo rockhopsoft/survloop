@@ -274,7 +274,8 @@ class TreeSurvInput extends TreeSurvUpload
                 // then run standard post, move all this code in here:
                 //$this->postNodePublicStandards($nID, $nIDtxt, $tmpSubTier);
 
-                if ($GLOBALS["SL"]->REQ->has('loop')) {
+                if ($GLOBALS["SL"]->REQ->has('loop')
+                    && trim($GLOBALS["SL"]->REQ->has('loop')) != '') {
                     $this->settingTheLoop(
                         trim($GLOBALS["SL"]->REQ->input('loop')), 
                         intVal($GLOBALS["SL"]->REQ->loopItem)
@@ -300,171 +301,7 @@ class TreeSurvInput extends TreeSurvUpload
                         }
                     }
                 } elseif (strpos($curr->dataStore, ':') !== false) {
-                    list($tbl, $fld) = $curr->getTblFld();
-                    list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
-                    $fldForeignTbl = $GLOBALS["SL"]->fldForeignKeyTbl($tbl, $fld);
-                    if (!$curr->isInstruct() && $tbl != '' && $fld != '') {
-                        $newVal = $this->getNodeFormFldBasic($nID, $curr);
-                        if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
-                            $newVal = $this->postNodeTweakNewVal($curr, $newVal);
-                            if (sizeof($curr->responses) == 1) { // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
-                                if (is_array($newVal) && sizeof($newVal) == 1) {
-                                    $this->sessData->currSessData(
-                                        $nID, 
-                                        $tbl, 
-                                        $fld, 
-                                        'update', 
-                                        $newVal[0], 
-                                        $hasParManip, 
-                                        $itemInd, 
-                                        $itemID
-                                    );
-                                } else {
-                                    $tmpVal = '';
-                                    $fldRow = $GLOBALS["SL"]->getFldRowFromFullName($tbl, $fld);
-                                    if (isset($fldRow->fld_default) 
-                                        && trim($fldRow->fld_default) != '') {
-                                        $tmpVal = $fldRow->fld_default;
-                                    }
-                                    $this->sessData->currSessData(
-                                        $nID, 
-                                        $tbl, 
-                                        $fld, 
-                                        'update', 
-                                        $tmpVal, 
-                                        $hasParManip, 
-                                        $itemInd, 
-                                        $itemID
-                                    );
-                                }
-                            } else {
-                                $curr = $this->checkResponses($curr, $fldForeignTbl);
-                                $this->sessData->currSessDataCheckbox(
-                                    $nID, 
-                                    $tbl, 
-                                    $fld, 
-                                    'update', 
-                                    $newVal, 
-                                    $curr, 
-                                    $itemInd, 
-                                    $itemID
-                                );
-                            }
-                        } else {
-                            if ($curr->nodeType == 'Date' && trim($newVal) == '') {
-                                // Redundancy in case JS breaks
-                                $newVal = $this->getRawFormDate($nIDtxt);
-                            }
-                            $this->sessData->currSessData(
-                                $nID, 
-                                $tbl, 
-                                $fld, 
-                                'update', 
-                                $newVal, 
-                                $hasParManip, 
-                                $itemInd, 
-                                $itemID
-                            );
-                        }
-                        // Check for Layout Sub-Response between each Checkbox Response
-                        if ($curr->nodeType == 'Checkbox' && sizeof($tmpSubTier[1]) > 0 && sizeof($newVal) > 0) {
-                            foreach ($newVal as $r => $val) {
-                                foreach ($tmpSubTier[1] as $childNode) {
-                                    if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
-                                        && sizeof($childNode[1]) > 0) {
-                                        foreach ($curr->responses as $j => $res) {
-                                            if ($res->node_res_value == $val) {
-                                                $subRowIDs = $this->sessData->getRowIDsByFldVal(
-                                                    $tbl, 
-                                                    [ $fld => $res->node_res_value ]
-                                                );
-                                                if (sizeof($subRowIDs) > 0) {
-                                                    $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
-                                                    $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
-                                                    $GLOBALS["SL"]->currCyc["res"][2] = $res->node_res_value;
-                                                    $this->sessData->startTmpDataBranch($tbl, $subRowIDs[0]);
-                                                    foreach ($childNode[1] as $k => $granNode) {
-                                                        $ret .= $this->postNodePublic($granNode[0], $granNode);
-                                                    }
-                                                    $this->sessData->endTmpDataBranch($tbl);
-                                                    $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if (in_array($curr->nodeType, ['Checkbox', 'Radio']) 
-                            && $curr->hasShowKids 
-                            && isset($this->kidMaps[$nID]) 
-                            && sizeof($this->kidMaps[$nID]) > 0) {
-                            foreach ($this->kidMaps[$nID] as $nKid => $ress) {
-                                $found = false;
-                                if (sizeof($ress) > 0) {
-                                    foreach ($ress as $cnt => $res) {
-                                        $this->kidMaps[$nID][$nKid][$cnt][2] = false;
-                                        if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
-                                            if (in_array($res[1], $newVal)) {
-                                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
-                                            }
-                                        } else {
-                                            if ($res[1] == $newVal) {
-                                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        $curr->chkFldOther();
-                        if ((in_array($curr->nodeType, ['Checkbox', 'Radio'])
-                                && sizeof($curr->fldHasOther) > 0)
-                            || in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
-                            foreach ($curr->responses as $j => $res) {
-                                if (in_array($j, $curr->fldHasOther)) {
-                                    $inFld = 'n' . $nID . 'fldOther' . $j;
-                                    $otherVal = '';
-                                    if ($GLOBALS["SL"]->REQ->has($inFld)) {
-                                        $otherVal = $GLOBALS["SL"]->REQ->get($inFld);
-                                    }
-                                    $fldVals = [ $fld => $res->node_res_value ];
-                                    $s = sizeof($this->sessData->dataBranches);
-                                    if ($s > 0 
-                                        && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
-                                        $tbl2 = $this->sessData->dataBranches[$s-1]["branch"];
-                                        $branchLnkFld = $GLOBALS["SL"]->getForeignLnkNameFldName(
-                                            $tbl, 
-                                            $tbl2
-                                        );
-                                        if ($branchLnkFld != '') {
-                                            $fldVals[$branchLnkFld] = $this->sessData
-                                                ->dataBranches[$s-1]["itemID"];
-                                        }
-                                    }
-                                    $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldVals);
-                                    $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
-                                    if ($branchRowID > 0) {
-                                        $GLOBALS["SL"]->currCyc["res"] = [
-                                            $tbl, 'res' . $j, 
-                                            $res->node_res_value
-                                        ];
-                                        $this->sessData->startTmpDataBranch($tbl, $branchRowID);
-                                        $this->sessData->currSessData(
-                                            $nID, 
-                                            $tbl, 
-                                            $fld . '_other', 
-                                            'update', 
-                                            $otherVal, 
-                                            $hasParManip
-                                        );
-                                        $this->sessData->endTmpDataBranch($tbl);
-                                        $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];                                    
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    $ret .= $this->postNodePublicDataStore($nID, $curr, $tmpSubTier, $hasParManip);
                 }
             }
             if (sizeof($tmpSubTier[1]) > 0) {
@@ -499,6 +336,221 @@ class TreeSurvInput extends TreeSurvUpload
     protected function postNodePublicStandards($nID = -3, $tmpSubTier = [])
     {
 
+    }
+
+    protected function postNodePublicDataStore($nID, &$curr, $tmpSubTier, $hasParManip)
+    {
+        $ret = '';
+        list($tbl, $fld) = $curr->getTblFld();
+        list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
+        $this->v["fldForeignTbl"] = $GLOBALS["SL"]->fldForeignKeyTbl($tbl, $fld);
+        if (!$curr->isInstruct() && $tbl != '' && $fld != '') {
+            $newVal = $this->getNodeFormFldBasic($nID, $curr);
+            if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
+                $this->postNodePublicCheckbox(
+                    $nID, 
+                    $tmpSubTier, 
+                    $tbl, 
+                    $fld, 
+                    $newVal, 
+                    $hasParManip, 
+                    $itemInd, 
+                    $itemID
+                );
+            } else {
+                if ($curr->nodeType == 'Date' && trim($newVal) == '') {
+                    // Redundancy in case JS breaks
+                    $newVal = $this->getRawFormDate($nIDtxt);
+                }
+                $this->sessData->currSessData(
+                    $nID, 
+                    $tbl, 
+                    $fld, 
+                    'update', 
+                    $newVal, 
+                    $hasParManip, 
+                    $itemInd, 
+                    $itemID
+                );
+            }
+            $ret .= $this->postNodePublicCheckboxSubRes(
+                $nID, 
+                $tmpSubTier, 
+                $tbl, 
+                $fld, 
+                $newVal
+            );
+            $this->postNodePublicUpdateKidMap($nID, $curr, $newVal);
+            $this->postNodePublicFldOther($nID, $curr, $tbl, $fld, $hasParManip);
+        }
+        return $ret;
+    }
+
+    protected function postNodePublicCheckbox($nID, $tmpSubTier, $tbl, $fld, &$newVal, $hasParManip, $itemInd, $itemID)
+    {
+        $curr = $this->allNodes[$nID];
+        $newVal = $this->postNodeTweakNewVal($curr, $newVal);
+        if (sizeof($curr->responses) == 1) { // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
+            if (is_array($newVal) && sizeof($newVal) == 1) {
+                $this->sessData->currSessData(
+                    $nID, 
+                    $tbl, 
+                    $fld, 
+                    'update', 
+                    $newVal[0], 
+                    $hasParManip, 
+                    $itemInd, 
+                    $itemID
+                );
+            } else {
+                $tmpVal = '';
+                $fldRow = $GLOBALS["SL"]->getFldRowFromFullName($tbl, $fld);
+                if (isset($fldRow->fld_default) && trim($fldRow->fld_default) != '') {
+                    $tmpVal = $fldRow->fld_default;
+                }
+                $this->sessData->currSessData(
+                    $nID, 
+                    $tbl, 
+                    $fld, 
+                    'update', 
+                    $tmpVal, 
+                    $hasParManip, 
+                    $itemInd, 
+                    $itemID
+                );
+            }
+        } else {
+            $curr = $this->checkResponses($curr, $this->v["fldForeignTbl"]);
+            $this->sessData->currSessDataCheckbox(
+                $nID, 
+                $tbl, 
+                $fld, 
+                'update', 
+                $newVal, 
+                $curr, 
+                $itemInd, 
+                $itemID
+            );
+        }
+        return true;
+    }
+
+    protected function postNodePublicCheckboxSubRes($nID, $tmpSubTier, $tbl, $fld, $newVal)
+    {
+        $ret = '';
+        // Check for Layout Sub-Response between each Checkbox Response
+        $curr = $this->allNodes[$nID];
+        if ($curr->nodeType == 'Checkbox' 
+            && sizeof($tmpSubTier[1]) > 0 
+            && sizeof($newVal) > 0) {
+            foreach ($newVal as $r => $val) {
+                foreach ($tmpSubTier[1] as $childNode) {
+                    if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
+                        && sizeof($childNode[1]) > 0) {
+                        foreach ($curr->responses as $j => $res) {
+                            if ($res->node_res_value == $val) {
+                                $subRowIDs = $this->sessData->getRowIDsByFldVal(
+                                    $tbl, 
+                                    [ $fld => $res->node_res_value ]
+                                );
+                                if (sizeof($subRowIDs) > 0) {
+                                    $GLOBALS["SL"]->currCyc["res"][0] = $tbl;
+                                    $GLOBALS["SL"]->currCyc["res"][1] = 'res' . $j;
+                                    $GLOBALS["SL"]->currCyc["res"][2] = $res->node_res_value;
+                                    $this->sessData->startTmpDataBranch($tbl, $subRowIDs[0]);
+                                    foreach ($childNode[1] as $k => $granNode) {
+                                        $ret .= $this->postNodePublic($granNode[0], $granNode);
+                                    }
+                                    $this->sessData->endTmpDataBranch($tbl);
+                                    $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+
+    protected function postNodePublicUpdateKidMap($nID, $curr, $newVal)
+    {
+        if (in_array($curr->nodeType, ['Checkbox', 'Radio']) 
+            && $curr->hasShowKids 
+            && isset($this->kidMaps[$nID]) 
+            && sizeof($this->kidMaps[$nID]) > 0) {
+            foreach ($this->kidMaps[$nID] as $nKid => $ress) {
+                $found = false;
+                if (sizeof($ress) > 0) {
+                    foreach ($ress as $cnt => $res) {
+                        $this->kidMaps[$nID][$nKid][$cnt][2] = false;
+                        if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
+                            if (in_array($res[1], $newVal)) {
+                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                            }
+                        } else {
+                            if ($res[1] == $newVal) {
+                                $this->kidMaps[$nID][$nKid][$cnt][2] = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    protected function postNodePublicFldOther($nID, &$curr, $tbl, $fld, $hasParManip)
+    {
+        $curr->chkFldOther();
+        if ((in_array($curr->nodeType, ['Checkbox', 'Radio']) 
+                && sizeof($curr->fldHasOther) > 0)
+            || in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
+            foreach ($curr->responses as $j => $res) {
+                if (in_array($j, $curr->fldHasOther)) {
+                    $inFld = 'n' . $nID . 'fldOther' . $j;
+                    $otherVal = '';
+                    if ($GLOBALS["SL"]->REQ->has($inFld)) {
+                        $otherVal = $GLOBALS["SL"]->REQ->get($inFld);
+                    }
+                    $fldVals = [ $fld => $res->node_res_value ];
+                    $s = sizeof($this->sessData->dataBranches);
+                    if ($s > 0 
+                        && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
+                        $tbl2 = $this->sessData->dataBranches[$s-1]["branch"];
+                        $branchLnkFld = $GLOBALS["SL"]->getForeignLnkNameFldName(
+                            $tbl, 
+                            $tbl2
+                        );
+                        if ($branchLnkFld != '') {
+                            $fldVals[$branchLnkFld] = $this->sessData
+                                ->dataBranches[$s-1]["itemID"];
+                        }
+                    }
+                    $subRowIDs = $this->sessData->getRowIDsByFldVal($tbl, $fldVals);
+                    $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
+                    if ($branchRowID > 0) {
+                        $GLOBALS["SL"]->currCyc["res"] = [
+                            $tbl, 
+                            'res' . $j, 
+                            $res->node_res_value
+                        ];
+                        $this->sessData->startTmpDataBranch($tbl, $branchRowID);
+                        $this->sessData->currSessData(
+                            $nID, 
+                            $tbl, 
+                            $fld . '_other', 
+                            'update', 
+                            $otherVal, 
+                            $hasParManip
+                        );
+                        $this->sessData->endTmpDataBranch($tbl);
+                        $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
+                    }
+                }
+            }
+        }
+        return true;
     }
     
     protected function postNodeTweakNewVal($curr, $newVal)

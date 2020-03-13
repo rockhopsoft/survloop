@@ -35,7 +35,7 @@
         "nnnick/chartjs": "^2.9.1",
         "plotly/plotly.js": "^1.51.0",
         "summernote/summernote": "v0.8.8",
-        "rockhopsoft/survloop-libraries": "^0.1.5"
+        "rockhopsoft/survloop-libraries": "^0.1.6"
     },
     "autoload": {
         "psr-4": {
