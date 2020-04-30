@@ -40,9 +40,11 @@ class TreeSurvUpload extends TreeSurv
     
     protected function genRandStr($len)
     {
-        $part1 = str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        $part1 = str_shuffle("abcdefghijklmnopqrstuvwxyz"
+            . "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         $part1 = substr($part1, 0, 1);
-        $part2 = str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        $part2 = str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"
+            . "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         $part2 = substr($part2, 0, ($len-1));
         return $part1 . $part2;
     }
@@ -95,7 +97,9 @@ class TreeSurvUpload extends TreeSurv
         $treeID = $this->treeID;
         $upType = "tree-" . $treeID . "-upload-types";
         if (isset($GLOBALS["SL"]->sysOpts[$upType])) {
-            $this->uploadTypes = $GLOBALS["SL"]->def->getSet($GLOBALS["SL"]->sysOpts[$upType]);
+            $this->uploadTypes = $GLOBALS["SL"]->def->getSet(
+                $GLOBALS["SL"]->sysOpts[$upType]
+            );
         }
         if (!$this->uploadTypes || $this->uploadTypes->isEmpty()) {
             $this->uploadTypes = $GLOBALS["SL"]->def->getSet('Upload Types');
@@ -209,9 +213,12 @@ class TreeSurvUpload extends TreeSurv
         }
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $up) {
-                $hasUpload = (isset($up->up_upload_file) && trim($up->up_upload_file) != '');
-                $hasStored = (isset($up->up_stored_file) && trim($up->up_stored_file) != '');
-                $hasVidLnk = (isset($up->up_video_link) && trim($up->up_video_link) != '');
+                $hasUpload = (isset($up->up_upload_file) 
+                    && trim($up->up_upload_file) != '');
+                $hasStored = (isset($up->up_stored_file) 
+                    && trim($up->up_stored_file) != '');
+                $hasVidLnk = (isset($up->up_video_link) 
+                    && trim($up->up_video_link) != '');
                 if (($hasUpload && $hasStored) || $hasVidLnk) {
                     $ret[] = $up;
                 }
@@ -367,7 +374,8 @@ class TreeSurvUpload extends TreeSurv
             if (file_exists($ret["file"]) && trim($upRow->up_type) != $vidTypeID) {
                 unlink($ret["file"]);
             }
-            SLUploads::find($upRow->up_id)->delete();
+            SLUploads::find($upRow->up_id)
+                ->delete();
         } else {
             $imgTypes = ['png', 'gif', 'jpg', 'jpeg'];
             if (intVal($upRow->up_type) == $vidTypeID) {

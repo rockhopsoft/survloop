@@ -211,36 +211,43 @@
                         <label><input type="checkbox" name="pageAdmOnly" value="1" onClick="if (this.checked) {
                             document.getElementById('isNewAdmPag').style.display='inline'; } else {
                             document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only</label><br />
+                            <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only
+                        </label><br />
                         <label><input type="checkbox" name="pageStfOnly" value="1" onClick="if (this.checked) {
                             document.getElementById('isNewAdmPag').style.display='inline'; } else { 
                             document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-key" aria-hidden="true"></i> Staff</label><br />
+                            <i class="fa fa-key" aria-hidden="true"></i> Staff
+                        </label><br />
                     @if ($GLOBALS["SL"]->sysHas('partners'))
                         <label><input type="checkbox" name="pagePrtOnly" value="1" onClick="if (this.checked) {
                             document.getElementById('isNewAdmPag').style.display='inline'; } else {
                             document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-university" aria-hidden="true"></i> Partners</label><br />
+                            <i class="fa fa-university" aria-hidden="true"></i> Partners
+                        </label><br />
                     @endif
                     @if ($GLOBALS["SL"]->sysHas('volunteers'))
                         <label><input type="checkbox" name="pageVolOnly" value="1" onClick="if (this.checked) {
                             document.getElementById('isNewAdmPag').style.display='inline'; } else {
                             document.getElementById('isNewAdmPag').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer</label><br />
+                            <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer
+                        </label><br />
                     @endif
                     </div><div class="col-6">
                         @if ($pageType == 'Report')
                             <input type="hidden" name="pageIsReport" value="1" autocomplete="off"> 
-                            <label>Report for Survey<select name="reportPageTree" id="reportPageTreeID" 
-                                class="form-control" autocomplete="off">
-                                {!! $GLOBALS["SL"]->allTreeDropOpts() !!}
-                                </select></label>
+                            <label>Report for Survey
+                                <select name="reportPageTree" id="reportPageTreeID" 
+                                    class="form-control" autocomplete="off">
+                                    {!! $GLOBALS["SL"]->allTreeDropOpts() !!}
+                                </select>
+                            </label>
                         @endif
                     </div>
                 </div>
                 <label for="newPageNameID" class="mT10"><b>New Page Title:</b></label>
-                <input type="text" name="newPageName" id="newPageNameID" class="form-control" value="" 
-                    autocomplete="off" onBlur="slugOnBlur(this, 'newPageSlugID');">
+                <input type="text" name="newPageName" id="newPageNameID" 
+                    class="form-control" value="" autocomplete="off" 
+                    onBlur="slugOnBlur(this, 'newPageSlugID');">
                 <div class="p10"></div>
                 <label for="newPageSlugID"><b>New Page URL:</b><br />{{ $GLOBALS['SL']->sysOpts["app-url"] 
                     }}/<div id="isNewAdmPag" class="disNon">dash/</div></label>
@@ -270,54 +277,70 @@
 
 @if ($pageType == 'Redirect')
         <div class="slCard nodeWrap">
-        <form name="mainRedirForm" method="post" action="/dashboard/pages">
+        <form name="mainRedirForm" method="post" action="/dashboard/redirects">
         <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
         <input type="hidden" name="subRedir" value="1">
         <div id="newRedirForm" class="row2 p20 mT20 mB20">
             <a id="hidivBtnNewRedir" class="hidivBtn" href="javascript:;"
-                ><h3 class="m0"><i class="fa fa-plus mR5" aria-hidden="true"></i> Create New Redirect</h3></a>
+                ><h3 class="m0"><i class="fa fa-plus mR5" aria-hidden="true"></i> 
+                Create New Redirect</h3></a>
             <div id="hidivNewRedir" class="disNon mT20">
                 <div class="row">
                     <div class="col-6">
-                        <label><input type="checkbox" name="redirAdmOnly" value="1" onClick="if (this.checked) {
+                        <label><input type="checkbox" name="redirAdmOnly" value="1" 
+                            onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
                             document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only</label><br />
-                        <label><input type="checkbox" name="redirStfOnly" value="1" onClick="if (this.checked) {
+                            <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only
+                        </label><br />
+                        <label><input type="checkbox" name="redirStfOnly" value="1" 
+                            onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
                             document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-key" aria-hidden="true"></i> Staff</label><br />
+                            <i class="fa fa-key" aria-hidden="true"></i> Staff
+                        </label><br />
                     </div><div class="col-6">
 @if ($GLOBALS["SL"]->sysHas('partners'))
-                        <label><input type="checkbox" name="redirPrtOnly" value="1" onClick="if (this.checked) {
+                        <label><input type="checkbox" name="redirPrtOnly" value="1" 
+                            onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir2').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
                             document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-university" aria-hidden="true"></i> Partner</label><br />
+                            <i class="fa fa-university" aria-hidden="true"></i> Partner
+                        </label><br />
 @endif
 @if ($GLOBALS["SL"]->sysHas('volunteers'))
-                        <label><input type="checkbox" name="redirVolOnly" value="1" onClick="if (this.checked) {
+                        <label><input type="checkbox" name="redirVolOnly" value="1" 
+                            onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir2').style.display='inline'; } 
                             else { document.getElementById('isNewAdmRedir').style.display='none'; 
                                 document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
-                            <i class="fa fa-hand-rock-o" aria-hidden="true"></i> Volunteer</label><br />
+                            <i class="fa fa-hand-rock-o" aria-hidden="true"></i> 
+                            Volunteer
+                        </label><br />
 @endif
                     </div>
                 </div>
-                <label for="newRedirNameID" class="mT10"><b>Redirect This URL:</b><br />{{ 
-                    $GLOBALS['SL']->sysOpts["app-url"] }}/<div id="isNewAdmRedir" class="disNon">dash/</div></label>
-                <input type="text" name="newRedirFrom" id="newRedirFromID" class="form-control" autocomplete="off">
+                <label for="newRedirNameID" class="mT10">
+                    <b>Redirect This URL:</b><br />{{ 
+                        $GLOBALS['SL']->sysOpts["app-url"] 
+                    }}/<div id="isNewAdmRedir" class="disNon">dash/</div>
+                </label>
+                <input type="text" name="newRedirFrom" id="newRedirFromID" 
+                    class="form-control" autocomplete="off">
                 <div class="p10"></div>
                 <label for="newRedirSlugID"><b>To This URL:</b></label>
-                <input type="text" name="newRedirTo" id="newRedirToID" class="form-control" autocomplete="off">
+                <input type="text" name="newRedirTo" id="newRedirToID" 
+                    class="form-control" autocomplete="off">
                 <div class="p10"></div>
-                <input type="submit" class="btn btn-lg btn-primary" value="Create New Redirect">
+                <input type="submit" class="btn btn-lg btn-primary" 
+                    value="Create New Redirect">
                 <div class="fC"></div>
             </div>
         </div>

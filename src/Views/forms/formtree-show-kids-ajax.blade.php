@@ -3,22 +3,22 @@
 if ({!! $if !!}) {
     showKids = true;
 @forelse ($grankids as $grandNode)
-    styBlock("node{{ $grandNode . $nSffx }}");
-    styBlock("node{{ $grandNode . $nSffx }}kids");
-    setNodeVisib("{{ $grandNode }}", "{{ $nSffx }}", true);
+    styBlock("node{{ $grandNode . $curr->nSffx }}");
+    styBlock("node{{ $grandNode . $curr->nSffx }}kids");
+    setNodeVisib("{{ $grandNode }}", "{{ $curr->nSffx }}", true);
 @empty
 @endforelse
-    styBlock("node{{ $nKid . $nSffx }}");
-    styBlock("node{{ $nKid . $nSffx }}kids"); 
-    setNodeVisib("{{ $nKid }}", "{{ $nSffx }}", true);
-    setSubResponses({{ $nID }}, "{{ $nSffx }}", true, new Array({{ implode(', ', $grankids) }}));
+    styBlock("node{{ $nKid . $curr->nSffx }}");
+    styBlock("node{{ $nKid . $curr->nSffx }}kids"); 
+    setNodeVisib("{{ $nKid }}", "{{ $curr->nSffx }}", true);
+    setSubResponses({{ $curr->nID }}, "{{ $curr->nSffx }}", true, new Array({{ implode(', ', $grankids) }}));
 } else {
-    setNodeVisib("{{ $nKid }}", "{{ $nSffx }}", false);
-    $("#node{{ $nKid . $nSffx }}").slideUp("50");
+    setNodeVisib("{{ $nKid }}", "{{ $curr->nSffx }}", false);
+    $("#node{{ $nKid . $curr->nSffx }}").slideUp("50");
 @forelse ($grankids as $grandNode)
-    $("#node{{ $grandNode . $nSffx }}").slideUp("50"); 
-    setNodeVisib("{{ $grandNode }}", "{{ $nSffx }}", false);
-    setSubResponses({{ $nID }}, "{{ $nSffx }}", false, new Array({{ implode(', ', $grankids) }}));
+    $("#node{{ $grandNode . $curr->nSffx }}").slideUp("50"); 
+    setNodeVisib("{{ $grandNode }}", "{{ $curr->nSffx }}", false);
+    setSubResponses({{ $curr->nID }}, "{{ $curr->nSffx }}", false, new Array({{ implode(', ', $grankids) }}));
 @empty
 @endforelse
 }

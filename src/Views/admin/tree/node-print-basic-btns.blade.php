@@ -1,7 +1,8 @@
 @if ((!isset($isPrint) || !$isPrint))
     @if ($canEditTree)
         <div class="disIn mL10">
-            <a  @if ($GLOBALS['SL']->treeRow->tree_type == 'Survey XML')
+            <a  @if ($GLOBALS['SL']->treeRow->tree_type == 'Survey XML'
+                    || (isset($GLOBALS["SL"]->x["isXmlMap"]) && $GLOBALS["SL"]->x["isXmlMap"]))
                     href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/xmlmap/node/{{ $nID }}" 
                 @else
                     href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/{{ $nID }}" 

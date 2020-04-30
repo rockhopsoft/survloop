@@ -13,6 +13,7 @@ namespace SurvLoop\Controllers\Tree;
 use DB;
 use Auth;
 use App\Models\SLFields;
+use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\SurvDataTestsAB;
 use SurvLoop\Controllers\Tree\SurvDataCheckbox;
 
@@ -732,46 +733,61 @@ class SurvData extends SurvDataCheckbox
         }
         return [$itemInd, $itemID];
     }
+     
+    public function currSessDataTblFld($nID, $tbl, $fld = '', $action = 'get', $newVal = null) 
+    //, $hasParManip = false, $itemInd = -3, $itemID = -3)
+    {
+        $curr = new TreeNodeSurv($nID);
+        $curr->fillNodeRow();
+        $curr->nID = $nID;
+        $curr->tbl = $tbl;
+        $curr->fld = $fld;
+        return $this->currSessData($curr, $action, $newVal);
+    }
     
     // Here we're trying to find the closest relative within current tree navigation to the table and field in question. 
-    public function currSessData($nID, $tbl, $fld = '', $action = 'get', $newVal = null, $hasParManip = false, 
-        $itemInd = -3, $itemID = -3)
+    public function currSessData(&$curr, $action = 'get', $newVal = null)
+        // ($nID, $tbl, $fld = '', $action = 'get', $newVal = null, $hasParManip = false, 
+        // $itemInd = -3, $itemID = -3)
     {
-        if (trim($tbl) == '' || trim($fld) == '' || !$this->loaded) {
+        if (trim($curr->tbl) == '' || trim($curr->fld) == '' || !$this->loaded) {
             return '';
         }
-        if (in_array($nID, $this->checkboxNodes) 
-            && $GLOBALS["SL"]->isFldCheckboxHelper($fld)) {
-            $tblFld = $tbl . '-' . $fld;
-            $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
+        if (in_array($curr->nID, $this->checkboxNodes) 
+            && $GLOBALS["SL"]->isFldCheckboxHelper($curr->fld)) {
+            $tblFld = $curr->tbl . '-' . $curr->fld;
+            $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($curr->tbl, $curr->fld);
             if ($this->helpInfo[$tblFld]["link"] 
                 && isset($this->helpInfo[$tblFld]["link"]->data_help_value_field)) {
-                return $this->currSessDataCheckbox($nID, $tbl, $fld);
+                return $this->currSessDataCheckbox($curr);
             }
         }
-        if ($itemInd < 0 || $itemID <= 0) {
-            list($itemInd, $itemID) = $this->currSessDataPos($tbl, $hasParManip);
+        if ($curr->itemInd < 0 || $curr->itemID <= 0) {
+            list($curr->itemInd, $curr->itemID) = $this->currSessDataPos(
+                $curr->tbl, 
+                $curr->hasParManip
+            );
         }
-        if ($itemInd < 0 || $itemID <= 0) {
+        if ($curr->itemInd < 0 || $curr->itemID <= 0) {
             return '';
         }
         if ($action == 'get') {
-            if ($this->dataFieldExists($tbl, $fld, $itemInd)) {
-                return $this->dataSets[$tbl][$itemInd]->{ $fld };
+            if ($this->dataFieldExists($curr->tbl, $curr->fld, $curr->itemInd)) {
+                return $this->dataSets[$curr->tbl][$curr->itemInd]->{ $curr->fld };
             }
         } elseif ($action == 'update' 
-            && $fld != ($GLOBALS["SL"]->tblAbbr[$tbl] . 'id')) {
-            $this->logDataSave($nID, $tbl, $itemID, $fld, $newVal);
-            $newVal = $this->currSessDataFormatNewVal($newVal, $tbl, $fld);
-            if (isset($this->dataSets[$tbl]) 
-                && isset($this->dataSets[$tbl][$itemInd])) {
-                if ($fld != $GLOBALS["SL"]->tblAbbr[$tbl] . 'id') {
-                    $this->dataSets[$tbl][$itemInd]->{ $fld } = $newVal;
-                    $this->dataSets[$tbl][$itemInd]->save();
+            && $curr->fld != ($GLOBALS["SL"]->tblAbbr[$curr->tbl] . 'id')) {
+            $this->logDataSave($curr->nID, $curr->tbl, $curr->itemID, $curr->fld, $newVal);
+            $newVal = $this->currSessDataFormatNewVal($newVal, $curr->tbl, $curr->fld);
+            if (isset($this->dataSets[$curr->tbl]) 
+                && isset($this->dataSets[$curr->tbl][$curr->itemInd])) {
+                if ($curr->fld != $GLOBALS["SL"]->tblAbbr[$curr->tbl] . 'id') {
+                    $this->dataSets[$curr->tbl][$curr->itemInd]->{ $curr->fld } = $newVal;
+                    $this->dataSets[$curr->tbl][$curr->itemInd]->save();
                 }
             } else {
-                $GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $tbl 
-                    . '][' . $itemInd . '] for ' . $fld . '<br />';
+                $GLOBALS["errors"] .= 'Couldn\'t find dataSets[' . $curr->tbl 
+                    . '][' . $curr->itemInd . '] for ' . $curr->fld . '<br />';
             }
         }
         return $newVal;
@@ -868,7 +884,7 @@ class SurvData extends SurvDataCheckbox
                     if ($recObj && $recObj->getKey() > 0) {
                         $currSessData = $recObj->{ $fldName };
                     } elseif ($nID > 0) {
-                        $currSessData = $this->currSessData($nID, $tblName, $fldName);
+                        $currSessData = $this->currSessDataTblFld($nID, $tblName, $fldName);
                     }
                     // else not a node, but general filter of entire core record's data set
                     if ($currSessData == '') { 
@@ -1054,16 +1070,15 @@ class SurvData extends SurvDataCheckbox
         return $tbl;
     }
     
-    public function currSessDataCheckbox($nID, $tbl, $fld = '', $action = 'get', $newVals = [], $curr = [], 
-        $itemInd = -3, $itemID = -3)
+    public function currSessDataCheckbox(&$curr, $action = 'get', $newVals = [])
     {
-        $tblFld = $tbl . '-' . $fld;
-        $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($tbl, $fld);
+        $tblFld = $curr->tbl . '-' . $curr->fld;
+        $this->helpInfo[$tblFld] = $this->getCheckboxHelperInfo($curr->tbl, $curr->fld);
 
         if (!$this->helpInfo[$tblFld]["link"] 
             || !isset($this->helpInfo[$tblFld]["link"]->data_help_value_field)) {
             $v = ';' . implode(';;', $newVals) . ';';
-            return $this->currSessData($nID, $tbl, $fld, $action, $v, false, $itemInd, $itemID);
+            return $this->currSessData($curr, $action, $v);
         }
         if ($action == 'get') {
             if (sizeof($this->helpInfo[$tblFld]["pastVals"]) > 0) {
@@ -1071,23 +1086,22 @@ class SurvData extends SurvDataCheckbox
             }
             return '';
         } elseif ($action == 'update') {
-            $this->currSessDataCheckboxUpdate($nID, $tbl, $fld, $newVals, $curr, $itemInd, $itemID);
+            $this->currSessDataCheckboxUpdate($curr, $newVals);
         }
         return '';
     }
     
-    public function currSessDataCheckboxUpdate($nID, $tbl, $fld = '', $newVals = [], $curr = [], 
-        $itemInd = -3, $itemID = -3)
+    public function currSessDataCheckboxUpdate(&$curr, $newVals = [])
     {
-        $tblFld = $tbl . '-' . $fld;
+        $tblFld = $curr->tbl . '-' . $curr->fld;
         $parentID = $this->helpInfo[$tblFld]["parentID"];
-        $this->logDataSave($nID, $tbl, $parentID, $fld, $newVals);
+        $this->logDataSave($curr->nID, $curr->tbl, $parentID, $curr->fld, $newVals);
         // check for newly submitted responses...
         if (is_array($newVals) && sizeof($newVals) > 0) {
             foreach ($newVals as $i => $val) {
                 if (!in_array($val, $this->helpInfo[$tblFld]["pastVals"]) 
                     && isset($this->helpInfo[$tblFld]["link"]->data_help_table)) {
-                    $this->currSessDataCheckboxAdd($nID, $tbl, $fld, $val, $curr);
+                    $this->currSessDataCheckboxAdd($curr, $val);
                 }
             }
         }
@@ -1097,16 +1111,16 @@ class SurvData extends SurvDataCheckbox
                     && isset($this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value])) {
                     $helpTbl = $this->helpInfo[$tblFld]["link"]->data_help_table;
                     $helpVal = $this->helpInfo[$tblFld]["pastValToID"][$res->node_res_value];
-                    $this->deleteDataItem($nID, $helpTbl, $helpVal);
+                    $this->deleteDataItem($curr->nID, $helpTbl, $helpVal);
                 }
             }
         }
         return true;
     }
     
-    public function currSessDataCheckboxAdd($nID, $tbl, $fld = '', $val = '', $curr = [])
+    public function currSessDataCheckboxAdd($curr, $val = '')
     {
-        $tblFld = $tbl . '-' . $fld;
+        $tblFld = $curr->tbl . '-' . $curr->fld;
         if ($this->helpInfo[$tblFld]["parentID"] <= 0 
             && $this->helpInfo[$tblFld]["link"]->data_help_parent_table == 'users') {
             $this->helpInfo[$tblFld]["parentID"] = -3;
@@ -1126,9 +1140,9 @@ class SurvData extends SurvDataCheckbox
                     $keyFld => $this->helpInfo[$tblFld]["parentID"],
                     $valFld => strip_tags($val)
                 ]);
-                $setInd = $this->initDataSet($tbl);
-                $this->dataSets[$tbl][$setInd] = $newObj;
-                $this->id2ind[$tbl][$newObj->getKey()] = $setInd;
+                $setInd = $this->initDataSet($curr->tbl);
+                $this->dataSets[$curr->tbl][$setInd] = $newObj;
+                $this->id2ind[$curr->tbl][$newObj->getKey()] = $setInd;
             }
         }
         return true;

@@ -8,7 +8,7 @@ $(document).on("click", "#nBtn{{ $nIDtxt }}", function() {
         if (document.getElementById("node{{ $nIDtxt }}kids").style.display=="none") {
             kidsVisible("{{ $nIDtxt }}", "{{ $nSffx }}", true);
             kidsDisplaySkip("{{ $nIDtxt }}", "{{ $nSffx }}", true);
-            $("#node{{ $nIDtxt }}kids").slideDown("50"); '
+            $("#node{{ $nIDtxt }}kids").slideDown("50");
         } else {
             $("#node{{ $nIDtxt }}kids").slideUp("50");
             kidsVisible("{{ $nIDtxt }}", "{{ $nSffx }}", false);

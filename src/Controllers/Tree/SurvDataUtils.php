@@ -100,8 +100,8 @@ class SurvDataUtils
         if ($model == '') {
             return null;
         }
-        eval("\$recObj = " . $model . "::where('" 
-                . $where . "', '" . $operator . "', '" . $whereVal . "')"
+        eval("\$recObj = " . $model . "::where('" . $where 
+                . "', '" . $operator . "', '" . $whereVal . "')"
             . "->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'asc')"
             . "->" . $getFirst . "();");
         return $recObj;
@@ -394,7 +394,7 @@ class SurvDataUtils
             && isset($this->dataSets[$tbl2]) 
             && sizeof($this->dataSets[$tbl2]) > 0) {
             $branch = $this->dataBranches[$bInd];
-            $tbl2fld = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl2, $branch["branch"]);
+            $tbl2fld = $GLOBALS["SL"]->getFornNameFldName($tbl2, $branch["branch"]);
             if (trim($tbl2fld) != '') {
                 foreach ($this->dataSets[$tbl2] as $i => $row) {
                     if (isset($row->{ $tbl2fld }) && $row->{ $tbl2fld } == $branch["itemID"]) {

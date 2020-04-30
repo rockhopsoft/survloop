@@ -152,9 +152,15 @@ class AuthController extends Controller
     public function postLogin(Request $request)
     {
         $pass = false;
-        if (Auth::attempt(['name' => $request->email, 'password' => $request->password])) {
+        if (Auth::attempt([
+            'name'     => $request->email, 
+            'password' => $request->password
+        ])) {
             $pass = true;
-        } elseif (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        } elseif (Auth::attempt([
+            'email'    => $request->email, 
+            'password' => $request->password
+        ])) {
             $pass = true;
         }
         if ($pass) {
@@ -169,6 +175,7 @@ class AuthController extends Controller
             return redirect('/afterLogin');
         }
         $this->chkAuthPageOpts($request);
+        $err = 'That combination of password with that username or email did not work.';
         return view(
             'vendor.survloop.auth.login', 
             [
@@ -177,7 +184,7 @@ class AuthController extends Controller
                 "midSurvRedir" => $this->midSurvRedir,
                 "midSurvBack"  => $this->midSurvBack,
                 "formFooter"   => $this->formFooter,
-                "errorMsg"     => 'That combination of password with that username or email did not work.' 
+                "errorMsg"     => $err 
             ]
         );
         //return $this->getLogin($request);

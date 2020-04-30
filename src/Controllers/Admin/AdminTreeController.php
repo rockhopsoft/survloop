@@ -46,130 +46,12 @@ class AdminTreeController extends AdminTreeStats
             $this->v["currPage"][0] = '/dashboard/tree';
         }
         
-        if (!isset($this->v["treeClassAdmin"])) {
-            $this->v["treeClassAdmin"] = new TreeSurvAdmin($request);
+        if (!isset($this->v["treeAdmin"])) {
+            $this->v["treeAdmin"] = new TreeSurvAdmin($request);
         }
-        $this->v["treeClassAdmin"]->loadTree($GLOBALS["SL"]->treeID, $request);
+        $this->v["treeAdmin"]->loadTree($GLOBALS["SL"]->treeID, $request);
         $this->initExtraCust();
-        
-        if (!session()->has('chkCoreTbls') || $request->has('refresh')) {
-            $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
-            $trees = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
-                ->where('tree_core_table', '>', 0)
-                ->get();
-            if ($trees->isNotEmpty()) {
-                foreach ($trees as $tree) {
-                    $coreTbl = SLTables::find($tree->tree_core_table);
-                    $GLOBALS["SL"]->initCoreTable($coreTbl, $userTbl);
-                }
-            }
-            $this->allStdCondition(
-                '#IsAdmin', 
-                'The user is currently logged in as an administrator.'
-            );
-            $this->allStdCondition(
-                '#IsNotAdmin', 
-                'The user is not currently logged in as an administrator.'
-            );
-            $this->allStdCondition(
-                '#IsStaff', 
-                'The user is currently logged in as a staff user.'
-            );
-            $this->allStdCondition(
-                '#IsStaffOrAdmin', 
-                'The user is currently logged in as a staff or admin user.'
-            );
-            $this->allStdCondition(
-                '#IsPartnerStaffOrAdmin', 
-                'The user is currently logged in as a partner, staff, or admin user.'
-            );
-            $this->allStdCondition(
-                '#IsPartnerStaffAdminOrOwner', 
-                'The user is currently logged in as a partner, staff, '
-                    . 'admin user, or the owner of core record.'
-            );
-            $this->allStdCondition(
-                '#IsPartner', 
-                'The user is currently logged in as a partner.'
-            );
-            $this->allStdCondition(
-                '#IsVolunteer', 
-                'The user is currently logged in as a volunteer.'
-            );
-            $this->allStdCondition(
-                '#IsBrancher', 
-                'The user is currently logged in as a database manager.'
-            );
-            $this->allStdCondition(
-                '#NodeDisabled', 
-                'This node is not active (for the public).'
-            );
-            $this->allStdCondition(
-                '#IsLoggedIn', 
-                'Complainant is currently logged into the system.'
-            );
-            $this->allStdCondition(
-                '#IsNotLoggedIn', 
-                'Complainant is not currently logged into the system.'
-            );
-            $this->allStdCondition(
-                '#IsOwner', 
-                'The user is currently logged is the owner of this record.'
-            );
-            $this->allStdCondition(
-                '#IsProfileOwner', 
-                'The user is currently logged in owns this user profile.'
-            );
-            $this->allStdCondition(
-                '#IsPrintable', 
-                'The current page view is intended to be printable.'
-            );
-            $this->allStdCondition(
-                '#IsPrintInFrame', 
-                'The current page view is printed into frame/ajax/widget.'
-            );
-            $this->allStdCondition(
-                '#IsDataPermPublic', 
-                'The current data permissions are set to public.'
-            );
-            $this->allStdCondition(
-                '#IsDataPermPrivate', 
-                'The current data permissions are set to private.'
-            );
-            $this->allStdCondition(
-                '#IsDataPermSensitive', 
-                'The current data permissions are set to sensitive.'
-            );
-            $this->allStdCondition(
-                '#IsDataPermInternal', 
-                'The current data permissions are set to internal.'
-            );
-            $this->allStdCondition(
-                '#HasTokenDialogue', 
-                'Current page load includes an access token dialogue.'
-            );
-            $this->allStdCondition(
-                '#EmailVerified', 
-                'Current user\'s email address has been verified.'
-            );
-            $this->allStdCondition(
-                '#TestLink', 
-                'Current page url parameters includes ?test=1.'
-            );
-            $this->allStdCondition(
-                '#NextButton', 
-                'Current page load results from clicking the survey\'s next button.'
-            );
-            //$this->allStdCondition('#HasUploads', 'Current core table record has associated uploads.');
-            $trees = SLTree::where('tree_type', 'Page')->get();
-            if ($trees->isNotEmpty()) {
-                foreach ($trees as $tree) {
-                    $this->v["treeClassAdmin"]->updateTreeOpts($tree->tree_id);
-                }
-            }
-            session()->put('chkCoreTbls', 1);
-            session()->save();
-        }
+        $this->chkCoreTbls();
         if (!isset($GLOBALS["SL"]->treeRow->tree_root) 
             || $GLOBALS["SL"]->treeRow->tree_root <= 0) {
             $this->createRootNode($GLOBALS["SL"]->treeRow);
@@ -263,7 +145,7 @@ class AdminTreeController extends AdminTreeStats
         $this->admControlInit($request, $page);
         if (!$this->checkCache()) {
             $this->chkAllCoreTbls();
-            $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
+            $this->v["printTree"] = $this->v["treeAdmin"]->adminPrintFullTree($request);
             $this->v["ipLegal"] = view(
                 'vendor.survloop.elements.dbdesign-legal', 
                 [ "sysOpts" => $GLOBALS["SL"]->sysOpts ]
@@ -280,7 +162,7 @@ class AdminTreeController extends AdminTreeStats
         )->render();
         $this->v["content"] = $treeAbout . $this->v["content"];
         if ($request->has('refresh')) {
-            $this->v["treeClassAdmin"]->createProgBarJs();
+            $this->v["treeAdmin"]->createProgBarJs();
             $GLOBALS["SL"]->pageJAVA .= 'setTimeout("document.'
                 . 'getElementById(\'hidFrameID\').src=\'/css-reload\'", 2000);';
         }
@@ -308,49 +190,57 @@ class AdminTreeController extends AdminTreeStats
         }
         $this->survLoopInit($request, '/tree/' . $treeSlug);
         if (!$this->checkCache()) {
-            $this->v["treeClassAdmin"]->loadTreeNodeStats();
-            $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
-            $this->v["content"] = '<div class="container">';
-            
-            $blurbName = 'Tree Map Header: ' . $GLOBALS["SL"]->treeRow->tree_name;
-            $custHeader = $GLOBALS["SL"]->getBlurb($blurbName);
-            if (trim($custHeader) != '') {
-                $readMore = '<div class="p15"><a href="javascript:;" '
-                    . 'id="hidivBtnReadMore" class="hidivBtn"'
-                    . '>About this map</a><div id="hidivReadMore" class="disNon">';
-                if (strpos($custHeader, '[[TreeStats]]') !== false) {
-                    $this->v["content"] .= str_replace('[[TreeStats]]', 
-                        $GLOBALS["SL"]->printTreeNodeStats(true, true, true), $custHeader) 
-                        . $readMore 
-                        . view('vendor.survloop.elements.print-tree-map-desc')->render() 
-                        . '</div></div>';
-                } else {
-                    $this->v["content"] .= $custHeader . $readMore 
-                        . view('vendor.survloop.elements.print-tree-map-desc')->render() 
-                        . '</div></div><div class="p10"></div>' 
-                        . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
-                }
-            } else {
-                $this->v["content"] .= view('vendor.survloop.elements.logo-print', [
-                        "sysOpts" => $GLOBALS["SL"]->sysOpts,
-                        "w100" => true
-                    ])->render()
-                    . '<h2>' . $GLOBALS["SL"]->treeRow->tree_name . ': Specifications</h2>'
-                    . view('vendor.survloop.elements.print-tree-map-desc')->render()
-                    . '<div class="p10"></div>'
-                    . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
-            }
-            $legal = view(
-                'vendor.survloop.elements.dbdesign-legal', 
-                [ "sysOpts" => $GLOBALS["SL"]->sysOpts ]
-            )->render();
-            $this->v["content"] .= str_replace('Content Chunk, WYSIWYG', 'Content Chunk', 
-                    $this->v["treeClassAdmin"]->adminPrintFullTree($request, true))
-                . '<div class="nodeAnchor"><a name="licenseInfo"></a></div>'
-                . '<div class="mT20 mB20 p20">' . $legal . '</div></div>';
-            $this->saveCache();
+            $this->adminPrintFullTreePublicGen($request);
         }
         return view('vendor.survloop.master', $this->v);
+    }
+    
+    protected function adminPrintFullTreePublicGen(Request $request)
+    {
+        $this->v["treeAdmin"]->loadTreeNodeStats();
+        $GLOBALS["SL"]->x["hideDisabledNodes"] = true;
+        $this->v["content"] = '<div class="container">';
+        $blurbName = 'Tree Map Header: ' . $GLOBALS["SL"]->treeRow->tree_name;
+        $custHeader = $GLOBALS["SL"]->getBlurb($blurbName);
+        if (trim($custHeader) != '') {
+            $readMore = '<div class="p15"><a href="javascript:;" '
+                . 'id="hidivBtnReadMore" class="hidivBtn"'
+                . '>About this map</a><div id="hidivReadMore" class="disNon">';
+            if (strpos($custHeader, '[[TreeStats]]') !== false) {
+                $custHeader = str_replace(
+                    '[[TreeStats]]', 
+                    $GLOBALS["SL"]->printTreeNodeStats(true, true, true), 
+                    $custHeader
+                );
+                $this->v["content"] .= $custHeader . $readMore 
+                    . view('vendor.survloop.elements.print-tree-map-desc')->render() 
+                    . '</div></div>';
+            } else {
+                $this->v["content"] .= $custHeader . $readMore 
+                    . view('vendor.survloop.elements.print-tree-map-desc')->render() 
+                    . '</div></div><div class="p10"></div>' 
+                    . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
+            }
+        } else {
+            $this->v["content"] .= view('vendor.survloop.elements.logo-print', [
+                    "sysOpts" => $GLOBALS["SL"]->sysOpts,
+                    "w100" => true
+                ])->render()
+                . '<h2>' . $GLOBALS["SL"]->treeRow->tree_name . ': Specifications</h2>'
+                . view('vendor.survloop.elements.print-tree-map-desc')->render()
+                . '<div class="p10"></div>'
+                . $GLOBALS["SL"]->printTreeNodeStats(true, true, true);
+        }
+        $legal = view(
+            'vendor.survloop.elements.dbdesign-legal', 
+            [ "sysOpts" => $GLOBALS["SL"]->sysOpts ]
+        )->render();
+        $this->v["content"] .= str_replace('Content Chunk, WYSIWYG', 'Content Chunk', 
+                $this->v["treeAdmin"]->adminPrintFullTree($request, true))
+            . '<div class="nodeAnchor"><a name="licenseInfo"></a></div>'
+            . '<div class="mT20 mB20 p20">' . $legal . '</div></div>';
+        $this->saveCache();
+        return true;
     }
     
     public function indexPage(Request $request, $treeID)
@@ -364,7 +254,7 @@ class AdminTreeController extends AdminTreeStats
         $GLOBALS["SL"] = new Globals($request, $this->dbID, $this->treeID, $this->treeID);
         $this->admControlInit($request, '/dashboard/pages');
         if (!$this->checkCache()) {
-            $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTree($request);
+            $this->v["printTree"] = $this->v["treeAdmin"]->adminPrintFullTree($request);
             $this->v["content"] = view('vendor.survloop.admin.tree.page', $this->v)->render();
             $this->saveCache();
         }
@@ -411,7 +301,8 @@ class AdminTreeController extends AdminTreeStats
             $treeXML->tree_slug = $tree->tree_slug;
             $treeXML->tree_opts = $tree->tree_opts;
             $treeXML->save();
-            return $this->redir('/dashboard/surv-' . $tree->tree_id . '/map?all=1&alt=1&refresh=1');
+            $redir = '/dashboard/surv-' . $tree->tree_id . '/map?all=1&alt=1&refresh=1';
+            return $this->redir($redir);
         }
         $this->v["myTrees"] = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
             ->where('tree_type', 'LIKE', 'Survey')
@@ -793,9 +684,11 @@ class AdminTreeController extends AdminTreeStats
         $node = [];
         if ($nID > 0) {
             $this->loadDbFromNode($request, $nID);
-        } elseif ($request->has('parent') && intVal($request->get('parent')) > 0) {
+        } elseif ($request->has('parent') 
+            && intVal($request->get('parent')) > 0) {
             $this->loadDbFromNode($request, $request->get('parent'));
-        } elseif ($request->has('nodeParentID') && intVal($request->nodeParentID) > 0) {
+        } elseif ($request->has('nodeParentID') 
+            && intVal($request->nodeParentID) > 0) {
             $this->loadDbFromNode($request, $request->nodeParentID);
         }
         if (!isset($GLOBALS["SL"])) {
@@ -812,10 +705,9 @@ class AdminTreeController extends AdminTreeStats
             $currPage = '/dashboard/pages';
         }
         $this->admControlInit($request, $currPage);
-        $this->v["content"] = $this->v["treeClassAdmin"]
-            ->adminNodeEdit($nID, $request, $currPage);
-        if (isset($this->v["treeClassAdmin"]->v["needsWsyiwyg"]) 
-            && $this->v["treeClassAdmin"]->v["needsWsyiwyg"]) {
+        $this->v["content"] = $this->v["treeAdmin"]->adminNodeEdit($nID, $request, $currPage);
+        if (isset($this->v["treeAdmin"]->v["needsWsyiwyg"]) 
+            && $this->v["treeAdmin"]->v["needsWsyiwyg"]) {
             $this->v["needsWsyiwyg"] = true;
         }
         return view('vendor.survloop.master', $this->v);
@@ -955,15 +847,31 @@ class AdminTreeController extends AdminTreeStats
     public function xmlmap(Request $request, $treeID = -3)
     {
         $this->initLoader();
+        $chk = SLTree::find($treeID);
+        if ($chk 
+            && isset($chk->tree_type) 
+            && isset($chk->tree_slug)
+            && $chk->tree_type == 'Survey XML') {
+            $chk = SLTree::where('tree_type', 'Survey')
+                ->where('tree_slug', $chk->tree_slug)
+                ->first();
+            if ($chk && isset($chk->tree_id)) {
+                $treeID = $chk->tree_id;
+            }
+        }
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
-        $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
-        $xmlmap = new TreeSurvAPI;
-        $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
-        $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
-        $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", function() {
-            $(".editXml").css("display","inline"); });';
-        return view('vendor.survloop.admin.tree.xmlmap', $this->v);
+        if (isset($GLOBALS["SL"]->xmlTree["id"])) {
+            $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
+            $GLOBALS["SL"]->x["isXmlMap"] = true;
+            $xmlmap = new TreeSurvAPI;
+            $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request);
+            $this->v["adminPrintFullTree"] = $xmlmap->adminPrintFullTree($request);
+            $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#editXmlMap", '
+                . 'function() { $(".editXml").css("display","inline"); });';
+            return view('vendor.survloop.admin.tree.xmlmap', $this->v);
+        }
+        return '';
     }
     
     public function xmlNodeEdit(Request $request, $treeID = -3, $nID = -3)
@@ -973,7 +881,7 @@ class AdminTreeController extends AdminTreeStats
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
         $xmlmap = new TreeSurvAPI;
-        $xmlmap->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
+        $xmlmap->loadTree($treeID, $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);
         return view('vendor.survloop.master', $this->v);
     }

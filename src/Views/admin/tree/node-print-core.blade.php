@@ -43,7 +43,8 @@
         <div id="addChild{{ $nID }}" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
             <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&start=1"
+            <a href="/dashboard/surv-{{ $node->nodeRow->node_tree 
+                }}/xmlmap/node/-37/?parent={{ $nID }}&start=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
     @endif
@@ -57,7 +58,8 @@
         <div id="addChild{{ $nID }}B" 
             class="disNon @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
             <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
-            <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ $nID }}&end=1"
+            <a href="/dashboard/surv-{{ $node->nodeRow->node_tree 
+                }}/xmlmap/node/-37/?parent={{ $nID }}&end=1"
                 ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
         </div>
     @else
@@ -76,14 +78,15 @@
     <div id="addSib{{ $nID }}B" class="disNon pT10 pB10 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
         <span class="slBlueDark fPerc125"><i class="fa fa-chevron-right"></i></span> 
-        <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap/node/-37/?parent={{ 
+        <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/xmlmap/node/-37/?parent={{ 
             $node->nodeRow->node_parent_id }}&ordAfter={{ $nID }}"
             ><i class="fa fa-plus-square-o"></i> Add Sibling Node</a>
     </div>
     <div class="nodeMover disNon pT5 pB5 
         @if ($tierDepth < 10) basicTier{{ $tierDepth }} @else basicTier9 @endif ">
         <span class="slBlueDark"><i class="fa fa-chevron-right"></i></span> 
-        <a id="moveTo{{ $node->nodeRow->node_parent_id }}ord{{ (1+$node->nodeRow->node_parent_order) }}"
+        <a id="moveTo{{ $node->nodeRow->node_parent_id 
+            }}ord{{ (1+$node->nodeRow->node_parent_order) }}"
             class="adminNodeMoveTo" href="javascript:;"
             ><i class="fa fa-bullseye"></i> Move Node Here</a>
     </div>

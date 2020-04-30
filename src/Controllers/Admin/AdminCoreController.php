@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Models\SLEmails;
 use App\Models\SLContact;
 use App\Models\SLTree;
+use App\Models\SLTables;
 use App\Models\User;
 use SurvLoop\Controllers\PageLoadUtils;
 use SurvLoop\Controllers\Admin\AdminMenu;
@@ -355,5 +356,130 @@ class AdminCoreController extends SurvLoopController
         }
         return $this->custReport->redir('/');
     }
+
+    protected function chkCoreTbls()
+    {
+        if (!session()->has('chkCoreTbls') 
+            || $GLOBALS["SL"]->REQ->has('refresh')) {
+            $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
+            $trees = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
+                ->where('tree_core_table', '>', 0)
+                ->get();
+            if ($trees->isNotEmpty()) {
+                foreach ($trees as $tree) {
+                    $coreTbl = SLTables::find($tree->tree_core_table);
+                    $GLOBALS["SL"]->initCoreTable($coreTbl, $userTbl);
+                }
+            }
+            $this->allStdCondition(
+                '#IsAdmin', 
+                'The user is currently logged in as an administrator.'
+            );
+            $this->allStdCondition(
+                '#IsNotAdmin', 
+                'The user is not currently logged in as an administrator.'
+            );
+            $this->allStdCondition(
+                '#IsStaff', 
+                'The user is currently logged in as a staff user.'
+            );
+            $this->allStdCondition(
+                '#IsStaffOrAdmin', 
+                'The user is currently logged in as a staff or admin user.'
+            );
+            $this->allStdCondition(
+                '#IsPartnerStaffOrAdmin', 
+                'The user is currently logged in as a partner, staff, or admin user.'
+            );
+            $this->allStdCondition(
+                '#IsPartnerStaffAdminOrOwner', 
+                'The user is currently logged in as a partner, staff, '
+                    . 'admin user, or the owner of core record.'
+            );
+            $this->allStdCondition(
+                '#IsPartner', 
+                'The user is currently logged in as a partner.'
+            );
+            $this->allStdCondition(
+                '#IsVolunteer', 
+                'The user is currently logged in as a volunteer.'
+            );
+            $this->allStdCondition(
+                '#IsBrancher', 
+                'The user is currently logged in as a database manager.'
+            );
+            $this->allStdCondition(
+                '#NodeDisabled', 
+                'This node is not active (for the public).'
+            );
+            $this->allStdCondition(
+                '#IsLoggedIn', 
+                'Complainant is currently logged into the system.'
+            );
+            $this->allStdCondition(
+                '#IsNotLoggedIn', 
+                'Complainant is not currently logged into the system.'
+            );
+            $this->allStdCondition(
+                '#IsOwner', 
+                'The user is currently logged is the owner of this record.'
+            );
+            $this->allStdCondition(
+                '#IsProfileOwner', 
+                'The user is currently logged in owns this user profile.'
+            );
+            $this->allStdCondition(
+                '#IsPrintable', 
+                'The current page view is intended to be printable.'
+            );
+            $this->allStdCondition(
+                '#IsPrintInFrame', 
+                'The current page view is printed into frame/ajax/widget.'
+            );
+            $this->allStdCondition(
+                '#IsDataPermPublic', 
+                'The current data permissions are set to public.'
+            );
+            $this->allStdCondition(
+                '#IsDataPermPrivate', 
+                'The current data permissions are set to private.'
+            );
+            $this->allStdCondition(
+                '#IsDataPermSensitive', 
+                'The current data permissions are set to sensitive.'
+            );
+            $this->allStdCondition(
+                '#IsDataPermInternal', 
+                'The current data permissions are set to internal.'
+            );
+            $this->allStdCondition(
+                '#HasTokenDialogue', 
+                'Current page load includes an access token dialogue.'
+            );
+            $this->allStdCondition(
+                '#EmailVerified', 
+                'Current user\'s email address has been verified.'
+            );
+            $this->allStdCondition(
+                '#TestLink', 
+                'Current page url parameters includes ?test=1.'
+            );
+            $this->allStdCondition(
+                '#NextButton', 
+                'Current page load results from clicking the survey\'s next button.'
+            );
+            //$this->allStdCondition('#HasUploads', 'Current core table record has associated uploads.');
+            $trees = SLTree::where('tree_type', 'Page')->get();
+            if ($trees->isNotEmpty()) {
+                foreach ($trees as $tree) {
+                    $this->v["treeAdmin"]->updateTreeOpts($tree->tree_id);
+                }
+            }
+            session()->put('chkCoreTbls', 1);
+            session()->save();
+        }
+        return true;
+    }
+
 
 }

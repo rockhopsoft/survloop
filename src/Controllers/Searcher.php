@@ -243,10 +243,8 @@ class Searcher extends SurvCustLoop
             }
             if ($GLOBALS["SL"]->REQ->has('f') 
                 && trim($GLOBALS["SL"]->REQ->get('f')) != '') {
-                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode(
-                    '__', 
-                    $GLOBALS["SL"]->REQ->get('f')
-                );
+                $f = $GLOBALS["SL"]->REQ->get('f');
+                $this->searchFilts["f"] = $GLOBALS["SL"]->mexplode('__', $f);
             }
             if ($GLOBALS["SL"]->REQ->has('u') 
                 && intVal($GLOBALS["SL"]->REQ->get('u')) > 0) {
@@ -324,6 +322,7 @@ class Searcher extends SurvCustLoop
                 }
             }
         }
+//if ($GLOBALS["SL"]->REQ->has('showPreviews')) { echo '<pre>'; print_r($this->searchFilts); print_r($GLOBALS["SL"]->REQ->all()); echo '</pre>'; exit; }
         return '';
     }
     
@@ -384,14 +383,19 @@ class Searcher extends SurvCustLoop
         return true;
     }
      
-    public function searchFiltsURL()
+    public function searchFiltsURL($refresh = false)
     {
-        if (isset($this->v["searchFiltsURL"])) {
+        if ($refresh) {
+            $this->v["searchFiltsURL"] = '';
+        }
+        if (isset($this->v["searchFiltsURL"]) 
+            && trim($this->v["searchFiltsURL"]) != '') {
             return $this->v["searchFiltsURL"];
         }
         $this->v["searchFiltsURL"] = '';
         if ($GLOBALS["SL"]->REQ->has('refresh')) {
-            $this->v["searchFiltsURL"] .= '&refresh=' . $GLOBALS["SL"]->REQ->refresh;
+            $this->v["searchFiltsURL"] .= '&refresh=' 
+                . $GLOBALS["SL"]->REQ->refresh;
         }
         if (sizeof($this->searchFilts) > 0) {
             foreach ($this->searchFilts as $key => $val) {

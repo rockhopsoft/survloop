@@ -24,8 +24,11 @@ class AdminTreeStats extends AdminController
         $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/stats?all=1');
         if (!$this->checkCache()) {
-            $this->v["printTree"] = $this->v["treeClassAdmin"]->adminPrintFullTreeStats($request);
-            $this->v["content"] = view('vendor.survloop.admin.tree.treeStats', $this->v)->render();
+            $this->v["printTree"] = $this->v["treeAdmin"]->adminPrintFullTreeStats($request);
+            $this->v["content"] = view(
+                'vendor.survloop.admin.tree.treeStats', 
+                $this->v
+            )->render();
             $this->saveCache();
         }
         return view('vendor.survloop.master', $this->v);
@@ -45,8 +48,8 @@ class AdminTreeStats extends AdminController
             // clear empties here
             $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), 
                 date("m"), date("d")-3, date("Y"));
-            eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::"
-                . $this->custReport->treeSessionsWhereExtra()
+            eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                . "::" . $this->custReport->treeSessionsWhereExtra()
                 . "where('updated_at', '<', '" . date("Y-m-d H:i:s", $this->v["dayold"]) 
                 . "')->get();");
             if ($chk->isNotEmpty()) {
@@ -119,6 +122,9 @@ class AdminTreeStats extends AdminController
                     }
                 }
             }
+            $title = '<h3 class="mT0 mB10">Duration of Attempt by Percent Completion'
+                . '</h3><div class="mTn10 mB10"><i>Based on the final page '
+                . 'saved during incomplete submission attempts.</i></div>';
             $this->v["graph1print"] = view(
                 'vendor.survloop.reports.graph-scatter', 
                 [
@@ -126,10 +132,7 @@ class AdminTreeStats extends AdminController
                     "hgt"         => $height . 'px',
                     "dotColor"    => $this->v["css"]["color-main-on"],
                     "brdColor"    => $this->v["css"]["color-main-grey"],
-                    "title"       => '<h3 class="mT0 mB10">Duration of Attempt by Percent Completion</h3>'
-                        . '<div class="mTn10 mB10"><i>'
-                        . 'Based on the final page saved during incomplete submission attempts.'
-                        . '</i></div>',
+                    "title"       => $title,
                     "xAxes"       => '% Complete',
                     "yAxes"       => 'Minutes',
                     "data"        => $this->v["graph1data"],

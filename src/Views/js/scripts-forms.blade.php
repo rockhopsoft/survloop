@@ -35,6 +35,8 @@ var addingLoopItem = 0;
 var maxItemCnt = 0;
 var uploadTypeVid = -1;
 
+var autoSaveDelay = 60000;
+
 function addFld(fld) {
 	allFldList[allFldList.length] = fld;
 	return true;

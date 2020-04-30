@@ -79,7 +79,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         return false;
     }
     
-    protected function printSetLoopNav($nID, $loopName)
+    protected function printSetLoopNav($nID, $loopName, $desc = '')
     {
         if (!isset($GLOBALS["SL"]->closestLoop["obj"])
             || !isset($GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural)) {
@@ -89,11 +89,14 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         $this->printSetLoopNavInit($nID, $loopName);
         $loopRows = '';
         if ($this->v["currLoopSize"] > 0) {
-            foreach ($this->sessData->loopItemIDs[$loopName] as $setIndex => $loopItem) {
-                $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
-                $loopRec = $this->sessData->getRowById($tbl, $loopItem);
-                $loopRows .= $this->printSetLoopNavRow($nID, $loopRec, $setIndex);
+            $tbl = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
+            foreach ($this->sessData->loopItemIDs[$loopName] as $ind => $rec) {
+                $loopRec = $this->sessData->getRowById($tbl, $rec);
+                $loopRows .= $this->printSetLoopNavRow($nID, $loopRec, $ind);
             }
+            $desc = str_replace('[other]', 'other', $desc);
+        } else {
+            $desc = str_replace('[other]', '', $desc);
         }
         if (!$this->allNodes[$nID]->isStepLoop()) {
             $GLOBALS["SL"]->pageJAVA .= 'currItemCnt = ' . $this->v["currLoopSize"] 
@@ -105,7 +108,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             $this->nextBtnOverride = 'Done With ' 
                 . $GLOBALS["SL"]->closestLoop["obj"]->data_loop_plural;
         } */
-        return view(
+        return $desc . view(
             'vendor.survloop.forms.formtree-looproot-nav', 
             [
                 "nID"            => $nID,
@@ -145,13 +148,15 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         }
         if ($this->v["addingLoopItem"] > 0) {
             $GLOBALS["SL"]->pageJAVA .= ' addingLoopItem = ' . $this->v["addingLoopItem"] 
-                . '; setLoopItemID(' . $this->v["addingLoopItem"] . ');';
+                . '; setLoopItemID(' . $this->v["addingLoopItem"] 
+                . '); console.log("addingLoopItem: "+addingLoopItem+""); ';
         } elseif ($GLOBALS["SL"]->REQ->has('editLoopInd')) {
             $ind = intVal($GLOBALS["SL"]->REQ->editLoopInd);
             if ($ind < $this->v["currLoopSize"]
                 && isset($this->sessData->loopItemIDs[$loopName][$ind])) {
                 $GLOBALS["SL"]->pageJAVA .= ' addingLoopItem = ' 
-                    . $this->sessData->loopItemIDs[$loopName][$ind] . '; ';
+                    . $this->sessData->loopItemIDs[$loopName][$ind] 
+                    . '; console.log("editLoopInd: "+addingLoopItem+""); ';
             }
         }
         return true;

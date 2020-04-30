@@ -319,4 +319,19 @@ class SurvStats extends SurvStatsCache
         return $this->getDatLetTot($dLet, $fStr, 'avg');
     }
     
+    public function getDatLetMin($dLet, $fStr = '1')
+    {
+//echo 'getDatLetMin(' . $dLet . '<pre>'; print_r($this->tagTot[$dLet]); echo '</pre>'; exit;
+        return $this->getDatLetTot($dLet, $fStr, 'min');
+    }
+    
+    public function getDatLetMax($dLet, $fStr = '1')
+    {
+//echo '<pre>'; print_r($this->tagTot[$dLet]); echo '</pre>'; exit;
+        return $this->getDatLetTot($dLet, $fStr, 'max');
+    }
+
+
+
+    
 }

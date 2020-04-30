@@ -79,7 +79,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
     
     protected function copyFromRow()
     {
-        if ($this->nodeRow) {
+        if ($this->nodeRow && isset($this->nodeRow->node_parent_id)) {
             $this->parentID    = $this->nodeRow->node_parent_id;
             $this->parentOrd   = $this->nodeRow->node_parent_order;
             $this->nodeOpts    = $this->nodeRow->node_opts;
@@ -114,84 +114,9 @@ class TreeNodeSurv extends TreeNodeSurvVars
         $this->hasShowKids = false;
         if ($this->nodeRow) {
             if ($this->isPage() || $this->isLoopRoot()) {
-                $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] 
-                    = $this->extraOpts["meta-keywords"] = $this->extraOpts["meta-img"] = '';
-                if (strpos($this->nodeRow->node_prompt_after, '::M::') !== false) {
-                    $meta = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->node_prompt_after);
-                    if (isset($meta[0])) {
-                        $this->extraOpts["meta-title"] = $meta[0];
-                        if (isset($meta[1])) {
-                            $this->extraOpts["meta-desc"] = $meta[1];
-                            if (isset($meta[2])) {
-                                $this->extraOpts["meta-keywords"] = $meta[2];
-                                if (isset($meta[3])) {
-                                    $this->extraOpts["meta-img"] = $meta[3];
-                                }
-                            }
-                        }
-                    }
-                }
-                $this->extraOpts["page-url"] = '';
-                if ($this->isPage()) {
-                    if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
-                        if ($GLOBALS["SL"]->treeIsAdmin) {
-                            if ($GLOBALS["SL"]->treeRow->tree_opts%7 == 0) {
-                                $this->extraOpts["page-url"] = '/dashboard';
-                            } else {
-                                $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->tree_slug;
-                            }
-                        } else {
-                            $this->extraOpts["page-url"] = '/' . $GLOBALS["SL"]->treeRow->tree_slug;
-                        }
-                    } else { // default survey mode
-                        if ($GLOBALS["SL"]->treeIsAdmin) {
-                            $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->tree_slug 
-                                . '/' . $this->nodeRow->node_prompt_notes;
-                        } else {
-                            $this->extraOpts["page-url"] = '/u/' . $GLOBALS["SL"]->treeRow->tree_slug 
-                                . '/' . $this->nodeRow->node_prompt_notes;
-                        }
-                    }
-                } else { // isLoopRoot
-                    if ($GLOBALS["SL"]->treeIsAdmin) {
-                        $this->extraOpts["page-url"] = '/dash/' . $GLOBALS["SL"]->treeRow->tree_slug 
-                            . '/' . $this->nodeRow->node_prompt_notes;
-                    } else {
-                        $this->extraOpts["page-url"] = '/u/' . $GLOBALS["SL"]->treeRow->tree_slug 
-                            . '/' . $this->nodeRow->node_prompt_notes;
-                    }
-                }
+                $this->initNodeRowExtraOptsPage();
             } elseif (in_array($this->nodeRow->node_type, ['Text:Number', 'Slider'])) {
-                // load min and max values
-                $this->extraOpts["minVal"] = $this->extraOpts["maxVal"] 
-                    = $this->extraOpts["incr"] = $this->extraOpts["unit"] = false;
-                $chk = SLNodeResponses::where('node_res_node', $this->nodeID)
-                    ->get();
-                if ($chk->isNotEmpty()) {
-                    foreach ($chk as $res) {
-                        if (isset($res->node_res_ord)) {
-                            if (isset($res->node_res_value)) {
-                                switch (intVal($res->node_res_ord)) {
-                                    case -1:
-                                        $this->extraOpts["minVal"] 
-                                            = floatVal($res->node_res_value); 
-                                        break;
-                                    case 1:
-                                        $this->extraOpts["maxVal"] 
-                                            = floatVal($res->node_res_value); 
-                                        break;
-                                    case 2:  
-                                        $this->extraOpts["incr"]   
-                                            = floatVal($res->node_res_value); 
-                                        break;
-                                }
-                            }
-                            if (isset($res->node_res_eng)) {
-                                $this->extraOpts["unit"] = trim($res->node_res_eng);
-                            }
-                        }
-                    }
-                }
+                $this->initNodeRowExtraOptsNumber();
             } elseif (in_array($this->nodeRow->node_type, ['Gender', 'Gender Not Sure'])) {
                 $this->loadGenderResponses();
                 $this->chkFldOther();
@@ -207,54 +132,14 @@ class TreeNodeSurv extends TreeNodeSurvVars
                 ->get();
         }
         if ($this->nodeType == 'Send Email') {
-            $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"] 
-                = $this->extraOpts["emailBCC"] = [];
-            if (strpos($this->nodeRow->node_prompt_notes, '::CC::') !== false) {
-                list($to, $ccs) = explode('::CC::', $this->nodeRow->node_prompt_notes);
-                list($cc, $bcc) = explode('::BCC::', $ccs);
-                $this->extraOpts["emailTo"]  = $GLOBALS["SL"]->mexplode(',', str_replace('::TO::', '', $to));
-                $this->extraOpts["emailCC"]  = $GLOBALS["SL"]->mexplode(',', $cc);
-                $this->extraOpts["emailBCC"] = $GLOBALS["SL"]->mexplode(',', $bcc);
-            }
+            $this->initNodeRowExtraOptsEmail();
         } elseif (in_array($this->nodeType, ['Plot Graph', 'Line Graph'])) {
-            if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
-                list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
-                    str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
-                list($this->extraOpts["y-axis-lab"], $xtras) = explode('::X::', $xtras);
-                list($this->extraOpts["x-axis"], $xtras) = explode('::Xlab::', $xtras);
-                list($this->extraOpts["x-axis-lab"], $this->extraOpts["conds"]) 
-                    = explode('::Cnd::', $xtras);
-                $this->extraOpts["data-conds"] = $GLOBALS["SL"]
-                    ->mexplode('#', $this->extraOpts["conds"]);
-            }
+            $this->initNodeRowExtraOptsGraph();
         } elseif (in_array($this->nodeType, ['Pie Chart'])) {
             
         } elseif (in_array($this->nodeType, ['Bar Graph'])) {
-            if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
-                list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
-                    str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
-                list($this->extraOpts["y-axis-lab"], $xtras) = explode('::Lab1::', $xtras);
-                list($this->extraOpts["lab1"], $xtras) = explode('::Lab2::', $xtras);
-                list($this->extraOpts["lab2"], $xtras) = explode('::Clr1::', $xtras);
-                list($this->extraOpts["clr1"], $xtras) = explode('::Clr2::', $xtras);
-                list($this->extraOpts["clr2"], $xtras) = explode('::Opc1::', $xtras);
-                list($this->extraOpts["opc1"], $xtras) = explode('::Opc2::', $xtras);
-                list($this->extraOpts["opc2"], $xtras) = explode('::Hgt::', $xtras);
-                list($this->extraOpts["hgt"], $this->extraOpts["conds"]) 
-                    = explode('::Cnd::', $xtras);
-                $this->extraOpts["data-conds"] = $GLOBALS["SL"]
-                    ->mexplode('#', $this->extraOpts["conds"]);
-                $this->extraOpts['hgt-sty'] = $this->extraOpts['hgt'];
-                if (trim($this->extraOpts['hgt']) != '') {
-                    if (strpos($this->extraOpts['hgt'], '%') === false) {
-                        $this->extraOpts['hgt-sty'] .= $this->extraOpts['hgt-sty'] . 'px'; 
-                    }
-                } else {
-                    $this->extraOpts['hgt-sty'] = '420px';
-                }
-            }
+            $this->initNodeRowExtraOptsBarGraph();
         } elseif (in_array($this->nodeType, ['Map'])) {
-            
             
         } elseif ($this->isSpreadTbl()) {
             if (!isset($this->nodeRow->node_char_limit) 
@@ -263,6 +148,152 @@ class TreeNodeSurv extends TreeNodeSurvVars
             }
         }
         $this->isPageBlock();
+        return true;
+    }
+    
+    public function initNodeRowExtraOptsPage()
+    {
+        $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] 
+            = $this->extraOpts["meta-keywords"] = $this->extraOpts["meta-img"] = '';
+        if (strpos($this->nodeRow->node_prompt_after, '::M::') !== false) {
+            $meta = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->node_prompt_after);
+            if (isset($meta[0])) {
+                $this->extraOpts["meta-title"] = $meta[0];
+                if (isset($meta[1])) {
+                    $this->extraOpts["meta-desc"] = $meta[1];
+                    if (isset($meta[2])) {
+                        $this->extraOpts["meta-keywords"] = $meta[2];
+                        if (isset($meta[3])) {
+                            $this->extraOpts["meta-img"] = $meta[3];
+                        }
+                    }
+                }
+            }
+        }
+        $slug = $GLOBALS["SL"]->treeRow->tree_slug;
+        $nodeSlug = '/' . $this->nodeRow->node_prompt_notes;
+        $this->extraOpts["page-url"] = '';
+        if ($this->isPage()) {
+            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
+                if ($GLOBALS["SL"]->treeIsAdmin) {
+                    if ($GLOBALS["SL"]->treeRow->tree_opts%7 == 0) {
+                        $this->extraOpts["page-url"] = '/dashboard';
+                    } else {
+                        $this->extraOpts["page-url"] = '/dash/' . $slug;
+                    }
+                } else {
+                    $this->extraOpts["page-url"] = '/' . $slug;
+                }
+            } else { // default survey mode
+                if ($GLOBALS["SL"]->treeIsAdmin) {
+                    $this->extraOpts["page-url"] = '/dash/' . $slug . $nodeSlug;
+                } else {
+                    $this->extraOpts["page-url"] = '/u/' . $slug . $nodeSlug;
+                }
+            }
+        } else { // isLoopRoot
+            if ($GLOBALS["SL"]->treeIsAdmin) {
+                $this->extraOpts["page-url"] = '/dash/' . $slug . $nodeSlug;
+            } else {
+                $this->extraOpts["page-url"] = '/u/' . $slug . $nodeSlug;
+            }
+        }
+        return true;
+    }
+
+    protected function initNodeRowExtraOptsNumber()
+    {
+        // load min and max values
+        $this->extraOpts["minVal"] 
+            = $this->extraOpts["maxVal"] 
+            = $this->extraOpts["incr"] 
+            = $this->extraOpts["unit"] 
+            = false;
+        $chk = SLNodeResponses::where('node_res_node', $this->nodeID)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $res) {
+                if (isset($res->node_res_ord)) {
+                    if (isset($res->node_res_value)) {
+                        switch (intVal($res->node_res_ord)) {
+                            case -1:
+                                $this->extraOpts["minVal"] 
+                                    = floatVal($res->node_res_value); 
+                                break;
+                            case 1:
+                                $this->extraOpts["maxVal"] 
+                                    = floatVal($res->node_res_value); 
+                                break;
+                            case 2:  
+                                $this->extraOpts["incr"]   
+                                    = floatVal($res->node_res_value); 
+                                break;
+                        }
+                    }
+                    if (isset($res->node_res_eng)) {
+                        $this->extraOpts["unit"] = trim($res->node_res_eng);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    protected function initNodeRowExtraOptsEmail()
+    {
+        $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"] 
+            = $this->extraOpts["emailBCC"] = [];
+        if (strpos($this->nodeRow->node_prompt_notes, '::CC::') !== false) {
+            list($to, $ccs) = explode('::CC::', $this->nodeRow->node_prompt_notes);
+            list($cc, $bcc) = explode('::BCC::', $ccs);
+            $to = str_replace('::TO::', '', $to);
+            $this->extraOpts["emailTo"]  = $GLOBALS["SL"]->mexplode(',', $to);
+            $this->extraOpts["emailCC"]  = $GLOBALS["SL"]->mexplode(',', $cc);
+            $this->extraOpts["emailBCC"] = $GLOBALS["SL"]->mexplode(',', $bcc);
+        }
+        return true;
+    }
+
+    protected function initNodeRowExtraOptsGraph()
+    {
+        if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
+            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+                str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
+            list($this->extraOpts["y-axis-lab"], $xtras) = explode('::X::', $xtras);
+            list($this->extraOpts["x-axis"], $xtras) = explode('::Xlab::', $xtras);
+            list($this->extraOpts["x-axis-lab"], $this->extraOpts["conds"]) 
+                = explode('::Cnd::', $xtras);
+            $this->extraOpts["data-conds"] = $GLOBALS["SL"]
+                ->mexplode('#', $this->extraOpts["conds"]);
+        }
+        return true;
+    }
+
+    protected function initNodeRowExtraOptsBarGraph()
+    {
+        if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
+            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+                str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
+            list($this->extraOpts["y-axis-lab"], $xtras) = explode('::Lab1::', $xtras);
+            list($this->extraOpts["lab1"], $xtras) = explode('::Lab2::', $xtras);
+            list($this->extraOpts["lab2"], $xtras) = explode('::Clr1::', $xtras);
+            list($this->extraOpts["clr1"], $xtras) = explode('::Clr2::', $xtras);
+            list($this->extraOpts["clr2"], $xtras) = explode('::Opc1::', $xtras);
+            list($this->extraOpts["opc1"], $xtras) = explode('::Opc2::', $xtras);
+            list($this->extraOpts["opc2"], $xtras) = explode('::Hgt::', $xtras);
+            list($this->extraOpts["hgt"], $this->extraOpts["conds"]) 
+                = explode('::Cnd::', $xtras);
+            $this->extraOpts["data-conds"] = $GLOBALS["SL"]
+                ->mexplode('#', $this->extraOpts["conds"]);
+            $this->extraOpts['hgt-sty'] = $this->extraOpts['hgt'];
+            if (trim($this->extraOpts['hgt']) != '') {
+                if (strpos($this->extraOpts['hgt'], '%') === false) {
+                    $this->extraOpts['hgt-sty'] .= $this->extraOpts['hgt-sty'] . 'px'; 
+                }
+            } else {
+                $this->extraOpts['hgt-sty'] = '420px';
+            }
+        }
         return true;
     }
     
@@ -366,6 +397,27 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return $this->responses;
     }
+
+    public function printNodePublicResponses()
+    {
+        if (sizeof($this->responses) == 3 
+            && $this->responses[1]->node_res_value == '...') {
+            $start = intVal($this->responses[0]->node_res_value);
+            $finish = intVal($this->responses[2]->node_res_value);
+            $this->responses = [];
+            if ($start < $finish) {
+                for ($i=$start; $i<=$finish; $i++) {
+                    $this->addTmpResponse($i);
+                }
+            } else {
+                for ($i=$start; $i>=$finish; $i--) {
+                    $this->addTmpResponse($i);
+                }
+            }
+            $this->chkFldOther();
+        }
+        return true;
+    }
     
     public function chkFill()
     {
@@ -378,7 +430,10 @@ class TreeNodeSurv extends TreeNodeSurvVars
     public function getTblFld()
     {
         $this->chkFill();
-        return $GLOBALS["SL"]->splitTblFld($this->dataStore);
+        if ($this->tbl == '' || $this->fld) {
+            list($this->tbl, $this->fld) = $GLOBALS["SL"]->splitTblFld($this->dataStore);
+        }
+        return [ $this->tbl, $this->fld ];
     }
     
     public function getTblFldID()

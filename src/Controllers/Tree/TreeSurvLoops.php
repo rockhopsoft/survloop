@@ -270,4 +270,62 @@ class TreeSurvLoops extends TreeSurvReport
         return $skipRoot;
     }
 
+    protected function nodePrintLoopCycle($curr)
+    {
+        $ret = '';
+        list($curr->tbl, $curr->fld, $newVal) = $this->nodeBranchInfo($curr->nID);
+        $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
+        $loopCycle = $this->sessData->getLoopRows($loop);
+        if (sizeof($curr->tmpSubTier[1]) > 0 && sizeof($loopCycle) > 0) {
+            $GLOBALS["SL"]->currCyc["cyc"][0] = $GLOBALS["SL"]->getLoopTable($loop);
+            foreach ($loopCycle as $i => $loopItem) {
+                $GLOBALS["SL"]->currCyc["cyc"][1] = 'cyc' . $i;
+                $GLOBALS["SL"]->currCyc["cyc"][2] = $loopItem->getKey();
+                $this->sessData->startTmpDataBranch($curr->tbl, $loopItem->getKey());
+                $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
+                foreach ($curr->tmpSubTier[1] as $child) {
+                    if (!$this->allNodes[$child[0]]->isPage()) {
+                        $ret .= $this->printNodePublic(
+                            $child[0], 
+                            $child, 
+                            $curr->currVisib
+                        );
+                    }
+                }
+                $GLOBALS["SL"]->removeFakeSessLoopCycle($loop, $loopItem->getKey());
+                $this->sessData->endTmpDataBranch($curr->tbl);
+                $GLOBALS["SL"]->currCyc["cyc"][1] = '';
+                $GLOBALS["SL"]->currCyc["cyc"][2] = -3;
+            }
+            $GLOBALS["SL"]->currCyc["cyc"][0] = '';
+        }
+        return $ret;
+    }
+
+    protected function nodePrintLoopSort(&$curr)
+    {
+        $ret = '';
+        $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
+        $loopCycle = $this->sessData->getLoopRows($loop);
+        if (sizeof($loopCycle) > 0) {
+            $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({ 
+                axis: "y", update: function (event, ui) {
+                var url = "/sortLoop/?n=' . $curr->nID 
+                . '&"+$(this).sortable("serialize")+"";
+                document.getElementById("hidFrameID").src=url;
+            } }); $("#sortable").disableSelection();';
+            $ret .= '<div class="nFld">' . $this->sortableStart($curr->nID) 
+                . '<ul id="sortableN' . $curr->nID . '" class="slSortable">' . "\n";
+            foreach ($loopCycle as $i => $loopItem) {
+                $ret .= '<li id="item-' . $loopItem->getKey() 
+                    . '" class="sortOff" onMouseOver="this.className=\'sortOn\';" '
+                    . 'onMouseOut="this.className=\'sortOff\';">'
+                    . '<span><i class="fa fa-sort slBlueDark"></i></span> ' 
+                    . $this->getLoopItemLabel($loop, $loopItem, $i) . '</li>' . "\n";
+            }
+            $ret .= '</ul>' . $this->sortableEnd($curr->nID) . '</div>' . "\n";
+        }
+        return $ret;
+    }
+
 }

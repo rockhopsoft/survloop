@@ -19,12 +19,10 @@
 			    	@else class="fa fa-chevron-down" 
 			    	@endif ></i>
 			    </div>
-				<div class="fL mT3">
-					@if ($big) <h4>{!! $title !!}</h4> 
-					@elseif ($isText) {!! $title !!} 
-					@else <h6>{!! $title !!}</h6>
-					@endif
-				</div>
+				@if ($big) <div class="fL mT3"><h4>{!! $title !!}</h4></div>
+				@elseif ($isText) <div class="fL mTn3">{!! $title !!}</div>
+				@else <div class="fL mTn3"><h6>{!! $title !!}</h6></div>
+				@endif
 			    <div class="fC"></div>
 			</div>
 		</a>

@@ -16,7 +16,9 @@
     @forelse ($tableDat["rows"] as $j => $row)
         <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif " >
             @if (trim($tableDat["rowCol"]) != '')
-                <td id="n{{ $nIDtxt }}tbl{{ $j }}rowLab" class="sprdRowLab">{!! $row["leftTxt"] !!}</td>
+                <td id="n{{ $nIDtxt }}tbl{{ $j }}rowLab" class="sprdRowLab">
+                    {!! $GLOBALS["SL"]->swapMonthNum($row["leftTxt"]) !!}
+                </td>
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" 
                     id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
                     value="{{ $row['leftVal'] }}" >
@@ -27,7 +29,12 @@
             @endif
             @forelse ($row["cols"] as $k => $col)
                 <td id="n{{ $nIDtxt }}tbl{{ $j }}row{{ $k }}col" class="sprdFld @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
-                    {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col)) !!}</td>
+                    @if (is_array($col))
+                        {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col[0])) !!}
+                    @else
+                        {!! str_replace('nFld', '', str_replace('nFld mT0', '', $col)) !!}
+                    @endif
+                </td>
             @empty
             @endforelse
             @if (trim($tableDat["rowCol"]) == '')

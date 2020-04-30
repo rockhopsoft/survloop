@@ -122,53 +122,10 @@ class AdminController extends AdminEmailController
         if ($request->has('refresh') 
             && intVal($request->get('refresh')) == 2) {
             $this->initLoader();
-            $chk = SLTree::whereIn('tree_type', [ 'Page', 'Survey' ])
-                ->where('tree_database', 1)
-                ->select('tree_id', 'tree_database')
-                ->orderBy('tree_id', 'asc')
-                ->get();
-            if ($chk->isNotEmpty()) {
-                $next = $curr = $found = 0;
-                if ($request->has('next')) {
-                    $curr = intVal($request->get('next'));
-                }
-                foreach ($chk as $tree) {
-                    if ($curr == 0) {
-                        $curr = $tree->tree_id;
-                    }
-                    if ($found == 1 && $next <= 0) {
-                        $next = $tree->tree_id;
-                    }
-                    if ($tree->tree_id == $curr) {
-                        $found = 1;
-                        $this->loader->syncDataTrees(
-                            $request, 
-                            $tree->tree_database, 
-                            $tree->tree_id
-                        );
-                        $this->loadCustLoop(
-                            $request, 
-                            $tree->tree_id, 
-                            $tree->tree_database
-                        );
-                        $this->custReport->loadTree($tree->tree_id);
-                        $this->custReport->loadProgBar();
-                    }
-                }
-                $this->loader->syncDataTrees($request);
-                if ($next > 0) {
-                    echo '<center><div class="p20"><br /><br /><h2>'
-                        . 'Refreshing JavaScript Cache for Tree #' . $curr 
-                        . '</h2></div></center><div class="p20">' 
-                        . $GLOBALS["SL"]->spinner() . '</div>';
-                    return $this->redir(
-                        '/dashboard/settings?refresh=2&next=' . $next, 
-                        true
-                    );
-                }
-            }
+            $this->sysSettingsRefresh($request);
             return $this->redir('/dashboard/settings?refresh=1', true);
-        } elseif ($request->has('refresh') && intVal($request->get('refresh')) == 3) {
+        } elseif ($request->has('refresh') 
+            && intVal($request->get('refresh')) == 3) {
             $this->cacheFlush();
         }
         $GLOBALS["SL"]->addAdmMenuHshoos([
@@ -200,6 +157,54 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.system-all-settings', $this->v);
     }
     
+    protected function sysSettingsRefresh(Request $request)
+    {
+        $chk = SLTree::whereIn('tree_type', [ 'Page', 'Survey' ])
+            ->where('tree_database', 1)
+            ->select('tree_id', 'tree_database')
+            ->orderBy('tree_id', 'asc')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            $next = $curr = $found = 0;
+            if ($request->has('next')) {
+                $curr = intVal($request->get('next'));
+            }
+            foreach ($chk as $tree) {
+                if ($curr == 0) {
+                    $curr = $tree->tree_id;
+                }
+                if ($found == 1 && $next <= 0) {
+                    $next = $tree->tree_id;
+                }
+                if ($tree->tree_id == $curr) {
+                    $found = 1;
+                    $this->loader->syncDataTrees(
+                        $request, 
+                        $tree->tree_database, 
+                        $tree->tree_id
+                    );
+                    $this->loadCustLoop(
+                        $request, 
+                        $tree->tree_id, 
+                        $tree->tree_database
+                    );
+                    $this->custReport->loadTree($tree->tree_id);
+                    $this->custReport->loadProgBar();
+                }
+            }
+            $this->loader->syncDataTrees($request);
+            if ($next > 0) {
+                echo '<center><div class="p20"><br /><br /><h2>'
+                    . 'Refreshing JavaScript Cache for Tree #' . $curr 
+                    . '</h2></div></center><div class="p20">' 
+                    . $GLOBALS["SL"]->spinner() . '</div>';
+                $redir = '/dashboard/settings?refresh=2&next=' . $next;
+                return $this->redir($redir, true);
+            }
+        }
+        return true;
+    }
+    
     public function sysSettingsRaw(Request $request)
     {
         $this->admControlInit($request, '/dashboard/settings-raw');
@@ -225,8 +230,10 @@ class AdminController extends AdminEmailController
         $this->admControlInit($request, '/dashboard/pages');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
-        if ($this->v["blurbRow"]->def_order <= 0 || $this->v["blurbRow"]->def_order%3 > 0) {
-            $GLOBALS["SL"]->pageAJAX .= ' $("#DefDescriptionID").summernote({ height: 500 }); ';
+        if ($this->v["blurbRow"]->def_order <= 0 
+            || $this->v["blurbRow"]->def_order%3 > 0) {
+            $GLOBALS["SL"]->pageAJAX .= ' $("#DefDescriptionID")'
+                . '.summernote({ height: 500 }); ';
         }
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
@@ -247,9 +254,9 @@ class AdminController extends AdminEmailController
     
     public function blurbEditSave(Request $request)
     {
-        $blurb = $this->blurbLoad($request->def_id);
-        $blurb->def_subset      = $request->def_subset;
-        $blurb->def_description = $request->def_description;
+        $blurb = $this->blurbLoad($request->DefID);
+        $blurb->def_subset      = $request->DefSubset;
+        $blurb->def_description = $request->DefDescription;
         $blurb->def_order = 1;
         if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) {
             $blurb->def_order *= 3;
@@ -412,7 +419,9 @@ class AdminController extends AdminEmailController
     
     public function postNodeURL(Request $request)
     {
-        if ($request->has('step') && $request->has('tree') && intVal($request->tree) > 0) {
+        if ($request->has('step') 
+            && $request->has('tree') 
+            && intVal($request->tree) > 0) {
             $this->initLoader();
             $this->loader->loadTreeByID($request, $request->tree);
             $url = '/dash/u/' . $GLOBALS["SL"]->treeRow->tree_slug 
@@ -430,7 +439,10 @@ class AdminController extends AdminEmailController
     {
         $this->admControlInit($request, '/ajadm/' . $type);
         $this->loadCustLoop($request, $this->treeID);
-        $newStatus = (($request->has('status')) ? trim($request->get('status')) : '');
+        $newStatus = '';
+        if ($request->has('status')) {
+            $newStatus = trim($request->get('status'));
+        }
         if ($type == 'contact') {
             return $this->ajaxContact($request);
         } elseif ($type == 'contact-tabs') {
@@ -449,40 +461,22 @@ class AdminController extends AdminEmailController
     {
         $this->admControlInit($request, '/dashboard/systems-check');
         if ($request->has('testEmail') && intVal($request->get('testEmail')) == 1) {
-            $this->v["testResults"] = '';
-            if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1
-                && $request->has('emailTo') && trim($request->emailTo) != '') {
-                $emaTo = trim($request->emailTo);
-                $emaToArr = [ [ $emaTo, 'Test Message' ] ];
-                $emaSubj = 'Email Flight Test from ' 
-                    . $GLOBALS["SL"]->sysOpts["site-name"];
-                $emaCont = '<p>Hi there friend,</p><p>This has been a flight test from ' 
-                    . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
-                if (!$GLOBALS["SL"]->isHomestead()) {
-                    $this->sendEmail($emaCont, $emaSubj, $emaToArr);
-                }
-                $this->logEmailSent(
-                    $emaCont, 
-                    $emaSubj, 
-                    $emaTo, 
-                    0, 
-                    $this->treeID, 
-                    $this->coreID, 
-                    $this->v["uID"]
-                );
-                $this->v["testResults"] .= '<div class="container">'
-                    . '<h2>' . $emaSubj . '</h2>' . $emaCont . '<hr><hr>'
-                    . '<i class="slBlueDark">to ' . $emaTo . '</i></div>';
-            }
-            return view('vendor.survloop.admin.systems-check-email', $this->v);
+            return $this->systemsCheckTestEmail($request);
         }
-        if ($request->has('testCache') && intVal($request->get('testCache')) == 1) {
-            if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1) {
+        if ($request->has('testCache') 
+            && intVal($request->get('testCache')) == 1) {
+            if ($request->has('sendTest') 
+                && intVal($request->get('sendTest')) == 1) {
                 Cache::put('testCache', trim($request->get('cacheVal')));
             }
-            return view('vendor.survloop.admin.systems-check-cache', [
-                "testCache" => ((Cache::has('testCache')) ? Cache::get('testCache') : '')
-            ]);
+            $testCache = '';
+            if (Cache::has('testCache')) {
+                $testCache = Cache::get('testCache');
+            }
+            return view(
+                'vendor.survloop.admin.systems-check-cache', 
+                [ "testCache" => $testCache ]
+            );
         }
         $tree1 = SLTree::find(1);
         $this->v["sysChks"] = [];
@@ -494,6 +488,31 @@ class AdminController extends AdminEmailController
         $this->v["sysChks"][] = ['XML-All',      '/' . $tree1->tree_slug . '-xml-all'];
         $this->v["sysChks"][] = ['XML-Schema',   '/' . $tree1->tree_slug . '-xml-schema'];
         return view('vendor.survloop.admin.systems-check', $this->v);
+    }
+    
+    protected function systemsCheckTestEmail(Request $request)
+    {
+        $this->v["testResults"] = '';
+        if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1
+            && $request->has('emailTo') && trim($request->emailTo) != '') {
+            $to = trim($request->emailTo);
+            $toArr = [ [ $to, 'Test Message' ] ];
+            $subj = 'Email Flight Test from ' 
+                . $GLOBALS["SL"]->sysOpts["site-name"];
+            $cont = '<p>Hi there friend,</p><p>This has been a flight test from ' 
+                . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
+            if (!$GLOBALS["SL"]->isHomestead()) {
+                $this->sendEmail($cont, $subj, $toArr);
+            }
+            $tree = $this->treeID;
+            $core = $this->coreID;
+            $uID = $this->v["uID"];
+            $this->logEmailSent($cont, $subj, $to, 0, $tree, $core, $uID);
+            $this->v["testResults"] .= '<div class="container">'
+                . '<h2>' . $emaSubj . '</h2>' . $emaCont . '<hr><hr>'
+                . '<i class="slBlueDark">to ' . $emaTo . '</i></div>';
+        }
+        return view('vendor.survloop.admin.systems-check-email', $this->v);
     }
     
     public function loadLogs()

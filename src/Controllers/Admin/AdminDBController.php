@@ -1070,17 +1070,17 @@ class AdminDBController extends AdminController
         if ($request->has('save')) {
             $this->cacheFlush();
             if ($request->has('changedFlds') 
-                && !$request->changedFlds != '' 
+                && trim($request->changedFlds) != '' 
                 && $request->changedFlds != ',') {
                 $flds = $GLOBALS["SL"]->mexplode(',', $request->changedFlds);
                 if (sizeof($flds) > 0) {
                     foreach ($flds as $f) {
                         if (intVal($f) > 0) {
-                            SLFields::find($f)->update([ 
-                                'fld_eng'   => $request->input('FldEng' . $f . ''), 
-                                'fld_desc'  => $request->input('FldDesc' . $f . ''), 
-                                'fld_notes' => $request->input('FldNotes' . $f . '') 
-                            ]);
+                            $fld = SLFields::find(intVal($f));
+                            $fld->fld_eng = trim($request->{ 'FldEng' . $f });
+                            $fld->fld_desc = trim($request->{ 'FldDesc' . $f }); 
+                            $fld->fld_notes = trim($request->{ 'FldNotes' . $f }); 
+                            $fld->save();
                         }
                     }
                 }
@@ -1178,6 +1178,11 @@ class AdminDBController extends AdminController
             }
         }
         return view('vendor.survloop.admin.db.fieldDescs', $this->v);
+    }
+    
+    public function fieldDescsSave(Request $request)
+    {
+
     }
     
     public function fieldXML(Request $request)

@@ -64,15 +64,22 @@ class SurvStatTh
         
     public function __toString()
     {
-        return $this->lab . (($this->cnt >= 0) ? '<sub class="slGrey">' . $this->cnt . '</sub>' : '');
+        $ret = '';
+        if ($this->cnt >= 0) {
+            $ret = '<sub class="slGrey">' . $this->cnt . '</sub>';
+        }
+        return $this->lab . $ret;
     }
         
     public function toExcel($j = 0, $brdRgt = false)
     {
-        $ret = '<th' . (($j == 0) ? ' align=left ' : '') . '>' . (($this->lab) ? $this->lab : '') . '</th>';
-        if ($j > 0) {
-            $ret .= '<th style="color: #777;' . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
-                . '">(count)</th>';
+        $ret = '<th' . (($j == 0) ? ' align=left ' : '') . ' >' 
+            . (($this->lab) ? $this->lab : '') . '</th>';
+        if ($j > 0 && $this->cnt !== null && $this->cnt >= 0) {
+            $ret .= '<th><sub>' . intVal($this->cnt) . '</sub></th>';
+            //$ret .= '<th style="color: #777;' 
+            //    . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
+            //    . '">(count)</th>';
         }
         return $ret;
     }
@@ -93,11 +100,15 @@ class SurvStatTd
     
     public function __toString()
     {
+        $cnt = '';
+        if ($this->cnt >= 0) {
+            $cnt = '<sub class="slGrey">' . $this->cnt . '</sub>';
+        }
         if ($this->val === null) {
             return '<span class="slGrey">0</span>';
         }
-        return $GLOBALS["SL"]->sigFigs($this->val, 3) . (($this->unit != '') ? $this->unit : '')
-            . (($this->cnt >= 0) ? '<sub class="slGrey">' . $this->cnt . '</sub>' : '');
+        return $GLOBALS["SL"]->sigFigs($this->val, 3) 
+            . (($this->unit != '') ? $this->unit : '') . $cnt;
     }
         
     public function toExcel($j = 0, $brdRgt = false)
@@ -106,9 +117,17 @@ class SurvStatTd
             return '<td style="color: #777;"></td>'
                 . '<td style="color: #777;">' . $this->cnt . '</td>';
         }
-        return '<td>' . $GLOBALS["SL"]->sigFigs($this->val, 3)
-            . (($this->unit != '') ? $this->unit : '') . '</td>'
-            . '<td style="color: #777;' . (($brdRgt) ? ' border-right: 1px #777 solid;' : '')
-            . '">' . number_format($this->cnt) . '</td>';
+        $brd = $cnt = '';
+        if ($brdRgt) {
+            $brd = ' border-right: 1px #777 solid;';
+        }
+        $ret = '<td style="' . $brd . '">';
+        if ($this->cnt !== null && $this->cnt >= 0) {
+            $cnt = '<td style="color: #777;' . $brd . '">'
+                . '<sub>' . number_format($this->cnt) . '</sub></td>';
+            $ret = '<td>';
+        }
+        return $ret . $GLOBALS["SL"]->sigFigs($this->val, 3)
+            . (($this->unit != '') ? $this->unit : '') . '</td>' . $cnt;
     }
 }

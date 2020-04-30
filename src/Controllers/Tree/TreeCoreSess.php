@@ -617,12 +617,12 @@ class TreeCoreSess extends TreeCore
     
     protected function deepCopyCoreRecUpdate($tbl1, $tbl2, $map)
     {
-        $tblKey = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl1, $tbl2);
+        $tblKey = $GLOBALS["SL"]->getFornNameFldName($tbl1, $tbl2);
         if (trim($tblKey) != '' && $map["id1"] > 0 && $map["id2"] > 0) {
             $this->sessData->dataSets[$tbl2][$map["ind1"]]->{ $tblKey } 
                 = $this->sessData->dataSets[$tbl1][$map["ind2"]]->getKey();
         } else {
-            $tblKey = $GLOBALS["SL"]->getForeignLnkNameFldName($tbl2, $tbl1);
+            $tblKey = $GLOBALS["SL"]->getFornNameFldName($tbl2, $tbl1);
             if (trim($tblKey) != '' && $map["id1"] > 0 && $map["id2"] > 0) {
                 $this->sessData->dataSets[$tbl2][$map["ind2"]]->{ $tblKey } 
                     = $this->sessData->dataSets[$tbl1][$map["ind1"]]->getKey();
@@ -899,14 +899,22 @@ class TreeCoreSess extends TreeCore
             }
             if ($this->v["user"]->hasRole('databaser')) {
                 $GLOBALS["SL"]->dataPerms = 'internal';
-            } elseif ($this->v["user"]->hasRole('administrator|staff') || $this->isCoreOwner()) {
+            } elseif ($this->v["user"]->hasRole('administrator|staff') 
+                || $this->isCoreOwner()) {
                 $GLOBALS["SL"]->dataPerms = 'sensitive';
             }
         } else {
+            if ($this->isCoreOwner()) {
+                $GLOBALS["SL"]->dataPerms = 'sensitive';
+            }
             if (in_array($GLOBALS["SL"]->pageView, ['', 'default', 'full'])) {
-                $GLOBALS["SL"]->pageView = 'public';
+                if (!$this->isCoreOwner()) {
+                    $GLOBALS["SL"]->pageView = 'public';
+                }
             } elseif ($GLOBALS["SL"]->pageView == 'full-pdf') {
-                $GLOBALS["SL"]->pageView = 'pdf';
+                if (!$this->isCoreOwner()) {
+                    $GLOBALS["SL"]->pageView = 'pdf';
+                }
             } elseif ($GLOBALS["SL"]->pageView == 'full-xml') {
                 $GLOBALS["SL"]->pageView = 'xml';
             }

@@ -4,13 +4,15 @@
     
 }
 @media screen and (max-width: 992px) {
-    
+
+/*    
 	#navDesktop {
         display: none;
     }
 	#navMobile {
         display: block;
     }
+*/
     #dashSearchFrmWrap,
     .topNavSearch #dashSearchFrmWrap #dashSearchBg,
     .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {

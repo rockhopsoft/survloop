@@ -14,22 +14,48 @@ use SurvLoop\Controllers\Tree\TreeNodeCore;
 
 class TreeNodeSurvVars extends TreeNodeCore
 {
-    public $conds         = [];
-    public $responses     = [];
-    public $hasShowKids   = false;
-    public $hasPageParent = false;
-    public $fldHasOther   = [];
+    public $conds            = [];
+    public $responses        = [];
+    public $hasShowKids      = false;
+    public $hasPageParent    = false;
+    public $fldHasOther      = [];
+    public $condKids         = [];
+    public $showMoreNodes    = [];
     
-    public $dataManips    = [];
-    public $colors        = [];
-    public $extraOpts     = [];
+    public $dataManips       = [];
+    public $colors           = [];
+    public $extraOpts        = [];
     
-    public $primeOpts     = [
+    public $primeOpts        = [
         "Required"         => 5, 
         "OneLineResponses" => 17, 
         "OneLiner"         => 11, 
         "RequiredInLine"   => 13
     ];
+
+    public $nID              = 0;
+    public $nSffx            = '';
+    public $nIDtxt           = '';
+    public $currVisib        = 1;
+    public $sessData         = null;
+    public $tbl              = '';
+    public $fld              = '';
+    public $itemID           = -1;
+    public $itemInd          = -1;
+    public $nodePrompt       = '';
+    public $nodePromptText   = '';
+    public $nodePromptNotes  = '';
+    public $nodePromptAfter  = '';
+    public $onKeyUp          = '';
+    public $onChange         = '';
+    public $charLimit        = '';
+    public $isOneLiner       = '';
+    public $isOneLinerFld    = '';
+    public $xtraClass        = '';
+    public $hasParManip      = false;
+    public $dateStr          = '00/00/0000';
+    public $timeStr          = '00:00:00';
+
     
     // Tree Nodes are assigned an optional property when ( SLNode->node_opts%OPT_PRIME == 0 )
     // (Coding style originally adopted for native cross-language compatibility.

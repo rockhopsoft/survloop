@@ -370,8 +370,7 @@ class SurvLoop extends SurvCustLoop
             && trim(session()->get('loginRedir')) != ''
             && session()->has('lastTreeTime') 
             && session()->has('loginRedirTime')) {
-            if (session()->get('lastTreeTime') 
-                < session()->get('loginRedirTime')) {
+            if (session()->get('lastTreeTime') < session()->get('loginRedirTime')) {
                 $redir = trim(session()->get('loginRedir'));
             } else {
                 $this->afterLoginLastTree($request);

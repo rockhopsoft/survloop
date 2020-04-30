@@ -269,7 +269,7 @@ Route::get(
 );
 
 Route::get(
-    '/survloop-libraries/state-flags/{stateFile}.svg',
+    '/survloop-libraries/state-flags/{stateFile}.{ext}',
     $path . 'SurvRoutes@getStateFlag'
 );
 

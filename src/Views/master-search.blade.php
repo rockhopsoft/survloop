@@ -2,7 +2,8 @@
 <a class="fL slNavLnk" id="topNavSearchBtn" href="javascript:;"
     ><i class="fa fa-search" aria-hidden="true"></i></a>
 <div id="topNavSearch" class="fL topNavSearch">
-    <form id="dashSearchFrmID" name="dashSearchForm" method="get" action="/search-run">
+    <form id="dashSearchFrmID" name="dashSearchForm" 
+        method="get" action="/search-run">
     <div id="dashSearchFrmWrap">
         <div id="dashSearchBg"></div>
         <a id="dashSearchBtn" onClick="document.dashSearchForm.submit();" href="javascript:;"
@@ -42,7 +43,10 @@
     <input type="hidden" id="sFiltID" name="sFilt" value="">
     <input type="hidden" id="sSortID" name="sSort" value="">
     <input type="hidden" id="sSortDirID" name="sSortDir" value="">
-    <input type="hidden" id="sViewID" name="sView" @if ($GLOBALS['SL']->REQ->has('sView')) 
-        value="{{ $GLOBALS['SL']->REQ->get('sView') }}" @else value="" @endif >
+    <input type="hidden" id="sViewID" name="sView" 
+        @if ($GLOBALS['SL']->REQ->has('sView')) 
+            value="{{ $GLOBALS['SL']->REQ->get('sView') }}" 
+        @else value="" 
+        @endif >
     </form>
 </div>

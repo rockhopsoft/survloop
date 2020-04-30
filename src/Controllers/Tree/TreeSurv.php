@@ -389,15 +389,18 @@ class TreeSurv extends TreeSurvLoops
     
     protected function runDataManip($nID, $betweenPages = false)
     {
-        if ($this->allNodes[$nID]->isDataManip()) {
-            list($tbl, $fld, $newVal) = $this->allNodes[$nID]->getManipUpdate();
-            if ($this->allNodes[$nID]->nodeType == 'Data Manip: New') {
+        $curr = $this->allNodes[$nID];
+        if ($curr->isDataManip()) {
+            $curr->fillNodeRow();
+            $curr->nID = $nID;
+            list($curr->tbl, $curr->fld, $newVal) = $curr->getManipUpdate();
+            if ($curr->nodeType == 'Data Manip: New') {
                 //$newObj = $this->checkNewDataRecord($tbl, $fld, $newVal);
                 //if (!$newObj) {
-                    $newObj = $this->sessData->newDataRecord($tbl, $fld, $newVal);
+                    $newObj = $this->sessData->newDataRecord($curr->tbl, $curr->fld, $newVal);
                     if ($newObj) {
-                        $this->sessData->startTmpDataBranch($tbl, $newObj->getKey());
-                        $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal);
+                        $this->sessData->startTmpDataBranch($curr->tbl, $newObj->getKey());
+                        $this->sessData->currSessData($curr, 'update', $newVal);
                         $manipUpdates = SLNode::where('node_tree', $this->treeID)
                             ->where('node_type', 'Data Manip: Update')
                             ->where('node_parent_id', $nID)
@@ -405,19 +408,21 @@ class TreeSurv extends TreeSurvLoops
                         if ($manipUpdates->isNotEmpty()) {
                             foreach ($manipUpdates as $nodeRow) {
                                 $nID2 = $nodeRow->node_id;
-                                $tmpNode = new TreeNodeSurv($nID2, $nodeRow);
-                                list($tbl, $fld, $newVal) = $tmpNode->getManipUpdate();
-                                $this->sessData->currSessData($nID2, $tbl, $fld, 'update', $newVal);
+                                $tmp = new TreeNodeSurv($nID2, $nodeRow);
+                                $tmp->nID = $nID2;
+                                $tmp->fillNodeRow();
+                                list($tmp->tbl, $tmp->fld, $newVal) = $tmp->getManipUpdate();
+                                $this->sessData->currSessData($tmp, 'update', $newVal);
                             }
                         }
                         if ($betweenPages) {
-                            $this->sessData->endTmpDataBranch($tbl);
+                            $this->sessData->endTmpDataBranch($curr->tbl);
                         }
                     }
                 //}
                 //$this->loadAllSessData();
             } elseif ($this->allNodes[$nID]->nodeType == 'Data Manip: Update') {
-                $this->sessData->currSessData($nID, $tbl, $fld, 'update', $newVal);
+                $this->sessData->currSessData($curr, 'update', $newVal);
             }
         }
         return true;

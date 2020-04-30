@@ -30,7 +30,9 @@ function runFormSubAjax() {
     replaceAjaxWithSpinner();
     addProTipToAjax();
     window.scrollTo(0, 0);
-    if (document.getElementById("postActionID")) actionUrl = document.getElementById("postActionID").value;
+    if (document.getElementById("postActionID")) {
+        actionUrl = document.getElementById("postActionID").value;
+    }
     $.ajax({
         url: formActionUrl,
         type: "POST", 
@@ -254,13 +256,15 @@ function postNodeAutoSave() {
             document.postNode.submit();
             document.getElementById('stepID').value = origStep;
             document.postNode.target = origTarget;
-            setTimeout(function() { postNodeAutoSave() }, 60000);
+            setTimeout(function() { postNodeAutoSave() }, autoSaveDelay);
             return true;
         }
     }
     return false;
 }
-setTimeout(function() { if (!document.getElementById("isPage")) postNodeAutoSave(); }, 90000);
+setTimeout(function() {
+    if (!document.getElementById("isPage")) postNodeAutoSave();
+}, (1.5*autoSaveDelay));
 
 window.onpopstate = function(event) {
     if (document.getElementById("stepID") && !document.getElementById("isPage")) {
@@ -290,14 +294,11 @@ $(document).on("click", ".editLoopItem", function() {
     return runFormSub();
 });
 function checkAutoLoad() {
-    if (pageDynaLoaded) {
-        if (addingLoopItem > 0) {
-            setLoopItemID(addingLoopItem);
-            return runFormSub();
-        }
-    } else {
-        setTimeout(function() { checkAutoLoad(); }, 500);
+    if (pageDynaLoaded && addingLoopItem > 0) {
+        setLoopItemID(addingLoopItem);
+        return runFormSub();
     }
+    setTimeout(function() { checkAutoLoad(); }, 750);
     return false;
 }
 setTimeout(function() { checkAutoLoad(); }, 1000);

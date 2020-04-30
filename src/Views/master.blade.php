@@ -14,7 +14,8 @@ $isWsyiwyg = false;
 if (isset($needsWsyiwyg) && $needsWsyiwyg) {
     $isWsyiwyg = true;
 }
-if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"]) {
+if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) 
+    && $GLOBALS["SL"]->x["needsWsyiwyg"]) {
     $isWsyiwyg = true;
 }
 
@@ -22,6 +23,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <?php /* <meta name="csrf-token" content="{{ csrf_token() }}" /> */ ?>
     {!! view('vendor.survloop.elements.inc-meta-seo')->render() !!}
 @if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
     <link href="/sys1.min.css" rel="stylesheet" type="text/css">
@@ -53,17 +55,20 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
         </script>
 @endif
 @if ((isset($needsCharts) && $needsCharts) 
-    || (isset($GLOBALS["SL"]->x["needsCharts"]) && $GLOBALS["SL"]->x["needsCharts"]))
+    || (isset($GLOBALS["SL"]->x["needsCharts"]) 
+        && $GLOBALS["SL"]->x["needsCharts"]))
     <script src="/Chart.bundle.min.js"></script>
 @endif
 @if ((isset($needsPlots) && $needsPlots) 
-    || (isset($GLOBALS["SL"]->x["needsPlots"]) && $GLOBALS["SL"]->x["needsPlots"]))
+    || (isset($GLOBALS["SL"]->x["needsPlots"]) 
+        && $GLOBALS["SL"]->x["needsPlots"]))
     <script src="/plotly.min.js"></script>
 @endif
 <?php /* @if ($isWsyiwyg)
     <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
 @endif */ ?>
-@if (isset($GLOBALS['SL']->sysOpts) && isset($GLOBALS['SL']->sysOpts['header-code']))
+@if (isset($GLOBALS['SL']->sysOpts) 
+    && isset($GLOBALS['SL']->sysOpts['header-code']))
     {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
 @endif
 @section('headCode')
@@ -72,8 +77,10 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
     {!! view('vendor.survloop.elements.inc-matomo-analytics')->render() !!}
 @endif
 </head>
-<body @if ($isDashLayout) class="bodyDash" @elseif ($bodyBg) class="bgFnt" @endif 
-    {!! $GLOBALS['SL']->getBodyParams() !!} >
+<body {!! $GLOBALS['SL']->getBodyParams() !!} 
+    @if ($isDashLayout) class="bodyDash" 
+    @elseif ($bodyBg) class="bgFnt" 
+    @endif >
 <div class="nodeAnchor"><a name="top"></a></div>
 <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
 <div id="absDebug"></div>
@@ -82,8 +89,10 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
 
 @if ((!isset($isPrint) || !$isPrint) 
     && (!isset($isFrame) || !$isFrame)
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
-    && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
+    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
+        || !$GLOBALS["SL"]->x["isPrintPDF"])
+    && (!$GLOBALS["SL"]->REQ->has("frame") 
+        || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
 <div id="mySidenav">
     <div class="headGap">
@@ -93,7 +102,9 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"]) && $GLOBALS["SL"]->x["needsWsyiwyg"
     @if (isset($navMenu) && sizeof($navMenu) > 0)
         @foreach ($navMenu as $i => $arr)
             @if (trim($arr[0]) != '' && trim($arr[1]) != '')
-                <li class="nav-item"><a href="{{ $arr[1] }}">{{ $arr[0] }}</a></li>
+                <li class="nav-item">
+                    <a href="{{ $arr[1] }}">{{ $arr[0] }}</a>
+                </li>
             @endif
         @endforeach
     @endif

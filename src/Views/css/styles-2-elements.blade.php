@@ -67,6 +67,7 @@
     width: 125px; 
     min-height: 125px; 
 }
+
 .hugTmbRound, .hugTmbRoundDiv { 
     width: 175px; 
     height: 175px; 

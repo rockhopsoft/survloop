@@ -57,6 +57,12 @@ class GeographyLookups extends GeographyLists
         return '';
     }
     
+    public function getStateSlug($abbr = '')
+    {
+        return $GLOBALS["SL"]->slugify($this->getState($abbr));
+    }
+    
+    
     public function getStateByInd($ind = -1)
     {
         $cnt = 1;
@@ -78,22 +84,25 @@ class GeographyLookups extends GeographyLists
         return '';
     }
 
-    public function getStateFlagImg($abbr)
+    public function getStateFlagImg($abbr = '')
     {
+        if ($abbr == 'US') {
+            return '/survloop-libraries/state-flags/united_states.jpg';
+        }
+        if ($abbr == 'DC') {
+            return '/survloop-libraries/state-flags/usa_district_of_columbia.jpg';
+        }
         $file = '';
         $this->loadStates();
+        $state = $this->getState($abbr);
         if (isset($this->stateList[$abbr])) {
-            $file = strtolower($this->stateList[$abbr]);
-            $file = 'usa_' . str_replace(' ', '_', $file);
+            $file = '/survloop-libraries/state-flags/usa_' 
+                . str_replace(' ', '_', strtolower($state)) . '.jpg';
         } else {
-
             if (isset($this->stateListCa[$abbr])) {
-                $file = strtolower($this->stateListCa[$abbr]);
-                $file = 'canada_' . str_replace(' ', '_', $file);
+                $file = '/survloop-libraries/state-flags/canada_' 
+                    . str_replace(' ', '_', strtolower($state)) . '.jpg';
             }
-        }
-        if ($file != '') {
-            $file = '/survloop-libraries/state-flags/' . $file . '.svg';
         }
         return $file;
     }

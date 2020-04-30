@@ -25,7 +25,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             . '<div class="fC p20"></div>';
     }
 
-    protected function customNodePrint($nID = -3, $tmpSubTier = [], $nIDtxt = '', $nSffx = '', $currVisib = 1)
+    protected function customNodePrint(&$curr = null)
     {
         return '';
     }
@@ -60,7 +60,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             $this->sessInfo->sess_loop_root_just_left = 0;
             $this->sessInfo->save();
         }
-        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page'
+            && !$GLOBALS["SL"]->REQ->has('ajax')) {
             $ret .= '<div id="isPage"></div>';
         }
         if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' 
@@ -92,7 +93,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         return $ret;
     }
     
-    protected function printNodePublicFormEnd($nID, $promptNotesSpecial = '')
+    protected function printNodePublicFormEnd($nID)
     {
         if ($this->skipFormForPreview($nID)) {
             return '';
@@ -184,8 +185,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     protected function getNodeCurrSessData($nID)
     {
         $this->allNodes[$nID]->fillNodeRow();
-        list($tbl, $fld) = $this->allNodes[$nID]->getTblFld();
-        return $this->sessData->currSessData($nID, $tbl, $fld);
+        $this->allNodes[$nID]->getTblFld();
+        return $this->sessData->currSessData($this->allNodes[$nID]);
     }
     
     protected function isPromptNotesSpecial($nodePromptNotes = '')
@@ -194,7 +195,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             && substr($nodePromptNotes, strlen($nodePromptNotes)-1) == ']');
     }
     
-    protected function printSpecial($nID, $promptNotesSpecial = '', $currNodeSessData = '')
+    protected function printSpecial(&$curr, $promptNotesSpecial = '')
     {
         return '';
     }
@@ -233,9 +234,12 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     protected function shouldPrintHalfGap($curr)
     {
-        $isContactPage = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_CONTACT == 0);
-        $isFormPage = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_PAGEFORM == 0);
-        return (($GLOBALS["SL"]->treeRow->tree_type != 'Page' || $isContactPage || $isFormPage)
+        $treeOpts = $GLOBALS["SL"]->treeRow->tree_opts;
+        $isContactPage = ($treeOpts%Globals::TREEOPT_CONTACT == 0);
+        $isFormPage = ($treeOpts%Globals::TREEOPT_PAGEFORM == 0);
+        return (($GLOBALS["SL"]->treeRow->tree_type != 'Page' 
+                || $isContactPage 
+                || $isFormPage)
             && !$curr->isPage() 
             && !$curr->isLoopRoot() 
             && !$curr->isLoopCycle() 
@@ -245,25 +249,25 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             && !$this->hasSpreadsheetParent($curr->nodeID));
     }
     
-    protected function isCurrDataSelected($currNodeSessData, $value, $node)
+    protected function isCurrDataSelected($curr, $value)
     {
         $selected = false;
         $resValCyc = $value . trim($GLOBALS["SL"]->currCyc["cyc"][1]);
         $resValCyc2 = trim($GLOBALS["SL"]->currCyc["cyc"][1]) . $value;
-        if (is_array($currNodeSessData)) {
-            $selected = (in_array($value, $currNodeSessData) 
-                || in_array($resValCyc, $currNodeSessData) 
-                || in_array($resValCyc2, $currNodeSessData));
+        if (is_array($curr->sessData)) {
+            $selected = (in_array($value, $curr->sessData) 
+                || in_array($resValCyc, $curr->sessData) 
+                || in_array($resValCyc2, $curr->sessData));
         } else {
-            if ($node->nodeType == 'Checkbox' || $node->isDropdownTagger()) {
-                $c = ';' . $currNodeSessData . ';';
+            if ($curr->nodeType == 'Checkbox' || $curr->isDropdownTagger()) {
+                $c = ';' . $curr->sessData . ';';
                 $selected = (strpos($c, ';' . $value . ';') !== false 
                     || strpos($c, ';' . $resValCyc . ';') !== false
                     || strpos($c, ';' . $resValCyc2 . ';') !== false);
             } else {
-                $selected = ($currNodeSessData == trim($value) 
-                    || $currNodeSessData == trim($resValCyc) 
-                    || $currNodeSessData == trim($resValCyc2));
+                $selected = ($curr->sessData == trim($value) 
+                    || $curr->sessData == trim($resValCyc) 
+                    || $curr->sessData == trim($resValCyc2));
             }
         }
         return $selected;
@@ -522,16 +526,18 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         return true;
     }
         
-    protected function checkResponses($curr, $fldForeignTbl)
+    protected function checkResponses(&$curr, $fldForeignTbl)
     {
-        if (isset($curr->responseSet) && strpos($curr->responseSet, 'LoopItems::') !== false) {
+        if (isset($curr->responseSet) 
+            && strpos($curr->responseSet, 'LoopItems::') !== false) {
             $loop = str_replace('LoopItems::', '', $curr->responseSet);
             $currLoopItems = $this->sessData->getLoopRows($loop);
             if (sizeof($currLoopItems) > 0) {
                 foreach ($currLoopItems as $i => $row) {
                     $curr->responses[$i] = new SLNodeResponses;
                     $curr->responses[$i]->node_res_value = $row->getKey();
-                    $curr->responses[$i]->node_res_eng = $this->getLoopItemLabel($loop, $row, $i);
+                    $curr->responses[$i]->node_res_eng 
+                        = $this->getLoopItemLabel($loop, $row, $i);
                 }
             }
         } elseif (isset($curr->responseSet) 
@@ -579,10 +585,14 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                 // what about tables with multiple loops??
                 $curr->responses[$i] = new SLNodeResponses;
                 $curr->responses[$i]->node_res_value = $row->getKey();
-                $curr->responses[$i]->node_res_eng = $this->getLoopItemLabel($loop, $row, $i);
+                $curr->responses[$i]->node_res_eng = $this->getLoopItemLabel(
+                    $loop, 
+                    $row, 
+                    $i
+                );
             }
         }
         return $curr;
     }
-    
+
 }

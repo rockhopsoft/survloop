@@ -2,6 +2,7 @@
 
 @if (sizeof($majorSections) > 0)
 
+<?php /*
     <div id="navDesktop">
     
         <div class="row">
@@ -87,28 +88,38 @@
         @endforeach
         
     </div> <!-- end of desktop navigation -->
+*/ ?>
     <div id="navMobile">
         
-        <a id="navMobToggle" class="btn btn-secondary btn-sm w100 taL ovrNo" href="javascript:;">
+        <a id="navMobToggle" href="javascript:;"
+            class="btn btn-secondary btn-sm w100 taL ovrNo" >
             <div id="navMobTogInr">
-                <div id="navMobBurger1" class="disIn"><i class="fa fa-caret-right" aria-hidden="true"></i></div>
-                <div id="navMobBurger2" class="disNon"><i class="fa fa-caret-down" aria-hidden="true"></i></div>
+                <div id="navMobPercNum">{{ $rawPerc }}%</div>
+                <div id="navMobBurger1" class="disIn">
+                    <i class="fa fa-caret-right" aria-hidden="true"></i>
+                </div>
+                <div id="navMobBurger2" class="disNon">
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                </div>
             @if (isset($majorSections[$currMajorSection]))
-                {{ $majorSections[$currMajorSection][1] }}
-                @if (sizeof($minorSections[$currMajorSection]) > 0 
-                    && isset($minorSections[$currMajorSection][$currMinorSection]))
-                    : {{ $minorSections[$currMajorSection][$currMinorSection][1] }}
-                @endif
+                <div id="navMobTitle">
+                    {{ $majorSections[$currMajorSection][1] }}
+                    @if (sizeof($minorSections[$currMajorSection]) > 0 
+                        && isset($minorSections[$currMajorSection][$currMinorSection]))
+                        : {{ $minorSections[$currMajorSection][$currMinorSection][1] }}
+                    @endif
+                </div>
             @endif
             </div>
-            <div id="navMobPercWrap"><div id="navMobPercProg" style="width: {{ $rawPerc }}%;"> </div></div>
+            <div id="navMobPercWrap"><div id="navMobPercProg" 
+                style="width: {{ $rawPerc }}%;"> </div></div>
         </a>
         
-        <div id="navMobFull" class="disNon">
+        <div id="navMobFull" class="disNon brdGrey pL15 pR15 mTn5">
             @foreach ($majorSections as $maj => $majSect)
-                <div class="brdBot pT5 pB5">
+                <div class=" @if ($maj > 0) brdTopGrey @endif pT20 pB10 mT10 mB10">
                     <b>{{ (1+$maj) }}. {{ $majorSections[$maj][1] }}</b>
-                    <div class="pL20">
+                    <div class="pT10 pL10 pR10">
                     @forelse ($minorSections[$maj] as $min => $minSect)
                         @if (in_array($min, $sessMinorsTouched[$maj]))
                             <a 
@@ -121,16 +132,23 @@
                                     $allNodes[$minSect[0]]->nodeRow->node_prompt_notes }}" 
                                 @endif
                             @endif class="
-                            @if ($maj == $currMajorSection && $min == $currMinorSection) navMobActive 
-                            @else navMobDone
+                            @if ($maj == $currMajorSection && $min == $currMinorSection) 
+                                navMobActive 
+                            @else 
+                                navMobDone
                             @endif " >
                             @if ($maj != $currMajorSection || $min != $currMinorSection) 
-                                <i class="fa fa-check"></i> 
+                                <i class="fa fa-check mR3"></i> 
+                                {{ $minSect[1] }}</a>
+                            @else
+                                <i class="fa fa-hand-o-right" aria-hidden="true"></i>
+                                <b>{{ $minSect[1] }}</b></a>
                             @endif 
                         @else
                             <a href="javascript:;" class="navMobOff" >
+                                <i class="fa fa-circle-thin mR3" aria-hidden="true"></i>
+                                {{ $minSect[1] }}</a>
                         @endif
-                        {{ $minSect[1] }}</a>
                     @empty
                     @endforelse
                     </div>

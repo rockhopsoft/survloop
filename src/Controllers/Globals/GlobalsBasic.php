@@ -365,7 +365,7 @@ class GlobalsBasic extends GlobalsVars
         return '';
     }
     
-    public function getForeignLnkNameFldName($tbl1, $tbl2 = '')
+    public function getFornNameFldName($tbl1, $tbl2 = '')
     {
         if (trim($tbl1) == '' || trim($tbl2) == '' 
             || !isset($this->tblI[$tbl1]) || !isset($this->tblI[$tbl2])) {

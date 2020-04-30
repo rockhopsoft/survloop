@@ -151,12 +151,7 @@ class TreeSurvConds extends TreeSurvAPI
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsPartnerStaffAdminOrOwner') {
-                if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
-                    $retTF = false;
-                } elseif (!$this->v["user"]->hasRole('administrator|staff|partner')
-                    && !$this->v["isOwner"]) {
-                    $retTF = false;
-                }
+                $retTF = $this->isPartnerStaffAdminOrOwner();
             } elseif (trim($cond->cond_tag) == '#IsPartner') {
                 if (!isset($this->v["uID"]) 
                     || $this->v["uID"] <= 0 
@@ -238,6 +233,18 @@ class TreeSurvConds extends TreeSurvAPI
                 }
             //} elseif (trim($cond->cond_tag) == '#HasUploads') {
             }
+        }
+        return $retTF;
+    }
+    
+    protected function isPartnerStaffAdminOrOwner()
+    {
+        $retTF = true;
+        if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
+            $retTF = false;
+        } elseif (!$this->v["user"]->hasRole('administrator|staff|partner')
+            && !$this->v["isOwner"]) {
+            $retTF = false;
         }
         return $retTF;
     }

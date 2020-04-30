@@ -510,4 +510,17 @@ class GlobalsStatic extends GlobalsConvert
         return $btu/3.412;
     }
 
+    public function swapMonthNum($str = '')
+    {
+        if (substr(strtolower($str), 0, 7) == 'month #') {
+            $month = intVal(substr($str, 7));
+            if ($month > 0 && $month < 13) {
+                return date("M", mktime(0, 0, 0, $month, 1, 2000));
+            }
+        }
+        return $str;
+    }
+
+
+
 }

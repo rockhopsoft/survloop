@@ -264,7 +264,7 @@ $(document).ready(function(){
         document.dashSearchForm.submit();
     });
 
-   $(document).on("click", "#toggleSearchFilts", function() {
+    $(document).on("click", "#toggleSearchFilts", function() {
         if (document.getElementById("searchFilts")) {
             if (document.getElementById("searchFilts").style.display!="block") {
                 currRightPane = 'filters';

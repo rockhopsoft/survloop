@@ -35,7 +35,8 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
             $this->v["pageCnt"] = 0;
         }
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
-            if (isset($this->allNodes[$tierNode[0]]) && $this->hasNode($tierNode[0])) {
+            if (isset($this->allNodes[$tierNode[0]]) 
+                && $this->hasNode($tierNode[0])) {
                 $this->allNodes[$tierNode[0]]->fillNodeRow();
                 if ($this->allNodes[$tierNode[0]]->isPage()) {
                     $this->v["pageCnt"]++;
@@ -55,7 +56,10 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 $childrenPrints = '';
                 if (sizeof($tierNode[1]) > 0) { 
                     foreach ($tierNode[1] as $next) {
-                        $childrenPrints .= $this->adminBasicPrintNode($next, $tierDepth);
+                        $childrenPrints .= $this->adminBasicPrintNode(
+                            $next, 
+                            $tierDepth
+                        );
                     }
                 }
                 $dataManips = $this->allNodes[$tierNode[0]]->printManipUpdate();

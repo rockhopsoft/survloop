@@ -26,16 +26,18 @@
             {{ $profileUser->listRoles() }}, 
         @endif
         @if ($canEdit)
-            <a id="hidivBtnEditProfile" class="hidivBtn" href="javascript:;"
-                >Edit User Info</a><br />
+            <a id="hidivBtnEditProfile" class="hidivBtn" 
+                href="javascript:;">Edit User Info</a><br />
         @endif
         </p>
         @if ($canEdit)
             <div id="hidivEditProfile" class="disNon">
                 <div class="nodeWrap">
                     <hr>
-                    <form name="mainPageForm" action="/profile/{{ urlencode($profileUser->name) }}?edit=sub" method="post">
-                    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+                    <form name="mainPageForm" method="post" action="/profile/{{ 
+                        urlencode($profileUser->name) }}?edit=sub">
+                    <input type="hidden" id="csrfTok" name="_token" 
+                        value="{{ csrf_token() }}">
                     <input type="hidden" name="uID" 
                         value="{{ $profileUser->id }}">
                     <div class="row mT20">
@@ -68,10 +70,12 @@
                             <div class="nPrompt">Roles:</div>
                             <div class="nFldRadio">
                             @foreach ($profileUser->roles as $i => $role)
-                                <input name="roles[]" id="role{{ $i }}" autocomplete="off" 
+                                <input name="roles[]" id="role{{ $i }}" 
                                     type="checkbox" value="{{ $role->def_id }}" 
-                                    @if ($profileUser->hasRole($role->def_subset)) CHECKED @endif >
-                                <label for="role{{ $i }}">{{ $role->def_value }}</label><br />
+                                    @if ($profileUser->hasRole($role->def_subset)) CHECKED @endif autocomplete="off" >
+                                <label for="role{{ $i }}">
+                                    {{ $role->def_value }}
+                                </label><br />
                             @endforeach
                             </div>
                         @endif
@@ -83,8 +87,10 @@
                     <div class="nodeHalfGap"></div>
 
                     <p>
-                        To change your password, please <a href="/logout">logout</a> then use the 
-                        <a href="/password/reset">reset password</a> tool from the login page.
+                        To change your password, please 
+                        <a href="/logout">logout</a> then use the 
+                        <a href="/password/reset">reset password</a> 
+                        tool from the login page.
                     </p>
 
                     <div class="nodeHalfGap"></div>

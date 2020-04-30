@@ -109,7 +109,8 @@ class TreeCore extends SurvLoopController
         $cache = '';
         $this->loadNodeTiers();
         if ($this->rootID > 0) {
-            $cache .= '$'.'this->nodesRawOrder = [' . implode(', ', $this->nodesRawOrder) 
+            $cache .= '$'.'this->nodesRawOrder = [' 
+                . implode(', ', $this->nodesRawOrder) 
                 . '];' . "\n" . '$'.'this->nodesRawIndex = [';
             foreach ($this->nodesRawIndex as $node => $ind) {
                 $cache .= $node . ' => ' . $ind . ', ';
@@ -444,7 +445,7 @@ class TreeCore extends SurvLoopController
                 if ($GLOBALS["SL"]->coreTblAbbr() != '' 
                     && isset($this->sessData->dataSets[$coreTbl])) {
                     $prog = $GLOBALS["SL"]->coreTblAbbr() . 'submission_progress';
-                    $this->sessData->currSessData($nID, $coreTbl, $prog, 'update', $nID);
+                    $this->sessData->currSessDataTblFld($nID, $coreTbl, $prog, 'update', $nID);
                 }
             }
             $this->currNodeSubTier = $this->loadNodeSubTier($nID);

@@ -340,7 +340,7 @@ class TreeSurvLoad extends TreeSurvConds
             $currNode = intVal($this->sessInfo->sess_curr_node);
             $lastPage = intVal($GLOBALS["SL"]->treeRow->tree_last_page);
             $isLastPage = ($lastPage == $abbr . 'submission_progress');
-            if ($this->sessData->currSessData($currNode, $coreTbl, $isLastPage)) {
+            if ($this->sessData->currSessDataTblFld($currNode, $coreTbl, $isLastPage)) {
                 session()->forget('sessID' . $GLOBALS["SL"]->sessTree);
                 session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
                 session()->save();
@@ -566,12 +566,12 @@ class TreeSurvLoad extends TreeSurvConds
         return true;
     }
     
-    protected function printNodeSessDataOverride($nID = -3, $tmpSubTier = [], $nIDtxt = '', $currNodeSessionData = '')
+    protected function printNodeSessDataOverride(&$curr)
     {
         return [];
     }
     
-    protected function customNodePrint($nID = -3, $tmpSubTier = [], $nIDtxt = '', $nSffx = '', $currVisib = 1)
+    protected function customNodePrint(&$curr = null)
     {
         return '';
     }
@@ -581,7 +581,7 @@ class TreeSurvLoad extends TreeSurvConds
         return 'Node #' . $nID . '<br />';
     }
     
-    protected function postNodePublicCustom($nID = -3, $nIDtxt = '', $tmpSubTier = [])
+    protected function postNodePublicCustom(&$curr)
     {
         return false;
     }
@@ -605,7 +605,7 @@ class TreeSurvLoad extends TreeSurvConds
     public function sessDump($lastNode = -3)
     {
         //return '<!-- ipip: ' . $_SERVER["REMOTE_ADDR"] . ' -->';
-        if ($GLOBALS["SL"]->debugOn) { // && true
+        if ($GLOBALS["SL"]->debugOn && !$GLOBALS["SL"]->REQ->has('ajax')) {
             $userName = '';
             if (isset($this->v["user"]) && $this->v["user"]) {
                 $userName = $this->v["user"]->name;

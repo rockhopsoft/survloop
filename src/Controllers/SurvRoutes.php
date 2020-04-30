@@ -35,6 +35,15 @@ class SurvRoutes extends Controller
         if ($type == 'css') {
             return 'text/css';
         }
+        if ($type == 'png') {
+            return 'image/png';
+        }
+        if ($type == 'svg') {
+            return 'image/svg+xml';
+        }
+        if (in_array($type, ['jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp'])) {
+            return 'image/jpeg';
+        }
         return 'application/javascript';
     }
     
@@ -143,7 +152,8 @@ class SurvRoutes extends Controller
     
     public function getBootstrap(Request $request, $type = 'js')
     {
-        return $this->getLibFile('twbs/bootstrap/dist/' . $type . '/bootstrap.min', $type);
+        $file = 'twbs/bootstrap/dist/' . $type . '/bootstrap.min';
+        return $this->getLibFile($file, $type);
     }
     
     public function getFontAwesome(Request $request)
@@ -171,7 +181,8 @@ class SurvRoutes extends Controller
     
     public function getSummernoteEot(Request $request)
     {
-        $response = Response::make(file_get_contents('../vendor/summernote/summernote/dist/font/summernote.eot'));
+        $file = '../vendor/summernote/summernote/dist/font/summernote.eot';
+        $response = Response::make(file_get_contents($file));
         $response->header('Content-Type', 'application/vnd.ms-fontobject');
         return $response;
     }
@@ -186,9 +197,10 @@ class SurvRoutes extends Controller
         return $this->getLibFile('plotly/plotly.js/dist/plotly.min', 'js');
     }
     
-    public function getStateFlag(Request $request, $stateFlag)
+    public function getStateFlag(Request $request, $stateFlag, $ext = 'jpg')
     {
-        return $this->getLibFile('survloop-libraries/src/state-flags/$stateFlag', 'svg');
+        $file = 'rockhopsoft/survloop-libraries/src/state-flags/' . $stateFlag;
+        return $this->getLibFile($file, 'jpg');
     }
     
 }

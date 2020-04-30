@@ -143,9 +143,9 @@
 </form>
 
 <script type="text/javascript">
-function logFldDescChange(FldID) {
-    if (document.getElementById("changedFldsID").value.indexOf(","+FldID+",") < 0) {
-        document.getElementById("changedFldsID").value += FldID+",";
+function logFldDescChange(fldID) {
+    if (document.getElementById("changedFldsID").value.indexOf(","+fldID+",") < 0) {
+        document.getElementById("changedFldsID").value += ""+fldID+",";
     }
 }
 function submitFldDescChanges() {
@@ -154,9 +154,9 @@ function submitFldDescChanges() {
     setTimeout("document.getElementById('changedFldsGenID').value=','", 1000);
 }
 @if ($view == 'generics')
-    function logFldGenDescChange(FldID) {
-        if (document.getElementById("changedFldsGenID").value.indexOf(","+FldID+",") < 0) {
-            document.getElementById("changedFldsGenID").value += FldID+",";
+    function logFldGenDescChange(fldID) {
+        if (document.getElementById("changedFldsGenID").value.indexOf(","+fldID+",") < 0) {
+            document.getElementById("changedFldsGenID").value += ""+fldID+",";
         }
     }
     </script><span class="red">*</span> <b>WARNING:</b> Saving changes to Generic field descriptions here will push 

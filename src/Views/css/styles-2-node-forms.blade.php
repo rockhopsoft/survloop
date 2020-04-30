@@ -279,6 +279,11 @@ select.fingerTxt, select.form-control.fingerTxt, .nFld select.form-control.finge
     margin-top: 15px;
     width: 100%;
 }
+#nodeSubBtns {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 100%;
+}
 
 a.nFldBtn, a.nFldBtn:link, a.nFldBtn:active, 
 a.nFldBtn:visited, a.nFldBtn:hover,

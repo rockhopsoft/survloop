@@ -511,9 +511,9 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    public function initSearcher()
+    public function initSearcher($force = false)
     {
-        if ($this->searcher === null) {
+        if ($this->searcher === null || $force) {
             $this->loadCustSearcher();
             $this->copyUserToSearcher();
         }

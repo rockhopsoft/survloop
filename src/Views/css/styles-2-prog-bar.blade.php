@@ -79,36 +79,70 @@ a.navMobDone:visited, a.navMobDone:hover {
 	padding: 5px 5px 5px 10px;
 	margin-right: 3px;
 	margin-bottom: 3px;
-	-moz-border-radius: 20px; border-radius: 20px;
-	border: 1px {!! $css["color-main-on"] !!} solid;
 }
 a.navMobOff:link, a.navMobOff:active, 
 a.navMobOff:visited, a.navMobOff:hover {
-	color: {!! $css["color-main-on"] !!};
-	border: 1px {!! $css["color-main-faint"] !!} solid;
+	color: {!! $css["color-main-grey"] !!};
 	pointer-events: none;
 	text-decoration: none;
 }
 a.navMobActive:link, a.navMobActive:active, 
 a.navMobActive:visited, a.navMobActive:hover {
-	color: {!! $css["color-main-bg"] !!};
-	background: {!! $css["color-main-on"] !!};
+	color: {!! $css["color-main-on"] !!};
+    border-bottom: 2px {!! $css["color-main-on"] !!} solid;
+    margin-top: 4px;
+    margin-bottom: 8px;
 }
-#navMobTogInr { padding: 5px 0px 5px 5px; }
+#navMobTogInr {
+    position: relative;
+    padding: 5px 0px 5px 5px;
+}
+#navMobPercNum, 
+#navMobToggle:link #navMobPercNum, #navMobToggle:active #navMobPercNum,
+#navMobToggle:visited #navMobPercNum, #navMobToggle:hover #navMobPercNum {
+    position: absolute;
+    right: 5px;
+    top: 1px;
+    width: 26px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 12px;
+    letter-spacing: -0.1em;
+    padding: 6px 3px 6px 3px;
+    color: {!! $css["color-main-on"] !!};
+    -moz-border-radius: 25px; border-radius: 25px;
+    border: 1px {!! $css["color-main-on"] !!} dashed;
+}
+#navMobToggle:hover #navMobPercNum {
+    color: {!! $css["color-main-faint"] !!};
+    border: 1px {!! $css["color-main-faint"] !!} dashed;
+}
+#navMobTitle {
+    position: absolute;
+    left: 18px;
+    top: 5px;
+}
 #navMobBurger1, #navMobBurger2 { margin-right: 5px; }
 #navMobPercWrap { margin: 0px -10px -5px -10px; }
-#navMobPercProg {
+#navMobPercProg, 
+#navMobToggle:link #navMobPercProg, #navMobToggle:active #navMobPercProg,
+#navMobToggle:visited #navMobPercProg, #navMobToggle:hover #navMobPercProg {
     height: 4px;
     -moz-border-radius: 4px; border-radius: 4px;
     background: {!! $css["color-main-on"] !!};
 }
+#navMobToggle:hover #navMobPercProg {
+    background: {!! $css["color-main-faint"] !!};
+}
 
+/*
 #navDesktop {
 	display: block;
 	margin-top: 20px;
 }
+*/
 #navMobile {
-	display: none;
+	/* display: none; */
 	margin-bottom: 10px;
 }
 

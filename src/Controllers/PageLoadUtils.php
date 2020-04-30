@@ -239,7 +239,7 @@ class PageLoadUtils extends Controller
                     })
                     ->where('sl_tree.tree_type', 'Page')
                     ->where('sl_tree.tree_core_table', intVal($searchDataTbl[0]))
-                    ->select('sl_tree.*', 'sl_node.tree_response_set')
+                    ->select('sl_tree.*', 'sl_node.node_response_set')
                     ->get();
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
@@ -617,9 +617,13 @@ class PageLoadUtils extends Controller
         if ($str == '') {
             return false;
         }
+        $qMark = strrpos($str, '?');
+        if ($qMark > 0) {
+            $str = substr($str, 0, $qMark);
+        }
         $dot = strrpos($str, '.');
         if ($dot > 0) {
-            $sffx = substr($str, $dot);
+            $sffx = substr($str, $dot+1);
             if (in_array(strtolower($sffx), $types)) {
                 return false;
             }

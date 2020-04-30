@@ -163,130 +163,6 @@ class TreeSurvFormVarieties extends UserProfile
         return $ret;
     }
     
-    protected function printWidget($nID, $nIDtxt, $curr)
-    {
-        $ret = '';
-        $blockWidget = false;
-        if ($curr->nodeType == 'Incomplete Sess Check' 
-            && isset($this->v["profileUser"]) 
-            && isset($this->v["profileUser"]->id)) {
-            if (!isset($this->v["uID"]) || $this->v["uID"] != $this->v["profileUser"]->id) {
-                $blockWidget = true;
-            }
-        }
-        if ($blockWidget) {
-            // don't show widget
-        } elseif ($curr->nodeType == 'Member Profile Basics') {
-            $ret .= $this->showProfileBasics();
-        } elseif ($curr->nodeType == 'MFA Dialogue') {
-            $ret .= ((isset($this->v["mfaMsg"])) ? $this->v["mfaMsg"] : '');
-        } elseif (intVal($curr->nodeRow->node_response_set) > 0) {
-            $widgetTreeID = $curr->nodeRow->node_response_set;
-            $widgetLimit  = intVal($curr->nodeRow->node_char_limit);
-            $this->initSearcher();
-            if ($curr->nodeType == 'Search') {
-                $ret .= $this->searcher->printSearchBar(
-                    '', 
-                    $widgetTreeID, 
-                    trim($curr->nodeRow->node_prompt_text), 
-                    trim($curr->nodeRow->node_prompt_after), 
-                    $nID, 
-                    0
-                );
-            } else { // this widget loads via ajax
-                $spinner = (($curr->nodeType != 'Incomplete Sess Check') ? $GLOBALS["SL"]->spinner() : '');
-                $loadURL = '/records-full/' . $widgetTreeID;
-                $search = (($GLOBALS["SL"]->REQ->has('s')) ? trim($GLOBALS["SL"]->REQ->get('s')) : '');
-                if (isset($this->v["profileUser"]) && isset($this->v["profileUser"]->id)) {
-                    $this->searcher->advSearchUrlSffx .= '&u=' . $this->v["profileUser"]->id;
-                } elseif (isset($curr->nodeRow->node_data_branch) 
-                    && trim($curr->nodeRow->node_data_branch) == 'users') {
-                    $this->searcher->advSearchUrlSffx .= '&mine=1';
-                }
-                if (in_array($curr->nodeType, ['Record Full', 'Record Full Public'])) {
-                    $cid = -3;
-                    if ($GLOBALS["SL"]->REQ->has('i')) {
-                        $cid = intVal($GLOBALS["SL"]->REQ->get('i'));
-                    } elseif ($this->treeID == $widgetTreeID && $this->coreID > 0) {
-                        $cid = $this->coreID;
-                    }
-                    //$loadURL .= '?i=' . $cid . (($search != '') ? '&s=' . $search : '');
-                    $wTree = SLTree::find($widgetTreeID);
-                    if ($cid > 0 && $wTree) {
-                        $xtra = (($curr->nodeType == 'Record Full Public') ? '&publicView=1' : '');
-                        $loadURL = '/' . $wTree->tree_slug . '/read-' . $cid . '/full?ajax=1&wdg=1'
-                            . $xtra . $GLOBALS["SL"]->getAnyReqParams();
-                        $spinner = '<br /><br /><center>' . $spinner . '</center><br />';
-                    }
-                } elseif ($curr->nodeType == 'Search Featured') {
-                    $this->initSearcher();
-                    $ret .= $this->searcher->searchResultsFeatured($search, $widgetTreeID);
-                } elseif ($curr->nodeType == 'Search Results') {
-                    $this->initSearcher();
-                    $this->searcher->getSearchFilts();
-                    $loadURL = '/search-results/' . $widgetTreeID . '?s=' . urlencode($this->searcher->searchTxt) 
-                        . $this->searcher->searchFiltsURL() . $this->searcher->advSearchUrlSffx;
-                    $tmp = str_replace('[[search]]', $search, $curr->nodeRow->node_prompt_text);
-                    $curr->nodeRow->node_prompt_text = $GLOBALS["SL"]->extractJava($tmp, $nID);
-                    $tmp = str_replace('[[search]]', $search, $curr->nodeRow->node_prompt_after);
-                    $curr->nodeRow->node_prompt_after = $GLOBALS["SL"]->extractJava($tmp, $nID);
-                } elseif ($curr->nodeType == 'Record Previews') {
-                    $loadURL = '/record-prevs/' . $widgetTreeID . '?limit=' . $widgetLimit;
-                } elseif ($curr->nodeType == 'Incomplete Sess Check') {
-                    $loadURL = '/record-check/' . $widgetTreeID;
-                } elseif ($curr->isGraph()) {
-                    $GLOBALS["SL"]->x["needsCharts"] = true;
-                    $loadURL = '/record-graph/' . str_replace(' ', '-', strtolower($curr->nodeType)) 
-                        . '/' . $widgetTreeID . '/' . $curr->nodeID;
-                    $GLOBALS["SL"]->pageAJAX .= 'addGraph("' . $nIDtxt . '", "' . $loadURL.'");'."\n";
-                } elseif ($curr->nodeType == 'Widget Custom') {
-                    $loadURL = '/widget-custom/' . $widgetTreeID . '/' . $nID . '?txt=' 
-                        . str_replace($nID, '', $nIDtxt) . $this->sessData->getDataBranchUrl();
-                    $loadURL .= $this->widgetCustomLoadUrl($nID, $nIDtxt, $curr);
-                }
-                $promptText = trim($curr->nodeRow->node_prompt_text);
-                if ($promptText != '') {
-                    $promptText = '<div>' . $GLOBALS["SL"]->extractJava($promptText, $nID) . '</div>';
-                }
-                $afterPrompt = trim($curr->nodeRow->node_prompt_after);
-                if ($afterPrompt != '') {
-                    $afterPrompt = '<div>' . $GLOBALS["SL"]->extractJava($afterPrompt, $nID) . '</div>';
-                }
-                $ret .= $promptText . '<div id="n' . $nID . 'ajaxLoad" class="w100">' . $spinner
-                    . '</div>' . $afterPrompt;
-                $GLOBALS["SL"]->pageAJAX .= '$("#n' . $nID . 'ajaxLoad").load("' . $loadURL . '");' . "\n";
-            }
-        }
-        return $ret;
-    }
-    
-    // customizable function for what URL is used to load the widget's div
-    protected function widgetCustomLoadUrl($nID, $nIDtxt, $curr)
-    {
-        // if ($nID == ...
-        return '';
-    }
-    
-    // customizable function for what content is loaded in the widget's div 
-    public function widgetCust(Request $request, $nID = -3)
-    {
-        $this->survLoopInit($request, '');
-        $this->loadAllSessData();
-        //$this->loadTree();
-        $txt = (($request->has('txt')) ? trim($request->get('txt')) : '');
-        $nIDtxt = $nID . $txt;
-        $branches = (($request->has('branch')) ? trim($request->get('branch')) : '');
-        $this->sessData->loadDataBranchFromUrl($branches);
-        return $this->widgetCustomRun($nID, $nIDtxt);
-    }
-    
-    // customizable function for what content is loaded in the widget's div 
-    public function widgetCustomRun($nID = -3, $nIDtxt)
-    {
-        // if ($nID == ...
-        return '';
-    }
-    
     protected function getNodeFormFldBasic($nID = -3, $curr = null)
     {
         if ($nID <= 0) {
@@ -427,86 +303,29 @@ class TreeSurvFormVarieties extends UserProfile
         return $ret;
     }
     
-    protected function formDate($nID, $nIDtxt, $dateStr = '00/00/0000', $xtraClass = '')
+    protected function formDate($curr)
     {
         list($month, $day, $year) = [ '', '', '' ];
-        if (trim($dateStr) != '') {
-            $dateTime = $GLOBALS["SL"]->dateToTime($dateStr);
-            $month = date("m", $dateTime);
-            $day   = date("d", $dateTime);
-            $year  = date("Y", $dateTime);
+        if (trim($curr->dateStr) != '') {
+            $curr->dateTime = $GLOBALS["SL"]->dateToTime($curr->dateStr);
+            $month = date("m", $curr->dateTime);
+            $day   = date("d", $curr->dateTime);
+            $year  = date("Y", $curr->dateTime);
         }
         return view(
             'vendor.survloop.forms.formtree-date', 
             [
-                "nID"            => $nID,
-                "nIDtxt"         => $nIDtxt,
-                "dateStr"        => $dateStr,
+                "nID"            => $curr->nID,
+                "nIDtxt"         => $curr->nIDtxt,
+                "dateStr"        => $curr->dateStr,
                 "month"          => $month,
                 "day"            => $day,
                 "year"           => $year,
-                "xtraClass"      => $xtraClass,
-                "inputMobileCls" => $this->inputMobileCls($nID)
+                "xtraClass"      => $curr->xtraClass,
+                "inputMobileCls" => $this->inputMobileCls($curr->nID)
             ]
         )->render();
     }
-    
-    protected function formTime($nID, $timeStr = '00:00:00', $xtraClass = '')
-    {
-        if (strlen($timeStr) == 19) {
-            $timeStr = substr($timeStr, 11);
-        }
-        $timeArr = explode(':', $timeStr); 
-        foreach ($timeArr as $i => $t) {
-            $timeArr[$i] = intVal($timeArr[$i]);
-        }
-        if (!isset($timeArr[0])) {
-            $timeArr[0] = 0;
-            if (!isset($timeArr[1])) {
-                $timeArr[1] = 0;
-            }
-        }
-        $timeArr[3] = 'AM';
-        if ($timeArr[0] > 11) {
-            $timeArr[3] = 'PM'; 
-            if ($timeArr[0] > 12) {
-                $timeArr[0] = $timeArr[0]-12;
-            }
-        }
-        if ($timeArr[0] == 0 && (!isset($timeArr[1]) || $timeArr[1] == 0)) {
-            $timeArr[0] = -1; 
-            $timeArr[1] = 0; 
-        }
-        return view(
-            'vendor.survloop.forms.formtree-time', 
-            [
-                "nID"            => $nID,
-                "timeArr"        => $timeArr,
-                "xtraClass"      => $xtraClass,
-                "inputMobileCls" => $this->inputMobileCls($nID)
-            ]
-        )->render();
-    }
-    
-    protected function postFormTimeStr($nID)
-    {
-        $nIDtxt = $nID . $GLOBALS["SL"]->getCycSffx();
-        if (!$GLOBALS["SL"]->REQ->has('n' . $nIDtxt . 'fldHr') 
-            || trim($GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fldHr')) == '-1') {
-            return null;
-        }
-        $hr = intVal($GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fldHr'));
-        if ($hr == -1) {
-            return null;
-        }
-        if ($GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fldPM') == 'PM' && $hr < 12) {
-            $hr += 12;
-        }
-        $min = intVal($GLOBALS["SL"]->REQ->input('n' . $nIDtxt . 'fldMin'));
-        return ((intVal($hr) < 10) ? '0' : '') . $hr . ':' 
-            . ((intVal($min) < 10) ? '0' : '') . $min . ':00';
-    }
-    
     
     protected function valListArr($val)
     {

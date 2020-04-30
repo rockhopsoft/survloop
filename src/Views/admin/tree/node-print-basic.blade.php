@@ -186,8 +186,11 @@
 
         @if (!$isPrint)
             <div id="addChild{{ $nID }}" class="disNon 
-                @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ $nID }}&start=1"
+                @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} 
+                @else basicTier9 
+                @endif ">
+                <a href="/dashboard/surv-{{ $node->nodeRow->node_tree 
+                    }}/map/node/-37/?parent={{ $nID }}&start=1"
                     class="btn btn-sm btn-warning mTn15"><i class="fa fa-plus-square-o"></i> Add Child Node</a>
             </div>
         @endif
@@ -202,7 +205,8 @@
             @if (!$isPrint)
                 <div id="addChild{{ $nID }}B" class="disNon 
                     @if ((1+$tierDepth) < 10) basicTier{{ (1+$tierDepth) }} @else basicTier9 @endif ">
-                    <a href="/dashboard/surv-{{ $node->nodeRow->node_tree }}/map/node/-37/?parent={{ $nID }}&end=1"
+                    <a href="/dashboard/surv-{{ $node->nodeRow->node_tree 
+                        }}/map/node/-37/?parent={{ $nID }}&end=1"
                         class="btn btn-sm btn-warning opac50 w100 mTn15"
                         ><i class="fa fa-plus-square-o"></i> Add Child Node</a>
                 </div>

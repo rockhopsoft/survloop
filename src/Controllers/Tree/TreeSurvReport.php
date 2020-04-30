@@ -10,6 +10,7 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use App\Models\SLSessEmojis;
 use SurvLoop\Controllers\Tree\TreeSurvBasicNav;
 
@@ -485,19 +486,19 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (!$this->xmlAllAccess()) {
             return 'Sorry, access not permitted.';
         }
-        $limit = 20;
+        $limit = 100;
         if ($GLOBALS["SL"]->REQ->has('limit')) { 
             $limit = intVal($GLOBALS["SL"]->REQ->get('limit'));
             if ($limit <= 0) {
-                $limit = 20;
+                $limit = 100;
             }
         }
         $this->loadXmlMapTree($request);
         $this->v["nestedNodes"] = '';
         $coreTbl = $GLOBALS["SL"]->xmlTree["coreTbl"];
-        $this->getAllPublicCoreIDs($coreTbl);
-        if (sizeof($this->searcher->allPublicCoreIDs) > 0) {
-            foreach ($this->searcher->allPublicCoreIDs as $i => $coreID) {
+        $allIDs = $this->getAllPublicCoreIDs($coreTbl);
+        if (sizeof($allIDs) > 0) {
+            foreach ($allIDs as $i => $coreID) {
                 if ($i < $limit) {
                     $this->loadAllSessData($coreTbl, $coreID);
                     if (isset($this->sessData->dataSets[$coreTbl]) 
@@ -551,13 +552,14 @@ class TreeSurvReport extends TreeSurvBasicNav
         $coreID = 1;
         $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
         $optTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
-        if (isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
-            $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
-        } elseif (isset($GLOBALS["SL"]->sysOpts[$optTree])) {
+        if (isset($GLOBALS["SL"]->sysOpts[$optTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optTree]);
         }
-        eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]) 
-            . "::find(" . $coreID . ");");
+        if ($coreID <= 0 && isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
+            $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
+        }
+        $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]);
+        eval("\$chk = " . $model . "::find(" . $coreID . ");");
         if ($chk) {
             return $this->xmlByID($request, $coreID);
         }
