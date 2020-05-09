@@ -58,7 +58,7 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 
 # <a name="requirements"></a>Requirements
 
-* php: >=7.2
+* php: >=7.2.5
 * <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 7.6.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
@@ -87,7 +87,8 @@ DB_PASSWORD=secret
 
 You could do things like install Laravel's out-of-the-box user authentication tools, and push the vendor file copies where they need to be:
 ```
-$ php artisan make:auth
+$ composer require laravel/ui
+$ php artisan ui vue --auth
 $ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 ```
 
@@ -101,7 +102,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "rockhopsoft/survloop": "^0.2.15",
+    "rockhopsoft/survloop": "^0.2.16",
     ...
 },
 ...
