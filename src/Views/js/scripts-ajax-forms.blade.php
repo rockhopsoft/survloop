@@ -246,7 +246,7 @@ $(document).on("click", "a.saveAndRedir", function() {
     return false;
 });
 
-function postNodeAutoSave() {
+function postNodeAutoSave(repeat) {
     if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
         if (!document.getElementById('emailBlockID') && !document.getElementById('noAutoSaveID')) {
             var origStep = document.getElementById('stepID').value;
@@ -256,15 +256,23 @@ function postNodeAutoSave() {
             document.postNode.submit();
             document.getElementById('stepID').value = origStep;
             document.postNode.target = origTarget;
-            setTimeout(function() { postNodeAutoSave() }, autoSaveDelay);
+            if (repeat) {
+                setTimeout(function() { postNodeAutoSave(true) }, autoSaveDelay);
+            }
             return true;
         }
     }
     return false;
 }
 setTimeout(function() {
-    if (!document.getElementById("isPage")) postNodeAutoSave();
+    if (!document.getElementById("isPage")) postNodeAutoSave(true);
 }, (1.5*autoSaveDelay));
+
+$(document).on("click", ".forceBgSave", function() {
+    console.log("Focing extra autosave with forceBgSave");
+    postNodeAutoSave(false);
+});
+
 
 window.onpopstate = function(event) {
     if (document.getElementById("stepID") && !document.getElementById("isPage")) {

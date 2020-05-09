@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\SLDefinitions;
 use App\Models\SLUsersRoles;
 use SurvLoop\Controllers\DatabaseLookups;
+use SurvLoop\Controllers\Notifications\MailResetPasswordNotification;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -40,6 +41,16 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
     
+    /**
+    * Send the password reset notification.
+    *
+    * @param  string  $token
+    * @return void
+    */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new MailResetPasswordNotification($token));
+    }
     
     
     public function printUsername($link = true, $baseurl = '/profile/')

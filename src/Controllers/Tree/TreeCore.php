@@ -357,23 +357,69 @@ class TreeCore extends SurvLoopController
     
     public function rawOrderPercent($nID)
     {
-        if (sizeof($this->nodesRawOrder) == 0) {
+        if (!isset($this->allNodes[$nID])
+            || sizeof($this->nodeTiers) < 2) {
             return 0;
         }
-        $found = 0;
-        foreach ($this->nodesRawOrder as $i => $raw) {
-            if ($nID == $raw) {
-                $found = $i;
+        $this->v["percCalc"] = [
+            "curr"   => 0,
+            "nID"    => $nID,
+            "before" => 0,
+            "after"  => 0
+        ];
+        foreach ($this->nodeTiers[1] as $nextTier) {
+            $this->rawOrderPercNextNode($nextTier[0], $nextTier[1]);
+        }
+        $rawPerc = 0;
+        $denom = ($this->v["percCalc"]["before"]
+            +$this->v["percCalc"]["after"]);
+        if ($denom > 0) {
+            $rawPerc = round(100*($this->v["percCalc"]["before"]/$denom));
+        }
+        $found = ($this->v["percCalc"]["nID"] <= 0);
+        return $this->rawOrderPercentTweak($nID, $rawPerc, $found);
+    }
+    
+    // Locate next node in standard Pre-Order Traversal
+    protected function rawOrderPercNextNode($nID, $tiers = [])
+    {
+        if (!$this->checkNodeConditionsBasic($nID)) {
+            return false;
+        }
+        if ($this->v["percCalc"]["nID"] == $nID) {
+            $this->v["percCalc"]["nID"] = -3;
+        } elseif ($this->v["percCalc"]["nID"] > 0) {
+            $this->v["percCalc"]["before"]++;
+        }
+        if (sizeof($tiers) > 0) {
+            foreach ($tiers as $nextTier) {
+                $this->rawOrderPercNextNode($nextTier[0], $nextTier[1]);
             }
         }
-        $rawPerc = round(100*($found/sizeof($this->nodesRawOrder)));
-        return $this->rawOrderPercentTweak($nID, $rawPerc, $found);
+        if ($this->v["percCalc"]["nID"] <= 0) {
+            $this->v["percCalc"]["after"]++;
+        }
+        return true;
     }
     
     
     /*****************
     // to be overridden by extensions of this class...
     *****************/
+
+    protected function checkNodeConditionsBasic($nID)
+    {
+        if (!$this->sessData->dataSets
+            || sizeof($this->sessData->dataSets) == 0) {
+            return true;
+        }
+        return $this->checkNodeConditions($nID);
+    }
+
+    protected function checkNodeConditions($nID)
+    {
+        return true;
+    }
     
     protected function movePrevOverride($nID)
     {

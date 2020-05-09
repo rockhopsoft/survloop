@@ -29,6 +29,16 @@ class TreeSurvFormVarieties extends UserProfile
         $str = str_replace('[[coreID]]', $this->coreID, $str);
         $str = str_replace('[[corePubID]]', $this->getCurrPubID(), $str);
         $str = str_replace('[[DOMAIN]]', $GLOBALS["SL"]->sysOpts["app-url"], $str);
+        $tbl = $GLOBALS["SL"]->coreTbl;
+        if (strpos($str, '[[coreUnqStr]]') !== false
+            && isset($GLOBALS["SL"]->tblAbbr[$tbl])
+            && isset($this->sessData->dataSets[$tbl])) {
+            $unqStrFld = $GLOBALS["SL"]->tblAbbr[$tbl] . 'unique_str';
+            if (isset($this->sessData->dataSets[$tbl][0]->{ $unqStrFld })) {
+                $unqStr = $this->sessData->dataSets[$tbl][0]->{ $unqStrFld };
+                $str = str_replace('[[coreUnqStr]]', $unqStr, $str);
+            }
+        }
         return $str;
     }
     
@@ -52,45 +62,51 @@ class TreeSurvFormVarieties extends UserProfile
         return 'slBlueDark';
     }
     
-    protected function swapLabels($nIDtxt = '', $str = '', $itemID = -3, $itemInd = -3)
+    protected function swapLabels($curr, $str = '')
     {
         if (trim($str) == '') {
             return '';
         }
+        if (strpos($str, '[LoopItemLabel]') !== false 
+            && $curr->itemID <= 0 
+            && $curr->itemInd < 0) {
+            $this->printNodePublicCurrDataGetItem($curr);
+        }
+
         $str = $this->sendEmailBlurbsCustom($str);
-        $str = $this->customLabels($nIDtxt, $str);
+        $str = $this->customLabels($curr->nIDtxt, $str);
         $str = $GLOBALS["SL"]->swapBlurbs($str);
-        $str = $this->swapIDs($nIDtxt, $str);
+        $str = $this->swapIDs($curr->nIDtxt, $str);
         if (!isset($this->v["printFullTree"]) || !$this->v["printFullTree"]) {
-            if ($itemID > 0 && $itemInd >= 0) {
+            if ($curr->itemID > 0 && $curr->itemInd >= 0) {
                 if (strpos($str, '[LoopItemLabel]') !== false 
                     && isset($GLOBALS["SL"]->closestLoop["loop"])) {
                     $loop = $GLOBALS["SL"]->closestLoop["loop"];
                     $loopTbl = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
-                    $itemRowID = $this->sessData->getRowById($loopTbl, $itemID);
-                    $label = $this->getLoopItemLabel($loop, $itemRowID, $itemInd);
-                    $labelSwap = '<span class="' . $this->autoLabelClass($nIDtxt) 
+                    $itemRowID = $this->sessData->getRowById($loopTbl, $curr->itemID);
+                    $label = $this->getLoopItemLabel($loop, $itemRowID, $curr->itemInd);
+                    $labelSwap = '<span class="' . $this->autoLabelClass($curr->nIDtxt) 
                         . '">' . $label . '</span>';
                     $str = str_replace('[LoopItemLabel]', $labelSwap, $str);
                 }
-                $cnt = 1+$itemInd;
+                $cnt = 1+$curr->itemInd;
                 if (isset($GLOBALS["SL"]->closestLoop["loop"])) {
                     $rows = $this->sessData->getLoopRows($GLOBALS["SL"]->closestLoop["loop"]);
                     if ($rows && sizeof($rows) > 0) {
                         foreach ($rows as $j => $rec) {
-                            if ($rec->getKey() == $itemID) {
+                            if ($rec->getKey() == $curr->itemID) {
                                 $cnt = 1+$j;
                             }
                         }
                     }
                 }
-                $labelSwap = '<span class="' . $this->autoLabelClass($nIDtxt) 
+                $labelSwap = '<span class="' . $this->autoLabelClass($curr->nIDtxt) 
                     . '">' . $cnt . '</span>';
                 $str = str_replace('[LoopItemCnt]', $labelSwap, $str);
-                $str = str_replace('[LoopItemID]', $itemID, $str);
+                $str = str_replace('[LoopItemID]', $curr->itemID, $str);
             }
             $labelPos = strpos($str, '[LoopItemLabel:');
-            if (($itemID <= 0 || $itemInd < 0) && $labelPos !== false) {
+            if (($curr->itemID <= 0 || $curr->itemInd < 0) && $labelPos !== false) {
                 $strPre      = substr($str, 0, $labelPos);
                 $loopName    = substr($str, $labelPos+15);
                 $labelEndPos = strpos($loopName, ']');
@@ -98,13 +114,14 @@ class TreeSurvFormVarieties extends UserProfile
                 $loopName    = substr($loopName, 0, $labelEndPos);
                 $loopRows    = $this->sessData->getLoopRows($loopName);
                 if (sizeof($loopRows) == 1) {
-                    $label = $this->getLoopItemLabel($loopName, $loopRows[0], $itemInd);
-                    $str = $strPre . '<span class="' . $this->autoLabelClass($nIDtxt) 
+                    $label = $this->getLoopItemLabel($loopName, $loopRows[0], $curr->itemInd);
+                    $str = $strPre . '<span class="' 
+                        . $this->autoLabelClass($curr->nIDtxt) 
                         . '">' . $label . '</span>' . $strPost;
                 }
             }
         }
-        $str = $this->customCleanLabel($str, $nIDtxt);
+        $str = $this->customCleanLabel($str, $curr->nIDtxt);
         return $this->cleanLabel($str);
     }
     

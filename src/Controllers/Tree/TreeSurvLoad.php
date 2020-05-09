@@ -106,6 +106,18 @@ class TreeSurvLoad extends TreeSurvConds
         $this->isPage = (isset($GLOBALS["SL"]->treeRow->tree_type) 
             && $GLOBALS["SL"]->treeRow->tree_type == 'Page');
         $this->sessData = new SurvData;
+        $this->constructorExtra();
+        return true;
+    }
+
+    /**
+     * Initializing extra things for special admin pages.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    protected function constructorExtra()
+    {
         return true;
     }
     

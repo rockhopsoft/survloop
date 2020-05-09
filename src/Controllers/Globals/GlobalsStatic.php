@@ -80,6 +80,15 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $ret;
     }
+
+    public function addSlashLines($ret)
+    {
+        return str_replace( 
+            array( "\n", "\r" ), 
+            array( "\\n", "\\r" ), 
+            addslashes($ret)
+        );
+    }
     
     public function splitNumDash($str, $delim = '-')
     {

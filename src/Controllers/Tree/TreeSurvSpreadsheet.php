@@ -63,7 +63,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                     $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
                 }
             }
-            $GLOBALS["SL"]->currCyc["tbl"][1] = 'tbl?';
+            $GLOBALS["SL"]->currCyc["tbl"][1] = 'tbl' . $curr->nIDtxt;
             $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
             $java = '';
             foreach ($curr->tmpSubTier[1] as $k => $kidNode) {
@@ -83,19 +83,18 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                         . ") ";
                 }
                 $this->pageJSvalid .= ");\n" . "addReqNodeTbl(" 
-                    . $curr->nID . ", '" . $curr->nIDtxt 
-                    . "', 'reqFormFldTbl', " . $this->tableDat["maxRow"] 
-                    . ", cols, " 
-                    . (($this->tableDat["req"][1]) ? 'true' : 'false') 
-                    . ");\n";
+                    . $curr->nID . ", '" . $curr->nIDtxt . "', 'reqFormFldTbl', " 
+                    . $this->tableDat["maxRow"] . ", cols, " 
+                    . (($this->tableDat["req"][1]) ? 'true' : 'false') . ");\n";
             }
+            $prompt = $this->swapLabels($curr, $curr->nodeRow->node_prompt_text);
             $ret .= view(
                 'vendor.survloop.forms.formtree-table', 
                 [
                     "nID"             => $curr->nID,
                     "nIDtxt"          => $curr->nIDtxt,
                     "node"            => $curr,
-                    "nodePromptText"  => $curr->nodePromptText,
+                    "nodePromptText"  => $prompt,
                     "tableDat"        => $this->tableDat
                 ]
             )->render();

@@ -133,20 +133,19 @@ Route::get(
 /**
  * Password Reset
  */
-Route::post(
-    'password/email',
-    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
-)->name('password.email');
 
 Route::get(
     '/password/email', 
     $path . 'Auth\\AuthController@printPassReset'
 );
-
 Route::get( 
     '/password/reset', 
     $path . 'Auth\\AuthController@printPassReset'
 );
+Route::post(
+    'password/email',
+    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
+)->name('password.email');
 
 Route::get( 
     'password/reset/{token}', 
@@ -195,6 +194,12 @@ Route::get(
 Route::get(
     '/email-confirm/{token}/{tokenB}',
     $path . 'SurvLoop@processEmailConfirmToken'
+);
+
+
+Route::get(
+    '/spinner',
+    $path . 'SurvLoop@spinnerUrl'
 );
 
 /**

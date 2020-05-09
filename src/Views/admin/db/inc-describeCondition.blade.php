@@ -14,9 +14,13 @@
         {{ $cond->cond_tag }}
     @else
         @if (isset($hideDeets) && $hideDeets)
-            <a id="showCond{{ ((isset($nID)) ? $nID . 'n' : '') }}{{ $cond->cond_id }}" 
-                class="nodeShowCond slGreenDark" href="javascript:;">{{ $cond->cond_tag }}
-            </a><div id="condDeets{{ ((isset($nID)) ? $nID . 'n' : '') }}{{ $cond->cond_id }}" class="disNon">
+            <a id="showCond{{ ((isset($nID)) ? $nID . 'n' : '') 
+                }}{{ $cond->cond_id }}" 
+                class="nodeShowCond slGreenDark" 
+                href="javascript:;">{{ $cond->cond_tag }}
+            </a>
+            <div id="condDeets{{ ((isset($nID)) ? $nID . 'n' : '') 
+                }}{{ $cond->cond_id }}" class="disNon">
         @endif
         @if (trim($cond->cond_operator) == 'COMPLEX')
             <span class="fPerc80">
@@ -34,7 +38,8 @@
             <span class="slGreenDark">
             @if ($cond->cond_operator == 'URL-PARAM')
                 @if (sizeof($cond->condVals) == 1)
-                    /url/?{{ $cond->cond_oper_deet }}={{ $cond->condFldResponses["vals"][0][1] }}
+                    /url/?{{ $cond->cond_oper_deet }}={{ 
+                        $cond->condFldResponses["vals"][0][1] }}
                 @endif
             @else
                 @if (isset($cond->cond_loop) && intVal($cond->cond_loop) > 0)
@@ -43,7 +48,8 @@
                     && isset($GLOBALS['SL']->tbl[$cond->cond_table]))
                     {{ $GLOBALS['SL']->tbl[$cond->cond_table] }} : 
                 @endif
-                {{ $GLOBALS['SL']->getFullFldNameFromID($cond->CondField, false) }}
+                {{ $GLOBALS['SL']->getFullFldNameFromID($cond->cond_field, false) }}
+
                 @if (trim($cond->cond_operator) == 'EXISTS=')
                     @if ($cond->cond_oper_deet == 0)
                         <i>zero records exist</i>

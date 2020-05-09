@@ -13,6 +13,7 @@ var appUrlParamKeys = new Array('refresh', 'frame', 'widget', 'ajax', 'print', '
 var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
+var loggedIn = false;
 var pageDynaLoaded = false;
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
@@ -34,7 +35,7 @@ function listFullUrlParams() {
 }
 
 function findGetParam(paramName) {
-    var result = null,
+    var result = null;
     tmp = [];
     var items = location.search.substr(1).split("&");
     for (var index = 0; index < items.length; index++) {
@@ -49,6 +50,13 @@ function addGetParam(paramName) {
     var i = appUrlParams.length;
     appUrlParams[i] = new Array(paramName, val);
     return true;
+}
+function getGetParam(paramName) {
+    var result = null;
+    for (var ind = 0; ind < appUrlParams.length; ind++) {
+        if (appUrlParams[ind][0] == paramName) result = appUrlParams[ind][1];
+    }
+    return result;
 }
 function loadBasicUrlParams() {
     appUrlParams = new Array();

@@ -102,12 +102,11 @@ a.navMobActive:visited, a.navMobActive:hover {
 #navMobToggle:visited #navMobPercNum, #navMobToggle:hover #navMobPercNum {
     position: absolute;
     right: 5px;
-    top: 1px;
+    top: 2px;
     width: 26px;
     text-align: center;
-    font-size: 12px;
-    line-height: 12px;
-    letter-spacing: -0.1em;
+    font-size: 10px;
+    line-height: 10px;
     padding: 6px 3px 6px 3px;
     color: {!! $css["color-main-on"] !!};
     -moz-border-radius: 25px; border-radius: 25px;

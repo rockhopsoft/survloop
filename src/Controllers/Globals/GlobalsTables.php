@@ -906,13 +906,19 @@ class GlobalsTables extends GlobalsElements
                 && strtoupper($val) == 'F') {
                 $ret = 'Female';
             } elseif (trim($defSet) == '') {
-                if ($val != '' && isset($this->fldTypes[$tbl]) 
+                if ($val != '' 
+                    && isset($this->fldTypes[$tbl]) 
                     && isset($this->fldTypes[$tbl][$fld])
                     && in_array($this->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
                     if ($this->fldTypes[$tbl][$fld] == 'DOUBLE') {
                         $ret = $this->sigFigs($val, 3);
                     } else {
-                        $ret = number_format(1*floatval($val));
+                        $yearChk = strtolower(substr($fld, strlen($fld)-4));
+                        if ($yearChk == 'year' && strlen(trim('' . $val . '')) == 4) {
+                            $ret = $val;
+                        } else {
+                            $ret = number_format(1*floatval($val));
+                        }
                     }
                 } else {
                     $ret = $val;

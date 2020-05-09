@@ -1,7 +1,7 @@
 
 # RockHopSoft/SurvLoop
 
-[![Laravel](https://img.shields.io/badge/Laravel-5.8-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-7.6-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Table of Contents
@@ -59,7 +59,7 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 # <a name="requirements"></a>Requirements
 
 * php: >=7.2
-* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 5.8.*
+* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 7.6.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
 # <a name="getting-started"></a>Getting Started
@@ -70,7 +70,7 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 <a href="https://survloop.org/how-to-install-survloop" target="_blank">Full install instructions</a> also describe how to set up a development environment using VirutalBox, Vargrant, and Laravel's Homestead.
 
 ```
-$ composer create-project laravel/laravel survloop "5.8.*"
+$ composer create-project laravel/laravel survloop "7.6.*"
 $ cd survloop
 
 ```
@@ -101,7 +101,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "rockhopsoft/survloop": "^0.2.10",
+    "rockhopsoft/survloop": "^0.2.14",
     ...
 },
 ...

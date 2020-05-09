@@ -750,7 +750,11 @@ class SurvData extends SurvDataCheckbox
         // ($nID, $tbl, $fld = '', $action = 'get', $newVal = null, $hasParManip = false, 
         // $itemInd = -3, $itemID = -3)
     {
-        if (trim($curr->tbl) == '' || trim($curr->fld) == '' || !$this->loaded) {
+        if (!isset($curr->tbl) 
+            || trim($curr->tbl) == '' 
+            || !isset($curr->fld) 
+            || trim($curr->fld) == '' 
+            || !$this->loaded) {
             return '';
         }
         if (in_array($curr->nID, $this->checkboxNodes) 

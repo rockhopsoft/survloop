@@ -139,6 +139,7 @@ class AdminController extends AdminEmailController
         $this->getCSS($request);
         $this->v["sysDef"] = new SystemDefinitions;
         if ($request->has('refresh')) {
+            $GLOBALS["SL"]->clearAllSystemCaches();
             $this->v["sysDef"]->checkDefInstalls();
         }
         $this->v["sysDef"]->prepSysSettings($request);

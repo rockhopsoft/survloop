@@ -138,7 +138,6 @@ class SurvLoop extends SurvCustLoop
                 $GLOBALS["SL"]->x["isPrintPDF"] = true;
             }
             $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
-
             if ($cid <= 0 && $request->has('cid')) {
                 $cid = intVal($request->get('cid'));
             }
@@ -151,9 +150,15 @@ class SurvLoop extends SurvCustLoop
                 $cid = $GLOBALS["SL"]->coreID;
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
             }
-
-            if ($this->topCheckCache($request, 'page')
-                && $GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE > 0) {
+            $this->custLoop->chkPageToken();
+            $allowCache = true;
+            if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0
+                || (isset($this->custLoop->v["tokenIn"]) 
+                    && $this->custLoop->v["tokenIn"] != '')
+                || $request->has('refresh')) {
+                $allowCache = false;
+            }
+            if ($this->topCheckCache($request, 'page') && $allowCache) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
             if ($cid > 0) {
@@ -170,17 +175,13 @@ class SurvLoop extends SurvCustLoop
                 return $this->custLoop->getXmlID($request, $cid, $pageSlug);
             }
             $this->pageContent = $this->custLoop->index($request);
-            if ($GLOBALS["SL"]->treeRow->tree_opts
-                %Globals::TREEOPT_NOCACHE > 0) {
+            if ($allowCache) {
                 $this->topSaveCache(
                     $GLOBALS["SL"]->treeRow->tree_id, 
                     strtolower($GLOBALS["SL"]->treeRow->tree_type)
                 );
             }
-            return $this->addSessAdmCodeToPage(
-                $request, 
-                $this->pageContent
-            );
+            return $this->addSessAdmCodeToPage($request, $this->pageContent);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
@@ -545,6 +546,16 @@ class SurvLoop extends SurvCustLoop
         return redirect($this->domainPath . '/');
     }
     
+    public function xmlFullByID(Request $request, $treeSlug, $cid)
+    {
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoop($request);
+            return $this->custLoop->xmlFullByID($request, $cid);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
     public function getXmlExample(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
@@ -762,6 +773,12 @@ class SurvLoop extends SurvCustLoop
             'auth.dialog-check-form-sess',
             [ "req" => $request ]
         );
+    }
+    
+    public function spinnerUrl(Request $request)
+    {
+        $this->syncDataTrees($request, 1, 1);
+        return $GLOBALS["SL"]->spinner();
     }
     
     public function getJsonSurvStats(Request $request)

@@ -10,6 +10,7 @@
   */
 namespace SurvLoop\Controllers\Tree;
 
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\User;
@@ -302,8 +303,10 @@ class TreeSurv extends TreeSurvLoops
             $this->v["javaNodes"] = '';
         }
         $notes = '';
-        if (isset($GLOBALS["SL"]->pageView) && trim($GLOBALS["SL"]->pageView) != '') {
-            $notes .= 'pv.' . $GLOBALS["SL"]->pageView . ' dp.' . $GLOBALS["SL"]->dataPerms;
+        if (isset($GLOBALS["SL"]->pageView) 
+            && trim($GLOBALS["SL"]->pageView) != '') {
+            $notes .= 'pv.' . $GLOBALS["SL"]->pageView 
+                . ' dp.' . $GLOBALS["SL"]->dataPerms;
         }
         $this->v["content"] = $this->printTreePublic();
         if ($notes != '') {
@@ -346,7 +349,8 @@ class TreeSurv extends TreeSurvLoops
      */
     protected function loadTreePageJava()
     {
-        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' . $GLOBALS["SL"]->treeRow->tree_type 
+        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' 
+            . $GLOBALS["SL"]->treeRow->tree_type 
             . '"; setCurrPage("' . $this->v["currPage"][1] . '", "' 
             . $this->v["currPage"][0] . '", ' . $this->currNode() 
             . '); function loadPageNodes() { if (typeof chkNodeVisib === "function") { ' 
@@ -671,5 +675,26 @@ class TreeSurv extends TreeSurvLoops
     {
         
     }
+    
+    protected function clearLostSessionHelpers()
+    {
+        DB::select(DB::raw(
+            "DELETE FROM `sl_sess_loops` 
+            WHERE `sl_sess_loops`.`sess_loop_sess_id` NOT IN 
+                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
+        ));
+        DB::select(DB::raw(
+            "DELETE FROM `sl_node_saves` 
+            WHERE `sl_node_saves`.`node_save_session` NOT IN 
+                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
+        ));
+        DB::select(DB::raw(
+            "DELETE FROM `sl_node_saves_page` 
+            WHERE `sl_node_saves_page`.`page_save_session` NOT IN 
+                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
+        ));
+        return true;
+    }
+    
     
 }

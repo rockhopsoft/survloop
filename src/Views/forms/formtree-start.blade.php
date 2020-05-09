@@ -1,7 +1,9 @@
 <!-- resources/views/vendor/survloop/forms/formtree-start.blade.php -->
 <form id="postNodeForm" name="postNode" method="post" action="{{ $action }}" 
     target="_self" {!! $pageHasUpload !!} >
-<input type="hidden" name="_token" id="csrfTok" value="{{ csrf_token() }}">
+<div id="csrfTokSurvWrap">
+    <input type="hidden" name="_token" id="csrfTok" value="{{ csrf_token() }}">
+</div>
 <input type="hidden" name="formLoaded" value="<?= time() ?>">
 <input type="hidden" name="postAction" id="postActionID" value="{{ $action }}">
 <input type="hidden" name="ajax" id="ajaxID" value="{{ $isAjax }}">

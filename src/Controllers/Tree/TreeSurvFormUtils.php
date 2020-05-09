@@ -114,7 +114,8 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
             return '';
         }
-        $btnSize = 'btn-lg' . ((in_array($this->pageCnt, [1, 2])) ? ' btn-xl' : '');
+        $btnSize = ((in_array($this->pageCnt, [1, 2])) 
+            ? ' btn-xl' : ' btn-lg');
         
         // else print standard button variations
         $ret .= '<div class="fC"></div><div id="nodeSubBtns" class="nodeSub">';
@@ -140,16 +141,25 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             }
             if ($this->allNodes[$nID]->isStepLoop() 
                 && $itemCnt != sizeof($this->sessData->loopItemIDsDone)) {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize 
-                    . ' slTab nFormNext" id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() 
-                    . ' ><i class="fa fa-arrow-circle-o-right"></i> ' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' 
+                    . $btnSize . ' slTab nFormNext" id="nFormNextBtn" ' 
+                    . $GLOBALS["SL"]->tabInd() 
+                    . ' ><i class="fa fa-arrow-circle-o-right"></i> ' 
+                    . $nextLabel . '</a>';
             } else {
-                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' . $btnSize 
-                    . ' slTab nFormNext" id="nFormNextBtn" ' . $GLOBALS["SL"]->tabInd() 
-                    . ' >' . $nextLabel . '</a>';
+                $ret .= '<a href="javascript:;" class="fR btn btn-primary ' 
+                    . $btnSize . ' slTab nFormNext" id="nFormNextBtn" ' 
+                    . $GLOBALS["SL"]->tabInd() . ' >' . $nextLabel . '</a>';
                 //$ret .= '<input type="button" value="' . $nextLabel 
                 //    . '" class="fR btn btn-primary ' . $btnSize . ' nFormNext" id="nFormNextBtn">';
             }
+        }
+        if ($this->allNodes[$nID]->nodeType == 'Page' 
+            && $this->allNodes[$nID]->nodeOpts%29 == 0) {
+            $GLOBALS["SL"]->pageAJAX .= ' setTimeout(function() { '
+                . 'if (document.getElementById("csrfTokSurvWrap")) {'
+                . 'document.getElementById("csrfTokSurvWrap").innerHTML=""; '
+                . '} }, 100); ';
         }
         if ($this->nodePrintJumpTo($nID) <= 0 
             && $printBack 

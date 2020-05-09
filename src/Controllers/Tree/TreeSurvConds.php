@@ -17,6 +17,9 @@ class TreeSurvConds extends TreeSurvAPI
 {
     protected function checkNodeConditions($nID)
     {
+        if ($nID <= 0) {
+            return false;
+        }
         if (!isset($this->allNodes[$nID])) {
             return false;
         }
@@ -292,7 +295,9 @@ class TreeSurvConds extends TreeSurvAPI
         $allArticles = SLConditionsArticles::get();
         if ($allArticles->isNotEmpty()) {
             foreach ($allArticles as $i => $a) {
-                $artCondIds[] = $a->article_cond_id;
+                if (!in_array($a->article_cond_id, $artCondIds)) {
+                    $artCondIds[] = $a->article_cond_id;
+                }
             }
             $allConds = SLConditions::whereIn('cond_id', $artCondIds)
                 ->get();
@@ -302,9 +307,10 @@ class TreeSurvConds extends TreeSurvAPI
                         $artLnks = [];
                         foreach ($allArticles as $i => $a) {
                             if ($a->article_cond_id == $c->cond_id) {
-                                $artLnks[] = [$a->article_title, $a->article_url];
+                                $artLnks[] = [ $a->article_title, $a->article_url ];
                                 $url = strtolower($a->article_url);
-                                $set = ((strpos($url, 'youtube.com') !== false) ? 'vid' : 'txt');
+                                $set = ((strpos($url, 'youtube.com') !== false) 
+                                    ? 'vid' : 'txt');
                                 $found = false;
                                 if (sizeof($this->v["allUrls"][$set]) > 0) {
                                     foreach ($this->v["allUrls"][$set] as $url) {
@@ -314,11 +320,14 @@ class TreeSurvConds extends TreeSurvAPI
                                     }
                                 }
                                 if (!$found) {
-                                    $this->v["allUrls"][$set][] = [$a->article_title, $a->article_url];
+                                    $this->v["allUrls"][$set][] = [
+                                        $a->article_title, 
+                                        $a->article_url
+                                    ];
                                 }
                             }
                         }
-                        $this->v["articles"][] = [$c, $artLnks];
+                        $this->v["articles"][] = [ $c, $artLnks ];
                     }
                 }
             }

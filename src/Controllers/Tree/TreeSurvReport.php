@@ -518,7 +518,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-report-xml/' . $coreID;
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/xml';
         $this->survLoopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'public';
         $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
@@ -529,6 +529,30 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
         }
+        $this->checkPageViewPerms();
+        if ($GLOBALS["SL"]->dataPerms == 'none') {
+            return '';
+        }
+        return $this->getXmlID($request, $coreID, $coreSlug);
+    }
+    
+    public function xmlFullByID(Request $request, $coreID, $coreSlug = '')
+    {
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/full-xml';
+        $this->survLoopInit($request, $page);
+        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID); 
+        $this->loadXmlMapTree($request);
+        $GLOBALS["SL"]->pageView = 'full';
+        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
+            $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        } else { // XML core table is different from main tree
+            $this->loadSessInfo($GLOBALS["SL"]->xmlTree["coreTbl"]);
+            $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
+        }
+        $this->checkPageViewPerms();
+        if ($GLOBALS["SL"]->dataPerms == 'none') {
+            return '';
+        }
         return $this->getXmlID($request, $coreID, $coreSlug);
     }
     
@@ -538,7 +562,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
         if (isset($GLOBALS["fullAccess"]) 
             && $GLOBALS["fullAccess"] 
-            && $GLOBALS["SL"]->pageView != 'full') {
+            && !in_array($GLOBALS["SL"]->pageView, ['full', 'full-xml'])) {
             $this->v["content"] = $this->errorDeniedFullXml();
             return view('vendor.survloop.master', $this->v);
         }
@@ -578,7 +602,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         $this->survLoopInit($request, '');
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
-        $GLOBALS["SL"]->pageView = 'sensitive';
+        $GLOBALS["SL"]->pageView = 'full'; // changed from 'sensitive';
         return $this->retrieveUploadFile($upID);
     }
     

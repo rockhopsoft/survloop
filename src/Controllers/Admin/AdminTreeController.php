@@ -794,16 +794,16 @@ class AdminTreeController extends AdminTreeStats
             return DB::select($qry . "`cond_opts`%2 = 0 ORDER BY `cond_tag`");
         } elseif ($this->v["filtOnly"] == 'articles') {
             return DB::select($qry . "`cond_opts`%3 = 0 ORDER BY `cond_tag`");
-        } else {
-            return SLConditions::orderBy('cond_tag', 'asc')->get();
         }
+        return SLConditions::orderBy('cond_tag', 'asc')
+            ->get();
     }
     
     public function loadCondList()
     {
         $condsRaw = [];
         $condsTmp = $this->getRawConds();
-        if ($condsTmp && $condsTmp->isNotEmpty()) {
+        if ($condsTmp && sizeof($condsTmp) > 0) {
             foreach ($condsTmp as $c) {
                 $condsRaw[] = SLConditions::find($c->cond_id);
             }

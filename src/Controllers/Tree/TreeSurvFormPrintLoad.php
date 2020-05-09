@@ -96,6 +96,17 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
                 );
             }
         }
+        if ($curr->itemInd < 0 && sizeof($this->sessData->dataBranches) > 0) {
+            $ind = sizeof($this->sessData->dataBranches)-1;
+            if (isset($this->sessData->dataBranches[$ind]["branch"])
+                && trim($this->sessData->dataBranches[$ind]["branch"]) != ''
+                && isset($this->sessData->dataBranches[$ind]["itemID"])
+                && intVal($this->sessData->dataBranches[$ind]["itemID"]) > 0) {
+                $tbl = $this->sessData->dataBranches[$ind]["branch"];
+                $curr->itemID = intVal($this->sessData->dataBranches[$ind]["itemID"]);
+                $curr->itemInd = $this->sessData->getRowInd($tbl, $curr->itemID);
+            }
+        }
         return true;
     }
 
@@ -316,12 +327,7 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
                         $curr->onKeyUp .= ' fldOnKeyUp' 
                             . $curr->nIDtxt . '(); ';
                     }
-                    $curr->nodePromptAfter = $this->swapLabels(
-                        $curr->nIDtxt, 
-                        $after, 
-                        $curr->itemID, 
-                        $curr->itemInd
-                    );
+                    $curr->nodePromptAfter = $this->swapLabels($curr, $after);
                     $curr->nodePromptAfter = $GLOBALS["SL"]->extractJava(
                         $curr->nodePromptAfter, 
                         $curr->nID
@@ -397,7 +403,7 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
         
         // write basic node field labeling
         $tmp = $curr->nodeRow->node_prompt_text;
-        $tmp = $this->swapLabels($curr->nIDtxt, $tmp, $curr->itemID, $curr->itemInd);
+        $tmp = $this->swapLabels($curr, $tmp);
         $tmp  = stripslashes($tmp);
         if ($curr->isRequired() && $curr->nodeType != 'Hidden Field') {
             $tmp = $this->addPromptTextRequired($curr, $tmp, $curr->nIDtxt);
@@ -405,12 +411,7 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
         $curr->nodePromptText = $tmp;
 
         $tmp = $curr->nodeRow->node_prompt_notes;
-        $curr->nodePromptNotes = $this->swapLabels(
-            $curr->nIDtxt, 
-            $tmp, 
-            $curr->itemID, 
-            $curr->itemInd
-        );
+        $curr->nodePromptNotes = $this->swapLabels($curr, $tmp);
         $curr->nodePromptNotes = stripslashes($curr->nodePromptNotes);
         if (trim($curr->nodePromptNotes) != '' && !$curr->isLoopRoot()) {
             if ($curr->nodeRow->node_opts%83 == 0) {

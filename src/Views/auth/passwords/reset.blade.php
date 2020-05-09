@@ -18,7 +18,7 @@ $v = $surv->custLoop->v;
 <div class="p20"></div>
 
 <div class="loginTitles">
-    <a class="btn btn-secondary pull-right" href="/login" >Login</a>
+    <a href="/login" class="btn btn-secondary pull-right">Login</a>
     <h2 class="mT0">Reset Password</h2>
 </div>
 
@@ -56,8 +56,10 @@ $v = $surv->custLoop->v;
 
 <div class="nodeWrap">
 <div class="nPrompt"><label for="password">Password:</label></div>
-<div class="nFld"><input id="password" name="password" type="password" 
-    class="form-control form-control-lg" required ></div>
+<div class="nFld">
+    <input id="password" name="password" type="password" 
+        class="form-control form-control-lg" required >
+</div>
 </div>
 @if ($errors->has('password'))
     <span class="form-text">
@@ -68,10 +70,12 @@ $v = $surv->custLoop->v;
 <div class="nodeGap"></div>
 
 <div class="nodeWrap">
-    <div class="nPrompt"><label for="password-confirm">Confirm Password:</label></div>
+    <div class="nPrompt">
+        <label for="password-confirm">Confirm Password:</label>
+    </div>
     <div class="nFld">
-        <input id="password-confirm" name="password_confirmation" type="password" 
-            class="form-control form-control-lg">
+        <input id="password-confirm" name="password_confirmation" 
+            type="password" class="form-control form-control-lg">
     </div>
 </div>
 @if ($errors->has('password_confirmation'))
@@ -80,7 +84,8 @@ $v = $surv->custLoop->v;
     </span>
 @endif
 
-<center><input type="submit" class="btn btn-lg btn-xl btn-primary mT20" value="Reset Password"></center>
+<center><input type="submit" value="Reset Password"
+    class="btn btn-lg btn-xl btn-primary mT20" ></center>
 
 <div class="nodeGap"></div>
 

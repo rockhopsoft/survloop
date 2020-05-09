@@ -22,6 +22,10 @@ Route::get(
     '/{treeSlug}/read-{cid}/xml',
     $path . 'SurvLoop@xmlByID'
 );
+Route::get(
+    '/{treeSlug}/read-{cid}/full-xml',
+    $path . 'SurvLoop@xmlFullByID'
+);
 //Route::get(
 //    '/{treeSlug}/read-{cid}/json',
 //    $path . 'SurvLoop@xmlByID'

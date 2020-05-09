@@ -328,8 +328,10 @@ class GlobalsCache extends GlobalsBasic
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
         $java = $this->pageJAVA . $this->getXtraJs();
-        if (trim($this->pageAJAX) != '' && trim($this->pageAJAX) != '/* */') {
-            $java .= ' $(document).ready(function(){ ' . $this->pageAJAX . ' }); ';
+        if (trim($this->pageAJAX) != '' 
+            && trim($this->pageAJAX) != '/* */') {
+            $java .= ' $(document).ready(function(){ ' 
+                . $this->pageAJAX . ' }); ';
         }
         if (trim($java) != '' && trim($java) != '/* */') {
             $java .= ' pageDynaLoaded = true; ';
@@ -339,8 +341,9 @@ class GlobalsCache extends GlobalsBasic
             $minifier->add($minPath . '/js/' . $fileJs);
             $minifier->minify($minPath . '/js/' . $fileMin);
             Storage::delete($this->cachePath . '/js/' . $fileJs);
-            $this->pageSCRIPTS .= "\n" . '<script id="dynJs" type="text/javascript" '
-                . 'src="/sys/dyna/' . $fileMin . '"></script>' . "\n";
+            $this->pageSCRIPTS .= "\n" . '<script id="dynJs" '
+                . 'type="text/javascript" src="/sys/dyna/' 
+                . $fileMin . '"></script>' . "\n";
         }
 
         $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
@@ -370,7 +373,8 @@ class GlobalsCache extends GlobalsBasic
                 mkdir('../storage/app/' . $folder);
             }
             $cnt = 0;
-            $files = $this->mapDirFilesSlim('../storage/app/' . $folder, false);
+            $slimFold = '../storage/app/' . $folder;
+            $files = $this->mapDirFilesSlim($slimFold, false);
             if (sizeof($files) > 0) {
                 foreach ($files as $i => $file) {
                     if ($cnt < 5000) {
@@ -393,6 +397,12 @@ class GlobalsCache extends GlobalsBasic
         $chk = SLCaches::where('created_at', '<', $postDateTime)
             ->delete();
         return true;
+    }
+
+    public function clearAllSystemCaches()
+    {
+        return SLCaches::where('cach_id', '>', 0)
+            ->delete();
     }
 
     public function getCacheSffxAdds()
@@ -448,8 +458,7 @@ class GlobalsCache extends GlobalsBasic
             . '}, ' . (500+(500*$this->x["deferCnt"])) . '); ';
         return '<div id="deferNode' . $nID . '" class="w100 ovrSho">'
             . '<center><div id="deferAnim' . $nID . '" class="p20">'
-            . $this->spinner() . '</div></center>'
-            . '</div>';
+            . $this->spinner() . '</div></center></div>';
     }
 
     public function microLog($label = 'Start Page Load')

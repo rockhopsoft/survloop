@@ -50,7 +50,9 @@ class SurvLoopController extends Controller
     protected $sessInfo          = [];
     protected $sessLoops         = [];
     
-    public $v                    = []; // contains data to be shares with views, and/or across [dispersed] functions
+    public $v                    = []; 
+    // contains data to be shares with views, 
+    // and/or across [dispersed] functions
     
     protected $currPage          = '';
     protected $cacheKey          = '';
@@ -62,9 +64,18 @@ class SurvLoopController extends Controller
     
     protected function loadUserVars()
     {
-        $this->v["user"]       = Auth::user();
-        $this->v["uID"]        = (($this->v["user"] 
-            && isset($this->v["user"]->id)) ? $this->v["user"]->id : 0);
+        $this->v["user"] = Auth::user();
+        $this->v["uID"] = 0;
+        if ($this->v["user"] 
+            && isset($this->v["user"]->id) 
+            && intVal($this->v["user"]->id) > 0) {
+            $this->v["uID"] = $this->v["user"]->id;
+            if (isset($GLOBALS["SL"])) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedIn = true; ';
+            }
+        } elseif (isset($GLOBALS["SL"])) {
+            $GLOBALS["SL"]->pageJAVA .= ' loggedIn = false; ';
+        }
         $this->v["isAdmin"]    = ($this->v["user"] 
             && $this->v["user"]->hasRole('administrator'));
         $this->v["isVolun"]    = ($this->v["user"] 

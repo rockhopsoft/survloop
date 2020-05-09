@@ -6,17 +6,19 @@ $v = $surv->custLoop->v;
 
 @section('content')
 <!-- resources/views/vendor/survloop/auth/passwords/email.blade.php -->
-<form name="mainPageForm" class="form-horizontal" 
-    role="form" method="POST" action="{{ url('/password/email') }}">
-<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+<form name="mainPageForm" class="form-horizontal" role="form" 
+    method="POST" action="{{ url('/password/email') }}">
+<input type="hidden" id="csrfTok" name="_token" 
+    value="{{ csrf_token() }}">
 
-<div class="w100"><center>
+<div class="w100 mB30 pB30"><center>
     <div id="treeWrap" class="treeWrapForm">
 
         <div class="p20"></div>
 
         <div class="loginTitles">
-            <a class="btn btn-secondary pull-right" href="/login" >Login</a>
+            <a class="btn btn-secondary pull-right" href="/login" 
+                >Login</a>
             <h2 class="mT0">Reset Password</h2>
         </div>
 
@@ -35,7 +37,8 @@ $v = $surv->custLoop->v;
                 <label for="emailID"><b>Email:</b></label>
             </div>
             <div class="nFld">
-                <input id="emailID" name="email" class="form-control form-control-lg"
+                <input id="emailID" name="email" 
+                    class="form-control form-control-lg"
                     value="{{ old('email') }}" type="email">
             </div>
         </div>

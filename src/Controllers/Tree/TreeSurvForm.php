@@ -102,10 +102,10 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         if ($curr->isPage()) {
             $extraOpts = $this->swapIDsSEO($curr->extraOpts);
             $GLOBALS['SL']->setSEO(
-                $this->swapLabels($curr->nID . '', $extraOpts["meta-title"]), 
-                $this->swapLabels($curr->nID . '', $extraOpts["meta-desc"]), 
-                $this->swapLabels($curr->nID . '', $extraOpts["meta-keywords"]), 
-                $this->swapLabels($curr->nID . '', $extraOpts["meta-img"])
+                $this->swapLabels($curr, $extraOpts["meta-title"]), 
+                $this->swapLabels($curr, $extraOpts["meta-desc"]), 
+                $this->swapLabels($curr, $extraOpts["meta-keywords"]), 
+                $this->swapLabels($curr, $extraOpts["meta-img"])
             );
         }
 

@@ -227,14 +227,15 @@ class TreeSurvFormElements extends TreeSurvFormUtils
                 $curr->xtraClass .= ' w33';
             }
             if ($curr->isDropdownTagger()) {
-                $curr->onChange .= ' onChange="selectTag(\'' . $curr->nIDtxt 
+                $curr->onChange = ' onChange="selectTag(\'' . $curr->nIDtxt 
                     . '\', this.value); this.value=\'\';" ';
             }
             $ret .= view(
                 'vendor.survloop.forms.formtree-dropdown-start', 
                 [ "curr" => $curr ]
             )->render();
-            if ($curr->nodeType == 'U.S. States' && !$curr->isDropdownTagger()) {
+            if ($curr->nodeType == 'U.S. States' 
+                && !$curr->isDropdownTagger()) {
                 $GLOBALS["SL"]->loadStates();
                 $ret .= $GLOBALS["SL"]->states->stateDrop($curr->sessData);
             } else {

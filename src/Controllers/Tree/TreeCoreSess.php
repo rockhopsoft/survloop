@@ -51,7 +51,10 @@ class TreeCoreSess extends TreeCore
             return false;
         }
 
-        $uID = ((isset($this->v["uID"])) ? $this->v["uID"] : 0);
+        $uID = 0;
+        if (isset($this->v["uID"]) && $this->v["uID"] > 0) {
+            $uID = $this->v["uID"];
+        }
         $cid = 0; 
         if ($GLOBALS["SL"]->REQ->has('cid') 
             && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) {
@@ -165,7 +168,8 @@ class TreeCoreSess extends TreeCore
                 $subFld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'submission_progress';
                 if (isset($this->sessData->dataSets[$coreTbl])) {
                     $coreRec = $this->sessData->dataSets[$coreTbl][0];
-                    if (isset($coreRec->{ $subFld }) && intVal($coreRec->{ $subFld }) > 0) {
+                    if (isset($coreRec->{ $subFld }) 
+                        && intVal($coreRec->{ $subFld }) > 0) {
                         $this->updateCurrNode($coreRec->{ $subFld });
                     }
                 } elseif (isset($this->sessInfo->sess_curr_node) 
@@ -304,7 +308,8 @@ class TreeCoreSess extends TreeCore
     
     protected function recordIsEditable($coreTbl, $coreID, $coreRec = NULL)
     {
-        return ($this->isAdminUser() || $this->recordIsIncomplete($coreTbl, $coreID, $coreRec));
+        return ($this->isAdminUser() 
+            || $this->recordIsIncomplete($coreTbl, $coreID, $coreRec));
     }
     
     protected function recordIsIncomplete($coreTbl, $coreID, $coreRec = NULL)
@@ -319,8 +324,8 @@ class TreeCoreSess extends TreeCore
     
     public function isPublishedPublic($coreTbl, $coreID, $coreRec = NULL)
     {
-        return $this->isPublished($coreTbl, 
-            $GLOBALS["SL"]->swapIfPublicID($coreID), $coreRec);
+        $cid = $GLOBALS["SL"]->swapIfPublicID($coreID);
+        return $this->isPublished($coreTbl, $cid, $coreRec);
     }
     
     public function newCoreRow($coreTbl = '')
@@ -919,8 +924,7 @@ class TreeCoreSess extends TreeCore
                 $GLOBALS["SL"]->pageView = 'xml';
             }
         }
-        $this->chkPageToken();
-        $this->tweakPageViewPerms();
+        $this->tweakPageViewPerms($initPageView);
         if ($initPageView != $GLOBALS["SL"]->pageView) {
             //$this->redir('/' . $GLOBALS["SL"]->treeRow->tree_slug 
             //    . '/read-' . $this->corePublicID . '/' . $GLOBALS["SL"]->pageView);
@@ -933,7 +937,7 @@ class TreeCoreSess extends TreeCore
      *
      * @return boolean
      */
-    protected function tweakPageViewPerms()
+    protected function tweakPageViewPerms($initPageView = '')
     {
         return true;
     }
@@ -951,12 +955,15 @@ class TreeCoreSess extends TreeCore
         return false;
     }
     
-    protected function chkPageToken()
+    public function chkPageToken()
     {
         if (strlen($GLOBALS["SL"]->pageView) > 6 
             && substr($GLOBALS["SL"]->pageView, 0, 6) == 'token-') {
             $this->v["tokenIn"] = substr($GLOBALS["SL"]->pageView, 6);
             $GLOBALS["SL"]->pageView = '';
+        } elseif ($GLOBALS["SL"]->REQ->has('tokenIn') 
+            && trim($GLOBALS["SL"]->REQ->tokenIn) != '') {
+            $this->v["tokenIn"] = trim($GLOBALS["SL"]->REQ->tokenIn);
         }
         if (!isset($this->v["mfaMsg"])) {
             $this->v["mfaMsg"] = '';
@@ -966,13 +973,16 @@ class TreeCoreSess extends TreeCore
         }
         if (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '') {
             $this->v["mfaMsg"] = $this->processTokenAccess();
+            $GLOBALS["SL"]->pageJAVA .= ' appUrlParams[appUrlParams.length] '
+                . '= new Array("tokenIn", "' . $this->v["tokenIn"] . '"); ';
         }
         return (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0);
     }
     
     public function pageLoadHasToken()
     {
-        return ( (isset($GLOBALS["SL"]->pageView) && trim($GLOBALS["SL"]->pageView) == 'token')
+        return ( (isset($GLOBALS["SL"]->pageView) 
+                && trim($GLOBALS["SL"]->pageView) == 'token')
             || (isset($this->v["mfaMsg"]) && trim($this->v["mfaMsg"]) != '')
             || (isset($this->v["tokenIn"]) && $this->v["tokenIn"] != '')
             || (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0) );
@@ -983,9 +993,13 @@ class TreeCoreSess extends TreeCore
         if (!isset($this->v["tokenIn"]) || $this->v["tokenIn"] == '') {
             return '';
         }
+        $cid = $this->coreID;
+        if ($this->coreID <= 0) {
+            $cid = $GLOBALS["SL"]->coreID;
+        }
         $ret = '';
         $chk = SLTokens::where('tok_type', 'Sensitive')
-            ->where('tok_core_id', $this->coreID)
+            ->where('tok_core_id', $cid)
             ->where('tok_tok_token', $this->v["tokenIn"])
             ->orderBy('updated_at', 'desc')
             ->first();
@@ -994,38 +1008,13 @@ class TreeCoreSess extends TreeCore
             if ($this->v["tokenUser"] && isset($this->v["tokenUser"]->id)) {
                 $mfaTools = true;
                 $resultMsg = '';
-                if ($GLOBALS["SL"]->REQ->has('sub') 
+                if ($GLOBALS["SL"]->REQ->has('t2sub') 
                     && $GLOBALS["SL"]->REQ->has('t2') 
                     && trim($GLOBALS["SL"]->REQ->get('t2')) != '') {
-                    $time = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-7, date("Y"));
-                    $chk = SLTokens::where('tok_type', 'MFA')
-                        ->where('tok_core_id', $this->coreID)
-                        ->where('tok_tok_token', $GLOBALS["SL"]->REQ->get('t2'))
-                        ->where('updated_at', '>', date("Y-m-d H:i:s", $time))
-                        ->orderBy('updated_at', 'desc')
-                        ->first();
-                    if ($chk) {
-                        Auth::login($this->v["tokenUser"]);
-                        $successMsg = '<div class="alert alert-success alert-dismissible" role="alert">'
-                            . '<i class="fa-li fa fa-spinner fa-spin"></i> <strong>Access Granted!</strong> '
-                            . '<span class="mL10">Reloading the page...</span>'
-                            . '<button type="button" class="close" data-dismiss="alert">×</button></div>';
-                        session()->put('sessMsg', $successMsg);
-                        session()->save();
-                        $resultMsg .= $this->processTokenAccessRedirExtra() 
-                            . '<script type="text/javascript"> setTimeout("window.location=\'/' 
-                            . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' 
-                            . $this->corePublicID . '/full\'", 300); </script>';
-                    } else {
-                        $resultMsg .= '<div id="keySry" class="alert alert-danger mT10 mB10" '
-                            . 'role="alert"><strong>Whoops!</strong> The Key Code you '
-                            . 'entered didn\'t match our records or it expired. To view '
-                            . 'the full details using your authorized email address, please '
-                            . '<a href="?resend=access">request a new key code</a>.</div>';
-                    }
+                    $ret .= $this->processTokenAccessSubmit();
                 } else {
                     if ($GLOBALS["SL"]->REQ->has('resend') 
-                        && trim($GLOBALS["SL"]->REQ->get('resend')) == 'access') {
+                        && trim($GLOBALS["SL"]->REQ->resend) == 'access') {
                         $this->processTokenAccessEmail();
                     }
                 }
@@ -1035,6 +1024,48 @@ class TreeCoreSess extends TreeCore
                     $ret .= $resultMsg;
                 }
             }
+        }
+        return $ret;
+    }
+    
+    protected function processTokenAccessSubmit()
+    {
+        $ret = '';
+        $time = mktime(date("H"), date("i"), date("s"), 
+            date("m"), date("d")-7, date("Y"));
+        $cid = $this->coreID;
+        if ($cid <= 0 && $GLOBALS["SL"]->coreID > 0) {
+            $cid = $GLOBALS["SL"]->coreID;
+        }
+        $chk = SLTokens::where('tok_type', 'MFA')
+            ->where('tok_core_id', $cid)
+            ->where('tok_tok_token', trim($GLOBALS["SL"]->REQ->get('t2')))
+            ->where('updated_at', '>', date("Y-m-d H:i:s", $time))
+            ->orderBy('updated_at', 'desc')
+            ->first();
+//echo 'processTokenAccessSubmit - cid: ' . $cid . ', tokenUser: ' . $this->v["tokenUser"] . '<br />'; print_r($chk); exit;
+        if ($chk) {
+            Auth::login($this->v["tokenUser"]);
+            $successMsg = '<div id="tokAlrt" role="alert" '
+                . 'class="alert alert-success alert-dismissible">'
+                . '<i class="fa-li fa fa-spinner fa-spin"></i> '
+                . '<strong>Access Granted!</strong> '
+                . '<span class="mL10">Reloading the page...</span>'
+                . '<button type="button" class="close" '
+                . 'data-dismiss="alert">×</button></div>';
+            session()->put('sessMsg', $successMsg);
+            session()->save();
+            $ret .= $this->processTokenAccessRedirExtra() 
+                . '<script type="text/javascript"> '
+                . 'setTimeout("window.location=\'/' 
+                . $GLOBALS["SL"]->treeRow->tree_slug . '/readi-' 
+                . $cid . '/full?refresh=1\'", 300); </script>';
+        } else {
+            $ret .= '<div id="keySry" class="alert alert-danger mT10 mB10" '
+                . 'role="alert"><strong>Whoops!</strong> The Key Code you '
+                . 'entered didn\'t match our records or it expired. To view '
+                . 'the full details using your authorized email address, please '
+                . '<a href="?resend=access">request a new key code</a>.</div>';
         }
         return $ret;
     }
