@@ -105,7 +105,8 @@ class SurvLoopController extends Controller
             if (trim($this->v["currPage"][0]) == '') {
                 $this->v["currPage"][0] = $currPage;
             }
-            if (trim($this->v["currPage"][0]) == '') {
+            if (trim($this->v["currPage"][0]) == ''
+                && isset($_SERVER["REQUEST_URI"])) {
                 $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
                 if (strpos($this->v["currPage"][0], '?') !== false) {
                     $pos = strpos($this->v["currPage"][0], '?');
@@ -821,35 +822,36 @@ class SurvLoopController extends Controller
     
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
     {
-        if (!isset($repTo[0]) || trim($repTo[0]) == '') {
-            $repTo[0] = 'info@' . strtolower($GLOBALS["SL"]->getParentDomain());
-        }
-        if (!isset($repTo[1]) || trim($repTo[1]) == '') {
-            $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
-        }
         $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.master', [
             'emaSubj'    => \$emaSubject,
             'emaContent' => \$emaContent,
             'cssColors'  => \$GLOBALS['SL']->getCssColorsEmail()
-            ], function (\$m) { \$m->subject('" . str_replace("'", "\\'", $emaSubject) . "')";
-                if (sizeof($emaTo) > 0) {
-                    foreach ($emaTo as $i => $eTo) {
-                        $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
-                if (sizeof($emaCC) > 0) {
-                    foreach ($emaCC as $eTo) {
-                        $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
-                if (sizeof($emaBCC) > 0) {
-                    foreach ($emaBCC as $eTo) {
-                        $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
+            ], function (\$m) { \$m->subject('" 
+            . str_replace("'", "\\'", $emaSubject) . "')";
+        if (sizeof($emaTo) > 0) {
+            foreach ($emaTo as $i => $eTo) {
+                $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+            }
+        }
+        if (sizeof($emaCC) > 0) {
+            foreach ($emaCC as $eTo) {
+                $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+            }
+        }
+        if (sizeof($emaBCC) > 0) {
+            foreach ($emaBCC as $eTo) {
+                $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
+                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+            }
+        }
+        if (!isset($repTo[0]) || is_array($repTo[0]) || trim($repTo[0]) == '') {
+            $repTo[0] = 'info@' . strtolower($GLOBALS["SL"]->getParentDomain());
+        }
+        if (!isset($repTo[1]) || is_array($repTo[1]) || trim($repTo[1]) == '') {
+            $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
+        }
         $mail .= "->replyTo('" . $repTo[0] . "'" . ((trim($repTo[1]) != '') 
             ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
         if ($GLOBALS["SL"]->isHomestead()) {

@@ -530,6 +530,4 @@ class GlobalsStatic extends GlobalsConvert
         return $str;
     }
 
-
-
 }

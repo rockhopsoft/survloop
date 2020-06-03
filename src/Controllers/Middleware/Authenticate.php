@@ -7,7 +7,9 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
+
 namespace App\Http\Middleware;
+use Illuminate\Http\Request;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 
@@ -19,7 +21,7 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string
      */
-    protected function redirectTo($request)
+    protected function redirectTo(Request $request)
     {
         if (!$this->redirectIsBad($_SERVER["REQUEST_URI"])) {
             session()->put('loginRedir', $_SERVER["REQUEST_URI"]);

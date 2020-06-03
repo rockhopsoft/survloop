@@ -43,9 +43,12 @@ class AdminDBController extends AdminController
     protected function initExtra(Request $request)
     {
         $this->v["DbID"] = $this->dbID = $GLOBALS["SL"]->dbID;
-        $this->dbTitle = '<h1 class="disIn red">' . $GLOBALS["SL"]->dbRow->db_name . '&nbsp;</h1>';
-        $this->dbSubTitle = '<span class="red">' . $GLOBALS["SL"]->dbRow->db_desc . '</span>';
-        $this->v["dbAllowEdits"] = ($this->v["user"] && $this->v["user"]->hasRole('administrator|databaser'));
+        $this->dbTitle = '<h1 class="disIn red">' 
+            . $GLOBALS["SL"]->dbRow->db_name . '&nbsp;</h1>';
+        $this->dbSubTitle = '<span class="red">' 
+            . $GLOBALS["SL"]->dbRow->db_desc . '</span>';
+        $this->v["dbAllowEdits"] = ($this->v["user"] 
+            && $this->v["user"]->hasRole('administrator|databaser'));
         $this->v["mission"] = view(
             'vendor.survloop.elements.inc-mission-statement', 
             [ "DbMission" => $GLOBALS["SL"]->dbRow->db_mission ]
@@ -79,12 +82,30 @@ class AdminDBController extends AdminController
         }
         
         $this->v["FldDataTypes"] = [];
-        $this->v["FldDataTypes"]['VARCHAR']  = array('Text/String (255 characters max)', 'Text');
-        $this->v["FldDataTypes"]['TEXT']     = array('Long Text/String',                 'Text-Long');
-        $this->v["FldDataTypes"]['INT']      = array('Integer',                          'Number');
-        $this->v["FldDataTypes"]['DOUBLE']   = array('Decimal/Large Number',             'Number-Decimals');
-        $this->v["FldDataTypes"]['DATE']     = array('Date',                             'Date');
-        $this->v["FldDataTypes"]['DATETIME'] = array('Date and Time',                    'Date&Time');
+        $this->v["FldDataTypes"]['VARCHAR'] = [
+            'Text/String (255 characters max)', 
+            'Text'
+        ];
+        $this->v["FldDataTypes"]['TEXT'] = [
+            'Long Text/String',
+            'Text-Long'
+        ];
+        $this->v["FldDataTypes"]['INT'] = [
+            'Integer',
+            'Number'
+        ];
+        $this->v["FldDataTypes"]['DOUBLE'] = [
+            'Decimal/Large Number',
+            'Number-Decimals'
+        ];
+        $this->v["FldDataTypes"]['DATE'] = [
+            'Date',
+            'Date'
+        ];
+        $this->v["FldDataTypes"]['DATETIME'] = [
+            'Date and Time',
+            'Date&Time'
+        ];
         
         $tbls = SLTables::select('tbl_id', 'tbl_name', 'tbl_eng', 'tbl_abbr', 'tbl_opts')
             ->where('tbl_database', $this->dbID)

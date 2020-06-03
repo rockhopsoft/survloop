@@ -489,20 +489,33 @@ class GlobalsBasic extends GlobalsVars
         return '';
     }
     
-    public function fld2SchemaType($fld)
+    public function fld2SchemaType($fld = null)
     {
-        if (strpos($fld->fld_values, 'Def::') !== false) {
+        if (isset($fld->fld_values) 
+            && strpos($fld->fld_values, 'Def::') !== false) {
             return 'xs:string';
         }
-        switch (strtoupper(trim($fld->fld_type))) {
-            case 'INT':      return 'xs:integer'; break;
-            case 'DOUBLE':   return 'xs:double'; break;
-            case 'DATE':     return 'xs:date'; break;
-            case 'DATETIME': return 'xs:dateTime'; break;
-        } // case 'VARCHAR': case 'TEXT':
+        if (isset($fld->fld_type)) {
+            switch (strtoupper(trim($fld->fld_type))) {
+                case 'INT':      return 'xs:integer'; break;
+                case 'DOUBLE':   return 'xs:double'; break;
+                case 'DATE':     return 'xs:date'; break;
+                case 'DATETIME': return 'xs:dateTime'; break;
+            } // case 'VARCHAR': case 'TEXT':
+        }
         return 'xs:string';
     }
     
+    public function fld2SchemaEnumsType($enums)
+    {
+        if (sizeof($enums) > 0
+            && $enums[0] == 0
+            && $enums[1] == 1) {
+            return 'xs:integer';
+        }
+        return 'xs:string';
+    }
+
     public function getTblFlds($tbl)
     {
         $ret = [];

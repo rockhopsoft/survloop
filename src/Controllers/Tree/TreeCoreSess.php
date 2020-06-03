@@ -107,7 +107,7 @@ class TreeCoreSess extends TreeCore
             }
         }
         if ($this->coreIDoverride > 0) {
-            // should there be more permission checks here?..
+            // should there be more checks here?..
             $this->coreID = $this->coreIDoverride;
         //} elseif ($this->coreID <= 0) { $this->newCoreRow($coreTbl);
         }

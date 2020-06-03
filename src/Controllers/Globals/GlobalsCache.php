@@ -393,7 +393,7 @@ class GlobalsCache extends GlobalsBasic
                 }
             }
         }
-        $postDateTime = date('Y-m-d H:i:s', $this->getPastDateTime());
+        $postDateTime = date('Y-m-d H:i:s', $this->getPastDateTime(10));
         $chk = SLCaches::where('created_at', '<', $postDateTime)
             ->delete();
         return true;

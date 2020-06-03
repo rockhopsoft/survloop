@@ -462,8 +462,10 @@ class TreeNodeSurv extends TreeNodeSurvVars
     {
         $fld = SLFields::find($this->getTblFldID());
         if ($fld && isset($fld->fld_table)) {
-            return '<a target="_blank" href="' . (($isPrint) ? '/db/1' : '/dashboard/db/all')
-                . '#' . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->fld_table]] 
+            return '<a target="_blank" href="' 
+                . (($isPrint) ? '/db/1' : '/dashboard/db/all')
+                . '?fldID=' . $fld->fld_id . '#' 
+                . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->fld_table]] 
                 . $fld->fld_name . '" class="slGreenDark">'
                 . $this->getTblFldName() . '</a>';
         }

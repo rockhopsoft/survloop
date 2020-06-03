@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvAPI is extends a standard branching tree, for maps of API exports.
+  * TreeSurvAPI extends a standard branching tree, for maps of API exports.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
@@ -317,11 +317,10 @@ class TreeSurvAPI extends TreeCoreSess
                 $nextV = $this->getXmlTmpV(-3, $help);
                 if (isset($v["tblHelpFld"][$help]->fld_name)) {
                     $v["kids"] .= '<xs:element name="' 
-                        . $nextV["tbl"] . '" minOccurs="0">
+                        . $nextV["tbl"] . '">
                         <xs:complexType mixed="true"><xs:sequence>
                             <xs:element name="' 
-                            . $v["tblHelpFld"][$help]->fld_name 
-                            . '" minOccurs="0" maxOccurs="unbounded" />
+                            . $v["tblHelpFld"][$help]->fld_name . '" />
                         </xs:sequence></xs:complexType>
                     </xs:element>' . "\n";
                 }
@@ -495,15 +494,27 @@ class TreeSurvAPI extends TreeCoreSess
         return false;
     }
     
+    protected function genXmlFormatValCustomPerms($rec, $fld, $abbr)
+    {
+        return false;
+    }
+    
     public function genXmlFormatVal($rec, $fld, $abbr)
     {
         $val = false;
-        if ($this->checkFldDataPerms($fld) && $this->checkViewDataPerms($fld) 
-            && isset($rec->{ $abbr . $fld->fld_name })) {
+//if ($fld->fld_name == 'summary') { echo 'genXmlFormatVal(abbr: ' . $abbr . ',<br />fld: ' . $fld->fld_name . ' ' . $fld->fld_opts . ', rec:<br />'; print_r($rec); echo '<br />'; }
+//if ($apiFld->fld->fld_name == 'summary') { echo 'fld:table: ' . $apiFld->fld->fld_table . ', fldTbl: ' . $fldTbl . ', fldTblAbbr: ' . $fldTblAbbr . ', fldName: ' . $fldName . ', val: ' . $val . ', id: ' . $id . ',<pre>'; print_r($this->sessData->getChildRows($tbl, $id, $fldTbl)); print_r($rec); echo '</pre>'; }
+        if (isset($rec->{ $abbr . $fld->fld_name })
+            && ($this->genXmlFormatValCustomPerms($rec, $fld, $abbr)
+                || ($this->checkFldDataPerms($fld) 
+                    && $this->checkViewDataPerms($fld)))) {
             $val = $rec->{ $abbr . $fld->fld_name };
             if (strpos($fld->fld_values, 'Def::') !== false) {
                 if (intVal($val) > 0) {
-                    $val = $GLOBALS["SL"]->def->getVal(str_replace('Def::', '', $fld->fld_values), $val);
+                    $val = $GLOBALS["SL"]->def->getVal(
+                        str_replace('Def::', '', $fld->fld_values), 
+                        $val
+                    );
                 } else {
                     $val = false;
                 }
@@ -521,7 +532,8 @@ class TreeSurvAPI extends TreeCoreSess
                         }
                     }
                 } elseif ($fld->fld_type == 'DATETIME') {
-                    if ($val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00') {
+                    if ($val == '0000-00-00 00:00:00' 
+                        || $val == '1970-01-01 00:00:00') {
                         return '';
                     }
                     $val = str_replace(' ', 'T', $val);
@@ -538,10 +550,13 @@ class TreeSurvAPI extends TreeCoreSess
     public function checkValEmpty($fldType, $val)
     {
         $val = trim($val);
-        if ($fldType == 'DATE' && ($val == '' || $val == '0000-00-00' || $val == '1970-01-01')) {
+        if ($fldType == 'DATE' 
+            && ($val == '' || $val == '0000-00-00' || $val == '1970-01-01')) {
             return true;
         } elseif ($fldType == 'DATETIME' 
-            && ($val == '' || $val == '0000-00-00 00:00:00' || $val == '1970-01-01 00:00:00')) {
+            && ($val == '' 
+                || $val == '0000-00-00 00:00:00' 
+                || $val == '1970-01-01 00:00:00')) {
             return true;
         }
         return false;
@@ -633,7 +648,8 @@ class TreeSurvAPI extends TreeCoreSess
                 if (sizeof($kidRows) > 0) {
                     foreach ($kidRows as $j => $kid) {
                         $abbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]];
-                        $ret .= ' ' . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], $abbr);
+                        $ret .= ' ' 
+                            . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], $abbr);
                     }
                 }
             }
@@ -644,16 +660,17 @@ class TreeSurvAPI extends TreeCoreSess
             if (sizeof($kidRows) > 0) {
                 $nextV = $this->getXmlTmpV($nodeTiers[1][$i][0]);
                 foreach ($kidRows as $j => $kid) {
-                    $ret .= ' ' . $this->genRecDumpNode($nodeTiers[1][$i][0], $nodeTiers[1][$i], $kid);
+                    $ret .= ' ' 
+                        . $this->genRecDumpNode($nodeTiers[1][$i][0], $nodeTiers[1][$i], $kid);
                 }
             }
         }
         return $ret;
     }
-    
+
     protected function genRecDumpXtra()
     {
         return '';
     }
-    
+
 }

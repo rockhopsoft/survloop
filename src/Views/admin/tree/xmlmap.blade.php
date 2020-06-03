@@ -12,24 +12,24 @@
 <div class="row mT30">
     <div class="col-6">
         <h3>XML Schema</h3>
-        <a href="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema" target="_blank"
+        <a href="/{{ $GLOBALS['SL']->xmlTree['slug'] }}-schema-xml" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
-            /{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema</a>
+            /{{ $GLOBALS['SL']->xmlTree['slug'] }}-schema-xml</a>
     </div>
     <div class="col-6">
         <h3>XML Example</h3>
-        <a href="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example" target="_blank"
+        <a href="/{{ $GLOBALS['SL']->xmlTree['slug'] }}-example-xml" target="_blank"
             ><i class="fa fa-file-code-o" aria-hidden="true"></i> 
-            /{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example</a>
+            /{{ $GLOBALS['SL']->xmlTree['slug'] }}-example-xml</a>
     </div>
 </div>
 <div class="row">
     <div class="col-6">
-        <iframe src="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-schema" 
+        <iframe src="/{{ $GLOBALS['SL']->xmlTree['slug'] }}-schema-xml" 
             class="w100" style="height: 1000px;"></iframe>
     </div>
     <div class="col-6">
-        <iframe src="/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example" 
+        <iframe src="/{{ $GLOBALS['SL']->xmlTree['slug'] }}-example-xml" 
             class="w100" style="height: 1000px;"></iframe>
     </div>
 </div>

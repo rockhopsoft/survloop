@@ -11,6 +11,7 @@
 namespace SurvLoop\Controllers\Tree;
 
 use App\Models\User;
+use App\Models\SLNode;
 use App\Models\SLEmails;
 use Illuminate\Http\Request;
 use SurvLoop\Controllers\Tree\TreeSurvUpload;

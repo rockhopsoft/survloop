@@ -11,6 +11,7 @@
 namespace SurvLoop\Controllers\Admin;
 
 use DB;
+use Illuminate\Http\Request;
 use SurvLoop\Controllers\SystemDefinitions;
 use SurvLoop\Controllers\Stats\SessAnalysis;
 use SurvLoop\Controllers\Admin\AdminController;
@@ -45,9 +46,10 @@ class AdminTreeStats extends AdminController
             $this->sysDef = new SystemDefinitions;
             $this->v["css"] = $this->sysDef->loadCss();
             
-            // clear empties here
             $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), 
                 date("m"), date("d")-3, date("Y"));
+            /*
+            // clear empties here
             eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
                 . "::" . $this->custReport->treeSessionsWhereExtra()
                 . "where('updated_at', '<', '" . date("Y-m-d H:i:s", $this->v["dayold"]) 
@@ -61,6 +63,7 @@ class AdminTreeStats extends AdminController
                     }
                 }
             }
+            */
             
             $analyze = new SessAnalysis($treeID);
             $this->v["nodeTots"] = $analyze->loadNodeTots($this->custReport);

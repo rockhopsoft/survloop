@@ -1,5 +1,5 @@
 <!-- resources/views/vendor/survloop/reports/inc-deets-cols.blade.php -->
-<div class="w100" @if (isset($nID)) id="repNode{{ $nID }}" @endif >
+<div class="w100" @if (isset($nIDtxt)) id="repNode{{ $nIDtxt }}" @endif >
 @if (isset($blockName) && trim($blockName) != '')
     <h3 class="mT0 mB10 slBlueDark">{!! $blockName !!}</h3>
 @endif

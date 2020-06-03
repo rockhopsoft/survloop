@@ -390,9 +390,10 @@ class TreeSurvFormVarieties extends UserProfile
      *
      * @param  int $nID
      * @param  string $val
+     * @param  App\Models\SLFields $fldRow
      * @return string
      */
-    protected function printValCustom($nID, $val)
+    protected function printValCustom($nID, $val, $fldRow)
     {
         return $val;
     }

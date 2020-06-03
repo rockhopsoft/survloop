@@ -284,13 +284,15 @@ class GlobalsImportExport extends GlobalsTables
                     ->orderBy('tree_id', 'asc')
                     ->first();
                 if ($xmlTree && isset($xmlTree->tree_id)) {
-                    if (!isset($xmlTree->tree_root) || intVal($xmlTree->tree_root) <= 0) {
+                    if (!isset($xmlTree->tree_root) 
+                        || intVal($xmlTree->tree_root) <= 0) {
                         if (intVal($xmlTree->tree_core_table) > 0) {
                             $xmlRootNode = new SLNode;
                             $xmlRootNode->node_tree         = $xmlTree->tree_id;
                             $xmlRootNode->node_parent_id    = -3;
                             $xmlRootNode->node_type         = 'XML';
-                            $xmlRootNode->node_prompt_text  = $this->tbl[$xmlTree->tree_core_table];
+                            $xmlRootNode->node_prompt_text  
+                                = $this->tbl[$xmlTree->tree_core_table];
                             $xmlRootNode->node_prompt_notes = $xmlTree->tree_core_table;
                             $xmlRootNode->save();
                             $xmlTree->tree_root = $xmlRootNode->node_id;
@@ -305,6 +307,8 @@ class GlobalsImportExport extends GlobalsTables
                             ? $xmlTree->tree_core_table : 0) . ', '
                         . '"coreTbl" => "' . ((isset($this->tbl[$xmlTree->tree_core_table])) 
                             ? $this->tbl[$xmlTree->tree_core_table] : '') . '", '
+                        . '"slug" => "' . ((isset($xmlTree->tree_slug)) 
+                            ? $xmlTree->tree_slug : '') . '", '
                         . '"opts" => ' . ((isset($xmlTree->tree_opts) 
                             && intVal($xmlTree->tree_opts) > 0) ? $xmlTree->tree_opts : 0)
                     . ' ];' . "\n";
@@ -1004,6 +1008,17 @@ class GlobalsImportExport extends GlobalsTables
             || (in_array($this->pageView, ['pdf', 'full-pdf']))
             || ($this->REQ->has('print') && intVal($this->REQ->get('print')) > 0)
             || ($this->REQ->has('pdf') && intVal($this->REQ->get('pdf')) > 0));
+    }
+
+    public function getLimit($limit = 100)
+    {
+        if ($this->REQ->has('limit')) { 
+            $getLimit = intVal($this->REQ->get('limit'));
+            if ($getLimit > 0) {
+                $limit = $getLimit;
+            }
+        }
+        return $limit;
     }
     
 }

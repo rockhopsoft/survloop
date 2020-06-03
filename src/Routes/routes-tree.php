@@ -128,6 +128,14 @@ Route::get(
     $path . 'SurvLoop@genXmlSchema'
 );
 Route::get(
+    '/{treeSlug}-schema-xml',
+    $path . 'SurvLoop@genXmlSchema'
+);
+Route::get(
+    '/{treeSlug}-schema-xml.xsd',
+    $path . 'SurvLoop@genXmlSchema'
+);
+Route::get(
     '/{treeSlug}-xml-schema',
     $path . 'SurvLoop@genXmlSchema'
 );

@@ -76,7 +76,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
             $curr->sessData, 
             $fldRow
         );
-        $deetVal = $this->printValCustom($curr->nID, $deetVal);
+        $deetVal = $this->printValCustom($curr->nID, $deetVal, $fldRow);
         if (isset($GLOBALS["SL"]->formTree->tree_id)) {
             $tID = $GLOBALS["SL"]->formTree->tree_id;
             $lab = $GLOBALS["SL"]->getFldNodeQuestion($curr->tbl, $curr->fld, $tID);
@@ -147,7 +147,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                 $ret .= $this->printReportDeetsBlock(
                     $deets, 
                     $prompt, 
-                    $curr->nID
+                    $curr
                 );
             } else {
                 $colCnt = 2;
@@ -155,7 +155,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                     $deets, 
                     $prompt, 
                     $colCnt, 
-                    $curr->nID
+                    $curr
                 );
             }
         }
@@ -294,7 +294,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
         return $this->printReportDeetsVertProg(
             $deets, 
             strip_tags($curr->nodePromptText), 
-            $curr->nID
+            $curr
         );
     }
 

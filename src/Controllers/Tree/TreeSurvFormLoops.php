@@ -176,8 +176,10 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         } elseif ($loop->data_loop_min_limit > 0 && $loopCnt == 0) {
             $autoAdd = true;
         }
+
         if ($autoAdd) {
-            $this->v["addingLoopItem"] = $this->newLoopItem($nID);
+            //$this->v["addingLoopItem"] = $this->newLoopItem($nID);
+            $GLOBALS["SL"]->pageCSS .= ' #nFormNextBtn, .autoAddHide { display: none; } ';
         }
         return true;
     }

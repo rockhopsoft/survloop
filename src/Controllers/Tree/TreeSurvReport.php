@@ -283,20 +283,21 @@ class TreeSurvReport extends TreeSurvBasicNav
         return $new;
     }
     
-    public function printReportDeetsBlock($deets, $blockName = '', $nID = -3)
+    public function printReportDeetsBlock($deets, $blockName = '', $curr = null)
     {
         $deets = $this->chkDeets($deets);
         return view(
             'vendor.survloop.reports.inc-deets', 
             [
-                "nID"       => $nID,
+                "nID"       => $curr->nID,
+                "nIDtxt"    => $curr->nIDtxt,
                 "deets"     => $deets,
                 "blockName" => $blockName
             ]
         )->render();
     }
     
-    public function printReportDeetsBlockCols($deets, $blockName = '', $cols = 2, $nID = -3)
+    public function printReportDeetsBlockCols($deets, $blockName = '', $cols = 2, $curr = null)
     {
         $deets = $this->chkDeets($deets);
         $deetCols = $deetsTots = $deetsTotCols = [];
@@ -342,7 +343,8 @@ class TreeSurvReport extends TreeSurvBasicNav
         return view(
             'vendor.survloop.reports.inc-deets-cols', 
             [
-                "nID"       => $nID,
+                "nID"       => $curr->nID,
+                "nIDtxt"    => $curr->nIDtxt,
                 "deetCols"  => $deetCols,
                 "blockName" => $blockName,
                 "colWidth"  => $GLOBALS["SL"]->getColsWidth($cols)
@@ -350,7 +352,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         )->render();
     }
     
-    public function printReportDeetsVertProg($deets, $blockName = '', $nID = -3)
+    public function printReportDeetsVertProg($deets, $blockName = '', $curr = null)
     {
         $last = 0;
         if (sizeof($deets) > 0) {
@@ -363,7 +365,8 @@ class TreeSurvReport extends TreeSurvBasicNav
         return view(
             'vendor.survloop.reports.inc-deets-vert-prog', 
             [
-                "nID"       => $nID,
+                "nID"       => $curr->nID,
+                "nIDtxt"    => $curr->nIDtxt,
                 "deets"     => $deets,
                 "blockName" => $blockName,
                 "last"      => $last
@@ -378,7 +381,8 @@ class TreeSurvReport extends TreeSurvBasicNav
             $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         }
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
-        if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
+        if ($request->has('hideDisclaim') 
+            && intVal($request->hideDisclaim) == 1) {
             $this->hideDisclaim = true;
         }
         $this->v["isPublicRead"] = true;
@@ -387,7 +391,9 @@ class TreeSurvReport extends TreeSurvBasicNav
             return $this->v["content"];
         }
         $this->v["footOver"] = $this->printNodePageFoot();
-        return $GLOBALS["SL"]->swapSessMsg(view('vendor.survloop.master', $this->v)->render());
+        return $GLOBALS["SL"]->swapSessMsg(
+            view('vendor.survloop.master', $this->v)->render()
+        );
     }
     
     public function printReports(Request $request, $full = true)
@@ -486,13 +492,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (!$this->xmlAllAccess()) {
             return 'Sorry, access not permitted.';
         }
-        $limit = 100;
-        if ($GLOBALS["SL"]->REQ->has('limit')) { 
-            $limit = intVal($GLOBALS["SL"]->REQ->get('limit'));
-            if ($limit <= 0) {
-                $limit = 100;
-            }
-        }
+        $limit = $GLOBALS["SL"]->getLimit();
         $this->loadXmlMapTree($request);
         $this->v["nestedNodes"] = '';
         $coreTbl = $GLOBALS["SL"]->xmlTree["coreTbl"];

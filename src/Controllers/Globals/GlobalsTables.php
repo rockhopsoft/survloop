@@ -117,7 +117,7 @@ class GlobalsTables extends GlobalsElements
         $arr = $this->mexplode('_', $tbl);
         if (sizeof($arr) > 0) {
             foreach ($arr as $i => $word) {
-                $ret .= strtoupper(substr($word, 0, 1)) . substr($word, 1);
+                $ret .= ucfirst($word);
             }
         }
         return $ret;
@@ -908,17 +908,22 @@ class GlobalsTables extends GlobalsElements
             } elseif (trim($defSet) == '') {
                 if ($val != '' 
                     && isset($this->fldTypes[$tbl]) 
-                    && isset($this->fldTypes[$tbl][$fld])
-                    && in_array($this->fldTypes[$tbl][$fld], ['INT', 'DOUBLE'])) {
+                    && isset($this->fldTypes[$tbl][$fld])) {
                     if ($this->fldTypes[$tbl][$fld] == 'DOUBLE') {
                         $ret = $this->sigFigs($val, 3);
-                    } else {
+                    } elseif ($this->fldTypes[$tbl][$fld] == 'INT') {
                         $yearChk = strtolower(substr($fld, strlen($fld)-4));
                         if ($yearChk == 'year' && strlen(trim('' . $val . '')) == 4) {
                             $ret = $val;
                         } else {
                             $ret = number_format(1*floatval($val));
                         }
+                    } elseif ($this->fldTypes[$tbl][$fld] == 'DATE') {
+                        $ret = date("n/j/Y", strtotime($val));
+                    } elseif ($this->fldTypes[$tbl][$fld] == 'DATETIME') {
+                        $ret = date("n/j/Y g:i a", strtotime($val));
+                    } else {
+                        $ret = $val;
                     }
                 } else {
                     $ret = $val;

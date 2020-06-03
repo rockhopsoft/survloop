@@ -11,7 +11,7 @@
 table.repDeetsBlock, .slReport table.repDeetsBlock, 
 table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
 	width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 30px;
 }
 table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     word-wrap: break-word;

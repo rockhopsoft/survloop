@@ -106,7 +106,9 @@
     <div class="nodeHalfGap"></div>
 </div>
 
-@if ($GLOBALS["SL"]->sysHas('volunteers') && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
+@if (isset($GLOBALS["SL"]) 
+    && $GLOBALS["SL"]->sysHas('volunteers') 
+    && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
     <label><input type="checkbox" name="newVolunteer" id="newVolunteerID" value="1"
         @if (isset($request) && $request->has('volunteer')) CHECKED @endif > Volunteer</label>
 @endif
@@ -140,7 +142,8 @@ $(document).ready(function(){
             document.getElementById('nondialog').className = "row2"; 
         }
     }, 10);
-@if ($GLOBALS["SL"]->sysHas('volunteers'))
+@if (isset($GLOBALS["SL"])
+    && $GLOBALS["SL"]->sysHas('volunteers'))
     setTimeout(function() {
         if (findGetParam('volunteer')) document.getElementById('newVolunteerID').checked=true;
     }, 50);

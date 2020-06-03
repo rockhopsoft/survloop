@@ -1,5 +1,5 @@
 @if (intVal($tblID) <= 0)
-    <xs:element name="{{ $tbl }}" minOccurs="0">
+    <xs:element name="{{ $tbl }}">
         <xs:complexType mixed="true">
             <xs:sequence>
                 {!! $kids !!}
@@ -8,14 +8,12 @@
     </xs:element>
 @else
     @if ($tblOpts%11 > 0)
-        <xs:element name="{{ $tbl }}" minOccurs="0" >
+        <xs:element name="{{ $tbl }}">
             <xs:complexType mixed="true">
                 <xs:sequence>
     @endif
     @if ($tblOpts%5 > 0)
-        <xs:element name="{{ $tblAbbr }}" 
-            @if ($tblOpts%7 > 0) minOccurs="0" @endif 
-            @if ($tblOpts%11 > 0) maxOccurs="unbounded" @endif >
+        <xs:element name="{{ $tblAbbr }}">
             <xs:complexType mixed="true">
                 <xs:sequence>
     @endif
@@ -25,10 +23,6 @@
             <xs:element name="{{ $tblAbbr . $fld->fld_name }}" 
                 @if (!$tblFldEnum[$fld->fld_id]) 
                     type="{{ $GLOBALS['SL']->fld2SchemaType($fld) }}" 
-                @endif
-                @if (!isset($fld->fld_required) 
-                    || intVal($fld->fld_required) == 0) 
-                    minOccurs="0" 
                 @endif >
                 <xs:annotation>
                     <xs:appinfo>{{ htmlspecialchars($fld->fld_eng) }}</xs:appinfo>

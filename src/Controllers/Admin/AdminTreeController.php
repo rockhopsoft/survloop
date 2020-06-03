@@ -82,7 +82,8 @@ class AdminTreeController extends AdminTreeStats
         if ($treeRow->tree_type == 'Page') {
             $newRoot->node_type = 'Page';
             $newRoot->node_data_branch = $coreTbl;
-            if (!isset($treeRow->tree_slug) || trim($treeRow->tree_slug) == '') {
+            if (!isset($treeRow->tree_slug) 
+                || trim($treeRow->tree_slug) == '') {
                 $treeRow->tree_slug = $GLOBALS["SL"]->slugify($treeRow->tree_name);
                 $treeRow->save();
             }
@@ -847,20 +848,46 @@ class AdminTreeController extends AdminTreeStats
     public function xmlmap(Request $request, $treeID = -3)
     {
         $this->initLoader();
-        $chk = SLTree::find($treeID);
-        if ($chk 
-            && isset($chk->tree_type) 
-            && isset($chk->tree_slug)
-            && $chk->tree_type == 'Survey XML') {
+        $origTree = $treeID;
+        $xmlTree = SLTree::find($treeID);
+        if ($xmlTree 
+            && isset($xmlTree->tree_type) 
+            && isset($xmlTree->tree_slug)
+            && $xmlTree->tree_type == 'Survey XML') {
             $chk = SLTree::where('tree_type', 'Survey')
-                ->where('tree_slug', $chk->tree_slug)
+                ->where('tree_core_table', $xmlTree->tree_core_table)
                 ->first();
             if ($chk && isset($chk->tree_id)) {
-                $treeID = $chk->tree_id;
+                $origTree = $chk->tree_id;
             }
         }
-        $this->loader->syncDataTrees($request, -3, $treeID);
-        //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
+        $this->loader->syncDataTrees($request, -3, $origTree);
+//echo 'xmlmap(' . $treeID . ', orig: ' . $origTree . '<pre>'; print_r($xmlTree); echo '</pre>'; exit;
+        //$this->switchTree($origTree, '/dashboard/tree/switch', $request);
+        if ($origTree != $treeID && $xmlTree && isset($xmlTree->tree_opts)) {
+            $GLOBALS["SL"]->xmlTree["id"] = $xmlTree->tree_id;
+            $GLOBALS["SL"]->xmlTree["coreTbl"] 
+                = $GLOBALS["SL"]->xmlTree["slug"] 
+                = '';
+            $GLOBALS["SL"]->xmlTree["root"] 
+                = $GLOBALS["SL"]->xmlTree["coreTblID"] 
+                = $GLOBALS["SL"]->xmlTree["opts"] 
+                = 0;
+            if (intVal($xmlTree->tree_root) > 0) {
+                $GLOBALS["SL"]->xmlTree["root"] = $xmlTree->tree_root;
+            }
+            if (intVal($xmlTree->tree_core_table) > 0) {
+                $GLOBALS["SL"]->xmlTree["coreTblID"] = $xmlTree->tree_core_table;
+                $GLOBALS["SL"]->xmlTree["coreTbl"] 
+                    = $GLOBALS["SL"]->tbl[$xmlTree->tree_core_table];
+            }
+            if (trim($xmlTree->tree_slug) != '') {
+                $GLOBALS["SL"]->xmlTree["slug"] = $xmlTree->tree_slug;
+            }
+            if (intVal($xmlTree->tree_opts) > 0) {
+                $GLOBALS["SL"]->xmlTree["opts"] = intVal($xmlTree->tree_opts);
+            }
+        }
         if (isset($GLOBALS["SL"]->xmlTree["id"])) {
             $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
             $GLOBALS["SL"]->x["isXmlMap"] = true;
@@ -879,7 +906,7 @@ class AdminTreeController extends AdminTreeStats
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
-        $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/xmlmap');
+        $this->admControlInit($request, '/dashboard/surv-' . $origTree . '/xmlmap');
         $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($treeID, $request, true);
         $this->v["content"] = $xmlmap->adminNodeEditXML($request, $nID);

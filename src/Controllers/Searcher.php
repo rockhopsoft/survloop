@@ -272,9 +272,7 @@ class Searcher extends SurvCustLoop
                     $this->searchFilts["fltStateClim"] = $stateClim;
                 }
             }
-            if ($GLOBALS["SL"]->REQ->has('limit') && trim($GLOBALS["SL"]->REQ->get('limit')) != '') {
-                $this->searchOpts["limit"] = intVal($GLOBALS["SL"]->REQ->get('limit'));
-            }
+            $this->searchOpts["limit"] = $GLOBALS["SL"]->getLimit();
             $this->getSearchBarAdvanced($treeID);
             $this->searchResultsXtra($treeID);
             $this->printSearchBarAdvanced($treeID);

@@ -2,7 +2,7 @@
 @if (isset($blockName) && trim($blockName) != '')
     <h3 class="mT0 mB10 slBlueDark">{!! $blockName !!}</h3>
 @endif
-<table class="repDeetsBlock" @if (isset($nID)) id="repNode{{ $nID }}" @endif >
+<table class="repDeetsBlock" @if (isset($nIDtxt)) id="repNode{{ $nIDtxt }}" @endif >
 @if (isset($deets) && sizeof($deets) > 0)
     @foreach ($deets as $i => $deet) 
         {!! view(

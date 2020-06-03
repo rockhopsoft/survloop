@@ -97,11 +97,11 @@ class AdminEmailController extends AdminCoreController
             if ($request->emailID > 0 && $request->emailID == $emailID) {
                 $currEmail = SLEmails::find($request->emailID);
             }
-            $currEmail->EmailType    = $request->emailType;
-            $currEmail->EmailName    = $request->emailName;
-            $currEmail->EmailSubject = $request->emailSubject;
-            $currEmail->EmailBody    = $request->emailBody;
-            $currEmail->EmailOpts    = 1;
+            $currEmail->email_type    = $request->emailType;
+            $currEmail->email_name    = $request->emailName;
+            $currEmail->email_subject = $request->emailSubject;
+            $currEmail->email_body    = $request->emailBody;
+            $currEmail->email_opts    = 1;
             $currEmail->save();
         }
         return $this->redir('/dashboard/emails');
@@ -280,13 +280,21 @@ class AdminEmailController extends AdminCoreController
                 }
             }
             $this->loadCustLoop($request);
+            $repTo = ['', ''];
+            if (isset($emaCC[0])) {
+                if (!is_array($emaCC[0])) {
+                    $repTo[0] = $emaCC[0];
+                } elseif (isset($emaCC[0][0]) && !is_array($emaCC[0][0])) {
+                    $repTo[0] = $emaCC[0][0];
+                }
+            }
             $this->custReport->sendEmail(
                 (($request->has('emaBody')) ? trim($request->emaBody) : ''), 
                 (($request->has('emaSubject')) ? trim($request->emaSubject) : ''), 
                 $emaTo, 
                 $emaCC, 
                 $emaBCC, 
-                [((isset($emaCC[0])) ? $emaCC[0] : ''), '']
+                $repTo
             );
             if ($request->has('redir') && trim($request->get('redir')) != '') {
                 return $this->redir($request->get('redir'), true);
