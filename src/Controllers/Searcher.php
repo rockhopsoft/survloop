@@ -254,6 +254,10 @@ class Searcher extends SurvCustLoop
                 $this->searchFilts["user"] = $this->v["uID"];
             }
             $GLOBALS["SL"]->loadStates();
+            $this->searchFilts["state"] 
+                = $this->searchFilts["fltStateClim"] 
+                = '';
+            $this->searchFilts["states"] = [];
             if ($GLOBALS["SL"]->REQ->has('state')) {
                 $state = trim($GLOBALS["SL"]->REQ->get('state'));
                 if ($state != '' && (isset($GLOBALS["SL"]->states->stateList[$state])
@@ -287,10 +291,9 @@ class Searcher extends SurvCustLoop
             foreach ($states as $abbr) {
                 if (isset($GLOBALS["SL"]->states->stateList[$abbr])
                     || isset($GLOBALS["SL"]->states->stateListCa[$abbr])) {
-                    if (!isset($this->searchFilts["states"])) {
-                        $this->searchFilts["states"] = [];
+                    if (!in_array($abbr, $this->searchFilts["states"])) {
+                        $this->searchFilts["states"][] = $abbr;
                     }
-                    $this->searchFilts["states"][] = $abbr;
                 }
             }
         }

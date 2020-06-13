@@ -269,23 +269,33 @@ class TreeSurvDataPrint extends TreeSurvFormElements
         $deets = [];
         foreach ($curr->tmpSubTier[1] as $cNode) {
             $childNode = $this->allNodes[$cNode[0]];
+            $childNode->nID = $cNode[0];
             if ($childNode->nodeType == 'Data Print Row') {
                 list($tbl, $fld) = $childNode->getTblFld();
-                list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
-                if ($itemID > 0 && isset($this->sessData->dataSets[$tbl])) {
-                    $tblSet = $this->sessData->dataSets[$tbl]; 
-                    if (isset($tblSet[$itemInd]) > 0) {
-                        $dateTime = 0;
-                        if (isset($tblSet[$itemInd]->{ $fld })
-                            && trim($tblSet[$itemInd]->{ $fld }) != '') {
-                            $dateTime = strtotime($tblSet[$itemInd]->{ $fld });
-                        }
-                        if (!isset($childNode->nodeRow->node_default)
-                            || trim($childNode->nodeRow->node_default) != trim($dateTime)) {
-                            $fldRow = $GLOBALS["SL"]->getTblFldRow('', $tbl, $fld);
-                            if ($fldRow && isset($fldRow->fld_eng)) {
-                                $deets[] = [ $fldRow->fld_eng, $dateTime, $cNode[0] ];
+                $val = $this->printNodeSessDataOverride($childNode);
+                if (!$val 
+                    || (is_array($val) 
+                        && (sizeof($val) == 0 
+                            || (sizeof($val) == 1 && $val[0] == '')))) {
+                    list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
+                    if ($itemID > 0 && isset($this->sessData->dataSets[$tbl])) {
+                        $tblSet = $this->sessData->dataSets[$tbl]; 
+                        if (isset($tblSet[$itemInd]) > 0) {
+                            $dateTime = 0;
+                            if (isset($tblSet[$itemInd]->{ $fld })
+                                && trim($tblSet[$itemInd]->{ $fld }) != '') {
+                                $val = [$tblSet[$itemInd]->{ $fld }];
                             }
+                        }
+                    }
+                }
+                if ($val && is_array($val) && trim($val[0]) != '') {
+                    $dateTime = strtotime($val[0]);
+                    if (!isset($childNode->nodeRow->node_default)
+                        || trim($childNode->nodeRow->node_default) != trim($dateTime)) {
+                        $fldRow = $GLOBALS["SL"]->getTblFldRow('', $tbl, $fld);
+                        if ($fldRow && isset($fldRow->fld_eng)) {
+                            $deets[] = [ $fldRow->fld_eng, $dateTime, $cNode[0] ];
                         }
                     }
                 }

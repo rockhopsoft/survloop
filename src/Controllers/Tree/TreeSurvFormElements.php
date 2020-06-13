@@ -97,13 +97,13 @@ class TreeSurvFormElements extends TreeSurvFormUtils
         }
         $ret .= '<div class="nFld' . $curr->isOneLinerFld . '">';
         if (!$this->hasSpreadsheetParent($curr->nID)) {
-            $ret .= '<div class="row"><div class="col-sm-3 col-4">';
+            $ret .= '<div class="row"><div class="col-6">';
         }
         $unitCls = 'w100 ';
-        if (isset($curr->extraOpts["unit"]) 
-            && trim($curr->extraOpts["unit"]) != '') {
-            $unitCls = 'unitFld ';
-        }
+        //if (isset($curr->extraOpts["unit"]) 
+        //    && trim($curr->extraOpts["unit"]) != '') {
+        //    $unitCls = 'unitFld ';
+        //}
         $ret .= '<nobr><input type="number" data-nid="' . $curr->nID 
             . '" class="form-control form-control-lg ' 
             . (($curr->nodeType == 'Slider') ? 'slidePercFld ' : $unitCls)
@@ -115,7 +115,7 @@ class TreeSurvFormElements extends TreeSurvFormUtils
             && trim($curr->extraOpts["unit"]) != '') {
             if ($curr->nodeType == 'Text:Number' 
                 && !$this->hasSpreadsheetParent($curr->nID)) {
-                $ret .= '</nobr></div><div class="col-sm-9 col-4 pT10"><nobr>';
+                $ret .= '</nobr></div><div class="col-6 pT10"><nobr>';
             }
             $ret .= $curr->extraOpts["unit"];
         }

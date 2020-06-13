@@ -905,6 +905,9 @@ class GlobalsTables extends GlobalsElements
             } elseif (strpos(strtolower($fld), 'gender') !== false 
                 && strtoupper($val) == 'F') {
                 $ret = 'Female';
+            } elseif (strpos(strtolower($fld), 'gender') !== false 
+                && in_array(strtoupper($val), ['O', 'T'])) {
+                $ret = 'Other';
             } elseif (trim($defSet) == '') {
                 if ($val != '' 
                     && isset($this->fldTypes[$tbl]) 

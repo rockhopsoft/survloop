@@ -517,7 +517,7 @@ class TreeSurvUpload extends TreeSurv
     
     protected function canShowUpload($nID, $upDeets, $isAdmin = false, $isOwner = false)
     {
-        return ($isAdmin || $isOwner);
+        return ($isAdmin || $isOwner || $this->v["isAdmin"] || $this->v["isOwner"]);
     }
     
     protected function getUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)

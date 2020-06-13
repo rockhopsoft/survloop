@@ -13,6 +13,8 @@ use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Routing\Controller;
+use Intervention\Image\ImageManagerStatic as Image;
+use App\Models\User;
 use SurvLoop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
@@ -201,6 +203,26 @@ class SurvRoutes extends Controller
     {
         $file = 'rockhopsoft/survloop-libraries/src/state-flags/' . $stateFlag;
         return $this->getLibFile($file, 'jpg');
+    }
+    
+    public function getProfilePhoto(Request $request, $user = '')
+    {
+        $uID = 0;
+        if (trim($user) != '') {
+            $user = User::where('name', 'LIKE', urldecode($user))
+                ->first();
+            if ($user && isset($user->id)) {
+                $uID = intVal($user->id);
+            }
+        }
+        $metaType = $this->getContentType('jpg');
+        $file = '../storage/app/up/avatar/' . $uID . '-.jpg';
+        if (file_exists($file)) {
+            $response = Response::make(file_get_contents($file));
+            $response->header('Content-Type', $metaType);
+            return $response;
+        }
+        return '';
     }
     
 }

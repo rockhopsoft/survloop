@@ -44,6 +44,7 @@ class GeographyLookups extends GeographyLists
         if ($abbr == '') {
             return '';
         }
+        $abbr = strtoupper($abbr);
         if ($abbr == 'US') {
             return 'Federal';
         }

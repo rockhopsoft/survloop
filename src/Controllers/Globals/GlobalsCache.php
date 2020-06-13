@@ -84,6 +84,18 @@ class GlobalsCache extends GlobalsBasic
         return $this->deleteCacheFile($cache);
     }
 
+    public function forgetAllCachesOfType($type = 'search')
+    {
+        $chk = SLCaches::where('cach_type', $type)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
+        return true;
+    }
+
     public function forgetAllItemCaches($treeID = 0, $coreID = 0)
     {
         $chk = SLCaches::where('cach_tree_id', $treeID)
@@ -463,12 +475,18 @@ class GlobalsCache extends GlobalsBasic
 
     public function microLog($label = 'Start Page Load')
     {
-        return $GLOBALS["SL-Micro"]->microLog($label);
+        if (isset($GLOBALS["SL-Micro"])) {
+            return $GLOBALS["SL-Micro"]->microLog($label);
+        }
+        return false;
     }
 
     public function printMicroLog()
     {
-        return $GLOBALS["SL-Micro"]->printMicroLog();
+        if (isset($GLOBALS["SL-Micro"])) {
+            return $GLOBALS["SL-Micro"]->printMicroLog();
+        }
+        return '';
     }
 
 }

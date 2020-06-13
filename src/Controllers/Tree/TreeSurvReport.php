@@ -204,7 +204,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->fillGlossary();
         }
         if (sizeof($this->v["glossaryList"]) > 0) {
-            $ret = '<h3 class="mT0 mB20 slBlueDark">Glossary of Terms</h3><div class="glossaryList">';
+            $ret = '<h4 class="mT0 mB20 slBlueDark">Glossary of Terms</h4><div class="glossaryList">';
             foreach ($this->v["glossaryList"] as $i => $gloss) {
                 $ret .= '<div class="row pT15 pB15"><div class="col-md-3">' . $gloss[0] . '</div>'
                     . '<div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '') . '</div></div>';
@@ -369,7 +369,8 @@ class TreeSurvReport extends TreeSurvBasicNav
                 "nIDtxt"    => $curr->nIDtxt,
                 "deets"     => $deets,
                 "blockName" => $blockName,
-                "last"      => $last
+                "last"      => $last,
+                "dateType"  => (($GLOBALS["SL"]->pageView == 'public') ? 'F Y' : 'n/j/y')
             ]
         )->render();
     }
@@ -476,8 +477,8 @@ class TreeSurvReport extends TreeSurvBasicNav
         if ($this->corePublicID <= 0) {
             return '<!-- -->';
         }
-        return '<div class="well well-lg">#' . $this->corePublicID 
-            . ' is no longer published.</div>';
+        return '<!-- <div class="well well-lg">#' . $this->corePublicID 
+            . ' is no longer published.</div> -->';
     }
     
     public function xmlAllAccess()
@@ -601,8 +602,8 @@ class TreeSurvReport extends TreeSurvBasicNav
             return '';
         }
         $this->survLoopInit($request, '');
+        $GLOBALS["SL"]->pageView = 'full';
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
-        $GLOBALS["SL"]->pageView = 'full'; // changed from 'sensitive';
         return $this->retrieveUploadFile($upID);
     }
     

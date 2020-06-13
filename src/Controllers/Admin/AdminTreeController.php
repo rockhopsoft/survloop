@@ -330,9 +330,6 @@ class AdminTreeController extends AdminTreeStats
             ? '/dashboard/pages' : (($pageType == 'Report') 
                 ? '/dashboard/reports' : '/dashboard/redirects')));
         $this->startNewPage($request, $pageType);
-        if ($pageType != 'Redirect') {
-            $this->pagesRedirSaves($request);
-        }
         $this->v["myRdr"] = [
             "home"  => [], 
             "volun" => [], 
@@ -343,6 +340,7 @@ class AdminTreeController extends AdminTreeStats
         $this->v["myPages"] = $GLOBALS["SL"]->x["pageUrls"] 
             = $GLOBALS["SL"]->x["myRedirs"] = [];
         if ($pageType == 'Redirect') {
+            $this->pagesRedirSaves($request);
             $chk = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
                 ->where('tree_type', 'LIKE', 'Redirect')
                 ->get();

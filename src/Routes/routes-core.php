@@ -273,6 +273,12 @@ Route::get(
     $path . 'SurvRoutes@getPlotlyJs'
 );
 
+
+Route::get(
+    '/img/user/{user}.jpg',
+    $path . 'SurvRoutes@getProfilePhoto'
+);
+
 Route::get(
     '/survloop-libraries/state-flags/{stateFile}.{ext}',
     $path . 'SurvRoutes@getStateFlag'

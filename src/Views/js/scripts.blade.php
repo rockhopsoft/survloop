@@ -355,7 +355,8 @@ function addTopNavItem(navTxt, navLink) {
     }
     return true;
 }
-var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars'])) ? $GLOBALS['SL']->sysOpts['has-avatars'] : '') }}";
+var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars'])) 
+    ? trim($GLOBALS['SL']->sysOpts['has-avatars']) : '') }}";
 
 function addTopUserBurger(username) {
     if (!document.getElementById("myNavBar") || document.getElementById("myNavBar").innerHTML.indexOf("userMenuBtn") >= 0) {
@@ -363,7 +364,7 @@ function addTopUserBurger(username) {
     }
     var navCode = "<a id=\"userMenuBtn\" class=\"float-right slNavLnk\" href=\"javascript:;\"><div id=\"userMenuBtnWrp\">";
     if (userAvatar.trim() != "") {
-        navCode += "<div id=\"userMenuBtnAvatar\"><img src=\""+userAvatar+"\" border=0 ></div>";
+        navCode += "<div id=\"userMenuBtnAvatar\"><img src=\"/img/user/"+username+".jpg\" border=0 ></div>";
     }
     navCode += "<div id=\"userMenuBtnName\">"+username+"</div> <i id=\"userMenuArr\" class=\"fa fa-caret-down\" aria-hidden=\"true\"></i></div></a>";
     addTopCust(navCode);

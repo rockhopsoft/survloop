@@ -9,12 +9,15 @@
     </h2>
     @foreach ($uploads as $i => $upRow)
         @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->up_id)
-            <div class="nodeAnchor"><a id="up{{ $upRow->up_id }}" name="up{{ $upRow->up_id }}"></a></div>
+            <div class="nodeAnchor">
+                <a id="up{{ $upRow->up_id }}" name="up{{ $upRow->up_id }}"></a>
+            </div>
             <div class="uploadedWrap"><div class="row">
                 <div class="col-md-4 m0 taC">
                 
                     @if (intVal($upRow->up_type) == $vidTypeID 
-                        && (trim($upDeets[$i]["youtube"]) != '' || trim($upDeets[$i]["vimeo"]) != ''))
+                        && (trim($upDeets[$i]["youtube"]) != '' 
+                            || trim($upDeets[$i]["vimeo"]) != ''))
 
                         {!! view(
                             'vendor.survloop.forms.upload-previous-youtube', 
@@ -26,8 +29,10 @@
                             ]
                         )->render() !!}
 
-                    @elseif (isset($upRow->up_upload_file) && isset($upRow->up_stored_file) 
-                        && trim($upRow->up_upload_file) != '' && trim($upRow->up_stored_file) != '')
+                    @elseif (isset($upRow->up_upload_file) 
+                        && isset($upRow->up_stored_file) 
+                        && trim($upRow->up_upload_file) != '' 
+                        && trim($upRow->up_stored_file) != '')
 
                         @if (in_array($upDeets[$i]["ext"], array("gif", "jpeg", "jpg", "png")))
                             {!! view(

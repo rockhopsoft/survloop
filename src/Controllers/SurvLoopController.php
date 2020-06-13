@@ -76,10 +76,9 @@ class SurvLoopController extends Controller
         } elseif (isset($GLOBALS["SL"])) {
             $GLOBALS["SL"]->pageJAVA .= ' loggedIn = false; ';
         }
-        $this->v["isAdmin"]    = ($this->v["user"] 
-            && $this->v["user"]->hasRole('administrator'));
-        $this->v["isVolun"]    = ($this->v["user"] 
-            && $this->v["user"]->hasRole('volunteer'));
+        $this->v["isAdmin"]   = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
+        $this->v["isPartner"] = ($this->v["user"] && $this->v["user"]->hasRole('partner'));
+        $this->v["isVolun"]   = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
         $this->initPowerUser();
         return true;
     }

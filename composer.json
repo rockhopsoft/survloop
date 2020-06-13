@@ -39,6 +39,7 @@
         "nnnick/chartjs": "^2.9.3",
         "plotly/plotly.js": "^1.53.0",
         "summernote/summernote": "v0.8.8",
+        "intervention/image": "^2.5.1",
 
         "rockhopsoft/survloop-libraries": "^0.1.7"
     },

@@ -10,7 +10,9 @@
 namespace SurvLoop\Controllers\Tree;
 
 use Auth;
+use Storage;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLSess;
@@ -231,29 +233,15 @@ class UserProfile extends TreeSurvInput
                 $this->v["canEdit"] = true;
             }
             if (isset($this->v["uID"]) && $this->v["uID"] > 0 && $this->v["canEdit"]) {
-                if ($GLOBALS["SL"]->REQ->has('edit') && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
+                if ($GLOBALS["SL"]->REQ->has('edit') 
+                    && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
                     $this->updateProfile();
-                } elseif (session()->has('success') && !$GLOBALS["SL"]->isHomestead()) {
-                    $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] 
-                        . ' password has been changed.';
-                    $emaContent = '<h3>Password updated</h3><p>Hi ' 
-                        . $this->v["user"]->name . ',</p><p>We\'ve changed your ' 
-                        . $GLOBALS["SL"]->sysOpts["site-name"] 
-                        . ' password, as you asked. To view or change your '
-                        . 'account information, visit <a href="' 
-                        . $GLOBALS["SL"]->sysOpts["app-url"] 
-                        . '/my-profile" target="_blank">your profile</a>.</p>'
-                        . '<p>If you did not ask to change your password '
-                        . 'we are here to help secure your account, '
-                        . 'just contact us.</p><p>–Your friends at ' 
-                        . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
-                    $emaTo = [
-                        [
-                            ((isset($this->v["user"])) ? $this->v["user"]->email : ''), 
-                            '' 
-                        ]
-                    ];
-                    $this->sendEmail($emaContent, $emaSubject, $emaTo);
+                } elseif (session()->has('success')) {
+                    $this->profileResetPass();
+                }
+                if ($GLOBALS["SL"]->REQ->has('upload') 
+                    && $GLOBALS["SL"]->REQ->get('upload') == 'photo') {
+                    $this->profilePhotoUpload();
                 }
             }
             return view('vendor.survloop.auth.profile', $this->v)->render();
@@ -261,5 +249,74 @@ class UserProfile extends TreeSurvInput
         return '<br /><br /><br /><center><i>User not found.</i></center>'
             . '<script type="text/javascript"> setTimeout("window.location=\'/login\'", 1); </script>';
     }
+    
+    protected function profilePhotoUpload()
+    {
+        $file = 'profilePhotoUp';
+        if (!$GLOBALS["SL"]->REQ->hasFile($file)) {
+            return '<div class="txtDanger">No File Found.</div>';
+        }
+        $ret = '';
+        $fileOrig = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalName();
+        $extension = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalExtension();
+        $mimetype = $GLOBALS["SL"]->REQ->file($file)->getMimeType();
+        $size = $GLOBALS["SL"]->REQ->file($file)->getSize();
+        $exts = ["gif", "jpeg", "jpg", "png", "pdf"];
+        $mimes = [
+            "image/gif", "image/jpeg", "image/jpg", 
+            "image/pjpeg", "image/x-png", "image/png"
+        ];
+        if (in_array(strtolower($extension), $exts) 
+            && in_array(strtolower($mimetype), $mimes)) {
+            if (!$GLOBALS["SL"]->REQ->file($file)->isValid()) {
+                $ret .= '<div class="txtDanger">Upload Error.' 
+                    . /* $_FILES["up" . $nID . "File"]["error"] . */ '</div>';
+            } else {
+                $upFold = '../storage/app/up/avatar/';
+                $filename = $this->v["profileUser"]->id . '.jpg';
+                if (file_exists($upFold . $filename)) {
+                    unlink($upFold . $filename);
+                }
+                $GLOBALS["SL"]->REQ->file($file)->move($upFold, $filename);
+                Image::configure(array('driver' => 'imagick'));
+                $image = Image::make($upFold . $filename)->widen(500)->crop(500, 500); //->rotate(90);
+                $crop = str_replace('.jpg', '-.jpg', $upFold . $filename);
+                $image->save($crop, 60);
+            }
+        } else {
+            $ret .= '<div class="txtDanger">'
+                . 'Invalid file. Please check the format and try again.</div>';
+        }
+        return $ret;
+    }
+    
+    protected function profileResetPass()
+    {
+        if ($GLOBALS["SL"]->isHomestead()) {
+            return false;
+        }
+        $emaSubject = 'Your ' . $GLOBALS["SL"]->sysOpts["site-name"] 
+            . ' password has been changed.';
+        $emaContent = '<h3>Password updated</h3><p>Hi ' 
+            . $this->v["user"]->name . ',</p><p>We\'ve changed your ' 
+            . $GLOBALS["SL"]->sysOpts["site-name"] 
+            . ' password, as you asked. To view or change your '
+            . 'account information, visit <a href="' 
+            . $GLOBALS["SL"]->sysOpts["app-url"] 
+            . '/my-profile" target="_blank">your profile</a>.</p>'
+            . '<p>If you did not ask to change your password '
+            . 'we are here to help secure your account, '
+            . 'just contact us.</p><p>–Your friends at ' 
+            . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
+        $emaTo = [
+            [
+                ((isset($this->v["user"])) ? $this->v["user"]->email : ''), 
+                '' 
+            ]
+        ];
+        $this->sendEmail($emaContent, $emaSubject, $emaTo);
+        return true;
+    }
+
     
 }

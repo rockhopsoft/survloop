@@ -173,7 +173,9 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
             >{{ $GLOBALS['SL']->sysOpts['site-name'] }}</a>
     @endif
     </div>
+    <?php /*
     {!! view('vendor.survloop.master-search')->render() !!}
+    */ ?>
     <div class="fR taR">
         <div id="myNavBar"></div>
     </div>

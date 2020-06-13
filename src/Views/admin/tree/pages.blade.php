@@ -288,39 +288,39 @@
                 <div class="row">
                     <div class="col-6">
                         <label><input type="checkbox" name="redirAdmOnly" value="1" 
-                            onClick="if (this.checked) {
+                            autocomplete="off" onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
-                            document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
+                            document.getElementById('isNewAdmRedir').style.display='none'; }" > 
                             <i class="fa fa-eye" aria-hidden="true"></i> Admin-Only
                         </label><br />
                         <label><input type="checkbox" name="redirStfOnly" value="1" 
-                            onClick="if (this.checked) {
+                            autocomplete="off" onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
-                            document.getElementById('isNewAdmRedir').style.display='none'; }" autocomplete="off"> 
+                            document.getElementById('isNewAdmRedir').style.display='none'; }" > 
                             <i class="fa fa-key" aria-hidden="true"></i> Staff
                         </label><br />
                     </div><div class="col-6">
 @if ($GLOBALS["SL"]->sysHas('partners'))
                         <label><input type="checkbox" name="redirPrtOnly" value="1" 
-                            onClick="if (this.checked) {
+                            autocomplete="off" onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir2').style.display='inline'; } else {
                             document.getElementById('isNewAdmRedir').style.display='none'; 
-                            document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
+                            document.getElementById('isNewAdmRedir2').style.display='none'; }" > 
                             <i class="fa fa-university" aria-hidden="true"></i> Partner
                         </label><br />
 @endif
 @if ($GLOBALS["SL"]->sysHas('volunteers'))
                         <label><input type="checkbox" name="redirVolOnly" value="1" 
-                            onClick="if (this.checked) {
+                            autocomplete="off" onClick="if (this.checked) {
                             document.getElementById('isNewAdmRedir').style.display='inline'; 
                             document.getElementById('isNewAdmRedir2').style.display='inline'; } 
                             else { document.getElementById('isNewAdmRedir').style.display='none'; 
-                                document.getElementById('isNewAdmRedir2').style.display='none'; }" autocomplete="off"> 
+                                document.getElementById('isNewAdmRedir2').style.display='none'; }" > 
                             <i class="fa fa-hand-rock-o" aria-hidden="true"></i> 
                             Volunteer
                         </label><br />

@@ -53,24 +53,55 @@ class User extends Model implements AuthenticatableContract,
     }
     
     
-    public function printUsername($link = true, $baseurl = '/profile/')
+    public function urlSlug($baseurl = '/user/')
+    {
+        return $baseurl . urlencode($this->name);
+    }
+    
+    
+    public function printUsername($link = true, $baseurl = '/user/')
     {
         if ($link) {
-            return '<a href="' . $baseurl . urlencode($this->name) . '">' . $this->name . '</a>';
+            return '<a href="' . $this->urlSlug($baseurl) . '">'
+                . $this->name . '</a>';
         }
         return $this->name;
     }
     
-    public function printCasualUsername($link = true, $baseurl = '/profile/', $preFix = '')
+    public function printCasualUsername($link = true, $baseurl = '/user/', $preFix = '')
     {
         $uName = $this->name;
         if (strpos($uName, ' ') !== false) {
             $uName = substr($uName, 0, strpos($uName, ' '));
         }
         if ($link) {
-            return '<a href="' . $baseurl . urlencode($this->name) . '">' . $preFix . $uName . '</a>';
+            return '<a href="' . $this->urlSlug($baseurl) . '">'
+                . $preFix . $uName . '</a>';
         }
         return $uName;
+    }
+    
+    
+    public function profileImgSrc()
+    {
+        $file = '../storage/app/up/avatar/' . $this->id . '.jpg';
+        if (file_exists($file)) {
+            return '/img/user/' . urlencode($this->name) . '.jpg';
+        }
+        if (isset($GLOBALS["SL"]->sysOpts["has-avatars"])
+            && trim($GLOBALS["SL"]->sysOpts["has-avatars"]) != '') {
+            return trim($GLOBALS["SL"]->sysOpts["has-avatars"]);
+        }
+        return '';
+    }
+    
+    
+    public function profileImg()
+    {
+        return '<a href="/user/' . urlencode($this->name) 
+            . '"><img class="tmbRound profilePic" src="'
+            . $this->profileImgSrc() . '" border=0 alt="Profile Picture for '
+            . $this->name . '"></a>';
     }
     
     

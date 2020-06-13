@@ -59,7 +59,14 @@ Route::get( '/dashboard', [
     'middleware' => ['auth']
 ]);
 
-Route::post('/profile/{uname}', [
+Route::post('/user/{uname}', [
+    'uses'       => $path . 'SurvLoop@showProfile',
+    'middleware' => 'auth'
+]);
+Route::get( 
+    '/user/{uname}', 
+    $path . 'SurvLoop@showProfile'
+);Route::post('/profile/{uname}', [
     'uses'       => $path . 'SurvLoop@showProfile',
     'middleware' => 'auth'
 ]);
