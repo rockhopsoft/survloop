@@ -43,6 +43,7 @@ class Authenticate extends Middleware
     {
         $badRedir = false;
         $bads = [
+            '/api/pdf/',
             '/css/', 
             '/font/',
             '/gen-kml/', 

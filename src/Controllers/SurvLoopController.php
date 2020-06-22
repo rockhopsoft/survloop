@@ -136,8 +136,10 @@ class SurvLoopController extends Controller
                 $this->checkSystemInit();
             }
             if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
-                $this->v["pastUpDef"] = $this->v["pastUpArr"] 
-                    = $this->v["updateList"] = [];
+                $this->v["pastUpDef"] 
+                    = $this->v["pastUpArr"] 
+                    = $this->v["updateList"] 
+                    = [];
             }
             
             if ($this->coreIDoverride > 0) {
@@ -822,9 +824,9 @@ class SurvLoopController extends Controller
     public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
     {
         $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.master', [
-            'emaSubj'    => \$emaSubject,
-            'emaContent' => \$emaContent,
-            'cssColors'  => \$GLOBALS['SL']->getCssColorsEmail()
+                'emaSubj'    => \$emaSubject,
+                'emaContent' => \$emaContent,
+                'cssColors'  => \$GLOBALS['SL']->getCssColorsEmail()
             ], function (\$m) { \$m->subject('" 
             . str_replace("'", "\\'", $emaSubject) . "')";
         if (sizeof($emaTo) > 0) {

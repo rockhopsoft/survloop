@@ -295,7 +295,6 @@ class AdminCoreController extends SurvLoopController
         return $this->loader->loadNodeTreeURLedit($request, $cid, $treeSlug);
     }
     
-    //public function loadPageURL(Request $request, $pageSlug = '')
     public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '')
     {
         $this->initLoader();
@@ -309,7 +308,8 @@ class AdminCoreController extends SurvLoopController
                 $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
             }
             $this->v["content"] = $this->custReport->index($request);
-            if ($request->has('edit') && intVal($request->get('edit')) == 1 
+            if ($request->has('edit') 
+                && intVal($request->get('edit')) == 1 
                 && $this->loader->isUserAdmin()) {
                 echo '<script type="text/javascript"> '
                     . 'window.location="/dashboard/page/' 

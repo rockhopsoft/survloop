@@ -25,8 +25,9 @@
             value="{{ $res->node_res_value }}" autocomplete="off" 
             type="radio" class="slNodeClkGender" data-nid="{{ $curr->nIDtxt }}" 
         @if ($res->node_res_value != 'O')
-            onClick="document.getElementById('n{{ 
-                $curr->nIDtxt }}fldOtherID2').value='';"
+            onClick="if (document.getElementById('n{{ 
+                $curr->nIDtxt }}fldOtherID2')) { document.getElementById('n{{ 
+                $curr->nIDtxt }}fldOtherID2').value=''; }"
         @endif
         @if ($curr->sessData == $res->node_res_value) CHECKED @endif >
         </div> {{ $res->node_res_eng }}</nobr>

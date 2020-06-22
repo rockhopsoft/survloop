@@ -19,78 +19,95 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     $isWsyiwyg = true;
 }
 
-?><!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
+if (!$GLOBALS["SL"]->isPdfView()) {
+    echo '<!DOCTYPE html><html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml"><head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php /* <meta name="csrf-token" content="{{ csrf_token() }}" /> */ ?>
-    {!! view('vendor.survloop.elements.inc-meta-seo')->render() !!}
-@if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
-    <link href="/sys1.min.css" rel="stylesheet" type="text/css">
-    <link href="/sys2.min.css" rel="stylesheet" type="text/css">
-    <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
-    <script id="sysJs" src="/sys1.min.js" type="text/javascript"></script>
-    <script id="sysJs2" src="/sys2.min.js" type="text/javascript"></script>
-@else
-    <link href="/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
-        }}" rel="stylesheet" type="text/css">
-    <link href="/jquery-ui.min.css" rel="stylesheet" type="text/css">
-    <link href="/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{
-        $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
-    <script src="/jquery.min.js" type="text/javascript"></script>
-    <script src="/jquery-ui.min.js" type="text/javascript"></script>
-    <script src="/bootstrap.min.js" type="text/javascript"></script>
-<?php /* <script src="/survloop/parallax.min.js" type="text/javascript"></script> */ ?>
-    <script id="sysJs" src="/survloop/scripts-lib.js" 
-        type="text/javascript"></script>
-    {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
-    <script id="sysJs2" src="/sys2.min.js?v={{ 
-        $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
-@endif
-@if ($isWsyiwyg)
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
-        crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
-        </script>
-@endif
-@if ((isset($needsCharts) && $needsCharts) 
-    || (isset($GLOBALS["SL"]->x["needsCharts"]) 
-        && $GLOBALS["SL"]->x["needsCharts"]))
-    <script src="/Chart.bundle.min.js"></script>
-@endif
-@if ((isset($needsPlots) && $needsPlots) 
-    || (isset($GLOBALS["SL"]->x["needsPlots"]) 
-        && $GLOBALS["SL"]->x["needsPlots"]))
-    <script src="/plotly.min.js"></script>
-@endif
-<?php /* @if ($isWsyiwyg)
-    <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
-@endif */ ?>
-@if (isset($GLOBALS['SL']->sysOpts) 
-    && isset($GLOBALS['SL']->sysOpts['header-code']))
-    {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
-@endif
-@section('headCode')
-@show
-@if (!isset($admMenu))
-    {!! view('vendor.survloop.elements.inc-matomo-analytics')->render() !!}
+    <meta name="viewport" content="width=device-width, initial-scale=1">'
+    . view('vendor.survloop.elements.inc-meta-seo')->render();
+} else {
+    echo '<!DOCTYPE html><html><head>';
+}
+?>
+@if (!$GLOBALS["SL"]->isPdfView())
+    @if (!isset($GLOBALS["SL"]) || !$GLOBALS["SL"]->REQ->has("debug"))
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/sys1.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/sys2.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
+        <script id="sysJs" type="text/javascript" 
+            src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys1.min.js"></script>
+        <script id="sysJs2" type="text/javascript" 
+            src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.min.js"></script>
+    @else
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys1.css?v={{ $GLOBALS['SL']->sysOpts['log-css-reload'] 
+            }}" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/jquery-ui.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/css/fork-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/sys2.css?v={{
+            $GLOBALS['SL']->sysOpts['log-css-reload'] }}" rel="stylesheet" type="text/css">
+        <script src="/jquery.min.js" type="text/javascript"></script>
+        <script src="/jquery-ui.min.js" type="text/javascript"></script>
+        <script src="/bootstrap.min.js" type="text/javascript"></script>
+        <?php /* <script src="/survloop/parallax.min.js" 
+            type="text/javascript"></script> */ ?>
+        <script id="sysJs" src="/survloop/scripts-lib.js" 
+            type="text/javascript"></script>
+        {!! $GLOBALS['SL']->debugPrintExtraFilesCSS() !!}
+        <script id="sysJs2" src="/sys2.min.js?v={{ 
+            $GLOBALS['SL']->sysOpts['log-css-reload'] }}"></script>
+    @endif
+    @if ($isWsyiwyg)
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" 
+            crossorigin="anonymous" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4">
+            </script>
+    @endif
+    @if ((isset($needsCharts) && $needsCharts) 
+        || (isset($GLOBALS["SL"]->x["needsCharts"]) 
+            && $GLOBALS["SL"]->x["needsCharts"]))
+        <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/Chart.bundle.min.js"></script>
+    @endif
+    @if ((isset($needsPlots) && $needsPlots) 
+        || (isset($GLOBALS["SL"]->x["needsPlots"]) 
+            && $GLOBALS["SL"]->x["needsPlots"]))
+        <script src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/plotly.min.js"></script>
+    @endif
+    <?php /* @if ($isWsyiwyg)
+        <link rel="stylesheet" type="text/css" href="/content-tools.min.css">
+    @endif */ ?>
+
+    @if (isset($GLOBALS['SL']->sysOpts) 
+        && isset($GLOBALS['SL']->sysOpts['header-code']))
+        {!! $GLOBALS['SL']->sysOpts['header-code'] !!}
+    @endif
+    @section('headCode')
+    @show
+
+    @if (!isset($admMenu))
+        {!! view('vendor.survloop.elements.inc-matomo-analytics')->render() !!}
+    @endif
 @endif
 </head>
 <body {!! $GLOBALS['SL']->getBodyParams() !!} 
     @if ($isDashLayout) class="bodyDash" 
     @elseif ($bodyBg) class="bgFnt" 
     @endif >
-<div class="nodeAnchor"><a name="top"></a></div>
-<div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
-<div id="absDebug"></div>
-<div id="dialogPop" title=""></div>
+@if (!$GLOBALS["SL"]->isPdfView())
+    <div class="nodeAnchor"><a name="top"></a></div>
+    <div class="hidden"><a href="#maincontent">Skip to Main Content</a></div>
+    <div id="absDebug"></div>
+    <div id="dialogPop" title=""></div>
+@endif
 @if (isset($bodyTopCode)) {!! $bodyTopCode !!} @endif
 
 @if ((!isset($isPrint) || !$isPrint) 
     && (!isset($isFrame) || !$isFrame)
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) 
-        || !$GLOBALS["SL"]->x["isPrintPDF"])
+    && !$GLOBALS["SL"]->isPdfView()
     && (!$GLOBALS["SL"]->REQ->has("frame") 
         || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
 
@@ -117,7 +134,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 
 @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) 
     && (!isset($isPrint) || !$isPrint) 
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
+    && !$GLOBALS["SL"]->isPdfView())
 
 <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
 <td id="leftSide" class="leftSide">
@@ -185,13 +202,15 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
     <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
 </div>
 
-<noscript><div class="alert alert-dismissible alert-warning">
-    <b>Warning: It looks like you have JavaScript disabled.
-    @if (isset($GLOBALS['SL']->sysOpts['site-name'])) 
-        {{ $GLOBALS['SL']->sysOpts['site-name'] }}
-    @endif
-    requires JavaScript to give you the best possible experience.</b>
-</div></noscript>
+@if (!$GLOBALS["SL"]->isPdfView())
+    <noscript><div class="alert alert-dismissible alert-warning">
+        <b>Warning: It looks like you have JavaScript disabled.
+        @if (isset($GLOBALS['SL']->sysOpts['site-name'])) 
+            {{ $GLOBALS['SL']->sysOpts['site-name'] }}
+        @endif
+        requires JavaScript to give you the best possible experience.</b>
+    </div></noscript>
+@endif
 
 <!-- SessMsg -->
 
@@ -203,8 +222,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 
 @if ((!isset($isFrame) || !$isFrame) && $isDashLayout)
 
-    @if ((isset($isPrint) && $isPrint) 
-        || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
+    @if ((isset($isPrint) && $isPrint) || $GLOBALS["SL"]->isPdfView())
     
         <br />
         <div class="container">
@@ -240,7 +258,7 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 @endif
 
 @if ((!isset($isPrint) || !$isPrint) && (!isset($isFrame) || !$isFrame) 
-    && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"])
+    && !$GLOBALS["SL"]->isPdfView()
     && (!$GLOBALS["SL"]->REQ->has("frame") || intVal($GLOBALS["SL"]->REQ->get("frame")) != 1))
     
         @if (!$isDashLayout)
@@ -272,7 +290,9 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 @endif <?php /* end not print or frame */ ?>
 
 
-@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) && (!isset($isPrint) || !$isPrint) && (!isset($GLOBALS["SL"]->x["isPrintPDF"]) || !$GLOBALS["SL"]->x["isPrintPDF"]))
+@if (((!isset($isFrame) || !$isFrame) && $isDashLayout) 
+    && (!isset($isPrint) || !$isPrint) 
+    && !$GLOBALS["SL"]->isPdfView())
 
         </td>
     </tr></table>
@@ -280,54 +300,62 @@ if (isset($GLOBALS["SL"]->x["needsWsyiwyg"])
 @endif
 
 
-<div class="disNon">
-    <iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe>
-</div>
-<div class="imgPreload">
-@forelse ($GLOBALS["SL"]->listPreloadImgs() as $src)
-    <img src="{{ $src }}" border=0 alt="" >
-@empty
-@endforelse
-</div>
-@if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
-    {!! $GLOBALS['SL']->pageSCRIPTS !!}
+@if (!$GLOBALS["SL"]->isPdfView())
+    <div class="disNon">
+        <iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe>
+    </div>
+    <div class="imgPreload">
+    @forelse ($GLOBALS["SL"]->listPreloadImgs() as $src)
+        <img src="{{ $src }}" border=0 alt="" >
+    @empty
+    @endforelse
+    </div>
 @endif
-@if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') 
-    || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
-    <script id="dynamicJS" type="text/javascript" defer >
-    @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
-        {!! $GLOBALS['SL']->pageJAVA !!}
+@if (!$GLOBALS["SL"]->isPdfView())
+    @if (isset($GLOBALS['SL']->pageSCRIPTS) && trim($GLOBALS['SL']->pageSCRIPTS) != '')
+        {!! $GLOBALS['SL']->pageSCRIPTS !!}
     @endif
-    @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
-        $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
+    @if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') 
+        || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
+        <script id="dynamicJS" type="text/javascript" defer >
+        @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
+            {!! $GLOBALS['SL']->pageJAVA !!}
+        @endif
+        @if ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != ''))
+            $(document).ready(function(){ {!! $GLOBALS['SL']->pageAJAX !!} }); 
+        @endif
+        </script>
     @endif
-    </script>
 @endif
 
-@if ((isset($GLOBALS["SL"]->pageView) && in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))
-    || (isset($GLOBALS["SL"]->x["isPrintPDF"]) && $GLOBALS["SL"]->x["isPrintPDF"]))
-    <script id="dynamicJS" type="text/javascript" defer >
-    @if ($GLOBALS["SL"]->pageView != 'full-pdf')
-        alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+@if (!$GLOBALS["SL"]->isPdfView())
+
+    <?php /*
+    @if (isset($GLOBALS["SL"]->pageView) 
+        && in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))
+        <script id="dynamicJS" type="text/javascript" defer >
+        @if ($GLOBALS["SL"]->pageView != 'full-pdf')
+            alert("Make sure you are logged in, so that the full complaint is visible here. Then use your browser's print tools to save this page as a PDF. For best results, use Chrome or Firefox.");
+        @endif
+        setTimeout("window.print()", 1000);
+        </script>
     @endif
-    setTimeout("window.print()", 1000);
-    </script>
-@endif
+    */ ?>
+    <?php /* @if ($isWsyiwyg)
+        <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
+        <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}/survloop/ContentTools-master/build/editor.js"></script>
+    @endif */ ?>
 
-
-<?php /* @if ($isWsyiwyg)
-    <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/content-tools.min.js"></script>
-    <script defer src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
-        }}/survloop/ContentTools-master/build/editor.js"></script>
-@endif */ ?>
-@if ($isWsyiwyg)
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
-    <?php /* <link href="/summernote.css" rel="stylesheet"> <script defer src="/summernote.min.js"></script> */ ?>
-@endif
-@if (!isset($admMenu))
-    {!! view('vendor.survloop.elements.inc-google-analytics')->render() !!}
+    @if ($isWsyiwyg)
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
+        <?php /* <link href="/summernote.css" rel="stylesheet"> <script defer src="/summernote.min.js"></script> */ ?>
+    @endif
+    @if (!isset($admMenu))
+        {!! view('vendor.survloop.elements.inc-google-analytics')->render() !!}
+    @endif
 @endif
 </body>
 </html>

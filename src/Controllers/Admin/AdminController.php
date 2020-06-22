@@ -274,13 +274,7 @@ class AdminController extends AdminEmailController
         }
         $this->v["sysDef"] = new SystemDefinitions;
         $css = $this->v["sysDef"]->loadCss();
-        $custCSS = SLDefinitions::where('def_database', $this->dbID)
-            ->where('def_set', 'Style CSS')
-            ->where('def_subset', 'main')
-            ->first();
-        $css["raw"] = (($custCSS && isset($custCSS->def_description)) 
-            ? $custCSS->def_description : '');
-        
+        $css["raw"] = $GLOBALS["SL"]->getSysCustCSS();
         $syscss = view(
             'vendor.survloop.css.styles-1', 
             [ "css" => $css ]

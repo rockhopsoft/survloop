@@ -28,6 +28,10 @@ $v = $surv->custLoop->v;
 
         @if (session('status'))
             <div class="alert alert-success">{{ session('status') }}</div>
+        @elseif ($GLOBALS["SL"]->REQ->has('sent'))
+            <div class="alert alert-success">
+                Please check your email for a password reset link.
+            </div>
         @endif
 
         <div class="nodeGap"></div>

@@ -10,7 +10,7 @@
   */
 namespace SurvLoop\Controllers\Globals;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 use MatthiasMullie\Minify;
 use App\Models\SLCaches;
 use App\Models\SLTree;
@@ -333,8 +333,10 @@ class GlobalsCache extends GlobalsBasic
             $minifier->add($minPath . '/css/' . $fileCss);
             $minifier->minify($minPath . '/css/' . $fileMin);
             Storage::delete($this->cachePath . '/css/' . $fileCss);
-            $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" '
-                . 'href="/sys/dyna/' . $fileMin . '">' . "\n";
+            if (!$this->isPdfView()) {
+                $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" '
+                    . 'href="/sys/dyna/' . $fileMin . '">' . "\n";
+            }
         }
         
         $fileJs = str_replace('.css', '.js', $fileCss);
@@ -353,9 +355,11 @@ class GlobalsCache extends GlobalsBasic
             $minifier->add($minPath . '/js/' . $fileJs);
             $minifier->minify($minPath . '/js/' . $fileMin);
             Storage::delete($this->cachePath . '/js/' . $fileJs);
-            $this->pageSCRIPTS .= "\n" . '<script id="dynJs" '
-                . 'type="text/javascript" src="/sys/dyna/' 
-                . $fileMin . '"></script>' . "\n";
+            if (!$this->isPdfView()) {
+                $this->pageSCRIPTS .= "\n" . '<script id="dynJs" '
+                    . 'type="text/javascript" src="/sys/dyna/' 
+                    . $fileMin . '"></script>' . "\n";
+            }
         }
 
         $this->pageCSS = $this->pageJAVA = $this->pageAJAX = '';
@@ -405,7 +409,7 @@ class GlobalsCache extends GlobalsBasic
                 }
             }
         }
-        $postDateTime = date('Y-m-d H:i:s', $this->getPastDateTime(10));
+        $postDateTime = date('Y-m-d H:i:s', $this->getPastDateTime(14));
         $chk = SLCaches::where('created_at', '<', $postDateTime)
             ->delete();
         return true;
@@ -488,5 +492,29 @@ class GlobalsCache extends GlobalsBasic
         }
         return '';
     }
+
+    /**
+     * Generate list of user IDs with custom profile avatars uploads.
+     *
+     * @return array
+     */
+    public function getComplaintWithProfilePics()
+    {
+        $ret = [];
+        $files = Storage::files('up/avatar');
+        if (sizeof($files) > 0) {
+            foreach ($files as $file) {
+                if (strpos($file, '-.jpg') !== false) {
+                    $file = str_replace('-.jpg', '', 
+                        str_replace('up/avatar/', '', $file));
+                    $ret[] = intVal($file);
+                }
+            }
+        }
+        return $ret;
+    }
+/// $file = '../storage/app/up/avatar/' . $uID . '-.jpg';
+
+
 
 }

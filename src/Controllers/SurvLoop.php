@@ -21,6 +21,7 @@ use App\Models\SLTree;
 use App\Models\SLNode;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Globals\Globals;
+use SurvLoop\Controllers\DeliverImage;
 use SurvLoop\Controllers\SurvLoopInstaller;
 use SurvLoop\Controllers\SurvCustLoop;
 
@@ -136,6 +137,9 @@ class SurvLoop extends SurvCustLoop
             if (in_array($view, ['pdf', 'full-pdf'])) {
                 $this->custLoop->v["isPrint"] = 1;
                 $GLOBALS["SL"]->x["isPrintPDF"] = true;
+                if ($view == 'full-pdf') {
+                    $GLOBALS["SL"]->x["fullAccess"] = true;
+                }
             }
             $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
             if ($cid <= 0 && $request->has('cid')) {
@@ -149,6 +153,10 @@ class SurvLoop extends SurvCustLoop
                 }
                 $cid = $GLOBALS["SL"]->coreID;
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
+                $treeSlug = $GLOBALS["SL"]->treeRow->tree_slug;
+                if (in_array($view, ['pdf', 'full-pdf'])) {
+                    return $this->custLoop->byID($request, $cid, '', $request->has('ajax'));
+                }
             }
             $this->custLoop->chkPageToken();
             $allowCache = true;
@@ -185,6 +193,41 @@ class SurvLoop extends SurvCustLoop
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
+    }
+    
+    public function byID(Request $request, $treeSlug, $cid, $coreSlug = '')
+    {
+        if ($this->loadTreeBySlug($request, $treeSlug)) {
+            $this->loadLoop($request);
+            $hasAjax = $request->has('ajax');
+            return $this->custLoop->byID($request, $cid, $coreSlug, $hasAjax);
+        }
+        $this->loadDomain();
+        return redirect($this->domainPath . '/');
+    }
+    
+    public function fullByID(Request $request, $treeSlug, $cid, $coreSlug = '')
+    {
+        $GLOBALS["SL"]->x["fullAccess"] = true;
+        return $this->byID($request, $treeSlug, $cid, $coreSlug = '');
+    }
+    
+    public function pdfByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["SL"]->x["isPrintPDF"] = true;
+        return $this->byID($request, $treeSlug, $cid);
+    }
+    
+    public function fullPdfByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["SL"]->x["fullAccess"] = true;
+        return $this->pdfByID($request, $treeSlug, $cid);
+    }
+    
+    public function tokenByID(Request $request, $pageSlug, $cid, $token)
+    {
+        return $this->loadPageURL($request, $pageSlug, $cid, 'token-' . trim($token));
+        //return $this->byID($request, $treeSlug, $cid);
     }
     
     /**
@@ -475,55 +518,35 @@ class SurvLoop extends SurvCustLoop
         return true;
     }
     
-    public function retrieveUpload(Request $request, $treeSlug = '', $cid = -3, $upID = '')
+    public function retrieveUpload(Request $request, $treeSlug = '', $cid = -3, $upID = '', $refresh = false)
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
-            return $this->custLoop->retrieveUpload($request, $cid, $upID);
+            return $this->custLoop->retrieveUpload($request, $cid, $upID, $refresh);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
     
-    public function byID(Request $request, $treeSlug, $cid, $coreSlug = '')
+    public function retrieveUploadFresh(Request $request, $rand = '', $treeSlug = '', $cid = -3, $upID = '')
+    {
+        return $this->retrieveUpload($request, $treeSlug, $cid, $upID, true);
+    }
+    
+    public function checkImgResizeAll(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
-            $hasAjax = $request->has('ajax');
-            return $this->custLoop->byID($request, $cid, $coreSlug, $hasAjax);
+            return $this->custLoop->checkImgResizeAll();
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
-    }
-    
-    public function fullByID(Request $request, $treeSlug, $cid, $coreSlug = '')
-    {
-        $GLOBALS["fullAccess"] = true;
-        return $this->byID($request, $treeSlug, $cid, $coreSlug = '');
-    }
-    
-    public function pdfByID(Request $request, $treeSlug, $cid)
-    {
-        $GLOBALS["SL"]->x["isPrintPDF"] = true;
-        return $this->byID($request, $treeSlug, $cid);
-    }
-    
-    public function fullPdfByID(Request $request, $treeSlug, $cid)
-    {
-        $GLOBALS["fullAccess"] = true;
-        return $this->pdfByID($request, $treeSlug, $cid);
     }
     
     public function fullXmlByID(Request $request, $treeSlug, $cid)
     {
-        $GLOBALS["fullAccess"] = true;
+        $GLOBALS["SL"]->x["fullAccess"] = true;
         return $this->xmlByID($request, $treeSlug, $cid);
-    }
-    
-    public function tokenByID(Request $request, $pageSlug, $cid, $token)
-    {
-        return $this->loadPageURL($request, $pageSlug, $cid, 'token-' . trim($token));
-        //return $this->byID($request, $treeSlug, $cid);
     }
     
     public function xmlAll(Request $request, $treeSlug = '')
@@ -702,42 +725,8 @@ class SurvLoop extends SurvCustLoop
     public function getUploadFile(Request $request, $abbr, $file)
     {
         $filename = '../storage/app/up/' . $abbr . '/' . $file;
-        $handler = new File($filename);
-        // Get the last modified time for the file (Unix timestamp):
-        $file_time = $handler->getMTime(); 
-        $lifetime = (60*60*24*5); // five days in seconds
-        $header_etag = md5($file_time . $filename);
-        $header_last_modified = gmdate('r', $file_time);
-        $headers = [
-            'Content-Disposition' => 'inline; filename="' . $filename . '"',
-            // override caching for sensitive:
-            'Cache-Control'       => 'public, max-age="' . $lifetime . '"', 
-            'Last-Modified'       => $header_last_modified,
-            'Expires'             => gmdate('r', $file_time + $lifetime),
-            'Pragma'              => 'public',
-            'Etag'                => $header_etag
-        ];
-        
-        // Is the resource cached?
-        $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
-            && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_last_modified);
-        $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
-            && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) 
-                == $header_etag);
-        if (($h1 || $h2) && !$request->has('refresh')) {
-            return Response::make('', 304, $headers); 
-        }
-        // File (image) is cached by the browser, so we don't have to send it again
-        
-        $headers = array_merge($headers, [
-            'Content-Type'   => $handler->getMimeType(),
-            'Content-Length' => $handler->getSize()
-        ]);
-        return Response::make(
-            file_get_contents($filename), 
-            200, 
-            $headers
-        );
+        $img = new DeliverImage($filename, 0, $request->has('refresh'));
+        return $img->delivery();
     }
     
     public function jsLoadMenu(Request $request)

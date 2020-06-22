@@ -23,7 +23,8 @@ class UserProfile extends TreeSurvInput
     public function afterLogin(Request $request)
     {
         $this->survLoopInit($request, '');
-        if ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
+        if ($this->v["user"] 
+            && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
             //return redirect()->intended('dashboard');
             return $this->redir('/dashboard');
         } elseif ($this->v["user"] && $this->v["user"]->hasRole('volunteer|partner')) {
@@ -279,7 +280,13 @@ class UserProfile extends TreeSurvInput
                 }
                 $GLOBALS["SL"]->REQ->file($file)->move($upFold, $filename);
                 Image::configure(array('driver' => 'imagick'));
-                $image = Image::make($upFold . $filename)->widen(500)->crop(500, 500); //->rotate(90);
+                $image = Image::make($upFold . $filename);
+                $width = $height = 500;
+                $image->width() > $image->height() ? $width=null : $height=null;
+                $image->resize($width, $height, function ($constraint) {
+                        $constraint->aspectRatio();
+                    });
+                $image->crop(500, 500);
                 $crop = str_replace('.jpg', '-.jpg', $upFold . $filename);
                 $image->save($crop, 60);
             }

@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\SLDefinitions;
 use App\Models\SLUsersRoles;
 use SurvLoop\Controllers\DatabaseLookups;
-use SurvLoop\Controllers\Notifications\MailResetPasswordNotification;
+use SurvLoop\Controllers\Notifications\CustomResetPasswordNotification;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -49,7 +49,8 @@ class User extends Model implements AuthenticatableContract,
     */
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new MailResetPasswordNotification($token));
+        $this->notify(new CustomResetPasswordNotification($token));
+        // $this->notify(new MailResetPasswordNotification($token));
     }
     
     

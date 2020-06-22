@@ -1004,10 +1004,16 @@ class GlobalsImportExport extends GlobalsTables
 
     public function isPrintView()
     {
+        return ($this->isPdfView()
+            || ($this->REQ->has('print') && intVal($this->REQ->get('print')) > 0));
+    }
+
+    public function isPdfView()
+    {
         return ((isset($this->x["isPrintPDF"]) && $this->x["isPrintPDF"])
             || (in_array($this->pageView, ['pdf', 'full-pdf']))
-            || ($this->REQ->has('print') && intVal($this->REQ->get('print')) > 0)
-            || ($this->REQ->has('pdf') && intVal($this->REQ->get('pdf')) > 0));
+            || ($this->REQ->has('pdf') && intVal($this->REQ->get('pdf')) > 0)
+            || ($this->REQ->has('gen-pdf') && intVal($this->REQ->get('gen-pdf')) > 0));
     }
 
     public function getLimit($limit = 100)
@@ -1019,6 +1025,18 @@ class GlobalsImportExport extends GlobalsTables
             }
         }
         return $limit;
+    }
+
+    public function getSysCustCSS()
+    {
+        $custCSS = SLDefinitions::where('def_database', $this->dbID)
+            ->where('def_set', 'Style CSS')
+            ->where('def_subset', 'main')
+            ->first();
+        if ($custCSS && isset($custCSS->def_description)) {
+            return trim($custCSS->def_description);
+        }
+        return '';
     }
     
 }

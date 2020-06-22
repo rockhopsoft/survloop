@@ -38,7 +38,8 @@
                     [
                         "height"  => $height,
                         "upDeets" => $upDeets,
-                        "upRow"   => $upRow
+                        "upRow"   => $upRow,
+                        "refresh" => $GLOBALS["SL"]->REQ->has('refresh')
                     ]
                 )->render() !!}
             @else
@@ -72,7 +73,8 @@
             [
                 "upRow"   => $upRow,
                 "isAdmin" => $isAdmin,
-                "isOwner" => $isOwner
+                "isOwner" => $isOwner,
+                "ext"     => $upDeets["ext"]
             ]
         )->render() !!}
     </div>

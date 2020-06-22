@@ -112,8 +112,9 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
             $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld" ' 
                 . (($boxChecked) ? 'CHECKED' : '');
             if (sizeof($curr->fldHasOther) > 0 && $otherFld[1] == '') {
-                $otherFld[3] = ' document.getElementById(\'n' 
-                    . $curr->nIDtxt . 'fldOtherID' . $j . '\').value=\'\'; ';
+                $otherFld[3] = ' if (document.getElementById(\'n' 
+                    . $curr->nIDtxt . 'fldOtherID' . $j . '\')) { document.getElementById(\'n' 
+                    . $curr->nIDtxt . 'fldOtherID' . $j . '\').value=\'\'; } ';
             }
         } else {
             $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld[]" ' 

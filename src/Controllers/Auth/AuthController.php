@@ -234,6 +234,11 @@ class AuthController extends Controller
         return view('vendor.survloop.auth.passwords.email');
     }
     
+    public function printPassResetSent(Request $request)
+    {
+        return view('vendor.survloop.auth.passwords.email-sent');
+    }
+    
     protected function chkAuthPageOpts(Request $request)
     {
         if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {

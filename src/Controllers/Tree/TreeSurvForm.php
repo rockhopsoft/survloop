@@ -162,11 +162,14 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         if ($GLOBALS["SL"]->REQ->has('ajax')) {
             $id = 'n' . $curr->nID;
         }
-        return $this->printNodePublicFormStart($curr->nID) . $ret 
-            . '<div id="pageBtns' . $id . '"><div id="formErrorMsg' . $id . '"></div>' 
-            . $this->nodePrintButton($curr->nID, $curr->tmpSubTier, '') 
-            . '</div>' . $this->printNodePublicFormEnd($curr->nID, '')
-            . $gap;
+        $btns = '';
+        if (!$GLOBALS["SL"]->isPdfView()) {
+            $btns = '<div id="pageBtns' . $id . '"><div id="formErrorMsg' . $id 
+                . '"></div>' . $this->nodePrintButton($curr->nID, $curr->tmpSubTier, '')
+                . '</div>';
+        }
+        return $this->printNodePublicFormStart($curr->nID) . $ret . $btns 
+            . $this->printNodePublicFormEnd($curr->nID, '') . $gap;
     }
 
     protected function printNodePublicInner(&$curr, $promptNotesSpecial)

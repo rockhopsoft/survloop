@@ -302,7 +302,7 @@ class TreeCustomTableAPI
         if (sizeof($this->apiFields) > 0) {
             foreach ($this->apiFields as $apiFld) {
                 if ($type == 'eng') {
-                    $ret .= '<div class="p30 m30"></div>';
+                    $ret .= '<div class="p20"></div>';
                 }
                 $ret .= $apiFld->printFld($type, $this->singular . '_');
             }

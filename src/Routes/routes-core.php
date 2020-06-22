@@ -138,28 +138,36 @@ Route::get(
     '/password/email', 
     $path . 'Auth\\AuthController@printPassReset'
 );
-Route::get( 
+Route::get(
+    '/password/email-sent', 
+    $path . 'Auth\\AuthController@printPassResetSent'
+);
+Route::get(
     '/password/reset', 
     $path . 'Auth\\AuthController@printPassReset'
 );
 Route::post(
     'password/email',
-    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
+    $path . 'Auth\\ForgotPasswordController@sendResetLinkEmail'
+    //'App\\Http\\Controllers\\Auth\\ForgotPasswordController@sendResetLinkEmail'
 )->name('password.email');
 
-Route::get( 
+Route::get(
     'password/reset/{token}', 
-    'App\\Http\\Controllers\\Auth\\ResetPasswordController@showResetForm'
+    $path . 'Auth\\ResetPasswordController@showResetForm'
+    //'App\\Http\\Controllers\\Auth\\ResetPasswordController@showResetForm'
 )->name('password.reset');
 
 Route::get(
     'password/reset', 
-    'App\\Http\\Controllers\\Auth\\ForgotPasswordController@showLinkRequestForm'
+    $path . 'Auth\\ForgotPasswordController@showLinkRequestForm'
+    //'App\\Http\\Controllers\\Auth\\ForgotPasswordController@showLinkRequestForm'
 )->name('password.update');
 
 Route::post(
     'password/reset', 
-    'App\\Http\\Controllers\\Auth\\ResetPasswordController@reset'
+    $path . 'Auth\\ResetPasswordController@reset'
+    //'App\\Http\\Controllers\\Auth\\ResetPasswordController@reset'
 )->name('password.update');
 
 
@@ -275,7 +283,7 @@ Route::get(
 
 
 Route::get(
-    '/img/user/{user}.jpg',
+    '/img/user/{user}',
     $path . 'SurvRoutes@getProfilePhoto'
 );
 

@@ -1,8 +1,11 @@
 <!-- resources/views/vender/survloop/elements/inc-meta-seo.blade.php -->
-@if (isset($GLOBALS["SL"]) && isset($GLOBALS["SL"]->sysOpts) 
+@if (isset($GLOBALS["SL"]) 
+    && isset($GLOBALS["SL"]->sysOpts) 
     && isset($GLOBALS["SL"]->sysOpts["meta-title"]))
+
     <title>{{ $GLOBALS["SL"]->sysOpts["meta-title"] }}</title>
     <meta name="description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}" />
+@if (!$GLOBALS["SL"]->isPdfView())
     <meta name="keywords" content="{{ $GLOBALS['SL']->sysOpts['meta-keywords'] }}" />
     
     <link rel="shortcut icon" href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ $GLOBALS['SL']->sysOpts['shortcut-icon'] }}" />
@@ -28,6 +31,8 @@
     <meta name="twitter:title" content="{{ $GLOBALS['SL']->sysOpts['meta-title'] }}"/>
     <meta name="twitter:description" content="{{ $GLOBALS['SL']->sysOpts['meta-desc'] }}"/>
     <meta name="twitter:domain" content="{{ $GLOBALS['SL']->sysOpts['site-name'] }}"/>
-    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ 
-        $GLOBALS['SL']->sysOpts['meta-img'] }}">
+    <meta name="twitter:image" content="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}{{ $GLOBALS['SL']->sysOpts['meta-img'] }}">
+@endif
+
 @endif

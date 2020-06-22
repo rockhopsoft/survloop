@@ -884,22 +884,14 @@ class TreeCoreSess extends TreeCore
                 if ($this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
                     $GLOBALS["SL"]->pageView = 'full';
                 }
-            } elseif (!$this->isCoreOwner()) {
-                if (in_array($GLOBALS["SL"]->pageView, ['full', 'full-pdf', 'full-xml'])) {
-                    if (!$this->v["user"]
-                        ->hasRole('administrator|databaser|staff|partner')) {
-                        switch ($GLOBALS["SL"]->pageView) {
-                            case 'full-pdf':
-                                $GLOBALS["SL"]->pageView = 'pdf';
-                                break;
-                            case 'full-xml':
-                                $GLOBALS["SL"]->pageView = 'xml';
-                                break;
-                            default:
-                                $GLOBALS["SL"]->pageView = 'public';
-                                break;
-                        }
-                    }
+            } elseif (!$this->isCoreOwner()
+                && !$this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                if ($GLOBALS["SL"]->pageView == 'full-pdf') {
+                    $GLOBALS["SL"]->pageView = 'pdf';
+                } elseif ($GLOBALS["SL"]->pageView == 'full-xml') {
+                    $GLOBALS["SL"]->pageView = 'xml';
+                } else {
+                    $GLOBALS["SL"]->pageView = 'public';
                 }
             }
             if ($this->v["user"]->hasRole('databaser')) {
@@ -911,15 +903,10 @@ class TreeCoreSess extends TreeCore
         } else {
             if ($this->isCoreOwner()) {
                 $GLOBALS["SL"]->dataPerms = 'sensitive';
-            }
-            if (in_array($GLOBALS["SL"]->pageView, ['', 'default', 'full'])) {
-                if (!$this->isCoreOwner()) {
-                    $GLOBALS["SL"]->pageView = 'public';
-                }
+            } elseif (in_array($GLOBALS["SL"]->pageView, ['', 'default', 'full'])) {
+                $GLOBALS["SL"]->pageView = 'public';
             } elseif ($GLOBALS["SL"]->pageView == 'full-pdf') {
-                if (!$this->isCoreOwner()) {
-                    $GLOBALS["SL"]->pageView = 'pdf';
-                }
+                $GLOBALS["SL"]->pageView = 'pdf';
             } elseif ($GLOBALS["SL"]->pageView == 'full-xml') {
                 $GLOBALS["SL"]->pageView = 'xml';
             }

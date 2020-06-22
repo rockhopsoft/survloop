@@ -19,12 +19,19 @@ use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
+use SurvLoop\Controllers\SurvLoopPDF;
 use SurvLoop\Controllers\Globals\Globals;
+use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurvLoops;
 
 class TreeSurv extends TreeSurvLoops
 {
+    /**
+     * Top-level of the algorithm which traverses the branching tree
+     * which defines the generation of page.
+     *
+     * @return string
+     */
     public function printTreePublic()
     {
         $ret = '';
@@ -280,7 +287,12 @@ class TreeSurv extends TreeSurvLoops
         return $this->printNodePublic($this->currNode(), $this->currNodeSubTier);
     }
     
-    // This function is the primary front-facing controller for the user experience
+    /**
+     * This function is the primary front-facing 
+     * controller for the user experience.
+     *
+     * @return string
+     */
     public function index(Request $request, $type = '', $val = '')
     {
         $GLOBALS["SL"]->microLog('TreeSurv index(' . $type);
@@ -290,33 +302,10 @@ class TreeSurv extends TreeSurvLoops
         if ($chk && trim($chk) != '') {
             return $chk;
         }
-        $this->checkPageViewPerms();
-        if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
-            $this->fillGlossary(); // is report
-        }
-        //if ($this->v["uID"] > 0) $this->loadAllSessData();
-        if ($type == 'ajaxChecks') {
-            $this->runAjaxChecks($request);
-            exit;
-        }
-        if (!isset($this->v["javaNodes"])) {
-            $this->v["javaNodes"] = '';
-        }
-        $notes = '';
-        if (isset($GLOBALS["SL"]->pageView) 
-            && trim($GLOBALS["SL"]->pageView) != '') {
-            $notes .= 'pv.' . $GLOBALS["SL"]->pageView 
-                . ' dp.' . $GLOBALS["SL"]->dataPerms;
-        }
+        $notes = $this->indexChecks($request, $type);
         $this->v["content"] = $this->printTreePublic();
         if ($notes != '') {
             $this->v["content"] .= '<!-- ' . $notes . ' -->';
-        }
-        if ($this->v["currPage"][0] != '/' && isset($this->v["uID"])) {
-            $log = new SLUsersActivity;
-            $log->user_act_user = $this->v["uID"];
-            $log->user_act_curr_page = $this->v["currPage"][0] . $notes;
-            $log->save();
         }
         $this->loadTreePageJava();
         if ($request->has('ajax') && $request->ajax == 1) {
@@ -333,13 +322,59 @@ class TreeSurv extends TreeSurvLoops
             $this->v["content"], 
             $this->coreID
         );
+        return $this->indexResponse();
+    }
+    
+    /**
+     * Check, initialize, and log data needed to generate page.
+     *
+     * @return string
+     */
+    public function indexChecks(Request $request, $type = '')
+    {
+        $this->checkPageViewPerms();
+        $notes = '';
+        if (isset($GLOBALS["SL"]->pageView) 
+            && trim($GLOBALS["SL"]->pageView) != '') {
+            $notes .= 'pv.' . $GLOBALS["SL"]->pageView 
+                . ' dp.' . $GLOBALS["SL"]->dataPerms;
+        }
+        if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
+            $this->fillGlossary(); // is report
+        }
+        //if ($this->v["uID"] > 0) $this->loadAllSessData();
+        if ($type == 'ajaxChecks') {
+            $this->runAjaxChecks($request);
+            exit;
+        }
+        if (!isset($this->v["javaNodes"])) {
+            $this->v["javaNodes"] = '';
+        }
+        if ($this->v["currPage"][0] != '/' && isset($this->v["uID"])) {
+            $log = new SLUsersActivity;
+            $log->user_act_user = $this->v["uID"];
+            $log->user_act_curr_page = $this->v["currPage"][0] . $notes;
+            $log->save();
+        }
+        return $notes;
+    }
+    
+    /**
+     * Determine final formatting options on the generated page.
+     *
+     * @return string
+     */
+    public function indexResponse()
+    {
+        if ($GLOBALS["SL"]->isPdfView()) {
+            return $this->v["content"];
+        }
         if ($GLOBALS["SL"]->treeIsAdmin) {
             return $GLOBALS["SL"]->swapSessMsg($this->v["content"]);
-        } else {
-            return $GLOBALS["SL"]->swapSessMsg(
-                view('vendor.survloop.master', $this->v)->render()
-            );
         }
+        return $GLOBALS["SL"]->swapSessMsg(
+            view('vendor.survloop.master', $this->v)->render()
+        );
     }
     
     /**

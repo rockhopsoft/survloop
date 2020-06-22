@@ -3,6 +3,9 @@
 @if (isset($blockName) && trim($blockName) != '')
     <h4 class="mT0 mB10 slBlueDark">{!! $blockName !!}</h4>
 @endif
+@if (isset($blockDesc) && trim($blockDesc) != '')
+    <div class="mB10">{!! $blockDesc !!}</div>
+@endif
     <table class="repDeetsBlock repDeetVert">
     @foreach ($deets as $j => $deet)
         <?php $done = ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0); ?>

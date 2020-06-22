@@ -3,14 +3,13 @@
 @if (isset($blockName) && trim($blockName) != '')
     <h4 class="mT0 mB10 slBlueDark">{!! $blockName !!}</h4>
 @endif
+@if (isset($blockDesc) && trim($blockDesc) != '')
+    <div class="mB10">{!! $blockDesc !!}</div>
+@endif
 @if (isset($deetCols) && sizeof($deetCols) > 0)
-    @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) <table border=0 class="w100"><tr>
-    @else <div class="row"> @endif
+    <div class="row" @if ($GLOBALS["SL"]->isPdfView()) style="padding-bottom: 30px;" @endif >
     @foreach ($deetCols as $i => $deets) 
-        @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf']))
-            <td class="vaT pL15 pR15 pB15 @if (sizeof($deetCols) == 2) w50 @elseif (sizeof($deetCols) == 3) w33 
-                @elseif (sizeof($deetCols) == 4) w25 @elseif (sizeof($deetCols) == 5) w20 @endif ">
-        @else <div class="col-md-{{ $GLOBALS['SL']->getColsWidth(sizeof($deetCols)) }}"> @endif
+        <div class="col-md-{{ $GLOBALS['SL']->getColsWidth(sizeof($deetCols)) }}">
             <table class="repDeetsBlock">
             @foreach ($deets as $j => $deet)
                 @if (isset($deet[0]) && trim($deet[0]) != '')
@@ -25,9 +24,8 @@
                 @endif
             @endforeach
             </table>
-        @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) </td> @else </div> @endif
+        </div>
     @endforeach
-    @if (in_array($GLOBALS["SL"]->pageView, ['pdf', 'full-pdf'])) </tr></table>
-    @else </div> @endif
+    </div>
 @endif
 </div>

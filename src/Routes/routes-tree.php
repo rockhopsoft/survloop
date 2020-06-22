@@ -71,8 +71,16 @@ Route::get(
     $path . 'SurvLoop@getUploadFile'
 );
 Route::get(
+    '/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',
+    $path . 'SurvLoop@retrieveUploadFresh'
+);
+Route::get(
     '/up/{treeSlug}/{cid}/{upID}',
     $path . 'SurvLoop@retrieveUpload'
+);
+Route::get(
+    '/up-img-resize-all/{treeSlug}',
+    $path . 'SurvLoop@checkImgResizeAll'
 );
 
 

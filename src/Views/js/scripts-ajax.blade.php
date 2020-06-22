@@ -129,7 +129,7 @@ $(document).ready(function(){
     setTimeout(function() { chkHshoosPos(); }, 10);
     setTimeout(function() { chkHshooScroll(); }, 50);
     $(document).scroll(function() { chkHshooScroll(); });
-    
+
     function chkMatchCols(timeout) {
         if (matchingColRunning) {
             if (window.innerWidth > 992) {
@@ -512,14 +512,21 @@ $(document).ready(function(){
         setTimeout(function() { toggleHidiv(fldGrp); }, 350);
 	});
     
+    function visibShowNode(nID) {
+        setNodeVisib(""+nID+"", "", true);
+        $("#node"+nID+"").slideDown("fast");
+    }
+    function visibHideNode(nID) {
+        setNodeVisib(""+nID+"", "", false);
+        $("#node"+nID+"").slideUp("fast");
+    }
+
     function toggleHidnode(nID) {
         if (document.getElementById("node"+nID+"")) {
             if (document.getElementById("node"+nID+"").style.display!="block") {
-                setNodeVisib(""+nID+"", "", true);
-                $("#node"+nID+"").slideDown("fast");
+                visibShowNode(nID);
             } else {
-                setNodeVisib(""+nID+"", "", false);
-                $("#node"+nID+"").slideUp("fast");
+                visibHideNode(nID);
             }
         }
         return true;
@@ -533,6 +540,51 @@ $(document).ready(function(){
         toggleHidnode(nID);
         $(this).slideUp("fast");
 	});
+
+    function chkPageTweaks(timeout) {
+        chkMatchCols();
+        chkSpecialNodes();
+
+        timeout=Math.round(1.2*timeout);
+        setTimeout(function() { chkPageTweaks(timeout); }, timeout);
+        return true;
+    }
+
+    function chkSpecialNodes() {
+        if (specialNodes && specialNodes.length > 0) {
+            for (var i=0; i < specialNodes.length; i++) {
+                if (specialNodes[i].length > 0 && specialNodes[i][0].trim() != '') {
+                    if (specialNodes[i][0].trim() == 'nyc') {
+                        chkSpecialNodeNYC(specialNodes[i]);
+                    }
+                }
+            }
+        }
+        setTimeout(function() { chkSpecialNodes(); }, 2500);
+    }
+    setTimeout(function() { chkSpecialNodes(); }, 300);
+
+    function chkSpecialNodeNYC(specialNode) {
+        if (specialNode[0] == 'nyc' && specialNode.length == 4) {
+            var showNyc = false;
+            var cityFld = "n"+specialNode[1]+"FldID";
+            var stateFld = "n"+specialNode[2]+"FldID";
+            if (document.getElementById(cityFld) && document.getElementById(cityFld).value && document.getElementById(stateFld) && document.getElementById(stateFld).value) {
+                var city = document.getElementById(cityFld).value.trim().toLowerCase();
+                city = city.replace(' ', '').replace(' ', '').replace(' ', '').trim();
+                if (document.getElementById(stateFld).value == 'NY' && (city.indexOf("newyork") >= 0 || city.indexOf("nyc") >= 0)) {
+                    showNyc = true;
+                }
+            }
+            if (document.getElementById("blockWrap"+specialNode[3]+"")) {
+                if (showNyc) {
+                    visibShowNode(specialNode[3]);
+                } else {
+                    visibHideNode(specialNode[3]);
+                }
+            }
+        }
+    }
 	
 	$(document).on("click", ".hidTogAll", function() {
 	    if ($(this).attr("data-list") && $(this).attr("data-list").trim() != '') {
@@ -627,7 +679,9 @@ $(document).ready(function(){
         if (document.getElementById("dialogTitle")) document.getElementById("dialogTitle").innerHTML = title;
         $("#nondialog").fadeOut(300);
         window.scrollTo(0, 0);
-        $("#dialogBody").load("/ajax/img-sel?nIDtxt="+nIDtxt+"&presel="+encodeURIComponent(presel));
+        var url = "/ajax/img-sel?nIDtxt="+nIDtxt+"&presel="+encodeURIComponent(presel);
+        console.log(url);
+        $("#dialogBody").load(url);
         setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
         return true;
     }
@@ -655,8 +709,9 @@ $(document).ready(function(){
         openImgDetail(ids[0], ids[1]);
 	});
     function getImgNode(imgID) {
-	    var nIDtxt = "";
-	    if (document.getElementById("imgNode"+imgID+"ID")) nIDtxt = document.getElementById("imgNode"+imgID+"ID").value;
+	    var nIDtxt = "pageImg";
+	    if (document.getElementById("imgNode"+imgID+"ID") && document.getElementById("imgNode"+imgID+"ID").value.trim() != '') nIDtxt = document.getElementById("imgNode"+imgID+"ID").value;
+console.log("getImgNode("+imgID+" - "+nIDtxt);
 	    return nIDtxt;
     }
     function imgChoose(imgID) {
@@ -665,8 +720,11 @@ $(document).ready(function(){
         setTimeout(function() { $("#dialog").fadeOut(300); }, 301);
 	    var url = "";
 	    if (document.getElementById("imgUrl"+imgID+"ID")) url = document.getElementById("imgUrl"+imgID+"ID").value;
+console.log("imgChoosen "+imgID+" - n"+nIDtxt+"FldID ?");
         if (document.getElementById("n"+nIDtxt+"FldID")) {
             document.getElementById("n"+nIDtxt+"FldID").value=url;
+
+console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById("n"+nIDtxt+"FldID").value);
         }
         updateImgSelect(nIDtxt);
         return true;

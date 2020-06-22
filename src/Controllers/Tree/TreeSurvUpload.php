@@ -14,10 +14,12 @@ use Auth;
 use Storage;
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;
+use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLUploads;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
+use SurvLoop\Controllers\DeliverImage;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurv;
 
@@ -56,7 +58,6 @@ class TreeSurvUpload extends TreeSurv
             return null;
         }
         $modelObj = [];
-//echo 'checkRandStr(' . $tbl . ', ' . $fld . ', ' . $str . ' - ' . $model . '<br />'; exit;
         eval("\$modelObj = " . $model 
             . "::where('" . $fld . "', '" . $str . "')->get();");
         return $modelObj->isEmpty();
@@ -213,12 +214,9 @@ class TreeSurvUpload extends TreeSurv
         }
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $up) {
-                $hasUpload = (isset($up->up_upload_file) 
-                    && trim($up->up_upload_file) != '');
-                $hasStored = (isset($up->up_stored_file) 
-                    && trim($up->up_stored_file) != '');
-                $hasVidLnk = (isset($up->up_video_link) 
-                    && trim($up->up_video_link) != '');
+                $hasUpload = (isset($up->up_upload_file) && trim($up->up_upload_file) != '');
+                $hasStored = (isset($up->up_stored_file) && trim($up->up_stored_file) != '');
+                $hasVidLnk = (isset($up->up_video_link)  && trim($up->up_video_link)  != '');
                 if (($hasUpload && $hasStored) || $hasVidLnk) {
                     $ret[] = $up;
                 }
@@ -227,10 +225,9 @@ class TreeSurvUpload extends TreeSurv
         return $ret;
     }
     
-    public function retrieveUploadFile($upID = '')
+    public function retrieveUploadFile($upID = '', $refresh = false)
     {
         $this->checkPageViewPerms();
-        $this->tweakPageViewPerms();
         if (!$this->isPublic() && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
             return $this->retrieveUploadFail();
         }
@@ -253,7 +250,7 @@ class TreeSurvUpload extends TreeSurv
                 // != 'Public' && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
                     return $this->retrieveUploadFail();
                 }
-                return $this->previewImg($deet);
+                return $this->previewImg($deet, $refresh);
             }
         }
         return $this->retrieveUploadFail();
@@ -264,47 +261,24 @@ class TreeSurvUpload extends TreeSurv
         return '';
     }
     
-    public function previewImg($up)
+    public function previewImg($up, $refresh = false)
     {
         if (is_array($up) && sizeof($up) > 0 && isset($up["file"])) {
-            return response()->file($up["file"]);
-        }
-        /*
-        if ($up["ext"] == 'pdf') {
-            
-        } else {
-            $handler = new File($up["file"]);
-            $file_time = $handler->getMTime(); // Get the last modified time for the file (Unix timestamp)
-            $lifetime = 86400; // One day in seconds
-            $header_etag = md5($file_time . $up["file"]);
-            $header_modified = gmdate('r', $file_time);
-            $headers = array(
-                'Content-Disposition' => 'inline; filename="' . $this->coreID . '-' . (1+$up["ind"]) 
-                                            . '-' . $up["fileOrig"] . '"',
-                'Last-Modified'       => $header_modified,
-                'Cache-Control'       => 'must-revalidate',
-                'Expires'             => gmdate('r', $file_time + $lifetime),
-                'Pragma'              => 'public',
-                'Etag'                => $header_etag
-            );
-            // Is the resource cached?
-            $h1 = (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) 
-                && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $header_modified);
-            $h2 = (isset($_SERVER['HTTP_IF_NONE_MATCH']) 
-                && str_replace('"', '', stripslashes($_SERVER['HTTP_IF_NONE_MATCH'])) == $header_etag);
-            if ($h1 || $h2) {
-                return Response::make('', 304, $headers); 
+            $filename = $up["file"];
+            if ($GLOBALS["SL"]->REQ->has('orig')) {
+                $filename = $up["fileOG"];
             }
-            // File (image) is cached by the browser, so we don't have to send it again
-            
-            $headers = array_merge($headers, [
-                'Content-Type'   => $handler->getMimeType(),
-                'Content-Length' => $handler->getSize()
-            ]);
-            $up["file"] = $GLOBALS["SL"]->searchDeeperDirs($up["file"]);
-            return Response::make(file_get_contents($up["file"]), 200, $headers);
+            if ($GLOBALS["SL"]->REQ->has('refresh')) {
+                $refresh = true;
+            }
+            $lifetime = 0;
+            if ($refresh) {
+                $lifetime = 10;
+            }
+            $img = new DeliverImage($filename, 0, $refresh);
+            return $img->delivery();
         }
-        */
+        return '';
     }
     
     protected function uploadTool($nID, $nIDtxt)
@@ -351,14 +325,17 @@ class TreeSurvUpload extends TreeSurv
     {
         $ret = [];
         $treeID = $this->getUpTree();
+        $upFold = $this->getUploadFolder();
+        $treeSlug = $GLOBALS["SL"]->treeRow->tree_slug;
         $ret["ind"]      = $i;
         $ret["privacy"]  = $this->loadUpDeetPrivacy($upRow);
         $ret["ext"]      = $GLOBALS["SL"]->getFileExt($upRow->up_upload_file);
-        $ret["filename"] = $upRow->up_stored_file . '.' . $ret["ext"];
-        $ret["file"]     = $this->getUploadFolder() . $upRow->up_stored_file 
-            . '.' . $ret["ext"];
-        $ret["filePub"]  = '/up/' . $GLOBALS["SL"]->treeRow->tree_slug . '/'
-            . $this->coreID . '/' . $upRow->up_stored_file . '.' . $ret["ext"];
+        $ret["filename"] = $upRow->up_stored_file . '.jpg';
+        $ret["fileOG"]   = $upFold . $upRow->up_stored_file . '-orig.' . $ret["ext"];
+        $ret["file"]     = $upFold . $upRow->up_stored_file . '.jpg';
+        $ret["filePub"]  = '/up/' . $treeSlug . '/' . $this->coreID . '/' . $ret["filename"];
+        $ret["fileFrsh"] = '/up-fresh-' . rand(100000, 1000000) . '/' . $treeSlug 
+            . '/' . $this->coreID . '/' . $ret["filename"] . '?refresh=1';
         $ret["fileOrig"] = $upRow->up_upload_file;
         $ret["fileLnk"]  = '<a href="' . $ret["filePub"] . '" target="_blank">' 
             . $upRow->up_upload_file . '</a>';
@@ -413,6 +390,19 @@ class TreeSurvUpload extends TreeSurv
         $this->upDeets = [];
         if (sizeof($this->uploads) > 0) {
             foreach ($this->uploads as $i => $upRow) {
+                if ($GLOBALS["SL"]->REQ->has('upRotate') 
+                    && intVal($GLOBALS["SL"]->REQ->get('upRotate')) == $upRow->up_id
+                    && $GLOBALS["SL"]->REQ->has('rots') 
+                    && intVal($GLOBALS["SL"]->REQ->get('rots')) > 0) {
+
+                    $upFold = $this->getUploadFolder();
+                    $file = $upRow->up_stored_file . '.jpg';
+                    Image::configure(array('driver' => 'imagick'));
+                    $image = Image::make($upFold . $file);
+                    $image->rotate(90*intVal($GLOBALS["SL"]->REQ->get('rots')));
+                    //unlink($upFold . $file);
+                    $image->save($upFold . $file, 85, 'jpg');
+                }
                 $this->upDeets[$i] = $this->loadUpDeets($upRow, $i);
             }
         }
@@ -444,6 +434,7 @@ class TreeSurvUpload extends TreeSurv
                 "upDeets"     => $this->upDeets, 
                 "uploadTypes" => $this->uploadTypes, 
                 "vidTypeID"   => $this->getVidType($treeID),
+                "edit"        => $edit,
                 "v"           => $this->v
             ]
         )->render();
@@ -639,12 +630,14 @@ class TreeSurvUpload extends TreeSurv
                         $upFold = $this->getUploadFolder();
                         $this->mkNewFolder($upFold);
                         $upRow->up_stored_file = $this->getUploadFile($nID);
-                        $filename = $upRow->up_stored_file . '.' . strtolower($extension);
-                        //if ($GLOBALS["SL"]->debugOn) { $ret .= "saving as filename: " . $upFold . $filename . "<br>"; }
-                        if (file_exists($upFold . $filename)) {
-                            Storage::delete($upFold . $filename);
+                        $origFile = $upRow->up_stored_file . '-orig.' . strtolower($extension);
+                        //if ($GLOBALS["SL"]->debugOn) { $ret .= "saving as filename: " . $upFold . $origFile . "<br>"; }
+                        if (file_exists($upFold . $origFile)) {
+                            Storage::delete($upFold . $origFile);
                         }
-                        $GLOBALS["SL"]->REQ->file($file)->move($upFold, $filename);
+                        $GLOBALS["SL"]->REQ->file($file)->move($upFold, $origFile);
+                        $filename = $upRow->up_stored_file;
+                        $this->upImgResize($upFold, $filename, $origFile);
                     }
                 } else {
                     $ret .= '<div class="txtDanger">'
@@ -654,6 +647,98 @@ class TreeSurvUpload extends TreeSurv
             $upRow->save();
         }
         return $ret;
+    }
+    
+    protected function checkImgResize($upRow)
+    {
+        $ret = '';
+        if (isset($upRow->up_upload_file) && trim($upRow->up_upload_file) != '') {
+            $extPos = strrpos($upRow->up_upload_file, '.');
+            if ($extPos > 0) {
+                $extension = strtolower(trim(substr($upRow->up_upload_file, $extPos)));
+                if (in_array($extension, [".gif", ".jpeg", ".jpg", ".png"])) {
+                    $upFold = $GLOBALS["SL"]->getCoreUpFold(
+                        $upRow->up_tree_id, 
+                        $upRow->up_core_id
+                    );
+                    if ($upFold != '' && trim($upRow->up_stored_file) != '') {
+                        $resize = $GLOBALS["SL"]->REQ->has('refresh');
+                        $filename = $upRow->up_stored_file;
+                        $origFile = $upRow->up_stored_file . '-orig' . $extension;
+                        if (!file_exists($upFold . $origFile)
+                            && file_exists($upFold . $filename . $extension)) {
+                            copy($upFold . $filename . $extension, $upFold . $origFile);
+                            $resize = true;
+                        }
+                        if (file_exists($upFold . $origFile)
+                            && !file_exists($upFold . $filename . '.jpg')) {
+                            $resize = true;
+                        }
+                        if ($resize) {
+                            $this->upImgResize($upFold, $filename, $origFile);
+                            $ret .= '<br />' . $upFold . ', ' . $filename . ', ' . $origFile;
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    protected function upImgResize($upFold, $filename, $origFile)
+    {
+        Image::configure(array('driver' => 'imagick'));
+        $filename .= '.jpg';
+        $image = Image::make($upFold . $origFile);
+        $isLarge = false;
+        $width = $height = $max = 1600;
+        if ($image->width() > $image->height()) {
+            $isLarge = ($image->width() > $max);
+            $height=null;
+        } else {
+            $isLarge = ($image->height() > $max);
+            $width=null;
+        }
+        if ($isLarge) {
+            $image->resize($width, $height, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+        }
+        if (file_exists($upFold . $filename)) {
+            unlink($upFold . $filename);
+        }
+        $image->save($upFold . $filename, 85, 'jpg');
+        return true;
+    }
+    
+    public function checkImgResizeAll()
+    {
+        $cnt = 0;
+        ini_set('max_execution_time', 600);
+        $upRows = SLUploads::where('up_tree_id', $GLOBALS["SL"]->treeID)
+            ->whereNotNull('up_upload_file')
+            ->where('up_upload_file', 'NOT LIKE', '')
+            ->whereNotNull('up_stored_file')
+            ->where('up_stored_file', 'NOT LIKE', '')
+            ->get();
+        echo '<h2>Checking ' . number_format($upRows->count()) . '</h2>';
+        $ret = '';
+        if ($upRows->isNotEmpty()) {
+            foreach ($upRows as $upRow) {
+                if ($cnt < 100) {
+                    $curr = $this->checkImgResize($upRow);
+                    if ($curr != '') {
+                        $ret .= $curr;
+                        $cnt++;
+                    }
+                }
+            }
+        }
+        if ($GLOBALS["SL"]->REQ->has('redir')) {
+            return $this->redir($GLOBALS["SL"]->REQ->get('redir'), true);
+        }
+        echo 'Done. Resized ' . number_format($cnt) . '<br /><br />' . $ret;
+        exit;
     }
     
     protected function mkNewFolder($fold)

@@ -244,9 +244,12 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
 
     protected function printNodePublicVisibility($curr)
     {
-        $ret = '<input type="hidden" name="n' 
-            . $curr->nIDtxt . 'Visible" id="n' . $curr->nIDtxt 
-            . 'VisibleID" value="' . $curr->currVisib . '">';
+        $ret = '';
+        if (!$GLOBALS["SL"]->isPdfView()) {
+            $ret .= '<input type="hidden" name="n' 
+                . $curr->nIDtxt . 'Visible" id="n' . $curr->nIDtxt 
+                . 'VisibleID" value="' . $curr->currVisib . '">';
+        }
         if ($curr->nodeType == 'Layout Column') {
             $ret = '';
         }
@@ -472,7 +475,8 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
             $ret .= $this->nodePrintBlockStart($curr);
         }
 
-        if (!$this->hasSpreadsheetParent($curr->nID)) {
+        if (!$this->hasSpreadsheetParent($curr->nID)
+            && !$GLOBALS["SL"]->isPdfView()) {
             $ret .= '<div class="fC"></div><div class="nodeAnchor"><a id="n' 
                 . $curr->nIDtxt . '" name="n' . $curr->nIDtxt . '"></a></div>';
         }
@@ -585,7 +589,8 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
         )->render();
         $isParallax = (isset($curr->colors["blockImgFix"]) 
             && trim($curr->colors["blockImgFix"]) == 'P');
-        $ret .= '<div id="blockWrap' . $curr->nIDtxt . '" class="w100' . $dis;
+        $ret .= '<div id="blockWrap' . $curr->nIDtxt 
+            . '" class="w100 page-break-avoid' . $dis;
         if ($isParallax) {
             $imgSrc = '';
             if (sizeof($curr->colors) > 0) {

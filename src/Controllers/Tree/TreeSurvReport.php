@@ -12,21 +12,11 @@ namespace SurvLoop\Controllers\Tree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\SLSessEmojis;
+use SurvLoop\Controllers\SurvLoopPDF;
 use SurvLoop\Controllers\Tree\TreeSurvBasicNav;
 
 class TreeSurvReport extends TreeSurvBasicNav
 {
-    public function printAdminReport($coreID)
-    {
-        $this->v["cID"] = $coreID;
-        return $this->printFullReport('', true);
-    }
-    
-    public function printFullReport($reportType = '', $isAdmin = false, $inForms = false)
-    {
-        return '';
-    }
-    
     public function printPreviewReportCustom($isAdmin = false)
     {
         return '';
@@ -62,6 +52,69 @@ class TreeSurvReport extends TreeSurvBasicNav
             }
         }
         return $ret;
+    }
+    
+    public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
+    {
+        ini_set('max_execution_time', 90);
+        $this->survLoopInit($request, '/report/' . $coreID);
+        if (!$skipPublic) {
+            $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
+        }
+        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
+        $this->checkPageViewPerms();
+        if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
+            $this->hideDisclaim = true;
+        }
+        if ($GLOBALS["SL"]->isPdfView()) {
+            if ($this->chkCachePdfByID()) {
+                return $this->getCachePdfByID();
+            } elseif ($request->has('gen-pdf')) {
+                return $this->genPdfByID();
+            }
+        }
+        $this->v["isPublicRead"] = true;
+        $this->v["content"] = $this->index($request);
+        if ($GLOBALS["SL"]->isPdfView()) {
+            return $this->prepPdfByID();
+        }
+        if ($skipWrap) {
+            return $this->v["content"];
+        }
+        $this->v["footOver"] = $this->printNodePageFoot();
+        return $GLOBALS["SL"]->swapSessMsg(
+            view('vendor.survloop.master', $this->v)->render()
+        );
+    }
+    
+    public function chkCachePdfByID()
+    {
+        $this->v["pdf-gen"] = new SurvLoopPDF($GLOBALS["SL"]->coreTbl);
+        $this->v["pdf-file"] = $GLOBALS["SL"]->coreTbl . '-' 
+            . $this->corePublicID . '-' . $GLOBALS["SL"]->dataPerms . '.pdf';
+        $this->v["pdf-file"] = $this->v["pdf-gen"]->getPdfFile($this->v["pdf-file"]);
+        return ($GLOBALS["SL"]->isPdfView() 
+            && file_exists($this->v["pdf-file"]) 
+            && !$GLOBALS["SL"]->REQ->has('refresh'));
+    }
+    
+    public function getCachePdfByID()
+    {
+        return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
+    }
+    
+    public function prepPdfByID()
+    {
+        return $this->v["pdf-gen"]->storeHtml(
+            view('vendor.survloop.master', $this->v)->render(), 
+            $this->v["pdf-file"]
+        );
+    }
+    
+    public function genPdfByID()
+    {
+        $this->v["pdf-gen"]->genCorePdf($this->v["pdf-file"]);
+        return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
     }
     
     public function ajaxEmojiTag(Request $request, $recID = -3, $defID = -3)
@@ -203,15 +256,12 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) {
             $this->fillGlossary();
         }
-        if (sizeof($this->v["glossaryList"]) > 0) {
-            $ret = '<h4 class="mT0 mB20 slBlueDark">Glossary of Terms</h4><div class="glossaryList">';
-            foreach ($this->v["glossaryList"] as $i => $gloss) {
-                $ret .= '<div class="row pT15 pB15"><div class="col-md-3">' . $gloss[0] . '</div>'
-                    . '<div class="col-md-9">' . ((isset($gloss[1])) ? $gloss[1] : '') . '</div></div>';
-            }
-            return $ret . '</div>';
-        }
-        return '';
+        return view(
+            'vendor.survloop.reports.inc-glossary', 
+            [
+                "glossaryList" => $this->v["glossaryList"]
+            ]
+        )->render();
     }
     
     protected function swapSeo($str)
@@ -225,8 +275,10 @@ class TreeSurvReport extends TreeSurvBasicNav
     protected function runPageLoad($nID)
     {
         if (!$this->isPage && $GLOBALS["SL"]->treeRow->tree_opts%13 == 0) { // report
-            $GLOBALS["SL"]->sysOpts['meta-title'] = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-title']);
-            $GLOBALS["SL"]->sysOpts['meta-desc'] = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-desc']);
+            $GLOBALS["SL"]->sysOpts['meta-title'] 
+                = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-title']);
+            $GLOBALS["SL"]->sysOpts['meta-desc'] 
+                = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-desc']);
         }
         return true;
     }
@@ -283,7 +335,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         return $new;
     }
     
-    public function printReportDeetsBlock($deets, $blockName = '', $curr = null)
+    public function printReportDeetsBlock($deets, $blockName = '', $curr = null, $blockDesc = '')
     {
         $deets = $this->chkDeets($deets);
         return view(
@@ -292,12 +344,13 @@ class TreeSurvReport extends TreeSurvBasicNav
                 "nID"       => $curr->nID,
                 "nIDtxt"    => $curr->nIDtxt,
                 "deets"     => $deets,
-                "blockName" => $blockName
+                "blockName" => $blockName,
+                "blockDesc" => $blockDesc
             ]
         )->render();
     }
     
-    public function printReportDeetsBlockCols($deets, $blockName = '', $cols = 2, $curr = null)
+    public function printReportDeetsBlockCols($deets, $blockName = '', $cols = 2, $curr = null, $blockDesc = '')
     {
         $deets = $this->chkDeets($deets);
         $deetCols = $deetsTots = $deetsTotCols = [];
@@ -347,6 +400,7 @@ class TreeSurvReport extends TreeSurvBasicNav
                 "nIDtxt"    => $curr->nIDtxt,
                 "deetCols"  => $deetCols,
                 "blockName" => $blockName,
+                "blockDesc" => $blockDesc,
                 "colWidth"  => $GLOBALS["SL"]->getColsWidth($cols)
             ]
         )->render();
@@ -375,28 +429,6 @@ class TreeSurvReport extends TreeSurvBasicNav
         )->render();
     }
     
-    public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
-    {
-        $this->survLoopInit($request, '/report/' . $coreID);
-        if (!$skipPublic) {
-            $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
-        }
-        $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
-        if ($request->has('hideDisclaim') 
-            && intVal($request->hideDisclaim) == 1) {
-            $this->hideDisclaim = true;
-        }
-        $this->v["isPublicRead"] = true;
-        $this->v["content"] = $this->printFullReport();
-        if ($skipWrap) {
-            return $this->v["content"];
-        }
-        $this->v["footOver"] = $this->printNodePageFoot();
-        return $GLOBALS["SL"]->swapSessMsg(
-            view('vendor.survloop.master', $this->v)->render()
-        );
-    }
-    
     public function printReports(Request $request, $full = true)
     {
         $this->survLoopInit($request, '/reports-full/' . $this->treeID);
@@ -413,26 +445,33 @@ class TreeSurvReport extends TreeSurvBasicNav
                 $ret .= $this->printReportsRecord($id, $full);
             }
         } else {
-            $this->getAllPublicCoreIDs();
-            $this->initSearcher();
-            $this->searcher->getSearchFilts();
-            $this->searcher->processSearchFilts();
-            if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
-                foreach ($this->searcher->allPublicFiltIDs as $i => $coreID) {
-                    if (!isset($this->searchOpts["limit"]) 
-                        || intVal($this->searchOpts["limit"]) == 0
-                        || $i < $this->searchOpts["limit"]) {
-                        if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
-                            $ret .= $this->printReportsRecordPublic($coreID, $full);
-                        } else {
-                            $ret .= $this->printReportsRecord($coreID, $full);
-                        }
-                    }
-                }
-            }
+            $ret .= $this->printReportsDefault($full);
         }
         if ($ret == '') {
             $ret = '<p><i class="slGrey">None found.</i></p>';
+        }
+        return $ret;
+    }
+    
+    public function printReportsDefault($full = true)
+    {
+        $ret = '';
+        $this->getAllPublicCoreIDs();
+        $this->initSearcher();
+        $this->searcher->getSearchFilts();
+        $this->searcher->processSearchFilts();
+        if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
+            foreach ($this->searcher->allPublicFiltIDs as $i => $coreID) {
+                if (!isset($this->searchOpts["limit"]) 
+                    || intVal($this->searchOpts["limit"]) == 0
+                    || $i < $this->searchOpts["limit"]) {
+                    if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
+                        $ret .= $this->printReportsRecordPublic($coreID, $full);
+                    } else {
+                        $ret .= $this->printReportsRecord($coreID, $full);
+                    }
+                }
+            }
         }
         return $ret;
     }
@@ -561,8 +600,8 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         $this->maxUserView();
         $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
-        if (isset($GLOBALS["fullAccess"]) 
-            && $GLOBALS["fullAccess"] 
+        if (isset($GLOBALS["SL"]->x["fullAccess"]) 
+            && $GLOBALS["SL"]->x["fullAccess"] 
             && !in_array($GLOBALS["SL"]->pageView, ['full', 'full-xml'])) {
             $this->v["content"] = $this->errorDeniedFullXml();
             return view('vendor.survloop.master', $this->v);
@@ -596,7 +635,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         return true;
     }
     
-    public function retrieveUpload(Request $request, $cid = -3, $upID = '')
+    public function retrieveUpload(Request $request, $cid = -3, $upID = '', $refresh = false)
     {
         if ($cid <= 0) {
             return '';
@@ -604,7 +643,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->survLoopInit($request, '');
         $GLOBALS["SL"]->pageView = 'full';
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
-        return $this->retrieveUploadFile($upID);
+        return $this->retrieveUploadFile($upID, $refresh);
     }
     
     protected function errorDeniedFullPdf()
@@ -625,7 +664,8 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         return (!$this->hasREQ 
             && (!$GLOBALS["SL"]->REQ->has('ajax') 
-                || intVal($GLOBALS["SL"]->REQ->get('ajax')) == 0));
+                || intVal($GLOBALS["SL"]->REQ->get('ajax')) == 0)
+            && !$GLOBALS["SL"]->isPdfView());
     }
     
     protected function hasFrameLoad()

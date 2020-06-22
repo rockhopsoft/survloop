@@ -421,6 +421,13 @@ function updateRightPane() {
 }
 
 
+var specialNodes = new Array();
+function addSpecialNodeNYC(cityNID, stateNID, nycNID) {
+    specialNodes[specialNodes.length] = new Array('nyc', cityNID, stateNID, nycNID);
+    return true;
+}
+
+
 @if (isset($treeJs)) {!! $treeJs !!} @endif
 
 @if (isset($jsXtra)) {!! $jsXtra !!} @endif

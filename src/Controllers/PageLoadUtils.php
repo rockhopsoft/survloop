@@ -209,8 +209,11 @@ class PageLoadUtils extends Controller
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t && isset($t->tree_opts) 
-                        && $this->okToLoadTree($t->tree_opts)) {
+                    if ($t 
+                        && isset($t->tree_opts) 
+                        && $this->okToLoadTree($t->tree_opts)
+                        && (!isset($GLOBALS["SL"]) 
+                            || $GLOBALS["SL"]->treeID != $t->tree_id)) {
                         $this->syncDataTrees(
                             $request, 
                             $t->tree_database, 

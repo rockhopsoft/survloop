@@ -617,7 +617,9 @@ class TreeSurvLoad extends TreeSurvConds
     public function sessDump($lastNode = -3)
     {
         //return '<!-- ipip: ' . $_SERVER["REMOTE_ADDR"] . ' -->';
-        if ($GLOBALS["SL"]->debugOn && !$GLOBALS["SL"]->REQ->has('ajax')) {
+        if ($GLOBALS["SL"]->debugOn 
+            && !$GLOBALS["SL"]->REQ->has('ajax')
+            && !$GLOBALS["SL"]->isPdfView()) {
             $userName = '';
             if (isset($this->v["user"]) && $this->v["user"]) {
                 $userName = $this->v["user"]->name;
@@ -644,7 +646,9 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function nodeSessDump($nIDtxt = '', $nID = -3)
     {
-        if ($GLOBALS["SL"]->debugOn) {
+        if ($GLOBALS["SL"]->debugOn 
+            && !$GLOBALS["SL"]->REQ->has('ajax')
+            && !$GLOBALS["SL"]->isPrintView()) {
             if ($nID > 0 
                 && isset($this->allNodes[$nID]) 
                 && isset($this->allNodes[$nID]->nodeType)

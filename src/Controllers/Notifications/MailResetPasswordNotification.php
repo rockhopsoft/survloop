@@ -61,33 +61,14 @@ class MailResetPasswordNotification extends Notification
         */
 
         $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.password', [
-            'token'      => \$this->token,
-            'cssColors'  => \$GLOBALS['SL']->getCssColorsEmail()
-            ], function (\$m) { \$m->subject('" . str_replace("'", "\\'", $subj) . "')";
-                if (sizeof($emaTo) > 0) {
-                    foreach ($emaTo as $i => $eTo) {
-                        $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
-                if (sizeof($emaCC) > 0) {
-                    foreach ($emaCC as $eTo) {
-                        $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
-                if (sizeof($emaBCC) > 0) {
-                    foreach ($emaBCC as $eTo) {
-                        $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                            ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
-                    }
-                }
-        $mail .= "->replyTo('" . $repTo[0] . "'" . ((trim($repTo[1]) != '') 
-            ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
+                'token'     => \$this->token,
+                'cssColors' => \$GLOBALS['SL']->getCssColorsEmail()
+            ], function (\$m) { \$m->subject('" . str_replace("'", "\\'", $subj) . "')
+                ->to('" . $notifiable->email . "', '" . $notifiable->email . "');
+            });";
         if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<br /><br /><br /><div class="container"><h2>' 
-                . $emaSubject . '</h2>' . $emaContent 
-                . '<hr><hr></div><pre>' . $mail . '</pre><hr><br />';
+            echo '<br /><br /><br /><div class="container"><h2>' . $subj 
+                . '</h2><hr><hr></div><pre>' . $mail . '</pre><hr><br />';
             return true;
         }
         eval($mail);

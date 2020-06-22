@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Routing\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
+use App\Models\SLDefinitions;
 use SurvLoop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
@@ -209,6 +210,7 @@ class SurvRoutes extends Controller
     {
         $uID = 0;
         if (trim($user) != '') {
+            $user = str_replace('.jpg', '', $user);
             $user = User::where('name', 'LIKE', urldecode($user))
                 ->first();
             if ($user && isset($user->id)) {
@@ -221,6 +223,15 @@ class SurvRoutes extends Controller
             $response = Response::make(file_get_contents($file));
             $response->header('Content-Type', $metaType);
             return $response;
+        }
+        $def = SLDefinitions::where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'has-avatars')
+            ->first();
+        if ($def 
+            && isset($def->def_description) 
+            && trim($def->def_description) != '') {
+            return redirect($def->def_description);
         }
         return '';
     }

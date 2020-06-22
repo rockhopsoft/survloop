@@ -83,7 +83,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
             if (trim($lab) != '') {
                 $lab = $this->swapLabels($curr, $lab);
                 if (strip_tags($deetLabel) != strip_tags($lab)
-                    && !$GLOBALS["SL"]->REQ->has('print')) {
+                    && !$GLOBALS["SL"]->isPrintView()) {
                     $deetLabel = '<a id="hidivBtn' . $curr->nIDtxt 
                         .'" class="hidivBtn slGrey" href="javascript:;">' 
                         . $deetLabel . '</a><div id="hidiv' . $curr->nIDtxt 

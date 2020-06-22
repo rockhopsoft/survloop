@@ -3,11 +3,13 @@
 	<div class="w100 disBlo brdInfo" 
         style="height: {{ (2+$height) }}px; overflow: hidden;">
 @endif
-    <a href="{{ $upDeets['filePub'] }}" target="_blank" class="disBlo w100" 
-        ><img src="{{ $upDeets['filePub'] }}" class="w100"
-    	@if ($GLOBALS['SL']->isPrintView()) border=0 @else border=1 @endif
-        alt="{{ ((isset($upRow->up_stored_file)) ? $upRow->up_stored_file : 'Uploaded Image') }}"
-        ></a>
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}{{ $upDeets['filePub'] }}?orig=1" 
+        target="_blank" class="disBlo w100" 
+        ><img src="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+            }}{{ (($refresh) ? $upDeets['fileFrsh'] : $upDeets['filePub']) }}" 
+            @if ($GLOBALS['SL']->isPrintView()) border="0" @else border="1" @endif
+            alt="{{ ((isset($upRow->up_title)) ? $upRow->up_title : 'Uploaded Image') }}"
+            class="w100" ></a> asdfasdf
 @if (!$GLOBALS['SL']->isPrintView())
 	</div>
 @endif

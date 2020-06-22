@@ -152,6 +152,35 @@ class GlobalsTables extends GlobalsElements
         return '';
     }
     
+    public function getTreeCoreTbl($treeID)
+    {
+        $tree = SLTree::find($treeID);
+        if ($tree 
+            && isset($tree->tree_core_table) 
+            && intVal($tree->tree_core_table) > 0) {
+            return SLTables::find($tree->tree_core_table);
+        }
+        return null;
+    }
+    
+    public function getCoreUpFold($treeID, $coreID)
+    {
+        $tbl = $this->getTreeCoreTbl($treeID);
+        if ($tbl 
+            && isset($tbl->tbl_name) 
+            && trim($tbl->tbl_name) != '') {
+            eval("\$coreRow = " . $this->modelPath($tbl->tbl_name)
+                . "::find(" . $coreID . ");");
+            if ($coreRow 
+                && isset($coreRow->{ $tbl->tbl_abbr . 'unique_str' })) {
+                return '../storage/app/up/evidence/'
+                    . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) 
+                    . '/' . $coreRow->{ $tbl->tbl_abbr . 'unique_str' } . '/';
+            }
+        }
+        return '';
+    }
+    
     public function modelPathTblID($tblID = 0, $forceFile = false)
     {
         return $this->modelPath($this->tbl[$tblID], $forceFile);
