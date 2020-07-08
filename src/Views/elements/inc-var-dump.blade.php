@@ -2,7 +2,7 @@
 <div class="nodeAnchor"><a name="debug"></a></div>
 <div class="fC"></div>
 <center>
-<div id="dbgPops{{ $GLOBALS['SL']->treeID }}" class="w100 pT15 pB15 taL opac50">
+<div id="dbgPops{{ $GLOBALS['SL']->treeID }}" class="w100 pT15 pB15 taL">
     <a id="hidivBtnDbgPop" class="hidivBtn btn btn-sm btn-secondary mR15" 
         href="javascript:;"><i class="fa fa-list" aria-hidden="true"></i>
         Core Load</a>
@@ -16,12 +16,14 @@
 <div id="hidivDbgPop">
     <center>
     <h3>lastNode: {{ $lastNode }} -> currNode: {{ $currNode }}</h3>
-    <div class="pL10 pB20"><i>coreID: {{ $coreID }}, 
+    <div class="pL10 pB20">
+        <i>coreID: {{ $coreID }}, 
         @if (isset($user) && isset($user->id))
             userID: {{ $user->id }}, 
             @if (isset($user->name)) {{ $user->name }} @endif ,
         @endif
-        </i></div>
+        </i>
+    </div>
     </center>
     <div class="row">
         <div class="col-6">

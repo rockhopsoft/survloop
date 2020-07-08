@@ -38,70 +38,80 @@ class TreeSurvConds extends TreeSurvCustomAPI
         $retTF = true;
         if (sizeof($conds) > 0) {
             foreach ($conds as $i => $cond) {
-                if ($retTF) {
-                    if ($cond && isset($cond->cond_database) 
-                        && $cond->cond_operator == 'CUSTOM') {
-                        if (!$this->parseCondPreInstalled($cond)) {
-                            $retTF = false;
-                        }
-                    } elseif ($cond->cond_operator == 'AB TEST') {
-                        if (!$this->checkActiveTestAB($cond)) {
-                            $retTF = false;
-                        }
-                    } elseif ($cond->cond_operator == 'URL-PARAM') {
-                        if (trim($cond->cond_oper_deet) == '') {
-                            $retTF = false;
-                        } else {
-                            $val = trim($cond->condFldResponses["vals"][0][1]);
-                            if (!$GLOBALS["SL"]->REQ->has($cond->cond_oper_deet) 
-                                || trim($GLOBALS["SL"]->REQ->get($cond->cond_oper_deet)) != $val) {
-                                $retTF = false;
-                            }
-                        }
-                    } elseif ($cond->cond_operator == 'COMPLEX') {
-                        $cond->loadVals();
-                        if (isset($cond->condVals) && sizeof($cond->condVals) > 0) {
-                            foreach ($cond->condVals as $i => $val) {
-                                if ($val > 0) {
-                                    $subCond = SLConditions::find($val);
-                                    if ($subCond && isset($subCond->cond_operator)) {
-                                        if (!$this->sessData->parseCondition(
-                                            $subCond, 
-                                            $recObj, 
-                                            $nID)) {
-                                            $retTF = false;
-                                        }
-                                    }
-                                } else { // opposite
-                                    $subCond = SLConditions::find(-1*$val);
-                                    if ($subCond && isset($subCond->cond_operator)) {
-                                        if ($this->sessData->parseCondition(
-                                            $subCond, 
-                                            $recObj, 
-                                            $nID)) {
-                                            $retTF = false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } elseif (!$this->sessData->parseCondition($cond, $recObj, $nID)) {
-                        $retTF = false; 
-                    }
-                    $custom = $this->checkNodeConditionsCustom(
-                        $nID, 
-                        trim($cond->cond_tag)
-                    );
+                if ($retTF && $cond && isset($cond->cond_tag)) {
+                    $custom = $this->checkNodeConditionsCustom($nID, trim($cond->cond_tag));
                     if ($custom == 0) {
                         $retTF = false;
                     } elseif ($custom == 1) {
                         $retTF = true;
+                    } else {
+                        if (isset($cond->cond_database) 
+                            && $cond->cond_operator == 'CUSTOM') {
+                            if (!$this->parseCondPreInstalled($cond)) {
+                                $retTF = false;
+                            }
+                        } elseif ($cond->cond_operator == 'AB TEST') {
+                            if (!$this->checkActiveTestAB($cond)) {
+                                $retTF = false;
+                            }
+                        } elseif ($cond->cond_operator == 'URL-PARAM') {
+                            if (!$this->parseConditionParam($cond)) {
+                                $retTF = false;
+                            }
+                        } elseif ($cond->cond_operator == 'COMPLEX') {
+                            if (!$this->parseConditionComplex($cond, $recObj, $nID)) {
+                                $retTF = false;
+                            }
+                        } elseif (!$this->sessData->parseCondition($cond, $recObj, $nID)) {
+                            $retTF = false; 
+                        }
                     }
                     // This is where all the condition-inversion is applied
                     if ($nID > 0 
                         && isset($GLOBALS["SL"]->nodeCondInvert[$nID]) 
                         && isset($GLOBALS["SL"]->nodeCondInvert[$nID][$cond->cond_id])) {
                         $retTF = !$retTF;
+                    }
+                }
+            }
+        }
+        return $retTF;
+    }
+    
+    protected function parseConditionParam($cond)
+    {
+        $retTF = true;
+        if (trim($cond->cond_oper_deet) == '') {
+            $retTF = false;
+        } else {
+            $val = trim($cond->condFldResponses["vals"][0][1]);
+            if (!$GLOBALS["SL"]->REQ->has($cond->cond_oper_deet) 
+                || trim($GLOBALS["SL"]->REQ->get($cond->cond_oper_deet)) != $val) {
+                $retTF = false;
+            }
+        }
+        return $retTF;
+    }
+    
+    protected function parseConditionComplex($cond, $recObj = [], $nID = -3)
+    {
+        $retTF = true;
+        $cond->loadVals();
+        if (isset($cond->condVals) && sizeof($cond->condVals) > 0) {
+            foreach ($cond->condVals as $i => $val) {
+                if ($val > 0) {
+                    $subCond = SLConditions::find($val);
+                    if ($subCond && isset($subCond->cond_operator)) {
+                        if (!$this->sessData->parseCondition($subCond, $recObj, $nID)) {
+                            $retTF = false;
+                        }
+                    }
+                } else { // opposite
+                    $subCond = SLConditions::find(-1*$val);
+                    if ($subCond && isset($subCond->cond_operator)) {
+                        if ($this->sessData->parseCondition($subCond, $recObj, $nID)) {
+                            $retTF = false;
+                        }
                     }
                 }
             }
@@ -262,12 +272,17 @@ class TreeSurvConds extends TreeSurvCustomAPI
                 if (isset($this->sessData->dataSets[$loop->data_loop_table]) 
                     && sizeof($this->sessData->dataSets[$loop->data_loop_table]) > 0) {
                     foreach ($this->sessData->dataSets[$loop->data_loop_table] as $recObj) {
-                        if ($recObj && $this->parseConditions($loop->conds, $recObj)) {
-                            $this->sessData->loopItemIDs[$loop->data_loop_plural][] 
-                                = $recObj->getKey();
-                            if (trim($loop->data_loop_sort_fld) != '') {
-                                $sortable['' . $recObj->getKey() . ''] 
-                                    = $recObj->{ $loop->data_loop_sort_fld };
+                        if ($recObj) {
+                            $custom = $this->parseConditionsCustom($loop, $recObj);
+                            if ($custom == 1 
+                                || ($custom == -1 
+                                    && $this->parseConditions($loop->conds, $recObj))) {
+                                $this->sessData->loopItemIDs[$loop->data_loop_plural][] 
+                                    = $recObj->getKey();
+                                if (trim($loop->data_loop_sort_fld) != '') {
+                                    $sortable['' . $recObj->getKey() . ''] 
+                                        = $recObj->{ $loop->data_loop_sort_fld };
+                                }
                             }
                         }
                     }
@@ -284,7 +299,13 @@ class TreeSurvConds extends TreeSurvCustomAPI
         return true;
     }
     
-    // Setting the second parameter to false alternatively returns an array of individual conditions
+    protected function parseConditionsCustom($loop, $recObj)
+    {
+        return -1;
+    }
+    
+    // Setting the second parameter to false alternatively 
+    // returns an array of individual conditions
     public function loadRelatedArticles()
     {
         $this->v["articles"] = $artCondIds = [];

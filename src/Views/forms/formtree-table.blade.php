@@ -17,26 +17,30 @@
             {!! $col->node_prompt_text !!}
         @endif
         </th>
-    @empty @endforelse
+    @empty
+    @endforelse
     @if (trim($tableDat["rowCol"]) == '') <th class="c1">&nbsp;</th> @endif
     </tr>
     @forelse ($tableDat["rows"] as $j => $row)
         <tr id="n{{ $nIDtxt }}tbl{{ $j }}row" class=" @if ($j%2 > 0) rw2 @endif " >
-            @if (trim($tableDat["rowCol"]) != '')
+            @if (trim($tableDat["rowCol"]) != '' || trim($tableDat["month"]) != '')
                 <td id="n{{ $nIDtxt }}tbl{{ $j }}rowLab" class="sprdRowLab">
                     {!! $GLOBALS["SL"]->swapMonthNum($row["leftTxt"]) !!}
                 </td>
+            @endif
+            @if (trim($tableDat["rowCol"]) != '' && trim($tableDat["month"]) == '')
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldDef" 
                     id="n{{ $nIDtxt }}tbl{{ $j }}fldDefID" 
-                    value="{{ $row['leftVal'] }}" >
+                    value="{{ $row['leftVal'] }}"
+                    >
             @else
                 <input type="hidden" name="n{{ $nIDtxt }}tbl{{ $j }}fldRow" 
                     id="n{{ $nIDtxt }}tbl{{ $j }}fldRowID" 
                     value="{{ $row['id'] }}" >
             @endif
             @forelse ($row["cols"] as $k => $col)
-                <td id="n{{ $nIDtxt }}tbl{{ $j }}row{{ $k }}col" 
-                    class="sprdFld @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
+                <td id="n{{ $nIDtxt }}tbl{{ $j }}row{{ $k }}col" class="sprdFld 
+                    @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif ">
                     @if (is_array($col))
                         {!! str_replace('nFld', '', 
                             str_replace('nFld mT0', '', $col[0])) !!}

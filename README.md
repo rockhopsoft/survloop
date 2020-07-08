@@ -102,7 +102,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "rockhopsoft/survloop": "^0.2.16",
+    "rockhopsoft/survloop": "^0.2.18",
     ...
 },
 ...
@@ -160,17 +160,18 @@ $ cd ~/homestead
 $ vagrant up
 $ vagrant ssh
 $ cd code/survloop
-$ php artisan migrate
+$ php artisan optimize:clear
 $ composer dump-autoload
+$ php artisan migrate
 $ php artisan db:seed --class=SurvLoopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
-$ php artisan optimize:clear
 ```
 
 For now, to apply database design changes to the same installation you are working in, depending on your server, you might also need something like this...
 ```
 $ chown -R www-data:33 app/Models
 $ chown -R www-data:33 database
+$ chown -R www-data:33 storage
 ```
 
 You might need to re-run some things outside the virtual box too, e.g.

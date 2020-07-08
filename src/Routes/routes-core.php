@@ -255,6 +255,11 @@ Route::get(
     $path . 'SurvRoutes@getFontAwesome'
 );
 Route::get( 
+    '/css/fork-awesome.min.css.map', 
+    $path . 'SurvRoutes@getFontAwesomeMap'
+);
+
+Route::get( 
     '/fonts/{file}',
     $path . 'SurvRoutes@getFont'
 );

@@ -2,8 +2,10 @@
 <div id="hasPrompt" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
     @else disBlo @endif ">
     <div class="slCard nodeWrap">
-        <label for="nodePromptTextID"><h4 class="m0 disIn mR20">Question or Prompt for User</h4> 
-            <small>(text/HTML)</small></label>
+        <label for="nodePromptTextID">
+            <h5 class="m0 disIn mR20">Question or Prompt for User</h5> 
+            <small>(text/HTML)</small>
+        </label>
         <div class="nFld">
             <textarea name="nodePromptText" id="nodePromptTextID" class="form-control" 
                 style="height: 200px; font-family: Courier New;" autocomplete="off" 
@@ -51,11 +53,11 @@
 <div id="hasResponse" class=" @if ($node->isSpecial() || $node->isWidget() || $node->isLayout()) disNon 
     @else disBlo @endif ">
     <div class="slCard nodeWrap">
-        <h4 class="mT0">User Response Settings</h4>
+        <h5 class="mT0">User Response Settings</h5>
         <div id="storeResponseDiv" class="row mB10 @if ($node->isSpreadTbl()) disNon @else disBlo @endif ">
             <div class="col-md-6">
                 <label class="w100">
-                    <h4 class="m0 slGreenDark">Store User Response</h4>
+                    <h5 class="m0 slGreenDark">Store User Response</h5>
                     <div class="nFld m0">
                         <select name="nodeDataStore" class="form-control form-control-lg w100" 
                             autocomplete="off" >
@@ -67,7 +69,7 @@
             </div>
             <div class="col-md-6">
                 <div class="nFld w100 mT0"><label class="w100">
-                    <h4 class="mT0">Default Value:</h4> 
+                    <h5 class="mT0">Default Value:</h5> 
                     <input type="text" name="nodeDefault" id="nodeDefaultID" 
                         class="form-control form-control-lg" autocomplete="off"
                         @if (isset($node->nodeRow->node_default)) value="{{ $node->nodeRow->node_default }}" 
@@ -137,7 +139,7 @@
                 <div id="spreadTblOpen" class="row mT10 
                     @if (!$node->hasResponseOpts()) disBlo @else disNon @endif ">
                     <label class="col-6">
-                        <h4 class="mT0">Maximum Number of Table Rows:</h4> 
+                        <h5 class="mT0">Maximum Number of Table Rows:</h5> 
                         <div class="nFld">
                             <input name="spreadTblMaxRows" id="spreadTblMaxRowsID" 
                                 type="number" class="form-control form-control-lg" 
@@ -147,7 +149,7 @@
                         </div>
                     </label>
                     <label class="col-6">
-                        <h4 class="mT0">Add & Edit Loop Rows:</h4> 
+                        <h5 class="mT0">Add & Edit Loop Rows:</h5> 
                         <div class="nFld">
                             <select name="spreadTblLoop" id="spreadTblLoopID" autocomplete="off"
                                 class="form-control form-control-lg" >
@@ -168,7 +170,7 @@
                 <div id="spreadTblDefs" class="row mT10 
                     @if ($node->hasResponseOpts()) disBlo @else disNon @endif ">
                     <label class="col-6">
-                        <h4 class="m0 slGreenDark">Store Row's List Item ID</h4>
+                        <h5 class="m0 slGreenDark">Store Row's List Item ID</h5>
                         <div class="nFld"><select name="nodeDataStoreSprd" 
                             autocomplete="off" class="form-control form-control-lg w100" >
                             {!! $GLOBALS['SL']->fieldsDropdown(isset($node->nodeRow->node_data_store) 
@@ -176,7 +178,7 @@
                         </select></div>
                     </label>
                     <label class="col-6">
-                        <h4 class="mT0">If Row Is Left Empty:</h4> 
+                        <h5 class="mT0">If Row Is Left Empty:</h5> 
                         <div class="nFld"><select name="opts73" id="opts73ID" 
                             class="form-control form-control-lg" autocomplete="off" >
                             <option value="0" @if ($node->nodeRow->node_opts%73 > 0) SELECTED @endif 
@@ -194,16 +196,16 @@
                 <div id="resNotWrdCnt" class=" @if (isset($node->nodeRow->node_type) && 
                     in_array($node->nodeRow->node_type, ['Text', 'Long Text'])) disBlo 
                     @else disNon @endif ">
-                    <label for="opts31ID" class="mB10"><h4 class="mT0">
+                    <label for="opts31ID" class="mB10"><h5 class="mT0">
                         <input type="checkbox" name="opts31" id="opts31ID" value="31" autocomplete="off" 
                             @if ($node->nodeRow->node_opts%31 == 0) CHECKED @endif 
                             > Show Word Count
-                    </h4></label>
-                    <label for="opts47ID"><h4 class="mT0">
+                    </h5></label>
+                    <label for="opts47ID"><h5 class="mT0">
                         <input type="checkbox" name="opts47" id="opts47ID" value="47" autocomplete="off" 
                             @if ($node->nodeRow->node_opts%47 == 0) CHECKED @endif 
                             onClick="return toggleWordCntLimit();" > Limit Word Count
-                    </h4></label>
+                    </h5></label>
                     <div id="resWordLimit" class="mB20 
                         @if ($node->nodeRow->node_opts%47 == 0) disBlo @else disNon @endif ">
                         <label class="w100">
@@ -221,7 +223,7 @@
                     in_array($node->nodeRow->node_type, ['Text', 'Long Text', 'Uploads'])) disBlo 
                     @else disNon @endif ">
                     <label class="w100">
-                        <h4 class="mT0">Character/Upload Limit</h4>
+                        <h5 class="mT0">Character/Upload Limit</h5>
                         <div class="nFld m0"><input type="number" name="nodeCharLimit" id="nodeCharLimitID" 
                             class="form-control disIn w50" autocomplete="off" 
                             @if (isset($node->nodeRow->node_char_limit)) 
@@ -235,7 +237,7 @@
                     in_array($node->nodeRow->node_type, ['Text'])) disBlo 
                     @else disNon @endif ">
                     <label>
-                        <h4 class="mT0">Autofill Suggestions</h4>
+                        <h5 class="mT0">Autofill Suggestions</h5>
                         <div class="nFld m0"><select name="nodeTextSuggest" id="nodeTextSuggestID" 
                             class="form-control w100" autocomplete="off" >
                             <option value="" @if (!isset($node->nodeRow->node_text_suggest) 
@@ -250,11 +252,11 @@
                         </select></div>
                     </label>
                     <div class="mT10 mB10">
-                        <label for="opts41ID"><h4 class="mT0">
+                        <label for="opts41ID"><h5 class="mT0">
                             <input type="checkbox" name="opts41" id="opts41ID" value="41" autocomplete="off" 
                                 @if ($node->nodeRow->node_opts%41 == 0) CHECKED @endif 
                                 > Echo Response Edits To Div
-                        </h4></label>
+                        </h5></label>
                     </div>
                 </div>
             </div>
@@ -263,7 +265,7 @@
         <div id="DateOpts" class=" @if (isset($node->nodeRow->node_type) && 
             in_array($node->nodeRow->node_type, ['Date', 'Date Picker', 'Date Time'])) disBlo 
             @else disNon @endif ">
-            <h4>Time Travelling Restriction</h4>
+            <h5>Time Travelling Restriction</h5>
             <label class="disIn">
                 <input type="radio" name="dateOptRestrict" value="0"
                     @if (!isset($node->nodeRow->node_char_limit) 
@@ -284,12 +286,13 @@
             </label>
         </div>
         
-        <div id="resOpts" class=" @if ($node->hasResponseOpts()) disBlo @else disNon @endif ">
-            <h4 id="resOptsLab" class=" @if ($node->isSpreadTbl()) disNon 
-                @else disBlo @endif ">Response Options Provided To User:</h4>
-            <h4 id="resOptsLabTbl" class=" @if (!$node->isSpreadTbl()) disNon 
-                @else disBlo @endif ">Start Table Rows From:</h4>
-            {!! $GLOBALS["SL"]->printLoopsDropdowns($node->nodeRow->node_response_set, 'responseList') !!}
+        <div id="resOpts" 
+            class=" @if ($node->hasResponseOpts()) disBlo @else disNon @endif ">
+            <h5 id="resOptsLab" class=" @if ($node->isSpreadTbl()) disNon 
+                @else disBlo @endif ">Response Options Provided To User:</h5>
+            <h5 id="resOptsLabTbl" class=" @if (!$node->isSpreadTbl()) disNon 
+                @else disBlo @endif ">Start Table Rows From:</h5>
+            {!! $loopDrops !!}
             
             <div id="nOptsRadio" class="mT20 @if ($node->nodeType == 'Radio') disBlo @else disNon @endif ">
                 <label>

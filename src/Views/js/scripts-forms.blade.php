@@ -173,6 +173,11 @@ function runRadioClick(nIDtxt, response) {
     return true;
 }
 
+var monthAbbr = new Array();
+@for ($m = 1; $m <= 12; $m++)
+    monthAbbr[{{ $m }}] = "{{ date("M", mktime(0, 0, 0, $m, 1, 2000)) }}";
+@endfor
+
 function checkFldDate(nIDtxt) {
     return (document.getElementById("n"+nIDtxt+"fldYearID").value != "0000" 
 	    && document.getElementById("n"+nIDtxt+"fldMonthID").value != "00" 
@@ -654,6 +659,7 @@ function changeLoopListType(fld) {
             document.getElementById(''+fld+'Loops').style.display = 'none';
             document.getElementById(''+fld+'Tbls').style.display = 'none';
             document.getElementById(''+fld+'TblCond').style.display = 'none';
+            document.getElementById(''+fld+'Months').style.display = 'none';
             document.getElementById(''+fld+'DefinitionID').value='';
             document.getElementById(''+fld+'LoopItemsID').value='';
             document.getElementById(''+fld+'TablesID').value='';
@@ -661,10 +667,12 @@ function changeLoopListType(fld) {
             document.getElementById(''+fld+'Defs').style.display = 'block';
             document.getElementById(''+fld+'Loops').style.display = 'none';
             document.getElementById(''+fld+'Tbls').style.display = 'none';
+            document.getElementById(''+fld+'Months').style.display = 'none';
         } else if (document.getElementById(''+fld+'TypeID').value == 'auto-loop') {
             document.getElementById(''+fld+'Defs').style.display = 'none';
             document.getElementById(''+fld+'Loops').style.display = 'block';
             document.getElementById(''+fld+'Tbls').style.display = 'none';
+            document.getElementById(''+fld+'Months').style.display = 'none';
         } else if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl' || document.getElementById(''+fld+'TypeID').value == 'auto-tbl-all') {
             document.getElementById(''+fld+'Defs').style.display = 'none';
             document.getElementById(''+fld+'Loops').style.display = 'none';
@@ -672,6 +680,13 @@ function changeLoopListType(fld) {
             if (document.getElementById(''+fld+'TypeID').value == 'auto-tbl-all') {
                 document.getElementById(''+fld+'TblCond').style.display = 'block';
             }
+            document.getElementById(''+fld+'Months').style.display = 'none';
+        } else if (document.getElementById(''+fld+'TypeID').value == 'auto-months') {
+            document.getElementById(''+fld+'Defs').style.display = 'none';
+            document.getElementById(''+fld+'Loops').style.display = 'none';
+            document.getElementById(''+fld+'Tbls').style.display = 'none';
+            document.getElementById(''+fld+'TblCond').style.display = 'none';
+            document.getElementById(''+fld+'Months').style.display = 'block';
         }
     }
     return true;

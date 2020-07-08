@@ -164,6 +164,11 @@ class SurvRoutes extends Controller
         return $this->getLibFile('forkawesome/fork-awesome/css/fork-awesome.min', 'css');
     }
     
+    public function getFontAwesomeMap(Request $request)
+    {
+        return $this->getLibFile('forkawesome/fork-awesome/css/fork-awesome.min.css', 'map');
+    }
+    
     public function getFont(Request $request, $file = '')
     {
         $filename = '../vendor/forkawesome/fork-awesome/fonts/' . $file;

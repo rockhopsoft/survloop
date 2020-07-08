@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\Models\SLDefinitions;
 
-use Spipu\Html2Pdf\Html2Pdf;
 use Mpdf\Mpdf;
+//use Rguedes\PDFMerger;
 
 class SurvLoopPDF
 {
@@ -49,19 +49,51 @@ class SurvLoopPDF
             . '</script>';
     }
 
+    public function storeAttachedPdf($pdfs = [], $filename = 'export.pdf')
+    {
+        $file = str_replace('.pdf', '-attach.pdf', $filename);
+        if (sizeof($pdfs) > 0) {
+            $pdfMerge = new \PDFMerger; // PDFMerger;
+            foreach ($pdfs as $pdf) {
+                $pdfMerge->addPDF($pdf, 'all');
+            }
+            $pdfMerge->merge('file', $file);
+        }
+        return true;
+    }
+
     public function genCorePdf($filename = 'export.pdf')
     {
         $file = $filename;
         $content = file_get_contents(str_replace('.pdf', '.html', $file));
         ini_set('max_execution_time', 90);
-        $mpdf = new Mpdf();
+        $mpdf = new Mpdf(['tempDir' => '/tmp']);
         $styles = view('vendor.survloop.css.styles-pdf')->render()
             . "\n" . $this->getSysCustCSS();
         $mpdf->WriteHTML($styles, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
         unset($content);
-        if (file_exists($file)) unlink($file);
+        if (file_exists($file)) {
+            unlink($file);
+        }
+        $title = $file;
+        if (isset($GLOBALS["SL"]->x["pdfFilename"])
+            && trim($GLOBALS["SL"]->x["pdfFilename"]) != '') {
+            $title = $GLOBALS["SL"]->x["pdfFilename"];
+        }
+        $mpdf->SetTitle($title);
         $mpdf->Output($file, \Mpdf\Output\Destination::FILE);
+
+        // check for attachments
+        $fileAttach = str_replace('.pdf', '-attach.pdf', $filename);
+        if (file_exists($fileAttach)) {
+            $pdfMerge = new \PDFMerger; // PDFMerger;
+            $pdfMerge->addPDF($filename, 'all');
+            $pdfMerge->addPDF($fileAttach, 'all');
+            $fileWithAttach = str_replace('.pdf', '-with-attach.pdf', $filename);
+            $pdfMerge->merge('file', $fileWithAttach);
+        }
+//echo 'fileAttach: ' . $fileAttach . '<br />'; exit;
         return true;
     }
 
@@ -72,10 +104,23 @@ class SurvLoopPDF
         if ($lastPos >= 0) {
             $file = substr($filename, ($lastPos+1));
         }
+        if (isset($GLOBALS["SL"]->x["pdfFilename"])
+            && trim($GLOBALS["SL"]->x["pdfFilename"]) != '') {
+            $file = $GLOBALS["SL"]->x["pdfFilename"];
+        }
+        $dispo = 'inline';
+        if ($GLOBALS["SL"]->REQ->has('download')) {
+            $dispo = 'attachment';
+        }
         $headers = [
             'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="' . $file . '"'
+            'Content-Disposition' => $dispo . '; filename="' . $file . '"'
         ];
+//echo 'headers:<pre>'; print_r($headers); echo '</pre>'; exit;
+        $fileWithAttach = str_replace('.pdf', '-with-attach.pdf', $filename);
+        if (file_exists($fileWithAttach)) {
+            return response()->file($fileWithAttach, $headers);
+        }
         return response()->file($filename, $headers);
     }
 

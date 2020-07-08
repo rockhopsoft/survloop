@@ -97,10 +97,12 @@ class User extends Model implements AuthenticatableContract,
     }
     
     
-    public function profileImg()
+    public function profileImg($lnk = '')
     {
-        return '<a href="/user/' . urlencode($this->name) 
-            . '"><img class="tmbRound profilePic" src="'
+        if ($lnk == '') {
+            $lnk = '/user/' . urlencode($this->name);
+        }
+        return '<a href="' . $lnk . '"><img class="tmbRound profilePic" src="'
             . $this->profileImgSrc() . '" border=0 alt="Profile Picture for '
             . $this->name . '"></a>';
     }

@@ -98,6 +98,12 @@ class TreeSurvReport extends TreeSurvBasicNav
             && !$GLOBALS["SL"]->REQ->has('refresh'));
     }
     
+    // Override PDF filename to be used for delivery to user.
+    public function customPdfFilename()
+    {
+        $GLOBALS["SL"]->x["pdfFilename"] = '';
+    }
+    
     public function getCachePdfByID()
     {
         return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
@@ -105,6 +111,19 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function prepPdfByID()
     {
+        $pdfAttachAll = $this->prevUploadsPDF($this->treeID);
+        if (sizeof($pdfAttachAll) > 0) {
+            $pdfAttach = [];
+            foreach ($pdfAttachAll as $upRow) {
+                $deet = $this->loadUpDeets($upRow);
+                if (sizeof($deet) > 0 && $deet["privacy"] == 'Public') {
+                    $pdfAttach[] = $deet["file"];
+                }
+            }
+            if (sizeof($pdfAttach) > 0) {
+                $this->v["pdf-gen"]->storeAttachedPdf($pdfAttach, $this->v["pdf-file"]);
+            }
+        }
         return $this->v["pdf-gen"]->storeHtml(
             view('vendor.survloop.master', $this->v)->render(), 
             $this->v["pdf-file"]

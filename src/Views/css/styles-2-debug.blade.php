@@ -19,20 +19,19 @@
 }
 .hidivBtnDbgW {
     position: absolute;
-    right: -20px;
-    top: 20px;
+    right: -30px;
+    top: -5px;
     text-align: right;
 }
 .hidivBtnDbgN, .hidivBtnDbgW .hidivBtnDbgN, 
 a.hidivBtnDbgN:link, a.hidivBtnDbgN:visited, a.hidivBtnDbgN:active, a.hidivBtnDbgN:hover {
-	color: {!! $css["color-main-faint"] !!};
-    margin-right: 20px;
-    opacity:0.5; filter:alpha(opacity=50);
+	color: {!! $css["color-main-grey"] !!};
+    opacity:0.95; filter:alpha(opacity=95);
 }
 .hidivDbgN, a.hidivDbgN:link, a.hidivDbgN:active, a.hidivDbgN:visited, a.hidivDbgN:hover {
     position: absolute;
-    right: 2px;
-    top: 40px;
+    right: -10px;
+    top: 32px;
     display: none;
     border: 1px {!! $css["color-main-grey"] !!} dashed;
     background: {!! $css["color-main-faint"] !!};

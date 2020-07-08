@@ -815,6 +815,7 @@ class SurvData extends SurvDataCheckbox
     
     public function parseCondition($cond = [], $recObj = [], $nID = -3)
     {
+//if (isset($recObj->ps_area_type)) { echo '<pre>'; print_r($cond); print_r($recObj); echo '</pre>'; }
         $passed = true;
         if ($cond && isset($cond->cond_database) 
             && $cond->cond_operator != 'CUSTOM') {

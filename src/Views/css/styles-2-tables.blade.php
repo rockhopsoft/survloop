@@ -104,3 +104,7 @@ table.slAdmTable tr th a.fPerc66:hover {
     font-size: 10pt;
 }
 
+.monthAbbr {
+    float: left;
+    width: 40px;
+}

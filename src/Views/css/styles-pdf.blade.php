@@ -1,12 +1,17 @@
 /* generated from resources/views/vendor/survloop/css/styles-pdf.blade.php */
 
-table.repDeetsBlock {
+table.repDeetsBlock, table.slSpreadTbl {
     width: 100%;
 }
-table.repDeetsBlock tr td {
+table.repDeetsBlock tr td, table.slSpreadTbl tr td {
     padding-top: 7px;
     padding-bottom: 7px;
     border-bottom: 1px solid #CCC;
+}
+
+table.repDeetsBlock tr th, table.slSpreadTbl tr th,
+table.repDeetsBlock tr td, table.slSpreadTbl tr td {
+    text-align: left;
 }
 
 .w100, .row, .col-6, .col-sm-6, .col-md-6, .col-lg-6 {
@@ -21,19 +26,19 @@ h1, h2, h3, h4, h5, h6, b, .bld {
     font-weight: bold;
 }
 h1 {
-    font-size: 2.25rem;
-}
-h2 {
     font-size: 2rem;
 }
-h3 {
+h2 {
     font-size: 1.75rem;
 }
-h4 {
+h3 {
     font-size: 1.5rem;
 }
-h5 {
+h4 {
     font-size: 1.25rem;
+}
+h5 {
+    font-size: 1.12rem;
 }
 h6 {
     font-size: 1rem;

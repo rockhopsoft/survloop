@@ -2,10 +2,14 @@
 <script defer type="text/javascript">
 function loadTopSideNavs() {
 @if (isset($username) && trim($username) != '')
-    addTopUserBurger('{{ $username }}');
+    if (!document.getElementById('userMenuBtn')) {
+        addTopUserBurger('{{ $username }}');
+    }
 @else
-    addTopNavItem('Sign Up',  '/register{!! $previousUrl !!}" id="signupLnk');
-    addTopNavItem('Login',    '/login{!! $previousUrl !!}" id="loginLnk');
+    if (!document.getElementById('loginLnk')) {
+        addTopNavItem('Sign Up',  '/register{!! $previousUrl !!}" id="signupLnk');
+        addTopNavItem('Login',    '/login{!! $previousUrl !!}" id="loginLnk');
+    }
 @endif
     return true;
 }

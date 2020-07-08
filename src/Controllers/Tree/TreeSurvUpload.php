@@ -207,10 +207,7 @@ class TreeSurvUpload extends TreeSurv
                     ->get();
             }
         } else {
-            $chk = SLUploads::where('up_tree_id', $treeID)
-                ->where('up_core_id', $this->coreID)
-                ->orderBy('created_at', 'asc')
-                ->get();
+            $chk = $this->getTreeUploadsRecs($treeID);
         }
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $up) {
@@ -219,6 +216,35 @@ class TreeSurvUpload extends TreeSurv
                 $hasVidLnk = (isset($up->up_video_link)  && trim($up->up_video_link)  != '');
                 if (($hasUpload && $hasStored) || $hasVidLnk) {
                     $ret[] = $up;
+                }
+            }
+        }
+        return $ret;
+    }
+    
+    private function getTreeUploadsRecs($treeID = 0)
+    {
+        if ($treeID <= 0) {
+            $treeID = $this->getUpTree();
+        }
+        return SLUploads::where('up_tree_id', $treeID)
+            ->where('up_core_id', $this->coreID)
+            ->orderBy('created_at', 'asc')
+            ->get();
+    }
+    
+    protected function prevUploadsPDF()
+    {
+        $ret = [];
+        $chk = $this->getTreeUploadsRecs();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $i => $up) {
+                if (isset($up->up_stored_file) && trim($up->up_stored_file) != ''
+                    && isset($up->up_upload_file) && trim($up->up_stored_file) != '') {
+                    $ext = substr($up->up_upload_file, strlen($up->up_upload_file)-4);
+                    if (strtolower($ext) == '.pdf') {
+                        $ret[] = $up;
+                    }
                 }
             }
         }
@@ -330,9 +356,16 @@ class TreeSurvUpload extends TreeSurv
         $ret["ind"]      = $i;
         $ret["privacy"]  = $this->loadUpDeetPrivacy($upRow);
         $ret["ext"]      = $GLOBALS["SL"]->getFileExt($upRow->up_upload_file);
-        $ret["filename"] = $upRow->up_stored_file . '.jpg';
-        $ret["fileOG"]   = $upFold . $upRow->up_stored_file . '-orig.' . $ret["ext"];
-        $ret["file"]     = $upFold . $upRow->up_stored_file . '.jpg';
+        if ($ret["ext"] == 'pdf') {
+            $ret["filename"] = $upRow->up_stored_file . '.pdf';
+            $ret["fileOG"]
+                = $ret["file"]
+                = $upFold . $upRow->up_stored_file . '.pdf';
+        } else {
+            $ret["filename"] = $upRow->up_stored_file . '.jpg';
+            $ret["fileOG"]   = $upFold . $upRow->up_stored_file . '-orig.' . $ret["ext"];
+            $ret["file"]     = $upFold . $upRow->up_stored_file . '.jpg';
+        }
         $ret["filePub"]  = '/up/' . $treeSlug . '/' . $this->coreID . '/' . $ret["filename"];
         $ret["fileFrsh"] = '/up-fresh-' . rand(100000, 1000000) . '/' . $treeSlug 
             . '/' . $this->coreID . '/' . $ret["filename"] . '?refresh=1';
@@ -474,12 +507,7 @@ class TreeSurvUpload extends TreeSurv
                         $this->v["uploadPrintMap"]["fil"][] = sizeof($ups);
                     }
                 }
-                $canShow = $this->canShowUpload(
-                    $nID, 
-                    $this->upDeets[$i], 
-                    $isAdmin, 
-                    $isOwner
-                );
+                $canShow = $this->canShowUpload($this->upDeets[$i], $isAdmin, $isOwner);
                 $view = 'vendor.survloop.forms.uploads-print';
                 if ($style == 'text') {
                     $view .= '-text';
@@ -506,7 +534,7 @@ class TreeSurvUpload extends TreeSurv
         return $ups;
     }
     
-    protected function canShowUpload($nID, $upDeets, $isAdmin = false, $isOwner = false)
+    protected function canShowUpload($upDeets, $isAdmin = false, $isOwner = false)
     {
         return ($isAdmin || $isOwner || $this->v["isAdmin"] || $this->v["isOwner"]);
     }

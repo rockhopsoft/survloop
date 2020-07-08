@@ -643,65 +643,6 @@ class GlobalsTables extends GlobalsElements
             ->get();
     }
     
-    public function printLoopsDropdowns($preSel = '', $fld = 'loopList', $manualOpt = true)
-    {
-        $currDefinition = $currLoopItems = $currTblRecs = $currTblAll = '';
-        $currTblAllCond = 0;
-        if (isset($preSel)) {
-            if (strpos($preSel, 'Definition::') !== false) {
-                $currDefinition = str_replace('Definition::', '', $preSel);
-            } elseif (strpos($preSel, 'LoopItems::') !== false) {
-                $currLoopItems = str_replace('LoopItems::', '', $preSel);
-            } elseif (strpos($preSel, 'Table::') !== false) {
-                $currTblRecs = str_replace('Table::', '', $preSel);
-            } elseif (strpos($preSel, 'TableAll::') !== false) {
-                $explode = str_replace('TableAll::', '', $preSel);
-                list($currTblAll, $currTblAllCond) = $GLOBALS["SL"]
-                    ->mexplode('::', $explode);
-                $currTblAllCond = intVal($currTblAllCond);
-            }
-        }                   
-        return view(
-            'vendor.survloop.admin.tree.node-edit-loop-list', 
-            [
-                "fld"            => $fld,
-                "manualOpt"      => $manualOpt,
-                "defs"           => $this->allDefSets(),
-                "currDefinition" => $currDefinition, 
-                "currLoopItems"  => $currLoopItems, 
-                "currTblRecs"    => $currTblRecs,
-                "currTblAll"     => $currTblAll,
-                "currTblAllCond" => $currTblAllCond
-            ]
-        )->render();
-    }
-    
-    public function postLoopsDropdowns($fld = 'loopList')
-    {
-        $ret = '';
-        if ($this->REQ->has($fld . 'Type')) {
-            if (trim($this->REQ->input($fld . 'Type')) == 'auto-def') {
-                if (trim($this->REQ->input($fld . 'Definition')) != '') {
-                    $ret = 'Definition::' . $this->REQ->input($fld . 'Definition');
-                }
-            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-loop') {
-                if (trim($this->REQ->input($fld . 'LoopItems')) != '') {
-                    $ret = 'LoopItems::' . $this->REQ->input($fld . 'LoopItems');
-                }
-            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-tbl') {
-                if (trim($this->REQ->input($fld . 'Tables')) != '') {
-                    $ret = 'Table::' . $this->REQ->input($fld . 'Tables');
-                }
-            } elseif (trim($this->REQ->input($fld . 'Type')) == 'auto-tbl-all') {
-                if (trim($this->REQ->input($fld . 'Tables')) != '' && $this->isAdmin) {
-                    $ret = 'TableAll::' . $this->REQ->input($fld . 'Tables') . '::' 
-                        . intVal($this->REQ->input($fld . 'TableCond'));
-                }
-            }
-        }
-        return $ret;
-    }
-    
     public function getLoopConditionLinks($loop)
     {
         $ret = [];
@@ -942,10 +883,14 @@ class GlobalsTables extends GlobalsElements
                     && isset($this->fldTypes[$tbl]) 
                     && isset($this->fldTypes[$tbl][$fld])) {
                     if ($this->fldTypes[$tbl][$fld] == 'DOUBLE') {
-                        $ret = $this->sigFigs($val, 3);
+                        $ret = number_format($val);
+                        if ($val < 100) {
+                            $ret = $this->sigFigs($val, 3);
+                        }
                     } elseif ($this->fldTypes[$tbl][$fld] == 'INT') {
                         $yearChk = strtolower(substr($fld, strlen($fld)-4));
-                        if ($yearChk == 'year' && strlen(trim('' . $val . '')) == 4) {
+                        if ($yearChk == 'year' 
+                            && strlen(trim('' . $val . '')) == 4) {
                             $ret = $val;
                         } else {
                             $ret = number_format(1*floatval($val));

@@ -816,8 +816,14 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
 	    }
 	    return true;
     }
-    $(document).on("change", ".graphUpDrp", function() { pullNewGraph($(this).attr("data-nid")); return true; });
-    $(document).on("click", ".graphUp", function() { pullNewGraph($(this).attr("data-nid")); return true; });
+    $(document).on("change", ".graphUpDrp", function() {
+        pullNewGraph($(this).attr("data-nid"));
+        return true;
+    });
+    $(document).on("click", ".graphUp", function() { 
+        pullNewGraph($(this).attr("data-nid"));
+        return true;
+    });
     
     function sliHgt(nIDtxt, next) {
         for (var i = 0; i < slideGals.length; i++) {

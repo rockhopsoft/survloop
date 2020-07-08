@@ -227,6 +227,10 @@ class TreeSurvNodeEdit extends TreeSurvForm
             $dataBranchDrop,
             'select database table to create deeper or more explicit data linkages'
         );
+        $loopDrops = $this->printLoopsDropdowns(
+            $node->nodeRow->node_response_set, 
+            'responseList'
+        );
         return view(
             'vendor.survloop.admin.tree.node-edit', 
             [
@@ -244,9 +248,79 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 "treeList"       => $treeList,
                 "childNodes"     => $childNodes,
                 "currMeta"       => $currMeta,
-                "dataBranchDrop" => $dataBranchDrop
+                "dataBranchDrop" => $dataBranchDrop,
+                "loopDrops"      => $loopDrops
             ]
         );
+    }
+    
+    public function printLoopsDropdowns($preSel = '', $fld = 'loopList', $manualOpt = true)
+    {
+        $currDefinition = $currLoopItems = $currTblRecs = $currTblAll = $currMonthFld = '';
+        $currTblAllCond = 0;
+        if (isset($preSel)) {
+            if (strpos($preSel, 'Definition::') !== false) {
+                $currDefinition = str_replace('Definition::', '', $preSel);
+            } elseif (strpos($preSel, 'LoopItems::') !== false) {
+                $currLoopItems = str_replace('LoopItems::', '', $preSel);
+            } elseif (strpos($preSel, 'Table::') !== false) {
+                $currTblRecs = str_replace('Table::', '', $preSel);
+            } elseif (strpos($preSel, 'TableAll::') !== false) {
+                $explode = str_replace('TableAll::', '', $preSel);
+                list($currTblAll, $currTblAllCond) = $GLOBALS["SL"]
+                    ->mexplode('::', $explode);
+                $currTblAllCond = intVal($currTblAllCond);
+            } elseif (strpos($preSel, 'Months::') !== false) {
+                $currMonthFld = intVal(str_replace('Months::', '', $preSel));
+            }
+        }
+        $monthNodeOpts = $this->getTreeNodeDropdownAll($currMonthFld);
+        return view(
+            'vendor.survloop.admin.tree.node-edit-loop-list', 
+            [
+                "fld"            => $fld,
+                "manualOpt"      => $manualOpt,
+                "defs"           => $GLOBALS["SL"]->allDefSets(),
+                "currDefinition" => $currDefinition, 
+                "currLoopItems"  => $currLoopItems, 
+                "currTblRecs"    => $currTblRecs,
+                "currTblAll"     => $currTblAll,
+                "currTblAllCond" => $currTblAllCond,
+                "currMonthFld"   => $currMonthFld,
+                "monthNodeOpts"  => $monthNodeOpts
+            ]
+        )->render();
+    }
+    
+    public function postLoopsDropdowns($fld = 'loopList')
+    {
+        $ret = '';
+        if ($GLOBALS["SL"]->REQ->has($fld . 'Type')) {
+            if (trim($GLOBALS["SL"]->REQ->input($fld . 'Type')) == 'auto-def') {
+                if (trim($GLOBALS["SL"]->REQ->input($fld . 'Definition')) != '') {
+                    $ret = 'Definition::' . $GLOBALS["SL"]->REQ->input($fld . 'Definition');
+                }
+            } elseif (trim($GLOBALS["SL"]->REQ->input($fld . 'Type')) == 'auto-loop') {
+                if (trim($GLOBALS["SL"]->REQ->input($fld . 'LoopItems')) != '') {
+                    $ret = 'LoopItems::' . $GLOBALS["SL"]->REQ->input($fld . 'LoopItems');
+                }
+            } elseif (trim($GLOBALS["SL"]->REQ->input($fld . 'Type')) == 'auto-tbl') {
+                if (trim($GLOBALS["SL"]->REQ->input($fld . 'Tables')) != '') {
+                    $ret = 'Table::' . $GLOBALS["SL"]->REQ->input($fld . 'Tables');
+                }
+            } elseif (trim($GLOBALS["SL"]->REQ->input($fld . 'Type')) == 'auto-tbl-all') {
+                if (trim($GLOBALS["SL"]->REQ->input($fld . 'Tables')) != '' 
+                    && $GLOBALS["SL"]->isAdmin) {
+                    $ret = 'TableAll::' . $GLOBALS["SL"]->REQ->input($fld . 'Tables') . '::' 
+                        . intVal($GLOBALS["SL"]->REQ->input($fld . 'TableCond'));
+                }
+            } elseif (trim($GLOBALS["SL"]->REQ->input($fld . 'Type')) == 'auto-months'
+                && $GLOBALS["SL"]->REQ->has($fld . 'MonthFld')
+                && trim($GLOBALS["SL"]->REQ->input($fld . 'MonthFld')) != '') {
+                $ret = 'Months::' . intVal($GLOBALS["SL"]->REQ->input($fld . 'MonthFld'));
+            }
+        }
+        return $ret;
     }
 
     protected function adminNodeEditSave(&$node, $nodeIN, $resLimit, Request $request, $currPage = '') 
@@ -608,13 +682,14 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     $node->nodeRow->node_response_set = '';
                     if ($GLOBALS["SL"]->REQ->has('spreadTblLoop')
                         || trim($GLOBALS["SL"]->REQ->spreadTblLoop) != '') {
-                        $node->nodeRow->node_response_set = 'LoopItems::' . $GLOBALS["SL"]->REQ->spreadTblLoop;
+                        $node->nodeRow->node_response_set = 'LoopItems::' 
+                            . $GLOBALS["SL"]->REQ->spreadTblLoop;
                     }
                 }
                 $newResponses = [];
                 if (!$GLOBALS["SL"]->REQ->has('spreadTblLoop') 
                     || trim($GLOBALS["SL"]->REQ->spreadTblLoop) == '') {
-                    $node->nodeRow->node_response_set = $GLOBALS["SL"]->postLoopsDropdowns('responseList');
+                    $node->nodeRow->node_response_set = $this->postLoopsDropdowns('responseList');
                     if ($node->nodeRow->node_response_set == '') {
                         for ($i=0; $i < 20; $i++) {
                             if ($GLOBALS["SL"]->REQ->has('response' . $i . '') 
@@ -666,6 +741,13 @@ class TreeSurvNodeEdit extends TreeSurvForm
                             }
                         }
                     }
+                }
+                if ($GLOBALS["SL"]->REQ->has('responseListType') 
+                    && trim($GLOBALS["SL"]->REQ->responseListType) == 'auto-months'
+                    && $GLOBALS["SL"]->REQ->has('responseListMonthFld') 
+                    && trim($GLOBALS["SL"]->REQ->responseListMonthFld) != '') {
+                    $node->nodeRow->node_response_set = 'Months::' 
+                        . trim($GLOBALS["SL"]->REQ->responseListMonthFld);
                 }
                 if (in_array($GLOBALS["SL"]->REQ->nodeTypeQ, ['Date', 'Date Picker', 'Date Time'])) {
                     $node->nodeRow->node_char_limit = intVal($GLOBALS["SL"]->REQ->get('dateOptRestrict'));

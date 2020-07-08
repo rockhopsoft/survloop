@@ -134,6 +134,7 @@ class SurvLoop extends SurvCustLoop
                 exit;
             }
             $this->loadLoop($request);
+            $this->custLoop->customPdfFilename();
             if (in_array($view, ['pdf', 'full-pdf'])) {
                 $this->custLoop->v["isPrint"] = 1;
                 $GLOBALS["SL"]->x["isPrintPDF"] = true;

@@ -101,16 +101,9 @@ a.navMobActive:visited, a.navMobActive:hover {
 #navMobToggle:link #navMobPercNum, #navMobToggle:active #navMobPercNum,
 #navMobToggle:visited #navMobPercNum, #navMobToggle:hover #navMobPercNum {
     position: absolute;
-    right: 5px;
-    top: 2px;
-    width: 26px;
-    text-align: center;
-    font-size: 10px;
-    line-height: 10px;
-    padding: 6px 3px 6px 3px;
+    right: 4px;
+    top: 5px;
     color: {!! $css["color-main-on"] !!};
-    -moz-border-radius: 25px; border-radius: 25px;
-    border: 1px {!! $css["color-main-on"] !!} dashed;
 }
 #navMobToggle:hover #navMobPercNum {
     color: {!! $css["color-main-faint"] !!};

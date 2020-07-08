@@ -1,12 +1,28 @@
 /* resources/views/vendor/survloop/admin/tree/node-edit-ajax.blade.php */
 
-$("#specialFuncsBtn").click(function(){ $("#specialFuncs").slideToggle("fast"); });
-$("#extraSmallBtn").click(function() { $("#extraSmall").slideToggle("fast"); });
-$("#extraHTMLbtn").click(function() { $("#extraHTML").slideToggle("fast"); });
-$("#extraHTMLbtn2").click(function() { $("#extraHTML2").slideToggle("fast"); });
-$("#internalNotesBtn").click(function() { $("#internalNotes").slideToggle("fast"); });
-$("#stepLoopN").click(function() { $("#stdLoopOpts").slideDown("fast"); $("#stepLoopOpts").slideUp("fast"); });
-$("#stepLoopY").click(function() { $("#stdLoopOpts").slideUp("fast"); $("#stepLoopOpts").slideDown("fast"); });
+$("#specialFuncsBtn").click(function(){
+    $("#specialFuncs").slideToggle("fast");
+});
+$("#extraSmallBtn").click(function() {
+    $("#extraSmall").slideToggle("fast");
+});
+$("#extraHTMLbtn").click(function() {
+    $("#extraHTML").slideToggle("fast");
+});
+$("#extraHTMLbtn2").click(function() {
+    $("#extraHTML2").slideToggle("fast");
+});
+$("#internalNotesBtn").click(function() {
+    $("#internalNotes").slideToggle("fast");
+});
+$("#stepLoopN").click(function() {
+    $("#stdLoopOpts").slideDown("fast");
+    $("#stepLoopOpts").slideUp("fast");
+});
+$("#stepLoopY").click(function() {
+    $("#stdLoopOpts").slideUp("fast"); 
+    $("#stepLoopOpts").slideDown("fast"); 
+});
 
 $(document).on("click", "a.condDelBtn", function() {
     var cond = $(this).attr("id").replace("cond", "").replace("delBtn", "");

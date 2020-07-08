@@ -392,7 +392,7 @@ class PageLoadUtils extends Controller
         if ($cid > 0) {
             $redir .= '?cid=' . $cid;
         } else {
-            $redir .= '?start=1&new=' . rand(100000000, 1000000000);
+            $redir .= '?started=1&new=' . rand(100000000, 1000000000);
         }
         $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '', 
             str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '', 

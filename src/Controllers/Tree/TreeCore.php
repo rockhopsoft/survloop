@@ -323,7 +323,7 @@ class TreeCore extends SurvLoopController
                 ->get();
             if ($sibs->isNotEmpty()) {
                 foreach ($sibs as $sib) {
-                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->input('orderBefore'))) { 
+                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->orderBefore)) { 
                         $node->nodeRow->node_parent_order = $sib->node_parent_order; 
                         $foundSibling = true;
                     }
@@ -331,7 +331,7 @@ class TreeCore extends SurvLoopController
                         SLNode::where('node_id', $sib->node_id)
                             ->increment('node_parent_order');
                     }
-                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->input('orderAfter'))) {
+                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->orderAfter)) {
                         $node->nodeRow->node_parent_order = (1+$sib->node_parent_order);
                         $foundSibling = true;
                     }
@@ -386,6 +386,41 @@ class TreeCore extends SurvLoopController
         if (!$this->checkNodeConditionsBasic($nID)) {
             return false;
         }
+        if ($this->v["percCalc"]["nID"] == $nID) {
+            $this->v["percCalc"]["nID"] = -3;
+        } elseif ($this->v["percCalc"]["nID"] > 0) {
+            $this->v["percCalc"]["before"]++;
+        }
+        if (sizeof($tiers) > 0) {
+            foreach ($tiers as $nextTier) {
+                $this->rawOrderPercNextNode($nextTier[0], $nextTier[1]);
+            }
+        }
+        if ($this->v["percCalc"]["nID"] <= 0) {
+            $this->v["percCalc"]["after"]++;
+        }
+        return true;
+    }
+    
+    public function getTreeNodeDropdownAll($preSel = 0)
+    {
+        $GLOBALS["SL"]->x["nodeDropdownOpts"] = '';
+        if (sizeof($this->nodesRawOrder) > 0) {
+            foreach ($this->nodesRawOrder as $ind => $nID) {
+                if (isset($this->allNodes[$nID])) {
+                    $GLOBALS["SL"]->x["nodeDropdownOpts"] .= '<option value="' 
+                        . $nID . '"' . (($preSel == $nID) ? 'SELECTED' : '') . '>'
+                        . $nID . ((isset($this->allNodes[$nID]->dataStore))
+                            ? ' ' . $this->allNodes[$nID]->dataStore
+                            : '');
+                }
+            }
+        }
+        return $GLOBALS["SL"]->x["nodeDropdownOpts"];
+    }
+    
+    public function getTreeNodeDropdown($nID, $tiers = [])
+    {
         if ($this->v["percCalc"]["nID"] == $nID) {
             $this->v["percCalc"]["nID"] = -3;
         } elseif ($this->v["percCalc"]["nID"] > 0) {

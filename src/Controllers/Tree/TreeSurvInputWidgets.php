@@ -190,7 +190,8 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                             $this->v["emaBCC"],
                             $this->postEmailFrom()
                         );
-                        $emaID = ((isset($currEmail->email_id)) ? $currEmail->email_id : -3);
+                        $emaID = ((isset($currEmail->email_id)) 
+                            ? $currEmail->email_id : -3);
                         $this->logEmailSent(
                             $emaContent, 
                             $emaSubject, 

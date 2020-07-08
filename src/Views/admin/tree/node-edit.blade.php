@@ -310,10 +310,11 @@
         {!! view(
             'vendor.survloop.admin.tree.node-edit-questions', 
             [
-                "node"       => $node,
-                "defs"       => $defs,
-                "resLimit"   => $resLimit,
-                "childNodes" => $childNodes
+                "node"          => $node,
+                "defs"          => $defs,
+                "resLimit"      => $resLimit,
+                "childNodes"    => $childNodes,
+                "loopDrops"     => $loopDrops
             ]
         )->render() !!}
         

@@ -55,62 +55,8 @@ class TreeCoreSess extends TreeCore
         if (isset($this->v["uID"]) && $this->v["uID"] > 0) {
             $uID = $this->v["uID"];
         }
-        $cid = 0; 
-        if ($GLOBALS["SL"]->REQ->has('cid') 
-            && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) {
-            $cid = intVal($GLOBALS["SL"]->REQ->get('cid'));
-        }
-        if ($GLOBALS["SL"]->REQ->has('start') 
-            && $GLOBALS["SL"]->REQ->has('new')) {
-            $treeNew = 't' . $GLOBALS["SL"]->treeID 
-                . 'new' . $GLOBALS["SL"]->REQ->get('new');
-            if (!session()->has($treeNew)) {
-                $this->createNewSess();
-                $this->newCoreRow($coreTbl);
-                session()->put($treeNew, time());
-                session()->save();
-            }
-        } elseif ($GLOBALS["SL"]->REQ->has('core') 
-            && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
-            $this->sessInfo = SLSess::where('sess_user_id', $uID)
-                ->where('sess_tree', $GLOBALS["SL"]->sessTree) //$this->treeID)
-                ->where('sess_core_id', '=', intVal($GLOBALS["SL"]->REQ->get('core')))
-                ->orderBy('updated_at', 'desc')
-                ->first();
-            if ($this->sessInfo && isset($this->sessInfo->sess_id)) {
-                $this->sessID = $this->sessInfo->sess_id;
-                $this->coreID = $this->sessInfo->sess_core_id;
-            }
-        } elseif (isset($this->v) && $uID > 0) {
-            $this->chkUserTreeSess($coreTbl, $cid);
-        } else {
-            $this->chkTreeSess($GLOBALS["SL"]->sessTree);
-        }
-        // Check for and load core record's ID
-        if ($this->coreID <= 0 
-            && $this->sessInfo 
-            && isset($this->sessInfo->sess_core_id) 
-            && intVal($this->sessInfo->sess_core_id) > 0) {
-            $this->coreID = $this->sessInfo->sess_core_id;
-        }
-        $this->chkIfCoreIsEditable($this->coreID);
-        if ($this->coreID <= 0 && $uID > 0) {
-            $pastUserSess = SLSess::where('sess_user_id', $uID)
-                ->where('sess_tree', $this->treeID)
-                ->where('sess_core_id', '>', '0')
-                ->orderBy('updated_at', 'desc')
-                ->get();
-            if ($pastUserSess->isNotEmpty()) {
-                foreach ($pastUserSess as $pastSess) {
-                    $this->chkIfCoreIsEditable($pastSess->sess_core_id);
-                }
-            }
-        }
-        if ($this->coreIDoverride > 0) {
-            // should there be more checks here?..
-            $this->coreID = $this->coreIDoverride;
-        //} elseif ($this->coreID <= 0) { $this->newCoreRow($coreTbl);
-        }
+        $this->loadSessInfoCoreID($coreTbl, $uID);
+
         if ($this->coreID > 0) {
             if (!$this->sessInfo) {
                 $this->createNewSess();
@@ -181,6 +127,74 @@ class TreeCoreSess extends TreeCore
             }
         } // end $this->coreID > 0
         return true;
+    }
+
+    /*****************
+    // Some More Generalized Session Processes
+    *****************/
+    protected function loadSessInfoCoreID($coreTbl = '', $uID = 0)
+    {
+        $cid = 0; 
+        if ($GLOBALS["SL"]->REQ->has('cid') 
+            && intVal($GLOBALS["SL"]->REQ->get('cid')) > 0) {
+            $cid = intVal($GLOBALS["SL"]->REQ->get('cid'));
+        }
+        $isNew = false;
+        if ($GLOBALS["SL"]->REQ->has('started') && $GLOBALS["SL"]->REQ->has('new')) {
+            $treeNew = 't' . $GLOBALS["SL"]->treeID 
+                . 'new' . $GLOBALS["SL"]->REQ->get('new');
+            if (!session()->has($treeNew)) {
+                $this->createNewSess();
+                $this->newCoreRow($coreTbl);
+                session()->put($treeNew, time());
+                session()->save();
+                $isNew = true;
+            }
+        }
+        if (!$isNew) {
+            if ($GLOBALS["SL"]->REQ->has('core') 
+                && intVal($GLOBALS["SL"]->REQ->get('core')) > 0) {
+                $this->sessInfo = SLSess::where('sess_user_id', $uID)
+                    ->where('sess_tree', $GLOBALS["SL"]->sessTree) //$this->treeID)
+                    ->where('sess_core_id', '=', intVal($GLOBALS["SL"]->REQ->get('core')))
+                    ->orderBy('updated_at', 'desc')
+                    ->first();
+                if ($this->sessInfo && isset($this->sessInfo->sess_id)) {
+                    $this->sessID = $this->sessInfo->sess_id;
+                    $this->coreID = $this->sessInfo->sess_core_id;
+                }
+            } elseif (isset($this->v) && $uID > 0) {
+                $this->chkUserTreeSess($coreTbl, $cid);
+            } else {
+                $this->chkTreeSess($GLOBALS["SL"]->sessTree);
+            }
+        }
+        // Check for and load core record's ID
+        if ($this->coreID <= 0 
+            && $this->sessInfo 
+            && isset($this->sessInfo->sess_core_id) 
+            && intVal($this->sessInfo->sess_core_id) > 0) {
+            $this->coreID = $this->sessInfo->sess_core_id;
+        }
+        $this->chkIfCoreIsEditable($this->coreID);
+        if ($this->coreID <= 0 && $uID > 0) {
+            $pastUserSess = SLSess::where('sess_user_id', $uID)
+                ->where('sess_tree', $this->treeID)
+                ->where('sess_core_id', '>', '0')
+                ->orderBy('updated_at', 'desc')
+                ->get();
+            if ($pastUserSess->isNotEmpty()) {
+                foreach ($pastUserSess as $pastSess) {
+                    $this->chkIfCoreIsEditable($pastSess->sess_core_id);
+                }
+            }
+        }
+        if ($this->coreIDoverride > 0) {
+            // should there be more checks here?..
+            $this->coreID = $this->coreIDoverride;
+        //} elseif ($this->coreID <= 0) { $this->newCoreRow($coreTbl);
+        }
+        return $this->coreID;
     }
     
     protected function chkUserTreeSess($coreTbl, $cid)
@@ -284,7 +298,7 @@ class TreeCoreSess extends TreeCore
         if ($coreID <= 0) {
             $coreID = $this->coreID;
         }
-        if ($coreID > 0) {
+        if ($coreID > 0 && !$GLOBALS["SL"]->REQ->has('new')) {
             if (!$this->isAdminUser() 
                 && $GLOBALS["SL"]->treeRow->tree_opts%11 == 0 // Tree allows record edits
                 && !$this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreID, $coreRec)) {
