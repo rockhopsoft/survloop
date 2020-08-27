@@ -103,8 +103,11 @@ class Globals extends GlobalsImportExport
         return true;
     }
     
-    public function loadSessLoops($sessID)
+    public function loadSessLoops($sessID = -3)
     {
+        if (!$sessID || $sessID <= 0) {
+            return [];
+        }
         $this->sessLoops = SLSessLoops::where('sess_loop_sess_id', $sessID)
             ->orderBy('sess_loop_id', 'desc')
             ->get();

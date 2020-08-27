@@ -17,6 +17,7 @@ class SLEmailed extends Model
         'emailed_subject', 
         'emailed_body', 
         'emailed_opts',  
+        'emailed_attach',
     ];
     
     

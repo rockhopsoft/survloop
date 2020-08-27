@@ -357,8 +357,7 @@ class TreeCore extends SurvLoopController
     
     public function rawOrderPercent($nID)
     {
-        if (!isset($this->allNodes[$nID])
-            || sizeof($this->nodeTiers) < 2) {
+        if (!isset($this->allNodes[$nID]) || sizeof($this->nodeTiers) < 2) {
             return 0;
         }
         $this->v["percCalc"] = [

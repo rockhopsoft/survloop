@@ -12,6 +12,7 @@ namespace SurvLoop\Controllers\Tree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\SLSessEmojis;
+use App\Models\SLTree;
 use SurvLoop\Controllers\SurvLoopPDF;
 use SurvLoop\Controllers\Tree\TreeSurvBasicNav;
 
@@ -73,6 +74,15 @@ class TreeSurvReport extends TreeSurvBasicNav
                 return $this->genPdfByID();
             }
         }
+        if ($GLOBALS["SL"]->isPdfView()
+            && !$GLOBALS["SL"]->REQ->has('pdf-attached')) {
+            if (sizeof($this->prevUploadsPDF()) > 0) {
+                return '<script type="text/javascript"> setTimeout("'
+                . 'window.location=\'?pdf=1&refresh=1&pdf-attached=1' 
+                . '\'", 10); </script>';
+            }
+        }
+
         $this->v["isPublicRead"] = true;
         $this->v["content"] = $this->index($request);
         if ($GLOBALS["SL"]->isPdfView()) {
@@ -87,15 +97,36 @@ class TreeSurvReport extends TreeSurvBasicNav
         );
     }
     
-    public function chkCachePdfByID()
+    public function chkCachePdfByID($skipPDfViewCheck = false)
+    {
+        $isPdfView = $skipPDfViewCheck;
+        if (!$isPdfView) {
+            $isPdfView = $GLOBALS["SL"]->isPdfView();
+        }
+        $this->loadPdfByID();
+        return ($isPdfView
+            && file_exists($this->v["pdf-file"]) 
+            && !$GLOBALS["SL"]->REQ->has('refresh'));
+    }
+    
+    protected function loadPdfByID()
     {
         $this->v["pdf-gen"] = new SurvLoopPDF($GLOBALS["SL"]->coreTbl);
         $this->v["pdf-file"] = $GLOBALS["SL"]->coreTbl . '-' 
-            . $this->corePublicID . '-' . $GLOBALS["SL"]->dataPerms . '.pdf';
+            . $this->corePublicID . '-' . $GLOBALS["SL"]->pageView 
+            . '-' . $GLOBALS["SL"]->dataPerms . '.pdf';
         $this->v["pdf-file"] = $this->v["pdf-gen"]->getPdfFile($this->v["pdf-file"]);
-        return ($GLOBALS["SL"]->isPdfView() 
-            && file_exists($this->v["pdf-file"]) 
-            && !$GLOBALS["SL"]->REQ->has('refresh'));
+        $fileDeliver = $this->loadPdfFilename();
+        if (trim($fileDeliver) == '') {
+            $fileDeliver = $this->v["pdf-file"];
+        }
+        $this->v["pdf-gen"]->setOutput($this->v["pdf-file"], $fileDeliver);
+        return $this->v["pdf-file"];
+    }
+    
+    protected function loadPdfFilename()
+    {
+        return '';
     }
     
     // Override PDF filename to be used for delivery to user.
@@ -111,18 +142,9 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function prepPdfByID()
     {
-        $pdfAttachAll = $this->prevUploadsPDF($this->treeID);
-        if (sizeof($pdfAttachAll) > 0) {
-            $pdfAttach = [];
-            foreach ($pdfAttachAll as $upRow) {
-                $deet = $this->loadUpDeets($upRow);
-                if (sizeof($deet) > 0 && $deet["privacy"] == 'Public') {
-                    $pdfAttach[] = $deet["file"];
-                }
-            }
-            if (sizeof($pdfAttach) > 0) {
-                $this->v["pdf-gen"]->storeAttachedPdf($pdfAttach, $this->v["pdf-file"]);
-            }
+        if (!isset($this->v["content"]) || trim($this->v["content"]) == '') {
+            $this->v["isPublicRead"] = true;
+            $this->v["content"] = $this->index($GLOBALS["SL"]->REQ);
         }
         return $this->v["pdf-gen"]->storeHtml(
             view('vendor.survloop.master', $this->v)->render(), 
@@ -132,6 +154,10 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function genPdfByID()
     {
+        $fileHtml = str_replace('.pdf', '.html', $this->v["pdf-file"]);
+        if (!file_exists($fileHtml)) {
+            return $this->prepPdfByID();
+        }
         $this->v["pdf-gen"]->genCorePdf($this->v["pdf-file"]);
         return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
     }
@@ -539,26 +565,57 @@ class TreeSurvReport extends TreeSurvBasicNav
             . ' is no longer published.</div> -->';
     }
     
-    public function xmlAllAccess()
+    protected function xmlAllAccess()
     {
         return true; 
     }
     
     public function xmlAll(Request $request)
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-all';
+        $xtras = '';
+        if ($request->has('state') && trim($request->get('state')) != '') {
+            $xtras .= '&state=' . trim($request->get('state'));
+        }
+        $page 
+            = $pageBasic
+            = '/api/all/' . $GLOBALS["SL"]->treeRow->tree_slug . '/xml';
         $this->survLoopInit($request, $page);
         if (!$this->xmlAllAccess()) {
             return 'Sorry, access not permitted.';
         }
-        $limit = $GLOBALS["SL"]->getLimit();
+        $limit  = $GLOBALS["SL"]->getLimit(200);
+        $start = $GLOBALS["SL"]->getStart();
+        $page .= '?limit=' . $limit . '&start=' . $start . $xtras;
+        $content = $GLOBALS["SL"]->chkCache($page, 'api', $GLOBALS["SL"]->treeID);
+        // $GLOBALS["SL"]->hasCache($page, 'api', $GLOBALS["SL"]->treeID)
+        if ($content != '' && !$request->has('refresh')) {
+            return Response::make($content, '200')
+                ->header('Content-Type', 'text/xml');
+        }
+        $this->v["apiLoadLinks"] = 'Current: ' . $GLOBALS['SL']->sysOpts["app-url"] . $page;
+
         $this->loadXmlMapTree($request);
-        $this->v["nestedNodes"] = '';
+
+        if (sizeof($GLOBALS["SL"]->dataLoops) == 0
+            && sizeof($GLOBALS["SL"]->dataSubsets) == 0
+            && sizeof($GLOBALS["SL"]->dataHelpers) == 0) {
+            $treeChk = SLTree::where('tree_type', 'Survey')
+                ->where('tree_database', $GLOBALS["SL"]->dbID)
+                ->where('tree_core_table', $GLOBALS["SL"]->tblI[$GLOBALS["SL"]->coreTbl])
+                ->orderBy('tree_id', 'asc')
+                ->first();
+            if ($treeChk && isset($treeChk->tree_id)) {
+                $GLOBALS["SL"]->loadDataMap($treeChk->tree_id);
+            }
+        }
+
+        $this->v["nestedNodes"] = $this->v["nextPage"] = '';
         $coreTbl = $GLOBALS["SL"]->xmlTree["coreTbl"];
         $allIDs = $this->getAllPublicCoreIDs($coreTbl);
+        $this->v["tot"] = sizeof($allIDs);
         if (sizeof($allIDs) > 0) {
             foreach ($allIDs as $i => $coreID) {
-                if ($i < $limit) {
+                if ($i >= $start && $i < ($start+$limit)) {
                     $this->loadAllSessData($coreTbl, $coreID);
                     if (isset($this->sessData->dataSets[$coreTbl]) 
                         && sizeof($this->sessData->dataSets[$coreTbl]) > 0) {
@@ -570,9 +627,17 @@ class TreeSurvReport extends TreeSurvBasicNav
                     }
                 }
             }
+            if ($limit < sizeof($allIDs)) {
+                $this->v["nextPage"] = $GLOBALS["SL"]->sysOpts["app-url"] 
+                    . $pageBasic . '?limit=' . $limit . '&start=' 
+                    . ($start+$limit) . $xtras;
+                $this->v["apiLoadLinks"] .= "\n" . 'Next: ' . $this->v["nextPage"];
+            }
         }
         $view = view('vendor.survloop.admin.tree.xml-report', $this->v)->render();
-        return Response::make($view, '200')->header('Content-Type', 'text/xml');
+        $GLOBALS["SL"]->putCache($page, $view, 'api', $GLOBALS["SL"]->treeID);
+        return Response::make($view, '200')
+            ->header('Content-Type', 'text/xml');
     }
     
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
@@ -580,6 +645,9 @@ class TreeSurvReport extends TreeSurvBasicNav
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/xml';
         $this->survLoopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'public';
+        if (!$this->xmlAccess()) {
+            return 'Sorry, access not permitted.';
+        }
         $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
@@ -599,9 +667,13 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/full-xml';
         $this->survLoopInit($request, $page);
+        $GLOBALS["SL"]->pageView = 'full';
+//echo 'view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
+        if (!$this->xmlAccess()) {
+            return 'Sorry, access not permitted.';
+        }
         $coreID = $GLOBALS["SL"]->chkInPublicID($coreID); 
         $this->loadXmlMapTree($request);
-        $GLOBALS["SL"]->pageView = 'full';
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         } else { // XML core table is different from main tree
@@ -609,6 +681,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
         }
         $this->checkPageViewPerms();
+//echo 'view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
         if ($GLOBALS["SL"]->dataPerms == 'none') {
             return '';
         }

@@ -86,7 +86,7 @@
             
         <div class="p20"></div>
         <div class="pB20">
-            <input type="submit" class="btn btn-lg btn-xl btn-primary pull-right" 
+            <input type="submit" class="btn btn-lg btn-primary pull-right" 
                 @if (trim($tblName) == '') value="Add Table" 
                 @else value="Save Changes" 
                 @endif >

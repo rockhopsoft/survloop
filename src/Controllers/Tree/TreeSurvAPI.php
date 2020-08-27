@@ -210,28 +210,50 @@ class TreeSurvAPI extends TreeCoreSess
     public function loadXmlMapTree(Request $request, $forceReload = false)
     {
         $this->survLoopInit($request);
-        if (isset($GLOBALS["SL"]->xmlTree["id"]) 
-            && (empty($this->xmlMapTree) || $forceReload)) {
-            $this->xmlMapTree = new TreeSurvAPI;
-            $this->xmlMapTree->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
+        if (empty($this->xmlMapTree) || $forceReload) {
+            if (isset($GLOBALS["SL"]->xmlTree["id"])) {
+                $this->xmlMapTree = new TreeSurvAPI;
+                $this->xmlMapTree->loadTree($GLOBALS["SL"]->xmlTree["id"], $request, true);
+            } elseif ($GLOBALS["SL"]->treeRow->tree_type == 'Survey XML') {
+                $this->xmlMapTree = new TreeSurvAPI;
+                $this->xmlMapTree->loadTree($GLOBALS["SL"]->treeID, $request, true);
+                $this->copyXmlTreeCore();
+            }
         }
         return true;
     }
-        
+    
+    private function copyXmlTreeCore()
+    {
+        $t = $GLOBALS["SL"]->treeRow;
+        $GLOBALS["SL"]->xmlTree["id"] = $GLOBALS["SL"]->treeID;
+        $GLOBALS["SL"]->xmlTree["root"] = $t->tree_root;
+        $GLOBALS["SL"]->xmlTree["coreTblID"] = $t->tree_core_table;
+        $GLOBALS["SL"]->xmlTree["coreTbl"] = $GLOBALS["SL"]->tbl[$t->tree_core_table];
+        $GLOBALS["SL"]->xmlTree["slug"] = $t->tree_slug;
+        $GLOBALS["SL"]->xmlTree["opts"] = intVal($t->tree_opts);
+        return true;
+    }
+    
     protected function getXmlTmpV($nID, $tblID = -3)
     {
         $v = [];
+        $v["tblID"] = 0;
+        $v["tblAbbr"] = '';
         if ($tblID > 0) {
             $v["tbl"] = $GLOBALS["SL"]->tbl[$tblID];
-//echo 'getXmlTmpV(' . $nID . ', ' . $tblID . '  --- A --- ' . $v["tbl"] . '<br />';
+            $v["tblID"] = $tblID;
+//echo 'getXmlTmpV(' . $nID . ', ' . $tblID . '  --- A --- ' . $v["tbl"] . '<br />'; exit;
         } else {
             $v["tbl"] = $this->xmlMapTree->getNodeTblName($nID);
-//echo 'getXmlTmpV(' . $nID . ', ' . $tblID . '  --- B --- ' . $v["tbl"] . '<br />';
+            if (isset($GLOBALS["SL"]->tblI[$v["tbl"]])) {
+                $v["tblID"] = $GLOBALS["SL"]->tblI[$v["tbl"]];
+            }
+//echo 'getXmlTmpV(' . $nID . ', ' . $v["tblID"] . '  --- B --- ' . $v["tbl"] . '<br />'; exit;
         }
-        $v["tblID"] = ((isset($GLOBALS["SL"]->tblI[$v["tbl"]])) 
-            ? $GLOBALS["SL"]->tblI[$v["tbl"]] : 0);
-        $v["tblAbbr"] = ((isset($GLOBALS["SL"]->tblAbbr[$v["tbl"]])) 
-            ? $GLOBALS["SL"]->tblAbbr[$v["tbl"]] : '');
+        if (isset($GLOBALS["SL"]->tblAbbr[$v["tbl"]])) {
+            $v["tblAbbr"] = $GLOBALS["SL"]->tblAbbr[$v["tbl"]];
+        }
         $v["tblAbbrTrim"] = $v["tblAbbr"];
         if (substr($v["tblAbbr"], strlen($v["tblAbbr"])-1) == '_') {
             $v["tblAbbrTrim"] = substr($v["tblAbbr"], 0, strlen($v["tblAbbr"])-1);
@@ -284,6 +306,11 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return $v;
     }
+
+    protected function xmlAccess()
+    {
+        return true;
+    }
     
     public function genXmlSchema(Request $request)
     {
@@ -291,7 +318,9 @@ class TreeSurvAPI extends TreeCoreSess
         if (!isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
             return $this->redir('/');
         }
-//echo '<pre>'; print_r($this->xmlMapTree->nodeTiers); echo '</pre>'; exit;
+        if (!$this->xmlAccess()) {
+            return 'Sorry, access not permitted.';
+        }
         $this->v["nestedNodes"] = $this->genXmlSchemaNode(
             $this->xmlMapTree->rootID, 
             $this->xmlMapTree->nodeTiers
@@ -310,7 +339,6 @@ class TreeSurvAPI extends TreeCoreSess
         } else {
             $v = $this->getXmlTmpV($nID);
         }
-//echo '<pre>'; print_r($v); echo '</pre>'; exit;
         $v["kids"] = '';
         if ($v["tblHelp"] && sizeof($v["tblHelp"]) > 0) {
             foreach ($v["tblHelp"] as $help) {
@@ -367,6 +395,7 @@ class TreeSurvAPI extends TreeCoreSess
         } else {
             $v = $this->getXmlTmpV($nID);
         }
+        $v["tot"]     = 1;
         $v["rec"]     = $rec;
         $v["recFlds"] = [];
         if (sizeof($v["tblFlds"]) > 0) {
@@ -526,10 +555,6 @@ class TreeSurvAPI extends TreeCoreSess
                 } elseif (in_array($fld->fld_type, array('VARCHAR', 'TEXT'))) {
                     if (trim($val) == '') {
                         $val = false;
-                    } else {
-                        if ($val != htmlspecialchars($val, ENT_XML1, 'UTF-8')) {
-                            $val = '<![CDATA[' . $val . ']]>'; // !in_array($val, array('Y', 'N', '?'))
-                        }
                     }
                 } elseif ($fld->fld_type == 'DATETIME') {
                     if ($val == '0000-00-00 00:00:00' 
@@ -542,6 +567,11 @@ class TreeSurvAPI extends TreeCoreSess
                         return '';
                     }
                 }
+            }
+            if ($val != htmlspecialchars($val, ENT_XML1, 'UTF-8')
+                || strpos($val, '<') !== false
+                || strpos($val, '>') !== false) {
+                $val = '<![CDATA[' . $val . ']]>'; // !in_array($val, array('Y', 'N', '?'))
             }
         }
         return $val;

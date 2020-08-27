@@ -50,7 +50,7 @@
 
 <div class="nodeGap"></div>
 
-<center><input type="submit" class="btn btn-lg btn-xl btn-primary mT20" value="Create Database"></center>
+<center><input type="submit" class="btn btn-lg btn-primary mT20" value="Create Database"></center>
 
 <div class="nodeGap"></div>
 </form></div></center>

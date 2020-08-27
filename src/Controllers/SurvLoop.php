@@ -134,25 +134,9 @@ class SurvLoop extends SurvCustLoop
                 exit;
             }
             $this->loadLoop($request);
-            $this->custLoop->customPdfFilename();
-            if (in_array($view, ['pdf', 'full-pdf'])) {
-                $this->custLoop->v["isPrint"] = 1;
-                $GLOBALS["SL"]->x["isPrintPDF"] = true;
-                if ($view == 'full-pdf') {
-                    $GLOBALS["SL"]->x["fullAccess"] = true;
-                }
-            }
-            $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
-            if ($cid <= 0 && $request->has('cid')) {
-                $cid = intVal($request->get('cid'));
-            }
+            $view = $this->chkPageView($view);
+            $cid = $this->chkPageCID($request, $cid, $skipPublic);
             if ($cid > 0) {
-                if (!$skipPublic) {
-                    $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
-                } else {
-                    $GLOBALS["SL"]->coreID = intVal($cid);
-                }
-                $cid = $GLOBALS["SL"]->coreID;
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
                 $treeSlug = $GLOBALS["SL"]->treeRow->tree_slug;
                 if (in_array($view, ['pdf', 'full-pdf'])) {
@@ -160,24 +144,11 @@ class SurvLoop extends SurvCustLoop
                 }
             }
             $this->custLoop->chkPageToken();
-            $allowCache = true;
-            if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0
-                || (isset($this->custLoop->v["tokenIn"]) 
-                    && $this->custLoop->v["tokenIn"] != '')
-                || $request->has('refresh')) {
-                $allowCache = false;
-            }
+            $allowCache = $this->chkPageAllowCache($request);
             if ($this->topCheckCache($request, 'page') && $allowCache) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
-            if ($cid > 0) {
-                $GLOBALS["SL"]->initPageReadSffx($cid);
-                $this->custLoop->loadSessionDataRawCid($cid);
-                if ($request->has('hideDisclaim') 
-                    && intVal($request->hideDisclaim) == 1) {
-                    $this->custLoop->hideDisclaim = true;
-                }
-            }
+            $this->chkPageHideDisclaim($request, $cid);
             if (in_array($view, ['xml', 'json'])) {
                 $GLOBALS["SL"]->pageView = 'public';
                 $this->custLoop->loadXmlMapTree($request);
@@ -185,15 +156,102 @@ class SurvLoop extends SurvCustLoop
             }
             $this->pageContent = $this->custLoop->index($request);
             if ($allowCache) {
-                $this->topSaveCache(
-                    $GLOBALS["SL"]->treeRow->tree_id, 
-                    strtolower($GLOBALS["SL"]->treeRow->tree_type)
-                );
+                $treeID = $GLOBALS["SL"]->treeRow->tree_id;
+                $treeType = strtolower($GLOBALS["SL"]->treeRow->tree_type);
+                $this->topSaveCache($treeID, $treeType);
+            }
+//echo '??loadPageURL(' . $pageSlug . ' - ' . $this->cacheKey; exit;
+            if ($request->has('ajax') && $request->ajax == 1) {
+                return $this->pageContent;
             }
             return $this->addSessAdmCodeToPage($request, $this->pageContent);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
+    }
+    
+    /**
+     * Check the view for this page's load.
+     *
+     * @param  string  $view
+     * @return string
+     */
+    private function chkPageView($view = '')
+    {
+        $this->custLoop->customPdfFilename();
+        if (in_array($view, ['pdf', 'full-pdf'])) {
+            $this->custLoop->v["isPrint"] = 1;
+            $GLOBALS["SL"]->x["isPrintPDF"] = true;
+            if ($view == 'full-pdf') {
+                $GLOBALS["SL"]->x["fullAccess"] = true;
+            }
+        }
+        $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
+        return $view;
+    }
+    
+    /**
+     * Loading a core record ID identifying a specific Page Tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $cid
+     * @param  boolean  $skipPublic
+     * @return int
+     */
+    private function chkPageCID(Request $request, $cid = 0, $skipPublic = false)
+    {
+        if ($cid <= 0 && $request->has('cid')) {
+            $cid = intVal($request->get('cid'));
+        }
+        if ($cid > 0) {
+            if (!$skipPublic) {
+                $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
+            } else {
+                $GLOBALS["SL"]->coreID = intVal($cid);
+            }
+            $cid = $GLOBALS["SL"]->coreID;
+        }
+        if ($request->has('cidi')) {
+            $cid = $GLOBALS["SL"]->coreID = intVal($request->get('cidi'));
+        }
+        return $cid;
+    }
+    
+    /**
+     * Check page load's current allowance for caching.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    private function chkPageAllowCache(Request $request)
+    {
+        $allowCache = true;
+        if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0
+            || (isset($this->custLoop->v["tokenIn"]) 
+                && $this->custLoop->v["tokenIn"] != '')
+            || $request->has('refresh')) {
+            $allowCache = false;
+        }
+        return $allowCache;
+    }
+    
+    /**
+     * Check page's settings for the need to hide disclaimers.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $cid
+     * @return boolean
+     */
+    private function chkPageHideDisclaim(Request $request, $cid)
+    {
+        if ($cid > 0) {
+            $GLOBALS["SL"]->initPageReadSffx($cid);
+            $this->custLoop->loadSessionDataRawCid($cid);
+            if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
+                $this->custLoop->hideDisclaim = true;
+            }
+        }
+        return true;
     }
     
     public function byID(Request $request, $treeSlug, $cid, $coreSlug = '')
@@ -552,6 +610,10 @@ class SurvLoop extends SurvCustLoop
     
     public function xmlAll(Request $request, $treeSlug = '')
     {
+        if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
+            $this->loadLoop($request);
+            return $this->custLoop->xmlAll($request);
+        }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->xmlAll($request);
@@ -562,6 +624,10 @@ class SurvLoop extends SurvCustLoop
     
     public function xmlByID(Request $request, $treeSlug, $cid)
     {
+        if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
+            $this->loadLoop($request);
+            return $this->custLoop->xmlByID($request, $cid);
+        }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->xmlByID($request, $cid);
@@ -572,6 +638,10 @@ class SurvLoop extends SurvCustLoop
     
     public function xmlFullByID(Request $request, $treeSlug, $cid)
     {
+        if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
+            $this->loadLoop($request);
+            return $this->custLoop->xmlFullByID($request, $cid);
+        }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->xmlFullByID($request, $cid);
@@ -582,6 +652,10 @@ class SurvLoop extends SurvCustLoop
     
     public function getXmlExample(Request $request, $treeSlug = '')
     {
+        if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
+            $this->loadLoop($request);
+            return $this->custLoop->getXmlExample($request);
+        }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->getXmlExample($request);
@@ -592,6 +666,10 @@ class SurvLoop extends SurvCustLoop
     
     public function genXmlSchema(Request $request, $treeSlug = '')
     {
+        if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
+            $this->loadLoop($request);
+            return $this->custLoop->genXmlSchema($request);
+        }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
             return $this->custLoop->genXmlSchema($request);
@@ -659,11 +737,7 @@ class SurvLoop extends SurvCustLoop
     public function searchPrep(Request $request, $treeID = 1)
     {
         $this->loadLoop($request, true);
-        $this->custLoop->loadTree($treeID);
-        $this->custLoop->initSearcher();
-        $this->custLoop->searcher->getSearchFilts();
-        $this->custLoop->searcher->getAllPublicCoreIDs();
-        $this->custLoop->chkRecsPub($request);
+        $this->custLoop->searchPrep($request, $treeID);
         return true;
     }
     

@@ -76,7 +76,7 @@
                 <label id="dataPrintPull" class="w100 
                     @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
                         'Print Vert Progress'])) disNon @else disBlo @endif ">
-                    <h3 class="m0 slGreenDark">Pull User Response</h3>
+                    <h4 class="m0 slGreenDark">Pull User Response</h4>
                     <div class="nFld m0"><select name="nodeDataPull" class="form-control form-control-lg w100" 
                         autocomplete="off" >
                         {!! $GLOBALS['SL']->fieldsDropdown(isset($node->nodeRow->node_data_store) 
@@ -105,7 +105,7 @@
                 <label id="dataPrintTitle" class="w100 
                     @if (in_array($node->nodeType, ['Data Print Block', 'Data Print Columns', 
                         'Print Vert Progress'])) disBlo @else disNon @endif ">
-                    <h3 class="m0 slGreenDark">Title of Data Block</h3>
+                    <h4 class="m0 slGreenDark">Title of Data Block</h4>
                     <div class="nFld m0"><input type="text" name="nodeDataBlcTitle" autocomplete="off" 
                         class="form-control form-control-lg w100" @if (isset($node->nodeRow->node_prompt_text)) 
                             value="{{ trim($node->nodeRow->node_prompt_text) }}" @endif >
@@ -114,7 +114,7 @@
                 <div id="dataPrintConds" class="
                     @if ($node->nodeType == 'Data Print Row') disBlo @else disNon @endif ">
                     <label class="w100">
-                        <h3 class="m0 slGreenDark">Hide Row If Response Is</h3>
+                        <h4 class="m0 slGreenDark">Hide Row If Response Is</h4>
                         <div class="nFld m0">
                             <input type="text" name="nodeDataHideIf" autocomplete="off" class="
                                 form-control form-control-lg w100" @if (isset($node->nodeRow->node_default)) 

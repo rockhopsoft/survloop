@@ -10,13 +10,14 @@
 	<div id="accordHead{{ $accordID }}" class="disBlo">
 		<a id="hidivBtn{{ $accordID }}" 
 			class="hidivBtn" href="javascript:;">
-			<div class="disBlo @if ($big) pT15 pB15 
-				@else pT5 pB5 @endif ">
-				<div class=" @if ($isText) fL fPerc80 mR5 
-					@else fR @endif ">
+			<div class="disBlo @if ($big) pT15 pB15 @else pT5 pB10 @endif ">
+				<div class="fR">
 			    	<i id="hidivBtnAcc{{ $accordID }}" aria-hidden="true" 
-			    	@if ($open) class="fa fa-chevron-up" 
-			    	@else class="fa fa-chevron-down" 
+			    	@if ($open) class="fa fa-chevron-up"
+			    	@else class="fa fa-chevron-down"
+			    	@endif
+			    	@if ($big) style="margin-top: -3px;"
+			    	@elseif ($isText) style="font-size: 16px;" 
 			    	@endif ></i>
 			    </div>
 				@if ($big) <div class="fL mT3"><h4>{!! $title !!}</h4></div>

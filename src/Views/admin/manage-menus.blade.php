@@ -33,7 +33,7 @@
                         onKeyUp="checkMainNav();" class="form-control" autocomplete="off" ></div>
                 </div>
             @endfor
-            <center><input type="submit" class="btn btn-primary btn-xl" value="Save Menu Changes"></center>
+            <center><input type="submit" class="btn btn-primary btn-lg" value="Save Menu Changes"></center>
             </form>
         </div>
     </div>

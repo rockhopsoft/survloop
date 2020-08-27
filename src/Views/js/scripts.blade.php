@@ -9,16 +9,24 @@ function debugTxt(txt) {
 
 var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
 var appUrlParams = new Array();
-var appUrlParamKeys = new Array('refresh', 'frame', 'widget', 'ajax', 'print', 'tree', 'tip', 'sub', 't2', 'resend', 'cid', 'core', 'new', 'start', 'redir', 'sView');
+var appUrlParamKeys = new Array('frame', 'widget', 'ajax', 'print', 'tree', 'tip', 'sub', 't2', 'resend', 'cid', 'core', 'new', 'start', 'redir', 'sView');
 var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var loggedIn = false;
 var pageDynaLoaded = false;
+var pageFullLoaded = {};
+var pageFadeInDelay = 300;
+var pageFadeInSpeed = 1000;
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 var fixedHeaderOffset = 0;
 
+function addRefreshParam() {
+    var val = findGetParam("refresh");
+    if (!val || val.trim() == "") return "";
+    return "&refresh="+val.trim();
+}
 function listUrlParams() {
     var params = "";
     for (var i = 0; i < appUrlParams.length; i++) {
@@ -112,6 +120,12 @@ function copyClip(divID) {
     return true;
 }
 
+var currNav2 = "";
+var currNav2Pos = new Array( 250, 400, 550 );
+function setCurrNav2Pos(lg, md, sm) {
+    currNav2Pos = new Array(lg, md, sm);
+}
+
 var graphs = new Array();
 function addGraph(nIDtxt, baseurl) {
     graphs[graphs.length] = [ txt2nID(nIDtxt), nIDtxt, baseurl ];
@@ -123,27 +137,24 @@ function addGraphFld(nIDtxt, fld, parent) {
     return true;
 }
 
-function ajaxSearchExpandResults() {
-	if (document.getElementById("ajaxSearchResults").className=="ajaxSearch") document.getElementById("ajaxSearchResults").className="ajaxSearchExpand";
-	else document.getElementById("ajaxSearchResults").className="ajaxSearch";
-	return true;
-}
+var dontHideSearch = false;
+var dashResultCnt = 0;
+var autoRunDashResults = false;
 
-function runSearch(nID, treeID) {
-    var sURL = "/search?t="+treeID;
-    @if (isset($jqueryXtraSrch)) {!! $jqueryXtraSrch !!} @endif
-    if (document.getElementById("searchBar"+nID+"t"+treeID)) {
-        sURL += "&s="+encodeURIComponent(document.getElementById("searchBar"+nID+"t"+treeID).value);
+var resultAnimBases = new Array();
+function addResultAnimBase(setBase) {
+    if (!resultAnimBases.includes(setBase)) {
+        resultAnimBases[resultAnimBases.length] = setBase;
     }
-    if (document.getElementById("advUrlID")) {
-        sURL += document.getElementById("advUrlID").value;
-    }
-    window.location.replace(sURL);
-    return false;
 }
+setTimeout("addResultAnimBase('dashResults')", 1);
+
 
 function getSpinner() {
     return {!! json_encode($GLOBALS["SL"]->spinner()) !!};
+}
+function getSpinnerPadded() {
+    return '<div class="w100 p30"><center>'+getSpinner()+'</center></div>';
 }
 function getSpinnerAjaxWrap() {
     return {!! json_encode('<div id="ajaxWrapLoad" class="container">') !!}+getSpinner()+{!! json_encode('</div>') !!};
@@ -222,6 +233,9 @@ function addMatchingColsLg(col1, col2) {
     }
     return true;
 }
+
+var matchingColWidthPadding = 0;
+
 
 function setPopDiaTxt(title, desc) {
     return true;
@@ -329,6 +343,14 @@ function logLastProTip() {
     return true;
 }
 
+function addImgPreload(src) {
+    if (document.getElementById("imgPreloadID")) {
+        document.getElementById("imgPreloadID").innerHTML += '<img src="'+src+'" alt="" border=0 >';
+    }
+    return true;
+}
+
+
 function addTopCust(navCode) {
     if (document.getElementById("myNavBar")) {
         if (document.getElementById("myNavBar").innerHTML.indexOf(navCode) < 0 && document.getElementById("myNavBar").innerHTML.indexOf(navCode.replace("fa-caret-down", "fa-caret-up")) < 0) {
@@ -389,6 +411,8 @@ function getStateList() {
 }
 
 var openAdmMenuOnLoad = true;
+var admMenuCollapses = 0;
+
 var sView = 'list';
 var resultLoaded = 0;
 var dashHeight = 0;

@@ -18,7 +18,7 @@
     </h3>
     <p id="reloadDesc"></p>
     <div class="p10"></div>
-    <a id="dialogCloseID" class="dialogClose btn btn-xl btn-primary" 
+    <a id="dialogCloseID" class="dialogClose btn btn-lg btn-primary" 
         onClick="setTimeout('location.reload()', 1);"
         href="javascript:;">Reload</a>
     <script type="text/javascript"> 

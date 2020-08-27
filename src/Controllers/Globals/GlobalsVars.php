@@ -26,6 +26,9 @@ class GlobalsVars extends GlobalsStatic
     public $pageAJAX       = '';
     public $pageCSS        = '';
 
+    public $pageNav2       = '';
+    public $pageNav2Scroll = [ 60, 100, 140 ];
+
     public $cachePath      = 'cache'; // ../storage/app/
 
     public $def            = null;
@@ -131,5 +134,6 @@ class GlobalsVars extends GlobalsStatic
     public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
     public const TREEOPT_CONTACT    = 19; // This page is a SurvLoop standard contact form 
     public const TREEOPT_BG         = 67; // This whole page has a background color (default: faint)
+    public const TREEOPT_FADEIN     = 71; // This whole page fades in after load
 
 }

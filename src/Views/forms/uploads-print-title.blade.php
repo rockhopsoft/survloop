@@ -1,14 +1,14 @@
 <!-- resources/views/survloop/forms/uploads-print-title.blade.php -->
 <p>
 @if (trim($upRow->up_title) != '') 
-    <span class="mR10">{{  $upRow->up_title }}</span>
+    <b>Upload #{{ (1+$cnt) }}: {{  $upRow->up_title }}</b>
     <?php /*
     @if ($GLOBALS["SL"]->isPdfView() && $ext == 'pdf')
         <span class="mR10">({{ strtoupper($ext) }} attached below)</span>
     @endif
     */ ?>
 @endif
-@if ($isAdmin || $isOwner)
+@if (in_array($GLOBALS["SL"]->dataPerms, ['sensitive', 'full-pdf']))
     <span class="slGrey">
         @if ($upRow->up_privacy == 'Public') (Public) @else (Private) @endif
     </span>

@@ -12,22 +12,23 @@ var checkingForm = false;
 var totFormErrors = 0;
 var formErrorsEng = "";
 var firstNodeError = "";
-var errorFocus = new Array();
+var errorFocus = [];
 
-var allFldList = new Array();
-var nodeList = new Array();
-var nodeParents = new Array();
-var nodeKidList = new Array();
-var nodeTblList = new Array();
+var allFldList = [];
+var nodeList = [];
+var nodeParents = [];
+var nodeKidList = [];
+var nodeTblList = [];
 var nodeSffxs = new Array("");
-var conditionNodes = new Array();
-var radioNodes = new Array();
-var nodeResTot = new Array();
-var nodeMutEx = new Array();
-var reqNodes = new Array();
-var nodeMobile = new Array();
-var nodeTags = new Array();
-var nodeTagList = new Array();
+var conditionNodes = [];
+var radioNodes = [];
+var reqNodes = [];
+var nodeMobile = [];
+var nodeTags = [];
+var nodeTagList = [];
+
+var nodeResTot = {};
+var nodeMutEx = {};
 
 var loopItemsNextID = 0;
 var currItemCnt = 0;
@@ -82,6 +83,9 @@ function stripN(nIDtxt) {
     }
     return nIDtxt;
 }
+function stripNodeFromFldID(fldID) {
+    return stripN(fldID).replace("FldID", "");
+}
 
 function txt2nID(nIDtxt) {
     nIDtxt = stripN(nIDtxt);
@@ -101,9 +105,9 @@ function getNodeAndResFromFldID(nFldID) {
     var nodeAndRes = new Array('', -1);
     if (nFldID.substring(0, 1) == 'n' && nFldID.indexOf('radioCurrID') < 0 && nFldID.indexOf('fldOtherID') < 0) {
         if (nFldID.indexOf('FldID') > 0) {
-            nodeAndRes[0] = nFldID.substring(0, nFldID.indexOf('FldID'));
+            nodeAndRes[0] = nFldID.substring(1, nFldID.indexOf('FldID'));
         } else if (nFldID.indexOf('fld') > 0) {
-            nodeAndRes[0] = nFldID.substring(0, nFldID.indexOf('fld'));
+            nodeAndRes[0] = nFldID.substring(1, nFldID.indexOf('fld'));
             nodeAndRes[1] = parseInt(nFldID.substring(3+nFldID.indexOf('fld')));
         }
     }
@@ -173,7 +177,7 @@ function runRadioClick(nIDtxt, response) {
     return true;
 }
 
-var monthAbbr = new Array();
+var monthAbbr = [];
 @for ($m = 1; $m <= 12; $m++)
     monthAbbr[{{ $m }}] = "{{ date("M", mktime(0, 0, 0, $m, 1, 2000)) }}";
 @endfor
@@ -233,7 +237,7 @@ function charLimit(nIDtxt, limit) {
 	return true;
 }
 
-var gryFlds = new Array();
+var gryFlds = [];
 function addGryFld(fldID, defaultTxt) {
     
 }
@@ -301,7 +305,7 @@ function charCountKeyUp(nIDtxt) {
 }
 function keywordCountKeyUp(nIDtxt) {
 	if (document.getElementById("n"+nIDtxt+"FldID")) {
-	    var keywords = new Array();
+	    var keywords = [];
 	    if (document.getElementById("n"+nIDtxt+"FldID").value.trim() != "") {
 	        keywords = document.getElementById("n"+nIDtxt+"FldID").value.trim().split(",");
         }
@@ -314,7 +318,7 @@ function keywordCountKeyUp(nIDtxt) {
 
 function wordCountKeyUp(nIDtxt, limit, warn) {
 	if (document.getElementById("n"+nIDtxt+"FldID")) {
-	    var words = new Array();
+	    var words = [];
 	    if (document.getElementById("n"+nIDtxt+"FldID").value.trim() != "") {
 	        words = document.getElementById("n"+nIDtxt+"FldID").value.trim().split(" ");
         }
@@ -350,14 +354,8 @@ function checkMax(nIDtxt, maxVal) {
     return true;
 }
 
-function addResTot(nID, tot) {
-    nodeResTot[nID] = tot;
-    return true;
-}
-
-function addMutEx(nID, response) {
-    if (!nodeMutEx[nID]) nodeMutEx[nID] = new Array();
-    nodeMutEx[nID][nodeMutEx[nID].length] = response;
+function addResTot(nIDtxt, tot) {
+    nodeResTot[nIDtxt] = tot;
     return true;
 }
 
@@ -366,7 +364,7 @@ function checkFingerClassTime(nIDtxt) {
     if (nIDtxt.substring(0, 1) != 'n') {
         printNidtxt = "n"+nIDtxt+"";
     }
-    for (var j = 0; j < nodeResTot[txt2nID(nIDtxt)]; j++) {
+    for (var j = 0; j < nodeResTot[nIDtxt]; j++) {
         var fld = ""+printNidtxt+"fld"+j+"";
         if (document.getElementById(fld+"lab")) {
             if (document.getElementById(fld) && document.getElementById(fld).checked) {
@@ -384,15 +382,19 @@ function checkFingerClass(nIDtxt) {
     return true;
 }
 
+function addMutEx(nIDtxt, response) {
+    if (!(nIDtxt in nodeMutEx)) nodeMutEx[nIDtxt] = [];
+    nodeMutEx[nIDtxt][nodeMutEx[nIDtxt].length] = response;
+    return true;
+}
+
 function checkMutEx(nIDtxt, response) {
-    var nID = txt2nID(nIDtxt);
-    if (nID > 0 && response > 0 && nodeMutEx[nID] && nodeMutEx[nID].length > 0) {
-        var hasMutEx = false;
+    if (nID > 0 && response >= 0 && nodeMutEx[nIDtxt] && nodeMutEx[nIDtxt].length > 0) {
         var clickedMutEx = false;
-        for (var i = 0; i < nodeMutEx[nID].length; i++) {
-            if (nodeMutEx[nID][i] == response && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
+        for (var i = 0; i < nodeMutEx[nIDtxt].length; i++) {
+            if (nodeMutEx[nIDtxt][i] == response && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
                 clickedMutEx = true;
-                for (var j=0; j < nodeResTot[nID]; j++) {
+                for (var j=0; j < nodeResTot[nIDtxt]; j++) {
                     if (j != response && document.getElementById("n"+nIDtxt+"fld"+j+"")) {
                         document.getElementById("n"+nIDtxt+"fld"+j+"").checked = false;
                     }
@@ -400,9 +402,9 @@ function checkMutEx(nIDtxt, response) {
             }
         }
         if (!clickedMutEx) {
-            for (var i=0; i < nodeMutEx[nID].length; i++) {
-                if (nodeMutEx[nID][i] != response && document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nID][i]+"") && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
-                    document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nID][i]+"").checked = false;
+            for (var i=0; i < nodeMutEx[nIDtxt].length; i++) {
+                if (nodeMutEx[nIDtxt][i] != response && document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nIDtxt][i]+"") && document.getElementById("n"+nIDtxt+"fld"+response+"") && document.getElementById("n"+nIDtxt+"fld"+response+"").checked) {
+                    document.getElementById("n"+nIDtxt+"fld"+nodeMutEx[nIDtxt][i]+"").checked = false;
                 }
             }
         }
@@ -416,14 +418,13 @@ function chkRadioHide(nIDtxt) {
 }
 
 function chkRadioHideRun(nIDtxt) {
-    var nID = txt2nID(nIDtxt);
     var foundCheck = false;
-    for (var j = 0; j < nodeResTot[nID]; j++) {
+    for (var j = 0; j < nodeResTot[nIDtxt]; j++) {
         if (document.getElementById("n"+nIDtxt+"fld"+j+"")) {
             if (document.getElementById("n"+nIDtxt+"fld"+j+"").checked) foundCheck = true;
         }
     }
-    for (var j = 0; j < nodeResTot[nID]; j++) {
+    for (var j = 0; j < nodeResTot[nIDtxt]; j++) {
         if (document.getElementById("n"+nIDtxt+"fld"+j+"lab") && document.getElementById("n"+nIDtxt+"fld"+j+"")) {
             if (!foundCheck || document.getElementById("n"+nIDtxt+"fld"+j+"").checked) {
                 document.getElementById("n"+nIDtxt+"fld"+j+"lab").style.display = "block";
@@ -440,11 +441,10 @@ function chkRadioHideRun(nIDtxt) {
 }
 
 function radioUnHide(nIDtxt) {
-    var nID = txt2nID(nIDtxt);
     if (document.getElementById("radioUnHide"+nIDtxt+"")) {
         document.getElementById("radioUnHide"+nIDtxt+"").style.display="none";
     }
-    for (var j = 0; j < nodeResTot[nID]; j++) {
+    for (var j = 0; j < nodeResTot[nIDtxt]; j++) {
         if (document.getElementById("n"+nIDtxt+"fld"+j+"lab")) {
             document.getElementById("n"+nIDtxt+"fld"+j+"lab").style.display = "block";
         }
@@ -471,8 +471,8 @@ function addTagOpt(nIDtxt, tagID, tagText, preSel) {
     var nodeInd = getTagNodeInd(nIDtxt);
     if (nodeInd < 0) {
         nodeInd = nodeTags.length;
-        nodeTags[nodeInd] = new Array(nIDtxt, new Array());
-        nodeTagList[nodeInd] = new Array();
+        nodeTags[nodeInd] = new Array(nIDtxt, []);
+        nodeTagList[nodeInd] = [];
     }
     if (!nodeTags[nodeInd][1][tagID]) nodeTags[nodeInd][1][tagID] = new Array(tagText, preSel);
     nodeTagList[nodeInd][nodeTagList[nodeInd].length] = tagID;
@@ -526,7 +526,7 @@ function disableElement(fldID) {
     return true;
 }
 
-var disableSpreadKids = new Array();
+var disableSpreadKids = [];
 function disableSpreadsheetRow(nID, row) {
     var rowID = "n"+nID+"tbl"+row+"row";
     disableElement(rowID);
@@ -572,11 +572,18 @@ function kidsVisible(nID, nSffx, onOff) {
 	return true;
 }
 function setNodeVisib(nID, nSffx, onOff) {
-	if (document.getElementById("n"+nID+nSffx+"VisibleID")) {
-		if (onOff) document.getElementById("n"+nID+nSffx+"VisibleID").value=1;
-		else document.getElementById("n"+nID+nSffx+"VisibleID").value=0;
-	}
-	return true;
+    if (document.getElementById("n"+nID+nSffx+"VisibleID")) {
+        if (onOff) document.getElementById("n"+nID+nSffx+"VisibleID").value=1;
+        else document.getElementById("n"+nID+nSffx+"VisibleID").value=0;
+    }
+    return true;
+}
+function setNodeVisibTxt(nIDtxt, onOff) {
+    if (document.getElementById("n"+nIDtxt+"VisibleID")) {
+        if (onOff) document.getElementById("n"+nIDtxt+"VisibleID").value=1;
+        else document.getElementById("n"+nIDtxt+"VisibleID").value=0;
+    }
+    return true;
 }
 
 function chkNodeVisib(nIDtxt) {
@@ -704,4 +711,97 @@ function setLoopItemID(itemID) {
     if (document.getElementById("loopItemID")) document.getElementById("loopItemID").value=itemID;
     return true;
 }
+
+function topSearchFocus() {
+    if (document.getElementById('admSrchFld')) {
+        setTimeout("document.getElementById('admSrchFld').focus()", 100);
+    }
+    return true;
+}
+function setSearchResultsDiv(divID) {
+    if (document.getElementById("sResultsDivID")) document.getElementById("sResultsDivID").value=divID;
+    return true;
+}
+function setSearchResultsUrlBase(url) {
+    if (document.getElementById("sResultsUrlID")) document.getElementById("sResultsUrlID").value=url;
+    return true;
+}
+function searchDataSetsChecked() {
+    var tblChecked = "";
+    for (var i=0 ; i < 20; i++) {
+        var fldID = "srchBarDataSet"+i+"";
+        if (document.getElementById(fldID) && document.getElementById(fldID).checked) {
+            tblChecked = ","+document.getElementById(fldID).value+"";
+        }
+    }
+    return true;
+}
+function multiSearchDataSetsChecked() {
+    var tblChecked = searchDataSetsChecked();
+    return (tblChecked.indexOf(",") > 0);
+}
+function didSearchDataSetChange() {
+    if (document.getElementById("sPrevSearchTblsID")) {
+        var tblChecked = searchDataSetsChecked();
+        if (document.getElementById("sPrevSearchTblsID").value.localeCompare(tblChecked) != 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function ReqGreaterThan() {
+    var obj = {};
+    obj.checks = [];
+    obj.add = function(fldMin, fldMax) {
+        var ind = obj.checks.length;
+        obj.checks[ind] = {
+            fldMin : fldMin,
+            fldMax : fldMax
+        };
+    };
+    obj.validateAll = function() {
+        var results = {
+            nIDgood : [],
+            nIDbad : []
+        };
+        if (obj.checks.length > 0) {
+            for (var i=0; i < obj.checks.length; i++) {
+                if (document.getElementById(obj.checks[i].fldMin) && document.getElementById(obj.checks[i].fldMax) && document.getElementById(obj.checks[i].fldMin).value.trim() != '' && document.getElementById(obj.checks[i].fldMax).value.trim() != '') {
+                    if (parseInt(document.getElementById(obj.checks[i].fldMin).value) > parseInt(document.getElementById(obj.checks[i].fldMax).value)) {
+                        results.nIDbad[results.nIDbad.length]=obj.checks[i].fldMin;
+                        results.nIDbad[results.nIDbad.length]=obj.checks[i].fldMax;
+                    } else {
+                        results.nIDgood[results.nIDgood.length]=obj.checks[i].fldMin;
+                        results.nIDgood[results.nIDgood.length]=obj.checks[i].fldMax;
+                    }
+                } else {
+                    results.nIDgood[results.nIDgood.length]=obj.checks[i].fldMin;
+                    results.nIDgood[results.nIDgood.length]=obj.checks[i].fldMax;
+                }
+            }
+        }
+        return results;
+    };
+    return obj;
+}
+var reqGreaterThan = new ReqGreaterThan();
+function addReqGreaterThan(fldMin, fldMax) {
+    if (document.getElementById(fldMin) && document.getElementById(fldMax)) {
+        reqGreaterThan.add(fldMin, fldMax);
+        return true;
+    }
+    return false;
+}
+function addReqGreaterThanNodes(nIDtxtMin, nIDtxtMax) {
+    return addReqGreaterThan("n"+nIDtxtMin+"FldID", "n"+nIDtxtMax+"FldID");
+}
+function addReqGreaterThanNodesCycle(nIDtxtMin, nIDtxtMax, cnt) {
+    for (var i=0; i < cnt; i++) {
+        addReqGreaterThanNodes(nIDtxtMin+"cyc"+i, nIDtxtMax+"cyc"+i);
+    }
+    return true;
+}
+// For now, manually load this via some JS in the Node, e.g. a cycle of up to four loops:
+// addReqGreaterThanNodesCycle('1016', '1553', 4);
 

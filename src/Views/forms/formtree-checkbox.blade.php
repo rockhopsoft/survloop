@@ -1,5 +1,6 @@
 <!-- resources/views/survloop/forms/formtree-checkbox.blade.php -->
 
+<div id="n{{ $curr->nIDtxt }}fld{{ $j }}labWrap" class="w100">
 @if ($mobileCheckbox)
     <label for="n{{ $curr->nIDtxt }}fld{{ $j }}" 
         id="n{{ $curr->nIDtxt }}fld{{ $j }}lab" 
@@ -33,3 +34,4 @@
         @if (strlen($res) < 40) </nobr> @endif
     </div>
 @endif
+</div>

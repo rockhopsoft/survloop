@@ -1027,6 +1027,14 @@ class GlobalsImportExport extends GlobalsTables
         return $limit;
     }
 
+    public function getStart($start = 0)
+    {
+        if ($this->REQ->has('start')) { 
+            $start = intVal($this->REQ->get('start'));
+        }
+        return $start;
+    }
+
     public function getSysCustCSS()
     {
         $custCSS = SLDefinitions::where('def_database', $this->dbID)

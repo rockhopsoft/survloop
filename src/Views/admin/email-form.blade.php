@@ -16,11 +16,11 @@
 
 <h4 class="m0 slGrey">Auto-Email Type</h4>
 <select name="emailType" class="form-control form-control-lg mB20">
-    <option value="To Complainant" 
-        @if ($currEmail->email_type == 'To Complainant' || trim($currEmail->email_type) == '') SELECTED @endif
-        >Sent To Complainant</option>
-    <option value="To Oversight" @if ($currEmail->email_type == 'To Oversight') SELECTED @endif 
-        >Sent To Oversight Agency</option>
+    <option value="to Complainant" 
+        @if ($currEmail->email_type == 'to Complainant' || trim($currEmail->email_type) == '') SELECTED @endif
+        >Sent to Complainant</option>
+    <option value="to Oversight" @if ($currEmail->email_type == 'to Oversight') SELECTED @endif 
+        >Sent to Oversight Agency</option>
     <option value="Blurb" @if ($currEmail->email_type == 'Blurb') SELECTED @endif 
         >Excerpt used within other emails</option>
 </select>
@@ -38,8 +38,27 @@
     class="form-control form-control-lg" style="height: 500px;"
     >{{ $currEmail->email_body }}</textarea>
 
+<div class="pT20">
+<h4 class="m0  slGrey">Email Attachment</h4>
+</div>
+<select type="text" name="emailAttach"  
+    class="form-control form-control-lg mB20" >
+    <option value="" 
+        @if (!isset($currEmail->email_attach) || trim($currEmail->email_attach) == '') 
+            SELECTED
+        @endif >none selected by default</option>
+    <option value="sensitive" 
+        @if (isset($currEmail->email_attach) && trim($currEmail->email_attach) == 'sensitive') 
+            SELECTED
+        @endif >PDF Report: Sensitive</option>
+    <option value="public" 
+        @if (isset($currEmail->email_attach) && trim($currEmail->email_attach) == 'public') 
+            SELECTED
+        @endif >PDF Report: Public</option>
+</select>
+
 <input type="submit" value="Save Email Template" 
-    class="btn btn-lg btn-xl btn-primary btn-block">
+    class="btn btn-lg btn-primary btn-block">
 </form>
 <!--- {{ $currEmail->email_opts }} --->
 </div></div>

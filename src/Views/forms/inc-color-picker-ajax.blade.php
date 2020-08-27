@@ -8,7 +8,7 @@
         @endif
         <div id="{{ $fldName }}ColorSwatch{!! str_replace('#', '', strtoupper($color)) !!}" 
             class="w100 round5 slBoxShd crsrPntr colorPickFldSwatchBtn" style="background: {!! $color !!};">
-            <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" alt=""
+            <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" alt=""
                 border=0 height=35 width=1 style="background: none;" >
         </div>
     @empty
@@ -28,7 +28,7 @@
     <div class="col-6">
         <div id="{{ $fldName }}CustomColor" class="w100 round5 slBoxShd" 
             @if ($isCustom) style="background: {!! $preSel !!};" @endif >
-            <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/spacer.png" alt="" 
+            <img src="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/survloop/uploads/spacer.gif" alt="" 
                 border=0 height=35 width=1 style="background: none;" >
         </div>
     </div>

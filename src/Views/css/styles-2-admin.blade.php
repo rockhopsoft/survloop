@@ -5,12 +5,23 @@
     display: block;
 }
 .admMenu .admMenuTier1 a:link, .admMenu .admMenuTier1 a:visited, 
-.admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover {
+.admMenu .admMenuTier1 a:active, .admMenu .admMenuTier1 a:hover,
+a.admMenuTier1Lnk:link, a.admMenuTier1Lnk:visited,
+a.admMenuTier1Lnk:active, a.admMenuTier1Lnk:hover {
     color: {!! $css["color-main-faint"] !!};
     background: {!! $css["color-main-text"] !!};
     padding: 16px 5px 17px 9px;
     font-weight: bold;
     min-height: 56px;
+}
+.admMenu .admMenuTier1 a:hover, a.admMenuTier1Lnk:hover,
+.admMenu .admMenuTier1 a.hidivBtn.admMenuTier1Lnk.primeNav:hover,
+.admMenuTier1 a.hidivBtn.admMenuTier1Lnk.primeNav:hover,
+a.hidivBtn.admMenuTier1Lnk.primeNav:hover,
+.admMenuTier1 a.admMenuTier1Lnk.primeNav:hover,
+a.admMenuTier1Lnk.primeNav:hover,
+a#admMenuClpsBtn:hover {
+    background: {!! $css["color-main-grey"] !!};
 }
 .admMenu a.active:link, .admMenu a.active:visited, 
 .admMenu a.active:active, .admMenu a.active:hover,
@@ -26,18 +37,17 @@
 .admMenu div a:active .admMenuIco, .admMenu div a:hover .admMenuIco {
     display: inline;
 }
-.admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, 
-.admMenu div a .admMenuIco.pull-left, 
-.admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, .admMenu div a:active .admMenuIco.pull-left, 
-.admMenu div a:hover .admMenuIco.pull-left {
+.admMenuIco.pull-left, .admMenu .admMenuIco.pull-left, .admMenu div a .admMenuIco.pull-left, 
+.admMenu div a:link .admMenuIco.pull-left, .admMenu div a:visited .admMenuIco.pull-left, 
+.admMenu div a:active .admMenuIco.pull-left, .admMenu div a:hover .admMenuIco.pull-left {
     display: block;
-    width: 40px;
-    margin: -3px 0px 0px 12px;
+    width: 33px;
+    margin: 0px 0px 0px 7px;
     font-size: 120%;
 }
 .admMenuTier2 {
-    height: 42px;
-    max-height: 42px;
+    height: 36px;
+    max-height: 36px;
 }
 .admMenuTier2 a:link, .admMenuTier2 a:visited, 
 .admMenuTier2 a:active, .admMenuTier2 a:hover,
@@ -49,24 +59,46 @@
 .admMenu .admMenuTier2 a.admMenuTier2Lnk:visited, 
 .admMenu .admMenuTier2 a.admMenuTier2Lnk:active, 
 .admMenu .admMenuTier2 a.admMenuTier2Lnk:hover {
-    padding: 10px 5px 10px 62px;
+    color: {!! $css["color-main-faint"] !!};
+    background: {!! $css["color-main-text"] !!};
+    padding: 7px 5px 7px 58px;
     font-weight: normal;
 }
+.admMenuTier2 a:hover, .admMenu .admMenuTier2 a:hover,
+.admMenuTier2 a:hover, .admMenu .admMenuTier2 a.admMenuTier2Lnk:hover {
+    background: {!! $css["color-main-grey"] !!};
+}
+
 a.tier2active:link, a.tier2active:visited, 
 a.tier2active:active, a.tier2active:hover,
 .admMenuTier2 a.tier2active:link, .admMenuTier2 a.tier2active:visited, 
-.admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover {
+.admMenuTier2 a.tier2active:active, .admMenuTier2 a.tier2active:hover,
+a.admMenuTier2Lnk.tier2active:link, a.admMenuTier2Lnk.tier2active:visited, 
+a.admMenuTier2Lnk.tier2active:active, a.admMenuTier2Lnk.tier2active:hover,
+.admMenuTier2 a.admMenuTier2Lnk.tier2active:link, .admMenuTier2 a.admMenuTier2Lnk.tier2active:visited, 
+.admMenuTier2 a.admMenuTier2Lnk.tier2active:active, .admMenuTier2 a.admMenuTier2Lnk.tier2active:hover {
     color: {!! $css["color-main-link"] !!};
     background: {!! $css["color-main-faint"] !!};
-    height: 33px;
-    max-height: 33px;
 }
-table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2,
-table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:link,
-table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:visited,
-table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:active,
-table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTier1 .sublinks .admMenuTier2 a:hover {
+
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks,
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2,
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:link,
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:visited,
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:active,
+table tr td.leftSide #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:hover {
+    display: block;
+}
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:link,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:visited,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:active,
+table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .admMenuTier2 a:hover {
     display: none;
+}
+#admMenu .sublinks {
+    padding-bottom: 10px;
 }
 
 #slTopTabsWrap {
@@ -187,7 +219,7 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTie
 }
 .leftSideCollapse, .leftSideCollapse #leftSideWdth, 
 .leftSideCollapse #leftSideWrap {
-    width: 60px;
+    width: 50px;
 }
 .admMenuLbl {
     display: inline;
@@ -203,7 +235,7 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .admMenuTie
 	z-index: 100;
 }
 #mainBody.mainBodyDash {
-    background: {!! $css["color-main-faint"] !!};
+<?php /* background: {!! $css["color-main-faint"] !!}; */ ?>
     padding: 0px;
 }
 body.bodyDash {

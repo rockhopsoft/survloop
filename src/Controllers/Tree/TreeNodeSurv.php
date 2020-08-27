@@ -351,9 +351,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
     
     public function indexShowsKid($ind = '')
     {
-        return (sizeof($this->responses) > 0 
-            && isset($this->responses[$ind]) 
-            && intVal($this->responses[$ind]->node_res_show_kids) > 0);
+        return ($this->indexShowsKidNode($ind) > 0);
     }
     
     public function indexShowsKidNode($ind = '')

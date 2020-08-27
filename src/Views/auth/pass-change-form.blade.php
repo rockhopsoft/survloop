@@ -66,7 +66,7 @@
 <div id="passChgErrs" class="red"></div>
 <div class="nodeHalfGap"></div>
 <center><a id="passChgSub" href="javascript:;"
-    class="btn btn-primary btn-xl"
+    class="btn btn-primary btn-lg"
     >Change Password</a></center>
 <div class="nodeHalfGap"></div>
 </form>

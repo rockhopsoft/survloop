@@ -72,12 +72,12 @@ class TreeSurvLoad extends TreeSurvConds
         return true;
     }
     
-    public function __construct(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false)
+    public function __construct(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
     {
-        return $this->constructor($request, $sessIn, $dbID, $treeID, $skipSessLoad);
+        return $this->constructor($request, $sessIn, $dbID, $treeID, $skipSessLoad, $slInit);
     }
 
-    public function constructor(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false)
+    public function constructor(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
     {
         $this->dbID = $this->treeID = 1;
         if ($dbID > 0) {
@@ -90,22 +90,24 @@ class TreeSurvLoad extends TreeSurvConds
         } elseif (isset($GLOBALS["SL"])) {
             $this->treeID = $GLOBALS["SL"]->treeID;
         }
-        $this->survLoopInit($request);
-        $this->coreIDoverride = -3;
-        if ($sessIn > 0) {
-            $this->coreIDoverride = $sessIn;
+        if ($slInit) {
+            $this->survLoopInit($request);
+            $this->coreIDoverride = -3;
+            if ($sessIn > 0) {
+                $this->coreIDoverride = $sessIn;
+            }
+            if (isset($GLOBALS["SL"]) 
+                && $GLOBALS["SL"]->REQ->has('step') 
+                && $GLOBALS["SL"]->REQ->has('tree') 
+                && intVal($GLOBALS["SL"]->REQ->get('tree')) > 0) {
+                $this->hasREQ = true;
+                $this->REQstep = $GLOBALS["SL"]->REQ->get('step');
+            }
+            $this->loadLookups();
+            $this->isPage = (isset($GLOBALS["SL"]->treeRow->tree_type) 
+                && $GLOBALS["SL"]->treeRow->tree_type == 'Page');
+            $this->sessData = new SurvData;
         }
-        if (isset($GLOBALS["SL"]) 
-            && $GLOBALS["SL"]->REQ->has('step') 
-            && $GLOBALS["SL"]->REQ->has('tree') 
-            && intVal($GLOBALS["SL"]->REQ->get('tree')) > 0) {
-            $this->hasREQ = true;
-            $this->REQstep = $GLOBALS["SL"]->REQ->get('step');
-        }
-        $this->loadLookups();
-        $this->isPage = (isset($GLOBALS["SL"]->treeRow->tree_type) 
-            && $GLOBALS["SL"]->treeRow->tree_type == 'Page');
-        $this->sessData = new SurvData;
         $this->constructorExtra();
         return true;
     }
@@ -321,7 +323,18 @@ class TreeSurvLoad extends TreeSurvConds
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessionDataSaves(');
         $this->runLoopConditions();
         $GLOBALS["SL"]->microLog('End loadAllSessData( after runLoopConditions(');
+        $this->loadAllSessDataChecks();
         return true;
+    }
+    
+    /**
+     * Initializing extra things after loading a core record's data.
+     *
+     * @return boolean
+     */
+    protected function loadAllSessDataChecks()
+    {
+        return false;
     }
 
     /**
@@ -331,7 +344,7 @@ class TreeSurvLoad extends TreeSurvConds
      */
     protected function loadSessionClear($coreTbl = '', $coreID = -3)
     {
-        
+        return false;
     }
     
     /**
@@ -474,9 +487,14 @@ class TreeSurvLoad extends TreeSurvConds
         if ($coreID > 0) {
             if ($GLOBALS["SL"]->tblHasPublicID($coreTbl)) {
                 $this->corePublicID = $coreID;
-                $this->coreID = $GLOBALS["SL"]->chkInPublicID($coreID, $coreTbl);
+                $this->coreID 
+                    = $GLOBALS["SL"]->coreID 
+                    = $GLOBALS["SL"]->chkInPublicID($coreID, $coreTbl);
             } else {
-                $this->coreID = $this->corePublicID = $coreID;
+                $this->coreID 
+                    = $GLOBALS["SL"]->coreID 
+                    = $this->corePublicID 
+                    = $coreID;
             }
         }
         return $this->coreID;
@@ -487,7 +505,8 @@ class TreeSurvLoad extends TreeSurvConds
         if (trim($coreTbl) == '') {
             $coreTbl = $GLOBALS["SL"]->coreTbl;
         }
-        if ($GLOBALS["SL"]->tblHasPublicID($coreTbl) && isset($this->sessData->dataSets[$coreTbl])) {
+        if ($GLOBALS["SL"]->tblHasPublicID($coreTbl) 
+            && isset($this->sessData->dataSets[$coreTbl])) {
             $fld = $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'public_id';
             if (isset($this->sessData->dataSets[$coreTbl][0])
                 && isset($this->sessData->dataSets[$coreTbl][0]->{ $fld })) {
@@ -509,10 +528,18 @@ class TreeSurvLoad extends TreeSurvConds
             if (!$skipPublic) {
                 $this->chkPublicCoreID($coreTbl, $coreID);
             } else {
-                $this->coreID = $this->corePublicID = $coreID;
+                $this->coreID 
+                    = $GLOBALS["SL"]->coreID 
+                    = $this->corePublicID 
+                    = $coreID;
             }
         }
-        $this->sessData->loadCore($coreTbl, $this->coreID, $this->checkboxNodes, $this->isBigSurvLoop);
+        $this->sessData->loadCore(
+            $coreTbl, 
+            $this->coreID, 
+            $this->checkboxNodes, 
+            $this->isBigSurvLoop
+        );
         $this->loadExtra();
         $this->setPublicID();
         $this->v["isOwner"] = $this->isCoreOwner($this->coreID);
@@ -605,7 +632,8 @@ class TreeSurvLoad extends TreeSurvConds
     
     public function addCondEditorAjax()
     {
-        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.db.inc-addCondition-ajax')->render();
+        $GLOBALS["SL"]->pageAJAX .= view('vendor.survloop.admin.db.inc-addCondition-ajax')
+            ->render();
         return true;
     }
     
@@ -639,7 +667,8 @@ class TreeSurvLoad extends TreeSurvConds
             $this->v["sessData"]           = $this->sessData;
             $this->v["dataSets"]           = $this->sessData->dataSets;
             $this->v["currNodeDataBranch"] = $this->sessData->dataBranches;
-            return view('vendor.survloop.elements.inc-var-dump', $this->v)->render();
+            return view('vendor.survloop.elements.inc-var-dump', $this->v)
+                ->render();
         }
         return '';
     }

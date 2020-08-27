@@ -46,6 +46,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
         } else {
             if ($this->shouldPrintDataRow($curr)) {
                 list($deetLabel, $deetVal) = $this->nodePrintDataRowDeets($curr);
+                $deetLabel = $this->customLabels($curr, $deetLabel);
                 if ($curr->nodeType == 'Data Print') {
                     return [
                         '<div id="nLabel' . $curr->nIDtxt 

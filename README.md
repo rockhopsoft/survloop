@@ -196,6 +196,21 @@ After logging in as an admin, this link rebuilds many supporting files:
 
 http://survloop.local/dashboard/settings?refresh=2
 
+### Other Package Installation
+
+If you plan to generate PDFs, then you should also 
+<a href="https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostpdl-9.52.tar.gz" target="_blank">download</a> and 
+<a href="https://stackoverflow.com/questions/20798792/installing-ghostscript-with-vagrant#21417795" target="_blank">install</a> 
+<a href="https://ghostscript.com/doc/current/Install.htm" target="_blank">Ghostscript</a>. This is for Ubuntu, it might already be installed:
+```
+$ sudo apt-get install ghostscript
+```
+
+This works in Homestead on Mac, with Homebrew:
+```
+$ brew install ghostscript
+```
+
 # <a name="documentation"></a>Documentation
 
 ## About SurvLoop's Codebase and Database Design

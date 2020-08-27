@@ -440,6 +440,16 @@ class TreeSurvNodeEdit extends TreeSurvForm
                             $treeOpts = $treeOpts/67;
                         }
                     }
+                    if ($GLOBALS["SL"]->REQ->has('pageFadeIn') 
+                        && intVal($GLOBALS["SL"]->REQ->pageFadeIn) == 71) {
+                        if ($treeOpts%71 > 0) {
+                            $treeOpts *= 71;
+                        }
+                    } else {
+                        if ($treeOpts%71 == 0) {
+                            $treeOpts = $treeOpts/71;
+                        }
+                    }
                     if ($GLOBALS["SL"]->REQ->has('noCache') 
                         && intVal($GLOBALS["SL"]->REQ->noCache) == 29) {
                         if ($treeOpts%29 > 0) {

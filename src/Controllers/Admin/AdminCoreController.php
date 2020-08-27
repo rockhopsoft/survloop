@@ -62,7 +62,7 @@ class AdminCoreController extends SurvLoopController
             $this->reloadAdmMenu();
             $this->loadSearchSuggestions();
             $this->initExtra($request);
-            $this->initCustViews();
+            $this->initCustViews($request);
             $this->logPageVisit();
             $this->clearEmpties();
         }
@@ -93,8 +93,10 @@ class AdminCoreController extends SurvLoopController
             $admMenu = new AdminMenu;
         }
         if ($admMenu) {
-            $this->admMenuData["adminNav"] = $admMenu
-                ->loadAdmMenu($this->v["user"], $currPage);
+            $this->admMenuData["adminNav"] = $admMenu->loadAdmMenu(
+                $this->v["user"], 
+                $currPage
+            );
         }
         $this->tweakAdmMenu($currPage);
         if (!$this->getAdmMenuLoc($currPage) 

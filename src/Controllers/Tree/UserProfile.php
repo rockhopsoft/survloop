@@ -101,7 +101,7 @@ class UserProfile extends TreeSurvInput
             }
             //$this->loadSessInfo($GLOBALS["SL"]->coreTbl);
             if (!session()->has('coreID' . $sessTree) || $this->coreID <= 0) {
-                $this->coreID = $this->findUserCoreID();
+                $this->coreID = $GLOBALS["SL"]->coreID = $this->findUserCoreID();
                 if ($this->coreID > 0) {
                     session()->put('coreID' . $sessTree, $this->coreID);
                     session()->save();

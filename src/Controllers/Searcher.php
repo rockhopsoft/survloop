@@ -41,6 +41,7 @@ class Searcher extends SurvCustLoop
         $this->initExtra();
         $this->v["sort"] = [ 'created_at', 'desc' ];
         $this->v["sortLab"] = 'date';
+        $this->v["flts"] = [];
     }
     
     public function initExtra()
@@ -270,12 +271,19 @@ class Searcher extends SurvCustLoop
             }
             if ($GLOBALS["SL"]->REQ->has('fltStateClim')) {
                 $stateClim = trim($GLOBALS["SL"]->REQ->get('fltStateClim'));
-                if ($stateClim != '' && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
+                if ($stateClim != '' 
+                    && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
                         || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
                         || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
                     $this->searchFilts["fltStateClim"] = $stateClim;
                 }
             }
+            $this->searchFilts["dataSet"] = $this->v["dataSet"] = '';
+            if ($GLOBALS["SL"]->REQ->has('dataSet')) {
+                $this->v["dataSet"] = trim($GLOBALS["SL"]->REQ->get('dataSet'));
+                $this->searchFilts["dataSet"] = $this->v["dataSet"];
+            }
+
             $this->searchOpts["limit"] = $GLOBALS["SL"]->getLimit();
             $this->getSearchBarAdvanced($treeID);
             $this->searchResultsXtra($treeID);

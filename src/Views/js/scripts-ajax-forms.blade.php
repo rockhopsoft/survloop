@@ -129,6 +129,7 @@ function checkNodeForm() {
             }
         }
     }
+    reqFormAllMinMax();
     if (typeof reqFormFldCustom === "function") {
         reqFormFldCustom();
     }
@@ -607,6 +608,22 @@ function reqFormFldDateLimit(nIDtxt, future, today, optional) {
     return true;
 }
 
+function reqFormAllMinMax() {
+    var results = reqGreaterThan.validateAll();
+    if (results.nIDgood.length > 0) {
+        for (var i=0; i < results.nIDgood.length; i++) {
+            setFormLabelBlack(stripNodeFromFldID(results.nIDgood[i]));
+        }
+    }
+    if (results.nIDbad.length > 0) {
+        for (var i=0; i < results.nIDbad.length; i++) {
+            setFormLabelRed(stripNodeFromFldID(results.nIDbad[i]));
+        }
+        totFormErrors++;
+    }
+    return true;
+}
+
 function reqFormFldTbl(nID, nIDtxt, maxRow, cols, colsReq) {
     var foundTblFail = false;
     var nSffx = nIDtxt.replace(nID.toString(), "");
@@ -855,3 +872,51 @@ $(document).on("click", ".nFormSignupSubBtn", function() {
     return checkNodeFormSignup();
 });
 
+function chkSpecialNodes() {
+    if (specialNodes && specialNodes.length > 0) {
+        for (var i=0; i < specialNodes.length; i++) {
+            if (specialNodes[i].length > 0 && specialNodes[i][0].trim() != '') {
+                if (specialNodes[i][0].trim() == 'nyc') {
+                    chkSpecialNodeNYC(specialNodes[i]);
+                }
+            }
+        }
+    }
+}
+
+function chkSpecialNodeNYC(specialNode) {
+    if (specialNode[0] == 'nyc' && specialNode.length == 4) {
+        var showNyc = false;
+        var cityFld = "n"+specialNode[1]+"FldID";
+        var stateFld = "n"+specialNode[2]+"FldID";
+        if (document.getElementById(cityFld) && document.getElementById(cityFld).value && document.getElementById(stateFld) && document.getElementById(stateFld).value) {
+            var city = document.getElementById(cityFld).value.trim().toLowerCase();
+            city = city.replace(' ', '').replace(' ', '').replace(' ', '').trim();
+            if (document.getElementById(stateFld).value == 'NY' && (city.indexOf("newyork") >= 0 || city.indexOf("nyc") >= 0)) {
+                showNyc = true;
+            }
+        }
+        if (document.getElementById("blockWrap"+specialNode[3]+"")) {
+            if (showNyc) {
+                visibShowNode(specialNode[3]);
+            } else {
+                visibHideNode(specialNode[3]);
+            }
+        }
+    }
+}
+
+function toggleNodeSimple(node) {
+    if (node && document.getElementById('node'+node+'')) {
+        if (!document.getElementById('node'+node+'').style.display || document.getElementById('node'+node+'').style.display == 'none') {
+            $("#node"+node+"").slideDown(300);
+        } else {
+            $("#node"+node+"").slideUp(300);
+        }
+        return true;
+    }
+    return false;
+}
+$(document).on("click", ".toglNodeSmpl", function() {
+    toggleNodeSimple($(this).attr("data-tog-node")); 
+});

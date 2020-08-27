@@ -12,8 +12,7 @@ var mapOptions{{ $nID }} = {
 function initMap{{ $nID }}() {
     var map{{ $nID }} = new google.maps.Map(document.getElementById('map{{ $nID }}'), mapOptions{{ $nID }});
     var kmlLayer = new google.maps.KmlLayer({
-        url: '{{ $GLOBALS["SL"]->sysOpts["app-url"] }}/gen-kml/{{ $filename }}.kml{{
-            (($GLOBALS["SL"]->REQ->has("refresh")) ? "?refresh=1" : "") }}',
+        url: '{{ $GLOBALS["SL"]->sysOpts["app-url"] }}/gen-kml/{{ $filename }}.kml?rand={{ rand(10000, 100000) }}',
         suppressInfoWindows: true,
         preserveViewport: true,
         map: map{{ $nID }}

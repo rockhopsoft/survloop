@@ -102,7 +102,7 @@ a.navMobActive:visited, a.navMobActive:hover {
 #navMobToggle:visited #navMobPercNum, #navMobToggle:hover #navMobPercNum {
     position: absolute;
     right: 4px;
-    top: 5px;
+    top: 2px;
     color: {!! $css["color-main-on"] !!};
 }
 #navMobToggle:hover #navMobPercNum {
@@ -112,7 +112,7 @@ a.navMobActive:visited, a.navMobActive:hover {
 #navMobTitle {
     position: absolute;
     left: 18px;
-    top: 5px;
+    top: 2px;
 }
 #navMobBurger1, #navMobBurger2 { margin-right: 5px; }
 #navMobPercWrap { margin: 0px -10px -5px -10px; }

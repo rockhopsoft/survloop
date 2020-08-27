@@ -13,7 +13,8 @@
 
 <div class="fL slGrey pL20 mL20">
     <h5 class="m0">Email Subject Line</h5>
-    Internal Name (Email Type)
+    Internal Name<br />
+    Email Type, Attachments
 </div>
 <div class="fR slGrey pR20">Emails Sent</div>
 <div class="fC pB10"></div>
@@ -33,7 +34,14 @@
             @else
                 {{ $email->email_name }}
             @endif
-            ({{ $email->email_type }})
+            <br />{{ $email->email_type }}
+            @if (isset($email->email_attach) && $email->email_attach == 'sensitive')
+                <i class="fa fa-paperclip mL5" aria-hidden="true"></i>
+                <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Sensitive
+            @elseif (isset($email->email_attach) && $email->email_attach == 'public')
+                <i class="fa fa-paperclip mL5" aria-hidden="true"></i>
+                <i class="fa fa-file-pdf-o" aria-hidden="true"></i> Public
+            @endif
             <div id="emailBody{{ $email->email_id }}" 
                 class="emailBody mB20 @if ($i%2 == 0) row2 @endif 
                 @if ($isAll) disBlo @else disNon @endif ">

@@ -61,6 +61,10 @@ class SystemDefinitionsInit
                 'URL Linked To Logo',
                 '/optionally-different'
             ], 
+            'app-root-path' => [
+                'Absolute Path To App Root',
+                '/var/www/laravel'
+            ], 
             'meta-title' => [
                 'SEO Default Meta Title', 
                 ''

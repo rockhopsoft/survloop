@@ -17,7 +17,6 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
     protected function printNodePublicCheckboxes(&$curr)
     {
         $ret = '';
-        $this->checkResponses($curr, $this->v["fldForeignTbl"]);
         if ($curr->nodeType == 'Radio') {
             $ret .= '<input type="hidden" name="n' . $curr->nIDtxt 
                 . 'radioCurr" id="n' . $curr->nIDtxt . 'radioCurrID" value="';
@@ -102,7 +101,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         $otherFld = $this->printNodeCheckboxOther($curr, $j, $res, $val);
         
         if ($curr->nodeType == 'Checkbox' && $curr->indexMutEx($j)) {
-            $GLOBALS["SL"]->pageJAVA .= ' addMutEx(' . $curr->nID . ', ' . $j . '); ';
+            $GLOBALS["SL"]->pageJAVA .= ' addMutEx("' . $curr->nIDtxt . '", ' . $j . '); ';
         }
         $this->pageFldList[] = 'n' . $curr->nIDtxt . 'fld' . $j;
         $resNameCheck = '';
@@ -278,14 +277,12 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
                 $genderSuggest .= ', "' . $gen . '"';
             }
         }
-        $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $curr->nIDtxt 
-            . 'fldOtherID2" ).autocomplete({ source: [' 
-            . substr($genderSuggest, 1) . '] });' . "\n";
-        $this->v["javaNodes"] .= 'nodeResTot[' . $curr->nID . '] = ' 
+        $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $curr->nIDtxt . 'fldOtherID2" )'
+            . '.autocomplete({ source: [' . substr($genderSuggest, 1) . '] });' . "\n";
+        $this->v["javaNodes"] .= 'nodeResTot["' . $curr->nID . '"] = ' 
             . sizeof($curr->responses) . '; ';
         if ($curr->isRequired()) {
-            $this->pageJSvalid .= "addReqNode('" 
-                . $curr->nIDtxt . "', 'reqFormGender');\n";
+            $this->pageJSvalid .= "addReqNode('" . $curr->nIDtxt . "', 'reqFormGender');\n";
         }
         return $ret;
     }

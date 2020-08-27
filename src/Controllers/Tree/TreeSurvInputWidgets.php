@@ -351,6 +351,11 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         $this->setNotif('Thank you for contacting us!', 'success');
         return $ret;
     }
+    
+    public function authMinimalInit(Request $request, $currPage = '')
+    {
+        return true;
+    }
 
 
 }

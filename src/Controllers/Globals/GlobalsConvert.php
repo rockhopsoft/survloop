@@ -74,6 +74,23 @@ class GlobalsConvert
         return $ret;
     }
     
+    public function numKMBT($value, $sigFigs = 3)
+    {
+        if ($value < 1000) {
+            return $this->sigFigs($value, $sigFigs);
+        }
+        if ($value < 1000000) {
+            return $this->sigFigs(($value/1000), $sigFigs) . 'K';
+        }
+        if ($value < 1000000000) {
+            return $this->sigFigs(($value/1000000), $sigFigs) . 'M';
+        }
+        if ($value < 1000000000000) {
+            return $this->sigFigs(($value/1000000000), $sigFigs) . 'B';
+        }
+        return $this->sigFigs(($value/1000000000000), $sigFigs) . 'T';
+    }
+    
     public function leadZero($num, $sigFigs = 2)
     {
         if ($sigFigs == 2) {
@@ -487,6 +504,57 @@ class GlobalsConvert
         $strIN = str_replace('>', '&gt;', $strIN);
         return htmlspecialchars(trim($strIN), ENT_XML1, 'UTF-8');
         //return trim($strIN);
+    }
+    
+    public function cnvrtSqFt2Acr($squareFeet = 0)
+    {
+        return $squareFeet*0.000022956841138659;
+    }
+    
+    public function cnvrtAcr2SqFt($acres = 0)
+    {
+        return $acres*43560;
+    }
+    
+    public function cnvrtLbs2Grm($lbs = 0)
+    {
+        return $lbs*453.59237;
+    }
+    
+    public function cnvrtKwh2Kbtu($kWh = 0)
+    {
+        return $kWh*3.412;
+    }
+    
+    public function cnvrtKwh2Btu($kWh = 0)
+    {
+        return $kWh*3412;
+    }
+    
+    public function cnvrtKbtu2Kwh($btu = 0)
+    {
+        return $btu/3.412;
+    }
+    
+    public function cnvrtLiter2Gal($liters = 0)
+    {
+        return $liters*0.2641729;
+    }
+    
+    public function cnvrtSqFt2SqMeters($sqft = 0)
+    {
+        return $sqft*10.76391;
+    }
+
+    public function arrayToInts($array = [])
+    {
+        $ret = [];
+        if (is_array($array) && sizeof($array) > 0) {
+            foreach ($array as $val) {
+                $ret[] = intVal($val);
+            }
+        }
+        return $ret;
     }
 
 

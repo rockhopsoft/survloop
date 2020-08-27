@@ -120,6 +120,10 @@ Route::get(
 
     
 Route::get(
+    '/api/all/{treeSlug}/xml',
+    $path . 'SurvLoop@xmlAll'
+);
+Route::get(
     '/{treeSlug}-xml-all',
     $path . 'SurvLoop@xmlAll'
 );

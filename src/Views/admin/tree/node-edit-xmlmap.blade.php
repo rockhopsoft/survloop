@@ -36,12 +36,12 @@
             <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID 
                 }}/xmlmap?all=1#n{{ $node->nodeRow->node_id 
                 }}" class="float-right">Back to XML Map</a>
-            <h2 class="disIn"><span class="mR20">
-                #{{ $node->nodeRow->node_id }}</span> Editing Node</h2>
+            <h4 class="disIn"><span class="mR20">
+                #{{ $node->nodeRow->node_id }}</span> Editing Node</h4>
         @else 
             <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/xmlmap?all=1" 
                 class="float-right">Back to XML Map</a>
-            <h2 class="disIn">Adding Node</h2>
+            <h4 class="disIn">Adding Node</h4>
         @endif
     </div>
     <div class="card-body">
@@ -54,7 +54,7 @@
                         @if (intVal($node->nodeRow->node_prompt_notes) > 0) 
                             CHECKED 
                         @endif >
-                    <h3 class="disIn m0 slBlueDark">Data Table:</h3>
+                    <b class="slBlueDark">Data Table:</b>
                 </nobr></label>
                 <label><nobr>
                     <input type="radio" name="xmlNodeType" id="xmlNodeTypeWrap" 
@@ -63,7 +63,7 @@
                         @if (intVal($node->nodeRow->node_prompt_notes) <= 0) 
                             CHECKED
                         @endif >
-                    <h3 class="disIn m0 slBlueDark">Extra Wrap:</h3>
+                    <b>Extra Wrap:</b>
                 </nobr></label>
             </div>
             <div class="col-6">

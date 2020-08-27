@@ -3,18 +3,23 @@
 @section('content')
 
 <div class="container">
-<div class="slCard nodeWrap">
-<h1>
-    <span class="slBlueDark"><i class="fa fa-database"></i> 
-    {{ $GLOBALS['SL']->dbRow->db_name }}</span>:
-    Sorting Database Tables
-</h1>
+    <a href="/dashboard/db/all" 
+        class="btn btn-secondary btn-sm pull-right"
+        >All Database Details</a>
 
-<a href="/dashboard/db/all" class="btn btn-secondary mR10">All Database Details</a>
+    <h3>
+        <span class="slBlueDark"><i class="fa fa-database"></i> 
+        {{ $GLOBALS['SL']->dbRow->db_name }}</span>:
+        Sorting Database Tables
+    </h3>
+    <p>
+        Drag database tables into the desired order.
+    </p>
 
-{!! $sortable !!}
+    {!! $sortable !!}
 
 </div>
-</div>
+
+<div class="pB30"></div>
 
 @endsection

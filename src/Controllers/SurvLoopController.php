@@ -62,6 +62,43 @@ class SurvLoopController extends Controller
     protected $extraTree         = [];
     public    $searcher          = null;
     
+    /**
+     * Initialize key SurvLoop variables needed for content delivery.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $currPage
+     * @param  boolean  $runExtra
+     * @return boolean
+     */
+    public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
+    {
+        if (!$this->survInitRun || !isset($this->v["uID"])) {
+            $this->survInitRun = true;
+            $this->loadUserVars();
+            $this->loadSimpleVars($request);
+            $this->loadCurrPage($currPage);
+            $this->loadSlSess($request);
+            $this->loadNavMenu();
+            $this->loadDbLookups($request);
+            $this->initCheckUpdates($request);
+            if ($this->coreIDoverride > 0) {
+                $this->loadAllSessData();
+            }
+            if ($runExtra) {
+                $this->initExtra($request);
+                $this->loadSysSettings();
+                $this->initCustViews($request);
+            }
+            $this->genCacheKey();
+        }
+        return true;
+    }
+    
+    /**
+     * Initialize key user variables tied to this core trunk object.
+     *
+     * @return boolean
+     */
     protected function loadUserVars()
     {
         $this->v["user"] = Auth::user();
@@ -76,87 +113,114 @@ class SurvLoopController extends Controller
         } elseif (isset($GLOBALS["SL"])) {
             $GLOBALS["SL"]->pageJAVA .= ' loggedIn = false; ';
         }
-        $this->v["isAdmin"]   = ($this->v["user"] && $this->v["user"]->hasRole('administrator'));
-        $this->v["isPartner"] = ($this->v["user"] && $this->v["user"]->hasRole('partner'));
-        $this->v["isVolun"]   = ($this->v["user"] && $this->v["user"]->hasRole('volunteer'));
+        $this->v["isAdmin"] 
+            = $this->v["isStaff"] 
+            = $this->v["isPartner"]
+            = $this->v["isVolun"]
+            = 0;
+        if ($this->v["user"]) {
+            $this->v["isAdmin"]   = $this->v["user"]->hasRole('administrator');
+            $this->v["isStaff"]   = $this->v["user"]->hasRole('staff');
+            $this->v["isPartner"] = $this->v["user"]->hasRole('partner');
+            $this->v["isVolun"]   = $this->v["user"]->hasRole('volunteer');
+        }
         $this->initPowerUser();
         return true;
     }
     
-    public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
+    /**
+     * Check if the current user has staff or admin permissions.
+     *
+     * @return boolean
+     */
+    protected function isStaffOrAdmin()
     {
-        if (!$this->survInitRun || !isset($this->v["uID"])) {
-            $this->survInitRun = true;
-            $this->loadUserVars();
-            $this->v["isAll"]     = $request->has('all');
-            $this->v["isAlt"]     = $request->has('alt');
-            $this->v["isPrint"]   = $request->has('print');
-            $this->v["isExcel"]   = $request->has('excel');
-            $this->v["view"]      = (($request->has('view')) 
-                ? trim($request->get('view')) : '');
-            $this->v["isDash"]    = false;
-            $this->v["exportDir"] = 'survloop';
-            $this->v["content"]   = '';
-            $this->v["isOwner"]   = false;
-            if (!isset($this->v["currPage"])) {
-                $this->v["currPage"] = ['', ''];
-            }
-            if (trim($this->v["currPage"][0]) == '') {
-                $this->v["currPage"][0] = $currPage;
-            }
-            if (trim($this->v["currPage"][0]) == ''
-                && isset($_SERVER["REQUEST_URI"])) {
-                $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
-                if (strpos($this->v["currPage"][0], '?') !== false) {
-                    $pos = strpos($this->v["currPage"][0], '?');
-                    $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, $pos);
-                }
-            }
-            
-            $this->loadSlSess();
-            if ($request->has('sessmsg') && trim($request->get('sessmsg')) != '') {
-                session()->put('sessMsg', trim($request->get('sessmsg')));
-                session()->save();
-            }
-            
-            if (!isset($this->v["currState"])) {
-                $this->v["currState"] = '';
-            }
-            if (!isset($this->v["yourUserInfo"])) {
-                $this->v["yourUserInfo"] = [];
-            }
-            if (!isset($this->v["yourContact"])) {
-                $this->v["yourContact"]  = [];
-            }
-            
-            $this->loadNavMenu();
-            $this->loadDbLookups($request);
-            
-            if ($request->has('refresh') && trim($request->get('refresh')) != '') {
-                $this->checkSystemInit();
-            }
-            if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
-                $this->v["pastUpDef"] 
-                    = $this->v["pastUpArr"] 
-                    = $this->v["updateList"] 
-                    = [];
-            }
-            
-            if ($this->coreIDoverride > 0) {
-                $this->loadAllSessData();
-            }
-            
-            if ($runExtra) {
-                $this->initExtra($request);
-                $this->loadSysSettings();
-                $this->initCustViews();
-            }
-            $this->genCacheKey();
+        return ($this->v["isAdmin"] || $this->v["isStaff"]);
+    }
+    
+    /**
+     * Initialize the simplest SurvLoop variables which track page loads.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    protected function loadSimpleVars(Request $request)
+    {
+        $this->v["isAll"]     = $request->has('all');
+        $this->v["isAlt"]     = $request->has('alt');
+        $this->v["isPrint"]   = $request->has('print');
+        $this->v["isExcel"]   = $request->has('excel');
+        $this->v["view"]      = (($request->has('view')) 
+            ? trim($request->get('view')) : '');
+        $this->v["isDash"]    = false;
+        $this->v["exportDir"] = 'survloop';
+        $this->v["content"]   = '';
+        $this->v["isOwner"]   = false;
+        if (!isset($this->v["currState"])) {
+            $this->v["currState"] = '';
+        }
+        if (!isset($this->v["yourUserInfo"])) {
+            $this->v["yourUserInfo"] = [];
+        }
+        if (!isset($this->v["yourContact"])) {
+            $this->v["yourContact"]  = [];
         }
         return true;
     }
     
-    protected function loadSlSess()
+    /**
+     * Initialize the simplest SurvLoop variables which track page loads.
+     *
+     * @param  string  $currPage
+     * @return boolean
+     */
+    protected function loadCurrPage($currPage = '')
+    {
+        if (!isset($this->v["currPage"])) {
+            $this->v["currPage"] = ['', ''];
+        }
+        if (trim($this->v["currPage"][0]) == '') {
+            $this->v["currPage"][0] = $currPage;
+        }
+        if (trim($this->v["currPage"][0]) == ''
+            && isset($_SERVER["REQUEST_URI"])) {
+            $this->v["currPage"][0] = $_SERVER["REQUEST_URI"];
+            if (strpos($this->v["currPage"][0], '?') !== false) {
+                $pos = strpos($this->v["currPage"][0], '?');
+                $this->v["currPage"][0] = substr($this->v["currPage"][0], 0, $pos);
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Check for software maintenance processes and updates.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    protected function initCheckUpdates(Request $request)
+    {
+        if ($request->has('refresh') && trim($request->get('refresh')) != '') {
+            $this->checkSystemInit();
+        }
+        if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
+            $this->v["pastUpDef"] 
+                = $this->v["pastUpArr"] 
+                = $this->v["updateList"] 
+                = [];
+        }
+        return true;
+    }
+    
+    /**
+     * Load basic SurvLoop user session for a general site visit,
+     * not for a specific survey.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    protected function loadSlSess(Request $request)
     {
         $slSess = null;
         if (isset($this->v["uID"])) {
@@ -180,9 +244,18 @@ class SurvLoopController extends Controller
                 $slSess->save();
             }
         }
+        if ($request->has('sessmsg') && trim($request->get('sessmsg')) != '') {
+            session()->put('sessMsg', trim($request->get('sessmsg')));
+            session()->save();
+        }
         return true;
     }
     
+    /**
+     * Load all system settings which are customize for a client installation.
+     *
+     * @return boolean
+     */
     protected function loadSysSettings()
     {
         $settings = SLDefinitions::where('def_set', 'Custom Settings')
@@ -197,6 +270,12 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    /**
+     * Load a survey/page tree by its slug.
+     *
+     * @param  string  $treeSlug
+     * @return boolean
+     */
     protected function loadTreeURL($treeSlug = '')
     {
         if (trim($treeSlug) != '' 
@@ -212,6 +291,12 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    /**
+     * Load all GLOBALS for the current database in focus.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
     protected function loadDbLookups(Request $request)
     {
         if (!isset($GLOBALS["SL"]) || !isset($GLOBALS["SL"]->sysOpts["cust-abbr"])) {
@@ -247,6 +332,13 @@ class SurvLoopController extends Controller
         return true;
     }
     
+    /**
+     * Load all GLOBALS for a specific node's parent database.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $nID
+     * @return boolean
+     */
     protected function loadDbFromNode(Request $request, $nID)
     {
         $node = SLNode::find($nID);
@@ -266,7 +358,11 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    // Check For Basic System Setup First
+    /**
+     * Check for basic system installation and setup before most other things.
+     *
+     * @return string
+     */
     public function checkSystemInit()
     {
         if (!session()->has('chkSysInit') || $GLOBALS["SL"]->REQ->has('refresh')) {
@@ -339,7 +435,7 @@ class SurvLoopController extends Controller
         return '';
     }
     
-    public function initCustViews()
+    public function initCustViews(Request $request)
     {
         $chk = SLDefinitions::where('def_database', 1)
             ->where('def_set', 'Blurbs')
@@ -349,6 +445,7 @@ class SurvLoopController extends Controller
             && trim($chk->def_description) != '') {
             $GLOBALS["SL"]->sysOpts["footer-master"] = $chk->def_description;
         }
+        $this->loadCustLoop($request, 1, 1, false);
         return true;
     }
     
@@ -498,7 +595,7 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    protected function loadCustLoop(Request $request, $treeID = -3, $dbID = -3)
+    protected function loadCustLoop(Request $request, $treeID = -3, $dbID = -3, $slInit = true)
     {
         if ($treeID <= 0) {
             $treeID = $this->treeID;
@@ -510,7 +607,8 @@ class SurvLoopController extends Controller
             && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
             $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
-                . "(\$request, -3, \$dbID, \$treeID);";
+                . "(\$request, -3, \$dbID, \$treeID, false, "
+                . (($slInit) ? "true" : "false") . ");";
             eval($eval);
         } else {
             $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
@@ -520,7 +618,11 @@ class SurvLoopController extends Controller
             && sizeof($this->v["currPage"]) > 0) {
             $currPage = $this->v["currPage"][0];
         }
-        $this->custReport->survLoopInit($request, $currPage);
+        if ($slInit) {
+            $this->custReport->survLoopInit($request, $currPage);
+        } else {
+            $this->custReport->authMinimalInit($request, $currPage);
+        }
         return true;
     }
     
@@ -530,6 +632,16 @@ class SurvLoopController extends Controller
             $this->loadCustSearcher();
             $this->copyUserToSearcher();
         }
+        return true;
+    }
+    
+    public function searchPrep(Request $request, $treeID = 1)
+    {
+        $this->loadTree($treeID);
+        $this->initSearcher();
+        $this->searcher->getSearchFilts();
+        $this->searcher->getAllPublicCoreIDs();
+        $this->chkRecsPub($request);
         return true;
     }
     
@@ -689,6 +801,12 @@ class SurvLoopController extends Controller
             session()->put('survSysChecks', 1);
             session()->save();
         }
+        $admMenuOnLoad = 1;
+        if (session()->has('admMenuOpen')
+            && intVal(session()->get('admMenuOpen')) == 0) {
+            $admMenuOnLoad = 0;
+        }
+        $GLOBALS["SL"]->setAdmMenuOnLoad($admMenuOnLoad);
         return true;
     }
     
@@ -821,30 +939,43 @@ class SurvLoopController extends Controller
         );
     }
     
-    public function sendEmail($emaContent, $emaSubject, $emaTo = [], $emaCC = [], $emaBCC = [], $repTo = [])
+    public function sendEmail($emaContent, $emaSubject, $emaTo = [], 
+        $emaCC = [], $emaBCC = [], $repTo = [], $attach = [])
     {
-        $mail = "Illuminate\\Support\\Facades\\Mail::send('vendor.survloop.emails.master', [
+        $mail = "Illuminate\\Support\\Facades\\Mail::send(
+            'vendor.survloop.emails.master', 
+            [
                 'emaSubj'    => \$emaSubject,
                 'emaContent' => \$emaContent,
                 'cssColors'  => \$GLOBALS['SL']->getCssColorsEmail()
-            ], function (\$m) { \$m->subject('" 
+            ], 
+            function (\$m) { \$m->subject('" 
             . str_replace("'", "\\'", $emaSubject) . "')";
         if (sizeof($emaTo) > 0) {
             foreach ($emaTo as $i => $eTo) {
-                $mail .= "->to('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                $mail .= "->to('" . $eTo[0] . "'" 
+                    . ((trim($eTo[1]) != '') 
+                        ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" 
+                        : "") 
+                    . ")";
             }
         }
         if (sizeof($emaCC) > 0) {
             foreach ($emaCC as $eTo) {
-                $mail .= "->cc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                $mail .= "->cc('" . $eTo[0] . "'" 
+                    . ((trim($eTo[1]) != '') 
+                        ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" 
+                        : "") 
+                    . ")";
             }
         }
         if (sizeof($emaBCC) > 0) {
             foreach ($emaBCC as $eTo) {
-                $mail .= "->bcc('" . $eTo[0] . "'" . ((trim($eTo[1]) != '') 
-                    ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" : "") . ")";
+                $mail .= "->bcc('" . $eTo[0] . "'" 
+                    . ((trim($eTo[1]) != '') 
+                        ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'" 
+                        : "") 
+                    . ")";
             }
         }
         if (!isset($repTo[0]) || is_array($repTo[0]) || trim($repTo[0]) == '') {
@@ -853,8 +984,27 @@ class SurvLoopController extends Controller
         if (!isset($repTo[1]) || is_array($repTo[1]) || trim($repTo[1]) == '') {
             $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
         }
-        $mail .= "->replyTo('" . $repTo[0] . "'" . ((trim($repTo[1]) != '') 
-            ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" : "") . "); });";
+        $mail .= "->replyTo('" . $repTo[0] . "'" 
+            . ((trim($repTo[1]) != '') 
+                ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" 
+                : "") 
+            . ")";
+        if (sizeof($attach) > 0) {
+            foreach ($attach as $a => $att) {
+                if (isset($att->fileStore) 
+                    && trim($att->fileStore) != ''
+                    && isset($att->fileDeliver) 
+                    && trim($att->fileDeliver) != '') {
+                    $mail .= "->attach('" . $att->fileStore . "', [
+                        'as' => '" . $att->fileDeliver . "',
+                        'mime' => 'application/pdf',
+                    ])";
+                } elseif (is_string($att)) {
+                    $mail .= "->attach('" . $att . "')";
+                }
+            }
+        }
+        $mail .= "; });";
         if ($GLOBALS["SL"]->isHomestead()) {
             echo '<br /><br /><br /><div class="container"><h2>' 
                 . $emaSubject . '</h2>' . $emaContent 
@@ -866,29 +1016,30 @@ class SurvLoopController extends Controller
     }
     
     // This function should be migrated to sendEmail() ...
-    protected function sendNewEmailSimple($body, $subject, $emailTo = '', 
-        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    protected function sendNewEmailSimple($bod, $subj, $emaTo = '', 
+        $emaID = -3, $tID = -3, $cID = -3, $usrTo = -3)
     {
-        $emaTo = [$this->getEmailTo($emailTo)];
-        $this->sendEmail($body, $subject, $emaTo);
-        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+        $eTo = [$this->getEmailTo($emaTo)];
+        $this->sendEmail($bod, $subj, $eTo);
+        return $this->logEmailSent($bod, $subj, $emaTo, $emaID, $tID, $cID, $usrTo);
     }
     
-    protected function sendNewEmailFromCurrUser($body, $subject, $emailTo = '', 
-        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3, $cc = '', $bcc = '')
+    protected function sendNewEmailFromCurrUser($bod, $subj, 
+        $emaTo = '', $emaID = -3, $tID = -3, $cID = -3, 
+        $usrTo = -3, $cc = '', $bcc = '', $attach = [])
     {
-        $emaTo = [$this->getEmailTo($emailTo)];
-        $emaCC = $emaBCC = [];
-        $emaFrom = $this->getEmailFromCurrUser();
-        $emaCC[] = $this->getEmailTo($emaFrom);
+        $eTo = [$this->getEmailTo($emaTo)];
+        $eCC = $eBCC = [];
+        $eFrom = $this->getEmailFromCurrUser();
+        $eCC[] = $this->getEmailTo($eFrom);
         if (trim($cc) != '') {
-            $emaCC[] = $this->getEmailTo($cc);
+            $eCC[] = $this->getEmailTo($cc);
         }
         if (trim($bcc) != '') {
-            $emaBCC[] = $this->getEmailTo($bcc);
+            $eBCC[] = $this->getEmailTo($bcc);
         }
-        $this->sendEmail($body, $subject, $emaTo, $emaCC, $emaBCC, $emaFrom);
-        return $this->logEmailSent($body, $subject, $emailTo, $emailID, $treeID, $coreID, $userTo);
+        $this->sendEmail($bod, $subj, $eTo, $eCC, $eBCC, $eFrom, $attach);
+        return $this->logEmailSent($bod, $subj, $emaTo, $emaID, $tID, $cID, $usrTo, $attach);
     }
     
     protected function getEmailTo($emailTo = '')
@@ -920,19 +1071,39 @@ class SurvLoopController extends Controller
         return $emaFrom;
     }
     
-    protected function logEmailSent($body, $subject, $emailTo = '', 
-        $emailID = -3, $treeID = -3, $coreID = -3, $userTo = -3)
+    protected function logEmailSent($bod, $subj, $emaTo = '', 
+        $emaID = -3, $tID = -3, $cID = -3, $usrTo = -3, $attach = [])
     {
         $emailRec = new SLEmailed;
-        $emailRec->emailed_email_id  = (($emailID > 0) ? $emailID : 0);
-        $emailRec->emailed_tree      = (($treeID > 0)  ? $treeID  : 0);
-        $emailRec->emailed_rec_id    = (($coreID > 0)  ? $coreID  : 0);
-        $emailRec->emailed_to        = trim($emailTo);
-        $emailRec->emailed_to_user   = (($userTo > 0)  ? $userTo  : 0);
+        $emailRec->emailed_email_id  = (($emaID > 0) ? $emaID : 0);
+        $emailRec->emailed_tree      = (($tID > 0)  ? $tID  : 0);
+        $emailRec->emailed_rec_id    = (($cID > 0)  ? $cID  : 0);
+        $emailRec->emailed_to        = trim($emaTo);
+        $emailRec->emailed_to_user   = (($usrTo > 0)  ? $usrTo  : 0);
         $emailRec->emailed_from_user = ((Auth::user() && isset(Auth::user()->id))
             ? Auth::user()->id : 0);
-        $emailRec->emailed_Subject   = $subject;
-        $emailRec->emailed_Body      = $body;
+        $emailRec->emailed_subject   = $subj;
+        $emailRec->emailed_body      = $bod;
+        $emailRec->emailed_attach    = '';
+        if (sizeof($attach) > 0) {
+            foreach ($attach as $att) {
+                if (trim($emailRec->emailed_attach) != '') {
+                    $emailRec->emailed_attach .= ', ';
+                }
+                if (isset($att->fileStore) 
+                    && trim($att->fileStore) != ''
+                    && isset($att->fileDeliver) 
+                    && trim($att->fileDeliver) != '') {
+                    $emailRec->emailed_attach .= $att->fileDeliver;
+                } elseif (is_string($att) && trim($att) != '') {
+                    $pos = strrpos($att, '/');
+                    if ($pos >= 0) {
+                        $att = substr($att, $pos+1);
+                    }
+                    $emailRec->emailed_attach .= $att;
+                }
+            }
+        }
         $emailRec->save();
         return true;
     }

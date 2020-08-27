@@ -128,7 +128,7 @@ label, .nPrompt label {
 }
 .slidePercFld {
     display: inline;
-    width: 57px; 
+    width: 100px; 
     padding: 6px 6px;
     text-align: right;
 }
@@ -345,13 +345,13 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 }
 .ui-state-default, .ui-widget-content .ui-state-default, 
 .ui-widget-header .ui-state-default {
-    border: 1px solid {!! $css["color-main-faint"] !!};
+    border: 1px {!! $css["color-main-faint"] !!} solid;
     background: {!! $css["color-main-on"] !!};
     color: {!! $css["color-main-faint"] !!};
 }
 .ui-state-active, .ui-widget-content .ui-state-active, 
 .ui-widget-header .ui-state-active {
-    border: 1px solid {!! $css["color-main-on"] !!};
+    border: 1px {!! $css["color-main-on"] !!} solid;
     background: {!! $css["color-main-faint"] !!};
     color: {!! $css["color-main-on"] !!};
 }
@@ -368,8 +368,7 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 	border-bottom: 1px {!! $css["color-main-on"] !!} solid; 
 	background: {!! $css["color-main-faint"] !!}; 
 	color: {!! $css["color-main-on"] !!}; 
-	font-size: 20pt; 
-	padding: 12px;
+	padding: 10px;
 	margin: 1px 0px;
 	width: 100%; 
 	text-align: left; 
@@ -379,18 +378,7 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 }
 .slSortable li i, .slSortable li.sortOn i, 
 .slSortable li.sortOff i { 
-    margin: 0px 20px;
-}
-@media screen and (max-width: 768px) {
-    .slSortable li, .slSortable li.sortOn, 
-    .slSortable li.sortOff {
-        font-size: 14pt;
-        padding: 10px 5px;
-    }
-    .slSortable li i, .slSortable li.sortOn i, 
-    .slSortable li.sortOff i { 
-        margin: 0px 10px;
-    }
+    margin: 0px 10px;
 }
 
 .ui-widget-header {
@@ -424,3 +412,10 @@ label.fingerAct .subNote, .nFld label.fingerAct .subNote {
 /* .ui-datepicker-prev.ui-corner-all.ui-state-hover.ui-datepicker-prev-hover .ui-icon.ui-icon-circle-triangle-w {
     background: {!! $css["color-main-on"] !!};
 } */
+
+.ui-slider-handle.ui-corner-all.ui-state-default {
+    background: {!! $css["color-main-on"] !!}; 
+    border: 1px {!! $css["color-main-faint"] !!} solid;
+}
+
+

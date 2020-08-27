@@ -451,7 +451,7 @@ class AdminController extends AdminEmailController
         }
         return $this->custReport->ajaxChecks($request, $type);
     }
-    
+
     public function systemsCheck(Request $request)
     {
         $this->admControlInit($request, '/dashboard/systems-check');

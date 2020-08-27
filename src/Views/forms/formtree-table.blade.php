@@ -10,10 +10,13 @@
     @endif
     @forelse ($tableDat["cols"] as $k => $col)
         <th class=" @if (trim($tableDat['rowCol']) != '' || $k > 0) cl1 @endif " >
-        @if (isset($col->nodeRow->node_prompt_text)) 
+        @if (isset($col->nodePromptText) 
+            && trim($col->nodePromptText) != '') 
+            {!! $col->nodePromptText !!}
+        @elseif (isset($col->nodeRow->node_prompt_text)
+            && trim($col->nodeRow->node_prompt_text) != '')
             {!! $col->nodeRow->node_prompt_text !!}
-        @endif
-        @if (isset($col->node_prompt_text))
+        @elseif (isset($col->node_prompt_text))
             {!! $col->node_prompt_text !!}
         @endif
         </th>

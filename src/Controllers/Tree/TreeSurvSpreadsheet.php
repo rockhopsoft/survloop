@@ -216,6 +216,9 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         }
         if (sizeof($tmpSubTier) > 0) {
             foreach ($tmpSubTier[1] as $k => $kidNode) {
+                $this->allNodes[$kidNode[0]]->chkFill();
+                $label = $this->allNodes[$kidNode[0]]->nodeRow->node_prompt_text;
+                $this->allNodes[$kidNode[0]]->nodePromptText = $this->customLabels($curr, $label);
                 $this->tableDat["cols"][]   = $this->allNodes[$kidNode[0]];
                 $this->tableDat["req"][2][] = $this->allNodes[$kidNode[0]]->isRequired();
                 if ($this->allNodes[$kidNode[0]]->isRequired()) {
@@ -401,3 +404,4 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
     }
 
 }
+

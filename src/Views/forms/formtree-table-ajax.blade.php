@@ -81,6 +81,8 @@ function pushNewMonthLayout{{ $nIDtxt }}() {
         for (var k = 0; k < (1+cols{{ $nIDtxt }}.length); k++) {
             if (document.getElementById(rowIDs{{ $nIDtxt }}[i][k])) {
                 document.getElementById(rowIDs{{ $nIDtxt }}[i][k]).value=rowData{{ $nIDtxt }}[currRow][k];
+            } else {
+                document.getElementById(rowIDs{{ $nIDtxt }}[i][k]).value="";
             }
         }
         currMonth++;
@@ -104,6 +106,8 @@ function pullMonthUpdates{{ $nIDtxt }}() {
         for (var k = 0; k < (1+cols{{ $nIDtxt }}.length); k++) {
             if (document.getElementById(rowIDs{{ $nIDtxt }}[currRow][k]).value != rowData{{ $nIDtxt }}[currRow][k]) {
                 rowData{{ $nIDtxt }}[currRow][k]=document.getElementById(rowIDs{{ $nIDtxt }}[i][k]).value;
+            } else {
+                rowData{{ $nIDtxt }}[currRow][k]="";
             }
         }
         currMonth++;

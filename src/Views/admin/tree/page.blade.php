@@ -8,7 +8,7 @@
     }
     </style>
 @endif
-<div class="container"><div class="slCard nodeWrap">
+<div class="container">
     <h1 class="slBlueDark">
         @if ($GLOBALS['SL']->treeRow->tree_type == 'Page')
             <nobr>@if (!$isPrint) <i class="fa fa-newspaper-o"></i> @endif
@@ -52,7 +52,7 @@
             <a class="adminAboutTog" href="javascript:;">Read more about pages.</a>
         </span>
     </div>
-</div></div>
+</div>
 
 {!! $printTree !!}
 

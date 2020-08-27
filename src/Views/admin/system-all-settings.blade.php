@@ -69,7 +69,7 @@
             )->render() !!}
         @endforeach
     </div><div class="col-md-6">
-        @foreach (['app-url', 'logo-url', 'parent-website'] as $opt)
+        @foreach (['app-url', 'logo-url', 'parent-website', 'app-root-path'] as $opt)
             {!! view(
                 'vendor.survloop.admin.system-one-setting', 
                 [
@@ -336,7 +336,7 @@
 @endif
 
 <div class="p20"></div>
-<input type="submit" class="btn btn-lg btn-xl btn-primary btn-block" value="Save All Settings Changes">
+<input type="submit" class="btn btn-lg btn-primary btn-block" value="Save All Settings Changes">
 
 </form>
 </div>

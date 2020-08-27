@@ -5,7 +5,7 @@ table.slSpreadTbl tr td.sprdFld {
     padding: 0px;
 }
 table.slSpreadTbl tr th {
-    padding: 0px 12px 6px 12px;
+    padding: 12px;
     vertical-align: bottom;
     border-top: 0px none;
     border-bottom: 1px {!! $css["color-main-on"] !!} solid;
@@ -13,6 +13,7 @@ table.slSpreadTbl tr th {
 table.slSpreadTbl tr td.sprdRowLab {
     padding: 12px 0px 0px 12px;
     color: {!! $css["color-main-on"] !!};
+    min-width: 92px;
 }
 table.slSpreadTbl tr td.sprdRowLab, 
 table.slSpreadTbl tr th.sprdRowLab {

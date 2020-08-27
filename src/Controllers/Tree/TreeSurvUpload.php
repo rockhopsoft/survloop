@@ -19,6 +19,7 @@ use App\Models\User;
 use App\Models\SLUploads;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
+use SurvLoop\Controllers\SurvLoopPDF;
 use SurvLoop\Controllers\DeliverImage;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurv;
@@ -236,19 +237,85 @@ class TreeSurvUpload extends TreeSurv
     protected function prevUploadsPDF()
     {
         $ret = [];
+        if ($GLOBALS["SL"]->dataPerms == 'none') {
+            return $ret;
+        }
+        $noPub = '';
+        $this->loadPdfByID();
         $chk = $this->getTreeUploadsRecs();
         if ($chk->isNotEmpty()) {
+            $cnt = 0;
             foreach ($chk as $i => $up) {
-                if (isset($up->up_stored_file) && trim($up->up_stored_file) != ''
-                    && isset($up->up_upload_file) && trim($up->up_stored_file) != '') {
-                    $ext = substr($up->up_upload_file, strlen($up->up_upload_file)-4);
-                    if (strtolower($ext) == '.pdf') {
-                        $ret[] = $up;
+                if (isset($up->up_upload_file) && trim($up->up_upload_file) != ''
+                    && isset($up->up_stored_file) && trim($up->up_stored_file) != '') {
+                    if ($GLOBALS["SL"]->REQ->has('resize')) {
+                        $this->checkImgResize($up);
+                    }
+                    $deet = $this->loadUpDeets($up);
+                    if (sizeof($deet) > 0) {
+                        $cnt++;
+                        $title = $this->prevUploadImageTitlePDF($cnt, $up) . '<br />';
+                        $public = [ 'pdf', 'public' ];
+                        if ($deet["privacy"] == 'Block'
+                            && (in_array($GLOBALS["SL"]->pageView, $public)
+                            || in_array($GLOBALS["SL"]->dataPerms, $public)) ) {
+                            $noPub .= $title;
+                        } elseif (isset($deet["file"])) {
+                            $ext = substr($up->up_upload_file, strlen($up->up_upload_file)-4);
+                            if (strtolower($ext) == '.pdf') {
+                                $compressed = str_replace('.pdf', '-.pdf', $deet["file"]);
+                                if (!file_exists($compressed)
+                                    || $GLOBALS["SL"]->REQ->has('refresh')) {
+                                    $this->v["pdf-gen"]->simplifyPdf($deet["file"], $compressed);
+                                }
+                                $ret[] = $compressed;
+                            } else { // create PDF for each image
+                                $ret[] = $this->prevUploadImagePDF($deet, $title);
+                            }
+                        }
                     }
                 }
             }
+            if ($noPub != '') {
+                $noPub = '<h4>Uploads Not Published</h4>' . $noPub;
+                $noPubFile = '-attach-not-published.pdf';
+                $noPubFile = str_replace('.pdf', $noPubFile, $this->v["pdf-file"]);
+                $this->v["pdf-gen"]->genSimplePDF($noPub, $noPubFile);
+                $ret[] = $noPubFile;
+            }
+        }
+        $fileAttach = str_replace('.pdf', '-attach.pdf', $this->v["pdf-file"]);
+        if (file_exists($fileAttach)) {
+            unlink($fileAttach);
+        }
+        if (sizeof($ret) > 0) {
+            $this->v["pdf-gen"]->mergePdfs($ret, $fileAttach);
         }
         return $ret;
+    }
+    
+    protected function prevUploadImageTitlePDF($cnt, $up)
+    {
+        $title = '<h5>Upload #' . $cnt;
+        if (isset($up->up_title) && trim($up->up_title) != '') {
+            $title .= ': ' . $up->up_title;
+        }
+        return $title . '</h5>' . $up->up_upload_file;
+    }
+    
+    protected function prevUploadImagePDF($deet, $title = '')
+    {
+        $imgPdfFile = str_replace('.jpg', '.pdf', $deet["file"]);
+        if (isset($deet["file"])
+            && (!file_exists($imgPdfFile) || $GLOBALS["SL"]->REQ->has('refresh'))) {
+            list($width, $height, $type, $attr) = getimagesize($deet["file"]);
+            $title .= '<img src="data:image/jpeg;base64, '
+                . base64_encode(file_get_contents($deet["file"])) . '" style="'
+                . (($width < ($height*0.7)) ? 'width: 67%;' : 'width: 100%;')
+                . '" >';
+            $this->v["pdf-gen"]->genSimplePDF($title, $imgPdfFile);
+        }
+        return $imgPdfFile;
     }
     
     public function retrieveUploadFile($upID = '', $refresh = false)
@@ -372,8 +439,11 @@ class TreeSurvUpload extends TreeSurv
         $ret["fileOrig"] = $upRow->up_upload_file;
         $ret["fileLnk"]  = '<a href="' . $ret["filePub"] . '" target="_blank">' 
             . $upRow->up_upload_file . '</a>';
-        $ret["youtube"]  = '';
-        $ret["vimeo"]    = '';
+        $ret["youtube"]  
+            = $ret["vimeo"]
+            = $ret["archiveVid"]
+            = $ret["otherLnk"]
+            = '';
         $ret["imgWidth"] = $ret["imgHeight"] = 0;
         $ret["imgClass"] = 'w100';
         $vidTypeID = $this->getVidType($treeID);
@@ -389,16 +459,7 @@ class TreeSurvUpload extends TreeSurv
         } else {
             $imgTypes = ['png', 'gif', 'jpg', 'jpeg'];
             if (intVal($upRow->up_type) == $vidTypeID) {
-                if (stripos($upRow->up_video_link, 'youtube') !== false 
-                    || stripos($upRow->up_video_link, 'youtu.be') !== false) {
-                    $ret["youtube"] = $this->getYoutubeID($upRow->up_video_link);
-                    $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
-                        . '" target="_blank">youtube/' . $ret["youtube"] . '</a>';
-                } elseif (stripos($upRow->up_video_link, 'vimeo.com') !== false) {
-                    $ret["vimeo"] = $this->getVimeoID($upRow->up_video_link);
-                    $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
-                        . '" target="_blank">vimeo/' . $ret["vimeo"] . '</a>';
-                }
+                $this->loadUpDeetsVideo($ret, $upRow);
             } elseif (isset($upRow->up_stored_file) && trim($upRow->up_stored_file) != '') {
                 $ret["file"] = $GLOBALS["SL"]->searchDeeperDirs($ret["file"]);
                 if (!file_exists($ret["file"])) {
@@ -414,6 +475,28 @@ class TreeSurvUpload extends TreeSurv
             }
         }
         return $ret;
+    }
+    
+    protected function loadUpDeetsVideo(&$ret, $upRow)
+    {
+        if (stripos($upRow->up_video_link, 'youtube') !== false 
+            || stripos($upRow->up_video_link, 'youtu.be') !== false) {
+            $ret["youtube"] = $GLOBALS["SL"]->getYoutubeID($upRow->up_video_link);
+            $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
+                . '" target="_blank">youtube/' . $ret["youtube"] . '</a>';
+        } elseif (stripos($upRow->up_video_link, 'vimeo.com') !== false) {
+            $ret["vimeo"] = $GLOBALS["SL"]->getVimeoID($upRow->up_video_link);
+            $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
+                . '" target="_blank">vimeo/' . $ret["vimeo"] . '</a>';
+            $ret["thmbUrl"] = '';
+        } elseif (stripos($upRow->up_video_link, 'archive.org') !== false) {
+            $ret["archiveVid"] = $GLOBALS["SL"]->getArchiveOrgVidID($upRow->up_video_link);
+            $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
+                . '" target="_blank">archive.org/details/' . $ret["archiveVid"] . '</a>';
+        } elseif (isset($upRow->up_video_link)) {
+            $ret["otherLnk"] = trim($upRow->up_video_link);
+        }
+        return true;
     }
     
     protected function loadPrevUploadDeets($nID = -3)
@@ -515,6 +598,7 @@ class TreeSurvUpload extends TreeSurv
                 $ups[] = view(
                     $view, 
                     [
+                        "cnt"         => sizeof($ups),
                         "nID"         => $nID,
                         "REQ"         => $GLOBALS["SL"]->REQ,
                         "height"      => 180,
@@ -658,14 +742,21 @@ class TreeSurvUpload extends TreeSurv
                         $upFold = $this->getUploadFolder();
                         $this->mkNewFolder($upFold);
                         $upRow->up_stored_file = $this->getUploadFile($nID);
-                        $origFile = $upRow->up_stored_file . '-orig.' . strtolower($extension);
+                        $origFile = $upRow->up_stored_file . '-orig.' 
+                            . strtolower($extension);
                         //if ($GLOBALS["SL"]->debugOn) { $ret .= "saving as filename: " . $upFold . $origFile . "<br>"; }
                         if (file_exists($upFold . $origFile)) {
                             Storage::delete($upFold . $origFile);
                         }
                         $GLOBALS["SL"]->REQ->file($file)->move($upFold, $origFile);
                         $filename = $upRow->up_stored_file;
-                        $this->upImgResize($upFold, $filename, $origFile);
+                        if (strtolower($mimetype) == "application/pdf") {
+                            $minFile = $upRow->up_stored_file . '.pdf';
+                            $pdf = new SurvLoopPDF($GLOBALS["SL"]->coreTbl);
+                            $pdf->simplifyPdf($upFold . $origFile, $upFold . $minFile);
+                        } else {
+                            $this->upImgResize($upFold, $filename, $origFile);
+                        }
                     }
                 } else {
                     $ret .= '<div class="txtDanger">'
@@ -719,7 +810,7 @@ class TreeSurvUpload extends TreeSurv
         $filename .= '.jpg';
         $image = Image::make($upFold . $origFile);
         $isLarge = false;
-        $width = $height = $max = 1600;
+        $width = $height = $max = 1400;
         if ($image->width() > $image->height()) {
             $isLarge = ($image->width() > $max);
             $height=null;
@@ -729,8 +820,8 @@ class TreeSurvUpload extends TreeSurv
         }
         if ($isLarge) {
             $image->resize($width, $height, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
+                $constraint->aspectRatio();
+            });
         }
         if (file_exists($upFold . $filename)) {
             unlink($upFold . $filename);
@@ -774,32 +865,7 @@ class TreeSurvUpload extends TreeSurv
         $this->checkBaseFolders();
         $this->checkFolder($fold);
         return true;
-    }
-
-    protected function getYoutubeDuration($vidURL)
-    {
-        if (stripos($vidURL, 'youtube') !== false) {
-            
-        }
-        return -1;
-    }
-    
-    protected function getYoutubeID($vidURL)
-    {
-        if (strpos(strtolower($vidURL), 'https://youtu.be/') !== false) {
-            return str_ireplace('https://youtu.be/', '', $vidURL);
-        }
-        preg_match('/[\\?\\&]v=([^\\?\\&]+)/', $vidURL, $matches);
-        return $matches[1];
-    }
-    
-    protected function getVimeoID($vidURL)
-    {
-        if (strpos(strtolower($vidURL), 'https://vimeo.com/') !== false) {
-            return str_ireplace('https://vimeo.com/', '', $vidURL);
-        }
-        return '';
-    }                           
+    }                        
     
 }
 

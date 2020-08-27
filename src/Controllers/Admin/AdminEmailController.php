@@ -101,6 +101,7 @@ class AdminEmailController extends AdminCoreController
             $currEmail->email_name    = $request->emailName;
             $currEmail->email_subject = $request->emailSubject;
             $currEmail->email_body    = $request->emailBody;
+            $currEmail->email_attach  = $request->emailAttach;
             $currEmail->email_opts    = 1;
             $currEmail->save();
         }
@@ -230,11 +231,16 @@ class AdminEmailController extends AdminCoreController
     
     public function ajaxContactTabs(Request $request)
     {
-        $this->getRecFiltTots('SLContact', 'cont_flag', ['Unread', 'Read', 'Trash'], 'cont_id');
+        $types = ['Unread', 'Read', 'Trash'];
+        $this->getRecFiltTots('SLContact', 'cont_flag', $types, 'cont_id');
+        $status = 'unread';
+        if ($request->has('tab')) {
+            $status = trim($request->get('tab'));
+        }
         return view(
             'vendor.survloop.admin.contact-tabs', 
             [
-                "filtStatus" => (($request->has('tab')) ? $request->get('tab') : 'unread'),
+                "filtStatus" => $status,
                 "recTots"    => $this->v["recTots"]
             ]
         )->render();
@@ -244,19 +250,32 @@ class AdminEmailController extends AdminCoreController
     {
         $cID = (($request->has('cid')) ? $request->get('cid') : -3);
         $cRow = (($cID > 0) ? SLContact::find($cID) : []);
-        $newStatus = (($request->has('status')) ? $request->get('status') : '');
+        $newStatus = '';
+        if ($request->has('status')) {
+            $newStatus = trim($request->get('status'));
+        }
         if ($cID > 0 && isset($cRow->ContID) && $newStatus != '') {
             $cRow->ContFlag = $newStatus;
             $cRow->save();
         }
         if ($cID > 0 && isset($cRow->ContID)) {
-            $currTab = (($request->has('tab')) ? trim($request->get('tab')) : 'unread');
-            $newRow = (($currTab == 'unread' && $newStatus != 'Unread')
-                || ($currTab == 'all' && $newStatus == 'Trash')) 
-                || ($currTab == 'trash' && $newStatus != 'Trash')
-                ? '<div class="col-12"><i>Message moved.</i></div>' 
-                : view('vendor.survloop.admin.contact-row', [ "contact" => $cRow ])->render();
-            return $newRow . '<script type="text/javascript"> $(document).ready(function(){
+            $currTab = 'unread';
+            if ($request->has('tab')) {
+                $currTab = trim($request->get('tab'));
+            }
+            $ret = '';
+            if ((($currTab == 'unread' && $newStatus != 'Unread')
+                    || ($currTab == 'all' && $newStatus == 'Trash')) 
+                || ($currTab == 'trash' && $newStatus != 'Trash')) {
+                $ret = '<div class="col-12"><i>Message moved.</i></div>';
+            } else {
+                $ret = view(
+                    'vendor.survloop.admin.contact-row', 
+                    [ "contact" => $cRow ]
+                )->render();
+            }
+            return $ret . '<script type="text/javascript"> 
+            $(document).ready(function(){
                 setTimeout( function() {
                     var tabLnk = "/ajadm/contact-tabs?tab=' . $currTab . '";
                     $( "#pageTabs" ).load( tabLnk );

@@ -1,4 +1,5 @@
 <!-- resources/views/survloop/forms/upload-previous.blade.php -->
+
 <div class="nodeAnchor"><a id="upPrev{{ $nIDtxt }}" name="upPrev{{ $nIDtxt }}"></a></div>
 @if (!isset($uploads) || sizeof($uploads) == 0) 
     <h4><span class="slGrey">Nothing uploaded here.</span></h4>

@@ -121,7 +121,25 @@ class SurvTrends extends SurvStatsCore
     {
         $GLOBALS["SL"]->x["needsPlots"] = true;
         $this->loadAxisPastDayLabels();
-//echo 'printDailyGraph(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
+        $sysDef = new SystemDefinitions;
+        return view(
+            'vendor.survloop.reports.graph-bar-grouped', 
+            [
+                "nIDtxt"     => $this->nIDtxt,
+                "datMap"     => $this->datMap,
+                "axisLabels" => $this->axisLabels,
+                "dataDays"   => $this->dataDays,
+                "height"     => $height,
+                "css"        => $sysDef->loadCss()
+            ]
+        )->render();
+    }
+    
+    public function printDailyGraphLines($height = 500)
+    {
+        $GLOBALS["SL"]->x["needsPlots"] = true;
+        $this->loadAxisPastDayLabels();
+echo 'printDailyGraphLines(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
         $sysDef = new SystemDefinitions;
         return view(
             'vendor.survloop.reports.graph-bar-grouped', 

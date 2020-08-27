@@ -1,7 +1,9 @@
 <?php
 /**
-  * GlobalsStatic is the mid-level core class for loading and accessing system information from anywhere.
-  * This level contains mostly standalone functions which are not SurvLoop-specific.
+  * GlobalsStatic is the mid-level core class for loading 
+  * and accessing system information from anywhere.
+  * This level contains mostly standalone functions 
+  * which are not really SurvLoop-specific.
   *
   * SurvLoop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
@@ -66,6 +68,11 @@ class GlobalsStatic extends GlobalsConvert
             }
         }
         return $ret;
+    }
+    
+    public function printThrottledHtml($str)
+    {
+        return strip_tags($str, '<p><br>');
     }
 
     public function getAnyReqParams()
@@ -338,6 +345,48 @@ class GlobalsStatic extends GlobalsConvert
         return $shrt;
     }
     
+    public function breakUpLongLinesPrint($str, $charLimit = 120)
+    {
+        $str = $this->breakUpLongWords($str, $charLimit);
+        return wordwrap($str, $charLimit, "<br>\n");
+    }
+    
+    public function breakUpLongWordsPrint($str, $charLimit = 120)
+    {
+        $str = $this->breakUpLongWords($str, $charLimit);
+        return str_replace("\n", '<br />', $str);
+    }
+    
+    public function breakUpLongWords($str, $charLimit = 120)
+    {
+        $lines = $this->mexplode("\n", $str);
+        $str = '';
+        if (sizeof($lines) > 0) {
+            foreach ($lines as $l => $line) {
+                if ($l > 0) {
+                    $str .= "\n";
+                }
+                $words = $this->mexplode(' ', $line);
+                if (sizeof($words) > 0) {
+                    foreach ($words as $w => $word) {
+                        $words[$w] = $this->breakUpWord($word, $charLimit);
+                    }
+                    $str .= implode(' ', $words);
+                }
+            }
+        }
+        return $str;
+    }
+    
+    public function breakUpWord($word, $charLimit = 120)
+    {
+        if (strlen($word) > $charLimit) {
+            return substr($word, 0, $charLimit) . ' '
+                . $this->breakUpWord(substr($word, $charLimit), $charLimit);
+        }
+        return $word;
+    }
+    
     // takes in and returns rows of [ Record ID, Ranked Value, Rank Order, Percentile ]
     public function calcPercentiles($arr = [])
     {
@@ -371,6 +420,9 @@ class GlobalsStatic extends GlobalsConvert
     public function parseSearchWords($search = '')
     {
         $search = trim($search);
+        if ($search == '') {
+            return [];
+        }
         $ret = [$search];
         if (substr($search, 0, 1) == '"' && substr($search, 0, 1) == '"') {
             $ret = [substr($search, 1, strlen($search)-2)];
@@ -488,36 +540,6 @@ class GlobalsStatic extends GlobalsConvert
             . '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', 
             substr($_SERVER["HTTP_USER_AGENT"],0,4)));
     }
-    
-    public function cnvrtSqFt2Acr($squareFeet = 0)
-    {
-        return $squareFeet*0.000022956841138659;
-    }
-    
-    public function cnvrtAcr2SqFt($acres = 0)
-    {
-        return $acres*43560;
-    }
-    
-    public function cnvrtLbs2Grm($lbs = 0)
-    {
-        return $lbs*453.59237;
-    }
-    
-    public function cnvrtKwh2Kbtu($kWh = 0)
-    {
-        return $kWh*3.412;
-    }
-    
-    public function cnvrtKwh2Btu($kWh = 0)
-    {
-        return $kWh*3412;
-    }
-    
-    public function cnvrtKbtu2Kwh($btu = 0)
-    {
-        return $btu/3.412;
-    }
 
     public function swapMonthNum($str = '')
     {
@@ -528,6 +550,94 @@ class GlobalsStatic extends GlobalsConvert
             }
         }
         return $str;
+    }
+
+    public function fixAllUpOrLow($str = '')
+    {
+        $str = str_replace('-', ' - ', 
+            str_replace('/', ' / ', 
+            str_replace('’', ' ’ ', 
+            str_replace('"', ' " ', 
+            str_replace("'", " ' ", 
+            $str)))));
+        $str = str_replace('  ', ' ', str_replace('  ', ' ', $str));
+        $wordSplit = $this->mexplode(' ', $str);
+        $str = '';
+        foreach ($wordSplit as $i => $word) {
+            if ($i > 0) {
+                $str .= ' ';
+            }
+            if ($word == strtolower($word) || $word == strtoupper($word)) {
+                $word = ucwords(strtolower(trim($word)));
+                $str .= $this->fixAllUpOrLowSurnames($word);
+            } else {
+                $str .= $word;
+            }
+        }
+        $str = str_replace(' - ', '-', 
+            str_replace(' / ', '/', 
+            str_replace(' ’ ', '’', 
+            str_replace(' " ', '"', 
+            str_replace(" ' ", "'", 
+            $str)))));
+        return $str;
+    }
+
+    public function fixAllUpOrLowSurnames($str = '')
+    {
+        if (strpos($str, 'Mc') === 0) {
+            $str .= 'Mc' . ucwords(substr($str, 2, strlen($str)));
+        }
+        return $str;
+    }
+
+    public function upperCaseWordsExceptAcronym($str = '')
+    {
+        $str = ucwords(strtolower(trim($str)));
+        $parenStart = strpos($str, '(');
+        if ($parenStart > 0) {
+            $parenEnd = strpos($str, ')', $parenStart);
+            if ($parenEnd > 0 && $parenEnd == ($str.length-1)) {
+                $str = substr($str, 0, $parenStart) 
+                    . strtoupper(substr($str, ($parenStart-1)));
+            }
+        }
+        return $str;
+    }
+
+    public function mergeArr($arr1 = [], $arr2 = [], $duplicates = false)
+    {
+        $ret = $arr1;
+        if (sizeof($arr2) > 0) {
+            foreach ($arr2 as $val) {
+                if ($duplicates || !in_array($val, $ret)) {
+                    $ret[] = $val;
+                }
+            }
+        }
+        return $ret;
+    }
+
+    public function resultsToArrIds($results = null, $fld = '')
+    {
+        if (!$results || $results->isEmpty() || $fld == '') {
+            return [];
+        }
+        $arr = [];
+        foreach ($results as $rec) {
+            if ($rec
+                && isset($rec->{ $fld }) 
+                && intVal($rec->{ $fld }) > 0) {
+                $arr[] = intVal($rec->{ $fld });
+            }
+        }
+        return $arr;
+    }
+
+    public function mergeResultIds(&$arr1, $results = null, $fld = '')
+    {
+        $arr1 = $this->mergeArr($arr1, $this->resultsToArrIds($results, $fld));
+        return $arr1;
     }
 
 }

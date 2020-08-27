@@ -1,10 +1,48 @@
 /* generated from resources/views/vendor/survloop/js/scripts-ajax.blade.php */
 
 $(document).ready(function(){
+    
+{!! view('vendor.survloop.js.scripts-ajax-forms')->render() !!}
+    
+{!! view('vendor.survloop.js.scripts-ajax-search')->render() !!}
+
+{!! view('vendor.survloop.js.scripts-ajax-scrolling')->render() !!}
+
+{!! view('vendor.survloop.js.scripts-ajax-size-match')->render() !!}
+
+{!! view('vendor.survloop.js.scripts-ajax-colors')->render() !!}
+
+{!! view('vendor.survloop.js.scripts-ajax-images')->render() !!}
+
+    // Primary hook for little scripts which need to be run every second or two
+    function loopCheckPageTweaks(timeout) {
+        chkAutoLoadDashResults();
+        chkMatchCols();
+        chkMatchColWidths();
+        chkSpecialNodes();
+        chkAnyAnimRevealResults();
+
+        timeout=Math.round(1.1*timeout);
+        setTimeout(function() { loopCheckPageTweaks(timeout); }, timeout);
+        return true;
+    }
+    setTimeout(function() { loopCheckPageTweaks(1000); }, 100);
 
     function isAdmDash() {
         return ($( "#mainBody" ).hasClass( "mainBodyDash" ));
     }
+
+    var winResizeHold = false;
+    function slOnResize() {
+        if (!winResizeHold) {
+            winResizeHold = true;
+            var win = $(this); //this = window
+            sliLoadHgts();
+            chkLogoResize();
+            setTimeout(function() { winResizeHold = false; }, 250);
+        }
+    }
+    $(window).on('resize', function(){ slOnResize(); });
     
     function popDialog(title, desc) {
         if (document.getElementById("dialogPop")) {
@@ -44,124 +82,36 @@ $(document).ready(function(){
     }
     setTimeout(function() { chkFormSess(); }, (45*60000));
     
-    function slideToHshooPos(hash) {
-        if (document.getElementById(hash)) {
-            var newTop = (1+getAnchorOffset()+$("#"+hash+"").offset().top);
-            $('html, body').animate({ scrollTop: newTop }, 800, 'swing', function(){ });
-        }
-        return true;
-    }
-    
-    $(".hsho").on('click', function(event) {
-        var hash = $(this).attr("data-hash").trim();
-        if (hash !== "") slideToHshooPos(hash);
-        return false;
-    });
-    
-    $(".hshoo").on('click', function(event) {
-        event.preventDefault();
-        var hash = '';
-        if ($(this).attr("id") && $(this).attr("id").substring(0, 6) == 'admLnk') {
-            hash = '#'+$(this).attr("id").substring(6);
-        } else if (this.hash !== "") {
-            hash = this.hash;
-        }
-        var hashDivID = hash.replace('#', '');
-        if (document.getElementById(hashDivID)) {
-            setTimeout(function() { slideToHshooPos(hashDivID); }, 100);
-            hshooCurr = getHshooInd(hash);
-            setTimeout(function() { updateHshooActive(hshooCurr); }, 1000);
-        }
-        return false;
-    });
-    
-    function chkHshoosPos() {
-        for (var i = 0; i < hshoos.length; i++) {
-            if (document.getElementById(hshoos[i][0].replace('#', ''))) {
-                hshoos[i][1] = $(hshoos[i][0]).offset().top;
-                var admLnk = "admLnk"+hshoos[i][0].replace('#', '');
-                if (document.getElementById(admLnk)) {
-                    if (document.getElementById(admLnk).className.indexOf("active") !== false) hshooCurr = i;
-                }
-            }
-        }
-        var absMin = -1000000000;
-        var newArr = new Array();
-        for (var i = 0; i < hshoos.length; i++) {
-            var min = new Array(0, 1000000000);
-            for (var j = 0; j < hshoos.length; j++) {
-                if (absMin < hshoos[j][1] && hshoos[j][1] < min[1]) min = new Array(j, hshoos[j][1]);
-            }
-            if (min[1] > -1000000000) {
-                absMin = min[1];
-                newArr[newArr.length] = new Array(hshoos[min[0]][0], hshoos[min[0]][1]);
-            }
-        }
-        hshoos = newArr;
-        setTimeout(function() { chkHshoosPos(); }, 5000);
-        return true;
-    }
-    
-    function updateHshooActive(hshooCurr) {
-        for (var i = 0; i < hshoos.length; i++) {
-            var admLnk = "admLnk"+hshoos[i][0].replace('#', '');
-            if (document.getElementById(admLnk)) {
-                if (i == hshooCurr) $("#"+admLnk+"").addClass('active');
-                else $("#"+admLnk+"").removeClass('active');
-            }
-        }
-        return true;
-    }
-    
-    function chkHshooScroll() {
-        if (hshoos.length > 0) {
-            hshooCurr = -1;
-            var currScroll = Math.ceil($(document).scrollTop())-getAnchorOffset();
-            var compareScroll = currScroll+2;
-            for (var i = 0; i < hshoos.length; i++) {
-                if (hshoos[i][1] <= compareScroll) hshooCurr = i;
-            }
-            if (hshooCurr < 0) hshooCurr = 0;
-            updateHshooActive(hshooCurr);
-        }
-        return true;
-    }
-    setTimeout(function() { chkHshoosPos(); }, 10);
-    setTimeout(function() { chkHshooScroll(); }, 50);
-    $(document).scroll(function() { chkHshooScroll(); });
-
-    function chkMatchCols(timeout) {
-        if (matchingColRunning) {
-            if (window.innerWidth > 992) {
-                for (var i = 0; i < matchingColHgtsLg.length; i++) {
-                    var tallest = 0;
-                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
-                        if (document.getElementById(matchingColHgtsLg[i][j]) && tallest < $('#'+matchingColHgtsLg[i][j]+'').height()) {
-                            tallest = $('#'+matchingColHgtsLg[i][j]+'').height();
-                        }
+    function chkNav2(currScroll) {
+        if (document.getElementById("mainNav2")) {
+            var pos = currNav2Pos[0];
+            if (window.innerWidth < 992) {
+                if (window.innerWidth > 768) {
+                    if (currNav2Pos.length > 1) {
+                        pos = currNav2Pos[1];
                     }
-                    var newHgt = ''+Math.round(tallest+40)+'px';
-                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
-                        if (document.getElementById(matchingColHgtsLg[i][j])) {
-                            document.getElementById(matchingColHgtsLg[i][j]).style.minHeight=newHgt;
-                        }
+                } else if (window.innerWidth > 480) {
+                    if (currNav2Pos.length > 2) {
+                        pos = currNav2Pos[2];
+                    } else if (currNav2Pos.length > 1) {
+                        pos = currNav2Pos[1];
                     }
                 }
+            }
+            if (currScroll > pos) {
+                document.getElementById("mainNav2").style.display="block";
             } else {
-                for (var i = 0; i < matchingColHgtsLg.length; i++) {
-                    for (var j = 0; j < matchingColHgtsLg[i].length; j++) {
-                        document.getElementById(matchingColHgtsLg[i][j]).style.minHeight='1px';
-                    }
-                }
+                document.getElementById("mainNav2").style.display="none";
             }
         }
-        timeout=Math.round(1.2*timeout);
-        setTimeout(function() { chkMatchCols(timeout); }, timeout);
-        return true;
+
     }
-    setTimeout(function() { chkMatchCols(500); }, 300);
-    
-{!! view('vendor.survloop.js.scripts-ajax-forms')->render() !!}
+
+    $(document).scroll(function() {
+        var currScroll = getCurrScroll();
+        chkHshooScroll(currScroll);
+        chkNav2(currScroll);
+    });
     
 	function hideMajNav(majInd) {
         if (document.getElementById("minorNav"+majInd+"") && document.getElementById("majSect"+majInd+"Vert2")) {
@@ -198,132 +148,6 @@ $(document).ready(function(){
         $(this).blur();
 	    return false;
 	});
-	
-    var dontHideSearch = false;
-    function chkSearchOnLoad() {
-        if (document.getElementById("admSrchFld") && document.getElementById("admSrchFld").value && document.getElementById("admSrchFld").value.trim() != '') {
-            document.getElementById("topNavSearchBtn").style.display = 'none';
-            document.getElementById("topNavSearch").style.display = 'block';
-        }
-        return true;
-    }
-    setTimeout(function() { chkSearchOnLoad(); }, 10);
-    $(document).on("click", "#topNavSearchBtn", function() {
-        $("#topNavSearchBtn").fadeOut(25);
-        setTimeout(function() { $("#topNavSearch").fadeIn(25); }, 26);
-        setTimeout(function() { $("#admSrchFld").focus(); }, 52);
-        if (document.getElementById("userMenuBtnName")) {
-            document.getElementById("userMenuBtnName").style.display="none";
-        }
-    });
-    $(document).on("focusin", "#admSrchFld", function() {
-        if (document.getElementById("topNavSearch")) {
-            document.getElementById("topNavSearch").className="fL topNavSearchActive";
-        }
-    });
-    $(document).on("focusout", "#admSrchFld", function() {
-        setTimeout(function() { hideAdvSeach(); }, 100);
-    });
-    function hideAdvSeach() {
-        if (!dontHideSearch) {
-            if (document.getElementById("topNavSearch")) {
-                document.getElementById("topNavSearch").className="fL topNavSearch";
-            }
-            setTimeout(function() { chkHideAdvSeach(); }, 20);
-        }
-        return true;
-    }
-    function chkHideAdvSeach() {
-        if (!dontHideSearch && document.getElementById("hidivSearchOpts") && document.getElementById("topNavSearch") && document.getElementById("topNavSearch").className=="fL topNavSearch" && document.getElementById("hidivSearchOpts").style.display=="block") {
-            $("#hidivSearchOpts").slideUp("fast");
-            document.getElementById("hidivBtnArrSearchOpts").className="fa fa-caret-down";
-        }
-        return true;
-    }
-    function pauseHideAdvSearch() {
-        $("#admSrchFld").focus();
-        dontHideSearch = true;
-        setTimeout(function() { dontHideSearch = false; }, 300);
-    }
-    $(document).on("focusin", "#hidivBtnSearchOpts", function() {
-        pauseHideAdvSearch();
-    });
-    $(document).on("focusin", "#hidivSearchOpts", function() {
-        pauseHideAdvSearch();
-    });
-    $(document).on("focusin", "#hidivSearchOpts a", function() {
-        pauseHideAdvSearch();
-    });
-    $(document).on("click", ".srchBarParts", function() {
-        pauseHideAdvSearch();
-    });
-    $(document).on("focusin", "input.srchBarParts", function() {
-        pauseHideAdvSearch();
-    });
-    $(document).on("click", ".updateSearchFilts", function() {
-        document.dashSearchForm.submit();
-    });
-
-    $(document).on("click", "#toggleSearchFilts", function() {
-        if (document.getElementById("searchFilts")) {
-            if (document.getElementById("searchFilts").style.display!="block") {
-                currRightPane = 'filters';
-            } else {
-                currRightPane = 'preview';
-            }
-        }
-        updateRightPane();
-    });
-
-    $(document).on("click", "#hidivBtnDashViewLrg", function() {
-        if (sView != 'lrg') {
-            document.getElementById("sViewID").value='lrg';
-            document.dashSearchForm.submit();
-        }
-    });
-    $(document).on("click", "#hidivBtnDashViewList", function() {
-        if (sView != 'list') {
-            document.getElementById("sViewID").value='list';
-            document.dashSearchForm.submit();
-        }
-    });
-
-    $(document).on("click", ".fltSortTypeBtn", function() {
-        var srtType = $(this).attr("data-sort-type");
-        if (document.getElementById("sSortID") && srtType) {
-            document.getElementById("sSortID").value=srtType;
-            document.dashSearchForm.submit();
-        }
-    });
-    $(document).on("click", ".fltSortDirBtn", function() {
-        var srtDir = $(this).attr("data-sort-dir");
-        if (document.getElementById("sSortDirID") && srtType) {
-            document.getElementById("sSortDirID").value=srtDir;
-            document.dashSearchForm.submit();
-        }
-    });
-
-    function chkDashHeight() {
-        dashHeight = document.body.clientHeight;
-        var newHeight = dashHeight-130;
-        if (document.getElementById("dashResultsWrap")) {
-            document.getElementById("dashResultsWrap").style.height=''+newHeight+'px';
-        }
-        if (document.getElementById("reportAdmPreview")) {
-            document.getElementById("reportAdmPreview").style.height=''+newHeight+'px';
-        }
-        if (document.getElementById("hidivDashTools")) {
-            document.getElementById("hidivDashTools").style.height=''+newHeight+'px';
-        }
-        if (document.getElementById("reportAdmPreviewFull")) {
-            newHeight += 60;
-            document.getElementById("reportAdmPreviewFull").style.height=''+newHeight+'px';
-        }
-        setTimeout(function() { chkDashHeight(); }, 5000);
-        return true;
-    }
-    setTimeout(function() { chkDashHeight(); }, 1);
-
 
 	$(document).on("click", "#navMobToggle", function() {
 	    if (document.getElementById("navMobBurger1").style.display!="none") {
@@ -347,18 +171,6 @@ $(document).ready(function(){
             }
         }
         return true;
-    });
-    
-	$(document).on("click", ".searchBarBtn", function() {
-        var nID = $(this).attr("id").replace("searchTxt", "").split("t");
-        return runSearch(nID[0], nID[1]);
-	});
-	$(document).on("keyup", ".searchBar", function(e) {
-        if (e.keyCode == 13) {
-            e.preventDefault();
-            var nID = $(this).attr("id").replace("searchBar", "").split("t");
-            return runSearch(nID[0], nID[1]);
-        }
     });
     
     $(".slSortable").sortable({
@@ -402,66 +214,6 @@ $(document).ready(function(){
 		setTimeout(function() { $("#nondialog").fadeIn(300); }, 301);
 	});
 	
-	function showColorList(fldName) {
-	    if (document.getElementById(""+fldName+"ID") && document.getElementById("colorPick"+fldName+"")) {
-	        if (document.getElementById("colorPick"+fldName+"").innerHTML == "") {
-                var src = "/ajax/color-pick?fldName="+fldName+"&preSel="+document.getElementById(""+fldName+"ID").value.replace("#", "")+"";
-                $("#colorPick"+fldName+"").load(src);
-            } else {
-                $("#colorPick"+fldName+"").slideDown("fast");
-            }
-        }
-        return true;
-	}
-    $(document).on("click", ".colorPickFld", function() {
-        return showColorList($(this).attr("name"));
-	});
-    $(document).on("click", ".colorPickFldSwatch", function() {
-        return showColorList($(this).attr("id").replace("ColorSwatch", ""));
-	});
-	function setColorFld(fldName, val) {
-	    if (document.getElementById(""+fldName+"ID") && document.getElementById("colorPick"+fldName+"")) {
-	        document.getElementById(""+fldName+"ID").value = val;
-	        document.getElementById(""+fldName+"ColorSwatch").style.backgroundColor = val;
-            $("#colorPick"+fldName+"").slideUp("fast");
-        }
-        return true;
-	}
-    $(document).on("click", ".colorPickRadio", function() {
-        setColorFld($(this).attr("name").replace("Radio", ""), $(this).val());
-		return true;
-	});
-    $(document).on("click", ".colorPickFldSwatchBtn", function() {
-        var colorArr = $(this).attr("id").split("ColorSwatch");
-        if (document.getElementById(""+colorArr[0]+"CustomID")) {
-            return setColorFld(colorArr[0], "#"+colorArr[1]+"");
-        }
-		return true;
-	});
-	function setColorToCustom(fldName) {
-        if (document.getElementById(""+fldName+"CustomID")) {
-            return setColorFld(fldName, document.getElementById(""+fldName+"CustomID").value);
-        }
-        return true;
-	}
-    $(document).on("click", ".colorPickCustomBtn", function() {
-        var fldName = $(this).attr("id").replace("SetCustomColor", "");
-		return setColorToCustom(fldName);
-	});
-    $(document).on("keyup", ".colorPickCustomFld", function(e) {
-        var fldName = $(this).attr("name").replace("Custom", "");
-        if (document.getElementById(""+fldName+"CustomColor")) {
-            document.getElementById(""+fldName+"CustomColor").style.backgroundColor = $(this).val();
-        }
-        if (e.keyCode == 13) {
-            var fldName = $(this).attr("name").replace("Custom", "");
-            setColorToCustom(fldName);
-            e.preventDefault();
-            return false;
-        }
-		return true;
-	});
-	
 	if (document.getElementById('tblSelect')) {
         $("#tblSelect").load("/dashboard/db/ajax/tblFldSelT/"+encodeURIComponent(document.getElementById("RuleTablesID").value)+"");
         $("#fldSelect").load("/dashboard/db/ajax/tblFldSelF/"+encodeURIComponent(document.getElementById("RuleFieldsID").value)+"");
@@ -469,7 +221,7 @@ $(document).ready(function(){
     
     function toggleHidiv(fldGrp) {
         if (document.getElementById("hidiv"+fldGrp+"")) {
-            if (document.getElementById("hidiv"+fldGrp+"").style.display!="block") {
+            if (document.getElementById("hidiv"+fldGrp+"").style.display!="block" || document.getElementById("hidiv"+fldGrp+"").style.display=="none") {
                 $("#hidiv"+fldGrp+"").slideDown("fast");
                 setTimeout(function() { document.getElementById("hidiv"+fldGrp+"").style.display="block"; }, 351);
                 if (document.getElementById("hidivBtnArr"+fldGrp+"")) {
@@ -506,11 +258,14 @@ $(document).ready(function(){
         var fldGrp = $(this).attr("id").replace("hidivBtn", "");
         toggleHidiv(fldGrp);
 	});
-	$(document).on("click", ".hidivBtnSelf", function() {
+    $(document).on("click", ".hidivBtnSelf", function() {
         var fldGrp = $(this).attr("id").replace("hidivBtn", "");
         $(this).slideUp("fast");
         setTimeout(function() { toggleHidiv(fldGrp); }, 350);
-	});
+    });
+    $(document).on("click", ".hidSelf", function() {
+        $(this).slideUp("fast");
+    });
     
     function visibShowNode(nID) {
         setNodeVisib(""+nID+"", "", true);
@@ -540,51 +295,6 @@ $(document).ready(function(){
         toggleHidnode(nID);
         $(this).slideUp("fast");
 	});
-
-    function chkPageTweaks(timeout) {
-        chkMatchCols();
-        chkSpecialNodes();
-
-        timeout=Math.round(1.2*timeout);
-        setTimeout(function() { chkPageTweaks(timeout); }, timeout);
-        return true;
-    }
-
-    function chkSpecialNodes() {
-        if (specialNodes && specialNodes.length > 0) {
-            for (var i=0; i < specialNodes.length; i++) {
-                if (specialNodes[i].length > 0 && specialNodes[i][0].trim() != '') {
-                    if (specialNodes[i][0].trim() == 'nyc') {
-                        chkSpecialNodeNYC(specialNodes[i]);
-                    }
-                }
-            }
-        }
-        setTimeout(function() { chkSpecialNodes(); }, 2500);
-    }
-    setTimeout(function() { chkSpecialNodes(); }, 300);
-
-    function chkSpecialNodeNYC(specialNode) {
-        if (specialNode[0] == 'nyc' && specialNode.length == 4) {
-            var showNyc = false;
-            var cityFld = "n"+specialNode[1]+"FldID";
-            var stateFld = "n"+specialNode[2]+"FldID";
-            if (document.getElementById(cityFld) && document.getElementById(cityFld).value && document.getElementById(stateFld) && document.getElementById(stateFld).value) {
-                var city = document.getElementById(cityFld).value.trim().toLowerCase();
-                city = city.replace(' ', '').replace(' ', '').replace(' ', '').trim();
-                if (document.getElementById(stateFld).value == 'NY' && (city.indexOf("newyork") >= 0 || city.indexOf("nyc") >= 0)) {
-                    showNyc = true;
-                }
-            }
-            if (document.getElementById("blockWrap"+specialNode[3]+"")) {
-                if (showNyc) {
-                    visibShowNode(specialNode[3]);
-                } else {
-                    visibHideNode(specialNode[3]);
-                }
-            }
-        }
-    }
 	
 	$(document).on("click", ".hidTogAll", function() {
 	    if ($(this).attr("data-list") && $(this).attr("data-list").trim() != '') {
@@ -605,7 +315,6 @@ $(document).ready(function(){
             }
         }
 	});
-	
 	
 	$(document).on("click", ".ajx", function() {
         var ajxUrl = $(this).attr("data-ajx");
@@ -637,7 +346,9 @@ $(document).ready(function(){
     function chkMenuLoad(last) {
 	    if ((!document.getElementById('loginLnk') && !document.getElementById('userMenu')) && document.getElementById('headClear')) {
             var redirUrl = "/js-load-menu";
-            if (currTreeType == 'Survey' && currPage[1].trim() != '') redirUrl += "?currPage="+encodeURIComponent(currPage[1])+'&nd='+currTreeNode+'';
+            if (currTreeType == 'Survey' && currPage[1].trim() != '') {
+                redirUrl += "?currPage="+encodeURIComponent(currPage[1])+'&nd='+currTreeNode+'';
+            }
 	        $("#headClear").load(redirUrl);
 	    }
 	}
@@ -648,145 +359,6 @@ $(document).ready(function(){
         if (document.getElementById('adminAbout')) {
             $("#adminAbout").slideToggle('slow');
         }
-	});
-	
-	function updateImgSelect(nIDtxt) {
-        if (document.getElementById("n"+nIDtxt+"FldID") && document.getElementById("n"+nIDtxt+"SelImg")) {
-            var imgSrc = "";
-            if (document.getElementById("n"+nIDtxt+"FldID").value.trim() != "") {
-                imgSrc = document.getElementById("n"+nIDtxt+"FldID").value.trim();
-            }
-            document.getElementById("n"+nIDtxt+"SelImg").src=imgSrc;
-        }
-        return true;
-    }
-	$(document).on("click", ".openImgUpdate", function() {
-        updateImgSelect($(this).attr("id").replace("imgUpd", "").replace("n", "").replace("FldID", ""));
-	});
-    function defaultImgSelect(nIDtxt) {
-        if (document.getElementById("n"+nIDtxt+"FldID")) {
-            document.getElementById("n"+nIDtxt+"FldID").value = defMetaImg.replace(appUrl, "");
-        }
-        updateImgSelect(nIDtxt);
-        return true;
-    }
-	$(document).on("click", ".openImgReset", function() {
-	    var nIDtxt = $(this).attr("id").replace("imgReset", "");
-        defaultImgSelect(nIDtxt);
-        updateImgSelect(nIDtxt);
-	});
-    function openImgSelect(nIDtxt, title, presel) {
-        if (document.getElementById("dialogTitle")) document.getElementById("dialogTitle").innerHTML = title;
-        $("#nondialog").fadeOut(300);
-        window.scrollTo(0, 0);
-        var url = "/ajax/img-sel?nIDtxt="+nIDtxt+"&presel="+encodeURIComponent(presel);
-        console.log(url);
-        $("#dialogBody").load(url);
-        setTimeout(function() { $("#dialog").fadeIn(300); }, 301);
-        return true;
-    }
-	$(document).on("click", ".openImgSelect", function() {
-	    var imgID = $(this).attr("id").replace("imgSelect", "");
-	    var title = "";
-	    if (document.getElementById("imgSelect"+imgID+"Title")) {
-	        title = document.getElementById("imgSelect"+imgID+"Title").innerHTML.trim();
-	    } else if ($(this).attr("data-title") && $(this).attr("data-title").trim() != '') {
-	        title = $(this).attr("data-title").trim();
-	    }
-        openImgSelect(imgID, title, $(this).attr("data-presel"));
-	});
-    function openImgDetail(nIDtxt, imgID) {
-        if (document.getElementById("imgDeetDiv"+nIDtxt+"")) {
-            document.getElementById("imgDeetDiv"+nIDtxt+"").innerHTML = '<center>'+getSpinner()+'</center>';
-            document.getElementById("hidivImgUp"+nIDtxt+"").style.display = "none";
-            document.getElementById("hidivBtnImgUp"+nIDtxt+"").style.display = "block";
-            $("#imgDeetDiv"+nIDtxt+"").load( "/ajax/img-deet?nIDtxt="+nIDtxt+"&imgID="+imgID+"" );
-        }
-        return true;
-    }
-	$(document).on("click", ".openImgDetail", function() {
-	    var ids = $(this).attr("id").replace("selectImg", "").split("sel");
-        openImgDetail(ids[0], ids[1]);
-	});
-    function getImgNode(imgID) {
-	    var nIDtxt = "pageImg";
-	    if (document.getElementById("imgNode"+imgID+"ID") && document.getElementById("imgNode"+imgID+"ID").value.trim() != '') nIDtxt = document.getElementById("imgNode"+imgID+"ID").value;
-console.log("getImgNode("+imgID+" - "+nIDtxt);
-	    return nIDtxt;
-    }
-    function imgChoose(imgID) {
-        var nIDtxt = getImgNode(imgID);
-        $("#nondialog").fadeIn(300);
-        setTimeout(function() { $("#dialog").fadeOut(300); }, 301);
-	    var url = "";
-	    if (document.getElementById("imgUrl"+imgID+"ID")) url = document.getElementById("imgUrl"+imgID+"ID").value;
-console.log("imgChoosen "+imgID+" - n"+nIDtxt+"FldID ?");
-        if (document.getElementById("n"+nIDtxt+"FldID")) {
-            document.getElementById("n"+nIDtxt+"FldID").value=url;
-
-console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById("n"+nIDtxt+"FldID").value);
-        }
-        updateImgSelect(nIDtxt);
-        return true;
-    }
-	$(document).on("click", ".imgChoose", function() {
-	    imgChoose($(this).attr("id").replace("imgChoose", ""));
-	});
-    function imgSaveDeet(imgID) {
-        var nIDtxt = getImgNode(imgID);
-        if (document.getElementById("img"+imgID+"saveUpdate")) {
-            document.getElementById("img"+imgID+"saveUpdate").innerHTML='<center>'+getSpinner()+'</center>';
-            var formData = new FormData(document.getElementById("formSaveImg"+imgID+"ID"));
-            $.ajax({
-                url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/ajax/img-save",
-                type: "POST", 
-                data: formData, 
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    $("#img"+imgID+"saveUpdate").empty();
-                    $("#img"+imgID+"saveUpdate").append(data);
-                }, 
-                error: function(xhr, status, error) {
-                    $("#img"+imgID+"saveUpdate").append("<div>(error - "+xhr.responseText+")</div>");
-                }
-            });
-        }
-        return true;
-    }
-	$(document).on("click", ".imgSaveDeet", function() {
-	    var imgID = $(this).attr("id").replace("imgSave", "");
-	    imgSaveDeet(imgID);
-	});
-	$(document).on("keyup", ".imgSaveDeetFld", function(e) {
-        if (e.keyCode == 13) {
-            e.preventDefault();
-            if ($(this).attr("data-imgid")) imgSaveDeet($(this).attr("data-imgid"));
-        }
-    });
-    function imgUpBtn(nIDtxt) {
-        if (document.getElementById("img"+nIDtxt+"fileUpdate")) {
-            document.getElementById("img"+nIDtxt+"fileUpdate").innerHTML='<center>'+getSpinner()+'</center>';
-            var formData = new FormData(document.getElementById("formUpImg"+nIDtxt+"ID"));
-            $.ajax({
-                url: "{{ $GLOBALS['SL']->sysOpts['app-url'] }}/ajax/img-up",
-                type: "POST", 
-                data: formData, 
-                contentType: false,
-                processData: false,
-                success: function(data) {
-                    $("#img"+nIDtxt+"fileUpdate").empty();
-                    $("#img"+nIDtxt+"fileUpdate").append(data);
-                }, 
-                error: function(xhr, status, error) {
-                    $("#img"+nIDtxt+"fileUpdate").append("<div>(error - "+xhr.responseText+")</div>");
-                }
-            });
-        }
-        return true;
-    }
-	$(document).on("click", ".imgUpBtn", function() {
-	    imgUpBtn($(this).attr("id").replace("imgUp", ""));
 	});
 	
 	function pullNewGraph(nID) {
@@ -825,155 +397,6 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
         return true;
     });
     
-    function sliHgt(nIDtxt, next) {
-        for (var i = 0; i < slideGals.length; i++) {
-            if (next < 0) next = slideGals[i][3];
-            if (slideGals[i][0] == nIDtxt && document.getElementById("blockWrap"+slideGals[i][1][next]+"")) {
-                var newH = $("#blockWrap"+slideGals[i][1][next]+"").height();
-                if (document.getElementById("node"+nIDtxt+"kids")) {
-                    document.getElementById("node"+nIDtxt+"kids").style.height=newH+"px";
-                }
-                var btnHgt = 30+newH;
-                var hvrHgt = newH;
-                if (document.getElementById("sliLft"+nIDtxt+"")) {
-                    document.getElementById("sliLft"+nIDtxt+"").style.height=btnHgt+"px";
-                    document.getElementById("sliLft"+nIDtxt+"").style.marginTop="-"+newH+"px";
-                    document.getElementById("sliLftHvr"+nIDtxt+"").style.height=newH+"px";
-                }
-                if (document.getElementById("sliRgt"+nIDtxt+"")) {
-                    document.getElementById("sliRgt"+nIDtxt+"").style.height=btnHgt+"px";
-                    document.getElementById("sliRgt"+nIDtxt+"").style.marginTop="-"+newH+"px";
-                    document.getElementById("sliRgtHvr"+nIDtxt+"").style.height=newH+"px";
-                }
-            }
-        }
-        return true;
-    }
-    function sliChange(nIDtxt, next) {
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == nIDtxt) {
-                if (document.getElementById("sliNav"+nIDtxt+"dot"+slideGals[i][3]+"") && document.getElementById("sliNav"+nIDtxt+"dot"+next+"")) {
-                    $("#sliNav"+nIDtxt+"dot"+slideGals[i][3]+"").removeClass('sliNavAct');
-                    $("#sliNav"+nIDtxt+"dot"+slideGals[i][3]+"").addClass('sliNav');
-                    $("#sliNav"+nIDtxt+"dot"+next+"").removeClass('sliNav');
-                    $("#sliNav"+nIDtxt+"dot"+next+"").addClass('sliNavAct');
-                }
-                for (var j = 0; j < slideGals[i][1].length; j++) {
-                    var kidID = slideGals[i][1][j];
-                    if (document.getElementById("blockWrap"+kidID+"")) {
-                        if (j == next) {
-                            $("#blockWrap"+kidID+"").delay(451).fadeIn(450);
-                            setTimeout(function() { sliHgt(nIDtxt, j); }, 451);
-                        } else {
-                            $("#blockWrap"+kidID+"").fadeOut(450);
-                        }
-                    }
-                }
-                slideGals[i][3] = next;
-            }
-        }
-        return true;
-    }
-    function sliLoadAuto(nIDtxt) {
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == nIDtxt) {
-                if (slideGals[i][4] > 0) {
-                    slideGals[i][4] = 0;
-                } else {
-                    sliNext(nIDtxt);
-                }
-                setTimeout(function() { sliLoadAuto(nIDtxt); }, 8000);
-            }
-        }
-        return true;
-    }
-    function sliLoadHgts() {
-        for (var i = 0; i < slideGals.length; i++) sliHgt(slideGals[i][0], -1);
-        return true;
-    }
-    function sliLoad() {
-        for (var i = 0; i < slideGals.length; i++) {
-            var nIDtxt = slideGals[i][0];
-            sliChange(nIDtxt, 0);
-            sliHgt(nIDtxt, 0);
-            setTimeout(function() { sliLoadAuto(nIDtxt); }, 8000);
-        }
-        sliLoadHgts();
-        return true;
-    }
-    setTimeout(function() { sliLoad(); }, 1);
-    function sliNext(nIDtxt) {
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == nIDtxt) {
-                var next = slideGals[i][3]+1;
-                if (next >= slideGals[i][1].length) next = 0;
-                sliChange(nIDtxt, next);
-            }
-        }
-        return true;
-    }
-    $(document).on("click", ".sliRgt", function() {
-        var nIDtxt = $(this).attr("id").replace("sliRgt", "");
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == nIDtxt) slideGals[i][4]++;
-        }
-        sliNext(nIDtxt);
-        return true;
-    });
-    $(document).on("click", ".sliLft", function() {
-        var nIDtxt = $(this).attr("id").replace("sliLft", "");
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == nIDtxt) {
-                var next = slideGals[i][3]-1;
-                if (next < 0) next = slideGals[i][1].length-1;
-                slideGals[i][4]++;
-                sliChange(nIDtxt, next);
-            }
-        }
-        return true;
-    });
-    $(document).on("click", ".sliNav", function() {
-        var n = $(this).attr("id").replace("sliNav", "").split("dot");
-        for (var i = 0; i < slideGals.length; i++) {
-            if (slideGals[i][0] == n[0]) slideGals[i][4]++;
-        }
-        sliChange(n[0], n[1]);
-        return true;
-    });
-
-<?php /*    
-@if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
-    && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
-    function chkLogoResize() {
-        if (!document.getElementById('slLogoImg')) return false;
-        if (window.innerWidth <= 480) {
-            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-sm'] }}';
-        } else if (window.innerWidth <= 768) {
-            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-md'] }}';
-        } else {
-            document.getElementById('slLogoImg').src='{{ $GLOBALS['SL']->sysOpts['logo-img-lrg'] }}';
-        }
-    }
-    setTimeout(function() { chkLogoResize(); }, 1);
-@endif
-*/ ?>
-
-    var winResizeHold = false;
-    $(window).on('resize', function(){
-        if (!winResizeHold) {
-            winResizeHold = true;
-            var win = $(this); //this = window
-            sliLoadHgts();
-<?php /*
-@if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
-    && $GLOBALS['SL']->sysOpts['logo-img-sm'] != $GLOBALS['SL']->sysOpts['logo-img-lrg'])
-            chkLogoResize();
-@endif
-*/ ?>
-            setTimeout(function() { winResizeHold = false; }, 250);
-        }
-    });
-    
     $(document).on("click", ".admSrchFldFocus", function() {
         if (document.getElementById("admSrchFld")) {
             $("#admSrchFld").focus();
@@ -1004,6 +427,16 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
     }
     setTimeout(function() { chkFixedHeaders(true); }, 10);
     
+    function logAdmMenuToggle(opening) {
+        var cycle = admMenuCollapses%3;
+        if (document.getElementById("admBgAjax"+cycle+"")) {
+            var src = "/ajax/adm-menu-toggle";
+            if (opening) src += "?status=open";
+            $("#admBgAjax"+cycle+"").load(src);
+        }
+        admMenuCollapses++;
+    }
+
     function openAdmMenu() {
         if (document.getElementById("leftSide")) {
             document.getElementById("leftSide").className="leftSide";
@@ -1012,6 +445,7 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
             document.getElementById("admMenuClpsArr").className="fa fa-arrow-left";
         }
         chkFixedHeaders(false);
+        logAdmMenuToggle(true);
         return true;
     }
     function closeAdmMenu() {
@@ -1022,6 +456,7 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
             document.getElementById("admMenuClpsArr").className="fa fa-arrow-right";
         }
         chkFixedHeaders(false);
+        logAdmMenuToggle(false);
         return true;
     }
     $(document).on("click", "#admMenuClpsBtn", function() {
@@ -1037,7 +472,7 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
     setTimeout(function() { 
         var mobile = false;
         if (window.innerWidth < 768) mobile = true;
-        if (!openAdmMenuOnLoad || mobile) closeAdmMenu();
+        if (openAdmMenuOnLoad && !mobile) openAdmMenu();
     }, 10);
     $(window).resize(function() {
         setTimeout(function() { chkFixedHeaders(false); }, 5);
@@ -1048,7 +483,6 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
     $(document).on("click", ".admMenuTier2Lnk", function() {
         openAdmMenu();
     });
-
     
     $(document).on("click", ".clickBox", function() {
         if ($(this).attr("data-url")) window.location=$(this).attr("data-url");
@@ -1062,21 +496,6 @@ console.log("imgChoose("+imgID+" - n"+nIDtxt+"FldID = "+document.getElementById(
             $(this).css("background-color", "{!! $css['color-main-bg'] !!}");
         }
     }, ".clickBox");
-    
-    function toggleNodeSimple(node) {
-        if (node && document.getElementById('node'+node+'')) {
-            if (!document.getElementById('node'+node+'').style.display || document.getElementById('node'+node+'').style.display == 'none') {
-                $("#node"+node+"").slideDown(300);
-            } else {
-                $("#node"+node+"").slideUp(300);
-            }
-            return true;
-        }
-        return false;
-    }
-    $(document).on("click", ".toglNodeSmpl", function() {
-        toggleNodeSimple($(this).attr("data-tog-node")); 
-    });
 
     @if (isset($GLOBALS['SL']->sysOpts['sys-cust-ajax']))
         {!! $GLOBALS['SL']->sysOpts['sys-cust-ajax'] !!}

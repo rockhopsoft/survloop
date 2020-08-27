@@ -241,7 +241,8 @@ class AuthController extends Controller
     
     protected function chkAuthPageOpts(Request $request)
     {
-        if (session()->has('lastTree') && intVal(session()->get('lastTree')) > 0) {
+        if (session()->has('lastTree') 
+            && intVal(session()->get('lastTree')) > 0) {
             $this->treeID = intVal(session()->get('lastTree'));
             $this->currTree = SLTree::find($this->treeID);
             if ($this->currTree && isset($this->currTree->tree_database)) {
@@ -251,11 +252,15 @@ class AuthController extends Controller
                 && intVal(session()->get('sessID' . $this->treeID)) > 0
                 && session()->has('coreID' . $this->treeID) 
                 && intVal(session()->get('coreID' . $this->treeID)) > 0) {
-                $sess = SLSess::where('sess_id', intVal(session()->get('sessID' . $this->treeID)))
-                    ->where('sess_core_id', intVal(session()->get('coreID' . $this->treeID)))
+                $sID = intVal(session()->get('sessID' . $this->treeID));
+                $tID = intVal(session()->get('coreID' . $this->treeID));
+                $sess = SLSess::where('sess_id', $sID)
+                    ->where('sess_core_id', $tID)
                     ->where('sess_tree', $this->treeID)
                     ->first();
-                if ($sess && isset($sess->sess_curr_node) && intVal($sess->sess_curr_node) > 0) {
+                if ($sess 
+                    && isset($sess->sess_curr_node) 
+                    && intVal($sess->sess_curr_node) > 0) {
                     $this->currNode = SLNode::find($sess->sess_curr_node);
                     $this->loadNodeLoginPass($request);
                 }
@@ -264,7 +269,7 @@ class AuthController extends Controller
         $this->chkGlobal($request);
         if (!isset($GLOBALS["SL"]->sysOpts["footer-master"])) {
             $sl = new SurvLoopController;
-            $sl->initCustViews();
+            $sl->initCustViews($request);
         }
         return true;
     }

@@ -15,6 +15,7 @@ class SLEmails extends Model
         'email_body', 
         'email_opts', 
         'email_tot_sent', 
+        'email_attach',
     ];
     
     

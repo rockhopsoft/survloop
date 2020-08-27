@@ -57,7 +57,7 @@ table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv {
 .vertPrgDone, .vertPrgFutr, 
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
-    margin: 6px 5px 9px 1px;
+    margin: 5px 5px 9px 1px;
 	background: {!! $css["color-main-on"] !!};
 }
 .vertPrgCurr, 
@@ -74,9 +74,10 @@ table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone img,
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr,
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr img {
-    width: 8px;
-    height: 8px;
-	-moz-border-radius: 4px; border-radius: 4px;
+    width: 10px;
+    height: 10px;
+	-moz-border-radius: 5px; border-radius: 5px;
+    border: 0px none;
 }
 .vertPrgCurr, .vertPrgCurr img, 
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr, 
@@ -124,3 +125,9 @@ table.detailList tr td {
 	font-size: 20pt;
 	color: {!! $css["color-main-on"] !!};
 }
+
+.dashResultsAnim {
+    width: 100%;
+    display: none;
+}
+

@@ -510,7 +510,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
                 );
             }
         }
-        return $curr;
+        return $curr;   
     }
 
 }

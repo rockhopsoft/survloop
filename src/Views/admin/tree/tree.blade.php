@@ -1,5 +1,5 @@
 <!-- resources/views/vendor/survloop/admin/tree/tree.blade.php -->
-<div class="container">
+<div class="container-fluid">
     
 @if (!$isPrint) <div class="slCard nodeWrap"> @else <div> @endif
     <div class="row mB15">

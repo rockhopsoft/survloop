@@ -19,7 +19,6 @@ use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
-use SurvLoop\Controllers\SurvLoopPDF;
 use SurvLoop\Controllers\Globals\Globals;
 use SurvLoop\Controllers\Tree\TreeNodeSurv;
 use SurvLoop\Controllers\Tree\TreeSurvLoops;
@@ -106,7 +105,8 @@ class TreeSurv extends TreeSurvLoops
             if ($this->REQstep == 'autoSave') {
                 return 'Saved!-)';
             }
-            //$this->loadAllSessData(); // refresh should not bedefault, run manually where needed
+            //$this->loadAllSessData(); 
+            // refresh should not bedefault, run manually where needed
             $GLOBALS["SL"]->microLog('printTreePublic( before post-step-redirect');
             if (!$this->isPage) {
                 if ($this->REQstep == 'save') {
@@ -226,8 +226,18 @@ class TreeSurv extends TreeSurvLoops
         
         $this->v["nodeKidFunks"] = '';
         
-        $goSkinny = (!$this->hasFrameLoad() 
-            && $GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SKINNY == 0);
+        $fadeIn = ($GLOBALS['SL']->treeRow->tree_opts%Globals::TREEOPT_FADEIN == 0);
+        if ($GLOBALS["SL"]->isPrintView()) {
+            $fadeIn = false;
+        }
+        if ($fadeIn) {
+            $GLOBALS["SL"]->setTreePageFadeIn($this->setTreePageFadeInDelay());
+        }
+        $ret .= '<div id="pageAnimWrap' . $GLOBALS['SL']->treeID 
+            . '" class="w100" style="display: ' . (($fadeIn) ? 'none' : 'block') 
+            . ';">';
+        $goSkinny = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SKINNY == 0);
+        $goSkinny = (!$this->hasFrameLoad() && $goSkinny);
         if ($goSkinny) {
             $ret .= '<center><div id="skinnySurv" class="treeWrapForm">';
         } elseif (!$this->isPage) {
@@ -242,10 +252,11 @@ class TreeSurv extends TreeSurvLoops
             . $this->printCurrRecMgmt() . $this->sessDump($lastNode) . "\n";
         $GLOBALS["SL"]->microLog('printTreePublic( after printNodePublic(');
         if ($goSkinny) {
-            $ret .= '</div><center>';
+            $ret .= '</div><center> <!-- end skinnySurv -->';
         } elseif (!$this->isPage) {
-            $ret .= '</div>';
+            $ret .= '</div> <!-- end wideSurv -->';
         }
+        $ret .= '</div> <!-- end pageAnimWrap -->';
         if (isset($GLOBALS["SL"]->treeSettings["footer"]) 
             && isset($GLOBALS["SL"]->treeSettings["footer"][0]) 
             && trim($GLOBALS["SL"]->treeSettings["footer"][0]) != '') {
@@ -310,8 +321,7 @@ class TreeSurv extends TreeSurvLoops
         $this->loadTreePageJava();
         if ($request->has('ajax') && $request->ajax == 1) {
             // tree form ajax submission
-            echo $this->ajaxContentWrapCustom($this->v["content"]);
-            exit;
+            return $this->ajaxContentWrapCustom($this->v["content"]);
         }
         // Otherwise, Proceed Running Various Index Functions
         $this->v["currInReport"] = $this->currInReport();
@@ -584,6 +594,11 @@ class TreeSurv extends TreeSurvLoops
         return $this->index($request, 'testRun');
     }
     
+    public function ajaxChecksCustom(Request $request, $type = '')
+    {
+        return '';
+    }
+    
     public function ajaxChecks(Request $request, $type = '')
     {
         $this->survLoopInit($request, '/ajax/' . $type);
@@ -602,7 +617,11 @@ class TreeSurv extends TreeSurvLoops
     {
         $this->survLoopInit($request, '/ajadm/' . $type);
         $nID = (($request->has('nID')) ? trim($request->get('nID')) : '');
-        if ($type == 'color-pick') {
+        if ($type == 'adm-menu-toggle') {
+            return $this->ajaxAdmMenuToggle($request);
+        } elseif ($type == 'data-set-search-results') {
+            return $this->printDataSetSearchResultsAjax($request);
+        } elseif ($type == 'color-pick') {
             return $this->ajaxColorPicker($request);
         } elseif (substr($type, 0, 4) == 'img-') {
             $imgID = (($request->has('imgID')) ? trim($request->get('imgID')) : '');
@@ -622,9 +641,88 @@ class TreeSurv extends TreeSurvLoops
         }
         return '';
     }
-    
-    public function ajaxChecksCustom(Request $request, $type = '')
+
+
+    /**
+     * Print search results across multiple data sets.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return string
+     */
+    private function printDataSetSearchResultsAjax(Request $request)
     {
+        $type = 0;
+        if ($request->has('type')) {
+            $type = intVal($request->get('type'));
+        }
+        if (sizeof($GLOBALS["SL"]->allCoreTbls) > 0) {
+            foreach ($GLOBALS["SL"]->allCoreTbls as $tbl) {
+                if (intVal($type) == intVal($tbl["id"])) {
+                    $ret = $this->printDataSetResultsAjaxCustom($request, $tbl);
+                    if (trim($ret) != '') {
+                        return $ret;
+                    }
+                    return $this->printDataSetResultsAjax($request, $tbl);
+                }
+            }
+        }
+        return '<!-- no data set search results found -->';
+    }
+
+    /**
+     * Customize search results from one data sets.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  array  $tblInfo
+     * @return string
+     */
+    private function printDataSetResultsAjax(Request $request, $tblInfo)
+    {
+        return '<i>Auto-printing multi-data-set searches coming soon...</i>';
+    }
+
+    /**
+     * Customize search results from one data sets.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  array  $tblInfo
+     * @return string
+     */
+    protected function printDataSetResultsAjaxCustom(Request $request, $tblInfo)
+    {
+        return '';
+    }
+
+    /**
+     * Customize search results from one data sets.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  array  $tblInfo
+     * @return string
+     */
+    private function printDataSetResultsWrap(Request $request, $tblInfo)
+    {
+        return '<h3 class="slBlueDark">' . $tblInfo["name"] . '</h3>
+            <div id="setSearchResults' . $tblInfo["name"] . '" class="w100"></div>
+            <script type="text/javascript"> $(document).ready(function(){ 
+                setTimeout(function() {
+                    var url = "/ajax/data-set-search-results?type=' 
+                        . strtolower($tblInfo["name"]) . '";
+                    $("#setSearchResults' . $tblInfo["name"] . '").load(url);
+                    console.log(url);
+                }, 10);
+            }); </script>';
+    }
+    
+    private function ajaxAdmMenuToggle(Request $request)
+    {
+        $open = 0;
+        if ($request->has('status')
+            && strtolower(trim($request->get('status'))) == 'open') {
+            $open = 1;
+        }
+        session()->put('admMenuOpen', $open);
+        session()->save();
         return '';
     }
     
@@ -729,6 +827,11 @@ class TreeSurv extends TreeSurvLoops
                 (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
         ));
         return true;
+    }
+
+    protected function setTreePageFadeInDelay()
+    {
+        return 1000;
     }
     
     

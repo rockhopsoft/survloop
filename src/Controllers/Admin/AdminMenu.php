@@ -54,10 +54,14 @@ class AdminMenu
     
     protected function addAdmMenuCollapse()
     {
+        $arrow = 'fa-arrow-right';
+        if ($GLOBALS["SL"]->openAdmMenuOnLoad()) {
+            $arrow = 'fa-arrow-left';
+        }
         return $this->admMenuLnk(
             'javascript:;" id="admMenuClpsBtn', 
             'Collapse', 
-            '<i id="admMenuClpsArr" class="fa fa-arrow-left" '
+            '<i id="admMenuClpsArr" class="fa ' . $arrow . '" '
                 . 'aria-hidden="true"></i>'
         );
     }
@@ -143,18 +147,18 @@ class AdminMenu
                     'Media Gallery'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/send-email',
-                    'Send Emails', 
+                    '/dashboard/emails',
+                    'Email Manager', 
                     '', 
                     1, 
                     [
                         $this->admMenuLnk(
-                            '/dashboard/send-email',
-                            'Send Email'
-                        ),
-                        $this->admMenuLnk(
                             '/dashboard/emails',
                             'Manage Templates'
+                        ),
+                        $this->admMenuLnk(
+                            '/dashboard/send-email',
+                            'Send Email'
                         ),
                         $this->admMenuLnk(
                             '/dashboard/sent-emails',

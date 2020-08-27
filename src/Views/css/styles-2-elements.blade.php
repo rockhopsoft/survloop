@@ -272,3 +272,11 @@ a.sliNav, .sliNavDiv a.sliNav,
     height: 32px;
     padding-top: 10px;
 }
+
+@for ($i = 0; $i < 20; $i++) @if ($i > 0) , @endif #fixHead{{ $i }} @endfor {
+    width: 100%;
+}
+@for ($i = 0; $i < 20; $i++) @if ($i > 0) , @endif #fixHeadFixed{{ $i }} @endfor {
+    width: 100%;
+}
+

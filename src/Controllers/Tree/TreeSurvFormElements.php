@@ -117,7 +117,7 @@ class TreeSurvFormElements extends TreeSurvFormUtils
                 && !$this->hasSpreadsheetParent($curr->nID)) {
                 $ret .= '</nobr></div><div class="col-6 pT10"><nobr>';
             }
-            $ret .= $curr->extraOpts["unit"];
+            $ret .= $this->nodePrintNumberFldUnitSwap($curr);
         }
         $ret .= '</nobr>';
         if (!$this->hasSpreadsheetParent($curr->nID)) {
@@ -126,6 +126,14 @@ class TreeSurvFormElements extends TreeSurvFormUtils
         $ret .= $this->nodePrintNumberSlider($curr) . '</div>' . "\n";
         $this->nodePrintNumberFieldReqs($curr);
         return $ret;
+    }
+
+    protected function nodePrintNumberFldUnitSwap($curr)
+    {
+        if (isset($curr->extraOpts["unit"])) {
+            return trim($curr->extraOpts["unit"]);
+        }
+        return '';
     }
 
     protected function nodePrintNumberFieldMinMax($curr)

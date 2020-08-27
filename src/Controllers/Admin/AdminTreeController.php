@@ -485,7 +485,7 @@ class AdminTreeController extends AdminTreeStats
                 $tree->tree_opts *= Globals::TREEOPT_VOLUNTEER;
             }
             $tree->save();
-            echo $this->redir('/dashboard/redirects/list', true);
+            echo $this->redir('/dashboard/redirects', true);
             exit;
         }
         if ($request->has('redirEdit') && intVal($request->get('redirEdit')) > 0 
@@ -496,7 +496,7 @@ class AdminTreeController extends AdminTreeStats
                 $tree->tree_slug = trim($request->redirFrom);
                 $tree->save();
             }
-            echo $this->redir('/dashboard/redirects/list', true);
+            echo $this->redir('/dashboard/redirects', true);
             exit;
         }
         return false;
@@ -902,6 +902,7 @@ class AdminTreeController extends AdminTreeStats
     public function xmlNodeEdit(Request $request, $treeID = -3, $nID = -3)
     {
         $this->initLoader();
+        $origTree = $treeID;
         $this->loader->syncDataTrees($request, -3, $treeID);
         //$this->switchTree($treeID, '/dashboard/tree/switch', $request);
         $this->admControlInit($request, '/dashboard/surv-' . $origTree . '/xmlmap');

@@ -107,6 +107,11 @@
                             @if ($GLOBALS['SL']->treeRow->tree_opts%67 == 0) CHECKED @endif autocomplete="off" class="mR5">
                         Whole page has alternate background
                     </label>
+                    <label class="disBlo mT20">
+                        <input type="checkbox" name="pageFadeIn" id="pageFadeInID" value="71"
+                            @if ($GLOBALS['SL']->treeRow->tree_opts%71 == 0) CHECKED @endif autocomplete="off" class="mR5">
+                        Whole page fades in after load
+                    </label>
                 @endif
 
                     <div class="nFld w100">

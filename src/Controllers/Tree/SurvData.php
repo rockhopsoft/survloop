@@ -479,7 +479,7 @@ class SurvData extends SurvDataCheckbox
         return true;
     }
     
-    protected function processSubObjs($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $subObjs)
+    public function processSubObjs($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $subObjs)
     {
         if ($subObjs && sizeof($subObjs) > 0) {
             foreach ($subObjs as $subObj) {

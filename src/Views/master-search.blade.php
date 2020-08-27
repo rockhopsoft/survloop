@@ -1,44 +1,38 @@
 <!-- Stored in resources/views/vendor/survloop/master-search.blade.php -->
+<?php /*
 <a class="fL slNavLnk" id="topNavSearchBtn" href="javascript:;"
     ><i class="fa fa-search" aria-hidden="true"></i></a>
+*/ ?>
 <div id="topNavSearch" class="fL topNavSearch">
-    <form id="dashSearchFrmID" name="dashSearchForm" 
-        method="get" action="/search-run">
+    <form id="dashSearchFormID" name="dashSearchForm" method="get" action="/search-run">
     <div id="dashSearchFrmWrap">
         <div id="dashSearchBg"></div>
-        <a id="dashSearchBtn" onClick="document.dashSearchForm.submit();" href="javascript:;"
+        <a id="dashSearchBtn" class="updateSearchFilts" href="javascript:;"
             ><i class="fa fa-search" aria-hidden="true"></i></a>
-        <input type="text" name="s" id="admSrchFld" class="form-control form-control-sm"
-            placeholder="Search the database" 
+        <input type="text" name="s" id="admSrchFld" class="form-control form-control-lg"
+            placeholder="Search" 
             @if ($GLOBALS['SL']->REQ->has('s') && trim($GLOBALS['SL']->REQ->get('s')) != '')
                 value="{{ trim($GLOBALS['SL']->REQ->get('s')) }}" @endif >
+    @if (sizeof($GLOBALS["SL"]->allCoreTbls) > 0)
         <a id="hidivBtnSearchOpts" class="hidivBtn" href="javascript:;"
             ><i id="hidivBtnArrSearchOpts" class="fa fa-caret-down" aria-hidden="true"></i></a>
-        <div id="hidivSearchOpts">
-            <div class="row">
-                <div class="col-6">
-                @if (sizeof($GLOBALS["SL"]->allCoreTbls) > 0)
-                    <div class="p15">
-                        <b>Data Sets</b><br />
-                    @foreach ($GLOBALS["SL"]->allCoreTbls as $tbl)
-                        <label class="w100 srchBarParts">
-                            <input type="checkbox" name="searchData[]" value="{{ $tbl['id']}}"
-                                @if (in_array($tbl['id'], $GLOBALS['SL']->currSearchTbls)
-                                    || sizeof($GLOBALS["SL"]->currSearchTbls) == 0) CHECKED @endif
-                                class="mR5 srchBarParts" autocomplete="off"> {{ $tbl["name"] }}
-                        </label>
-                    @endforeach
-                    </div>
-                @endif
-                </div>
-                <div class="col-6">
-                    <div class="p15">
-                        <a class="btn btn-primary btn-sm fR srchBarParts" href="javascript:;"
-                            onClick="document.dashSearchForm.submit();">Search</a>
-                    </div>
-                </div>
+        <div id="hidivSearchOpts" class="p15">
+            <a class="btn btn-primary btn-sm fR srchBarParts updateSearchFilts" 
+                href="javascript:;">Search</a>
+            <b><u>Data Sets</u></b><br />
+        @foreach ($GLOBALS["SL"]->allCoreTbls as $cnt => $tbl)
+            <div id="srchBarTbl{{ $tbl['id'] }}" class="w100 disBlo">
+                <label class="w100 srchBarParts">
+                    <input type="checkbox" name="searchData[]" 
+                        id="srchBarDataSet{{ $cnt }}" value="{{ $tbl['id'] }}"
+                        @if (in_array($tbl['id'], $GLOBALS['SL']->currSearchTbls)
+                            || sizeof($GLOBALS["SL"]->currSearchTbls) == 0) CHECKED @endif
+                        class="mR5 srchBarParts" autocomplete="off"> {{ $tbl["name"] }}
+                </label>
             </div>
+        @endforeach
         </div>
+    @endif
     </div>
     <input type="hidden" id="sFiltID" name="sFilt" value="">
     <input type="hidden" id="sSortID" name="sSort" value="">
@@ -48,5 +42,13 @@
             value="{{ $GLOBALS['SL']->REQ->get('sView') }}" 
         @else value="" 
         @endif >
+    <input type="hidden" id="sPrevSearchTblsID" name="sPrevSearchTbls" 
+        @if (sizeof($GLOBALS['SL']->currSearchTbls) > 0)
+            value="{{ implode(',', $GLOBALS['SL']->currSearchTbls) }}"
+        @else value=""
+        @endif >
+    <input type="hidden" id="sResultsDivID" name="sResultsDiv" value="dashResultsWrap">
+    <input type="hidden" id="sResultsUrlID" name="sResultsUrl" value="?ajax=1&dashResults=1">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
     </form>
 </div>

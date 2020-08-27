@@ -96,6 +96,19 @@ class GlobalsCache extends GlobalsBasic
         return true;
     }
 
+    public function forgetAllCachesTypeTree($type = 'search', $treeID = 0)
+    {
+        $chk = SLCaches::where('cach_type', $type)
+            ->where('cach_tree_id', $treeID)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
+        return true;
+    }
+
     public function forgetAllItemCaches($treeID = 0, $coreID = 0)
     {
         $chk = SLCaches::where('cach_tree_id', $treeID)
@@ -186,7 +199,7 @@ class GlobalsCache extends GlobalsBasic
         $ret = ((isset($this->sysOpts["spinner-code"])) 
             ? $this->sysOpts["spinner-code"] : '<b>...</b>');
         if ($center) {
-            return '<div class="w100 pT20 pB20"><center>' 
+            return '<div class="w100 pT15 pB15"><center>' 
                 . $ret . '</center></div>';
         }
         return $ret;
@@ -334,8 +347,13 @@ class GlobalsCache extends GlobalsBasic
             $minifier->minify($minPath . '/css/' . $fileMin);
             Storage::delete($this->cachePath . '/css/' . $fileCss);
             if (!$this->isPdfView()) {
-                $this->pageSCRIPTS .= '<link id="dynCss" rel="stylesheet" '
-                    . 'href="/sys/dyna/' . $fileMin . '">' . "\n";
+                $scriptID = 'dynCss';
+                if ($this->REQ->has('ajax')) {
+                    $scriptID .= 'Ajax';
+                }
+                $this->pageSCRIPTS .= '<link id="' . $scriptID 
+                    . '" rel="stylesheet" href="/sys/dyna/' 
+                    . $fileMin . '">' . "\n";
             }
         }
         
@@ -356,8 +374,12 @@ class GlobalsCache extends GlobalsBasic
             $minifier->minify($minPath . '/js/' . $fileMin);
             Storage::delete($this->cachePath . '/js/' . $fileJs);
             if (!$this->isPdfView()) {
-                $this->pageSCRIPTS .= "\n" . '<script id="dynJs" '
-                    . 'type="text/javascript" src="/sys/dyna/' 
+                $scriptID = 'dynJs';
+                if ($this->REQ->has('ajax')) {
+                    $scriptID .= 'Ajax';
+                }
+                $this->pageSCRIPTS .= "\n" . '<script id="' . $scriptID 
+                    . '" type="text/javascript" src="/sys/dyna/' 
                     . $fileMin . '"></script>' . "\n";
             }
         }
@@ -494,11 +516,38 @@ class GlobalsCache extends GlobalsBasic
     }
 
     /**
+     * Get path and filename of user's profile picture.
+     *
+     * @return string
+     */
+    public function getUserProfilePicFile($uID = 0)
+    {
+        if ($uID > 0) {
+            return 'up/avatar/' . $uID . '-.jpg';
+        }
+        return '';
+    }
+
+    /**
+     * Get path and filename of user's profile picture.
+     *
+     * @return boolean
+     */
+    public function getUserProfilePicExists($uID = 0)
+    {
+        if ($uID > 0) {
+            return file_exists('../storage/app/' 
+                . $this->getUserProfilePicFile($uID));
+        }
+        return false;
+    }
+
+    /**
      * Generate list of user IDs with custom profile avatars uploads.
      *
      * @return array
      */
-    public function getComplaintWithProfilePics()
+    public function getUsersWithProfilePics()
     {
         $ret = [];
         $files = Storage::files('up/avatar');

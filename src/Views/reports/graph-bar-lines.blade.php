@@ -1,4 +1,4 @@
-/* resources/views/vendor/survloop/reports/graph-bar.blade.php */
+/* resources/views/vendor/survloop/reports/graph-bar-lines.blade.php */
 {
     label: "{{ $label }}",
     fill: false,

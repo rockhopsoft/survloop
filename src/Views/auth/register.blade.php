@@ -31,7 +31,12 @@
     @endif
 </div>
 
-@if (isset($errorMsg)) <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div> @endif
+@if (isset($errorMsg)) 
+    <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
+@endif
+@if (isset($GLOBALS["SL"]->x["registerNotes"]))
+    <p>{!! $GLOBALS["SL"]->x["registerNotes"] !!}</p>
+@endif
 
 <div id="node004" class="nodeWrap{{ ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
     <div class="nodeHalfGap"></div>
@@ -114,7 +119,7 @@
 @endif
 
 @if (!isset($midSurvBack) || trim($midSurvBack) == '')
-    <center><input type="submit" class="nFormSignupSubBtn btn btn-lg btn-xl btn-primary" value="Sign Up"></center>
+    <center><input type="submit" class="nFormSignupSubBtn btn btn-lg btn-primary" value="Sign Up"></center>
 @else
     <div id="pageBtns">
         <div id="formErrorMsg"></div>

@@ -39,6 +39,59 @@ class GlobalsElements extends GlobalsCache
         return $this->printAccordian($title, $body, $open, false, 'text');
     }
 
+    public function setAdmMenuOnLoad($open = 1) 
+    {
+        $this->x["admMenuOnLoad"] = $open;
+        $this->pageJAVA .= ' openAdmMenuOnLoad = ' 
+            . (($open == 1) ? 'true' : 'false') . '; ';
+    }
+
+    public function openAdmMenuOnLoad() 
+    {
+        if ((isset($this->x["needsCharts"]) && $this->x["needsCharts"])
+            || (isset($this->x["needsPlots"]) && $this->x["needsPlots"])) {
+            return true;
+        }
+        return (isset($this->x["admMenuOnLoad"])
+            && intVal($this->x["admMenuOnLoad"]) == 1);
+    }
+
+    public function setFullPageLoaded($delay = 5, $treeID = 0) 
+    {
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        $this->pageAJAX .= view(
+            'vendor.survloop.js.inc-element-page-full-loaded', 
+            [
+                "treeID" => $treeID,
+                "delay"  => $delay
+            ]
+        )->render();
+    }
+
+    public function setAutoRunSearch() 
+    {
+        $this->pageJAVA .= ' autoRunDashResults = true; ';
+        return true;
+    }
+
+    public function setTreePageFadeIn($delay = 250, $speed = 1000, $treeID = 0) 
+    {
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        $this->pageAJAX .= view(
+            'vendor.survloop.js.inc-element-tree-page-fade-in', 
+            [
+                "treeID" => $treeID,
+                "delay"  => $delay,
+                "speed"  => $speed
+            ]
+        )->render();
+        return true;
+    }
+
     public function addSideNavItem($title = '', $url = '', $delay = 2000)
     {
         $this->pageJAVA .= ' setTimeout(\'addSideNavItem("' 
@@ -53,11 +106,14 @@ class GlobalsElements extends GlobalsCache
         }
         $this->pageAJAX .= '$( "#' . $fldName 
             . 'ID" ).datepicker({ maxDate: "+0d" });';
-        return '<input type="text" name="' . $fldName . '" id="' 
-            . $fldName . 'ID" value="' . (($dateStr != '') 
-                ? date("m/d/Y", strtotime($dateStr)) : '')
-            . '" class="dateFld form-control" ' . $this->tabInd() 
-            . ' autocomplete="off" >' . "\n";
+        return view(
+            'vendor.survloop.forms.formtree-datepicker', 
+            [
+                "fldName" => $fldName,
+                "dateStr" => $dateStr,
+                "tabInd"  => $this->tabInd()
+            ]
+        )->render();
     }
     
     public function getTwitShareLnk($url = '', $title = '', $hashtags = '')
@@ -121,16 +177,54 @@ class GlobalsElements extends GlobalsCache
     
     public function getYoutubeID($url)
     {
-        $ret = '';
-        $pos = strpos($url, 'v=');
-        if ($pos > 0) {
-            $ret = substr($url, (2+$pos));
-            $pos = strpos($ret, '&');
-            if ($pos > 0) {
-                $ret = substr($ret, 0, $pos);
+        if (strpos(strtolower($url), 'https://youtu.be/') !== false) {
+            return str_ireplace('https://youtu.be/', '', $url);
+        }
+        preg_match('/[\\?\\&]v=([^\\?\\&]+)/', $url, $matches);
+        return $matches[1];
+    }
+
+    public function getVimeoID($url)
+    {
+        if (preg_match('#(?:https?://)?(?:www.)?(?:player.)?vimeo.com/(?:[a-z]*/)*([0-9]{6,11})[?]?.*#', $url, $m)) {
+            return $m[1];
+        }
+        return false;
+        /*
+        if (strpos(strtolower($vidURL), 'https://vimeo.com/') !== false) {
+            return str_ireplace('https://vimeo.com/', '', $vidURL);
+        }
+        return '';
+        */
+    } 
+    
+    public function getArchiveOrgVidID($vidURL)
+    {
+        if (strpos(strtolower($vidURL), 'https://archive.org/') !== false) {
+            $id = str_ireplace('https://archive.org/', '', $vidURL);
+            if (strpos(strtolower($id), 'details/') == 0) {
+                return substr($id, 8);
             }
         }
-        return $ret;
+        return '';
+    }
+     
+    public function getYouTubeThumb($id)
+    {
+        return 'http://i3.ytimg.com/vi/' . $id . '/0.jpg';
+    }   
+     
+    public function getVimeoThumb($id)
+    {
+        $arr_vimeo = unserialize(file_get_contents("http://vimeo.com/api/v2/video/$id.php"));
+        return $arr_vimeo[0]['thumbnail_small']; // returns small thumbnail
+        // return $arr_vimeo[0]['thumbnail_medium']; // returns medium thumbnail
+        // return $arr_vimeo[0]['thumbnail_large']; // returns large thumbnail
+    }
+     
+    public function getArchiveOrgVidThumb($id)
+    {
+        return 'https://archive.org/services/img/' . $id;
     }
     
     public function getYoutubeUrl($id = '', $link = true, $class = '')
@@ -153,6 +247,20 @@ class GlobalsElements extends GlobalsCache
             return '';
         }
         $url = 'https://vimeo.com/' . $id;
+        if (!$link) {
+            return $url;
+        }
+        return '<a href="' . $url . '" target="_blank"' 
+            . (($class != '') ? ' class="' . $class . '"' : '')
+            . ' >' . $url . '</a>';
+    }
+    
+    public function getArchiveOrgVidUrl($id = '', $link = true, $class = '')
+    {
+        if (trim($id) == '') {
+            return '';
+        }
+        $url = 'https://archive.org/details/' . $id;
         if (!$link) {
             return $url;
         }
@@ -278,6 +386,66 @@ class GlobalsElements extends GlobalsCache
             }
         }
         return '';
+    }
+
+    public function setPageNav2Scroll($lgTop = 350, $mdTop = 500, $smTop = 650)
+    {
+        $this->pageNav2Scroll = [ $lgTop, $mdTop, $smTop ];
+        return true;
+    }
+
+    public function setPageNav2($navContent = '', $containerWrap = true)
+    {
+        $this->pageNav2 = trim($navContent);
+        if ($this->pageNav2 != '') {
+            if ($containerWrap) {
+                $this->pageNav2 = '<div class="w100 container">' 
+                    . $this->pageNav2 . '</div>';
+            }
+            $encode = json_encode($this->pageNav2);
+            if (strpos($this->pageJAVA, $encode) === false
+                && strpos($this->pageJAVA, 'currNav2') === false) {
+                $this->pageJAVA .= ' currNav2 = ' . $encode . '; ';
+                $this->pageJAVA .= ' setCurrNav2Pos(' . $this->pageNav2Scroll[0] 
+                    . ', ' . $this->pageNav2Scroll[1] . ', ' 
+                    . $this->pageNav2Scroll[2] . '); ';
+            }
+        }
+        return true;
+    }
+
+    
+    public function lastMonths12($rec = null, $monthFld = 'start_month')
+    {
+        $ret = [
+            "has"        => false,
+            "startYear"  => intVal(date("Y")),
+            "startMonth" => intVal(date("n")),
+            "endYear"    => (intVal(date("Y"))-1),
+            "endMonth"   => (intVal(date("n"))+1)
+        ];
+        if ($rec !== null) {
+            if (isset($rec->{ $monthFld }) 
+                && intVal($rec->{ $monthFld }) > 0
+                && isset($rec->created_at)) {
+                $ret["has"] = true;
+                $startMonth   = intVal($rec->{ $monthFld });
+                $createdYear  = intVal(date("Y", strtotime($rec->created_at)));
+                $createdMonth = intVal(date("n", strtotime($rec->created_at)));
+                if ($createdMonth < $startMonth) {
+                    $createdYear--;
+                }
+                $ret["startYear"]  = $createdYear;
+                $ret["startMonth"] = $startMonth;
+                $ret["endYear"]    = $createdYear-1;
+                $ret["endMonth"]   = $startMonth+1;
+                if ($ret["endMonth"] > 12) {
+                    $ret["endMonth"] = 1;
+                    $ret["endYear"]++;
+                }
+            }
+        }
+        return $ret;
     }
 
 }

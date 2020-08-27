@@ -17,7 +17,7 @@
                             <div class="vertPrgDone">
                         @else <div class="vertPrgFutr">
                         @endif
-                        <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
+                        <?php /* <img src="/survloop/uploads/spacer.gif" border=0 alt="" > */ ?>
                         </div>
                     </div>
                     @if (trim($deet[0]) != '')

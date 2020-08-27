@@ -4,7 +4,8 @@
     position: fixed;
     z-index: 99;
     width: 100%;
-	background: {!! $css["color-nav-bg"] !!};
+    background: {!! $css["color-nav-bg"] !!};
+    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
 }
 #mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, 
 #myNavBar, #myNavBar .navbar {
@@ -16,6 +17,12 @@
 }
 .navbar, #myNavBar, #myNavBar .navbar {
     text-align: right;
+}
+#mainNav2 {
+    display: none;
+    width: 100%;
+    margin-top: -1px;
+    background: {!! $css["color-nav-bg"] !!};
 }
 #headClear {
     clear: both;
@@ -29,18 +36,19 @@
 }
 #dashSearchFrmWrap {
     position: relative;
-    width: 420px;
+    width: 320px;
     height: 40px;
     margin-top: 7px;
 }
 #topNavSearchBtn {
     display: block;
-    margin-left: 15px;
+    margin-left: 30px;
 }
 #topNavSearch {
-    display: none;
+    display: block;
     position: relative;
-    margin-left: 15px;
+    margin-top: -1px;
+    margin-left: 30px;
 }
 .topNavSearch #dashSearchFrmWrap #dashSearchBg,
 .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
@@ -48,13 +56,15 @@
     z-index: 10;
     top: 0px;
     left: 0px;
-    width: 420px;
+    width: 320px;
     height: 40px;
-    background: {!! $css["color-main-bg"] !!};
-    opacity:0.1; filter:alpha(opacity=10);
+    color: {!! $css["color-nav-text"] !!};
+    background: {!! $css["color-nav-bg"] !!};
+    box-shadow: 0px none;
+    -moz-border-radius: 10px; border-radius: 10px;
 }
 .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
-    opacity:0.95; filter:alpha(opacity=95);
+    box-shadow: 0px 0px 10px {!! $css["color-main-grey"] !!};
 }
 .topNavSearch #dashSearchFrmWrap a#dashSearchBtn:link, 
 .topNavSearch #dashSearchFrmWrap a#dashSearchBtn:active, 
@@ -75,12 +85,53 @@
     position: absolute;
     z-index: 99;
     width: 20px;
-    top: 3px;
+    top: 6px;
     color: {!! $css["color-main-bg"] !!};
     padding: 5px;
 }
 .topNavSearch #dashSearchFrmWrap #admSrchFld {
     color: {!! $css["color-main-bg"] !!};
+}
+
+#admSrchFld {
+    position: absolute;
+    left: 40px;
+    top: 0px;
+    border: 0px none;
+    background: none; 
+    background-color: none;
+    z-index: 80;
+    width: 240px;
+    height: 40px;
+    padding-left: 5px;
+}
+#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, 
+#admSrchFld a:active, #admSrchFld a:hover {
+    color: {!! $css["color-main-bg"] !!};
+}
+#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, 
+#admSrchFld::-ms-input-placeholder {
+    color: {!! $css["color-main-bg"] !!};
+}
+#hidivSearchOpts {
+    display: none;
+    position: absolute;
+    z-index: 99;
+    left: -1px;
+    top: 41px;
+    width: 322px;
+    overflow: visible;
+    color: {!! $css["color-main-text"] !!};
+    background: {!! $css["color-main-bg"] !!};
+    border: 1px {!! $css["color-main-grey"] !!} solid;
+    -moz-border-radius: 3px; border-radius: 3px;
+    box-shadow: 0px 0px 10px {!! $css["color-main-grey"] !!};
+}
+.srchOpt {
+    width: 100%;
+    height: 30px;
+    padding: 10px 15px;
+
 }
 
 .topNavSearch #dashSearchFrmWrap a#dashSearchBtn:link, 
@@ -112,43 +163,7 @@
 .topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:active, 
 .topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:visited, 
 .topNavSearchActive #dashSearchFrmWrap a#hidivBtnSearchOpts:hover {
-    color: {!! $css["color-main-text"] !!};
-}
-#admSrchFld {
-    position: absolute;
-    left: 40px;
-    top: 5px;
-    border: 0px none;
-    background: none; 
-    background-color: none;
-    z-index: 80;
-    width: 340px;
-}
-#admSrchFld, #admSrchFld a:link, #admSrchFld a:visited, 
-#admSrchFld a:active, #admSrchFld a:hover {
-    color: {!! $css["color-main-bg"] !!};
-}
-#admSrchFld::placeholder, #admSrchFld:-ms-input-placeholder, 
-#admSrchFld::-ms-input-placeholder {
-    color: {!! $css["color-main-bg"] !!};
-}
-#hidivSearchOpts {
-    display: none;
-    position: absolute;
-    z-index: 99;
-    left: -1px;
-    top: 41px;
-    width: 422px;
-    height: 200px;
-    color: {!! $css["color-main-text"] !!};
-    background: {!! $css["color-main-bg"] !!};
-    border: 1px {!! $css["color-nav-bg"] !!} solid;
-}
-.srchOpt {
-    width: 100%;
-    height: 30px;
-    padding: 10px 15px;
-
+    color: {!! $css["color-nav-text"] !!};
 }
 
 .headGap {

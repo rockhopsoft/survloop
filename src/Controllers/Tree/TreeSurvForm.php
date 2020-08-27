@@ -164,8 +164,9 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         }
         $btns = '';
         if (!$GLOBALS["SL"]->isPdfView()) {
-            $btns = '<div id="pageBtns' . $id . '"><div id="formErrorMsg' . $id 
-                . '"></div>' . $this->nodePrintButton($curr->nID, $curr->tmpSubTier, '')
+            $btns = '<div id="pageBtns' . $id . '">'
+                . '<div id="formErrorMsg' . $id . '"></div>' 
+                . $this->nodePrintButton($curr->nID, $curr->tmpSubTier, '')
                 . '</div>';
         }
         return $this->printNodePublicFormStart($curr->nID) . $ret . $btns 
@@ -271,6 +272,7 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         if (!in_array($curr->nodeType, $chk)) {
             $this->pageFldList[] = 'n' . $curr->nID . 'FldID';
         }
+        $this->checkResponses($curr, $this->v["fldForeignTbl"]);
         $this->customResponses($curr->nID, $curr);
         $this->nodePrintLoadDateTime($curr);
         $ret = $this->nodePrintOneLiner($curr);

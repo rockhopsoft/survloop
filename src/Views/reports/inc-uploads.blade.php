@@ -8,22 +8,19 @@
 	        	<div class="pT20 pB20">
 	        		{!! $up !!}
 	        	</div>
+				<hr>
 	        </div>
 	    @endforeach
 	    </div>
 	@else
 		@if (sizeof($upMap["img"]) > 0)
 			@foreach ($upMap["img"] as $j => $upInd)
-				@if ($j < (sizeof($upMap["img"])-1)) 
-					<div class="pB20 mB20">
-						<div class="pT20 pB20">
-				@endif
+				<div class="pB20 mB20">
+					<div class="pT20 pB20">
 						{!! $uploads[$upInd] !!}
-				@if ($j < (sizeof($upMap["img"])-1))
-						</div>
-						<hr>
 					</div>
-				@endif
+					<hr>
+				</div>
 			@endforeach
 		@endif
 		@if ((sizeof($upMap["vid"])+sizeof($upMap["fil"])) > 0)
@@ -31,11 +28,12 @@
 			<?php $cnt = 0; ?>
 			@if (sizeof($upMap["vid"]) > 0)
 				@foreach ($upMap["vid"] as $j => $upInd)
-			        @if ($cnt > 0 && $cnt%3 == 0) </div><div class="row"> @endif
-			        <div class="col-md-4">
+			        @if ($cnt > 0 && $cnt%2 == 0) </div><div class="row"> @endif
+			        <div class="col-md-6">
 			        	<div class="pT20 pB20">
 			        		{!! $uploads[$upInd] !!}
 			        	</div>
+						<hr>
 			        </div>
 			        <?php $cnt++; ?>
 				@endforeach
@@ -47,6 +45,7 @@
 			        	<div class="pT20 pB20">
 			        		{!! $uploads[$upInd] !!}
 			        	</div>
+						<hr>
 			        </div>
 			        <?php $cnt++; ?>
 				@endforeach

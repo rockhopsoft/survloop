@@ -17,7 +17,7 @@ use SurvLoop\Controllers\Tree\UserProfile;
 
 class TreeSurvFormVarieties extends UserProfile
 {
-    protected function customLabels($nIDtxt = '', $str = '')
+    protected function customLabels($curr, $str = '')
     {
         return $str;
     }
@@ -74,7 +74,7 @@ class TreeSurvFormVarieties extends UserProfile
         }
 
         $str = $this->sendEmailBlurbsCustom($str);
-        $str = $this->customLabels($curr->nIDtxt, $str);
+        $str = $this->customLabels($curr, $str);
         $str = $GLOBALS["SL"]->swapBlurbs($str);
         $str = $this->swapIDs($curr->nIDtxt, $str);
         if (!isset($this->v["printFullTree"]) || !$this->v["printFullTree"]) {

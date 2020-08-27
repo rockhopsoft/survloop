@@ -16,17 +16,19 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\SLDefinitions;
 
 use Mpdf\Mpdf;
-//use Rguedes\PDFMerger;
 
 class SurvLoopPDF
 {
+    private $mpdf     = null;
     protected $folder = 'api/pdf/';
+    protected $output = null;
 
     public function __construct($group = '')
     {
         if (trim($group) != '') {
             $this->folder .= $group . '/';
         }
+        $this->output = new SurvLoopOutputPDF;
     }
 
     public function getPdfFile($filename = 'export.pdf')
@@ -44,20 +46,57 @@ class SurvLoopPDF
         $file = str_replace('../storage/app/', '', $filename);
         $file = str_replace('.pdf', '.html', $file);
         Storage::put($file, $this->cleanHtml($content));
+        $xtra = '';
+        if ($GLOBALS["SL"]->REQ->has('publicView')) {
+            $xtra .= '&publicView=1';
+        }
         return '<script type="text/javascript"> '
-            . 'setTimeout("window.location=\'?gen-pdf=1\'", 10); '
-            . '</script>';
+            . 'setTimeout("window.location=\'?gen-pdf=1&refresh=1' 
+            . $xtra . '\'", 10); </script>';
     }
 
-    public function storeAttachedPdf($pdfs = [], $filename = 'export.pdf')
+    public function simplifyPdf($input = '', $output = '')
     {
-        $file = str_replace('.pdf', '-attach.pdf', $filename);
-        if (sizeof($pdfs) > 0) {
-            $pdfMerge = new \PDFMerger; // PDFMerger;
-            foreach ($pdfs as $pdf) {
-                $pdfMerge->addPDF($pdf, 'all');
-            }
-            $pdfMerge->merge('file', $file);
+        $exec = "gs -sDEVICE=pdfwrite "
+            . "-sPAPERSIZE=a4 -dPDFFitPage -dCompatibilityLevel=1.4 "
+            . $this->gsPdfSettings() . " -dNOPAUSE -dQUIET -dBATCH "
+            . "-sOutputFile=" . $output . " " . $input;
+        return shell_exec($exec);
+    }
+
+    public function mergePdfs($files = [], $output = '')
+    {
+        if (file_exists($output)) {
+            unlink($output);
+        }
+        $exec = "gs -sDEVICE=pdfwrite " . $this->gsPdfSettings() 
+            . " -sOUTPUTFILE=" . $output . " -dNOPAUSE -dBATCH "
+            . implode(" ", $files);
+        return shell_exec($exec);
+    }
+
+    private function gsPdfSettings()
+    {
+        return " -dPDFSETTINGS=/" . $this->output->quality 
+            . " -dDownsampleColorImages=true"
+            . " -dColorImageResolution=" . $this->output->dpi
+            . " -dColorImageDownsampleType=/Bicubic"
+            . " -dDownsampleGrayImages=true"
+            . " -dGrayImageResolution=" . $this->output->dpi
+            . " -dGrayImageDownsampleType=/Bicubic"
+            . " -dDownsampleMonoImages=true"
+            . " -dMonoImageResolution=" . $this->output->dpi 
+            . " -dMonoImageDownsampleType=/Bicubic ";
+    }
+
+    public function loadMpdf($fresh = true)
+    {
+        if ($this->mpdf === null || $fresh) {
+            ini_set('max_execution_time', 90);
+            $this->mpdf = new Mpdf(['tempDir' => '/tmp']);
+            $styles = view('vendor.survloop.css.styles-pdf')->render()
+                . "\n" . $this->getSysCustCSS();
+            $this->mpdf->WriteHTML($styles, \Mpdf\HTMLParserMode::HEADER_CSS);
         }
         return true;
     }
@@ -66,12 +105,8 @@ class SurvLoopPDF
     {
         $file = $filename;
         $content = file_get_contents(str_replace('.pdf', '.html', $file));
-        ini_set('max_execution_time', 90);
-        $mpdf = new Mpdf(['tempDir' => '/tmp']);
-        $styles = view('vendor.survloop.css.styles-pdf')->render()
-            . "\n" . $this->getSysCustCSS();
-        $mpdf->WriteHTML($styles, \Mpdf\HTMLParserMode::HEADER_CSS);
-        $mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
+        $this->loadMpdf();
+        $this->mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
         unset($content);
         if (file_exists($file)) {
             unlink($file);
@@ -81,32 +116,52 @@ class SurvLoopPDF
             && trim($GLOBALS["SL"]->x["pdfFilename"]) != '') {
             $title = $GLOBALS["SL"]->x["pdfFilename"];
         }
-        $mpdf->SetTitle($title);
-        $mpdf->Output($file, \Mpdf\Output\Destination::FILE);
+        $this->mpdf->SetTitle($title);
+        $this->mpdf->Output($file, \Mpdf\Output\Destination::FILE);
 
         // check for attachments
         $fileAttach = str_replace('.pdf', '-attach.pdf', $filename);
         if (file_exists($fileAttach)) {
-            $pdfMerge = new \PDFMerger; // PDFMerger;
-            $pdfMerge->addPDF($filename, 'all');
-            $pdfMerge->addPDF($fileAttach, 'all');
             $fileWithAttach = str_replace('.pdf', '-with-attach.pdf', $filename);
-            $pdfMerge->merge('file', $fileWithAttach);
+            $this->mergePdfs([$filename, $fileAttach], $fileWithAttach);
         }
-//echo 'fileAttach: ' . $fileAttach . '<br />'; exit;
         return true;
     }
 
-    public function pdfResponse($filename)
+    public function genSimplePDF($content = '', $filename = '/path/to/export.pdf')
+    {
+        if (trim($content) == '' || $filename == '/path/to/export.pdf') {
+            return '';
+        }
+        $this->loadMpdf();
+        $this->mpdf->WriteHTML($content, \Mpdf\HTMLParserMode::HTML_BODY);
+        $this->mpdf->Output($filename, \Mpdf\Output\Destination::FILE);
+        return $filename;
+    }
+
+    public function write($file = '')
+    {
+        $this->mpdf->Output($file, \Mpdf\Output\Destination::FILE);
+        return $file;
+    }
+
+    public function pdfResponse($filename, $fileDeliver = '')
     {
         $file = $filename;
         $lastPos = strrpos($filename, '/');
         if ($lastPos >= 0) {
             $file = substr($filename, ($lastPos+1));
         }
+        if ($fileDeliver != '') {
+            $file = $fileDeliver;
+        }
         if (isset($GLOBALS["SL"]->x["pdfFilename"])
             && trim($GLOBALS["SL"]->x["pdfFilename"]) != '') {
             $file = $GLOBALS["SL"]->x["pdfFilename"];
+        } elseif ($fileDeliver == ''
+            && isset($this->output->fileDeliver)
+            && trim($this->output->fileDeliver) != '') {
+            $file = $this->output->fileDeliver;
         }
         $dispo = 'inline';
         if ($GLOBALS["SL"]->REQ->has('download')) {
@@ -116,7 +171,6 @@ class SurvLoopPDF
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => $dispo . '; filename="' . $file . '"'
         ];
-//echo 'headers:<pre>'; print_r($headers); echo '</pre>'; exit;
         $fileWithAttach = str_replace('.pdf', '-with-attach.pdf', $filename);
         if (file_exists($fileWithAttach)) {
             return response()->file($fileWithAttach, $headers);
@@ -153,5 +207,27 @@ class SurvLoopPDF
         }
         return '';
     }
+
+    public function setOutput($fileStore, $fileDeliver = '')
+    {
+        if ($fileDeliver == '') {
+            $fileDeliver = $fileStore;
+        }
+        $this->output->fileStore   = $fileStore;
+        $this->output->fileDeliver = $fileDeliver;
+        return $this->output;
+    }
+
+}
+
+class SurvLoopOutputPDF
+{
+    public $fileStore   = '';
+    public $fileDeliver = '';
+
+    public $dpi         = 100; 
+    public $quality     = 'screen'; 
+    // 'screen' is smallest, "ebook" is medium, "prepress" is HQ
+    // "printer" might be worth trying
 
 }
