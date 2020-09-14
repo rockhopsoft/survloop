@@ -265,7 +265,7 @@ class AdminMenu
                 //),
                 $this->admMenuLnk(
                     '/dashboard/db/export',
-                    'Export', 
+                    'Import / Export', 
                     '', 
                     1, 
                     [
@@ -276,6 +276,10 @@ class AdminMenu
                         $this->admMenuLnk(
                             '/dashboard/sl/export/laravel',
                             'SurvLoop Package'
+                        ),
+                        $this->admMenuLnk(
+                            '/dashboard/db/import',
+                            'Import'
                         )
                     ]
                 ),

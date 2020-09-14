@@ -254,6 +254,9 @@ a.sliNav, .sliNavDiv a.sliNav,
 .slAccord div .fR {
     font-size: 16px;
 }
+.slAccord div .fR .fa-caret-down, .slAccord div .fR .fa-caret-up {
+    color: {!! $css["color-main-text"] !!};
+}
 .slAccordBig {
     min-height: 56px;
 }

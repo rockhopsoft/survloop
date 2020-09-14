@@ -225,19 +225,19 @@ $(document).ready(function(){
                 $("#hidiv"+fldGrp+"").slideDown("fast");
                 setTimeout(function() { document.getElementById("hidiv"+fldGrp+"").style.display="block"; }, 351);
                 if (document.getElementById("hidivBtnArr"+fldGrp+"")) {
-                    document.getElementById("hidivBtnArr"+fldGrp+"").className="fa fa-caret-up";
+                    document.getElementById("hidivBtnArr"+fldGrp+"").className=document.getElementById("hidivBtnArr"+fldGrp+"").className.replace("-down", "-up");
                 }
                 if (document.getElementById("hidivBtnAcc"+fldGrp+"")) {
-                    document.getElementById("hidivBtnAcc"+fldGrp+"").className="fa fa-chevron-up";
+                    document.getElementById("hidivBtnAcc"+fldGrp+"").className=document.getElementById("hidivBtnAcc"+fldGrp+"").className.replace("-down", "-up");
                 }
             } else {
                 $("#hidiv"+fldGrp+"").slideUp("fast");
                 setTimeout(function() { document.getElementById("hidiv"+fldGrp+"").style.display="none"; }, 351);
                 if (document.getElementById("hidivBtnArr"+fldGrp+"")) {
-                    document.getElementById("hidivBtnArr"+fldGrp+"").className="fa fa-caret-down";
+                    document.getElementById("hidivBtnArr"+fldGrp+"").className=document.getElementById("hidivBtnArr"+fldGrp+"").className.replace("-up", "-down");
                 }
                 if (document.getElementById("hidivBtnAcc"+fldGrp+"")) {
-                    document.getElementById("hidivBtnAcc"+fldGrp+"").className="fa fa-chevron-down";
+                    document.getElementById("hidivBtnAcc"+fldGrp+"").className=document.getElementById("hidivBtnAcc"+fldGrp+"").className.replace("-up", "-down");
                 }
             }
         }

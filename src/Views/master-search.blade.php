@@ -4,7 +4,6 @@
     ><i class="fa fa-search" aria-hidden="true"></i></a>
 */ ?>
 <div id="topNavSearch" class="fL topNavSearch">
-    <form id="dashSearchFormID" name="dashSearchForm" method="get" action="/search-run">
     <div id="dashSearchFrmWrap">
         <div id="dashSearchBg"></div>
         <a id="dashSearchBtn" class="updateSearchFilts" href="javascript:;"
@@ -23,14 +22,16 @@
         @foreach ($GLOBALS["SL"]->allCoreTbls as $cnt => $tbl)
             <div id="srchBarTbl{{ $tbl['id'] }}" class="w100 disBlo">
                 <label class="w100 srchBarParts">
-                    <input type="checkbox" name="searchData[]" 
-                        id="srchBarDataSet{{ $cnt }}" value="{{ $tbl['id'] }}"
+                    <input type="checkbox" value="{{ $tbl['id'] }}"
+                        name="sDataSet[]" id="sDataSet{{ $cnt }}" 
                         @if (in_array($tbl['id'], $GLOBALS['SL']->currSearchTbls)
                             || sizeof($GLOBALS["SL"]->currSearchTbls) == 0) CHECKED @endif
                         class="mR5 srchBarParts" autocomplete="off"> {{ $tbl["name"] }}
                 </label>
             </div>
         @endforeach
+        <input type="hidden" id="sDataSetCntID" name="srchBarDataSetCnt" 
+            value="{{ sizeof($GLOBALS['SL']->allCoreTbls) }}">
         </div>
     @endif
     </div>
@@ -49,6 +50,4 @@
         @endif >
     <input type="hidden" id="sResultsDivID" name="sResultsDiv" value="dashResultsWrap">
     <input type="hidden" id="sResultsUrlID" name="sResultsUrl" value="?ajax=1&dashResults=1">
-    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-    </form>
 </div>

@@ -14,6 +14,10 @@ var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img']))
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var loggedIn = false;
+var loggedInAdmin = false;
+var loggedInStaff = false;
+var loggedInPartner = false;
+var loggedInVolun = false;
 var pageDynaLoaded = false;
 var pageFullLoaded = {};
 var pageFadeInDelay = 300;
@@ -55,8 +59,7 @@ function findGetParam(paramName) {
 function addGetParam(paramName) {
     var val = findGetParam(paramName);
     if (!val || val.trim() == "") return false;
-    var i = appUrlParams.length;
-    appUrlParams[i] = new Array(paramName, val);
+    appUrlParams[appUrlParams.length] = new Array(paramName, val);
     return true;
 }
 function getGetParam(paramName) {
@@ -74,6 +77,52 @@ function loadBasicUrlParams() {
     return true;
 }
 setTimeout(function() { loadBasicUrlParams(); }, 10);
+
+// Example:
+// const flds = [ 'fldElementID' ];
+// const params = convertArrToParams(flds);
+function convertArrToParams(flds) {
+    var params = "";
+    flds.forEach((element) => {
+        if (document.getElementById(element) && document.getElementById(element).value) {
+            var val = encodeURI(document.getElementById(element).value.trim());
+            if (val !== "") {
+                var key = element;
+                if (key.substring(key.length-2) == "ID") {
+                    key = key.substring(0, key.length-2);
+                }
+                params += "&"+key+"="+val;
+            }
+        }
+    })
+    return params;
+}
+function convertCheckboxArrToParams(flds) {
+    var params = "";
+    flds.forEach((element) => {
+        var cnt = 0;
+        var cntFld = element+"CntID";
+        if (document.getElementById(cntFld) && document.getElementById(cntFld).value) {
+            cnt = parseInt(document.getElementById(cntFld).value);
+        }
+        if (cnt > 0) {
+            var chkVals = "";
+            for (var i=0; i < (1+cnt); i++) {
+                var chkFld = element+""+cnt+"";
+                if (document.getElementById(chkFld) && document.getElementById(chkFld).checked && document.getElementById(chkFld).value) {
+                    var val = encodeURI(document.getElementById(chkFld).value.trim());
+                    if (val !== "") {
+                        chkVals += ","+val;
+                    }
+                }
+            }
+            if (chkVals !== "") {
+                params += "&"+element+"="+chkVals.substring(1);
+            }
+        }
+    });
+    return params;
+}
 
 var treeList = new Array();
 @forelse ($GLOBALS["SL"]->getTreeList() as $i => $t)

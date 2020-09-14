@@ -1,6 +1,9 @@
 <!-- resources/views/admin/treeStats.blade.php -->
 
-<h1><i class="fa fa-snowflake-o"></i> {{ $GLOBALS['SL']->treeName }}: Users Response Stats</nobr></h1>
+<h2>
+    <i class="fa fa-snowflake-o"></i> Users Response Stats: 
+    <nobr>{{ $GLOBALS['SL']->treeName }}</nobr>
+</h2>
 <div class="container mB20">
 @if ($isAll)
     <a class="float-right btn btn-secondary mR10" 
@@ -11,6 +14,10 @@
         href="/dashboard/surv-{{ $GLOBALS['SL']->treeID }}/stats?all=1"
         ><i class="fa fa-expand fa-flip-horizontal"></i> Expand All Nodes</a>
 @endif
+    <a class="float-right btn btn-secondary mR10" 
+        href="/dashboard/debug-node-saves?tree={{ $GLOBALS['SL']->treeID }}"
+        ><i class="fa fa-bug"></i> Record Response History</a>
+
     <b>Down To The NODE.</b> <span class="slGrey">
     This report provides a breakdown of response statistics for every freakin' 
     <a href="https://en.wikipedia.org/wiki/Tree_%28data_structure%29" target="_blank">node</a> 

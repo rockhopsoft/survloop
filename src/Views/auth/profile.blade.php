@@ -1,4 +1,4 @@
-<!-- resources/views/vendor/survloop/profile.blade.php -->
+<!-- resources/views/vendor/survloop/auth/profile.blade.php -->
 
 <?php /* <pre>{!! print_r($GLOBALS['SL']->sysOpts) !!}</pre> */ ?>
 
@@ -36,7 +36,16 @@
             <a id="hidivBtnEditProfilePic" class="hidivBtn" 
                 href="javascript:;">Upload Profile Picture</a>
         @endif
+        @if ($userLogs != '')
+            <br /><a id="hidivBtnSessLogs" class="hidivBtn" 
+                href="javascript:;">Session Logs</a>
+        @endif
         </p>
+        @if ($userLogs != '')
+            <div id="hidivSessLogs" class="disNon">
+                <hr>{!! $userLogs !!}
+            </div>
+        @endif
         @if ($canEdit)
             <div id="hidivEditProfile" class="disNon">
                 <div class="nodeWrap">
@@ -111,8 +120,9 @@
 
                     <div class="nPrompt">
                         <label for="profilePhotoUpID">
-                            New Profile Photo (Visible To Public):
+                            <b>New Profile Photo</b>
                         </label>
+                        <div>{!! $picInstruct !!}</div>
                     </div>
                     <div class="nFld">
                         <input type="file" name="profilePhotoUp" id="profilePhotoUpID" 
@@ -120,10 +130,26 @@
                             {!! $GLOBALS["SL"]->tabInd() !!} >
                     </div>
                     <div class="nodeHalfGap"></div>
-                    <center><input type="submit" value="Upload Profile Photo" 
-                        class="btn btn-primary"></center>
+                    <input type="submit" value="Upload Profile Photo" 
+                        class="btn btn-primary">
                     <div class="nodeHalfGap"></div>
                     </form>
+                </div>
+                <div class="nodeWrap">
+                    <hr>
+                    <a id="hidivBtnDeletePic" class="hidivBtn btn btn-danger"
+                        href="javascript:;">Delete Profile Picture</a>
+                    <div id="hidivDeletePic" class="disNon pT15">
+                        <p>
+                            Are you sure you want to delete this profile picture?
+                            <nobr>This cannot be undone.</nobr>
+                        </p>
+                        <a class="hidivBtn btn btn-danger mR10"
+                            href="/user/{{ urlencode($profileUser->name) 
+                            }}?delProfPic=1">Yes, Delete</a>
+                        <a id="cancelDeletePic" class="btn btn-secondary"
+                            href="javascript:;">No, Don't Delete</a>
+                    </div>
                 </div>
             </div>
         @endif
@@ -132,3 +158,11 @@
 </div>
 
 <style> #unfinishedList { display: block; } </style>
+
+<script type="text/javascript"> $(document).ready(function(){
+
+$(document).on("click", "#cancelDeletePic", function() {
+    $("#hidivDeletePic").slideUp(300);
+});
+
+}); </script>

@@ -411,20 +411,41 @@ class GlobalsConvert
         return $str;
     }
 
-    public function arr2nums(&$array = [])
+    public function getVarTypeList()
     {
-        if (sizeof($array) > 0) {
-            foreach ($array as $i => $val) {
-                $array[$i] = floatval($val);
+        return [ 'float', 'int', 'text', 'textLong' ];
+    }
+
+    public function getVarType($val)
+    {
+        $string = trim($val);
+        if (is_numeric($string)) {
+            if ((int) $string == $string) {
+                return 'int';
+            }
+            return 'float';
+        }
+        if (strlen($string) > 255) {
+            return 'textLong';
+        }
+        return 'text';
+    }
+
+    public function arrayToInts($array = [])
+    {
+        $ret = [];
+        if (is_array($array) && sizeof($array) > 0) {
+            foreach ($array as $val) {
+                $ret[] = intVal($val);
             }
         }
-        return $array;
+        return $ret;
     }
 
     public function arrAvg($array = [])
     {
         if (is_array($array) && count($array) > 0) {
-            $this->arr2nums($array);
+            $array = $this->arrayToInts($array);
             return array_sum($array)/count($array);
         }
         return 0;
@@ -450,21 +471,22 @@ class GlobalsConvert
     
     public function getArrPercentileStr($str, $val, $isGolf = false)
     {
-        return $this->getArrPercentile(
-            $this->mexplode(',', $str), 
-            $val, 
-            $isGolf
-        );
+        $arr = $this->mexplode(',', $str);
+        return $this->getArrPercentile($arr, $val, $isGolf);
     }
     
     public function getArrPercentile($arr, $val, $isGolf = false)
     {
         $ret = $pos = 0;
         $max = (($isGolf) ? 1000000000 : -1000000000);
+        $val = floatval($val);
         if (is_array($arr) && sizeof($arr) > 0) {
             foreach ($arr as $i => $v) {
-                if (floatval($val) >= floatval($v) 
-                    && $max != $v) {
+                $arr[$i] = floatval($v);
+            }
+            sort($arr, SORT_NUMERIC);
+            foreach ($arr as $i => $v) {
+                if ($val >= $v) { // && $max != $v
                     $pos = $i;
                     $max = $v;
                 }
@@ -472,6 +494,10 @@ class GlobalsConvert
             if ($isGolf) {
                 $ret = (1-($pos/sizeof($arr)))*100;
             } else { // higher value is better
+                $pos++;
+                if ($pos > sizeof($arr)) {
+                    $pos = sizeof($arr);
+                }
                 $ret = ($pos/sizeof($arr))*100;
             }
         }
@@ -544,17 +570,6 @@ class GlobalsConvert
     public function cnvrtSqFt2SqMeters($sqft = 0)
     {
         return $sqft*10.76391;
-    }
-
-    public function arrayToInts($array = [])
-    {
-        $ret = [];
-        if (is_array($array) && sizeof($array) > 0) {
-            foreach ($array as $val) {
-                $ret[] = intVal($val);
-            }
-        }
-        return $ret;
     }
 
 

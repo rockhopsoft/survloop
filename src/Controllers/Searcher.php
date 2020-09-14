@@ -117,8 +117,8 @@ class Searcher extends SurvCustLoop
     
     public function searchCacheName()
     {
-        $this->cacheName = '/search?t=' . $this->treeID . $this->searchFiltsURL() 
-            . '&s=' . $this->searchTxt . $this->advSearchUrlSffx;
+        $this->cacheName = '/search?t=' . $this->treeID 
+            . $this->searchFiltsURL() . $this->advSearchUrlSffx;
         return $this->cacheName;
     }
     
@@ -405,6 +405,9 @@ class Searcher extends SurvCustLoop
         if ($GLOBALS["SL"]->REQ->has('refresh')) {
             $this->v["searchFiltsURL"] .= '&refresh=' 
                 . $GLOBALS["SL"]->REQ->refresh;
+        }
+        if (trim($this->searchTxt) != '') {
+            $this->v["searchFiltsURL"] .= '&s=' . $this->searchTxt;
         }
         if (sizeof($this->searchFilts) > 0) {
             foreach ($this->searchFilts as $key => $val) {

@@ -10,6 +10,7 @@
 namespace SurvLoop\Controllers\Admin;
 
 use DB;
+use Auth;
 use Storage;
 use Illuminate\Http\Request;
 use League\Flysystem\Filesystem;
@@ -19,6 +20,7 @@ use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
+use SurvLoop\Controllers\SurvLoopImportExcel;
 use SurvLoop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
@@ -83,6 +85,128 @@ class AdminDatabaseInstall extends AdminDBController
     {
         return $this->printExportLaravel($request, true);
     }
+
+    public function printRawTable(Request $request)
+    {
+        $cacheName = '/dashboard/db/tbl-raw';
+        $this->admControlInit($request, $cacheName);
+        if (Auth::user()
+            && Auth::user()->hasRole('administrator')
+            && $request->has('tbl') 
+            && trim($request->get('tbl')) != '') {
+            $tbl = trim($request->get('tbl'));
+            if (in_array(strtolower($tbl), ['user', 'users'])) {
+                $tbl = '';
+            }
+            $this->v["tbl"] = SLTables::where('tbl_name', $tbl)
+                ->first();
+            if ($this->v["tbl"] && isset($this->v["tbl"]->tbl_name)) {
+                $tbl = $this->v["tbl"]->tbl_name;
+                $this->printRawTableSorts($request);
+                $this->printRawTableQry($tbl);
+                if ($this->v["rows"]->isNotEmpty()
+                    && $this->v["flds"]->isNotEmpty()) {
+                    $this->v["content"] = view(
+                        'vendor.survloop.admin.db.raw-tbl', 
+                        $this->v
+                    )->render();
+                    if ($request->has('ajax')) {
+                        return $this->v["content"];
+                    }
+                    $GLOBALS["SL"]->pageAJAX = view(
+                        'vendor.survloop.admin.db.raw-tbl-ajax', 
+                        $this->v
+                    )->render();
+                    $GLOBALS["SL"]->setAdmMenuOnLoad(0);
+                }
+            }
+        }
+        return view('vendor.survloop.master', $this->v);
+    }
+
+    private function printRawTableSorts(Request $request)
+    {
+        $this->v["sortFld"] = 'id';
+        $this->v["sortDir"] = 'desc';
+        if ($request->has('sortFld')
+            && trim($request->get('sortFld')) != '') {
+            $this->v["sortFld"] = trim($request->get('sortFld'));
+        }
+        if ($request->has('sortDir')
+            && trim($request->get('sortDir')) == 'asc') {
+            $this->v["sortDir"] = 'asc';
+        }
+        return true;
+    }
+
+    private function printRawTableQry($tbl)
+    {
+        $sortFld = $this->v["tbl"]->tbl_abbr . $this->v["sortFld"];
+        eval("\$this->v['rowTotCnt'] = " 
+            . $GLOBALS["SL"]->modelPath($tbl) . "::select('" 
+            . $this->v["tbl"]->tbl_abbr . "id')->count();");
+        eval("\$this->v['rows'] = " . $GLOBALS["SL"]->modelPath($tbl)
+            . "::orderBy('" . $sortFld . "', '" 
+            . $this->v["sortDir"] . "')->limit(2000)->get();");
+        $this->v["flds"] = SLFields::where('fld_database', $GLOBALS["SL"]->dbID)
+            ->where('fld_table', $this->v["tbl"]->tbl_id)
+            ->select('fld_name', 'fld_eng', 
+                'fld_id', 'fld_ord', 'fld_type')
+            ->orderBy('fld_ord', 'asc')
+            ->get();
+        return true;
+    }
+    
+    public function printImport(Request $request)
+    {
+        $cacheName = '/dashboard/db/import';
+        $this->admControlInit($request, $cacheName);
+        $this->v["uploadImport"] = null;
+        if ($request->has('import')) {
+            if (trim($request->get('import')) == 'excel') {
+                $this->uploadImportStep1($request);
+            } else {
+                if ($request->has('file') 
+                    && trim($request->get('file')) != '') { 
+                    $tblEng = '';
+                    if ($request->has('tblEng')) {
+                        $tblEng = trim($request->tblEng);
+                    }
+                    $this->v["uploadImport"] = new SurvLoopImportExcel($tblEng);
+                    if (trim($request->get('import')) == 'flds') {
+                        $this->v["uploadImport"]->loadFile($request->get('file'));
+                    } elseif (trim($request->get('import')) == 'fldNames') {
+                        $this->v["uploadImport"]->loadFldNames($request);
+                    }
+                }
+            }
+        }
+        $GLOBALS["SL"]->pageAJAX = view(
+            'vendor.survloop.admin.db.import-ajax', 
+            $this->v
+        )->render();
+        $this->v["content"] = view(
+            'vendor.survloop.admin.db.import', 
+            $this->v
+        )->render();
+        return view('vendor.survloop.master', $this->v);
+    }
+    
+    private function uploadImportStep1(Request $request)
+    {
+        if ($GLOBALS["SL"]->REQ->hasFile('importExcel')) {
+            $tblEng = '';
+            if ($request->has('importTblName')) {
+                $tblEng = trim($request->get('importTblName'));
+            }
+            $this->v["uploadImport"] = new SurvLoopImportExcel($tblEng);
+            $this->v["uploadImport"]->uploadToArray('importExcel');
+            $redir = '?import=flds&file=' . $this->v["uploadImport"]->getFile()
+                . '&tblEng=' . $request->get('importTblName');
+            $this->redir($redir, true);
+        }
+        return true;
+    }
     
     protected function prepLaravelExport()
     {
@@ -93,7 +217,10 @@ class AdminDatabaseInstall extends AdminDBController
             "Zip Files"  => ''
         ];
 		$this->v["fileListModel"] = [];
-		$this->v["migratFileUp"] = $this->v["migratFileDown"] = $this->v["tblClean"] = '';
+		$this->v["migratFileUp"] 
+            = $this->v["migratFileDown"] 
+            = $this->v["tblClean"] 
+            = '';
         if (!isset($this->v["modelFile"])) {
             $this->v["modelFile"] = "";
         }
@@ -133,7 +260,7 @@ class AdminDatabaseInstall extends AdminDBController
         $this->v["newMigFile"] = 'database/migrations/' 
             . $this->v["dateStmp"] . '_000000_create_' 
             . strtolower($GLOBALS["SL"]->dbRow->db_name) . '_tables.php';
-        $this->v["seedFile"] = 'database/seeds/' 
+        $this->v["seedFile"] = 'database/seeders/' 
             . $GLOBALS["SL"]->dbRow->db_name . 'Seeder.php';
         $this->v["tbls"] = $this->exportQryTbls();
         

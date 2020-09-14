@@ -301,7 +301,7 @@ class GlobalsStatic extends GlobalsConvert
         return $this->mapDirSlimmer($this->mapDirFiles($folder, $recurse), $folder);
     }
     
-    public function slugify($text)
+    public function slugify($text, $delim = '-')
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
         $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
@@ -310,7 +310,10 @@ class GlobalsStatic extends GlobalsConvert
         $text = preg_replace('~-+~', '-', $text);
         $text = strtolower($text);
         if (empty($text)) {
-            return 'n-a';
+            $text = 'n-a';
+        }
+        if ($delim != '-') {
+            $text = str_replace('-', $delim, $text);
         }
         return $text;
     }

@@ -1,7 +1,7 @@
 
 # RockHopSoft/SurvLoop
 
-[![Laravel](https://img.shields.io/badge/Laravel-7.6-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-8.0-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Table of Contents
@@ -58,8 +58,8 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 
 # <a name="requirements"></a>Requirements
 
-* php: >=7.2.5
-* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 7.6.*
+* php: >=7.3
+* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.0.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
 # <a name="getting-started"></a>Getting Started
@@ -70,7 +70,7 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 <a href="https://survloop.org/how-to-install-survloop" target="_blank">Full install instructions</a> also describe how to set up a development environment using VirutalBox, Vargrant, and Laravel's Homestead.
 
 ```
-$ composer create-project laravel/laravel survloop "7.6.*"
+$ composer create-project laravel/laravel survloop "8.0.*"
 $ cd survloop
 
 ```
@@ -197,6 +197,18 @@ After logging in as an admin, this link rebuilds many supporting files:
 http://survloop.local/dashboard/settings?refresh=2
 
 ### Other Package Installation
+
+The Excel tools use maatwebsite/excel, and you might need this on Ubuntu:
+```
+$ sudo apt-get install php7.3-zip
+```
+...or this on Mac:
+```
+$ brew update
+$ brew install php@7.3
+$ brew link php@7.3 --force
+```
+
 
 If you plan to generate PDFs, then you should also 
 <a href="https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostpdl-9.52.tar.gz" target="_blank">download</a> and 

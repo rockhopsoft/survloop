@@ -131,12 +131,17 @@ class SurvLoopImages
     
     public function analizeImg($img = [])
     {
-        if (!isset($img->img_full_filename) || trim($img->img_full_filename) == '') {
-            $img->img_full_filename = '/' . $GLOBALS["SL"]->getPckgProj() 
+        if (!isset($img->img_full_filename) 
+            || trim($img->img_full_filename) == '') {
+            $img->img_full_filename = '/' 
+                . $GLOBALS["SL"]->getPckgProj() 
                 . '/uploads/' . $img->img_file_loc;
         }
         $file = $this->fold . '/' . $img->img_file_loc;
-        $img->img_type = substr($img->img_file_loc, strrpos($img->img_file_loc, '.')+1);
+        $img->img_type = substr(
+            $img->img_file_loc, 
+            strrpos($img->img_file_loc, '.')+1
+        );
         $img->img_type = strtolower($img->img_type);
         switch($img->img_type) {
             case 'jpeg'; $img->img_type = 'jpg'; break;
@@ -157,7 +162,8 @@ class SurvLoopImages
             ->get();
         if ($imgs->isNotEmpty()) {
             foreach ($imgs as $i => $img) {
-                if (!isset($img->img_type) || trim($img->img_type) == '') {
+                if (!isset($img->img_type) 
+                    || trim($img->img_type) == '') {
                     // update to newest added field
                     $this->analizeImg($img);
                 }
@@ -217,7 +223,10 @@ class SurvLoopImages
         $img = SLImages::where('img_id', $imgID)
             ->where('img_database_id', $this->dbID)
             ->first();
-        $img->img_title = $img->img_credit = $img->img_credit_url = '';
+        $img->img_title 
+            = $img->img_credit 
+            = $img->img_credit_url 
+            = '';
         if ($GLOBALS["SL"]->REQ->has('img' . $imgID . 'Name')) {
             $img->img_title = trim($GLOBALS["SL"]->REQ
                 ->get('img' . $imgID . 'Name'));

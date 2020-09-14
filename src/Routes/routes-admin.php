@@ -112,6 +112,12 @@ Route::post('/dashboard/systems-check', [
     'uses'       => $path . 'Admin\\AdminController@systemsCheck',    
     'middleware' => ['auth']
 ]);
+Route::get( '/dashboard/debug-node-saves', [
+    'uses'       => $path . 'Admin\\AdminController@debugNodeSaves', 
+    'middleware' => ['auth']
+]);
+
+
 
 Route::get( '/dashboard/contact', [
     'uses'       => $path . 'Admin\\AdminEmailController@manageContact', 

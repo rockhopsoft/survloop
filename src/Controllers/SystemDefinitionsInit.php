@@ -102,11 +102,11 @@ class SystemDefinitionsInit
                 '&lt;i class="fa-li fa fa-spinner fa-spin"&gt;&lt;/i&gt;'
             ], 
             'matomo-analytic-url' => [
-                'Matomo Analytics URL', 
-                '//analytics.myapp.com/'
+                'Matomo Cloud Analytics URL', 
+                'myapp.matomo.cloud'
             ], 
             'matomo-analytic-site-id' => [
-                'Matomo Analytics Site ID', 
+                'Matomo Cloud Analytics Site ID', 
                 '1'
             ], 
             'google-analytic' => [

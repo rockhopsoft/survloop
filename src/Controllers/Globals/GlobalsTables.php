@@ -34,6 +34,7 @@ class GlobalsTables extends GlobalsElements
     public function loadGlobalTables($dbID = 1, $treeID = 1, $treeOverride = -3)
     {
         $this->isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
+        $this->isStaff = (Auth::user() && Auth::user()->hasRole('staff'));
         $this->isVolun = (Auth::user() && Auth::user()->hasRole('volunteer'));
         if ($treeOverride > 0) {
             $this->treeOverride = $treeOverride;
@@ -101,6 +102,11 @@ class GlobalsTables extends GlobalsElements
         }
         $this->sysOpts = [ "cust-abbr" => 'SurvLoop' ];
         return true;
+    }
+    
+    public function isStaffOrAdmin()
+    {
+        return ($this->isAdmin || $this->isStaff);
     }
     
     public function installNewModel($tbl, $forceFile = true)
@@ -514,7 +520,7 @@ class GlobalsTables extends GlobalsElements
                 || $loopTbl == $tblName) {
                 $selected = 'SELECTED';
             }
-            $ret .= '<option value="' . $tblName.'" ' . $selected . ' >'
+            $ret .= '<option value="' . $tblName . '" ' . $selected . ' >'
                 . $prefix . $tblName . '</option>' . "\n";
         }
         return $ret;

@@ -230,9 +230,9 @@ class PageLoadUtils extends Controller
     public function searchRun(Request $request)
     {
         $searchTree = null;
-        if ($request->has('searchData') && is_array($request->get('searchData'))) {
+        if ($request->has('sDataSet') && is_array($request->get('sDataSet'))) {
             $perms = $this->getPermOpts();
-            $searchDataTbl = $request->get('searchData');
+            $searchDataTbl = $request->get('sDataSet');
             if (sizeof($searchDataTbl) == 1 && intVal($searchDataTbl[0]) > 0) {
                 $trees = DB::table('sl_tree')
                     ->join('sl_node', function ($join) {
@@ -447,15 +447,15 @@ class PageLoadUtils extends Controller
         return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
     }
     
-    protected function chkGenCacheKey()
+    protected function chkGenCacheKey($type = 'page')
     {
         if (trim($this->cacheKey) == '') {
-            return $this->topGenCacheKey();
+            return $this->topGenCacheKey($type);
         }
         return $this->cacheKey;
     }
     
-    protected function topGenCacheKey()
+    protected function topGenCacheKey($type = 'page')
     {
         $sffx = '-visitor';
         if ($this->isUserAdmin()) {
@@ -474,16 +474,18 @@ class PageLoadUtils extends Controller
             $GLOBALS["SL"]->cacheSffx = $sffx;
         }
         $uri = str_replace('?refresh=1', '', 
-            str_replace('&refresh=1', '', $_SERVER["REQUEST_URI"])
-        );
+                str_replace('?refresh=1&', '?', 
+                    str_replace('&refresh=1', '', $_SERVER["REQUEST_URI"])
+                )
+            );
         $uri = substr($uri, 1);
-        $this->cacheKey = 'page-' . $uri . $sffx . '.html';
+        $this->cacheKey = $type . '-' . $uri . $sffx . '.html';
         return $this->cacheKey;
     }
     
-    public function topCheckCache(Request $request, $type = '')
+    public function topCheckCache(Request $request, $type = 'page')
     {
-        $this->topGenCacheKey();
+        $this->topGenCacheKey($type);
         $cache = new GlobalsCache;
         if ($request->has('refresh')) {
             $cache->forgetCache($this->cacheKey, $type);
@@ -591,6 +593,11 @@ class PageLoadUtils extends Controller
     protected function isUserStaff()
     {
         return (Auth::user() && Auth::user()->hasRole('staff'));
+    }
+    
+    protected function isStaffOrAdmin()
+    {
+        return (Auth::user() && Auth::user()->hasRole('administrator|staff'));
     }
     
     protected function isUserVolun()

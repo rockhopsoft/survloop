@@ -128,7 +128,7 @@ class SurvLoop extends SurvCustLoop
             return redirect($redir, 301);
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
-            if ($this->hasParamEdit($request) && $this->isUserAdmin()) {
+            if ($this->hasParamEdit($request) && $this->isStaffOrAdmin()) {
                 echo '<script type="text/javascript"> window.location="/dashboard/page/' 
                     . $this->treeID . '?all=1&alt=1&refresh=1"; </script>';
                 exit;
@@ -321,8 +321,9 @@ class SurvLoop extends SurvCustLoop
                     if ($redir != $tree->tree_slug) {
                         return redirect($redir);
                     }
-                    if ($request->has('edit') && intVal($request->get('edit')) == 1 
-                        && $this->isUserAdmin()) {
+                    if ($request->has('edit') 
+                        && intVal($request->get('edit')) == 1 
+                        && $this->isStaffOrAdmin()) {
                         echo '<script type="text/javascript"> '
                             . 'window.location="/dashboard/page/' 
                             . $tree->tree_id . '?all=1&alt=1&refresh=1";'
@@ -371,6 +372,7 @@ class SurvLoop extends SurvCustLoop
     public function ajaxChecks(Request $request, $type = '')
     {
         $this->loadLoop($request);
+        $GLOBALS["SL"]->v["cacheKey"] = $this->topGenCacheKey('ajax');
         return $this->custLoop->ajaxChecks($request, $type);
     }
     

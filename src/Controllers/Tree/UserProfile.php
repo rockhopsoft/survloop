@@ -229,11 +229,13 @@ class UserProfile extends TreeSurvInput
             $this->v["canEdit"] = false;
             if (isset($this->v["user"]) 
                 && $this->v["user"] 
-                && ($this->v["user"]->hasRole('administrator') 
+                && ($this->v["user"]->hasRole('administrator|staff')
                     || $this->v["user"]->id == $this->v["profileUser"]->id)) {
                 $this->v["canEdit"] = true;
             }
-            if (isset($this->v["uID"]) && $this->v["uID"] > 0 && $this->v["canEdit"]) {
+            if (isset($this->v["uID"]) 
+                && $this->v["uID"] > 0 
+                && $this->v["canEdit"]) {
                 if ($GLOBALS["SL"]->REQ->has('edit') 
                     && $GLOBALS["SL"]->REQ->get('edit') == 'sub') {
                     $this->updateProfile();
@@ -244,11 +246,32 @@ class UserProfile extends TreeSurvInput
                     && $GLOBALS["SL"]->REQ->get('upload') == 'photo') {
                     $this->profilePhotoUpload();
                 }
+                if ($GLOBALS["SL"]->REQ->has('delProfPic') 
+                    && intVal($GLOBALS["SL"]->REQ->delProfPic) == 1) {
+                    $this->profilePhotoDelete();
+                }
             }
+            $this->v["userLogs"] = '';
+            if ($this->v["user"] 
+                && $this->v["user"]->hasRole('administrator|staff')) {
+                $this->v["userLogs"] = $this->logPreviewUser(
+                    'session-stuff', 
+                    $this->v["profileUser"]->id
+                );
+            }
+            $this->v["picInstruct"] = $this->profilePhotoUploadInstruct();
             return view('vendor.survloop.auth.profile', $this->v)->render();
         }
         return '<br /><br /><br /><center><i>User not found.</i></center>'
-            . '<script type="text/javascript"> setTimeout("window.location=\'/login\'", 1); </script>';
+            . '<script type="text/javascript"> '
+            . 'setTimeout("window.location=\'/login\'", 1); '
+            . '</script>';
+    }
+    
+    protected function profilePhotoUploadInstruct()
+    {
+        return 'Please upload an appropriate photo of yourself.'
+            . 'This will be <nobr>visible to the public.</nobr>';
     }
     
     protected function profilePhotoUpload()
@@ -284,17 +307,34 @@ class UserProfile extends TreeSurvInput
                 $width = $height = 500;
                 $image->width() > $image->height() ? $width=null : $height=null;
                 $image->resize($width, $height, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
+                    $constraint->aspectRatio();
+                });
                 $image->crop(500, 500);
-                $crop = str_replace('.jpg', '-.jpg', $upFold . $filename);
-                $image->save($crop, 60);
+                $crop = str_replace('.jpg', '-.jpg', $filename);
+                if (file_exists($upFold . $crop)) {
+                    unlink($upFold . $crop);
+                }
+                $image->save($upFold . $crop, 60);
             }
         } else {
-            $ret .= '<div class="txtDanger">'
-                . 'Invalid file. Please check the format and try again.</div>';
+            $ret .= '<div class="txtDanger">Invalid file. '
+                . 'Please check the format and try again.</div>';
         }
         return $ret;
+    }
+    
+    private function profilePhotoDelete()
+    {
+        $upFold = '../storage/app/up/avatar/';
+        $filename = $this->v["profileUser"]->id . '.jpg';
+        if (file_exists($upFold . $filename)) {
+            unlink($upFold . $filename);
+        }
+        $crop = str_replace('.jpg', '-.jpg', $filename);
+        if (file_exists($upFold . $crop)) {
+            unlink($upFold . $crop);
+        }
+        return true;
     }
     
     protected function profileResetPass()

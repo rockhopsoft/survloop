@@ -13,7 +13,7 @@ namespace SurvLoop\Controllers\Globals;
 class GlobalsElements extends GlobalsCache
 {
 
-    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '')
+    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'fa-chevron')
     {
       	return view(
             'vendor.survloop.elements.inc-accordian', 
@@ -24,7 +24,8 @@ class GlobalsElements extends GlobalsCache
         		"big"      => $big,
         		"open"     => $open,
                 "isCard"   => ($type == 'card'),
-                "isText"   => ($type == 'text')
+                "isText"   => ($type == 'text'),
+                "ico"      => $ico
           	]
         )->render();
     }
@@ -73,6 +74,22 @@ class GlobalsElements extends GlobalsCache
     public function setAutoRunSearch() 
     {
         $this->pageJAVA .= ' autoRunDashResults = true; ';
+        return true;
+    }
+
+    public function setDashSearchDiv($divID) 
+    {
+        $this->pageJAVA .= ' setTimeout("'
+            . 'document.getElementById(\'sResultsDivID\').value=\'' 
+            . $divID . '\'", 1); ';
+        return true;
+    }
+
+    public function setDashSearchUrl($url) 
+    {
+        $this->pageJAVA .= ' setTimeout("'
+            . 'document.getElementById(\'sResultsUrlID\').value=\'' 
+            . $url . '\'", 1); ';
         return true;
     }
 
@@ -283,6 +300,15 @@ class GlobalsElements extends GlobalsCache
         }
         $posEnd = strpos($str, '"', (10+$pos));
         return substr($str, 0, $pos) . $this->tabInd() . substr($str, (1+$posEnd));
+    }
+
+    
+    public function saveIconAnim()
+    {
+        return view(
+            'vendor.survloop.elements.inc-save-ico-anim', 
+            [ "rand" => rand(100000, 1000000) ]
+        )->render();
     }
     
     public function colorHex2Rgba($hex = '#000000', $a = 1)

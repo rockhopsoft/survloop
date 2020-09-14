@@ -12,13 +12,8 @@ namespace SurvLoop\Controllers;
 
 use DB;
 use Auth;
-use Cache;
-use Storage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Routing\Controller;
-use Illuminate\Database\QueryException;
 use App\Models\User;
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
@@ -30,37 +25,11 @@ use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
 use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\Globals\GlobalsCache;
 use SurvLoop\Controllers\Globals\Globals;
+use SurvLoop\Controllers\SurvLoopControllerUtils;
 
-class SurvLoopController extends Controller
+class SurvLoopController extends SurvLoopControllerUtils
 {
-    public $isLoaded             = true;
-    protected $custReport        = [];
-    
-    protected $dbID              = 1;
-    protected $treeID            = 1;
-    protected $treeFromURL       = false;
-    
-    protected $coreID            = -3;
-    protected $corePublicID      = -3;
-    protected $coreIDoverride    = -3;
-    public $coreIncompletes      = [];
-    protected $sessID            = 0;
-    protected $sessInfo          = [];
-    protected $sessLoops         = [];
-    
-    public $v                    = []; 
-    // contains data to be shares with views, 
-    // and/or across [dispersed] functions
-    
-    protected $currPage          = '';
-    protected $cacheKey          = '';
-    protected $isFirstTimeOnPage = false;
-    protected $survInitRun       = false;
-    
-    protected $extraTree         = [];
-    public    $searcher          = null;
     
     /**
      * Initialize key SurvLoop variables needed for content delivery.
@@ -95,6 +64,47 @@ class SurvLoopController extends Controller
     }
     
     /**
+     * Initialize the client-extension of the SurvLoop's TreeSurvForm class
+     * which works with all branching tress.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $treeID
+     * @param  int  $dbID
+     * @param  boolean  $slInit
+     * @return boolean
+     */
+    protected function loadCustLoop(Request $request, $treeID = -3, $dbID = -3, $slInit = true)
+    {
+        if ($treeID <= 0) {
+            $treeID = $this->treeID;
+        }
+        if ($dbID <= 0) {
+            $dbID = $this->dbID;
+        }
+        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
+            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
+            $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
+                . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
+                . "(\$request, -3, \$dbID, \$treeID, false, "
+                . (($slInit) ? "true" : "false") . ");";
+            eval($eval);
+        } else {
+            $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
+        }
+        $currPage = '';
+        if (isset($this->v["currPage"]) 
+            && sizeof($this->v["currPage"]) > 0) {
+            $currPage = $this->v["currPage"][0];
+        }
+        if ($slInit) {
+            $this->custReport->survLoopInit($request, $currPage);
+        } else {
+            $this->custReport->authMinimalInit($request, $currPage);
+        }
+        return true;
+    }
+    
+    /**
      * Initialize key user variables tied to this core trunk object.
      *
      * @return boolean
@@ -110,8 +120,6 @@ class SurvLoopController extends Controller
             if (isset($GLOBALS["SL"])) {
                 $GLOBALS["SL"]->pageJAVA .= ' loggedIn = true; ';
             }
-        } elseif (isset($GLOBALS["SL"])) {
-            $GLOBALS["SL"]->pageJAVA .= ' loggedIn = false; ';
         }
         $this->v["isAdmin"] 
             = $this->v["isStaff"] 
@@ -124,46 +132,44 @@ class SurvLoopController extends Controller
             $this->v["isPartner"] = $this->v["user"]->hasRole('partner');
             $this->v["isVolun"]   = $this->v["user"]->hasRole('volunteer');
         }
+        $this->loadUserVarsJava();
         $this->initPowerUser();
         return true;
     }
     
     /**
-     * Check if the current user has staff or admin permissions.
+     * Initialize key user variables in Javascript.
      *
      * @return boolean
      */
-    protected function isStaffOrAdmin()
+    private function loadUserVarsJava()
     {
-        return ($this->v["isAdmin"] || $this->v["isStaff"]);
-    }
-    
-    /**
-     * Initialize the simplest SurvLoop variables which track page loads.
-     *
-     * @param  Illuminate\Http\Request  $request
-     * @return boolean
-     */
-    protected function loadSimpleVars(Request $request)
-    {
-        $this->v["isAll"]     = $request->has('all');
-        $this->v["isAlt"]     = $request->has('alt');
-        $this->v["isPrint"]   = $request->has('print');
-        $this->v["isExcel"]   = $request->has('excel');
-        $this->v["view"]      = (($request->has('view')) 
-            ? trim($request->get('view')) : '');
-        $this->v["isDash"]    = false;
-        $this->v["exportDir"] = 'survloop';
-        $this->v["content"]   = '';
-        $this->v["isOwner"]   = false;
-        if (!isset($this->v["currState"])) {
-            $this->v["currState"] = '';
-        }
-        if (!isset($this->v["yourUserInfo"])) {
-            $this->v["yourUserInfo"] = [];
-        }
-        if (!isset($this->v["yourContact"])) {
-            $this->v["yourContact"]  = [];
+        if (isset($GLOBALS["SL"])) {
+            if ($this->v["uID"] > 0) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedIn = true; ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedIn = false; ';
+            }
+            if ($this->v["isAdmin"]) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInAdmin = true; ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInAdmin = false; ';
+            }
+            if ($this->v["isStaff"]) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInStaff = true; ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInStaff = false; ';
+            }
+            if ($this->v["isPartner"]) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInPartner = true; ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInPartner = false; ';
+            }
+            if ($this->v["isVolun"]) {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInVolun = true; ';
+            } else {
+                $GLOBALS["SL"]->pageJAVA .= ' loggedInVolun = false; ';
+            }
         }
         return true;
     }
@@ -395,45 +401,6 @@ class SurvLoopController extends Controller
         }
         return '';
     }
-
-    protected function chkHasTreeOne($dbID = 1)
-    {
-        $sysChk = SLTree::find(1);
-        return ($sysChk && isset($sysChk->tree_id));
-    }
-    
-    public function getCoreID()
-    {
-        return $this->coreID;
-    }
-    
-    protected function setCurrPage($currPage = '')
-    {
-        $this->v["currPage"][0] = $currPage;
-        return true;
-    }
-    
-    public function getCurrPage()
-    {
-        return ((isset($this->v["currPage"][0])) ? $this->v["currPage"][0] : '/');
-    }
-    
-    /**
-     * Initializing a bunch of things which are not [yet] automatically 
-     * set by the SurvLoop and its GUIs.
-     *
-     * @param  Illuminate\Http\Request  $request
-     * @return boolean
-     */
-    protected function initExtra(Request $request)
-    {
-        return true;
-    }
-    
-    protected function extraNavItems()
-    {
-        return '';
-    }
     
     public function initCustViews(Request $request)
     {
@@ -449,73 +416,6 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    protected function getHighestGroupLabel()
-    {
-        if (Auth::user() && Auth::user()->id > 0) {
-            if (Auth::user()->hasRole('administrator')) {
-                return 'admin';
-            } elseif (Auth::user()->hasRole('staff|databaser|brancher')) {
-                return 'staff';
-            } elseif (Auth::user()->hasRole('partner')) {
-                return 'partner';
-            } elseif (Auth::user()->hasRole('volunteer')) {
-                return 'volun';
-            } else {
-                return 'user';
-            }
-        }
-        return 'visitor';
-    }
-    
-    protected function genCacheKey($baseOverride = '')
-    {
-        $this->cacheKey = str_replace('/', '.', $this->v["currPage"][0]);
-        if ($baseOverride != '') {
-            $this->cacheKey = $baseOverride;
-        }
-        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID . '.tree'
-            . $GLOBALS["SL"]->treeID . '.' . $this->getHighestGroupLabel();
-        if ($this->v["isPrint"]) {
-            $this->cacheKey .= '.print';
-        }
-        if ($this->v["isAll"]) {
-            $this->cacheKey .= '.all';
-        }
-        if ($this->v["isAlt"]) {
-            $this->cacheKey .= '.alt';
-        }
-        if ($this->v["isExcel"]) {
-            $this->cacheKey .= '.excel';
-        }
-        return $this->cacheKey;
-    }
-    
-    protected function checkCache($baseOverride = '')
-    {
-        if ($baseOverride != '') {
-            $this->genCacheKey($baseOverride);
-        }
-        $cache = new GlobalsCache;
-        if ($GLOBALS["SL"]->REQ->has('refresh')) {
-            $cache->forgetCache($this->cacheKey);
-        }
-        $ret = $cache->chkCache($this->cacheKey);
-        if ($ret != '') {
-            $this->v["content"] = $ret;
-            $GLOBALS["SL"]->x["pageCacheLoaded"] = true;
-            return true;
-        }
-        $GLOBALS["SL"]->x["pageCacheLoaded"] = false;
-        return false;
-    }
-    
-    protected function saveCache()
-    {
-        $cache = new GlobalsCache;
-        $cache->putCache($this->cacheKey, $this->v["content"]);
-        return true;
-    }
-    
     // Is this the first time this user has visited the current page?
     protected function isPageFirstTime($currPage = '')
     {
@@ -528,19 +428,6 @@ class SurvLoopController extends Controller
         if ($chk->isNotEmpty()) {
             return false;
         }
-        return true;
-    }
-    
-    protected function logPageVisit($currPage = '', $val = '')
-    {
-        $log = new SLUsersActivity;
-        $log->user_act_user = Auth::user()->id;
-        $log->user_act_curr_page = $_SERVER["REQUEST_URI"];
-        if (strlen($log->user_act_curr_page) > 255) {
-            $log->user_act_curr_page = substr($log->user_act_curr_page, 0, 255);
-        }
-        $log->user_act_val = $val;
-        $log->save();
         return true;
     }
     
@@ -591,37 +478,6 @@ class SurvLoopController extends Controller
                     . "->get();");
                 $this->v["recTots"][$filt] = (($totChk->isNotEmpty()) ? $totChk->count() : 0);
             }
-        }
-        return true;
-    }
-    
-    protected function loadCustLoop(Request $request, $treeID = -3, $dbID = -3, $slInit = true)
-    {
-        if ($treeID <= 0) {
-            $treeID = $this->treeID;
-        }
-        if ($dbID <= 0) {
-            $dbID = $this->dbID;
-        }
-        if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
-            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
-            $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
-                . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
-                . "(\$request, -3, \$dbID, \$treeID, false, "
-                . (($slInit) ? "true" : "false") . ");";
-            eval($eval);
-        } else {
-            $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
-        }
-        $currPage = '';
-        if (isset($this->v["currPage"]) 
-            && sizeof($this->v["currPage"]) > 0) {
-            $currPage = $this->v["currPage"][0];
-        }
-        if ($slInit) {
-            $this->custReport->survLoopInit($request, $currPage);
-        } else {
-            $this->custReport->authMinimalInit($request, $currPage);
         }
         return true;
     }
@@ -827,17 +683,6 @@ class SurvLoopController extends Controller
             }
         }
         return true;
-    }
-    
-    public function generateRandomString($length = 10)
-    {
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-        for ($i = 0; $i < $length; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $randomString;
     }
     
     
@@ -1108,81 +953,6 @@ class SurvLoopController extends Controller
         return true;
     }
     
-    function checkFolder($fold)
-    {
-        $currFold = '';
-        $limit = 0;
-        while (!is_dir($currFold . 'storage/app') && $limit < 9) {
-            $currFold .= '../';
-            $limit++;
-        }
-        $currFold .= 'storage/app';
-        $fold = str_replace('../storage/app/', '', $fold);
-        $subs = [$fold];
-        if (strpos($fold, '/') !== false) {
-            $subs = explode('/', $fold);
-        }
-        if (sizeof($subs) > 0) {
-            foreach ($subs as $sub) {
-                if (trim($sub) != '') {
-                    $currFold .= '/' . $sub;
-                    if (!is_dir($currFold)) {
-                        mkdir($currFold);
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    
-    public function logAdd($log, $content)
-    {
-        $this->checkFolder('../storage/app/log');
-        $fold = '../storage/app/';
-        $file = 'log/' . $log . '.html';
-        $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
-        if (!isset($GLOBALS["SL"])) {
-            $GLOBALS["SL"] = new Globals(new Request, $this->dbID, $this->treeID);
-        }
-        $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' . $content 
-            . '<br /><span class="slGrey fPerc80">' . $GLOBALS["SL"]->hashIP()
-            . '</span></p>';
-        if (!file_exists($fold . $file)) {
-            Storage::disk('local')->put($file, ' ');
-        }
-        Storage::disk('local')->prepend($file, $content);
-        return true;
-    }
-    
-    public function logLoad($log)
-    {
-        $file = '../storage/app/log/' . $log . '.html';
-        if ($this->v["isAdmin"] && file_exists($file)) {
-            return file_get_contents($file);
-        }
-        return '';
-    }
-    
-    public function logPreview($log)
-    {
-        $ret = '';
-        $all = $this->logLoad($log);
-        if (trim($all) != '' && strpos($all, '</p>') !== false) {
-            $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
-            for ($i = 0; ($i < 100 && $i < sizeof($logs)); $i++) {
-                $ret .= $logs[$i] . '</p><div class="p20"></div>';
-            }
-        }
-        return $ret;
-    }
-    
-    public function logAddSessStuff($type)
-    {
-        $log = '';
-        $this->logAdd('session-stuff', $log);
-        return true;
-    }
-    
     public function getCoreDef($set, $subset, $dbID = 1)
     {
         $def = SLDefinitions::where('def_database', $dbID)
@@ -1223,18 +993,6 @@ class SurvLoopController extends Controller
         return '';
     }
     
-    public function printUserLnk($uID = -3)
-    {
-        if ($uID > 0) {
-            $user = User::find($uID);
-            if ($user && isset($user->id)) {
-                return $user->printUsername();
-            }
-            return 'User #' . $uID;
-        }
-        return '';
-    }
-    
     public function tblsInPackage()
     {
         if ($this->dbID == 3) {
@@ -1259,17 +1017,6 @@ class SurvLoopController extends Controller
     public function tblsInPackageCustom()
     {
         return [];
-    }
-    
-    /**
-     * Load additional data related to users who are logged in.
-     *
-     * @param   int  $uID
-     * @return  array
-     */
-    public function initPowerUser($uID = -3)
-    {
-        return true;
     }
     
 }

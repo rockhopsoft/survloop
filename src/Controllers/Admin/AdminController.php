@@ -22,8 +22,11 @@ use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLCaches;
-use SurvLoop\Controllers\Globals\Globals;
+use App\Models\SLSess;
+use App\Models\SLNodeSaves;
 use SurvLoop\Controllers\SystemDefinitions;
+use SurvLoop\Controllers\Globals\Globals;
+use SurvLoop\Controllers\Admin\NodeSaveSet;
 use SurvLoop\Controllers\Admin\AdminEmailController;
 
 class AdminController extends AdminEmailController
@@ -529,10 +532,12 @@ class AdminController extends AdminEmailController
     public function logsSessions(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs/session-stuff');
+        if (!Auth::user() || !Auth::user()->hasRole('administrator|staff')) {
+            return $this->redir('/dashboard');
+        }
         $this->loadLogs();
         return view('vendor.survloop.admin.logs-sessions', $this->v);
     }
-    
     
     public function navMenus(Request $request)
     {
@@ -596,4 +601,24 @@ class AdminController extends AdminEmailController
         return 'Not found :(';
     }
     
+    public function debugNodeSaves(Request $request)
+    {
+        $this->admControlInit($request, '/dashboard/debug-node-saves');
+        if (!Auth::user() || !Auth::user()->hasRole('administrator|staff')) {
+            return $this->redir('/dashboard');
+        }
+        $treeID = $coreID = 0;
+        if ($request->has('tree') && intVal($request->get('tree')) > 0) {
+            $treeID = intVal($request->get('tree'));
+            if ($request->has('cidi') && intVal($request->get('cidi')) > 0) {
+                $coreID = intVal($request->get('cidi'));
+            }
+        }
+        $this->v["nodeSaveReport"] = new NodeSaveSet($coreID, $treeID);
+        $this->v["nodeLog"] = $this->logPreviewCore('session-stuff', $coreID);
+        return view('vendor.survloop.admin.debug-node-saves', $this->v);
+    }
+    
 }
+
+

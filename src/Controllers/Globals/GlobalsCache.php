@@ -17,8 +17,19 @@ use App\Models\SLTree;
 
 class GlobalsCache extends GlobalsBasic
 {
+
+    public function cleanCacheKey($key)
+    {
+        $key = str_replace('&refresh=1',  '',  $key);
+        $key = str_replace('?refresh=1&', '?', $key);
+        $key = str_replace('?refresh=1',  '',  $key);
+        $key = str_replace('&state=&states=',  '&states=',  $key);
+        return $key;
+    }
+
     public function getCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = null;
         if ($treeID > 0) {
@@ -44,6 +55,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function hasCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
         return ($chk && isset($chk->cach_id));
@@ -61,6 +73,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function chkCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
         if ($chk && isset($chk->cach_value) && trim($chk->cach_value) != '') {
@@ -79,6 +92,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $cache = $this->getCache($key, $type, $treeID, $coreID);
         return $this->deleteCacheFile($cache);
@@ -91,6 +105,28 @@ class GlobalsCache extends GlobalsBasic
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cache) {
                 $this->deleteCacheFile($cache);
+            }
+        }
+        return true;
+    }
+
+    public function forgetAllCachesOfTree($treeID = 0)
+    {
+        $chk = SLCaches::where('cach_tree_id', intVal($treeID))
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
+        return true;
+    }
+
+    public function forgetAllCachesOfTrees($trees = [])
+    {
+        if (sizeof($trees) > 0) {
+            foreach ($trees as $treeID) {
+                $this->forgetAllCachesOfTree(intVal($treeID));
             }
         }
         return true;
@@ -135,6 +171,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function putCache($key = '', $content = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $file = date("Ymd") . '-t' . $treeID . (($coreID > 0) ? '-c' . $coreID : '');
         $treeRow = false;
         if (isset($this->treeRow->tree_type)) {
@@ -175,6 +212,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function putCacheSearch($key = '', $ids = '', $treeID = 0)
     {
+        $key = $this->cleanCacheKey($key);
         $cache = new SLCaches;
         $cache->cach_type    = 'search';
         $cache->cach_tree_id = $treeID;
@@ -182,6 +220,41 @@ class GlobalsCache extends GlobalsBasic
         $cache->cach_value   = $ids;
         $cache->save();
         return $cache->cach_id;
+    }
+
+    public function addAjaxKeySffx($sffx = '')
+    {
+        if ($sffx != '') {
+            if (!isset($GLOBALS["SL"]->v["cacheKey"])) {
+                $GLOBALS["SL"]->v["cacheKey"] = '';
+            }
+            if (strpos(strtolower($GLOBALS["SL"]->v["cacheKey"]), '.html')) {
+                $GLOBALS["SL"]->v["cacheKey"] = str_replace('.html', '', $GLOBALS["SL"]->v["cacheKey"])
+                    . $sffx . '.html';
+            } else {
+                $GLOBALS["SL"]->v["cacheKey"] .= $sffx;
+            }
+        }
+        $GLOBALS["SL"]->v["cacheKey"] = $this->cleanCacheKey($GLOBALS["SL"]->v["cacheKey"]);
+        return $GLOBALS["SL"]->v["cacheKey"];
+    }
+
+    public function chkAjaxCache($sffx = '')
+    {
+        $this->addAjaxKeySffx($sffx);
+        return $this->chkCache($GLOBALS["SL"]->v["cacheKey"], 'ajax');
+    }
+
+    public function getAjaxCache($sffx = '')
+    {
+        $this->addAjaxKeySffx($sffx);
+        return $this->getCache($GLOBALS["SL"]->v["cacheKey"], 'ajax');
+    }
+
+    public function putAjaxCache($content = '', $sffx = '')
+    {
+        $this->addAjaxKeySffx($sffx);
+        return $this->putCache($GLOBALS["SL"]->v["cacheKey"], $content, 'ajax');
     }
     
     public function opnAjax()

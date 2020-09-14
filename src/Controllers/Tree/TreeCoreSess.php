@@ -225,7 +225,9 @@ class TreeCoreSess extends TreeCore
                 ->first();
         }
         if ($this->sessInfo && isset($this->sessInfo->sess_id)) {
-            if ($this->isAdminUser() && $cid > 0 && $cid != $this->sessInfo->sess_core_id) {
+            if ($this->isStaffOrAdmin() 
+                && $cid > 0 
+                && $cid != $this->sessInfo->sess_core_id) {
                 $this->sessInfo = new SLSess;
                 $this->sessInfo->sess_user_id   = $this->v["uID"];
                 $this->sessInfo->sess_tree      = $GLOBALS["SL"]->sessTree;
@@ -233,7 +235,7 @@ class TreeCoreSess extends TreeCore
                 $this->sessInfo->sess_is_active = 1;
                 $this->sessInfo->save();
                 $this->sessID = $this->sessInfo->sess_id;
-            } elseif ($this->isAdminUser() 
+            } elseif ($this->isStaffOrAdmin()
                 || $this->recordIsEditable($coreTbl, $this->sessInfo->sess_core_id)) {
                 $this->sessID = $this->sessInfo->sess_id;
                 $this->coreID = $GLOBALS["SL"]->coreID = $this->sessInfo->sess_core_id;
@@ -302,7 +304,7 @@ class TreeCoreSess extends TreeCore
             $coreID = $this->coreID;
         }
         if ($coreID > 0 && !$GLOBALS["SL"]->REQ->has('new')) {
-            if (!$this->isAdminUser() 
+            if (!$this->isStaffOrAdmin()
                 && $GLOBALS["SL"]->treeRow->tree_opts%11 == 0 // Tree allows record edits
                 && !$this->recordIsEditable($GLOBALS["SL"]->coreTbl, $coreID, $coreRec)) {
                 session()->forget('sessID' . $this->treeID);
@@ -325,7 +327,7 @@ class TreeCoreSess extends TreeCore
     
     protected function recordIsEditable($coreTbl, $coreID, $coreRec = NULL)
     {
-        return ($this->isAdminUser() 
+        return ($this->isStaffOrAdmin()
             || $this->recordIsIncomplete($coreTbl, $coreID, $coreRec));
     }
     
@@ -479,10 +481,10 @@ class TreeCoreSess extends TreeCore
         }
         if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
             $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
-            if ($ownerUser != $this->v["uID"] && !$this->isAdminUser()) {
+            if ($ownerUser != $this->v["uID"] && !$this->isStaffOrAdmin()) {
                 return $this->redir('/my-profile');
             }
-        } elseif (!$this->isAdminUser()) {
+        } elseif (!$this->isStaffOrAdmin()) {
             return $this->redir('/my-profile');
         }
         $session = $this->chkSess($cid);
@@ -555,7 +557,7 @@ class TreeCoreSess extends TreeCore
         }
         if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
             $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
-            if ($ownerUser != $this->v["uID"] && !$this->isAdminUser()) {
+            if ($ownerUser != $this->v["uID"] && !$this->isStaffOrAdmin()) {
                 return $this->redir('/my-profile');
             }
         }
@@ -768,7 +770,7 @@ class TreeCoreSess extends TreeCore
     public function delSess(Request $request, $coreID)
     {
         $this->survLoopInit($request);
-        if ($this->isCoreOwner($coreID) || $this->isAdminUser()) {
+        if ($this->isCoreOwner($coreID) || $this->isStaffOrAdmin()) {
             if ($coreID != $this->coreID) {
                 $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $coreID);
             }
@@ -789,7 +791,8 @@ class TreeCoreSess extends TreeCore
             }
             $msg = 'Deleting Sess#' 
                 . (($sess && isset($sess->sess_id)) ? $sess->sess_id : 0) 
-                . ' to U#' . $this->v["uID"] . ' <i>(delSess)</i>';
+                . ' to U#' . $this->v["uID"]
+                . ' to C#' . $coreID . ' <i>(delSess)</i>';
             $this->logAdd('session-stuff', $msg);
             if ($sess && isset($sess->sess_id)) {
                 //SLSessLoops::where('SessLoopSessID', $sess->sess_id)
@@ -857,7 +860,7 @@ class TreeCoreSess extends TreeCore
                 return true;
             }
         }
-        if (!$this->isAdminUser()) {
+        if (!$this->isStaffOrAdmin()) {
             $chk = SLSess::where('sess_tree', $this->treeID)
                 ->where('sess_user_id', $this->v["uID"])
                 ->where('sess_core_id', $coreID)
@@ -960,14 +963,6 @@ class TreeCoreSess extends TreeCore
     protected function tweakPageViewPerms($initPageView = '')
     {
         return true;
-    }
-    
-    protected function isAdminUser()
-    {
-        if (!isset($this->v["user"]) || $this->v["uID"] <= 0) {
-            return false;
-        }
-        return $this->v["user"]->hasRole('administrator|databaser|staff');
     }
     
     protected function isPublic()

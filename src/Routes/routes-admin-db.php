@@ -274,6 +274,22 @@ Route::get( '/dashboard/sl/export/laravel', [
     'middleware' => ['auth']
 ]);
 
+Route::post( '/dashboard/db/import', [
+    'uses'       => $path . 'Admin\\AdminDatabaseInstall@printImport', 
+    'middleware' => ['auth']
+]);
+
+Route::get( '/dashboard/db/import', [
+    'uses'       => $path . 'Admin\\AdminDatabaseInstall@printImport', 
+    'middleware' => ['auth']
+]);
+
+Route::get( '/dashboard/db/tbl-raw', [
+    'uses'       => $path . 'Admin\\AdminDatabaseInstall@printRawTable', 
+    'middleware' => ['auth']
+]);
+
+
 Route::get( '/dashboard/db/switch/{dbID}', [
     'uses'       => $path . 'Admin\\AdminDBController@switchDB', 
     'middleware' => ['auth']

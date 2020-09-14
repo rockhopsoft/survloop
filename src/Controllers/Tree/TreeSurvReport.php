@@ -267,7 +267,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (isset($GLOBALS["SL"]->treeSettings['emojis']) 
             && sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 
             && $this->coreID > 0) {
-            $admPower = ($this->v["user"] && $this->v["user"]->hasRole('administrator|staff'));
+            $admPower = ($this->v["user"] && $this->isStaffOrAdmin());
             $spot = 't' . $this->treeID . 'r' . $this->coreID;
             foreach ($GLOBALS["SL"]->treeSettings['emojis'] as $emo) {
                 if (!$emo["admin"] || $admPower) {
@@ -525,7 +525,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         if (!$this->isPublished($GLOBALS["SL"]->coreTbl, $coreID) 
             && !$this->isCoreOwner($coreID) 
-            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
+            && (!$this->v["user"] || !$this->isStaffOrAdmin())) {
             return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
         }
         if ($full) {
@@ -539,7 +539,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         if (!$this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $coreID) 
             && !$this->isCoreOwnerPublic($coreID) 
-            && (!$this->v["user"] || !$this->v["user"]->hasRole('administrator|staff'))) {
+            && (!$this->v["user"] || !$this->isStaffOrAdmin())) {
             return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
         }
         if ($full) {

@@ -60,7 +60,7 @@
 }
 .nodeAnchor a {
     position: absolute;
-    top: -50px;
+    top: -80px;
 }
 .nodeWrap, .nodeWrapError, #formErrorMsg {
 	background: none;

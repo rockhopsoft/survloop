@@ -1,42 +1,38 @@
 /* generated from resources/views/vendor/survloop/js/scripts-ajax-search.blade.php */
 
-function tryAjaxDashResults() {
+function loadDashResults() {
     var resultsDivID = "dashResultsWrap";
     if (document.getElementById("sResultsDivID") && document.getElementById("sResultsDivID").value) {
         resultsDivID = document.getElementById("sResultsDivID").value.trim();
+    }
+    var hasResultsDiv = false;
+    if (resultsDivID.length > 0 && document.getElementById(resultsDivID)) {
+        hasResultsDiv = true;
     }
     var resultsUrl = "?ajax=1&dashResults=1";
     if (document.getElementById("sResultsUrlID") && document.getElementById("sResultsUrlID").value) {
         resultsUrl = document.getElementById("sResultsUrlID").value.trim();
     }
-    if (resultsDivID.length > 0 && document.getElementById(resultsDivID)) {
-        document.getElementById(resultsDivID).innerHTML=getSpinner();
-        var formData = new FormData(document.getElementById("dashSearchFormID"));
-        console.log("loadDashResults div: "+resultsUrl);
-        $.ajax({
-            url: resultsUrl,
-            type: "POST", 
-            data: formData, 
-            contentType: false,
-            processData: false,
-            success: function(data) {
-                $("#"+resultsDivID+"").empty();
-                $("#"+resultsDivID+"").append(data);
-            }, 
-            error: function(xhr, status, error) {
-                $("#"+resultsDivID+"").append("<div>(error - "+xhr.responseText+")</div>");
-            }
-        });
-        return true;
+    if (!hasResultsDiv && resultsUrl == "?ajax=1&dashResults=1") {
+        if (loggedInAdmin) resultsUrl = "/dash/search?run=1";
+        else if (loggedInStaff) resultsUrl = "/dash/staff-search?run=1";
+        else if (loggedInPartner) resultsUrl = "/dash/partner-search?run=1";
+        else resultsUrl = "/search?run=1";
     }
-    return false;
-}
-
-function loadDashResults() {
-    if (!tryAjaxDashResults() && document.getElementById("dashSearchFormID")) {
-        // Otherwise submit search form traditionally
-        console.log("loadDashResults action: "+document.dashSearchForm.action);
-        document.dashSearchForm.submit();
+    if (document.getElementById("admSrchFld") && document.getElementById("admSrchFld").value && document.getElementById("admSrchFld").value.trim() != "") {
+        resultsUrl += "&s="+encodeURI(document.getElementById("admSrchFld").value.trim());
+    }
+    var paramFlds = [ 'sFiltID', 'sSortID', 'sSortDirID', 'sViewID' ];
+    resultsUrl += convertArrToParams(paramFlds);
+    paramFlds = [ 'sDataSet' ];
+    resultsUrl += convertCheckboxArrToParams(paramFlds);
+    if (hasResultsDiv) {
+        console.log(resultsDivID+": "+resultsUrl);
+        document.getElementById(resultsDivID).innerHTML=getSpinner();
+        $("#"+resultsDivID).load(resultsUrl);
+    } else {
+        console.log("window.location = "+resultsUrl);
+        window.location=resultsUrl;
     }
     return false;
 }
@@ -70,6 +66,13 @@ console.log("NOT didSearchDataSetChange: "+sURL);
     }
     return false;
 }
+
+$(document).on("keyup", "#admSrchFld", function(e) {
+    if (e.keyCode == 13) {
+        e.preventDefault();
+        setTimeout(function() { loadDashResults(); }, 500);
+    }
+});
 
 function ajaxSearchExpandResults() {
     if (document.getElementById("ajaxSearchResults").className=="ajaxSearch") document.getElementById("ajaxSearchResults").className="ajaxSearchExpand";
@@ -138,7 +141,7 @@ $(document).on("focusin", "input.srchBarParts", function() {
     pauseHideAdvSearch();
 });
 $(document).on("click", ".updateSearchFilts", function() {
-    setTimeout(function() { loadDashResults(); }, 100);
+    setTimeout(function() { loadDashResults(); }, 750);
 });
 
 $(document).on("click", "#toggleSearchFilts", function() {

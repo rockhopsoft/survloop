@@ -321,7 +321,9 @@ class TreeSurvUpload extends TreeSurv
     public function retrieveUploadFile($upID = '', $refresh = false)
     {
         $this->checkPageViewPerms();
-        if (!$this->isPublic() && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
+        if (!$this->isPublic() 
+            && !$this->isStaffOrAdmin() 
+            && !$this->v["isOwner"]) {
             return $this->retrieveUploadFail();
         }
         $upRequest = [];
@@ -340,7 +342,7 @@ class TreeSurvUpload extends TreeSurv
             $deet = $this->loadUpDeets($upRow);
             if (sizeof($deet) > 0) {
                 if ($deet["privacy"] == 'Block') {
-                // != 'Public' && !$this->v["isAdmin"] && !$this->v["isOwner"]) {
+                // != 'Public' && !$this->isStaffOrAdmin() && !$this->v["isOwner"]) {
                     return $this->retrieveUploadFail();
                 }
                 return $this->previewImg($deet, $refresh);
@@ -620,7 +622,10 @@ class TreeSurvUpload extends TreeSurv
     
     protected function canShowUpload($upDeets, $isAdmin = false, $isOwner = false)
     {
-        return ($isAdmin || $isOwner || $this->v["isAdmin"] || $this->v["isOwner"]);
+        return ($isAdmin 
+            || $isOwner 
+            || $this->isStaffOrAdmin() 
+            || $this->v["isOwner"]);
     }
     
     protected function getUploadsMultNodes($nIDs, $isAdmin = false, $isOwner = false)
