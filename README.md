@@ -130,48 +130,48 @@ $ nano config/app.php
 'providers' => [
     ...
     SurvLoop\SurvLoopServiceProvider::class,
-    Intervention\Image\ImageServiceProvider::class,
     ...
 ],
 ...
 'aliases' => [
     ...
     'SurvLoop' => 'RockHopSoft\SurvLoop\SurvLoopFacade',
-    'Image' => Intervention\Image\Facades\Image::class,
     ...
 ], ...
 ```
 
-Swap out the OpenPolice user model in `config/auth.php`.
+For now, to apply database design changes to the same installation you are working in, depending on your server, you might also need something like this...
 ```
-$ nano config/auth.php
-```
-```
-...
-'model' => App\Models\User::class,
-...
+$ sudo su
+$ chown -R www-data:33 storage database app/Models
 ```
 
 Update composer, publish the package migrations, etc...
 ```
 $ echo "0" | php artisan vendor:publish --force
-$ php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravelRecent"
 $ cd ~/homestead
 $ vagrant up
 $ vagrant ssh
 $ cd code/survloop
 $ php artisan optimize:clear
 $ composer dump-autoload
+```
+
+If using the new DigitalOcean managed databases, you may need to tweak the laravel install:
+```
+$ nano database/migrations/2014_10_12_100000_create_password_resets_table.php
+$ sudo nano database/migrations/2019_08_19_000000_create_failed_jobs_table.php
+```
+Add this line before the "Schema::create" line in each file:
+```
+\Illuminate\Support\Facades\DB::statement('SET SESSION sql_require_primary_key=0');
+```
+
+Then initialize the database:
+```
 $ php artisan migrate
 $ php artisan db:seed --class=SurvLoopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
-```
-
-For now, to apply database design changes to the same installation you are working in, depending on your server, you might also need something like this...
-```
-$ chown -R www-data:33 app/Models
-$ chown -R www-data:33 database
-$ chown -R www-data:33 storage
 ```
 
 You might need to re-run some things outside the virtual box too, e.g.

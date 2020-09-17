@@ -13,7 +13,7 @@ namespace SurvLoop\Controllers\Globals;
 class GlobalsElements extends GlobalsCache
 {
 
-    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'fa-chevron')
+    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'chevron')
     {
       	return view(
             'vendor.survloop.elements.inc-accordian', 
@@ -35,9 +35,9 @@ class GlobalsElements extends GlobalsCache
         return $this->printAccordian($title, $body, $open, true, 'card');
     }
 
-    public function printAccordTxt($title, $body = '', $open = false)
+    public function printAccordTxt($title, $body = '', $open = false, $ico = 'chevron')
     {
-        return $this->printAccordian($title, $body, $open, false, 'text');
+        return $this->printAccordian($title, $body, $open, false, 'text', $ico);
     }
 
     public function setAdmMenuOnLoad($open = 1) 
@@ -199,6 +199,14 @@ class GlobalsElements extends GlobalsCache
         }
         preg_match('/[\\?\\&]v=([^\\?\\&]+)/', $url, $matches);
         return $matches[1];
+    }
+
+    public function getYoutubeDuration($vidURL)
+    {
+        if (stripos($vidURL, 'youtube') !== false) {
+            
+        }
+        return -1;
     }
 
     public function getVimeoID($url)

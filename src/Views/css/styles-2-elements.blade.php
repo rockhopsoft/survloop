@@ -276,6 +276,21 @@ a.sliNav, .sliNavDiv a.sliNav,
     padding-top: 10px;
 }
 
+a.accordHeadBtn:link, a.accordHeadBtn:visited, 
+a.accordHeadBtn:active, a.accordHeadBtn:hover {
+    background: {!! $css["color-main-bg"] !!};
+}
+a.accordHeadBtn:hover {
+    background: {!! $css["color-main-faint"] !!};
+}
+.slAccord .accordHeadWrap, .slAccord div a div .accordHeadWrap,
+.slAccordTxt .accordHeadWrap, .slAccordTxt div a div .accordHeadWrap {
+    min-height: 20px;
+}
+.slAccordBig .accordHeadWrap, .slAccordBig div a div .accordHeadWrap {
+    min-height: 35px;
+}
+
 @for ($i = 0; $i < 20; $i++) @if ($i > 0) , @endif #fixHead{{ $i }} @endfor {
     width: 100%;
 }

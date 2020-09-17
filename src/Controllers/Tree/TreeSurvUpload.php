@@ -727,7 +727,8 @@ class TreeSurvUpload extends TreeSurv
                 && $GLOBALS["SL"]->REQ->has('n' . $nID . 'fld')
                 && $GLOBALS["SL"]->REQ->input('n' . $nID . 'fld') == $vidTypeID) {
                 $upRow->up_video_link = $GLOBALS["SL"]->REQ->input('up' . $nID . 'Vid');
-                $upRow->up_video_duration = $this->getYoutubeDuration($upRow->up_video_link);
+                $upRow->up_video_duration = $GLOBALS["SL"]
+                    ->getYoutubeDuration($upRow->up_video_link);
             } elseif ($GLOBALS["SL"]->REQ->hasFile($file)) { // file upload
                 $upRow->up_upload_file = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalName();
                 $extension = $GLOBALS["SL"]->REQ->file($file)->getClientOriginalExtension();

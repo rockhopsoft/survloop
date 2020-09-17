@@ -1003,12 +1003,13 @@ class SurvLoopController extends SurvLoopControllerUtils
             return $ret;
         }
         $chk = SLTables::where('tbl_database', $this->dbID)
-            ->whereRaw("tbl_opts%5 LIKE 0")
-            ->select('tbl_name')
+            ->select('tbl_name', 'tbl_opts')
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tbl) {
-                $ret[] = $tbl->tbl_name;
+                if ($tbl->tbl_opts%5 == 0) {
+                    $ret[] = $tbl->tbl_name;
+                }
             }
         }
         return $ret;

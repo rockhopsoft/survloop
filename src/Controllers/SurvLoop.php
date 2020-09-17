@@ -853,7 +853,7 @@ class SurvLoop extends SurvCustLoop
         $this->loadLoop($request);
         header('Content-Type: application/json');
         $stats = $GLOBALS["SL"]->getJsonSurvStats();
-    	$stats["Survey1Complete"] = sizeof(
+    	$stats["survey1_complete"] = sizeof(
             $this->custLoop->getAllPublicCoreIDs()
         );
         echo json_encode($stats);

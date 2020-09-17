@@ -285,7 +285,7 @@ class AdminMenu
                 ),
                 $this->admMenuLnk(
                     '/dashboard/db/switch',
-                    '<span class="fPerc80">All Databases</span>'
+                    'Switch Databases'
                 )
             ]
         );

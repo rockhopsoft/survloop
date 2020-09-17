@@ -945,23 +945,27 @@ class GlobalsImportExport extends GlobalsTables
     
     public function getJsonSurvStats($pkg = '')
     {
+        $dbID = $this->dbID;
+        if ($pkg == 'rockhopsoft/survloop') {
+            $dbID = 3;
+        }
     	$types = $this->loadTreeNodeStatTypes();
     	$stats = [
-            "Date"    => date("Y-m-d"),
-            "IconUrl" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"]
+            "date"    => date("Y-m-d"),
+            "icon_url" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"]
         ];
     	$survs = $pages = [];
-    	$stats["DbTables"] = SLTables::where('tbl_database', $this->dbID)
+    	$stats["db_tables"] = SLTables::where('tbl_database', $dbID)
     	   ->count();
-    	$stats["DbFields"] = SLFields::where('fld_database', $this->dbID)
+    	$stats["db_fields"] = SLFields::where('fld_database', $dbID)
     	   ->where('fld_table', '>', 0)
     	   ->count();
-    	$stats["DbLinks"] = SLFields::where('fld_database', $this->dbID)
+    	$stats["db_links"] = SLFields::where('fld_database', $dbID)
     	   ->where('fld_foreign_table', '>', 0)
     	   ->where('fld_table', '>', 0)
     	   ->count();
     	$chk = SLTree::where('tree_type', 'Survey')
-    		->where('tree_database', $this->dbID)
+    		->where('tree_database', $dbID)
     		->select('tree_id')
     		->get();
     	if ($chk->isNotEmpty()) {
@@ -969,20 +973,20 @@ class GlobalsImportExport extends GlobalsTables
     		    $survs[] = $t->tree_id;
     		}
     	}
-    	$stats["Surveys"] = sizeof($survs);
-    	$stats["SurveyNodes"] = SLNode::whereIn('node_tree', $survs)
+    	$stats["surveys"] = sizeof($survs);
+    	$stats["survey_nodes"] = SLNode::whereIn('node_tree', $survs)
             ->count();
-    	$stats["SurveyNodesMult"] = SLNode::whereIn('node_tree', $survs)
+    	$stats["survey_nodes_mult"] = SLNode::whereIn('node_tree', $survs)
             ->whereIn('node_type', $types["choic"])
             ->count();
-    	$stats["SurveyNodesOpen"] = SLNode::whereIn('node_tree', $survs)
+    	$stats["survey_nodes_open"] = SLNode::whereIn('node_tree', $survs)
             ->whereIn('node_type', $types["quali"])
             ->count();
-    	$stats["SurveyNodesNumb"] = SLNode::whereIn('node_tree', $survs)
+    	$stats["survey_nodes_numb"] = SLNode::whereIn('node_tree', $survs)
             ->whereIn('node_type', $types["quant"])
             ->count();
     	$chk = SLTree::where('tree_type', 'Page')
-    		->where('tree_database', $this->dbID)
+    		->where('tree_database', $dbID)
     		->select('tree_id')
     		->get();
     	if ($chk->isNotEmpty()) {
@@ -990,15 +994,15 @@ class GlobalsImportExport extends GlobalsTables
     		    $pages[] = $t->tree_id;
     		}
     	}
-    	$stats["Pages"]                = sizeof($pages);
-    	$stats["PageNodes"]            = SLNode::whereIn('node_tree', $pages)->count();
-    	$stats["CodeLinesControllers"] = $this->getPackageLineCount('Controllers', $pkg);
-    	$stats["CodeLinesViews"]       = $this->getPackageLineCount('Views', $pkg);
-    	$stats["BytesControllers"]     = $this->getPackageByteCount('Controllers', $pkg);
-    	$stats["BytesDatabase"]        = $this->getPackageByteCount('Database', $pkg);
-    	$stats["BytesUploads"]         = $this->getPackageByteCount('Uploads', $pkg);
-    	$stats["BytesViews"]           = $this->getPackageByteCount('Views', $pkg);
-    	$stats["Users"] = User::select('id')->count();
+    	$stats["pages"]             = sizeof($pages);
+    	$stats["page_nodes"]        = SLNode::whereIn('node_tree', $pages)->count();
+    	$stats["lines_controllers"] = $this->getPackageLineCount('Controllers', $pkg);
+    	$stats["lines_views"]       = $this->getPackageLineCount('Views', $pkg);
+    	$stats["bytes_controllers"] = $this->getPackageByteCount('Controllers', $pkg);
+    	$stats["bytes_database"]    = $this->getPackageByteCount('Database', $pkg);
+    	$stats["bytes_uploads"]     = $this->getPackageByteCount('Uploads', $pkg);
+    	$stats["bytes_views"]       = $this->getPackageByteCount('Views', $pkg);
+    	$stats["users"] = User::select('id')->count();
     	return $stats;
     }
 

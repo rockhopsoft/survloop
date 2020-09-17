@@ -13,6 +13,7 @@ class Create{{ str_replace('_', '', $GLOBALS['SL']->sysOpts['cust-abbr']) }}Tabl
      */
     public function up()
     {
+        \Illuminate\Support\Facades\DB::statement('SET SESSION sql_require_primary_key=0');
     {!! $migratFileUp !!}
     }
 

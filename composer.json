@@ -1,6 +1,6 @@
 {
     "name": "rockhopsoft/survloop",
-    "description": "SurvLoop is a Laravel-based engine for designing a database and creating a mobile-friendly user interface to fill it.",
+    "description": "SurvLoop is a Laravel-based engine for designing a database and creating a mobile-friendly user interfaces to fill it.",
     "keywords": [
     	"SurvLoop", 
     	"survey", 
@@ -25,13 +25,11 @@
         }
     ],
     "require": {
-        "laravel/framework": "^8.0.0",
         "laravel/helpers": "^1.3.0",
         "laravel/ui": "^3.0",
         "fideloper/proxy": "^4.4.0",
         "doctrine/dbal": "^2.10.4", 
         "guzzlehttp/guzzle": "^7.0.1",
-        "phpunit/phpunit": "^9.0",
 
         "matthiasmullie/minify": "^1.3.63",
         "twbs/bootstrap": "^4.5.2",
