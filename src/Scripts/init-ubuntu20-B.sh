@@ -2,13 +2,24 @@
 set -x
 
 DIR="$1"
-PCKG="$2"
+USER="$2"
+PCKGA="$3"
+PCKGB="$4"
 
 # To be run under sudo su...
 
 php artisan cache:clear
 composer require rockhopsoft/survloop
-composer require $PCKG
+composer require $PCKGA/$PCKGB
+
+mkdir /home/$USER/staging/$PCKGA
+mkdir /home/$USER/staging/$PCKGA/$PCKGB
+cp -R /var/www/$DIR/vendor/$PCKGA/$PCKGB/src /home/$USER/staging/$PCKGA/$PCKGB/src
+cp -R /var/www/$DIR/vendor/rockhopsoft/survloop/src /home/$USER/staging/rockhopsoft/survloop/src
+cp -R /var/www/$DIR/vendor/rockhopsoft/survloop-libraries/src /home/$USER/staging/rockhopsoft/survloop-libraries/src
+
+chown -R $USER:$USER /home/$USER/survloop
+chown -R $USER:$USER /home/$USER/staging
 
 #sed -i 's///g' /var/www/$DIR/composer.json
 

@@ -46,8 +46,9 @@ fail2ban-client status sshd
 
 echo "Y" | apt install nginx
 #ufw allow 'Nginx HTTP'
-echo "Y" | apt install mysql-server
+echo "Y" | apt install mysql-server php-fpm php-mysql php-mbstring php-xml php-bcmath php7.4-zip php7.4-gd ghostscript
 systemctl reload nginx
+
 
 cp /tmp/survloop/example.com /etc/nginx/sites-available/$1
 sed -i "s/example.com/$DIR/g" /etc/nginx/sites-available/$1
