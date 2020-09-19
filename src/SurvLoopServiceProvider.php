@@ -10,13 +10,17 @@
   */
 namespace SurvLoop;
 
+use SurvLoop\SurvLoopFacade;
 use Illuminate\Support\ServiceProvider;
 
 class SurvLoopServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        //require __DIR__ . '/Routes/routes.php';
+        $this->app->bind('survloopfacade', function($app) {
+                return new SurvLoopFacade();
+            });
+        }
         $this->loadRoutesFrom(__DIR__ . '/Routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
         $this->publishes([

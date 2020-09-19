@@ -5,7 +5,7 @@ server {
         index index.php index.html index.htm index.nginx-debian.html;
 
         location / {
-                try_files $uri $uri/ =404;
+                try_files $uri $uri/ /index.php?$query_string;
         }
 
         location ~ .php$ {

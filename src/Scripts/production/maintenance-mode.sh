@@ -9,7 +9,8 @@ then
         if ! -d "/var/www/$DIR-maintenance"; then
             mkdir /var/www/$DIR-maintenance
             mkdir /var/www/$DIR-maintenance/public
-            cp /var/www/$DIR/vendor/rockhopsoft/survloop/src/Scripts/index.php /var/www/$DIR-maintenance/public/index.php
+            cp /var/www/$DIR/vendor/rockhopsoft/survloop/src/Scripts/production/mainentance-index.php /var/www/$DIR-maintenance/public/index.php
+            sudo nano /var/www/$DIR-maintenance/public/index.php
         fi
         mkdir /var/www/$DIR-in-progress
         mv /var/www/$DIR /var/www/$DIR-production

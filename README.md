@@ -58,7 +58,7 @@ The installation used for SurvLoop.org is currently the best example of a bare-b
 
 # <a name="requirements"></a>Requirements
 
-* php: >=7.3
+* php: >=7.4
 * <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.0.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
@@ -102,7 +102,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "rockhopsoft/survloop": "^0.2.18",
+    "rockhopsoft/survloop": "^0.2.20",
     ...
 },
 ...
