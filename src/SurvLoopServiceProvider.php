@@ -18,9 +18,8 @@ class SurvLoopServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->bind('survloopfacade', function($app) {
-                return new SurvLoopFacade();
-            });
-        }
+            return new SurvLoopFacade();
+        });
         $this->loadRoutesFrom(__DIR__ . '/Routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
         $this->publishes([

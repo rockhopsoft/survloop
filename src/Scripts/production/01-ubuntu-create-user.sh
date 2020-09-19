@@ -7,6 +7,7 @@ PORT="$3"
 YUBI="$4"
 
 apt-get update
+apt-get upgrade
 adduser $USER
 usermod -aG sudo $USER
 rsync --archive --chown=$USER:$USER ~/.ssh /home/$USER
@@ -32,4 +33,4 @@ ufw default deny incoming
 ufw default allow outgoing
 ufw limit from $IP to any port $PORT
 echo "y" | ufw enable
-ufw status numbered
+ufw status verbose

@@ -12,3 +12,4 @@ rm -f /tmp/survloop/production/nginx-example.com
 rm -f /tmp/survloop/production/deploy-update-from-staging.sh
 rm -f /tmp/survloop/production/maintenance-mode.sh
 rm -f /tmp/survloop/production/maintenance-index.php
+rm -f /tmp/survloop/production/jitsi-install-ubuntu20.sh

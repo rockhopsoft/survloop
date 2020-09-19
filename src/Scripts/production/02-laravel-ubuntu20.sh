@@ -13,10 +13,10 @@ echo "y" | ufw enable
 echo "Y" | apt install mysql-server php-fpm php-mysql php-mbstring php-xml php-bcmath php7.4-zip php7.4-gd ghostscript
 systemctl reload nginx
 
-cp /tmp/survloop/production/nginx-example.com /etc/nginx/sites-available/$DIR
-sed -i "s/example.com/$DIR/g" /etc/nginx/sites-available/$DIR
+cp /tmp/survloop/production/nginx-example.com /etc/nginx/sites-available/$DIR.conf
+sed -i "s/example.com/$DIR/g" /etc/nginx/sites-available/$DIR.conf
 #nano /etc/nginx/sites-available/$DIR
-ln -s /etc/nginx/sites-available/$DIR /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/$DIR.conf /etc/nginx/sites-enabled/
 unlink /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
@@ -71,7 +71,7 @@ chown -R $USER:www-data storage database app/Models
 php artisan cache:clear
 composer require laravel/ui
 php artisan ui vue --auth
-echo "0" | php artisan vendor:publish --tag=laravel-notifications
+echo "0" | php artisan vendor:publish --force --tag=laravel-notifications
 
 sed -i "s/APP_NAME=Laravel/APP_NAME=$DIR/g" /var/www/$DIR/.env
 sed -i "s/APP_ENV=local/APP_ENV=production/g" /var/www/$DIR/.env
@@ -91,12 +91,9 @@ mkdir /home/$USER/staging/rockhopsoft/survloop-libraries
 chown -R $USER:$USER /home/$USER/survloop
 chown -R $USER:$USER /home/$USER/staging
 
-# Final UFW tweaks, then print it once more...
-echo "y" | ufw delete 7
-echo "y" | ufw delete 6
-echo "y" | ufw delete 3
-echo "y" | ufw delete 2
-echo "y" | ufw enable
-ufw status numbered
+# Final UFW tweaks? then print it once more...
+#echo "y" | ufw delete 2
+#echo "y" | ufw enable
+ufw status verbose
 
 nano /var/www/$DIR/.env
