@@ -1,6 +1,8 @@
 <?php 
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-gen-migration.blade.php
 
+namespace Database\Migrations;
+
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
