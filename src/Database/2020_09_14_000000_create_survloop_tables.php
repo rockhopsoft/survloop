@@ -1,12 +1,11 @@
 <?php 
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-gen-migration.blade.php
 
-namespace Database\Migrations;
-
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateSurvLoopTables extends Migration
+class CreateSurvloopTables extends Migration
 {
     /**
      * Run the migrations.

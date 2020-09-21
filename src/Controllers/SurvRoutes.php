@@ -240,5 +240,10 @@ class SurvRoutes extends Controller
         }
         return '';
     }
+
+    public function testRouteCall(Request $request)
+    {
+        echo 'SurvLoop Route Function Calls are Working!';
+    }
     
 }

@@ -301,3 +301,11 @@ Route::get(
     '/vendor/rockhopsoft/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
     $path . 'SurvRoutes@catchJqueryUiMappingError'
 );
+
+Route::get('test-survloop-routes', function(){
+    echo 'SurvLoop Routes are Working!';
+});
+Route::get( 
+    'test-route-call',
+    $path . 'SurvRoutes@testRouteCall'
+);
