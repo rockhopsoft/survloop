@@ -43,7 +43,7 @@
         "maatwebsite/excel": "^3.1.21",
         "summernote/summernote": "v0.8.8",
 
-        "rockhopsoft/survloop-libraries": "^0.1.7"
+        "rockhopsoft/survloop-libraries": "v0.2.*"
     },
     "autoload": {
         "psr-4": {
