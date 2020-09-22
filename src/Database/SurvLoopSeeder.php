@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class SurvLoopSeeder extends Seeder
+class SurvloopSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -23,7 +23,7 @@ class SurvLoopSeeder extends Seeder
 			'db_id' => 3,
 			'db_user' => '0',
 			'db_prefix' => 'sl_',
-			'db_name' => 'SurvLoop',
+			'db_name' => 'Survloop',
 			'db_desc' => 'All The Data Are Belong',
 			'db_mission' => 'Empower you to design your complex databases, collect data with an easy user experience, and create an API to share the data with the world!',
 			'db_tables' => '44',
@@ -309,7 +309,7 @@ class SurvLoopSeeder extends Seeder
 			'tbl_abbr' => 'twk_',
 			'tbl_name' => 'design_tweaks',
 			'tbl_eng' => 'Design Tweaks',
-			'tbl_desc' => 'Represents one modification to the existing database and user experience designs in SurvLoop. Information stored here is important for tracking history of changes and success of A/B testing in the user experience. This is the Core Data Table of SurvLoop\'s naked installation.',
+			'tbl_desc' => 'Represents one modification to the existing database and user experience designs in Survloop. Information stored here is important for tracking history of changes and success of A/B testing in the user experience. This is the Core Data Table of Survloop\'s naked installation.',
 			'tbl_group' => 'Session Records',
 			'tbl_ord' => '19',
 			'tbl_num_fields' => '7',
@@ -334,7 +334,7 @@ class SurvLoopSeeder extends Seeder
 			'tbl_database' => '3',
 			'tbl_name' => 'users',
 			'tbl_eng' => 'Users',
-			'tbl_desc' => 'This represents the Laravel Users table, but will not actually be implemented by SurvLoop as part of the database installation.',
+			'tbl_desc' => 'This represents the Laravel Users table, but will not actually be implemented by Survloop as part of the database installation.',
 			'tbl_group' => 'Users',
 			'tbl_ord' => '33',
 			'tbl_num_foreign_in' => '15'
@@ -357,7 +357,7 @@ class SurvLoopSeeder extends Seeder
 			'tbl_abbr' => 'email_',
 			'tbl_name' => 'emails',
 			'tbl_eng' => 'Email Templates',
-			'tbl_desc' => 'Each record represents one Email Template which can be used throughout SurvLoop.',
+			'tbl_desc' => 'Each record represents one Email Template which can be used throughout Survloop.',
 			'tbl_group' => 'Users',
 			'tbl_ord' => '35',
 			'tbl_num_fields' => '7',
@@ -370,7 +370,7 @@ class SurvLoopSeeder extends Seeder
 			'tbl_abbr' => 'img_',
 			'tbl_name' => 'images',
 			'tbl_eng' => 'Gallery Images',
-			'tbl_desc' => 'Each record represents one item in the Media Galleries managed by SurvLoop.',
+			'tbl_desc' => 'Each record represents one item in the Media Galleries managed by Survloop.',
 			'tbl_group' => 'Trees',
 			'tbl_ord' => '16',
 			'tbl_num_fields' => '13',
@@ -407,7 +407,7 @@ class SurvLoopSeeder extends Seeder
 			'tbl_abbr' => 'db_',
 			'tbl_name' => 'databases',
 			'tbl_eng' => 'Databases',
-			'tbl_desc' => 'Each record represents one Database being designed in SurvLoop, a collection of Tables, Fields, Definitions, and Business Rules often owned by a User. Information stored here can define core system settings.',
+			'tbl_desc' => 'Each record represents one Database being designed in Survloop, a collection of Tables, Fields, Definitions, and Business Rules often owned by a User. Information stored here can define core system settings.',
 			'tbl_group' => 'Databases',
 			'tbl_num_fields' => '8',
 			'tbl_num_foreign_keys' => '1',
@@ -4314,7 +4314,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_name' => 'opts',
 			'fld_eng' => 'Tree Options',
 			'fld_desc' => 'Indicates the multiple of various prime numbers which mark specific other qualities of this Node.',
-			'fld_notes' => '%3 Admin-Only; %5 Tree That Is One Big SurvLoop; %7 Area Home Page (for Public, Admin, or Volun); %11 Record Edits Not Allowed (except by Admins); %13 Report for Survey (linked and shares core table); %17 Volunteers Access (& Admin); %19 Contact Form (Auto Page); %23 Page Is Skinny; %29 Page Not [Yet] Simple Enough To Be Cached; %31 Search Bar Results Page (for Public, Admin, or Volun); %37 Survey Navigation Menu Bottom; %41 Partners Member Access; %43 Staff Access; %47 Uses Public ID#; %53 Has Page Form; %59 Survey Navigation Menu Top; %61 Survey Progress Line',
+			'fld_notes' => '%3 Admin-Only; %5 Tree That Is One Big Survloop; %7 Area Home Page (for Public, Admin, or Volun); %11 Record Edits Not Allowed (except by Admins); %13 Report for Survey (linked and shares core table); %17 Volunteers Access (& Admin); %19 Contact Form (Auto Page); %23 Page Is Skinny; %29 Page Not [Yet] Simple Enough To Be Cached; %31 Search Bar Results Page (for Public, Admin, or Volun); %37 Survey Navigation Menu Bottom; %41 Partners Member Access; %43 Staff Access; %47 Uses Public ID#; %53 Has Page Form; %59 Survey Navigation Menu Top; %61 Survey Progress Line',
 			'fld_foreign_min' => '0',
 			'fld_foreign_max' => '0',
 			'fld_foreign2_min' => '0',
@@ -5265,7 +5265,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_spec_source' => '0',
 			'fld_name' => 'key_type',
 			'fld_eng' => 'Key Type',
-			'fld_desc' => 'Indicates whether or not this Field is some kind of Key in its parent Database Table, including Foreign Keys, Primary Keys, or Alternate Keys. By default, all SurvLoop Tables will automatically generate a Unique, Primary Key if no such Field is specified by the Database Designer. (* Multiple key types are currently stored as comma separated strings, but this should probably be some cleaner method. *)',
+			'fld_desc' => 'Indicates whether or not this Field is some kind of Key in its parent Database Table, including Foreign Keys, Primary Keys, or Alternate Keys. By default, all Survloop Tables will automatically generate a Unique, Primary Key if no such Field is specified by the Database Designer. (* Multiple key types are currently stored as comma separated strings, but this should probably be some cleaner method. *)',
 			'fld_notes' => 'Designates this field\'s role within a table. (Hernandez p.292)',
 			'fld_foreign_min' => 'N',
 			'fld_foreign_max' => 'N',
@@ -5538,7 +5538,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_name' => 'opts',
 			'fld_eng' => 'Field Options',
 			'fld_desc' => 'Indicates the multiple of various prime numbers which mark other specific qualities of this Field.',
-			'fld_notes' => '%3 Field Is Auto-Managed by SurvLoop; | %1 XML Public Data; %7 XML Private Data; %11 XML Sensitive Data; %13 XML Internal Use Data;',
+			'fld_notes' => '%3 Field Is Auto-Managed by Survloop; | %1 XML Public Data; %7 XML Private Data; %11 XML Sensitive Data; %13 XML Internal Use Data;',
 			'fld_foreign_min' => 'N',
 			'fld_foreign_max' => 'N',
 			'fld_foreign2_min' => 'N',
@@ -5565,7 +5565,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_foreign_max' => 'N',
 			'fld_foreign2_min' => 'N',
 			'fld_foreign2_max' => 'N',
-			'fld_values' => 'Def::SurvLoop Definition Types',
+			'fld_values' => 'Def::Survloop Definition Types',
 			'fld_default' => 'Value Ranges',
 			'fld_data_length' => '20',
 			'fld_char_support' => ',Letters,Numbers,Keyboard,',
@@ -5769,7 +5769,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_spec_source' => '0',
 			'fld_name' => 'is_app_orient',
 			'fld_eng' => 'Is Implemented In Application',
-			'fld_desc' => 'Indicates whether or not this Business Rule can be directly implemented within the logical design of the database (Database-Oriented). Application-Oriented Rules will have to be implemented with custom coding, outside the scope of SurvLoop\'s automation.',
+			'fld_desc' => 'Indicates whether or not this Business Rule can be directly implemented within the logical design of the database (Database-Oriented). Application-Oriented Rules will have to be implemented with custom coding, outside the scope of Survloop\'s automation.',
 			'fld_notes' => 'Database-Oriented: impose constraints that you can establish within the logical design of the database; Application-Oriented: impose constraints that you cannot establish within the logical design of the database. (Hernandez p.397)',
 			'fld_foreign_min' => 'N',
 			'fld_foreign_max' => 'N',
@@ -6001,7 +6001,7 @@ class SurvLoopSeeder extends Seeder
 			'fld_spec_source' => '0',
 			'fld_name' => 'type',
 			'fld_eng' => 'Tree Type',
-			'fld_desc' => 'Indicates whether this Tree (collection of Nodes) indeed maps out a User Experience, or if it provides a map of the Database Design for the creating XML documents automatically-generated by SurvLoop.',
+			'fld_desc' => 'Indicates whether this Tree (collection of Nodes) indeed maps out a User Experience, or if it provides a map of the Database Design for the creating XML documents automatically-generated by Survloop.',
 			'fld_foreign_min' => 'N',
 			'fld_foreign_max' => 'N',
 			'fld_foreign2_min' => 'N',
@@ -6556,7 +6556,7 @@ class SurvLoopSeeder extends Seeder
 			'def_database' => '3',
 			'def_set' => 'System Settings',
 			'def_subset' => 'twitter',
-			'def_description' => '@SurvLoop'
+			'def_description' => '@Survloop'
 		]);
 		DB::table('sl_definitions')->insert([
 			'def_id' => 611,
@@ -6638,7 +6638,7 @@ class SurvLoopSeeder extends Seeder
 			'def_database' => '3',
 			'def_set' => 'System Settings',
 			'def_subset' => 'cust-abbr',
-			'def_description' => 'SurvLoop'
+			'def_description' => 'Survloop'
 		]);
 		DB::table('sl_definitions')->insert([
 			'def_id' => 600,
@@ -6817,7 +6817,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 50,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '6',
 			'def_value' => 'User Roles',
 			'def_description' => 'Each definition for User Roles represents one system-wide type of user permissions.'
@@ -6825,15 +6825,15 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 49,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '5',
 			'def_value' => 'Custom Settings',
-			'def_description' => 'Each definition for Custom Settings represents one system-wide specification, which is established and defined by a client-specific installation of SurvLoop.'
+			'def_description' => 'Each definition for Custom Settings represents one system-wide specification, which is established and defined by a client-specific installation of Survloop.'
 		]);
 		DB::table('sl_definitions')->insert([
 			'def_id' => 48,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '4',
 			'def_value' => 'Diagrams',
 			'def_description' => 'Each definition which is a Diagram represents one document uploaded by system administrators.'
@@ -6841,7 +6841,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 47,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '3',
 			'def_value' => 'Instructions',
 			'def_description' => 'Each definition which is an Instruction represents one blurb, used somewhere in the system, which can be edited by system administrators.'
@@ -6849,7 +6849,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 46,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '2',
 			'def_value' => 'Style Settings',
 			'def_description' => 'Each definition for Style Settings represents one color or other branding element needed system-wide.'
@@ -6857,7 +6857,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 45,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_order' => '1',
 			'def_value' => 'System Settings',
 			'def_description' => 'Each definition for System Settings represents one system-wide specification.'
@@ -6865,14 +6865,14 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 44,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Definition Types',
+			'def_subset' => 'Survloop Definition Types',
 			'def_value' => 'Value Ranges',
 			'def_description' => 'Each definition in a set of Value Ranges represents one response a user can choose when responding to some question/prompt.'
 		]);
 		DB::table('sl_definitions')->insert([
 			'def_id' => 43,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '8',
 			'def_value' => 'Edit Experience Question',
 			'def_description' => 'Edit the basic properties of a Experience Question Node.'
@@ -6880,7 +6880,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 42,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '6',
 			'def_value' => 'Edit Experience',
 			'def_description' => 'Edit the basic properties of a User Experience.'
@@ -6888,7 +6888,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 41,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '4',
 			'def_value' => 'Edit Database Field',
 			'def_description' => 'Edit the basic or thorough properties of a Database Field.'
@@ -6896,7 +6896,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 40,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '2',
 			'def_value' => 'Edit Database Table',
 			'def_description' => 'Edit the basic properties of a Database Table.'
@@ -6904,7 +6904,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 39,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '1',
 			'def_value' => 'Add a Data Table',
 			'def_description' => 'Create a new Database Table to later fill with Fields.'
@@ -6912,7 +6912,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 38,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '7',
 			'def_value' => 'New Experience Question',
 			'def_description' => 'Create a new Question Node in a User Experience. This might include a simplified version of adding a new Database Field.'
@@ -6920,7 +6920,7 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 37,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '3',
 			'def_value' => 'Add a Data Field',
 			'def_description' => 'Create a new Field in the Database, without adding it as an Experience Node yet.'
@@ -6928,14 +6928,14 @@ class SurvLoopSeeder extends Seeder
 		DB::table('sl_definitions')->insert([
 			'def_id' => 35,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_value' => 'New Database',
-			'def_description' => 'This is part of the SurvLoop installation process, where a user creates a new Database and a primary/default Experience to go with it.'
+			'def_description' => 'This is part of the Survloop installation process, where a user creates a new Database and a primary/default Experience to go with it.'
 		]);
 		DB::table('sl_definitions')->insert([
 			'def_id' => 36,
 			'def_database' => '3',
-			'def_subset' => 'SurvLoop Design Tweak Types',
+			'def_subset' => 'Survloop Design Tweak Types',
 			'def_order' => '5',
 			'def_value' => 'New Experience',
 			'def_description' => 'Create a new, secondary Experience for an existing Database.'
@@ -6954,8 +6954,8 @@ class SurvLoopSeeder extends Seeder
 			'tree_database' => '3',
 			'tree_user' => '0',
 			'tree_type' => 'Survey',
-			'tree_name' => 'SurvLoop Database Designer',
-			'tree_desc' => 'SurvLoop users can add a new field to the database and/or user experience.',
+			'tree_name' => 'Survloop Database Designer',
+			'tree_desc' => 'Survloop users can add a new field to the database and/or user experience.',
 			'tree_slug' => 'data-design',
 			'tree_root' => '7',
 			'tree_first_page' => '8',
@@ -6967,7 +6967,7 @@ class SurvLoopSeeder extends Seeder
 			'tree_database' => '3',
 			'tree_user' => '0',
 			'tree_type' => 'Survey XML',
-			'tree_name' => 'SurvLoop Database Designer',
+			'tree_name' => 'Survloop Database Designer',
 			'tree_slug' => 'data-design',
 			'tree_root' => '14',
 			'tree_core_table' => '3'

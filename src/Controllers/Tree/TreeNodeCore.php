@@ -1,13 +1,13 @@
 <?php
 /**
-  * TreeNodeCore - The core class for a single node in a SurvLoop tree.
+  * TreeNodeCore - The core class for a single node in a Survloop tree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use App\Models\SLNode;

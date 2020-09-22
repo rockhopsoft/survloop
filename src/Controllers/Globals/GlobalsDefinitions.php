@@ -2,12 +2,12 @@
 /**
   * GlobalsDefinitions is a side-class which loads and gets installation definition sets.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use App\Models\SLDefinitions;
 

@@ -1,8 +1,8 @@
 <?php
-namespace SurvLoop\Tests;
+namespace Survloop\Tests;
 
 use PHPUnit\Framework\TestCase;
-use SurvLoop\Controllers\Stats\SurvStatsCore;
+use Survloop\Controllers\Stats\SurvStatsCore;
 
 class SurvStatsCoreTest extends TestCase
 {

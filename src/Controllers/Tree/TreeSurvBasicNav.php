@@ -1,20 +1,20 @@
 <?php
 /**
-  * TreeSurvBasicNav is a mid-level class using a standard branching tree, mostly for SurvLoop's surveys and pages.
+  * TreeSurvBasicNav is a mid-level class using a standard branching tree, mostly for Survloop's surveys and pages.
   * But it does house some of the core functions to print the whole of a tree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.19
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use App\Models\SLNode;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSessLoops;
-use SurvLoop\Controllers\Tree\TreeSurvProgBar;
+use Survloop\Controllers\Tree\TreeSurvProgBar;
 
 class TreeSurvBasicNav extends TreeSurvProgBar
 {

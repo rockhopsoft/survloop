@@ -3,14 +3,14 @@
   * TreeSurvSpreadsheet is a mid-level class which provides management
   * of in-line spreadsheets.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvFormCheckboxes;
+use Survloop\Controllers\Tree\TreeSurvFormCheckboxes;
 
 class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
 {

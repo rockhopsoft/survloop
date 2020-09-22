@@ -21,7 +21,7 @@ made available by {{ $GLOBALS['SL']->sysOpts['site-name'] }} under the
 Creative Commons Attribution-ShareAlike License, {{ date("Y") }}.
 https://creativecommons.org/licenses/by-sa/3.0/
 
-This XML was auto-generated from the SurvLoop open data engine,
+This XML was auto-generated from the Survloop open data engine,
 resources/views/survloop/admin/tree/xml-schema.blade.php
 -->
 

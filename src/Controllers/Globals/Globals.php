@@ -3,12 +3,12 @@
   * Globals is a core class for loading and accessing system information from anywhere.
   * This is very helpful for processes which may need to be used within Views, etc.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use DB;
 use Auth;
@@ -31,8 +31,8 @@ use App\Models\SLSessSite;
 use App\Models\SLSessPage;
 use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
-use SurvLoop\Controllers\SurvLoopImages;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\SurvloopImages;
+use Survloop\Controllers\Tree\TreeNodeSurv;
 
 class Globals extends GlobalsImportExport
 {
@@ -58,7 +58,7 @@ class Globals extends GlobalsImportExport
     {
         $GLOBALS["CUST"] = null;
         if (isset($this->sysOpts["cust-abbr"]) 
-            && $this->sysOpts["cust-abbr"] != 'SurvLoop') {
+            && $this->sysOpts["cust-abbr"] != 'Survloop') {
             $custClass = $this->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $this->sysOpts["cust-abbr"] . "Globals";
             if (class_exists($custClass)) {
@@ -420,7 +420,7 @@ class Globals extends GlobalsImportExport
     public function loadImgs($nID = '', $dbID = 1)
     {
         if ($this->imgs === false) {
-            $this->imgs = new SurvLoopImages($nID, $dbID);
+            $this->imgs = new SurvloopImages($nID, $dbID);
         }
         return true;
     }

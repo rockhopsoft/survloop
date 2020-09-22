@@ -3,12 +3,12 @@
   * GlobalsImportExport is a mid-level class for loading and accessing system information from anywhere.
   * This level contains processes which are uses during certain import and exports.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use DB;
 use Cache;
@@ -40,7 +40,7 @@ class GlobalsImportExport extends GlobalsTables
             eval($content);
         } else {
             $cache = '// Auto-generated loading cache from '
-                . '/SurvLoop/Controllers/Globals.php' . "\n\n";
+                . '/Survloop/Controllers/Globals.php' . "\n\n";
             
             $cache .= '$'.'this->allDbs = [];' . "\n";
             $allDbs = SLDatabases::get();
@@ -733,7 +733,7 @@ class GlobalsImportExport extends GlobalsTables
         }
         $dbIDs = [ $dbID ];
         if ($dbID == 3) {
-            // if getting SurvLoop database, include the universal non-DbID
+            // if getting Survloop database, include the universal non-DbID
             $dbIDs[] = 0;
         }
         $this->x["slTrees"] = $this->x["slNodes"] = $this->x["slConds"] = [];

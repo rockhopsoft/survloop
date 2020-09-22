@@ -1,20 +1,20 @@
 <?php
 /**
   * TreeSurvInputWidgets is a mid-level class using a standard branching tree, mostly for 
-  * processing the input SurvLoop's surveys and pages.
+  * processing the input Survloop's surveys and pages.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use App\Models\User;
 use App\Models\SLNode;
 use App\Models\SLEmails;
 use Illuminate\Http\Request;
-use SurvLoop\Controllers\Tree\TreeSurvUpload;
+use Survloop\Controllers\Tree\TreeSurvUpload;
 
 class TreeSurvInputWidgets extends TreeSurvUpload
 {

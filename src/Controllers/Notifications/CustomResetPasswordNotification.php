@@ -1,6 +1,6 @@
 <?php
 
-namespace SurvLoop\Controllers\Notifications;
+namespace Survloop\Controllers\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
-use SurvLoop\Controllers\SurvLoopController;
-use SurvLoop\Controllers\Globals\Globals;
+use Survloop\Controllers\SurvloopController;
+use Survloop\Controllers\Globals\Globals;
 
 class CustomResetPasswordNotification extends Notification
 {

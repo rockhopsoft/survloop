@@ -1,14 +1,14 @@
 <?php
 /**
-  * SurvLoopController is the primary base class for SurvLoop, 
+  * SurvloopController is the primary base class for Survloop, 
   * housing some key variables and functions.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -24,15 +24,15 @@ use App\Models\SLTables;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
-use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\SurvLoopControllerUtils;
+use Survloop\Controllers\SurvloopInstaller;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\SurvloopControllerUtils;
 
-class SurvLoopController extends SurvLoopControllerUtils
+class SurvloopController extends SurvloopControllerUtils
 {
     
     /**
-     * Initialize key SurvLoop variables needed for content delivery.
+     * Initialize key Survloop variables needed for content delivery.
      *
      * @param  Illuminate\Http\Request  $request
      * @param  string  $currPage
@@ -64,7 +64,7 @@ class SurvLoopController extends SurvLoopControllerUtils
     }
     
     /**
-     * Initialize the client-extension of the SurvLoop's TreeSurvForm class
+     * Initialize the client-extension of the Survloop's TreeSurvForm class
      * which works with all branching tress.
      *
      * @param  Illuminate\Http\Request  $request
@@ -82,7 +82,7 @@ class SurvLoopController extends SurvLoopControllerUtils
             $dbID = $this->dbID;
         }
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
-            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
+            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop') {
             $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "(\$request, -3, \$dbID, \$treeID, false, "
@@ -175,7 +175,7 @@ class SurvLoopController extends SurvLoopControllerUtils
     }
     
     /**
-     * Initialize the simplest SurvLoop variables which track page loads.
+     * Initialize the simplest Survloop variables which track page loads.
      *
      * @param  string  $currPage
      * @return boolean
@@ -220,7 +220,7 @@ class SurvLoopController extends SurvLoopControllerUtils
     }
     
     /**
-     * Load basic SurvLoop user session for a general site visit,
+     * Load basic Survloop user session for a general site visit,
      * not for a specific survey.
      *
      * @param  Illuminate\Http\Request  $request
@@ -394,7 +394,7 @@ class SurvLoopController extends SurvLoopControllerUtils
             if (!$this->chkHasTreeOne()) {
                 return $this->redir('/fresh/survey', true);
             }
-            $survInst = new SurvLoopInstaller;
+            $survInst = new SurvloopInstaller;
             $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
             session()->save();
@@ -437,7 +437,7 @@ class SurvLoopController extends SurvLoopControllerUtils
         $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">Create Admin Account</h2>';
         $content = '<center><div class="treeWrapForm mT20 mBn20">
             <h1 class="slBlueDark">' . ((isset($GLOBALS["SL"]->sysOpts["site-name"])) 
-                    ? $GLOBALS["SL"]->sysOpts["site-name"] : 'SurvLoop') 
+                    ? $GLOBALS["SL"]->sysOpts["site-name"] : 'Survloop') 
                 . ' Installed!</h1><h4>All Out Data Are Belong...</h4>
             <p>Please create the first admin super user account.</p></div></center>';
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
@@ -529,7 +529,7 @@ class SurvLoopController extends SurvLoopControllerUtils
     {
         $loaded = false;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
-            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'SurvLoop') {
+            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop') {
             $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Searcher";
             if (class_exists($custClass)) {

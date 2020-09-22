@@ -9,7 +9,7 @@
         Database Design (3rd Edition)</u>, by Michael J. Hernandez</a>.
     </p>
     <p>
-        SurvLoop is still far from the point of enforcing the full database design details when creating exports.
+        Survloop is still far from the point of enforcing the full database design details when creating exports.
         So far it just internally tracks all the advanced settings.
     </p>
 </div><div class="col-md-6">

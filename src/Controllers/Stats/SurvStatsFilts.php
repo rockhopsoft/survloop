@@ -2,14 +2,14 @@
 /**
   * SurvStatsFilts provides simpler foundations for SurvStats to collect data set calculations.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.24
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
-use SurvLoop\Controllers\Stats\SurvStatsCore;
+use Survloop\Controllers\Stats\SurvStatsCore;
 
 class SurvStatsFilts extends SurvStatsCore
 {

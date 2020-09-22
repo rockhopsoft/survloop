@@ -1,14 +1,14 @@
 <?php
 /**
   * TreeSurvCustomAPI extends a standard branching tree, for maps of more customized
-  * API exports, instead of those fully built using SurvLoop functionality.
+  * API exports, instead of those fully built using Survloop functionality.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.17
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Cache;
 use Illuminate\Http\Request;
@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLSearchRecDump;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeCoreSess;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeCoreSess;
 
 class TreeSurvCustomAPI extends TreeSurvAPI
 {
@@ -146,7 +146,7 @@ class TreeSurvCustomAPI extends TreeSurvAPI
 /**
   * TreeCustomAPI is a helper class for creating custom API exports.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.17

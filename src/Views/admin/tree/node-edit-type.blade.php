@@ -22,7 +22,7 @@
         <option value="cycle" @if ($node->isLoopCycle()) SELECTED @endif >
             Loop: Root Node of one or more Nodes</option>
         <?php /* <option value="sort" @if ($node->isLoopSort()) SELECTED @endif >
-            Sort SurvLoop Responses</option> */ ?>
+            Sort Survloop Responses</option> */ ?>
     
     @else 
     
@@ -48,7 +48,7 @@
     <option value="dataPrint" @if ($node->isDataPrint()) SELECTED @endif 
         >Data Printout</option>
     <option value="survWidget" @if ($node->isWidget()) SELECTED @endif 
-        >SurvLoop Widget</option>
+        >Survloop Widget</option>
     <option value="sendEmail" @if ($node->nodeType == 'Send Email') SELECTED @endif 
         >Send Email</option>
     <option value="layout" @if ($node->isLayout()) SELECTED @endif 

@@ -2,15 +2,15 @@
 /**
   * SurvTrends is optimized for generating line graphs, often for trends.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.24
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
-use SurvLoop\Controllers\SystemDefinitions;
-use SurvLoop\Controllers\Stats\SurvStatsCore;
+use Survloop\Controllers\SystemDefinitions;
+use Survloop\Controllers\Stats\SurvStatsCore;
 
 class SurvTrends extends SurvStatsCore
 {

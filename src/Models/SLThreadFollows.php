@@ -15,6 +15,6 @@ class SLThreadFollows extends Model
 		'thrd_flwfollow_type', 
     ];
     
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

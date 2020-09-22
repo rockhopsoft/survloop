@@ -14,6 +14,6 @@ class SLSessPage extends Model
 		'sess_page_url', 
     ];
     
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

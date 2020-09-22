@@ -3,12 +3,12 @@
   * SurvDataTestsAB is a small helper class to track the current user-survey-session's list
   * of relevant AB Tests, and their active/inactive aka true/false aka pass/fail status.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.3
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 class SurvDataTestsAB
 {

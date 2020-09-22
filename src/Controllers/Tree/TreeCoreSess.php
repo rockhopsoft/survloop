@@ -2,12 +2,12 @@
 /**
   * TreeCoreSess is a mid-level class handling the session controls for TreeCore.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Auth;
@@ -18,8 +18,8 @@ use App\Models\SLNode;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
 use App\Models\SLTokens;
-use SurvLoop\Controllers\Tree\SurvData;
-use SurvLoop\Controllers\Tree\TreeCore;
+use Survloop\Controllers\Tree\SurvData;
+use Survloop\Controllers\Tree\TreeCore;
 
 class TreeCoreSess extends TreeCore
 {

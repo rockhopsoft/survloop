@@ -3,12 +3,12 @@
   * GlobalsVars is a mid-level class to declare most variables
   * used by the rest of this globals trunk.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 class GlobalsVars extends GlobalsStatic
 {
@@ -132,7 +132,7 @@ class GlobalsVars extends GlobalsStatic
     // Page Tree Options
     public const TREEOPT_NOCACHE    = 29; // Page Tree is currently too complicated to cache
     public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
-    public const TREEOPT_CONTACT    = 19; // This page is a SurvLoop standard contact form 
+    public const TREEOPT_CONTACT    = 19; // This page is a Survloop standard contact form 
     public const TREEOPT_BG         = 67; // This whole page has a background color (default: faint)
     public const TREEOPT_FADEIN     = 71; // This whole page fades in after load
 

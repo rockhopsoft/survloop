@@ -1,5 +1,5 @@
 
-# RockHopSoft/SurvLoop
+# RockHopSoft/Survloop
 
 [![Laravel](https://img.shields.io/badge/Laravel-8.0-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -21,10 +21,10 @@
 * Blade HTML Template Views ~ 1.31 MB 
 * Javascript/jQuery within Blade Templates ~ 147 KB
 * CSS within Blade Templates ~ 139 KB
-* SurvLoop-Generated PHP Eloquent Data Table Models ~ 176 KB
-* SurvLoop-Generated PHP Laravel Database Migration & Seeders ~ 274 KB
+* Survloop-Generated PHP Eloquent Data Table Models ~ 176 KB
+* Survloop-Generated PHP Laravel Database Migration & Seeders ~ 274 KB
 
-SurvLoop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
+Survloop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
 This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
 web-based problems.
 
@@ -37,7 +37,7 @@ It began as an internal tool to design our database, then prototype survey gener
 Laravel framework, and has continued to grow towards a content-management system for data-focused websites.
 
 The upcoming Open Police web app is the best live <b>beta demo</b> of the engine's end results, 
-and feedback on that project and the SurvLoop user experience can be  via the end of the submission process:<br />
+and feedback on that project and the Survloop user experience can be  via the end of the submission process:<br />
 <a href="https://openpolice.org/filing-your-police-complaint" target="_blank">https://openpolice.org/filing-your-police-complaint</a><br />
 The resulting database designed using the engine, as well as the branching tree which specifies the user's experience: 
 <a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a><br />
@@ -48,11 +48,11 @@ XML included an automatically generated schema, eg.<br />
 <a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
 <a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
 
-Other projects running SurvLoop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
+Other projects running Survloop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
 Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
 <a href="https://drugstory.me" target="_blank">Drug Story</a> (less active).
 
-The installation used for SurvLoop.org is currently the best example of a bare-bones extenstion of SurvLoop:<br />
+The installation used for Survloop.org is currently the best example of a bare-bones extenstion of Survloop:<br />
 <a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
@@ -92,7 +92,7 @@ $ php artisan ui vue --auth
 $ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 ```
 
-### Install RockHopSoft/SurvLoop
+### Install RockHopSoft/Survloop
 
 From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
 ```
@@ -110,7 +110,7 @@ $ nano composer.json
     ...
     "psr-4": {
         ...
-        "SurvLoop\\": "vendor/rockhopsoft/survloop/src/",
+        "Survloop\\": "vendor/rockhopsoft/survloop/src/",
     }
     ...
 }, ...
@@ -129,13 +129,13 @@ $ nano config/app.php
 ...
 'providers' => [
     ...
-    SurvLoop\SurvLoopServiceProvider::class,
+    Survloop\SurvloopServiceProvider::class,
     ...
 ],
 ...
 'aliases' => [
     ...
-    'SurvLoop' => 'RockHopSoft\SurvLoop\SurvLoopFacade',
+    'Survloop' => 'RockHopSoft\Survloop\SurvloopFacade',
     ...
 ], ...
 ```
@@ -170,7 +170,7 @@ Add this line before the "Schema::create" line in each file:
 Then initialize the database:
 ```
 $ php artisan migrate
-$ php artisan db:seed --class=SurvLoopSeeder
+$ php artisan db:seed --class=SurvloopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
 ```
 
@@ -182,7 +182,7 @@ $ php artisan optimize:clear
 $ composer dump-autoload
 ```
 
-### Initialize SurvLoop Installation
+### Initialize Survloop Installation
 
 Then browsing to the home page should prompt you to create the first admin user account:
 
@@ -225,7 +225,7 @@ $ brew install ghostscript
 
 # <a name="documentation"></a>Documentation
 
-## About SurvLoop's Codebase and Database Design
+## About Survloop's Codebase and Database Design
 
 Better documentation is juuust beginning to be created...
 
@@ -248,10 +248,10 @@ Here's the TODO list for the next release (**1.0**). It's my first time building
 * [ ] Code commenting, learning and adopting more community norms.
 * [ ] Add decent levels of unit testing. Hopefully improve the organization of objects/classes.
 * [ ] Improve import/export work flow for copying/moving installations.
-* [ ] Generate all admin tools by SurvLoop itself.
+* [ ] Generate all admin tools by Survloop itself.
 * [ ] Add multi-lingual support on the Node-level (surveys and web pages), for starters, then database design.
 * [ ] Finish migrating all raw queries to use Laravel's process.
-* [ ] Convert more SurvLoop (older) code to take advantage of more Laravel built-in icapabilities.
+* [ ] Convert more Survloop (older) code to take advantage of more Laravel built-in icapabilities.
 
 # <a name="change-logs"></a>Change Logs
 
@@ -263,8 +263,8 @@ Please report any issue you find in the issues page.
 
 # <a name="security-help"></a>Reporting a Security Vulnerability
 
-We want to ensure that SurvLoop is a secure HTTP open data platform for everyone. 
-If you've discovered a security vulnerability in the SurvLoop software or SurvLoop.org, 
+We want to ensure that Survloop is a secure HTTP open data platform for everyone. 
+If you've discovered a security vulnerability in the Survloop software or Survloop.org, 
 we appreciate your help in disclosing it to us in a responsible manner.
 
 Publicly disclosing a vulnerability can put the entire community at risk. 

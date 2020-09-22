@@ -3,12 +3,12 @@
   * SurvStatsCore provides simpler foundations for SurvStats to collect data set calculations, 
   * and SurvTrends for line graphs with fewer filtering needs.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
 class SurvStatsCore
 {

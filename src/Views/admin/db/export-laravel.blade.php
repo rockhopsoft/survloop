@@ -8,7 +8,7 @@
         {{ $GLOBALS['SL']->dbRow->db_name }}</span>: 
     @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
         && $GLOBALS["SL"]->x["exportAsPackage"])
-        Export for SurvLoop Extension Package 
+        Export for Survloop Extension Package 
     @else Export for Laravel 
     @endif
 </h1>
@@ -72,8 +72,8 @@
 		<h1>Instructions To Install Your Database Design</h1>
 		<h3>(and this entire system on another server)</h3>
 		
-		<h2>Step 1: Install Laravel & SurvLoop</h2>
-		<p><a href="https://survloop.org/how-to-install-survloop" target="_blank">How To Install SurvLoop</a></p>
+		<h2>Step 1: Install Laravel & Survloop</h2>
+		<p><a href="https://survloop.org/how-to-install-survloop" target="_blank">How To Install Survloop</a></p>
 		
 		<h2>Step 2: Copy Your Migration and Seeder Files</h2>
 		<p>Copy these two generated files into the Database folder in your destination Laravel installation.</p>

@@ -1,24 +1,24 @@
 <?php
 /**
-  * SurvLoopServiceProvider manages which package files and folders need to be copied to elsewhere in the system.
+  * SurvloopServiceProvider manages which package files and folders need to be copied to elsewhere in the system.
   * This mostly just runs after installation, and perhaps of some other code updates. 
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
-namespace SurvLoop;
+namespace Survloop;
 
-use SurvLoop\SurvLoopFacade;
+use Survloop\SurvloopFacade;
 use Illuminate\Support\ServiceProvider;
 
-class SurvLoopServiceProvider extends ServiceProvider
+class SurvloopServiceProvider extends ServiceProvider
 {
     public function boot()
     {
         $this->app->bind('survloopfacade', function($app) {
-            return new SurvLoopFacade();
+            return new SurvloopFacade();
         });
         $this->loadRoutesFrom(__DIR__ . '/Routes/routes.php');
         $this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
@@ -53,8 +53,8 @@ class SurvLoopServiceProvider extends ServiceProvider
             __DIR__ . '/Database/' . $dbMig . '.php'
                 => base_path('database/migrations/' . $dbMig . '.php'),
 
-            __DIR__ . '/Database/SurvLoopSeeder.php'
-                => base_path('database/seeders/SurvLoopSeeder.php'),
+            __DIR__ . '/Database/SurvloopSeeder.php'
+                => base_path('database/seeders/SurvloopSeeder.php'),
 
             base_path($libDir . 'geo/ZipCodeSeeder.php')
                 => base_path('database/seeders/ZipCodeSeeder.php'),

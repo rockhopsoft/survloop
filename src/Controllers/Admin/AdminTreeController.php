@@ -1,14 +1,14 @@
 <?php
 /**
-  * AdminTreeController is the admin class responsible for the tools to edit SurvLoop's tree designs.
-  * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
+  * AdminTreeController is the admin class responsible for the tools to edit Survloop's tree designs.
+  * (Ideally, this will eventually be replaced by Survloop-generated surveys.)
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use DB;
 use Illuminate\Http\Request;
@@ -26,11 +26,11 @@ use App\Models\SLConditionsArticles;
 use App\Models\SLUsersRoles;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
-use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeSurvAPI;
-use SurvLoop\Controllers\Tree\TreeSurvAdmin;
-use SurvLoop\Controllers\Admin\AdminTreeStats;
+use Survloop\Controllers\SurvloopInstaller;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeSurvAPI;
+use Survloop\Controllers\Tree\TreeSurvAdmin;
+use Survloop\Controllers\Admin\AdminTreeStats;
 
 class AdminTreeController extends AdminTreeStats
 {
@@ -603,7 +603,7 @@ class AdminTreeController extends AdminTreeStats
     public function autoAddPages(Request $request, $addPageType = '')
     {
         if ($addPageType == 'contact') {
-            $survInst = new SurvLoopInstaller;
+            $survInst = new SurvloopInstaller;
             $survInst->installPageContact();
         }
         return $this->pagesList($request);
@@ -1048,7 +1048,7 @@ class AdminTreeController extends AdminTreeStats
             $userTbl->tbl_name     = 'users';
             $userTbl->tbl_abbr     = '';
             $userTbl->tbl_desc     = 'This represents the Laravel Users table, but will not '
-                . 'actually be implemented by SurvLoop as part of the database installation.';
+                . 'actually be implemented by Survloop as part of the database installation.';
             $userTbl->save();
         }
         

@@ -2,7 +2,7 @@
 /**
   * Authenticate assists with the login redirect process.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0

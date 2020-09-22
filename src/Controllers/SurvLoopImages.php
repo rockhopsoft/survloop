@@ -1,19 +1,19 @@
 <?php
 /**
-  * SurvLoopImages is a class which manages SurvLoop's uploaded images like a CMS.
+  * SurvloopImages is a class which manages Survloop's uploaded images like a CMS.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.21
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Auth;
 use Storage;
 use App\Models\SLImages;
 
-class SurvLoopImages
+class SurvloopImages
 {
     private $nID  = '';
     private $dbID = 1;

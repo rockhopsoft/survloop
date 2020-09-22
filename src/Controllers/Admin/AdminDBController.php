@@ -1,14 +1,14 @@
 <?php
 /**
-  * AdminDBController is the admin class responsible for the tools to edit SurvLoop's database design.
-  * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
+  * AdminDBController is the admin class responsible for the tools to edit Survloop's database design.
+  * (Ideally, this will eventually be replaced by Survloop-generated surveys.)
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use DB;
 use Auth;
@@ -24,9 +24,9 @@ use App\Models\SLBusRules;
 use App\Models\SLLogActions;
 use App\Models\SLDatabases;
 
-use SurvLoop\Controllers\Tree\SurvData;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Admin\AdminController;
+use Survloop\Controllers\Tree\SurvData;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Admin\AdminController;
 
 class AdminDBController extends AdminController
 {

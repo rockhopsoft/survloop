@@ -2,12 +2,12 @@
 /**
   * TreeSurvAPI extends a standard branching tree, for maps of API exports.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Cache;
 use Illuminate\Http\Request;
@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLSearchRecDump;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeCoreSess;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeCoreSess;
 
 class TreeSurvAPI extends TreeCoreSess
 {

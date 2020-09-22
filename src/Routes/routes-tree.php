@@ -1,8 +1,8 @@
 <?php
 /**
-  * routes-tree.php registers all the paths used by core SurvLoop behavior.
+  * routes-tree.php registers all the paths used by core Survloop behavior.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
@@ -11,159 +11,159 @@
 // main survey process for primary database, primary tree
 Route::post(
     '/u/{nodeSlug}',
-    $path . 'SurvLoop@loadNodeURL'
+    $path . 'Survloop@loadNodeURL'
 );
 Route::get(
     '/u/{nodeSlug}',
-    $path . 'SurvLoop@loadNodeURL'
+    $path . 'Survloop@loadNodeURL'
 );
 
 // survey process for any database or tree
 Route::get(
     '/start/{treeSlug}',
-    $path . 'SurvLoop@loadNodeTreeURL'
+    $path . 'Survloop@loadNodeTreeURL'
 );
 Route::get(
     '/start-{cid}/{treeSlug}', [
-        'uses' => $path . 'SurvLoop@loadNodeTreeURLedit', 
+        'uses' => $path . 'Survloop@loadNodeTreeURLedit', 
         'middleware' => ['auth']
     ]
 );
 Route::post(
     '/u/{treeSlug}/{nodeSlug}',
-    $path . 'SurvLoop@loadNodeURL'
+    $path . 'Survloop@loadNodeURL'
 );
 Route::get(
     '/u/{treeSlug}/{nodeSlug}',
-    $path . 'SurvLoop@loadNodeURL'
+    $path . 'Survloop@loadNodeURL'
 );
 
 Route::get(
     '/switch/{treeID}/{cid}',
-    $path . 'SurvLoop@switchSess'
+    $path . 'Survloop@switchSess'
 );
 Route::get(
     '/delSess/{treeID}/{cid}',
-    $path . 'SurvLoop@delSess'
+    $path . 'Survloop@delSess'
 );
 Route::get(
     '/cpySess/{treeID}/{cid}',
-    $path . 'SurvLoop@cpySess'
+    $path . 'Survloop@cpySess'
 );
 
 Route::post(
     '/sub',
-    $path . 'SurvLoop@mainSub'
+    $path . 'Survloop@mainSub'
 );
 
 Route::get(
     '/sortLoop',
-    $path . 'SurvLoop@sortLoop'
+    $path . 'Survloop@sortLoop'
 );
 
 Route::get(
     '/defer/{treeID}/{cid}/{nID}/{date}/{rand}',
-    $path . 'SurvLoop@deferNode'
+    $path . 'Survloop@deferNode'
 );
 
 Route::get(
     '/{abbr}/uploads/{file}',
-    $path . 'SurvLoop@getUploadFile'
+    $path . 'Survloop@getUploadFile'
 );
 Route::get(
     '/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',
-    $path . 'SurvLoop@retrieveUploadFresh'
+    $path . 'Survloop@retrieveUploadFresh'
 );
 Route::get(
     '/up/{treeSlug}/{cid}/{upID}',
-    $path . 'SurvLoop@retrieveUpload'
+    $path . 'Survloop@retrieveUpload'
 );
 Route::get(
     '/up-img-resize-all/{treeSlug}',
-    $path . 'SurvLoop@checkImgResizeAll'
+    $path . 'Survloop@checkImgResizeAll'
 );
 
 
 Route::get(
     '/records-full/{treeID}',
-    $path . 'SurvLoop@ajaxRecordFulls'
+    $path . 'Survloop@ajaxRecordFulls'
 );
 Route::get(
     '/record-prevs/{treeID}',
-    $path . 'SurvLoop@ajaxRecordPreviews'
+    $path . 'Survloop@ajaxRecordPreviews'
 );
 Route::get(
     '/record-check/{treeID}',
-    $path . 'SurvLoop@ajaxMultiRecordCheck'
+    $path . 'Survloop@ajaxMultiRecordCheck'
 );
 Route::get(
     '/record-graph/{gType}/{treeID}/{nID}',
-    $path . 'SurvLoop@ajaxGraph'
+    $path . 'Survloop@ajaxGraph'
 );
 Route::get(
     '/widget-custom/{treeID}/{nID}',
-    $path . 'SurvLoop@widgetCust'
+    $path . 'Survloop@widgetCust'
 );
 
 Route::get(
     '/ajax-get-flds/{treeID}',
-    $path . 'SurvLoop@getSetFlds'
+    $path . 'Survloop@getSetFlds'
 );
 Route::get(
     '/ajax-get-flds/{treeID}/{rSet}',
-    $path . 'SurvLoop@getSetFlds'
+    $path . 'Survloop@getSetFlds'
 );
 Route::get(
     '/ajax-emoji-tag/{treeID}/{recID}/{defID}',
-    $path . 'SurvLoop@ajaxEmojiTag'
+    $path . 'Survloop@ajaxEmojiTag'
 );
 
     
 Route::get(
     '/api/all/{treeSlug}/xml',
-    $path . 'SurvLoop@xmlAll'
+    $path . 'Survloop@xmlAll'
 );
 Route::get(
     '/{treeSlug}-xml-all',
-    $path . 'SurvLoop@xmlAll'
+    $path . 'Survloop@xmlAll'
 );
 Route::get(
     '/{treeSlug}-xml-example',
-    $path . 'SurvLoop@getXmlExample'
+    $path . 'Survloop@getXmlExample'
 );
 Route::get(
     '/{treeSlug}-xml-example.xml',
-    $path . 'SurvLoop@getXmlExample'
+    $path . 'Survloop@getXmlExample'
 );
 Route::get(
     '/schema/{treeSlug}/xml',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );
 Route::get(
     '/{treeSlug}-schema-xml',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );
 Route::get(
     '/{treeSlug}-schema-xml.xsd',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );
 Route::get(
     '/{treeSlug}-xml-schema',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );
 Route::get(
     '/{treeSlug}-xml-schema.xsd',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );
 Route::get(
     '/{treeSlug}-report-xml/{cid}',
-    $path . 'SurvLoop@xmlByID'
+    $path . 'Survloop@xmlByID'
 );
 Route::get(
     '/xml-example',
-    $path . 'SurvLoop@getXmlExample'
+    $path . 'Survloop@getXmlExample'
 );
 Route::get(
     '/xml-schema',
-    $path . 'SurvLoop@genXmlSchema'
+    $path . 'Survloop@genXmlSchema'
 );

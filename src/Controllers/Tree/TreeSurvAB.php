@@ -2,14 +2,14 @@
 /**
   * TreeSurvAB is a mid-level class which handles the AB test variants of a CoreTree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvLoad;
+use Survloop\Controllers\Tree\TreeSurvLoad;
 
 class TreeSurvAB extends TreeSurvLoad
 {

@@ -17,6 +17,6 @@ class SLCaches extends Model
         'cach_value', 
     ];
      
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

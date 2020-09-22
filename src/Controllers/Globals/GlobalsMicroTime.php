@@ -2,12 +2,12 @@
 /**
   * GlobalsMicroTime is a standalone global class to log a page's load times.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 class GlobalsMicroTime
 {

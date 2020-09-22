@@ -29,9 +29,9 @@
             navigation menu provided for the user.
             </p>
             <p>
-            Some nodes are marked as the root node of a SurvLoop 
+            Some nodes are marked as the root node of a Survloop 
             (<span class="f12"><i class="fa fa-refresh"></i></span>). 
-            The children of a SurvLoop node will loop through multiple records of one collection 
+            The children of a Survloop node will loop through multiple records of one collection 
             of data. They serve one or more questions, pages, or whole branches, for each record. 
             They can be setup to allow the user to add new records as part of that process, 
             or cycle through previously entered data sets.

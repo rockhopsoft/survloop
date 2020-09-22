@@ -17,6 +17,6 @@ class SLUploadsTime extends Model
 		'up_ti_link_rec_id', 
     ];
     
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

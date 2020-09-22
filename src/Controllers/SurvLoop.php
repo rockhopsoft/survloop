@@ -1,14 +1,14 @@
 <?php
 /**
-  * SurvLoop is a core class for routing system access, particularly for loading a
+  * Survloop is a core class for routing system access, particularly for loading a
   * client installation's customized extension of TreeSurvForm instead of the default.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.0.1
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Auth;
 use Cache;
@@ -19,13 +19,13 @@ use App\Models\User;
 use App\Models\SLSess;
 use App\Models\SLTree;
 use App\Models\SLNode;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\DeliverImage;
-use SurvLoop\Controllers\SurvLoopInstaller;
-use SurvLoop\Controllers\SurvCustLoop;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\DeliverImage;
+use Survloop\Controllers\SurvloopInstaller;
+use Survloop\Controllers\SurvCustLoop;
 
-class SurvLoop extends SurvCustLoop
+class Survloop extends SurvCustLoop
 {
     /**
      * Get a validator for an incoming registration request.
@@ -354,7 +354,7 @@ class SurvLoop extends SurvCustLoop
         }
         
         // else Home Page not found, so let's create one
-        $installer = new SurvLoopInstaller;
+        $installer = new SurvloopInstaller;
         $installer->checkSysInit();
         return '<center><br /><br /><i>Reloading...</i><br /> '
             . '<iframe src="/css-reload" frameborder=0'
@@ -699,7 +699,7 @@ class SurvLoop extends SurvCustLoop
         return $this->custLoop->freshDB($request);
     }
     
-    // SurvLoop Widgets
+    // Survloop Widgets
     
     public function ajaxMultiRecordCheck(Request $request, $treeID = 1)
     {

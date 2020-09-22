@@ -2,14 +2,14 @@
 /**
   * TreeSurvFormLoops is a mid-level class with functions related to printing the loops within forms.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvFormVarieties;
+use Survloop\Controllers\Tree\TreeSurvFormVarieties;
 
 class TreeSurvFormLoops extends TreeSurvFormVarieties
 {

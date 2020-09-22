@@ -2,12 +2,12 @@
 /**
   * AdminMenu is responsible for building the menu inside the dashboard area for all user types.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use App\Models\SLTree;
 use App\Models\SLContact;
@@ -275,7 +275,7 @@ class AdminMenu
                         ),
                         $this->admMenuLnk(
                             '/dashboard/sl/export/laravel',
-                            'SurvLoop Package'
+                            'Survloop Package'
                         ),
                         $this->admMenuLnk(
                             '/dashboard/db/import',

@@ -25,8 +25,8 @@
     </div>
 
     <a href="#search" class="hsho">SEO</a> - 
-    <a href="#general" class="hsho">SurvLoop Configuration</a> - 
-    <a href="#survopts" class="hsho">SurvLoop Settings</a> - 
+    <a href="#general" class="hsho">Survloop Configuration</a> - 
+    <a href="#survopts" class="hsho">Survloop Settings</a> - 
     <a href="#social" class="hsho">Social Media</a> - 
     <a href="#license" class="hsho">Licenses</a> - 
     <a href="#logos" class="hsho">Logos & Fonts</a> - 
@@ -56,7 +56,7 @@
 
 <div class="slCard nodeWrap">
 <h2>General Settings</h2>
-<h3 class="slBlueDark"><u>SurvLoop Configurations</u></h3>
+<h3 class="slBlueDark"><u>Survloop Configurations</u></h3>
 <div class="row">
     <div class="col-md-6">
         @foreach (['site-name', 'cust-abbr', 'cust-package', 'parent-company'] as $opt)
@@ -86,7 +86,7 @@
 <div class="nodeAnchor"><a id="survopts" name="survopts"></a></div>
 
 <div class="slCard nodeWrap">
-<h3 class="slBlueDark"><u>SurvLoop Settings</u></h3>
+<h3 class="slBlueDark"><u>Survloop Settings</u></h3>
 <div class="row">
     <div class="col-md-6">
         @foreach (['has-volunteers', 'has-partners', 'has-avatars'] as $opt)

@@ -2,12 +2,12 @@
 /**
   * Searcher manages the primary needs of system searches, optionally autoloads client class extension.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -15,7 +15,7 @@ use Session;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLSearchRecDump;
-use SurvLoop\Controllers\SurvCustLoop;
+use Survloop\Controllers\SurvCustLoop;
 
 class Searcher extends SurvCustLoop
 {

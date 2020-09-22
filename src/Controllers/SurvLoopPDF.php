@@ -1,13 +1,13 @@
 <?php
 /**
-  * SurvLoopPDF is a class which aid exports to PDF.
+  * SurvloopPDF is a class which aid exports to PDF.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.17
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use App;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ use App\Models\SLDefinitions;
 
 use Mpdf\Mpdf;
 
-class SurvLoopPDF
+class SurvloopPDF
 {
     private $mpdf     = null;
     protected $folder = 'api/pdf/';
@@ -28,7 +28,7 @@ class SurvLoopPDF
         if (trim($group) != '') {
             $this->folder .= $group . '/';
         }
-        $this->output = new SurvLoopOutputPDF;
+        $this->output = new SurvloopOutputPDF;
     }
 
     public function getPdfFile($filename = 'export.pdf')
@@ -220,7 +220,7 @@ class SurvLoopPDF
 
 }
 
-class SurvLoopOutputPDF
+class SurvloopOutputPDF
 {
     public $fileStore   = '';
     public $fileDeliver = '';

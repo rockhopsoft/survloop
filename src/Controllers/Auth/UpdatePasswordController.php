@@ -2,12 +2,12 @@
 /**
   * UpdatePasswordController customizes the Laravel default.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.9
   */
-namespace SurvLoop\Controllers\Auth;
+namespace Survloop\Controllers\Auth;
 
 use App\User;
 use Illuminate\Http\Request;

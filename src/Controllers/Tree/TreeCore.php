@@ -2,20 +2,20 @@
 /**
   * TreeCore is the bottom-level class for a standard branching tree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\SLTree;
 use App\Models\SLNode;
-use SurvLoop\Controllers\Tree\TreeNodeCore;
-use SurvLoop\Controllers\SurvLoopController;
+use Survloop\Controllers\Tree\TreeNodeCore;
+use Survloop\Controllers\SurvloopController;
 
-class TreeCore extends SurvLoopController
+class TreeCore extends SurvloopController
 {
     public $treeID             = -3;
     public $treeSize           = 0;

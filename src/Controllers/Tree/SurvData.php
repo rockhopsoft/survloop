@@ -3,52 +3,52 @@
   * SurvData is a critical class with loads all the details of a survey's core record
   * according to the database design, and it's settings for a given survey.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Auth;
 use App\Models\SLFields;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Tree\SurvDataTestsAB;
-use SurvLoop\Controllers\Tree\SurvDataCheckbox;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\SurvDataTestsAB;
+use Survloop\Controllers\Tree\SurvDataCheckbox;
 
 class SurvData extends SurvDataCheckbox
 {
     
-    public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvLoop = [], $dataBranches = [])
+    public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvloop = [], $dataBranches = [])
     {
         $this->setCoreID($coreTbl, $coreID);
         if (sizeof($dataBranches) > 0) {
             $this->dataBranches = $dataBranches;
         }
         $this->checkboxNodes = $checkboxNodes;
-        $this->refreshDataSets($isBigSurvLoop);
+        $this->refreshDataSets($isBigSurvloop);
         $this->loadSessTestsAB();
         $this->loaded = true;
         return true;
     }
     
-    public function refreshDataSets($isBigSurvLoop = [])
+    public function refreshDataSets($isBigSurvloop = [])
     {
         $this->dataSets = $this->id2ind = $this->kidMap 
             = $this->helpInfo = $this->dataSetsSubbed = [];
         $this->loadData($this->coreTbl, $this->coreID);
 // if (Auth::user() && Auth::user()->id) $this->loadData('users', Auth::user()->id);
 // check for data needed for root data loop which isn't connected to the core record
-        if (sizeof($isBigSurvLoop) > 0 && trim($isBigSurvLoop[0]) != '') {
-            $model = trim($GLOBALS["SL"]->modelPath($isBigSurvLoop[0]));
+        if (sizeof($isBigSurvloop) > 0 && trim($isBigSurvloop[0]) != '') {
+            $model = trim($GLOBALS["SL"]->modelPath($isBigSurvloop[0]));
             if ($model != '') {
                 eval("\$rows = " . $model 
-                    . "::orderBy('" . $isBigSurvLoop[1] . "', '" . $isBigSurvLoop[2] 
+                    . "::orderBy('" . $isBigSurvloop[1] . "', '" . $isBigSurvloop[2] 
                     . "')->get();");
                 if ($rows->isNotEmpty()) {
                     foreach ($rows as $row) {
-                        $this->loadData($isBigSurvLoop[0], $row->getKey(), $row);
+                        $this->loadData($isBigSurvloop[0], $row->getKey(), $row);
                     }
                 }
             }

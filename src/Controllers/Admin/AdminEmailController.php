@@ -2,19 +2,19 @@
 /**
   * AdminEmailController contains the emailing functions for users who are logged in.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.2.5
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\SLEmails;
 use App\Models\SLEmailed;
 use App\Models\SLContact;
 use App\Models\User;
-use SurvLoop\Controllers\Admin\AdminCoreController;
+use Survloop\Controllers\Admin\AdminCoreController;
 
 class AdminEmailController extends AdminCoreController
 {

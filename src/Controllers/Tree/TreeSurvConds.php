@@ -2,16 +2,16 @@
 /**
   * TreeSurvConds is a mid-level class focused on checking node conditions.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use App\Models\SLConditions;
 use App\Models\SLConditionsArticles;
-use SurvLoop\Controllers\Tree\TreeSurvCustomAPI;
+use Survloop\Controllers\Tree\TreeSurvCustomAPI;
 
 class TreeSurvConds extends TreeSurvCustomAPI
 {

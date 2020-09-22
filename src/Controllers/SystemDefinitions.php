@@ -1,17 +1,17 @@
 <?php
 /**
-  * SystemDefinitions loads and manages key SurvLoop system variables.
+  * SystemDefinitions loads and manages key Survloop system variables.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\SystemDefinitionsInit;
+use Survloop\Controllers\SystemDefinitionsInit;
 
 class SystemDefinitions extends SystemDefinitionsInit
 {
@@ -173,7 +173,7 @@ class SystemDefinitions extends SystemDefinitionsInit
                 $css[$key] = $val[0];
             }
             $dbID = $this->dbID;
-            //if ($this->dbID == 3 && $GLOBALS["SL"]->sysOpts["cust-abbr"] == 'SurvLoop') $dbID = 1;
+            //if ($this->dbID == 3 && $GLOBALS["SL"]->sysOpts["cust-abbr"] == 'Survloop') $dbID = 1;
             $chk = SLDefinitions::where('def_database', $dbID)
                 ->where('def_set', 'Style Settings')
                 ->where('def_subset', $key)

@@ -8,7 +8,7 @@
     {{ $GLOBALS['SL']->dbRow->db_name }}</span>: MySQL Export 
     @if (isset($GLOBALS["SL"]->x["exportAsPackage"]) 
         && $GLOBALS["SL"]->x["exportAsPackage"])
-        for SurvLoop Extension Package
+        for Survloop Extension Package
     @endif
 </h1>
 

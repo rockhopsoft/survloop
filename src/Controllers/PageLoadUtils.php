@@ -1,13 +1,13 @@
 <?php
 /**
-  * PageLoadUtils assists the SurvLoop-level routing processes in SurvRoutes and AdminController.
+  * PageLoadUtils assists the Survloop-level routing processes in SurvRoutes and AdminController.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -20,15 +20,15 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
 use App\Models\SLSess;
-use SurvLoop\Controllers\Globals\GlobalsCache;
-use SurvLoop\Controllers\Globals\Globals;
+use Survloop\Controllers\Globals\GlobalsCache;
+use Survloop\Controllers\Globals\Globals;
 
 class PageLoadUtils extends Controller
 {
     protected $isAdminPage = false;
     public $dashPrfx       = '';
     public $domainPath     = 'http://survloop.local';
-    public $custAbbr       = 'SurvLoop';
+    public $custAbbr       = 'Survloop';
     public $dbID           = 1;
     public $treeID         = 1;
     public $cacheKey       = '';

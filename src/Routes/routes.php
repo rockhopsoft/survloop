@@ -1,8 +1,8 @@
 <?php
 /**
-  * routes.php registers all the paths used by SurvLoop behavior.
+  * routes.php registers all the paths used by Survloop behavior.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
@@ -19,11 +19,11 @@
 |
 */
 
-$GLOBALS["SL-Micro"] = new SurvLoop\Controllers\Globals\GlobalsMicroTime;
+$GLOBALS["SL-Micro"] = new Survloop\Controllers\Globals\GlobalsMicroTime;
 
 Route::group(['middleware' => ['web']], function () {
 
-    $path = 'SurvLoop\\Controllers\\';
+    $path = 'Survloop\\Controllers\\';
     
     require_once('routes-core.php');
 

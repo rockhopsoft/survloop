@@ -2,12 +2,12 @@
 /**
   * SurvRoutes is a side-class to handle the smallest routing functions which largely just redirect.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.9
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ use Illuminate\Routing\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Globals\GlobalsCache;
+use Survloop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
 {
@@ -243,7 +243,7 @@ class SurvRoutes extends Controller
 
     public function testRouteCall(Request $request)
     {
-        echo 'SurvLoop Route Function Calls are Working!';
+        echo 'Survloop Route Function Calls are Working!';
     }
     
 }

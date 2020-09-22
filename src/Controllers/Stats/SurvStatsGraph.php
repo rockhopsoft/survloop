@@ -2,14 +2,14 @@
 /**
   * SurvStatsGraph builds on SurvStats and SurvStatsChart to present the visually present data.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
-use SurvLoop\Controllers\Stats\SurvStatsChart;
+use Survloop\Controllers\Stats\SurvStatsChart;
 
 class SurvStatsGraph extends SurvStatsChart
 {

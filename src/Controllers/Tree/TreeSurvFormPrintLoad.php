@@ -3,14 +3,14 @@
   * TreeSurvFormPrintLoad is a mid-level class of the branching tree, which provides
   * functions to prep for the main functions that generate output.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvFormWidgets;
+use Survloop\Controllers\Tree\TreeSurvFormWidgets;
 
 class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
 {

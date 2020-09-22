@@ -3,12 +3,12 @@
   * SurvDataUtils holds the core variables and functional infrastructure
   * for managing the data, as organized by the database design.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.6
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use App\Models\SLNodeSaves;
 

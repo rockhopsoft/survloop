@@ -17,6 +17,6 @@ class SLSessSite extends Model
 		'site_sess_zoom_pref', 
     ];
     
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

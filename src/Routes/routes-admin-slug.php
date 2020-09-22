@@ -3,7 +3,7 @@
   * routes-admin-slug.php registers all the paths used in accessing and
   * interacting with admin tree reports.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5

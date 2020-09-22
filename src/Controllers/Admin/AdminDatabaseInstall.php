@@ -1,13 +1,13 @@
 <?php
 /**
-  * AdminDatabaseInstall is the admin class responsible for building standard SurvLoop components.
+  * AdminDatabaseInstall is the admin class responsible for building standard Survloop components.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use DB;
 use Auth;
@@ -20,8 +20,8 @@ use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
-use SurvLoop\Controllers\SurvLoopImportExcel;
-use SurvLoop\Controllers\Admin\AdminDBController;
+use Survloop\Controllers\SurvloopImportExcel;
+use Survloop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
 {
@@ -172,7 +172,7 @@ class AdminDatabaseInstall extends AdminDBController
                     if ($request->has('tblEng')) {
                         $tblEng = trim($request->tblEng);
                     }
-                    $this->v["uploadImport"] = new SurvLoopImportExcel($tblEng);
+                    $this->v["uploadImport"] = new SurvloopImportExcel($tblEng);
                     if (trim($request->get('import')) == 'flds') {
                         $this->v["uploadImport"]->loadFile($request->get('file'));
                     } elseif (trim($request->get('import')) == 'fldNames') {
@@ -199,7 +199,7 @@ class AdminDatabaseInstall extends AdminDBController
             if ($request->has('importTblName')) {
                 $tblEng = trim($request->get('importTblName'));
             }
-            $this->v["uploadImport"] = new SurvLoopImportExcel($tblEng);
+            $this->v["uploadImport"] = new SurvloopImportExcel($tblEng);
             $this->v["uploadImport"]->uploadToArray('importExcel');
             $redir = '?import=flds&file=' . $this->v["uploadImport"]->getFile()
                 . '&tblEng=' . $request->get('importTblName');
@@ -273,7 +273,7 @@ class AdminDatabaseInstall extends AdminDBController
             $this->runExportLaravCreateSeeds($request);
             
         } elseif ($this->v["generate"] == 3) {
-            // Phase 3) Create seeder files for custom system's SurvLoop configurations
+            // Phase 3) Create seeder files for custom system's Survloop configurations
             $this->runExportLaravCreateSeedsConfig($request);
             
         } elseif ($this->v["generate"] == 4) {
@@ -572,7 +572,7 @@ class AdminDatabaseInstall extends AdminDBController
             . "\n status:" . $zip->status . "\n";
         $zip->close();
         //$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__ . $this->v["exportDir"] 
-            . "/SurvLoop2Laravel-Export-" . date("Y-m-d") . ".zip"));
+            . "/Survloop2Laravel-Export-" . date("Y-m-d") . ".zip"));
         */
         
         $this->v["dumpOut"]["Migrations"] = $this->v["newMigFile"];
@@ -616,7 +616,7 @@ class AdminDatabaseInstall extends AdminDBController
         $this->v["dumpOut"]["Models"] .= $fullFileOut;
         if (file_exists($newModelFilename)) {
             $oldFile = file_get_contents($newModelFilename);
-            $endStr = '// END SurvLoop auto-generated portion of Model';
+            $endStr = '// END Survloop auto-generated portion of Model';
             $endPos = strpos($oldFile, $endStr);
             if ($endPos > 0 && ($endPos+strLen($endStr)+2) >= strLen($oldFile)) {
                 $append = substr($oldFile, ($endPos+strLen($endStr)+2));

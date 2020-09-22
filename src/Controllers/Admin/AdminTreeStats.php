@@ -1,20 +1,20 @@
 <?php
 /**
-  * AdminTreeController is the admin class responsible for the tools to edit SurvLoop's tree designs.
-  * (Ideally, this will eventually be replaced by SurvLoop-generated surveys.)
+  * AdminTreeController is the admin class responsible for the tools to edit Survloop's tree designs.
+  * (Ideally, this will eventually be replaced by Survloop-generated surveys.)
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use DB;
 use Illuminate\Http\Request;
-use SurvLoop\Controllers\SystemDefinitions;
-use SurvLoop\Controllers\Stats\SessAnalysis;
-use SurvLoop\Controllers\Admin\AdminController;
+use Survloop\Controllers\SystemDefinitions;
+use Survloop\Controllers\Stats\SessAnalysis;
+use Survloop\Controllers\Admin\AdminController;
 
 class AdminTreeStats extends AdminController
 {

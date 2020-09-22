@@ -79,7 +79,7 @@
             <div class="col-9">
                 <select id="setSelectID" name="setSelect" class="form-control form-control-lg" autocomplete=off >
                     <option value="" @if (!isset($cond)) SELECTED @endif ></option>
-                    <option value="" DISABLED >SurvLoops:</option>
+                    <option value="" DISABLED >Survloops:</option>
                     @forelse ($GLOBALS['SL']->dataLoops as $loopName => $loopRow)
                         <option @if (isset($cond) && isset($cond->cond_operator) 
                             && $cond->CondLoop == $loopRow->data_loop_id) SELECTED @endif 

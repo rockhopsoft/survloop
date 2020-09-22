@@ -2,12 +2,12 @@
 /**
   * SessAnalysis runs basic queries to track the activity within a user session.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.25
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
 use DB;
 use App\Models\SLTree;
@@ -15,7 +15,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSess;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\TreeNodeSurv;
 
 class SessAnalysis
 {

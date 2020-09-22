@@ -1,14 +1,14 @@
 <?php
 /**
-  * TreeSurv is a mid-level class using a standard branching tree, mostly for SurvLoop's surveys and pages.
+  * TreeSurv is a mid-level class using a standard branching tree, mostly for Survloop's surveys and pages.
   * But it does house some of the core functions to print the whole of a tree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Illuminate\Http\Request;
@@ -19,11 +19,11 @@ use App\Models\SLNode;
 use App\Models\SLFields;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Tree\TreeSurvLoops;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\TreeSurvloops;
 
-class TreeSurv extends TreeSurvLoops
+class TreeSurv extends TreeSurvloops
 {
     /**
      * Top-level of the algorithm which traverses the branching tree

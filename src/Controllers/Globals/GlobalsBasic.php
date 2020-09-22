@@ -1,20 +1,20 @@
 <?php
 /**
   * GlobalsBasic is a mid-level class to declare the most basic
-  * functions which are specifc to SurvLoop (compared to the
+  * functions which are specifc to Survloop (compared to the
   * more generalized functions in GlobalsStatic.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use DB;
 use App\Models\SLFields;
 use App\Models\SLTables;
-use SurvLoop\Controllers\Globals\GlobalsVars;
+use Survloop\Controllers\Globals\GlobalsVars;
 
 class GlobalsBasic extends GlobalsVars
 {

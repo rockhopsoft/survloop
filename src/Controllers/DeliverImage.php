@@ -2,12 +2,12 @@
 /**
   * DeliverImage is a helper class 
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.2.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Illuminate\Support\Facades\Response;
 use Symfony\Component\HttpFoundation\File\File;

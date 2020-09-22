@@ -3,12 +3,12 @@
   * Geographs is a class focused on providing geographically-based data interactions
   * from dropdown lists of U.S. and Canadian states, to embedding maps.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.7
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use App\Models\SLAddyGeo;
 

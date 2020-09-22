@@ -18,7 +18,7 @@
 </div>
 
 <div class="slCard nodeWrap">
-<h2>SurvLoops</h2>
+<h2>Survloops</h2>
 <p>
 <i>Loop</i>: The group of records which the end user may provide between <i>Min</i> and <i>Max</i> records 
 in the <i>Table</i>. This data loop plays out for the end user within its family's <i>Root Node</i>. 
@@ -155,7 +155,7 @@ New loops can be added by editing any node in the
 Some <i>Tables</i> use <i>Helper Tables</i> to store multiple checkbox responses 
 in their <i>Value Field</i>, linked to momma by their <i>Foreign Key</i>. These can also 
 be created by editing any Node in the Tree Map with a <i>checkbox response</i>. The 
-SurvLoops above also have a one-to-many relation, so there's no need to repeat any 
+Survloops above also have a one-to-many relation, so there's no need to repeat any 
 basic core-table-to-loop-table relations.
 </p>
 <table class="table table-striped">

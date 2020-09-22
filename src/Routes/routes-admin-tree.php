@@ -1,9 +1,9 @@
 <?php
 /**
   * routes-admin-tree.php registers the admin paths used for
-  * managing SurvLoop trees.
+  * managing Survloop trees.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5

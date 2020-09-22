@@ -1,7 +1,7 @@
 <!-- resources/views/vendor/survloop/admin/tree/node-edit-widgets.blade.php -->
 <div id="hasSurvWidget" class=" @if ($node->isWidget()) disBlo @else disNon @endif ">
     <div class="slCard nodeWrap">
-        <h4 class="mT0">SurvLoop Widget Options</h4>
+        <h4 class="mT0">Survloop Widget Options</h4>
         <div class="row mB20">
             <div class="col-md-6">
                 <label class="nPrompt @if ($GLOBALS['SL']->treeRow->tree_type != 'Page') disNon @endif ">

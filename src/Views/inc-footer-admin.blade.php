@@ -26,7 +26,7 @@
             @else {{ date("Y") }}. 
             @endif
         <nobr>Database powered by 
-        <a href="https://SurvLoop.org" target="_blank">SurvLoop</a></nobr>
+        <a href="https://Survloop.org" target="_blank">Survloop</a></nobr>
     </div>
     <div class="p15"></div>
 @endif

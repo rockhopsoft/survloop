@@ -1,14 +1,14 @@
 <?php
 /**
-  * TreeSurvUpload is a mid-level class atop SurvLoop's branching tree, specifically for 
+  * TreeSurvUpload is a mid-level class atop Survloop's branching tree, specifically for 
   * uploading functionality in surveys and pages.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Auth;
 use Storage;
@@ -19,10 +19,10 @@ use App\Models\User;
 use App\Models\SLUploads;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
-use SurvLoop\Controllers\SurvLoopPDF;
-use SurvLoop\Controllers\DeliverImage;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Tree\TreeSurv;
+use Survloop\Controllers\SurvloopPDF;
+use Survloop\Controllers\DeliverImage;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\TreeSurv;
 
 class TreeSurvUpload extends TreeSurv
 {
@@ -758,7 +758,7 @@ class TreeSurvUpload extends TreeSurv
                         $filename = $upRow->up_stored_file;
                         if (strtolower($mimetype) == "application/pdf") {
                             $minFile = $upRow->up_stored_file . '.pdf';
-                            $pdf = new SurvLoopPDF($GLOBALS["SL"]->coreTbl);
+                            $pdf = new SurvloopPDF($GLOBALS["SL"]->coreTbl);
                             $pdf->simplifyPdf($upFold . $origFile, $upFold . $minFile);
                         } else {
                             $this->upImgResize($upFold, $filename, $origFile);

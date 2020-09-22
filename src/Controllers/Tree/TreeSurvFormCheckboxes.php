@@ -3,14 +3,14 @@
   * TreeSurvFormCheckboxes is a mid-level class which provides management of
   * checkboxes, radio buttons, etc.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvFormPrintLoad;
+use Survloop\Controllers\Tree\TreeSurvFormPrintLoad;
 
 class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
 {

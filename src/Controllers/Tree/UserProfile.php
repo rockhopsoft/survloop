@@ -2,12 +2,12 @@
 /**
   * UserProfile is the mid-level class for user profile functions.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Auth;
 use Storage;
@@ -16,7 +16,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLSess;
-use SurvLoop\Controllers\Tree\TreeSurvInput;
+use Survloop\Controllers\Tree\TreeSurvInput;
 
 class UserProfile extends TreeSurvInput
 {

@@ -2,14 +2,14 @@
 /**
   * TreeSurvProgBar is a mid-level class using to report a user's progress through a survey.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvLoad;
+use Survloop\Controllers\Tree\TreeSurvLoad;
 
 class TreeSurvProgBar extends TreeSurvLoad
 {

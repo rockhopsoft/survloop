@@ -1,9 +1,9 @@
 <?php
 /**
   * routes-admin-db.php registers the admin paths used for
-  * managing SurvLoop database structures.
+  * managing Survloop database structures.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5

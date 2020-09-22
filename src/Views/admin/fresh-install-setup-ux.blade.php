@@ -26,7 +26,7 @@ But for now, please focus on the data you want to collect when visitors land on 
 <div class="nodeWrap">
     <div class="nPrompt"><label for="nameID">
         <b><span class="slBlueDark">Survey/Form</span> Name</b>: 
-        <span class="slGrey fPerc66">(eg. "SurvLoop Main")</span>
+        <span class="slGrey fPerc66">(eg. "Survloop Main")</span>
     </label></div>
     <div class="nFld"><input id="TreeNameID" name="TreeName" type="text" class="form-control"
         @if ($isFresh && isset($GLOBALS['SL']->sysOpts["site-name"])) 

@@ -5,7 +5,7 @@
 
 <div class="jumbotron"><center>
 <h1>Create Your <span class="slBlueDark">Database</span>!</h1>
-<h4>Describe the data you want to organize, collect, and share using <b class="slBlueDark">SurvLoop</b>.</h4>
+<h4>Describe the data you want to organize, collect, and share using <b class="slBlueDark">Survloop</b>.</h4>
 <p><i class="slGrey mL20">Don't worry, you can keep tweaking your entire database design forever.</i></p>
 </center></div>
 
@@ -19,7 +19,7 @@
     <div class="col-8">
         <div class="nodeWrap">
             <div class="nPrompt"><label for="nameID"><b>Database Name</b>: 
-                <span class="slGrey fPerc66">(eg. SurvLoop)</span></label></div>
+                <span class="slGrey fPerc66">(eg. Survloop)</span></label></div>
             <div class="nFld"><input id="DbNameID" name="DbName" type="text" class="form-control"></div>
         </div>
     </div>

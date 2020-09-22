@@ -1,15 +1,15 @@
 <?php
 /**
-  * TreeSurvForm is the main class for SurvLoop's branching tree, capable of generating complex forms.
+  * TreeSurvForm is the main class for Survloop's branching tree, capable of generating complex forms.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvSpreadsheet;
+use Survloop\Controllers\Tree\TreeSurvSpreadsheet;
 
 class TreeSurvForm extends TreeSurvSpreadsheet
 {

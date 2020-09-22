@@ -1,5 +1,5 @@
 <?php // sorry, not sure how this should be done instead
-$surv = new SurvLoop\Controllers\SurvLoop;
+$surv = new Survloop\Controllers\Survloop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
 ?>@extends('vendor.survloop.master')

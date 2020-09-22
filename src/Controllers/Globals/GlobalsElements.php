@@ -3,12 +3,12 @@
   * GlobalsTables is a mid-level class for loading and accessing system information from anywhere.
   * This level contains access to the database design, its tables, and field details.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 class GlobalsElements extends GlobalsCache
 {

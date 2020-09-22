@@ -1,8 +1,8 @@
 <?php
 /**
-  * routes-core.php registers all the paths used by core SurvLoop behavior.
+  * routes-core.php registers all the paths used by core Survloop behavior.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
@@ -13,19 +13,19 @@
  */
 Route::post(
     '/',
-    $path . 'SurvLoop@loadPageHome'
+    $path . 'Survloop@loadPageHome'
 );
 Route::get(
     '/',
-    $path . 'SurvLoop@loadPageHome'
+    $path . 'Survloop@loadPageHome'
 );
 Route::post(
     '/home', 
-    $path . 'SurvLoop@loadPageHome'
+    $path . 'Survloop@loadPageHome'
 );
 Route::get( 
     '/home', 
-    $path . 'SurvLoop@loadPageHome'
+    $path . 'Survloop@loadPageHome'
 );
 
 /**
@@ -33,40 +33,40 @@ Route::get(
  */
 Route::get(
     '/search-bar',
-    $path . 'SurvLoop@searchBar'
+    $path . 'Survloop@searchBar'
 );
 Route::get(
     '/search-results/{treeID}',
-    $path . 'SurvLoop@searchResultsAjax'
+    $path . 'Survloop@searchResultsAjax'
 );
 Route::get(
     '/search-run',
-    $path . 'SurvLoop@searchRun'
+    $path . 'Survloop@searchRun'
 );
 
 Route::post(
     '/ajax',
-    $path . 'SurvLoop@ajaxChecks'
+    $path . 'Survloop@ajaxChecks'
 );
 Route::get(
     '/ajax',
-    $path . 'SurvLoop@ajaxChecks'
+    $path . 'Survloop@ajaxChecks'
 );
 Route::post(
     '/ajax/{type}',
-    $path . 'SurvLoop@ajaxChecks'
+    $path . 'Survloop@ajaxChecks'
 );
 Route::get(
     '/ajax/{type}',
-    $path . 'SurvLoop@ajaxChecks'
+    $path . 'Survloop@ajaxChecks'
 );
 Route::get(
     '/js-load-menu', 
-    $path . 'SurvLoop@jsLoadMenu'
+    $path . 'Survloop@jsLoadMenu'
 );
 
 /**
- * SurvLoop Post-Install System Initialization
+ * Survloop Post-Install System Initialization
  */
 Route::get(
     '/fresh/creator', 
@@ -115,11 +115,11 @@ Route::get(
 );
 Route::post(
     '/afterLogin',
-    $path . 'SurvLoop@afterLogin'
+    $path . 'Survloop@afterLogin'
 );
 Route::get(
     '/afterLogin',
-    $path . 'SurvLoop@afterLogin'
+    $path . 'Survloop@afterLogin'
 );
 Route::get(
     '/logout',
@@ -127,7 +127,7 @@ Route::get(
 );
 Route::get(
     '/chkEmail',
-    $path . 'SurvLoop@chkEmail'
+    $path . 'Survloop@chkEmail'
 );
 
 /**
@@ -172,19 +172,19 @@ Route::post(
 
 
 /**
- * SurvLoop Auth Helpers
+ * Survloop Auth Helpers
  */
 Route::get(
     '/holdSess',
-    $path . 'SurvLoop@holdSess'
+    $path . 'Survloop@holdSess'
 );
 Route::get(
     '/restart',
-    $path . 'SurvLoop@restartSess'
+    $path . 'Survloop@restartSess'
 );
 Route::get(
     '/sessDump',
-    $path . 'SurvLoop@sessDump'
+    $path . 'Survloop@sessDump'
 );
 Route::get(
     '/test',
@@ -192,22 +192,22 @@ Route::get(
 );
 Route::get(
     '/time-out',
-    $path . 'SurvLoop@timeOut'
+    $path . 'Survloop@timeOut'
 );
 Route::get(
     '/survloop-stats.json',
-    $path . 'SurvLoop@getJsonSurvStats'
+    $path . 'Survloop@getJsonSurvStats'
 );
 
 Route::get(
     '/email-confirm/{token}/{tokenB}',
-    $path . 'SurvLoop@processEmailConfirmToken'
+    $path . 'Survloop@processEmailConfirmToken'
 );
 
 
 Route::get(
     '/spinner',
-    $path . 'SurvLoop@spinnerUrl'
+    $path . 'Survloop@spinnerUrl'
 );
 
 /**
@@ -303,7 +303,7 @@ Route::get(
 );
 
 Route::get('test-survloop-routes', function(){
-    echo 'SurvLoop Routes are Working!';
+    echo 'Survloop Routes are Working!';
 });
 Route::get( 
     'test-route-call',

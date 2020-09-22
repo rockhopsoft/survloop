@@ -1,14 +1,14 @@
 <?php
 /**
   * TreeSurvInput is a mid-level class using a standard branching tree, mostly for 
-  * processing the input SurvLoop's surveys and pages.
+  * processing the input Survloop's surveys and pages.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Storage;
 use Illuminate\Http\Request;
@@ -16,8 +16,8 @@ use App\Models\SLNode;
 use App\Models\SLContact;
 use App\Models\SLTokens;
 use App\Models\SLUsersRoles;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Tree\TreeSurvInputElements;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\TreeSurvInputElements;
 
 class TreeSurvInput extends TreeSurvInputElements
 {

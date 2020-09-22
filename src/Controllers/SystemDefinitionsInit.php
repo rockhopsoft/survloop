@@ -1,13 +1,13 @@
 <?php
 /**
-  * SystemDefinitionsInit loads the list of SurvLoop system variables and their defaults.
+  * SystemDefinitionsInit loads the list of Survloop system variables and their defaults.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 class SystemDefinitionsInit
 {   
@@ -131,7 +131,7 @@ class SystemDefinitionsInit
             ], 
             'twitter' => [
                 'Twitter Account', 
-                '@SurvLoop'
+                '@Survloop'
             ], 
             'facebook-app-id' => [
                 'Facebook App ID', 

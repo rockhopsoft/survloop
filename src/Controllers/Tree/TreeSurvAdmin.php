@@ -1,14 +1,14 @@
 <?php
 /**
-  * TreeSurvAdmin is a higher-level class extending SurvLoop's core tree class
+  * TreeSurvAdmin is a higher-level class extending Survloop's core tree class
   * with tools to edit the tree itself.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Cache;
@@ -23,7 +23,7 @@ use App\Models\SLConditions;
 use App\Models\SLDataLoop;
 use App\Models\SLConditionsNodes;
 use App\Models\SLEmails;
-use SurvLoop\Controllers\Tree\TreeSurvNodeEdit;
+use Survloop\Controllers\Tree\TreeSurvNodeEdit;
 
 class TreeSurvAdmin extends TreeSurvNodeEdit
 {

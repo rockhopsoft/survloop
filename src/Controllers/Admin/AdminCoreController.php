@@ -2,12 +2,12 @@
 /**
   * AdminCoreController initializes functions for users who are logged in.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.2.5
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\SLEmails;
@@ -15,12 +15,12 @@ use App\Models\SLContact;
 use App\Models\SLTree;
 use App\Models\SLTables;
 use App\Models\User;
-use SurvLoop\Controllers\PageLoadUtils;
-use SurvLoop\Controllers\Admin\AdminMenu;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\SurvLoopController;
+use Survloop\Controllers\PageLoadUtils;
+use Survloop\Controllers\Admin\AdminMenu;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\SurvloopController;
 
-class AdminCoreController extends SurvLoopController
+class AdminCoreController extends SurvloopController
 {
     protected $loader      = null;
     protected $adminNav    = [];
@@ -56,7 +56,7 @@ class AdminCoreController extends SurvLoopController
             $this->initPowerUser();
             $this->v["isDash"] = true;
             if ($GLOBALS["SL"]->sysOpts["cust-abbr"] == 'survloop') {
-                $GLOBALS["SL"]->sysOpts["cust-abbr"] = 'SurvLoop';
+                $GLOBALS["SL"]->sysOpts["cust-abbr"] = 'Survloop';
             }
             $this->checkCurrPage();
             $this->reloadAdmMenu();
@@ -81,7 +81,7 @@ class AdminCoreController extends SurvLoopController
         $admMenu = null;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"])) {
             $abbr = $GLOBALS["SL"]->sysOpts["cust-abbr"];
-            if ($abbr != 'SurvLoop') {
+            if ($abbr != 'Survloop') {
                 $custClass = $abbr . "\\Controllers\\" 
                     . $abbr . "AdminMenu";
                 if (class_exists($custClass)) {

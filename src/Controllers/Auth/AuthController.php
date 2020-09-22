@@ -2,12 +2,12 @@
 /**
   * AuthController customizes some of the standard Laravel behavior.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
-namespace SurvLoop\Controllers\Auth;
+namespace Survloop\Controllers\Auth;
 
 use Auth;
 use Validator;
@@ -22,9 +22,9 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\SurvLoopController;
-use SurvLoop\Controllers\SurvLoop;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\SurvloopController;
+use Survloop\Controllers\Survloop;
 
 class AuthController extends Controller
 {
@@ -164,7 +164,7 @@ class AuthController extends Controller
             $pass = true;
         }
         if ($pass) {
-            $sl = new SurvLoopController;
+            $sl = new SurvloopController;
             $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
             $sl->logAdd('session-stuff', 'User #' . $uID . ' Logged In');
             if ($request->has('previous') && trim($request->get('previous')) != '') {
@@ -203,7 +203,7 @@ class AuthController extends Controller
     
     public function getLogout()
     {
-        $sl = new SurvLoopController;
+        $sl = new SurvloopController;
         $uID = ((Auth::user() && isset(Auth::user()->id)) ? Auth::user()->id : 0);
         if ($uID > 0) {
             SLSess::where('sess_user_id', $uID)
@@ -268,7 +268,7 @@ class AuthController extends Controller
         }
         $this->chkGlobal($request);
         if (!isset($GLOBALS["SL"]->sysOpts["footer-master"])) {
-            $sl = new SurvLoopController;
+            $sl = new SurvloopController;
             $sl->initCustViews($request);
         }
         return true;
@@ -279,7 +279,7 @@ class AuthController extends Controller
         if ($this->currNode && isset($this->currNode->node_id) 
             && $request->has('nd') && intVal($request->get('nd')) > 0) {
             $nID = $this->currNode->node_id;
-            $this->surv = new SurvLoop;
+            $this->surv = new Survloop;
             $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
             $this->surv->loadLoop($request);
             $this->surv->custLoop->loadTree($this->treeID, $request);

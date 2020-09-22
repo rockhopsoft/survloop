@@ -3,7 +3,7 @@
   * routes-slug.php registers all the paths used in accessing and
   * interacting with tree reports.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
@@ -12,71 +12,71 @@
 // views include full, public, pdf, full-pdf, xml, full-xml
 Route::post(
     '/{pageSlug}/read-{cid}/full/t-{token}',
-    $path . 'SurvLoop@tokenByID'
+    $path . 'Survloop@tokenByID'
 );
 Route::get(
     '/{pageSlug}/read-{cid}/full/t-{token}',
-    $path . 'SurvLoop@tokenByID'
+    $path . 'Survloop@tokenByID'
 );
 Route::get(
     '/{treeSlug}/read-{cid}/xml',
-    $path . 'SurvLoop@xmlByID'
+    $path . 'Survloop@xmlByID'
 );
 Route::get(
     '/{treeSlug}/read-{cid}/full-xml',
-    $path . 'SurvLoop@xmlFullByID'
+    $path . 'Survloop@xmlFullByID'
 );
 //Route::get(
 //    '/{treeSlug}/read-{cid}/json',
-//    $path . 'SurvLoop@xmlByID'
+//    $path . 'Survloop@xmlByID'
 //);
 Route::post(
     '/{pageSlug}/read-{cid}/{view}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::get(
     '/{pageSlug}/read-{cid}/{view}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::post(
     '/{pageSlug}/read-{cid}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::get( 
     '/{pageSlug}/read-{cid}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::post(
     '/{pageSlug}/u-{cid}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::get(
     '/{pageSlug}/u-{cid}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::post(
     '/{pageSlug}/readi-{cid}/{view}',
-    $path . 'SurvLoop@loadPageURLrawID'
+    $path . 'Survloop@loadPageURLrawID'
 );
 Route::get(
     '/{pageSlug}/readi-{cid}/{view}',
-    $path . 'SurvLoop@loadPageURLrawID'
+    $path . 'Survloop@loadPageURLrawID'
 );
 Route::post(
     '/{pageSlug}/readi-{cid}',
-    $path . 'SurvLoop@loadPageURLrawID'
+    $path . 'Survloop@loadPageURLrawID'
 );
 Route::get( 
     '/{pageSlug}/readi-{cid}',
-    $path . 'SurvLoop@loadPageURLrawID'
+    $path . 'Survloop@loadPageURLrawID'
 );
 Route::post(
     '/{pageSlug}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 Route::get( 
     '/{pageSlug}',
-    $path . 'SurvLoop@loadPageURL'
+    $path . 'Survloop@loadPageURL'
 );
 
 Route::post('/dash/{pageSlug}/read-{cid}', [

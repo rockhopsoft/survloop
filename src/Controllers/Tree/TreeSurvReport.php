@@ -2,19 +2,19 @@
 /**
   * TreeSurvReport is a mid-level class with functions related to generating reports within a tree.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.19
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\SLSessEmojis;
 use App\Models\SLTree;
-use SurvLoop\Controllers\SurvLoopPDF;
-use SurvLoop\Controllers\Tree\TreeSurvBasicNav;
+use Survloop\Controllers\SurvloopPDF;
+use Survloop\Controllers\Tree\TreeSurvBasicNav;
 
 class TreeSurvReport extends TreeSurvBasicNav
 {
@@ -111,7 +111,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     protected function loadPdfByID()
     {
-        $this->v["pdf-gen"] = new SurvLoopPDF($GLOBALS["SL"]->coreTbl);
+        $this->v["pdf-gen"] = new SurvloopPDF($GLOBALS["SL"]->coreTbl);
         $this->v["pdf-file"] = $GLOBALS["SL"]->coreTbl . '-' 
             . $this->corePublicID . '-' . $GLOBALS["SL"]->pageView 
             . '-' . $GLOBALS["SL"]->dataPerms . '.pdf';
@@ -807,8 +807,8 @@ class TreeSurvReport extends TreeSurvBasicNav
                                 . $fldName . "', 'asc')->get();");
                         } else {
                             //eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) 
-                            //    . "::orderBy('" . $isBigSurvLoop[1] 
-                            //    . "', '" . $isBigSurvLoop[2] . "')->get();");
+                            //    . "::orderBy('" . $isBigSurvloop[1] 
+                            //    . "', '" . $isBigSurvloop[2] . "')->get();");
                         }
                         if ($rows->isNotEmpty()) {
                             if (isset($this->v["currNode"]->extraOpts["conds"]) 

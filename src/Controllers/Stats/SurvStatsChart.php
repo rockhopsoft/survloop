@@ -1,15 +1,15 @@
 <?php
 /**
-  * SurvLoopChart builds on SurvStats data set calculations to present the raw data in tables.
+  * SurvloopChart builds on SurvStats data set calculations to present the raw data in tables.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
-use SurvLoop\Controllers\Stats\SurvStats;
+use Survloop\Controllers\Stats\SurvStats;
 
 class SurvStatsChart extends SurvStats
 {

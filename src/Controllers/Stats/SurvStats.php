@@ -3,14 +3,14 @@
   * SurvStats is a standalone class used to make aggregate calculations on data sets.
   * 
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Stats;
+namespace Survloop\Controllers\Stats;
 
-use SurvLoop\Controllers\Stats\SurvStatsCache;
+use Survloop\Controllers\Stats\SurvStatsCache;
 
 class SurvStats extends SurvStatsCache
 {

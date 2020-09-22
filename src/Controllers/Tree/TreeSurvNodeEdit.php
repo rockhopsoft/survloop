@@ -1,14 +1,14 @@
 <?php
 /**
-  * TreeSurvNodeEdit is a mid-level class extending SurvLoop's core tree class
+  * TreeSurvNodeEdit is a mid-level class extending Survloop's core tree class
   * with the functions needed to save node edits using the original interface.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.12
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Cache;
@@ -23,7 +23,7 @@ use App\Models\SLConditions;
 use App\Models\SLDataLoop;
 use App\Models\SLConditionsNodes;
 use App\Models\SLEmails;
-use SurvLoop\Controllers\Tree\TreeSurvForm;
+use Survloop\Controllers\Tree\TreeSurvForm;
 
 class TreeSurvNodeEdit extends TreeSurvForm
 {   

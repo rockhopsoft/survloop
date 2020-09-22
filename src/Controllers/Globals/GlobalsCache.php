@@ -3,12 +3,12 @@
   * GlobalsCache is a mid-level class for optimizing content, 
   * mostly HTML, JS, and CSS.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use Illuminate\Support\Facades\Storage;
 use MatthiasMullie\Minify;

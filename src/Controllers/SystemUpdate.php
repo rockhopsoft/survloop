@@ -3,19 +3,19 @@
   * SystemUpdate runs scripts for system updates, 
   * but should be replaced by Laravel's migrations.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.5
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Admin\AdminController;
+use Survloop\Controllers\Admin\AdminController;
 
 class SystemUpdate extends AdminController
 {

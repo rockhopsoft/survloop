@@ -3,12 +3,12 @@
   * GlobalsTables is a mid-level class for loading and accessing system information from anywhere.
   * This level contains access to the database design, its tables, and field details.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use DB;
 use Auth;
@@ -27,7 +27,7 @@ use App\Models\SLDataLinks;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsArticles;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\TreeNodeSurv;
 
 class GlobalsTables extends GlobalsElements
 {
@@ -100,7 +100,7 @@ class GlobalsTables extends GlobalsElements
                 $this->sessTree = $this->treeRow->tree_id;
             }
         }
-        $this->sysOpts = [ "cust-abbr" => 'SurvLoop' ];
+        $this->sysOpts = [ "cust-abbr" => 'Survloop' ];
         return true;
     }
     
@@ -1770,7 +1770,7 @@ class GlobalsTables extends GlobalsElements
     
     public function initCoreTable($coreTbl, $userTbl = null)
     {
-        //if ($this->dbID == 3 && $this->sysOpts["cust-abbr"] != 'SurvLoop') return false;
+        //if ($this->dbID == 3 && $this->sysOpts["cust-abbr"] != 'Survloop') return false;
         if (!$coreTbl || !isset($coreTbl->tbl_id)) {
             return false;
         }
@@ -1843,7 +1843,7 @@ class GlobalsTables extends GlobalsElements
                     $fld->fld_key_type      = ',Foreign,';
                     $fld->fld_foreign_table = $userTbl->tbl_id;
                 }
-                // Options: Auto-Managed By SurvLoop; Internal Use not in XML
+                // Options: Auto-Managed By Survloop; Internal Use not in XML
                 $fld->fld_opts = 39;
                 $fld->save();
                 if ($this->chkTableExists($coreTbl, $userTbl)) {

@@ -3,12 +3,12 @@
   * AdminController is the main landing class routing to certain admin tools which 
   * requires a user to be logged in.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use Auth;
 use Cache;
@@ -24,10 +24,10 @@ use App\Models\SLNodeResponses;
 use App\Models\SLCaches;
 use App\Models\SLSess;
 use App\Models\SLNodeSaves;
-use SurvLoop\Controllers\SystemDefinitions;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Admin\NodeSaveSet;
-use SurvLoop\Controllers\Admin\AdminEmailController;
+use Survloop\Controllers\SystemDefinitions;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Admin\NodeSaveSet;
+use Survloop\Controllers\Admin\AdminEmailController;
 
 class AdminController extends AdminEmailController
 {

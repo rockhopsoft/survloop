@@ -1,13 +1,13 @@
 <?php
 
-namespace SurvLoop\Controllers\Notifications;
+namespace Survloop\Controllers\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class SurvLoopEmail extends Notification
+class SurvloopEmail extends Notification
 {
     use Queueable;
 

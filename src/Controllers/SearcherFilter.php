@@ -2,12 +2,12 @@
 /**
   * SearcherFilter manages a single filter's properties and custom functionality.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 

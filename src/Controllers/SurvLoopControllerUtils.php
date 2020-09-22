@@ -1,14 +1,14 @@
 <?php
 /**
-  * SurvLoopControllerUtils holds helper functions for the primary base class for SurvLoop, 
+  * SurvloopControllerUtils holds helper functions for the primary base class for Survloop, 
   * housing logging functions.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Auth;
 use Storage;
@@ -16,11 +16,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
-use SurvLoop\Controllers\Globals\GlobalsCache;
-use SurvLoop\Controllers\Globals\Globals;
+use Survloop\Controllers\Globals\GlobalsCache;
+use Survloop\Controllers\Globals\Globals;
 use Illuminate\Routing\Controller;
 
-class SurvLoopControllerUtils extends Controller
+class SurvloopControllerUtils extends Controller
 {
     public $isLoaded             = true;
     protected $custReport        = [];
@@ -51,7 +51,7 @@ class SurvLoopControllerUtils extends Controller
 
     
     /**
-     * Initialize the simplest SurvLoop variables which track page loads.
+     * Initialize the simplest Survloop variables which track page loads.
      *
      * @param  Illuminate\Http\Request  $request
      * @return boolean
@@ -118,7 +118,7 @@ class SurvLoopControllerUtils extends Controller
     
     /**
      * Initializing a bunch of things which are not [yet] automatically 
-     * set by the SurvLoop and its GUIs.
+     * set by the Survloop and its GUIs.
      *
      * @param  Illuminate\Http\Request  $request
      * @return boolean

@@ -12,7 +12,7 @@ https://creativecommons.org/licenses/by-sa/3.0/
 
 XML Example: {{ $GLOBALS['SL']->sysOpts['app-url'] }}/{{ $GLOBALS['SL']->treeRow->tree_slug }}-xml-example
 
-This XML was auto-generated from the SurvLoop open data engine,
+This XML was auto-generated from the Survloop open data engine,
 resources/views/survloop/admin/tree/xml-schema.blade.php
 -->
 

@@ -1,23 +1,23 @@
 <?php
 /**
-  * SurvLoopInstaller initiallizes a basic SurvLoop installation, after command line installation is complete.
+  * SurvloopInstaller initiallizes a basic Survloop installation, after command line installation is complete.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.7
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use DB;
 use Illuminate\Routing\Controller;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLDefinitions;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\SystemDefinitions;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\SystemDefinitions;
 
-class SurvLoopInstaller extends Controller
+class SurvloopInstaller extends Controller
 {
     
     public function checkSysInit()

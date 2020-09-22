@@ -3,14 +3,14 @@
   * GlobalsStatic is the mid-level core class for loading 
   * and accessing system information from anywhere.
   * This level contains mostly standalone functions 
-  * which are not really SurvLoop-specific.
+  * which are not really Survloop-specific.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Globals;
+namespace Survloop\Controllers\Globals;
 
 use Auth;
 use Illuminate\Http\Request;

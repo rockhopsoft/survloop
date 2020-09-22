@@ -1,8 +1,8 @@
 <?php
 /**
-  * routes-admin.php registers all the paths used in the SurvLoop admin area.
+  * routes-admin.php registers all the paths used in the Survloop admin area.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
@@ -60,26 +60,26 @@ Route::get( '/dashboard', [
 ]);
 
 Route::post('/user/{uname}', [
-    'uses'       => $path . 'SurvLoop@showProfile',
+    'uses'       => $path . 'Survloop@showProfile',
     'middleware' => 'auth'
 ]);
 Route::get( 
     '/user/{uname}', 
-    $path . 'SurvLoop@showProfile'
+    $path . 'Survloop@showProfile'
 );Route::post('/profile/{uname}', [
-    'uses'       => $path . 'SurvLoop@showProfile',
+    'uses'       => $path . 'Survloop@showProfile',
     'middleware' => 'auth'
 ]);
 Route::get( 
     '/profile/{uname}', 
-    $path . 'SurvLoop@showProfile'
+    $path . 'Survloop@showProfile'
 );
 Route::post('/my-profile', [
-    'uses'       => $path . 'SurvLoop@showMyProfile',
+    'uses'       => $path . 'Survloop@showMyProfile',
     'middleware' => 'auth'
 ]);
 Route::get( '/my-profile', [
-    'uses'       => $path . 'SurvLoop@showMyProfile',
+    'uses'       => $path . 'Survloop@showMyProfile',
     'middleware' => 'auth'
 ]);
 Route::post('/change-my-password', [
@@ -234,6 +234,6 @@ Route::get( '/dashboard/images/gallery', [
 
 
 Route::get( '/dashboard/systems-update', [
-    'uses'       => 'SurvLoop\Controllers\SystemUpdate@index', 
+    'uses'       => 'Survloop\Controllers\SystemUpdate@index', 
     'middleware' => ['auth']
 ]);

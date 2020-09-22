@@ -1,13 +1,13 @@
 <?php
 
-namespace SurvLoop\Controllers\Notifications;
+namespace Survloop\Controllers\Notifications;
 
 use Illuminate\Http\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use SurvLoop\Controllers\Globals\Globals;
+use Survloop\Controllers\Globals\Globals;
 
 class MailResetPasswordNotification extends Notification
 {

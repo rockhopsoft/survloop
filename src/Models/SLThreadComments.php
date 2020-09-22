@@ -20,6 +20,6 @@ class SLThreadComments extends Model
 		'thrd_cmttot_dislikes', 
     ];
     
-    // END SurvLoop auto-generated portion of Model
+    // END Survloop auto-generated portion of Model
     
 }

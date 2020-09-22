@@ -4,12 +4,12 @@
   * It is loaded with a set of all possible columns for data to include,
   * then columns are printed in sets of 3 or 4 per table.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.19
   */
-namespace SurvLoop\Controllers\Tree\Report;
+namespace Survloop\Controllers\Tree\Report;
 
 class ReportMonthly
 {

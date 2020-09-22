@@ -1,20 +1,20 @@
 <?php
 /**
-  * TreeNodeSurv extends a standard branching tree's node for SurvLoop's needs.
+  * TreeNodeSurv extends a standard branching tree's node for Survloop's needs.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLFields;
-use SurvLoop\Controllers\Tree\TreeNodeSurvVars;
+use Survloop\Controllers\Tree\TreeNodeSurvVars;
 
 class TreeNodeSurv extends TreeNodeSurvVars
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace SurvLoop\Controllers\Auth;
+namespace Survloop\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;

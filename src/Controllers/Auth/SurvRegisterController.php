@@ -2,12 +2,12 @@
 /**
   * SurvRegisterController customizes new user registration.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
-namespace SurvLoop\Controllers\Auth;
+namespace Survloop\Controllers\Auth;
 
 use Auth;
 use Illuminate\Http\Request;

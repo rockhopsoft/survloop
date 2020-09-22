@@ -3,12 +3,12 @@
   * NodeSaveSet is a helper class which preps 
   * sets of node saves for debugging purposes.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.18
   */
-namespace SurvLoop\Controllers\Admin;
+namespace Survloop\Controllers\Admin;
 
 use App\Models\SLSess;
 use App\Models\SLNodeSaves;

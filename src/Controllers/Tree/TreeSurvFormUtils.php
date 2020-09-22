@@ -3,17 +3,17 @@
   * TreeSurvFormUtils is a mid-level class using a standard branching tree, which provides
   * lots of smaller functions used by the form generation processes (in TreeSurvForm).
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\SLNodeResponses;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeSurvFormLoops;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeSurvFormLoops;
 
 class TreeSurvFormUtils extends TreeSurvFormLoops
 {

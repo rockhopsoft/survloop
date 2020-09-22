@@ -1,24 +1,24 @@
 <?php
 /**
   * TreeSurvLoad is a mid-level class using a standard branching tree, 
-  * mostly for SurvLoop's surveys and pages.
+  * mostly for Survloop's surveys and pages.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
 use DB;
 use Storage;
 use Illuminate\Http\Request;
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
-use SurvLoop\Controllers\Tree\TreeNodeSurv;
-use SurvLoop\Controllers\Tree\SurvData;
-use SurvLoop\Controllers\Globals\Globals;
-use SurvLoop\Controllers\Tree\TreeSurvConds;
+use Survloop\Controllers\Tree\TreeNodeSurv;
+use Survloop\Controllers\Tree\SurvData;
+use Survloop\Controllers\Globals\Globals;
+use Survloop\Controllers\Tree\TreeSurvConds;
 
 class TreeSurvLoad extends TreeSurvConds
 {
@@ -37,7 +37,7 @@ class TreeSurvLoad extends TreeSurvConds
     protected $isReport      = false;
 
     // table name, and sort field, if this is tree one big loop
-    protected $isBigSurvLoop = ['', '', ''];
+    protected $isBigSurvloop = ['', '', ''];
     
     public $xmlMapTree       = false;
     
@@ -142,7 +142,7 @@ class TreeSurvLoad extends TreeSurvConds
             eval($content);
         } else {
             $cache = '// Auto-generated loading cache from '
-                . '/SurvLoop/Controllers/TreeSurv.php' . "\n\n";
+                . '/Survloop/Controllers/TreeSurv.php' . "\n\n";
             $this->pageCnt = 0;
             $this->kidMaps = $nodeIDs = [];
             if (isset($GLOBALS["SL"]->treeRow->tree_opts)) {
@@ -199,7 +199,7 @@ class TreeSurvLoad extends TreeSurvConds
             $loop = $GLOBALS["SL"]->dataLoops[$row->node_default];
             if (isset($loop->data_loop_table)) {
                 $tbl = $loop->data_loop_table;
-                $cache .= '$'.'this->isBigSurvLoop = [\'' . $tbl . '\', \'';
+                $cache .= '$'.'this->isBigSurvloop = [\'' . $tbl . '\', \'';
                 if (trim($row->node_default) != '') {
                     $cache .= $row->node_default . '\', \'asc\'];' . "\n";
                 } else {
@@ -227,7 +227,7 @@ class TreeSurvLoad extends TreeSurvConds
         }
         if ($includeNode) {
             $cacheNode = '$'.'this->allNodes[' . $row->node_id . '] = '
-                . 'new SurvLoop\Controllers\Tree\TreeNodeSurv(' 
+                . 'new Survloop\Controllers\Tree\TreeNodeSurv(' 
                     . $row->node_id . ', [], ['
                     . '"pID" => '      . intVal($row->node_parent_id)        . ', '
                     . '"pOrd" => '     . intVal($row->node_parent_order)     . ', '
@@ -538,7 +538,7 @@ class TreeSurvLoad extends TreeSurvConds
             $coreTbl, 
             $this->coreID, 
             $this->checkboxNodes, 
-            $this->isBigSurvLoop
+            $this->isBigSurvloop
         );
         $this->loadExtra();
         $this->setPublicID();

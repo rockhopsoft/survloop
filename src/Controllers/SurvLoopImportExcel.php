@@ -1,13 +1,13 @@
 <?php
 /**
-  * SurvLoopImportExcel is a class which aid imports from Excel.
+  * SurvloopImportExcel is a class which aid imports from Excel.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.18
   */
-namespace SurvLoop\Controllers;
+namespace Survloop\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -20,7 +20,7 @@ use Maatwebsite\Excel\Concerns\Importable;
 use App\Models\SLFields;
 use App\Models\SLTables;
 
-class SurvLoopImportExcel
+class SurvloopImportExcel
 {
     protected $folder     = 'api/excel/';
     protected $file       = 'tmp.xls';

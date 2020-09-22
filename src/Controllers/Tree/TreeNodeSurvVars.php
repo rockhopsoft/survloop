@@ -1,16 +1,16 @@
 <?php
 /**
   * TreeNodeSurvVars preps for TreeNodeSurv to extend a 
-  * standard branching tree's node for SurvLoop's needs.
+  * standard branching tree's node for Survloop's needs.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeNodeCore;
+use Survloop\Controllers\Tree\TreeNodeCore;
 
 class TreeNodeSurvVars extends TreeNodeCore
 {

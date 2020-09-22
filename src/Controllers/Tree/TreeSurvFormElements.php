@@ -3,14 +3,14 @@
   * TreeSurvFormElements is a mid-level class in the branching tree, which provides
   * less complicated elements used during output generation.
   *
-  * SurvLoop - All Our Data Are Belong
+  * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace SurvLoop\Controllers\Tree;
+namespace Survloop\Controllers\Tree;
 
-use SurvLoop\Controllers\Tree\TreeSurvFormUtils;
+use Survloop\Controllers\Tree\TreeSurvFormUtils;
 
 class TreeSurvFormElements extends TreeSurvFormUtils
 {

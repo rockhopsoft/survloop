@@ -11,8 +11,8 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 use App\Models\SLDefinitions;
 use App\Models\SLUsersRoles;
-use SurvLoop\Controllers\DatabaseLookups;
-use SurvLoop\Controllers\Notifications\CustomResetPasswordNotification;
+use Survloop\Controllers\DatabaseLookups;
+use Survloop\Controllers\Notifications\CustomResetPasswordNotification;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,
@@ -110,14 +110,14 @@ class User extends Model implements AuthenticatableContract,
     
     
     /**
-     * The information of all possible SurvLoop Roles.
+     * The information of all possible Survloop Roles.
      *
      * @var array
      */
     public $roles = [];
     
     /**
-     * The names of SurvLoop Roles held by this user.
+     * The names of Survloop Roles held by this user.
      *
      * @var array
      */
