@@ -24,20 +24,28 @@
 * Survloop-Generated PHP Eloquent Data Table Models ~ 176 KB
 * Survloop-Generated PHP Laravel Database Migration & Seeders ~ 274 KB
 
-Survloop is a Laravel-based engine for websites dominated by the collection and publication of open data. 
-This is a database design and survey generation system, though it will increasingly be a flexible tool to solve many 
-web-based problems.
+Survloop is a Laravel-based engine for websites 
+dominated by the collection and publication of open data. 
+This is a database design and survey generation system, 
+though it will increasingly be a flexible tool 
+to solve many web-based problems.
 
-It is currently in continued, heavy development, with much happening here in early 2019, almost ready to go live. 
-I plan to provide more documentation in the coming weeks. Thank you for your interest and patience!
+It is currently in continued, heavy development, with 
+much happening here in 2020, almost ready to go live. 
+I plan to provide more documentation in the coming weeks. 
+Thank you for your interest and patience!
 
 This software was originally developed to build the 
-<a href="https://github.com/flexyourrights/openpolice" target="_blank">Open Police</a> system. 
-It began as an internal tool to design our database, then prototype survey generation. Then it was adapted to the 
-Laravel framework, and has continued to grow towards a content-management system for data-focused websites.
+<a href="https://github.com/flexyourrights/openpolice" 
+    target="_blank">Open Police</a> 
+system. It began as an internal tool to design our database, 
+then prototype survey generation. Then it was adapted to the 
+Laravel framework, and has continued to grow towards a 
+content-management system for data-focused websites.
 
-The upcoming Open Police web app is the best live <b>beta demo</b> of the engine's end results, 
-and feedback on that project and the Survloop user experience can be  via the end of the submission process:<br />
+The upcoming Open Police web app is the best live install 
+of the engine, and feedback on that project and the Survloop 
+user experience can be via the end of the submission process:<br />
 <a href="https://openpolice.org/filing-your-police-complaint" target="_blank">https://openpolice.org/filing-your-police-complaint</a><br />
 The resulting database designed using the engine, as well as the branching tree which specifies the user's experience: 
 <a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a><br />
@@ -48,19 +56,25 @@ XML included an automatically generated schema, eg.<br />
 <a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
 <a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
 
-Other projects running Survloop: <a href="https://powerscore.resourceinnovation.org/start/calculator" target="_blank">
-Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>), and
-<a href="https://drugstory.me" target="_blank">Drug Story</a> (less active).
+Other projects running Survloop: 
+<a href="https://powerscore.resourceinnovation.org/go-pro" 
+    target="_blank">Cannabis PowerScore</a> 
+(<a href="https://github.com/resourceinnovation/cannabisscore" 
+    target="_blank">GitHub</a>).
 
-The installation used for Survloop.org is currently the best example of a bare-bones extenstion of Survloop:<br />
-<a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
+The installation used for Survloop.org is currently the 
+best example of a bare-bones extenstion of Survloop:<br />
+<a href="https://github.com/rockhopsoft/survlooporg" 
+    target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
 # <a name="requirements"></a>Requirements
 
 * php: >=7.4
-* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.0.*
-* <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
+* <a href="https://packagist.org/packages/laravel/laravel" 
+    target="_blank">laravel/laravel</a>: 8.0.*
+* <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" 
+    target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
 
 # <a name="getting-started"></a>Getting Started
 
@@ -102,7 +116,7 @@ $ nano composer.json
 ...
 "require": {
     ...
-    "rockhopsoft/survloop": "^0.2.20",
+    "rockhopsoft/survloop": "v0.2.*",
     ...
 },
 ...
@@ -118,7 +132,7 @@ $ nano composer.json
 
 After saving the file, run the update to download OpenPolice, and any missing dependencies.
 ```
-$ composer update
+$ composer install
 ```
 
 Add the package to your application service providers in `config/app.php`.

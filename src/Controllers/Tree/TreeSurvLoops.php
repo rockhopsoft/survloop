@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvloops is a mid-level class used for logic related to survey loops.
+  * TreeSurvLoops is a mid-level class used for logic related to survey loops.
   *
   * Survloop - All Our Data Are Belong
   * @package  rockhopsoft/survloop
@@ -21,7 +21,7 @@ use Survloop\Controllers\Tree\TreeNodeSurv;
 use Survloop\Controllers\Globals\Globals;
 use Survloop\Controllers\Tree\TreeSurvReport;
 
-class TreeSurvloops extends TreeSurvReport
+class TreeSurvLoops extends TreeSurvReport
 {
     
     protected function newLoopItem($nID = -3)

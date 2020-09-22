@@ -35,7 +35,8 @@ class Survloop extends SurvCustLoop
      */
     public function mainSub(Request $request, $type = '', $val = '')
     {
-        if ($request->has('step') && $request->has('tree') 
+        if ($request->has('step') 
+            && $request->has('tree') 
             && intVal($request->get('tree')) > 0) {
             $this->loadTreeByID($request, $request->tree);
         }

@@ -21,9 +21,9 @@ use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use Survloop\Controllers\Globals\Globals;
 use Survloop\Controllers\Tree\TreeNodeSurv;
-use Survloop\Controllers\Tree\TreeSurvloops;
+use Survloop\Controllers\Tree\TreeSurvLoops;
 
-class TreeSurv extends TreeSurvloops
+class TreeSurv extends TreeSurvLoops
 {
     /**
      * Top-level of the algorithm which traverses the branching tree
