@@ -10,7 +10,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use Auth;
 use Illuminate\Http\Request;

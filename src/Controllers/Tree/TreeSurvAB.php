@@ -7,9 +7,9 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
-use Survloop\Controllers\Tree\TreeSurvLoad;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvLoad;
 
 class TreeSurvAB extends TreeSurvLoad
 {

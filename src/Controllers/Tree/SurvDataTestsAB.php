@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.3
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 class SurvDataTestsAB
 {

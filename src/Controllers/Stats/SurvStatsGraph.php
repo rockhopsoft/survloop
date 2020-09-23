@@ -7,9 +7,9 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Stats;
+namespace RockHopSoft\Survloop\Controllers\Stats;
 
-use Survloop\Controllers\Stats\SurvStatsChart;
+use RockHopSoft\Survloop\Controllers\Stats\SurvStatsChart;
 
 class SurvStatsGraph extends SurvStatsChart
 {

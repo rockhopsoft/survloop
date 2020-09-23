@@ -7,7 +7,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use DB;
 use App\Models\SLNode;

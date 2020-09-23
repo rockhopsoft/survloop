@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use DB;
 use Auth;
@@ -27,7 +27,7 @@ use App\Models\SLDataLinks;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsArticles;
-use Survloop\Controllers\Tree\TreeNodeSurv;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv;
 
 class GlobalsTables extends GlobalsElements
 {

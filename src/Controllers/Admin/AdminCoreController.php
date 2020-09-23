@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.2.5
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\SLEmails;
@@ -15,10 +15,10 @@ use App\Models\SLContact;
 use App\Models\SLTree;
 use App\Models\SLTables;
 use App\Models\User;
-use Survloop\Controllers\PageLoadUtils;
-use Survloop\Controllers\Admin\AdminMenu;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\SurvloopController;
+use RockHopSoft\Survloop\Controllers\PageLoadUtils;
+use RockHopSoft\Survloop\Controllers\Admin\AdminMenu;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SurvloopController;
 
 class AdminCoreController extends SurvloopController
 {

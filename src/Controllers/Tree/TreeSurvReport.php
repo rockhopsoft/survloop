@@ -7,14 +7,14 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.19
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\SLSessEmojis;
 use App\Models\SLTree;
-use Survloop\Controllers\SurvloopPDF;
-use Survloop\Controllers\Tree\TreeSurvBasicNav;
+use RockHopSoft\Survloop\Controllers\SurvloopPDF;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvBasicNav;
 
 class TreeSurvReport extends TreeSurvBasicNav
 {
@@ -706,12 +706,16 @@ class TreeSurvReport extends TreeSurvBasicNav
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-example';
         $this->survLoopInit($request, $page);
         $coreID = 1;
-        $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
-        $optTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
+        $optTree = $optXmlTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
+        if (isset($GLOBALS["SL"]->xmlTree["id"])) {
+            $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
+        }
         if (isset($GLOBALS["SL"]->sysOpts[$optTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optTree]);
         }
-        if ($coreID <= 0 && isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
+        if ($coreID <= 0 
+            && $optXmlTree != $optTree
+            && isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
         }
         $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]);

@@ -2,7 +2,7 @@
 namespace Survloop\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Survloop\Controllers\Tree\TreeNode;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNode;
 
 class TreeNodeTest extends TestCase
 {

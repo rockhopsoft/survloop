@@ -8,7 +8,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.12
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use DB;
 use Cache;
@@ -23,7 +23,7 @@ use App\Models\SLConditions;
 use App\Models\SLDataLoop;
 use App\Models\SLConditionsNodes;
 use App\Models\SLEmails;
-use Survloop\Controllers\Tree\TreeSurvForm;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvForm;
 
 class TreeSurvNodeEdit extends TreeSurvForm
 {   

@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -20,8 +20,8 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
 use App\Models\SLSess;
-use Survloop\Controllers\Globals\GlobalsCache;
-use Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Globals\GlobalsCache;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 
 class PageLoadUtils extends Controller
 {

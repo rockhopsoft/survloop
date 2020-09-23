@@ -7,15 +7,15 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.7
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use DB;
 use Illuminate\Routing\Controller;
 use App\Models\SLTree;
 use App\Models\SLNode;
 use App\Models\SLDefinitions;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\SystemDefinitions;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SystemDefinitions;
 
 class SurvloopInstaller extends Controller
 {

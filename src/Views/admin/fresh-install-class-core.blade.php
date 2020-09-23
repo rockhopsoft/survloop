@@ -2,7 +2,7 @@
 
 namespace {{ $abbr }}\Controllers;
 
-use Survloop\Controllers\Tree\TreeSurvForm;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvForm;
 
 class {{ $abbr }} extends TreeSurvForm
 {

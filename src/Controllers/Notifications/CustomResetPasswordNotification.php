@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Mail;
-use Survloop\Controllers\SurvloopController;
-use Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SurvloopController;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 
 class CustomResetPasswordNotification extends Notification
 {

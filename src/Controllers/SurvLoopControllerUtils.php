@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.18
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use Auth;
 use Storage;
@@ -16,8 +16,8 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
-use Survloop\Controllers\Globals\GlobalsCache;
-use Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Globals\GlobalsCache;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 use Illuminate\Routing\Controller;
 
 class SurvloopControllerUtils extends Controller
@@ -91,7 +91,8 @@ class SurvloopControllerUtils extends Controller
     {
         return (isset($this->v["uID"]) 
             && $this->v["uID"] > 0
-            && ($this->v["isAdmin"] || $this->v["isStaff"]));
+            && ((isset($this->v["isAdmin"]) && $this->v["isAdmin"])
+                || (isset($this->v["isStaff"]) && $this->v["isStaff"])));
     }
 
     protected function chkHasTreeOne($dbID = 1)
@@ -113,7 +114,11 @@ class SurvloopControllerUtils extends Controller
     
     public function getCurrPage()
     {
-        return ((isset($this->v["currPage"][0])) ? $this->v["currPage"][0] : '/');
+        $ret = '/';
+        if (isset($this->v["currPage"][0])) {
+            $ret = $this->v["currPage"][0];
+        }
+        return $ret;
     }
     
     /**
@@ -168,8 +173,9 @@ class SurvloopControllerUtils extends Controller
         if ($baseOverride != '') {
             $this->cacheKey = $baseOverride;
         }
-        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID . '.tree'
-            . $GLOBALS["SL"]->treeID . '.' . $this->getHighestGroupLabel();
+        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID 
+            . '.tree' . $GLOBALS["SL"]->treeID 
+            . '.' . $this->getHighestGroupLabel();
         if ($this->v["isPrint"]) {
             $this->cacheKey .= '.print';
         }

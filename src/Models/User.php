@@ -11,8 +11,8 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
 use App\Models\SLDefinitions;
 use App\Models\SLUsersRoles;
-use Survloop\Controllers\DatabaseLookups;
-use Survloop\Controllers\Notifications\CustomResetPasswordNotification;
+use RockHopSoft\Survloop\Controllers\DatabaseLookups;
+use RockHopSoft\Survloop\Controllers\Notifications\CustomResetPasswordNotification;
 
 class User extends Model implements AuthenticatableContract,
                                     AuthorizableContract,

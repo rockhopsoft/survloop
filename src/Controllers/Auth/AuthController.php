@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since 0.0
   */
-namespace Survloop\Controllers\Auth;
+namespace RockHopSoft\Survloop\Controllers\Auth;
 
 use Auth;
 use Validator;
@@ -22,9 +22,9 @@ use App\Models\SLNode;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use App\Models\SLDefinitions;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\SurvloopController;
-use Survloop\Controllers\Survloop;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SurvloopController;
+use RockHopSoft\Survloop\Controllers\Survloop;
 
 class AuthController extends Controller
 {

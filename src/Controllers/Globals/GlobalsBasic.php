@@ -9,12 +9,12 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use DB;
 use App\Models\SLFields;
 use App\Models\SLTables;
-use Survloop\Controllers\Globals\GlobalsVars;
+use RockHopSoft\Survloop\Controllers\Globals\GlobalsVars;
 
 class GlobalsBasic extends GlobalsVars
 {

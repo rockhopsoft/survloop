@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.9
   */
-namespace Survloop\Controllers\Auth;
+namespace RockHopSoft\Survloop\Controllers\Auth;
 
 use App\User;
 use Illuminate\Http\Request;

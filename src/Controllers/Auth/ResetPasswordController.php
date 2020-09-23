@@ -1,6 +1,6 @@
 <?php
 
-namespace Survloop\Controllers\Auth;
+namespace RockHopSoft\Survloop\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;

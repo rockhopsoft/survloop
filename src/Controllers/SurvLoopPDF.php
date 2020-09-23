@@ -7,15 +7,15 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.17
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use App;
+use Mpdf\Mpdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\Models\SLDefinitions;
-
-use Mpdf\Mpdf;
+use RockHopSoft\Survloop\Controllers\SurvloopOutputPDF;
 
 class SurvloopPDF
 {
@@ -217,17 +217,5 @@ class SurvloopPDF
         $this->output->fileDeliver = $fileDeliver;
         return $this->output;
     }
-
-}
-
-class SurvloopOutputPDF
-{
-    public $fileStore   = '';
-    public $fileDeliver = '';
-
-    public $dpi         = 100; 
-    public $quality     = 'screen'; 
-    // 'screen' is smallest, "ebook" is medium, "prepress" is HQ
-    // "printer" might be worth trying
 
 }

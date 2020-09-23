@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use Auth;
 use Cache;
@@ -24,10 +24,10 @@ use App\Models\SLNodeResponses;
 use App\Models\SLCaches;
 use App\Models\SLSess;
 use App\Models\SLNodeSaves;
-use Survloop\Controllers\SystemDefinitions;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\Admin\NodeSaveSet;
-use Survloop\Controllers\Admin\AdminEmailController;
+use RockHopSoft\Survloop\Controllers\SystemDefinitions;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Admin\NodeSaveSet;
+use RockHopSoft\Survloop\Controllers\Admin\AdminEmailController;
 
 class AdminController extends AdminEmailController
 {

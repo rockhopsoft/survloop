@@ -16,13 +16,13 @@
 
 
 # <a name="about"></a>About
-
-* PHP Controllers ~ 1.25 MB (on disk)
-* Blade HTML Template Views ~ 1.31 MB 
-* Javascript/jQuery within Blade Templates ~ 147 KB
-* CSS within Blade Templates ~ 139 KB
-* Survloop-Generated PHP Eloquent Data Table Models ~ 176 KB
-* Survloop-Generated PHP Laravel Database Migration & Seeders ~ 274 KB
+Code bytes measured as stored on Mac disk:
+* PHP Controllers ~ 1.8MB (43%)
+* Blade HTML Template Views ~ 1.56MB (37%)
+* Javascript/jQuery within Blade Templates ~ 197KB (4%)
+* CSS within Blade Templates ~ 147KB (3%)
+* Survloop-Generated PHP Eloquent Data Table Models ~ 221KB (5%)
+* Survloop-Generated PHP Laravel Database Migration & Seeders ~ 291KB (7%)
 
 Survloop is a Laravel-based engine for websites 
 dominated by the collection and publication of open data. 

@@ -8,11 +8,11 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.19
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use Auth;
 use Illuminate\Http\Request;
-use Survloop\Controllers\PageLoadUtils;
+use RockHopSoft\Survloop\Controllers\PageLoadUtils;
 
 class SurvCustLoop extends PageLoadUtils
 {

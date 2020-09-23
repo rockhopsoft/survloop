@@ -8,9 +8,9 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
-use Survloop\Controllers\Tree\TreeNodeCore;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeCore;
 
 class TreeNodeSurvVars extends TreeNodeCore
 {

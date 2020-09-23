@@ -7,14 +7,14 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since  v0.2.5
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\SLEmails;
 use App\Models\SLEmailed;
 use App\Models\SLContact;
 use App\Models\User;
-use Survloop\Controllers\Admin\AdminCoreController;
+use RockHopSoft\Survloop\Controllers\Admin\AdminCoreController;
 
 class AdminEmailController extends AdminCoreController
 {

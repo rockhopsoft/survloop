@@ -7,10 +7,10 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.24
   */
-namespace Survloop\Controllers\Stats;
+namespace RockHopSoft\Survloop\Controllers\Stats;
 
-use Survloop\Controllers\SystemDefinitions;
-use Survloop\Controllers\Stats\SurvStatsCore;
+use RockHopSoft\Survloop\Controllers\SystemDefinitions;
+use RockHopSoft\Survloop\Controllers\Stats\SurvStatsCore;
 
 class SurvTrends extends SurvStatsCore
 {

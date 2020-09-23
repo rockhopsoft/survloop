@@ -7,7 +7,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use DB;
 use Auth;
@@ -18,8 +18,8 @@ use App\Models\SLNode;
 use App\Models\SLSess;
 use App\Models\SLSessLoops;
 use App\Models\SLTokens;
-use Survloop\Controllers\Tree\SurvData;
-use Survloop\Controllers\Tree\TreeCore;
+use RockHopSoft\Survloop\Controllers\Tree\SurvData;
+use RockHopSoft\Survloop\Controllers\Tree\TreeCore;
 
 class TreeCoreSess extends TreeCore
 {

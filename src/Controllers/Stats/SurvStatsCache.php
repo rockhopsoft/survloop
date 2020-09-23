@@ -7,9 +7,9 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Stats;
+namespace RockHopSoft\Survloop\Controllers\Stats;
 
-use Survloop\Controllers\Stats\SurvStatsFilts;
+use RockHopSoft\Survloop\Controllers\Stats\SurvStatsFilts;
 
 class SurvStatsCache extends SurvStatsFilts
 {

@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use DB;
 use Auth;
@@ -20,8 +20,8 @@ use App\Models\SLTables;
 use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
-use Survloop\Controllers\SurvloopImportExcel;
-use Survloop\Controllers\Admin\AdminDBController;
+use RockHopSoft\Survloop\Controllers\SurvloopImportExcel;
+use RockHopSoft\Survloop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
 {

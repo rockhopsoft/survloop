@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.6
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use App\Models\SLNodeSaves;
 

@@ -7,7 +7,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use Auth;
 use Storage;
@@ -16,7 +16,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLTree;
 use App\Models\SLSess;
-use Survloop\Controllers\Tree\TreeSurvInput;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvInput;
 
 class UserProfile extends TreeSurvInput
 {

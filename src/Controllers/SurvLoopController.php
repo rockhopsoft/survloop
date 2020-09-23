@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -24,9 +24,9 @@ use App\Models\SLTables;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
-use Survloop\Controllers\SurvloopInstaller;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\SurvloopControllerUtils;
+use RockHopSoft\Survloop\Controllers\SurvloopInstaller;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SurvloopControllerUtils;
 
 class SurvloopController extends SurvloopControllerUtils
 {

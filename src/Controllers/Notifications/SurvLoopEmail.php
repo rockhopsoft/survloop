@@ -28,7 +28,6 @@ class SurvloopEmail extends Notification
         $this->subj    = $subj;
         $this->content = $content;
         $this->emaTo   = $emaTo;
-
     }
 
     /**
@@ -50,6 +49,7 @@ class SurvloopEmail extends Notification
      */
     public function toMail($notifiable)
     {
+        /*
         return (new MailMessage)
             ->to($this->emaTo[0][0])
             ->view(
@@ -64,6 +64,7 @@ class SurvloopEmail extends Notification
                     ->line('The introduction to the notification.')
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
+        */
     }
 
     /**

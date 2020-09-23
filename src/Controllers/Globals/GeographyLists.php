@@ -7,7 +7,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 class GeographyLists
 {

@@ -7,13 +7,13 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\SLTree;
 use App\Models\SLNode;
-use Survloop\Controllers\Tree\TreeNodeCore;
-use Survloop\Controllers\SurvloopController;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeCore;
+use RockHopSoft\Survloop\Controllers\SurvloopController;
 
 class TreeCore extends SurvloopController
 {

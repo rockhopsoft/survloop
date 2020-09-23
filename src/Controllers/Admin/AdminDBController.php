@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use DB;
 use Auth;
@@ -24,9 +24,9 @@ use App\Models\SLBusRules;
 use App\Models\SLLogActions;
 use App\Models\SLDatabases;
 
-use Survloop\Controllers\Tree\SurvData;
-use Survloop\Controllers\Globals\Globals;
-use Survloop\Controllers\Admin\AdminController;
+use RockHopSoft\Survloop\Controllers\Tree\SurvData;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 
 class AdminDBController extends AdminController
 {

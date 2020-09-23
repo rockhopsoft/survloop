@@ -7,11 +7,11 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SLDefinitions;
-use Survloop\Controllers\SystemDefinitionsInit;
+use RockHopSoft\Survloop\Controllers\SystemDefinitionsInit;
 
 class SystemDefinitions extends SystemDefinitionsInit
 {

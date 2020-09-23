@@ -8,11 +8,11 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\SLTree;
-use Survloop\Controllers\Tree\TreeSurvDataPrint;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvDataPrint;
 
 class TreeSurvFormWidgets extends TreeSurvDataPrint
 {

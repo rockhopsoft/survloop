@@ -8,13 +8,13 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use App\Models\User;
 use App\Models\SLNode;
 use App\Models\SLEmails;
 use Illuminate\Http\Request;
-use Survloop\Controllers\Tree\TreeSurvUpload;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvUpload;
 
 class TreeSurvInputWidgets extends TreeSurvUpload
 {

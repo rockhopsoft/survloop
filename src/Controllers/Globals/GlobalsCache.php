@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use Illuminate\Support\Facades\Storage;
 use MatthiasMullie\Minify;
@@ -472,7 +472,11 @@ class GlobalsCache extends GlobalsBasic
 
     public function getCachePageCss($filename = '')
     {
-        return trim(Storage::get($this->cachePath . '/css/' . $filename));
+        $fullPath = '../storage/app/' . $this->cachePath;
+        if (file_exists($fullPath . '/css/' . $filename)) {
+            return trim(Storage::get($this->cachePath . '/css/' . $filename));
+        }
+        return '/* ' . $filename . ' not found */';
     }
 
     public function clearOldDynascript($minAge = 0)

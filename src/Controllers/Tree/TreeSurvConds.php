@@ -7,11 +7,11 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use App\Models\SLConditions;
 use App\Models\SLConditionsArticles;
-use Survloop\Controllers\Tree\TreeSurvCustomAPI;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvCustomAPI;
 
 class TreeSurvConds extends TreeSurvCustomAPI
 {

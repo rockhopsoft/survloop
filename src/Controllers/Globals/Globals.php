@@ -8,7 +8,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use DB;
 use Auth;
@@ -31,8 +31,8 @@ use App\Models\SLSessSite;
 use App\Models\SLSessPage;
 use App\Models\SLEmails;
 use App\Models\SLSearchRecDump;
-use Survloop\Controllers\SurvloopImages;
-use Survloop\Controllers\Tree\TreeNodeSurv;
+use RockHopSoft\Survloop\Controllers\SurvloopImages;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv;
 
 class Globals extends GlobalsImportExport
 {

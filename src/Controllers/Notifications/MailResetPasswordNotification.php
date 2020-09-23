@@ -7,7 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 
 class MailResetPasswordNotification extends Notification
 {

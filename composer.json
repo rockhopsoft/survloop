@@ -41,20 +41,37 @@
         "mpdf/mpdf": "v8.0.7",
         "maatwebsite/excel": "^3.1.21",
         "summernote/summernote": "v0.8.8",
-        "rockhopsoft/survloop-libraries": "dev-master"
+        "rockhopsoft/survloop-libraries": "^0.2"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.3"
     },
     "autoload": {
         "psr-4": {
-            "Survloop\\": "src/"
+            "RockHopSoft\\Survloop\\": "src"
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "RockHopSoft\\Survloop\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Survloop\\SurvloopServiceProvider"
+                "RockHopSoft\\Survloop\\SurvloopServiceProvider"
             ],
             "aliases": {
-                "Survloop": "Survloop\\SurvloopFacade"
+                "Survloop": "RockHopSoft\\Survloop\\SurvloopFacade"
             }
         }
     }

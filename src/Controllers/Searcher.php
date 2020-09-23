@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use DB;
 use Auth;
@@ -15,7 +15,7 @@ use Session;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLSearchRecDump;
-use Survloop\Controllers\SurvCustLoop;
+use RockHopSoft\Survloop\Controllers\SurvCustLoop;
 
 class Searcher extends SurvCustLoop
 {

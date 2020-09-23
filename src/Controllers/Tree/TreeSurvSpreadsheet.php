@@ -8,9 +8,9 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
-use Survloop\Controllers\Tree\TreeSurvFormCheckboxes;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvFormCheckboxes;
 
 class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
 {

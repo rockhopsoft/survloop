@@ -4,7 +4,7 @@ namespace {{ $abbr }}\Controllers;
 
 use Illuminate\Http\Request;
 
-use Survloop\Controllers\Admin\AdminController;
+use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 
 class {{ $abbr }}Admin extends AdminController
 {

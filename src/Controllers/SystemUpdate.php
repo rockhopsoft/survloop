@@ -8,14 +8,14 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.5
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use DB;
 use Auth;
 use Illuminate\Http\Request;
 use App\Models\SLTree;
 use App\Models\SLDefinitions;
-use Survloop\Controllers\Admin\AdminController;
+use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 
 class SystemUpdate extends AdminController
 {

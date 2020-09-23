@@ -9,7 +9,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.19
   */
-namespace Survloop\Controllers\Tree\Report;
+namespace RockHopSoft\Survloop\Controllers\Tree\Report;
 
 class ReportMonthly
 {

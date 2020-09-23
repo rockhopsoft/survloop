@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.9
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 use Cache;
 use Illuminate\Http\Request;
@@ -16,7 +16,7 @@ use Illuminate\Routing\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
 use App\Models\User;
 use App\Models\SLDefinitions;
-use Survloop\Controllers\Globals\GlobalsCache;
+use RockHopSoft\Survloop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
 {

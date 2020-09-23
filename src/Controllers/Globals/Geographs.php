@@ -8,7 +8,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.7
   */
-namespace Survloop\Controllers\Globals;
+namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use App\Models\SLAddyGeo;
 

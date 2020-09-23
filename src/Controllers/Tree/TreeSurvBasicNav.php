@@ -8,13 +8,13 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.19
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use DB;
 use App\Models\SLNode;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSessLoops;
-use Survloop\Controllers\Tree\TreeSurvProgBar;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvProgBar;
 
 class TreeSurvBasicNav extends TreeSurvProgBar
 {

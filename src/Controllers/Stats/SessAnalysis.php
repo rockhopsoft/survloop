@@ -7,7 +7,7 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.25
   */
-namespace Survloop\Controllers\Stats;
+namespace RockHopSoft\Survloop\Controllers\Stats;
 
 use DB;
 use App\Models\SLTree;
@@ -15,7 +15,7 @@ use App\Models\SLNode;
 use App\Models\SLNodeSaves;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSess;
-use Survloop\Controllers\Tree\TreeNodeSurv;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv;
 
 class SessAnalysis
 {

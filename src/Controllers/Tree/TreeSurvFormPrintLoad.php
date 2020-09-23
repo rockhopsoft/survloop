@@ -8,9 +8,9 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.13
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
-use Survloop\Controllers\Tree\TreeSurvFormWidgets;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvFormWidgets;
 
 class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
 {

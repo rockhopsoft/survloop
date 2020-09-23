@@ -7,7 +7,7 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.2.5
   */
-namespace Survloop\Controllers;
+namespace RockHopSoft\Survloop\Controllers;
 
 class SystemDefinitionsInit
 {   

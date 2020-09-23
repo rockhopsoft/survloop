@@ -7,14 +7,14 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.18
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use App\Models\SLNode;
 use App\Models\SLNodeResponses;
 use App\Models\SLConditions;
 use App\Models\SLConditionsNodes;
 use App\Models\SLFields;
-use Survloop\Controllers\Tree\TreeNodeSurvVars;
+use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurvVars;
 
 class TreeNodeSurv extends TreeNodeSurvVars
 {

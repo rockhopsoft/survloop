@@ -8,12 +8,12 @@
   * @author   Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.1.2
   */
-namespace Survloop\Controllers\Tree;
+namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SLTree;
-use Survloop\Controllers\Tree\UserProfile;
+use RockHopSoft\Survloop\Controllers\Tree\UserProfile;
 
 class TreeSurvFormVarieties extends UserProfile
 {

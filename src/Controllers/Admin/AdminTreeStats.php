@@ -8,13 +8,13 @@
   * @author  Morgan Lesko <rockhoppers@runbox.com>
   * @since v0.0.1
   */
-namespace Survloop\Controllers\Admin;
+namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use DB;
 use Illuminate\Http\Request;
-use Survloop\Controllers\SystemDefinitions;
-use Survloop\Controllers\Stats\SessAnalysis;
-use Survloop\Controllers\Admin\AdminController;
+use RockHopSoft\Survloop\Controllers\SystemDefinitions;
+use RockHopSoft\Survloop\Controllers\Stats\SessAnalysis;
+use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 
 class AdminTreeStats extends AdminController
 {
