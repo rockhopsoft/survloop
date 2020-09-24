@@ -27,9 +27,13 @@ class SurvCustLoop extends PageLoadUtils
     public function loadLoop(Request $request, $skipSessLoad = false)
     {
         $this->loadAbbr();
-        $class = "Survloop\\Controllers\\Tree\\TreeSurvForm";
-        if ($this->custAbbr != 'Survloop') {
-            $custClass = $this->custAbbr . "\\Controllers\\" . $this->custAbbr . "";
+        $class = "RockHopSoft\\Survloop\\Controllers\\Tree\\TreeSurvForm";
+        $custLoopFile = '../vendor/' . $this->custPckg 
+            . '/src/Controllers/' . $this->custAbbr . '.php';
+        if ($this->custAbbr != 'Survloop'
+            && file_exists($custLoopFile)) {
+            $custClass = $this->custVend . "\\" . $this->custAbbr
+                . "\\Controllers\\" . $this->custAbbr . "";
             if (class_exists($custClass)) {
                 $class = $custClass;
             }

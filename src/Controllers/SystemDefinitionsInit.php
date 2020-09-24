@@ -46,7 +46,11 @@ class SystemDefinitionsInit
             ], 
             'cust-abbr' => [
                 'Installation Abbreviation',
-                'SiteAbrv'
+                'Survloop'
+            ], 
+            'cust-vend' => [
+                'Installation Vendor',
+                'RockHopSoft'
             ], 
             'cust-package' => [
                 'Vendor Package Name', 

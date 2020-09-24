@@ -227,7 +227,7 @@ class TreeSurvLoad extends TreeSurvConds
         }
         if ($includeNode) {
             $cacheNode = '$'.'this->allNodes[' . $row->node_id . '] = '
-                . 'new Survloop\Controllers\Tree\TreeNodeSurv(' 
+                . 'new RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv(' 
                     . $row->node_id . ', [], ['
                     . '"pID" => '      . intVal($row->node_parent_id)        . ', '
                     . '"pOrd" => '     . intVal($row->node_parent_order)     . ', '

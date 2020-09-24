@@ -2,7 +2,7 @@
 // Check for globals required to load this master template
 if (!isset($GLOBALS["SL"])) {
     $request = new Illuminate\Http\Request;
-    $GLOBALS["SL"] = new Survloop\Controllers\Globals\Globals($request, 1, 1, 1);
+    $GLOBALS["SL"] = new RockHopSoft\Survloop\Controllers\Globals\Globals($request, 1, 1, 1);
 }
 $GLOBALS["SL"]->logSiteSessPage();
 $isDashLayout = ((isset($admMenu) && trim($admMenu) != '') 

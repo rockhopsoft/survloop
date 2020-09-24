@@ -18,12 +18,12 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-
-$GLOBALS["SL-Micro"] = new Survloop\Controllers\Globals\GlobalsMicroTime;
+use RockHopSoft\Survloop\Controllers\Globals\GlobalsMicroTime;
+$GLOBALS["SL-Micro"] = new GlobalsMicroTime;
 
 Route::group(['middleware' => ['web']], function () {
 
-    $path = 'Survloop\\Controllers\\';
+    $path = 'RockHopSoft\\Survloop\\Controllers\\';
     
     require_once('routes-core.php');
 

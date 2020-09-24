@@ -24,8 +24,9 @@ use App\Models\SLTables;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
-use RockHopSoft\Survloop\Controllers\SurvloopInstaller;
 use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Tree\TreeSurvForm;
+use RockHopSoft\Survloop\Controllers\SurvloopInstaller;
 use RockHopSoft\Survloop\Controllers\SurvloopControllerUtils;
 
 class SurvloopController extends SurvloopControllerUtils
@@ -81,9 +82,17 @@ class SurvloopController extends SurvloopControllerUtils
         if ($dbID <= 0) {
             $dbID = $this->dbID;
         }
+        $custLoopFile = '../vendor/' 
+            . $GLOBALS["SL"]->sysOpts["cust-package"] 
+            . '/src/Controllers/'
+            . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.php';
+//echo 'custLoopFile: ' . $custLoopFile; exit;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
-            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop') {
-            $eval = "\$this->custReport = new " . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
+            && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop'
+            && file_exists($custLoopFile)) {
+            $eval = "\$this->custReport = new " 
+                . $GLOBALS["SL"]->sysOpts["cust-vend"] . "\\" 
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "(\$request, -3, \$dbID, \$treeID, false, "
                 . (($slInit) ? "true" : "false") . ");";

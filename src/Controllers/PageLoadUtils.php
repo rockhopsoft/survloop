@@ -29,6 +29,8 @@ class PageLoadUtils extends Controller
     public $dashPrfx       = '';
     public $domainPath     = 'http://survloop.local';
     public $custAbbr       = 'Survloop';
+    public $custVend       = 'RockHopSoft';
+    public $custPckg       = 'rockhopsoft/survloop';
     public $dbID           = 1;
     public $treeID         = 1;
     public $cacheKey       = '';
@@ -81,6 +83,22 @@ class PageLoadUtils extends Controller
             ->first();
         if ($chk && isset($chk->def_description)) {
             $this->custAbbr = trim($chk->def_description);
+        }
+        $chk = SLDefinitions::select('def_description')
+            ->where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'cust-vend')
+            ->first();
+        if ($chk && isset($chk->def_description)) {
+            $this->custVend = trim($chk->def_description);
+        }
+        $chk = SLDefinitions::select('def_description')
+            ->where('def_database', 1)
+            ->where('def_set', 'System Settings')
+            ->where('def_subset', 'cust-package')
+            ->first();
+        if ($chk && isset($chk->def_description)) {
+            $this->custPckg = trim($chk->def_description);
         }
         return $this->custAbbr;
     }

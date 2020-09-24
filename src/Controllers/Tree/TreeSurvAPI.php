@@ -42,6 +42,7 @@ class TreeSurvAPI extends TreeCoreSess
     public function checkTreeRoot()
     {
         if ((!$this->rootID || intVal($this->rootID) <= 0) 
+            && isset($GLOBALS["SL"]->treeRow->tree_core_table)
             && intVal($GLOBALS["SL"]->treeRow->tree_core_table) > 0) {
             $chk = SLNode::where('node_tree', $this->treeID)
                 ->where('node_parent_id', -3)
