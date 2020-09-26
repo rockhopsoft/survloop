@@ -14,7 +14,6 @@ class CreateSurvloopTables extends Migration
      */
     public function up()
     {
-    	\Illuminate\Support\Facades\DB::statement('SET SESSION sql_require_primary_key=0');
     	Schema::create('sl_databases', function(Blueprint $table)
 		{
 			$table->increments('db_id');

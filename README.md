@@ -63,7 +63,7 @@ Other projects running Survloop:
     target="_blank">GitHub</a>).
 
 The installation used for Survloop.org is currently the 
-best example of a bare-bones extenstion of Survloop:<br />
+best example of a bare-bones extension of Survloop:<br />
 <a href="https://github.com/rockhopsoft/survlooporg" 
     target="_blank">github.com/rockhopsoft/survlooporg</a>
 
@@ -110,29 +110,19 @@ $ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 
 From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
 ```
+$ composer require rockhopsoft/survloop
 $ nano composer.json
 ```
 ```
-...
-"require": {
-    ...
-    "rockhopsoft/survloop": "dev-master",
-    ...
-},
 ...
 "autoload": {
     ...
     "psr-4": {
         ...
-        "Survloop\\": "vendor/rockhopsoft/survloop/src/",
+        "RockHopSoft\\Survloop\\": "vendor/rockhopsoft/survloop/src/",
     }
     ...
 }, ...
-```
-
-After saving the file, run the update to download OpenPolice, and any missing dependencies.
-```
-$ composer install
 ```
 
 Add the package to your application service providers in `config/app.php`.
@@ -143,7 +133,7 @@ $ nano config/app.php
 ...
 'providers' => [
     ...
-    Survloop\SurvloopServiceProvider::class,
+    RockHopSoft\Survloop\SurvloopServiceProvider::class,
     ...
 ],
 ...
