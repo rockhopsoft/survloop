@@ -10,7 +10,7 @@
   */
 namespace RockHopSoft\Survloop;
 
-use Survloop\SurvloopFacade;
+use RockHopSoft\Survloop\SurvloopFacade;
 use Illuminate\Support\ServiceProvider;
 
 class SurvloopServiceProvider extends ServiceProvider
