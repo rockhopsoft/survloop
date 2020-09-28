@@ -443,19 +443,21 @@ class SurvloopController extends SurvloopControllerUtils
     public function freshUser(Request $request)
     {
         $this->survLoopInit($request, '/fresh/creator');
-        $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">Create Admin Account</h2>';
-        $content = '<center><div class="treeWrapForm mT20 mBn20">
+        $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">'
+            . 'Create Admin Account</h2>';
+        $content = '<center><div class="treeWrapForm pT30 mBn20">
             <h1 class="slBlueDark">' . ((isset($GLOBALS["SL"]->sysOpts["site-name"])) 
                     ? $GLOBALS["SL"]->sysOpts["site-name"] : 'Survloop') 
                 . ' Installed!</h1><h4>All Out Data Are Belong...</h4>
             <p>Please create the first admin super user account.</p></div></center>';
         if (isset($GLOBALS["SL"]->sysOpts["app-url"])) {
-            if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $_SERVER["HTTP_HOST"]
-                && $GLOBALS["SL"]->sysOpts["app-url"] != 'https://' . $_SERVER["HTTP_HOST"]) {
+            $http = $_SERVER["HTTP_HOST"];
+            if ($GLOBALS["SL"]->sysOpts["app-url"] != 'http://' . $http
+                && $GLOBALS["SL"]->sysOpts["app-url"] != 'https://' . $http) {
                 SLDefinitions::where('def_database', 1)
                     ->where('def_set', 'System Settings')
                     ->whereIn('def_subset', ['app-url', 'logo-url'])
-                    ->update([ "def_description" =>  'http://' . $_SERVER["HTTP_HOST"] ]);
+                    ->update([ "def_description" =>  'http://' . $http ]);
             }
 
         }
