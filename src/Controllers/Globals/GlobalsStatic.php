@@ -600,7 +600,7 @@ class GlobalsStatic extends GlobalsConvert
         $parenStart = strpos($str, '(');
         if ($parenStart > 0) {
             $parenEnd = strpos($str, ')', $parenStart);
-            if ($parenEnd > 0 && $parenEnd == ($str.length-1)) {
+            if ($parenEnd > 0 && $parenEnd == (strlen($str)-1)) {
                 $str = substr($str, 0, $parenStart) 
                     . strtoupper(substr($str, ($parenStart-1)));
             }

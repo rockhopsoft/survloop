@@ -59,7 +59,8 @@ class Globals extends GlobalsImportExport
         $GLOBALS["CUST"] = null;
         if (isset($this->sysOpts["cust-abbr"]) 
             && $this->sysOpts["cust-abbr"] != 'Survloop') {
-            $custClass = $this->sysOpts["cust-abbr"] . "\\Controllers\\" 
+            $custClass = $this->sysOpts["cust-vend"] . "\\" 
+                . $this->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $this->sysOpts["cust-abbr"] . "Globals";
             if (class_exists($custClass)) {
                 eval("\$GLOBALS['CUST'] = new " . $custClass . ";");

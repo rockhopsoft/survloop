@@ -86,7 +86,6 @@ class SurvloopController extends SurvloopControllerUtils
             . $GLOBALS["SL"]->sysOpts["cust-package"] 
             . '/src/Controllers/'
             . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.php';
-//echo 'custLoopFile: ' . $custLoopFile; exit;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
             && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop'
             && file_exists($custLoopFile)) {
@@ -541,7 +540,8 @@ class SurvloopController extends SurvloopControllerUtils
         $loaded = false;
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
             && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop') {
-            $custClass = $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
+            $custClass = $GLOBALS["SL"]->sysOpts["cust-vend"] . "\\" 
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "Searcher";
             if (class_exists($custClass)) {
                 eval("\$this->searcher = new ". $custClass 

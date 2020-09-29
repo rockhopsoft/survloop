@@ -434,6 +434,7 @@ class Searcher extends SurvCustLoop
     
     public function searchFiltsURLXtra()
     {
+        $this->v["urlFlts"] = '';
         return '';
     }
     

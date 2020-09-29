@@ -49,12 +49,12 @@
     },
     "autoload": {
         "psr-4": {
-            "RockHopSoft\\Survloop\\": "src"
+            "RockHopSoft\\Survloop\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RockHopSoft\\Survloop\\Tests\\": "tests"
+            "RockHopSoft\\Survloop\\Tests\\": "tests/"
         }
     },
     "scripts": {
