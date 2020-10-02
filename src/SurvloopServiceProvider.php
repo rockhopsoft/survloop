@@ -36,9 +36,6 @@ class SurvloopServiceProvider extends ServiceProvider
                 __DIR__ . '/Views/auth/passwords' 
                     => base_path('resources/views/auth/passwords'),
 
-                __DIR__ . '/Uploads' 
-                    => base_path('storage/app/up/survloop'),
-
                 __DIR__ . '/Models' 
                     => base_path('app/Models'),
 
@@ -56,6 +53,9 @@ class SurvloopServiceProvider extends ServiceProvider
 
                 __DIR__ . '/Database/SurvloopSeeder.php' 
                     => base_path('database/seeders/SurvloopSeeder.php'),
+
+                base_path('/vendor/rockhopsoft/survloop-images/src') 
+                    => base_path('storage/app/up/survloop'),
 
                 base_path($libDir . 'geo/ZipCodeSeeder.php') 
                     => base_path('database/seeders/ZipCodeSeeder.php'),
