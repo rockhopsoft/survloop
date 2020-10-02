@@ -21,10 +21,14 @@
                 @if ($i == $day) SELECTED @endif >{{ $i }}</option>
         @endfor
     </select><select name="n{{ $nID }}fldYear" id="n{{ $nID }}fldYearID"
-        class="form-control form-control-lg slDateChange @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mL5" 
-        style="width: 110px;" data-nid="{{ $nID }}" data-nid-txt="{{ $nIDtxt }}" {!! $GLOBALS["SL"]->tabInd() !!}>
-        <option value="0000" @if ($year == 'YYYY' || intVal($year) == 0) SELECTED @endif >year</option>
-        @for ($i = intVal(date("Y")); $i > (intVal(date("Y"))-100); $i--)
+        class="form-control form-control-lg slDateChange 
+            @if (isset($xtraClass)) {{ $xtraClass }} @endif fL mL5" 
+        style="width: 110px;" data-nid="{{ $nID }}" 
+            data-nid-txt="{{ $nIDtxt }}" {!! $GLOBALS["SL"]->tabInd() !!}>
+        <option value="0000" 
+            @if ($year == 'YYYY' || intVal($year) == 0) SELECTED @endif
+            >year</option>
+        @for ($i = $startYear; $i > (intVal(date("Y"))-100); $i--)
             <option @if ($i < 10) value="0{{ $i }}" @else value="{{ $i }}" @endif
                 @if ($i == $year) SELECTED @endif >{{ $i }}</option>
         @endfor

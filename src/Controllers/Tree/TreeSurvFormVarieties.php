@@ -278,13 +278,15 @@ class TreeSurvFormVarieties extends UserProfile
     public function nodeHasDateRestriction($nodeRow)
     {
         return (in_array($nodeRow->node_type, ['Date', 'Date Picker', 'Date Time']) 
-            && $nodeRow->node_opts%31 > 0 // Character limit means word count, if enabled
+            && $nodeRow->node_opts%31 > 0 
+                // Character limit means word count, if enabled
             && $nodeRow->node_char_limit != 0);
     }
     
     public function inputMobileCls($nID)
     {
-        if (isset($this->allNodes[$nID]) && $this->allNodes[$nID]->nodeRow->node_opts%2 > 0) {
+        if (isset($this->allNodes[$nID]) 
+            && $this->allNodes[$nID]->nodeRow->node_opts%2 > 0) {
             return ' fingerTxt';
         }
         return '';
@@ -298,7 +300,9 @@ class TreeSurvFormVarieties extends UserProfile
     
     protected function cleanDateVal($dateStr)
     {
-        if ($dateStr == '0000-00-00' || $dateStr == '1970-01-01' || trim($dateStr) == '') {
+        if ($dateStr == '0000-00-00' 
+            || $dateStr == '1970-01-01' 
+            || trim($dateStr) == '') {
             return '';
         }
         return $dateStr;
@@ -307,13 +311,16 @@ class TreeSurvFormVarieties extends UserProfile
     protected function printWordCntStuff($nIDtxt, $nodeRow)
     {
         $ret = '';
-        if ($nodeRow->node_opts%31 == 0 || $nodeRow->node_opts%47 == 0) {
+        if ($nodeRow->node_opts%31 == 0 
+            || $nodeRow->node_opts%47 == 0) {
             $ret .= '<div id="currWordCount" class="fL pT15">';
             if ($nodeRow->node_opts%47 == 0) {
-                $ret .= 'Word count limit: ' . intVal($nodeRow->node_char_limit) . '. ';
+                $ret .= 'Word count limit: ' 
+                    . intVal($nodeRow->node_char_limit) . '. ';
             }
             if ($nodeRow->node_opts%31 == 0) {
-                $ret .= 'Current word count: <div id="wordCnt' . $nIDtxt . '" class="disIn"></div>';
+                $ret .= 'Current word count: <div id="wordCnt' 
+                    . $nIDtxt . '" class="disIn"></div>';
             }
             $ret .= '</div><div class="fC"></div>';
         }
@@ -329,6 +336,10 @@ class TreeSurvFormVarieties extends UserProfile
             $day   = date("d", $curr->dateTime);
             $year  = date("Y", $curr->dateTime);
         }
+        $startYear = intVal(date("Y"));
+        if ($curr->nodeRow->node_char_limit >= 0) {
+            $startYear++;
+        }
         return view(
             'vendor.survloop.forms.formtree-date', 
             [
@@ -338,6 +349,7 @@ class TreeSurvFormVarieties extends UserProfile
                 "month"          => $month,
                 "day"            => $day,
                 "year"           => $year,
+                "startYear"      => $startYear,
                 "xtraClass"      => $curr->xtraClass,
                 "inputMobileCls" => $this->inputMobileCls($curr->nID)
             ]
@@ -346,7 +358,8 @@ class TreeSurvFormVarieties extends UserProfile
     
     protected function valListArr($val)
     {
-        return explode('-=-', str_replace(';', '', str_replace(';;', '-=-', $val)));
+        $val = str_replace(';', '', str_replace(';;', '-=-', $val));
+        return explode('-=-', $val);
     }
     
     protected function printValList($val)
