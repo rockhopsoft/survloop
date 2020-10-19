@@ -1,6 +1,6 @@
 <?php
 
-namespace Survloop\Controllers\Notifications;
+namespace RockHopSoft\Survloop\Controllers\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

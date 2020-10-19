@@ -169,17 +169,22 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         $autoAdd = false;
         if ($this->allNodes[$nID]->isStepLoop()) {
             if ($loopCnt == 0 
+                && isset($loop->data_loop_min_limit)
                 && $loop->data_loop_min_limit == 1 
+                && isset($loop->data_loop_max_limit)
                 && $loop->data_loop_max_limit == 1) {
                 $autoAdd = true;
             }
-        } elseif ($loop->data_loop_min_limit > 0 && $loopCnt == 0) {
+        } elseif (isset($loop->data_loop_min_limit)
+            && $loop->data_loop_min_limit > 0 
+            && $loopCnt == 0) {
             $autoAdd = true;
         }
 
         if ($autoAdd) {
             //$this->v["addingLoopItem"] = $this->newLoopItem($nID);
-            $GLOBALS["SL"]->pageCSS .= ' #nFormNextBtn, .autoAddHide { display: none; } ';
+            $GLOBALS["SL"]->pageCSS .= ' #nFormNextBtn, '
+                . '.autoAddHide { display: none; } ';
         }
         return true;
     }

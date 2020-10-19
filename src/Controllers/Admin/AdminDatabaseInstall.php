@@ -83,6 +83,8 @@ class AdminDatabaseInstall extends AdminDBController
     
     public function printExportPackageLaravel(Request $request) 
     {
+        $cacheName = '/dashboard/sl/export/laravel';
+        $this->admControlInit($request, $cacheName);
         return $this->printExportLaravel($request, true);
     }
 
@@ -230,7 +232,8 @@ class AdminDatabaseInstall extends AdminDBController
     public function printExportLaravel(Request $request, $asPackage = false) 
     {
         ini_set('max_execution_time', 180);
-        $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
+        $this->v["asPackage"] = $asPackage;
+        $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
         $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' 
             : '/dashboard/db/export');
         $this->admControlInit($request, $currPage);

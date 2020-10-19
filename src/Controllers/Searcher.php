@@ -237,10 +237,8 @@ class Searcher extends SurvCustLoop
             $this->searchFilts = $this->searchOpts = [];
             if ($GLOBALS["SL"]->REQ->has('d') 
                 && trim($GLOBALS["SL"]->REQ->get('d')) != '') {
-                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(
-                    ',', 
-                    $GLOBALS["SL"]->REQ->get('d')
-                );
+                $d = $GLOBALS["SL"]->REQ->get('d');
+                $this->searchFilts["d"] = $GLOBALS["SL"]->mexplode(',', $d);
             }
             if ($GLOBALS["SL"]->REQ->has('f') 
                 && trim($GLOBALS["SL"]->REQ->get('f')) != '') {

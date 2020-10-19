@@ -83,16 +83,15 @@ class SurvloopController extends SurvloopControllerUtils
             $dbID = $this->dbID;
         }
         $custLoopFile = '../vendor/' 
-            . $GLOBALS["SL"]->sysOpts["cust-package"] 
-            . '/src/Controllers/'
+            . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Controllers/'
             . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.php';
         if (isset($GLOBALS["SL"]->sysOpts["cust-abbr"]) 
             && $GLOBALS["SL"]->sysOpts["cust-abbr"] != 'Survloop'
             && file_exists($custLoopFile)) {
             $eval = "\$this->custReport = new " 
                 . $GLOBALS["SL"]->sysOpts["cust-vend"] . "\\" 
+                . $GLOBALS["SL"]->sysOpts["cust-abbr"] . "\\Controllers\\" 
                 . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
-                . "\\Controllers\\" . $GLOBALS["SL"]->sysOpts["cust-abbr"] 
                 . "(\$request, -3, \$dbID, \$treeID, false, "
                 . (($slInit) ? "true" : "false") . ");";
             eval($eval);

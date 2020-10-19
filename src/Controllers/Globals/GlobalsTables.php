@@ -147,6 +147,12 @@ class GlobalsTables extends GlobalsElements
         if ($model == '' && isset($this->tblModels[strtolower($tbl)])) {
             $model = trim($this->tblModels[strtolower($tbl)]);
         }
+        if ($model == '') {
+            $model = $this->strFullTblModel($tbl);
+            if (!file_exists('../app/Models/' . $model . '.php')) {
+                $model = '';
+            }
+        }
         if ($model != '') {
             $path = "App\\Models\\" . $model;
             $this->chkTblModel($tbl, $path, $forceFile);
