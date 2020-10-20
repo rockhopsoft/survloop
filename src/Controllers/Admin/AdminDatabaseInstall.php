@@ -179,6 +179,8 @@ class AdminDatabaseInstall extends AdminDBController
                         $this->v["uploadImport"]->loadFile($request->get('file'));
                     } elseif (trim($request->get('import')) == 'fldNames') {
                         $this->v["uploadImport"]->loadFldNames($request);
+                    } elseif (trim($request->get('import')) == 'dataRows') {
+                        $this->v["uploadImport"]->loadDataRows($request);
                     }
                 }
             }

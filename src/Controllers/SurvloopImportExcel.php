@@ -127,13 +127,52 @@ class SurvloopImportExcel
                     }
                 }
                 $GLOBALS["SL"]->createTableIfNotExists($this->tblObj);
+            }
+            echo '<script type="text/javascript"> '
+                . 'setTimeout("window.location=\'?import=dataRows&file=' 
+                . trim($request->get('file')) . '&tblID=' 
+                . $this->tblObj->tbl_id . '\'", 1000); </script>';
+            exit;
+        }
+        return false;
+    }
 
-                $startRow = 1;
-                if (sizeof($this->row2heads) > (sizeof($this->arr[0][0])/3)) {
-                    $startRow = 2;
+    public function loadDataRows(Request $request)
+    {
+        if ($request->has('import') 
+            && trim($request->get('import')) == 'dataRows'
+            && $request->has('file')
+            && trim($request->get('file')) != ''
+            && $request->has('tblID')
+            && intVal($request->get('tblID')) > 0) {
+            $this->tblObj = SLTables::find(intVal($request->get('tblID')));
+            if ($this->tblObj && isset($this->tblObj->tbl_id)) {
+                $this->tblEng  = $this->tblObj->tbl_eng;
+                $this->tblName = $this->tblObj->tbl_name;
+                $this->tblAbbr = $this->tblObj->tbl_abbr;
+                $this->dataFlds 
+                    = $this->row2heads 
+                    = [];
+                $this->loadFile($request->get('file'));
+                foreach ($this->arr[0][0] as $col => $colHeader) {
+                    if (trim($colHeader) != '') {
+                        $this->dataFlds[] = SLFields::where('fld_table', $this->tblObj->tbl_id)
+                            ->where('fld_eng', 'LIKE', $colHeader)
+                            ->first();
+                    } else {
+                        $this->dataFlds[] = null;
+                    }
                 }
-                for ($row = $startRow; $row < sizeof($this->arr[0]); $row++) {
-                    $this->loadFldNamesSaveRow($request, $row);
+                if (sizeof($this->arr) > 0
+                    && sizeof($this->arr[0]) > 0
+                    && sizeof($this->arr[0][0]) > 0) {
+                    $startRow = 1;
+                    if (sizeof($this->row2heads) > (sizeof($this->arr[0][0])/3)) {
+                        $startRow = 2;
+                    }
+                    for ($row = $startRow; $row < sizeof($this->arr[0]); $row++) {
+                        $this->loadFldNamesSaveRow($row);
+                    }
                 }
             }
         }
@@ -253,7 +292,7 @@ class SurvloopImportExcel
         return [ 'VARCHAR', 'Alphanumeric', 255 ];
     }
 
-    private function loadFldNamesSaveRow(Request $request, $row)
+    private function loadFldNamesSaveRow($row)
     {
         $colCnt = 0;
         eval("\$this->rowData[\$row] = new " 
@@ -261,8 +300,6 @@ class SurvloopImportExcel
         foreach ($this->arr[0][0] as $col => $colHeader) {
             $val = trim($this->arr[0][$row][$col]);
             if (trim($colHeader) != ''
-                && $request->has('fldImport' . $col)
-                && intVal($request->get('fldImport' . $col)) == 1
                 && $this->dataFlds[$col] !== null
                 && $val != '') {
                 $dataFldName = $this->tblAbbr . $this->dataFlds[$col]->fld_name;
