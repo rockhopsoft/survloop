@@ -44,12 +44,12 @@ class SurvloopController extends SurvloopControllerUtils
     {
         if (!$this->survInitRun || !isset($this->v["uID"])) {
             $this->survInitRun = true;
+            $this->loadDbLookups($request);
             $this->loadUserVars();
             $this->loadSimpleVars($request);
             $this->loadCurrPage($currPage);
             $this->loadSlSess($request);
             $this->loadNavMenu();
-            $this->loadDbLookups($request);
             $this->initCheckUpdates($request);
             if ($this->coreIDoverride > 0) {
                 $this->loadAllSessData();

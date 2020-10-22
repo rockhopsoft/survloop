@@ -1,7 +1,7 @@
 
 # RockHopSoft/Survloop
 
-[![Laravel](https://img.shields.io/badge/Laravel-8.0-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-8.2-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Table of Contents
@@ -46,15 +46,20 @@ content-management system for data-focused websites.
 The upcoming Open Police web app is the best live install 
 of the engine, and feedback on that project and the Survloop 
 user experience can be via the end of the submission process:<br />
-<a href="https://openpolice.org/filing-your-police-complaint" target="_blank">https://openpolice.org/filing-your-police-complaint</a><br />
-The resulting database designed using the engine, as well as the branching tree which specifies the user's experience: 
+<a href="https://openpolice.org/filing-your-police-complaint" target="_blank"
+>https://openpolice.org/filing-your-police-complaint</a><br />
+The resulting database designed using the engine, as well as 
+the branching tree which specifies the user's experience: 
 <a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a><br />
 <a href="https://openpolice.org/tree/complaint" target="_blank">/tree/complaint</a><br />
 Among other methods, the resulting data can also be provided as 
 XML included an automatically generated schema, eg.<br />
-<a href="https://openpolice.org/complaint-xml-schema" target="_blank">/complaint-xml-schema</a><br />
-<a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
-<a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
+<a href="https://openpolice.org/complaint-xml-schema" target="_blank"
+>/complaint-xml-schema</a><br />
+<a href="https://openpolice.org/complaint-xml-example" target="_blank"
+>/complaint-xml-example</a><br />
+<a href="https://openpolice.org/complaint-xml-all" target="_blank"
+>/complaint-xml-all</a>
 
 Other projects running Survloop: 
 <a href="https://powerscore.resourceinnovation.org/go-pro" 
@@ -72,19 +77,21 @@ best example of a bare-bones extension of Survloop:<br />
 
 * php: >=7.4
 * <a href="https://packagist.org/packages/laravel/laravel" 
-    target="_blank">laravel/laravel</a>: 8.0.*
+    target="_blank">laravel/laravel</a>: 8.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" 
-    target="_blank">rockhopsoft/survloop-libraries</a>: 0.1.*
+    target="_blank">rockhopsoft/survloop-libraries</a>: 0.*
 
 # <a name="getting-started"></a>Getting Started
 
 
-### Install Laravel Using Composer
+### Install Laravel & Survloop Using Composer
 
-<a href="https://survloop.org/how-to-install-survloop" target="_blank">Full install instructions</a> also describe how to set up a development environment using VirutalBox, Vargrant, and Laravel's Homestead.
+<a href="https://survloop.org/how-to-install-survloop" target="_blank"
+>Full install instructions</a> also describe how to set up a 
+development environment using VirutalBox, Vargrant, and Laravel's Homestead.
 
 ```
-$ composer create-project laravel/laravel survloop "8.0.*"
+$ composer create-project laravel/laravel survloop "8.*"
 $ cd survloop
 
 ```
@@ -101,16 +108,12 @@ DB_PASSWORD=secret
 
 You could do things like install Laravel's out-of-the-box user authentication tools, and push the vendor file copies where they need to be:
 ```
-$ composer require laravel/ui
+$ composer require laravel/ui rockhopsoft/survloop
 $ php artisan ui vue --auth
-$ echo "0" | php artisan vendor:publish --tag=laravel-notifications
 ```
-
-### Install RockHopSoft/Survloop
 
 From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
 ```
-$ composer require rockhopsoft/survloop
 $ nano composer.json
 ```
 ```
@@ -125,7 +128,7 @@ $ nano composer.json
 }, ...
 ```
 
-Add the package to your application service providers in `config/app.php`.
+Hopefully, editing `config/app.php` is no longer needed, but this can be tried if later steps break.
 ```
 $ nano config/app.php
 ```
@@ -153,10 +156,6 @@ $ chown -R www-data:33 storage database app/Models
 Update composer, publish the package migrations, etc...
 ```
 $ echo "0" | php artisan vendor:publish --force
-$ cd ~/homestead
-$ vagrant up
-$ vagrant ssh
-$ cd code/survloop
 $ php artisan optimize:clear
 $ composer dump-autoload
 ```
@@ -176,14 +175,6 @@ Then initialize the database:
 $ php artisan migrate
 $ php artisan db:seed --class=SurvloopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
-```
-
-You might need to re-run some things outside the virtual box too, e.g.
-```
-$ exit
-$ cd ~/homestead/code/survloop
-$ php artisan optimize:clear
-$ composer dump-autoload
 ```
 
 ### Initialize Survloop Installation
