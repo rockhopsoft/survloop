@@ -491,8 +491,10 @@ class AdminController extends AdminEmailController
     protected function systemsCheckTestEmail(Request $request)
     {
         $this->v["testResults"] = '';
-        if ($request->has('sendTest') && intVal($request->get('sendTest')) == 1
-            && $request->has('emailTo') && trim($request->emailTo) != '') {
+        if ($request->has('sendTest') 
+            && intVal($request->get('sendTest')) == 1
+            && $request->has('emailTo') 
+            && trim($request->emailTo) != '') {
             $to = trim($request->emailTo);
             $toArr = [ [ $to, 'Test Message' ] ];
             $subj = 'Email Flight Test from ' 
@@ -507,8 +509,8 @@ class AdminController extends AdminEmailController
             $uID = $this->v["uID"];
             $this->logEmailSent($cont, $subj, $to, 0, $tree, $core, $uID);
             $this->v["testResults"] .= '<div class="container">'
-                . '<h2>' . $emaSubj . '</h2>' . $emaCont . '<hr><hr>'
-                . '<i class="slBlueDark">to ' . $emaTo . '</i></div>';
+                . '<h2>' . $subj . '</h2>' . $cont . '<hr><hr>'
+                . '<i class="slBlueDark">to ' . $to . '</i></div>';
         }
         return view('vendor.survloop.admin.systems-check-email', $this->v);
     }
