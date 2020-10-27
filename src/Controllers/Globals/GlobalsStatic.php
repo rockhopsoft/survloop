@@ -590,6 +590,10 @@ class GlobalsStatic extends GlobalsConvert
     {
         if (strpos($str, 'Mc') === 0) {
             $str .= 'Mc' . ucwords(substr($str, 2, strlen($str)));
+        } elseif ($str == 'Iii') {
+            $str = 'III';
+        } elseif ($str == 'Iv') {
+            $str = 'IV';
         }
         return $str;
     }

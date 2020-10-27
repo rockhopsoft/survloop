@@ -58,16 +58,16 @@ table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv {
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
     margin: 5px 5px 9px 1px;
-	background: {!! $css["color-main-on"] !!};
+	background: {!! $css["color-main-link"] !!};
 }
 .vertPrgCurr, 
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgCurr {
     margin: 5px 4px 8px 0px;
-	border: 3px {!! $css["color-main-on"] !!} solid;
+	border: 3px {!! $css["color-main-link"] !!} solid;
 }
 .vertPrgFutr, 
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgFutr {
-    opacity:0.20; filter:alpha(opacity=20);
+    background: {!! $css["color-main-grey"] !!};
 }
 .vertPrgDone, .vertPrgDone img, .vertPrgFutr, .vertPrgFutr img, 
 table.repDeetsBlock.repDeetVert tr td .relDiv .absDiv .vertPrgDone,
