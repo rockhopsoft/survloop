@@ -13,6 +13,21 @@ namespace RockHopSoft\Survloop\Controllers\Globals;
 class GlobalsElements extends GlobalsCache
 {
 
+    public function printLoadAnimBtn($title, $animID = '', $class = 'btn-lg btn-primary')
+    {
+        if (trim($animID) == '') {
+            $animID = rand(100000, 1000000);
+        }
+        return view(
+            'vendor.survloop.elements.inc-load-anim-btn', 
+            [
+                "animID" => $animID,
+                "title"  => $title,
+                "class"  => $class
+            ]
+        )->render();
+    }
+
     public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'chevron')
     {
       	return view(
@@ -233,6 +248,20 @@ class GlobalsElements extends GlobalsCache
         }
         return '';
     }
+
+    public function getInstagramID($url)
+    {
+        $id = str_ireplace('http://www.instagram.com/p/', '', $url);
+        $id = str_ireplace('https://www.instagram.com/p/', '', $id);
+        $id = str_ireplace('http://instagram.com/p/', '', $id);
+        $id = str_ireplace('https://instagram.com/p/', '', $id);
+        $id = str_ireplace('instagram.com/p/', '', $id);
+        $dashPos = strpos($id, '/');
+        if ($dashPos > 0) {
+            $id = substr($id, 0, $dashPos);
+        }
+        return $id;
+    }
      
     public function getYouTubeThumb($id)
     {
@@ -449,7 +478,7 @@ class GlobalsElements extends GlobalsCache
     }
 
     
-    public function lastMonths12($rec = null, $monthFld = 'start_month')
+    public function lastMonths12($rec = null, $monthFld = 'start_month', $yearFld = 'end_year')
     {
         $ret = [
             "has"        => false,
@@ -461,17 +490,19 @@ class GlobalsElements extends GlobalsCache
         if ($rec !== null) {
             if (isset($rec->{ $monthFld }) 
                 && intVal($rec->{ $monthFld }) > 0
+                && isset($rec->{ $yearFld })
+                && intVal($rec->{ $yearFld }) > 0
                 && isset($rec->created_at)) {
                 $ret["has"] = true;
+                $startYear    = intVal($rec->{ $yearFld });
                 $startMonth   = intVal($rec->{ $monthFld });
-                $createdYear  = intVal(date("Y", strtotime($rec->created_at)));
                 $createdMonth = intVal(date("n", strtotime($rec->created_at)));
                 if ($createdMonth < $startMonth) {
-                    $createdYear--;
+                    $startYear--;
                 }
-                $ret["startYear"]  = $createdYear;
+                $ret["startYear"]  = $startYear;
                 $ret["startMonth"] = $startMonth;
-                $ret["endYear"]    = $createdYear-1;
+                $ret["endYear"]    = $startYear-1;
                 $ret["endMonth"]   = $startMonth+1;
                 if ($ret["endMonth"] > 12) {
                     $ret["endMonth"] = 1;
@@ -481,5 +512,6 @@ class GlobalsElements extends GlobalsCache
         }
         return $ret;
     }
+    
 
 }

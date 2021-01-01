@@ -99,8 +99,7 @@ class SurvloopController extends SurvloopControllerUtils
             $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
         }
         $currPage = '';
-        if (isset($this->v["currPage"]) 
-            && sizeof($this->v["currPage"]) > 0) {
+        if (isset($this->v["currPage"]) && sizeof($this->v["currPage"]) > 0) {
             $currPage = $this->v["currPage"][0];
         }
         if ($slInit) {
@@ -654,6 +653,9 @@ class SurvloopController extends SurvloopControllerUtils
         session()->put('sessMsg',     $msg);
         session()->put('sessMsgType', 'alert-' . $type);
         session()->save();
+        if ($type == 'danger' && isset($GLOBALS["SL"])) {
+            $GLOBALS["SL"]->x["hasSessMsgError"] = true;
+        }
         return true;
     }
     
@@ -844,12 +846,17 @@ class SurvloopController extends SurvloopControllerUtils
                 ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'" 
                 : "") 
             . ")";
+        $errMsg = '';
         if (sizeof($attach) > 0) {
             foreach ($attach as $a => $att) {
                 if (isset($att->fileStore) 
                     && trim($att->fileStore) != ''
                     && isset($att->fileDeliver) 
                     && trim($att->fileDeliver) != '') {
+                    if (!file_exists($att->fileStore)) {
+                        $errMsg = 'Could not find file to attach (' . $att->fileDeliver . ')';
+                        $this->setNotif($errMsg, 'danger');
+                    }
                     $mail .= "->attach('" . $att->fileStore . "', [
                         'as' => '" . $att->fileDeliver . "',
                         'mime' => 'application/pdf',
@@ -866,7 +873,9 @@ class SurvloopController extends SurvloopControllerUtils
                 . '<hr><hr></div><pre>' . $mail . '</pre><hr><br />';
             return true;
         }
-        eval($mail);
+        if ($errMsg == '') {
+            eval($mail);
+        }
         return true;
     }
     

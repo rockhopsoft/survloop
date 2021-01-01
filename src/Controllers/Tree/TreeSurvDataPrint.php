@@ -38,12 +38,8 @@ class TreeSurvDataPrint extends TreeSurvFormElements
 
     protected function nodePrintDataRow(&$curr)
     {
-        if (!$this->checkFldDataPerms($curr->getFldRow()) 
-            || !$this->checkViewDataPerms($curr->getFldRow())) {
-            if ($curr->nodeType == 'Data Print Row') {
-                return [];
-            }
-        } else {
+        if ($this->checkFldDataPerms($curr->getFldRow()) 
+            && $this->checkViewDataPerms($curr->getFldRow())) {
             if ($this->shouldPrintDataRow($curr)) {
                 list($deetLabel, $deetVal) = $this->nodePrintDataRowDeets($curr);
                 $deetLabel = $this->customLabels($curr, $deetLabel);
@@ -99,9 +95,10 @@ class TreeSurvDataPrint extends TreeSurvFormElements
     {
         if (isset($GLOBALS["SL"]->formTree->tree_id) 
             && in_array($curr->nID, $this->checkboxNodes)) {
-            $curr->sessData = $this->valListArr(
-                $this->sessData->currSessDataCheckbox($curr)
-            );
+            $sessData = $this->sessData->currSessDataCheckbox($curr);
+            $curr->sessData = $this->valListArr($sessData);
+
+            /* // this was breaking checkboxes reported within a loop
             if ($this->hasCycleAncestorActive($curr->nID)) {
                 $cycInd = $GLOBALS["SL"]->currCyc["cyc"][1];
                 $cycInd = intVal(str_replace('cyc', '', $cycInd));
@@ -109,6 +106,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                     $curr->sessData = $curr->sessData[$cycInd];
                 }
             }
+            */
         }
         return true;
     }
@@ -140,24 +138,13 @@ class TreeSurvDataPrint extends TreeSurvFormElements
         $ret = '';
         $deets = $this->nodePrintDataBlockLoadDeets($curr);
         if (sizeof($deets) > 0) {
-            $prompt = strip_tags($this->swapLabels(
-                $curr, 
-                $curr->nodeRow->node_prompt_text
-            ));
+            $prompt = $curr->nodeRow->node_prompt_text;
+            $prompt = strip_tags($this->swapLabels($curr, $prompt));
             if ($curr->nodeType == 'Data Print Block') {
-                $ret .= $this->printReportDeetsBlock(
-                    $deets, 
-                    $prompt, 
-                    $curr
-                );
+                $ret .= $this->printReportDeetsBlock($deets, $prompt, $curr);
             } else {
                 $colCnt = 2;
-                $ret .= $this->printReportDeetsBlockCols(
-                    $deets, 
-                    $prompt, 
-                    $colCnt, 
-                    $curr
-                );
+                $ret .= $this->printReportDeetsBlockCols($deets, $prompt, $colCnt, $curr);
             }
         }
         return $ret;
@@ -170,37 +157,60 @@ class TreeSurvDataPrint extends TreeSurvFormElements
             foreach ($curr->tmpSubTier[1] as $child) {
                 $kidID = $child[0];
                 if ($this->allNodes[$kidID]->nodeType == 'Data Print Row') {
-                    $newDeet = $this->printNodePublic($kidID, $child, $curr->currVisib);
-                    if (is_array($newDeet) 
-                        && sizeof($newDeet) > 0 
-                        && trim($newDeet[0]) != '' 
-                        && trim($newDeet[1]) != '') {
-                        $deets[] = $newDeet;
+                    $cust = $this->nodePrintDataBlockLoadDeetsCustom($kidID);
+                    if (sizeof($cust) > 0 && sizeof($cust[0]) > 0) {
+                        foreach ($cust as $custRow) {
+                            if (is_array($custRow) && sizeof($custRow) > 0) {
+                                $deets[] = $custRow;
+                            }
+                        }
+                    } else { // default processing
+                        $newDeet = $this->printNodePublic($kidID, $child, $curr->currVisib);
+                        if (is_array($newDeet) 
+                            && sizeof($newDeet) > 0 
+                            && trim($newDeet[0]) != '' 
+                            && trim($newDeet[1]) != '') {
+                            $deets[] = $newDeet;
+                        }
                     }
                 } elseif ($this->allNodes[$kidID]->isDataManip()) {
                     $this->loadManipBranch($kidID, ($curr->currVisib == 1));
                     foreach ($child[1] as $gNode) {
                         if ($this->allNodes[$gNode[0]]->nodeType == 'Data Print Row') {
-                            $deet = $this->printNodePublic(
-                                $gNode[0], 
-                                $gNode, 
-                                $curr->currVisib
-                            );
-                            if ($deet && is_array($deet) && sizeof($deet) > 0) {
-                                $deets[] = $deet;
+                            $cust = $this->nodePrintDataBlockLoadDeetsCustom($gNode[0]);
+                            if (sizeof($cust) > 0 && sizeof($cust[0]) > 0) {
+                                foreach ($cust as $custRow) {
+                                    if (is_array($custRow) && sizeof($custRow) > 0) {
+                                        $deets[] = $custRow;
+                                    }
+                                }
+                            } else { // default processing
+                                $deet = $this->printNodePublic(
+                                    $gNode[0], 
+                                    $gNode, 
+                                    $curr->currVisib
+                                );
+                                if ($deet && is_array($deet) && sizeof($deet) > 0) {
+                                    $deets[] = $deet;
+                                }
                             }
                         }
                     }
                     $this->closeManipBranch($kidID);
                 } elseif ($this->allNodes[$kidID]->isLoopCycle()) {
                     foreach ($this->nodePrintDataBlockLoopCycle($curr, $kidID, $child) 
-                        as $deet) {
+                            as $deet) {
                         $deets[] = $deet;
                     }
                 }
             }
         }
         return $deets;
+    }
+
+    protected function nodePrintDataBlockLoadDeetsCustom($nID)
+    {
+        return [];
     }
 
     protected function nodePrintDataBlockLoopCycle($curr, $kidID, $child)
@@ -290,9 +300,17 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                         }
                     }
                 }
-                if ($val && is_array($val) && trim($val[0]) != '') {
+                $deet = $this->customNodePrintVertProgress($childNode, $val);
+                if ($deet !== null) {
+                    if (sizeof($deet) != 1 || $deet[0] != 'skip row') {
+                        $deets[] = $deet;
+                    }
+                } elseif ($val 
+                    && is_array($val) 
+                    && trim($val[0]) != '') { // && trim($val[0]) != '0000-00-00 00:00:00'
                     $dateTime = strtotime($val[0]);
-                    if (!isset($childNode->nodeRow->node_default)
+                    if (!isset(
+                        $childNode->nodeRow->node_default)
                         || trim($childNode->nodeRow->node_default) != trim($dateTime)) {
                         $fldRow = $GLOBALS["SL"]->getTblFldRow('', $tbl, $fld);
                         if ($fldRow && isset($fldRow->fld_eng)) {
@@ -302,11 +320,23 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                 }
             }
         }
-        return $this->printReportDeetsVertProg(
-            $deets, 
-            strip_tags($curr->nodePromptText), 
-            $curr
-        );
+        $text = strip_tags($curr->nodePromptText);
+        return $this->printReportDeetsVertProg($deets, $text, $curr);
     }
+
+    /**
+     * Overrides primary Survloop printing of individual nodes from 
+     * surveys and site pages. This is one of the main routing hubs
+     * for OpenPolice.org customizations beyond Survloop defaults.
+     *
+     * @param  TreeNodeSurv $curr
+     * @param  string $var
+     * @return string
+     */
+    protected function customNodePrintVertProgress(&$curr = null, $val = null)
+    {
+        return null;
+    }
+
 
 }

@@ -65,19 +65,27 @@
 {!! $GLOBALS["SL"]->printTreeNodeStats($isPrint, $isAll, $isAlt) !!}
 
 @if ($GLOBALS['SL']->treeIsAdmin)
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}" 
-        ><h4 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/dashboard/start/' 
-        . $GLOBALS['SL']->treeRow->tree_slug, false) !!}</h4></a>
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/dashboard/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}" 
+        ><h4 class="mTn10 mB5">{!! 
+            $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] 
+                . '/dashboard/start/' . $GLOBALS['SL']->treeRow->tree_slug, false)
+        !!}</h4></a>
 @else
-    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] }}/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}"
-        ><h4 class="mTn10 mB5">{!! $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] . '/start/' 
-        . $GLOBALS['SL']->treeRow->tree_slug, false) !!}</h4></a>
+    <a href="{{ $GLOBALS['SL']->sysOpts['app-url'] 
+        }}/start/{{ $GLOBALS['SL']->treeRow->tree_slug }}"
+        ><h4 class="mTn10 mB5">{!! 
+            $GLOBALS['SL']->swapURLwrap($GLOBALS['SL']->sysOpts['app-url'] 
+                . '/start/' . $GLOBALS['SL']->treeRow->tree_slug, false) 
+        !!}</h4></a>
 @endif
 
 <div class="mT15">{!! $printTree !!}</div>
 
-@if (!isset($GLOBALS['SL']->treeRow->tree_root) || intVal($GLOBALS['SL']->treeRow->tree_root) <= 0)
-    <a href="?node=-37" class="btn btn-lg btn-primary"><i class="fa fa-plus-square-o"></i> Create Root Node</a>
+@if (!isset($GLOBALS['SL']->treeRow->tree_root) 
+    || intVal($GLOBALS['SL']->treeRow->tree_root) <= 0)
+    <a href="?node=-37" class="btn btn-primary"
+        ><i class="fa fa-plus-square-o"></i> Create Root Node</a>
 @endif
 
 </div>

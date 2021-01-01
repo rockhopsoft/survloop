@@ -11,15 +11,17 @@
         <div id="isStepLoop"></div>
     @endif
     @if (!$node->isStepLoop() && $currLoopSize == 0)
-        <div class="pT15 pB15">
-            <b>No {{ strtolower($loopName) }} added yet.</b>
+        <div class="pT15">
+            <h4><span class="slGrey">
+                No {{ strtolower($loopName) }} added yet.
+            </span></h4>
         </div>
     @else
-        <div class="p15"></div>
+        <div class="pT15"></div>
     @endif
     @if ($currLoopSize > 0)
         @if (!$node->isStepLoop() && $currLoopSize > 10)
-            <div class="mTn10 mB20">{!! $addBtn !!}</div>
+            <div class="mTn15 mB20">{!! $addBtn !!}</div>
         @endif
         {!! $loopRows !!}
     @endif

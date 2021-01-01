@@ -96,7 +96,7 @@
             <div class="mB5"><br /><u><b>Special Page Types</b></u></div>
             <label class="w100 p5"><input type="checkbox" name="opt7" value="7" autocomplete="off" 
                 @if ($GLOBALS['SL']->treeRow->tree_opts%7 == 0) CHECKED @endif >
-                <i class="fa fa-home mL10 mR5" aria-hidden="true"></i> Home Page</label>
+                <i class="fa fa-home mL10 mR5" aria-hidden="true"></i> Homepage</label>
             <label class="w100 p5"><input type="checkbox" name="opt13" value="13" autocomplete="off" 
                 @if ($GLOBALS['SL']->treeRow->tree_opts%13 == 0) CHECKED @endif >
                 <i class="fa fa-list-alt mL10 mR5"></i> Report for Survey</label>

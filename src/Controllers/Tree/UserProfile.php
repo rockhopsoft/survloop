@@ -104,9 +104,11 @@ class UserProfile extends TreeSurvInput
                 $this->coreID = $GLOBALS["SL"]->coreID = $this->findUserCoreID();
                 if ($this->coreID > 0) {
                     session()->put('coreID' . $sessTree, $this->coreID);
+                    session()->put('coreID' . $sessTree . 'old' . $this->coreID, time());
                     session()->save();
-                    $log = 'Putting Cookie ' . $GLOBALS["SL"]->coreTbl . '#' . $this->coreID 
-                        . ' for U#' . $this->v["uID"] . ' <i>(afterLogin)</i>';
+                    $log = 'Putting Cookie ' . $GLOBALS["SL"]->coreTbl 
+                        . '#' . $this->coreID . ' for U#' 
+                        . $this->v["uID"] . ' <i>(afterLogin)</i>';
                     $this->logAdd('session-stuff', $log);
                 }
             }
@@ -226,11 +228,12 @@ class UserProfile extends TreeSurvInput
             && isset($this->v["profileUser"]) 
             && isset($this->v["profileUser"]->id)) {
             $this->v["profileUser"]->loadRoles();
+            $uID = $this->v["profileUser"]->id;
             $this->v["canEdit"] = false;
             if (isset($this->v["user"]) 
                 && $this->v["user"] 
                 && ($this->v["user"]->hasRole('administrator|staff')
-                    || $this->v["user"]->id == $this->v["profileUser"]->id)) {
+                    || $this->v["user"]->id == $uID)) {
                 $this->v["canEdit"] = true;
             }
             if (isset($this->v["uID"]) 
@@ -251,13 +254,11 @@ class UserProfile extends TreeSurvInput
                     $this->profilePhotoDelete();
                 }
             }
-            $this->v["userLogs"] = '';
+            $this->v["userActivity"] = $this->v["userSess"] = '';
             if ($this->v["user"] 
                 && $this->v["user"]->hasRole('administrator|staff')) {
-                $this->v["userLogs"] = $this->logPreviewUser(
-                    'session-stuff', 
-                    $this->v["profileUser"]->id
-                );
+                $this->v["userSess"] = $this->logPreviewUser('session-stuff', $uID);
+                $this->v["userActivity"] = $this->activityPreviewUser($uID);
             }
             $this->v["picInstruct"] = $this->profilePhotoUploadInstruct();
             return view('vendor.survloop.auth.profile', $this->v)->render();

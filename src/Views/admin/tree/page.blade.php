@@ -57,7 +57,8 @@
 {!! $printTree !!}
 
 @if (!isset($GLOBALS['SL']->treeRow->tree_root) || intVal($GLOBALS['SL']->treeRow->tree_root) <= 0)
-    <a href="?node=-37" class="btn btn-lg btn-primary"><i class="fa fa-plus-square-o"></i> Create Root Node</a>
+    <a href="?node=-37" class="btn btn-primary"
+        ><i class="fa fa-plus-square-o"></i> Create Root Node</a>
 @endif
 
 {!! $GLOBALS["SL"]->chkMissingReportFlds() !!}

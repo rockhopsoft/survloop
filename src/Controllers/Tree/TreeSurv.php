@@ -70,6 +70,9 @@ class TreeSurv extends TreeSurvLoops
             session()->forget('redirLoginSurvey');
             session()->save();
         }
+        if (!isset($GLOBALS["SL"]->treeRow->tree_root)) {
+            $GLOBALS["SL"]->loadGlobalTables($this->dbID, $this->treeID, $this->treeID);
+        }
         if ($this->currNode() < 0 || !isset($this->allNodes[$this->currNode()])) {
             $this->updateCurrNode($GLOBALS["SL"]->treeRow->tree_root);
             //return '<h1>Sorry, Page Not Found.</h1>';
@@ -363,7 +366,7 @@ class TreeSurv extends TreeSurvLoops
         if ($this->v["currPage"][0] != '/' && isset($this->v["uID"])) {
             $log = new SLUsersActivity;
             $log->user_act_user = $this->v["uID"];
-            $log->user_act_curr_page = $this->v["currPage"][0] . $notes;
+            $log->user_act_curr_page = $this->v["currPage"][0] . ' ' . $notes;
             $log->save();
         }
         return $notes;
@@ -516,7 +519,7 @@ class TreeSurv extends TreeSurvLoops
                 $tbl = $curr->dataBranch;
             }
         }
-        return [$tbl, $fld, $newVal];
+        return [ $tbl, $fld, $newVal ];
     }
     
     protected function loadManipBranch($nID, $force = false)

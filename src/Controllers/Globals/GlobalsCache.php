@@ -112,7 +112,9 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllCachesOfTree($treeID = 0)
     {
+        $key = ".%.db%.tree" . $treeID . ".%";
         $chk = SLCaches::where('cach_tree_id', intVal($treeID))
+            ->orWhere('cach_key', 'LIKE', $key)
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cache) {
@@ -142,12 +144,30 @@ class GlobalsCache extends GlobalsBasic
                 $this->deleteCacheFile($cache);
             }
         }
+        $key = ".%.db%.tree" . $treeID . ".%";
+        $chk = SLCaches::where('cach_type', $type)
+            ->where('cach_key', 'LIKE', $key)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
         return true;
     }
 
     public function forgetAllItemCaches($treeID = 0, $coreID = 0)
     {
         $chk = SLCaches::where('cach_tree_id', $treeID)
+            ->where('cach_rec_id', $coreID)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $cache) {
+                $this->deleteCacheFile($cache);
+            }
+        }
+        $key = ".%.db%.tree" . $treeID . ".%";
+        $chk = SLCaches::where('cach_key', 'LIKE', $key)
             ->where('cach_rec_id', $coreID)
             ->get();
         if ($chk->isNotEmpty()) {
@@ -523,7 +543,7 @@ class GlobalsCache extends GlobalsBasic
     public function getCacheSffxAdds()
     {
         $sffx = '';
-        if ($this->isOwner) {
+        if (isset($this->isOwner) && $this->isOwner == true) {
             $sffx .= '-owner';
         }
         if (isset($this->coreID) && intVal($this->coreID) > 0) {

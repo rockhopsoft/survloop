@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\SLNode;
 use App\Models\SLFields;
+use App\Models\SLLogActions;
 use App\Models\SLSearchRecDump;
 use RockHopSoft\Survloop\Controllers\Globals\Globals;
 use RockHopSoft\Survloop\Controllers\Tree\TreeCoreSess;
@@ -582,7 +583,9 @@ class TreeSurvAPI extends TreeCoreSess
     {
         $val = trim($val);
         if ($fldType == 'DATE' 
-            && ($val == '' || $val == '0000-00-00' || $val == '1970-01-01')) {
+            && ($val == '' 
+                || $val == '0000-00-00' 
+                || $val == '1970-01-01')) {
             return true;
         } elseif ($fldType == 'DATETIME' 
             && ($val == '' 
@@ -654,12 +657,32 @@ class TreeSurvAPI extends TreeCoreSess
                 $this->xmlMapTree->nodeTiers, 
                 $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]
             ) . $this->genRecDumpXtra();
-        $dump = htmlentities($GLOBALS["SL"]->stdizeChars(str_replace('  ', ' ', trim($dump))));
+        $dump = str_replace('  ', ' ', trim($dump));
+        $dump = htmlentities($GLOBALS["SL"]->stdizeChars($dump));
+
         $dumpRec = new SLSearchRecDump;
         $dumpRec->sch_rec_dmp_tree_id  = $treeID;
         $dumpRec->sch_rec_dmp_rec_id   = $this->sessData->getDataCoreID();
+        $dumpRec->sch_rec_dmp_perms    = $GLOBALS["SL"]->getCacheSffxAdds();
         $dumpRec->sch_rec_dmp_rec_dump = $dump;
-        $dumpRec->save();
+        $chk = SLSearchRecDump::where('sch_rec_dmp_tree_id', '=', $treeID)
+            ->where('sch_rec_dmp_rec_id', '=', $dumpRec->sch_rec_dmp_rec_id)
+            ->where('sch_rec_dmp_perms', 'LIKE', $dumpRec->sch_rec_dmp_perms)
+            ->where('sch_rec_dmp_rec_dump', 'LIKE', $dump)
+            ->get();
+        if ($chk->isEmpty()) {
+            try {
+                $dumpRec->save();
+            } catch (Exception $e) {
+                $log = new SLLogActions;
+                $log->log_database = $this->dbID;
+                $log->log_user     = $this->v["uID"];
+                $log->log_action   = 'Search Rec Dump';
+                $log->log_old_name = 'Tree ' . $treeID;
+                $log->log_new_name = 'Rec ' . $dumpRec->sch_rec_dmp_rec_id;
+                $log->save();
+            }
+        }
         return $dumpRec;
     }
     

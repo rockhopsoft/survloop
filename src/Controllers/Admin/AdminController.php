@@ -392,7 +392,7 @@ class AdminController extends AdminEmailController
         $users = User::orderBy('name', 'asc') // where('name', 'NOT LIKE', 'Session#%')
             ->get();
         foreach ($users as $i => $usr) {
-            $list = 3;
+            $list = 5;
             if ($usr->hasRole('administrator')) {
                 $list = 0;
             } elseif ($usr->hasRole('databaser')) {

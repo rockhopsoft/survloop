@@ -1,7 +1,7 @@
 <!-- resources/views/survloop/forms/uploads-print.blade.php -->
 @if (!$REQ->has('upDel') || intVal($REQ->upDel) != $upRow->up_id)
     <div class="nodeAnchor"><a name="up{{ $upRow->up_id }}"></a></div>
-    <div class="pB20 mB20">
+    <div class="pB20 mB20 page-break-avoid">
     @if (intVal($upRow->up_type) == $vidTypeID)
 
         <div class="mB10">
@@ -82,5 +82,15 @@
                 "ext"     => $upDeets["ext"]
             ]
         )->render() !!}
+
+    @if ($GLOBALS["SL"]->REQ->has('pdf')
+        && intVal($upRow->up_type) != $vidTypeID
+        && isset($upRow->up_upload_file) 
+        && isset($upRow->up_stored_file) 
+        && trim($upRow->up_upload_file) != '' 
+        && trim($upRow->up_stored_file) != '')
+        <div><br /><i>Image included at the end of this report.</i></div>
+    @endif
+
     </div>
 @endif

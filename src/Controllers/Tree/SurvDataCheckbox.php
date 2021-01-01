@@ -12,7 +12,6 @@ namespace RockHopSoft\Survloop\Controllers\Tree;
 
 use DB;
 use Auth;
-//use App\Models\SLFields;
 use RockHopSoft\Survloop\Controllers\Tree\SurvDataUtils;
 
 class SurvDataCheckbox extends SurvDataUtils

@@ -53,6 +53,16 @@ class GlobalsTables extends GlobalsElements
                 $this->treeID = $this->treeRow->tree_id;
             }
         }
+        if (!isset($this->treeRow->tree_root) 
+            || intVal($this->treeRow->tree_root) <= 0) {
+            $rootChk = SLNode::where('node_tree', $this->treeID)
+                ->where('node_parent_id', 'LIKE', -3)
+                ->first();
+            if ($rootChk && isset($rootChk->node_id)) {
+                $this->treeRow->tree_root = $rootChk->node_id;
+                $this->treeRow->save();
+            }
+        }
         $coreTbl = 0;
         if ($this->treeRow 
             && isset($this->treeRow->tree_core_table) 

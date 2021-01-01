@@ -188,8 +188,10 @@ class SurvloopSpecialLoads extends SurvCustLoop
     // check if being redirected back to a survey session, which needs to be associated with new user ID
     protected function afterLoginSurveyRedir(Request $request, $redir)
     {
-        if (strpos($redir, '/u/') == 0 && Auth::user() 
-            && isset(Auth::user()->id) && Auth::user()->id > 0) {
+        if (strpos($redir, '/u/') == 0 
+            && Auth::user() 
+            && isset(Auth::user()->id) 
+            && Auth::user()->id > 0) {
             $treeSlug = substr($redir, 3);
             $pos = strpos($treeSlug, '/');
             if ($pos > 0) {
@@ -423,10 +425,27 @@ class SurvloopSpecialLoads extends SurvCustLoop
         return view(
             'vendor.survloop.js.inc-load-menu', 
             [
-                "username"    => $username,
-                "previousUrl" => $previousUrl
+                "username"       => $username,
+                "previousUrl"    => $previousUrl,
+                "userLoadTweaks" => $this->jsLoadMenuTweaks()
             ]
         );
+    }
+    
+    private function jsLoadMenuTweaks()
+    {
+        $userLoadTweaks = null;
+        $this->loadAbbr();
+        if ($this->custAbbr != 'Survloop') {
+            $file = '../vendor/' . $this->custPckg 
+                . '/src/Controllers/' . $this->custAbbr . 'UserLoad.php';
+            $class = $this->custVend . "\\" . $this->custAbbr
+                . "\\Controllers\\" . $this->custAbbr . "UserLoad";
+            if (file_exists($file) && class_exists($class)) {
+                eval("\$userLoadTweaks = new " . $class . ";");
+            }
+        }
+        return $userLoadTweaks;
     }
     
     public function timeOut(Request $request)

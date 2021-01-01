@@ -13,12 +13,12 @@ class SLSess extends Model
 		'sess_user_id', 
 		'sess_tree', 
 		'sess_core_id', 
-		'sess_is_active', 
+        'sess_is_active', 
 		'sess_curr_node', 
 		'sess_loop_root_just_left', 
 		'sess_after_jump_to', 
 		'sess_is_mobile', 
-		'sess_vrowser', 
+		'sess_browser', 
 		'sess_ip', 
     ];
     

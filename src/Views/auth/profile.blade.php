@@ -36,15 +36,29 @@
             <a id="hidivBtnEditProfilePic" class="hidivBtn" 
                 href="javascript:;">Upload Profile Picture</a>
         @endif
-        @if ($userLogs != '')
-            <br /><a id="hidivBtnSessLogs" class="hidivBtn" 
-                href="javascript:;">Session Logs</a>
+        @if (Auth::user() && Auth::user()->hasRole('administrator|staff'))
+            @if ($userActivity != '')
+                <br /><a id="hidivBtnActLogs" class="hidivBtn" 
+                    href="javascript:;">Activity Logs</a>
+            @endif
+            @if ($userSess != '')
+                <br /><a id="hidivBtnSessLogs" class="hidivBtn" 
+                    href="javascript:;">Session Logs</a>
+            @endif
+            <br /><a href="/dashboard/users">List of All Users</a>
         @endif
         </p>
-        @if ($userLogs != '')
-            <div id="hidivSessLogs" class="disNon">
-                <hr>{!! $userLogs !!}
-            </div>
+        @if (Auth::user() && Auth::user()->hasRole('administrator|staff'))
+            @if ($userActivity != '')
+                <div id="hidivActLogs" class="disNon">
+                    <hr>{!! $userActivity !!}
+                </div>
+            @endif
+            @if ($userSess != '')
+                <div id="hidivSessLogs" class="disNon">
+                    <hr>{!! $userSess !!}
+                </div>
+            @endif
         @endif
         @if ($canEdit)
             <div id="hidivEditProfile" class="disNon">

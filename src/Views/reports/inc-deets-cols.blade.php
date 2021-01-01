@@ -7,7 +7,7 @@
     <div class="mB10">{!! $blockDesc !!}</div>
 @endif
 @if (isset($deetCols) && sizeof($deetCols) > 0)
-    <div class="row" @if ($GLOBALS["SL"]->isPdfView()) style="padding-bottom: 30px;" @endif >
+    <div class="row repDeetsCols">
     @foreach ($deetCols as $i => $deets) 
         <div class="col-md-{{ $GLOBALS['SL']->getColsWidth(sizeof($deetCols)) }}">
             <table class="repDeetsBlock">

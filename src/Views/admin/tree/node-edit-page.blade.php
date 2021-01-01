@@ -56,7 +56,7 @@
                         <input type="checkbox" name="homepage" id="homepageID" value="7" 
                             @if ($GLOBALS['SL']->treeRow->tree_opts%7 == 0) CHECKED @endif 
                             autocomplete="off" class="mR5">
-                        <i class="fa fa-star mR5" aria-hidden="true"></i> Website Home Page
+                        <i class="fa fa-star mR5" aria-hidden="true"></i> Website Homepage
                     </label>
                     <label class="disBlo mT20">
                         <input type="checkbox" name="reportPage" id="reportPageID" value="13" 

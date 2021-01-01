@@ -468,33 +468,65 @@ function getTagNodeInd(nIDtxt) {
 }
 
 function addTagOpt(nIDtxt, tagID, tagText, preSel) {
+    return addTagOptExtra(nIDtxt, tagID, tagText, preSel, '');
+}
+
+function addTagOptExtra(nIDtxt, tagID, tagText, preSel, classExtra) {
     var nodeInd = getTagNodeInd(nIDtxt);
     if (nodeInd < 0) {
         nodeInd = nodeTags.length;
         nodeTags[nodeInd] = new Array(nIDtxt, []);
         nodeTagList[nodeInd] = [];
     }
-    if (!nodeTags[nodeInd][1][tagID]) nodeTags[nodeInd][1][tagID] = new Array(tagText, preSel);
+    var found = false;
+    for (var t=0; t < nodeTags[nodeInd][1].length; t++) {
+        if (nodeTags[nodeInd][1][t][0] == tagID) {
+            found = true;
+        }
+    }
+    if (!found) {
+        nodeTags[nodeInd][1][nodeTags[nodeInd][1].length] = new Array(tagID, tagText, preSel, classExtra);
+    }
     nodeTagList[nodeInd][nodeTagList[nodeInd].length] = tagID;
     return true;
 }
 
+function getTagInd(nodeInd, tagID) {
+    var tagInd = -1;
+    for (var t=0; t < nodeTags[nodeInd][1].length; t++) {
+        if (nodeTags[nodeInd][1][t][0] == tagID) {
+            tagInd = t;
+        }
+    }
+    return tagInd;
+}
+
 function selectTag(nIDtxt, tagID) {
     var nodeInd = getTagNodeInd(nIDtxt);
-    if (nodeInd >= 0 && nodeTags[nodeInd] && nodeTags[nodeInd][1][tagID]) nodeTags[nodeInd][1][tagID][1] = 1;
+    if (nodeInd >= 0 && nodeTags[nodeInd] && nodeTags[nodeInd][1].length > 0) {
+        var tagInd = getTagInd(nodeInd, tagID);
+        if (tagInd >= 0) nodeTags[nodeInd][1][tagInd][2] = 1;
+    }
     updateTagList(nIDtxt);
     return true;
 }
 
 function deselectTag(nIDtxt, tagID) {
     var nodeInd = getTagNodeInd(nIDtxt);
-    if (nodeInd >= 0 && nodeTags[nodeInd] && nodeTags[nodeInd][1][tagID]) nodeTags[nodeInd][1][tagID][1] = 0;
+    if (nodeInd >= 0 && nodeTags[nodeInd] && nodeTags[nodeInd][1].length > 0) {
+        var tagInd = getTagInd(nodeInd, tagID);
+        if (tagInd >= 0) nodeTags[nodeInd][1][tagInd][2] = 0;
+    }
     updateTagList(nIDtxt);
     return false;
 }
 
 function printTag(nIDtxt, tagID, tagText) {
-    return "<a onClick=\"return deselectTag('"+nIDtxt+"', "+tagID+");\" class=\"btn btn-primary\" href=\"javascript:;\">"+tagText+"<i class=\"fa fa-times\" aria-hidden=\"true\"></i></a> ";
+    return printTagExtra(nIDtxt, tagID, tagText, '');
+}
+
+function printTagExtra(nIDtxt, tagID, tagText, classExtra) {
+    return "<a data-tag-nid=\""+nIDtxt+"\" data-tag-id=\""+tagID+"\" class=\"btn btn-primary formTagDeselect "+classExtra+" \" href=\"javascript:;\">"+tagText+"<i class=\"fa fa-times\" aria-hidden=\"true\"></i></a> ";
 }
 
 function updateTagList(nIDtxt) {
@@ -504,14 +536,19 @@ function updateTagList(nIDtxt) {
     if (nodeTags[nodeInd] && nodeTagList[nodeInd]) {
         for (var i = 0; i < nodeTagList[nodeInd].length; i++) {
             var tagID = nodeTagList[nodeInd][i];
-            if (nodeTags[nodeInd][1][tagID] && nodeTags[nodeInd][1][tagID][1] == 1 && tagIDs.indexOf(","+tagID+",") < 0) {
+            var tagInd = getTagInd(nodeInd, tagID);
+            if (tagInd >= 0 && nodeTags[nodeInd][1][tagInd][2] == 1 && tagIDs.indexOf(","+tagID+",") < 0) {
                 tagIDs += tagID+",";
-                tagHtml += printTag(nIDtxt, tagID, nodeTags[nodeInd][1][tagID][0]);
+                tagHtml += printTagExtra(nIDtxt, tagID, nodeTags[nodeInd][1][tagInd][1], nodeTags[nodeInd][1][tagInd][3]);
             }
         }
     }
-    if (document.getElementById("n"+nIDtxt+"tagIDsID")) document.getElementById("n"+nIDtxt+"tagIDsID").value=tagIDs;
-    if (document.getElementById("n"+nIDtxt+"tags")) document.getElementById("n"+nIDtxt+"tags").innerHTML=tagHtml;
+    if (document.getElementById("n"+nIDtxt+"tagIDsID")) {
+        document.getElementById("n"+nIDtxt+"tagIDsID").value=tagIDs;
+    }
+    if (document.getElementById("n"+nIDtxt+"tags")) {
+        document.getElementById("n"+nIDtxt+"tags").innerHTML=tagHtml;
+    }
     return true;
 }
 

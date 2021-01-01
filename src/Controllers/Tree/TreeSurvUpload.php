@@ -307,12 +307,14 @@ class TreeSurvUpload extends TreeSurv
     {
         $imgPdfFile = str_replace('.jpg', '.pdf', $deet["file"]);
         if (isset($deet["file"])
+            && file_exists($deet["file"])
             && (!file_exists($imgPdfFile) || $GLOBALS["SL"]->REQ->has('refresh'))) {
             list($width, $height, $type, $attr) = getimagesize($deet["file"]);
-            $title .= '<img src="data:image/jpeg;base64, '
+            $title = '<div class="page-break-avoid" style="width: 100%;">'
+                . $title . '<img src="data:image/jpeg;base64, '
                 . base64_encode(file_get_contents($deet["file"])) . '" style="'
                 . (($width < ($height*0.7)) ? 'width: 67%;' : 'width: 100%;')
-                . '" >';
+                . '" ></div>';
             $this->v["pdf-gen"]->genSimplePDF($title, $imgPdfFile);
         }
         return $imgPdfFile;
@@ -444,6 +446,7 @@ class TreeSurvUpload extends TreeSurv
         $ret["youtube"]  
             = $ret["vimeo"]
             = $ret["archiveVid"]
+            = $ret["instagram"]
             = $ret["otherLnk"]
             = '';
         $ret["imgWidth"] = $ret["imgHeight"] = 0;
@@ -495,6 +498,25 @@ class TreeSurvUpload extends TreeSurv
             $ret["archiveVid"] = $GLOBALS["SL"]->getArchiveOrgVidID($upRow->up_video_link);
             $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
                 . '" target="_blank">archive.org/details/' . $ret["archiveVid"] . '</a>';
+            $ret["thmbUrl"] = '';
+        } elseif (stripos($upRow->up_video_link, 'instagram.com') !== false) {
+            $ret["instagram"] = $GLOBALS["SL"]->getInstagramID($upRow->up_video_link);
+            $ret["fileLnk"] = '<a href="' . $upRow->up_video_link 
+                . '" target="_blank">instagram/' . $ret["instagram"] . '</a>';
+            $ret["thmbUrl"] = $ret["instagramShortLink"] = '';
+            /*
+            $jsonUrl = $upRow->up_video_link . '?__a=1';
+            $json = json_decode(file_get_contents($jsonUrl), true);
+            if (isset($json["graphql"])
+                && isset($json["graphql"]["shortcode_media"])) {
+                if (isset($json["graphql"]["shortcode_media"]["thumbnail_src"])) {
+                    $ret["thmbUrl"] = $json["graphql"]["shortcode_media"]["thumbnail_src"];
+                }
+                if (isset($json["graphql"]["shortcode_media"]["display_url"])) {
+                    $ret["instagramShortLink"] = $json["graphql"]["shortcode_media"]["display_url"];
+                }
+            }
+            */
         } elseif (isset($upRow->up_video_link)) {
             $ret["otherLnk"] = trim($upRow->up_video_link);
         }
@@ -603,7 +625,7 @@ class TreeSurvUpload extends TreeSurv
                         "cnt"         => sizeof($ups),
                         "nID"         => $nID,
                         "REQ"         => $GLOBALS["SL"]->REQ,
-                        "height"      => 180,
+                        "height"      => 400,
                         "width"       => 330,
                         "upRow"       => $upRow, 
                         "upDeets"     => $this->upDeets[$i], 

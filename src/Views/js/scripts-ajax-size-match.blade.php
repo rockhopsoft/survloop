@@ -25,10 +25,12 @@ function chkMatchCols() {
             }
         }
     }
+    chkMatchColWidths();
+    chkStickyFooter();
     return true;
 }
 
-function chkMatchColWidths(timeout) {
+function chkMatchColWidths() {
     for (var i = 0; i < 20; i++) {
         if (document.getElementById("fixHead"+i+"") && document.getElementById("fixHeadFixed"+i+"")) {
             var width = $("#fixHead"+i+"").width()-matchingColWidthPadding;
@@ -37,3 +39,22 @@ function chkMatchColWidths(timeout) {
     }
     return true;
 }
+
+function chkStickyFooter() {
+    if (document.getElementById("mainNav") && document.getElementById("footerLinks") && document.getElementById("ajaxWrap")) {
+        var headHeight = $("#mainNav").height();
+        var footHeight = $("#footerLinks").height();
+        var bodyHeight = (window.innerHeight || document.documentElement.clientHeight);
+        var newHeight = Math.round(bodyHeight-footHeight-headHeight-stickyFooterExtra);
+        document.getElementById("ajaxWrap").style.minHeight=newHeight+"px";
+        /*
+        if ($("#ajaxWrap").height() <= (newHeight+5)) {
+            document.body.style.overflowY = "hidden";
+        } else {
+            document.body.style.overflowY = "auto";
+        }
+        */
+    }
+}
+
+

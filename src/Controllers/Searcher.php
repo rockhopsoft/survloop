@@ -135,6 +135,7 @@ class Searcher extends SurvCustLoop
             $chk = SLSearchRecDump::where('sch_rec_dmp_tree_id', $this->treeID)
                 ->whereIn('sch_rec_dmp_rec_id', $this->allPublicFiltIDs)
                 ->where('sch_rec_dmp_rec_dump', 'LIKE', '%' . $this->searchTxt . '%')
+                ->where('sch_rec_dmp_perms', $GLOBALS["SL"]->getCacheSffxAdds())
                 ->orderBy('sch_rec_dmp_rec_id', 'desc')
                 ->get();
             if ($chk->isNotEmpty()) {
@@ -253,40 +254,65 @@ class Searcher extends SurvCustLoop
                 $this->searchFilts["user"] = $this->v["uID"];
             }
             $GLOBALS["SL"]->loadStates();
-            $this->searchFilts["state"] 
-                = $this->searchFilts["fltStateClim"] 
-                = '';
-            $this->searchFilts["states"] = [];
-            if ($GLOBALS["SL"]->REQ->has('state')) {
-                $state = trim($GLOBALS["SL"]->REQ->get('state'));
-                if ($state != '' && (isset($GLOBALS["SL"]->states->stateList[$state])
-                    || isset($GLOBALS["SL"]->states->stateListCa[$state]))) {
-                    $this->searchFilts["state"] = $state;
-                }
-            }
-            if ($GLOBALS["SL"]->REQ->has('states')) {
-                $this->getSearchFiltsStates($GLOBALS["SL"]->REQ->get('states'));
-            }
-            if ($GLOBALS["SL"]->REQ->has('fltStateClim')) {
-                $stateClim = trim($GLOBALS["SL"]->REQ->get('fltStateClim'));
-                if ($stateClim != '' 
-                    && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
-                        || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
-                        || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
-                    $this->searchFilts["fltStateClim"] = $stateClim;
-                }
-            }
+            $this->getSearchFiltsGeography();
             $this->searchFilts["dataSet"] = $this->v["dataSet"] = '';
             if ($GLOBALS["SL"]->REQ->has('dataSet')) {
                 $this->v["dataSet"] = trim($GLOBALS["SL"]->REQ->get('dataSet'));
                 $this->searchFilts["dataSet"] = $this->v["dataSet"];
             }
-
             $this->searchOpts["limit"] = $GLOBALS["SL"]->getLimit();
             $this->getSearchBarAdvanced($treeID);
             $this->searchResultsXtra($treeID);
             $this->printSearchBarAdvanced($treeID);
         }
+        return true;
+    }
+    
+    protected function getSearchFiltsGeography()
+    {
+        $this->searchFilts["state"] 
+            = $this->searchFilts["fltStateClim"] 
+            = '';
+        $this->searchFilts["states"] 
+            = $this->searchFilts["fltStateClimTag"]
+            = [];
+        if ($GLOBALS["SL"]->REQ->has('state')) {
+            $state = trim($GLOBALS["SL"]->REQ->get('state'));
+            if ($state != '' 
+                && (isset($GLOBALS["SL"]->states->stateList[$state])
+                    || isset($GLOBALS["SL"]->states->stateListCa[$state]))) {
+                $this->searchFilts["state"] = $state;
+            }
+        }
+        if ($GLOBALS["SL"]->REQ->has('states')) {
+            $this->getSearchFiltsStates($GLOBALS["SL"]->REQ->get('states'));
+        }
+        if ($GLOBALS["SL"]->REQ->has('fltStateClim')) {
+            $stateClim = trim($GLOBALS["SL"]->REQ->get('fltStateClim'));
+            if ($stateClim != '' 
+                && (isset($GLOBALS["SL"]->states->stateList[$stateClim])
+                    || isset($GLOBALS["SL"]->states->stateListCa[$stateClim])
+                    || sizeof($GLOBALS["SL"]->states->getAshraeGroupZones($stateClim)) > 0)) {
+                $this->searchFilts["fltStateClim"] = $stateClim;
+            }
+        }
+        if ($GLOBALS["SL"]->REQ->has('fltStateClimTag')
+            && trim($GLOBALS["SL"]->REQ->has('fltStateClimTag')) != ',') {
+            $tags = $GLOBALS["SL"]->REQ->get('fltStateClimTag');
+            $this->searchFilts["fltStateClimTag"] = $GLOBALS["SL"]->mexplode(',', $tags);
+        } elseif ($GLOBALS["SL"]->REQ->has('fltStateClimNID')
+            && intVal($GLOBALS["SL"]->REQ->get('fltStateClimNID')) > 0) {
+            $nID = intVal($GLOBALS["SL"]->REQ->get('fltStateClimNID'));
+            if ($GLOBALS["SL"]->REQ->has('n' . $nID . 'tagIDs')) {
+                $tags = $GLOBALS["SL"]->REQ->get('n' . $nID . 'tagIDs');
+                $this->searchFilts["fltStateClimTag"] = $GLOBALS["SL"]->mexplode(',', $tags);
+            }
+        }
+//echo '<pre>'; print_r($this->searchFilts); print_r($GLOBALS["SL"]->REQ->all()); echo '</pre>'; exit;
+        $this->v["state"]           = $this->searchFilts["state"];
+        $this->v["states"]          = $this->searchFilts["states"];
+        $this->v["fltStateClim"]    = $this->searchFilts["fltStateClim"];
+        $this->v["fltStateClimTag"] = $this->searchFilts["fltStateClimTag"];
         return true;
     }
     

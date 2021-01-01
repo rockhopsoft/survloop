@@ -1,12 +1,14 @@
-@extends('vendor.survloop.master')
+<?php
+$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
+$css = $sysDefs->loadCss();
+?>@extends('vendor.survloop.master')
 @section('content')
+<div id="ajaxWrap">
 <!-- resources/views/auth/login.blade.php -->
 
 <form name="mainPageForm" method="POST" action="/login">
-<input type="hidden" id="isLoginID" 
-    name="isLogin" value="1">
-<input type="hidden" id="csrfTok" 
-    name="_token" value="{{ csrf_token() }}">
+<input type="hidden" id="isLoginID" name="isLogin" value="1">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="previous" 
     @if (isset($midSurvRedir) && trim($midSurvRedir) != '') 
         value="{{ $midSurvRedir }}"
@@ -15,8 +17,7 @@
     @else value="{{ URL::previous() }}"
     @endif >
 
-<div class="w100 row2" 
-    style="padding: 30px 0px 60px 0px;"><center>
+<div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
     <div id="treeWrap" class="treeWrapForm">
         <div class="slCard">
 
@@ -49,81 +50,74 @@
                 !!}</div>
             @endif
 
-            <div id="innerFormWrapHide" class="disNon p30">
-                <center>{!! 
-                    $GLOBALS["SL"]->sysOpts["spinner-code"] 
-                !!}</center>
-            </div>
-            <div id="innerFormWrap" class="disBlo">
-                <div id="node004" class="nodeWrap">
-                    <div class="nodeHalfGap"></div>
-                    <div id="nLabel004" class="nPrompt">
-                        <label for="emailID">
-                            Username or Email 
-                            <span class="red">*required</span>
-                        </label>
-                    </div>
-                    <div class="nFld">
-                        <input id="emailID" name="email" type="text"
-                            value="{{ old('email') }}" class="form-control">
-                        @if ($errors->has('email'))
-                            <span class="form-text">
-                                <b>{{ $errors->first('email') }}</b>
-                            </span>
-                        @endif
-                    </div>
-                    <div class="nodeHalfGap"></div>
-                </div>
-
-                <div id="node003" class="nodeWrap">
-                    <div class="nodeHalfGap"></div>
-                    <div id="nLabel003" class="nPrompt">
-                        <label for="password">
-                            Password 
-                            <span class="red">*required</span>
-                        </label>
-                    </div>
-                    <div class="nFld">
-                        <input id="password" name="password" value="" 
-                            type="password" class="form-control">
-                        @if ($errors->has('password'))
-                            <span class="form-text">
-                                <b>{{ $errors->first('password') }}</b>
-                            </span>
-                        @endif
-                    </div>
-                    <div class="nodeHalfGap"></div>
-                </div>
-
-                <div class="nFldRadio fL">
-                    <label for="rememberID">
-                        <input name="remember" id="rememberID" 
-                            type="checkbox" > Remember Me
+            <div id="node004" class="nodeWrap">
+                <div class="nodeHalfGap"></div>
+                <div id="nLabel004" class="nPrompt">
+                    <label for="emailID">
+                        Username or Email 
+                        <span class="red">*required</span>
                     </label>
                 </div>
-                <a href="/password/reset" class="fR"
-                    >Forgot your username or password?</a>
-                <div class="fC pB20"></div>
-
-            @if (!isset($midSurvBack) || trim($midSurvBack) == '')
-                <center><input type="submit" value="Login" 
-                    class="btn btn-lg btn-primary"
-                    id="loginSubmitBtn"></center>
-            @else
-                <div id="pageBtns">
-                    <div id="formErrorMsg"></div>
-                    <div id="nodeSubBtns" class="nodeSub">
-                        <input type="submit" value="Login" 
-                            class="fR btn btn-primary btn-lg" 
-                            id="loginSubmitBtn">
-                        <a href="{{ $midSurvBack }}" id="nFormBack" 
-                            class="fL btn btn-secondary btn-lg">Back</a>
-                        <div class="fC p5"></div>
-                    </div>
+                <div class="nFld">
+                    <input id="emailID" name="email" type="text"
+                        value="{{ old('email') }}" class="form-control">
+                    @if ($errors->has('email'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first('email') }}
+                        </div>
+                    @endif
                 </div>
-                <div class="pageBotGap"></div>
-            @endif
+                <div class="nodeHalfGap"></div>
             </div>
+
+            <div id="node003" class="nodeWrap">
+                <div class="nodeHalfGap"></div>
+                <div id="nLabel003" class="nPrompt">
+                    <label for="password">
+                        Password 
+                        <span class="red">*required</span>
+                    </label>
+                </div>
+                <div class="nFld">
+                    <input id="password" name="password" value="" 
+                        type="password" class="form-control">
+                    @if ($errors->has('password'))
+                        <div class="alert alert-danger" role="alert">
+                            {{ $errors->first('password') }}
+                        </div>
+                    @endif
+                </div>
+                <div class="nodeHalfGap"></div>
+            </div>
+
+            <div class="nFldRadio fL">
+                <label for="rememberID">
+                    <input name="remember" id="rememberID" 
+                        type="checkbox" > Remember Me
+                </label>
+            </div>
+            <a href="/password/reset" class="fR"
+                >Forgot your username or password?</a>
+            <div class="fC pB20"></div>
+
+        @if (!isset($midSurvBack) || trim($midSurvBack) == '')
+            <center>{!!
+                $GLOBALS["SL"]->printLoadAnimBtn('Login', 'Login')
+            !!}</center>
+        @else
+            <div id="pageBtns">
+                <div id="formErrorMsg"></div>
+                <div id="nodeSubBtns" class="nodeSub">
+                    <input type="submit" value="Login" 
+                        class="fR btn btn-primary btn-lg" 
+                        id="loginSubmitBtn">
+                    <a href="{{ $midSurvBack }}" id="nFormBack" 
+                        class="fL btn btn-secondary btn-lg">Back</a>
+                    <div class="fC p5"></div>
+                </div>
+            </div>
+            <div class="pageBotGap"></div>
+        @endif
 
         </div>
     </div></center>
@@ -133,14 +127,7 @@
 
 </form>
 
-<script type="text/javascript"> $(document).ready(function(){
+<style> #main, body { background: {{ $css["color-main-faint"] }}; } </style>
 
-$(document).on("click", "#loginSubmitBtn", function() {
-    document.getElementById("innerFormWrap").style.display="none";
-    document.getElementById("innerFormWrapHide").style.display="block";
-});
-
-}); </script>
-
-
+</div>
 @endsection

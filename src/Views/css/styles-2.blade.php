@@ -27,7 +27,6 @@ body, p, .slTxt {
     width: 100%;
     min-height: 100%;
     overflow: visible;
-    padding-bottom: 60px;
 }
 #ajaxWrapLoad {
     display: block;
@@ -58,7 +57,6 @@ body, p, .slTxt {
 #nondialog {
     display: block;
     width: 100%;
-    height: 100%;
 }
 
 #footerLinks {

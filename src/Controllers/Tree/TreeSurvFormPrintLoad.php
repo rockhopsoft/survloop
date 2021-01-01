@@ -82,7 +82,8 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
         } else { // default logic, not LoopCycle, not SpreadTable 
             list($curr->itemInd, $curr->itemID) = $this->sessData->currSessDataPos(
                 $curr->tbl, 
-                $curr->hasParManip
+                $curr->hasParManip,
+                $curr->nID
             );
             if ($curr->itemInd < 0 
                 && isset($GLOBALS["SL"]->closestLoop["loop"]) 

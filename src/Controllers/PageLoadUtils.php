@@ -230,7 +230,8 @@ class PageLoadUtils extends Controller
                     if ($t 
                         && isset($t->tree_opts) 
                         && $this->okToLoadTree($t->tree_opts)
-                        && (!isset($GLOBALS["SL"]) 
+                        && (!isset($GLOBALS["SL"])
+                            || sizeof($GLOBALS["SL"]->REQ->all()) == 0 
                             || $GLOBALS["SL"]->treeID != $t->tree_id)) {
                         $this->syncDataTrees(
                             $request, 
@@ -427,6 +428,33 @@ class PageLoadUtils extends Controller
         return redirect($this->domainPath . $redir);
     }
     
+    /**
+     * Loading a core record ID identifying a specific Page Tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $cid
+     * @param  boolean  $skipPublic
+     * @return int
+     */
+    public function chkPageCID(Request $request, $cid = 0, $skipPublic = false)
+    {
+        if ($cid <= 0 && $request->has('cid')) {
+            $cid = intVal($request->get('cid'));
+        }
+        if ($cid > 0) {
+            if (!$skipPublic) {
+                $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
+            } else {
+                $GLOBALS["SL"]->coreID = intVal($cid);
+            }
+            $cid = $GLOBALS["SL"]->coreID;
+        }
+        if ($request->has('cidi')) {
+            $cid = $GLOBALS["SL"]->coreID = intVal($request->get('cidi'));
+        }
+        return $cid;
+    }
+    
     public function loadPageCID(Request $request, $tree, $cid)
     {
         if ($cid > 0 && $tree && isset($tree->tree_id)) {
@@ -455,6 +483,7 @@ class PageLoadUtils extends Controller
             }
             session()->put('sessID' . $tree->tree_id, $sess->sess_id);
             session()->put('coreID' . $tree->tree_id, $cid);
+            session()->put('coreID' . $tree->tree_id . 'old' . $cid, time());
             session()->save();
         }
         return true;
@@ -490,6 +519,9 @@ class PageLoadUtils extends Controller
         if (isset($GLOBALS["SL"])) {
             $sffx .= $GLOBALS["SL"]->getCacheSffxAdds();
             $GLOBALS["SL"]->cacheSffx = $sffx;
+
+//echo 'topGenCacheKey ? ' . (($GLOBALS["SL"]->isOwner) ? 't' : 'f') . ''; exit;
+
         }
         $uri = str_replace('?refresh=1', '', 
                 str_replace('?refresh=1&', '?', 

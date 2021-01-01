@@ -44,8 +44,7 @@ class AdminCoreController extends SurvloopController
             if (trim($perms) == '') {
                 $perms = 'administrator|staff|databaser|brancher|partner|volunteer';
             }
-            if ($this->v["uID"] <= 0 
-                || !$this->v["user"]->hasRole($perms)) {
+            if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole($perms)) {
                 echo view(
                     'vendor.survloop.js.inc-redirect-home', 
                     $this->v
@@ -180,13 +179,13 @@ class AdminCoreController extends SurvloopController
                     if (isset($nav[4]) && is_array($nav[4]) 
                         && sizeof($nav[4]) > 0) {
                         foreach ($nav[4] as $j => $nA) {
-                            if ($nA[0] == $currPage) {
+                            if (isset($nA[0]) && $nA[0] == $currPage) {
                                 $this->admMenuData["currNavPos"] = [$i, $j, -1, -1];
                             }
                             if (isset($nA[4]) && is_array($nA[4]) 
                                 && sizeof($nA[4]) > 0) {
                                 foreach ($nA[4] as $k => $nB) {
-                                    if ($nB[0] == $currPage) {
+                                    if (isset($nB[0]) && $nB[0] == $currPage) {
                                         $this->admMenuData["currNavPos"] = [
                                             $i, 
                                             $j, 
@@ -197,7 +196,7 @@ class AdminCoreController extends SurvloopController
                                     if (isset($nB[4]) && is_array($nB[4]) 
                                         && sizeof($nB[4]) > 0) {
                                         foreach ($nB[4] as $l => $nC) {
-                                            if ($nC[0] == $currPage) {
+                                            if (isset($nC[0]) && $nC[0] == $currPage) {
                                                 $this->admMenuData["currNavPos"] = [
                                                     $i, 
                                                     $j, 
@@ -298,19 +297,13 @@ class AdminCoreController extends SurvloopController
         return $this->loader->loadNodeTreeURLedit($request, $cid, $treeSlug);
     }
     
-    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '')
+    public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '', $skipPublic = false)
     {
         $this->initLoader();
         if ($this->loader->loadTreeBySlug($request, $pageSlug, 'Page')) {
             $this->admControlInit($request, '/dash/' . $pageSlug);
             $this->loadCustLoop($request, $this->loader->treeID);
-            if ($request->has('new') && intVal($request->get('new')) == 1) {
-                $this->custReport->restartTreeSess($GLOBALS["SL"]->treeID);
-            } elseif ($cid && intVal($cid) > 0) {
-                $this->loader->loadPageCID($request, $GLOBALS["SL"]->treeRow, intVal($cid));
-                $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
-            }
-            $this->v["content"] = $this->custReport->index($request);
+
             if ($request->has('edit') 
                 && intVal($request->get('edit')) == 1 
                 && $this->loader->isUserAdmin()) {
@@ -320,6 +313,42 @@ class AdminCoreController extends SurvloopController
                     . ' </script>';
                 exit;
             }
+            //$view = $this->chkPageView($view);
+            $cid = $this->loader->chkPageCID($request, $cid, $skipPublic);
+            if ($request->has('new') && intVal($request->get('new')) == 1) {
+                $this->custReport->restartTreeSess($GLOBALS["SL"]->treeID);
+            } elseif ($cid && intVal($cid) > 0) {
+                $this->loader->loadPageCID($request, $GLOBALS["SL"]->treeRow, intVal($cid));
+                $this->custReport->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+                if (in_array($view, ['pdf', 'full-pdf'])) {
+                    return $this->custReport->byID($request, $cid, '', $request->has('ajax'));
+                }
+            }
+            $this->custReport->chkPageToken();
+            /*
+            $allowCache = $this->chkPageAllowCache($request);
+            if ($this->topCheckCache($request, 'page') && $allowCache) {
+                return $this->addSessAdmCodeToPage($request, $this->pageContent);
+            }
+            */
+            $this->v["content"] = $this->custReport->index($request);
+            if ($request->has('ajax') && intVal($request->ajax) == 1) {
+                return $this->v["content"];
+            }
+            /*
+            $this->chkPageHideDisclaim($request, $cid);
+            if (in_array($view, ['xml', 'json'])) {
+                $GLOBALS["SL"]->pageView = 'public';
+                $this->custReport->loadXmlMapTree($request);
+                return $this->custReport->getXmlID($request, $cid, $pageSlug);
+            }
+            $this->pageContent = $this->custReport->index($request);
+            if ($allowCache) {
+                $treeID = $GLOBALS["SL"]->treeRow->tree_id;
+                $treeType = strtolower($GLOBALS["SL"]->treeRow->tree_type);
+                $this->topSaveCache($treeID, $treeType);
+            }
+            */
             $this->chkNewAdmMenuPage();
             return $this->loader->addAdmCodeToPage(
                 view('vendor.survloop.master', $this->v)->render()
@@ -327,6 +356,11 @@ class AdminCoreController extends SurvloopController
         }
         $this->loader->loadDomain();
         return redirect($this->loader->domainPath . '/');
+    }
+    
+    public function loadPageURLrawID(Request $request, $pageSlug = '', $cid = -3, $view = '')
+    {
+        return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
     }
     
     public function loadPageDashboard(Request $request)

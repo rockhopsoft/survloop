@@ -493,6 +493,11 @@ function reqFormTxt(fldID, nIDtxt) {
     return true;
 }
 
+$(document).on("click", ".formTagDeselect", function() {
+    deselectTag($(this).attr("data-tag-nid"), $(this).attr("data-tag-id"));
+    return true;
+});
+
 function reqFormFld(nIDtxt) {
     var fail = (document.getElementById("n"+nIDtxt+"FldID") && document.getElementById("n"+nIDtxt+"FldID").value.trim() == "");
     if (document.getElementById("n"+nIDtxt+"tagIDsID")) {
@@ -798,80 +803,6 @@ $(document).on("click", "input.slNodeClkGender", function() {
 });
 
 
-function checkNodeFormSignup() {
-@if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
-    var emailRequired = false;
-@else var emailRequired = true; @endif
-    hasAttemptedSubmit = true;
-    totFormErrors = 0;
-    formErrorsEng = "";
-@if (isset($GLOBALS["SL"]->sysOpts["user-name-req"]) && intVal($GLOBALS["SL"]->sysOpts["user-name-req"]) == 1)
-    if (document.getElementById('nameID').value.trim() == '') {
-        setFormLabelRed('004');
-        totFormErrors++;
-    } else {
-        setFormLabelBlack('004');
-    }
-@endif
-    if (emailRequired && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        setFormLabelRed('001'); 
-        totFormErrors++;
-    } else if (reqFormEmail('emailID') && document.getElementById('emailID').value.trim() != '') {
-        document.getElementById('emailWarning').style.display='none';
-        $.ajax({
-            url: "/chkEmail?"+$("#emailID").serialize(),
-            type: 'GET',
-            async: false,
-            cache: false,
-            timeout: 30000,
-            error: function(){
-                return true;
-            },
-            success: function(chkData){ 
-                if (chkData == 'found') {
-                    document.getElementById('emailBlockID').value = 1;
-                    setFormLabelRed('001'); 
-                    totFormErrors++;
-                    //document.getElementById('emailWarning').style.display='block';
-                    $("#emailWarning").slideDown("fast");
-                } else {
-                    document.getElementById('emailBlockID').value = 0;
-                    setFormLabelBlack('001');
-                }
-            }
-        });
-    }
-    if (document.getElementById('password') && document.getElementById('password_confirmation')) {
-        var pass1 = document.getElementById('password').value;
-        if (pass1 == '' || pass1.length < 8 || pass1 != document.getElementById('password_confirmation').value) {
-            setFormLabelRed('002');
-            setFormLabelRed('003');
-            totFormErrors++;
-        } else {
-            setFormLabelBlack('002');
-            setFormLabelBlack('003');
-        }
-    }
-    if (totFormErrors > 0) {
-        setFormErrs();
-        return false;
-    }
-    if (!emailRequired && (!reqFormEmail('emailID') || document.getElementById('emailID').value.trim() == '')) {
-        document.getElementById('emailID').value = 'no.email.'+document.getElementById('nameID').value+'@noemail.org';
-    }
-    clearFormErrs();
-    firstNodeError = "";
-    if (document.getElementById('nameID').value.trim() == '') {
-        document.getElementById('nameID').value=document.getElementById('emailID').value;
-    }
-    return true;
-}
-
-$(document).on("click", ".nFormSignupSubBtn", function() {
-    pressedSubmit = true;
-    return checkNodeFormSignup();
-});
-
 function chkSpecialNodes() {
     if (specialNodes && specialNodes.length > 0) {
         for (var i=0; i < specialNodes.length; i++) {
@@ -892,8 +823,14 @@ function chkSpecialNodeNYC(specialNode) {
         if (document.getElementById(cityFld) && document.getElementById(cityFld).value && document.getElementById(stateFld) && document.getElementById(stateFld).value) {
             var city = document.getElementById(cityFld).value.trim().toLowerCase();
             city = city.replace(' ', '').replace(' ', '').replace(' ', '').trim();
-            if (document.getElementById(stateFld).value == 'NY' && (city.indexOf("newyork") >= 0 || city.indexOf("nyc") >= 0)) {
-                showNyc = true;
+            if (document.getElementById(stateFld).value == 'NY') {
+                if (city.indexOf("newyork") >= 0 || city.indexOf("nyc") >= 0) {
+                    showNyc = true;
+                } else if (city.indexOf("bronxny") >= 0 || city.indexOf("brooklynny") >= 0 || city.indexOf("manhattanny") >= 0 || city.indexOf("queensny") >= 0 || city.indexOf("statenislandny") >= 0 || city.indexOf("bronxny") >= 0) {
+
+                    showNyc = true;
+                    
+                }
             }
         }
         if (document.getElementById("blockWrap"+specialNode[3]+"")) {

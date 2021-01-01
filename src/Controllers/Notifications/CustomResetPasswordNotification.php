@@ -46,8 +46,9 @@ class CustomResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         $GLOBALS["SL"] = new Globals(new Request, 1, 1, 1);
-        $GLOBALS["SL"]->x["subj"] = $GLOBALS["SL"]->sysOpts["site-name"] 
-            . ' Reset Password Notification';
+        $GLOBALS["SL"]->x["subj"] = 'Reset your '
+            . $GLOBALS["SL"]->sysOpts["site-name"] 
+            . ' password';
         /* $content = view(
             'vendor.survloop.emails.password', 
             [

@@ -118,7 +118,6 @@ class Survloop extends SurvloopSpecialLoads
             $cid = $this->chkPageCID($request, $cid, $skipPublic);
             if ($cid > 0) {
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
-                $treeSlug = $GLOBALS["SL"]->treeRow->tree_slug;
                 if (in_array($view, ['pdf', 'full-pdf'])) {
                     return $this->custLoop->byID($request, $cid, '', $request->has('ajax'));
                 }
@@ -140,8 +139,7 @@ class Survloop extends SurvloopSpecialLoads
                 $treeType = strtolower($GLOBALS["SL"]->treeRow->tree_type);
                 $this->topSaveCache($treeID, $treeType);
             }
-//echo '??loadPageURL(' . $pageSlug . ' - ' . $this->cacheKey; exit;
-            if ($request->has('ajax') && $request->ajax == 1) {
+            if ($request->has('ajax') && intVal($request->ajax) == 1) {
                 return $this->pageContent;
             }
             return $this->addSessAdmCodeToPage($request, $this->pageContent);
@@ -149,7 +147,7 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     /**
      * Check the view for this page's load.
      *
@@ -168,33 +166,6 @@ class Survloop extends SurvloopSpecialLoads
         }
         $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
         return $view;
-    }
-    
-    /**
-     * Loading a core record ID identifying a specific Page Tree.
-     *
-     * @param  Illuminate\Http\Request  $request
-     * @param  int  $cid
-     * @param  boolean  $skipPublic
-     * @return int
-     */
-    private function chkPageCID(Request $request, $cid = 0, $skipPublic = false)
-    {
-        if ($cid <= 0 && $request->has('cid')) {
-            $cid = intVal($request->get('cid'));
-        }
-        if ($cid > 0) {
-            if (!$skipPublic) {
-                $GLOBALS["SL"]->coreID = $GLOBALS["SL"]->swapIfPublicID($cid);
-            } else {
-                $GLOBALS["SL"]->coreID = intVal($cid);
-            }
-            $cid = $GLOBALS["SL"]->coreID;
-        }
-        if ($request->has('cidi')) {
-            $cid = $GLOBALS["SL"]->coreID = intVal($request->get('cidi'));
-        }
-        return $cid;
     }
     
     /**

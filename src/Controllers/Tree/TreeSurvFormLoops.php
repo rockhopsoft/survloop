@@ -207,7 +207,7 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
                     . '<i class="fa fa-arrow-circle-o-right mR5"></i> ' . $custNext . '</a>';
                 $GLOBALS["SL"]->pageJAVA .= 'loopItemsNextID = ' 
                     . $this->sessData->loopItemsNextID . '; ';
-                $this->v["labelFirstLet"] = strtolower(substr($loopSing, 0, 1));
+                $this->v["labelFirstLet"] = strtolower(substr(strip_tags($loopSing), 0, 1));
             }
         }
         return $this->v["labelFirstLet"];
@@ -217,14 +217,21 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
     {
         $loopRec = $GLOBALS["SL"]->closestLoop["obj"];
         $vowels = [ 'a', 'e', 'i', 'o', 'u' ];
+
         $itemDesc = 'another';
         if (empty($this->sessData->loopItemIDs[$loopName])) {
             $itemDesc = 'a';
+            if (trim($this->v["labelFirstLet"]) == ''
+                && isset($loopRec->data_loop_singular)) {
+                $this->v["labelFirstLet"] = strtolower(
+                    substr(strip_tags($loopRec->data_loop_singular), 0, 1)
+                );
+            }
             if (in_array($this->v["labelFirstLet"], $vowels)) {
-                $itemDesc = 'n';
+                $itemDesc .= 'n';
             }
         }
-        $itemDesc = ' ' . strtolower($loopRec->data_loop_singular);
+        $itemDesc .= ' ' . strtolower($loopRec->data_loop_singular);
         $dis = 'disNon';
         $cnt = 0;
         if (isset($this->sessData->loopItemIDs[$loopName])) {
@@ -243,8 +250,10 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
             && intVal($GLOBALS["SL"]->closestLoop["obj"]->data_loop_auto_gen) == 1) {
             $idHref = 'href="?addLoopItem=1" id="nFormLoopAdd"';
         }
-        return '<a ' . $idHref . ' class="btn btn-lg btn-secondary mT15 ' . $dis 
-            . '"><i class="fa fa-plus-circle"></i> Add ' . $itemDesc . '</a>' ;
+        $firstLet = strtolower(substr(strip_tags($itemDesc), 0, 1));
+        return '<a ' . $idHref . ' class="btn btn-lg btn-primary mT15 ' . $dis 
+            . '"><i class="fa fa-plus-circle"></i> Add ' 
+            . $itemDesc . '</a>' ;
     }
     
     protected function printSetLoopNavRowCustom($nID, $loopItem, $setIndex)

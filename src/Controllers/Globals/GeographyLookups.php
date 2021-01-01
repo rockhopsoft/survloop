@@ -18,6 +18,22 @@ class GeographyLookups extends GeographyLists
 {
     protected $zoneZips = [];
 
+    public function getAbrr($abbr = '')
+    {
+        if (trim($abbr) == '') {
+            return '';
+        }
+        $ret = trim($this->getState($abbr));
+        if ($ret != '') {
+            return $ret;
+        }
+        $ret = trim($this->getAshraeZoneLabel($abbr));
+        if ($ret != '') {
+            return 'Climate Zone ' . $abbr;
+        }
+        return '';
+    }
+
     public function getStateAbrr($state = '')
     {
         if ($state == 'Federal') {
@@ -261,10 +277,84 @@ class GeographyLookups extends GeographyLists
         )->render();
     }
     
-    public function stateClimateDrop($state = '', $all = false)
+    public function stateClimateDrop($fltStateClim = '', $all = false)
     {
-        return $this->climateGroupDrop($state) . '<option disabled ></option>'
-            . $this->stateDrop($state, $all);
+        return $this->climateGroupDrop($fltStateClim) . '<option disabled ></option>'
+            . $this->stateDrop($fltStateClim, $all);
+    }
+    
+    public function stateClimateTagsSelect($fltStateClimTag = [], $nID = 1, $classExtra = '')
+    {
+        return view(
+            'vendor.survloop.forms.formtree-climate-tagger', 
+            [
+                "print"           => 'select',
+                "nID"             => $nID,
+                "fltStateClimTag" => $fltStateClimTag,
+                "stateList"       => $this->stateList,
+                "stateListCa"     => $this->stateListCa,
+                "hasCanada"       => $this->hasCanada,
+                "classExtra"      => $classExtra
+            ]
+        )->render();
+    }
+    
+    public function stateClimateTagsList($fltStateClimTag = [], $nID = 1)
+    {
+        return view(
+            'vendor.survloop.forms.formtree-climate-tagger', 
+            [
+                "print"           => 'tag',
+                "nID"             => $nID,
+                "fltStateClimTag" => $fltStateClimTag
+            ]
+        )->render();
+    }
+    
+    public function stateClimateTagsJS($fltStateClimTag = [], $nID = 1, $classExtra = '')
+    {
+        return view(
+            'vendor.survloop.forms.formtree-climate-tagger', 
+            [
+                "print"           => 'js',
+                "nID"             => $nID,
+                "fltStateClimTag" => $fltStateClimTag,
+                "stateList"       => $this->stateList,
+                "stateListCa"     => $this->stateListCa,
+                "hasCanada"       => $this->hasCanada,
+                "classExtra"      => $classExtra
+            ]
+        )->render();
+    }
+    
+    public function stateClimateTagsInRow($fltStateClimTag = [], $nID = 1, $classExtra = '')
+    {
+        return '<div class="row"><div class="col-md-4 pB10">'
+            . $this->stateClimateTagsSelect($fltStateClimTag, $nID, $classExtra)
+            . '</div><div class="col-md-8 pT0 pB10">'
+            . $this->stateClimateTagsList($fltStateClimTag, $nID)
+            . '</div></div>'
+            . $this->stateClimateTagsJS($fltStateClimTag, $nID, $classExtra);
+    }
+
+    public function getTagsStates($fltStateClimTag = [])
+    {
+        $states = $zones = [];
+        if (sizeof($fltStateClimTag) > 0) {
+            foreach ($fltStateClimTag as $tag) {
+                if ($this->getState($tag) != '') {
+                    $states[] = $tag;
+                }
+            }
+        }
+        if (sizeof($fltStateClimTag) > 0) {
+            foreach ($fltStateClimTag as $tag) {
+                if ($this->getAshraeZoneLabel($tag) != '') {
+                    $zones[] = $tag;
+                }
+            }
+        }
+        return [ $states, $zones ];
     }
     
     public function getStateWhereIn($fltState = '')

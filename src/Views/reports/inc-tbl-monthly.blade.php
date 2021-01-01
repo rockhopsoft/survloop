@@ -13,7 +13,9 @@
     <tr>
         <th><b>Total</b></th>
     @foreach ($cols as $c => $col)
-        <th><b>{{ number_format($col->sum) }}</b></th>
+        <th id="colTot{{ str_replace('-', '', $GLOBALS['SL']->slugify($col->name)) }}">
+            <b>{{ number_format($col->sum) }}</b>
+        </th>
     @endforeach
     </tr>
     @foreach ($monthlyData as $m => $month)

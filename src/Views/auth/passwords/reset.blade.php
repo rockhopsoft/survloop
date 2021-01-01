@@ -2,94 +2,120 @@
 $surv = new RockHopSoft\Survloop\Controllers\Survloop;
 $surv->loadLoop(new Illuminate\Http\Request);
 $v = $surv->custLoop->v;
+$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
+$css = $sysDefs->loadCss();
 ?>@extends('vendor.survloop.master')
-
 @section('content')
+<div id="ajaxWrap">
 <!-- resources/views/vendor/survloop/auth/passwords/reset.blade.php -->
+
 <form class="form-horizontal" role="form" method="POST" 
     action="{{ url('/password/reset') }}">
-{{ csrf_field() }}
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="token" value="{{ $token }}">
 
-<div class="w100 row2" 
-    style="padding: 30px 0px 60px 0px;"><center>
-    <div id="treeWrap" class="treeWrapForm">
+<div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
+<div id="treeWrap" class="treeWrapForm">
+    <div class="slCard">
 
-<div class="p20"></div>
+        <a class="btn btn-secondary pull-right mL20" 
+            href="/login" id="registerLoginLnk">Login</a>
 
-<div class="loginTitles">
-    <a href="/login" class="btn btn-secondary pull-right">Login</a>
-    <h2 class="mT0">Reset Password</h2>
-</div>
+        <div class="nPrompt">
+            <h2 class="mT0">Reset Password</h2>
+            <p>
+                Please create a new password for your account.
+            </p>
+        </div>
 
-@if (session('status'))
-    <div class="alert alert-success">
-        {{ session('status') }}
+    @if (session('status'))
+        <div class="alert alert-success mT20" role="alert">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if (count($errors) > 0)
+        @foreach ($errors->all() as $error)
+        <div class="alert alert-danger mT20" role="alert">
+            {{ $error }}
+        </div>
+        @endforeach
+    @endif
+
+    <div class="nodeAnchor"><a id="n001" name="n001"></a></div>
+    <div id="node001" class="nodeWrap">
+        <div class="nodeHalfGap"></div>
+        <div id="nLabel001" class="nPrompt">
+            <label for="emailID">
+                Email
+                <span class="red">*required</span>
+            </label>
+        </div>
+        <div class="nFld">
+            <input id="emailID" name="email" type="text" 
+                value="{{ old('email') }}" 
+                class="form-control" autofocus >
+        </div>
+        <div class="nodeGap"></div>
     </div>
-@endif
 
-@if (count($errors) > 0)
-<ul>
-    @foreach ($errors->all() as $error)
-    <li>{{ $error }}</li>
-    @endforeach
-</ul>
-@endif
-
-<div class="nodeWrap">
-    <div class="nPrompt">
-        <label for="emailID">Email:</label>
+    <div class="nodeAnchor"><a id="n002" name="n002"></a></div>
+    <div id="node002" class="nodeWrap">
+        <div class="nodeHalfGap"></div>
+        <div id="node002" class="nPrompt">
+            <label for="password">
+                Password
+                <span class="red">*required</span>
+            </label>
+        </div>
+        <div class="nFld">
+            <input id="password" name="password" 
+                type="password" class="form-control">
+        </div>
+        <div class="nodeGap"></div>
     </div>
-    <div class="nFld">
-        <input id="emailID" name="email" type="email" 
-            value="{{ $email or old('email') }}" 
-            class="form-control form-control-lg" required autofocus >
+
+    <div class="nodeAnchor"><a id="n003" name="n003"></a></div>
+    <div id="node003" class="nodeWrap">
+        <div class="nodeGap"></div>
+        <div id="node003" class="nPrompt">
+            <label for="password-confirm">
+                Confirm Password
+                <span class="red">*required</span>
+            </label>
+        </div>
+        <div class="nFld">
+            <input id="password_confirmation" name="password_confirmation" 
+                type="password" class="form-control">
+        </div>
+        <div class="nodeGap"></div>
     </div>
-</div>
-@if ($errors->has('email'))
-    <span class="form-text">
-        <strong>{{ $errors->first('email') }}</strong>
-    </span>
-@endif
 
-<div class="nodeGap"></div>
+    <div id="formErrorMsg"></div>
 
-<div class="nodeWrap">
-<div class="nPrompt"><label for="password">Password:</label></div>
-<div class="nFld">
-    <input id="password" name="password" type="password" 
-        class="form-control form-control-lg" required >
-</div>
-</div>
-@if ($errors->has('password'))
-    <span class="form-text">
-        <strong>{{ $errors->first('password') }}</strong>
-    </span>
-@endif
-
-<div class="nodeGap"></div>
-
-<div class="nodeWrap">
-    <div class="nPrompt">
-        <label for="password-confirm">Confirm Password:</label>
+    <center>
+    <div id="loadAnimResetPass" class="disBlo">
+        <input id="loadAnimBtnResetPass" type="submit" 
+            class="btn btn-lg btn-primary"
+            value="Reset Password">
     </div>
-    <div class="nFld">
-        <input id="password-confirm" name="password_confirmation" 
-            type="password" class="form-control form-control-lg">
+    <div id="loadAnimClickedResetPass" class="disNon">
+        <button class="btn btn-lg btn-primary" type="button" disabled >
+            <table border=0 cellpadding=0 cellspacing=0 ><tr>
+                <td><span class="spinner-border spinner-border-sm" 
+                    role="status" aria-hidden="true"></span></td>
+                <td class="pL5"><div class="disIn pT5">Loading...</div></td>
+            </tr></table>
+        </button>
     </div>
-</div>
-@if ($errors->has('password_confirmation'))
-    <span class="form-text">
-        <strong>{{ $errors->first('password_confirmation') }}</strong>
-    </span>
-@endif
+    </center>
 
-<center><input type="submit" value="Reset Password"
-    class="btn btn-lg btn-primary mT20" ></center>
-
-<div class="nodeGap"></div>
-
+    </div>
 </div></center></div>
 
 </form>
+
+<style> #main, body { background: {{ $css["color-main-faint"] }}; } </style>
+
+</div>
 @endsection

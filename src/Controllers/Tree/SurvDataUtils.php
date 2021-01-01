@@ -568,6 +568,40 @@ class SurvDataUtils
         return '';
     }
 
+    public function updateZipInfo($zipIn = '', $tbl = '', $fldState = '', $fldCounty = '', $fldAshrae = '', $fldCountry = '', $setInd = 0)
+    {
+        if (trim($zipIn) == '' || trim($tbl) == '') {
+            return false;
+        }
+        $GLOBALS["SL"]->loadStates();
+        $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
+        if ($zipRow && isset($zipRow->zip_zip) 
+            && isset($this->dataSets[$tbl])) {
+            if (trim($fldState) != '' && isset($zipRow->zip_state)) {
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldState  => $zipRow->zip_state  
+                ]);
+            }
+            if (trim($fldCounty) != '' && isset($zipRow->zip_county)) {
+                $this->dataSets[$tbl][$setInd]->update([ 
+                    $fldCounty => $zipRow->zip_county 
+                ]);
+            }
+            if (trim($fldCountry) != '' && isset($zipRow->zip_country)) {
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldCountry => $zipRow->zip_country
+                ]);
+            }
+            if (trim($fldAshrae) != '') {
+                $ashrae = $GLOBALS["SL"]->states->getAshrae($zipRow);
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldAshrae => $ashrae
+                ]);
+            }
+            return true;
+        }
+        return false;
+    }
 
 
 }

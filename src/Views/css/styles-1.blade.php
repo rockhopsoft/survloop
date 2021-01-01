@@ -4,6 +4,7 @@ html, body {
     height: 100%;
 }
 body {
+    min-height: 100%;
     width: 100%;
     overflow-x: hidden;
 }

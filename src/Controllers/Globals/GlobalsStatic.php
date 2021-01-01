@@ -485,9 +485,14 @@ class GlobalsStatic extends GlobalsConvert
         return $ip;
     }
     
-    public function hashIP()
+    public function hashIP($shorten = false)
     {
-        return hash('sha512', $this->getIP());
+        $ip = hash('sha512', $this->getIP());
+        if ($shorten) {
+            $ip = substr($ip, 0, 12) . '...' 
+                . substr($ip, strlen($ip)-12);
+        }
+        return $ip;
     }
 
     public function getPastDateTime($days = 3)

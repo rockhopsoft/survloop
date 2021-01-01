@@ -4,51 +4,73 @@
 <div class="container"><div class="slCard nodeWrap">
 <h1><i class="fa fa-users"></i> Manage User Privileges</h1>
 
-<div class="well">
+<div class="mT15 mB15 row">
+    <div class="col-2"><b>
+        {{ sizeof($printVoluns[0]) }} Administrators
+    </b></div>
+    <div class="col-2"><b>
+        {{ sizeof($printVoluns[1]) }} Databasers
+    </b></div>
+    <div class="col-2"><b>
+        {{ number_format(sizeof($printVoluns[2])) }} Staff
+    </b></div>
+    <div class="col-2"><b>
+        {{ number_format(sizeof($printVoluns[3])) }} Partners
+    </b></div>
+    <div class="col-2"><b>
+        {{ number_format(sizeof($printVoluns[4])) }} Volunteers
+    </b></div>
+    <div class="col-2"><b>
+        {{ number_format(sizeof($printVoluns[5])) }} Basic Users
+    </b></div>
+</div>
+
+<p>
     <b>Adding A User:</b> Use the public volunteer sign up form 
     (<a href="/register" target="_blank">/register</a>, while logged out, easiest in a separate browser) 
     to first create the new user. Then reload this page and change their privileges here as needed.
-</div>
-<table class="table table-striped">
+</p>
 
+<div class="mT15 p5 brdBot">
+    <div class="row">
+        <div class="col-4"><b>Name</b></div>
+        <div class="col-5">
+            <b>Email</b> <span class="slGrey mL10">
+            [<i class="fa fa-check-circle-o" 
+                aria-hidden="true"></i> 
+            verified]</span>
+        </div>
+        <div class="col-3"><b>User Permissions</b></div>
+    </div>
+</div>
 <?php $cnt = 0; ?>
 @foreach ($printVoluns as $userSet)
     @forelse ($userSet as $volun)
-        @if ($cnt%15 == 0)
-            <tr>
-                <th>Name</th>
-                <th>Email <span class="slGrey mL10">
-                    [<i class="fa fa-check-circle-o" aria-hidden="true"></i> verified]</span></th>
-                <th class="taC">Volunteer</th>
-                <th class="taC">Partners</th>
-                <th class="taC">Staff</th>
-                <th class="taC">Databaser</th>
-                <th class="taC">Admin</th>
-            </tr>
-        @endif
         <?php $cnt++; ?>
-        <tr>
-            <td><b>{!! $volun->printUsername(true) !!}</b></td>
-            <td><a href="mailto:{{ $volun->email }}">{{ str_replace('@', ' @', $volun->email) }}</a>
-                @if ($volun->hasVerifiedEmail())
-                    <span class="slGrey"><i class="fa fa-check-circle-o mL10" aria-hidden="true"></i></span>
-                @endif
-            </td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
-                value="volunteer" @if ($volun->hasRole('volunteer')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
-                value="partner" {{ $disableAdmin }} @if ($volun->hasRole('partner')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
-                value="staff" {{ $disableAdmin }} @if ($volun->hasRole('staff')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
-                value="databaser" {{ $disableAdmin }} @if ($volun->hasRole('databaser')) CHECKED @endif ></td>
-            <td class="taC"><input type="checkbox" name="user{{ $volun->id }}[]" DISABLED
-                value="administrator" {{ $disableAdmin }} @if ($volun->hasRole('administrator')) CHECKED @endif ></td>
-        </tr>
+        <div class="p5 @if ($cnt%2 == 1) row2 @endif ">
+            <div class="row">
+                <div class="col-4"><b>
+                    {!! $volun->printUsername(true) !!}
+                </b></div>
+                <div class="col-5">
+                    <a href="mailto:{{ $volun->email }}"
+                        style="word-break: break-all;"
+                        >{{ $volun->email }}</a>
+                    @if ($volun->hasVerifiedEmail())
+                        <span class="slGrey">
+                        <i class="fa fa-check-circle-o mL10" 
+                            aria-hidden="true"></i></span>
+                    @endif
+                </div>
+                <div class="col-3">
+                    {{ $volun->listRoles() }}
+                </div>
+            </div>
+        </div>
     @empty
     @endforelse
 @endforeach
-</table>
+
 </div></div>
 
 <div class="adminFootBuff"></div>

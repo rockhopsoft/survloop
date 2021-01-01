@@ -13,6 +13,16 @@ table.repDeetsBlock tbody, .slReport table.repDeetsBlock tbody {
 	width: 100%;
     margin-bottom: 30px;
 }
+.repDeetsCols {
+    margin-bottom: 30px;
+}
+.repDeetsCols div table.repDeetsBlock, 
+.repDeetsCols div .slReport table.repDeetsBlock, 
+.repDeetsCols div table.repDeetsBlock tbody, 
+.repDeetsCols div .slReport table.repDeetsBlock tbody {
+    margin-bottom: 0px;
+}
+
 table.repDeetsBlock tr td, table.repDeetsBlock tr th {
     word-wrap: break-word;
     line-break: loose;

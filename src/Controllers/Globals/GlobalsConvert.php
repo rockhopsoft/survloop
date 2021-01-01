@@ -567,6 +567,16 @@ class GlobalsConvert
         return $liters*0.2641729;
     }
     
+    public function cnvrtCF2Gal($cf = 0)
+    {
+        return $cf*7.4805194805195;
+    }
+    
+    public function cnvrtCCF2Gal($ccf = 0)
+    {
+        return $ccf*748.05194805195;
+    }
+    
     public function cnvrtSqFt2SqMeters($sqft = 0)
     {
         return $sqft*10.76391;

@@ -108,35 +108,47 @@ class AdminEmailController extends AdminCoreController
         return $this->redir('/dashboard/emails');
     }
     
-    public function manageContact(Request $request)
+    public function manageContact(Request $request, $folder = '')
     {
-        $this->admControlInit($request, '/dashboard/contact');
+        $this->v["filtStatus"] = 'unread';
+        $url = '/dashboard/contact';
+        if (trim($folder) != '') {
+            $url .= '/' . $folder;
+            $this->v["filtStatus"] = $folder;
+        }
+        $this->admControlInit($request, $url);
         $status = [''];
         $this->v["recs"] = [];
-        $this->getRecFiltTots('SLContact', 'cont_flag', ['Unread', 'Read', 'Trash'], 'cont_id');
-        $this->v["filtStatus"] = 'unread';
-        if ($request->has('tab')) {
-            $this->v["filtStatus"] = trim($request->get('tab'));
-        }
+        $types = ['Unread', 'On Hold', 'Resolved', 'Trash'];
+        $this->v["currPage"][1] = 'Contact Form Messages';
+        $this->getRecFiltTots('SLContact', 'cont_flag', $types, 'cont_id');
         if (in_array($this->v["filtStatus"], ['', 'unread'])) {
+            $this->v["currPage"][1] = 'Unread ' . $this->v["currPage"][1];
             $this->v["recs"] = SLContact::where('cont_flag', 'Unread')
                 ->orderBy('created_at', 'desc')
                 ->get();
-        } elseif ($this->v["filtStatus"] == 'all') {
-            $this->v["recs"] = SLContact::whereIn('cont_flag', ['Read', 'Unread'])
+        } elseif ($this->v["filtStatus"] == 'hold') {
+            $this->v["currPage"][1] = 'On Hold ' . $this->v["currPage"][1];
+            $this->v["recs"] = SLContact::where('cont_flag', 'On Hold')
+                ->orderBy('created_at', 'desc')
+                ->get();
+        } elseif ($this->v["filtStatus"] == 'resolved') {
+            $this->v["currPage"][1] = 'Resolved ' . $this->v["currPage"][1];
+            $this->v["recs"] = SLContact::where('cont_flag', 'Resolved')
                 ->orderBy('created_at', 'desc')
                 ->get();
         } elseif ($this->v["filtStatus"] == 'trash') {
+            $this->v["currPage"][1] = 'Trashed ' . $this->v["currPage"][1];
             $this->v["recs"] = SLContact::where('cont_flag', 'Trash')
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
-        $this->v["currPage"][1] = 'Contact Form Messages';
         $GLOBALS["SL"]->pageAJAX .= '$(".changeContStatus").change(function(){
-            var cID = $(this).attr( "name" ).replace( "cont_flag", "" );
+            var cID = $(this).attr( "name" ).replace( "ContFlag", "" );
             var postUrl = "/ajadm/contact?' 
                 . ((isset($filtStatus)) ? 'tab=' . $filtStatus . '&' : '') 
-                . 'cid="+cID+"&status="+$(this).val();
+                . 'cid="+cID+"&status="+encodeURIComponent($(this).val());
+            console.log(postUrl);
             $( "#wrapItem"+cID+"" ).load( postUrl );
         });';
         return view('vendor.survloop.admin.contact', $this->v)->render();
@@ -231,7 +243,7 @@ class AdminEmailController extends AdminCoreController
     
     public function ajaxContactTabs(Request $request)
     {
-        $types = ['Unread', 'Read', 'Trash'];
+        $types = ['Unread', 'On Hold', 'Resolved', 'Trash'];
         $this->getRecFiltTots('SLContact', 'cont_flag', $types, 'cont_id');
         $status = 'unread';
         if ($request->has('tab')) {
@@ -254,11 +266,11 @@ class AdminEmailController extends AdminCoreController
         if ($request->has('status')) {
             $newStatus = trim($request->get('status'));
         }
-        if ($cID > 0 && isset($cRow->ContID) && $newStatus != '') {
-            $cRow->ContFlag = $newStatus;
+        if ($cID > 0 && isset($cRow->cont_id) && $newStatus != '') {
+            $cRow->cont_flag = $newStatus;
             $cRow->save();
         }
-        if ($cID > 0 && isset($cRow->ContID)) {
+        if ($cID > 0 && isset($cRow->cont_id)) {
             $currTab = 'unread';
             if ($request->has('tab')) {
                 $currTab = trim($request->get('tab'));

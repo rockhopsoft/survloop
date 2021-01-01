@@ -18,7 +18,7 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeSurvBasicNav;
 
 class TreeSurvReport extends TreeSurvBasicNav
 {
-    public function printPreviewReportCustom($isAdmin = false)
+    public function printPreviewReportCustom($isAdmin = false, $view = '')
     {
         return '';
     }
@@ -400,43 +400,50 @@ class TreeSurvReport extends TreeSurvBasicNav
         $deets = $this->chkDeets($deets);
         $deetCols = $deetsTots = $deetsTotCols = [];
         $colChars = (($cols == 2) ? 37 : (($cols == 3) ? 24 : 16));
+        $colChars = round(2.4*$colChars);
         if (sizeof($deets) > 0) {
             foreach ($deets as $i => $deet) {
-                $size = 0; //strlen($deet[0]);
-                if (sizeof($deet) > 1 && isset($deet[1]) && $size < strlen($deet[1])) {
-                    $size = strlen($deet[1]);
+                // Get longest character count between question and answer
+                $size = 0;
+                if (sizeof($deet) > 1) {
+                    $size = strlen($deet[0]);
+                    if ($size < strlen($deet[1])) {
+                        $size = strlen($deet[1]);
+                    }
                 }
-                if ($size > $colChars) {
-                    $size -= $colChars;
-                } else {
-                    $size = 0;
-                }
-                $size = ($size/$colChars)+2;
+                // Estimate line count from character count
+                $size = ($size/$colChars);
                 if ($i == 0) {
                     $deetsTots[$i] = $size;
                 } else {
                     $deetsTots[$i] = $deetsTots[$i-1]+$size;
                 }
             }
+            // Initiale output array, and tracking helper
+            $totSize = $deetsTots[sizeof($deetsTots)-1];
             for ($c = 0; $c < $cols; $c++) {
                 $deetCols[$c] = [];
                 $deetsTotCols[$c] = [
-                    (($c/$cols)*$deetsTots[sizeof($deetsTots)-1]), 
-                    -3
+                    "cutoff" => ((1.3*($c/$cols))*$totSize),
+                    "ind"    => -3
                 ];
             }
-            $c = $deetsTotCols[0][1] = 0;
+            $c = 0;
+            $deetsTotCols[$c][1] = 0;
             foreach ($deets as $i => $deet) {
+                // Check if we should switch columns
                 $chk = 1+$c;
                 if ($chk < $cols 
-                    && $deetsTotCols[$chk][1] < 0 
-                    && $deetsTotCols[$chk][0] < $deetsTots[$i]
+                    && $deetsTotCols[$chk]["ind"] < 0 
+                    && $deetsTotCols[$chk]["cutoff"] < $deetsTots[$i]
                     && sizeof($deetCols[$c]) > 0) {
-                    $deetsTotCols[$chk][1] = $i;
+                    $deetsTotCols[$chk]["ind"] = $i;
                     $c++;
                 }
+                // Add deet to column
                 $deetCols[$c][] = $deet;
             }
+//if ($deets[0][1] == 'Betty') { echo '<pre>'; print_r($deetsTots); print_r($deetsTotCols); echo '</pre>'; exit; }
         }
         return view(
             'vendor.survloop.reports.inc-deets-cols', 
@@ -544,7 +551,8 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         if ($full) {
             return '<div class="reportWrap">' 
-                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) . '</div>';
+                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) 
+                . '</div>';
         }
         return $this->printReportsPrev($coreID);
     }
@@ -592,16 +600,18 @@ class TreeSurvReport extends TreeSurvBasicNav
             return Response::make($content, '200')
                 ->header('Content-Type', 'text/xml');
         }
-        $this->v["apiLoadLinks"] = 'Current: ' . $GLOBALS['SL']->sysOpts["app-url"] . $page;
+        $this->v["apiLoadLinks"] = 'Current: ' 
+            . $GLOBALS['SL']->sysOpts["app-url"] . $page;
 
         $this->loadXmlMapTree($request);
 
         if (sizeof($GLOBALS["SL"]->dataLoops) == 0
             && sizeof($GLOBALS["SL"]->dataSubsets) == 0
             && sizeof($GLOBALS["SL"]->dataHelpers) == 0) {
+            $tblI = $GLOBALS["SL"]->tblI[$GLOBALS["SL"]->coreTbl];
             $treeChk = SLTree::where('tree_type', 'Survey')
                 ->where('tree_database', $GLOBALS["SL"]->dbID)
-                ->where('tree_core_table', $GLOBALS["SL"]->tblI[$GLOBALS["SL"]->coreTbl])
+                ->where('tree_core_table', $tblI)
                 ->orderBy('tree_id', 'asc')
                 ->first();
             if ($treeChk && isset($treeChk->tree_id)) {
@@ -718,10 +728,12 @@ class TreeSurvReport extends TreeSurvBasicNav
             && isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
         }
-        $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]);
-        eval("\$chk = " . $model . "::find(" . $coreID . ");");
-        if ($chk) {
-            return $this->xmlByID($request, $coreID);
+        if (isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
+            $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]);
+            eval("\$chk = " . $model . "::find(" . $coreID . ");");
+            if ($chk) {
+                return $this->xmlByID($request, $coreID);
+            }
         }
         return $this->redir('/xml-schema');
     }

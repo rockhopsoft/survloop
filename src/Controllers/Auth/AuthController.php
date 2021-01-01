@@ -276,8 +276,11 @@ class AuthController extends Controller
     
     protected function loadNodeLoginPass(Request $request)
     {
-        if ($this->currNode && isset($this->currNode->node_id) 
-            && $request->has('nd') && intVal($request->get('nd')) > 0) {
+        if ($this->currNode 
+            && isset($this->currNode->node_id) 
+            && $request->has('nd') 
+            && intVal($request->get('nd')) > 0) {
+            $nIn = intVal($request->get('nd'));
             $nID = $this->currNode->node_id;
             $this->surv = new Survloop;
             $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
@@ -302,9 +305,9 @@ class AuthController extends Controller
             
             $node2 = null; // reset in search of custom mid-survey language
             //if ($request->has('nd') && intVal($request->get('nd')) > 0) {
-                $nIn = intVal($request->get('nd'));
                 if ($this->surv->custLoop->allNodes[$nIn] 
-                    && $this->surv->custLoop->allNodes[$nIn]->nodeType == 'User Sign Up') {
+                    && $this->surv->custLoop->allNodes[$nIn]->nodeType 
+                        == 'User Sign Up') {
                     $node2 = $this->surv->custLoop->allNodes[$nIn];
                     $node2->fillNodeRow();
                 }
@@ -325,7 +328,8 @@ class AuthController extends Controller
             if ($node2 
                 && isset($node2->nodeRow->node_prompt_text) 
                 && trim($node2->nodeRow->node_prompt_text) != '') {
-                $GLOBALS["SL"]->sysOpts["midsurv-instruct"] = $node2->nodeRow->node_prompt_text;
+                $GLOBALS["SL"]->sysOpts["midsurv-instruct"] 
+                    = $node2->nodeRow->node_prompt_text;
             }
             $this->formFooter = '<center><div class="treeWrapForm">' 
                 . $this->surv->custLoop->printCurrRecMgmt()

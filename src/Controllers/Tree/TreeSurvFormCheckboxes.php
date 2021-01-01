@@ -152,12 +152,23 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
             && sizeof($curr->tmpSubTier[1]) > 0) {
             $ret .= $this->printCheckSubRes($curr, $j, $res, $boxChecked);
         }
-        /* if ($curr->nodeType == 'Checkbox' && in_array($j, $curr->fldHasOther)) {
-            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' . $nIDtxt . 'fldOtherID' . $j 
-                . '", function() { if (document.getElementById("n' . $nIDtxt . 'fldOtherID' . $j 
-                . '").value.trim() != "") { formKeyUpOther(\'' . $nID . '\', ' . $j . '); } });';
+//if ($curr->nID == 3174) { echo '<pre>'; print_r($curr); echo '</pre>'; exit; }
+        if (in_array($curr->nodeType, ['Checkbox', 'Radio'])
+            && in_array($j, $curr->fldHasOther)) {
+            $fldOth = 'n' . $curr->nIDtxt . 'fldOtherID' . $j;
+            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' 
+                . $curr->nIDtxt . 'fldOtherID' . $j . '", function() { '
+                . 'if (document.getElementById("' . $fldOth . '") '
+                . '&& document.getElementById("' . $fldOth . '").value.trim() '
+                . '!= "") { document.getElementById("n' . $curr->nIDtxt . 'fld' . $j 
+                . '").checked=true; checkFingerClass("' . $curr->nIDtxt . '"); } });';
+            /*
+            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' 
+                . $curr->nIDtxt . 'fldOtherID' . $j . '", function() { formKeyUpOther(\'' 
+                . $curr->nIDtxt . '\', ' . $j . '); });';
                 // chkSubRes' . $nIDtxt . 'j' . $j . '();
-        } */
+            */
+        }
         return $ret;
     }
 

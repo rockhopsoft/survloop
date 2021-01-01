@@ -404,8 +404,11 @@ class TreeCoreSess extends TreeCore
                 session()->forget('coreID' . $GLOBALS["SL"]->sessTree);
             }
             session()->save();
-            session([ 'sessID' . $GLOBALS["SL"]->sessTree => $this->sessID ]);
-            session([ 'coreID' . $GLOBALS["SL"]->sessTree => $this->coreID ]);
+            $tree = $GLOBALS["SL"]->sessTree;
+            session([ 'sessID' . $tree => $this->sessID ]);
+            session([ 'coreID' . $tree => $this->coreID ]);
+            session([ 'coreID' . $tree => $this->coreID ]);
+            session([ 'coreID' . $tree . 'old' . $this->coreID => time() ]);
             session()->save();
         }
         return true;
@@ -832,20 +835,42 @@ class TreeCoreSess extends TreeCore
         }
         $core = 'coreID' . $GLOBALS["SL"]->sessTree;
         $sess = 'sessID' . $GLOBALS["SL"]->sessTree;
-        if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
+        if ((!isset($this->v["uID"]) || intVal($this->v["uID"]) <= 0)
+            && trim($GLOBALS["SL"]->coreTbl) != ''
+            && trim($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)) != '') {
+            $eval = "\$coreRec = " 
+                . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
+                . "::find(" . intVal($coreID) . ");";
+            eval($eval);
+            $abbr = $GLOBALS["SL"]->coreTblAbbr();
             if (session()->has($core)
                 && $coreID == intVal(session()->get($core))
                 && session()->has($sess)
                 && intVal(session()->get($sess)) > 0) {
                 $trees = [ $this->treeID, $GLOBALS["SL"]->sessTree ];
-                $chk = SLSess::where('sess_id', intVal(session()->get($sess)))
-                    ->whereIn('sess_tree', $trees)
-                    ->where('sess_core_id', $coreID)
-                    ->where('sess_is_active', 1)
-                    ->get();
-                if ($chk->isNotEmpty()) {
-                    return true;
+                $fldIP = $GLOBALS["SL"]->coreTblAbbr() . 'ip_addy';
+                if ($coreRec 
+                    && isset($coreRec->{ $fldIP })
+                    && trim($coreRec->{ $fldIP }) != '') {
+                    $chk = SLSess::where('sess_id', intVal(session()->get($sess)))
+                        ->where('sess_ip', $GLOBALS["SL"]->hashIP())
+                        ->whereIn('sess_tree', $trees)
+                        ->where('sess_core_id', $coreID)
+                        ->where('sess_is_active', 1)
+                        ->get();
+                    if ($chk->isNotEmpty()) {
+                        foreach ($chk as $sess) {
+                            if (isset($sess->sess_ip)
+                                && trim($sess->sess_ip) == trim($coreRec->{ $fldIP })) {
+                                return true;
+                            }
+                        }
+                    }
                 }
+            } elseif ($coreRec 
+                && isset($coreRec->{ $abbr . 'ip_addy' })
+                && trim($coreRec->{ $abbr . 'ip_addy' }) == $GLOBALS["SL"]->hashIP()) {
+                return true;
             }
             return false;
         }
@@ -899,14 +924,15 @@ class TreeCoreSess extends TreeCore
     
     protected function checkPageViewPerms()
     {
-        $initPageView = $GLOBALS["SL"]->pageView;
-        if ($GLOBALS["SL"]->dataPerms == '') {
+        if (trim($GLOBALS["SL"]->dataPerms) == '') {
             $GLOBALS["SL"]->dataPerms = 'public';
         }
+        $initPageView = $GLOBALS["SL"]->pageView;
         if (isset($this->v["uID"]) && $this->v["uID"] > 0 && isset($this->v["user"])) {
             if (in_array($GLOBALS["SL"]->pageView, ['', 'default'])) {
                 $GLOBALS["SL"]->pageView = 'public';
-                if ($this->v["user"]->hasRole('administrator|databaser|staff|partner')) {
+                if ($this->v["user"]->hasRole('administrator|databaser|staff|partner')
+                    || $this->isCoreOwner()) {
                     $GLOBALS["SL"]->pageView = 'full';
                 }
             } elseif (!$this->isCoreOwner()
@@ -991,7 +1017,9 @@ class TreeCoreSess extends TreeCore
             $GLOBALS["SL"]->pageJAVA .= ' appUrlParams[appUrlParams.length] '
                 . '= new Array("tokenIn", "' . $this->v["tokenIn"] . '"); ';
         }
-        return (isset($this->v["pageToken"]) && sizeof($this->v["pageToken"]) > 0);
+        $GLOBALS["SL"]->loadAppUrlParams();
+        return (isset($this->v["pageToken"]) 
+            && sizeof($this->v["pageToken"]) > 0);
     }
     
     public function pageLoadHasToken()
@@ -1087,7 +1115,7 @@ class TreeCoreSess extends TreeCore
                 . 'data-dismiss="alert">×</button></div>'
                 . '<script type="text/javascript"> '
                 . 'setTimeout("window.location=\'' . $url . '\'", 300); '
-. 'console.log("' . $url . '"); '
+                . 'console.log("' . $url . '"); '
                 . '</script>';
             session()->put('sessMsg', $successMsg);
             session()->save();
@@ -1107,6 +1135,10 @@ class TreeCoreSess extends TreeCore
         $btnText   = 'Access Full Details', 
         $btnSz     = '-lg')
     {
+        $user = null;
+        if (isset($this->v["tokenUser"])) {
+            $user = $this->v["tokenUser"];
+        }
         return view(
             'vendor.survloop.elements.inc-sensitive-access-mfa-form', 
             [
@@ -1114,7 +1146,7 @@ class TreeCoreSess extends TreeCore
                 "showLabel" => $showLabel,
                 "btnText"   => $btnText,
                 "btnSz"     => $btnSz, 
-                "user"      => ((isset($this->v["tokenUser"])) ? $this->v["tokenUser"] : null)
+                "user"      => $user
             ]
         )->render();
     }

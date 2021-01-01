@@ -9,7 +9,7 @@
         <a href="/dashboard/surv-{{ $GLOBALS['SL']->treeID 
             }}/map/node/{{ $nID }}" class="blk"
             ><i class="fa fa-pencil" aria-hidden="true"></i> 
-            Edit Node</a><br />
+            Edit Node #{{ $nID }}</a><br />
         {!! view(
             'vendor.survloop.elements.inc-var-dump-branches', 
             [ "dataBranches" => $dataBranches ]

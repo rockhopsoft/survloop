@@ -119,6 +119,10 @@ Route::get( '/dashboard/debug-node-saves', [
 
 
 
+Route::get( '/dashboard/contact/{folder}', [
+    'uses'       => $path . 'Admin\\AdminEmailController@manageContact', 
+    'middleware' => ['auth']
+]);
 Route::get( '/dashboard/contact', [
     'uses'       => $path . 'Admin\\AdminEmailController@manageContact', 
     'middleware' => ['auth']

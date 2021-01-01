@@ -608,6 +608,7 @@ class Globals extends GlobalsImportExport
             foreach ($searches as $s) {
                 $rows = SLSearchRecDump::where('sch_rec_dmp_tree_id', $treeID)
                     ->where('sch_rec_dmp_rec_dump', 'LIKE', '%' . $s . '%')
+                    ->where('sch_rec_dmp_perms', $this->getCacheSffxAdds())
                     ->select('sch_rec_dmp_rec_id')
                     ->orderBy('created_at', 'desc')
                     ->get();

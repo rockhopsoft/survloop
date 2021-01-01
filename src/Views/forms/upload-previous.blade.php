@@ -17,10 +17,12 @@
             <div class="uploadedWrap">
                 <div class="row">
                     <div class="col-md-4 m0 taC">
-
+                        
                 @if (intVal($upRow->up_type) == $vidTypeID 
                     && (trim($upDeets[$i]["youtube"]) != '' 
-                        || trim($upDeets[$i]["vimeo"]) != ''))
+                        || trim($upDeets[$i]["vimeo"]) != '')
+                        || trim($upDeets[$i]["archiveVid"]) != '')
+                        || trim($upDeets[$i]["instagram"]) != ''))
 
                     {!! view(
                         'vendor.survloop.forms.upload-previous-youtube', 

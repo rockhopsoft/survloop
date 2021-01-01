@@ -283,7 +283,7 @@ class TreeSurvLoops extends TreeSurvReport
                 $GLOBALS["SL"]->currCyc["cyc"][2] = $loopItem->getKey();
                 $this->sessData->startTmpDataBranch($curr->tbl, $loopItem->getKey());
                 $GLOBALS["SL"]->fakeSessLoopCycle($loop, $loopItem->getKey());
-                foreach ($curr->tmpSubTier[1] as $child) {
+                foreach ($curr->tmpSubTier[1] as $c => $child) {
                     if (!$this->allNodes[$child[0]]->isPage()) {
                         $ret .= $this->printNodePublic(
                             $child[0], 

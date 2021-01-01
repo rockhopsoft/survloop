@@ -25,6 +25,7 @@ var pageFadeInSpeed = 1000;
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 var fixedHeaderOffset = 0;
+var stickyFooterExtra = 0;
 
 function addRefreshParam() {
     var val = findGetParam("refresh");
@@ -428,6 +429,19 @@ function addTopNavItem(navTxt, navLink) {
 }
 var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars'])) 
     ? trim($GLOBALS['SL']->sysOpts['has-avatars']) : '') }}";
+
+function tweakNavLink(posA, posB, posC, link) {
+    if (posA > 0 && posB == 0 && posC == 0) {
+        if (document.getElementById("hidivBtnAdminNav"+posA+"")) {
+            document.getElementById("hidivBtnAdminNav"+posA+"").href=link;
+        }
+    } else if (posA > 0 && posB > 0 && posC == 0) {
+        if (document.getElementById("admMenu2Link"+posA+"j"+posB+"")) {
+            document.getElementById("admMenu2Link"+posA+"j"+posB+"").href=link;
+        }
+    }
+    return true;
+}        
 
 function addTopUserBurger(username) {
     if (!document.getElementById("myNavBar") || document.getElementById("myNavBar").innerHTML.indexOf("userMenuBtn") >= 0) {

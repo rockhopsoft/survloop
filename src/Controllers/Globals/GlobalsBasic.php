@@ -12,8 +12,10 @@
 namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use DB;
+use Auth;
 use App\Models\SLFields;
 use App\Models\SLTables;
+use App\Models\SLUserActivity;
 use RockHopSoft\Survloop\Controllers\Globals\GlobalsVars;
 
 class GlobalsBasic extends GlobalsVars
@@ -631,6 +633,29 @@ class GlobalsBasic extends GlobalsVars
             $this->x["pageSlugSffx"] .= '/' . $this->pageView;
         }
         return $this->x["pageSlugSffx"];
+    }
+
+    public function logError($err, $page = '')
+    {
+        $log = new SLUserActivity;
+        if (Auth::user() && Auth::user()->id) {
+            $log->user_act_user = Auth::user()->id;
+        }
+        $log->user_act_curr_page = $page;
+        $log->user_act_val = $err;
+        $log->save();
+        return true;
+    }
+
+    public function loadAppUrlParams()
+    {
+        if ($this->REQ->has('refresh') 
+            && intVal($this->REQ->get('refresh')) > 0) {
+            $this->pageJAVA .= ' appUrlParams[appUrlParams.length]'
+                . ' = new Array("refresh", "' 
+                . intVal($this->REQ->get('refresh')) . '"); ';
+        }
+        return true;
     }
 
 }

@@ -1,4 +1,5 @@
 <!-- resources/views/survloop/forms/upload-previous-youtube.blade.php -->
+
 @if (trim($upDeets[$i]["youtube"]) != '')
     <iframe id="ytplayer{{ $upRow->up_id }}" type="text/html" width="100%" 
         height="{{ $height }}" class="mBn5" frameborder="0" allowfullscreen 
@@ -15,4 +16,13 @@
         webkitallowfullscreen="true" mozallowfullscreen="true" 
         src="https://archive.org/embed/{{ $upDeets[$i]['archiveVid'] }}"
         allowfullscreen></iframe>
+@elseif (trim($upDeets[$i]["instagram"]) != '')
+    @if (trim($upDeets["thmbUrl"]) != '')
+        <a href="{{ $upRow->up_video_link }}" target="_blank"
+            ><img src="{{ $upDeets[$i]['thmbUrl'] }}" border="0" 
+            width="100%" height="{{ $height }}"></a>
+    @else
+        <div class="mT10"><a href="{{ $upRow->up_video_link }}" target="_blank"
+            >{{ $upRow->up_video_link }}</a></div>
+    @endif
 @endif

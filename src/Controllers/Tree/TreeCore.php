@@ -498,6 +498,10 @@ class TreeCore extends SurvloopController
             $nodeType = $this->allNodes[$this->nodesRawOrder[$ind]]->nodeType;
             while ($ind >= 0 && $nodeType != $type) {
                 $ind--;
+                if (isset($this->nodesRawOrder[$ind])
+                    && isset($this->allNodes[$this->nodesRawOrder[$ind]])) {
+                    $nodeType = $this->allNodes[$this->nodesRawOrder[$ind]]->nodeType;
+                }
             }
             if ($ind >= 0 && $nodeType == $type) {
                 return $this->nodesRawOrder[$ind];

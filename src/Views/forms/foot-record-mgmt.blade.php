@@ -1,6 +1,6 @@
 @if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' && $coreID > 0)
     <!-- resources/views/survloop/forms/foot-record-mgmt.blade.php -->
-    <div id="sessMgmtWrap" class="disBlo pT20 mT20">
+    <div id="sessMgmtWrap" class="disBlo pT20 mT20 mB30">
         <a id="hidivBtnSessMgmtID" class="hidivBtn btn btn-secondary btn-sm" href="javascript:;">
             <div class="pT5 pB5"><i class="fa fa-cogs" aria-hidden="true"></i>
             {{ $GLOBALS["SL"]->treeRow->tree_name }} #{{ $coreID }}

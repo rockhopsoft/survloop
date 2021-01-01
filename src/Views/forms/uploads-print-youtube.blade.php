@@ -62,6 +62,25 @@
     @endif
     </div>
 
+@elseif (trim($upDeets["instagram"]) != '')
+
+    @if (trim($upDeets["thmbUrl"]) != '')
+        <a href="{{ $upRow->up_video_link }}" target="_blank"
+            ><img src="{{ $upDeets['thmbUrl'] }}" border="0" 
+            width="100%" height="{{ $height }}"></a>
+    @endif
+    <div class="mT10 mBn10"><a href="{{ $upRow->up_video_link }}" target="_blank"
+        >{{ $upRow->up_video_link }}</a></div>
+    <?php /*
+    <video controls style="width:100%; display: block !important;">
+        <source src="{{ $upDeets['instagramShortLink'] }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <iframe src="{{ $upDeets['instagramShortLink'] }}embed/" width="100%" 
+        height="{{ $height }}" frameborder="0" scrolling="no" 
+        allowtransparency="true"></iframe>
+    */ ?>
+
 @elseif (isset($upDeets["otherLnk"]) && trim($upDeets["otherLnk"]) != '')
 
     <a href="{{ $upDeets['otherLnk'] }}"

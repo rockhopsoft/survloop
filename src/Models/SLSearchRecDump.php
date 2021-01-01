@@ -13,5 +13,6 @@ class SLSearchRecDump extends Model
         'sch_rec_dmp_tree_id', 
         'sch_rec_dmp_rec_id', 
         'sch_rec_dmp_rec_dump',
+        'sch_rec_dmp_perms',
     ];
 }

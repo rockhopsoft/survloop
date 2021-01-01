@@ -244,7 +244,7 @@ class SurvloopControllerUtils extends Controller
         }
         $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' 
             . $content . '<br /><span class="slGrey fPerc80">' 
-            . $GLOBALS["SL"]->hashIP() . '</span></p>';
+            . $GLOBALS["SL"]->hashIP(true) . '</span></p>';
         if (!file_exists($fold . $file)) {
             Storage::disk('local')->put($file, ' ');
         }
@@ -286,7 +286,7 @@ class SurvloopControllerUtils extends Controller
             $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
             for ($i = 0; $i < sizeof($logs); $i++) {
                 if (strpos($logs[$i], $match) !== false) {
-                    $ret .= $logs[$i] . '</p><div class="p10"></div>';
+                    $ret .= $logs[$i] . '</p><div class="p5"></div>';
                 }
             }
         }
@@ -302,8 +302,23 @@ class SurvloopControllerUtils extends Controller
             $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
             for ($i = 0; $i < sizeof($logs); $i++) {
                 if (strpos($logs[$i], $match) !== false) {
-                    $ret .= $logs[$i] . '</p><div class="p10"></div>';
+                    $ret .= $logs[$i] . '</p><div class="p5"></div>';
                 }
+            }
+        }
+        return $ret;
+    }
+    
+    protected function activityPreviewUser($userID = 0)
+    {
+        $ret = '';
+        $chk = SLUsersActivity::where('user_act_user', $userID)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $log) {
+                $ret .= '<p>' . date("n/j/y, g:ia", strtotime($log->created_at)) 
+                    . ' ' . $log->user_act_curr_page . '</p>';
             }
         }
         return $ret;

@@ -146,52 +146,44 @@ class TreeSurvConds extends TreeSurvCustomAPI
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsStaff') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('staff')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsStaffOrAdmin') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('administrator|staff')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsPartnerStaffOrAdmin') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('administrator|staff|partner')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsPartnerStaffAdminOrOwner') {
                 $retTF = $this->isPartnerStaffAdminOrOwner();
             } elseif (trim($cond->cond_tag) == '#IsPartner') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('partner')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsVolunteer') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('volunteer')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsBrancher') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["user"]->hasRole('databaser')) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsOwner') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !$this->v["isOwner"]) {
                     $retTF = false;
                 }
             } elseif (trim($cond->cond_tag) == '#IsProfileOwner') {
-                if (!isset($this->v["uID"]) 
-                    || $this->v["uID"] <= 0 
+                if ((!isset($this->v["uID"]) || $this->v["uID"] <= 0)
                     || !isset($this->v["profileUser"]) 
                     || !isset($this->v["profileUser"]->id) 
                     || !$this->v["profileUser"]
@@ -265,35 +257,45 @@ class TreeSurvConds extends TreeSurvCustomAPI
     public function runLoopConditions()
     {
         $this->sessData->loopItemIDs = [];
-        if (isset($GLOBALS["SL"]->dataLoops) && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
+        if (isset($GLOBALS["SL"]->dataLoops) 
+            && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             $GLOBALS["SL"]->loadLoopConds();
             foreach ($GLOBALS["SL"]->dataLoops as $loopName => $loop) {
-                $this->sessData->loopItemIDs[$loop->data_loop_plural] = $sortable = [];
-                if (isset($this->sessData->dataSets[$loop->data_loop_table]) 
-                    && sizeof($this->sessData->dataSets[$loop->data_loop_table]) > 0) {
-                    foreach ($this->sessData->dataSets[$loop->data_loop_table] as $recObj) {
+                $tbl    = $loop->data_loop_table;
+                $plural = $loop->data_loop_plural;
+                $this->sessData->loopItemIDs[$plural] 
+                    = $sortable 
+                    = [];
+                if (isset($this->sessData->dataSets[$tbl]) 
+                    && sizeof($this->sessData->dataSets[$tbl]) > 0) {
+                    foreach ($this->sessData->dataSets[$tbl] as $recObj) {
                         if ($recObj) {
                             $custom = $this->parseConditionsCustom($loop, $recObj);
+//if ($loop->data_loop_id == 24 && $recObj->getKey() == 200) { echo 'Loop isCiv: ' . $recObj->vehic_is_civilian . ', custom: ' . $custom . ', parse: ' . (($this->parseConditions($loop->conds, $recObj)) ? 'true' : 'false') . '<br />'; }
                             if ($custom == 1 
                                 || ($custom == -1 
                                     && $this->parseConditions($loop->conds, $recObj))) {
-                                $this->sessData->loopItemIDs[$loop->data_loop_plural][] 
+                                $this->sessData->loopItemIDs[$plural][] 
                                     = $recObj->getKey();
                                 if (trim($loop->data_loop_sort_fld) != '') {
                                     $sortable['' . $recObj->getKey() . ''] 
                                         = $recObj->{ $loop->data_loop_sort_fld };
                                 }
+//if ($loop->data_loop_id == 24 && $recObj->getKey() == 200) { echo '<hr>sortable: '; print_r($sortable); echo '<br />loopItemIDs: '; print_r($this->sessData->loopItemIDs[$plural]); echo '<hr>'; }
                             }
                         }
                     }
                 }
+//if ($loop->data_loop_id == 24 && $recObj->getKey() == 200) { echo 'sortable: <pre>'; print_r($sortable); echo '</pre>loopItemIDs: <pre>'; print_r($this->sessData->loopItemIDs[$plural]); echo '</pre>'; }
                 if (trim($loop->data_loop_sort_fld) != '' && sizeof($sortable) > 0) {
-                    $this->sessData->loopItemIDs[$loop->data_loop_plural] = [];
+                    $this->sessData->loopItemIDs[$plural] = [];
                     asort($sortable);
                     foreach ($sortable as $id => $ord) {
-                        $this->sessData->loopItemIDs[$loop->data_loop_plural][] = intVal($id);
+                        $this->sessData->loopItemIDs[$plural][] = intVal($id);
+//if ($loop->data_loop_id == 24 && $recObj->getKey() == 200) { echo 'Loop adding to loopItemIDs: ' . intVal($id) . '<br />'; }
                     }
                 }
+//if ($loop->data_loop_id == 24 && $recObj->getKey() == 200) { echo '<h3>Loop ItemIDS</h3><pre>'; print_r($this->sessData->loopItemIDs[$plural]); echo '</pre><br />'; exit; }
             }
         }
         return true;

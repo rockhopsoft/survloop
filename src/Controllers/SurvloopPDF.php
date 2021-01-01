@@ -168,8 +168,10 @@ class SurvloopPDF
             $dispo = 'attachment';
         }
         $headers = [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => $dispo . '; filename="' . $file . '"'
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => $dispo . '; filename="' . $file . '"',
+            'Cache-Control'       => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'              => 'no-cache'
         ];
         $fileWithAttach = str_replace('.pdf', '-with-attach.pdf', $filename);
         if (file_exists($fileWithAttach)) {

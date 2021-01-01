@@ -4,6 +4,8 @@ $(document).ready(function(){
     
 {!! view('vendor.survloop.js.scripts-ajax-forms')->render() !!}
     
+{!! view('vendor.survloop.js.scripts-ajax-forms-signup')->render() !!}
+    
 {!! view('vendor.survloop.js.scripts-ajax-search')->render() !!}
 
 {!! view('vendor.survloop.js.scripts-ajax-scrolling')->render() !!}
@@ -18,7 +20,6 @@ $(document).ready(function(){
     function loopCheckPageTweaks(timeout) {
         chkAutoLoadDashResults();
         chkMatchCols();
-        chkMatchColWidths();
         chkSpecialNodes();
         chkAnyAnimRevealResults();
 
@@ -266,6 +267,16 @@ $(document).ready(function(){
     $(document).on("click", ".hidSelf", function() {
         $(this).slideUp("fast");
     });
+
+
+    $(document).on("click", ".loadAnimBtn", function() {
+        var animID = $(this).attr("data-anim-id");
+        if (document.getElementById("loadAnim"+animID+"") && document.getElementById("loadAnimClicked"+animID+"")) {
+            document.getElementById("loadAnim"+animID+"").style.display="none";
+            document.getElementById("loadAnimClicked"+animID+"").style.display="block";
+        }
+    });
+
     
     function visibShowNode(nID) {
         setNodeVisib(""+nID+"", "", true);
@@ -473,6 +484,7 @@ $(document).ready(function(){
         var mobile = false;
         if (window.innerWidth < 768) mobile = true;
         if (openAdmMenuOnLoad && !mobile) openAdmMenu();
+        else closeAdmMenu();
     }, 10);
     $(window).resize(function() {
         setTimeout(function() { chkFixedHeaders(false); }, 5);

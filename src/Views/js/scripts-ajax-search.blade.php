@@ -40,6 +40,7 @@ function loadDashResults() {
 function chkAutoLoadDashResults() {
     if (autoRunDashResults) {
         autoRunDashResults = false;
+        console.log("autoRunDashResults");
         loadDashResults();
         return true;
     }

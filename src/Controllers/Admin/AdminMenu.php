@@ -386,15 +386,19 @@ class AdminMenu
             1, 
             [
                 $this->admMenuLnk(
-                    '/dashboard/contact?tab=unread', 
+                    '/dashboard/contact', 
                     'Unread'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/contact?tab=all', 
-                    'All Contacts'
+                    '/dashboard/contact/hold', 
+                    'On Hold'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/contact?tab=trash', 
+                    '/dashboard/contact/resolved', 
+                    'Resolved'
+                ),
+                $this->admMenuLnk(
+                    '/dashboard/contact/trash', 
                     'Trash'
                 )
             ]
@@ -402,7 +406,7 @@ class AdminMenu
         return $ret;
     }
     
-    protected function admMenuLnkContactCnt()
+    public function admMenuLnkContactCnt()
     {
         $chk = SLContact::where('cont_flag', 'Unread')
             ->select('cont_id')
