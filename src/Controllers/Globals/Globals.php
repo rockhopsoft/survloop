@@ -47,7 +47,7 @@ class Globals extends GlobalsImportExport
         $this->loadGlobalTables($dbID, $treeID, $treeOverride);
         $this->loadDBFromCache($request);
         $this->loadTreeMojis();
-        $this->loadDataMap($this->treeID);
+        $this->loadDataMap();
         $this->chkReportFormTree();
         $this->loadCustomGlobals();
         $GLOBALS["errors"] = '';

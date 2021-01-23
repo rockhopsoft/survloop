@@ -15,6 +15,7 @@ use DB;
 use Auth;
 use App\Models\SLFields;
 use App\Models\SLTables;
+use App\Models\SLTree;
 use App\Models\SLUserActivity;
 use RockHopSoft\Survloop\Controllers\Globals\GlobalsVars;
 
@@ -105,11 +106,24 @@ class GlobalsBasic extends GlobalsVars
             return $this->x["tblHasPublicID"][$tbl];
         }
         $this->x["tblHasPublicID"][$tbl] = false;
-        if ((isset($this->treeRow->tree_opts) && $this->treeRow->tree_opts%47 == 0) 
-            || (isset($this->reportTree["opts"]) && $this->reportTree["opts"]%47 == 0)) {
+        if ((isset($this->treeRow->tree_opts) 
+                && $this->treeRow->tree_opts%Globals::TREEOPT_PUBLICID == 0) 
+            || (isset($this->reportTree["opts"]) 
+                && $this->reportTree["opts"]%Globals::TREEOPT_PUBLICID == 0)) {
             $this->x["tblHasPublicID"][$tbl] = true;
+        } elseif (isset($this->tblI[$tbl])) {
+            $chk = SLTree::where('tree_type', 'Survey')
+                ->where('tree_core_table', $this->tblI[$tbl])
+                ->orderBy('tree_id', 'asc')
+                ->first();
+            if ($chk
+                && isset($chk->tree_opts)
+                && $chk->tree_opts%Globals::TREEOPT_PUBLICID == 0) {
+                $this->x["tblHasPublicID"][$tbl] = true;
+            }
         }
-        if ($this->x["tblHasPublicID"][$tbl] 
+        if (isset($this->x["tblHasPublicID"][$tbl])
+            && $this->x["tblHasPublicID"][$tbl] 
             && isset($this->tblI[$tbl])) {
             $chk = SLFields::where('fld_table', $this->tblI[$tbl])
                 ->where('fld_name', 'public_id')
@@ -142,15 +156,19 @@ class GlobalsBasic extends GlobalsVars
     
     public function chkInPublicID($pubID = -3, $tbl = '')
     {
+        if (intVal($pubID) <= 0) {
+            return $pubID;
+        }
         if (trim($tbl) == '') {
             $tbl = $this->coreTbl;
         }
-        if (intVal($pubID) <= 0 || !$this->tblHasPublicID($tbl)) {
+        if (!$this->tblHasPublicID($tbl)) {
             return $pubID;
         }
         $pubIdFld = $this->tblAbbr[$tbl] . 'public_id';
-        eval("\$idChk = " . $this->modelPath($tbl) . "::where('" 
-            . $pubIdFld . "', '" . intVal($pubID) . "')->first();");
+        $eval = "\$idChk = " . $this->modelPath($tbl) . "::where('" 
+            . $pubIdFld . "', '" . intVal($pubID) . "')->first();";
+        eval($eval);
         if ($idChk) {
             return $idChk->getKey();
         }
@@ -628,7 +646,7 @@ class GlobalsBasic extends GlobalsVars
 
     public function initPageReadSffx($cid = 0)
     {
-        $this->x["pageSlugSffx"] = '/read-' . $cid;
+        $this->x["pageSlugSffx"] = '/readi-' . $cid;
         if ($this->pageView != '') {
             $this->x["pageSlugSffx"] .= '/' . $this->pageView;
         }

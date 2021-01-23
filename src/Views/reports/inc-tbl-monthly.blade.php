@@ -13,7 +13,8 @@
     <tr>
         <th><b>Total</b></th>
     @foreach ($cols as $c => $col)
-        <th id="colTot{{ str_replace('-', '', $GLOBALS['SL']->slugify($col->name)) }}">
+        <th id="colTot{{ str_replace('-', '', 
+            $GLOBALS['SL']->slugify($col->name)) }}">
             <b>{{ number_format($col->sum) }}</b>
         </th>
     @endforeach

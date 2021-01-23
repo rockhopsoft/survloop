@@ -484,14 +484,20 @@ class TreeSurvAPI extends TreeCoreSess
     // FldOpts %1 XML Public Data; %7 XML Private Data; %11 XML Sensitive Data; %13 XML Internal Use Data
     public function checkViewDataPerms($fld)
     {
-        if ($fld && isset($fld->fld_opts) && intVal($fld->fld_opts) > 0) {
-            if ($fld->fld_opts%7 > 0 && $fld->fld_opts%11 > 0 && $fld->fld_opts%13 > 0) {
+        if ($fld 
+            && isset($fld->fld_opts) 
+            && intVal($fld->fld_opts) > 0) {
+            if ($fld->fld_opts%7 > 0 
+                && $fld->fld_opts%11 > 0 
+                && $fld->fld_opts%13 > 0) {
                 return true;
             }
             if (in_array($GLOBALS["SL"]->pageView, ['full', 'full-pdf', 'full-xml'])) {
                 return true;
             }
-            if ($fld->fld_opts%13 == 0 || $fld->fld_opts%11 == 0) {
+            if ($fld->fld_opts%7 == 0
+                || $fld->fld_opts%11 == 0
+                || $fld->fld_opts%13 == 0) {
                 return false;
             }
             return true;
@@ -533,7 +539,7 @@ class TreeSurvAPI extends TreeCoreSess
     public function genXmlFormatVal($rec, $fld, $abbr)
     {
         $val = false;
-//if ($fld->fld_name == 'summary') { echo 'genXmlFormatVal(abbr: ' . $abbr . ',<br />fld: ' . $fld->fld_name . ' ' . $fld->fld_opts . ', rec:<br />'; print_r($rec); echo '<br />'; }
+//if ($fld->fld_name == 'summary') { echo 'genXmlFormatVal(abbr: ' . $abbr . ',<br />fld: ' . $fld->fld_name . ' ' . $fld->fld_opts . ', dataPerms: ' . $GLOBALS["SL"]->dataPerms . ', pageView: ' . $GLOBALS["SL"]->pageView . ' <br />genXmlFormatValCustomPerms: ' . (($this->genXmlFormatValCustomPerms($rec, $fld, $abbr)) ? 't' : 'f') . ' — checkFldDataPerms: ' . (($this->checkFldDataPerms($fld)) ? 't' : 'f') . ' — checkViewDataPerms: ' . (($this->checkViewDataPerms($fld)) ? 't' : 'f') . ' — rec:<pre>'; print_r($rec); echo '</pre>'; exit; }
 //if ($apiFld->fld->fld_name == 'summary') { echo 'fld:table: ' . $apiFld->fld->fld_table . ', fldTbl: ' . $fldTbl . ', fldTblAbbr: ' . $fldTblAbbr . ', fldName: ' . $fldName . ', val: ' . $val . ', id: ' . $id . ',<pre>'; print_r($this->sessData->getChildRows($tbl, $id, $fldTbl)); print_r($rec); echo '</pre>'; }
         if (isset($rec->{ $abbr . $fld->fld_name })
             && ($this->genXmlFormatValCustomPerms($rec, $fld, $abbr)
@@ -602,6 +608,7 @@ class TreeSurvAPI extends TreeCoreSess
             $treeID = $this->treeID;
         }
         if (!session()->has('chkRecsPub') || $request->has('refresh')) {
+            /*
             $dumped = [];
             if ($request->has('refresh')) {
                 $chk = SLSearchRecDump::where('sch_rec_dmp_tree_id', $treeID)
@@ -627,6 +634,7 @@ class TreeSurvAPI extends TreeCoreSess
                 }
             }
             $this->reloadStats($this->searcher->allPublicCoreIDs);
+            */
             session()->put('chkRecsPub', 1);
             session()->save();
             return true;
@@ -658,7 +666,7 @@ class TreeSurvAPI extends TreeCoreSess
                 $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]
             ) . $this->genRecDumpXtra();
         $dump = str_replace('  ', ' ', trim($dump));
-        $dump = htmlentities($GLOBALS["SL"]->stdizeChars($dump));
+        $dump = utf8_encode(htmlentities($GLOBALS["SL"]->stdizeChars($dump)));
 
         $dumpRec = new SLSearchRecDump;
         $dumpRec->sch_rec_dmp_tree_id  = $treeID;
@@ -702,20 +710,27 @@ class TreeSurvAPI extends TreeCoreSess
                 if (sizeof($kidRows) > 0) {
                     foreach ($kidRows as $j => $kid) {
                         $abbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]];
-                        $ret .= ' ' 
-                            . $this->genXmlFormatVal($kid, $v["tblHelpFld"][$help], $abbr);
+                        $ret .= ' ' . $this->genXmlFormatVal(
+                                $kid, 
+                                $v["tblHelpFld"][$help], 
+                                $abbr
+                            );
                     }
                 }
             }
         }
+//echo 'genRecDumpNode(<pre>'; print_r($nodeTiers[1]); echo '</pre>'; exit;
         for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
             $tbl2 = $this->xmlMapTree->getNodeTblName($nodeTiers[1][$i][0]);
             $kidRows = $this->sessData->getChildRows($v["tbl"], $rec->getKey(), $tbl2);
             if (sizeof($kidRows) > 0) {
                 $nextV = $this->getXmlTmpV($nodeTiers[1][$i][0]);
                 foreach ($kidRows as $j => $kid) {
-                    $ret .= ' ' 
-                        . $this->genRecDumpNode($nodeTiers[1][$i][0], $nodeTiers[1][$i], $kid);
+                    $ret .= ' ' . $this->genRecDumpNode(
+                            $nodeTiers[1][$i][0], 
+                            $nodeTiers[1][$i], 
+                            $kid
+                        );
                 }
             }
         }

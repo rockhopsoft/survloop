@@ -192,7 +192,7 @@
                 </label>
                 <label id="importTblTypeOldlab" class="finger">
                     <div class="disIn mR5">
-                        <input type="radio" value="DLC" 
+                        <input type="radio" value="Existing" 
                             id="importTblTypeOld" name="importType" 
                             class="updateImportType slTab ntrStp" 
                             autocomplete="off">

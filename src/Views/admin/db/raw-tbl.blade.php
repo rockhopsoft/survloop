@@ -70,8 +70,7 @@
         <td>
         @if (isset($row->{ $fldName }) 
             && trim($row->{ $fldName }) != '')
-            @if (in_array($fld->fld_type, ['INT', 'DOUBLE'])
-                && !in_array($fld->fld_name, ['year']))
+            @if ($fld->fld_type == 'INT' && !in_array($fld->fld_name, ['year']))
                 {{ number_format($row->{ $fldName }) }}
             @else
                 {{ $row->{ $fldName } }}

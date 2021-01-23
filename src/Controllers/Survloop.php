@@ -82,7 +82,7 @@ class Survloop extends SurvloopSpecialLoads
                     if ($cid > 0) {
                         $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
                         $GLOBALS["SL"]->initPageReadSffx($cid);
-                        $this->custLoop->loadSessionDataRawCid($cid);
+                        $this->custLoop->loadSessionData($cid);
                     }
                     return $this->custLoop->printTreeNodePublic($nID);
                 }
@@ -109,8 +109,10 @@ class Survloop extends SurvloopSpecialLoads
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
             if ($this->hasParamEdit($request) && $this->isStaffOrAdmin()) {
-                echo '<script type="text/javascript"> window.location="/dashboard/page/' 
-                    . $this->treeID . '?all=1&alt=1&refresh=1"; </script>';
+                echo '<script type="text/javascript"> '
+                    . 'window.location="/dashboard/page/' 
+                    . $this->treeID . '?all=1&alt=1&refresh=1"; '
+                    . '</script>';
                 exit;
             }
             $this->loadLoop($request);
@@ -119,7 +121,7 @@ class Survloop extends SurvloopSpecialLoads
             if ($cid > 0) {
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
                 if (in_array($view, ['pdf', 'full-pdf'])) {
-                    return $this->custLoop->byID($request, $cid, '', $request->has('ajax'));
+                    return $this->custLoop->byID($request, $cid, ' - ' . $this->custLoop->getCoreID() . '', $request->has('ajax'));
                 }
             }
             $this->custLoop->chkPageToken();
@@ -127,11 +129,16 @@ class Survloop extends SurvloopSpecialLoads
             if ($this->topCheckCache($request, 'page') && $allowCache) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
+            //$this->custLoop->loadSessionData($cid);
             $this->chkPageHideDisclaim($request, $cid);
             if (in_array($view, ['xml', 'json'])) {
                 $GLOBALS["SL"]->pageView = 'public';
                 $this->custLoop->loadXmlMapTree($request);
                 return $this->custLoop->getXmlID($request, $cid, $pageSlug);
+            }
+            if ($cid > 0) {
+                $this->loadPageCID($request, $GLOBALS["SL"]->treeRow, intVal($cid));
+                $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
             }
             $this->pageContent = $this->custLoop->index($request);
             if ($allowCache) {
@@ -198,7 +205,6 @@ class Survloop extends SurvloopSpecialLoads
     {
         if ($cid > 0) {
             $GLOBALS["SL"]->initPageReadSffx($cid);
-            $this->custLoop->loadSessionDataRawCid($cid);
             if ($request->has('hideDisclaim') && intVal($request->hideDisclaim) == 1) {
                 $this->custLoop->hideDisclaim = true;
             }
@@ -315,12 +321,6 @@ class Survloop extends SurvloopSpecialLoads
             . 'setTimeout("window.location=\'/\'", 2000); </script>';
     }
     
-    public function fullXmlByID(Request $request, $treeSlug, $cid)
-    {
-        $GLOBALS["SL"]->x["fullAccess"] = true;
-        return $this->xmlByID($request, $treeSlug, $cid);
-    }
-    
     public function xmlAll(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -339,24 +339,34 @@ class Survloop extends SurvloopSpecialLoads
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
             $this->loadLoop($request);
+            $cid = $GLOBALS["SL"]->chkInPublicID($cid);
             return $this->custLoop->xmlByID($request, $cid);
         }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
+            $cid = $GLOBALS["SL"]->chkInPublicID($cid);
             return $this->custLoop->xmlByID($request, $cid);
         }
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
     
+    public function fullXmlByID(Request $request, $treeSlug, $cid)
+    {
+        $GLOBALS["SL"]->x["fullAccess"] = true;
+        return $this->xmlByID($request, $treeSlug, $cid);
+    }
+    
     public function xmlFullByID(Request $request, $treeSlug, $cid)
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
             $this->loadLoop($request);
+            $cid = $GLOBALS["SL"]->chkInPublicID($cid);
             return $this->custLoop->xmlFullByID($request, $cid);
         }
         if ($this->loadTreeBySlug($request, $treeSlug)) {
             $this->loadLoop($request);
+            $cid = $GLOBALS["SL"]->chkInPublicID($cid);
             return $this->custLoop->xmlFullByID($request, $cid);
         }
         $this->loadDomain();

@@ -19,6 +19,7 @@ $(document).ready(function(){
     // Primary hook for little scripts which need to be run every second or two
     function loopCheckPageTweaks(timeout) {
         chkAutoLoadDashResults();
+        chkSearchWidth();
         chkMatchCols();
         chkSpecialNodes();
         chkAnyAnimRevealResults();

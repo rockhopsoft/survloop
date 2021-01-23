@@ -517,22 +517,13 @@ class TreeSurvLoad extends TreeSurvConds
         return false;
     }
     
-    public function loadSessionDataRawCid($coreID = -3)
-    {
-        return $this->loadSessionData($GLOBALS["SL"]->coreTbl, $coreID, true);
-    }
-    
-    public function loadSessionData($coreTbl, $coreID = -3, $skipPublic = false)
+    public function loadSessionData($coreTbl, $coreID = -3)
     {
         if ($coreID > 0) {
-            if (!$skipPublic) {
-                $this->chkPublicCoreID($coreTbl, $coreID);
-            } else {
-                $this->coreID 
-                    = $GLOBALS["SL"]->coreID 
-                    = $this->corePublicID 
-                    = $coreID;
-            }
+            $this->coreID 
+                = $GLOBALS["SL"]->coreID 
+                = $this->corePublicID 
+                = $coreID;
         }
         $this->sessData->loadCore(
             $coreTbl, 

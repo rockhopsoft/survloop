@@ -443,7 +443,6 @@ class TreeSurvReport extends TreeSurvBasicNav
                 // Add deet to column
                 $deetCols[$c][] = $deet;
             }
-//if ($deets[0][1] == 'Betty') { echo '<pre>'; print_r($deetsTots); print_r($deetsTotCols); echo '</pre>'; exit; }
         }
         return view(
             'vendor.survloop.reports.inc-deets-cols', 
@@ -652,13 +651,13 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/xml';
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
+            . '/readi-' . $coreID . '/xml';
         $this->survLoopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'public';
         if (!$this->xmlAccess()) {
             return 'Sorry, access not permitted.';
         }
-        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
@@ -675,10 +674,10 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function xmlFullByID(Request $request, $coreID, $coreSlug = '')
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $coreID . '/full-xml';
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
+            . '/readi-' . $coreID . '/full-xml';
         $this->survLoopInit($request, $page);
-        $GLOBALS["SL"]->pageView = 'full';
-//echo 'view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
+        $GLOBALS["SL"]->pageView = 'full-xml';
         if (!$this->xmlAccess()) {
             return 'Sorry, access not permitted.';
         }
@@ -691,7 +690,6 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->loadAllSessData($GLOBALS["SL"]->xmlTree["coreTbl"], $coreID);
         }
         $this->checkPageViewPerms();
-//echo 'view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
         if ($GLOBALS["SL"]->dataPerms == 'none') {
             return '';
         }
@@ -700,7 +698,9 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function getXmlID(Request $request, $coreID, $coreSlug = '')
     {
-        $this->maxUserView();
+//echo 'getXmlID( view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms;
+        //$this->maxUserView();
+//echo 'getXmlID( view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
         $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
         if (isset($GLOBALS["SL"]->x["fullAccess"]) 
             && $GLOBALS["SL"]->x["fullAccess"] 
@@ -715,18 +715,24 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-example';
         $this->survLoopInit($request, $page);
-        $coreID = 1;
+        $coreID = $this->getXmlExampleID();
         $optTree = $optXmlTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
-        if (isset($GLOBALS["SL"]->xmlTree["id"])) {
-            $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
-        }
-        if (isset($GLOBALS["SL"]->sysOpts[$optTree])) {
+        if ($coreID <= 0 && isset($GLOBALS["SL"]->sysOpts[$optTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optTree]);
         }
         if ($coreID <= 0 
             && $optXmlTree != $optTree
-            && isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
-            $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
+            && isset($GLOBALS["SL"]->xmlTree["id"])) {
+            $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
+            if (isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
+                $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
+            }
+        }
+        if ($coreID <= 0) {
+            $optXmlTree = "tree-" . $GLOBALS["SL"]->getXmlSurveyID() . "-example";
+            if (isset($GLOBALS["SL"]->sysOpts[$optXmlTree])) {
+                $coreID = intVal($GLOBALS["SL"]->sysOpts[$optXmlTree]);
+            }
         }
         if (isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
             $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->xmlTree["coreTbl"]);
@@ -735,7 +741,24 @@ class TreeSurvReport extends TreeSurvBasicNav
                 return $this->xmlByID($request, $coreID);
             }
         }
+        if (isset($GLOBALS["SL"]->coreTbl)) {
+            $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl);
+            eval("\$chk = " . $model . "::find(" . $coreID . ");");
+            if ($chk) {
+                return $this->xmlByID($request, $coreID);
+            }
+        }
         return $this->redir('/xml-schema');
+    }
+    
+    /**
+     * Specify the example record for individual XML exports.
+     *
+     * @return int
+     */
+    protected function getXmlExampleID()
+    {
+        return -3;
     }
     
     protected function reloadStats($coreIDs = [])

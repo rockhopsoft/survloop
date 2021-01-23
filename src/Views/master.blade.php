@@ -91,8 +91,7 @@ if (!$GLOBALS["SL"]->isPdfView()) {
     </div>
 
     @if (((!isset($isFrame) || !$isFrame) && $isDashLayout) 
-        && (!isset($isPrint) || !$isPrint) 
-        && !$GLOBALS["SL"]->isPdfView())
+        && (!isset($isPrint) || !$isPrint))
 
         <table border=0 cellpadding=0 cellspacing=0 class="w100 h100"><tr>
         <td id="leftSide" 
@@ -139,7 +138,9 @@ if (!$GLOBALS["SL"]->isPdfView()) {
                     'vendor.survloop.inc-master-logo'
                 )->render() !!}
             </div>
-            {!! view('vendor.survloop.master-search')->render() !!}
+            <a id="topNavSearchBtn" 
+                class="fL slNavLnk mLn15" href="javascript:;"
+                ><i class="fa fa-search mT3" aria-hidden="true"></i></a>
             <div class="fR taR">
                 <div id="myNavBar"></div>
             </div>
@@ -155,16 +156,18 @@ if (!$GLOBALS["SL"]->isPdfView()) {
     <div class="headGap">
         <img src="/survloop/uploads/spacer.gif" border=0 alt="" >
     </div>
+    {!! view(
+        'vendor.survloop.master-search',
+        [ "isDashLayout" => $isDashLayout ]
+    )->render() !!}
 
-    @if (!$GLOBALS["SL"]->isPdfView())
-        <noscript><div class="alert alert-dismissible alert-warning">
-            <b>Warning: It looks like you have JavaScript disabled.
-            @if (isset($GLOBALS['SL']->sysOpts['site-name'])) 
-                {{ $GLOBALS['SL']->sysOpts['site-name'] }}
-            @endif
-            requires JavaScript to give you the best possible experience.</b>
-        </div></noscript>
-    @endif
+    <noscript><div class="alert alert-dismissible alert-warning">
+        <b>Warning: It looks like you have JavaScript disabled.
+        @if (isset($GLOBALS['SL']->sysOpts['site-name'])) 
+            {{ $GLOBALS['SL']->sysOpts['site-name'] }}
+        @endif
+        requires JavaScript to give you the best possible experience.</b>
+    </div></noscript>
 
     <!-- SessMsg -->
 

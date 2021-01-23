@@ -447,6 +447,7 @@ class Searcher extends SurvCustLoop
                 $this->v["searchFiltsURL"] .= '&' . $key . '=' . $paramVal;
             }
         }
+//echo 'url: ' . $this->v["searchFiltsURL"] . '<pre>'; print_r($this->searchFilts); echo '</pre>';
         if (sizeof($this->searchOpts) > 0) {
             foreach ($this->searchOpts as $key => $val) {
                 $this->v["searchFiltsURL"] .= '&' . $key . '=' . $val;

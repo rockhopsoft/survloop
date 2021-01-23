@@ -194,3 +194,10 @@ input[type="submit"].btn-success.btn-sm:hover {
     color: {!! $css["color-main-bg"] !!};
     background: {!! $css["color-main-link"] !!};
 }
+
+select.form-control, select.form-control.form-control-lg {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: {!! $css["color-main-bg"] !!} url(/survloop/uploads/caret-down.png) 93% center no-repeat !important;
+    padding-right: 25px;
+}

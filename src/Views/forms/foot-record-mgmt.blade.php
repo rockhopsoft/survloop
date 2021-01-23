@@ -1,13 +1,16 @@
 @if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' && $coreID > 0)
     <!-- resources/views/survloop/forms/foot-record-mgmt.blade.php -->
     <div id="sessMgmtWrap" class="disBlo pT20 mT20 mB30">
-        <a id="hidivBtnSessMgmtID" class="hidivBtn btn btn-secondary btn-sm" href="javascript:;">
-            <div class="pT5 pB5"><i class="fa fa-cogs" aria-hidden="true"></i>
-            {{ $GLOBALS["SL"]->treeRow->tree_name }} #{{ $coreID }}
-            @if (trim($recDesc) != '' && $recDesc != $GLOBALS["SL"]->treeRow->tree_name
-                && strpos($GLOBALS["SL"]->treeRow->tree_name, $recDesc) !== false)
-                <span class="mL10">{!! $recDesc !!}</span>
-            @endif
+        <a id="hidivBtnSessMgmtID" href="javascript:;"
+            class="hidivBtn btn btn-secondary btn-sm">
+            <div class="pT5 pB5">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+                @if (trim($recDesc) != '')
+                    {!! $recDesc !!}
+                @else 
+                    {{ $GLOBALS["SL"]->treeRow->tree_name }}
+                @endif
+                #{{ $coreID }}
             </div>
         </a>
         <div id="hidivSessMgmtID" class="disNon pT10">

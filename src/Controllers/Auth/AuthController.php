@@ -270,6 +270,9 @@ class AuthController extends Controller
         if (!isset($GLOBALS["SL"]->sysOpts["footer-master"])) {
             $sl = new SurvloopController;
             $sl->initCustViews($request);
+            $this->surv = new Survloop;
+            $this->surv->syncDataTrees($request, $this->dbID, $this->treeID);
+            $this->surv->loadLoop($request);
         }
         return true;
     }

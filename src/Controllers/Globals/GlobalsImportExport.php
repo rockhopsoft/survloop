@@ -55,12 +55,14 @@ class GlobalsImportExport extends GlobalsTables
             }
 
             $cache .= '$'.'this->allCoreTbls = [];' . "\n";
+            $cache .= '$'.'this->pubCoreTbls = [];' . "\n";
             $coresDone = [];
             $allCoreTbls = DB::table('sl_tree')
                 ->join('sl_tables', 'sl_tree.tree_core_table', '=', 'sl_tables.tbl_id')
                 ->where('sl_tree.tree_database', $this->dbID)
                 ->where('sl_tables.tbl_name', 'NOT LIKE', 'Visitors')
-                ->select('sl_tree.tree_slug', 'sl_tables.tbl_id', 'sl_tables.tbl_eng')
+                ->select('sl_tree.tree_slug', 'sl_tree.tree_opts', 
+                    'sl_tables.tbl_id', 'sl_tables.tbl_eng')
                 ->orderBy('sl_tree.tree_id', 'asc')
                 ->get();
             if ($allCoreTbls->isNotEmpty()) {
@@ -72,6 +74,15 @@ class GlobalsImportExport extends GlobalsTables
                             . ' "name" => "' . $tbl->tbl_eng . '", '
                             . ' "slug" => "' . $tbl->tree_slug . '" '
                         . '];' . "\n";
+                        if ($tbl->tree_opts%Globals::TREEOPT_ADMIN > 0
+                            && $tbl->tree_opts%Globals::TREEOPT_STAFF > 0
+                            && $tbl->tree_opts%Globals::TREEOPT_PARTNER > 0) {
+                            $cache .= '$'.'this->pubCoreTbls[] = ['
+                                . ' "id" => ' . $tbl->tbl_id . ', '
+                                . ' "name" => "' . $tbl->tbl_eng . '", '
+                                . ' "slug" => "' . $tbl->tree_slug . '" '
+                            . '];' . "\n";
+                        }
                     }
                 }
             }
@@ -397,6 +408,18 @@ class GlobalsImportExport extends GlobalsTables
             Storage::put($cacheFile, $cache . $cache2);
         }
         return true;
+    }
+
+    public function getSearchCoreTbls()
+    {
+        $tbls = [];
+        if (isset($this->x["searchCoreTbls"])
+            && sizeof($this->x["searchCoreTbls"]) > 0) {
+            $tbls = $this->x["searchCoreTbls"];
+        } elseif (sizeof($this->pubCoreTbls) > 0) {
+            $tbls = $this->pubCoreTbls;
+        }
+        return $tbls;
     }
     
     public function getGenericRows($tbl, $fld = '', $val = '', $oper = '', $ordFld = '')
@@ -951,7 +974,7 @@ class GlobalsImportExport extends GlobalsTables
         }
     	$types = $this->loadTreeNodeStatTypes();
     	$stats = [
-            "date"    => date("Y-m-d"),
+            "date"     => date("Y-m-d"),
             "icon_url" => $this->sysOpts["app-url"] . $this->sysOpts["shortcut-icon"]
         ];
     	$survs = $pages = [];

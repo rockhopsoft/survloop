@@ -57,14 +57,19 @@ class TreeSurvProgBar extends TreeSurvLoad
             || empty($this->minorSections[$this->currMajorSection])) {
             $this->currMinorSection = 0;
         } else {
-            $this->currMinorSection = $this->getCurrMinorSection($this->currNode(), $this->currMajorSection);
+            $this->currMinorSection = $this->getCurrMinorSection(
+                $this->currNode(), 
+                $this->currMajorSection
+            );
         }
         $this->loadProgBarTweak();
         if (sizeof($this->majorSections) > 0) {
             foreach ($this->majorSections as $maj => $majSect) {
-                if (sizeof($this->minorSections[$maj]) > 0) {
+                if (isset($this->minorSections[$maj])
+                    && sizeof($this->minorSections[$maj]) > 0) {
                     foreach ($this->minorSections[$maj] as $min => $minSect) {
-                        if (isset($minSect[0]) && isset($this->allNodes[$minSect[0]])) {
+                        if (isset($minSect[0]) 
+                            && isset($this->allNodes[$minSect[0]])) {
                             $this->allNodes[$minSect[0]]->fillNodeRow();
                         }
                     }
@@ -129,15 +134,20 @@ class TreeSurvProgBar extends TreeSurvLoad
             }
             $GLOBALS['SL']->pageJAVA .= 'printHeadBar(' . $currPerc . ');' . "\n";
         }
-        if (($GLOBALS["SL"]->treeRow->tree_opts%37 == 0 || $GLOBALS["SL"]->treeRow->tree_opts%59 == 0)
+        if (($GLOBALS["SL"]->treeRow->tree_opts%37 == 0 
+            || $GLOBALS["SL"]->treeRow->tree_opts%59 == 0)
             && isset($this->majorSections[$this->currMajorSection][1]) > 0) {
             $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
                 . '$("html, body").animate({ scrollTop: 0 }, "fast"); });' . "\n";
-            $majorsOut = $minorsOut = [];
+            $majorsOut = $minorsOut = $majorsWithMinors = [];
             foreach ($this->majorSections as $maj => $majSect) {
                 if ($majSect[2] != 'disabled') {
                     $majorsOut[] = $this->majorSections[$maj];
                     $minorsOut[] = $this->minorSections[$maj];
+                    if (isset($this->minorSections[$maj])
+                        && sizeof($this->minorSections[$maj]) > 0) {
+                        $majorsWithMinors[] = $maj;
+                    }
                 }
             }
             $ret .= view(
@@ -152,6 +162,7 @@ class TreeSurvProgBar extends TreeSurvLoad
                     "sessMinorsTouched" => $this->sessMinorsTouched, 
                     "currMajorSection"  => $this->currMajorSection, 
                     "currMinorSection"  => $this->currMinorSection, 
+                    "majorsWithMinors"  => $majorsWithMinors,
                     "majTot"            => $majTot,
                     "rawPerc"           => $rawPerc
                 ]

@@ -57,4 +57,18 @@ function chkStickyFooter() {
     }
 }
 
+function chkSearchWidth() {
+    if (document.getElementById("topNavSearchAbs")) {
+        var bodyWidth = (window.innerWidth || document.documentElement.clientWidth);
+        var leftWidth = 0;
+        if (document.getElementById("leftSide")) {
+            leftWidth = $("#leftSide").width();
+        }
+        var newWidth = Math.round(bodyWidth-leftWidth);
+        document.getElementById("topNavSearchAbs").style.width=newWidth+"px";
+        document.getElementById("topNavSearchWrap").style.width=newWidth+"px";
+        document.getElementById("topNavSearchContain").style.width=newWidth+"px";
+    }
+}
+
 

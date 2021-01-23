@@ -248,54 +248,51 @@ class PageLoadUtils extends Controller
     
     public function searchRun(Request $request)
     {
+        $params = '?s=';
+        if ($request->has('s')) {
+            $params .= $request->get('s');
+        }
+        if ($request->has('sFilt') 
+            && trim($request->get('sFilt')) != '') {
+            $params .= '&sFilt=' . $request->get('sFilt');
+        }
+        if ($request->has('sSort') 
+            && trim($request->get('sSort')) != '') {
+            $params .= '&sSort=' . $request->get('sSort');
+        }
+        if ($request->has('sSortDir') 
+            && trim($request->get('sSortDir')) != '') {
+            $params .= '&sSortDir=' . $request->get('sSortDir');
+        }
+        if ($request->has('sView') 
+            && trim($request->get('sView')) != '') {
+            $params .= '&sView=' . $request->get('sView');
+        }
         $searchTree = null;
-        if ($request->has('sDataSet') && is_array($request->get('sDataSet'))) {
+        if ($request->has('sDataSet') 
+            && intVal($request->get('sDataSet')) > 0) {
             $perms = $this->getPermOpts();
-            $searchDataTbl = $request->get('sDataSet');
-            if (sizeof($searchDataTbl) == 1 && intVal($searchDataTbl[0]) > 0) {
-                $trees = DB::table('sl_tree')
-                    ->join('sl_node', function ($join) {
-                        $join->on('sl_tree.tree_id', '=', 'sl_node.node_tree')
-                            ->where('sl_node.node_parent_id', '<=', 0)
-                            ->where('sl_node.node_type', 'Page');
-                    })
-                    ->where('sl_tree.tree_type', 'Page')
-                    ->where('sl_tree.tree_core_table', intVal($searchDataTbl[0]))
-                    ->select('sl_tree.*', 'sl_node.node_response_set')
-                    ->get();
-                $searchTree = $this->chkSearchRunTrees($trees, $perms);
-            }
-            if ($searchTree === null) {
+            $searchDataTbl = intVal($request->get('sDataSet'));
+            $trees = SLTree::where('tree_type', 'Page')
+                ->where('tree_database', $this->dbID)
+                ->where('tree_core_table', $searchDataTbl)
+                ->get();
+            $searchTree = $this->chkSearchRunTrees($trees, $perms);
+//echo '<pre>searchTree: '; print_r($trees); echo '</pre>'; exit;
+            if ($searchTree === null || !isset($searchTree->tree_opts)) {
                 $trees = SLTree::where('tree_type', 'Page')
+                    ->where('tree_database', $this->dbID)
                     ->get();
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
-            if ($searchTree !== null 
-                && isset($searchTree->tree_opts)) {
+            if ($searchTree !== null && isset($searchTree->tree_opts)) {
                 $redir = $this->getPageDashPrefix($searchTree->tree_opts) 
-                    . '/' . $searchTree->tree_slug . '?s=' 
-                    . (($request->has('s')) ? $request->get('s') : '');
-                if ($request->has('sFilt') 
-                    && trim($request->get('sFilt')) != '') {
-                    $redir .= '&sFilt=' . $request->get('sFilt');
-                }
-                if ($request->has('sSort') 
-                    && trim($request->get('sSort')) != '') {
-                    $redir .= '&sSort=' . $request->get('sSort');
-                }
-                if ($request->has('sSortDir') 
-                    && trim($request->get('sSortDir')) != '') {
-                    $redir .= '&sSortDir=' . $request->get('sSortDir');
-                }
-                if ($request->has('sView') 
-                    && trim($request->get('sView')) != '') {
-                    $redir .= '&sView=' . $request->get('sView');
-                }
+                    . '/' . $searchTree->tree_slug . $params;
+//echo '<br />redir: ' . $redir; exit;
                 return redirect($redir);
             }
         }
-        $this->loadDomain();
-        return redirect($this->domainPath . '/');
+        return redirect('/search' . $params);
     }
     
     protected function chkSearchRunTrees($trees, $perms)
@@ -410,8 +407,11 @@ class PageLoadUtils extends Controller
             . '/' . $rootNode->node_prompt_notes;
         if ($cid > 0) {
             $redir .= '?cid=' . $cid;
+            $this->loadPageCID($request, $tree, $cid);
         } else {
             $redir .= '?started=1&new=' . rand(100000000, 1000000000);
+            session()->forget('coreID' . $tree->tree_id);
+            session()->forget('sessID' . $tree->tree_id);
         }
         $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '', 
             str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '', 
@@ -421,9 +421,6 @@ class PageLoadUtils extends Controller
         }
         if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
             $redir .= '&' . substr($paramTxt, 1);
-        }
-        if (intVal($cid) > 0) {
-            $this->loadPageCID($request, $tree, $cid);
         }
         return redirect($this->domainPath . $redir);
     }
@@ -457,7 +454,11 @@ class PageLoadUtils extends Controller
     
     public function loadPageCID(Request $request, $tree, $cid)
     {
-        if ($cid > 0 && $tree && isset($tree->tree_id)) {
+        if ($cid > 0 
+            && $tree 
+            && isset($tree->tree_id)
+            && Auth::user()
+            && isset(Auth::user()->id)) {
             $sess = SLSess::where('sess_user_id', Auth::user()->id)
                 ->where('sess_tree', $tree->tree_id)
                 ->where('sess_core_id', $cid)
@@ -483,6 +484,7 @@ class PageLoadUtils extends Controller
             }
             session()->put('sessID' . $tree->tree_id, $sess->sess_id);
             session()->put('coreID' . $tree->tree_id, $cid);
+            session()->put('sessID' . $tree->tree_id . 'old' . $cid, $sess->sess_id);
             session()->put('coreID' . $tree->tree_id . 'old' . $cid, time());
             session()->save();
         }

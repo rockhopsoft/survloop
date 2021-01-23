@@ -5,8 +5,8 @@
     @if (!isset($deet[1]))
         <td colspan=2 >{!! $deet[0] !!}</td>
     @else
-        <td class="w50"><span>{!! $deet[0] !!}</span></td>
-        <td class="w50">{!! $deet[1] !!}</td>
+        <td class="w50 datTdLab"><span>{!! $deet[0] !!}</span></td>
+        <td class="w50 datTdDat">{!! $deet[1] !!}</td>
     @endif
     </tr>
 @endif

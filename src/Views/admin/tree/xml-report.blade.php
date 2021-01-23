@@ -1,7 +1,8 @@
 <?php print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
 <!--
+@if (isset($tot) && intVal($tot) > 0)
 {{ number_format($tot) }} Total Records Found
-
+@endif
 @if (isset($apiLoadLinks) && trim($apiLoadLinks) != '')
 {!! $apiLoadLinks !!}
 @else

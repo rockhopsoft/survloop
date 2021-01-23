@@ -253,14 +253,40 @@ class GlobalsTables extends GlobalsElements
         return true;
     }
     
+    public function getXmlSurveyID()
+    {
+        $treeID = -3;
+        if (isset($this->treeRow->tree_type)
+            && trim($this->treeRow->tree_type) == 'Survey XML'
+            && isset($this->treeRow->tree_slug)
+            && isset($this->treeRow->tree_core_table)) {
+            $chk = SLTree::where('tree_type', 'Survey')
+                ->where('tree_database', $this->dbID)
+                ->where('tree_slug', $this->treeRow->tree_slug)
+                ->where('tree_core_table', $this->treeRow->tree_core_table)
+                ->orderBy('tree_id', 'asc')
+                ->first();
+            if ($chk && isset($chk->tree_id) && intVal($chk->tree_id) > 0) {
+                $treeID = intVal($chk->tree_id);
+            }
+        }
+        return $treeID;
+    }
+    
     public function loadDataMap($treeID = -3)
     {
-        if ($treeID != $this->treeID) {
+        if ($treeID > 0 && $treeID != $this->treeID) {
             $this->formTree = SLTree::find($treeID);
             if ($this->treeRow->tree_opts%Globals::TREEOPT_SEARCH == 0
                 || $this->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
                 $this->currSearchTbls[] = $this->treeRow->tree_core_table;
             }
+        } else {
+            $treeID = $this->treeID;
+        }
+        $xmlSurveyID = $this->getXmlSurveyID();
+        if ($xmlSurveyID > 0) {
+            $treeID = $xmlSurveyID;
         }
         $this->dataLoops = [];
         $this->dataLoopNames = [];

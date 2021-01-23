@@ -13,14 +13,6 @@
         display: block;
     }
 */
-    #dashSearchFrmWrap,
-    .topNavSearch #dashSearchFrmWrap #dashSearchBg,
-    .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
-        width: 300px;
-    }
-    #admSrchFld {
-        width: 240px;
-    }
 	
     a#menuColpsBtn:link, a#menuColpsBtn:visited, 
     a#menuColpsBtn:active, a#menuColpsBtn:hover {
@@ -48,7 +40,8 @@
 
     @if (isset($GLOBALS['SL']->sysOpts['logo-img-sm']) 
         && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != ''
-        && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) != trim($GLOBALS['SL']->sysOpts['logo-img-lrg']))
+        && trim($GLOBALS['SL']->sysOpts['logo-img-sm']) 
+            != trim($GLOBALS['SL']->sysOpts['logo-img-lrg']))
         #slLogoImgSm { display: inline; }
         #slLogoImg { display: none; }
     @endif
@@ -65,13 +58,12 @@
     #userMenuBtnAvatar, #userMenuBtnWrp #userMenuBtnAvatar {
         left: 10px;
     }
-    #dashSearchFrmWrap,
-    .topNavSearch #dashSearchFrmWrap #dashSearchBg,
-    .topNavSearchActive #dashSearchFrmWrap #dashSearchBg {
-        width: 220px;
-    }
-    #admSrchFld {
-        width: 160px;
+
+    #admSrchFld, #topNavSearch div div #admSrchFld, 
+    #sDataSetID, #topNavSearch div div #sDataSetID,
+    #admSrchFld.form-control-lg, #topNavSearch div div #admSrchFld.form-control-lg, 
+    #sDataSetID.form-control-lg, #topNavSearch div div #sDataSetID.form-control-lg {
+        font-size: 1rem;
     }
 
 	input.nFormBtnSub, input.nFormBtnBack {

@@ -127,7 +127,12 @@ $css = $sysDefs->loadCss();
 
 </form>
 
-<style> #main, body { background: {{ $css["color-main-faint"] }}; } </style>
+<style>
+#main, body { background: {{ $css["color-main-faint"] }}; }
+</style>
+<script type="text/javascript"> $(document).ready(function(){
+    setTimeout(function() { window.location='/login'; }, (59*60000));
+}); </script>
 
 </div>
 @endsection

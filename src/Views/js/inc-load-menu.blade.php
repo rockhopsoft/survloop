@@ -5,11 +5,17 @@ function loadTopSideNavs() {
 @if (isset($username) && trim($username) != '')
     if (!document.getElementById('userMenuBtn')) {
         addTopUserBurger('{{ $username }}');
+        <?php /*
+        addTopNavItem('<i class="fa fa-search mT3" aria-hidden="true"></i>', 'javascript:;" id="topNavSearchBtn');
+        */ ?>
     }
 @else
     if (!document.getElementById('loginLnk')) {
         addTopNavItem('Sign Up',  '/register{!! $previousUrl !!}" id="signupLnk');
         addTopNavItem('Login',    '/login{!! $previousUrl !!}" id="loginLnk');
+        <?php /*
+        addTopNavItem('<i class="fa fa-search mT3" aria-hidden="true"></i>', 'javascript:;" id="topNavSearchBtn');
+        */ ?>
     }
 @endif
     return true;

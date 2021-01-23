@@ -78,6 +78,7 @@ class SurvData extends SurvDataConditions
                 $this->dataSets[$tbl][$setInd] = $recObj;
                 $this->id2ind[$tbl][$recObj->getKey()] = $setInd;
                 
+//echo 'loadData( dataSubsets:<pre>'; print_r($GLOBALS["SL"]->dataSubsets); echo '</pre>dataLoops:<pre>'; print_r($GLOBALS["SL"]->dataLoops); echo '</pre>dataHelpers:<pre>'; print_r($GLOBALS["SL"]->dataHelpers); echo '</pre>dataLinksOn:<pre>'; print_r($GLOBALS["SL"]->dataLinksOn); echo '</pre><pre>'; print_r($this->dataSets); echo '</pre>'; exit;
                 // Recurse through this parent's families...
                 if (isset($GLOBALS["SL"]->dataSubsets) 
                     && sizeof($GLOBALS["SL"]->dataSubsets) > 0) {

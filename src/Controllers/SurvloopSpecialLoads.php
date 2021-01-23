@@ -467,7 +467,11 @@ class SurvloopSpecialLoads extends SurvCustLoop
         $this->syncDataTrees($request);
         $this->loadLoop($request);
         header('Content-Type: application/json');
-        $stats = $GLOBALS["SL"]->getJsonSurvStats();
+        $pkg = '';
+        if ($request->has('pkg')) {
+            $pkg = trim($request->get('pkg'));
+        }
+        $stats = $GLOBALS["SL"]->getJsonSurvStats($pkg);
         $stats["survey1_complete"] = sizeof(
             $this->custLoop->getAllPublicCoreIDs()
         );

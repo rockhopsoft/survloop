@@ -244,14 +244,16 @@ class TreeSurvConds extends TreeSurvCustomAPI
     
     protected function isPartnerStaffAdminOrOwner()
     {
-        $retTF = true;
-        if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
-            $retTF = false;
-        } elseif (!$this->v["user"]->hasRole('administrator|staff|partner')
-            && !$this->v["isOwner"]) {
-            $retTF = false;
+        if ($this->v["isOwner"]) {
+            return true;
         }
-        return $retTF;
+        if (!isset($this->v["uID"]) || $this->v["uID"] <= 0) {
+            return false;
+        }
+        if ($this->v["user"]->hasRole('administrator|staff|partner')) {
+            return true;
+        }
+        return false;
     }
     
     public function runLoopConditions()

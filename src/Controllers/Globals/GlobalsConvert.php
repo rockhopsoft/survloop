@@ -547,6 +547,16 @@ class GlobalsConvert
         return $lbs*453.59237;
     }
     
+    public function cnvrtLbs2Kg($lbs = 0)
+    {
+        return $lbs*0.45359237;
+    }
+    
+    public function cnvrtKwh2Mwh($kWh = 0)
+    {
+        return $kWh/1000;
+    }
+    
     public function cnvrtKwh2Kbtu($kWh = 0)
     {
         return $kWh*3.412;
@@ -582,5 +592,81 @@ class GlobalsConvert
         return $sqft*10.76391;
     }
 
+    public function cnvrtLbs2KgCarbonEq($val = 0, $type = 'CH4')
+    {
+        return $this->cnvrtKgCarbonEq($this->cnvrtLbs2Kg($val), $type);
+    }
+    
+    // epa.gov/sites/production/files/2020-04/documents/ghg-emission-factors-hub.pdf
+    // Table 11, Last Modified: 26 March 2020
+    public function cnvrtKgCarbonEq($val = 0, $type = 'CH4')
+    {
+        if ($type == 'CH4') {
+            return $val*25;
+        } elseif ($type == 'N2O') {
+            return $val*298;
+        } elseif ($type == 'HFC-23') {
+            return $val*14800;
+        } elseif ($type == 'HFC-32') {
+            return $val*675;
+        } elseif ($type == 'HFC-41') {
+            return $val*92;
+        } elseif ($type == 'HFC-125') {
+            return $val*3500;
+        } elseif ($type == 'HFC-134') {
+            return $val*1100;
+        } elseif ($type == 'HFC-134a') {
+            return $val*1430;
+        } elseif ($type == 'HFC-143') {
+            return $val*353;
+        } elseif ($type == 'HFC-143a') {
+            return $val*4470;
+        } elseif ($type == 'HFC-152') {
+            return $val*53;
+        } elseif ($type == 'HFC-152a') {
+            return $val*124;
+        } elseif ($type == 'HFC-161') {
+            return $val*12;
+        } elseif ($type == 'HFC-227ea') {
+            return $val*3220;
+        } elseif ($type == 'HFC-236cb') {
+            return $val*1340;
+        } elseif ($type == 'HFC-236ea') {
+            return $val*1370;
+        } elseif ($type == 'HFC-236fa') {
+            return $val*9810;
+        } elseif ($type == 'HFC-245ca') {
+            return $val*693;
+        } elseif ($type == 'HFC-245fa') {
+            return $val*1030;
+        } elseif ($type == 'HFC-365mfc') {
+            return $val*794;
+        } elseif ($type == 'HFC-43-10mee') {
+            return $val*1640;
+        } elseif ($type == 'SF6') {
+            return $val*22800;
+        } elseif ($type == 'SO2') {
+            return $val*0; // not found
+        } elseif ($type == 'NF3') {
+            return $val*17200;
+        } elseif ($type == 'CF4') {
+            return $val*7390;
+        } elseif ($type == 'C2F6') {
+            return $val*12200;
+        } elseif ($type == 'C3F8') {
+            return $val*8830;
+        } elseif ($type == 'c-C4F8') {
+            return $val*10300;
+        } elseif ($type == 'C4F10') {
+            return $val*8860;
+        } elseif ($type == 'C5F12') {
+            return $val*9160;
+        } elseif ($type == 'C6F14') {
+            return $val*9300;
+        } elseif ($type == 'C10F18') {
+            return $val*7500;
+        }
+        return 0;
+    }
 
 }

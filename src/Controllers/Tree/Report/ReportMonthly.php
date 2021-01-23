@@ -92,6 +92,9 @@ class ReportMonthly
         for ($cnt = 0; $cnt < 12; $cnt++) {
             $m = $this->startMonth-$cnt;
             $year = intVal(date("y"));
+            if (intVal(date("n")) < $this->startMonth) {
+                $year--;
+            }
             if ($m < 1) {
                 $m += 12;
                 $year--;

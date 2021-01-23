@@ -193,12 +193,17 @@ class SearcherFilter
             . $this->printDropdownOpts() . '</select>';
     }
 
-    public function printDropdownColWrap($class = '', $cols = 4, $defID = '', $defLabel = '')
+    public function printDropdownColWrap($class = '', $cols = 4, $defID = '', $defLabel = '', $wrap1 = '', $wrap2 = '')
     {
         return '<div id="' . $this->abbr . 'Wrap" class="col-md-' . intVal($cols) . ' pB10"'
             . (($this->hideIfEmpty && $this->isEmpty()) ? ' style="display: none;" ' : '')
-            . ' >' . $this->printDropdown($class, $defID, $defLabel)
+            . ' >' . $wrap1 . $this->printDropdown($class, $defID, $defLabel) . $wrap2
             . '</div>';
+    }
+
+    public function printDropdownColWraps($class = '', $wrap1 = '', $wrap2 = '')
+    {
+        return $this->printDropdownColWrap($class, 4, '', '', $wrap1, $wrap2);
     }
 
     public function getPrintDefaults($defID = '', $defLabel = '')

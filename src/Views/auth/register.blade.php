@@ -194,8 +194,8 @@ $css = $sysDefs->loadCss();
 <style> #main, body { background: {{ $css["color-main-faint"] }}; } </style>
 
 <script type="text/javascript" src="/survloop/zxcvbn.js"></script>
-<script type="text/javascript">
-$(document).ready(function(){
+<script type="text/javascript"> $(document).ready(function(){
+
     setTimeout(function() {
         if (document.getElementById('nondialog')) {
             document.getElementById('nondialog').className = "row2"; 
@@ -209,7 +209,10 @@ $(document).ready(function(){
     }, 50);
 @endif
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
-});</script>
+
+    setTimeout(function() { window.location='/register'; }, (59*60000));
+
+}); </script>
 
 </div>
 @endsection

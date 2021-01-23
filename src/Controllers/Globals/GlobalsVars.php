@@ -99,6 +99,7 @@ class GlobalsVars extends GlobalsStatic
     public $proTips        = [];
     public $allTrees       = [];
     public $allCoreTbls    = [];
+    public $pubCoreTbls    = [];
     public $currSearchTbls = [];
     
     public $currTabInd     = 0;

@@ -74,6 +74,54 @@ class GlobalsStatic extends GlobalsConvert
     {
         return strip_tags($str, '<p><br>');
     }
+    
+    public function stripDoubleSpaces($str)
+    {
+        while (strpos($str, '  ') !== false) {
+            $str = str_replace('  ', ' ', $str);
+        }
+        return $str;
+    }
+    
+    public function stripTabs($str)
+    {
+        return trim(preg_replace('/[ ]{2,}|[\t]/', ' ', $str));
+    }
+    
+    public function stripDoubleLines($str)
+    {
+        return trim(preg_replace('/\s\s+/', ' ', $str));
+    }
+    
+    public function stripAllSpaces($str)
+    {
+        $str = $this->stripDoubleLines($str);
+        $str = $this->stripTabs($str);
+        return trim($this->stripDoubleSpaces($str));
+    }
+    
+    
+    public function stripCertainHtmlTags($str, $tagStart, $tagEnd)
+    {
+        if (trim($str) != '' && trim($tagStart) != '' && trim($tagEnd) != '') {
+            $pos      = strpos($str, $tagStart);
+            $startLen = strlen($tagStart);
+            $endLen   = strlen($tagEnd);
+            $limit    = 0;
+            while ($pos > 0 && $limit < 5000) {
+                $limit++;
+                $pos2 = strpos($str, $tagEnd, $pos);
+                if ($pos2 > 0) {
+                    $str = substr($str, 0, $pos-1) . substr($str, $pos2+$endLen);
+                        //. substr($str, ($pos+$startLen), ($pos2-$pos-$startLen));
+                    $pos = strpos($str, $tagStart);
+                } else {
+                    $pos = -1;
+                }
+            }
+        }
+        return $str;
+    }
 
     public function getAnyReqParams()
     {
@@ -497,13 +545,13 @@ class GlobalsStatic extends GlobalsConvert
 
     public function getPastDateTime($days = 3)
     {
-        return mktime(0, 0, 0, date("n"), date("j")-$days, date("Y"));
+        return mktime(date("H"), date("i")-($days*24*60), date("s"), 
+            date("n"), date("j"), date("Y"));
     }
 
     public function pastDateTimeStr($days = 3)
     {
-        return date("Y-m-d H:i:s", mktime(0, 0, 0, 
-            date("n"), date("j")-$days, date("Y")));
+        return date("Y-m-d H:i:s", $this->getPastDateTime($days));
     }
 
     public function getPastDateArray($minAge = 0)

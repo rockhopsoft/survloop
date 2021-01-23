@@ -835,23 +835,34 @@ class TreeCoreSess extends TreeCore
         }
         $core = 'coreID' . $GLOBALS["SL"]->sessTree;
         $sess = 'sessID' . $GLOBALS["SL"]->sessTree;
+        $model = trim($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl));
         if ((!isset($this->v["uID"]) || intVal($this->v["uID"]) <= 0)
             && trim($GLOBALS["SL"]->coreTbl) != ''
-            && trim($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)) != '') {
-            $eval = "\$coreRec = " 
-                . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                . "::find(" . intVal($coreID) . ");";
+            && $model != '') {
+            $eval = "\$coreRec = " . $model . "::find(" . intVal($coreID) . ");";
             eval($eval);
+            $trees = [ $this->treeID, $GLOBALS["SL"]->sessTree ];
             $abbr = $GLOBALS["SL"]->coreTblAbbr();
+
+            // First check the record itself, if it's
+            // not explicitly associated with a full user account
+            if ($coreRec 
+                && (!isset($coreRec->{ $abbr . 'user_id' })
+                    || intVal($coreRec->{ $abbr . 'user_id' }) <= 0)
+                && isset($coreRec->{ $abbr . 'ip_addy' })
+                && trim($coreRec->{ $abbr . 'ip_addy' }) 
+                    == $GLOBALS["SL"]->hashIP()) {
+                return true;
+            }
+
+            // Second, check main session variables
             if (session()->has($core)
                 && $coreID == intVal(session()->get($core))
                 && session()->has($sess)
                 && intVal(session()->get($sess)) > 0) {
-                $trees = [ $this->treeID, $GLOBALS["SL"]->sessTree ];
-                $fldIP = $GLOBALS["SL"]->coreTblAbbr() . 'ip_addy';
                 if ($coreRec 
-                    && isset($coreRec->{ $fldIP })
-                    && trim($coreRec->{ $fldIP }) != '') {
+                    && isset($coreRec->{ $abbr . 'ip_addy' })
+                    && trim($coreRec->{ $abbr . 'ip_addy' }) != '') {
                     $chk = SLSess::where('sess_id', intVal(session()->get($sess)))
                         ->where('sess_ip', $GLOBALS["SL"]->hashIP())
                         ->whereIn('sess_tree', $trees)
@@ -861,24 +872,51 @@ class TreeCoreSess extends TreeCore
                     if ($chk->isNotEmpty()) {
                         foreach ($chk as $sess) {
                             if (isset($sess->sess_ip)
-                                && trim($sess->sess_ip) == trim($coreRec->{ $fldIP })) {
+                                && trim($sess->sess_ip) 
+                                    == trim($coreRec->{ $abbr . 'ip_addy' })) {
                                 return true;
                             }
                         }
                     }
                 }
-            } elseif ($coreRec 
-                && isset($coreRec->{ $abbr . 'ip_addy' })
-                && trim($coreRec->{ $abbr . 'ip_addy' }) == $GLOBALS["SL"]->hashIP()) {
-                return true;
+            }
+
+            // Second, check secondary session variables
+            if (session()->has($core . 'old' . $coreID)
+                && session()->has($sess . 'old' . $coreID)
+                && intVal(session()->get($sess . 'old' . $coreID)) > 0) {
+                $trees = [ $this->treeID, $GLOBALS["SL"]->sessTree ];
+                $fldIP = $GLOBALS["SL"]->coreTblAbbr() . 'ip_addy';
+                if ($coreRec 
+                    && isset($coreRec->{ $abbr . 'ip_addy' })
+                    && trim($coreRec->{ $abbr . 'ip_addy' }) != '') {
+                    $sessID = intVal(session()->get($sess . 'old' . $coreID));
+                    $chk = SLSess::where('sess_id', $sessID)
+                        ->where('sess_ip', $GLOBALS["SL"]->hashIP())
+                        ->whereIn('sess_tree', $trees)
+                        ->where('sess_core_id', $coreID)
+                        ->where('sess_is_active', 1)
+                        ->get();
+                    if ($chk->isNotEmpty()) {
+                        foreach ($chk as $sess) {
+                            if (isset($sess->sess_ip)
+                                && trim($sess->sess_ip) 
+                                    == trim($coreRec->{ $abbr . 'ip_addy' })) {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
             return false;
         }
         // else user is already logged in
         if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
-            $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                . "::where('" . $GLOBALS["SL"]->coreTblIdFld() . "', " . intVal($coreID) . ")"
-                . "->where('" . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] . ")"
+            $eval = "\$chk = " . $model
+                . "::where('" . $GLOBALS["SL"]->coreTblIdFld() 
+                    . "', " . intVal($coreID) . ")"
+                . "->where('" . $GLOBALS["SL"]->coreTblUserFld 
+                    . "', " . $this->v["uID"] . ")"
                 . "->first();";
             eval($eval);
             if ($chk) {

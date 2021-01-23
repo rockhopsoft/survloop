@@ -13,6 +13,7 @@ namespace RockHopSoft\Survloop\Controllers\Globals;
 use Illuminate\Support\Facades\Storage;
 use MatthiasMullie\Minify;
 use App\Models\SLCaches;
+use App\Models\SLSearchRecDump;
 use App\Models\SLTree;
 
 class GlobalsCache extends GlobalsBasic
