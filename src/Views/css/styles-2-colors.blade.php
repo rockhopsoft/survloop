@@ -52,7 +52,7 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
 .brdDotGry { 
     border: 1px {!! $css["color-main-grey"] !!} dotted; 
 }
-.brdGrey { 
+.brdGrey, .brdGry { 
     border: 1px {!! $css["color-main-grey"] !!} solid; 
 }
 .brdFnt { 
