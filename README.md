@@ -17,10 +17,10 @@
 
 # <a name="about"></a>About
 Code bytes measured as stored on Mac disk:
-* PHP Controllers ~ 1.8MB (43%)
-* Blade HTML Template Views ~ 1.56MB (37%)
-* Javascript/jQuery within Blade Templates ~ 197KB (4%)
-* CSS within Blade Templates ~ 147KB (3%)
+* PHP Controllers ~ 1.9MB (44%)
+* Blade HTML Template Views ~ 1.56MB (36%)
+* Javascript/jQuery within Blade Templates ~ 201KB (5%)
+* CSS within Blade Templates ~ 143KB (3%)
 * Survloop-Generated PHP Eloquent Data Table Models ~ 221KB (5%)
 * Survloop-Generated PHP Laravel Database Migration & Seeders ~ 291KB (7%)
 
