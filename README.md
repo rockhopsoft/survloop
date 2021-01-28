@@ -46,8 +46,7 @@ content-management system for data-focused websites.
 The upcoming Open Police web app is the best live install 
 of the engine, and feedback on that project and the Survloop 
 user experience can be via the end of the submission process:
-<a href="https://openpolice.org/filing-your-police-complaint" target="_blank"
->https://openpolice.org/filing-your-police-complaint</a>
+<a href="https://openpolice.org/filing-your-police-complaint" target="_blank">https://openpolice.org/filing-your-police-complaint</a>
 The resulting database designed using the engine, as well as 
 the branching tree which specifies the user's experience: 
 <a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a>
@@ -61,7 +60,7 @@ XML included an automatically generated schema, eg.
 Other projects running Survloop:
 <a href="https://powerscore.resourceinnovation.org/go-pro" target="_blank">Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>).
 
-The installation used for Survloop.org is currently the best example of a bare-bones extension of Survloop:
+The installation used for Survloop.org is currently the best example of a bare-bones extension of Survloop:<br />
 <a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
