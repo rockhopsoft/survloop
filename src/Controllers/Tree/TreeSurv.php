@@ -14,8 +14,12 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use App\Models\User;
+use App\Models\SLSess;
+use App\Models\SLSessLoops;
 use App\Models\SLDefinitions;
 use App\Models\SLNode;
+use App\Models\SLNodeSaves;
+use App\Models\SLNodeSavesPage;
 use App\Models\SLFields;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
@@ -814,21 +818,18 @@ class TreeSurv extends TreeSurvLoops
     
     protected function clearLostSessionHelpers()
     {
-        DB::select(DB::raw(
-            "DELETE FROM `sl_sess_loops` 
-            WHERE `sl_sess_loops`.`sess_loop_sess_id` NOT IN 
-                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
-        ));
-        DB::select(DB::raw(
-            "DELETE FROM `sl_node_saves` 
-            WHERE `sl_node_saves`.`node_save_session` NOT IN 
-                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
-        ));
-        DB::select(DB::raw(
-            "DELETE FROM `sl_node_saves_page` 
-            WHERE `sl_node_saves_page`.`page_save_session` NOT IN 
-                (SELECT `sl_sess`.`sess_id` FROM `sl_sess`)"
-        ));
+        $chk = SLSess::select('sess_id')
+            ->get();
+        $sessIDs = $GLOBALS["SL"]->resultsToArrIds($chk, 'sess_id');
+        SLSessLoops::whereNotIn('sess_loop_sess_id', $sessIDs)
+            ->limit(1000)
+            ->delete();
+        SLNodeSaves::whereNotIn('node_save_session', $sessIDs)
+            ->limit(1000)
+            ->delete();
+        SLNodeSavesPage::whereNotIn('page_save_session', $sessIDs)
+            ->limit(1000)
+            ->delete();
         return true;
     }
 

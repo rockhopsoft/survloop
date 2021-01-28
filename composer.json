@@ -41,8 +41,8 @@
         "mpdf/mpdf": "^8.0",
         "maatwebsite/excel": "^3.1.21",
         "summernote/summernote": "v0.8.8",
-        "rockhopsoft/survloop-libraries": "^0.2",
-        "rockhopsoft/survloop-images": "^0.2"
+        "rockhopsoft/survloop-libraries": "*@dev",
+        "rockhopsoft/survloop-images": "*@dev"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",

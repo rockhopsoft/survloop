@@ -54,68 +54,61 @@ the branching tree which specifies the user's experience:
 <a href="https://openpolice.org/tree/complaint" target="_blank">/tree/complaint</a><br />
 Among other methods, the resulting data can also be provided as 
 XML included an automatically generated schema, eg.<br />
-<a href="https://openpolice.org/complaint-xml-schema" target="_blank"
->/complaint-xml-schema</a><br />
-<a href="https://openpolice.org/complaint-xml-example" target="_blank"
->/complaint-xml-example</a><br />
-<a href="https://openpolice.org/complaint-xml-all" target="_blank"
->/complaint-xml-all</a>
+<a href="https://openpolice.org/complaint-xml-schema" target="_blank">/complaint-xml-schema</a><br />
+<a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
+<a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
 
-Other projects running Survloop: 
-<a href="https://powerscore.resourceinnovation.org/go-pro" 
-    target="_blank">Cannabis PowerScore</a> 
-(<a href="https://github.com/resourceinnovation/cannabisscore" 
-    target="_blank">GitHub</a>).
+Other projects running Survloop:<br />
+<a href="https://powerscore.resourceinnovation.org/go-pro" target="_blank">Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>).
 
-The installation used for Survloop.org is currently the 
-best example of a bare-bones extension of Survloop:<br />
-<a href="https://github.com/rockhopsoft/survlooporg" 
-    target="_blank">github.com/rockhopsoft/survlooporg</a>
+The installation used for Survloop.org is currently the best example of a bare-bones extension of Survloop:<br />
+<a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
 # <a name="requirements"></a>Requirements
 
 * php: >=7.4
-* <a href="https://packagist.org/packages/laravel/laravel" 
-    target="_blank">laravel/laravel</a>: 8.*
-* <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" 
-    target="_blank">rockhopsoft/survloop-libraries</a>: 0.*
+* <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.5.*
+* <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.*
 
 # <a name="getting-started"></a>Getting Started
 
 
-### Install Laravel & Survloop Using Composer
+### Install Laravel & Survloop on Homestead
 
-<a href="https://survloop.org/how-to-install-survloop" target="_blank"
->Full install instructions</a> also describe how to set up a 
-development environment using VirutalBox, Vargrant, and Laravel's Homestead.
+<a href="https://survloop.org/how-to-install-survloop" target="_blank">Full install instructions</a> also describe how to set up a development environment using VirutalBox, Vargrant, and <a href="https://laravel.com/docs/8.x/homestead" target="_blank">Laravel's Homestead</a>. For these instructions, the new project directory is 'survproject'.
 
 ```
-$ composer create-project laravel/laravel survloop "8.*"
-$ cd survloop
+% composer create-project laravel/laravel survproject "8.5.*"
+% cd survproject
 
 ```
 
 Edit the environment file to connect the default MYSQL database:
 ```
-$ nano .env
+% nano .env
 ```
 ```
-DB_DATABASE=homestead
+APP_NAME="My Survloop Project"
+APP_URL=http://survproject.local
+
+DB_HOST=localhost
+DB_PORT=33060
+DB_CONNECTION=mysql
+DB_DATABASE=survproject
 DB_USERNAME=homestead
 DB_PASSWORD=secret
 ```
 
-You could do things like install Laravel's out-of-the-box user authentication tools, and push the vendor file copies where they need to be:
+Next, install Laravel's out-of-the-box user authentication tools, and Survloop:
 ```
-$ composer require laravel/ui rockhopsoft/survloop
-$ php artisan ui vue --auth
+% php artisan key:generate
+% php artisan cache:clear
+% COMPOSER_MEMORY_LIMIT=-1 composer require laravel/ui paragonie/random_compat mpdf/mpdf rockhopsoft/survloop
+% php artisan ui vue --auth
+% nano composer.json
 ```
-
 From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
-```
-$ nano composer.json
-```
 ```
 ...
 "autoload": {
@@ -128,9 +121,9 @@ $ nano composer.json
 }, ...
 ```
 
-Hopefully, editing `config/app.php` is no longer needed, but this can be tried if later steps break.
+It seems we also still need to manually edit `config/app.php`:
 ```
-$ nano config/app.php
+% nano config/app.php
 ```
 ```
 ...
@@ -147,23 +140,23 @@ $ nano config/app.php
 ], ...
 ```
 
-For now, to apply database design changes to the same installation you are working in, depending on your server, you might also need something like this...
+If installing on a server, you might also need to fix some permissions before the following steps...
 ```
-$ sudo su
-$ chown -R www-data:33 storage database app/Models
-```
-
-Update composer, publish the package migrations, etc...
-```
-$ echo "0" | php artisan vendor:publish --force
-$ php artisan optimize:clear
-$ composer dump-autoload
+% chown -R www-data:33 storage database app/Models
 ```
 
-If using the new DigitalOcean managed databases, you may need to tweak the laravel install:
+Clear caches and publish the package migrations...
 ```
-$ nano database/migrations/2014_10_12_100000_create_password_resets_table.php
-$ sudo nano database/migrations/2019_08_19_000000_create_failed_jobs_table.php
+% php artisan optimize:clear
+% echo "0" | php artisan vendor:publish --force
+% composer dump-autoload
+% curl http://survproject.local/css-reload
+```
+
+With certain databases (like some managed by DigitalOcean), you may need to tweak the Laravel migration:
+```
+% nano database/migrations/2014_10_12_100000_create_password_resets_table.php
+% sudo nano database/migrations/2019_08_19_000000_create_failed_jobs_table.php
 ```
 Add this line before the "Schema::create" line in each file:
 ```
@@ -208,10 +201,7 @@ $ brew link php@7.4 --force
 ```
 
 
-If you plan to generate PDFs, then you should also 
-<a href="https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostpdl-9.52.tar.gz" target="_blank">download</a> and 
-<a href="https://stackoverflow.com/questions/20798792/installing-ghostscript-with-vagrant#21417795" target="_blank">install</a> 
-<a href="https://ghostscript.com/doc/current/Install.htm" target="_blank">Ghostscript</a>. This is for Ubuntu, it might already be installed:
+If you plan to generate PDFs, then you should also <a href="https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs952/ghostpdl-9.52.tar.gz" target="_blank">download</a> and <a href="https://stackoverflow.com/questions/20798792/installing-ghostscript-with-vagrant#21417795" target="_blank">install</a> <a href="https://ghostscript.com/doc/current/Install.htm" target="_blank">Ghostscript</a>. This is for Ubuntu, it might already be installed:
 ```
 $ sudo apt-get install ghostscript
 ```
@@ -242,13 +232,13 @@ Here's the TODO list for the next release (**1.0**). It's my first time building
 
 * [ ] Correct all issues needed for minimum viable product, and launch Open Police Complaints.
 * [ ] Integrate options for MFA using Laravel-compatible package.
-* [ ] Upgrade database and graphic design for admin tools, thus far only used by the author. This should include database preparations for multi-lingual support.
+* [ ] Upgrade database and graphic design for admin tools, thus far only used by the author.
 * [ ] Code commenting, learning and adopting more community norms.
 * [ ] Add decent levels of unit testing. Hopefully improve the organization of objects/classes.
 * [ ] Improve import/export work flow for copying/moving installations.
 * [ ] Generate all admin tools by Survloop itself.
 * [ ] Add multi-lingual support on the Node-level (surveys and web pages), for starters, then database design.
-* [ ] Finish migrating all raw queries to use Laravel's process.
+* [ ] Multi-lingual support at every level.
 * [ ] Convert more Survloop (older) code to take advantage of more Laravel built-in icapabilities.
 
 # <a name="change-logs"></a>Change Logs

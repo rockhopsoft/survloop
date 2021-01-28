@@ -68,14 +68,6 @@ class SystemUpdate extends AdminController
         } // end update '2018-02-08'
         */
         
-        /*
-        $updateID = [ '2018-03-31', 'Table extension field change in the tables table' ];
-        if (!$this->custReport->addSysUpdate($updateID) && $apply) {
-            $msgs .= '<b>' . $updateID[0] . ':</b> ' . $updateID[1] . '<br />';
-            $flds = DB::select(DB::raw("ALTER TABLE `sl_tables` CHANGE COLUMN `tbl_active` `tbl_extend` INT(11) NULL"));
-            $flds = DB::select(DB::raw("UPDATE `sl_tables` SET `tbl_extend`=0 WHERE 1"));
-        } // end update '2018-03-31'
-        */
         $updateID = [ '2018-03-27', 'Tree Type primary public is now just Survey' ];
         if (!$this->custReport->addSysUpdate($updateID) && $apply) {
             $msgs .= '<b>' . $updateID[0] . ':</b> ' . $updateID[1] . '<br />';

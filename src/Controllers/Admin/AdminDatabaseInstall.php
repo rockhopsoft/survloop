@@ -604,7 +604,7 @@ class AdminDatabaseInstall extends AdminDBController
             }
         }
         $this->saveModelFile();
-        return ':)' . (($request->has('redir64')) 
+        return ':) ' . (($request->has('redir64')) 
             ? '<script type="text/javascript"> setTimeout("window.location=\'' 
                 . base64_decode($request->get('redir64')) . '\'", 100); </script>' 
             : '');

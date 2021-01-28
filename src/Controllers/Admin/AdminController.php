@@ -355,7 +355,7 @@ class AdminController extends AdminEmailController
         $log = SLDefinitions::where('def_set', 'System Settings')
             ->where('def_subset', 'log-css-reload')
             ->update([ 'def_description' => time() ]);
-        return ':)';
+        return ':) ';
     }
     
     protected function eng2data($name)
