@@ -91,7 +91,7 @@ class TreeSurvLoad extends TreeSurvConds
             $this->treeID = $GLOBALS["SL"]->treeID;
         }
         if ($slInit) {
-            $this->survLoopInit($request);
+            $this->survloopInit($request);
             $this->coreIDoverride = -3;
             if ($sessIn > 0) {
                 $this->coreIDoverride = $sessIn;
@@ -129,7 +129,7 @@ class TreeSurvLoad extends TreeSurvConds
         $GLOBALS["SL"]->microLog();
         $this->constructor($request, -3, $dbID, $treeID);
         $this->survInitRun = false;
-        $this->survLoopInit($request, $currPage);
+        $this->survloopInit($request, $currPage);
         return true;
     }
     

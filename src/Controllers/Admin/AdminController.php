@@ -121,7 +121,7 @@ class AdminController extends AdminEmailController
     
     public function sysSettings(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/settings#search');
+        $this->admControlInit($request, '/dashboard/settings#search', '', false);
         if ($request->has('refresh') 
             && intVal($request->get('refresh')) == 2) {
             $this->initLoader();
@@ -271,7 +271,7 @@ class AdminController extends AdminEmailController
     
     public function getCSS(Request $request)
     {
-        $this->survLoopInit($request, '/dashboard/settings');
+        $this->survloopInit($request, '/dashboard/settings', false);
         if (!is_dir('../storage/app/sys')) {
             mkdir('../storage/app/sys');
         }
@@ -360,16 +360,21 @@ class AdminController extends AdminEmailController
     
     protected function eng2data($name)
     {
-        return preg_replace("/[^a-zA-Z0-9]+/", "", ucwords($name));
+        return preg_replace("/[^a-z0-9]+/", "", strtolower($name));
     }
     
     protected function eng2abbr($name)
     {
-        $abbr = preg_replace("/[^A-Z]+/", "", $name);
-        if (strlen($abbr) > 1) {
-            return $abbr;
+        $name = strtolower($name);
+        $words = $GLOBALS["SL"]->mexplode(' ', $name);
+        $abbr = '';
+        if (sizeof($words) > 0) {
+            foreach ($words as $word) {
+                $word = preg_replace("/[^a-z0-9]+/", "", $word);
+                $abbr .= substr($word, 0, 3) . '_';
+            }
         }
-        return substr(preg_replace("/[^a-zA-Z0-9]+/", "", $name), 0, 3);
+        return $abbr;
     }
     
     protected function isCoreTbl($tblID)

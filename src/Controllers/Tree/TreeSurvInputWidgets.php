@@ -21,7 +21,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
     public function sortLoop(Request $request)
     {
         $ret = date("Y-m-d H:i:s");
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         $this->loadTree();
         if ($request->has('n') && intVal($request->n) > 0) {
             $nID = intVal($request->n);

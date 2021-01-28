@@ -35,12 +35,12 @@ class AdminCoreController extends SurvloopController
         return true;
     }
     
-    protected function admControlInit(Request $request, $currPage = '', $perms = '')
+    protected function admControlInit(Request $request, $currPage = '', $perms = '', $initCust = true)
     {
         if (!$this->admInitRun) {
             $this->admInitRun = true;
             $this->loadDbLookups($request);
-            $this->survLoopInit($request, $currPage, false);
+            $this->survloopInit($request, $currPage, false);
             if (trim($perms) == '') {
                 $perms = 'administrator|staff|databaser|brancher|partner|volunteer';
             }
@@ -61,7 +61,9 @@ class AdminCoreController extends SurvloopController
             $this->reloadAdmMenu();
             $this->loadSearchSuggestions();
             $this->initExtra($request);
-            $this->initCustViews($request);
+            if ($initCust) {
+                $this->initCustViews($request);
+            }
             $this->logPageVisit();
             $this->clearEmpties();
         }

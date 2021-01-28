@@ -29,7 +29,7 @@ class TreeCoreSess extends TreeCore
     protected function loadSessInfo($coreTbl = '')
     {
         if (!isset($this->v["currPage"])) {
-            $this->survLoopInit($GLOBALS["SL"]->REQ); // not sure why this
+            $this->survloopInit($GLOBALS["SL"]->REQ); // not sure why this
         }
         if (isset($GLOBALS["SL"]->formTree->tree_id)) {
             return false;
@@ -471,7 +471,7 @@ class TreeCoreSess extends TreeCore
     
     public function switchSess(Request $request, $cid)
     {
-        $this->survLoopInit($request);
+        $this->survloopInit($request);
         if (!$cid || intVal($cid) <= 0) {
             return $this->redir('/my-profile');
         }
@@ -548,7 +548,7 @@ class TreeCoreSess extends TreeCore
     
     public function cpySess(Request $request, $cid)
     {
-        $this->survLoopInit($request);
+        $this->survloopInit($request);
         if (!$cid || intVal($cid) <= 0) {
             return $this->redir('/my-profile');
         }
@@ -772,7 +772,7 @@ class TreeCoreSess extends TreeCore
     
     public function delSess(Request $request, $coreID)
     {
-        $this->survLoopInit($request);
+        $this->survloopInit($request);
         if ($this->isCoreOwner($coreID) || $this->isStaffOrAdmin()) {
             if ($coreID != $this->coreID) {
                 $this->sessData->loadCore($GLOBALS["SL"]->coreTbl, $coreID);

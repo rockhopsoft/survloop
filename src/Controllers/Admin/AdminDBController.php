@@ -248,7 +248,7 @@ class AdminDBController extends AdminController
     
     public function index(Request $request)
     {
-        $this->admControlInit($request);
+        $this->admControlInit($request, '/dashboard/db', '', false);
         return $this->printOverview();
     }
     
@@ -353,7 +353,7 @@ class AdminDBController extends AdminController
                 }
             }
         }
-        $this->survLoopInit($request, '/db/' . str_replace('_', '', $dbPrefix));
+        $this->survloopInit($request, '/db/' . str_replace('_', '', $dbPrefix));
         $this->v["content"] = view('vendor.survloop.elements.print-header-legal')->render()
             . '<div class="pL20"><h2>' . $GLOBALS["SL"]->dbRow->db_name 
             . ': Database Design Specs</h2></div><div class="p20">' 
@@ -960,7 +960,7 @@ class AdminDBController extends AdminController
     
     public function tblSort(Request $request)
     {
-        $this->admControlInit($request, '/dashboard/db/all');
+        $this->admControlInit($request, '/dashboard/db/all', '', false);
         if (!$this->v["dbAllowEdits"]) {
             return $this->printOverview();
         }

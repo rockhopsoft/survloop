@@ -58,7 +58,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
     {
         ini_set('max_execution_time', 90);
-        $this->survLoopInit($request, '/report/' . $coreID);
+        $this->survloopInit($request, '/report/' . $coreID);
         if (!$skipPublic) {
             $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         }
@@ -167,7 +167,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if ($recID <= 0) {
             return '';
         }
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         if ($this->v["uID"] <= 0) {
             return '<h4><i>Please <a href="/login">Login</a></i></h4>';
         }
@@ -482,7 +482,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function printReports(Request $request, $full = true)
     {
-        $this->survLoopInit($request, '/reports-full/' . $this->treeID);
+        $this->survloopInit($request, '/reports-full/' . $this->treeID);
         $this->loadTree();
         $ret = '';
         if ($request->has('i') && intVal($request->get('i')) > 0) {
@@ -586,7 +586,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $page 
             = $pageBasic
             = '/api/all/' . $GLOBALS["SL"]->treeRow->tree_slug . '/xml';
-        $this->survLoopInit($request, $page);
+        $this->survloopInit($request, $page);
         if (!$this->xmlAllAccess()) {
             return 'Sorry, access not permitted.';
         }
@@ -653,7 +653,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
             . '/readi-' . $coreID . '/xml';
-        $this->survLoopInit($request, $page);
+        $this->survloopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'public';
         if (!$this->xmlAccess()) {
             return 'Sorry, access not permitted.';
@@ -676,7 +676,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
             . '/readi-' . $coreID . '/full-xml';
-        $this->survLoopInit($request, $page);
+        $this->survloopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'full-xml';
         if (!$this->xmlAccess()) {
             return 'Sorry, access not permitted.';
@@ -714,7 +714,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     public function getXmlExample(Request $request)
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-example';
-        $this->survLoopInit($request, $page);
+        $this->survloopInit($request, $page);
         $coreID = $this->getXmlExampleID();
         $optTree = $optXmlTree = "tree-" . $GLOBALS["SL"]->treeID . "-example";
         if ($coreID <= 0 && isset($GLOBALS["SL"]->sysOpts[$optTree])) {
@@ -771,7 +771,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if ($cid <= 0) {
             return '';
         }
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         $GLOBALS["SL"]->pageView = 'full';
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
         return $this->retrieveUploadFile($upID, $refresh);
@@ -810,7 +810,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     
     public function ajaxGraph(Request $request, $gType = '', $nID = -3)
     {
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         $this->v["currNode"] = new TreeNodeSurv;
         $this->v["currNode"]->fillNodeRow($nID);
         $this->v["currGraphID"] = 'nGraph' . $nID;

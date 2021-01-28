@@ -432,14 +432,16 @@ class AdminMenu
         $treeName = '';
         if (isset($GLOBALS["SL"]->treeRow->tree_id)) {
             $treeID = $GLOBALS["SL"]->treeRow->tree_id;
-        }
-        if (isset($GLOBALS["SL"]->treeName)) {
-            $treeName = $GLOBALS["SL"]->treeName;
-        }
-        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
-            $tree = SLTree::find(1);
-            $treeID = $tree->tree_id;
-            $treeName = 'Tree: ' . $tree->tree_name;
+            if (isset($GLOBALS["SL"]->treeName)) {
+                $treeName = $GLOBALS["SL"]->treeName;
+            }
+            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
+                $tree = SLTree::find(1);
+                if ($tree && isset($tree->tree_id)) {
+                    $treeID = $tree->tree_id;
+                    $treeName = 'Tree: ' . $tree->tree_name;
+                }
+            }
         }
         return [ $treeID, $treeName, $dbName ];
     }

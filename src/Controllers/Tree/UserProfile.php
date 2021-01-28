@@ -22,7 +22,7 @@ class UserProfile extends TreeSurvInput
 {
     public function afterLogin(Request $request)
     {
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         if ($this->v["user"] 
             && $this->v["user"]->hasRole('administrator|staff|databaser|brancher')) {
             //return redirect()->intended('dashboard');
@@ -134,11 +134,13 @@ class UserProfile extends TreeSurvInput
         if (isset($this->v["uID"]) 
             && $this->v["uID"] > 0 
             && isset($GLOBALS["SL"]->coreTbl) 
-            && trim($GLOBALS["SL"]->coreTbl) != '') {
+            && trim($GLOBALS["SL"]->coreTbl) != ''
+            && trim($GLOBALS["SL"]->coreTblUserFld) != '') {
             $model = $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl);
             if (trim($model) != '') {
-                eval("\$incompletes = " . $model . "::where('" . $GLOBALS["SL"]->coreTblUserFld 
-                    . "', " . $this->v["uID"] . ")->orderBy('created_at', 'desc')->get();");
+                eval("\$incompletes = " . $model . "::where('" 
+                    . $GLOBALS["SL"]->coreTblUserFld . "', " . $this->v["uID"] 
+                    . ")->orderBy('created_at', 'desc')->get();");
                 if ($incompletes->isNotEmpty()) {
                     foreach ($incompletes as $i => $row) {
                         if ($this->recordIsIncomplete(

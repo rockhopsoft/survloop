@@ -189,7 +189,7 @@ class AdminTreeController extends AdminTreeStats
                 }
             }
         }
-        $this->survLoopInit($request, '/tree/' . $treeSlug);
+        $this->survloopInit($request, '/tree/' . $treeSlug);
         if (!$this->checkCache()) {
             $this->adminPrintFullTreePublicGen($request);
         }
@@ -923,46 +923,56 @@ class AdminTreeController extends AdminTreeStats
         return true;
     }
     
-    public function freshDBstore(Request $request, $db)
+    public function freshDBstore(Request $request, &$db)
     {
         $db->db_user    = $this->v["uID"];
-        $db->db_prefix  = trim($request->db_prefix) . '_';
-        $db->db_name    = trim($request->db_name);
-        $db->db_desc    = trim($request->db_desc);
-        $db->db_mission = trim($request->db_mission);
+        if ($request->has('DbPrefix')) {
+            $db->db_prefix = trim($request->DbPrefix);
+        }
+        if ($request->has('DbName')) {
+            $db->db_name = trim($request->DbName);
+        }
+        if ($request->has('DbDesc')) {
+            $db->db_desc = trim($request->DbDesc);
+        }
+        if ($request->has('DbMission')) {
+            $db->db_mission = trim($request->DbMission);
+        }
         $db->save();
-        $GLOBALS["SL"] = new Globals($request, $db->dbID, -3);
+        $GLOBALS["SL"] = new Globals($request, $db->db_id, -3);
         return $db;
     }
     
     public function freshDB(Request $request)
     {
-        $this->survLoopInit($request, '/fresh/database');
+        $this->survloopInit($request, '/fresh/database', false);
         $chk = SLUsersRoles::get();
         if ($chk->isEmpty()) {
             $this->v["user"]->assignRole('administrator');
             $this->logPageVisit('NEW SYSTEM ADMINISTRATOR!');
         }
         $this->v["isFresh"] = true;
-        if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
+        if ($request->has('freshSub') 
+            && intVal($request->freshSub) == 1
+            && $this->v["user"] 
+            && $this->v["user"]->hasRole('administrator')) {
             // Initialize Database Record Settings
             $db = SLDatabases::find(1);
             if (!$db) {
                 $db = new SLDatabases;
                 $db->db_id = 1;
             }
-            $db = $this->freshDBstore($request, $db);
+            $this->freshDBstore($request, $db);
             $this->logPageVisit('/fresh/database', $db->db_id . ';0');
             
             // Initialize system-wide settings
-            $this->updateSysSet('cust-abbr', trim($request->db_prefix));
-            $this->updateSysSet('site-name', trim($request->db_name));
-            $this->updateSysSet('meta-desc', trim($request->db_name));
-            $title = trim($request->db_desc . ' | ' . trim($request->db_name));
+            $this->updateSysSet('cust-abbr', trim($request->DbPrefix));
+            $this->updateSysSet('site-name', trim($request->DbName));
+            $this->updateSysSet('meta-desc', trim($request->DbName));
+            $title = trim($request->DbDesc . ' | ' . trim($request->DbName));
             $this->updateSysSet('meta-title', $title);
             
-            $this->genDbClasses($request->db_prefix);
+            $this->genDbClasses($request->DbPrefix);
             
             if (!$this->chkHasTreeOne()) {
                 return $this->redir('/fresh/survey', true);
@@ -974,15 +984,17 @@ class AdminTreeController extends AdminTreeStats
 
     public function newDB(Request $request)
     {
-        $this->survLoopInit($request, '/dashboard/db/new');
+        $this->survloopInit($request, '/dashboard/db/new', false);
         $this->v["isFresh"] = false;
-        if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
+        if ($request->has('freshSub') 
+            && intVal($request->freshSub) == 1
+            && $this->v["user"] 
+            && $this->v["user"]->hasRole('administrator')) {
             // Initialize Database Record Settings
             $db = new SLDatabases;
-            $db = $this->freshDBstore($request, $db);
+            $this->freshDBstore($request, $db);
             $this->logPageVisit('/fresh/database', $db->db_id . ';0');
-            $this->genDbClasses($request->db_prefix);
+            $this->genDbClasses($request->DbPrefix);
             if (!$this->chkHasTreeOne()) {
                 return $this->redir('/fresh/survey', true);
             }
@@ -1036,7 +1048,7 @@ class AdminTreeController extends AdminTreeStats
             $coreTbl->tbl_eng      = $tableName;
             $coreTbl->tbl_name     = $this->eng2data($tableName);
             $coreTbl->tbl_abbr     = $this->eng2abbr($tableName);
-            $coreTbl->tbl_desc     = trim($request->tree_desc);
+            $coreTbl->tbl_desc     = trim($request->TreeDesc);
             $coreTbl->save();
         }
 
@@ -1047,30 +1059,33 @@ class AdminTreeController extends AdminTreeStats
             $userTbl->tbl_eng      = 'Users';
             $userTbl->tbl_name     = 'users';
             $userTbl->tbl_abbr     = '';
+            $userTbl->tbl_group    = 'Internal';
             $userTbl->tbl_desc     = 'This represents the Laravel Users table, but will not '
                 . 'actually be implemented by Survloop as part of the database installation.';
             $userTbl->save();
         }
         
-        $tree->tree_name = trim($request->tree_name);
-        $tree->tree_desc = trim($request->tree_desc);
-        $tree->tree_slug = $GLOBALS["SL"]->slugify($tree->tree_name);
+        $tree->tree_name = trim($request->TreeName);
+        $tree->tree_desc = trim($request->TreeDesc);
+        $tree->tree_slug = $GLOBALS["SL"]->slugify($tableName);
         $tree->save();
         $tree = $this->initTree($tree, $coreTbl, $userTbl, 'Survey');
         $this->initTreeXML($tree, $coreTbl, 'Survey XML');
         
         $this->installNewCoreTable($coreTbl);
         
-        $GLOBALS["SL"] = new Globals($request, $GLOBALS["SL"]->dbID, $tree->tree_id);
+        $GLOBALS["SL"] = new Globals($request, $GLOBALS["SL"]->dbID, $coreTbl->tree_id);
         return true;
     }
     
     public function freshUX(Request $request)
     {
-        $this->survLoopInit($request, '/fresh/survey');
+        $this->survloopInit($request, '/fresh/survey', false);
         $this->v["isFresh"] = true;
-        if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
+        if ($request->has('freshSub') 
+            && intVal($request->freshSub) == 1
+            && $this->v["user"] 
+            && $this->v["user"]->hasRole('administrator')) {
             $tree = SLTree::find(1);
             if (!$tree) {
                 $tree = new SLTree;
@@ -1085,10 +1100,12 @@ class AdminTreeController extends AdminTreeStats
     
     public function newTree(Request $request)
     {
-        $this->survLoopInit($request, '/dashboard/tree/new');
+        $this->survloopInit($request, '/dashboard/tree/new', false);
         $this->v["isFresh"] = false;
-        if ($request->has('freshSub') && intVal($request->freshSub) == 1
-            && $this->v["user"] && $this->v["user"]->hasRole('administrator')) {
+        if ($request->has('freshSub') 
+            && intVal($request->freshSub) == 1
+            && $this->v["user"] 
+            && $this->v["user"]->hasRole('administrator')) {
             $tree = new SLTree;
             $tree->save();
             $tree = $this->freshUXstore($request, $tree, '/dashboard/tree/new');
@@ -1099,10 +1116,10 @@ class AdminTreeController extends AdminTreeStats
     
     protected function initTree($tree, $coreTbl, $userTbl, $type = 'Public')
     {
-        $tree->tree_user            = $this->v["uID"];
+        $tree->tree_user       = $this->v["uID"];
         $tree->tree_database   = $GLOBALS["SL"]->dbID;
         $tree->tree_core_table = $coreTbl->tbl_id;
-        $tree->tree_type            = $type;
+        $tree->tree_type       = $type;
         $tree->save();
         
         $this->logPageVisit('/fresh/database', $GLOBALS["SL"]->dbID.';'.$tree->tree_id);
@@ -1110,13 +1127,20 @@ class AdminTreeController extends AdminTreeStats
         $rootNode = new SLNode;
         $rootNode->node_tree        = $tree->tree_id;
         $rootNode->node_parent_id   = -3;
-        $rootNode->node_type        = 'Branch Title';
-        $rootNode->node_prompt_text = $tree->tree_name;
+        $rootNode->node_type        = 'Data Manip: New';
+        $rootNode->node_data_branch = $coreTbl->tbl_name;
         $rootNode->save();
+        
+        $branchNode = new SLNode;
+        $branchNode->node_tree        = $tree->tree_id;
+        $branchNode->node_parent_id   = $rootNode->node_id;
+        $branchNode->node_type        = 'Branch Title';
+        $branchNode->node_prompt_text = 'Section 1';
+        $branchNode->save();
         
         $pageNode = new SLNode;
         $pageNode->node_tree         = $tree->tree_id;
-        $pageNode->node_parent_id    = $rootNode->node_id;
+        $pageNode->node_parent_id    = $branchNode->node_id;
         $pageNode->node_type         = 'Page';
         $pageNode->node_prompt_text  = 'Welcome To ' . $tree->tree_name;
         $pageNode->node_prompt_notes = 'welcome';

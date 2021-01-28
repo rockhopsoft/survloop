@@ -310,7 +310,7 @@ class TreeSurv extends TreeSurvLoops
     public function index(Request $request, $type = '', $val = '')
     {
         $GLOBALS["SL"]->microLog('TreeSurv index(' . $type);
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         $GLOBALS["SL"]->microLog('TreeSurv index( after survLoopInit');
         $chk = $this->checkSystemInit();
         if ($chk && trim($chk) != '') {
@@ -604,7 +604,7 @@ class TreeSurv extends TreeSurvLoops
     
     public function ajaxChecks(Request $request, $type = '')
     {
-        $this->survLoopInit($request, '/ajax/' . $type);
+        $this->survloopInit($request, '/ajax/' . $type);
         $ret = $this->ajaxChecksCustom($request, $type);
         if (trim($ret) != '') {
             return $ret;
@@ -618,7 +618,7 @@ class TreeSurv extends TreeSurvLoops
     
     public function ajaxChecksSL(Request $request, $type = '')
     {
-        $this->survLoopInit($request, '/ajadm/' . $type);
+        $this->survloopInit($request, '/ajadm/' . $type);
         $nID = (($request->has('nID')) ? trim($request->get('nID')) : '');
         if ($type == 'adm-menu-toggle') {
             return $this->ajaxAdmMenuToggle($request);

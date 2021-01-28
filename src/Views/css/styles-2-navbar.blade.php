@@ -7,8 +7,12 @@
     background: {!! $css["color-nav-bg"] !!};
     border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
 }
-#mainNav, #mainNav .col-4, #mainNav .col-8, .navbar, 
-#myNavBar, #myNavBar .navbar {
+#mainNav, 
+#mainNav .col-4, 
+#mainNav .col-8, 
+.navbar, 
+#myNavBar, 
+#myNavBar .navbar {
     height: 56px;
 	min-height: 56px;
 	max-height: 56px;
@@ -18,6 +22,7 @@
 .navbar, #myNavBar, #myNavBar .navbar {
     text-align: right;
 }
+
 #mainNav2 {
     display: none;
     width: 100%;
@@ -168,6 +173,11 @@ a.slNavLnk:visited, a.slNavLnk:hover,
 #slLogo {
     display: block;
     margin: 7px 0px 0px 30px;
+}
+#slLogo.navbar-brand {
+    color: {!! $css["color-nav-logo"] !!};
+    margin: 0px 0px 0px 20px;
+    font-size: 26pt;
 }
 #slLogoImg, #slLogoImgSm {
     display: inline;

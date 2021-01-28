@@ -360,7 +360,7 @@ class SurvloopSpecialLoads extends SurvCustLoop
         $this->loadTreeByID($request, $treeID, true);
         $this->searchPrep($request, $treeID);
         $this->custLoop->searcher->searchCacheName();
-    //$this->currLoop->survLoopInit($request, $this->currLoop->searchCacheName());
+    //$this->currLoop->survloopInit($request, $this->currLoop->searchCacheName());
     // [ check for cache ]
         $this->custLoop->searcher->prepSearchResults($request);
         if (sizeof($this->custLoop->searcher->searchResults) > 0) {

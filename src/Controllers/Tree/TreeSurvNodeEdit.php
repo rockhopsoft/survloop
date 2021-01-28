@@ -29,7 +29,7 @@ class TreeSurvNodeEdit extends TreeSurvForm
 {   
     public function adminNodeEdit($nodeIN, Request $request, $currPage = '') 
     {
-        $this->survLoopInit($request, $currPage);
+        $this->survloopInit($request, $currPage);
         $resLimit = 60;
         $node = $parent = NULL;
         if ($nodeIN > 0) {

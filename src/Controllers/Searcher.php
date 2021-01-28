@@ -88,7 +88,7 @@ class Searcher extends SurvCustLoop
     
     public function searchBar()
     {
-        $this->survLoopInit($request, '/search-bar/' . $this->treeID);
+        $this->survloopInit($request, '/search-bar/' . $this->treeID);
         return $this->printSearchBar();
     }
     

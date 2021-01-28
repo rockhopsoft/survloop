@@ -169,7 +169,7 @@ class TreeSurvFormWidgets extends TreeSurvDataPrint
     // customizable function for what content is loaded in the widget's div 
     public function widgetCust(Request $request, $nID = -3)
     {
-        $this->survLoopInit($request, '');
+        $this->survloopInit($request, '');
         $this->loadAllSessData();
         //$this->loadTree();
         $txt = (($request->has('txt')) ? trim($request->get('txt')) : '');

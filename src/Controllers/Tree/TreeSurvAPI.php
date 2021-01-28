@@ -211,7 +211,7 @@ class TreeSurvAPI extends TreeCoreSess
     
     public function loadXmlMapTree(Request $request, $forceReload = false)
     {
-        $this->survLoopInit($request);
+        $this->survloopInit($request);
         if (empty($this->xmlMapTree) || $forceReload) {
             if (isset($GLOBALS["SL"]->xmlTree["id"])) {
                 $this->xmlMapTree = new TreeSurvAPI;

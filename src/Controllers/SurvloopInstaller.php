@@ -24,36 +24,31 @@ class SurvloopInstaller extends Controller
     {
         $chkSysDef = new SystemDefinitions;
         $chkSysDef->checkDefInstalls();
-        $specialOpts = [ Globals::TREEOPT_HOMEPAGE, Globals::TREEOPT_SEARCH ];
-        foreach ($specialOpts as $keyOptType) {
-            $typeName = (($keyOptType == Globals::TREEOPT_HOMEPAGE) 
-                ? 'Dashboard' : 'Search');
-            if (!$this->chkPagePerm($keyOptType)) {
-                $this->installPageSimpl('Home', $keyOptType);
+        $type = Globals::TREEOPT_HOMEPAGE*Globals::TREEOPT_ADMIN;
+        $this->installPageSimpl('Dashboard', $type, 'dashboard');
+        $this->installPageSimpl('Home', Globals::TREEOPT_HOMEPAGE);
+        $type = Globals::TREEOPT_SEARCH*Globals::TREEOPT_ADMIN;
+        $this->installPageSimpl('Admin Search', $type, 'search');
+        $this->installPageSimpl('Search', Globals::TREEOPT_SEARCH);
+        $specialOpts = [
+            [ 'Dashboard', Globals::TREEOPT_HOMEPAGE ],
+            [ 'Search',    Globals::TREEOPT_SEARCH   ]
+        ];
+        $permOpts = [
+            [ 'Staff',     Globals::TREEOPT_STAFF     ],
+            [ 'Partner',   Globals::TREEOPT_PARTNER   ],
+            [ 'Volunteer', Globals::TREEOPT_VOLUNTEER ]
+        ];
+        foreach ($specialOpts as $keyType) {
+            if (!$this->chkPagePerm($keyType[1], Globals::TREEOPT_ADMIN)) {
+                $type = $keyType[1]*Globals::TREEOPT_ADMIN;
+                $this->installPageSimpl($keyType[0], $type);
             }
-            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_ADMIN)) {
-                $this->installPageSimpl(
-                    $typeName, 
-                    ($keyOptType*Globals::TREEOPT_ADMIN)
-                );
-            }
-            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_STAFF)) {
-                $this->installPageSimpl(
-                    'Staff ' . $typeName, 
-                    ($keyOptType*Globals::TREEOPT_STAFF)
-                );
-            }
-            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_PARTNER)) {
-                $this->installPageSimpl(
-                    'Partner ' . $typeName, 
-                    ($keyOptType*Globals::TREEOPT_PARTNER)
-                );
-            }
-            if (!$this->chkPagePerm($keyOptType, Globals::TREEOPT_VOLUNTEER)) {
-                $this->installPageSimpl(
-                    'Volunteer ' . $typeName, 
-                    ($keyOptType*Globals::TREEOPT_VOLUNTEER)
-                );
+            foreach ($permOpts as $perm) {
+                if (!$this->chkPagePerm($keyType[1], $perm[1])) {
+                    $type = $keyType[1]*$perm[1];
+                    $this->installPageSimpl($perm[0] . ' ' . $keyType[0], $type);
+                }
             }
         }
         if (!$this->chkPagePerm(Globals::TREEOPT_PROFILE)) {
@@ -122,6 +117,18 @@ class SurvloopInstaller extends Controller
         if (trim($slug) == '') {
             $slug = $GLOBALS["SL"]->slugify($name);
         }
+        $add = true;
+        if ($opts > 1) {
+            $chk = SLTree::where('tree_type', 'Page')
+                ->where('tree_opts', $opts)
+                ->first();
+            if ($chk && isset($chk->tree_opts)) {
+                $add = false;
+            }
+        }
+        if (!$add) {
+            return null;
+        }
         $newTree = new SLTree;
         $newTree->tree_type      = 'Page';
         $newTree->tree_name      = $name;
@@ -142,13 +149,22 @@ class SurvloopInstaller extends Controller
         $n->node_tree            = $newTree->tree_id;
         $n->node_parent_id       = $node->node_id;
         $n->node_type            = 'Instructions';
-        $n->node_prompt_text     = '<center><h1 style="margin-top: 50px;">Coming Soon</h1></center>';
+        $n->node_prompt_text     = '<center><h1 style="margin-top: 50px;">'
+            . 'Coming Soon</h1></center>';
         $n->save();
         return $newTree;
     }
     
     public function installPageMyProfile()
     {
+        if ($opts > 1) {
+            $chk = SLTree::where('tree_type', 'Page')
+                ->where('tree_opts', 23)
+                ->first();
+            if ($chk && isset($chk->tree_opts)) {
+                return null;
+            }
+        }
         $newTree = new SLTree;
         $newTree->tree_type       = 'Page';
         $newTree->tree_name       = 'My Profile';

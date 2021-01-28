@@ -40,7 +40,7 @@ class SurvloopController extends SurvloopControllerUtils
      * @param  boolean  $runExtra
      * @return boolean
      */
-    public function survLoopInit(Request $request, $currPage = '', $runExtra = true)
+    public function survloopInit(Request $request, $currPage = '', $runExtra = true)
     {
         if (!$this->survInitRun || !isset($this->v["uID"])) {
             $this->survInitRun = true;
@@ -50,11 +50,11 @@ class SurvloopController extends SurvloopControllerUtils
             $this->loadCurrPage($currPage);
             $this->loadSlSess($request);
             $this->loadNavMenu();
-            $this->initCheckUpdates($request);
             if ($this->coreIDoverride > 0) {
                 $this->loadAllSessData();
             }
             if ($runExtra) {
+                $this->initCheckUpdates($request);
                 $this->initExtra($request);
                 $this->loadSysSettings();
                 $this->initCustViews($request);
@@ -82,6 +82,17 @@ class SurvloopController extends SurvloopControllerUtils
         if ($dbID <= 0) {
             $dbID = $this->dbID;
         }
+        if ($treeID <= 0) {
+            return false;
+        }
+        $chk = SLTree::where('tree_id', $treeID)
+            ->where('tree_database', $dbID)
+            ->first();
+        if (!$chk || !isset($chk->tree_id)) {
+            return false;
+        }
+//echo '???<pre>'; print_r($request->all()); echo '</pre>'; exit;
+
         $custLoopFile = '../vendor/' 
             . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Controllers/'
             . $GLOBALS["SL"]->sysOpts["cust-abbr"] . '.php';
@@ -96,14 +107,14 @@ class SurvloopController extends SurvloopControllerUtils
                 . (($slInit) ? "true" : "false") . ");";
             eval($eval);
         } else {
-            $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID);
+            $this->custReport = new TreeSurvForm($request, -3, $dbID, $treeID, false, $slInit);
         }
         $currPage = '';
         if (isset($this->v["currPage"]) && sizeof($this->v["currPage"]) > 0) {
             $currPage = $this->v["currPage"][0];
         }
         if ($slInit) {
-            $this->custReport->survLoopInit($request, $currPage);
+            $this->custReport->survloopInit($request, $currPage);
         } else {
             $this->custReport->authMinimalInit($request, $currPage);
         }
@@ -213,10 +224,12 @@ class SurvloopController extends SurvloopControllerUtils
      */
     protected function initCheckUpdates(Request $request)
     {
-        if ($request->has('refresh') && trim($request->get('refresh')) != '') {
+        if ($request->has('refresh') 
+            && trim($request->get('refresh')) != '') {
             $this->checkSystemInit();
         }
-        if (isset($GLOBALS["slRunUpdates"]) && $GLOBALS["slRunUpdates"]) {
+        if (isset($GLOBALS["slRunUpdates"]) 
+            && $GLOBALS["slRunUpdates"]) {
             $this->v["pastUpDef"] 
                 = $this->v["pastUpArr"] 
                 = $this->v["updateList"] 
@@ -235,7 +248,7 @@ class SurvloopController extends SurvloopControllerUtils
     protected function loadSlSess(Request $request)
     {
         $slSess = null;
-        if (isset($this->v["uID"])) {
+        if (isset($this->v["uID"]) && intVal($this->v["uID"]) > 0) {
             $slSess = SLSess::where('sess_user_id', $this->v["uID"])
                 ->where('sess_tree', 0)
                 ->where('sess_is_active', 1)
@@ -250,13 +263,15 @@ class SurvloopController extends SurvloopControllerUtils
                 }
                 session()->put('slSessID', $slSess->sess_id);
                 session()->save();
-            } elseif ($slSess && isset($slSess->sess_id) 
-                && !isset($slSess->sess_user_id) && $this->v["uID"] > 0) {
+            } elseif ($slSess 
+                && isset($slSess->sess_id) 
+                && !isset($slSess->sess_user_id)) {
                 $slSess->sess_user_id = $this->v["uID"];
                 $slSess->save();
             }
         }
-        if ($request->has('sessmsg') && trim($request->get('sessmsg')) != '') {
+        if ($request->has('sessmsg') 
+            && trim($request->get('sessmsg')) != '') {
             session()->put('sessMsg', trim($request->get('sessmsg')));
             session()->save();
         }
@@ -377,15 +392,20 @@ class SurvloopController extends SurvloopControllerUtils
      */
     public function checkSystemInit()
     {
-        if (!session()->has('chkSysInit') || $GLOBALS["SL"]->REQ->has('refresh')) {
+        if (!session()->has('chkSysInit') 
+            || $GLOBALS["SL"]->REQ->has('refresh')) {
             if (!$GLOBALS["SL"]->REQ->has('cssLoaded')
                 && !file_exists('../storage/app/sys/sys2.min.js')) {
-                echo '<div class="disNon"><iframe src="/css-reload" ></iframe></div>
-                    <script type="text/javascript"> 
-                    setTimeout("window.location=\'?cssLoaded=1\'", 2000); 
-                    </script>';
+                echo '<div style="display: none;">'
+                    . '<iframe src="/css-reload" ></iframe>'
+                    . '</div>'
+                    . '<script type="text/javascript"> '
+                    . 'setTimeout("window.location=\'?cssLoaded=1\'", 2000); '
+                    . '</script>';
                 exit;
             }
+            $survInst = new SurvloopInstaller;
+            $survInst->checkSysInit();
             $sysChk = User::select('id')
                 ->get();
             if ($sysChk->isEmpty()) {
@@ -400,8 +420,6 @@ class SurvloopController extends SurvloopControllerUtils
             if (!$this->chkHasTreeOne()) {
                 return $this->redir('/fresh/survey', true);
             }
-            $survInst = new SurvloopInstaller;
-            $survInst->checkSysInit();
             session()->put('chkSysInit', 1);
             session()->save();
         }
@@ -439,7 +457,7 @@ class SurvloopController extends SurvloopControllerUtils
     
     public function freshUser(Request $request)
     {
-        $this->survLoopInit($request, '/fresh/creator');
+        $this->survloopInit($request, '/fresh/creator', false);
         $GLOBALS["SL"]->sysOpts["signup-instruct"] = '<h2 class="mT5 mB0">'
             . 'Create Admin Account</h2>';
         $content = '<center><div class="treeWrapForm pT30 mBn20">

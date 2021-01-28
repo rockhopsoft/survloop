@@ -944,6 +944,7 @@ class GlobalsImportExport extends GlobalsTables
         $this->modelPath($coreTbl->tbl_name, true);
         if (!$this->chkTableExists($coreTbl, $userTbl)) {
             $tblQuery = $this->exportMysqlTbl($coreTbl, true);
+            PDOStatement::fetchAll(); // shouldn't be needed?
             $chk = DB::select( DB::raw( $tblQuery ) );
             return false;
         }

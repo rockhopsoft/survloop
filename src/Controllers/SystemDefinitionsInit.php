@@ -33,7 +33,8 @@ class SystemDefinitionsInit
             'color-field-bg'    => ['#FFF',    'Form Field BG Color'],
             'color-form-text'   => ['#333',    'Form Field Text Color'],
             'color-nav-bg'      => ['#000',    'Navigation BG Color'],
-            'color-nav-text'    => ['#888',    'Navigation Text Color']
+            'color-nav-text'    => ['#888',    'Navigation Text Color'],
+            'color-nav-logo'    => ['#FFF',    'Navigation Logo Color']
         ];
     }
     
@@ -42,7 +43,7 @@ class SystemDefinitionsInit
         return [
             'site-name' => [
                 'Installation/Site Name', 
-                'for general reference, in English'
+                'My Survloop Project'
             ], 
             'cust-abbr' => [
                 'Installation Abbreviation',
@@ -63,7 +64,7 @@ class SystemDefinitionsInit
             ], 
             'logo-url' => [
                 'URL Linked To Logo',
-                '/optionally-different'
+                '/home'
             ], 
             'app-root-path' => [
                 'Absolute Path To App Root',
@@ -87,103 +88,103 @@ class SystemDefinitionsInit
             ], 
             'logo-img-lrg' => [
                 'Large Logo Image', 
-                '/siteabrv/uploads/logo-large.png'
+                ''
             ], 
             'logo-img-md' => [
                 'Medium Logo Image', 
-                '/siteabrv/uploads/logo-medium.png'
+                ''
             ], 
             'logo-img-sm' => [
                 'Small Logo Image', 
-                '/siteabrv/uploads/logo-small.png'
+                ''
             ], 
             'shortcut-icon' => [
                 'Shortcut Icon Image', 
-                '/siteabrv/ico.png'
+                '/survloop/uploads/survloop-ico.png'
             ],
             'spinner-code' => [
                 'Spinner Animation', 
-                '&lt;i class="fa-li fa fa-spinner fa-spin"&gt;&lt;/i&gt;'
+                '<i class="fa-li fa fa-spinner fa-spin"></i>'
             ], 
             'matomo-analytic-url' => [
                 'Matomo Cloud Analytics URL', 
-                'myapp.matomo.cloud'
+                ''
             ], 
             'matomo-analytic-site-id' => [
                 'Matomo Cloud Analytics Site ID', 
-                '1'
+                ''
             ], 
             'google-analytic' => [
                 'Google Analytics Tracking ID', 
-                'UA-23427655-1'
+                ''
             ], 
             'google-map-key' => [
                 'Google Maps API Key: Server', 
-                'string'
+                ''
             ], 
             'google-map-key2' => [
                 'Google Maps API Key: Browser', 
-                'string'
+                ''
             ], 
             'google-cod-key' => [
                 'Google Geocoding API Key: Server', 
-                'string'
+                ''
             ], 
             'google-cod-key2' => [
                 'Google Geocoding API Key: Browser', 
-                'string'
+                ''
             ], 
             'twitter' => [
                 'Twitter Account', 
-                '@Survloop'
+                ''
             ], 
             'facebook-app-id' => [
                 'Facebook App ID', 
-                '234775309892416'
+                ''
             ], 
             'show-logo-title' => [
                 'Print Site Name Next To Logo', 
-                '1 or 0'
+                '0'
             ], 
             'users-create-db' => [
                 'Users Can Create Databases', 
-                '1 or 0'
+                '0'
             ], 
             'user-name-req' => [
                 'Username Are Required To Register', 
-                '1 or 0'
+                '0'
             ], 
             'has-partners' => [
                 'Has Partners User Area', 
-                '1 or 0'
+                '0'
             ], 
             'has-volunteers' => [
                 'Has Volunteer User Area', 
-                '1 or 0'
+                '0'
             ], 
             'has-avatars' => [
                 'Default User Avatar Image', 
-                '/siteabrv/uploads/avatar-shell.png'
+                '/survloop/uploads/avatar-shell.png'
             ], 
             'has-canada' => [
                 'Has Canadian Maps', 
-                '1 or 0'
+                '1'
             ], 
             'parent-company' => [
                 'Parent Company of This Installation', 
-                'MegaOrg'
+                ''
             ], 
             'parent-website' => [
                 'Parent Company\'s Website URL', 
-                'http://www...'
+                ''
             ], 
             'login-instruct' => [
                 'User Login Instructions', 
-                'HTML'
+                ''
             ], 
             'signup-instruct' => [
                 'New User Sign Up Instructions', 
-                'HTML'
+                ''
             ], 
             'app-license' => [
                 'License Info', 
@@ -203,19 +204,19 @@ class SystemDefinitionsInit
             ],
             'css-extra-files' => [
                 'CSS Extra Files', 
-                'comma separated'
+                ''
             ],
             'header-code' => [
                 '< head > Header Code < / head >', 
-                '&lt;div&gt;Anything&lt;/div&gt;'
+                '<!-- Anything -->'
             ],
             'sys-cust-js' => [
                 'System-Wide Javascript', 
-                'var custom = 1;'
+                'var myProjectCustomJava = 1;'
             ],
             'sys-cust-ajax' => [
                 'System-Wide jQuery/AJAX', 
-                'function reqFormFldCustom() { return 0; }'
+                'function reqFormFldCustomMyProject() { return 0; }'
             ]
         ];
     }

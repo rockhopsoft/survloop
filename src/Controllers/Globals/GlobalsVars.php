@@ -36,7 +36,7 @@ class GlobalsVars extends GlobalsStatic
     public $isVolun        = false;
     public $dbID           = 1;
     public $dbRow          = [];
-    public $treeID         = 1;
+    public $treeID         = 0;
     public $treeRow        = [];
     public $treeName       = '';
     public $treeBaseSlug   = '';
@@ -106,35 +106,78 @@ class GlobalsVars extends GlobalsStatic
     public $debugOn        = false;
 
     
-    // Trees (Surveys & Pages) are assigned an optional property when ( SLTree->tree_opts%TREEOPT_PRIME == 0 )
+    // Trees (Surveys & Pages) are assigned an optional property 
+    // when ( SLTree->tree_opts%TREEOPT_PRIME == 0 )
+
     // Site Map Architecture and Permissions Flags
-    public const TREEOPT_HOMEPAGE   = 7;  // Page Tree acts as home page for site area
-    public const TREEOPT_SEARCH     = 31; // Tree acts as search results page for site area 
-    public const TREEOPT_PROFILE    = 23; // This page acts as the default Member Profile for the system
-    public const TREEOPT_REPORT     = 13; // Page Tree is a Report for a survey, so they share data structures
+
+    // Page Tree acts as home page for site area
+    public const TREEOPT_HOMEPAGE   = 7;
+
+    // Tree acts as search results page for site area 
+    public const TREEOPT_SEARCH     = 31;
+
+    // This page acts as the default Member Profile for the system
+    public const TREEOPT_PROFILE    = 23;
+
+    // Page Tree is a Report for a survey, so they share data structures
+    public const TREEOPT_REPORT     = 13; 
     
+
     // Site Map Architecture and Permissions Flags
-    public const TREEOPT_ADMIN      = 3;  // Access limited to admin users
-    public const TREEOPT_STAFF      = 43; // Access limited to staff users (and higher)
-    public const TREEOPT_PARTNER    = 41; // Access limited to partner users (and higher)
-    public const TREEOPT_VOLUNTEER  = 17; // Access limited to volunteer users (and higher)
+
+    // Access limited to admin users
+    public const TREEOPT_ADMIN      = 3;  
+
+    // Access limited to staff users (and higher)
+    public const TREEOPT_STAFF      = 43; 
+
+    // Access limited to partner users (and higher)
+    public const TREEOPT_PARTNER    = 41; 
+
+    // Access limited to volunteer users (and higher)
+    public const TREEOPT_VOLUNTEER  = 17; 
     
-    // Tree Options
-    public const TREEOPT_SKINNY     = 2;  // Tree's contents are wrapped in the skinny page width 
+
+    // Other Tree Options
+
+    // Tree's contents are wrapped in the skinny page width 
+    public const TREEOPT_SKINNY     = 2;  
     
-    // Survey Tree Options
-    public const TREEOPT_NOEDITS    = 11; // Record edits not allowed after complete (except admins)
-    public const TREEOPT_PUBLICID   = 47; // Survey uses a separate unique Public ID for completed records
-    public const TREEOPT_SURVNAVBOT = 37; // A navigation menu is generated below each page of the survey
-    public const TREEOPT_SURVNAVTOP = 59; // A navigation menu is generated atop each page of the survey
-    public const TREEOPT_SURVNAVLIN = 61; // A thin progress bar is generated atop each page of the survey
-    public const TREEOPT_ONEBIGLOOP = 5;  // Survey is one big loop through editable records
-    
+    // Record edits not allowed after complete (except admins)
+    public const TREEOPT_NOEDITS    = 11; 
+
+    // Survey uses a separate unique Public ID for completed records
+    public const TREEOPT_PUBLICID   = 47; 
+
+    // A navigation menu is generated below each page of the survey
+    public const TREEOPT_SURVNAVBOT = 37; 
+
+    // A navigation menu is generated atop each page of the survey
+    public const TREEOPT_SURVNAVTOP = 59; 
+
+    // A thin progress bar is generated atop each page of the survey
+    public const TREEOPT_SURVNAVLIN = 61; 
+
+    // Survey is one big loop through editable records
+    public const TREEOPT_ONEBIGLOOP = 5;  
+
+
     // Page Tree Options
-    public const TREEOPT_NOCACHE    = 29; // Page Tree is currently too complicated to cache
-    public const TREEOPT_PAGEFORM   = 53; // This page's enclosing form is submittable
-    public const TREEOPT_CONTACT    = 19; // This page is a Survloop standard contact form 
-    public const TREEOPT_BG         = 67; // This whole page has a background color (default: faint)
-    public const TREEOPT_FADEIN     = 71; // This whole page fades in after load
+
+    // Page Tree is currently too complicated to cache
+    public const TREEOPT_NOCACHE    = 29; 
+
+    // This page's enclosing form is submittable
+    public const TREEOPT_PAGEFORM   = 53; 
+
+    // This page is a Survloop standard contact form 
+    public const TREEOPT_CONTACT    = 19; 
+
+    // This whole page has a background color (default: faint)
+    public const TREEOPT_BG         = 67; 
+
+    // This whole page fades in after load
+    public const TREEOPT_FADEIN     = 71; 
 
 }

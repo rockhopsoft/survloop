@@ -1,7 +1,7 @@
 
 # RockHopSoft/Survloop
 
-[![Laravel](https://img.shields.io/badge/Laravel-8.2-orange.svg?style=flat-square)](http://laravel.com)
+[![Laravel](https://img.shields.io/badge/Laravel-8.5-orange.svg?style=flat-square)](http://laravel.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 # Table of Contents
@@ -175,6 +175,9 @@ Then initialize the database:
 $ php artisan migrate
 $ php artisan db:seed --class=SurvloopSeeder
 $ php artisan db:seed --class=ZipCodeSeeder
+$ php artisan db:seed --class=ZipCodeSeeder2
+$ php artisan db:seed --class=ZipCodeSeeder3
+$ php artisan db:seed --class=ZipCodeSeeder4
 ```
 
 ### Initialize Survloop Installation
@@ -195,13 +198,13 @@ http://survloop.local/dashboard/settings?refresh=2
 
 The Excel tools use maatwebsite/excel, and you might need this on Ubuntu:
 ```
-$ sudo apt-get install php7.3-zip
+$ sudo apt-get install php7.4-zip
 ```
 ...or this on Mac:
 ```
 $ brew update
-$ brew install php@7.3
-$ brew link php@7.3 --force
+$ brew install php@7.4
+$ brew link php@7.4 --force
 ```
 
 

@@ -315,7 +315,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
     
     public function getSetFlds(Request $request, $rSet = '')
     {
-        $this->survLoopInit($request);
+        $this->survloopInit($request);
         if (trim($rSet) == '') {
             $rSet = $GLOBALS["SL"]->coreTbl;
         }

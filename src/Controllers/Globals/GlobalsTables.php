@@ -213,8 +213,8 @@ class GlobalsTables extends GlobalsElements
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) {
             return false;
         }
-        $modelFilename = str_replace('App\\Models\\', '../app/Models/', $path)
-            . '.php';
+        $tblClean = str_replace('App\\Models\\', '', $path);
+        $modelFilename = '../app/Models/' . $tblClean . '.php';
         if ($this->isAdmin 
             && (!file_exists($modelFilename) || $forceFile)) {
             // copied from AdminDatabaseInstall...
@@ -240,7 +240,7 @@ class GlobalsTables extends GlobalsElements
                     "modelFile" => $modelFile, 
                     "tbl"       => $tbl,
                     "tblName"   => $tblName,
-                    "tblClean"  => str_replace('_', '', $tblName)
+                    "tblClean"  => $tblClean
                 ]
             );
             //if (is_writable($modelFilename)) {
