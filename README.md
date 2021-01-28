@@ -45,23 +45,23 @@ content-management system for data-focused websites.
 
 The upcoming Open Police web app is the best live install 
 of the engine, and feedback on that project and the Survloop 
-user experience can be via the end of the submission process:<br />
+user experience can be via the end of the submission process:
 <a href="https://openpolice.org/filing-your-police-complaint" target="_blank"
->https://openpolice.org/filing-your-police-complaint</a><br />
+>https://openpolice.org/filing-your-police-complaint</a>
 The resulting database designed using the engine, as well as 
 the branching tree which specifies the user's experience: 
-<a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a><br />
-<a href="https://openpolice.org/tree/complaint" target="_blank">/tree/complaint</a><br />
+<a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a>
+<a href="https://openpolice.org/tree/complaint" target="_blank">/tree/complaint</a>
 Among other methods, the resulting data can also be provided as 
-XML included an automatically generated schema, eg.<br />
-<a href="https://openpolice.org/complaint-xml-schema" target="_blank">/complaint-xml-schema</a><br />
-<a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a><br />
+XML included an automatically generated schema, eg.
+<a href="https://openpolice.org/complaint-xml-schema" target="_blank">/complaint-xml-schema</a>
+<a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a>
 <a href="https://openpolice.org/complaint-xml-all" target="_blank">/complaint-xml-all</a>
 
-Other projects running Survloop:<br />
+Other projects running Survloop:
 <a href="https://powerscore.resourceinnovation.org/go-pro" target="_blank">Cannabis PowerScore</a> (<a href="https://github.com/resourceinnovation/cannabisscore" target="_blank">GitHub</a>).
 
-The installation used for Survloop.org is currently the best example of a bare-bones extension of Survloop:<br />
+The installation used for Survloop.org is currently the best example of a bare-bones extension of Survloop:
 <a href="https://github.com/rockhopsoft/survlooporg" target="_blank">github.com/rockhopsoft/survlooporg</a>
 
 
@@ -175,16 +175,13 @@ $ php artisan db:seed --class=ZipCodeSeeder4
 
 ### Initialize Survloop Installation
 
-Then browsing to the home page should prompt you to create the first admin user account:
-
+Then browsing to the home page should prompt you to create the first admin user account:<br />
 http://survloop.local
 
-If everything looks janky, then manually load the style sheets, etc:
-
+If everything looks janky, then manually load the style sheets, etc:<br />
 http://survloop.local/css-reload
 
-After logging in as an admin, this link rebuilds many supporting files:
-
+After logging in as an admin, this link rebuilds many supporting files:<br />
 http://survloop.local/dashboard/settings?refresh=2
 
 ### Other Package Installation
@@ -215,14 +212,10 @@ $ brew install ghostscript
 
 ## About Survloop's Codebase and Database Design
 
-Better documentation is juuust beginning to be created...
-
+Better documentation is juuust beginning to be created...<br />
 <a href="https://survloop.org/package-files-folders-classes" target="_blank">survloop.org/package-files-folders-classes</a>
 
-Once installed, documentation of this system's database design can be found at http://localhost/dashboard/db/all. This system's 
-survey design can be found at http://localhost/dashboard/surv-1/map?all=1&alt=1
-or publicly visible links like those above.
-
+Once installed, documentation of this system's database design can be found at http://localhost/dashboard/db/all. This system's survey design can be found at http://localhost/dashboard/surv-1/map?all=1&alt=1 or publicly visible links like those above.<br />
 <a href="https://survloop.org/db/SL" target="_blank">survloop.org/db/SL</a>
 
 
@@ -241,25 +234,16 @@ Here's the TODO list for the next release (**1.0**). It's my first time building
 * [ ] Multi-lingual support at every level.
 * [ ] Convert more Survloop (older) code to take advantage of more Laravel built-in icapabilities.
 
-# <a name="change-logs"></a>Change Logs
-
 
 # <a name="contribution-guidelines"></a>Contribution Guidelines
 
-Please help educate me on best practices for sharing code in this community.
-Please report any issue you find in the issues page.
+Please help educate me on best practices for sharing code in this community. Please report any issue you find in the issues page.
 
 # <a name="security-help"></a>Reporting a Security Vulnerability
 
-We want to ensure that Survloop is a secure HTTP open data platform for everyone. 
-If you've discovered a security vulnerability in the Survloop software or Survloop.org, 
-we appreciate your help in disclosing it to us in a responsible manner.
+We want to ensure that Survloop is a secure HTTP open data platform for everyone. If you've discovered a security vulnerability in the Survloop software or Survloop.org, we appreciate your help in disclosing it to us in a responsible manner.
 
-Publicly disclosing a vulnerability can put the entire community at risk. 
-If you've discovered a security concern, please email us at rockhoppers *at* runbox.com. 
-We'll work with you to make sure that we understand the scope of the issue, and that we fully address your concern. 
-We consider correspondence sent to rockhoppers *at* runbox.com our highest priority, 
-and work to address any issues that arise as quickly as possible.
+Publicly disclosing a vulnerability can put the entire community at risk. If you've discovered a security concern, please email us at rockhoppers *at* runbox.com. We'll work with you to make sure that we understand the scope of the issue, and that we fully address your concern. We consider correspondence sent to rockhoppers *at* runbox.com our highest priority, and work to address any issues that arise as quickly as possible.
 
 After a security vulnerability has been corrected, a release will be deployed as soon as possible.
 
