@@ -1,10 +1,10 @@
 <?php 
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-gen-migration.blade.php
 
-use DB; // \Illuminate\Support\Facades\DB
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class CreateSurvloopTables extends Migration
 {
@@ -210,8 +210,8 @@ class CreateSurvloopTables extends Migration
 		{
 			$table->increments('cond_node_id');
 			$table->integer('cond_node_cond_id')->unsigned()->nullable();
-			$table->integer('cond_node_node_id')->unsigned()->nullable();
-			$table->integer('cond_node_loop_id')->unsigned()->nullable();
+			$table->integer('cond_node_node_id')->nullable();
+			$table->integer('cond_node_loop_id')->nullable();
 			$table->timestamps();
 			$table->index('cond_node_cond_id');
 		});
