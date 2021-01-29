@@ -331,7 +331,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
      *
      * @param  TreeNodeSurv $curr
      * @param  string $var
-     * @return string
+     * @return array
      */
     protected function customNodePrintVertProgress(&$curr = null, $val = null)
     {

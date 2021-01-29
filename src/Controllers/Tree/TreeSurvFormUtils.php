@@ -215,7 +215,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
         return '';
     }
     
-    protected function customResponses($nID, &$curr)
+    protected function customResponses(&$curr)
     {
         return $curr;
     }

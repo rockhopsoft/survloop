@@ -21,6 +21,14 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeSurvInputElements;
 
 class TreeSurvInput extends TreeSurvInputElements
 {
+    /**
+     * Default behavior for submitting survey forms,
+     * delegateing specifc saving procedures for tree nodes.
+     *
+     * @param  int $nID
+     * @param  array $tmpSubTier
+     * @return boolean
+     */
     protected function postNodePublic($nID = -3, $tmpSubTier = [])
     {
         $ret = '';

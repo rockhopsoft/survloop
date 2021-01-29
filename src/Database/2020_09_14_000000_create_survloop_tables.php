@@ -4,7 +4,6 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 class CreateSurvloopTables extends Migration
 {
@@ -15,7 +14,6 @@ class CreateSurvloopTables extends Migration
      */
     public function up()
     {
-    	DB::statement('SET SESSION sql_require_primary_key=0');
     	Schema::create('sl_databases', function(Blueprint $table)
 		{
 			$table->increments('db_id');
