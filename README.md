@@ -83,7 +83,7 @@ The installation used for Survloop.org is currently the best example of a bare-b
 
 ```
 
-Edit the environment file to connect the default MYSQL database:
+Edit these lines of the environment file to connect the default MYSQL database:
 ```
 % nano .env
 ```
@@ -146,7 +146,9 @@ If installing on a server, you might also need to fix some permissions before th
 
 Clear caches and publish the package migrations...
 ```
-% php artisan optimize:clear
+% php artisan config:cache
+% php artisan route:cache
+% php artisan view:cache
 % echo "0" | php artisan vendor:publish --force
 % composer dump-autoload
 % curl http://survproject.local/css-reload
