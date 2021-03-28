@@ -19,7 +19,7 @@ use RockHopSoft\Survloop\Controllers\SystemDefinitions;
 
 class SurvloopInstaller extends Controller
 {
-    
+
     public function checkSysInit()
     {
         $chkSysDef = new SystemDefinitions;
@@ -56,7 +56,7 @@ class SurvloopInstaller extends Controller
         }
         return true;
     }
-    
+
     public function chkPagePerm($keyOptType, $perm = 0)
     {
         $adm = Globals::TREEOPT_ADMIN;
@@ -72,36 +72,36 @@ class SurvloopInstaller extends Controller
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
-                if (isset($tree->tree_opts) 
+                if (isset($tree->tree_opts)
                     && $tree->tree_opts%$keyOptType == 0) {
                     if ($perm <= 1) {
                         return true;
                     }
                     if ($perm == $adm) {
-                        if ($tree->tree_opts%$adm == 0 
-                            && $tree->tree_opts%$stf > 0 
-                            && $tree->tree_opts%$prt > 0 
+                        if ($tree->tree_opts%$adm == 0
+                            && $tree->tree_opts%$stf > 0
+                            && $tree->tree_opts%$prt > 0
                             && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $stf) {
-                        if ($tree->tree_opts%$adm > 0 
-                            && $tree->tree_opts%$stf == 0 
-                            && $tree->tree_opts%$prt > 0 
+                        if ($tree->tree_opts%$adm > 0
+                            && $tree->tree_opts%$stf == 0
+                            && $tree->tree_opts%$prt > 0
                             && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $prt) {
-                        if ($tree->tree_opts%$adm > 0 
-                            && $tree->tree_opts%$stf > 0 
-                            && $tree->tree_opts%$prt == 0 
+                        if ($tree->tree_opts%$adm > 0
+                            && $tree->tree_opts%$stf > 0
+                            && $tree->tree_opts%$prt == 0
                             && $tree->tree_opts%$vol > 0) {
                             return true;
                         }
                     } elseif ($perm == $vol) {
-                        if ($tree->tree_opts%$adm > 0 
-                            && $tree->tree_opts%$stf > 0 
-                            && $tree->tree_opts%$prt > 0 
+                        if ($tree->tree_opts%$adm > 0
+                            && $tree->tree_opts%$stf > 0
+                            && $tree->tree_opts%$prt > 0
                             && $tree->tree_opts%$vol == 0) {
                             return true;
                         }
@@ -111,7 +111,7 @@ class SurvloopInstaller extends Controller
         }
         return false;
     }
-    
+
     public function installPageSimpl($name = 'Home', $opts = 1, $slug = '')
     {
         if (trim($slug) == '') {
@@ -154,7 +154,7 @@ class SurvloopInstaller extends Controller
         $n->save();
         return $newTree;
     }
-    
+
     public function installPageMyProfile()
     {
         if ($opts > 1) {
@@ -230,7 +230,7 @@ class SurvloopInstaller extends Controller
         $n->save();
         return $newTree;
     }
-    
+
     public function installPageContact()
     {
         $newTree = new SLTree;
@@ -241,7 +241,7 @@ class SurvloopInstaller extends Controller
         $newTree->tree_user     = 1;
         $newTree->tree_opts     = 19; // %19 indicates contact form
         $newTree->save();
-        
+
         $nodePage = new SLNode;
         $nodePage->node_tree         = $newTree->tree_id;
         $nodePage->node_parent_id    = -3;
@@ -251,7 +251,7 @@ class SurvloopInstaller extends Controller
         $nodePage->save();
         $newTree->tree_root          = $nodePage->node_id;
         $newTree->save();
-        
+
         $n = new SLNode;
         $n->node_tree         = $newTree->tree_id;
         $n->node_parent_id    = $nodePage->node_id;
@@ -300,7 +300,7 @@ class SurvloopInstaller extends Controller
         $n->node_default      = 'Send Your Message';
         $n->node_data_store   = 'document.postNode.submit();';
         $n->save();
-        
+
         $def = new SLDefinitions;
         $def->def_database = 1;
         $def->def_set      = 'Value Ranges';
@@ -322,8 +322,8 @@ class SurvloopInstaller extends Controller
         $def->def_order    = 2;
         $def->def_value    = 'Networking Opportunities';
         $def->save();
-        
+
         return $newTree;
     }
-    
+
 }

@@ -4,7 +4,7 @@
     <span class="mR10">{{ $GLOBALS["SL"]->sec2minSec($core["dur"]) }}</span>
     @if ($core["cmpl"]) Complete @else Incomplete @endif #{{ $core["core"] }}
 </h3>
-<div class="pL10 mB5 slGrey">{{ date("m/d/y, g:ia", $core["date"]) }}</div>
+<div class="pL10 mB5 slGrey">{{ $GLOBALS["SL"]->printTimeZoneShiftStamp($core["date"]) }}</div>
 @if (isset($core["log"]) && is_array($core["log"]) && sizeof($core["log"]) > 0)
     @foreach ($core["log"] as $k => $log)
         <div class="pL10 mT5">

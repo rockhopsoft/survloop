@@ -46,56 +46,23 @@ class CustomResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         $GLOBALS["SL"] = new Globals(new Request, 1, 1, 1);
-        $GLOBALS["SL"]->x["subj"] = 'Reset your '
-            . $GLOBALS["SL"]->sysOpts["site-name"] 
-            . ' password';
-        /* $content = view(
-            'vendor.survloop.emails.password', 
+        $subj = 'Reset your ' . $GLOBALS["SL"]->sysOpts["site-name"] . ' password';
+        $content = view(
+            'vendor.survloop.emails.password',
             [
                 'token'     => $this->token,
                 'cssColors' => $GLOBALS["SL"]->getCssColorsEmail()
             ]
-        )->render(); */
-        $GLOBALS["SL"]->x["emaTo"] = [
+        )->render();
+        $emaTo = [
             [ $notifiable->email, $notifiable->email ]
         ];
-        if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<br /><br /><br /><div class="container"><h2>' 
-                . $GLOBALS["SL"]->x["subj"] . '</h2><hr><hr></div><pre>' 
-                . /* $content . */ '</pre><hr><br />';
-            return true;
-        }
-        Mail::send(
-            'vendor.survloop.emails.password', 
-            [
-                'token'     => $this->token,
-                'cssColors' => $GLOBALS["SL"]->getCssColorsEmail()
-            ],
-            function ($m) { 
-                $m->subject($GLOBALS["SL"]->x["subj"])
-                    ->to($GLOBALS["SL"]->x["emaTo"][0][0]);
-            }
-        );
-        session()->put(
-            'status',
-            'Please check your email for a password reset link.'
-        );
+        $surv = new SurvloopController;
+        $surv->sendEmail($content, $subj, $emaTo);
         echo '<script type="text/javascript"> '
             . 'setTimeout("window.location=\'/password/email-sent\'", 10); '
             . '</script>';
         exit;
-        /*
-        return (new MailMessage)
-            ->to($this->emaTo[0][0])
-            ->subject($subj)
-            ->view(
-                'vendor.survloop.emails.password', 
-                [
-                    'token'     => $this->token,
-                    'cssColors' => $GLOBALS["SL"]->getCssColorsEmail()
-                ]
-            );
-        */
     }
 
     /**

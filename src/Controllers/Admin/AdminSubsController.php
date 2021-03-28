@@ -1,6 +1,6 @@
 <?php
 /**
-  * AdminSubsController is the admin class responsible for 
+  * AdminSubsController is the admin class responsible for
   * displaying survey submissions in a generalized way.
   *
   * Survloop - All Our Data Are Belong

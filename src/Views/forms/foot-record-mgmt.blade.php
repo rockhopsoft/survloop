@@ -5,20 +5,18 @@
             class="hidivBtn btn btn-secondary btn-sm">
             <div class="pT5 pB5">
                 <i class="fa fa-cogs" aria-hidden="true"></i>
-                @if (trim($recDesc) != '')
-                    {!! $recDesc !!}
-                @else 
-                    {{ $GLOBALS["SL"]->treeRow->tree_name }}
+                @if (trim($recDesc) != '') {!! $recDesc !!}
+                @else {{ $GLOBALS["SL"]->treeRow->tree_name }}
                 @endif
                 #{{ $coreID }}
             </div>
         </a>
-        <div id="hidivSessMgmtID" class="disNon pT10">
+        <div id="hidivSessMgmtID" class="disNon pT30">
             @if (!isset($isUser) || !$isUser)
                 <a class="mR10 saveAndRedir" data-redir-url="/register" 
                     href="javascript:;">Save and Continue Later</a>
             @endif
-            <a id="hidivBtnRecMgmtDel" class="hidivBtn txtDanger" 
+            <a id="hidivBtnRecMgmtDel" class="hidivBtn slRedDark" 
                 href="javascript:;">Delete</a>
             <div id="hidivRecMgmtDel" class="disNon mT5 w100">
                 <div class="alert alert-danger w100">

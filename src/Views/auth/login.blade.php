@@ -1,7 +1,4 @@
-<?php
-$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
-$css = $sysDefs->loadCss();
-?>@extends('vendor.survloop.master')
+@extends('vendor.survloop.master')
 @section('content')
 <div id="ajaxWrap">
 <!-- resources/views/auth/login.blade.php -->
@@ -12,8 +9,10 @@ $css = $sysDefs->loadCss();
 <input type="hidden" name="previous" 
     @if (isset($midSurvRedir) && trim($midSurvRedir) != '') 
         value="{{ $midSurvRedir }}"
-    @elseif ($GLOBALS['SL']->REQ->has('redir')) value="{{ $GLOBALS['SL']->REQ->get('redir') }}"
-    @elseif ($GLOBALS['SL']->REQ->has('previous')) value="{{ $GLOBALS['SL']->REQ->get('previous') }}"
+    @elseif ($GLOBALS['SL']->REQ->has('redir')) 
+        value="{{ $GLOBALS['SL']->REQ->get('redir') }}"
+    @elseif ($GLOBALS['SL']->REQ->has('previous')) 
+        value="{{ $GLOBALS['SL']->REQ->get('previous') }}"
     @else value="{{ URL::previous() }}"
     @endif >
 
@@ -27,7 +26,7 @@ $css = $sysDefs->loadCss();
                 >Sign Up</a>
             <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
             <div class="nPrompt">
-                <h1 class="mT0">Login</h1>
+                <h2 class="mT0 mB20">Login</h2>
                 @if (isset($sysOpts["midsurv-instruct"]) 
                     && trim($sysOpts["midsurv-instruct"]) != '')
                     {!! $sysOpts["midsurv-instruct"] !!}
@@ -38,14 +37,14 @@ $css = $sysDefs->loadCss();
             </div>
 
             @if (isset($errorMsg) && trim($errorMsg) != '')
-                <div class="alert alert-danger" role="alert">{!! 
+                <div class="alert alert-danger mT15" role="alert">{!! 
                     $errorMsg 
                 !!}</div>
             @endif
             @if (isset($GLOBALS['SL']->REQ) 
                 && $GLOBALS['SL']->REQ->has('error') 
                 && trim($GLOBALS['SL']->REQ->get('error')) != '')
-                <div class="alert alert-danger" role="alert">{!! 
+                <div class="alert alert-danger mT15" role="alert">{!! 
                     $GLOBALS['SL']->REQ->get('error') 
                 !!}</div>
             @endif
@@ -54,7 +53,12 @@ $css = $sysDefs->loadCss();
                 <div class="nodeHalfGap"></div>
                 <div id="nLabel004" class="nPrompt">
                     <label for="emailID">
-                        Username or Email 
+                    @if (isset($GLOBALS["SL"]->sysOpts["has-usernames"])
+                        && intVal($GLOBALS["SL"]->sysOpts["has-usernames"]) == 1)
+                        Username or Email
+                    @else
+                        Email 
+                    @endif
                         <span class="red">*required</span>
                     </label>
                 </div>
@@ -62,7 +66,7 @@ $css = $sysDefs->loadCss();
                     <input id="emailID" name="email" type="text"
                         value="{{ old('email') }}" class="form-control">
                     @if ($errors->has('email'))
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger mT15" role="alert">
                             {{ $errors->first('email') }}
                         </div>
                     @endif
@@ -82,7 +86,7 @@ $css = $sysDefs->loadCss();
                     <input id="password" name="password" value="" 
                         type="password" class="form-control">
                     @if ($errors->has('password'))
-                        <div class="alert alert-danger" role="alert">
+                        <div class="alert alert-danger mT15" role="alert">
                             {{ $errors->first('password') }}
                         </div>
                     @endif
@@ -96,7 +100,7 @@ $css = $sysDefs->loadCss();
                         type="checkbox" > Remember Me
                 </label>
             </div>
-            <a href="/password/reset" class="fR"
+            <a href="/forgot-password" class="fR"
                 >Forgot your username or password?</a>
             <div class="fC pB20"></div>
 

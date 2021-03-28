@@ -1,6 +1,6 @@
 <?php
 /**
-  * SurvDataCheckbox is a mid-level class with loads SurvData's 
+  * SurvDataCheckbox is a mid-level class with loads SurvData's
   & functions related to Checkboxes processing.
   *
   * Survloop - All Our Data Are Belong
@@ -16,6 +16,6 @@ use RockHopSoft\Survloop\Controllers\Tree\SurvDataUtils;
 
 class SurvDataCheckbox extends SurvDataUtils
 {
-    
+
 
 }

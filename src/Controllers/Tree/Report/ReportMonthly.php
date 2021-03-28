@@ -189,7 +189,7 @@ class ReportMonthlyColumns
             return '<!-- no monthly data to print into tables -->';
         }
         return view(
-            'vendor.survloop.reports.inc-tbl-monthly', 
+            'vendor.survloop.reports.inc-tbl-monthly',
             [
                 "monthlyData" => $monthlyData,
                 "cols"        => $this->cols,

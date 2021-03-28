@@ -1,6 +1,6 @@
 <?php
 /**
-  * SurvStatsCore provides simpler foundations for SurvStats to collect data set calculations, 
+  * SurvStatsCore provides simpler foundations for SurvStats to collect data set calculations,
   * and SurvTrends for line graphs with fewer filtering needs.
   *
   * Survloop - All Our Data Are Belong
@@ -15,7 +15,7 @@ class SurvStatsCore
     // for variables to be passed to views
     public $v       = [];
     public $isExcel = false;
-    
+
     public $datMap  = [];
     public $dat     = [];
     public $raw     = [];
@@ -24,7 +24,22 @@ class SurvStatsCore
         "datLabPrfx" => '',
         "datLabOvr"  => ''
     ];
-    
+
+    public $clrFade1 = '';
+    public $clrFade2 = '';
+
+
+    public function __construct()
+    {
+        $this->loadFadeColors();
+    }
+
+    protected function loadFadeColors()
+    {
+        $this->clrFade1 = $GLOBALS["SL"]->getCssColor('color-main-on');
+        $this->clrFade2 = $GLOBALS["SL"]->getCssColor('color-main-bg');
+    }
+
     public function addDataType($abbr = '', $label = '', $unit = '', $rowLabels = [])
     {
         $let = chr(97+(sizeof($this->datMap)));
@@ -36,7 +51,7 @@ class SurvStatsCore
         ];
         return true;
     }
-    
+
     public function addNewDataCalc($datAbbr, $datAbbr2, $oper = '*')
     {
         $datAbbr3 = $datAbbr . $oper . $datAbbr2;
@@ -62,19 +77,23 @@ class SurvStatsCore
         foreach ($this->dat as $filtStr => $row) {
             foreach (['sum', 'avg'] as $typ) {
                 if ($oper == '*') {
-                    $this->dat[$filtStr]["dat"][$dLet3][$typ] = $row["dat"][$dLet1][$typ]*$row["dat"][$dLet2][$typ];
+                    $this->dat[$filtStr]["dat"][$dLet3][$typ]
+                        = $row["dat"][$dLet1][$typ]*$row["dat"][$dLet2][$typ];
                 } elseif ($oper == '+') {
-                    $this->dat[$filtStr]["dat"][$dLet3][$typ] = $row["dat"][$dLet1][$typ]+$row["dat"][$dLet2][$typ];
+                    $this->dat[$filtStr]["dat"][$dLet3][$typ]
+                        = $row["dat"][$dLet1][$typ]+$row["dat"][$dLet2][$typ];
                 } elseif ($oper == '-') {
-                    $this->dat[$filtStr]["dat"][$dLet3][$typ] = $row["dat"][$dLet1][$typ]-$row["dat"][$dLet2][$typ];
+                    $this->dat[$filtStr]["dat"][$dLet3][$typ]
+                        = $row["dat"][$dLet1][$typ]-$row["dat"][$dLet2][$typ];
                 } elseif ($oper == '/' && $row["dat"][$dLet2][$typ] > 0) {
-                    $this->dat[$filtStr]["dat"][$dLet3][$typ] = $row["dat"][$dLet1][$typ]/$row["dat"][$dLet2][$typ];
+                    $this->dat[$filtStr]["dat"][$dLet3][$typ]
+                        = $row["dat"][$dLet1][$typ]/$row["dat"][$dLet2][$typ];
                 }
             }
         }
         return $datAbbr3;
     }
-    
+
     public function dAbr($abbr = '')
     {
         if (sizeof($this->datMap) > 0 && $abbr != '') {
@@ -86,7 +105,7 @@ class SurvStatsCore
         }
         return '';
     }
-    
+
     protected function addNewMapRowsData($datNewAbbr)
     {
         $datNewLet = $this->dAbr($datNewAbbr);
@@ -99,7 +118,7 @@ class SurvStatsCore
         }
         return true;
     }
-    
+
     // raw data array, filters on each raw data point, data sum, data average, unique record count
     protected function loadMapRow()
     {
@@ -119,7 +138,7 @@ class SurvStatsCore
         }
         return $ret;
     }
-    
+
     protected function loadMapTagRow()
     {
         return [
@@ -129,5 +148,5 @@ class SurvStatsCore
             "max" => [ "raw" => 0, "row" => [] ]
         ];
     }
-    
+
 }

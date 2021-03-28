@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvInput is a mid-level class using a standard branching tree, mostly for 
+  * TreeSurvInput is a mid-level class using a standard branching tree, mostly for
   * processing the input Survloop's surveys and pages.
   *
   * Survloop - All Our Data Are Belong
@@ -46,7 +46,7 @@ class TreeSurvInput extends TreeSurvInputElements
         $curr->nIDtxt     = $nIDtxt = trim($nID . $nSffx);
         $curr->tmpSubTier = $tmpSubTier;
         $curr->getTblFld();
-        
+
         $this->openPostNodePublic($curr);
         if ($curr->isLayout()) {
             return $this->postNodePublicLayoutKids($curr);
@@ -60,7 +60,7 @@ class TreeSurvInput extends TreeSurvInputElements
         if ($curr->isLoopSort()) { // actual storage happens with with each change /loopSort/
             return $this->postNodePublicLoopSort($curr);
         }
-        if ($this->allNodes[$nID]->isPage() 
+        if ($this->allNodes[$nID]->isPage()
             || $this->allNodes[$nID]->isLoopRoot()) {
             $this->checkLoopRootInput($nID);
         }
@@ -72,13 +72,13 @@ class TreeSurvInput extends TreeSurvInputElements
         } elseif ($curr->isSpreadTbl()) {
             $ret .= $this->postNodePublicSpreadTbl($curr);
         } elseif (!$curr->isDataPrint()) {
-            if (!$this->postNodePublicCustom($curr)) { 
+            if (!$this->postNodePublicCustom($curr)) {
                 // then run standard post, move all this code in here:
                 $this->postNodePublicStandards($curr);
             }
             if (sizeof($tmpSubTier[1]) > 0) {
                 foreach ($tmpSubTier[1] as $childNode) {
-                    if (!$this->allNodes[$childNode[0]]->isPage() 
+                    if (!$this->allNodes[$childNode[0]]->isPage()
                         && $this->allNodes[$childNode[0]]->nodeType != 'Layout Sub-Response') {
                         $ret .= $this->postNodePublic($childNode[0], $childNode);
                     }
@@ -109,7 +109,7 @@ class TreeSurvInput extends TreeSurvInputElements
     protected function postNodePublicInit($curr)
     {
         $curr->hasParManip = $this->hasParentDataManip($curr->nID);
-        $curr->currVisib = ($GLOBALS["SL"]->REQ->has('n' . $curr->nIDtxt . 'Visible') 
+        $curr->currVisib = ($GLOBALS["SL"]->REQ->has('n' . $curr->nIDtxt . 'Visible')
             && intVal($GLOBALS["SL"]->REQ->{ 'n' . $curr->nIDtxt . 'Visible' }) == 1);
         if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])) {
             $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->update([
@@ -118,24 +118,24 @@ class TreeSurvInput extends TreeSurvInputElements
         }
         return true;
     }
-    
+
     protected function openPostNodePublic(&$curr = [])
     {
         return true;
     }
-    
+
     protected function closePostNodePublic(&$curr = [])
     {
         return true;
     }
-    
+
     protected function postNodePublicStandards(&$curr)
     {
         $ret = '';
         if ($GLOBALS["SL"]->REQ->has('loop')
             && trim($GLOBALS["SL"]->REQ->has('loop')) != '') {
             $this->settingTheLoop(
-                trim($GLOBALS["SL"]->REQ->input('loop')), 
+                trim($GLOBALS["SL"]->REQ->input('loop')),
                 intVal($GLOBALS["SL"]->REQ->loopItem)
             );
         }
@@ -150,7 +150,7 @@ class TreeSurvInput extends TreeSurvInputElements
             }
         } elseif ($curr->isDataManip()) {
             $param = 'dataManip' . $curr->nID;
-            if ($GLOBALS["SL"]->REQ->has($param) 
+            if ($GLOBALS["SL"]->REQ->has($param)
                 && intVal($GLOBALS["SL"]->REQ->input($param)) == 1) {
                 if ($curr->currVisib) {
                     $this->runDataManip($curr->nID);
@@ -169,7 +169,7 @@ class TreeSurvInput extends TreeSurvInputElements
         $ret = '';
         list($curr->itemInd, $curr->itemID) = $this->sessData->currSessDataPos($curr->tbl);
         $this->v["fldForeignTbl"] = $GLOBALS["SL"]->fldForeignKeyTbl(
-            $curr->tbl, 
+            $curr->tbl,
             $curr->fld
         );
         if (!$curr->isInstruct() && $curr->tbl != '' && $curr->fld != '') {
@@ -193,7 +193,7 @@ class TreeSurvInput extends TreeSurvInputElements
     protected function postNodePublicCheckbox(&$curr, &$newVal)
     {
         $newVal = $this->postNodeTweakNewVal($curr, $newVal);
-        if (sizeof($curr->responses) == 1) { 
+        if (sizeof($curr->responses) == 1) {
             // && !$GLOBALS["SL"]->isFldCheckboxHelper($fld)
             if (is_array($newVal) && sizeof($newVal) == 1) {
                 $this->sessData->currSessData($curr, 'update', $newVal[0]);
@@ -216,17 +216,17 @@ class TreeSurvInput extends TreeSurvInputElements
     {
         $ret = '';
         // Check for Layout Sub-Response between each Checkbox Response
-        if ($curr->nodeType == 'Checkbox' 
-            && sizeof($curr->tmpSubTier[1]) > 0 
+        if ($curr->nodeType == 'Checkbox'
+            && sizeof($curr->tmpSubTier[1]) > 0
             && sizeof($newVal) > 0) {
             foreach ($newVal as $r => $val) {
                 foreach ($curr->tmpSubTier[1] as $child) {
-                    if ($this->allNodes[$child[0]]->nodeType == 'Layout Sub-Response' 
+                    if ($this->allNodes[$child[0]]->nodeType == 'Layout Sub-Response'
                         && sizeof($child[1]) > 0) {
                         foreach ($curr->responses as $j => $res) {
                             if ($res->node_res_value == $val) {
                                 $subRowIDs = $this->sessData->getRowIDsByFldVal(
-                                    $curr->tbl, 
+                                    $curr->tbl,
                                     [ $curr->fld => $res->node_res_value ]
                                 );
                                 if (sizeof($subRowIDs) > 0) {
@@ -251,16 +251,16 @@ class TreeSurvInput extends TreeSurvInputElements
 
     protected function postNodePublicUpdateKidMap($curr, $newVal)
     {
-        if (in_array($curr->nodeType, ['Checkbox', 'Radio']) 
-            && $curr->hasShowKids 
-            && isset($this->kidMaps[$curr->nID]) 
+        if (in_array($curr->nodeType, ['Checkbox', 'Radio'])
+            && $curr->hasShowKids
+            && isset($this->kidMaps[$curr->nID])
             && sizeof($this->kidMaps[$curr->nID]) > 0) {
             foreach ($this->kidMaps[$curr->nID] as $nKid => $ress) {
                 $found = false;
                 if (sizeof($ress) > 0) {
                     foreach ($ress as $cnt => $res) {
                         $this->kidMaps[$curr->nID][$nKid][$cnt][2] = false;
-                        if ($curr->nodeType == 'Checkbox' 
+                        if ($curr->nodeType == 'Checkbox'
                             || $curr->isDropdownTagger()) {
                             if (in_array($res[1], $newVal)) {
                                 $this->kidMaps[$curr->nID][$nKid][$cnt][2] = true;
@@ -280,7 +280,7 @@ class TreeSurvInput extends TreeSurvInputElements
     protected function postNodePublicFldOther(&$curr)
     {
         $curr->chkFldOther();
-        if ((in_array($curr->nodeType, ['Checkbox', 'Radio']) 
+        if ((in_array($curr->nodeType, ['Checkbox', 'Radio'])
                 && sizeof($curr->fldHasOther) > 0)
             || in_array($curr->nodeType, ['Gender', 'Gender Not Sure'])) {
             foreach ($curr->responses as $j => $res) {
@@ -292,11 +292,11 @@ class TreeSurvInput extends TreeSurvInputElements
                     }
                     $fldVals = [ $curr->fld => $res->node_res_value ];
                     $s = sizeof($this->sessData->dataBranches);
-                    if ($s > 0 
+                    if ($s > 0
                         && intVal($this->sessData->dataBranches[$s-1]["itemID"]) > 0) {
                         $tbl2 = $this->sessData->dataBranches[$s-1]["branch"];
                         $branchLnkFld = $GLOBALS["SL"]->getFornNameFldName(
-                            $curr->tbl, 
+                            $curr->tbl,
                             $tbl2
                         );
                         if ($branchLnkFld != '') {
@@ -308,8 +308,8 @@ class TreeSurvInput extends TreeSurvInputElements
                     $branchRowID = ((sizeof($subRowIDs) > 0) ? $subRowIDs[0] : -3);
                     if ($branchRowID > 0) {
                         $GLOBALS["SL"]->currCyc["res"] = [
-                            $curr->tbl, 
-                            'res' . $j, 
+                            $curr->tbl,
+                            'res' . $j,
                             $res->node_res_value
                         ];
                         $this->sessData->startTmpDataBranch($curr->tbl, $branchRowID);
@@ -333,7 +333,7 @@ class TreeSurvInput extends TreeSurvInputElements
     protected function processSpecialPageForms($curr)
     {
         $ret = '';
-        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page' 
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Page'
             && $this->allNodes[$curr->nID]->nodeType == 'Page') {
             if ($GLOBALS["SL"]->treeRow->tree_opts%19 == 0) {
                 $ret .= $this->processContactForm($curr->nID, $curr->tmpSubTier);
@@ -342,7 +342,7 @@ class TreeSurvInput extends TreeSurvInputElements
         return $ret;
     }
 
-    
+
     protected function processPageForm($nID = -3, $tmpSubTier = [], $slTable = '', $dumpFld = '')
     {
         if (trim($slTable) == '') {
@@ -356,14 +356,14 @@ class TreeSurvInput extends TreeSurvInputElements
         $this->pageCoreRow->save();
         return '';
     }
-    
+
     protected function processPageFormInner($nID = -3, $tmpSubTier = [])
     {
         $extraData = '';
         $newVal = $this->getNodeFormFldBasic($nID);
         if ($newVal && !is_array($newVal) && trim($newVal) != '') {
             $found = false;
-            if (isset($this->allNodes[$nID]->dataStore) 
+            if (isset($this->allNodes[$nID]->dataStore)
                 && trim($this->allNodes[$nID]->dataStore) != '') {
                 $storeFld = trim($this->allNodes[$nID]->dataStore);
                 if (strpos($storeFld, ':') !== false) {

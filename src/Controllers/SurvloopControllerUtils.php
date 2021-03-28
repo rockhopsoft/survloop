@@ -1,6 +1,6 @@
 <?php
 /**
-  * SurvloopControllerUtils holds helper functions for the primary base class for Survloop, 
+  * SurvloopControllerUtils holds helper functions for the primary base class for Survloop,
   * housing logging functions.
   *
   * Survloop - All Our Data Are Belong
@@ -10,10 +10,14 @@
   */
 namespace RockHopSoft\Survloop\Controllers;
 
+use DB;
 use Auth;
 use Storage;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\SLNodeSavesPage;
+use App\Models\SLSess;
+use App\Models\SLSessSite;
 use App\Models\SLTree;
 use App\Models\SLUsersActivity;
 use RockHopSoft\Survloop\Controllers\Globals\GlobalsCache;
@@ -24,11 +28,11 @@ class SurvloopControllerUtils extends Controller
 {
     public $isLoaded             = true;
     protected $custReport        = [];
-    
+
     protected $dbID              = 1;
     protected $treeID            = 0;
     protected $treeFromURL       = false;
-    
+
     protected $coreID            = -3;
     protected $corePublicID      = -3;
     protected $coreIDoverride    = -3;
@@ -36,20 +40,20 @@ class SurvloopControllerUtils extends Controller
     protected $sessID            = 0;
     protected $sessInfo          = [];
     protected $sessLoops         = [];
-    
-    public $v                    = []; 
-    // contains data to be shares with views, 
+
+    public $v                    = [];
+    // contains data to be shares with views,
     // and/or across [dispersed] functions
-    
+
     protected $currPage          = '';
     protected $cacheKey          = '';
     protected $isFirstTimeOnPage = false;
     protected $survInitRun       = false;
-    
+
     protected $extraTree         = [];
     public    $searcher          = null;
 
-    
+
     /**
      * Initialize the simplest Survloop variables which track page loads.
      *
@@ -81,7 +85,7 @@ class SurvloopControllerUtils extends Controller
         }
         return true;
     }
-    
+
     /**
      * Check if the current user has staff or admin permissions.
      *
@@ -89,10 +93,7 @@ class SurvloopControllerUtils extends Controller
      */
     protected function isStaffOrAdmin()
     {
-        return (isset($this->v["uID"]) 
-            && $this->v["uID"] > 0
-            && ((isset($this->v["isAdmin"]) && $this->v["isAdmin"])
-                || (isset($this->v["isStaff"]) && $this->v["isStaff"])));
+        return (Auth::user() && Auth::user()->hasRole('administrator|staff'));
     }
 
     protected function chkHasTreeOne($dbID = 1)
@@ -100,18 +101,18 @@ class SurvloopControllerUtils extends Controller
         $sysChk = SLTree::find(1);
         return ($sysChk && isset($sysChk->tree_id));
     }
-    
+
     public function getCoreID()
     {
         return $this->coreID;
     }
-    
+
     protected function setCurrPage($currPage = '')
     {
         $this->v["currPage"][0] = $currPage;
         return true;
     }
-    
+
     public function getCurrPage()
     {
         $ret = '/';
@@ -120,9 +121,9 @@ class SurvloopControllerUtils extends Controller
         }
         return $ret;
     }
-    
+
     /**
-     * Initializing a bunch of things which are not [yet] automatically 
+     * Initializing a bunch of things which are not [yet] automatically
      * set by the Survloop and its GUIs.
      *
      * @param  Illuminate\Http\Request  $request
@@ -132,7 +133,7 @@ class SurvloopControllerUtils extends Controller
     {
         return true;
     }
-    
+
     /**
      * Load additional data related to users who are logged in.
      *
@@ -143,12 +144,12 @@ class SurvloopControllerUtils extends Controller
     {
         return true;
     }
-    
+
     protected function extraNavItems()
     {
         return '';
     }
-    
+
     protected function getHighestGroupLabel()
     {
         if (Auth::user() && Auth::user()->id > 0) {
@@ -166,15 +167,15 @@ class SurvloopControllerUtils extends Controller
         }
         return 'visitor';
     }
-    
+
     protected function genCacheKey($baseOverride = '')
     {
         $this->cacheKey = str_replace('/', '.', $this->v["currPage"][0]);
         if ($baseOverride != '') {
             $this->cacheKey = $baseOverride;
         }
-        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID 
-            . '.tree' . $GLOBALS["SL"]->treeID 
+        $this->cacheKey .= '.db' . $GLOBALS["SL"]->dbID
+            . '.tree' . $GLOBALS["SL"]->treeID
             . '.' . $this->getHighestGroupLabel();
         if ($this->v["isPrint"]) {
             $this->cacheKey .= '.print';
@@ -190,7 +191,7 @@ class SurvloopControllerUtils extends Controller
         }
         return $this->cacheKey;
     }
-    
+
     protected function checkCache($baseOverride = '')
     {
         if ($baseOverride != '') {
@@ -209,121 +210,14 @@ class SurvloopControllerUtils extends Controller
         $GLOBALS["SL"]->x["pageCacheLoaded"] = false;
         return false;
     }
-    
+
     protected function saveCache()
     {
         $cache = new GlobalsCache;
         $cache->putCache($this->cacheKey, $this->v["content"]);
         return true;
     }
-    
-    protected function logPageVisit($currPage = '', $val = '')
-    {
-        $log = new SLUsersActivity;
-        $log->user_act_user = Auth::user()->id;
-        $log->user_act_curr_page = $_SERVER["REQUEST_URI"];
-        if (strlen($log->user_act_curr_page) > 255) {
-            $log->user_act_curr_page = substr($log->user_act_curr_page, 0, 255);
-        }
-        $log->user_act_val = $val;
-        $log->save();
-        return true;
-    }
-    
-    public function logAdd($log, $content)
-    {
-        $this->checkFolder('../storage/app/log');
-        $fold = '../storage/app/';
-        $file = 'log/' . $log . '.html';
-        $uID = 0;
-        if (Auth::user() && isset(Auth::user()->id)) {
-            $uID = Auth::user()->id;
-        }
-        if (!isset($GLOBALS["SL"])) {
-            $GLOBALS["SL"] = new Globals(new Request, $this->dbID, $this->treeID);
-        }
-        $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - ' 
-            . $content . '<br /><span class="slGrey fPerc80">' 
-            . $GLOBALS["SL"]->hashIP(true) . '</span></p>';
-        if (!file_exists($fold . $file)) {
-            Storage::disk('local')->put($file, ' ');
-        }
-        Storage::disk('local')->prepend($file, $content);
-        return true;
-    }
-    
-    private function logLoad($log)
-    {
-        $file = '../storage/app/log/' . $log . '.html';
-        if ($this->isStaffOrAdmin() && file_exists($file)) {
-            return file_get_contents($file);
-        }
-        return '';
-    }
-    
-    protected function logPreview($log)
-    {
-        $ret = '';
-        $all = $this->logLoad($log);
-        if (trim($all) != '' && strpos($all, '</p>') !== false) {
-            $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
-            for ($i = 0; ($i < 100 && $i < sizeof($logs)); $i++) {
-                $ret .= $logs[$i] . '</p><div class="p10"></div>';
-            }
-        }
-        return $ret;
-    }
-    
-    protected function logPreviewCore($log, $coreID = 0, $coreTbl = '')
-    {
-        if ($coreTbl == '') {
-            $coreTbl = $GLOBALS["SL"]->coreTbl;
-        }
-        $match = $coreTbl . '#' . $coreID;
-        $ret = '';
-        $all = $this->logLoad($log);
-        if (trim($all) != '' && strpos($all, '</p>') !== false) {
-            $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
-            for ($i = 0; $i < sizeof($logs); $i++) {
-                if (strpos($logs[$i], $match) !== false) {
-                    $ret .= $logs[$i] . '</p><div class="p5"></div>';
-                }
-            }
-        }
-        return $ret;
-    }
-    
-    protected function logPreviewUser($log, $userID = 0)
-    {
-        $match = '<b>U#' . $userID . '</b>';
-        $ret = '';
-        $all = $this->logLoad($log);
-        if (trim($all) != '' && strpos($all, '</p>') !== false) {
-            $logs = $GLOBALS["SL"]->mexplode('</p>', $all);
-            for ($i = 0; $i < sizeof($logs); $i++) {
-                if (strpos($logs[$i], $match) !== false) {
-                    $ret .= $logs[$i] . '</p><div class="p5"></div>';
-                }
-            }
-        }
-        return $ret;
-    }
-    
-    protected function activityPreviewUser($userID = 0)
-    {
-        $ret = '';
-        $chk = SLUsersActivity::where('user_act_user', $userID)
-            ->orderBy('created_at', 'desc')
-            ->get();
-        if ($chk->isNotEmpty()) {
-            foreach ($chk as $log) {
-                $ret .= '<p>' . date("n/j/y, g:ia", strtotime($log->created_at)) 
-                    . ' ' . $log->user_act_curr_page . '</p>';
-            }
-        }
-        return $ret;
-    }
-    
+
     protected function generateRandomString($length = 10)
     {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -334,7 +228,7 @@ class SurvloopControllerUtils extends Controller
         }
         return $randomString;
     }
-    
+
     protected function checkFolder($fold)
     {
         $currFold = '';
@@ -361,7 +255,7 @@ class SurvloopControllerUtils extends Controller
         }
         return true;
     }
-    
+
     protected function printUserLnk($uID = -3)
     {
         if ($uID > 0) {
@@ -372,6 +266,41 @@ class SurvloopControllerUtils extends Controller
             return 'User #' . $uID;
         }
         return '';
+    }
+
+    protected function logPageVisit($currPage = '', $val = '')
+    {
+        $log = new SLUsersActivity;
+        $log->user_act_user = Auth::user()->id;
+        $log->user_act_curr_page = $_SERVER["REQUEST_URI"];
+        if (strlen($log->user_act_curr_page) > 255) {
+            $log->user_act_curr_page = substr($log->user_act_curr_page, 0, 255);
+        }
+        $log->user_act_val = $val;
+        $log->save();
+        return true;
+    }
+
+    public function logAdd($log, $content)
+    {
+        $this->checkFolder('../storage/app/log');
+        $fold = '../storage/app/';
+        $file = 'log/' . $log . '.html';
+        $uID = 0;
+        if (Auth::user() && isset(Auth::user()->id)) {
+            $uID = Auth::user()->id;
+        }
+        if (!isset($GLOBALS["SL"])) {
+            $GLOBALS["SL"] = new Globals(new Request, $this->dbID, $this->treeID);
+        }
+        $content = '<p>' . date("Y-m-d H:i:s") . ' <b>U#' . $uID . '</b> - '
+            . $content . '<br /><span class="slGrey fPerc80">'
+            . $GLOBALS["SL"]->hashIP(true) . '</span></p>';
+        if (!file_exists($fold . $file)) {
+            Storage::disk('local')->put($file, ' ');
+        }
+        Storage::disk('local')->prepend($file, $content);
+        return true;
     }
 
 }

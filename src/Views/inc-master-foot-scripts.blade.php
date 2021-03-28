@@ -17,7 +17,8 @@
     @endif
     @if ((isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '') 
         || ((isset($GLOBALS['SL']->pageAJAX) && trim($GLOBALS['SL']->pageAJAX) != '')))
-        <script id="dynamicJS" type="text/javascript" defer >
+        <script @if ($GLOBALS['SL']->REQ->has('ajax')) id="dynamicJSajax" @else id="dynamicJS" @endif
+            type="text/javascript" defer >
         @if (isset($GLOBALS['SL']->pageJAVA) && trim($GLOBALS['SL']->pageJAVA) != '')
             {!! $GLOBALS['SL']->pageJAVA !!}
         @endif

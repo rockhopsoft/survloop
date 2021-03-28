@@ -44,8 +44,63 @@ class TreeSurv extends TreeSurvLoops
         if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' && $this->coreID <= 0) {
             return $this->redir($GLOBALS["SL"]->getCurrTreeUrl(), true);
         }
+        $ret .= $this->printTreePublicPageWrapOpen() . $this->printTreeGetCurrNode();
+        $this->multiRecordCheck();
+        $GLOBALS["SL"]->microLog('printTreePublic( after multiRecordCheck(');
+
+        $this->loadAncestry($this->currNode());
+        $GLOBALS["SL"]->microLog('printTreePublic( before printNodePublic(');
+
+        $ret .= $this->printTreePublicCore($this->v["lastNode"]);
+        $GLOBALS["SL"]->microLog('printTreePublic( after printNodePublic(');
+
+        $ret .= $this->printTreePublicPageWrapClose();
+        if (!$this->hasAjaxWrapPrinting()) {
+            $GLOBALS["SL"]->pageJAVA
+                .= 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();';
+            $GLOBALS["SL"]->pageAJAX
+                .= 'if (document.getElementById("maincontentWrap")) '
+                    . '$("#maincontentWrap").fadeIn(50); ';
+            $ret = $GLOBALS["SL"]->pullPageJsCss($ret, $this->coreID)
+                . $GLOBALS["SL"]->pageSCRIPTS;
+            $GLOBALS["SL"]->pageSCRIPTS = '';
+        }
+        $GLOBALS["SL"]->microLog('printTreePublic( end');
+        return $ret;
+    }
+
+    /**
+     * Runs the core commands which actually print this tree.
+     *
+     * @return string
+     */
+    private function printTreePublicCore($lastNode)
+    {
+        $this->v["nodeKidFunks"] = '';
+        $fadeIn = $this->printTreeLoadFadeIn();
+        $goSkinny = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SKINNY == 0);
+        $goSkinny = (!$this->hasFrameLoad() && $goSkinny);
+        return $this->printTreePublicAnimWrapOpen($fadeIn, $goSkinny)
+            . ((trim($GLOBALS["errors"]) != '') ? $GLOBALS["errors"] : '')
+            . $this->nodeSessDump('pageStart')
+            . $this->printNodePublic($this->currNode(), $this->currNodeSubTier) . "\n"
+            . $this->loadProgBar() . "\n"
+            // (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0)
+                // ? $this->loadProgBar() : '') // not exit page?
+            . $this->printCurrRecMgmt() . $this->sessDump($lastNode) . "\n"
+            . $this->printTreePublicAnimWrapClose($goSkinny);
+    }
+
+    /**
+     * Generate the start of this page's wrapper.
+     *
+     * @return string
+     */
+    private function printTreePublicPageWrapOpen()
+    {
+        $ret = '';
         $GLOBALS["SL"]->pageJAVA .= view(
-            'vendor.survloop.js.inc-check-tree-load', 
+            'vendor.survloop.js.inc-check-tree-load',
             [ "treeID" => $this->treeID ]
         )->render();
         if ($this->hasAjaxWrapPrinting()) {
@@ -56,14 +111,109 @@ class TreeSurv extends TreeSurvLoops
         if (!$this->isPage) {
             $ret .= '<div id="maincontentWrap" style="display: none;">' . "\n";
         }
+        return $ret;
+    }
+
+    /**
+     * Generate the end of this page's wrapper.
+     *
+     * @return string
+     */
+    private function printTreePublicPageWrapClose()
+    {
+        $ret = '';
+        if (!$this->isPage) {
+            $ret .= '</div> <!-- end maincontentWrap --> ';
+        }
+        if ($this->hasAjaxWrapPrinting()) {
+            $ret .= '</div> <!-- end ajaxWrap --> ';
+        }
+        return $ret;
+    }
+
+    /**
+     * Generate the start of this page's animation wrapper.
+     *
+     * @return string
+     */
+    private function printTreePublicAnimWrapOpen($fadeIn, $goSkinny)
+    {
+        $dispStyle = 'block';
+        if ($fadeIn) {
+            $dispStyle = 'none';
+        }
+        $ret = '<div id="pageAnimWrap' . $GLOBALS['SL']->treeID
+            . '" class="w100" style="display: ' . $dispStyle . ';">';
+        if ($goSkinny) {
+            $ret .= '<center><div id="skinnySurv" class="treeWrapForm">';
+        } elseif (!$this->isPage) {
+            $ret .= '<div id="wideSurv" class="container">';
+        }
+        return $ret;
+    }
+
+    /**
+     * Generate the end of this page's animation wrapper.
+     *
+     * @return string
+     */
+    private function printTreePublicAnimWrapClose($goSkinny)
+    {
+        $ret = '';
+        if ($goSkinny) {
+            $ret .= '</div><center> <!-- end skinnySurv -->';
+        } elseif (!$this->isPage) {
+            $ret .= '</div> <!-- end wideSurv -->';
+        }
+        $ret .= '</div> <!-- end pageAnimWrap -->';
+        if (isset($GLOBALS["SL"]->treeSettings["footer"])
+            && isset($GLOBALS["SL"]->treeSettings["footer"][0])
+            && trim($GLOBALS["SL"]->treeSettings["footer"][0]) != '') {
+            $this->v["footOver"] = $GLOBALS["SL"]->treeSettings["footer"][0];
+        }
+        if (trim($this->v["nodeKidFunks"]) != '') {
+            $GLOBALS["SL"]->pageAJAX .= 'function checkAllNodeKids() { '
+                . $this->v["nodeKidFunks"]
+                /* . ' if (nodeList && nodeList.length > 0) { for (var i=0; i < nodeList.length; i++) { '
+                . 'chkNodeParentVisib(nodeList[i]); } } ' */
+                . ' setTimeout(function() { checkAllNodeKids(); }, 3000); }' // re-check every 3 seconds
+                . ' setTimeout(function() { checkAllNodeKids(); }, 1);' . "\n";
+        }
+        return $ret;
+    }
+
+    /**
+     * Determine whether or not this page should fade in after loading.
+     *
+     * @return boolean
+     */
+    private function printTreeLoadFadeIn()
+    {
+        $fadeIn = ($GLOBALS['SL']->treeRow->tree_opts%Globals::TREEOPT_FADEIN == 0);
+        if ($GLOBALS["SL"]->isPrintView()) {
+            $fadeIn = false;
+        }
+        if ($fadeIn) {
+            $GLOBALS["SL"]->setTreePageFadeIn($this->setTreePageFadeInDelay());
+        }
+        return $fadeIn;
+    }
+
+    /**
+     * Determine the current node with help from a form submission.
+     *
+     * @return boolean
+     */
+    private function printTreeLoadLastNode()
+    {
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('node')) {
             $nodeIn = intVal($GLOBALS["SL"]->REQ->input('node'));
             if ($nodeIn > 0) {
                 $this->updateCurrNode($nodeIn);
             }
         }
-        
-        $lastNode = $this->currNode();
+        $this->v["lastNode"] = $this->currNode();
+
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('superHardJump')) {
             $this->updateCurrNode(intVal($GLOBALS["SL"]->REQ->superHardJump));
         }
@@ -82,134 +232,86 @@ class TreeSurv extends TreeSurvLoops
             //return '<h1>Sorry, Page Not Found.</h1>';
         }
         // double-check we haven't landed on a mid-page node
-        if (isset($this->allNodes[$this->currNode()]) 
-            && !$this->allNodes[$this->currNode()]->isPage() 
+        if (isset($this->allNodes[$this->currNode()])
+            && !$this->allNodes[$this->currNode()]->isPage()
             && !$this->allNodes[$this->currNode()]->isLoopRoot()) {
             $this->updateCurrNode($this->allNodes[$this->currNode()]->getParent());
         }
-        $GLOBALS["SL"]->microLog('printTreePublic( after redirect checks');
+        return $this->v["lastNode"];
+    }
+
+    /**
+     * Determines which node the top-level of the algorithm
+     * should start from.
+     *
+     * @return boolean
+     */
+    private function printTreeGetCurrNode()
+    {
+        $ret = '';
+        $this->printTreeLoadLastNode();
+        $GLOBALS["SL"]->microLog('printTreeGetCurrNode( after redirect checks');
 
         $this->loadAncestry($this->currNode());
-        $GLOBALS["SL"]->microLog('printTreePublic( after loadAncestry(');
-        
+        $GLOBALS["SL"]->microLog('printTreeGetCurrNode( after loadAncestry(');
+
         if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
-            $GLOBALS["SL"]->microLog('printTreePublic( start has posted step');
+            $GLOBALS["SL"]->microLog('printTreeGetCurrNode( start has posted step');
             if (!$this->sessInfo) {
                 $this->createNewSess();
             }
             // Process form POST for all nodes, then store the data updates...
-            if ($this->REQstep == 'autoSave' 
-                && (!$GLOBALS["SL"]->REQ->has('chgCnt') 
+            if ($this->REQstep == 'autoSave'
+                && (!$GLOBALS["SL"]->REQ->has('chgCnt')
                     || intVal($GLOBALS["SL"]->REQ->get('chgCnt')) <= 0)) {
                 return 'No changes found to auto-save. <3';
             }
             $nodeIn = $GLOBALS["SL"]->REQ->node;
             $logTitle = 'PAGE SAVE' . (($this->REQstep == 'autoSave') ? ' AUTO' : '');
             $this->sessData->logDataSave($nodeIn, $logTitle, -3, '', '');
-            $GLOBALS["SL"]->microLog('printTreePublic( before postNodePublic');
+            $GLOBALS["SL"]->microLog('printTreeGetCurrNode( before postNodePublic');
             $ret .= $this->postNodePublic($nodeIn);
-            $GLOBALS["SL"]->microLog('printTreePublic( after postNodePublic');
+            $GLOBALS["SL"]->microLog('printTreeGetCurrNode( after postNodePublic');
             if ($this->REQstep == 'autoSave') {
                 return 'Saved!-)';
             }
-            //$this->loadAllSessData(); 
+            //$this->loadAllSessData();
             // refresh should not bedefault, run manually where needed
-            $GLOBALS["SL"]->microLog('printTreePublic( before post-step-redirect');
+            $GLOBALS["SL"]->microLog('printTreeGetCurrNode( before post-step-redirect');
             if (!$this->isPage) {
                 if ($this->REQstep == 'save') {
-                    if ($GLOBALS["SL"]->REQ->has('popStateUrl') 
+                    if ($GLOBALS["SL"]->REQ->has('popStateUrl')
                         && trim($GLOBALS["SL"]->REQ->popStateUrl) != '') {
                         $url = $GLOBALS["SL"]->REQ->popStateUrl;
                         $url = str_replace($GLOBALS["SL"]->treeBaseSlug, '', $url);
                         $this->setNodeURL($url);
                         $this->pullNewNodeURL();
                     } else {
-                        $redir1 = '';
-                        if ($GLOBALS["SL"]->REQ->has('jumpTo')) {
-                            $jump = trim($GLOBALS["SL"]->REQ->get('jumpTo'));
-                            if ($jump != '') {
-                                $redir1 = $jump;
-                            }
-                        }
-                        if ($GLOBALS["SL"]->REQ->has('afterJumpTo')) {
-                            $jump = trim($GLOBALS["SL"]->REQ->get('afterJumpTo'));
-                            if ($jump != '') {
-                                session()->put('redir2', $jump);
-                                session()->save();
-                            }
-                        }
+                        $redir1 = $this->printTreeGetCurrNodeCheckJumpRedir();
                         if ($redir1 != '') {
                             return $this->redir($redir1, true);
                         }
                     }
-                } else {
-                    $this->updateCurrNode($nodeIn);
-                    $lastNode = $nodeIn;
-                    // Now figure what comes next. 
-                    if (!$this->isStepUpload()) { // if uploading, then don't change nodes yet
-                        $jumpID = $this->jumpToNode($this->currNode());
-                        $jumpArr = ['exitLoop', 'exitLoopBack', 'exitLoopJump'];
-                        if (in_array($this->REQstep, $jumpArr) 
-                            && trim($GLOBALS["SL"]->REQ->input('loop')) != '') {
-                            $this->sessData->logDataSave(
-                                $this->currNode(), 
-                                $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table, 
-                                $GLOBALS["SL"]->REQ->input('loopItem'), 
-                                $this->REQstep, 
-                                $GLOBALS["SL"]->REQ->input('loop')
-                            );
-                            $this->leavingTheLoop($GLOBALS["SL"]->REQ->input('loop'));
-                            if ($this->REQstep == 'exitLoop') {
-                                $next = $this->nextNodeSibling($this->currNode());
-                                $this->updateCurrNodeNB($next);
-                            } elseif ($this->REQstep == 'exitLoopBack') {
-                                $prev = $this->prevNode($this->currNode());
-                                $prev = $this->getNextNonBranch($prev, 'prev');
-                                $this->updateCurrNodeNB($prev, 'prev');
-                            } else {
-                                $this->updateCurrNode($jumpID); // exit through jump
-                            }
-                        } elseif ($jumpID > 0) {
-                            $this->updateCurrNode($jumpID);
-                        } else { // no jumps, let's do the old back and forth...
-                            if ($this->REQstep == 'back') {
-                                $prev = $this->prevNode($this->currNode());
-                                $prev = $this->getNextNonBranch($prev, 'prev');
-                                $this->updateCurrNodeNB($prev, 'prev');
-                            } else {
-                                $next = $this->nextNode($this->currNode(), $this->currNodeSubTier);
-                                $this->updateCurrNodeNB($next);
-                            }
-                        }
-                    }
-                } // end REQstep == 'save' check
+                } else { // REQstep != 'save'
+                    $this->printTreeGetCurrNodeProcessStep($nodeIn);
+                }
             }
-            $GLOBALS["SL"]->microLog('printTreePublic( end has posted step');
+            $GLOBALS["SL"]->microLog('printTreeGetCurrNode( end has posted step');
         } else {
             if (trim($this->urlSlug) != '') {
                 $this->pullNewNodeURL();
-                if ($this->currNode() == $GLOBALS["SL"]->treeRow->tree_first_page 
-                    && $GLOBALS["SL"]->REQ->has('start') 
+                if ($this->currNode() == $GLOBALS["SL"]->treeRow->tree_first_page
+                    && $GLOBALS["SL"]->REQ->has('start')
                     && intVal($GLOBALS["SL"]->REQ->get('start')) == 1) {
                     $this->runDataManip($GLOBALS["SL"]->treeRow->tree_root);
                 }
             }
             $this->checkLoopsLeft($this->currNode());
         }
-        
-        $GLOBALS["SL"]->microLog('printTreePublic( start moving currNode');
+
+        $GLOBALS["SL"]->microLog('printTreeGetCurrNode( start moving currNode');
         if (!$this->isStepUpload()) {
-            $this->updateCurrNodeNB($this->currNode());
-            if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
-                $this->loadAllSessData();
-                $this->checkLoopsPostProcessing($this->currNode(), $lastNode);
-            } else {
-                if (!$this->checkNodeConditions($this->currNode())) {
-                    $next = $this->nextNode($this->currNode(), $this->currNodeSubTier);
-                    $this->updateCurrNode($next);
-                }
-                $this->updateCurrNodeNB($this->currNode());
-            }
+            $this->printTreeGetCurrNodeStepNormal();
             //$this->loadAllSessData();
         }
         /* if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
@@ -219,82 +321,109 @@ class TreeSurv extends TreeSurvLoops
                 exit;
             }
         } */
-        $GLOBALS["SL"]->microLog('printTreePublic( end moving currNode');
-        
-        if (!$GLOBALS["SL"]->REQ->has('popStateUrl') 
+        $GLOBALS["SL"]->microLog('printTreeGetCurrNode( end moving currNode');
+
+        if (!$GLOBALS["SL"]->REQ->has('popStateUrl')
             || trim($GLOBALS["SL"]->REQ->popStateUrl) == '') {
             $this->pushCurrNodeURL($this->currNode());
         }
-        $this->multiRecordCheck();
-        $GLOBALS["SL"]->microLog('printTreePublic( after multiRecordCheck(');
-        
-        $this->loadAncestry($this->currNode());
-        $GLOBALS["SL"]->microLog('printTreePublic( after loadAncestry(');
-        
-        $this->v["nodeKidFunks"] = '';
-        
-        $fadeIn = ($GLOBALS['SL']->treeRow->tree_opts%Globals::TREEOPT_FADEIN == 0);
-        if ($GLOBALS["SL"]->isPrintView()) {
-            $fadeIn = false;
-        }
-        if ($fadeIn) {
-            $GLOBALS["SL"]->setTreePageFadeIn($this->setTreePageFadeInDelay());
-        }
-        $ret .= '<div id="pageAnimWrap' . $GLOBALS['SL']->treeID 
-            . '" class="w100" style="display: ' . (($fadeIn) ? 'none' : 'block') 
-            . ';">';
-        $goSkinny = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SKINNY == 0);
-        $goSkinny = (!$this->hasFrameLoad() && $goSkinny);
-        if ($goSkinny) {
-            $ret .= '<center><div id="skinnySurv" class="treeWrapForm">';
-        } elseif (!$this->isPage) {
-            $ret .= '<div id="wideSurv" class="container">';
-        }
-        $GLOBALS["SL"]->microLog('printTreePublic( before printNodePublic(');
-        $ret .= ((trim($GLOBALS["errors"]) != '') ? $GLOBALS["errors"] : '') 
-            . $this->nodeSessDump('pageStart')
-            . $this->printNodePublic($this->currNode(), $this->currNodeSubTier) . "\n"
-            . $this->loadProgBar() . "\n"
-                // (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0) ? $this->loadProgBar() : '') // not exit page?
-            . $this->printCurrRecMgmt() . $this->sessDump($lastNode) . "\n";
-        $GLOBALS["SL"]->microLog('printTreePublic( after printNodePublic(');
-        if ($goSkinny) {
-            $ret .= '</div><center> <!-- end skinnySurv -->';
-        } elseif (!$this->isPage) {
-            $ret .= '</div> <!-- end wideSurv -->';
-        }
-        $ret .= '</div> <!-- end pageAnimWrap -->';
-        if (isset($GLOBALS["SL"]->treeSettings["footer"]) 
-            && isset($GLOBALS["SL"]->treeSettings["footer"][0]) 
-            && trim($GLOBALS["SL"]->treeSettings["footer"][0]) != '') {
-            $this->v["footOver"] = $GLOBALS["SL"]->treeSettings["footer"][0];
-        }
-        if (trim($this->v["nodeKidFunks"]) != '') {
-            $GLOBALS["SL"]->pageAJAX .= 'function checkAllNodeKids() { ' 
-                . $this->v["nodeKidFunks"] 
-                /* . ' if (nodeList && nodeList.length > 0) { for (var i=0; i < nodeList.length; i++) { '
-                . 'chkNodeParentVisib(nodeList[i]); } } ' */
-                . ' setTimeout(function() { checkAllNodeKids(); }, 3000); }' // re-check every 3 seconds
-                . ' setTimeout(function() { checkAllNodeKids(); }, 1);' . "\n";
-        }
-        if (!$this->isPage) {
-            $ret .= '</div> <!-- end maincontentWrap --> ';
-        }
-        if ($this->hasAjaxWrapPrinting()) {
-            $ret .= '</div> <!-- end ajaxWrap --> ';
-        } else {
-            $GLOBALS["SL"]->pageJAVA 
-                .= 'if (document.getElementById("dynamicJS")) document.getElementById("dynamicJS").remove();';
-            $GLOBALS["SL"]->pageAJAX 
-                .= 'if (document.getElementById("maincontentWrap")) '
-                    . '$("#maincontentWrap").fadeIn(50); ';
-            $ret = $GLOBALS["SL"]->pullPageJsCss($ret, $this->coreID) 
-                . $GLOBALS["SL"]->pageSCRIPTS;
-            $GLOBALS["SL"]->pageSCRIPTS = '';
-        }
-        $GLOBALS["SL"]->microLog('printTreePublic( end');
         return $ret;
     }
+
+    /**
+     * Determine the current node with help from a form submission.
+     *
+     * @return boolean
+     */
+    private function printTreeGetCurrNodeProcessStep($nodeIn)
+    {
+        $this->updateCurrNode($nodeIn);
+        $this->v["lastNode"] = $nodeIn;
+        // Now figure what comes next.
+        if (!$this->isStepUpload()) { // if uploading, then don't change nodes yet
+            $jumpID = $this->jumpToNode($this->currNode());
+            $jumpArr = ['exitLoop', 'exitLoopBack', 'exitLoopJump'];
+            if (in_array($this->REQstep, $jumpArr)
+                && trim($GLOBALS["SL"]->REQ->input('loop')) != '') {
+                $this->sessData->logDataSave(
+                    $this->currNode(),
+                    $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table,
+                    $GLOBALS["SL"]->REQ->input('loopItem'),
+                    $this->REQstep,
+                    $GLOBALS["SL"]->REQ->input('loop')
+                );
+                $this->leavingTheLoop($GLOBALS["SL"]->REQ->input('loop'));
+                if ($this->REQstep == 'exitLoop') {
+                    $next = $this->nextNodeSibling($this->currNode());
+                    $this->updateCurrNodeNB($next);
+                } elseif ($this->REQstep == 'exitLoopBack') {
+                    $prev = $this->prevNode($this->currNode());
+                    $prev = $this->getNextNonBranch($prev, 'prev');
+                    $this->updateCurrNodeNB($prev, 'prev');
+                } else {
+                    $this->updateCurrNode($jumpID); // exit through jump
+                }
+            } elseif ($jumpID > 0) {
+                $this->updateCurrNode($jumpID);
+            } else { // no jumps, let's do the old back and forth...
+                if ($this->REQstep == 'back') {
+                    $prev = $this->prevNode($this->currNode());
+                    $prev = $this->getNextNonBranch($prev, 'prev');
+                    $this->updateCurrNodeNB($prev, 'prev');
+                } else {
+                    $next = $this->nextNode($this->currNode(), $this->currNodeSubTier);
+                    $this->updateCurrNodeNB($next);
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Determine the redirect URL if a tree jump is needed.
+     *
+     * @return string
+     */
+    private function printTreeGetCurrNodeCheckJumpRedir()
+    {
+        $redir = '';
+        if ($GLOBALS["SL"]->REQ->has('jumpTo')) {
+            $jump = trim($GLOBALS["SL"]->REQ->get('jumpTo'));
+            if ($jump != '') {
+                $redir = $jump;
+            }
+        }
+        if ($GLOBALS["SL"]->REQ->has('afterJumpTo')) {
+            $jump = trim($GLOBALS["SL"]->REQ->get('afterJumpTo'));
+            if ($jump != '') {
+                session()->put('redir2', $jump);
+                session()->save();
+            }
+        }
+        return $redir;
+    }
+
+    /**
+     * Determine the next node in the normal tree traversal.
+     *
+     * @return boolean
+     */
+    private function printTreeGetCurrNodeStepNormal()
+    {
+        $this->updateCurrNodeNB($this->currNode());
+        if ($this->hasREQ && $GLOBALS["SL"]->REQ->has('step')) {
+            $this->loadAllSessData();
+            $this->checkLoopsPostProcessing($this->currNode(), $this->v["lastNode"]);
+        } else {
+            if (!$this->checkNodeConditions($this->currNode())) {
+                $next = $this->nextNode($this->currNode(), $this->currNodeSubTier);
+                $this->updateCurrNode($next);
+            }
+            $this->updateCurrNodeNB($this->currNode());
+        }
+        return true;
+    }
+
 
     public function printTreeNodePublic($nID)
     {
@@ -304,9 +433,9 @@ class TreeSurv extends TreeSurvLoops
         $this->loadAncestry($this->currNode());
         return $this->printNodePublic($this->currNode(), $this->currNodeSubTier);
     }
-    
+
     /**
-     * This function is the primary front-facing 
+     * This function is the primary front-facing
      * controller for the user experience.
      *
      * @return string
@@ -336,12 +465,12 @@ class TreeSurv extends TreeSurvLoops
             return $this->redir('/');
         }
         $this->v["content"] = $GLOBALS["SL"]->pullPageJsCss(
-            $this->v["content"], 
+            $this->v["content"],
             $this->coreID
         );
         return $this->indexResponse();
     }
-    
+
     /**
      * Check, initialize, and log data needed to generate page.
      *
@@ -351,9 +480,9 @@ class TreeSurv extends TreeSurvLoops
     {
         $this->checkPageViewPerms();
         $notes = '';
-        if (isset($GLOBALS["SL"]->pageView) 
+        if (isset($GLOBALS["SL"]->pageView)
             && trim($GLOBALS["SL"]->pageView) != '') {
-            $notes .= 'pv.' . $GLOBALS["SL"]->pageView 
+            $notes .= 'pv.' . $GLOBALS["SL"]->pageView
                 . ' dp.' . $GLOBALS["SL"]->dataPerms;
         }
         if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
@@ -375,7 +504,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return $notes;
     }
-    
+
     /**
      * Determine final formatting options on the generated page.
      *
@@ -393,7 +522,7 @@ class TreeSurv extends TreeSurvLoops
             view('vendor.survloop.master', $this->v)->render()
         );
     }
-    
+
     /**
      * Load the current tree and page in the Javascript load.
      *
@@ -401,31 +530,31 @@ class TreeSurv extends TreeSurvLoops
      */
     protected function loadTreePageJava()
     {
-        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "' 
-            . $GLOBALS["SL"]->treeRow->tree_type 
-            . '"; setCurrPage("' . $this->v["currPage"][1] . '", "' 
-            . $this->v["currPage"][0] . '", ' . $this->currNode() 
-            . '); function loadPageNodes() { if (typeof chkNodeVisib === "function") { ' 
+        $GLOBALS["SL"]->pageJAVA .= 'currTreeType = "'
+            . $GLOBALS["SL"]->treeRow->tree_type
+            . '"; setCurrPage("' . $this->v["currPage"][1] . '", "'
+            . $this->v["currPage"][0] . '", ' . $this->currNode()
+            . '); function loadPageNodes() { if (typeof chkNodeVisib === "function") { '
             . $this->v["javaNodes"] . ' } else { setTimeout("loadPageNodes()", 500); } '
             . 'return true; } setTimeout("loadPageNodes()", 100); ' . "\n";
         // Check if search results page
-        if ($GLOBALS["SL"]->treeRow->tree_opts%31 == 0 
-            && $GLOBALS["SL"]->REQ->has('s') 
+        if ($GLOBALS["SL"]->treeRow->tree_opts%31 == 0
+            && $GLOBALS["SL"]->REQ->has('s')
             && trim($GLOBALS["SL"]->REQ->get('s')) != '') {
             if ($GLOBALS["SL"]->treeRow->tree_opts%3 == 0
-                || $GLOBALS["SL"]->treeRow->tree_opts%17 == 0 
+                || $GLOBALS["SL"]->treeRow->tree_opts%17 == 0
                 || $GLOBALS["SL"]->treeRow->tree_opts%41 == 0
                 || $GLOBALS["SL"]->treeRow->tree_opts%43 == 0) {
                 $GLOBALS["SL"]->pageJAVA .= 'setTimeout(\''
                     . 'if (document.getElementById("admSrchFld")) '
-                    . 'document.getElementById("admSrchFld").value=' 
+                    . 'document.getElementById("admSrchFld").value='
                     . json_encode(trim($GLOBALS["SL"]->REQ->get('s')))
                     . '\', 10); ';
-            } // else check for the main public search field? 
+            } // else check for the main public search field?
         }
         return true;
     }
-    
+
     /**
      * Override the default behavior for wrapping a tree which has
      * been called through an ajax call.
@@ -436,13 +565,13 @@ class TreeSurv extends TreeSurvLoops
     {
         return $str;
     }
-    
+
     protected function runCurrNode($nID)
     {
         //if ($nID == $GLOBALS["SL"]->treeRow->tree_root) $this->runDataManip($nID);
         return true;
     }
-    
+
     protected function runDataManip($nID, $betweenPages = false)
     {
         $curr = $this->allNodes[$nID];
@@ -483,7 +612,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return true;
     }
-    
+
     protected function reverseDataManip($nID)
     {
         if ($this->allNodes[$nID]->isDataManip()) {
@@ -495,7 +624,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return true;
     }
-    
+
     protected function nodeBranchInfo($nID, $curr = NULL)
     {
         $tbl = $fld = $newVal = '';
@@ -511,12 +640,12 @@ class TreeSurv extends TreeSurvLoops
         }
         if ($curr->isLoopCycle()) {
             $loop = '';
-            if (isset($curr->nodeRow->node_response_set) 
+            if (isset($curr->nodeRow->node_response_set)
                 && strpos($curr->nodeRow->node_response_set, 'LoopItems:') === 0) {
                 $loop = trim(str_replace('LoopItems:', '', $curr->nodeRow->node_response_set));
             }
-            if ($loop != '' 
-                && isset($GLOBALS["SL"]->dataLoops[$loop]) 
+            if ($loop != ''
+                && isset($GLOBALS["SL"]->dataLoops[$loop])
                 && isset($GLOBALS["SL"]->dataLoops[$loop]->node_loop_table)) {
                 $tbl = $GLOBALS["SL"]->dataLoops[$loop]->node_loop_table;
             } elseif (isset($curr->dataBranch) && trim($curr->dataBranch) != '') {
@@ -525,7 +654,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return [ $tbl, $fld, $newVal ];
     }
-    
+
     protected function loadManipBranch($nID, $force = false)
     {
         list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
@@ -540,7 +669,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return true;
     }
-    
+
     protected function closeManipBranch($nID)
     {
         list($tbl, $fld, $newVal) = $this->nodeBranchInfo($nID);
@@ -549,14 +678,14 @@ class TreeSurv extends TreeSurvLoops
         }
         return true;
     }
-    
+
     protected function hasParentDataManip($nID)
     {
         $found = false;
         while ($this->hasNode($nID) && !$found) {
             if ($this->allNodes[$nID]->isDataManip()) {
                 list($tbl, $fld, $newVal) = $this->allNodes[$nID]->getManipUpdate();
-                if ($this->allNodes[$nID]->nodeType == 'Data Manip: New' 
+                if ($this->allNodes[$nID]->nodeType == 'Data Manip: New'
                     && $newVal != ''
                     && $fld != '') {
                     $found = true;
@@ -566,12 +695,39 @@ class TreeSurv extends TreeSurvLoops
         }
         return $found;
     }
-    
+
+    protected function getAncestorPage($nID)
+    {
+        $pageNode = -3;
+        $parent = -3;
+        if (isset($this->allNodes[$nID])) {
+            $parent = $this->allNodes[$nID]->getParent();
+            while ($parent > 0
+                && $pageNode <= 0
+                && isset($this->allNodes[$parent])) {
+                if ($this->allNodes[$parent]->nodeType == 'Page') {
+                    $pageNode = $parent;
+                }
+                $parent = $this->allNodes[$parent]->getParent();
+            }
+        }
+        return $pageNode;
+    }
+
+    public function loadNodeURL(Request $request, $nodeSlug = '')
+    {
+        $GLOBALS["SL"]->microLog('loadNodeURL(' . $nodeSlug);
+        if (trim($nodeSlug) != '') {
+            $this->setNodeURL($nodeSlug);
+        }
+        return $this->index($request);
+    }
+
     public function runAjaxChecksCustom(Request $request, $over = '')
     {
         return false;
     }
-    
+
     public function runAjaxChecks(Request $request, $over = '')
     {
         $this->runAjaxChecksCustom($request, $over);
@@ -586,26 +742,17 @@ class TreeSurv extends TreeSurvLoops
             exit;
         }
     }
-    
-    public function loadNodeURL(Request $request, $nodeSlug = '')
-    {
-        $GLOBALS["SL"]->microLog('loadNodeURL(' . $nodeSlug);
-        if (trim($nodeSlug) != '') {
-            $this->setNodeURL($nodeSlug);
-        }
-        return $this->index($request);
-    }
-    
+
     public function testRun(Request $request)
     {
         return $this->index($request, 'testRun');
     }
-    
+
     public function ajaxChecksCustom(Request $request, $type = '')
     {
         return '';
     }
-    
+
     public function ajaxChecks(Request $request, $type = '')
     {
         $this->survloopInit($request, '/ajax/' . $type);
@@ -619,13 +766,17 @@ class TreeSurv extends TreeSurvLoops
         }
         return $this->index($request, 'ajaxChecks');
     }
-    
+
     public function ajaxChecksSL(Request $request, $type = '')
     {
         $this->survloopInit($request, '/ajadm/' . $type);
         $nID = (($request->has('nID')) ? trim($request->get('nID')) : '');
         if ($type == 'adm-menu-toggle') {
             return $this->ajaxAdmMenuToggle($request);
+        } elseif ($type == 'my-profile-enable-mfa') {
+            return $this->ajaxEnableMfaForm($request);
+        } elseif ($type == 'my-profile-disable-mfa') {
+            return $this->ajaxDisableMfaForm($request);
         } elseif ($type == 'data-set-search-results') {
             return $this->printDataSetSearchResultsAjax($request);
         } elseif ($type == 'color-pick') {
@@ -645,6 +796,10 @@ class TreeSurv extends TreeSurvLoops
             }
         } elseif ($type == 'log-pro-tip') {
             $this->ajaxLogLastProTip($request);
+        } elseif ($type == 'tbl-add-row') {
+            $this->ajaxTblAddRow($request);
+
+
         }
         return '';
     }
@@ -711,16 +866,16 @@ class TreeSurv extends TreeSurvLoops
     {
         return '<h3 class="slBlueDark">' . $tblInfo["name"] . '</h3>
             <div id="setSearchResults' . $tblInfo["name"] . '" class="w100"></div>
-            <script type="text/javascript"> $(document).ready(function(){ 
+            <script type="text/javascript"> $(document).ready(function(){
                 setTimeout(function() {
-                    var url = "/ajax/data-set-search-results?type=' 
+                    var url = "/ajax/data-set-search-results?type='
                         . strtolower($tblInfo["name"]) . '";
                     $("#setSearchResults' . $tblInfo["name"] . '").load(url);
                     console.log(url);
                 }, 10);
             }); </script>';
     }
-    
+
     private function ajaxAdmMenuToggle(Request $request)
     {
         $open = 0;
@@ -732,7 +887,17 @@ class TreeSurv extends TreeSurvLoops
         session()->save();
         return '';
     }
-    
+
+    private function ajaxEnableMfaForm(Request $request)
+    {
+        return view('vendor.survloop.auth.enable-mfa');
+    }
+
+    private function ajaxDisableMfaForm(Request $request)
+    {
+        return view('vendor.survloop.auth.disable-mfa');
+    }
+
     protected function ajaxColorPicker(Request $request)
     {
         $fldName = $preSel = '';
@@ -751,7 +916,7 @@ class TreeSurv extends TreeSurvLoops
             $isCustom = true;
             if ($sysStyles->isNotEmpty()) {
                 foreach ($sysStyles as $i => $sty) {
-                    if (strpos($sty->def_subset, 'color-') !== false 
+                    if (strpos($sty->def_subset, 'color-') !== false
                         && !in_array($sty->def_description, $sysColors)) {
                         $sysColors[] = $sty->def_description;
                         if ($sty->def_description == $preSel) {
@@ -761,7 +926,7 @@ class TreeSurv extends TreeSurvLoops
                 }
             }
             return view(
-                'vendor.survloop.forms.inc-color-picker-ajax', 
+                'vendor.survloop.forms.inc-color-picker-ajax',
                 [
                     "sysColors" => $sysColors,
                     "fldName"   => $fldName,
@@ -772,12 +937,12 @@ class TreeSurv extends TreeSurvLoops
         }
         return '';
     }
-    
+
     protected function ajaxLogLastProTip(Request $request)
     {
-        if ($request->has('tree') 
-            && intVal($request->get('tree')) > 0 
-            && $request->has('tip') 
+        if ($request->has('tree')
+            && intVal($request->get('tree')) > 0
+            && $request->has('tip')
             && intVal($request->get('tip')) > 0) {
             $tok = $this->getProTipToken();
             $tok->tok_tok_token = intVal($request->get('tip'));
@@ -785,7 +950,24 @@ class TreeSurv extends TreeSurvLoops
         }
         exit;
     }
-    
+
+    protected function ajaxTblAddRow(Request $request)
+    {
+        $ret = $this->ajaxTblAddRowCustom($request);
+        if ($ret != '') {
+            return $ret;
+        }
+
+        // load node, load table, create new database row, print new blank row
+
+        return '';
+    }
+
+    protected function ajaxTblAddRowCustom(Request $request)
+    {
+        return '';
+    }
+
     protected function getProTipToken()
     {
         $tok = SLTokens::where('tok_type', 'ProTip')
@@ -802,7 +984,7 @@ class TreeSurv extends TreeSurvLoops
         }
         return $tok;
     }
-    
+
     protected function loadTreeProTip()
     {
         $tok = $this->getProTipToken();
@@ -810,33 +992,16 @@ class TreeSurv extends TreeSurvLoops
         $GLOBALS["SL"]->pageJAVA .= ' lastProTip = ' . $tok->tok_tok_token . '; ';
         return true;
     }
-    
+
     protected function changeNodeID($nID, $newID)
     {
-        
-    }
-    
-    protected function clearLostSessionHelpers()
-    {
-        $chk = SLSess::select('sess_id')
-            ->get();
-        $sessIDs = $GLOBALS["SL"]->resultsToArrIds($chk, 'sess_id');
-        SLSessLoops::whereNotIn('sess_loop_sess_id', $sessIDs)
-            ->limit(1000)
-            ->delete();
-        SLNodeSaves::whereNotIn('node_save_session', $sessIDs)
-            ->limit(1000)
-            ->delete();
-        SLNodeSavesPage::whereNotIn('page_save_session', $sessIDs)
-            ->limit(1000)
-            ->delete();
-        return true;
+
     }
 
     protected function setTreePageFadeInDelay()
     {
         return 1000;
     }
-    
-    
+
+
 }

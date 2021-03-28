@@ -1,18 +1,12 @@
-<?php // sorry, not sure how this should be done instead
-$surv = new RockHopSoft\Survloop\Controllers\Survloop;
-$surv->loadLoop(new Illuminate\Http\Request);
-$v = $surv->custLoop->v;
-$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
-$css = $sysDefs->loadCss();
-?>@extends('vendor.survloop.master')
+@extends('vendor.survloop.master')
 @section('content')
 <div id="ajaxWrap">
 <!-- resources/views/vendor/survloop/auth/passwords/reset.blade.php -->
 
 <form class="form-horizontal" role="form" method="POST" 
-    action="{{ url('/password/reset') }}">
+    action="{{ route('password.update') }}">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-<input type="hidden" name="token" value="{{ $token }}">
+<input type="hidden" name="token" value="{{ request()->token }}">
 
 <div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
 <div id="treeWrap" class="treeWrapForm">

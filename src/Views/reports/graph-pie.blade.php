@@ -1,36 +1,39 @@
 <!-- resources/views/vendor/survloop/reports/graph-pie.blade.php -->
-<?php if (!isset($currGraphID)) $currGraphID = 'rand' . rand(0, 100000); ?>
-@if (isset($title)) {!! $title !!}
-@elseif (isset($yAxisLab)) {!! $yAxisLab !!}
-@elseif (isset($currNode) && isset($currNode->extraOpts["y-axis-lab"])) {!! $currNode->extraOpts['y-axis-lab'] !!}
+
+@if (isset($title)) 
+    {!! $title !!}
+@elseif (isset($yAxisLab)) 
+    {!! $yAxisLab !!}
+@elseif (isset($currNode) && isset($currNode->extraOpts["y-axis-lab"])) 
+    {!! $currNode->extraOpts['y-axis-lab'] !!}
 @endif
-<div id="{{ $currGraphID }}myChartWrap" class="w100" style="height: @if (isset($hgt)) {{ $hgt }} 
-    @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) {{ $currNode->extraOpts['hgt'] }} 
-    @else 50% @endif ; overflow: visible;">
+<div id="{{ $graphID }}myChartWrap" class="w100 mB30" style="overflow: visible;
+    @if (isset($hgt) && $hgt !== null) height: {{ $hgt }}px;
+    @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) height: {{ $currNode->extraOpts['hgt'] }};
+    @else height: 50%; 
+    @endif ">
 @if (isset($graphFail) && $graphFail)
     <div class="jumbotron w100 h100 mB5"><i>No data found</i></div>
-@elseif (isset($pieData) && is_array($pieData) && sizeof($pieData) > 0)
-    <div class="w100 pR5"><canvas id="{{ $currGraphID }}myChart" style="width: 100%; height: 100%;" ></canvas></div>
+@elseif (isset($data) && is_array($data) && sizeof($data) > 0)
+    <div class="w100 pR5">
+        <canvas id="{{ $graphID }}myChart" style="width: 100%; 
+            @if (isset($hgt) && $hgt !== null) height: {{ $hgt }}px;
+            @elseif (isset($currNode) && isset($currNode->extraOpts['hgt'])) height: {{ $currNode->extraOpts['hgt'] }};
+            @else height: 100%; 
+            @endif " ></canvas>
+    </div>
     <script>
-    new Chart(document.getElementById("{{ $currGraphID }}myChart").getContext('2d'), {
+    new Chart(document.getElementById("{{ $graphID }}myChart").getContext('2d'), {
         type: 'pie',
         data: {
             datasets: [{
-                data: [
-                @foreach ($pieData as $i => $dat)
-                    {{ $dat[0] }},
-                @endforeach
-                ],
-                backgroundColor: [
-                @foreach ($pieData as $i => $dat)
-                    {!! $dat[2] !!},
-                @endforeach
-                ],
+                data: [ @foreach ($data as $i => $dat) {{ $dat->value }}, @endforeach ],
+                backgroundColor: [ @foreach ($data as $i => $dat) "{!! $dat->color !!}", @endforeach ],
                 @if (isset($title)) label: '{!! $title !!}' @else label: '' @endif
             }],
             labels: [
-                @foreach ($pieData as $i => $dat)
-                    {!! json_encode($dat[1]) !!},
+                @foreach ($data as $i => $dat)
+                    {!! json_encode($dat->label) !!},
                 @endforeach
             ]
         },

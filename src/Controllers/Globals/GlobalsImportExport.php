@@ -30,10 +30,10 @@ use App\Models\SLTokens;
 class GlobalsImportExport extends GlobalsTables
 {
     private $exprtProg = [];
-    
+
     public function loadDBFromCache(Request $request = NULL)
     {
-        $cacheFile = '/cache/php/db-load-' 
+        $cacheFile = '/cache/php/db-load-'
             . $this->dbID . '-' . $this->treeID . '.php';
         if ((!$request || !$request->has('refresh')) && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
@@ -41,7 +41,7 @@ class GlobalsImportExport extends GlobalsTables
         } else {
             $cache = '// Auto-generated loading cache from '
                 . '/Survloop/Controllers/Globals.php' . "\n\n";
-            
+
             $cache .= '$'.'this->allDbs = [];' . "\n";
             $allDbs = SLDatabases::get();
             if ($allDbs->isNotEmpty()) {
@@ -61,7 +61,7 @@ class GlobalsImportExport extends GlobalsTables
                 ->join('sl_tables', 'sl_tree.tree_core_table', '=', 'sl_tables.tbl_id')
                 ->where('sl_tree.tree_database', $this->dbID)
                 ->where('sl_tables.tbl_name', 'NOT LIKE', 'Visitors')
-                ->select('sl_tree.tree_slug', 'sl_tree.tree_opts', 
+                ->select('sl_tree.tree_slug', 'sl_tree.tree_opts',
                     'sl_tables.tbl_id', 'sl_tables.tbl_eng')
                 ->orderBy('sl_tree.tree_id', 'asc')
                 ->get();
@@ -86,7 +86,7 @@ class GlobalsImportExport extends GlobalsTables
                     }
                 }
             }
-            
+
             $this->allTrees = [];
             $cache .= '$'.'this->allTrees = [];' . "\n";
             $allTrees = SLTree::where('tree_type', 'Survey')
@@ -102,16 +102,16 @@ class GlobalsImportExport extends GlobalsTables
                         . ' "id" => ' . $tree->tree_id . ', '
                         . ' "name" => "' . str_replace('"', '\\"', $tree->tree_name) . '", '
                         . ' "slug" => "' . $tree->tree_slug . '", '
-                        . ' "opts" => ' . ((isset($tree->tree_opts) && intVal($tree->tree_opts) > 0) 
-                            ? $tree->tree_opts : 1) 
+                        . ' "opts" => ' . ((isset($tree->tree_opts) && intVal($tree->tree_opts) > 0)
+                            ? $tree->tree_opts : 1)
                     . ' ];' . "\n";
                 }
             }
-            
+
             if ($this->treeRow && isset($this->treeRow->tree_root)) {
                 if ($this->treeRow->tree_root > 0) {
                     $chk = SLConditionsNodes::select('sl_conditions_nodes.cond_node_id')
-                        ->join('sl_conditions', 'sl_conditions.cond_id', 
+                        ->join('sl_conditions', 'sl_conditions.cond_id',
                             '=', 'sl_conditions_nodes.cond_node_cond_id')
                         ->where('sl_conditions.cond_tag', '#IsAdmin')
                         ->where('sl_conditions_nodes.cond_node_node_id', $this->treeRow->tree_root)
@@ -128,17 +128,17 @@ class GlobalsImportExport extends GlobalsTables
                     || $this->treeRow->tree_opts%Globals::TREEOPT_PARTNER == 0
                     || $this->treeRow->tree_opts%Globals::TREEOPT_VOLUNTEER == 0) {
                     $cache .= '$'.'this->treeIsAdmin = true;' . "\n"
-                        . '$'.'this->treeBaseSlug = "/dash/' 
+                        . '$'.'this->treeBaseSlug = "/dash/'
                         . $this->treeRow->tree_slug . '/";' . "\n";
                 } else {
-                    $cache .= '$'.'this->treeBaseSlug = "/u/' 
+                    $cache .= '$'.'this->treeBaseSlug = "/u/'
                         . $this->treeRow->tree_slug . '/";' . "\n";
                 }
             }
 
             //$sys = SLDefinitions::where('def_database', $this->dbID)
             //    ->where('def_set', 'System Settings')
-            //    ->get(); 
+            //    ->get();
             //if (!$sys || sizeof($sys) == 0) {
                 $sys = SLDefinitions::where('def_database', 1)
                     ->where('def_set', 'System Settings')
@@ -157,31 +157,31 @@ class GlobalsImportExport extends GlobalsTables
                     ->orderBy('tbl_ord', 'asc')
                     ->get();
                 foreach ($tbls as $tbl) {
-                    if (isset($this->treeRow->tree_core_table) 
+                    if (isset($this->treeRow->tree_core_table)
                         && $tbl->tbl_id == $this->treeRow->tree_core_table) {
                         $coreTbl = $tbl->tbl_name;
                         $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
                     }
                     $cache .= '$'.'this->tbls[] = ' . $tbl->tbl_id . ';' . "\n"
-                        . '$'.'this->tblI[\'' . $tbl->tbl_name 
+                        . '$'.'this->tblI[\'' . $tbl->tbl_name
                             . '\'] = ' . intVal($tbl->tbl_id) . ';' . "\n"
-                        . '$'.'this->tbl[' . $tbl->tbl_id 
+                        . '$'.'this->tbl[' . $tbl->tbl_id
                             . '] = \'' . $tbl->tbl_name . '\';' . "\n"
-                        . '$'.'this->tblEng[' . $tbl->tbl_id 
+                        . '$'.'this->tblEng[' . $tbl->tbl_id
                             . '] = \'' . str_replace("'", "\\'", $tbl->tbl_eng).'\';'."\n"
-                        . '$'.'this->tblOpts[' . $tbl->tbl_id 
+                        . '$'.'this->tblOpts[' . $tbl->tbl_id
                             . '] = ' . intVal($tbl->tbl_opts) . ';' . "\n"
-                        . '$'.'this->tblAbbr[\'' . $tbl->tbl_name 
+                        . '$'.'this->tblAbbr[\'' . $tbl->tbl_name
                             . '\'] = \'' . $tbl->tbl_abbr . '\';' . "\n"
                         . '$'.'this->fldTypes[\'' . $tbl->tbl_name . '\'] = [];' . "\n"
-                        . '$'.'this->fldTypes[\'' . $tbl->tbl_name 
+                        . '$'.'this->fldTypes[\'' . $tbl->tbl_name
                             . '\'][\'' . $tbl->tbl_abbr . 'id\'] = \'INT\';' . "\n"
-                        . '$'.'this->tblModels[\'' . $tbl->tbl_name . '\'] = \'' 
+                        . '$'.'this->tblModels[\'' . $tbl->tbl_name . '\'] = \''
                             . $this->strFullTblModel($tbl->tbl_name) . '\';' . "\n";
-                    if ($this->treeRow 
-                        && isset($this->treeRow->tree_core_table) 
+                    if ($this->treeRow
+                        && isset($this->treeRow->tree_core_table)
                         && $tbl->tbl_id == $this->treeRow->tree_core_table) {
-                    	$coreType = '$'.'this->fldTypes[\'' . $tbl->tbl_name 
+                    	$coreType = '$'.'this->fldTypes[\'' . $tbl->tbl_name
                             . '\'][\'' . $tbl->tbl_abbr;
                         $cache .= $coreType . 'user_id\'] = \'INT\';' . "\n"
                         	. $coreType . 'submission_progress\'] = \'INT\';' . "\n"
@@ -196,7 +196,7 @@ class GlobalsImportExport extends GlobalsTables
                     $this->tblAbbr[$tbl->tbl_name] = $tbl->tbl_abbr;
                 }
                 $cache .= '$'.'this->coreTbl = \'' . $coreTbl . '\';' . "\n";
-                
+
                 $fldNames = [];
                 $flds = SLFields::select()
                     ->where('fld_database', $this->dbID)
@@ -205,11 +205,11 @@ class GlobalsImportExport extends GlobalsTables
                     ->get();
                 foreach ($flds as $fld) {
                     if (isset($this->tbl[$fld->fld_table])) {
-                        $fldName = $this->tblAbbr[$this->tbl[$fld->fld_table]] 
+                        $fldName = $this->tblAbbr[$this->tbl[$fld->fld_table]]
                             . $fld->fld_name;
                         $fldNames[] = $fldName;
-                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->fld_table] 
-                            . '\'][\'' . $fldName . '\'] = \'' . $fld->fld_type 
+                        $cache .= '$'.'this->fldTypes[\'' . $this->tbl[$fld->fld_table]
+                            . '\'][\'' . $fldName . '\'] = \'' . $fld->fld_type
                             . '\';' . "\n";
                         if (strtolower(substr($fldName, strlen($fldName)-6)) == '_other') {
                             $othFld = substr($fldName, 0, strlen($fldName)-6);
@@ -220,9 +220,9 @@ class GlobalsImportExport extends GlobalsTables
                         }
                     }
                 }
-                
+
                 $cache .= $this->loadDataMapLinks($this->treeID);
-                
+
                 $cache .= '$'.'this->nodeCondInvert = [];' . "\n";
                 $inv = SLConditionsNodes::where('cond_node_node_id', '>', 0)
                     ->where('cond_node_loop_id', '<', 0)
@@ -236,7 +236,7 @@ class GlobalsImportExport extends GlobalsTables
                             $this->nodeCondInvert[$invNode] = [];
                         }
                         if (!isset($this->nodeCondInvert[$invNode][$invCond])) {
-                            $cache .= '$'.'this->nodeCondInvert[' . $invNode 
+                            $cache .= '$'.'this->nodeCondInvert[' . $invNode
                                 . '][' . $invCond . '] = true;' . "\n";
                             $this->nodeCondInvert[$invNode][$invCond] = true;
                         }
@@ -245,7 +245,7 @@ class GlobalsImportExport extends GlobalsTables
             } // end if (isset($this->dbRow->db_prefix))
 
             eval($cache);
-            
+
             $cache2 = '';
             $extends = SLTables::where('tbl_database', $this->dbID)
                 ->where('tbl_extend', '>', 0)
@@ -253,30 +253,30 @@ class GlobalsImportExport extends GlobalsTables
                 ->get();
             if ($extends->isNotEmpty()) {
                 foreach ($extends as $tbl) {
-                    if (isset($this->tbl[$tbl->tbl_id]) 
+                    if (isset($this->tbl[$tbl->tbl_id])
                         && isset($this->fldTypes[$this->tbl[$tbl->tbl_extend]])
                         && is_array($this->fldTypes[$this->tbl[$tbl->tbl_extend]])
                         && sizeof($this->fldTypes[$this->tbl[$tbl->tbl_extend]]) > 0) {
-                        $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id] . '\'][\'' 
-                            . $tbl->tbl_abbr . $this->tblAbbr[$this->tbl[$tbl->tbl_extend]] 
+                        $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id] . '\'][\''
+                            . $tbl->tbl_abbr . $this->tblAbbr[$this->tbl[$tbl->tbl_extend]]
                             . 'ID\'] = \'INT\';' . "\n";
                         foreach ($this->fldTypes[$this->tbl[$tbl->tbl_extend]] as $fldName => $fldType) {
                             $fldName2 = $this->tblAbbr[$this->tbl[$tbl->tbl_id]] . $fldName;
-                            $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id] 
+                            $cache2 .= '$'.'this->fldTypes[\'' . $this->tbl[$tbl->tbl_id]
                                 . '\'][\'' . $fldName2 . '\'] = \'' . $fldType . '\';' . "\n";
                             $fldNames[] = $fldName2;
                         }
                     }
                 }
             }
-            
+
             $this->getCoreTblUserFld();
             $cache2 .= '$'.'this->coreTblUserFld = \'' . $this->coreTblUserFld . '\';' . "\n";
             $xmlTreeSlug = '';
             if ($this->treeRow && isset($this->treeRow->tree_type)) {
                 if ($this->treeRow->tree_type == 'Survey') {
                     $xmlTreeSlug = $this->treeRow->tree_slug;
-                } elseif ($this->treeRow->tree_type == 'Page' 
+                } elseif ($this->treeRow->tree_type == 'Page'
                     && $this->treeRow->tree_opts%Globals::TREEOPT_SEARCH == 0
                     && $this->treeRow->tree_core_table > 0) {
                     $chk = SLTree::where('tree_type', 'Survey')
@@ -295,14 +295,14 @@ class GlobalsImportExport extends GlobalsTables
                     ->orderBy('tree_id', 'asc')
                     ->first();
                 if ($xmlTree && isset($xmlTree->tree_id)) {
-                    if (!isset($xmlTree->tree_root) 
+                    if (!isset($xmlTree->tree_root)
                         || intVal($xmlTree->tree_root) <= 0) {
                         if (intVal($xmlTree->tree_core_table) > 0) {
                             $xmlRootNode = new SLNode;
                             $xmlRootNode->node_tree         = $xmlTree->tree_id;
                             $xmlRootNode->node_parent_id    = -3;
                             $xmlRootNode->node_type         = 'XML';
-                            $xmlRootNode->node_prompt_text  
+                            $xmlRootNode->node_prompt_text
                                 = $this->tbl[$xmlTree->tree_core_table];
                             $xmlRootNode->node_prompt_notes = $xmlTree->tree_core_table;
                             $xmlRootNode->save();
@@ -312,15 +312,15 @@ class GlobalsImportExport extends GlobalsTables
                     }
                     $cache2 .= '$'.'this->xmlTree = [ '
                         . '"id" => ' . $xmlTree->tree_id . ', '
-                        . '"root" => ' . ((intVal($xmlTree->tree_root) > 0) 
+                        . '"root" => ' . ((intVal($xmlTree->tree_root) > 0)
                             ? $xmlTree->tree_root : 0) . ', '
-                        . '"coreTblID" => ' . ((intVal($xmlTree->tree_core_table) > 0) 
+                        . '"coreTblID" => ' . ((intVal($xmlTree->tree_core_table) > 0)
                             ? $xmlTree->tree_core_table : 0) . ', '
-                        . '"coreTbl" => "' . ((isset($this->tbl[$xmlTree->tree_core_table])) 
+                        . '"coreTbl" => "' . ((isset($this->tbl[$xmlTree->tree_core_table]))
                             ? $this->tbl[$xmlTree->tree_core_table] : '') . '", '
-                        . '"slug" => "' . ((isset($xmlTree->tree_slug)) 
+                        . '"slug" => "' . ((isset($xmlTree->tree_slug))
                             ? $xmlTree->tree_slug : '') . '", '
-                        . '"opts" => ' . ((isset($xmlTree->tree_opts) 
+                        . '"opts" => ' . ((isset($xmlTree->tree_opts)
                             && intVal($xmlTree->tree_opts) > 0) ? $xmlTree->tree_opts : 0)
                     . ' ];' . "\n";
                 }
@@ -333,7 +333,7 @@ class GlobalsImportExport extends GlobalsTables
                         . '"opts" => '  . $reportTree->tree_opts . ''
                     . ' ];' . "\n";
                 }
-            } elseif ($this->treeRow && isset($this->treeRow->tree_opts) 
+            } elseif ($this->treeRow && isset($this->treeRow->tree_opts)
                 && $this->treeRow->tree_opts%Globals::TREEOPT_REPORT == 0) {
                 $reportTree = SLTree::where('tree_type', 'Survey')
                     ->where('tree_database', $this->dbID)
@@ -357,16 +357,16 @@ class GlobalsImportExport extends GlobalsTables
             if (sizeof($this->condABs) > 0) {
                 $cache2 .= '$'.'this->condABs = [];' . "\n";
                 foreach ($this->condABs as $i => $ab) {
-                    $cache2 .= '$'.'this->condABs[] = [ ' 
+                    $cache2 .= '$'.'this->condABs[] = [ '
                         . $ab[0] . ', "' . $ab[1] . '" ];' . "\n";
                 }
             }
-            
+
             $this->x["srchUrls"] = [
                 'public'        => '',
                 'administrator' => '',
                 'volunteer'     => '',
-                'partner'       => '', 
+                'partner'       => '',
                 'staff'         => ''
             ];
             if ($this->treeRow && isset($this->treeRow->tree_database)) {
@@ -401,7 +401,7 @@ class GlobalsImportExport extends GlobalsTables
                 . '"volunteer"     => \'' . $this->x["srchUrls"]["volunteer"]     . '\''
             . ' ];' . "\n";
             eval($cache2);
-            
+
             if (file_exists($cacheFile)) {
                 Storage::delete($cacheFile);
             }
@@ -421,27 +421,27 @@ class GlobalsImportExport extends GlobalsTables
         }
         return $tbls;
     }
-    
+
     public function getGenericRows($tbl, $fld = '', $val = '', $oper = '', $ordFld = '')
     {
-        eval("\$rows = " . $this->modelPath($tbl) . "::" 
-            . ((trim($fld) != '') ? "where('" . $fld . "'" . ((trim($oper) != '') 
+        eval("\$rows = " . $this->modelPath($tbl) . "::"
+            . ((trim($fld) != '') ? "where('" . $fld . "'" . ((trim($oper) != '')
                 ? ", '" . $oper . "'" : "") . ", '" . $val . "')->" : "")
-            . ((in_array($oper, ['<>', 'NOT LIKE']) && strtolower($val) != 'null') 
+            . ((in_array($oper, ['<>', 'NOT LIKE']) && strtolower($val) != 'null')
                 ? "orWhere('" . $fld . "', NULL)->" : "")
-            . ((trim($ordFld) != '') ? "orderBy('" . $ordFld . "', 'asc')->" : "") 
-            . ((isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
-                && intVal($this->exprtProg["tok"]->tok_core_id) > 0) 
+            . ((trim($ordFld) != '') ? "orderBy('" . $ordFld . "', 'asc')->" : "")
+            . ((isset($this->exprtProg["tok"]) && $this->exprtProg["tok"]
+                && intVal($this->exprtProg["tok"]->tok_core_id) > 0)
                 ? "offset(" . $this->exprtProg["tok"]->tok_core_id . ")->" : "")
             . "limit(50000)->get();");
         return $rows;
     }
-    
+
     public function genCsv($tbl, $fld = '', $val = '', $oper = '', $ordFld = '', $filebase = '')
     {
         $flds = $this->getTblFldTypes($tbl);
         if (trim($filebase) == '') {
-            $filebase = $tbl . ((trim($val) != '') ? '-' . $val 
+            $filebase = $tbl . ((trim($val) != '') ? '-' . $val
                 . ((trim($oper) != '') ? '-' . $oper : '') : '');
         }
         $this->getExportProgress($filebase);
@@ -457,7 +457,7 @@ class GlobalsImportExport extends GlobalsTables
                 if ($this->exprtProg["fileCnt"] == 1) {
                     $this->exprtProg["tok"]->tok_core_id = 0;
                 }
-            } elseif (isset($this->exprtProg["tok"]) && $this->exprtProg["tok"] 
+            } elseif (isset($this->exprtProg["tok"]) && $this->exprtProg["tok"]
                 && intVal($this->exprtProg["tok"]->tok_tree_id) > 0) {
                 $this->exprtProg["fileCnt"] = $this->exprtProg["tok"]->tok_tree_id;
             }
@@ -470,7 +470,7 @@ class GlobalsImportExport extends GlobalsTables
                     foreach ($rows as $i => $row) {
                         $rowCsv = '';
                         foreach ($flds as $fld => $type) {
-                            $rowCsv .= ',' . ((isset($row->{ $fld })) 
+                            $rowCsv .= ',' . ((isset($row->{ $fld }))
                                 ? str_replace(',', '!;!', $row->{ $fld }) : '');
                         }
                         if (trim($rowCsv) != '') {
@@ -480,13 +480,13 @@ class GlobalsImportExport extends GlobalsTables
                         $this->exprtProg["tok"]->tok_core_id++;
                         if (strlen($this->exprtProg["fileContent"]) > 9000000) {
                             $this->genCsvStore();
-                            echo '<html><body><br /><br /><center>' 
+                            echo '<html><body><br /><br /><center>'
                                 . $this->spinner() . '<br /></center>' . "\n"
                                 . '<script type="text/javascript"> '
-                                . 'setTimeout("window.location=\'' 
-                                . $this->getCurrUrlBase() . '?export=' 
-                                . $this->exprtProg["fileCnt"] . '&off=' 
-                                . $this->exprtProg["tok"]->tok_core_id 
+                                . 'setTimeout("window.location=\''
+                                . $this->getCurrUrlBase() . '?export='
+                                . $this->exprtProg["fileCnt"] . '&off='
+                                . $this->exprtProg["tok"]->tok_core_id
                                 . '\'", 1000); </script></body></html>';
                             exit;
                         }
@@ -500,13 +500,18 @@ class GlobalsImportExport extends GlobalsTables
             session()->put('sessMsg', '<h2 class="slBlueDark">Export Complete!</h2>');
             session()->save();
             echo '<html><body><br /><br /><center>' . $this->spinner() . '<br /></center>'
-                . "\n" . '<script type="text/javascript"> setTimeout("window.location=\'' 
-                . $this->getCurrUrlBase() . '\'", 1000); </script></body></html>';
+                . "\n" . $this->jsRedir($this->getCurrUrlBase(), 1000) . '</body></html>';
             exit;
         }
         return true;
     }
-    
+
+    public function jsRedir($url, $delay = 1)
+    {
+        return '<script type="text/javascript"> setTimeout("window.location=\''
+            . $url . '\'", ' . $delay . '); </script>';
+    }
+
     public function genCsvHeader($tbl, $flds)
     {
         $ret = '';
@@ -520,12 +525,12 @@ class GlobalsImportExport extends GlobalsTables
         }
         return $ret;
     }
-    
+
     public function genCsvStore()
     {
         $filename = str_replace(
             '.csv',
-            '-' . $this->leadZero($this->exprtProg["fileCnt"]) . '.csv', 
+            '-' . $this->leadZero($this->exprtProg["fileCnt"]) . '.csv',
             $this->exprtProg["fileName"]
         );
         if (file_exists($filename)) {
@@ -538,7 +543,7 @@ class GlobalsImportExport extends GlobalsTables
         $this->exprtProg["fileContent"] = '';
         return true;
     }
-    
+
     public function getExportProgress($filebase, $expImp = 'Export')
     {
         $twoDaysAgo = date("Y-m-d H:i:s", mktime(0, 0, 0, date("n"), date("j")-2, date("Y")));
@@ -556,7 +561,7 @@ class GlobalsImportExport extends GlobalsTables
         }
         return true;
     }
-    
+
     public function openFileLines($filename = '')
     {
 		$content = [];
@@ -568,10 +573,10 @@ class GlobalsImportExport extends GlobalsTables
 		}
     	return $content;
     }
-    
+
     public function importCsv($tbl, $filebase = '')
     {
-    	if (!file_exists($filebase) 
+    	if (!file_exists($filebase)
             && file_exists(str_replace('.csv', '-01.csv', $filebase))) {
     		$filebase = str_replace('.csv', '-01.csv', $filebase);
     	}
@@ -610,7 +615,7 @@ class GlobalsImportExport extends GlobalsTables
         }
         return true;
     }
-    
+
     public function importZipsUS()
     {
         $chk = SLZips::where('zip_country', 'IS', NULL)
@@ -618,13 +623,13 @@ class GlobalsImportExport extends GlobalsTables
             ->first();
         if (!$chk) {
         	$this->importCsv(
-                'Zips', 
+                'Zips',
                 'https://survloop.org/survlooporg/expansion-pack/Zips-US-01.csv'
             );
         }
         return true;
     }
-    
+
     // sourced from https://fusiontables.google.com/DataSource?docid=1H_cl-oyeG4FDwqJUTeI_aGKmmkJdPDzRNccp96M
     // and https://www.aggdata.com/free/canada-postal-codes
     public function importZipsCanada()
@@ -634,22 +639,22 @@ class GlobalsImportExport extends GlobalsTables
             ->first();
         if (!$chk) {
         	$this->importCsv(
-                'Zips', 
+                'Zips',
                 'https://survloop.org/survlooporg/expansion-pack/Zips-Canada-01.csv'
             );
         }
         return true;
     }
-    
-    
+
+
     public function mysqlTblCoreStart($tbl)
     {
-        return "CREATE TABLE IF NOT EXISTS `" 
-            . (($tbl->tbl_database == 3) ? 'sl_' : $this->dbRow->db_prefix) 
+        return "CREATE TABLE IF NOT EXISTS `"
+            . (($tbl->tbl_database == 3) ? 'sl_' : $this->dbRow->db_prefix)
             . $tbl->tbl_name . "` ( `" . $tbl->tbl_abbr
             . "id` int(11) NOT NULL AUTO_INCREMENT, \n";
     }
-    
+
     public function mysqlTblCoreFinish($tbl)
     {
         return "  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP , \n"
@@ -658,7 +663,110 @@ class GlobalsImportExport extends GlobalsTables
             . "  PRIMARY KEY (`" . $tbl->tbl_abbr . "id`) )"
             . "  ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
     }
-    
+
+    public function getTblExportFlds($tbl)
+    {
+        $flds = SLFields::where('fld_table', $tbl->tbl_id)
+            ->orderBy('fld_ord', 'asc')
+            ->orderBy('fld_eng', 'asc')
+            ->get();
+        if (isset($tbl->tbl_extend) && intVal($tbl->tbl_extend) > 0) {
+            $flds = $this->addFldRowExtends($flds, $tbl->tbl_extend);
+        }
+        return $flds;
+    }
+
+    public function installTblByShema($tbl, $flds = [])
+    {
+        if (!$flds || sizeof($flds) == 0) {
+            $flds = $this->getTableFields($tbl);
+        }
+        $ret = "Schema::create('"
+            . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name
+            . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
+            . "$"."table->increments('" . $tbl->tbl_abbr . "id');";
+        if ($flds->isNotEmpty()) {
+            foreach ($flds as $fld) {
+                $ret .= $this->installTblByShemaFld($fld, $tbl->tbl_abbr);
+            }
+        }
+        $ret .= "\n\t\t\t" . "$"."table->timestamps();"
+            . "\n\t\t" . "});" . "\n\t";
+        return $ret;
+    }
+
+    protected function installTblByShemaFld($fld = null, $abbr = '')
+    {
+        $fldName = trim($abbr . $fld->fld_name);
+        $ret =  "\n\t\t\t"."$"."table->";
+        if (strpos($fld->fld_values, 'Def::') !== false) {
+            $ret .=  "integer('" . $fldName . "')->unsigned()";
+        } elseif ($fld->fld_type == 'INT') {
+            if ($fld->fld_values == '0;1') {
+                $ret .=  "boolean('" . $fldName . "')";
+            } else {
+                $ret .=  "integer('" . $fldName . "')";
+            }
+            if (intVal($fld->fld_foreign_table) > 0
+                && intVal($fld->fld_default) >= 0) {
+                $ret .=  "->unsigned()";
+            }
+        } elseif ($fld->fld_type == 'DOUBLE') {
+            $ret .=  "double('" . $fldName . "')";
+        } elseif ($fld->fld_type == 'VARCHAR') {
+            if ($fld->fld_data_length == 1
+                || $fld->fld_values == 'Y;N'
+                || $fld->fld_values == 'Y;N;?'
+                || $fld->fld_values == 'M;F'
+                || $fld->fld_values == 'Y;N;?'
+                || $fld->fld_values == 'M;F;?') {
+                $ret .=  "char('" . $fldName . "', 1)";
+            } else {
+                $ret .=  "string('" . $fldName . "'"
+                    . (($fld->fld_data_length > 0)
+                        ? ", " . $fld->fld_data_length : "")
+                    . ")";
+            }
+        } elseif ($fld->fld_type == 'TEXT') {
+            $ret .=  "longText('" . $fldName . "')";
+        } elseif ($fld->fld_type == 'DATE') {
+            $ret .=  "date('" . $fldName . "')";
+        } elseif ($fld->fld_type == 'DATETIME') {
+            $ret .=  "dateTime('" . $fldName . "')";
+        }
+        if (trim($fld->fld_default) != '') {
+            $ret .=  "->default(";
+            if ($fld->fld_default == 'NULL') {
+                $ret .= "NULL";
+            } else {
+                if ($fld->fld_values == '0;1') {
+                    if (intVal($fld->fld_default) == 1) {
+                        $ret .= "1";
+                    } else {
+                        $ret .= "0";
+                    }
+                } else {
+                    $ret .= "'" . $fld->fld_default . "'";
+                }
+            }
+            $ret .= ")";
+        }
+        $ret .=  "->nullable();";
+        if ($fld->fld_is_index == 1) {
+            $ret .= "\n\t\t\t$"."table->index('" . $fldName . "');";
+        }
+        /* // This is throwing errors
+        if (intVal($fld->fld_foreign_table) > 0) {
+            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->fld_foreign_table);
+            $this->v["migrateEnd"] .= "\t"."Schema::table('"
+                . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name
+                . "', function($"."table) { $"."table->foreign('" . $fldName
+                . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
+        }
+        */
+        return $ret;
+    }
+
     public function exportMysqlTbl($tbl, $installHereNow = false)
     {
         if (!isset($this->x["indexesEnd"])) {
@@ -667,26 +775,20 @@ class GlobalsImportExport extends GlobalsTables
         if (strtolower($tbl->tbl_eng) == 'users') {
             return "";
         }
-        
+
         $tblQuery = $this->mysqlTblCoreStart($tbl);
         $indexes = "";
-        $flds = SLFields::where('fld_table', $tbl->tbl_id)
-            ->orderBy('fld_ord', 'asc')
-            ->orderBy('fld_eng', 'asc')
-            ->get();
-        if (isset($tbl->tbl_extend) && intVal($tbl->tbl_extend) > 0) {
-            $flds = $this->addFldRowExtends($flds, $tbl->tbl_extend);
-        }
+        $flds = $this->getTblExportFlds($tbl);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
                 $tblQuery .= "  `" . $tbl->tbl_abbr . $fld->fld_name . "` ";
                 if ($fld->fld_type == 'INT') {
-                    if (intVal($fld->fld_foreign_table) > 0 
+                    if (intVal($fld->fld_foreign_table) > 0
                         && isset($this->tbl[$fld->fld_foreign_table])
                         && strtolower($this->tbl[$fld->fld_foreign_table]) == 'users') {
                         $tblQuery .= "BIGINT(20) unsigned ";
                     } else {
-                        $tblQuery .= "INT(" . (($fld->fld_data_length > 0) 
+                        $tblQuery .= "INT(" . (($fld->fld_data_length > 0)
                             ? $fld->fld_data_length : 11) . ") ";
                     }
                 } elseif ($fld->fld_type == 'DOUBLE') {
@@ -695,7 +797,7 @@ class GlobalsImportExport extends GlobalsTables
                     if ($fld->fld_values == 'Y;N' || $fld->fld_values == 'M;F') {
                         $tblQuery .= "VARCHAR(1) ";
                     } else {
-                        $tblQuery .= "VARCHAR(" . (($fld->fld_data_length > 0) 
+                        $tblQuery .= "VARCHAR(" . (($fld->fld_data_length > 0)
                             ? $fld->fld_data_length : 255) . ") ";
                     }
                 } elseif ($fld->fld_type == 'TEXT') {
@@ -723,8 +825,8 @@ class GlobalsImportExport extends GlobalsTables
                 }
                 if (intVal($fld->fld_foreign_table) > 0) {
                     list($forTbl, $forID) = $this->chkForeignKey($fld->fld_foreign_table);
-                    $this->x["indexesEnd"] .= "ALTER TABLE `" 
-                        . $this->dbRow->db_prefix . $tbl->tbl_name 
+                    $this->x["indexesEnd"] .= "ALTER TABLE `"
+                        . $this->dbRow->db_prefix . $tbl->tbl_name
                         . "` ADD FOREIGN KEY (`" . $tbl->tbl_abbr . $fld->fld_name . "`) "
                         . "REFERENCES `" . $forTbl . "` (`" . $forID . "`); \n";
                 }
@@ -733,13 +835,13 @@ class GlobalsImportExport extends GlobalsTables
         }
         return $tblQuery;
     }
-    
+
     public function tblQrySlExports()
     {
         $exportTbls = [
-            'bus_rules', 'conditions', 'conditions_articles', 'conditions_nodes', 
-            'conditions_vals', 'databases', 'data_helpers', 'data_links', 
-            'data_loop', 'data_subsets', 'definitions','emails', 'fields', 
+            'bus_rules', 'conditions', 'conditions_articles', 'conditions_nodes',
+            'conditions_vals', 'databases', 'data_helpers', 'data_links',
+            'data_loop', 'data_subsets', 'definitions','emails', 'fields',
             'images', 'node', 'node_responses', 'tables', 'tree'
         ];
         return SLTables::where('tbl_database', 3)
@@ -747,7 +849,7 @@ class GlobalsImportExport extends GlobalsTables
             ->orderBy('tbl_ord', 'asc')
             ->get();
     }
-    
+
     public function loadSlParents($dbIN = -3)
     {
         $dbID = intVal($this->dbID);
@@ -786,34 +888,34 @@ class GlobalsImportExport extends GlobalsTables
         }
         return true;
     }
-    
+
     public function chkTableSeedCnt($tblClean = '', $eval = '')
     {
         $seedCnt = 0;
-        if (trim($tblClean) != '' 
+        if (trim($tblClean) != ''
             && file_exists('../app/Models/' . $tblClean . '.php')) {
             eval("\$seedCnt = App\\Models\\" . $tblClean . "::" . $eval . "count();");
         }
         return (($seedCnt && intVal($seedCnt) > 0) ? intVal($seedCnt) : 0);
     }
-    
+
     public function chkTableSeedLimits($tblClean = '', $eval = '', $limit = 10000)
     {
         $seedCnt = $this->chkTableSeedCnt($tblClean, $eval);
         return ($limit < intVal($seedCnt));
     }
-    
+
     public function getTableSeedDump($tblClean = '', $eval = '', $limit = 10000, $start = 0)
     {
         $seedChk = [];
-        if (trim($tblClean) != '' 
+        if (trim($tblClean) != ''
             && file_exists('../app/Models/' . $tblClean . '.php')) {
-            eval("\$seedChk = App\\Models\\" . $tblClean . "::" 
+            eval("\$seedChk = App\\Models\\" . $tblClean . "::"
                 . $eval . "orderBy('created_at', 'asc')->get();");
         }
         return $seedChk;
     }
-    
+
     public function getTableSeedDumpLimit($tblClean = '', $eval = '', $limit = 10000, $start = 0)
     {
         return [
@@ -821,7 +923,7 @@ class GlobalsImportExport extends GlobalsTables
             $this->getTableSeedDump($tblClean, $eval, $limit, $start)
         ];
     }
-    
+
     public function loadSlSeedEval($tbl = [], $dbIn = -3)
     {
         $dbID = $this->dbID;
@@ -851,27 +953,27 @@ class GlobalsImportExport extends GlobalsTables
                 $eval = "whereIn('" . $tbl->tbl_abbr . "database', " . $dbIDs . ")->";
                 if ($tbl->tbl_name == 'definitions') {
                     $eval .= "whereNotIn('def_subset', [
-                        'facebook-app-id', 'google-analytic', 
-                        'google-cod-key', 'google-cod-key2', 
-                        'google-map-key', 'google-map-key2', 
-                        'google-maps-key', 'google-maps-key2', 
+                        'facebook-app-id', 'google-analytic',
+                        'google-cod-key', 'google-cod-key2',
+                        'google-map-key', 'google-map-key2',
+                        'google-maps-key', 'google-maps-key2',
                         'matomo-analytic-url', 'matomo-analytic-site-id'
                     ])->";
                 }
             } elseif (in_array($tbl->tbl_name, $treeChildren)) {
-                $eval = "whereIn('" . $tbl->tbl_abbr . "tree', [" 
+                $eval = "whereIn('" . $tbl->tbl_abbr . "tree', ["
                     . implode(", ", $this->x["slTrees"]) . "])->";
             } elseif (in_array($tbl->tbl_name, $condChildren)) {
-                $eval = "whereIn('" . $tbl->tbl_abbr . "cond_id', [" 
+                $eval = "whereIn('" . $tbl->tbl_abbr . "cond_id', ["
                     . implode(", ", $this->x["slConds"]) ."])->";
             } elseif ($tbl->tbl_name == 'NodeResponses') {
-                $eval = "whereIn('" . $tbl->tbl_abbr . "node', [" 
+                $eval = "whereIn('" . $tbl->tbl_abbr . "node', ["
                     . implode(", ", $this->x["slNodes"]) . "])->";
             }
         }
         return $eval;
     }
-    
+
     public function exportMysqlSl()
     {
         $this->loadSlParents();
@@ -885,19 +987,19 @@ class GlobalsImportExport extends GlobalsTables
                 $this->x["tbl"] = $tbl;
                 $this->x["tblName"] = 'sl_' . $tbl->tbl_name;
                 $this->x["tblClean"] = str_replace('_', '', $this->x["tblName"]);
-                $this->x["export"] .= "\nDROP TABLE IF EXISTS `" 
+                $this->x["export"] .= "\nDROP TABLE IF EXISTS `"
                     . $this->x["tblName"] . "`;\n" . $this->exportMysqlTbl($tbl);
                 $flds = $this->getTableFields($tbl);
                 if ($flds->isNotEmpty()) {
                     $seedChk = $this->getTableSeedDump(
-                        $this->x["tblClean"], 
+                        $this->x["tblClean"],
                         $this->loadSlSeedEval($tbl)
                     );
                     if ($seedChk->isNotEmpty()) {
-                        $this->x["tblInsertStart"] = "\nINSERT INTO `" 
+                        $this->x["tblInsertStart"] = "\nINSERT INTO `"
                             . $this->x["tblName"] . "` (`" . $tbl->tbl_abbr . "id`";
                         foreach ($flds as $i => $fld) {
-                            $this->x["tblInsertStart"] .= ", `" 
+                            $this->x["tblInsertStart"] .= ", `"
                                 . $tbl->tbl_abbr . $fld->fld_name . "`";
                         }
                         $this->x["tblInsertStart"] .= ", `created_at`, `updated_at`) VALUES \n";
@@ -911,16 +1013,16 @@ class GlobalsImportExport extends GlobalsTables
                             $this->x["export"] .= "(" . $seed->getKey();
                             foreach ($flds as $fld) {
                                 if (isset($seed->{ $tbl->tbl_abbr . $fld->fld_name })) {
-                                    $this->x["export"] .= ", '" . str_replace("'", "\'", 
+                                    $this->x["export"] .= ", '" . str_replace("'", "\'",
                                         $seed->{ $tbl->tbl_abbr . $fld->fld_name }) . "'";
-                                } elseif ($fld->fld_null_support 
+                                } elseif ($fld->fld_null_support
                                     && intVal($fld->fld_null_support) == 1) {
                                     $this->x["export"] .= ", NULL";
                                 } else {
                                     $this->x["export"] .= ", ''";
                                 }
                             }
-                            $this->x["export"] .= ", '" . $seed->created_at 
+                            $this->x["export"] .= ", '" . $seed->created_at
                                 . "', '" . $seed->updated_at . "')";
                         }
                         $this->x["export"] .= "; \n";
@@ -930,26 +1032,30 @@ class GlobalsImportExport extends GlobalsTables
         }
         while (strpos($this->x["export"], ") VALUES \n,\n") !== false) {
             $this->x["export"] = str_replace(
-                ") VALUES \n,\n", 
-                ") VALUES \n", 
+                ") VALUES \n,\n",
+                ") VALUES \n",
                 $this->x["export"]
             );
         }
         //$this->tmpDbSwitchBack();
         return true;
     }
-    
+
     public function createTableIfNotExists($coreTbl, $userTbl = null)
     {
         $this->modelPath($coreTbl->tbl_name, true);
         if (!$this->chkTableExists($coreTbl, $userTbl)) {
-            $tblQuery = $this->exportMysqlTbl($coreTbl, true);
-            $chk = DB::select( DB::raw( $tblQuery ) );
+            $eval = "Illuminate\\Support\\Facades\\"
+                . $this->installTblByShema($coreTbl);
+            $blu = "(Illuminate\\Database\\Schema\\Blueprint";
+            $eval = str_replace("(Blueprint ", $blu, $eval);
+//echo '<pre>' . $eval . '</pre>'; exit;
+            eval($eval);
             return false;
         }
         return true;
     }
-    
+
     public function getPackageLineCount($dir = 'Controllers', $pkg = '', $type = '.php')
     {
         if ($pkg == '') {
@@ -957,7 +1063,7 @@ class GlobalsImportExport extends GlobalsTables
         }
         return $this->getDirLinesCount('../vendor/' . $pkg . '/src/' . $dir, $type);
     }
-    
+
     public function getPackageByteCount($dir = 'Controllers', $pkg = '', $type = '')
     {
         if ($pkg == '') {
@@ -965,7 +1071,7 @@ class GlobalsImportExport extends GlobalsTables
         }
         return $this->getDirSize('../vendor/' . $pkg . '/src/' . $dir, $type);
     }
-    
+
     public function getJsonSurvStats($pkg = '')
     {
         $dbID = $this->dbID;
@@ -1045,7 +1151,7 @@ class GlobalsImportExport extends GlobalsTables
 
     public function getLimit($limit = 100)
     {
-        if ($this->REQ->has('limit')) { 
+        if ($this->REQ->has('limit')) {
             $getLimit = intVal($this->REQ->get('limit'));
             if ($getLimit > 0) {
                 $limit = $getLimit;
@@ -1056,7 +1162,7 @@ class GlobalsImportExport extends GlobalsTables
 
     public function getStart($start = 0)
     {
-        if ($this->REQ->has('start')) { 
+        if ($this->REQ->has('start')) {
             $start = intVal($this->REQ->get('start'));
         }
         return $start;
@@ -1073,5 +1179,5 @@ class GlobalsImportExport extends GlobalsTables
         }
         return '';
     }
-    
+
 }

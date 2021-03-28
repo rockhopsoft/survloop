@@ -23,12 +23,12 @@ class SessAnalysis
     public $nodeTots = [];
     public $nodeSort = [];
     public $coreTots = [];
-    
+
     public function __construct($treeID = 1)
     {
         $this->treeID = $treeID;
     }
-    
+
     public function loadNodeTots(&$custReport = null)
     {
         if ($custReport === null) {
@@ -45,9 +45,9 @@ class SessAnalysis
                 $this->nodeTots[$n->node_id] = [
                     "cmpl" => [ 0, 0 ],
                     "perc" => intVal($custReport->rawOrderPercent($n->node_id)),
-                    "name" => ((isset($tmp->extraOpts["meta-title"]) 
+                    "name" => ((isset($tmp->extraOpts["meta-title"])
                         && trim($tmp->extraOpts["meta-title"]) != '')
-                        ? $tmp->extraOpts["meta-title"] 
+                        ? $tmp->extraOpts["meta-title"]
                         : $n->node_prompt_notes)
                 ];
                 $this->nodeSort[$this->nodeTots[$n->node_id]["perc"]] = $n->node_id;
@@ -75,18 +75,18 @@ class SessAnalysis
             "date" => 0,
             "dur"  => 0,
             "mobl" => false,
-            "cmpl" => false, 
+            "cmpl" => false,
             "log"  => []
         ];
-        eval("\$coreRec = " . $GLOBALS["SL"]->modelPathTblID($tree->tree_core_table) 
+        eval("\$coreRec = " . $GLOBALS["SL"]->modelPathTblID($tree->tree_core_table)
             . "::find(" . intVal($coreID) .");");
         if (!$coreRec || !isset($coreRec->updated_at)) {
             return $this->coreTots;
         }
-        
+
         $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), date("m"), date("d")-3, date("Y"));
         $cacheFile = '../storage/app/anlyz/t' . $this->treeID . '/c' . $coreID . '.php';
-        if (!file_exists($cacheFile) 
+        if (!file_exists($cacheFile)
             || strtotime($coreRec->updated_at) > $this->v["dayold"]
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             if (in_array($GLOBALS["SL"]->getTblRecPublicID($coreRec), $allPublicIDs)) {
@@ -96,7 +96,7 @@ class SessAnalysis
             if (isset($coreRec->{ $coreAbbr . 'submission_progress' })) {
                 $this->coreTots["node"] = $coreRec->{ $coreAbbr . 'submission_progress' };
                 $this->coreTots["date"] = strtotime($coreRec->created_at);
-                if (isset($coreRec->{ $coreAbbr . 'is_mobile' }) 
+                if (isset($coreRec->{ $coreAbbr . 'is_mobile' })
                     && intVal($coreRec->{ $coreAbbr . 'is_mobile' }) == 1) {
                     $this->coreTots["mobl"] = true;
                 }
@@ -137,12 +137,12 @@ class SessAnalysis
                 }
             }
             $cacheCode = '$'.'this->coreTots = [
-                "core" => ' . $coreID . ', 
-                "node" => ' . $this->coreTots["node"] . ', 
-                "date" => ' . ((trim($this->coreTots["date"]) != '') ? $this->coreTots["date"] : 0) . ', 
-                "dur"  => ' . ((trim($this->coreTots["dur"]) != '') ? $this->coreTots["dur"] : 0) . ', 
-                "mobl" => ' . (($this->coreTots["mobl"]) ? 'true' : 'false') . ', 
-                "cmpl" => ' . (($this->coreTots["cmpl"]) ? 'true' : 'false') . ', 
+                "core" => ' . $coreID . ',
+                "node" => ' . $this->coreTots["node"] . ',
+                "date" => ' . ((trim($this->coreTots["date"]) != '') ? $this->coreTots["date"] : 0) . ',
+                "dur"  => ' . ((trim($this->coreTots["dur"]) != '') ? $this->coreTots["dur"] : 0) . ',
+                "mobl" => ' . (($this->coreTots["mobl"]) ? 'true' : 'false') . ',
+                "cmpl" => ' . (($this->coreTots["cmpl"]) ? 'true' : 'false') . ',
                 "log"  => [ ' . $coreLog . ' ]
                 ];' . "\n";
             file_put_contents($cacheFile, $cacheCode);
@@ -150,5 +150,5 @@ class SessAnalysis
         eval(file_get_contents($cacheFile));
         return $this->coreTots;
     }
-    
+
 }

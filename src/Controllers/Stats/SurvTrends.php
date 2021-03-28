@@ -18,17 +18,19 @@ class SurvTrends extends SurvStatsCore
     public $pastDays      = 60;
     public $axisLabels    = [];
     public $dataDays     = [];
-    
+
     public $datFldDate    = '';
     public $datRawResults = null;
-    
+
+
     public function __construct($nIDtxt = '0', $datFldDate = '', $pastDays = 60)
     {
         $this->nIDtxt     = $nIDtxt;
         $this->datFldDate = $datFldDate;
         $this->pastDays   = $pastDays;
+        $this->loadFadeColors();
     }
-    
+
     public function addDataLineType($abbr = '', $label = '', $fld = '', $brdClr = '#2b3493', $dotClr = '#2b3493')
     {
         $this->addDataType($abbr, $label);
@@ -42,12 +44,12 @@ class SurvTrends extends SurvStatsCore
         }
         return true;
     }
-    
+
     public function getPastStartDate()
     {
         return date("Y-m-d", mktime(0, 0, 0, date("n"), date("j")-$this->pastDays, date("Y")));
     }
-    
+
     public function loadAxisPastDayLabels()
     {
         $this->axisLabels = [];
@@ -56,14 +58,14 @@ class SurvTrends extends SurvStatsCore
         }
         return $this->axisLabels;
     }
-    
+
     // Takes Eloquent database search results
     public function addRawDataResults($res = null)
     {
         $this->rawDataRes = $res;
         return true;
     }
-    
+
     private function getDateIndex($date = '')
     {
         $time = strtotime($date);
@@ -75,7 +77,7 @@ class SurvTrends extends SurvStatsCore
         }
         return -1;
     }
-    
+
     private function getRawResultDateIndex($row = null)
     {
         if ($row && trim($this->datFldDate) != '' && isset($row->{ $this->datFldDate })) {
@@ -83,7 +85,7 @@ class SurvTrends extends SurvStatsCore
         }
         return -1;
     }
-    
+
     public function processRawDataResults($res = null)
     {
         if ($res !== null) {
@@ -94,9 +96,9 @@ class SurvTrends extends SurvStatsCore
                 $dateIndex = $this->getRawResultDateIndex($statRec);
                 if ($dateIndex >= 0) {
                     foreach ($this->datMap as $dLet => $datMap) {
-                        if (isset($datMap["rowFld"]) 
+                        if (isset($datMap["rowFld"])
                             && trim($datMap["rowFld"]) != ''
-                            && isset($statRec->{ $datMap["rowFld"] }) 
+                            && isset($statRec->{ $datMap["rowFld"] })
                             && $statRec->{ $datMap["rowFld"] } !== null) {
                             $this->dataDays[$dLet][$dateIndex] = $statRec->{ $datMap["rowFld"] };
                         }
@@ -106,7 +108,7 @@ class SurvTrends extends SurvStatsCore
         }
         return true;
     }
-    
+
     public function addDayTally($abbr, $date, $tally = 1)
     {
         $dLet = $this->dAbr($abbr);
@@ -116,42 +118,43 @@ class SurvTrends extends SurvStatsCore
         }
         return true;
     }
-    
-    public function printDailyGraph($height = 500)
+
+    public function printDailyGraph($height = 500, $title = '')
     {
         $GLOBALS["SL"]->x["needsPlots"] = true;
         $this->loadAxisPastDayLabels();
         $sysDef = new SystemDefinitions;
         return view(
-            'vendor.survloop.reports.graph-bar-grouped', 
+            'vendor.survloop.reports.graph-bar-grouped',
             [
                 "nIDtxt"     => $this->nIDtxt,
                 "datMap"     => $this->datMap,
                 "axisLabels" => $this->axisLabels,
                 "dataDays"   => $this->dataDays,
                 "height"     => $height,
+                "title"      => $title,
                 "css"        => $sysDef->loadCss()
             ]
         )->render();
     }
-    
-    public function printDailyGraphLines($height = 500)
+
+    public function printDailyGraphLines($height = 500, $title = '')
     {
-        $GLOBALS["SL"]->x["needsPlots"] = true;
+        $GLOBALS["SL"]->x["needsCharts"] = true;
         $this->loadAxisPastDayLabels();
-echo 'printDailyGraphLines(<pre>'; print_r($this->datMap); print_r($this->dataDays); print_r($this->axisLabels); echo '</pre>'; exit;
         $sysDef = new SystemDefinitions;
         return view(
-            'vendor.survloop.reports.graph-bar-grouped', 
+            'vendor.survloop.reports.graph-data-line',
             [
                 "nIDtxt"     => $this->nIDtxt,
                 "datMap"     => $this->datMap,
                 "axisLabels" => $this->axisLabels,
                 "dataDays"   => $this->dataDays,
                 "height"     => $height,
+                "title"      => $title,
                 "css"        => $sysDef->loadCss()
             ]
         )->render();
     }
-    
+
 }

@@ -22,7 +22,7 @@ function checkNodeFormSignup() {
     } else if (reqFormEmail('emailID') && document.getElementById('emailID').value.trim() != '') {
         document.getElementById('emailWarning').style.display='none';
         $.ajax({
-            url: "/chkEmail?"+$("#emailID").serialize(),
+            url: "/chk-email?"+$("#emailID").serialize(),
             type: 'GET',
             async: false,
             cache: false,

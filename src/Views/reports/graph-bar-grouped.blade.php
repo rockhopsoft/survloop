@@ -5,13 +5,13 @@
 <script type="text/javascript">
 @forelse ($datMap as $dLet => $dat)
     var trace{{ $dLet }} = {
-      x: [ @foreach ($axisLabels as $i => $lab) @if ($i > 0) , @endif "{{ $lab }}" @endforeach ],
-      y: [ @forelse ($dataDays[$dLet] as $i => $val) @if ($i > 0) , @endif {{ $val }} @empty @endforelse ],
-      name: '{{ $dat["lab"] }}',
-      type: 'bar',
-      marker: {
-        color: '{{ $GLOBALS["SL"]->printHex2Rgba($dat["dotClr"]) }}'
-      }
+        x: [ @foreach ($axisLabels as $i => $lab) @if ($i > 0) , @endif "{{ $lab }}" @endforeach ],
+        y: [ @forelse ($dataDays[$dLet] as $i => $val) @if ($i > 0) , @endif {{ $val }} @empty @endforelse ],
+        name: '{{ $dat["lab"] }}',
+        type: 'bar',
+        marker: {
+          color: '{{ $GLOBALS["SL"]->printHex2Rgba($dat["dotClr"]) }}'
+        }
     };
 @empty
 @endforelse

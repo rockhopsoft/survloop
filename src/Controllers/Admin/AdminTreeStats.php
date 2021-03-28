@@ -18,8 +18,8 @@ use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 
 class AdminTreeStats extends AdminController
 {
-    
-    public function treeStats(Request $request, $treeID = -3) 
+
+    public function treeStats(Request $request, $treeID = -3)
     {
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
@@ -27,7 +27,7 @@ class AdminTreeStats extends AdminController
         if (!$this->checkCache()) {
             $this->v["printTree"] = $this->v["treeAdmin"]->adminPrintFullTreeStats($request);
             $this->v["content"] = view(
-                'vendor.survloop.admin.tree.treeStats', 
+                'vendor.survloop.admin.tree.treeStats',
                 $this->v
             )->render();
             $this->saveCache();
@@ -35,7 +35,7 @@ class AdminTreeStats extends AdminController
         return view('vendor.survloop.master', $this->v);
     }
 
-    public function treeSessions(Request $request, $treeID = 1, $refresh = false, $height = 720) 
+    public function treeSessions(Request $request, $treeID = 1, $refresh = false, $height = 720)
     {
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
@@ -45,34 +45,15 @@ class AdminTreeStats extends AdminController
             $this->custReport->loadTree($treeID, $request);
             $this->sysDef = new SystemDefinitions;
             $this->v["css"] = $this->sysDef->loadCss();
-            
-            $this->v["dayold"] = mktime(date("H"), date("i"), date("s"), 
-                date("m"), date("d")-3, date("Y"));
-            /*
-            // clear empties here
-            eval("\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) 
-                . "::" . $this->custReport->treeSessionsWhereExtra()
-                . "where('updated_at', '<', '" . date("Y-m-d H:i:s", $this->v["dayold"]) 
-                . "')->get();");
-            if ($chk->isNotEmpty()) {
-                foreach ($chk as $row) {
-                    if ($this->custReport->chkCoreRecEmpty($row->getKey(), $row)) {
-                        $row->delete();
-                        //eval("\$del = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl) . "::find(" 
-                        //    . $row->getKey() . ")->delete();");
-                    }
-                }
-            }
-            */
-            
+
             $analyze = new SessAnalysis($treeID);
             $this->v["nodeTots"] = $analyze->loadNodeTots($this->custReport);
             $this->v["nodeSort"] = $analyze->nodeSort;
             $this->v["coreTots"] = [];
             $this->v["allPublicCoreIDs"] = $this->custReport->getAllPublicCoreIDs();
-            
+
             $this->v["last100ids"] = DB::table('sl_node_saves_page')
-                ->join('sl_sess', 'sl_node_saves_page.page_save_session', 
+                ->join('sl_sess', 'sl_node_saves_page.page_save_session',
                     '=', 'sl_sess.sess_id')
                 ->where('sl_sess.sess_tree', '=', $treeID)
                 ->where('sl_sess.sess_core_id', '>', 0)
@@ -85,19 +66,19 @@ class AdminTreeStats extends AdminController
             $this->v["graph1data"] = [];
             $this->v["genTots"] = [
                 // incomplete time tot, complete time tot, start date, totals by date
-                "date" => [ 0, 0, 0, [] ], 
+                "date" => [ 0, 0, 0, [] ],
                 "cmpl" => [ 0, 0 ], // incomplete (I), complete (C)
-                "mobl" => [ 0, 0, [ 0, 0 ], [ 0, 0 ] ] 
+                "mobl" => [ 0, 0, [ 0, 0 ], [ 0, 0 ] ]
                 // desktop (D), mobile (M), [ DI, DC ], [ MI, MC ]
             ];
             $nodeTots = $lines = [];
             if ($this->v["last100ids"]->isNotEmpty()) {
                 foreach ($this->v["last100ids"] as $i => $rec) {
                     $coreTots = $analyze->analyzeCoreSessions(
-                        $rec->sess_core_id, 
+                        $rec->sess_core_id,
                         $this->v["allPublicCoreIDs"]
                     );
-                    if ($coreTots["node"] > 0 
+                    if ($coreTots["node"] > 0
                         && isset($this->v["nodeTots"][$coreTots["node"]])) {
                         $this->v["coreTots"][] = $coreTots;
                         $cmpl = (($coreTots["cmpl"]) ? 1 : 0);
@@ -107,7 +88,7 @@ class AdminTreeStats extends AdminController
                         $this->v["genTots"]["mobl"][$mobl]++;
                         $this->v["genTots"]["mobl"][(2+$mobl)][$cmpl]++;
                         $this->v["genTots"]["date"][2] = $coreTots["date"];
-                        $this->v["genTots"]["date"][$cmpl] 
+                        $this->v["genTots"]["date"][$cmpl]
                             = $this->v["genTots"]["date"][$cmpl]+$coreTots["dur"];
                         $date = date("Y-m-d", $coreTots["date"]);
                         if (!isset($this->v["genTots"]["date"][3][$date])) {
@@ -129,7 +110,7 @@ class AdminTreeStats extends AdminController
                 . '</h3><div class="mTn10 mB10"><i>Based on the final page '
                 . 'saved during incomplete submission attempts.</i></div>';
             $this->v["graph1print"] = view(
-                'vendor.survloop.reports.graph-scatter', 
+                'vendor.survloop.reports.graph-scatter',
                 [
                     "currGraphID" => 'treeSessScat',
                     "hgt"         => $height . 'px',
@@ -142,7 +123,7 @@ class AdminTreeStats extends AdminController
                     "css"         => $this->v["css"]
                 ]
             )->render();
-            
+
             $this->v["graph2"] = [
                 "dat" => '',
                 "lab" => '',
@@ -154,8 +135,8 @@ class AdminTreeStats extends AdminController
             $currDate = date("Y-m-d", $currTime);
             while ($currDate != date("Y-m-d")) {
                 $cma = (($cnt > 0) ? ", " : "");
-                $this->v["graph2"]["dat"] .= $cma 
-                    . ((isset($this->v["genTots"]["date"][3][$currDate])) 
+                $this->v["graph2"]["dat"] .= $cma
+                    . ((isset($this->v["genTots"]["date"][3][$currDate]))
                         ? $this->v["genTots"]["date"][3][$currDate] : 0);
                 $this->v["graph2"]["lab"] .= $cma . "\"" . $currDate . "\"";
                 $this->v["graph2"]["bg"]  .= $cma . "\"" . $this->v["css"]["color-main-on"]  . "\"";
@@ -165,7 +146,7 @@ class AdminTreeStats extends AdminController
                 $currDate = date("Y-m-d", $currTime);
             }
             $this->v["graph2print"] = view(
-                'vendor.survloop.reports.graph-bar', 
+                'vendor.survloop.reports.graph-bar',
                 [
                     "currGraphID" => 'treeSessCalen',
                     "hgt"   => '380px',
@@ -176,7 +157,7 @@ class AdminTreeStats extends AdminController
                 ]
             )->render();
             $this->v["content"] = view(
-                'vendor.survloop.admin.tree.tree-sessions-stats', 
+                'vendor.survloop.admin.tree.tree-sessions-stats',
                 $this->v
             )->render();
             $this->saveCache();
@@ -184,13 +165,13 @@ class AdminTreeStats extends AdminController
         $this->v["needsCharts"] = true;
         return view('vendor.survloop.master', $this->v);
     }
-    
+
     protected function treeSessGraphDaily(Request $request, $treeID = 1)
     {
         $this->treeSessions($request, $treeID, true);
         return $this->v["graph2print"];
     }
-    
+
     protected function treeSessGraphDurations(Request $request, $treeID = 1)
     {
         $this->treeSessions($request, $treeID, true);

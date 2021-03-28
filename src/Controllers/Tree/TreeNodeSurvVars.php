@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeNodeSurvVars preps for TreeNodeSurv to extend a 
+  * TreeNodeSurvVars preps for TreeNodeSurv to extend a
   * standard branching tree's node for Survloop's needs.
   *
   * Survloop - All Our Data Are Belong
@@ -21,15 +21,15 @@ class TreeNodeSurvVars extends TreeNodeCore
     public $fldHasOther      = [];
     public $condKids         = [];
     public $showMoreNodes    = [];
-    
+
     public $dataManips       = [];
     public $colors           = [];
     public $extraOpts        = [];
-    
+
     public $primeOpts        = [
-        "Required"         => 5, 
-        "OneLineResponses" => 17, 
-        "OneLiner"         => 11, 
+        "Required"         => 5,
+        "OneLineResponses" => 17,
+        "OneLiner"         => 11,
         "RequiredInLine"   => 13
     ];
 
@@ -57,18 +57,18 @@ class TreeNodeSurvVars extends TreeNodeCore
     public $timeStr          = '00:00:00';
     public $dynaMonthFld     = '';
 
-    
+
     // Tree Nodes are assigned an optional property when ( SLNode->node_opts%OPT_PRIME == 0 )
     // (Coding style originally adopted for native cross-language compatibility.
     // Yes, the plan is to swap strategies.)
-   
+
     // Node Options
-    public const OPT_DROPTAGGER = 53;  
+    public const OPT_DROPTAGGER = 53;
     // This node's dropdown stores like a checkbox, associating tags
 
     // Node Visual Layout Options
     public const OPT_SKINNY     = 67;
-    // This node's contents are wrapped in the skinny page width 
+    // This node's contents are wrapped in the skinny page width
 
     public const OPT_JUMBOTRON  = 37;
     // Wrap the contents of this node inside bootstrap's Jumbotron
@@ -84,16 +84,16 @@ class TreeNodeSurvVars extends TreeNodeCore
 
     public const OPT_NONODECACH = 103;
     // The deferred loading of this node's contents should not pull from a cache
-    
-    
+
+
     // Node Form Field Layout Options
     public const OPT_CUSTOMLAY  = 2;   // Node uses some layout overrides instead of default
     public const OPT_REQUIRELIN = 13;  // "*Required" must appear on its own line
     public const OPT_RESPOCOLS  = 61;  // Node responses layed out in columns
-    
+
     // Node Form Field Saving Options
     public const OPT_TBLSAVEROW = 73;  // Table leaves existing rows' records upon saving (don't delete empties)
-    
+
     // Node Interaction Options
     public const OPT_WORDCOUNT  = 31;  // Open ended field should show a live word count
     public const OPT_WORDLIMIT  = 47;  // Force limit on word count
@@ -102,22 +102,22 @@ class TreeNodeSurvVars extends TreeNodeCore
     public const OPT_HIDESELECT = 79;  // Hide unselected options after radio button selected
     public const OPT_REVEALINFO = 83;  // Reveal node sub-notes upon clicking a little info icon
     public const OPT_MONTHCALC  = 101; // Provides a calculator to total 12 months
-    
+
     // Page Node Options
-    public const OPT_EXITPAGE   = 29;  // Node is an Exit Page, without a next button 
+    public const OPT_EXITPAGE   = 29;  // Node is an Exit Page, without a next button
     public const OPT_HIDEPROG   = 59;  // Hide progress bar on this page
-    
+
     // For XML Tree Nodes
     public const OPT_XMLPARENTS = 5;   // Include members with parent, without table wrap
     public const OPT_XMLMIN     = 7;   // Min 1 Record
     public const OPT_XMLMAX     = 11;  // Max 1 Record
-    
+
     public function getPrimeConst($type)
     {
         eval("\$prime = self::OPT_" . $type . ";");
         return $prime;
     }
-    
+
     public function chkOpt($nodeOpts = 1, $type = '')
     {
         if ($type == '' || $nodeOpts == 0) {
@@ -126,7 +126,7 @@ class TreeNodeSurvVars extends TreeNodeCore
         $prime = $this->getPrimeConst($type);
         return (intVal($prime) != 0 && $nodeOpts%$prime == 0);
     }
-    
+
     public function chkCurrOpt($type = '')
     {
         if (!isset($this->nodeOpts) || intVal($this->nodeOpts) == 0) {
@@ -134,33 +134,33 @@ class TreeNodeSurvVars extends TreeNodeCore
         }
         return $this->chkOpt($this->nodeOpts, $type);
     }
-    
+
     public function clearResponses()
     {
         $this->responses = [];
         return true;
     }
-    
+
     public function isBranch()
     {
         return ($this->nodeType == 'Branch Title');
     }
-    
+
     public function isLoopRoot()
     {
         return ($this->nodeType == 'Loop Root');
     }
-    
+
     public function isLoopCycle()
     {
         return ($this->nodeType == 'Loop Cycle');
     }
-    
+
     public function isLoopSort()
     {
         return ($this->nodeType == 'Loop Sort');
     }
-    
+
     public function isStepLoop()
     {
 //echo 'isStepLoop() nID: ' . $this->nodeID . ', type: ' . $this->nodeType . ', branch: ' . $this->dataBranch . '<pre>'; print_r($GLOBALS["SL"]->dataLoops[$this->nodeRow->node_default]); echo '</pre>'; exit;
@@ -168,36 +168,36 @@ class TreeNodeSurvVars extends TreeNodeCore
             if ($GLOBALS["SL"]->isStepLoop($this->dataBranch)) {
                 return true;
             } // hmmm..
-            if (isset($this->nodeRow->node_default) 
+            if (isset($this->nodeRow->node_default)
                 && $GLOBALS["SL"]->isStepLoop($this->nodeRow->node_default)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public function isDataManip()
     {
         return (substr($this->nodeType, 0, 10) == 'Data Manip');
     }
-    
+
     public function isDataPrint()
     {
         $types = [
-            'Data Print', 
-            'Data Print Row', 
-            'Data Print Block', 
+            'Data Print',
+            'Data Print Row',
+            'Data Print Block',
             'Data Print Columns',
             'Print Vert Progress'
         ];
         return in_array($this->nodeType, $types);
     }
-    
+
     public function isSpreadTbl()
     {
         return ($this->nodeType == 'Spreadsheet Table');
     }
-    
+
     public function isDynaMonthTbl()
     {
         if ($this->isSpreadTbl() && strpos($this->responseSet, 'Months::') == 0) {
@@ -208,109 +208,109 @@ class TreeNodeSurvVars extends TreeNodeCore
         }
         return false;
     }
-    
+
     public function isPage()
     {
         return ($this->nodeType == 'Page');
     }
-    
+
     public function isInstruct()
     {
         return ($this->nodeType == 'Instructions');
     }
-    
+
     public function isInstructRaw()
     {
         return ($this->nodeType == 'Instructions Raw');
     }
-    
+
     public function isInstructAny()
     {
         return ($this->isInstruct() || $this->isInstructRaw());
     }
-    
+
     public function isBigButt()
     {
-        return ($this->nodeType == 'Big Button'); 
+        return ($this->nodeType == 'Big Button');
     }
-    
+
     public function hasResponseOpts()
     {
         if ($this->nodeType == 'Spreadsheet Table') {
             return (isset($this->dataStore) && trim($this->dataStore) != '');
         }
         $types = [
-            'Radio', 
-            'Checkbox', 
-            'Drop Down', 
+            'Radio',
+            'Checkbox',
+            'Drop Down',
             'Other/Custom'
         ];
         return in_array($this->nodeType, $types);
     }
-    
+
     public function isSpecial()
     {
         return ($this->isNonLoopSpecial() || $this->isLoopRoot() || $this->isLoopCycle());
     }
-    
+
     public function isNonLoopSpecial()
     {
-        return ($this->isInstruct() 
-            || $this->isInstructRaw() 
-            || $this->isPage()  
-            || $this->isBranch() 
-            || $this->isLoopSort() 
-            || $this->isDataManip() 
-            || $this->isWidget() 
-            || $this->isBigButt() 
-            || $this->isLayout() 
-            || $this->isDataPrint() 
+        return ($this->isInstruct()
+            || $this->isInstructRaw()
+            || $this->isPage()
+            || $this->isBranch()
+            || $this->isLoopSort()
+            || $this->isDataManip()
+            || $this->isWidget()
+            || $this->isBigButt()
+            || $this->isLayout()
+            || $this->isDataPrint()
             || in_array($this->nodeType, ['Send Email']));
     }
-    
+
     public function isWidget()
     {
         $types = [
-            'Search', 
-            'Search Results', 
-            'Search Featured', 
-            'Member Profile Basics', 
-            'Record Full', 
-            'Record Full Public', 
-            'Record Previews', 
-            'Incomplete Sess Check', 
-            'Back Next Buttons', 
-            'Widget Custom', 
-            'Admin Form', 
+            'Search',
+            'Search Results',
+            'Search Featured',
+            'Member Profile Basics',
+            'Record Full',
+            'Record Full Public',
+            'Record Previews',
+            'Incomplete Sess Check',
+            'Back Next Buttons',
+            'Widget Custom',
+            'Admin Form',
             'MFA Dialogue'
         ];
         return ($this->isGraph() || in_array($this->nodeType, $types));
     }
-    
+
     public function isGraph()
     {
         $types = [
-            'Plot Graph', 
-            'Line Graph', 
-            'Bar Graph', 
-            'Pie Chart', 
+            'Plot Graph',
+            'Line Graph',
+            'Bar Graph',
+            'Pie Chart',
             'Map'
         ];
         return in_array($this->nodeType, $types);
     }
-    
+
     public function isLayout()
     {
         $types = [
-            'Page Block', 
-            'Layout Row', 
-            'Layout Column', 
+            'Page Block',
+            'Layout Row',
+            'Layout Column',
             'Layout Sub-Response',
             'Gallery Slider'
         ];
         return (in_array($this->nodeType, $types));
     }
-    
+
     public function isPageBlock()
     {
         //if ($GLOBALS["SL"]->treeRow->tree_type == 'Page' && $this->parentID == $GLOBALS["SL"]->treeRow->tree_root) {
@@ -320,46 +320,46 @@ class TreeNodeSurvVars extends TreeNodeCore
         }
         return false;
     }
-    
+
     public function isPageBlockSkinny()
     {
         return ($this->isPageBlock() && $this->nodeRow->node_opts%67 == 0);
     }
-    
+
     public function isRequired()
     {
         return ($this->nodeOpts%$this->primeOpts["Required"] == 0);
     }
-    
+
     public function isOneLiner()
     {
         return ($this->nodeOpts%$this->primeOpts["OneLiner"] == 0);
     }
-    
+
     public function isOneLineResponses()
     {
         return ($this->nodeOpts%$this->primeOpts["OneLineResponses"] == 0);
     }
-    
+
     public function isDropdownTagger()
     {
-        return (in_array($this->nodeType, ['Drop Down', 'U.S. States']) 
+        return (in_array($this->nodeType, ['Drop Down', 'U.S. States'])
             && $this->nodeOpts%53 == 0);
     }
-    
+
     public function isHnyPot()
     {
         return ($this->nodeType == 'Spambot Honey Pot');
     }
-    
+
     public function isPrintBasicTine()
     {
-        return ($this->isDataManip() 
-            || $this->isLoopCycle() 
-            || $this->isLayout() 
+        return ($this->isDataManip()
+            || $this->isLoopCycle()
+            || $this->isLayout()
             || $this->isBranch());
     }
-    
+
     public function getIcon()
     {
         if ($this->isBranch()) {
@@ -385,7 +385,7 @@ class TreeNodeSurvVars extends TreeNodeCore
             return '<i class="fa fa-check-square-o" aria-hidden="true" alt="Checkboxes"></i>';
         } elseif ($this->nodeType == 'Radio') {
             return '<i class="fa fa-dot-circle-o" aria-hidden="true" title="Radio Buttons"></i>';
-        } elseif (in_array($this->nodeType, ['Email', 'Gender', 'Gender Not Sure', 'Long Text', 
+        } elseif (in_array($this->nodeType, ['Email', 'Gender', 'Gender Not Sure', 'Long Text',
             'Text', 'Text:Number'])) {
             return '<i class="fa fa-i-cursor" aria-hidden="true" title="Text Field"></i>';
         } elseif (in_array($this->nodeType, ['U.S. States', 'Drop Down', 'Date', 'Feet Inches'])) {
@@ -440,11 +440,11 @@ class TreeNodeSurvVars extends TreeNodeCore
             return '<i class="fa fa-magic" aria-hidden="true" title="Other/Custom"></i>';
         }
     }
-    
+
     public function loadPageBlockColors()
     {
-        if (isset($this->nodeRow->node_default) 
-            && trim($this->nodeRow->node_default) != '' 
+        if (isset($this->nodeRow->node_default)
+            && trim($this->nodeRow->node_default) != ''
             && empty($this->colors)) {
             $colors = explode(';;', $this->nodeRow->node_default);
             if (isset($colors[0])) {

@@ -10,6 +10,10 @@ body, p, .slTxt {
     color: #000;
 }
 
+img {
+    border: 0;
+}
+
 #main {
     transition: margin-right .5s;
     width: 100%;
@@ -61,81 +65,81 @@ body, p, .slTxt {
 
 #footerLinks {
     display: block;
-    max-width: 730px;
+    max-width: 100%;
 }
 
 {!! view(
-    'vendor.survloop.css.styles-2-debug', 
+    'vendor.survloop.css.styles-2-debug',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-navbar', 
+    'vendor.survloop.css.styles-2-navbar',
     [ "css" => $css ]
     )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-prog-bar', 
+    'vendor.survloop.css.styles-2-prog-bar',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-social', 
+    'vendor.survloop.css.styles-2-social',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-node-forms', 
+    'vendor.survloop.css.styles-2-node-forms',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-reports', 
+    'vendor.survloop.css.styles-2-reports',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-elements', 
+    'vendor.survloop.css.styles-2-elements',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-tree-print', 
+    'vendor.survloop.css.styles-2-tree-print',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-tables', 
+    'vendor.survloop.css.styles-2-tables',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-bootstrap', 
+    'vendor.survloop.css.styles-2-bootstrap',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-admin', 
+    'vendor.survloop.css.styles-2-admin',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-utils', 
+    'vendor.survloop.css.styles-2-utils',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-other-overs', 
+    'vendor.survloop.css.styles-2-other-overs',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-colors', 
+    'vendor.survloop.css.styles-2-colors',
     [ "css" => $css ]
 )->render() !!}
 
 {!! view(
-    'vendor.survloop.css.styles-2-responsive', 
+    'vendor.survloop.css.styles-2-responsive',
     [ "css" => $css ]
 )->render() !!}
 

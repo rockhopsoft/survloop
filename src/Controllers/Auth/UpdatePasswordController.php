@@ -9,10 +9,11 @@
   */
 namespace RockHopSoft\Survloop\Controllers\Auth;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use RockHopSoft\Survloop\Controllers\SurvloopController;
 
 class UpdatePasswordController extends Controller
 {
@@ -42,15 +43,20 @@ class UpdatePasswordController extends Controller
             'old' => 'required',
             'password' => 'required|min:8|confirmed',
         ]);
+        $sl = new SurvloopController;
         if (Auth::attempt([ 'name' => $user->name, 'password' => $request->old ])) {
             $user->fill([ 'password' => bcrypt($request->password) ])->save();
             $request->session()->flash('success', 'Your password has been changed.');
             $request->session()->save();
+            $logTxt = 'User #' . Auth::id() . ' Password Changed';
+            $sl->logAdd('session-stuff', $logTxt);
             return redirect('/my-profile');
         }
         $request->session()->flash('failure', 'Your password has not been changed.');
         $request->session()->save();
+        $logTxt = 'User #' . Auth::id() . ' Password Change Failed';
+        $sl->logAdd('session-stuff', $logTxt);
         return redirect('/my-profile');
     }
-    
+
 }

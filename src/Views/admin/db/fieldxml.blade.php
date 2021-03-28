@@ -20,7 +20,7 @@
     These fields are never included in XML files</li>
 </ul>
 
-<form name="mainPageForm" action="/dashboard/db/fieldXML/save" 
+<form name="mainPageForm" action="/dashboard/db/fieldAPI/save" 
     method="post" target="hidFrame">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="changedFld" id="changedFldID" value="-3">

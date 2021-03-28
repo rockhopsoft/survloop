@@ -18,14 +18,14 @@ use RockHopSoft\Survloop\Controllers\Admin\AdminCoreController;
 
 class AdminEmailController extends AdminCoreController
 {
-    
+
     public function userEmailing(Request $request)
     {
         $this->admControlInit($request, '/dashboard/users/emailing');
         $this->loadPrintUsers();
         return view('vendor.survloop.admin.user-emailing', $this->v);
     }
-    
+
     protected function loadEmails()
     {
         $this->v["emailList"] = SLEmails::orderBy('email_name', 'asc')
@@ -33,7 +33,7 @@ class AdminEmailController extends AdminCoreController
             ->get();
         return true;
     }
-    
+
     public function processEmail($emailID)
     {
         $email = [
@@ -48,7 +48,7 @@ class AdminEmailController extends AdminCoreController
                         $email["rec"] = $e;
                     }
                 }
-                if ($email["rec"] !== false && isset($email["rec"]->email_body) 
+                if ($email["rec"] !== false && isset($email["rec"]->email_body)
                     && trim($email["rec"]->email_body) != '') {
                     $email["body"] = $GLOBALS["SL"]
                         ->swapEmailBlurbs($email["rec"]->email_body);
@@ -65,7 +65,7 @@ class AdminEmailController extends AdminCoreController
         }
         return $email;
     }
-    
+
     public function manageEmails(Request $request)
     {
         $this->admControlInit($request, '/dashboard/emails');
@@ -76,7 +76,7 @@ class AdminEmailController extends AdminCoreController
         $(document).on("click", "#showAll", function() { $(".emailBody").slideToggle("fast"); }); ';
         return view('vendor.survloop.admin.email-manage', $this->v);
     }
-    
+
     public function manageEmailsForm(Request $request, $emailID = -3)
     {
         $this->admControlInit($request, '/dashboard/emails');
@@ -89,7 +89,7 @@ class AdminEmailController extends AdminCoreController
         $GLOBALS["SL"]->pageAJAX .= ' $("#emailBodyID").summernote({ height: 500 }); ';
         return view('vendor.survloop.admin.email-form', $this->v);
     }
-    
+
     public function manageEmailsPost(Request $request, $emailID)
     {
         if ($request->has('emailType')) {
@@ -107,7 +107,7 @@ class AdminEmailController extends AdminCoreController
         }
         return $this->redir('/dashboard/emails');
     }
-    
+
     public function manageContact(Request $request, $folder = '')
     {
         $this->v["filtStatus"] = 'unread';
@@ -145,22 +145,22 @@ class AdminEmailController extends AdminCoreController
         }
         $GLOBALS["SL"]->pageAJAX .= '$(".changeContStatus").change(function(){
             var cID = $(this).attr( "name" ).replace( "ContFlag", "" );
-            var postUrl = "/ajadm/contact?' 
-                . ((isset($filtStatus)) ? 'tab=' . $filtStatus . '&' : '') 
+            var postUrl = "/ajadm/contact?'
+                . ((isset($filtStatus)) ? 'tab=' . $filtStatus . '&' : '')
                 . 'cid="+cID+"&status="+encodeURIComponent($(this).val());
             console.log(postUrl);
             $( "#wrapItem"+cID+"" ).load( postUrl );
         });';
         return view('vendor.survloop.admin.contact', $this->v)->render();
     }
-    
+
     public function ajaxSendEmail(Request $request)
     {
-        $emaID = (($request->has('e') && intVal($request->get('e')) > 0) 
+        $emaID = (($request->has('e') && intVal($request->get('e')) > 0)
             ? intVal($request->get('e')) : 0);
-        $treeID = (($request->has('t') && intVal($request->get('t')) > 0) 
+        $treeID = (($request->has('t') && intVal($request->get('t')) > 0)
             ? intVal($request->get('t')) : 1);
-        $coreID = (($request->has('c') && intVal($request->get('c')) > 0) 
+        $coreID = (($request->has('c') && intVal($request->get('c')) > 0)
             ? intVal($request->get('c')) : 0);
         $this->custReport->loadTree($treeID);
         $emaToArr = [];
@@ -200,10 +200,10 @@ class AdminEmailController extends AdminCoreController
             $emaSubj = $this->custReport->emailRecordSwap($currEmail->EmailSubject);
             $emaCont = $this->custReport->emailRecordSwap($currEmail->EmailBody);
             $sffx = 'e' . $emaID . 't' . $treeID . 'c' . $coreID;
-            $ret .= '<a id="hidivBtnMsgDeet' . $sffx 
+            $ret .= '<a id="hidivBtnMsgDeet' . $sffx
                 . '" class="hidivBtn" href="javascript:;">Message sent to '
-                . '<i class="slBlueDark">' . $emaTo . ' (' . $emaToName . ')</i>: ' . $emaSubj 
-                . '"</a><div id="hidivMsgDeet' . $sffx . '" class="disNon container"><h2>' 
+                . '<i class="slBlueDark">' . $emaTo . ' (' . $emaToName . ')</i>: ' . $emaSubj
+                . '"</a><div id="hidivMsgDeet' . $sffx . '" class="disNon container"><h2>'
                 . $emaSubj . '</h2><p>' . $emaCont . '</p><hr><hr></div>';
             $replyTo = [
                 'info@' . $GLOBALS['SL']->getParentDomain(),
@@ -223,24 +223,24 @@ class AdminEmailController extends AdminCoreController
                 $emaToUsrID = $emaToUsr->id;
             }
             $this->custReport->logEmailSent(
-                $emaCont, 
-                $emaSubj, 
-                $emaTo, 
-                $emaID, 
-                $treeID, 
-                $coreID, 
+                $emaCont,
+                $emaSubj,
+                $emaTo,
+                $emaID,
+                $treeID,
+                $coreID,
                 $emaToUsrID
             );
         } else {
             $ret .= '<i class="red">Email template not found.</i>';
         }
         if ($request->has('l') && trim($request->get('l')) != '') {
-            //$ret .= $GLOBALS["SL"]->opnAjax() . '$("#' . trim($request->get('l')) . '").fadeOut(100);' 
+            //$ret .= $GLOBALS["SL"]->opnAjax() . '$("#' . trim($request->get('l')) . '").fadeOut(100);'
             //    . $GLOBALS["SL"]->clsAjax();
         }
         return $ret;
     }
-    
+
     public function ajaxContactTabs(Request $request)
     {
         $types = ['Unread', 'On Hold', 'Resolved', 'Trash'];
@@ -250,14 +250,14 @@ class AdminEmailController extends AdminCoreController
             $status = trim($request->get('tab'));
         }
         return view(
-            'vendor.survloop.admin.contact-tabs', 
+            'vendor.survloop.admin.contact-tabs',
             [
                 "filtStatus" => $status,
                 "recTots"    => $this->v["recTots"]
             ]
         )->render();
     }
-    
+
     public function ajaxContact(Request $request)
     {
         $cID = (($request->has('cid')) ? $request->get('cid') : -3);
@@ -277,16 +277,16 @@ class AdminEmailController extends AdminCoreController
             }
             $ret = '';
             if ((($currTab == 'unread' && $newStatus != 'Unread')
-                    || ($currTab == 'all' && $newStatus == 'Trash')) 
+                    || ($currTab == 'all' && $newStatus == 'Trash'))
                 || ($currTab == 'trash' && $newStatus != 'Trash')) {
                 $ret = '<div class="col-12"><i>Message moved.</i></div>';
             } else {
                 $ret = view(
-                    'vendor.survloop.admin.contact-row', 
+                    'vendor.survloop.admin.contact-row',
                     [ "contact" => $cRow ]
                 )->render();
             }
-            return $ret . '<script type="text/javascript"> 
+            return $ret . '<script type="text/javascript">
             $(document).ready(function(){
                 setTimeout( function() {
                     var tabLnk = "/ajadm/contact-tabs?tab=' . $currTab . '";
@@ -296,7 +296,7 @@ class AdminEmailController extends AdminCoreController
             }); </script>';
         }
     }
-    
+
     public function sendEmailPage(Request $request)
     {
         $this->admControlInit($request, '/dashboard/send-email');
@@ -306,7 +306,7 @@ class AdminEmailController extends AdminCoreController
             foreach (['To', 'CC', 'BCC'] as $type) {
                 $eType = 'ema' . $type;
                 if ($request->has($eType) && trim($request->get($eType)) != '') {
-                    eval("\$ema" . $type . "[] = ['" 
+                    eval("\$ema" . $type . "[] = ['"
                         . trim($request->get($eType)) . "', ''];");
                 }
             }
@@ -320,11 +320,11 @@ class AdminEmailController extends AdminCoreController
                 }
             }
             $this->custReport->sendEmail(
-                (($request->has('emaBody')) ? trim($request->emaBody) : ''), 
-                (($request->has('emaSubject')) ? trim($request->emaSubject) : ''), 
-                $emaTo, 
-                $emaCC, 
-                $emaBCC, 
+                (($request->has('emaBody')) ? trim($request->emaBody) : ''),
+                (($request->has('emaSubject')) ? trim($request->emaSubject) : ''),
+                $emaTo,
+                $emaCC,
+                $emaBCC,
                 $repTo
             );
             if ($request->has('redir') && trim($request->get('redir')) != '') {
@@ -337,14 +337,14 @@ class AdminEmailController extends AdminCoreController
             ->select('email', 'name')
             ->orderBy('name', 'asc')
             ->get();
-        $this->v["emaID"] = (($request->has('emaTemplate')) 
+        $this->v["emaID"] = (($request->has('emaTemplate'))
             ? $request->get('emaTemplate') : -3);
         $this->v["email"] = $this->processEmail($this->v["emaID"]);
         $this->v["needsWsyiwyg"] = true;
         $GLOBALS["SL"]->pageAJAX .= ' $("#emaBodyID").summernote({ height: 350 }); ';
         return view('vendor.survloop.admin.send-email', $this->v);
     }
-    
+
     public function printSentEmails(Request $request)
     {
         $this->admControlInit($request, '/dashboard/sent-emails');

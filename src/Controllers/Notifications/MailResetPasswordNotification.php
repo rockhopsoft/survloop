@@ -46,12 +46,12 @@ class MailResetPasswordNotification extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         } */
         $GLOBALS["SL"] = new Globals(new Request, 1, 1, 1);
-        $subj = $GLOBALS["SL"]->sysOpts["site-name"] 
+        $subj = $GLOBALS["SL"]->sysOpts["site-name"]
             . ' Reset Password Notification';
         /*
         return (new MailMessage)
             ->view(
-                'vendor.survloop.emails.password', 
+                'vendor.survloop.emails.password',
                 [
                     'token'     => $this->token,
                     'cssColors' => $GLOBALS["SL"]->getCssColorsEmail()
@@ -67,7 +67,7 @@ class MailResetPasswordNotification extends Notification
                 ->to('" . $notifiable->email . "', '" . $notifiable->email . "');
             });";
         if ($GLOBALS["SL"]->isHomestead()) {
-            echo '<br /><br /><br /><div class="container"><h2>' . $subj 
+            echo '<br /><br /><br /><div class="container"><h2>' . $subj
                 . '</h2><hr><hr></div><pre>' . $mail . '</pre><hr><br />';
             return true;
         }

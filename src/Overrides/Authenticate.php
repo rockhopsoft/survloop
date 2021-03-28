@@ -44,9 +44,9 @@ class Authenticate extends Middleware
         $badRedir = false;
         $bads = [
             '/api/pdf/',
-            '/css/', 
+            '/css/',
             '/font/',
-            '/gen-kml/', 
+            '/gen-kml/',
             '/sys/dyna/',
             '/survloop/uploads/'
         ];
@@ -56,10 +56,18 @@ class Authenticate extends Middleware
             }
         }
         $bads = [
-            '.js', 
+            '.js',
             '.css',
             '.kml',
-            '.eot'
+            '.eot',
+            '.map',
+            '.ttf',
+            '.woff',
+            '.woff2',
+            '.jpg',
+            '.png',
+            '.gif',
+            '.svg'
         ];
         $ext = $redir;
         $pos = strpos($ext, '?');

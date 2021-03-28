@@ -28,15 +28,15 @@ class Survloop extends SurvloopSpecialLoads
      */
     public function mainSub(Request $request, $type = '', $val = '')
     {
-        if ($request->has('step') 
-            && $request->has('tree') 
+        if ($request->has('step')
+            && $request->has('tree')
             && intVal($request->get('tree')) > 0) {
             $this->loadTreeByID($request, $request->tree);
         }
         $this->loadLoop($request);
         return $this->custLoop->index($request, $type, $val);
     }
-    
+
     /**
      * Loading a url identifying a specific Page Node within a Survey Tree.
      *
@@ -54,7 +54,7 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     /**
      * Loading an ajax-retrieved Node within a Tree's Page.
      *
@@ -90,7 +90,7 @@ class Survloop extends SurvloopSpecialLoads
         }
         return '';
     }
-    
+
     /**
      * Loading a url identifying a specific Page Tree.
      *
@@ -105,23 +105,29 @@ class Survloop extends SurvloopSpecialLoads
     {
         $redir = $this->chkPageRedir($pageSlug);
         if ($redir != $pageSlug) {
-            return redirect($redir, 301);
+            echo '<html><body><script type="text/javascript"> window.location="'
+                . $redir . '"; </script></body></html>';
+            exit;
+            //return redirect($redir, 302)
+            //    ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
         }
         if ($this->loadTreeBySlug($request, $pageSlug, 'Page')) {
             if ($this->hasParamEdit($request) && $this->isStaffOrAdmin()) {
-                echo '<script type="text/javascript"> '
-                    . 'window.location="/dashboard/page/' 
+                echo '<html><body><script type="text/javascript"> '
+                    . 'window.location="/dashboard/page/'
                     . $this->treeID . '?all=1&alt=1&refresh=1"; '
-                    . '</script>';
+                    . '</script></body></html>';
                 exit;
             }
+            $hasAjax = ($request->has('ajax') && intVal($request->ajax) == 1);
             $this->loadLoop($request);
             $view = $this->chkPageView($view);
             $cid = $this->chkPageCID($request, $cid, $skipPublic);
             if ($cid > 0) {
                 $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
                 if (in_array($view, ['pdf', 'full-pdf'])) {
-                    return $this->custLoop->byID($request, $cid, ' - ' . $this->custLoop->getCoreID() . '', $request->has('ajax'));
+                    $cidStr = ' - ' . $this->custLoop->getCoreID() . '';
+                    return $this->custLoop->byID($request, $cid, $cidStr, $hasAjax);
                 }
             }
             $this->custLoop->chkPageToken();
@@ -146,7 +152,7 @@ class Survloop extends SurvloopSpecialLoads
                 $treeType = strtolower($GLOBALS["SL"]->treeRow->tree_type);
                 $this->topSaveCache($treeID, $treeType);
             }
-            if ($request->has('ajax') && intVal($request->ajax) == 1) {
+            if ($hasAjax) {
                 return $this->pageContent;
             }
             return $this->addSessAdmCodeToPage($request, $this->pageContent);
@@ -174,7 +180,7 @@ class Survloop extends SurvloopSpecialLoads
         $GLOBALS["SL"]->pageView = trim($view); // blank results in user default
         return $view;
     }
-    
+
     /**
      * Check page load's current allowance for caching.
      *
@@ -184,7 +190,7 @@ class Survloop extends SurvloopSpecialLoads
     private function chkPageAllowCache(Request $request)
     {
         $allowCache = true;
-        $hasToken = (isset($this->custLoop->v["tokenIn"]) 
+        $hasToken = (isset($this->custLoop->v["tokenIn"])
             && trim($this->custLoop->v["tokenIn"]) != '');
         if ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0
             || $hasToken
@@ -193,7 +199,7 @@ class Survloop extends SurvloopSpecialLoads
         }
         return $allowCache;
     }
-    
+
     /**
      * Check page's settings for the need to hide disclaimers.
      *
@@ -211,7 +217,7 @@ class Survloop extends SurvloopSpecialLoads
         }
         return true;
     }
-    
+
     public function byID(Request $request, $treeSlug, $cid, $coreSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug)) {
@@ -222,31 +228,31 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     public function fullByID(Request $request, $treeSlug, $cid, $coreSlug = '')
     {
         $GLOBALS["SL"]->x["fullAccess"] = true;
         return $this->byID($request, $treeSlug, $cid, $coreSlug = '');
     }
-    
+
     public function pdfByID(Request $request, $treeSlug, $cid)
     {
         $GLOBALS["SL"]->x["isPrintPDF"] = true;
         return $this->byID($request, $treeSlug, $cid);
     }
-    
+
     public function fullPdfByID(Request $request, $treeSlug, $cid)
     {
         $GLOBALS["SL"]->x["fullAccess"] = true;
         return $this->pdfByID($request, $treeSlug, $cid);
     }
-    
+
     public function tokenByID(Request $request, $pageSlug, $cid, $token)
     {
         return $this->loadPageURL($request, $pageSlug, $cid, 'token-' . trim($token));
         //return $this->byID($request, $treeSlug, $cid);
     }
-    
+
     /**
      * Loading the site's home page by looking up the right Page Tree.
      *
@@ -257,6 +263,10 @@ class Survloop extends SurvloopSpecialLoads
     {
         $this->syncDataTrees($request);
         $this->loadDomain();
+        $redir = $this->chkLoginRedir($request);
+        if ($redir != '') {
+            return redirect($redir);
+        }
         $this->checkHttpsDomain($request);
         $trees = SLTree::where('tree_type', 'Page')
             ->where('tree_opts', '>', (Globals::TREEOPT_HOMEPAGE-1))
@@ -269,33 +279,33 @@ class Survloop extends SurvloopSpecialLoads
             ->get();
         if ($trees->isNotEmpty()) {
             foreach ($trees as $i => $tree) {
-                if (isset($tree->tree_opts) 
-                    && $tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0 
-                    && $tree->tree_opts%Globals::TREEOPT_ADMIN     > 0 
+                if (isset($tree->tree_opts)
+                    && $tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0
+                    && $tree->tree_opts%Globals::TREEOPT_ADMIN     > 0
                     && $tree->tree_opts%Globals::TREEOPT_STAFF     > 0
-                    && $tree->tree_opts%Globals::TREEOPT_PARTNER   > 0 
+                    && $tree->tree_opts%Globals::TREEOPT_PARTNER   > 0
                     && $tree->tree_opts%Globals::TREEOPT_VOLUNTEER > 0) {
                     $redir = $this->chkPageRedir($tree->tree_slug);
                     if ($redir != $tree->tree_slug) {
                         return redirect($redir);
                     }
-                    if ($request->has('edit') 
-                        && intVal($request->get('edit')) == 1 
+                    if ($request->has('edit')
+                        && intVal($request->get('edit')) == 1
                         && $this->isStaffOrAdmin()) {
-                        echo '<script type="text/javascript"> '
-                            . 'window.location="/dashboard/page/' 
+                        echo '<html><body><script type="text/javascript"> '
+                            . 'window.location="/dashboard/page/'
                             . $tree->tree_id . '?all=1&alt=1&refresh=1";'
-                            . ' </script>';
+                            . ' </script></body></html>';
                         exit;
                     }
                     $this->syncDataTrees(
-                        $request, 
-                        $tree->tree_database, 
+                        $request,
+                        $tree->tree_database,
                         $tree->tree_id
                     );
                     if ($this->topCheckCache($request, 'page')) {
                         return $this->addSessAdmCodeToPage(
-                            $request, 
+                            $request,
                             $this->pageContent
                         );
                     }
@@ -310,7 +320,7 @@ class Survloop extends SurvloopSpecialLoads
                 }
             }
         }
-        
+
         // else Home Page not found, so let's create one
         $installer = new SurvloopInstaller;
         $installer->checkSysInit();
@@ -320,7 +330,7 @@ class Survloop extends SurvloopSpecialLoads
             . '></iframe></center><script type="text/javascript"> '
             . 'setTimeout("window.location=\'/\'", 2000); </script>';
     }
-    
+
     public function xmlAll(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -334,7 +344,7 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     public function xmlByID(Request $request, $treeSlug, $cid)
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -350,13 +360,13 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     public function fullXmlByID(Request $request, $treeSlug, $cid)
     {
         $GLOBALS["SL"]->x["fullAccess"] = true;
         return $this->xmlByID($request, $treeSlug, $cid);
     }
-    
+
     public function xmlFullByID(Request $request, $treeSlug, $cid)
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -372,7 +382,7 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     public function getXmlExample(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -386,7 +396,7 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
     public function genXmlSchema(Request $request, $treeSlug = '')
     {
         if ($this->loadTreeBySlug($request, $treeSlug, 'Survey XML')) {
@@ -400,5 +410,5 @@ class Survloop extends SurvloopSpecialLoads
         $this->loadDomain();
         return redirect($this->domainPath . '/');
     }
-    
+
 }

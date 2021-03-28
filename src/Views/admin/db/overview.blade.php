@@ -7,10 +7,10 @@
     <div class="col-md-9">
         @if (isset($GLOBALS['SL']->dbRow->db_mission) 
             && trim($GLOBALS['SL']->dbRow->db_mission) != '')
-            <h3 class="slBlueDark">
+            <h2 class="slBlueDark">
                 <i class="fa fa-database mR3"></i> 
                 {{ $GLOBALS['SL']->dbRow->db_name }}
-            </h3>
+            </h2>
             <b>Mission:</b> 
             {!! $GLOBALS['SL']->dbRow->db_mission !!}<br />
         @else
@@ -20,7 +20,7 @@
                 Database Overview
             </h3>
         @endif
-        <h3><nobr>{!! strip_tags($dbStats) !!}</nobr></h3>
+        <b><nobr>{!! strip_tags($dbStats) !!}</nobr></b>
     </div>
 @if (!$isPrint)
     <div class="col-md-3">
@@ -40,13 +40,14 @@
     <i>Table Plain English Name, Database Name (Abbreviation), 
     Data Type, Description, [Notes]</i>
 </p>
-<hr>
-<p><br /></p>
 
 @forelse ($groupTbls as $group => $tbls)
-    <h3>{{ $group }}</h3><hr>
+    <p><br /></p>
+    <div class="w100 brdBotFnt">
+        <h3 class="slBlueDark">{{ $group }}</h3>
+    </div>
     @forelse ($tbls as $tbl)
-        <div class="pB20">
+        <div class="brdBotFnt pT15 pB15">
             <a href="/dashboard/db/table/{{ $tbl->tbl_name }}"
                 class="pull-right btn btn-secondary btn-sm mT5 mL10"
                 >Field List</a>
@@ -64,8 +65,7 @@
                 <p><span class="slGrey">{{ $tbl->tbl_notes }}</span></p>
             @endif
         </div>
-        <hr>
-        <p><br /></p>
+
     @empty
         No tables in group.
     @endforelse

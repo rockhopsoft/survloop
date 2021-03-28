@@ -1,7 +1,4 @@
-<?php
-$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
-$css = $sysDefs->loadCss();
-?>@extends('vendor.survloop.master')
+@extends('vendor.survloop.master')
 @section('content')
 <div id="ajaxWrap">
 <!-- resources/views/vendor/survloop/auth/passwords/email-sent.blade.php -->

@@ -28,13 +28,13 @@ class AdminCoreController extends SurvloopController
     protected $pageIsAdmin = true;
     protected $admInitRun  = false;
     protected $domainPath  = '';
-    
+
     protected function initLoader()
     {
         $this->loader = new PageLoadUtils(true);
         return true;
     }
-    
+
     protected function admControlInit(Request $request, $currPage = '', $perms = '', $initCust = true)
     {
         if (!$this->admInitRun) {
@@ -46,7 +46,7 @@ class AdminCoreController extends SurvloopController
             }
             if ($this->v["uID"] <= 0 || !$this->v["user"]->hasRole($perms)) {
                 echo view(
-                    'vendor.survloop.js.inc-redirect-home', 
+                    'vendor.survloop.js.inc-redirect-home',
                     $this->v
                 )->render();
                 exit;
@@ -69,7 +69,7 @@ class AdminCoreController extends SurvloopController
         }
         return true;
     }
-    
+
     protected function getAdmMenu($currPage = '')
     {
         $GLOBALS["SL"]->sysOpts["footer-admin"] = view(
@@ -84,7 +84,7 @@ class AdminCoreController extends SurvloopController
             $vend = $GLOBALS["SL"]->sysOpts["cust-vend"];
             $abbr = $GLOBALS["SL"]->sysOpts["cust-abbr"];
             if ($abbr != 'Survloop') {
-                $custClass = $vend . "\\" . $abbr 
+                $custClass = $vend . "\\" . $abbr
                     . "\\Controllers\\" . $abbr . "AdminMenu";
                 if (class_exists($custClass)) {
                     eval("\$admMenu = new " . $custClass . ";");
@@ -95,42 +95,138 @@ class AdminCoreController extends SurvloopController
             $admMenu = new AdminMenu;
         }
         if ($admMenu) {
-            $this->admMenuData["adminNav"] = $admMenu->loadAdmMenu(
-                $this->v["user"], 
-                $currPage
-            );
+            $this->admMenuData["adminNav"] = $admMenu->loadAdmMenu($this->v["user"], $currPage);
         }
         $this->tweakAdmMenu($currPage);
-        if (!$this->getAdmMenuLoc($currPage) 
-            && $currPage != '') {
+        if (!$this->getAdmMenuLoc($currPage) && $currPage != '') {
             $this->getAdmMenuLoc($currPage);
         }
         return view(
-            'vendor.survloop.admin.admin-menu', 
+            'vendor.survloop.admin.admin-menu',
             $this->admMenuData
         )->render();
     }
-    
+
     protected function getAdmMenuTopTabs()
     {
-        $tabs = view(
-            'vendor.survloop.admin.admin-menu-tabs', 
-            $this->admMenuData
-        )->render();
+        $tabs = $this->loopAdmMenuTopTabs();
         if (trim($tabs) == '') {
             return '<div class="w100 mB15"> </div>';
         }
         $tabs = '<div id="slTopTabsWrap" class="slTopTabs">' . $tabs . '</div>';
-        $subTabs = view(
-            'vendor.survloop.admin.admin-menu-tabs-sub', 
-            $this->admMenuData
-        )->render();
+        $subTabs = $this->loopAdmMenuTopSubTabs();
         if (trim($subTabs) != '') {
             $tabs .= '<div class="slTopTabsSub">' . $subTabs . '</div>';
         }
         return $tabs;
     }
-    
+
+    private function loopAdmMenuTopTabs()
+    {
+        $tabs = '';
+        if (sizeof($this->admMenuData["adminNav"]) > 0) {
+            foreach ($this->admMenuData["adminNav"] as $i => $nav) {
+                if (isset($nav[0])
+                    && isset($nav[4])
+                    && sizeof($nav[4]) > 0
+                    && $this->admMenuData["currNavPos"][0] == $i) {
+                    foreach ($nav[4] as $j => $nA) {
+                        if (isset($nA[4])
+                            && sizeof($nA[4]) > 0
+                            && $this->admMenuData["currNavPos"][0] == $i
+                            && $this->admMenuData["currNavPos"][1] == $j) {
+                            $tabs .= view(
+                                'vendor.survloop.admin.admin-menu-tabs',
+                                [
+                                    "i"          => $i,
+                                    "j"          => $j,
+                                    "nA"         => $nA,
+                                    "currNavPos" => $this->admMenuData["currNavPos"]
+                                ]
+                            )->render();
+                            if ($this->admMenuData["currNavPos"][0] == $i
+                                && $this->admMenuData["currNavPos"][1] == $j) {
+                                $this->loopAdmMenuTopTabsCheckAjax($nA, $i, $j);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $tabs;
+    }
+
+    private function loopAdmMenuTopTabsCheckAjax($nA, $i, $j)
+    {
+        foreach ($nA[4] as $k => $nB) {
+            if (isset($nB[0])
+                && trim($nB[0]) != ''
+                && (strpos($nB[0], '?ajax=1') !== false
+                    || strpos($nB[0], '&ajax=1') !== false)) {
+                // Not sure why this is getting duplicated,
+                // this ajaxChk should not be needed
+                $ajaxChk = '"click", "#admLnkK' . $k . '"';
+                if (strpos($GLOBALS["SL"]->pageAJAX, $ajaxChk) === false) {
+                    $hshoo = '';
+                    if ($GLOBALS['SL']->isAdmMenuHshoo($nB[0])) {
+                        $hshoo = 'hshoo';
+                    }
+                    $GLOBALS["SL"]->pageAJAX .= view(
+                        'vendor.survloop.admin.admin-menu-tabs-ajax',
+                        [
+                            "k"          => $k,
+                            "nA"         => $nA,
+                            "nB"         => $nB,
+                            "hshoo"      => $hshoo,
+                            "currNavPos" => $this->admMenuData["currNavPos"]
+                        ]
+                    )->render();
+                }
+            }
+        }
+        return true;
+    }
+
+    private function loopAdmMenuTopSubTabs()
+    {
+        $subTabs = '';
+        if (sizeof($this->admMenuData["adminNav"]) > 0) {
+            foreach ($this->admMenuData["adminNav"] as $i => $nav) {
+                if (isset($nav[0])
+                    && isset($nav[4])
+                    && sizeof($nav[4]) > 0
+                    && $this->admMenuData["currNavPos"][0] == $i) {
+                    foreach ($nav[4] as $j => $nA) {
+                        if (sizeof($nA) > 4
+                            && sizeof($nA[4]) > 0
+                            && $this->admMenuData["currNavPos"][0] == $i
+                            && $this->admMenuData["currNavPos"][1] == $j) {
+                            foreach ($nA[4] as $k => $nB) {
+                                if (isset($nB[4])
+                                    && sizeof($nB[4]) > 0
+                                    && $this->admMenuData["currNavPos"][0] == $i
+                                    && $this->admMenuData["currNavPos"][1] == $j
+                                    && $this->admMenuData["currNavPos"][2] == $k) {
+                                    $subTabs .= view(
+                                        'vendor.survloop.admin.admin-menu-tabs-sub',
+                                        [
+                                            "i"          => $i,
+                                            "j"          => $j,
+                                            "k"          => $k,
+                                            "nB"         => $nB,
+                                            "currNavPos" => $this->admMenuData["currNavPos"]
+                                        ]
+                                    )->render();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $subTabs;
+    }
+
     protected function reloadAdmMenu()
     {
         $this->v["admMenu"]      = $this->getAdmMenu($this->v["currPage"][0]);
@@ -138,20 +234,20 @@ class AdminCoreController extends SurvloopController
         $this->v["admMenuTabs"]  = $this->getAdmMenuTopTabs();
         return true;
     }
-    
+
     protected function chkNewAdmMenuPage($currPage = '')
     {
-        $custPage = ((isset($this->custReport->treeID)) 
+        $custPage = ((isset($this->custReport->treeID))
             ? $this->custReport->initAdmMenuExtras() : '');
-        if (trim($custPage) != '' 
+        if (trim($custPage) != ''
             && $this->v["currPage"][0] != $custPage) {
             $this->v["currPage"][0] = $custPage;
             $this->reloadAdmMenu();
-        } elseif (trim($currPage) != '' 
+        } elseif (trim($currPage) != ''
             && $this->v["currPage"][0] != $currPage) {
             $this->v["currPage"][0] = $currPage;
             $this->reloadAdmMenu();
-        } elseif (isset($GLOBALS["SL"]->x["currPage"]) 
+        } elseif (isset($GLOBALS["SL"]->x["currPage"])
             && trim($GLOBALS["SL"]->x["currPage"]) != ''
             && $this->v["currPage"][0] != $currPage) {
             $this->v["currPage"][0] = $GLOBALS["SL"]->x["currPage"];
@@ -159,7 +255,7 @@ class AdminCoreController extends SurvloopController
         }
         return true;
     }
-    
+
     protected function checkCurrPage()
     {
         /* if (sizeof($this->custReport) > 0) {
@@ -168,7 +264,7 @@ class AdminCoreController extends SurvloopController
         } */
         return true;
     }
-    
+
     protected function getAdmMenuLoc($currPage)
     {
         $this->admMenuData["currNavPos"] = [0, -1, -1, -1];
@@ -178,31 +274,38 @@ class AdminCoreController extends SurvloopController
                     if ($nav[0] == $currPage) {
                         $this->admMenuData["currNavPos"] = [$i, -1, -1, -1];
                     }
-                    if (isset($nav[4]) && is_array($nav[4]) 
+                    if (isset($nav[4]) && is_array($nav[4])
                         && sizeof($nav[4]) > 0) {
                         foreach ($nav[4] as $j => $nA) {
-                            if (isset($nA[0]) && $nA[0] == $currPage) {
+                            if (isset($nA[0])
+                                && $GLOBALS["SL"]->stripUrlAjaxRefresh($nA[0])
+                                    == $GLOBALS["SL"]->stripUrlAjaxRefresh($currPage)) {
                                 $this->admMenuData["currNavPos"] = [$i, $j, -1, -1];
                             }
-                            if (isset($nA[4]) && is_array($nA[4]) 
+                            if (isset($nA[4]) && is_array($nA[4])
                                 && sizeof($nA[4]) > 0) {
                                 foreach ($nA[4] as $k => $nB) {
-                                    if (isset($nB[0]) && $nB[0] == $currPage) {
+                                    if (isset($nB[0])
+                                        && ($nB[0] == $currPage
+                                            || $GLOBALS["SL"]->stripUrlAjaxRefresh($nB[0])
+                                                == $GLOBALS["SL"]->stripUrlAjaxRefresh($currPage))) {
                                         $this->admMenuData["currNavPos"] = [
-                                            $i, 
-                                            $j, 
-                                            $k, 
+                                            $i,
+                                            $j,
+                                            $k,
                                             -1
                                         ];
                                     }
-                                    if (isset($nB[4]) && is_array($nB[4]) 
+                                    if (isset($nB[4]) && is_array($nB[4])
                                         && sizeof($nB[4]) > 0) {
                                         foreach ($nB[4] as $l => $nC) {
-                                            if (isset($nC[0]) && $nC[0] == $currPage) {
+                                            if (isset($nC[0])
+                                                && $GLOBALS["SL"]->stripUrlAjaxRefresh($nC[0])
+                                                    == $GLOBALS["SL"]->stripUrlAjaxRefresh($currPage)) {
                                                 $this->admMenuData["currNavPos"] = [
-                                                    $i, 
-                                                    $j, 
-                                                    $k, 
+                                                    $i,
+                                                    $j,
+                                                    $k,
                                                     $l
                                                 ];
                                             }
@@ -215,52 +318,52 @@ class AdminCoreController extends SurvloopController
                 }
             }
         }
-        return ($this->admMenuData["currNavPos"][0] > -1 
+        return ($this->admMenuData["currNavPos"][0] > -1
             || $this->admMenuData["currNavPos"][1]  > -1
-            || $this->admMenuData["currNavPos"][2]  > -1 
+            || $this->admMenuData["currNavPos"][2]  > -1
             || $this->admMenuData["currNavPos"][3]  > -1);
     }
-    
+
     protected function tweakAdmMenu($currPage = '')
     {
-        return true; 
+        return true;
     }
-    
+
     protected function loadBelowAdmMenu()
     {
         return '';
     }
-    
+
     protected function loadTreesPagesBelowAdmMenu()
     {
         return '<div class="p20"></div>';
     }
-    
+
     public function admRedirEdit(Request $request)
     {
-        if ($request->has('t') 
+        if ($request->has('t')
             && intVal($request->get('t')) > 0) {
             $tree = SLTree::find(intVal($request->get('t')));
             if ($tree && isset($tree->tree_id)) {
                 return view(
-                    'vendor.survloop.admin.tree.ajax-redir-edit', 
+                    'vendor.survloop.admin.tree.ajax-redir-edit',
                     [ "tree" => $tree ]
                 )->render();
             }
         }
         return '';
     }
-    
+
     protected function loadSearchSuggestions()
-    {    
+    {
         $this->v["searchSuggest"] = [];
         return true;
     }
-    
+
     // Override in custom admin class
     protected function clearEmpties()
     {
-        if (!session()->has('chkClearEmpties') 
+        if (!session()->has('chkClearEmpties')
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             // something can be automated by default...
             session()->put('chkClearEmpties', 1);
@@ -268,7 +371,7 @@ class AdminCoreController extends SurvloopController
         }
         return true;
     }
-    
+
     public function loadNodeURL(Request $request, $treeSlug = '', $nodeSlug = '')
     {
         $this->initLoader();
@@ -277,8 +380,8 @@ class AdminCoreController extends SurvloopController
             $this->treeID = $this->loader->treeID;
             $this->admControlInit($request, '/dashboard/start/' . $treeSlug);
             $this->loadCustLoop($request, $this->treeID);
-            $this->v["content"] = '<div class="pT20">' 
-                . $this->custReport->loadNodeURL($request, $nodeSlug) 
+            $this->v["content"] = '<div class="pT20">'
+                . $this->custReport->loadNodeURL($request, $nodeSlug)
                 . '</div>';
             $this->chkNewAdmMenuPage();
             return view('vendor.survloop.master', $this->v);
@@ -286,31 +389,35 @@ class AdminCoreController extends SurvloopController
         $this->loader->loadDomain();
         return redirect($this->loader->domainPath . '/');
     }
-    
+
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
     {
         $this->initLoader();
         return $this->loader->loadNodeTreeURL($request, $treeSlug);
     }
-    
+
     public function loadNodeTreeURLedit(Request $request, $cid = -3, $treeSlug = '')
     {
         $this->initLoader();
         return $this->loader->loadNodeTreeURLedit($request, $cid, $treeSlug);
     }
-    
+
     public function loadPageURL(Request $request, $pageSlug = '', $cid = -3, $view = '', $skipPublic = false)
     {
         $this->initLoader();
+        $redir = $this->loader->chkLoginRedir($request);
+        if ($redir != '') {
+            return redirect($redir);
+        }
         if ($this->loader->loadTreeBySlug($request, $pageSlug, 'Page')) {
             $this->admControlInit($request, '/dash/' . $pageSlug);
             $this->loadCustLoop($request, $this->loader->treeID);
 
-            if ($request->has('edit') 
-                && intVal($request->get('edit')) == 1 
+            if ($request->has('edit')
+                && intVal($request->get('edit')) == 1
                 && $this->loader->isUserAdmin()) {
                 echo '<script type="text/javascript"> '
-                    . 'window.location="/dashboard/page/' 
+                    . 'window.location="/dashboard/page/'
                     . $GLOBALS["SL"]->treeID . '?all=1&alt=1&refresh=1";'
                     . ' </script>';
                 exit;
@@ -359,16 +466,20 @@ class AdminCoreController extends SurvloopController
         $this->loader->loadDomain();
         return redirect($this->loader->domainPath . '/');
     }
-    
+
     public function loadPageURLrawID(Request $request, $pageSlug = '', $cid = -3, $view = '')
     {
         return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
     }
-    
+
     public function loadPageDashboard(Request $request)
     {
         $this->admControlInit($request, '/dashboard');
         $this->initLoader();
+        $redir = $this->loader->chkLoginRedir($request);
+        if ($redir != '') {
+            return redirect($redir);
+        }
         $prime = $this->loader->getMaxPermsPrime();
         if ($prime <= 1) {
             return $this->redir('/login');
@@ -387,7 +498,7 @@ class AdminCoreController extends SurvloopController
                     $this->reloadAdmMenu();
                     $this->v["content"] = $this->custReport->index($request);
                     return $this->loader->addSessAdmCodeToPage(
-                        $request, 
+                        $request,
                         view('vendor.survloop.master', $this->v)->render()
                     );
                 }
@@ -398,7 +509,7 @@ class AdminCoreController extends SurvloopController
 
     protected function chkCoreTbls()
     {
-        if (!session()->has('chkCoreTbls') 
+        if (!session()->has('chkCoreTbls')
             || $GLOBALS["SL"]->REQ->has('refresh')) {
             $userTbl = $GLOBALS["SL"]->loadUsrTblRow();
             $trees = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
@@ -411,100 +522,100 @@ class AdminCoreController extends SurvloopController
                 }
             }
             $this->allStdCondition(
-                '#IsAdmin', 
+                '#IsAdmin',
                 'The user is currently logged in as an administrator.'
             );
             $this->allStdCondition(
-                '#IsNotAdmin', 
+                '#IsNotAdmin',
                 'The user is not currently logged in as an administrator.'
             );
             $this->allStdCondition(
-                '#IsStaff', 
+                '#IsStaff',
                 'The user is currently logged in as a staff user.'
             );
             $this->allStdCondition(
-                '#IsStaffOrAdmin', 
+                '#IsStaffOrAdmin',
                 'The user is currently logged in as a staff or admin user.'
             );
             $this->allStdCondition(
-                '#IsPartnerStaffOrAdmin', 
+                '#IsPartnerStaffOrAdmin',
                 'The user is currently logged in as a partner, staff, or admin user.'
             );
             $this->allStdCondition(
-                '#IsPartnerStaffAdminOrOwner', 
+                '#IsPartnerStaffAdminOrOwner',
                 'The user is currently logged in as a partner, staff, '
                     . 'admin user, or the owner of core record.'
             );
             $this->allStdCondition(
-                '#IsPartner', 
+                '#IsPartner',
                 'The user is currently logged in as a partner.'
             );
             $this->allStdCondition(
-                '#IsVolunteer', 
+                '#IsVolunteer',
                 'The user is currently logged in as a volunteer.'
             );
             $this->allStdCondition(
-                '#IsBrancher', 
+                '#IsBrancher',
                 'The user is currently logged in as a database manager.'
             );
             $this->allStdCondition(
-                '#NodeDisabled', 
+                '#NodeDisabled',
                 'This node is not active (for the public).'
             );
             $this->allStdCondition(
-                '#IsLoggedIn', 
+                '#IsLoggedIn',
                 'Complainant is currently logged into the system.'
             );
             $this->allStdCondition(
-                '#IsNotLoggedIn', 
+                '#IsNotLoggedIn',
                 'Complainant is not currently logged into the system.'
             );
             $this->allStdCondition(
-                '#IsOwner', 
+                '#IsOwner',
                 'The user is currently logged is the owner of this record.'
             );
             $this->allStdCondition(
-                '#IsProfileOwner', 
+                '#IsProfileOwner',
                 'The user is currently logged in owns this user profile.'
             );
             $this->allStdCondition(
-                '#IsPrintable', 
+                '#IsPrintable',
                 'The current page view is intended to be printable.'
             );
             $this->allStdCondition(
-                '#IsPrintInFrame', 
+                '#IsPrintInFrame',
                 'The current page view is printed into frame/ajax/widget.'
             );
             $this->allStdCondition(
-                '#IsDataPermPublic', 
+                '#IsDataPermPublic',
                 'The current data permissions are set to public.'
             );
             $this->allStdCondition(
-                '#IsDataPermPrivate', 
+                '#IsDataPermPrivate',
                 'The current data permissions are set to private.'
             );
             $this->allStdCondition(
-                '#IsDataPermSensitive', 
+                '#IsDataPermSensitive',
                 'The current data permissions are set to sensitive.'
             );
             $this->allStdCondition(
-                '#IsDataPermInternal', 
+                '#IsDataPermInternal',
                 'The current data permissions are set to internal.'
             );
             $this->allStdCondition(
-                '#HasTokenDialogue', 
+                '#HasTokenDialogue',
                 'Current page load includes an access token dialogue.'
             );
             $this->allStdCondition(
-                '#EmailVerified', 
+                '#EmailVerified',
                 'Current user\'s email address has been verified.'
             );
             $this->allStdCondition(
-                '#TestLink', 
+                '#TestLink',
                 'Current page url parameters includes ?test=1.'
             );
             $this->allStdCondition(
-                '#NextButton', 
+                '#NextButton',
                 'Current page load results from clicking the survey\'s next button.'
             );
             //$this->allStdCondition('#HasUploads', 'Current core table record has associated uploads.');

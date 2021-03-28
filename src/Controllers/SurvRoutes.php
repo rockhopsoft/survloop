@@ -24,7 +24,7 @@ class SurvRoutes extends Controller
     {
         return redirect('/?test=1');
     }
-    
+
     public function getSysExpire($size = '.min')
     {
         if ($size == '') {
@@ -32,7 +32,7 @@ class SurvRoutes extends Controller
         }
         return (60*60*24);
     }
-    
+
     public function getContentType($type = 'js')
     {
         if ($type == 'css') {
@@ -49,7 +49,7 @@ class SurvRoutes extends Controller
         }
         return 'application/javascript';
     }
-    
+
     public function loadSysFile($type = 'js', $which = 1, $size = '.min')
     {
         $expires = $this->getSysExpire($size);
@@ -61,17 +61,17 @@ class SurvRoutes extends Controller
         $response->header('Expires', gmdate('r', time()+$expires));
         return $response;
     }
-    
+
     public function getSysFile(Request $request, $which = 1, $type = 'js')
     {
         return $this->loadSysFile($type, $which, '');
     }
-    
+
     public function getSysFileMin(Request $request, $which = 1, $type = 'js')
     {
         return $this->loadSysFile($type, $which);
     }
-    
+
     public function getSysTreeJs(Request $request, $treeID = 1)
     {
         $expires = $this->getSysExpire(); // expires daily
@@ -82,15 +82,16 @@ class SurvRoutes extends Controller
         $response->header('Expires', gmdate('r', time()+$expires));
         return $response;
     }
-    
+
     public function getDynaFile(Request $request, $file = '', $type = '')
     {
         $cache = new GlobalsCache;
         $filename = $file . '.' . $type;
         //$expires = $this->getSysExpire(''); // expires immediately
         $response = null;
-        if (strpos($file, '-s') === false || (session()->has('slSessID') 
-            && strpos($file, '-s' . session()->get('slSessID') . '-') !== false)) {
+        $sessSrch = '-s' . session()->get('slSessID') . '-';
+        if (strpos($file, '-s') === false
+            || strpos($file, $sessSrch) !== false) {
             $ret = '';
             if ($type == 'js') {
                 $ret = $cache->getCachePageJs($filename);
@@ -110,7 +111,7 @@ class SurvRoutes extends Controller
         //$response->header('Expires', gmdate('r', time()+$expires));
         return $response;
     }
-    
+
     public function getKml(Request $request, $kmlfile = '')
     {
         $expires = $this->getSysExpire(); // expires daily
@@ -124,7 +125,7 @@ class SurvRoutes extends Controller
         }
         return '';
     }
-    
+
     public function getLibFile($loc = '', $type = 'js')
     {
         $metaType = $this->getContentType($type);
@@ -133,12 +134,12 @@ class SurvRoutes extends Controller
         $response->header('Content-Type', $metaType);
         return $response;
     }
-    
+
     public function getJquery(Request $request)
     {
         return $this->getLibFile('components/jquery/jquery.min');
     }
-    
+
     public function getJqueryUi(Request $request, $type = 'js')
     {
         $path = 'components/jqueryui/';
@@ -147,28 +148,28 @@ class SurvRoutes extends Controller
         }
         return $this->getLibFile($path . 'themes/base/jquery-ui.min', 'css');
     }
-    
+
     public function catchJqueryUiMappingError(Request $request, $file = '')
     {
         return redirect('/survloop/jquery-ui-1.12.1/images/' . $file);
     }
-    
+
     public function getBootstrap(Request $request, $type = 'js')
     {
         $file = 'twbs/bootstrap/dist/' . $type . '/bootstrap.min';
         return $this->getLibFile($file, $type);
     }
-    
+
     public function getFontAwesome(Request $request)
     {
         return $this->getLibFile('forkawesome/fork-awesome/css/fork-awesome.min', 'css');
     }
-    
+
     public function getFontAwesomeMap(Request $request)
     {
         return $this->getLibFile('forkawesome/fork-awesome/css/fork-awesome.min.css', 'map');
     }
-    
+
     public function getFont(Request $request, $file = '')
     {
         $filename = '../vendor/forkawesome/fork-awesome/fonts/' . $file;
@@ -176,17 +177,17 @@ class SurvRoutes extends Controller
         //$response->header('Content-Type', 'text/css');
         return $response;
     }
-    
+
     public function getSummernoteJs(Request $request)
     {
         return $this->getLibFile('summernote/summernote/dist/summernote.min', 'js');
     }
-    
+
     public function getSummernoteCss(Request $request)
     {
         return $this->getLibFile('summernote/summernote/dist/summernote', 'css');
     }
-    
+
     public function getSummernoteEot(Request $request)
     {
         $file = '../vendor/summernote/summernote/dist/font/summernote.eot';
@@ -194,23 +195,23 @@ class SurvRoutes extends Controller
         $response->header('Content-Type', 'application/vnd.ms-fontobject');
         return $response;
     }
-    
+
     public function getChartJs(Request $request)
     {
         return $this->getLibFile('nnnick/chartjs/dist/Chart.bundle.min', 'js');
     }
-    
+
     public function getPlotlyJs(Request $request)
     {
         return $this->getLibFile('plotly/plotly.js/dist/plotly.min', 'js');
     }
-    
+
     public function getStateFlag(Request $request, $stateFlag, $ext = 'jpg')
     {
         $file = 'rockhopsoft/survloop-libraries/src/state-flags/' . $stateFlag;
         return $this->getLibFile($file, 'jpg');
     }
-    
+
     public function getProfilePhoto(Request $request, $user = '')
     {
         $uID = 0;
@@ -233,8 +234,8 @@ class SurvRoutes extends Controller
             ->where('def_set', 'System Settings')
             ->where('def_subset', 'has-avatars')
             ->first();
-        if ($def 
-            && isset($def->def_description) 
+        if ($def
+            && isset($def->def_description)
             && trim($def->def_description) != '') {
             return redirect($def->def_description);
         }
@@ -245,5 +246,5 @@ class SurvRoutes extends Controller
     {
         echo 'Survloop Route Function Calls are Working!';
     }
-    
+
 }

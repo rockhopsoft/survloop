@@ -10,6 +10,7 @@
   */
 namespace RockHopSoft\Survloop\Controllers\Tree;
 
+use DB;
 use App\Models\SLNodeSaves;
 
 class SurvDataUtils
@@ -19,45 +20,45 @@ class SurvDataUtils
     protected $privacy      = 'public';
     protected $id2ind       = [];
     protected $loaded       = false;
-    
+
     // These are collections of all this session's records for each table
     public $dataSets        = [];
     public $dataSetsSubbed  = [];
-    
+
     // Lookup arrays mapping this record to others by table an ID
     public $kidMap          = [];
-    
+
     // Tree node's current data structure nested position
     public $dataBranches    = [];
-    
+
     // Tree node's which capture multiple-response checkboxes
     public $checkboxNodes   = [];
     public $helpInfo        = [];
 
     // These are the IDs the items within a table's dataSet which are in a loop collection
     public $loopItemIDs     = [];
-    
+
     public $loopTblID       = -3;
     public $loopItemIDsDone = [];
     public $loopItemsNextID = -3;
-                
+
     // These are the currently active AB Tests for this user's session. Each record has
-    //  [ {Condition 
+    //  [ {Condition
     public $testsAB         = [];
 
-    
+
     public function setCoreID($coreTbl, $coreID = -3)
     {
         $this->coreTbl = $coreTbl;
         $this->coreID  = $coreID;
         return true;
     }
-    
+
     public function getCoreID()
     {
         return $this->coreID;
     }
-    
+
     public function getDataCoreID()
     {
         if (isset($this->dataSets[$this->coreTbl])) {
@@ -69,7 +70,7 @@ class SurvDataUtils
         }
         return -3;
     }
-    
+
     protected function initDataSet($tbl)
     {
         $setInd = 0;
@@ -80,12 +81,18 @@ class SurvDataUtils
         }
         return $setInd;
     }
-    
-    public function dataFind($tbl, $rowID)
+
+    protected function dataFind($tbl, $rowID)
     {
         if ($rowID <= 0) {
             return [];
         }
+        /*
+        $fullTbl = $GLOBALS["SL"]->dbRow->db_prefix . $tbl;
+        return DB::table($fullTbl)
+            ->where($GLOBALS["SL"]->tblAbbr[$tbl] . 'id', intVal($rowID))
+            ->first();
+        */
         $model = trim($GLOBALS["SL"]->modelPath($tbl));
         if ($model == '') {
             return [];
@@ -93,21 +100,34 @@ class SurvDataUtils
         eval("\$recObj = " . $model . "::find(" . $rowID . ");");
         return $recObj;
     }
-    
-    public function dataWhere($tbl, $where, $whereVal, $operator = "=", $getFirst = "get")
+
+    protected function dataWhere($tbl, $where, $whereVal, $operator = '=', $getFirst = 'get')
     {
         $model = trim($GLOBALS["SL"]->modelPath($tbl));
-        if ($model == '') {
+        if ($tbl == '' || $model == '') {
             return null;
         }
-        eval("\$recObj = " . $model . "::where('" . $where 
+        /*
+        if ($getFirst == 'get') {
+            return DB::table($fullTbl)
+                ->where($where, $operator, $whereVal)
+                ->orderBy($GLOBALS["SL"]->tblAbbr[$tbl] . 'id', 'asc')
+                ->get();
+        } else {
+            return DB::table($fullTbl)
+                ->where($where, $operator, $whereVal)
+                ->orderBy($GLOBALS["SL"]->tblAbbr[$tbl] . 'id', 'asc')
+                ->first();
+        }
+        */
+        eval("\$recObj = " . $model . "::where('" . $where
                 . "', '" . $operator . "', '" . $whereVal . "')"
             . "->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'asc')"
             . "->" . $getFirst . "();");
         return $recObj;
     }
-    
-    public function deleteDataItem($nID, $tbl = '', $itemID = -3)
+
+    public function deleteDataItem($tbl = '', $itemID = -3)
     {
         $itemInd = $this->getRowInd($tbl, $itemID);
         if ($itemID <= 0 || $itemInd < 0) {
@@ -117,21 +137,30 @@ class SurvDataUtils
         if ($model == '') {
             return false;
         }
-        eval($model . "::find(" . $itemID . ")->delete();");
+        $fullTbl = $GLOBALS["SL"]->dbRow->db_prefix . $tbl;
+        $idFld = $GLOBALS["SL"]->tblAbbr[$tbl] . 'id';
+        DB::table($fullTbl)
+            ->where($idFld, intVal($itemID))
+            ->delete();
+        //eval($model . "::find(" . intVal($itemID) . ")->delete();");
         unset($this->dataSets[$tbl][$itemInd]);
         unset($this->id2ind[$tbl][$itemID]);
         return true;
     }
-    
+
     public function deleteEntireCore()
     {
         if (sizeof($this->dataSets) > 0) {
             foreach ($this->dataSets as $tbl => $rows) {
                 $model = trim($GLOBALS["SL"]->modelPath($tbl));
+                $idFld = $GLOBALS["SL"]->tblAbbr[$tbl] . 'id';
                 if ($model != '' && sizeof($rows) > 0) {
                     foreach ($rows as $row) {
-                        eval($GLOBALS["SL"]->modelPath($tbl) . "::find(" 
-                            . intVal($row->getKey()) . ")->delete();");
+                        DB::table($GLOBALS["SL"]->dbRow->db_prefix . $tbl)
+                            ->where($idFld, intVal($row->{ $idFld }))
+                            ->delete();
+                        //eval($GLOBALS["SL"]->modelPath($tbl) . "::find("
+                        //    . intVal($row->getKey()) . ")->delete();");
                     }
                 }
             }
@@ -139,33 +168,33 @@ class SurvDataUtils
         }
         return true;
     }
-    
+
     public function dataHas($tbl, $rowID = -3)
     {
         if ($rowID <= 0) {
             return (isset($this->dataSets[$tbl]) && sizeof($this->dataSets[$tbl]) > 0);
         }
         $rowInd = $this->getRowInd($tbl, $rowID);
-        if ($rowInd >= 0 
-            && isset($this->dataSets[$tbl]) 
+        if ($rowInd >= 0
+            && isset($this->dataSets[$tbl])
             && $this->dataSets[$tbl][$rowInd]->getKey() == $rowID) {
             return true;
         }
         return false;
     }
-    
+
     public function getRowInd($tbl, $rowID)
     {
-        if ($rowID > 0 
-            && isset($this->id2ind[$tbl]) 
+        if ($rowID > 0
+            && isset($this->id2ind[$tbl])
             && isset($this->id2ind[$tbl][$rowID])) {
             if (intVal($this->id2ind[$tbl][$rowID]) >= 0) {
                 return $this->id2ind[$tbl][$rowID];
             }
         }
         // else double-check
-        if ($rowID > 0 
-            && isset($this->dataSets[$tbl]) 
+        if ($rowID > 0
+            && isset($this->dataSets[$tbl])
             && sizeof($this->dataSets[$tbl]) > 0) {
             foreach ($this->dataSets[$tbl] as $ind => $d) {
                 if ($d->getKey() == $rowID) {
@@ -177,7 +206,7 @@ class SurvDataUtils
         }
         return -3;
     }
-    
+
     public function getRowById($tbl, $rowID)
     {
         if ($rowID <= 0) {
@@ -189,12 +218,12 @@ class SurvDataUtils
         }
         return [];
     }
-    
+
     public function getRowIDsByFldVal($tbl, $fldVals = [], $getRow = false)
     {
         $ret = [];
-        if (sizeof($fldVals) > 0 
-            && isset($this->dataSets[$tbl]) 
+        if (sizeof($fldVals) > 0
+            && isset($this->dataSets[$tbl])
             && sizeof($this->dataSets[$tbl]) > 0) {
             foreach ($this->dataSets[$tbl] as $ind => $d) {
                 $found = true;
@@ -214,14 +243,14 @@ class SurvDataUtils
         }
         return $ret;
     }
-    
+
     public function dataFieldExists($tbl, $fld, $ind = 0)
     {
-        return (isset($this->dataSets[$tbl]) 
+        return (isset($this->dataSets[$tbl])
             && isset($this->dataSets[$tbl][$ind])
             && isset($this->dataSets[$tbl][$ind]->{ $fld }));
     }
-    
+
     public function dataFieldIsInt($tbl, $fld, $int = 1, $ind = 0)
     {
         if ($this->dataFieldExists($tbl, $fld, $ind)) {
@@ -229,20 +258,20 @@ class SurvDataUtils
         }
         return false;
     }
-    
+
     public function dataFieldIsY($tbl, $fld, $val = 'Y', $ind = 0)
     {
         if ($this->dataFieldExists($tbl, $fld, $ind)) {
-            return (strtoupper($val) 
+            return (strtoupper($val)
                 == strtoupper(trim($this->dataSets[$tbl][$ind]->{ $fld })));
         }
         return false;
     }
-    
+
     public function getLoopRows($loopName)
     {
         $rows = [];
-        if (isset($this->loopItemIDs[$loopName]) 
+        if (isset($this->loopItemIDs[$loopName])
             && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $itemID) {
                 $loopTbl = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
@@ -251,7 +280,7 @@ class SurvDataUtils
         }
         return $rows;
     }
-    
+
     public function getLoopRowIDs($loopName)
     {
         if (isset($this->loopItemIDs[$loopName])) {
@@ -259,10 +288,10 @@ class SurvDataUtils
         }
         return [];
     }
-    
+
     public function getLoopIndFromID($loopName, $itemID)
     {
-        if (isset($this->loopItemIDs[$loopName]) 
+        if (isset($this->loopItemIDs[$loopName])
             && sizeof($this->loopItemIDs[$loopName]) > 0) {
             foreach ($this->loopItemIDs[$loopName] as $ind => $id) {
                 if ($id == $itemID) {
@@ -272,7 +301,7 @@ class SurvDataUtils
         }
         return -1;
     }
-    
+
     public function addToMap($tbl1, $tbl1ID, $tbl1Ind, $tbl2, $tbl2ID, $tbl2Ind = -3, $lnkTbl = '')
     {
         if ($tbl1Ind < 0) {
@@ -302,10 +331,10 @@ class SurvDataUtils
         }
         return false;
     }
-    
+
     public function removeFromMap($tbl1, $tbl1ID)
     {
-        if ($tbl1ID > 0 
+        if ($tbl1ID > 0
             && trim($tbl1) != ''
             && isset($this->kidMap[$tbl1])
             && sizeof($this->kidMap[$tbl1]) > 0) {
@@ -325,12 +354,12 @@ class SurvDataUtils
         }
         return false;
     }
-    
+
     public function getChild($tbl1, $tbl1ID, $tbl2, $type = 'id')
     {
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0) {
-            if (isset($this->kidMap[$tbl1]) 
-                && isset($this->kidMap[$tbl1][$tbl2]) 
+            if (isset($this->kidMap[$tbl1])
+                && isset($this->kidMap[$tbl1][$tbl2])
                 && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
                 foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
                     if ($tbl1ID == $map[$type . "1"]) {
@@ -338,8 +367,8 @@ class SurvDataUtils
                     }
                 }
             }
-            if (isset($this->kidMap[$tbl2]) 
-                && isset($this->kidMap[$tbl2][$tbl1]) 
+            if (isset($this->kidMap[$tbl2])
+                && isset($this->kidMap[$tbl2][$tbl1])
                 && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
                 foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
                     if ($tbl1ID == $map[$type . "2"]) {
@@ -350,7 +379,7 @@ class SurvDataUtils
         }
         return -3;
     }
-    
+
     public function getChildRow($tbl1, $tbl1ID, $tbl2)
     {
         $childID = $this->getChild($tbl1, $tbl1ID, $tbl2);
@@ -359,21 +388,21 @@ class SurvDataUtils
         }
         return [];
     }
-    
+
     public function getChildRows($tbl1, $tbl1ID, $tbl2)
     {
         $retArr = [];
         if (trim($tbl1) != '' && trim($tbl2) != '' && $tbl1ID >= 0) {
-            if (isset($this->kidMap[$tbl1]) 
-                && isset($this->kidMap[$tbl1][$tbl2]) 
+            if (isset($this->kidMap[$tbl1])
+                && isset($this->kidMap[$tbl1][$tbl2])
                 && sizeof($this->kidMap[$tbl1][$tbl2]) > 0) {
                 foreach ($this->kidMap[$tbl1][$tbl2] as $map) {
                     if ($tbl1ID == $map["id1"]) {
                         $retArr[] = $this->getRowById($tbl2, $map["id2"]);
                     }
                 }
-            } elseif (isset($this->kidMap[$tbl2]) 
-                && isset($this->kidMap[$tbl2][$tbl1]) 
+            } elseif (isset($this->kidMap[$tbl2])
+                && isset($this->kidMap[$tbl2][$tbl1])
                 && sizeof($this->kidMap[$tbl2][$tbl1]) > 0) {
                 foreach ($this->kidMap[$tbl2][$tbl1] as $map) {
                     if ($tbl1ID == $map["id2"]) {
@@ -384,14 +413,14 @@ class SurvDataUtils
         }
         return $retArr;
     }
-    
+
     public function getBranchChildRows($tbl2, $idOnly = false)
     {
         $ret = [];
         $bInd = sizeof($this->dataBranches)-1;
-        if ($bInd >= 0 
-            && trim($this->dataBranches[$bInd]["branch"]) != '' 
-            && isset($this->dataSets[$tbl2]) 
+        if ($bInd >= 0
+            && trim($this->dataBranches[$bInd]["branch"]) != ''
+            && isset($this->dataSets[$tbl2])
             && sizeof($this->dataSets[$tbl2]) > 0) {
             $branch = $this->dataBranches[$bInd];
             $tbl2fld = $GLOBALS["SL"]->getFornNameFldName($tbl2, $branch["branch"]);
@@ -409,14 +438,14 @@ class SurvDataUtils
         }
         return $ret;
     }
-    
+
     public function sessChildIDFromParent($tbl2)
     {
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
             if ($this->dataBranches[$i]["branch"] != $tbl2) {
                 $tbl2ID = $this->getChild(
-                    $this->dataBranches[$i]["branch"], 
-                    $this->dataBranches[$i]["itemID"], 
+                    $this->dataBranches[$i]["branch"],
+                    $this->dataBranches[$i]["itemID"],
                     $tbl2
                 );
                 if ($tbl2ID > 0) {
@@ -426,13 +455,13 @@ class SurvDataUtils
         }
         return -3;
     }
-    
+
     public function sessChildRowFromParent($tbl2)
     {
         return $this->getRowById($tbl2, $this->sessChildIDFromParent($tbl2));
     }
 
-    
+
     protected function getAllTableIDs($tbl)
     {
         $tmpIDs = [];
@@ -443,7 +472,7 @@ class SurvDataUtils
         }
         return $tmpIDs;
     }
-    
+
     protected function getAllTableIdFlds($tbl, $flds = [])
     {
         $ret = [];
@@ -463,7 +492,7 @@ class SurvDataUtils
         }
         return $ret;
     }
-    
+
     // For debugging purposes
     public function printAllTableIdFlds($tbl, $flds = [])
     {
@@ -482,7 +511,7 @@ class SurvDataUtils
         }
         return $ret;
     }
-    
+
     public function getLatestDataBranch()
     {
         if (sizeof($this->dataBranches) > 0) {
@@ -490,7 +519,7 @@ class SurvDataUtils
         }
         return [];
     }
-    
+
     public function getLatestDataBranchID()
     {
         $branch = $this->getLatestDataBranch();
@@ -499,7 +528,7 @@ class SurvDataUtils
         }
         return -3;
     }
-    
+
     public function getLatestDataBranchRow()
     {
         $branch = $this->getLatestDataBranch();
@@ -508,7 +537,7 @@ class SurvDataUtils
         }
         return null;
     }
-    
+
     public function getDataBranchRow($tbl = '')
     {
         for ($i = (sizeof($this->dataBranches)-1); $i >= 0; $i--) {
@@ -518,7 +547,7 @@ class SurvDataUtils
         }
         return null;
     }
-    
+
     public function logDataSave($nID = -3, $tbl = '', $itemID = -3, $fld = '', $newVal = '')
     {
         $nodeSave = new SLNodeSaves;
@@ -541,7 +570,7 @@ class SurvDataUtils
         $nodeSave->save();
         return true;
     }
-    
+
     protected function loadSessionDataLog($nID = -3, $tbl = '', $fld = '', $set = '')
     {
         $sessID = 0;
@@ -550,18 +579,18 @@ class SurvDataUtils
             $sessID = session()->get($sessKey);
         }
         $qryWheres = "where('node_save_session', \$sessID)->"
-            . "where('node_save_node', " . $nID . ")->";
+            . "where('node_save_node', " . intVal($nID) . ")->";
         if (trim($tbl) != '' && trim($fld) != '') {
-            $qryWheres .= "where('node_save_tbl_fld', '" . $tbl . ":" . $fld 
+            $qryWheres .= "where('node_save_tbl_fld', '" . $tbl . ":" . $fld
                 . ((trim($set) != '') ? "[" . $set . "]" : "") . "')->";
         }
-        if (isset($GLOBALS["SL"]->closestLoop["itemID"]) 
+        if (isset($GLOBALS["SL"]->closestLoop["itemID"])
             && intVal($GLOBALS["SL"]->closestLoop["itemID"]) > 0) {
-            $qryWheres .= "where('node_save_loop_item_id', " 
-                . $GLOBALS["SL"]->closestLoop["itemID"] . ")->";
+            $qryWheres .= "where('node_save_loop_item_id', "
+                . intVal($GLOBALS["SL"]->closestLoop["itemID"]) . ")->";
         }
-        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres 
-            . "orderBy('created_at', 'desc')->first();"); 
+        eval("\$nodeSave = App\\Models\\SLNodeSaves::" . $qryWheres
+            . "orderBy('created_at', 'desc')->first();");
         if ($nodeSave && isset($nodeSave->node_save_new_val)) {
             return $nodeSave->node_save_new_val;
         }
@@ -575,16 +604,16 @@ class SurvDataUtils
         }
         $GLOBALS["SL"]->loadStates();
         $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
-        if ($zipRow && isset($zipRow->zip_zip) 
+        if ($zipRow && isset($zipRow->zip_zip)
             && isset($this->dataSets[$tbl])) {
             if (trim($fldState) != '' && isset($zipRow->zip_state)) {
-                $this->dataSets[$tbl][$setInd]->update([ 
-                    $fldState  => $zipRow->zip_state  
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldState  => $zipRow->zip_state
                 ]);
             }
             if (trim($fldCounty) != '' && isset($zipRow->zip_county)) {
-                $this->dataSets[$tbl][$setInd]->update([ 
-                    $fldCounty => $zipRow->zip_county 
+                $this->dataSets[$tbl][$setInd]->update([
+                    $fldCounty => $zipRow->zip_county
                 ]);
             }
             if (trim($fldCountry) != '' && isset($zipRow->zip_country)) {

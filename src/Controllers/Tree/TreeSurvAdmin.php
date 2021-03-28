@@ -35,7 +35,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
             $this->v["pageCnt"] = 0;
         }
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
-            if (isset($this->allNodes[$tierNode[0]]) 
+            if (isset($this->allNodes[$tierNode[0]])
                 && $this->hasNode($tierNode[0])) {
                 $this->allNodes[$tierNode[0]]->fillNodeRow();
                 if ($this->allNodes[$tierNode[0]]->isPage()) {
@@ -49,15 +49,15 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 $styPos = strpos($nodePromptText, '<style>');
                 if ($styPos !== false) {
                     $styPosEnd = strpos($nodePromptText, '</style>', $styPos);
-                    $nodePromptText = substr($nodePromptText, 0, $styPos) 
+                    $nodePromptText = substr($nodePromptText, 0, $styPos)
                         . substr($nodePromptText, 8+$styPosEnd);
                 }
                 $nodePromptText = strip_tags($nodePromptText);
                 $childrenPrints = '';
-                if (sizeof($tierNode[1]) > 0) { 
+                if (sizeof($tierNode[1]) > 0) {
                     foreach ($tierNode[1] as $next) {
                         $childrenPrints .= $this->adminBasicPrintNode(
-                            $next, 
+                            $next,
                             $tierDepth
                         );
                     }
@@ -67,7 +67,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                     $dataManips = '<span class="fPerc80 mL5">' . $dataManips . '</span>';
                 }
                 $condList = view(
-                    'vendor.survloop.admin.tree.node-list-conditions', 
+                    'vendor.survloop.admin.tree.node-list-conditions',
                     [
                         "conds"     => $this->allNodes[$tierNode[0]]->conds,
                         "nID"       => $tierNode[0],
@@ -76,15 +76,15 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 )->render();
                 if (sizeof($this->allNodes[$tierNode[0]]->conds) > 0) {
                     $condList = '<span class="slGreenDark opac50 mL10">'
-                            . '<i class="fa fa-filter" aria-hidden="true"></i>' 
+                            . '<i class="fa fa-filter" aria-hidden="true"></i>'
                             . $condList . '</span>';
                 }
-                if (!isset($GLOBALS["SL"]->x["hideDisabledNodes"]) 
+                if (!isset($GLOBALS["SL"]->x["hideDisabledNodes"])
                     || !$GLOBALS["SL"]->x["hideDisabledNodes"]
                     || strpos($condList, '#NodeDisabled') === false) {
                     $ret .= $this->adminBasicPrintNodeInner(
-                        $tierNode, 
-                        $tierDepth, 
+                        $tierNode,
+                        $tierDepth,
                         $nodePromptText,
                         $childrenPrints,
                         $dataManips,
@@ -99,28 +99,28 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
     protected function adminBasicPrintNodeInner($tierNode, $tierDepth, $nodePromptText, $childrenPrints, $dataManips, $condList)
     {
         $nodeBtns = view(
-            'vendor.survloop.admin.tree.node-print-basic-btns', 
+            'vendor.survloop.admin.tree.node-print-basic-btns',
             [
-                "nID"         => $tierNode[0], 
-                "node"        => $this->allNodes[$tierNode[0]], 
-                "tierNode"    => $tierNode, 
-                "canEditTree" => $this->canEditTree, 
+                "nID"         => $tierNode[0],
+                "node"        => $this->allNodes[$tierNode[0]],
+                "tierNode"    => $tierNode,
+                "canEditTree" => $this->canEditTree,
                 "isPrint"     => $this->v["isPrint"],
                 "isAlt"       => $this->v["isAlt"]
             ]
         )->render();
         $nodeBtnExpand = view(
-            'vendor.survloop.admin.tree.node-print-basic-btn-expand', 
+            'vendor.survloop.admin.tree.node-print-basic-btn-expand',
             [
-                "nID"      => $tierNode[0], 
-                "node"     => $this->allNodes[$tierNode[0]], 
-                "tierNode" => $tierNode, 
+                "nID"      => $tierNode[0],
+                "node"     => $this->allNodes[$tierNode[0]],
+                "tierNode" => $tierNode,
                 "isPrint"  => $this->v["isPrint"],
                 "isAlt"    => $this->v["isAlt"]
             ]
         )->render();
         $instructPrint = '';
-        if ($this->allNodes[$tierNode[0]]->isInstruct() 
+        if ($this->allNodes[$tierNode[0]]->isInstruct()
             || $this->allNodes[$tierNode[0]]->isInstructRaw()) {
             $instructPrint = $this->printNodePublic($tierNode[0]);
         }
@@ -131,32 +131,32 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         $instructPrint = $GLOBALS["SL"]->extractJava($instructPrint, -3, true);
         if (intVal($tierNode[0]) > 0 && isset($this->allNodes[$tierNode[0]])) {
             return view(
-                'vendor.survloop.admin.tree.node-print-basic', 
+                'vendor.survloop.admin.tree.node-print-basic',
                 [
-                    "rootID"         => $this->rootID, 
-                    "nID"            => $tierNode[0], 
-                    "node"           => $this->allNodes[$tierNode[0]], 
+                    "rootID"         => $this->rootID,
+                    "nID"            => $tierNode[0],
+                    "node"           => $this->allNodes[$tierNode[0]],
                     "nodePromptText" => $nodePromptText,
-                    "tierNode"       => $tierNode, 
-                    "tierDepth"      => $tierDepth, 
+                    "tierNode"       => $tierNode,
+                    "tierDepth"      => $tierDepth,
                     "childrenPrints" => $childrenPrints,
                     "dataManips"     => $dataManips,
                     "conditionList"  => $condList,
                     "nodeBtns"       => $nodeBtns,
                     "nodeBtnExpand"  => $nodeBtnExpand,
                     "REQ"            => $GLOBALS["SL"]->REQ,
-                    "canEditTree"    => $this->canEditTree, 
+                    "canEditTree"    => $this->canEditTree,
                     "isPrint"        => $this->v["isPrint"],
                     "isAll"          => $this->v["isAll"],
                     "isAlt"          => $this->v["isAlt"],
-                    "pageCnt"        => $this->v["pageCnt"], 
+                    "pageCnt"        => $this->v["pageCnt"],
                     "instructPrint"  => $instructPrint
                 ]
             )->render();
         }
         return '';
     }
-    
+
     public function adminPrintFullTree(Request $request, $pubPrint = false)
     {
         $ret = '';
@@ -173,7 +173,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         $this->treeAdminNodeManip();
         $this->loadTreeNodeStats();
         if ($GLOBALS["SL"]->REQ->has('dataStruct')) {
-            
+
         }
         $pageJava = $GLOBALS['SL']->pageJAVA;
         $GLOBALS['SL']->pageJAVA = '';
@@ -181,12 +181,12 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
             $ret = $this->adminBasicPrintNode($this->nodeTiers, -1);
         }
         $retAjax = view(
-            'vendor.survloop.admin.tree.node-print-wrap-ajax', 
+            'vendor.survloop.admin.tree.node-print-wrap-ajax',
             [ "canEditTree" => $this->canEditTree ]
         )->render();
         $ret = view(
             'vendor.survloop.admin.tree.node-print-wrap', [
-                "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
+                "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1),
                 "canEditTree"     => $this->canEditTree,
                 "isPrint"         => $this->v["isPrint"]
             ]
@@ -196,9 +196,9 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         $GLOBALS['SL']->pageJAVA = $pageJava;
         return $ret;
     }
-    
-    
-    
+
+
+
     protected function adminResponseNodeStatsTxt($res, $fnlCnt, $atmptCnt, $fnlVals, $nAtmpts, $nodeSess)
     {
         $totCnt = ((is_array($nodeSess)) ? sizeof($nodeSess) : 0);
@@ -207,25 +207,25 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
             '0% of all attempts'
         ];
         if (isset($fnlVals[strtolower($res)])) {
-            $stats[0] = '<b>' . round(100*$fnlVals[strtolower($res)]/$fnlCnt) 
+            $stats[0] = '<b>' . round(100*$fnlVals[strtolower($res)]/$fnlCnt)
                 . '%</b> of ' . $totCnt . ' final submissions';
         }
         if (isset($nAtmpts[strtolower($res)])) {
-            $stats[1] = round(100*$nAtmpts[strtolower($res)]/$atmptCnt) 
+            $stats[1] = round(100*$nAtmpts[strtolower($res)]/$atmptCnt)
                 . '% of all ' . $atmptCnt . ' attempts';
         }
         return $stats;
     }
-    
+
     protected function adminResponseNodeStats($tierNode = [], $tierDepth = 0)
     {
         $retVal = '';
         $tierDepth++;
         if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
             $nID = $tierNode[0];
-            if ($this->hasNode($nID) 
-                && (sizeof($tierNode[1]) > 0) 
-                    || (!$this->allNodes[$nID]->isDataManip() 
+            if ($this->hasNode($nID)
+                && (sizeof($tierNode[1]) > 0)
+                    || (!$this->allNodes[$nID]->isDataManip()
                         && !$this->allNodes[$nID]->isInstructAny())) {
                 $fnlCnt = $atmptCnt = 0;
                 $fnlVals = $nAtmpts = $nodeSess = [];
@@ -243,7 +243,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                         if (sizeof($str2arr) > 0 && $str2arr[0] != 'EMPTY ARRAY') {
                             $responses = $str2arr;
                         } elseif (!is_array($save->node_save_new_val)) {
-                            if ($this->allNodes[$nID]->nodeType == 'Checkbox' 
+                            if ($this->allNodes[$nID]->nodeType == 'Checkbox'
                                 && strpos($save->node_save_new_val, ';;') !== false) {
                                 $responses = explode(';;', $save->node_save_new_val);
                             } else {
@@ -282,19 +282,19 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                         $this->allNodes[$nID]->responses[$ind]->node_res_mut_ex = 0;
                     }
                 }
-                
+
                 $nodeAJAX = '';
-                $retVal .= '<div class="nodeAnchor"><a id="n' . $nID 
-                    . '" name="n' . $nID . '"></a></div><div class="basicTier' 
+                $retVal .= '<div class="nodeAnchor"><a id="n' . $nID
+                    . '" name="n' . $nID . '"></a></div><div class="basicTier'
                     . (($tierDepth < 10) ? $tierDepth : 9) . '"><div>';
-                
+
                 if (!$this->allNodes[$nID]->isSpecial()) {
                     $retVal .= '<span class="slBlueDark mR5">#' . $nID . '</span> ';
                     if ($this->allNodes[$nID]->isBranch()) {
-                        $retVal .= '<h3 class="disIn slGrey"><i class="fa fa-share-alt"></i> ' 
-                            . (($nID == $this->rootID) ? 'Tree Root Node' : 'Section Branch') . ': ' 
-                            . $this->allNodes[$nID]->nodeRow->node_prompt_text 
-                            . '</h3><div class="pT5"><a href="#n' . $nID . '" id="adminNode' . $nID 
+                        $retVal .= '<h3 class="disIn slGrey"><i class="fa fa-share-alt"></i> '
+                            . (($nID == $this->rootID) ? 'Tree Root Node' : 'Section Branch') . ': '
+                            . $this->allNodes[$nID]->nodeRow->node_prompt_text
+                            . '</h3><div class="pT5"><a href="#n' . $nID . '" id="adminNode' . $nID
                             . 'Expand" class="adminNodeExpand slBlueDark noUnd">'
                             . '<i class="fa fa-expand fa-flip-horizontal"></i></a></div>';
                     } else { // non-branch nodes
@@ -302,8 +302,8 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                         $questionText = $this->allNodes[$nID]->nodeRow->node_prompt_text;
                         $questionText = trim(strip_tags($questionText));
                         if ($questionText == '') {
-                            if ($this->allNodes[$nID]->nodeType == 'Checkbox' 
-                                && isset($this->allNodes[$nID]->responses) 
+                            if ($this->allNodes[$nID]->nodeType == 'Checkbox'
+                                && isset($this->allNodes[$nID]->responses)
                                 && sizeof($this->allNodes[$nID]->responses) == 1
                                 && isset($this->allNodes[$nID]->responses[0]->node_res_eng)) {
                                 $questionText = $this->allNodes[$nID]->responses[0]->node_res_eng;
@@ -311,7 +311,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                                 $questionText = $GLOBALS["SL"]->getFldTitle($tbl, $fld);
                             }
                         }
-                        $req = (($this->allNodes[$nID]->isRequired()) 
+                        $req = (($this->allNodes[$nID]->isRequired())
                             ? ' <span class="txtDanger">*</span> ' : '');
                         $retVal .= '<h3 class="disIn">' . $questionText . $req . '</h3><div class="pT5">';
                         if (sizeof($tierNode[1]) > 0) {
@@ -319,23 +319,23 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                                 . 'class="slBlueDark noUnd"><i class="fa fa-expand fa-flip-horizontal"'
                                 . '></i></a>&nbsp;&nbsp;&nbsp;';
                         }
-                        if (isset($this->allNodes[$nID]->responses) 
+                        if (isset($this->allNodes[$nID]->responses)
                             && sizeof($this->allNodes[$nID]->responses) > 0) {
                             foreach ($this->allNodes[$nID]->responses as $j => $res) {
                                 $val = strtolower($res->node_res_value);
                                 $stats = $this->adminResponseNodeStatsTxt(
-                                    $val, 
-                                    $fnlCnt, 
-                                    $atmptCnt, 
-                                    $fnlVals, 
-                                    $nAtmpts, 
+                                    $val,
+                                    $fnlCnt,
+                                    $atmptCnt,
+                                    $fnlVals,
+                                    $nAtmpts,
                                     $nodeSess
                                 );
-                                if ($this->allNodes[$nID]->responses[0] != '[U.S.States]' 
-                                    || isset($fnlVals[strtolower($res->node_res_value)]) 
+                                if ($this->allNodes[$nID]->responses[0] != '[U.S.States]'
+                                    || isset($fnlVals[strtolower($res->node_res_value)])
                                     || isset($nAtmpts[strtolower($res->node_res_value)])) {
-                                    $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '') 
-                                        . '"><div class="col-6">' 
+                                    $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '')
+                                        . '"><div class="col-6">'
                                         . $GLOBALS["SL"]->printResponse($tbl, $fld, $res->node_res_value);
                                     if (isset($res->node_res_show_kids) && $res->node_res_show_kids > 0) {
                                         $retVal .= '<i class="fa fa-code-fork fa-flip-vertical mL5" '
@@ -350,27 +350,27 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                             $j=0;
                             foreach ($fnlVals as $res => $cnt) {
                                 $stats = $this->adminResponseNodeStatsTxt(
-                                    strtolower($res), 
-                                    $fnlCnt, 
-                                    $atmptCnt, 
-                                    $fnlVals, 
-                                    $nAtmpts, 
+                                    strtolower($res),
+                                    $fnlCnt,
+                                    $atmptCnt,
+                                    $fnlVals,
+                                    $nAtmpts,
                                     $nodeSess
                                 );
-                                $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '') 
-                                    . '"><div class="col-6 fPerc133">' . ((trim($res) != '') 
+                                $retVal .= '<div class="row p15 m0' . (($j%2 == 0) ? ' row2' : '')
+                                    . '"><div class="col-6 fPerc133">' . ((trim($res) != '')
                                         ? $GLOBALS["SL"]->printResponse($tbl, $fld, $res)
                                         : '<span class="slGrey"><i>(empty)</i></span>')
-                                    . '</div><div class="col-3 slBlueDark">' . $stats[0] 
+                                    . '</div><div class="col-3 slBlueDark">' . $stats[0]
                                     . '</div><div class="col-3 slGrey">' . $stats[1] . '</div></div>';
                                 if ($j == 9) {
-                                    $retVal .= '<div class="nodeAnchor"><a name="n' . $nID 
-                                        . 'more"></a></div><a href="#n' . $nID 
-                                        . 'more" id="show' . $nID . 'Response' . $j 
-                                        . 'Stats">show more</a></div><div id="more' . $nID 
+                                    $retVal .= '<div class="nodeAnchor"><a name="n' . $nID
+                                        . 'more"></a></div><a href="#n' . $nID
+                                        . 'more" id="show' . $nID . 'Response' . $j
+                                        . 'Stats">show more</a></div><div id="more' . $nID
                                         . 'Response' . $j . 'Stats" class="disNon">';
-                                    $nodeAJAX .= '$("#show' . $nID . 'Response' . $j 
-                                        . 'Stats").click(function(){ $("#more' . $nID . 'Response' 
+                                    $nodeAJAX .= '$("#show' . $nID . 'Response' . $j
+                                        . 'Stats").click(function(){ $("#more' . $nID . 'Response'
                                         . $j . 'Stats").slideToggle("fast"); }); ' . "\n";
                                 }
                                 $j++;
@@ -379,7 +379,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                         $retVal .= '</div>';
                     }
                 }
-                if (sizeof($tierNode[1]) > 0) { 
+                if (sizeof($tierNode[1]) > 0) {
                     $dis = 'Non';
                     if (session()->get('adminOverOpts')%2 == 0 || $nID == $this->rootID) {
                         $dis = 'Blo';
@@ -397,17 +397,17 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         }
         return $retVal;
     }
-    
-    public function adminPrintFullTreeStats(Request $request) 
+
+    public function adminPrintFullTreeStats(Request $request)
     {
         $this->loadTree();
         $this->initExtra($request);
         $this->checkTreeSessOpts();
         return $this->adminResponseNodeStats($this->nodeTiers, -1);
     }
-    
-    
-    
+
+
+
     public function checkTreeSessOpts()
     {
         if (!session()->has('adminOverOpts')) {
@@ -423,16 +423,16 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         session()->save();
         return true;
     }
-    
-    
-    
-    
+
+
+
+
     protected function adminBasicDropdownNode($tierNode = [], $tierDepth = 0, $preSel = -3)
     {
         $retVal = '';
         $tierDepth++;
-        if (sizeof($tierNode) > 0 && $tierNode[0] > 0) { 
-            $nID = $tierNode[0]; 
+        if (sizeof($tierNode) > 0 && $tierNode[0] > 0) {
+            $nID = $tierNode[0];
             if ($this->hasNode($nID)) {
                 $indent = '';
                 for ($i=0; $i<$tierDepth; $i++) {
@@ -442,8 +442,8 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
                 if (strlen($nodeName) > 70) {
                     $nodeName = trim(substr($nodeName, 0, 70)) . '...';
                 }
-                $retVal .= '<option value="' . $nID . '" ' 
-                    . ((intVal($preSel) == $nID) ? 'SELECTED' : '') 
+                $retVal .= '<option value="' . $nID . '" '
+                    . ((intVal($preSel) == $nID) ? 'SELECTED' : '')
                     . ' >' . $indent . $nodeName . '</option>';
                 if (sizeof($tierNode[1]) > 0) {
                     foreach ($tierNode[1] as $next) {
@@ -454,23 +454,23 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         }
         return $retVal;
     }
-    
+
     protected function adminBasicDropdown($preSel = -3)
     {
         return '<select name="nodeID" style="width: 100%;">'
-            . '<option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '') 
+            . '<option value="-3" ' . ((intVal($preSel) <= 0) ? 'SELECTED' : '')
             . ' >select tree node</option>
             ' . $this->adminBasicDropdownNode($this->nodeTiers, -1, $preSel) . '
             </select>';
     }
-    
+
     protected function updateTreeEnds()
     {
-        $GLOBALS["SL"]->treeRow->tree_first_page 
+        $GLOBALS["SL"]->treeRow->tree_first_page
             = $GLOBALS["SL"]->treeRow->tree_last_page = 0;
         foreach ($this->nodesRawOrder as $nID) {
-            if (isset($this->allNodes[$nID]) 
-                && ($this->allNodes[$nID]->isPage() 
+            if (isset($this->allNodes[$nID])
+                && ($this->allNodes[$nID]->isPage()
                     || $this->allNodes[$nID]->isLoopRoot())) {
                 if ($GLOBALS["SL"]->treeRow->tree_first_page <= 0) {
                     $GLOBALS["SL"]->treeRow->tree_first_page = $nID;
@@ -481,7 +481,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         $GLOBALS["SL"]->treeRow->save();
         return true;
     }
-    
+
     protected function updateLoopRoots()
     {
         $nodes = SLNode::where('node_tree', $this->treeID)
@@ -494,7 +494,7 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         }
         return true;
     }
-    
+
     protected function updateBranchUrls()
     {
         $branches = SLNode::where('node_tree', $this->treeID)
@@ -512,5 +512,5 @@ class TreeSurvAdmin extends TreeSurvNodeEdit
         }
         return true;
     }
-    
+
 }

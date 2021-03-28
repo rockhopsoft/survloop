@@ -20,36 +20,40 @@ class SurvloopServiceProvider extends ServiceProvider
         $this->app->bind('survloop', function($app) {
             return new SurvloopFacade();
         });
+
         $this->loadRoutesFrom(__DIR__ . '/Routes/routes.php');
         //$this->loadViewsFrom(__DIR__ . '/Views', 'survloop');
+        
         if ($this->app->runningInConsole()) {
             $libDir = '/vendor/rockhopsoft/survloop-libraries/src/';
-            $dbMig  = '2020_09_14_000000_create_survloop_tables';
             $this->publishes([
 
                 __DIR__ . '/Views' 
                     => base_path('resources/views/vendor/survloop'),
 
-                __DIR__ . '/Views/auth' 
-                    => base_path('resources/views/auth'),
-
-                __DIR__ . '/Views/auth/passwords' 
-                    => base_path('resources/views/auth/passwords'),
-
                 __DIR__ . '/Models' 
                     => base_path('app/Models'),
 
-                __DIR__ . '/Controllers/Middleware/routes-api.php' 
+                __DIR__ . '/Overrides/FortifyServiceProvider.php' 
+                    => base_path('app/Providers/FortifyServiceProvider.php'),
+
+                __DIR__ . '/Overrides/CreateNewUser.php' 
+                    => base_path('app/Actions/Fortify/CreateNewUser.php'),
+
+                __DIR__ . '/Overrides/fortify.php' 
+                    => base_path('config/fortify.php'),
+
+                __DIR__ . '/Overrides/routes-api.php' 
                     => base_path('routes/api.php'),
 
-                __DIR__ . '/Controllers/Middleware/routes-web.php' 
+                __DIR__ . '/Overrides/routes-web.php' 
                     => base_path('routes/web.php'),
 
-                __DIR__ . '/Controllers/Middleware/Authenticate.php' 
+                __DIR__ . '/Overrides/Authenticate.php' 
                     => base_path('app/Http/Middleware/Authenticate.php'),
 
-                __DIR__ . '/Database/' . $dbMig . '.php' 
-                    => base_path('database/migrations/' . $dbMig . '.php'),
+                __DIR__ . '/Database/2020_09_14_000000_create_survloop_tables.php' 
+                    => base_path('database/migrations/2020_09_14_000000_create_survloop_tables.php'),
 
                 __DIR__ . '/Database/SurvloopSeeder.php' 
                     => base_path('database/seeders/SurvloopSeeder.php'),

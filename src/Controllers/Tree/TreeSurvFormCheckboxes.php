@@ -18,7 +18,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
     {
         $ret = '';
         if ($curr->nodeType == 'Radio') {
-            $ret .= '<input type="hidden" name="n' . $curr->nIDtxt 
+            $ret .= '<input type="hidden" name="n' . $curr->nIDtxt
                 . 'radioCurr" id="n' . $curr->nIDtxt . 'radioCurrID" value="';
             if (!is_array($curr->sessData)) {
                 $ret .= $curr->sessData;
@@ -35,9 +35,9 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         }
         if (sizeof($curr->responses) > 0) {
             $mobileChk = ($curr->nodeRow->node_opts%2 > 0);
-            $ret .= (($curr->isOneLiner()) ? '<div class="pB20">' : '') 
-                . str_replace('<label for="n' . $curr->nIDtxt . 'FldID">', '', 
-                    str_replace('<label for="n' . $curr->nIDtxt . 'FldID" >', '', 
+            $ret .= (($curr->isOneLiner()) ? '<div class="pB20">' : '')
+                . str_replace('<label for="n' . $curr->nIDtxt . 'FldID">', '',
+                    str_replace('<label for="n' . $curr->nIDtxt . 'FldID" >', '',
                     str_replace('</label>', '', $curr->nodePrompt)))
                 . '<div class="nFld';
             if ($this->hasSpreadsheetParent($curr->nID)) {
@@ -47,14 +47,14 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
             } else {
                 $ret .= $curr->isOneLiner . ' pB0 mBn5">' . "\n";
             }
-            
+
                 // onClick="return check' . $nID . 'Kids();"
             $curr->onChange = '';
-            $GLOBALS["SL"]->pageJAVA .= "\n" . 'addResTot("' 
+            $GLOBALS["SL"]->pageJAVA .= "\n" . 'addResTot("'
                 . $curr->nID . '", ' . sizeof($curr->responses) . ');'; /// txt?
             if ($curr->nodeRow->node_opts%79 == 0) {
                 $curr->onChange = 'chkRadioHide(\'' . $curr->nIDtxt . '\'); ';
-                $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("' 
+                $GLOBALS["SL"]->pageJAVA .= "\n" . 'setTimeout("'
                     . $curr->onChange . '", 100);';
             }
             if ($curr->nodeRow->node_opts%61 == 0) {
@@ -73,7 +73,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
     {
         $ret = '';
         if ($curr->isRequired()) {
-            $this->pageJSvalid .= " addReqNodeRadio('" . $curr->nIDtxt 
+            $this->pageJSvalid .= " addReqNodeRadio('" . $curr->nIDtxt
                 . "', 'reqFormFldRadio', " . sizeof($curr->responses) . "); ";
         }
         if ($curr->nodeRow->node_opts%61 == 0) {
@@ -81,11 +81,11 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         }
         if ($curr->nodeRow->node_opts%79 == 0) {
             $ret .= view(
-                'vendor.survloop.forms.formtree-checkbox-unhide', 
+                'vendor.survloop.forms.formtree-checkbox-unhide',
                 [ "curr" => $curr ]
             )->render();
         }
-        $ret .= '</div>' . (($curr->isOneLiner()) ? '</div>' : '') . "\n"; 
+        $ret .= '</div>' . (($curr->isOneLiner()) ? '</div>' : '') . "\n";
         return $ret;
     }
 
@@ -96,10 +96,10 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         if ($curr->hasShowKids) {
             $curr->xtraClass .= ' n' . $curr->nIDtxt . 'fldCls';
         }
-        $respKids = ' data-nid="' . $curr->nID . '" class="nCbox' 
-            . $curr->nID . ' ' . $curr->xtraClass . '"'; 
+        $respKids = ' data-nid="' . $curr->nID . '" class="nCbox'
+            . $curr->nID . ' ' . $curr->xtraClass . '"';
         $otherFld = $this->printNodeCheckboxOther($curr, $j, $res, $val);
-        
+
         if ($curr->nodeType == 'Checkbox' && $curr->indexMutEx($j)) {
             $GLOBALS["SL"]->pageJAVA .= ' addMutEx("' . $curr->nIDtxt . '", ' . $j . '); ';
         }
@@ -108,18 +108,18 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         $boxChecked = $this->isCurrDataSelected($curr, $res->node_res_value);
     /// Somewhere 'round here
         if ($curr->nodeType == 'Radio') {
-            $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld" ' 
+            $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld" '
                 . (($boxChecked) ? 'CHECKED' : '');
             if (sizeof($curr->fldHasOther) > 0 && $otherFld[1] == '') {
-                $otherFld[3] = ' if (document.getElementById(\'n' 
-                    . $curr->nIDtxt . 'fldOtherID' . $j . '\')) { document.getElementById(\'n' 
+                $otherFld[3] = ' if (document.getElementById(\'n'
+                    . $curr->nIDtxt . 'fldOtherID' . $j . '\')) { document.getElementById(\'n'
                     . $curr->nIDtxt . 'fldOtherID' . $j . '\').value=\'\'; } ';
             }
         } else {
-            $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld[]" ' 
+            $resNameCheck = 'name="n' . $curr->nIDtxt . 'fld[]" '
                 . (($boxChecked) ? 'CHECKED' : '');
         }
-        
+
         if ($curr->nodeRow->node_opts%61 == 0) {
             $cols = $GLOBALS["SL"]->getColsWidth(sizeof($curr->responses));
             $ret .= '<div class="col-' . $cols . '">';
@@ -130,7 +130,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
             $onClickFull = ' onClick="' . $onClickFull . '" ';
         }
         $ret .= view(
-            'vendor.survloop.forms.formtree-checkbox', 
+            'vendor.survloop.forms.formtree-checkbox',
             [
                 "curr"           => $curr,
                 "j"              => $j,
@@ -148,7 +148,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
             $ret .= '</div> <!-- end col -->' . "\n";
         }
         // Check for Layout Sub-Response between each Checkbox Response
-        if ($curr->nodeType == 'Checkbox' 
+        if ($curr->nodeType == 'Checkbox'
             && sizeof($curr->tmpSubTier[1]) > 0) {
             $ret .= $this->printCheckSubRes($curr, $j, $res, $boxChecked);
         }
@@ -156,15 +156,15 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         if (in_array($curr->nodeType, ['Checkbox', 'Radio'])
             && in_array($j, $curr->fldHasOther)) {
             $fldOth = 'n' . $curr->nIDtxt . 'fldOtherID' . $j;
-            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' 
+            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n'
                 . $curr->nIDtxt . 'fldOtherID' . $j . '", function() { '
                 . 'if (document.getElementById("' . $fldOth . '") '
                 . '&& document.getElementById("' . $fldOth . '").value.trim() '
-                . '!= "") { document.getElementById("n' . $curr->nIDtxt . 'fld' . $j 
+                . '!= "") { document.getElementById("n' . $curr->nIDtxt . 'fld' . $j
                 . '").checked=true; checkFingerClass("' . $curr->nIDtxt . '"); } });';
             /*
-            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n' 
-                . $curr->nIDtxt . 'fldOtherID' . $j . '", function() { formKeyUpOther(\'' 
+            $GLOBALS["SL"]->pageAJAX .= '$(document).on("keyup", "#n'
+                . $curr->nIDtxt . 'fldOtherID' . $j . '", function() { formKeyUpOther(\''
                 . $curr->nIDtxt . '\', ' . $j . '); });';
                 // chkSubRes' . $nIDtxt . 'j' . $j . '();
             */
@@ -208,7 +208,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
                 $otherFld[1] = '';
             }
             $otherFld[2] = view(
-                'vendor.survloop.forms.formtree-checkbox-other', 
+                'vendor.survloop.forms.formtree-checkbox-other',
                 [
                     "curr" => $curr,
                     "j"    => $j,
@@ -223,9 +223,9 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
     {
         $ret = '';
         foreach ($curr->tmpSubTier[1] as $childNode) {
-            if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response' 
+            if ($this->allNodes[$childNode[0]]->nodeType == 'Layout Sub-Response'
                 && sizeof($childNode[1]) > 0) {
-                $ret .= '<div id="n' . $curr->nIDtxt 
+                $ret .= '<div id="n' . $curr->nIDtxt
                     . 'fld' . $j . 'sub" class="subRes '
                     . (($boxChecked) ? 'disBlo' : 'disNon') . '" >';
                 $GLOBALS["SL"]->currCyc["res"][0] = $curr->tbl;
@@ -248,7 +248,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
                 $GLOBALS["SL"]->currCyc["res"] = [ '', '', -3 ];
                 $ret .= '</div>';
                 $GLOBALS["SL"]->pageAJAX .= view(
-                    'vendor.survloop.forms.formtree-sub-response-ajax', 
+                    'vendor.survloop.forms.formtree-sub-response-ajax',
                     [
                         "nID"      => $curr->nID,
                         "nSffx"    => $curr->nSffx,
@@ -267,15 +267,15 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         $ret = '';
         $fldOth = $curr->fld . '_other';
         $sessDataOther = $this->sessData->currSessDataTblFld(
-            $curr->nID, 
-            $curr->tbl, 
+            $curr->nID,
+            $curr->tbl,
             $fldOth
         );
         for ($j = 0 ; $j < sizeof($curr->responses); $j++) {
             $this->pageFldList[] = 'n' . $curr->nIDtxt . 'fld' . $j;
         }
         $ret .= view(
-            'vendor.survloop.forms.formtree-gender', 
+            'vendor.survloop.forms.formtree-gender',
             [
                 "curr"          => $curr,
                 "sessDataOther" => $sessDataOther
@@ -290,7 +290,7 @@ class TreeSurvFormCheckboxes extends TreeSurvFormPrintLoad
         }
         $GLOBALS["SL"]->pageAJAX .= '$( "#n' . $curr->nIDtxt . 'fldOtherID2" )'
             . '.autocomplete({ source: [' . substr($genderSuggest, 1) . '] });' . "\n";
-        $this->v["javaNodes"] .= 'nodeResTot["' . $curr->nID . '"] = ' 
+        $this->v["javaNodes"] .= 'nodeResTot["' . $curr->nID . '"] = '
             . sizeof($curr->responses) . '; ';
         if ($curr->isRequired()) {
             $this->pageJSvalid .= "addReqNode('" . $curr->nIDtxt . "', 'reqFormGender');\n";

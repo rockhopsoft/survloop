@@ -90,7 +90,7 @@ class TreeSurvCustomAPI extends TreeSurvAPI
             	$val = $this->overrideRecordValueCustomAPI($name, $type, $tbl, $rec, $apiFld);
             	if ($val != '') {
                 	$ret .= '<' . $label . '>' . $val . '</' . $label . '>';
-            	} elseif ($apiFld->fld 
+            	} elseif ($apiFld->fld
                     && isset($apiFld->fld->fld_table)
                     && intVal($apiFld->fld->fld_table) > 0
                     && isset($GLOBALS["SL"]->tbl[$apiFld->fld->fld_table])) {
@@ -231,7 +231,7 @@ class TreeCustomAPI
     		"apiNamespace" => $this->apiNamespace
         ])->render();
     }
-    
+
 }
 
 
@@ -250,7 +250,7 @@ class TreeCustomTableAPI
         $this->loopTbl  = $loopTbl;
         $this->inline 	= $inline;
     }
-    
+
     public function addNode($label = '', $labelEng = '', $desc = '', $fldID = 0, $enums = [])
     {
         $this->apiFields[] = new TreeCustomFieldAPI($label, $labelEng, $desc, $fldID, $enums);
@@ -273,13 +273,13 @@ class TreeCustomTableAPI
         $this->addNode($label, $labelEng, $desc, $fldID, $enums);
         return true;
     }
-    
+
     protected function addNodeFldEnums($fld)
     {
         $enums = [];
         if (isset($fld->fld_values) && trim($fld->fld_values) != '') {
             if (strpos($fld->fld_values, 'Def::') !== false) {
-                $defSet = trim(str_replace('Def::', '', 
+                $defSet = trim(str_replace('Def::', '',
                     str_replace('DefX::', '', $fld->fld_values)
                 ));
                 $defs = $GLOBALS["SL"]->def->getSet($defSet);
@@ -294,7 +294,7 @@ class TreeCustomTableAPI
         }
         return $enums;
     }
-    
+
     public function printFlds($type = 'xml')
     {
         $ret = '';
@@ -344,7 +344,7 @@ class TreeCustomFieldAPI
         $this->label = str_replace($before, $after, $this->label);
         return $this->label;
     }
-    
+
     public function printFld($type = 'xml', $tblPrefix = '')
     {
         return view('vendor.survloop.admin.tree.' . $type . '-schema-custom-fld', [
@@ -358,6 +358,6 @@ class TreeCustomFieldAPI
             "elemType"   => $this->elemType
         ])->render();
     }
-    
+
 
 }

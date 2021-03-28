@@ -7,8 +7,8 @@
             <i class="fa fa-database mR3"></i> Raw Data Table
         </h2>
         <h4>
-            {{ $tbl->tbl_eng }} 
-            ({{ number_format($rowTotCnt) }} 
+            {{ $tbl->tbl_eng }}
+            ({{ number_format($rowTotCnt) }}
         @if ($rowTotCnt == $rows->count())
             rows)
         @else
@@ -26,7 +26,7 @@
                 data-sort-fld="id"
                 @if ($sortFld == 'id' && $sortDir == 'desc')
                     data-sort-dir="asc"
-                @else 
+                @else
                     data-sort-dir="desc"
                 @endif >
                 Unique Record ID#
@@ -41,11 +41,11 @@
         </th>
     @forelse ($flds as $col => $fld)
         <th id="colHead{{ (2+$col) }}">
-            <a href="javascript:;" class="columnSort" 
+            <a href="javascript:;" class="columnSort"
                 data-sort-fld="{{ $fld->fld_name }}"
                 @if ($sortFld == $fld->fld_name && $sortDir == 'desc')
                     data-sort-dir="asc"
-                @else 
+                @else
                     data-sort-dir="desc"
                 @endif >
                 {{ $fld->fld_eng }}
@@ -64,13 +64,14 @@
 @forelse ($rows as $cnt => $row)
     <tr class=" @if ($cnt%2 == 0) row2 @endif ">
         <td class="slGrey">{{ number_format(1+$cnt) }}</td>
-        <td>{{ $row->getKey() }}</td>
+        <td>{{ $row->{ $tbl->tbl_abbr . 'id' } }}</td>
     @forelse ($flds as $col => $fld)
         <?php $fldName = $tbl->tbl_abbr . $fld->fld_name; ?>
         <td>
-        @if (isset($row->{ $fldName }) 
+        @if (isset($row->{ $fldName })
             && trim($row->{ $fldName }) != '')
-            @if ($fld->fld_type == 'INT' && !in_array($fld->fld_name, ['year']))
+            @if ($fld->fld_type == 'INT'
+                && !in_array($fld->fld_name, ['year', 'year_code']))
                 {{ number_format($row->{ $fldName }) }}
             @else
                 {{ $row->{ $fldName } }}

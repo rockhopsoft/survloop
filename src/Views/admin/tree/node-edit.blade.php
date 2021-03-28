@@ -244,7 +244,7 @@
         <div id="pagePreview" class=" 
             @if ($node->nodeType == 'Page') disBlo @else disNon @endif ">
             <div class="slCard nodeWrap">
-                <h4 class="mT0">Social Sharing Preview</h4>
+                <p><b>Social Sharing Preview</b></p>
                 {!! view('vendor.survloop.admin.seo-meta-editor-preview', [])->render() !!}
             </div>
         </div>

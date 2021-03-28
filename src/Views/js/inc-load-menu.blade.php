@@ -3,6 +3,7 @@
 
 function loadTopSideNavs() {
 @if (isset($username) && trim($username) != '')
+    loggedIn = true;
     if (!document.getElementById('userMenuBtn')) {
         addTopUserBurger('{{ $username }}');
         <?php /*
@@ -10,6 +11,7 @@ function loadTopSideNavs() {
         */ ?>
     }
 @else
+    loggedIn = false;
     if (!document.getElementById('loginLnk')) {
         addTopNavItem('Sign Up',  '/register{!! $previousUrl !!}" id="signupLnk');
         addTopNavItem('Login',    '/login{!! $previousUrl !!}" id="loginLnk');

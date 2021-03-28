@@ -1,21 +1,18 @@
-<?php
-$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
-$css = $sysDefs->loadCss();
-?>@extends('vendor.survloop.master')
+@extends('vendor.survloop.master')
 @section('content')
 <div id="ajaxWrap">
 <!-- resources/views/vendor/survloop/auth/register.blade.php -->
 
-<form name="mainPageForm" method="POST" action="{{ url('/register') }}">
+<form name="mainPageForm" method="POST" action="/register">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" id="isSignupID" name="isSignup" value="1">
 <input type="hidden" name="previous" 
     @if (isset($midSurvRedir) && trim($midSurvRedir) != '') 
         value="{{ $midSurvRedir }}"
-    @elseif (isset($request) && $request->has('redir')) 
-        value="{{ $request->get('redir') }}"
-    @elseif (isset($request) && $request->has('previous')) 
-        value="{{ $request->get('previous') }}"
+    @elseif (isset($GLOBALS["SL"]->REQ) && $GLOBALS["SL"]->REQ->has('redir')) 
+        value="{{ $GLOBALS["SL"]->REQ->get('redir') }}"
+    @elseif (isset($GLOBALS["SL"]->REQ) && $GLOBALS["SL"]->REQ->has('previous')) 
+        value="{{ $GLOBALS["SL"]->REQ->get('previous') }}"
     @else 
         value="{{ URL::previous() }}"
     @endif >
@@ -24,54 +21,59 @@ $css = $sysDefs->loadCss();
 <div id="treeWrap" class="treeWrapForm">
     <div class="slCard">
 
-@if (!isset($sysOpts["signup-instruct"])
-    || trim($sysOpts["signup-instruct"]) 
+@if (!isset($GLOBALS["SL"]->sysOpts["signup-instruct"])
+    || trim($GLOBALS["SL"]->sysOpts["signup-instruct"]) 
         != '<h2 class="mT5 mB0">Create Admin Account</h2>')
-    <a href="/login{{ ((isset($request) && $request->has('nd')) 
-        ? '?nd=' . $request->get('nd') : '') 
+    <a href="/login{{ ((isset($GLOBALS["SL"]->REQ) && $GLOBALS["SL"]->REQ->has('nd')) 
+        ? '?nd=' . $GLOBALS["SL"]->REQ->get('nd') : '') 
         }}" class="btn btn-secondary pull-right mL20" 
         id="registerLoginLnk">Login</a>
 @endif
 <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
 <div class="nPrompt">
     <h2 class="mT0 mB20">Sign Up</h2>
-    @if (isset($sysOpts["midsurv-instruct"]) 
-        && trim($sysOpts["midsurv-instruct"]) != '')
-        {!! $sysOpts["midsurv-instruct"] !!}
-    @elseif (isset($sysOpts["signup-instruct"]) 
-        && trim($sysOpts["signup-instruct"]) != '')
-        {!! $sysOpts["signup-instruct"] !!}
+    @if (isset($GLOBALS["SL"]->sysOpts["midsurv-instruct"]) 
+        && trim($GLOBALS["SL"]->sysOpts["midsurv-instruct"]) != '')
+        {!! $GLOBALS["SL"]->sysOpts["midsurv-instruct"] !!}
+    @elseif (isset($GLOBALS["SL"]->sysOpts["signup-instruct"]) 
+        && trim($GLOBALS["SL"]->sysOpts["signup-instruct"]) != '')
+        {!! $GLOBALS["SL"]->sysOpts["signup-instruct"] !!}
     @endif
 </div>
 
-@if (isset($errorMsg)) 
-    <div class="alert alert-danger" role="alert">{!! $errorMsg !!}</div>
+@if (isset($errorMsg) && trim($errorMsg) != '') 
+    <div class="alert alert-danger mT15" role="alert">{!! $errorMsg !!}</div>
 @endif
 @if (isset($GLOBALS["SL"]->x["registerNotes"]))
     <p>{!! $GLOBALS["SL"]->x["registerNotes"] !!}</p>
 @endif
 
-<div id="node004" class="nodeWrap{{ 
-    ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
-    <div class="nodeHalfGap"></div>
-    <div id="nLabel004" class="nPrompt"><label for="nameID">
-        Username
-        @if (isset($sysOpts["user-name-req"]) 
-            && intVal($sysOpts["user-name-req"]) == 1)
-            <span class="red">*required</span>
-        @endif
-    </label></div>
-    <div class="nFld">
-        <input id="nameID" name="name" value="{{ old('name') }}" 
-            type="text" class="form-control">
-        @if (isset($errors) && $errors->has('name'))
-            <div class="alert alert-danger" role="alert">
-                {{ $errors->first('name') }}
-            </div>
-        @endif
+@if (isset($GLOBALS["SL"]->sysOpts["has-usernames"])
+    && intVal($GLOBALS["SL"]->sysOpts["has-usernames"]) == 1)
+    <div id="node004" class="nodeWrap{{ 
+        ((isset($errors) && $errors->has('name')) ? 'Error' : '') }}">
+        <div class="nodeHalfGap"></div>
+        <div id="nLabel004" class="nPrompt"><label for="nameID">
+            Username
+            @if (isset($GLOBALS["SL"]->sysOpts["user-name-req"]) 
+                && intVal($GLOBALS["SL"]->sysOpts["user-name-req"]) == 1)
+                <span class="red">*required</span>
+            @endif
+        </label></div>
+        <div class="nFld">
+            <input id="nameID" name="name" value="{{ old('name') }}" 
+                type="text" class="form-control">
+            @if (isset($errors) && $errors->has('name'))
+                <div class="alert alert-danger mT15" role="alert">
+                    {{ $errors->first('name') }}
+                </div>
+            @endif
+        </div>
+        <div class="nodeHalfGap"></div>
     </div>
-    <div class="nodeHalfGap"></div>
-</div>
+@else
+    <input type="hidden" id="nameID" name="name" value="" DISABLED >
+@endif
 
 <div class="nodeAnchor"><a id="n001" name="n001"></a></div>
 <div id="node001" class="nodeWrap{{ 
@@ -79,8 +81,8 @@ $css = $sysDefs->loadCss();
     <div class="nodeHalfGap"></div>
     <div id="nLabel001" class="nPrompt"><label for="emailID">
         Email
-        @if (!isset($sysOpts["user-email-optional"]) 
-            || $sysOpts["user-email-optional"] == 'Off')
+        @if (!isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) 
+            || $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'Off')
             <span class="red">*required</span>
         @endif
     </label></div>
@@ -89,11 +91,11 @@ $css = $sysDefs->loadCss();
             type="email" class="form-control">
         
         @if (isset($errors) && $errors->has('email'))
-            <div class="alert alert-danger" role="alert">
+            <div class="alert alert-danger mT15" role="alert">
                 {{ $errors->first('email') }}
             </div>
         @endif
-        @if (isset($sysOpts["user-email-optional"]) && $sysOpts["user-email-optional"] == 'On')
+        @if (isset($GLOBALS["SL"]->sysOpts["user-email-optional"]) && $GLOBALS["SL"]->sysOpts["user-email-optional"] == 'On')
             * Currently, you will only be able reset 
             a lost password with an email address.
         @endif
@@ -118,7 +120,7 @@ $css = $sysDefs->loadCss();
             <input id="password" name="password" value="" 
                 type="password" class="form-control">
             @if (isset($errors) && $errors->has('password'))
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger mT15" role="alert">
                     {{ $errors->first('password') }}
                 </div>
             @endif
@@ -150,7 +152,7 @@ $css = $sysDefs->loadCss();
     && (!isset($midSurvRedir) || trim($midSurvRedir) == ''))
     <label><input type="checkbox" name="newVolunteer" 
         id="newVolunteerID" value="1"
-        @if (isset($request) && $request->has('volunteer')) CHECKED @endif
+        @if (isset($GLOBALS["SL"]->REQ) && $GLOBALS["SL"]->REQ->has('volunteer')) CHECKED @endif
         > Volunteer</label>
 @endif
 
@@ -190,6 +192,7 @@ $css = $sysDefs->loadCss();
 @if (isset($formFooter)) {!! $formFooter !!} @endif
 
 </form>
+
 
 <style> #main, body { background: {{ $css["color-main-faint"] }}; } </style>
 

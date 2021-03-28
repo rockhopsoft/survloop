@@ -51,7 +51,7 @@ class SurvloopPDF
             $xtra .= '&publicView=1';
         }
         return '<script type="text/javascript"> '
-            . 'setTimeout("window.location=\'?gen-pdf=1&refresh=1' 
+            . 'setTimeout("window.location=\'?gen-pdf=1&refresh=1'
             . $xtra . '\'", 10); </script>';
     }
 
@@ -69,7 +69,7 @@ class SurvloopPDF
         if (file_exists($output)) {
             unlink($output);
         }
-        $exec = "gs -sDEVICE=pdfwrite " . $this->gsPdfSettings() 
+        $exec = "gs -sDEVICE=pdfwrite " . $this->gsPdfSettings()
             . " -sOUTPUTFILE=" . $output . " -dNOPAUSE -dBATCH "
             . implode(" ", $files);
         return shell_exec($exec);
@@ -77,7 +77,7 @@ class SurvloopPDF
 
     private function gsPdfSettings()
     {
-        return " -dPDFSETTINGS=/" . $this->output->quality 
+        return " -dPDFSETTINGS=/" . $this->output->quality
             . " -dDownsampleColorImages=true"
             . " -dColorImageResolution=" . $this->output->dpi
             . " -dColorImageDownsampleType=/Bicubic"
@@ -85,7 +85,7 @@ class SurvloopPDF
             . " -dGrayImageResolution=" . $this->output->dpi
             . " -dGrayImageDownsampleType=/Bicubic"
             . " -dDownsampleMonoImages=true"
-            . " -dMonoImageResolution=" . $this->output->dpi 
+            . " -dMonoImageResolution=" . $this->output->dpi
             . " -dMonoImageDownsampleType=/Bicubic ";
     }
 

@@ -1,18 +1,11 @@
-<?php
-// sorry, not sure how this should be done instead
-$surv = new RockHopSoft\Survloop\Controllers\Survloop;
-$surv->loadLoop(new Illuminate\Http\Request);
-$v = $surv->custLoop->v;
-$sysDefs = new RockHopSoft\Survloop\Controllers\SystemDefinitions;
-$css = $sysDefs->loadCss();
-?>@extends('vendor.survloop.master')
+@extends('vendor.survloop.master')
 @section('content')
 <div id="ajaxWrap">
 <!-- resources/views/vendor/survloop/auth/passwords/email.blade.php -->
+
 <form name="mainPageForm" class="form-horizontal" role="form" 
-    method="POST" action="{{ url('/password/email') }}">
-<input type="hidden" id="csrfTok" name="_token" 
-    value="{{ csrf_token() }}">
+    method="POST" action="{{ route('password.email') }}">
+<input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 
 <div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
     <div id="treeWrap" class="treeWrapForm">

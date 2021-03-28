@@ -43,7 +43,7 @@ class GlobalsTables extends GlobalsElements
             $this->treeID  = $treeID;
         }
         $this->treeRow = SLTree::find($this->treeID);
-        if (($treeOverride > 0 || $this->treeOverride <= 0) 
+        if (($treeOverride > 0 || $this->treeOverride <= 0)
             && (!$this->treeRow || !isset($this->treeRow->tree_id))) {
             $this->treeRow = SLTree::where('tree_database', $this->dbID)
                 ->where('tree_type', 'Survey')
@@ -53,7 +53,7 @@ class GlobalsTables extends GlobalsElements
                 $this->treeID = $this->treeRow->tree_id;
             }
         }
-        if (!isset($this->treeRow->tree_root) 
+        if (!isset($this->treeRow->tree_root)
             || intVal($this->treeRow->tree_root) <= 0) {
             $rootChk = SLNode::where('node_tree', $this->treeID)
                 ->where('node_parent_id', 'LIKE', -3)
@@ -64,13 +64,13 @@ class GlobalsTables extends GlobalsElements
             }
         }
         $coreTbl = 0;
-        if ($this->treeRow 
-            && isset($this->treeRow->tree_core_table) 
+        if ($this->treeRow
+            && isset($this->treeRow->tree_core_table)
             && intVal($this->treeRow->tree_core_table) > 0) {
             $coreTbl = intVal($this->treeRow->tree_core_table);
         }
-        if ($dbID == -3 
-            && isset($this->treeRow->tree_database) 
+        if ($dbID == -3
+            && isset($this->treeRow->tree_database)
             && intVal($this->treeRow->tree_database) > 0) {
             $dbID = $this->treeRow->tree_database;
         }
@@ -79,8 +79,8 @@ class GlobalsTables extends GlobalsElements
         }
         $this->def = new GlobalsDefinitions($this->dbID);
         $this->dbRow = SLDatabases::find($this->dbID);
-        if (($treeOverride > 0 || $this->treeOverride <= 0) 
-            && $dbID == 1 
+        if (($treeOverride > 0 || $this->treeOverride <= 0)
+            && $dbID == 1
             && !$this->dbRow) {
         	$this->dbID = 3;
         	$this->dbRow = SLDatabases::find($this->dbID);
@@ -89,18 +89,18 @@ class GlobalsTables extends GlobalsElements
             $this->initCoreTable(SLTables::find($coreTbl));
         }
         $this->treeIsAdmin = false;
-        if (isset($this->treeRow->tree_opts) 
-            && $this->treeRow->tree_opts > 1 
-            && ($this->treeRow->tree_opts%3 == 0 
-                || $this->treeRow->tree_opts%17 == 0 
-                || $this->treeRow->tree_opts%41 == 0 
+        if (isset($this->treeRow->tree_opts)
+            && $this->treeRow->tree_opts > 1
+            && ($this->treeRow->tree_opts%3 == 0
+                || $this->treeRow->tree_opts%17 == 0
+                || $this->treeRow->tree_opts%41 == 0
                 || $this->treeRow->tree_opts%43 == 0)) {
             $this->treeIsAdmin = true;
         }
-        if (isset($this->dbRow->db_name) 
+        if (isset($this->dbRow->db_name)
             && isset($this->treeRow->tree_name)) {
-            $this->treeName = str_replace($this->dbRow->db_name, 
-                str_replace('_', '', $this->dbRow->db_prefix), 
+            $this->treeName = str_replace($this->dbRow->db_name,
+                str_replace('_', '', $this->dbRow->db_prefix),
                 $this->treeRow->tree_name);
             if ($this->treeRow->tree_type == 'Page') {
                 if ($coreTbl > 0) {
@@ -113,12 +113,12 @@ class GlobalsTables extends GlobalsElements
         $this->sysOpts = [ "cust-abbr" => 'Survloop' ];
         return true;
     }
-    
+
     public function isStaffOrAdmin()
     {
         return ($this->isAdmin || $this->isStaff);
     }
-    
+
     public function installNewModel($tbl, $forceFile = true)
     {
         if ($tbl && isset($tbl->tbl_name) && $tbl->tbl_name != 'Users') {
@@ -126,7 +126,7 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function strTblToModel($tbl = '')
     {
         $ret = '';
@@ -138,13 +138,13 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function strFullTblModel($tbl = '')
     {
         return strtoupper(str_replace('_', '', $this->dbRow->db_prefix))
             . $this->strTblToModel($tbl);
     }
-    
+
     public function modelPath($tbl = '', $forceFile = false)
     {
         if (strtolower($tbl) == 'users') {
@@ -173,41 +173,41 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
+
     public function getTreeCoreTbl($treeID)
     {
         $tree = SLTree::find($treeID);
-        if ($tree 
-            && isset($tree->tree_core_table) 
+        if ($tree
+            && isset($tree->tree_core_table)
             && intVal($tree->tree_core_table) > 0) {
             return SLTables::find($tree->tree_core_table);
         }
         return null;
     }
-    
+
     public function getCoreUpFold($treeID, $coreID)
     {
         $tbl = $this->getTreeCoreTbl($treeID);
-        if ($tbl 
-            && isset($tbl->tbl_name) 
+        if ($tbl
+            && isset($tbl->tbl_name)
             && trim($tbl->tbl_name) != '') {
             eval("\$coreRow = " . $this->modelPath($tbl->tbl_name)
                 . "::find(" . $coreID . ");");
-            if ($coreRow 
+            if ($coreRow
                 && isset($coreRow->{ $tbl->tbl_abbr . 'unique_str' })) {
                 return '../storage/app/up/evidence/'
-                    . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) 
+                    . str_replace('-', '/', substr($coreRow->created_at, 0, 10))
                     . '/' . $coreRow->{ $tbl->tbl_abbr . 'unique_str' } . '/';
             }
         }
         return '';
     }
-    
+
     public function modelPathTblID($tblID = 0, $forceFile = false)
     {
         return $this->modelPath($this->tbl[$tblID], $forceFile);
     }
-    
+
     public function chkTblModel($tbl, $path, $forceFile = false)
     {
         if (in_array(strtolower(trim($tbl)), ['', 'uers'])) {
@@ -215,7 +215,7 @@ class GlobalsTables extends GlobalsElements
         }
         $tblClean = str_replace('App\\Models\\', '', $path);
         $modelFilename = '../app/Models/' . $tblClean . '.php';
-        if ($this->isAdmin 
+        if ($this->isAdmin
             && (!file_exists($modelFilename) || $forceFile)) {
             // copied from AdminDatabaseInstall...
             $modelFile = '';
@@ -229,30 +229,34 @@ class GlobalsTables extends GlobalsElements
                 ->get();
             if ($flds->isNotEmpty()) {
                 foreach ($flds as $fld) {
-                    $modelFile .= "\n\t\t'" . $tbl->tbl_abbr 
+                    $modelFile .= "\n\t\t'" . $tbl->tbl_abbr
                         . $fld->fld_name . "', ";
                 }
             }
             $tblName = $this->dbRow->db_prefix . $tbl->tbl_name;
             $fullFileOut = view(
-                'vendor.survloop.admin.db.export-laravel-gen-model' , 
+                'vendor.survloop.admin.db.export-laravel-gen-model' ,
                 [
-                    "modelFile" => $modelFile, 
+                    "modelFile" => $modelFile,
                     "tbl"       => $tbl,
                     "tblName"   => $tblName,
                     "tblClean"  => $tblClean
                 ]
             );
             //if (is_writable($modelFilename)) {
+            try {
                 if (file_exists($modelFilename)) {
                     unlink($modelFilename);
                 }
-                file_put_contents($modelFilename, $fullFileOut);
+            } catch (Exception $e) {
+                //echo 'Caught exception: ',  $e->getMessage(), "\n";
+            }
+            file_put_contents($modelFilename, $fullFileOut);
             //}
         }
         return true;
     }
-    
+
     public function getXmlSurveyID()
     {
         $treeID = -3;
@@ -272,7 +276,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $treeID;
     }
-    
+
     public function loadDataMap($treeID = -3)
     {
         if ($treeID > 0 && $treeID != $this->treeID) {
@@ -313,7 +317,7 @@ class GlobalsTables extends GlobalsElements
         eval($this->loadDataMapLinks($treeID));
         return true;
     }
-    
+
     public function loadDataMapLinks($treeID = -3)
     {
         if ($treeID <= 0) {
@@ -334,36 +338,36 @@ class GlobalsTables extends GlobalsElements
         $cache .= '$'.'this->dataLinksOn = [];' . "\n";
         if (sizeof($this->dataLinksOn) > 0) {
             foreach ($this->dataLinksOn as $tbl => $map) {
-                $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ \'' 
-                    . $map[0] . '\', \'' . $map[1] . '\', \'' . $map[2] 
+                $cache .= '$'.'this->dataLinksOn[' . $tbl . '] = [ \''
+                    . $map[0] . '\', \'' . $map[1] . '\', \'' . $map[2]
                     . '\', \'' . $map[3] . '\', \'' . $map[4] . '\' ];' . "\n";
             }
         }
         return $cache . $this->loadProTips();
     }
-    
+
     public function getCurrTreeUrl()
     {
         if ($this->treeRow->tree_type == 'Page') {
             if ($this->treeIsAdmin) {
-                return $this->sysOpts["app-url"] 
+                return $this->sysOpts["app-url"]
                     . '/dash/' . $this->treeRow->tree_slug;
             } else {
-                return $this->sysOpts["app-url"] 
+                return $this->sysOpts["app-url"]
                     . '/' . $this->treeRow->tree_slug;
             }
         } else {
             if ($this->treeIsAdmin) {
-                return $this->sysOpts["app-url"] 
+                return $this->sysOpts["app-url"]
                     . '/dashboard/start/' . $this->treeRow->tree_slug;
             } else {
-                return $this->sysOpts["app-url"] 
+                return $this->sysOpts["app-url"]
                     . '/start/' . $this->treeRow->tree_slug;
             }
         }
         return $this->sysOpts["app-url"];
     }
-    
+
     public function chkReportCoreTreeID($coreTblID = 0)
     {
         if ($coreTblID > 0) {
@@ -378,7 +382,7 @@ class GlobalsTables extends GlobalsElements
         }
         return NULL;
     }
-    
+
     public function chkReportCoreTree($coreTbl = '')
     {
         if ($coreTbl == '') {
@@ -391,7 +395,7 @@ class GlobalsTables extends GlobalsElements
         }
         return NULL;
     }
-    
+
     public function chkReportTree($coreTbl = '')
     {
         if ($coreTbl == '') {
@@ -413,24 +417,24 @@ class GlobalsTables extends GlobalsElements
         }
         return NULL;
     }
-    
+
     public function getReportTreeID()
     {
-        if (isset($this->reportTree["id"]) 
+        if (isset($this->reportTree["id"])
             && intVal($this->reportTree["id"]) > 0) {
             return $this->reportTree["id"];
         }
         return 0;
     }
-    
+
     public function chkReportFormTree()
     {
-        if ($this->treeRow 
-            && isset($this->treeRow->tree_type) 
+        if ($this->treeRow
+            && isset($this->treeRow->tree_type)
             && $this->treeRow->tree_type == 'Page') {
             $nodeChk = SLNode::find($this->treeRow->tree_root);
-            if ($nodeChk 
-                && isset($nodeChk->node_response_set) 
+            if ($nodeChk
+                && isset($nodeChk->node_response_set)
                 && intVal($nodeChk->node_response_set) > 0
                 && intVal($nodeChk->node_response_set) != $this->treeID) {
                 $this->loadDataMap(intVal($nodeChk->node_response_set));
@@ -441,12 +445,12 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function getForeignOpts($preSel = '', $opts = 'Subset')
     {
-        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '') 
+        $ret = '<option value="" ' . (($preSel == '') ? 'SELECTED' : '')
             . ' >parent - field - child</option><option value=""></option>' . "\n";
-        $flds = SLFields::select('sl_fields.fld_table', 
+        $flds = SLFields::select('sl_fields.fld_table',
                 'sl_fields.fld_name', 'sl_fields.fld_foreign_table')
             ->join('sl_tables', 'sl_tables.tbl_id', '=', 'sl_fields.fld_foreign_table')
             ->where('sl_fields.fld_database', $this->dbID)
@@ -456,26 +460,26 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                if (isset($this->tbl[$fld->fld_table]) 
+                if (isset($this->tbl[$fld->fld_table])
                     && isset($this->tbl[$fld->fld_foreign_table])) {
-                    $lnkMap = $this->tbl[$fld->fld_foreign_table] 
-                        . '::' . $this->tbl[$fld->fld_table] . ':' 
+                    $lnkMap = $this->tbl[$fld->fld_foreign_table]
+                        . '::' . $this->tbl[$fld->fld_table] . ':'
                         . $this->tblAbbr[$this->tbl[$fld->fld_table]] . $fld->fld_name;
-                    $ret .= '<option value="' . $lnkMap . '" ' 
-                        . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
-                        . $this->tbl[$fld->fld_foreign_table] . ' &larr; ' 
-                        . $this->tblAbbr[$this->tbl[$fld->fld_table]] . $fld->fld_name 
-                        . ' &larr; ' . $this->tbl[$fld->fld_table] 
+                    $ret .= '<option value="' . $lnkMap . '" '
+                        . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >'
+                        . $this->tbl[$fld->fld_foreign_table] . ' &larr; '
+                        . $this->tblAbbr[$this->tbl[$fld->fld_table]] . $fld->fld_name
+                        . ' &larr; ' . $this->tbl[$fld->fld_table]
                         . '</option>' . "\n";
                 } else {
-                    $ret .= '<option value="">** Warning ** not found: ' 
-                        . $fld->fld_table . ' * ' . $fld->fld_foreign_table 
+                    $ret .= '<option value="">** Warning ** not found: '
+                        . $fld->fld_table . ' * ' . $fld->fld_foreign_table
                         . '</option>';
                 }
             }
         }
         if ($opts == 'Subset') {
-            $flds = SLFields::select('sl_fields.fld_table', 
+            $flds = SLFields::select('sl_fields.fld_table',
                     'sl_fields.fld_name', 'sl_fields.fld_foreign_table')
                 ->join('sl_tables', 'sl_tables.tbl_id', '=', 'sl_fields.fld_table')
                 ->where('sl_fields.fld_database', $this->dbID)
@@ -485,17 +489,17 @@ class GlobalsTables extends GlobalsElements
                 ->get();
             if ($flds->isNotEmpty()) {
                 foreach ($flds as $fld) {
-                    if (isset($this->tbl[$fld->fld_table]) 
+                    if (isset($this->tbl[$fld->fld_table])
                         && isset($this->tbl[$fld->fld_foreign_table])) {
-                        $lnkMap = $this->tbl[$fld->fld_table] . ':' 
+                        $lnkMap = $this->tbl[$fld->fld_table] . ':'
                             . $this->tblAbbr[$this->tbl[$fld->fld_table]] . $fld->fld_name
                             . ':' . $this->tbl[$fld->fld_foreign_table] . ':';
-                        $ret .= '<option value="' . $lnkMap . '" ' 
-                            . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >' 
-                            . $this->tbl[$fld->fld_table] . ' &rarr; ' 
-                            . $this->tblAbbr[$this->tbl[$fld->fld_table]] 
-                            . $fld->fld_name . ' &rarr; ' 
-                            . $this->tbl[$fld->fld_foreign_table] 
+                        $ret .= '<option value="' . $lnkMap . '" '
+                            . (($preSel == $lnkMap) ? 'SELECTED' : '') . ' >'
+                            . $this->tbl[$fld->fld_table] . ' &rarr; '
+                            . $this->tblAbbr[$this->tbl[$fld->fld_table]]
+                            . $fld->fld_name . ' &rarr; '
+                            . $this->tbl[$fld->fld_foreign_table]
                             . '</option>' . "\n";
                     }
                 }
@@ -503,8 +507,8 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
-    // returns array(Table 1, Foreign Key 1, 
+
+    // returns array(Table 1, Foreign Key 1,
     // Linking Table, Foreign Key 2, Table 2)
     public function getLinkTblMap($linkTbl = -3)
     {
@@ -519,29 +523,29 @@ class GlobalsTables extends GlobalsElements
             ->orderBy('fld_eng', 'asc')
             ->get();
         if ($foreigns->isNotEmpty() && $foreigns->count() == 2) {
-            if (isset($foreigns[0]->fld_foreign_table) 
+            if (isset($foreigns[0]->fld_foreign_table)
                 && isset($this->tbl[$foreigns[0]->fld_foreign_table])
-                && isset($foreigns[1]->fld_foreign_table) 
+                && isset($foreigns[1]->fld_foreign_table)
                 && isset($this->tbl[$foreigns[1]->fld_foreign_table])
                 && isset($this->tbl[$linkTbl])) {
                 $t = $this->tbl[$linkTbl];
                 if (isset($this->tblAbbr[$t]) ) {
                     return [
-                        $this->tbl[$foreigns[0]->fld_foreign_table], 
-                        $this->tblAbbr[$t] . $foreigns[0]->fld_name, 
-                        $this->tbl[$linkTbl], 
-                        $this->tblAbbr[$t] . $foreigns[1]->fld_name, 
-                        $this->tbl[$foreigns[1]->fld_foreign_table] 
+                        $this->tbl[$foreigns[0]->fld_foreign_table],
+                        $this->tblAbbr[$t] . $foreigns[0]->fld_name,
+                        $this->tbl[$linkTbl],
+                        $this->tblAbbr[$t] . $foreigns[1]->fld_name,
+                        $this->tbl[$foreigns[1]->fld_foreign_table]
                     ];
                 }
             }
         }
         return [];
     }
-    
-    
-    
-    
+
+
+
+
     public function tablesDropdown($preSel = '', $instruct = 'select table', $prefix = '', $disableBlank = false)
     {
         $loopTbl = '';
@@ -552,13 +556,13 @@ class GlobalsTables extends GlobalsElements
                 $loopTbl = $preSel;
             }
         }
-        $ret = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '') 
-            . (($disableBlank) ? ' DISABLED ' : '') 
+        $ret = '<option value="" ' . (($preSel == "") ? 'SELECTED' : '')
+            . (($disableBlank) ? ' DISABLED ' : '')
             . ' >' . $instruct . '</option>' . "\n";
         foreach ($this->tblAbbr as $tblName => $tblAbbr) {
             $selected = '';
-            if ($preSel == $tblName 
-                || $preSel == $this->tblI[$tblName] 
+            if ($preSel == $tblName
+                || $preSel == $this->tblI[$tblName]
                 || $loopTbl == $tblName) {
                 $selected = 'SELECTED';
             }
@@ -567,27 +571,27 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
-    // if $keys is 0 don't include primary keys; if $keys is 1 show primary keys; if $keys is -1 show only foreign keys; 
+
+    // if $keys is 0 don't include primary keys; if $keys is 1 show primary keys; if $keys is -1 show only foreign keys;
     public function fieldsDropdown($preSel = '', $keys = 2)
     {
-        $ret = '<option value="" ' . ((trim($preSel) == '') 
+        $ret = '<option value="" ' . ((trim($preSel) == '')
             ? 'SELECTED' : '') . ' ></option>' . "\n";
         if ($keys > 0) {
             foreach ($this->tblAbbr as $tblName => $tblAbbr) {
-                $ret .= '<option value="' . $tblName.':'. $tblAbbr . 'id" ' 
-                    . (($preSel == $tblName.':'. $tblAbbr . 'id') ? 'SELECTED' : '') 
+                $ret .= '<option value="' . $tblName.':'. $tblAbbr . 'id" '
+                    . (($preSel == $tblName.':'. $tblAbbr . 'id') ? 'SELECTED' : '')
                     . ' >' . $tblName.' : '. $tblAbbr . 'id (primary key)</option>' . "\n";
             }
         }
         $flds = null;
-        $qman = "SELECT t.tbl_name, t.tbl_abbr, 
-                f.fld_id, f.fld_name, f.fld_type, f.fld_foreign_table 
+        $qman = "SELECT t.tbl_name, t.tbl_abbr,
+                f.fld_id, f.fld_name, f.fld_type, f.fld_foreign_table
             FROM sl_fields f LEFT OUTER JOIN sl_tables t ON f.fld_table LIKE t.tbl_id
-            WHERE f.fld_table > '0' AND t.tbl_name IS NOT NULL AND f.fld_database LIKE '" 
+            WHERE f.fld_table > '0' AND t.tbl_name IS NOT NULL AND f.fld_database LIKE '"
             . $this->dbID . "' [[EXTRA]] ORDER BY t.tbl_name, f.fld_name";
         if ($keys == -1) {
-            $flds = DB::select( DB::raw( 
+            $flds = DB::select( DB::raw(
                 str_replace("[[EXTRA]]", "AND f.fld_foreign_table` > '0'", $qman)
             ) );
         } else {
@@ -605,14 +609,14 @@ class GlobalsTables extends GlobalsElements
                 [[EXTRA]]
                 ->orderBy('sl_tables.tbl_name', 'asc')
                 ->orderBy('sl_fields.fld_name', 'asc')
-                ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr', 
-                    'sl_fields.fld_id', 'sl_fields.fld_name', 'sl_fields.fld_type', 
+                ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr',
+                    'sl_fields.fld_id', 'sl_fields.fld_name', 'sl_fields.fld_type',
                     'sl_fields.fld_foreign_table', 'sl_fields.fld_table')
                 ->get();";
         if ($keys == -1) {
             $eval = str_replace(
-                "[[EXTRA]]", 
-                "->where('sl_fields.fld_foreign_table', '>' 0)", 
+                "[[EXTRA]]",
+                "->where('sl_fields.fld_foreign_table', '>' 0)",
                 $eval
             );
         } else {
@@ -627,44 +631,44 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function fieldsDropdownOption($fld, $preSel = '', $valID = false, $prfx = '')
     {
         if (!isset($fld->fld_id)) {
             return '';
         }
-        if (!isset($fld->tbl_name) && isset($fld->fld_table) 
+        if (!isset($fld->tbl_name) && isset($fld->fld_table)
             && isset($this->tbl[$fld->fld_table])) {
             $fld->tbl_name = $this->tbl[$fld->fld_table];
         }
-        if (!isset($fld->tbl_abbr) && isset($fld->fld_table) 
+        if (!isset($fld->tbl_abbr) && isset($fld->fld_table)
             && isset($this->tbl[$fld->fld_table])) {
             $fld->tbl_abbr = $this->tblAbbr[$this->tbl[$fld->fld_table]];
         }
         if ($valID) {
-            return '<option value="' . $fld->fld_id . '"' 
-                . ((intVal($preSel) != 0 && intVal($preSel) == $fld->fld_id) 
+            return '<option value="' . $fld->fld_id . '"'
+                . ((intVal($preSel) != 0 && intVal($preSel) == $fld->fld_id)
                     ? ' SELECTED' : '') . ' >' . $prfx . $fld->tbl_name . ' : '
-                . $fld->tbl_abbr . $fld->fld_name 
-                . ' (' . (($fld->fld_foreign_table > 0) 
-                    ? 'foreign key' : strtolower($fld->fld_type)) 
+                . $fld->tbl_abbr . $fld->fld_name
+                . ' (' . (($fld->fld_foreign_table > 0)
+                    ? 'foreign key' : strtolower($fld->fld_type))
                 . ')</option>' . "\n";
         } else {
             $fldStr = $fld->tbl_name . ':' . $fld->tbl_abbr . $fld->fld_name;
-            return '<option value="' . $fldStr . '"' 
-                . ((trim($preSel) == $fldStr) ? ' SELECTED' : '') 
-                . ' >' . $prfx . str_replace(':', ' : ', $fldStr) . ' (' 
-                . (($fld->fld_foreign_table > 0) 
-                    ? 'foreign key' : strtolower($fld->fld_type)) 
+            return '<option value="' . $fldStr . '"'
+                . ((trim($preSel) == $fldStr) ? ' SELECTED' : '')
+                . ' >' . $prfx . str_replace(':', ' : ', $fldStr) . ' ('
+                . (($fld->fld_foreign_table > 0)
+                    ? 'foreign key' : strtolower($fld->fld_type))
                 . ')</option>' . "\n";
         }
         return '';
     }
-    
+
     public function allDefsDropdown($preSel = '')
     {
-        $ret = '<option value="" ' 
-            . (($preSel == "") ? 'SELECTED' : '') 
+        $ret = '<option value="" '
+            . (($preSel == "") ? 'SELECTED' : '')
             . ' ></option>' . "\n";
         $defs = SLDefinitions::select('def_id', 'def_subset', 'def_value')
             ->where('def_set', 'Value Ranges')
@@ -673,7 +677,7 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($defs->isNotEmpty()) {
             foreach ($defs as $def) {
-                $ret .= '<option value="' . $def->def_id.'" ' 
+                $ret .= '<option value="' . $def->def_id.'" '
                     . (($preSel == $def->def_id) ? 'SELECTED' : '') . ' >'
                     . $def->def_subset . ': ' . $def->def_value
                     . '</option>' . "\n";
@@ -681,7 +685,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function allDefSets()
     {
         return SLDefinitions::where('def_set', 'Value Ranges')
@@ -690,31 +694,31 @@ class GlobalsTables extends GlobalsElements
             ->orderBy('def_subset', 'asc')
             ->get();
     }
-    
+
     public function getLoopConditionLinks($loop)
     {
         $ret = [];
-        if (isset($this->dataLoops[$loop]) 
+        if (isset($this->dataLoops[$loop])
             && isset($this->dataLoops[$loop]->data_loop_id)) {
-            $chk = SLConditions::select('sl_conditions.cond_id', 
+            $chk = SLConditions::select('sl_conditions.cond_id',
                     'sl_conditions.cond_field', 'sl_conditions.cond_table')
-                ->join('sl_conditions_nodes', 'sl_conditions_nodes.cond_node_cond_id', 
+                ->join('sl_conditions_nodes', 'sl_conditions_nodes.cond_node_cond_id',
                     '=', 'sl_conditions.cond_id')
-                ->where('sl_conditions_nodes.cond_node_loop_id', 
+                ->where('sl_conditions_nodes.cond_node_loop_id',
                     $this->dataLoops[$loop]->data_loop_id)
                 ->where('sl_conditions.cond_operator', '{')
                 ->get();
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $cond) {
-                    if (isset($cond->cond_field) 
+                    if (isset($cond->cond_field)
                         && intVal($cond->cond_field) > 0) {
                         $vals = SLConditionsVals::where('cond_val_cond_id', $cond->cond_id)
                             ->get();
-                        if ($vals->isNotEmpty() && $vals->count() == 1 
-                            && isset($vals[0]->cond_val_value) 
+                        if ($vals->isNotEmpty() && $vals->count() == 1
+                            && isset($vals[0]->cond_val_value)
                             && trim($vals[0]->cond_val_value) != '') {
                             $fld = SLFields::find($cond->cond_field);
-                            if ($fld && isset($fld->fld_name) 
+                            if ($fld && isset($fld->fld_name)
                                 && isset($this->tbl[$cond->cond_table])) {
                                 $tblAbbr = $this->tblAbbr[$this->tbl[$cond->cond_table]];
                                 $ret[] = [
@@ -729,16 +733,16 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function getAllSetTables($tblIn = '')
     {
         $tbls = [];
         $tblID = -3;
-        if (strpos($tblIn, 'loop-') !== false 
+        if (strpos($tblIn, 'loop-') !== false
             && sizeof($this->dataLoops) > 0) {
             $loopID = intVal(str_replace('loop-', '', $tblIn));
             foreach ($this->dataLoops as $loopName => $loopRow) {
-                if ($loopRow->id == $loopID 
+                if ($loopRow->id == $loopID
                     && isset($this->tblI[$loopRow->data_loop_table])) {
                     $tblID = $this->tblI[$loopRow->data_loop_table];
                 }
@@ -751,12 +755,12 @@ class GlobalsTables extends GlobalsElements
         $tbls = $this->getSubsetTables($tblID, $tbls);
         return $tbls;
     }
-    
+
     public function getSubsetTables($tbl1 = -3, $tbls = [])
     {
         if ($tbl1 > 0 && !in_array($tbl1, $tbls)) {
             $tbls[] = $tbl1;
-            if (isset($this->dataSubsets) 
+            if (isset($this->dataSubsets)
                 && sizeof($this->dataSubsets) > 0) {
                 foreach ($this->dataSubsets as $subset) {
                     if ($tbl1 == $this->tblI[$subset->data_sub_tbl]) {
@@ -765,7 +769,7 @@ class GlobalsTables extends GlobalsElements
                     }
                 }
             }
-            if (isset($this->dataHelpers) 
+            if (isset($this->dataHelpers)
                 && sizeof($this->dataHelpers) > 0) {
                 foreach ($this->dataHelpers as $helper) {
                     if ($tbl1 == $this->tblI[$helper->data_help_parent_table]) {
@@ -777,13 +781,13 @@ class GlobalsTables extends GlobalsElements
         }
         return $tbls;
     }
-    
+
     public function isFldCheckboxHelper($fld = '')
     {
-        if (isset($this->dataHelpers) 
+        if (isset($this->dataHelpers)
             && sizeof($this->dataHelpers) > 0) {
             foreach ($this->dataHelpers as $helper) {
-                if (isset($helper->data_help_value_field) 
+                if (isset($helper->data_help_value_field)
                     && $helper->data_help_value_field == $fld) {
                     return true;
                 }
@@ -791,7 +795,7 @@ class GlobalsTables extends GlobalsElements
         }
         return false;
     }
-    
+
     public function fieldsTblsDropdown($tbls = [], $preSel = '', $prfx = '')
     {
         $ret = '';
@@ -803,8 +807,8 @@ class GlobalsTables extends GlobalsElements
             ->whereIn('sl_fields.fld_table', $tbls)
             ->orderBy('sl_tables.tbl_name', 'asc')
             ->orderBy('sl_fields.fld_name', 'asc')
-            ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr', 
-                'sl_fields.fld_id', 'sl_fields.fld_name', 'sl_fields.fld_type', 
+            ->select('sl_tables.tbl_name', 'sl_tables.tbl_abbr',
+                'sl_fields.fld_id', 'sl_fields.fld_name', 'sl_fields.fld_type',
                 'sl_fields.fld_foreign_table', 'sl_fields.fld_table')
             ->get();
         if ($flds->isNotEmpty()) {
@@ -818,22 +822,22 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function getAllSetTblFldDrops($tblIn = '', $preSel = '')
     {
         $allSetTbls = $this->getAllSetTables($tblIn);
         return $this->fieldsTblsDropdown($allSetTbls, $preSel, ' - ');
     }
-    
+
     public function copyTblRecFromRow($tbl, $row)
     {
-        if (!isset($this->tblAbbr[$tbl]) 
-            || !$row 
+        if (!isset($this->tblAbbr[$tbl])
+            || !$row
             || !isset($row->{ $this->tblAbbr[$tbl] . 'id' })) {
             return '';
         }
         $abbr = $this->tblAbbr[$tbl];
-        eval("\$cpyTo = " . $this->modelPath($tbl) 
+        eval("\$cpyTo = " . $this->modelPath($tbl)
             . "::find(" . $row->{ $abbr . 'id' } . ");");
         if (!$cpyTo || !isset($cpyTo->{ $abbr . 'id' })) {
             eval("\$cpyTo = new " . $this->modelPath($tbl) . ";");
@@ -861,7 +865,7 @@ class GlobalsTables extends GlobalsElements
         $cpyTo->save();
         return ' , copying ' . $tbl . ' row #' . $row->{ $abbr . 'id' };
     }
-    
+
     public function getMatchingFlds($tbl1, $tbl2)
     {
         $ret = [];
@@ -883,8 +887,8 @@ class GlobalsTables extends GlobalsElements
             }
         }
         return $ret;
-    }           
-    
+    }
+
     public function printResponse($tbl, $fld, $val, $fldRow = null)
     {
         $ret = '';
@@ -893,9 +897,9 @@ class GlobalsTables extends GlobalsElements
         }
         $defSet = $this->getFldDefSet($tbl, $fld, $fldRow);
         if ($defSet != '') {
-            if (!is_array($val) 
-                && $val != '' 
-                && substr($val, 0, 1) == ';' 
+            if (!is_array($val)
+                && $val != ''
+                && substr($val, 0, 1) == ';'
                 && substr($val, strlen($val)-1) == ';') {
                 $val = $this->mexplode(';;', substr($val, 1, strlen($val)-2));
             }
@@ -917,18 +921,18 @@ class GlobalsTables extends GlobalsElements
                 }
             }
         } else { // not array
-            if (strpos(strtolower($fld), 'gender') !== false 
+            if (strpos(strtolower($fld), 'gender') !== false
                 && strtoupper($val) == 'M') {
                 $ret = 'Male';
-            } elseif (strpos(strtolower($fld), 'gender') !== false 
+            } elseif (strpos(strtolower($fld), 'gender') !== false
                 && strtoupper($val) == 'F') {
                 $ret = 'Female';
-            } elseif (strpos(strtolower($fld), 'gender') !== false 
+            } elseif (strpos(strtolower($fld), 'gender') !== false
                 && in_array(strtoupper($val), ['O', 'T'])) {
                 $ret = 'Other';
             } elseif (trim($defSet) == '') {
-                if ($val != '' 
-                    && isset($this->fldTypes[$tbl]) 
+                if ($val != ''
+                    && isset($this->fldTypes[$tbl])
                     && isset($this->fldTypes[$tbl][$fld])) {
                     if ($this->fldTypes[$tbl][$fld] == 'DOUBLE') {
                         $ret = number_format($val);
@@ -937,7 +941,7 @@ class GlobalsTables extends GlobalsElements
                         }
                     } elseif ($this->fldTypes[$tbl][$fld] == 'INT') {
                         $yearChk = strtolower(substr($fld, strlen($fld)-4));
-                        if ($yearChk == 'year' 
+                        if (in_array($yearChk, ['year', 'year_code'])
                             && strlen(trim('' . $val . '')) == 4) {
                             $ret = $val;
                         } else {
@@ -969,30 +973,30 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function getMapToCore($fldID = -3, $fld = NULL)
     {
         $ret = [];
         if (!$fld) {
             $fld = SLFields::find($fldID);
         }
-        if ($fld 
-            && isset($fld->fld_table) 
+        if ($fld
+            && isset($fld->fld_table)
             && $fld->fld_table != $this->tblI[$this->coreTbl]) {
             $linkMap = $this->getLinkTblMap($fld->fld_table);
-            
+
         }
         return $ret;
     }
-    
+
     public function digMapToCore($tbl = -3)
     {
         $tbls = [];
         $kids = $this->getSubsetTables($tbl);
         if (sizeof($kids) > 0) {
             foreach ($kids as $i => $k) {
-                
-                //$tbls[] = 
+
+                //$tbls[] =
                 if (sizeof($tbls) > 0) {
                     $tbls[] = $tbl;
                 }
@@ -1000,7 +1004,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $tbls;
     }
-    
+
     public function processFiltFld($fldID, $value = '', $ids = [])
     {
         if (trim($value) != '' && sizeof($ids) > 0) {
@@ -1009,9 +1013,9 @@ class GlobalsTables extends GlobalsElements
                 $tbl = $this->tbl[$fld->fld_table];
                 $keyMap = $this->getMapToCore($fldID, $fld);
                 if (empty($keyMap)) { // then field in core record
-                    $eval = "\$chk = " . $this->modelPath($tbl) . "::whereIn('" 
-                        . $this->tblAbbr[$tbl] . "id', \$ids)->where('" 
-                        .  $this->tblAbbr[$tbl] . $fld->fld_name . "', '" . $value 
+                    $eval = "\$chk = " . $this->modelPath($tbl) . "::whereIn('"
+                        . $this->tblAbbr[$tbl] . "id', \$ids)->where('"
+                        .  $this->tblAbbr[$tbl] . $fld->fld_name . "', '" . $value
                         . "')->select('" . $this->tblAbbr[$tbl] . "id')->get();";
                     eval($eval);
                     $ids = [];
@@ -1020,14 +1024,14 @@ class GlobalsTables extends GlobalsElements
                             $ids[] = $lnk->getKey();
                         }
                     }
-                    
+
                 }
                 // filter out for field value
             }
         }
         return $ids;
     }
-    
+
     public function origFldCheckbox($tbl, $fld)
     {
         if (!isset($this->formTree->tree_id)) {
@@ -1042,7 +1046,7 @@ class GlobalsTables extends GlobalsElements
         }
         return -3;
     }
-    
+
     public function getFldNodeQuestion($tbl, $fld, $tree = -3)
     {
         $chk = null;
@@ -1062,7 +1066,7 @@ class GlobalsTables extends GlobalsElements
         }
         if ($chk && $chk->isNotEmpty()) {
             foreach ($chk as $node) {
-                if (isset($node->node_prompt_text) 
+                if (isset($node->node_prompt_text)
                     && trim($node->node_prompt_text) != '') {
                     return $node->node_prompt_text;
                 }
@@ -1070,23 +1074,23 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
-    
+
+
     public function getFldResponsesByID($fldID)
     {
         if (intVal($fldID) <= 0) {
             return [
-                "prompt" => '', 
+                "prompt" => '',
                 "vals"   => []
             ];
         }
         return $this->getFldResponses($this->getFullFldNameFromID($fldID));
     }
-    
+
     public function getFldResponses($fldName)
     {
         $ret = [
-            "prompt" => '', 
+            "prompt" => '',
             "vals"   => []
         ];
         $tmpVals = array( [], [] );
@@ -1111,15 +1115,15 @@ class GlobalsTables extends GlobalsElements
             if (sizeof($tmpVals[0]) > 0) {
                 foreach ($tmpVals[0] as $i => $val) {
                     $ret["vals"][] = [
-                        $val, 
-                        $tmpVals[1][$i] 
+                        $val,
+                        $tmpVals[1][$i]
                     ];
                 }
             }
         }
         return $ret;
     }
-    
+
     public function getCondLookup()
     {
         if (empty($this->condTags)) {
@@ -1134,20 +1138,20 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function getCondByID($id)
     {
         $this->getCondLookup();
         return ((isset($this->condTags[intVal($id)])) ? $this->condTags[intVal($id)] : '');
     }
-    
+
     public function getCondList()
     {
         return SLConditions::whereIn('cond_database', [0, $this->dbID])
             ->orderBy('cond_tag')
             ->get();
     }
-    
+
     public function saveEditCondition(Request $request)
     {
         if ($request->has('oldConds') && intVal($request->oldConds) > 0) {
@@ -1160,8 +1164,8 @@ class GlobalsTables extends GlobalsElements
         } else {
             $cond->cond_database = $this->dbID;
         }
-        if ($request->has('condHash') 
-            && trim($request->condHash) != '' 
+        if ($request->has('condHash')
+            && trim($request->condHash) != ''
             && trim($request->condHash) != '#') {
             $cond->cond_tag = (($request->has('condHash')) ? $request->condHash : '#');
             if (substr($cond->cond_tag, 0, 1) != '#') {
@@ -1172,11 +1176,11 @@ class GlobalsTables extends GlobalsElements
             $cond->cond_oper_deet = 0;
             $cond->cond_field = $cond->cond_table = $cond->cond_loop = 0;
             $cond->cond_opts     = 1;
-            
+
             if ($request->has('condType') && $request->condType == 'complex') {
                 $cond->cond_operator = 'COMPLEX';
                 $cond->save();
-                if ($request->has('multConds') && is_array($request->multConds) 
+                if ($request->has('multConds') && is_array($request->multConds)
                     && sizeof($request->multConds) > 0) {
                     foreach ($request->multConds as $val) {
                         $chk = SLConditionsVals::where('cond_val_cond_id', $cond->cond_id)
@@ -1186,7 +1190,7 @@ class GlobalsTables extends GlobalsElements
                             $tmpVal = new SLConditionsVals;
                             $tmpVal->cond_val_cond_id = $cond->cond_id;
                             $tmpVal->cond_val_value   = $val;
-                            if ($request->has('multCondsNot') 
+                            if ($request->has('multCondsNot')
                                 && in_array($val, $request->multCondsNot)) {
                                 $tmpVal->cond_val_value = (-1*$val);
                             }
@@ -1229,7 +1233,7 @@ class GlobalsTables extends GlobalsElements
                     $tmpVal->cond_val_cond_id = $cond->cond_id;
                     $tmpVal->cond_val_value   = $request->paramVal;
                     $tmpVal->save();
-                } elseif ($request->has('vals') && is_array($request->vals) 
+                } elseif ($request->has('vals') && is_array($request->vals)
                     && sizeof($request->vals) > 0) {
                     foreach ($request->vals as $val) {
                         $tmpVal = new SLConditionsVals;
@@ -1239,17 +1243,17 @@ class GlobalsTables extends GlobalsElements
                     }
                 }
             }
-            
-            if ($request->has('CondPublicFilter') 
+
+            if ($request->has('CondPublicFilter')
                 && intVal($request->get('CondPublicFilter')) == 1) {
                 $cond->cond_opts *= 2;
             }
             $artsIn = [];
             for ($j=0; $j < 10; $j++) {
-                if ($request->has('condArtUrl' . $j . '') 
+                if ($request->has('condArtUrl' . $j . '')
                     && trim($request->get('condArtUrl' . $j . '')) != '') {
                     $artsIn[$j] = ['', trim($request->get('condArtUrl' . $j . ''))];
-                    if ($request->has('condArtTitle' . $j . '') 
+                    if ($request->has('condArtTitle' . $j . '')
                         && trim($request->get('condArtTitle' . $j . '')) != ''){
                         $artsIn[$j][0] = trim($request->get('condArtTitle' . $j . ''));
                     }
@@ -1288,7 +1292,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $cond;
     }
-    
+
     public function loadTestsAB()
     {
         $this->condABs = [];
@@ -1299,14 +1303,14 @@ class GlobalsTables extends GlobalsElements
         if ($chk->isNotEmpty()) {
             foreach ($chk as $cond) {
                 $this->condABs[] = [
-                    $cond->cond_id, 
+                    $cond->cond_id,
                     $cond->cond_desc
                 ];
             }
         }
         return $this->condABs;
     }
-    
+
     public function loadFldAbout($pref = 'fld_')
     {
         $chk = SLFields::where('fld_database', 3)
@@ -1321,11 +1325,11 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function loadSysTrees($type = 'forms')
     {
-        if (!isset($this->sysTree[$type]) 
-            || !isset($this->sysTree[$type]["pub"]) 
+        if (!isset($this->sysTree[$type])
+            || !isset($this->sysTree[$type]["pub"])
             || empty($this->sysTree[$type]["pub"])) {
             $treeType = (($type == 'pages') ? 'Page' : 'Survey');
             $trees = SLTree::where('tree_type', $treeType)
@@ -1341,34 +1345,34 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function sysTreesDrop($preSel = -3, $type = 'forms', $pubPri = 'pub')
     {
         $this->loadSysTrees($type);
         $ret = '';
-        if (in_array($pubPri, ['pub', 'all']) 
+        if (in_array($pubPri, ['pub', 'all'])
             && sizeof($this->sysTree[$type]['pub']) > 0) {
             foreach ($this->sysTree[$type]['pub'] as $tree) {
-                $ret .= '<option value="' . $tree[0] . '" ' 
-                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
+                $ret .= '<option value="' . $tree[0] . '" '
+                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>'
                     . $tree[1] . (($type == 'page') ? ' (Page)' : '') . '</option>';
             }
         }
-        if (in_array($pubPri, ['adm', 'all']) 
+        if (in_array($pubPri, ['adm', 'all'])
             && sizeof($this->sysTree[$type]['adm']) > 0) {
             foreach ($this->sysTree[$type]['adm'] as $tree) {
-                $ret .= '<option value="' . $tree[0] . '" ' 
-                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>' 
-                    . $tree[1] . ' (' . (($type == 'page') ? 'Page, ' : '') 
+                $ret .= '<option value="' . $tree[0] . '" '
+                    . (($preSel == $tree[0]) ? 'SELECTED ' : '') . '>'
+                    . $tree[1] . ' (' . (($type == 'page') ? 'Page, ' : '')
                     . 'Admin)</option>';
             }
         }
         return $ret;
     }
-    
+
     public function loadProTips()
     {
-        $cache = '$'.'this->proTips = [];' . "\n" 
+        $cache = '$'.'this->proTips = [];' . "\n"
             . '$'.'this->proTipsImg = [];' . "\n";
         $chk = SLDefinitions::where('def_database', $this->dbID)
             ->where('def_set', 'Tree Settings')
@@ -1378,7 +1382,7 @@ class GlobalsTables extends GlobalsElements
         if ($chk->isNotEmpty()) {
             foreach ($chk as $set) {
                 if (trim($set->def_description) != '') {
-                    $cache .= '$'.'this->proTips[] = ' 
+                    $cache .= '$'.'this->proTips[] = '
                         . json_encode($set->def_description) . ';' . "\n";
                 }
             }
@@ -1390,13 +1394,13 @@ class GlobalsTables extends GlobalsElements
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $set) {
-                $cache .= '$'.'this->proTipsImg[] = ' 
+                $cache .= '$'.'this->proTipsImg[] = '
                     . json_encode($set->def_description) . ';' ."\n";
             }
         }
         return $cache;
     }
-    
+
     public function loadTreeMojis()
     {
         if (empty($this->treeSettings)) {
@@ -1408,8 +1412,8 @@ class GlobalsTables extends GlobalsElements
             if ($chk->isNotEmpty()) {
                 foreach ($chk as $set) {
                     $setting = str_replace(
-                        'tree-' . $this->treeID . '-', 
-                        '', 
+                        'tree-' . $this->treeID . '-',
+                        '',
                         $set->def_subset
                     );
                     if ($setting != 'protip') {
@@ -1422,11 +1426,11 @@ class GlobalsTables extends GlobalsElements
                                 "id"     => $set->def_id,
                                 "admin"  => ($set->def_order%7 == 0),
                                 "verb"   => $names[0],
-                                "plural" => $names[1], 
+                                "plural" => $names[1],
                                 "html"   => $set->def_description
                             ];
                         } else {
-                            $this->treeSettings[$setting][] 
+                            $this->treeSettings[$setting][]
                                 = $set->def_description;
                         }
                     }
@@ -1435,7 +1439,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $this->treeSettings;
     }
-    
+
     public function getEmojiName($defID = -3)
     {
         if ($defID > 0 && sizeof($this->treeSettings["emojis"]) > 0) {
@@ -1447,7 +1451,7 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
+
     public function getSysStyles()
     {
         return SLDefinitions::where('def_database', 1)
@@ -1455,7 +1459,7 @@ class GlobalsTables extends GlobalsElements
             ->orderBy('def_order')
             ->get();
     }
-    
+
     public function getCssColors()
     {
         $this->x["sysColor"] = [];
@@ -1467,7 +1471,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $this->x["sysColor"];
     }
-    
+
     public function getCssColor($name = '')
     {
         if (!isset($this->x["sysColor"])) {
@@ -1478,7 +1482,7 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
+
     public function getCssColorsEmail()
     {
         $cssColors = $this->getCssColors();
@@ -1492,12 +1496,12 @@ class GlobalsTables extends GlobalsElements
         }
         return $cssColors;
     }
-    
+
     public function swapSessMsg($page = '')
     {
         return str_replace('<!-- SessMsg -->', $this->getSessMsg(), $page);
     }
-    
+
     public function getSessMsg()
     {
         $ret = '';
@@ -1507,11 +1511,11 @@ class GlobalsTables extends GlobalsElements
                     $ret .= session()->get('sessMsg');
                 } else {
                     $ret .= '<div class="alert alert-dismissible w100 mB10 '
-                        . ((session()->has('sessMsgType') 
+                        . ((session()->has('sessMsgType')
                             && trim(session()->get('sessMsgType')) != '')
                             ? session()->get('sessMsgType') : 'alert-info')
                         . ' "><button type="button" class="close" '
-                        . 'data-dismiss="alert">×</button>' 
+                        . 'data-dismiss="alert">×</button>'
                         . session()->get('sessMsg') . '</div>';
                 }
             }
@@ -1521,22 +1525,22 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function allTreeDropOpts($preSel = -3)
     {
-        $ret = '<option value="-3" ' 
-            . ((intVal($preSel) <= 0) ? 'SELECTED' : '') 
+        $ret = '<option value="-3" '
+            . ((intVal($preSel) <= 0) ? 'SELECTED' : '')
             . ' >select form tree</option>';
         if (sizeof($this->allTrees) > 0) {
             foreach ($this->allTrees as $dbID => $trees) {
                 if (sizeof($trees) > 0) {
-                    $ret .= '<option value="-3" DISABLED >' 
+                    $ret .= '<option value="-3" DISABLED >'
                         . $this->getDbName($dbID) . ' Database...</option>';
                     foreach ($trees as $i => $tree) {
-                        $ret .= '<option ' 
-                            . ((intVal($preSel) == $tree["id"]) ? 'SELECTED' : '') 
+                        $ret .= '<option '
+                            . ((intVal($preSel) == $tree["id"]) ? 'SELECTED' : '')
                             . ' value="' . $tree["id"] . '" > - ' . $tree["name"]
-                            . (($tree["opts"]%3 == 0) ? ' (Admin)' : '') 
+                            . (($tree["opts"]%3 == 0) ? ' (Admin)' : '')
                             . '</option>';
                     }
                 }
@@ -1544,7 +1548,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $ret;
     }
-    
+
     public function getTreeList()
     {
         $trees = [];
@@ -1553,24 +1557,24 @@ class GlobalsTables extends GlobalsElements
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $t) {
                 $tblChk = SLTables::find($t->tree_core_table);
-                $trees[] = [ 
-                    $t->tree_id, 
-                    $t->tree_name, 
-                    $t->tree_slug, 
+                $trees[] = [
+                    $t->tree_id,
+                    $t->tree_name,
+                    $t->tree_slug,
                     (($tblChk && isset($tblChk->tbl_name)) ? $tblChk->tbl_name : '')
                 ];
             }
         }
         return $trees;
     }
-    
+
     public function treeBaseUrl($incDomain = false, $hideHttp = false)
     {
         $url = (($incDomain) ? $this->sysOpts["app-url"] : '');
         if ($hideHttp) {
-            $url = str_replace('http://', '', 
-                str_replace('http://www.', '', 
-                str_replace('https://', '', 
+            $url = str_replace('http://', '',
+                str_replace('http://www.', '',
+                str_replace('https://', '',
                 str_replace('https://www.', '', $url))));
         }
         if ($this->treeRow->tree_type == 'Page') {
@@ -1590,7 +1594,7 @@ class GlobalsTables extends GlobalsElements
         }
         return $url . '/';
     }
-    
+
     public function getNodePageName($currNode = -3)
     {
         if (!isset($this->x["nodeNames"])) {
@@ -1603,9 +1607,9 @@ class GlobalsTables extends GlobalsElements
                 if ($row && isset($row->node_id)) {
                     $node = new TreeNodeSurv();
                     $node->fillNodeRow($currNode, $row);
-                    if (isset($node->nodeRow) 
+                    if (isset($node->nodeRow)
                         && isset($node->nodeRow->node_id)) {
-                        if (isset($node->extraOpts["meta-title"]) 
+                        if (isset($node->extraOpts["meta-title"])
                             && trim($node->extraOpts["meta-title"]) != '') {
                             $this->x["nodeNames"][$currNode] = $node->extraOpts["meta-title"];
                         }
@@ -1619,73 +1623,73 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
+
     public function getCycSffx()
     {
-        return trim($this->currCyc["cyc"][1]) . trim($this->currCyc["res"][1]) 
+        return trim($this->currCyc["cyc"][1]) . trim($this->currCyc["res"][1])
             . trim($this->currCyc["tbl"][1]);
     }
-    
+
     public function getPckgProj()
     {
-        if (isset($this->sysOpts["cust-package"]) 
+        if (isset($this->sysOpts["cust-package"])
             && strpos($this->sysOpts["cust-package"], '/')) {
             $split = explode('/', $this->sysOpts["cust-package"]);
             return $split[1];
         }
         return '';
     }
-    
+
     public function setSEO($metaTitle = '', $metaDesc = '', $metaKeywords = '', $metaImg = '')
     {
         if (trim($metaTitle) != '') {
-            $GLOBALS['SL']->sysOpts['meta-title']    = $metaTitle;
+            $this->sysOpts['meta-title']    = $metaTitle;
         } else {
-            $GLOBALS['SL']->sysOpts['meta-title']    = $GLOBALS['SL']->sysOpts['meta-title'];
+            $this->sysOpts['meta-title']    = $GLOBALS['SL']->sysOpts['meta-title'];
         }
         if (trim($metaDesc) != '') {
-            $GLOBALS['SL']->sysOpts['meta-desc']     = $metaDesc;
+            $this->sysOpts['meta-desc']     = $metaDesc;
         }
         if (trim($metaKeywords) != '') {
-            $GLOBALS['SL']->sysOpts['meta-keywords'] = $metaKeywords;
+            $this->sysOpts['meta-keywords'] = $metaKeywords;
         }
         if (trim($metaImg) != '') {
-            $GLOBALS['SL']->sysOpts['meta-img']      = $metaImg;
+            $this->sysOpts['meta-img']      = $metaImg;
         }
         return true;
     }
-    
+
     public function loadTreeNodeStatTypes()
     {
         $this->x["dataStatTypes"] = [
             "quali" => [
-                'Text', 
-                'Long Text', 
-                'Email', 
-                'Uploads' 
+                'Text',
+                'Long Text',
+                'Email',
+                'Uploads'
             ],
             "choic" => [
-                'Radio', 
-                'Checkbox', 
-                'Drop Down', 
-                'Gender', 
-                'Gender Not Sure', 
-                'U.S. States', 
-                'Countries' 
+                'Radio',
+                'Checkbox',
+                'Drop Down',
+                'Gender',
+                'Gender Not Sure',
+                'U.S. States',
+                'Countries'
             ],
-            "quant" => [ 
-                'Text:Number', 
-                'Slider', 
-                'Date', 
-                'Date Picker', 
-                'Date Time', 
-                'Time', 
-                'Feet Inches' 
+            "quant" => [
+                'Text:Number',
+                'Slider',
+                'Date',
+                'Date Picker',
+                'Date Time',
+                'Time',
+                'Feet Inches'
             ]
         ];
         return $this->x["dataStatTypes"];
     }
-    
+
     public function resetTreeNodeStats()
     {
         $this->loadTreeNodeStatTypes();
@@ -1703,23 +1707,23 @@ class GlobalsTables extends GlobalsElements
         ];
         return true;
     }
-    
+
     public function logTreeNodeStat($node = [])
     {
         if ($node && isset($node->nodeType)) {
             $type = '';
-            if (in_array($node->nodeType, 
+            if (in_array($node->nodeType,
                 $this->x["dataStatTypes"]["quali"])) {
                 $type = 'quali';
-            } elseif (in_array($node->nodeType, 
+            } elseif (in_array($node->nodeType,
                 $this->x["dataStatTypes"]["choic"])) {
                 $type = 'choic';
-            } elseif (in_array($node->nodeType, 
+            } elseif (in_array($node->nodeType,
                 $this->x["dataStatTypes"]["quant"])) {
                 $type = 'quant';
             }
             if ($type != '') {
-                if (isset($node->dataStore) 
+                if (isset($node->dataStore)
                     && !in_array($node->dataStore, $this->x["dataTypeStats"]["flds"])) {
                     $this->x["dataTypeStats"]["flds"][] = $node->dataStore;
                     $this->x["dataTypeStats"][$type]["all"]++;
@@ -1735,12 +1739,12 @@ class GlobalsTables extends GlobalsElements
         }
         return true;
     }
-    
+
     public function printTreeNodeStats($isPrint = false, $isAll = true, $isAlt = true)
     {
         if (isset($this->x["dataTypeStats"]) && isset($this->x["dataTypeStats"]["quali"])) {
             return view(
-                'vendor.survloop.reports.inc-tree-node-type-stats' , 
+                'vendor.survloop.reports.inc-tree-node-type-stats' ,
                 [
                     "isPrint"       => $isPrint,
                     "isAll"         => $isAll,
@@ -1752,7 +1756,7 @@ class GlobalsTables extends GlobalsElements
         }
         return '';
     }
-    
+
     public function chkMissingReportFlds($treeID = -3)
     {
         $ret = '';
@@ -1761,8 +1765,8 @@ class GlobalsTables extends GlobalsElements
         }
         $flds1 = $flds2 = [];
         $tree1 = SLTree::find($treeID);
-        if ($tree1 && isset($tree1->tree_type) 
-            && $tree1->tree_type == 'Page' 
+        if ($tree1 && isset($tree1->tree_type)
+            && $tree1->tree_type == 'Page'
             && $tree1->tree_opts%13 == 0) { // is report
             $tree2 = SLTree::where('tree_type', 'Survey')
                 ->where('tree_core_table', $tree1->tree_core_table)
@@ -1774,8 +1778,8 @@ class GlobalsTables extends GlobalsElements
                     ->get();
                 if ($chk->isNotEmpty()) {
                     foreach ($chk as $i => $node) {
-                        if (isset($node->node_data_store) 
-                            && trim($node->node_data_store) != '' 
+                        if (isset($node->node_data_store)
+                            && trim($node->node_data_store) != ''
                             && !in_array($node->node_data_store, $flds1)) {
                             $flds1[] = $node->node_data_store;
                         }
@@ -1787,8 +1791,8 @@ class GlobalsTables extends GlobalsElements
                     ->get();
                 if ($chk->isNotEmpty()) {
                     foreach ($chk as $i => $node) {
-                        if (isset($node->node_data_store) 
-                            && trim($node->node_data_store) != '' 
+                        if (isset($node->node_data_store)
+                            && trim($node->node_data_store) != ''
                             && !in_array($node->node_data_store, $flds2)) {
                             $flds2[] = $node->node_data_store;
                         }
@@ -1804,12 +1808,12 @@ class GlobalsTables extends GlobalsElements
             }
         }
         if (trim($ret) != '') {
-            $ret = '<div class="mT20"><b>Fields Missing From Primary Survey:</b>' 
+            $ret = '<div class="mT20"><b>Fields Missing From Primary Survey:</b>'
                 . substr($ret, 1) . '</div>';
         }
         return $ret;
     }
-    
+
     public function initCoreTable($coreTbl, $userTbl = null)
     {
         //if ($this->dbID == 3 && $this->sysOpts["cust-abbr"] != 'Survloop') return false;
@@ -1824,43 +1828,43 @@ class GlobalsTables extends GlobalsElements
         }
         $coreFlds = [
             [
-                "FldType" => 'INT', 
-                "FldEng"  => 'User ID', 
-                "FldName" => 'user_id', 
+                "FldType" => 'INT',
+                "FldEng"  => 'User ID',
+                "FldName" => 'user_id',
                 "FldDesc" => 'Indicates the unique User ID number of the User '
-                    . 'owning the data stored in this record for this Experience.' 
-            ], [ 
-                "FldType" => 'INT', 
-                "FldEng"  => 'Experience Node Progress', 
-                "FldName" => 'submission_progress', 
+                    . 'owning the data stored in this record for this Experience.'
+            ], [
+                "FldType" => 'INT',
+                "FldEng"  => 'Experience Node Progress',
+                "FldName" => 'submission_progress',
                 "FldDesc" => 'Indicates the unique Node ID number of the last '
-                    . 'Experience Node loaded during this User\'s Experience.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Tree Version Number', 
-                "FldName" => 'tree_version', 
-                "FldDesc" => 'Stores the current version number of this User Experience, important for tracking bugs.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'A/B Testing Version', 
-                "FldName" => 'version_ab', 
+                    . 'Experience Node loaded during this User\'s Experience.'
+            ], [
+                "FldType" => 'VARCHAR',
+                "FldEng"  => 'Tree Version Number',
+                "FldName" => 'tree_version',
+                "FldDesc" => 'Stores the current version number of this User Experience, important for tracking bugs.'
+            ], [
+                "FldType" => 'VARCHAR',
+                "FldEng"  => 'A/B Testing Version',
+                "FldName" => 'version_ab',
                 "FldDesc" => 'Stores a complex string reflecting all A/B Testing '
-                    . 'variations in effect at the time of this User\'s Experience of this Node.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Unique String For Record', 
-                "FldName" => 'unique_str', 
-                "FldDesc" => 'This unique string is for cases when including the record ID number is not appropriate.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'IP Address', 
-                "FldName" => 'ip_addy', 
-                "FldDesc" => 'Encrypted IP address of the current user.' 
-            ], [ 
-                "FldType" => 'VARCHAR', 
-                "FldEng"  => 'Using Mobile Device', 
-                "FldName" => 'is_mobile', 
-                "FldDesc" => 'Indicates whether or not the current user is interacting via a mobile deviced.' 
+                    . 'variations in effect at the time of this User\'s Experience of this Node.'
+            ], [
+                "FldType" => 'VARCHAR',
+                "FldEng"  => 'Unique String For Record',
+                "FldName" => 'unique_str',
+                "FldDesc" => 'This unique string is for cases when including the record ID number is not appropriate.'
+            ], [
+                "FldType" => 'VARCHAR',
+                "FldEng"  => 'IP Address',
+                "FldName" => 'ip_addy',
+                "FldDesc" => 'Encrypted IP address of the current user.'
+            ], [
+                "FldType" => 'VARCHAR',
+                "FldEng"  => 'Using Mobile Device',
+                "FldName" => 'is_mobile',
+                "FldDesc" => 'Indicates whether or not the current user is interacting via a mobile deviced.'
             ]
         ];
         foreach ($coreFlds as $f) {
@@ -1889,7 +1893,7 @@ class GlobalsTables extends GlobalsElements
                 $fld->fld_opts = 39;
                 $fld->save();
                 if ($this->chkTableExists($coreTbl, $userTbl)) {
-                    $tblQry = "ALTER TABLE  `" . $this->dbRow->db_prefix . $coreTbl->tbl_name 
+                    $tblQry = "ALTER TABLE  `" . $this->dbRow->db_prefix . $coreTbl->tbl_name
                         . "` ADD `" . $coreTbl->tbl_abbr . $f["FldName"] . "` ";
                     switch ($f["FldName"]) {
                         case 'user_id':             $tblQry .= "bigint(20) unsigned"; break;
@@ -1908,5 +1912,5 @@ class GlobalsTables extends GlobalsElements
         $this->installNewModel($coreTbl, true);
         return true;
     }
-    
+
 }

@@ -37,6 +37,13 @@ a.label.label-primary:link, a.label.label-primary:active, a.label.label-primary:
     font-style: italic;
 }
 
+.row1, table tr.row1 {
+    background: {!! $css["color-main-bg"] !!};
+}
+.row2, table tr.row2, .table-striped>tbody>tr:nth-of-type(odd) { 
+    background: {!! $css["color-main-faint"] !!}; 
+}
+
 .brdNo, table.brdNo, table.brdNo tr, table.brdNo tr td {
     border: 0px none;
 }
@@ -91,47 +98,57 @@ table tr td.brdRgt, table tr th.brdRgt {
     border-right: 1px {!! $css["color-main-on"] !!} solid;
 }
 
-.brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th {
+.brdTopNon, table tr.brdTopNon td, table tr.brdTopNon th,
+table tr td.brdTopNon, table tr th.brdTopNon {
     border-top: 0px none;
 }
-.brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th {
+.brdBotNon, table tr.brdBotNon td, table tr.brdBotNon th,
+table tr td.brdBotNon, table tr th.brdBotNon {
     border-bottom: 0px none;
 }
 
-.brdBotBlk, table tr.brdBotBlk td, table tr.brdBotBlk th {
-    border-bottom: 1px {!! $css["color-main-text"] !!} solid;
+@foreach ([
+        'Grey' => $css["color-main-grey"],
+        'Fnt'  => $css["color-main-faint"],
+        'Blk'  => $css["color-main-text"],
+        'Blue' => $css["color-main-on"],
+        'Grn'  => $css["color-success-on"]
+    ] as $abbr => $color)
+
+.brdBot{{ $abbr }}, 
+table tr.brdBot{{ $abbr }} td, table tr.brdBot{{ $abbr }} th, 
+table tr td.brdBot{{ $abbr }}, table tr th.brdBot{{ $abbr }} {
+    border-bottom: 1px {!! $color !!} solid;
 }
-.brdBotBlk2, table tr.brdBotBlk2 td, table tr.brdBotBlk2 th {
-    border-bottom: 2px {!! $css["color-main-text"] !!} solid;
+.brdBot{{ $abbr }}2, 
+table tr.brdBot{{ $abbr }}2 td, table tr.brdBot{{ $abbr }}2 th, 
+table tr td.brdBot{{ $abbr }}2, table tr th.brdBot{{ $abbr }}2 {
+    border-bottom: 2px {!! $color !!} solid;
 }
-.brdBotGrey, table tr.brdBotGrey td, table tr.brdBotGrey th {
-    border-bottom: 1px {!! $css["color-main-grey"] !!} solid;
+.brdTop{{ $abbr }}, 
+table tr.brdTop{{ $abbr }} td, table tr.brdTop{{ $abbr }} th, 
+table tr td.brdTop{{ $abbr }}, table tr th.brdTop{{ $abbr }} {
+    border-top: 1px {!! $color !!} solid;
+}
+.brdLft{{ $abbr }}, 
+table tr.brdLft{{ $abbr }} td, table tr.brdLft{{ $abbr }} th, 
+table tr td.brdLft{{ $abbr }}, table tr th.brdLft{{ $abbr }} {
+    border-left: 1px {!! $color !!} solid;
+}
+.brdRgt{{ $abbr }}, 
+table tr.brdRgt{{ $abbr }} td, table tr.brdRgt{{ $abbr }} th, 
+table tr td.brdRgt{{ $abbr }}, table tr th.brdRgt{{ $abbr }} {
+    border-right: 1px {!! $color !!} solid;
+}
+.brdRgt{{ $abbr }}2, 
+table tr.brdRgt{{ $abbr }}2 td, table tr.brdRgt{{ $abbr }}2 th, 
+table tr td.brdRgt{{ $abbr }}2, table tr th.brdRgt{{ $abbr }}2 {
+    border-right: 2px {!! $color !!} solid;
 }
 
-.brdRgtGrey, table tr.brdRgtGrey td, table tr.brdRgtGrey th {
-    border-right: 1px {!! $css["color-main-grey"] !!} solid;
-}
-.brdRgtFnt, table tr.brdRgtFnt td, table tr.brdRgtFnt th {
-    border-right: 1px {!! $css["color-main-faint"] !!} solid;
-}
+@endforeach
 
-.brdLftGrey, table tr.brdLftGrey td, table tr.brdLftGrey th {
-    border-left: 1px {!! $css["color-main-grey"] !!} solid;
-}
 
-.brdTopGrey, table tr.brdTopGrey td, table tr.brdTopGrey th { 
-    border-top: 1px {!! $css["color-main-grey"] !!} solid; 
-}
-.brdTopFnt, table tr.brdTopFnt td, table tr.brdTopFnt th { 
-    border-top: 1px {!! $css["color-main-faint"] !!} solid; 
-}
-
-.row1, table tr.row1 {
-    background: {!! $css["color-main-bg"] !!};
-}
-.row2, table tr.row2, .table-striped>tbody>tr:nth-of-type(odd) { 
-    background: {!! $css["color-main-faint"] !!}; 
-}
 .bgPrimary { background: {!! $css["color-main-on"] !!}; }
 .bgInfo { background: {!! $css["color-info-on"] !!}; }
 .bgDanger { background: {!! $css["color-danger-on"] !!}; }

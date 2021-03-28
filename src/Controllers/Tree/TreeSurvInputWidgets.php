@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvInputWidgets is a mid-level class using a standard branching tree, mostly for 
+  * TreeSurvInputWidgets is a mid-level class using a standard branching tree, mostly for
   * processing the input Survloop's surveys and pages.
   *
   * Survloop - All Our Data Are Belong
@@ -43,7 +43,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         }
         return $ret;
     }
-    
+
     protected function getUserEmailList($userList = [])
     {
         $emaToList = [];
@@ -69,11 +69,11 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                             foreach ($dataStores as $ds) {
                                 if (strpos($ds->node_data_store, ':') !== false) {
                                     list($tbl, $fld) = explode(':', $ds->node_data_store);
-                                    if (isset($this->sessData->dataSets[$tbl]) 
+                                    if (isset($this->sessData->dataSets[$tbl])
                                         && isset($this->sessData->dataSets[$tbl][0]->{ $fld })
                                         && trim($this->sessData->dataSets[$tbl][0]->{ $fld }) != '') {
                                         $emaToList[] = [
-                                            $this->sessData->dataSets[$tbl][0]->{ $fld }, 
+                                            $this->sessData->dataSets[$tbl][0]->{ $fld },
                                             ''
                                         ];
                                     }
@@ -83,7 +83,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                     }
                 }
                 if (intVal($emaTo) == -68) {
-                    
+
                 }
                 if ($emaUsr && isset($emaUsr->email)) {
                     $emaToList[] = [ $emaUsr->email, $emaUsr->name ];
@@ -92,17 +92,17 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         }
         return $emaToList;
     }
-    
+
     protected function postEmailFrom()
     {
         return [];
     }
-    
+
     protected function postDumpFormEmailSubject()
     {
         return $GLOBALS["SL"]->sysOpts["site-name"] . ': ' . $GLOBALS["SL"]->treeRow->tree_name;
     }
-    
+
     protected function postNodeLoadEmail($nID)
     {
         $this->v["emaTo"] = $this->getUserEmailList($this->allNodes[$nID]->extraOpts["emailTo"]);
@@ -126,7 +126,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         }
         return true;
     }
-    
+
     protected function postNodeSendEmail($nID)
     {
         if (sizeof($this->allNodes[$nID]->extraOpts["emailTo"]) > 0) {
@@ -151,14 +151,14 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                                     $val = implode(', ', $val);
                                 }
                                 $paramKeys = [
-                                    '_token', 'ajax', 'tree', 'treeSlug', 'node', 
-                                    'nodeSlug', 'loop', 'loopItem', 'step', 
+                                    '_token', 'ajax', 'tree', 'treeSlug', 'node',
+                                    'nodeSlug', 'loop', 'loopItem', 'step',
                                     'alt', 'jumpTo', 'afterJumpTo', 'zoomPref'
                                 ];
                                 if (!in_array($key, $paramKeys)
-                                    && strpos($key, 'Visible') === false 
+                                    && strpos($key, 'Visible') === false
                                     && trim($val) != '') {
-                                    $fldNID = intVal(str_replace('n', '', 
+                                    $fldNID = intVal(str_replace('n', '',
                                         str_replace('fld', '', $key)));
                                     $line = '';
                                     if (isset($this->allNodes[$fldNID])) {
@@ -166,7 +166,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                                         if (isset($fldNode->nodeRow->node_prompt_text)) {
                                             $promptText = trim($fldNode->nodeRow->node_prompt_text);
                                             if ($promptText != '') {
-                                                $line .= '<b>' . strip_tags($promptText) 
+                                                $line .= '<b>' . strip_tags($promptText)
                                                     . '</b><br />';
                                             }
                                         }
@@ -183,22 +183,22 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                         $emaContent = $this->emailRecordSwap($emaContent);
                         $emaSubject = $this->emailRecordSwap($emaSubject);
                         $this->sendEmail(
-                            $emaContent, 
-                            $emaSubject, 
-                            $this->v["emaTo"], 
-                            $this->v["emaCC"], 
+                            $emaContent,
+                            $emaSubject,
+                            $this->v["emaTo"],
+                            $this->v["emaCC"],
                             $this->v["emaBCC"],
                             $this->postEmailFrom()
                         );
-                        $emaID = ((isset($currEmail->email_id)) 
+                        $emaID = ((isset($currEmail->email_id))
                             ? $currEmail->email_id : -3);
                         $this->logEmailSent(
-                            $emaContent, 
-                            $emaSubject, 
-                            $this->v["toList"], 
-                            $emaID, 
-                            $this->treeID, 
-                            $this->coreID, 
+                            $emaContent,
+                            $emaSubject,
+                            $this->v["toList"],
+                            $emaID,
+                            $this->treeID,
+                            $this->coreID,
                             $this->v["uID"]
                         );
                     }
@@ -207,12 +207,12 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         }
         return '';
     }
-    
+
     public function emailRecordSwap($emaTxt)
     {
         return $this->sendEmailBlurbs($emaTxt);
     }
-    
+
     public function sendEmailBlurbs($emailBody)
     {
         if (!isset($this->v["emailList"])) {
@@ -225,17 +225,17 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                 $emailTag = '[{ ' . $e->email_name . ' }]';
                 if (strpos($emailBody, $emailTag) !== false) {
                     $emailBody = str_replace(
-                        $emailTag, 
-                        $this->sendEmailBlurbs($e->email_body), 
+                        $emailTag,
+                        $this->sendEmailBlurbs($e->email_body),
                         $emailBody
                     );
                 }
             }
         }
         $dynamos = [
-            '[{ Core ID }]', 
-            '[{ Login URL }]', 
-            '[{ User Email }]', 
+            '[{ Core ID }]',
+            '[{ Login URL }]',
+            '[{ User Email }]',
             '[{ Email Confirmation URL }]'
         ];
         foreach ($dynamos as $dy) {
@@ -245,7 +245,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                 switch ($dy) {
                     case '[{ Core ID }]':
                         $swap = 0;
-                        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) 
+                        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])
                             && sizeof($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0) {
                             $swap = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->getKey();
                         }
@@ -253,13 +253,13 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                     case '[{ Login URL }]':
                         $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] . '/login');
                         break;
-                    case '[{ User Email }]': 
-                        $swap = ((isset($this->v["user"]) && isset($this->v["user"]->email)) 
+                    case '[{ User Email }]':
+                        $swap = ((isset($this->v["user"]) && isset($this->v["user"]->email))
                             ? $this->v["user"]->email : '');
                         break;
-                    case '[{ Email Confirmation URL }]': 
-                        $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"] 
-                            . '/email-confirm/' . $this->createToken('Confirm Email') 
+                    case '[{ Email Confirmation URL }]':
+                        $swap = $GLOBALS["SL"]->swapURLwrap($GLOBALS["SL"]->sysOpts["app-url"]
+                            . '/email-confirm/' . $this->createToken('Confirm Email')
                             . '/' . md5($this->v["user"]->email));
                         break;
                 }
@@ -268,20 +268,20 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         }
         return $this->sendEmailBlurbsCustom($emailBody);
     }
-    
+
     public function processEmailConfirmToken(Request $request, $token = '', $tokenB = '')
     {
         $tokRow = SLTokens::where('tok_tok_token', $token)
             ->where('updated_at', '>', $this->tokenExpireDate('Confirm Email'))
             ->first();
-        if ($tokRow 
-            && isset($tokRow->tok_user_id) 
-            && intVal($tokRow->tok_user_id) > 0 
+        if ($tokRow
+            && isset($tokRow->tok_user_id)
+            && intVal($tokRow->tok_user_id) > 0
             && trim($tokenB) != '') {
             $usr = User::find($tokRow->tok_user_id);
-            if ($usr 
-                && isset($usr->email) 
-                && trim($usr->email) != '' 
+            if ($usr
+                && isset($usr->email)
+                && trim($usr->email) != ''
                 && md5($usr->email) == $tokenB) {
                 $chk = SLUsersRoles::where('role_user_uid', $tokRow->tok_user_id)
                     ->where('role_user_rid', -37)
@@ -297,12 +297,12 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         $this->setNotif('Thank you for confirming your email address!', 'success');
         return $this->redir('/my-profile');
     }
-    
-    public function sendEmailBlurbsCustom($emailBody)
+
+    public function sendEmailBlurbsCustom($emailBody, $recID = 0)
     {
         return $emailBody;
     }
-    
+
     protected function manualLogContact($nID, $emaContent, $emaSubject, $email = '', $type = '')
     {
         $log = new SLContact;
@@ -314,14 +314,14 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         $log->save();
         return true;
     }
-    
+
     protected function processContactForm($nID = -3, $tmpSubTier = [])
     {
         $this->pageCoreFlds = [
-            'cont_type', 
-            'cont_email', 
-            'cont_subject', 
-            'cont_body' 
+            'cont_type',
+            'cont_email',
+            'cont_subject',
+            'cont_body'
         ];
         $ret = $this->processPageForm($nID, $tmpSubTier, 'SLContact', 'cont_body');
         $this->pageCoreRow->update([ 'cont_flag' => 'Unread' ]);
@@ -335,11 +335,11 @@ class TreeSurvInputWidgets extends TreeSurvUpload
                 }
                 $emaSubj = strip_tags($this->pageCoreRow->cont_subject);
                 if (strlen($emaSubj) > 30) {
-                    $emaSubj = trim(substr($emaSubj, 0, 30)) . '...'; 
+                    $emaSubj = trim(substr($emaSubj, 0, 30)) . '...';
                 }
                 $emaSubj = $GLOBALS["SL"]->sysOpts["site-name"] . ' Contact: ' . $emaTitle;
                 $emaContent = view(
-                    'vendor.survloop.admin.contact-row', 
+                    'vendor.survloop.admin.contact-row',
                     [
                         "contact"  => $this->pageCoreRow,
                         "forEmail" => true
@@ -351,7 +351,7 @@ class TreeSurvInputWidgets extends TreeSurvUpload
         $this->setNotif('Thank you for contacting us!', 'success');
         return $ret;
     }
-    
+
     public function authMinimalInit(Request $request, $currPage = '')
     {
         return true;

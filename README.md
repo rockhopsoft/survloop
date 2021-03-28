@@ -24,34 +24,34 @@ Code bytes measured as stored on Mac disk:
 * Survloop-Generated PHP Eloquent Data Table Models ~ 221KB (5%)
 * Survloop-Generated PHP Laravel Database Migration & Seeders ~ 291KB (7%)
 
-Survloop is a Laravel-based engine for websites 
-dominated by the collection and publication of open data. 
-This is a database design and survey generation system, 
-though it will increasingly be a flexible tool 
+Survloop is a Laravel-based engine for websites
+dominated by the collection and publication of open data.
+This is a database design and survey generation system,
+though it will increasingly be a flexible tool
 to solve many web-based problems.
 
-It is currently in continued, heavy development, with 
-much happening here in 2020, almost ready to go live. 
-I plan to provide more documentation in the coming weeks. 
+It is currently in continued, heavy development, with
+much happening here in 2020, almost ready to go live.
+I plan to provide more documentation in the coming weeks.
 Thank you for your interest and patience!
 
-This software was originally developed to build the 
-<a href="https://github.com/flexyourrights/openpolice" 
-    target="_blank">Open Police</a> 
-system. It began as an internal tool to design our database, 
-then prototype survey generation. Then it was adapted to the 
-Laravel framework, and has continued to grow towards a 
+This software was originally developed to build the
+<a href="https://github.com/flexyourrights/openpolice"
+    target="_blank">Open Police</a>
+system. It began as an internal tool to design our database,
+then prototype survey generation. Then it was adapted to the
+Laravel framework, and has continued to grow towards a
 content-management system for data-focused websites.
 
-The upcoming Open Police web app is the best live install 
-of the engine, and feedback on that project and the Survloop 
+The upcoming Open Police web app is the best live install
+of the engine, and feedback on that project and the Survloop
 user experience can be via the end of the submission process:
 <a href="https://openpolice.org/filing-your-police-complaint" target="_blank">https://openpolice.org/filing-your-police-complaint</a>
-The resulting database designed using the engine, as well as 
-the branching tree which specifies the user's experience: 
+The resulting database designed using the engine, as well as
+the branching tree which specifies the user's experience:
 <a href="https://openpolice.org/db/OP" target="_blank">/db/OP</a>
 <a href="https://openpolice.org/tree/complaint" target="_blank">/tree/complaint</a>
-Among other methods, the resulting data can also be provided as 
+Among other methods, the resulting data can also be provided as
 XML included an automatically generated schema, eg.
 <a href="https://openpolice.org/complaint-xml-schema" target="_blank">/complaint-xml-schema</a>
 <a href="https://openpolice.org/complaint-xml-example" target="_blank">/complaint-xml-example</a>
@@ -68,6 +68,7 @@ The installation used for Survloop.org is currently the best example of a bare-b
 
 * php: >=7.4
 * <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.5.*
+* <a href="https://packagist.org/packages/laravel/fortify" target="_blank">laravel/fortify</a>: 1.7.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.*
 
 # <a name="getting-started"></a>Getting Started
@@ -103,11 +104,10 @@ Next, install Laravel's out-of-the-box user authentication tools, and Survloop:
 ```
 % php artisan key:generate
 % php artisan cache:clear
-% COMPOSER_MEMORY_LIMIT=-1 composer require laravel/ui paragonie/random_compat mpdf/mpdf rockhopsoft/survloop
-% php artisan ui vue --auth
+% COMPOSER_MEMORY_LIMIT=-1 composer require rockhopsoft/survloop
 % nano composer.json
 ```
-From your Laravel installation's root directory, update `composer.json` to require and easily reference OpenPolice:
+From your Laravel installation's root directory, update `composer.json` to require and easily reference Survloop:
 ```
 ...
 "autoload": {
@@ -128,6 +128,7 @@ It seems we also still need to manually edit `config/app.php`:
 ...
 'providers' => [
     ...
+    App\Providers\FortifyServiceProvider::class,
     RockHopSoft\Survloop\SurvloopServiceProvider::class,
     ...
 ],
@@ -141,14 +142,14 @@ It seems we also still need to manually edit `config/app.php`:
 
 If installing on a server, you might also need to fix some permissions before the following steps...
 ```
-% chown -R www-data:33 storage database app/Models
+% chown -R www-data:www-data storage bootstrap/cache resources/views database app/Models
 ```
 
 Clear caches and publish the package migrations...
 ```
-% php artisan config:cache
-% php artisan route:cache
-% php artisan view:cache
+% php artisan config:clear
+% php artisan route:clear
+% php artisan view:clear
 % echo "0" | php artisan vendor:publish --force
 % composer dump-autoload
 % curl http://survproject.local/css-reload
@@ -157,7 +158,7 @@ Clear caches and publish the package migrations...
 With certain databases (like some managed by DigitalOcean), you may need to tweak the Laravel migration:
 ```
 % nano database/migrations/2014_10_12_100000_create_password_resets_table.php
-% sudo nano database/migrations/2019_08_19_000000_create_failed_jobs_table.php
+% nano database/migrations/2019_08_19_000000_create_failed_jobs_table.php
 ```
 Add this line before the "Schema::create" line in each file:
 ```

@@ -17,48 +17,48 @@ class TreeSurvProgBar extends TreeSurvLoad
     public $minorSections         = [];
     public $currMajorSection      = 0;
     public $currMinorSection      = 0;
-    
+
     protected $sessDataChangeLog  = [];
     protected $sessNodesDone      = [];
     protected $sessMajorsTouched  = [];
     protected $sessMinorsTouched  = [];
-    
+
     public $navBottom             = '';
     public $nodeTreeProgressBar   = '';
-    
+
     protected function rawOrderPercentTweak($nID, $rawPerc, $found = -3)
     {
         return $rawPerc;
     }
-    
+
     protected function loadProgBarTweak()
     {
         return true;
     }
-    
+
     protected function tweakProgBarJS()
     {
         return '';
     }
-    
+
     public function loadProgBar()
     {
         $rawPerc = $this->rawOrderPercent($this->currNode());
         if (intVal($rawPerc) < 0) {
             $rawPerc = 0;
         }
-        if (isset($this->allNodes[$this->currNode()]) 
-            && $this->allNodes[$this->currNode()]->nodeType == 'Page' 
+        if (isset($this->allNodes[$this->currNode()])
+            && $this->allNodes[$this->currNode()]->nodeType == 'Page'
             && $this->allNodes[$this->currNode()]->nodeOpts%29 == 0) {
             $rawPerc = 100;
         }
         $this->currMajorSection = $this->getCurrMajorSection($this->currNode());
-        if (!isset($this->minorSections[$this->currMajorSection]) 
+        if (!isset($this->minorSections[$this->currMajorSection])
             || empty($this->minorSections[$this->currMajorSection])) {
             $this->currMinorSection = 0;
         } else {
             $this->currMinorSection = $this->getCurrMinorSection(
-                $this->currNode(), 
+                $this->currNode(),
                 $this->currMajorSection
             );
         }
@@ -68,7 +68,7 @@ class TreeSurvProgBar extends TreeSurvLoad
                 if (isset($this->minorSections[$maj])
                     && sizeof($this->minorSections[$maj]) > 0) {
                     foreach ($this->minorSections[$maj] as $min => $minSect) {
-                        if (isset($minSect[0]) 
+                        if (isset($minSect[0])
                             && isset($this->allNodes[$minSect[0]])) {
                             $this->allNodes[$minSect[0]]->fillNodeRow();
                         }
@@ -82,17 +82,17 @@ class TreeSurvProgBar extends TreeSurvLoad
         foreach ($this->majorSections as $maj => $majSect) {
             if ($maj == $this->currMajorSection) {
                 $GLOBALS['SL']->pageJAVA .= view(
-                    'vendor.survloop.forms.inc-progress-bar-js-tweak', 
+                    'vendor.survloop.forms.inc-progress-bar-js-tweak',
                     [
-                        "maj"    => $maj, 
-                        "status" => 'active' 
+                        "maj"    => $maj,
+                        "status" => 'active'
                     ]
                 )->render();
             } elseif (in_array($maj, $this->sessMajorsTouched)) {
                 $GLOBALS['SL']->pageJAVA .= view(
-                    'vendor.survloop.forms.inc-progress-bar-js-tweak', 
+                    'vendor.survloop.forms.inc-progress-bar-js-tweak',
                     [
-                        "maj"    => $maj, 
+                        "maj"    => $maj,
                         "status" => 'completed'
                     ]
                 )->render();
@@ -106,20 +106,20 @@ class TreeSurvProgBar extends TreeSurvLoad
                 foreach ($this->minorSections[$maj] as $min => $minSect) {
                     if ($maj == $this->currMajorSection && $min == $this->currMinorSection) {
                         $GLOBALS['SL']->pageJAVA .= view(
-                            'vendor.survloop.forms.inc-progress-bar-js-tweak', 
+                            'vendor.survloop.forms.inc-progress-bar-js-tweak',
                             [
-                                "maj" => $maj, 
-                                "min" => $min, 
-                                "status" => 'active' 
+                                "maj" => $maj,
+                                "min" => $min,
+                                "status" => 'active'
                             ]
                         )->render();
                     } elseif (in_array($min, $this->sessMinorsTouched[$maj])) {
                         $GLOBALS['SL']->pageJAVA .= view(
-                            'vendor.survloop.forms.inc-progress-bar-js-tweak', 
+                            'vendor.survloop.forms.inc-progress-bar-js-tweak',
                             [
-                                "maj"    => $maj, 
-                                "min"    => $min, 
-                                "status" => 'completed' 
+                                "maj"    => $maj,
+                                "min"    => $min,
+                                "status" => 'completed'
                             ]
                         )->render();
                     }
@@ -128,13 +128,13 @@ class TreeSurvProgBar extends TreeSurvLoad
         }
         if ($GLOBALS["SL"]->treeRow->tree_opts%61 == 0) { // survey progress line
             $currPerc = -3;
-            if (isset($this->allNodes[$this->currNode()]) 
+            if (isset($this->allNodes[$this->currNode()])
                 && $this->allNodes[$this->currNode()]->nodeOpts%59 > 0) {
                 $currPerc = intVal($rawPerc);
             }
             $GLOBALS['SL']->pageJAVA .= 'printHeadBar(' . $currPerc . ');' . "\n";
         }
-        if (($GLOBALS["SL"]->treeRow->tree_opts%37 == 0 
+        if (($GLOBALS["SL"]->treeRow->tree_opts%37 == 0
             || $GLOBALS["SL"]->treeRow->tree_opts%59 == 0)
             && isset($this->majorSections[$this->currMajorSection][1]) > 0) {
             $GLOBALS["SL"]->pageAJAX .= '$(".snLabel").click(function() { '
@@ -151,17 +151,17 @@ class TreeSurvProgBar extends TreeSurvLoad
                 }
             }
             $ret .= view(
-                'vendor.survloop.forms.inc-progress-bar', 
+                'vendor.survloop.forms.inc-progress-bar',
                 [
                     "hasNavBot"         => ($GLOBALS["SL"]->treeRow->tree_opts%59 == 0),
                     "hasNavTop"         => ($GLOBALS["SL"]->treeRow->tree_opts%37 == 0),
-                    "allNodes"          => $this->allNodes, 
-                    "majorSections"     => $majorsOut, 
-                    "minorSections"     => $minorsOut, 
-                    "sessMajorsTouched" => $this->sessMajorsTouched, 
-                    "sessMinorsTouched" => $this->sessMinorsTouched, 
-                    "currMajorSection"  => $this->currMajorSection, 
-                    "currMinorSection"  => $this->currMinorSection, 
+                    "allNodes"          => $this->allNodes,
+                    "majorSections"     => $majorsOut,
+                    "minorSections"     => $minorsOut,
+                    "sessMajorsTouched" => $this->sessMajorsTouched,
+                    "sessMinorsTouched" => $this->sessMinorsTouched,
+                    "currMajorSection"  => $this->currMajorSection,
+                    "currMinorSection"  => $this->currMinorSection,
                     "majorsWithMinors"  => $majorsWithMinors,
                     "majTot"            => $majTot,
                     "rawPerc"           => $rawPerc
@@ -172,7 +172,7 @@ class TreeSurvProgBar extends TreeSurvLoad
         return $ret;
         //return false;
     }
-    
+
     public function createProgBarJs()
     {
         if (!is_dir('../storage/app/sys')) {
@@ -184,11 +184,11 @@ class TreeSurvProgBar extends TreeSurvLoad
                 unlink($jsFileName);
             }
             $jsOut = view(
-                'vendor.survloop.js.inc-tree', 
+                'vendor.survloop.js.inc-tree',
                 [
                     "treeID"        => $this->treeID,
-                    "allNodes"      => $this->allNodes, 
-                    "majorSections" => $this->majorSections, 
+                    "allNodes"      => $this->allNodes,
+                    "majorSections" => $this->majorSections,
                     "minorSections" => $this->minorSections
                 ]
             )->render();
@@ -196,7 +196,7 @@ class TreeSurvProgBar extends TreeSurvLoad
         }
         return true;
     }
-    
+
     protected function getCurrMajorSection($nID = -3)
     {
         if ($nID <= 0) {
@@ -214,7 +214,7 @@ class TreeSurvProgBar extends TreeSurvLoad
         }
         return $currSection;
     }
-    
+
     protected function getCurrMinorSection($nID = -3, $majorSectInd = -3)
     {
         if ($nID <= 0) {
@@ -239,12 +239,12 @@ class TreeSurvProgBar extends TreeSurvLoad
         }
         return $currSection;
     }
-    
+
     protected function overrideMinorSection($nID = -3, $majorSectInd = -3)
     {
         return -1;
     }
-    
+
     protected function getBranchName($branchID = -3)
     {
         if ($branchID > 0 && sizeof($this->branches) > 0) {
@@ -256,5 +256,5 @@ class TreeSurvProgBar extends TreeSurvLoad
         }
         return "";
     }
-    
+
 }

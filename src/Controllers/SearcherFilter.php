@@ -107,7 +107,7 @@ class SearcherFilter
         } else {
             $this->selected = '';
         }
-        if ($GLOBALS["SL"]->REQ->has($this->abbr) 
+        if ($GLOBALS["SL"]->REQ->has($this->abbr)
             && trim($GLOBALS["SL"]->REQ->get($this->abbr)) != '') {
             if ($this->idType == 'int') {
                 $this->selected = intVal($GLOBALS["SL"]->REQ->get($this->abbr));
@@ -155,7 +155,7 @@ class SearcherFilter
                 ->select($fldID)
                 ->get();
             $psids = $GLOBALS["SL"]->resultsToArrIds($chk, $fldID);
-            return "->whereIn('" . $coreTblFldID . "', [" 
+            return "->whereIn('" . $coreTblFldID . "', ["
                 . ((sizeof($psids) > 0) ? implode(', ', $psids) : 0)
                 . "])";
         }
@@ -188,7 +188,7 @@ class SearcherFilter
         return '<select name="' . $this->abbr . '" '
             . 'id="' . $this->abbr . 'ID" autocomplete="off" '
             . 'class="form-control ntrStp slTab ' . $class . '" '
-            . $GLOBALS["SL"]->tabInd() . ' ><option value="' . $defID 
+            . $GLOBALS["SL"]->tabInd() . ' ><option value="' . $defID
             . '" ' . $selected . ' >' . $defLabel . '</option>'
             . $this->printDropdownOpts() . '</select>';
     }

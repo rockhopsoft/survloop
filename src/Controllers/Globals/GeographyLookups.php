@@ -54,7 +54,7 @@ class GeographyLookups extends GeographyLists
         }
         return '';
     }
-    
+
     public function getState($abbr = '')
     {
         if ($abbr == '') {
@@ -73,13 +73,21 @@ class GeographyLookups extends GeographyLists
         }
         return '';
     }
-    
+
     public function getStateSlug($abbr = '')
     {
         return $GLOBALS["SL"]->slugify($this->getState($abbr));
     }
-    
-    
+
+    public function getStatePossessive($state = '')
+    {
+        if (substr(strtolower($state), strlen($state)-1) == 's') {
+            return $state . "'";
+        }
+        return $state . "'s";
+    }
+
+
     public function getStateByInd($ind = -1)
     {
         $cnt = 1;
@@ -113,17 +121,17 @@ class GeographyLookups extends GeographyLists
         $this->loadStates();
         $state = $this->getState($abbr);
         if (isset($this->stateList[$abbr])) {
-            $file = '/survloop-libraries/state-flags/usa_' 
+            $file = '/survloop-libraries/state-flags/usa_'
                 . str_replace(' ', '_', strtolower($state)) . '.jpg';
         } else {
             if (isset($this->stateListCa[$abbr])) {
-                $file = '/survloop-libraries/state-flags/canada_' 
+                $file = '/survloop-libraries/state-flags/canada_'
                     . str_replace(' ', '_', strtolower($state)) . '.jpg';
             }
         }
         return $file;
     }
-    
+
     public function loadStateResponseVals()
     {
         $this->loadStates();
@@ -138,7 +146,7 @@ class GeographyLookups extends GeographyLists
         }
         return $retArr;
     }
-    
+
     public function getCountryResponses($nID, $showKidsList = [])
     {
         $this->loadCountries();
@@ -154,7 +162,7 @@ class GeographyLookups extends GeographyLists
         }
         return $ret;
     }
-    
+
     public function getZipRow($zip = '')
     {
         if (trim($zip) == '') {
@@ -166,7 +174,7 @@ class GeographyLookups extends GeographyLists
         return SLZips::where('zip_zip', $zip)
             ->first();
     }
-    
+
     public function getZipProperty($zip = '', $fld = 'city')
     {
         $zipRow = $this->getZipRow($zip);
@@ -175,7 +183,7 @@ class GeographyLookups extends GeographyLists
         }
         return '';
     }
-    
+
     public function getCityCounty($city = '', $state = '')
     {
         $chk = SLZips::where('zip_city', $city)
@@ -186,18 +194,18 @@ class GeographyLookups extends GeographyLists
         }
         return '';
     }
-    
+
     public function getAshrae($zipRow = null)
     {
         if (!$zipRow) {
             return '';
         }
-        if (isset($zipRow->zip_country) 
+        if (isset($zipRow->zip_country)
             && $zipRow->zip_country == 'Canada') {
             return 'Canada';
         }
-        if ((!isset($zipRow->zip_country) || trim($zipRow->zip_country) == '') 
-            && isset($zipRow->zip_state) 
+        if ((!isset($zipRow->zip_country) || trim($zipRow->zip_country) == '')
+            && isset($zipRow->zip_state)
             && !in_array($zipRow->zip_state, $this->getTerritoryAbbrs())) {
             $ashrae = SLZipAshrae::where('ashr_state', $zipRow->zip_state)
                 ->where('ashr_county', $zipRow->zip_county)
@@ -206,26 +214,26 @@ class GeographyLookups extends GeographyLists
                 return $ashrae->ashr_zone;
             }
         }
-        return '';   
+        return '';
     }
-    
+
     public function countryDrop($cntry = '')
     {
         $this->loadCountries();
         return view(
-            'vendor.survloop.forms.inc-drop-opts-countries', 
+            'vendor.survloop.forms.inc-drop-opts-countries',
             [
                 "cntry"       => trim($cntry),
                 "countryList" => $this->countryList
             ]
         )->render();
     }
-    
+
     public function stateDrop($state = '', $all = false)
     {
         $this->loadStates();
         return view(
-            'vendor.survloop.forms.inc-drop-opts-states', 
+            'vendor.survloop.forms.inc-drop-opts-states',
             [
                 "state"       => trim($state),
                 "stateList"   => $this->stateList,
@@ -235,7 +243,7 @@ class GeographyLookups extends GeographyLists
             ]
         )->render();
     }
-    
+
     public function stateResponses($all = false)
     {
         $this->loadStates();
@@ -257,36 +265,36 @@ class GeographyLookups extends GeographyLists
         }
         return $responses;
     }
-    
+
     public function climateZoneDrop($fltClimate = '')
     {
         return view(
-            'vendor.survloop.forms.inc-drop-opts-ashrae', 
+            'vendor.survloop.forms.inc-drop-opts-ashrae',
             [
                 "fltClimate" => $fltClimate,
                 "hasCanada"  => $this->hasCanada
             ]
         )->render();
     }
-    
+
     public function climateGroupDrop($fltClimate = '')
     {
         return view(
-            'vendor.survloop.forms.inc-drop-opts-ashrae-groups', 
+            'vendor.survloop.forms.inc-drop-opts-ashrae-groups',
             [ "fltClimate" => $fltClimate ]
         )->render();
     }
-    
+
     public function stateClimateDrop($fltStateClim = '', $all = false)
     {
         return $this->climateGroupDrop($fltStateClim) . '<option disabled ></option>'
             . $this->stateDrop($fltStateClim, $all);
     }
-    
+
     public function stateClimateTagsSelect($fltStateClimTag = [], $nID = 1, $classExtra = '')
     {
         return view(
-            'vendor.survloop.forms.formtree-climate-tagger', 
+            'vendor.survloop.forms.formtree-climate-tagger',
             [
                 "print"           => 'select',
                 "nID"             => $nID,
@@ -298,11 +306,11 @@ class GeographyLookups extends GeographyLists
             ]
         )->render();
     }
-    
+
     public function stateClimateTagsList($fltStateClimTag = [], $nID = 1)
     {
         return view(
-            'vendor.survloop.forms.formtree-climate-tagger', 
+            'vendor.survloop.forms.formtree-climate-tagger',
             [
                 "print"           => 'tag',
                 "nID"             => $nID,
@@ -310,11 +318,11 @@ class GeographyLookups extends GeographyLists
             ]
         )->render();
     }
-    
+
     public function stateClimateTagsJS($fltStateClimTag = [], $nID = 1, $classExtra = '')
     {
         return view(
-            'vendor.survloop.forms.formtree-climate-tagger', 
+            'vendor.survloop.forms.formtree-climate-tagger',
             [
                 "print"           => 'js',
                 "nID"             => $nID,
@@ -326,7 +334,7 @@ class GeographyLookups extends GeographyLists
             ]
         )->render();
     }
-    
+
     public function stateClimateTagsInRow($fltStateClimTag = [], $nID = 1, $classExtra = '')
     {
         return '<div class="row"><div class="col-md-4 pB10">'
@@ -356,7 +364,7 @@ class GeographyLookups extends GeographyLists
         }
         return [ $states, $zones ];
     }
-    
+
     public function getStateWhereIn($fltState = '')
     {
         $ret = [];
@@ -372,6 +380,21 @@ class GeographyLookups extends GeographyLists
                 }
             } else {
                 $ret[] = $fltState;
+            }
+        }
+        return $ret;
+    }
+
+    public function getStateAbbrsArray()
+    {
+        $ret = [];
+        $this->loadStates();
+        foreach ($this->stateList as $abbr => $name) {
+            $ret[] = $abbr;
+        }
+        if ($this->hasCanada) {
+            foreach ($this->stateListCa as $abbr => $name) {
+                $ret[] = $abbr;
             }
         }
         return $ret;
@@ -395,7 +418,7 @@ class GeographyLookups extends GeographyLists
         }
         return $ret;
     }
-    
+
     public function getAshraeZoneLabel($ashraeZone = '')
     {
         switch ($ashraeZone) {
@@ -426,19 +449,19 @@ class GeographyLookups extends GeographyLists
         }
         return '';
     }
-    
+
     public function isAshraeZoneGroup($zoneGroup = '')
     {
         $zones = [
-            'Hot-Humid', 
-            'Mixed-Humid', 
-            'Cold', 
-            'Very Cold', 
+            'Hot-Humid',
+            'Mixed-Humid',
+            'Cold',
+            'Very Cold',
             'Subarctic'
         ];
         return (in_array($zoneGroup, $zones));
     }
-    
+
     public function getAshraeGroupZones($zoneGroup = '')
     {
         switch ($zoneGroup) {
@@ -471,7 +494,7 @@ class GeographyLookups extends GeographyLists
         }
         return $str;
     }
-    
+
     public function getAshraeGroupZips($zoneGroup = '')
     {
         if (trim($zoneGroup) == '') {
@@ -480,9 +503,9 @@ class GeographyLookups extends GeographyLists
         if (!isset($this->zoneZips[$zoneGroup])) {
             $this->zoneZips[$zoneGroup] = [];
             $zips = DB::table('sl_zips')
-                ->join('sl_zip_ashrae', 'sl_zips.zip_county', 
+                ->join('sl_zip_ashrae', 'sl_zips.zip_county',
                     'LIKE', 'sl_zip_ashrae.ashr_county')
-                ->whereIn('sl_zip_ashrae.ashr_zone', 
+                ->whereIn('sl_zip_ashrae.ashr_zone',
                     $this->getAshraeGroupZones($zoneGroup))
                 ->select('sl_zips.zip_zip')
                 ->get();

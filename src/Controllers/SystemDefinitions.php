@@ -9,6 +9,7 @@
   */
 namespace RockHopSoft\Survloop\Controllers;
 
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\SLDefinitions;
 use RockHopSoft\Survloop\Controllers\SystemDefinitionsInit;
@@ -17,7 +18,7 @@ class SystemDefinitions extends SystemDefinitionsInit
 {
     public $dbID = 1;
     public $v    = [];
-    
+
     public function checkDefInstalls()
     {
         $this->chkAppUrl();
@@ -25,7 +26,7 @@ class SystemDefinitions extends SystemDefinitionsInit
         $this->checkSysDefs();
         return true;
     }
-    
+
     public function loadCss($dbID = 1)
     {
         if ($dbID <= 0) {
@@ -50,18 +51,18 @@ class SystemDefinitions extends SystemDefinitionsInit
         }
         return $this->checkStyleDefs($this->v["css"]);
     }
-    
+
     protected function chkSysReqs()
     {
         $GLOBALS["SL"]->loadStates();
         $GLOBALS["SL"]->importZipsUS();
-        if (isset($GLOBALS["SL"]->sysOpts["has-canada"]) 
+        if (isset($GLOBALS["SL"]->sysOpts["has-canada"])
             && intVal($GLOBALS["SL"]->sysOpts["has-canada"]) == 1) {
             $GLOBALS["SL"]->importZipsCanada();
         }
         return true;
     }
-    
+
     public function prepSysSettings(Request $request, $dbID = 1)
     {
         if ($dbID <= 0) {
@@ -78,13 +79,29 @@ class SystemDefinitions extends SystemDefinitionsInit
         }
         $this->v["sysStyles"] = SLDefinitions::where('def_database', $dbID)
             ->where('def_set', 'Style Settings')
-            ->orderBy('def_order')    
+            ->orderBy('def_order')
             ->get();
+        $this->prepSysSettingsCustCss($dbID);
+        $this->v["rawSettings"] = SLDefinitions::where('def_set', 'Custom Settings')
+            ->orderBy('def_order', 'asc')
+            ->get();
+        $tmp = [];
+        if ($this->v["sysStyles"]->isNotEmpty()) {
+            foreach ($this->v["sysStyles"] as $sty) {
+                $tmp[$sty->def_subset] = $sty->def_description;
+            }
+        }
+        $this->v["sysStyles"] = $tmp;
+        return true;
+    }
+
+    private function prepSysSettingsCustCss($dbID)
+    {
         $this->v["custCSS"] = SLDefinitions::where('def_database', $dbID)
             ->where('def_set', 'Style CSS')
             ->where('def_subset', 'main')
             ->first();
-        if (!$this->v["custCSS"] 
+        if (!$this->v["custCSS"]
             || !isset($this->v["custCSS"]->def_id)) {
             $this->v["custCSS"] = new SLDefinitions;
             $this->v["custCSS"]->def_database = $dbID;
@@ -103,65 +120,95 @@ class SystemDefinitions extends SystemDefinitionsInit
             $this->v["custCSSemail"]->def_subset   = 'email';
             $this->v["custCSSemail"]->save();
         }
-        $this->v["rawSettings"] = SLDefinitions::where('def_set', 'Custom Settings')
-            ->orderBy('def_order', 'asc')
-            ->get();
-        if ($request->has('sub')) {
-            foreach ($GLOBALS["SL"]->sysOpts as $opt => $val) {
-                if (isset($this->v["settingsList"][$opt])) {
-                    $new = '';
-                    if ($request->has('sys-' . $opt)) {
-                        $new = $request->get('sys-' . $opt);
-                    }
-                    if ($opt == 'meta-title' && $request->has('pageTitle')) {
-                        $new = $request->get('pageTitle');
-                    } elseif ($opt == 'meta-desc' && $request->has('pageDesc')) {
-                        $new = $request->get('pageDesc');
-                    } elseif ($opt == 'meta-keywords' && $request->has('pageKey')) {
-                        $new = $request->get('pageKey');
-                    } elseif ($opt == 'meta-img' && $request->has('pageImg')) {
-                        $new = $request->get('pageImg');
-                    }
-                    if ($new != '') {
-                        $GLOBALS["SL"]->sysOpts[$opt] = $new;
-                        SLDefinitions::where('def_database', $dbID)
-                            ->where('def_set', 'System Settings')
-                            ->where('def_subset', $opt)
-                            ->update([ 'def_description' => $new ]);
-                    }
-                }
+        return true;
+    }
+
+    public function submitSysSettings(Request $request, $sysSet)
+    {
+        if (!Auth::user() || !Auth::user()->hasRole('administrator|staff')) {
+            return ':-(';
+        }
+        $sysOpts = $sysStys = [];
+        if ($request->has('optList') && trim($request->optList) != '') {
+            $sysOpts = $GLOBALS["SL"]->mexplode(',', $request->optList);
+        }
+        if ($request->has('styList') && trim($request->styList) != '') {
+            $sysStys = $GLOBALS["SL"]->mexplode(',', $request->styList);
+        }
+        if (sizeof($sysOpts) == 0 && sizeof($sysStys) == 0) {
+            return ':(';
+        }
+        if (sizeof($sysOpts) > 0) {
+            foreach ($sysOpts as $opt) {
+                $this->submitSysSettingsRunOpt($request, $opt);
             }
-            foreach ($this->v["sysStyles"] as $opt) {
-                if (isset($this->v["stylesList"][$opt->def_subset]) 
-                    && $request->has('sty-' . $opt->def_subset)) {
-                    $opt->def_description = $request
-                        ->get('sty-' . $opt->def_subset);
-                    $opt->save();
-                }
+        }
+        if (sizeof($sysStys) > 0) {
+            foreach ($sysStys as $opt) {
+                $this->submitSysSettingsRunSty($request, $opt);
             }
-            $this->v["custCSS"]->def_description 
-                = trim($request->get('sys-cust-css'));
-            $this->v["custCSS"]->save();
-            $this->v["custCSSemail"]->def_description
-                = trim($request->get('sys-cust-css-email'));
-            $this->v["custCSSemail"]->save();
+        }
+        return 'Changes Saved. <iframe width=1 height=1 '
+            . 'src="/dashboard/settings?refresh=1&frame=1" ></iframe>';
+    }
+
+    private function submitSysSettingsRunOpt($request, $opt)
+    {
+        if ($opt == 'rawSettings') {
             foreach ($this->v["rawSettings"] as $i => $s) {
                 if ($request->has('setting' . $i . '')) {
                     $s->def_value = $request->get('setting' . $i . '');
                     $s->save();
                 }
             }
-        }
-        $tmp = [];
-        if ($this->v["sysStyles"]->isNotEmpty()) {
-            foreach ($this->v["sysStyles"] as $sty) {
-                $tmp[$sty->def_subset] = $sty->def_description;
+        } elseif (isset($this->v["settingsList"][$opt])) {
+            $new = '';
+            if ($opt == 'meta-title' && $request->has('pageTitle')) {
+                $new = $request->get('pageTitle');
+            } elseif ($opt == 'meta-desc' && $request->has('pageDesc')) {
+                $new = $request->get('pageDesc');
+            } elseif ($opt == 'meta-keywords' && $request->has('pageKey')) {
+                $new = $request->get('pageKey');
+            } elseif ($opt == 'meta-img' && $request->has('pageImg')) {
+                $new = $request->get('pageImg');
+            } elseif ($request->has('sys-' . $opt)) {
+                $new = $request->get('sys-' . $opt);
             }
+            SLDefinitions::where('def_database', $this->dbID)
+                ->where('def_set', 'System Settings')
+                ->where('def_subset', $opt)
+                ->update([ 'def_description' => $new ]);
+            $GLOBALS["SL"]->sysOpts[$opt] = $new;
         }
-        $this->v["sysStyles"] = $tmp;
         return true;
     }
-    
+
+    private function submitSysSettingsRunSty($request, $opt)
+    {
+        if ($opt == 'custCSS') {
+            if ($request->has('sys-cust-css')) {
+                $this->v["custCSS"]->def_description
+                    = trim($request->get('sys-cust-css'));
+                $this->v["custCSS"]->save();
+            }
+        } elseif ($opt == 'custCSSemail') {
+            if ($request->has('sys-cust-css-email')) {
+                $this->v["custCSSemail"]->def_description
+                    = trim($request->get('sys-cust-css-email'));
+                $this->v["custCSSemail"]->save();
+            }
+        } elseif (isset($this->v["stylesList"][$opt])
+            && $request->has('sty-' . $opt)) {
+            $new = $request->get('sty-' . $opt);
+            SLDefinitions::where('def_database', $this->dbID)
+                ->where('def_set', 'System Settings')
+                ->where('def_subset', $opt)
+                ->update([ 'def_description' => $new ]);
+            $GLOBALS["SL"]->sysOpts[$opt] = $new;
+        }
+        return true;
+    }
+
     protected function checkStyleDefs($css = [], $dbID = 1)
     {
         if ($dbID <= 0) {
@@ -189,7 +236,7 @@ class SystemDefinitions extends SystemDefinitionsInit
         }
         return $css;
     }
-    
+
     protected function checkSysDefs($sys = [], $dbID = 1)
     {
         if ($dbID <= 0) {
@@ -206,16 +253,44 @@ class SystemDefinitions extends SystemDefinitionsInit
                 ->first();
             if (!$chk || !isset($chk->def_set)) {
                 $cssNew = new SLDefinitions;
-                $cssNew->def_database = $dbID;
-                $cssNew->def_set = 'System Settings';
-                $cssNew->def_subset = $key;
+                $cssNew->def_database    = $dbID;
+                $cssNew->def_set         = 'System Settings';
+                $cssNew->def_subset      = $key;
                 $cssNew->def_description = $val[1];
                 $cssNew->save();
             }
         }
-        $grps = [
+        $this->checkSysGroups($dbID);
+        return $sys;
+    }
+
+    protected function checkSysGroups($dbID = 1)
+    {
+        $grps = $this->loadSysGroupDefs();
+        foreach ($grps as $i => $grp) {
+            $chk = SLDefinitions::where('def_database', $dbID)
+                ->where('def_set', 'User Roles')
+                ->where('def_subset', $grp[0])
+                ->first();
+            if (!$chk || !isset($chk->def_set)) {
+                $chk = new SLDefinitions;
+                $chk->def_database = $dbID;
+                $chk->def_set      = 'User Roles';
+                $chk->def_subset   = $grp[0];
+            }
+            $chk->def_value       = $grp[1];
+            $chk->def_description = $grp[2];
+            $chk->def_order       = $i;
+            $chk->save();
+        }
+        return true;
+    }
+
+    private function loadSysGroupDefs()
+    {
+        return [
             [
-                'administrator', 
+                'administrator',
                 'Administrator',
                 'Highest system administrative privileges, can add, '
                     . 'remove, and change permissions of other users'
@@ -232,30 +307,13 @@ class SystemDefinitions extends SystemDefinitionsInit
                 'Partner Member',
                 'Basic permission to pages and tools just for partners'
             ], [
-                'volunteer', 
-                'Volunteer', 
+                'volunteer',
+                'Volunteer',
                 'Basic permission to pages and tools just for volunteers'
             ]
         ];
-        foreach ($grps as $i => $grp) {
-            $chk = SLDefinitions::where('def_database', $dbID)
-                ->where('def_set', 'User Roles')
-                ->where('def_subset', $grp[0])
-                ->first();
-            if (!$chk || !isset($chk->def_set)) {
-                $chk = new SLDefinitions;
-                $chk->def_database = $dbID;
-                $chk->def_set = 'User Roles';
-                $chk->def_subset  = $grp[0];
-            }
-            $chk->def_value       = $grp[1];
-            $chk->def_description = $grp[2];
-            $chk->def_order       = $i;
-            $chk->save();
-        }
-        return $sys;
     }
-    
+
     protected function chkAppUrl($dbID = 1)
     {
         if (!isset($_SERVER["APP_URL"])) {
@@ -274,12 +332,12 @@ class SystemDefinitions extends SystemDefinitionsInit
             $appUrl->def_set = 'System Settings';
             $appUrl->def_subset = 'app-url';
             $appUrl->def_description = $_SERVER["APP_URL"];
-        } elseif (!isset($appUrl->def_description) 
+        } elseif (!isset($appUrl->def_description)
             || trim($appUrl->def_description) == '') {
             $appUrl->def_description = $_SERVER["APP_URL"];
         }
         $appUrl->save();
         return true;
     }
-    
+
 }

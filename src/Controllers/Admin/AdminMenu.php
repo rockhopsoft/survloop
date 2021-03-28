@@ -16,7 +16,7 @@ class AdminMenu
 {
     private $currUser = null;
     private $currPage = '';
-    
+
     public function loadAdmMenu($currUser = null, $currPage = '')
     {
         $this->currUser = $currUser;
@@ -24,17 +24,17 @@ class AdminMenu
         $treeMenu = [
             $this->addAdmMenuHome(),
             $this->admMenuLnk(
-                'javascript:;', 
-                'Submissions', 
-                '<i class="fa fa-star"></i>', 
-                1, 
+                'javascript:;',
+                'Submissions',
+                '<i class="fa fa-star"></i>',
+                1,
                 [
                     $this->admMenuLnk(
                         '/dashboard/subs/all',
                         'All Complete'
-                    ), 
+                    ),
                     $this->admMenuLnk(
-                        '/dashboard/subs/incomplete', 
+                        '/dashboard/subs/incomplete',
                         'Incomplete Sessions'
                     )
                 ]
@@ -42,16 +42,16 @@ class AdminMenu
         ];
         return $this->addAdmMenuBasics($treeMenu);
     }
-    
+
     protected function addAdmMenuHome()
     {
         return $this->admMenuLnk(
-            '/dashboard', 
-            'Dashboard', 
+            '/dashboard',
+            'Dashboard',
             '<i class="fa fa-home" aria-hidden="true"></i>'
         );
     }
-    
+
     protected function addAdmMenuCollapse()
     {
         $arrow = 'fa-arrow-right';
@@ -59,13 +59,13 @@ class AdminMenu
             $arrow = 'fa-arrow-left';
         }
         return $this->admMenuLnk(
-            'javascript:;" id="admMenuClpsBtn', 
-            'Collapse', 
+            'javascript:;" id="admMenuClpsBtn',
+            'Collapse',
             '<i id="admMenuClpsArr" class="fa ' . $arrow . '" '
                 . 'aria-hidden="true"></i>'
         );
     }
-    
+
     protected function addAdmMenuBasics($treeMenu = [])
     {
         list($treeID, $treeLabel, $dbName) = $this->loadDbTreeShortNames();
@@ -77,16 +77,16 @@ class AdminMenu
         }
         $survLnk = '/dashboard/surv-' . $treeID;
         $treeOut[] = $this->admMenuLnk(
-            'javascript:;', 
-            'Site Content', 
-            '<i class="fa fa-file-text-o" aria-hidden="true"></i>', 
-            1, 
+            'javascript:;',
+            'Site Content',
+            '<i class="fa fa-file-text-o" aria-hidden="true"></i>',
+            1,
             [
                 $this->admMenuLnk(
                     '/dashboard/pages',
-                    'Pages & Reports', 
-                    '', 
-                    1, 
+                    'Pages & Reports',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/pages',
@@ -105,25 +105,25 @@ class AdminMenu
                             'Content Snippets'
                         )
                     ]
-                ), 
+                ),
                 $this->admMenuLnk(
-                    '/dashboard/surveys/list', 
-                    'Surveys & Forms', 
-                    '', 
-                    1, 
+                    '/dashboard/surveys/list',
+                    'Surveys & Forms',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
-                            $survLnk . '/map?all=1&alt=1', 
+                            $survLnk . '/map?all=1&alt=1',
                             'Full Map'
-                        ), 
+                        ),
                         $this->admMenuLnk(
                             $survLnk . '/settings',
                             'Settings'
-                        ), 
+                        ),
                         $this->admMenuLnk(
                             $survLnk . '/sessions',
                             'Sessions'
-                        ), 
+                        ),
                         $this->admMenuLnk(
                             $survLnk . '/stats?all=1',
                             'Responses'
@@ -131,26 +131,26 @@ class AdminMenu
                         $this->admMenuLnk(
                             $survLnk . '/data',
                             'Data Structures'
-                        ), 
+                        ),
                         $this->admMenuLnk(
                             $survLnk . '/xmlmap',
                             'XML Map'
                         )
                     ]
-                ), 
+                ),
                 $this->admMenuLnk(
                     '/dashboard/pages/menus',
                     'Navigation Menus'
-                ), 
+                ),
                 $this->admMenuLnk(
-                    '/dashboard/images/gallery', 
+                    '/dashboard/images/gallery',
                     'Media Gallery'
                 ),
                 $this->admMenuLnk(
                     '/dashboard/emails',
-                    'Email Manager', 
-                    '', 
-                    1, 
+                    'Email Manager',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/emails',
@@ -170,16 +170,16 @@ class AdminMenu
             ]
         );
         $treeOut[] = $this->admMenuLnk(
-            'javascript:;', 
-            'Database', 
-            '<i class="fa fa-database"></i>', 
-            1, 
+            'javascript:;',
+            'Database',
+            '<i class="fa fa-database"></i>',
+            1,
             [
                 $this->admMenuLnk(
-                    '/dashboard/db', 
-                    'Data Tables', 
-                    '', 
-                    1, 
+                    '/dashboard/db',
+                    'Data Tables',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/db',
@@ -198,17 +198,17 @@ class AdminMenu
                             'Data Diagrams'
                         )
                     ]
-                ), 
+                ),
                 $this->admMenuLnk(
-                    '/dashboard/db/all', 
-                    'Data Fields', 
-                    '', 
-                    1, 
+                    '/dashboard/db/all',
+                    'Data Fields',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/db/all',
                             'Full Field Map'
-                        ), 
+                        ),
                         $this->admMenuLnk(
                             '/dashboard/db/field-matrix?alt=1',
                             'Field Matrix: English'
@@ -222,16 +222,16 @@ class AdminMenu
                             'Business Rules'
                         )
                     ]
-                ), 
+                ),
                 $this->admMenuLnk(
-                    '/dashboard/db/definitions', 
+                    '/dashboard/db/definitions',
                     'Definition Lists'
                 ),
                 $this->admMenuLnk(
                     '/dashboard/db/conds',
-                    'Filters / Conditions', 
-                    '', 
-                    1, 
+                    'Filters / Conditions',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/db/conds',
@@ -254,20 +254,20 @@ class AdminMenu
                 $this->admMenuLnk(
                     '/dashboard/db/fieldDescs',
                     'Field Descriptions'
-                ), 
+                ),
                 $this->admMenuLnk(
-                    '/dashboard/db/fieldXML',
+                    '/dashboard/db/fieldAPI',
                     'Field Privacy Settings'
-                ), 
+                ),
                 //$this->admMenuLnk(
                 //    '/dashboard/db/workflows',
                 //    'Process Workflows'
                 //),
                 $this->admMenuLnk(
                     '/dashboard/db/export',
-                    'Import / Export', 
-                    '', 
-                    1, 
+                    'Import / Export',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
                             '/dashboard/db/export',
@@ -290,51 +290,47 @@ class AdminMenu
             ]
         );
         $treeOut[] = $this->admMenuLnk(
-            'javascript:;', 
-            'Settings', 
-            '<i class="fa fa-cogs"></i>', 
-            1, 
+            'javascript:;',
+            'Settings',
+            '<i class="fa fa-cogs"></i>',
+            1,
             [
                 $this->admMenuLnk(
                     '/dashboard/settings',
-                    'System Settings', 
-                    '', 
-                    1, 
+                    'System Settings',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
-                            '/dashboard/settings#search',
+                            '/dashboard/settings/seo?ajax=1',
                             'Search Engines'
                         ),
                         $this->admMenuLnk(
-                            '/dashboard/settings#general',
-                            'General Settings'
+                            '/dashboard/settings/colors?ajax=1',
+                            'Colors & Logos'
                         ),
                         $this->admMenuLnk(
-                            '/dashboard/settings#logos',
-                            'Logos & Fonts'
+                            '/dashboard/settings/hard-code?ajax=1',
+                            'Hard-Code HTML CSS JS'
                         ),
                         $this->admMenuLnk(
-                            '/dashboard/settings#color',
-                            'Colors'
-                        ),
-                        $this->admMenuLnk(
-                            '/dashboard/settings#hardcode',
-                            'Code HTML CSS JS'
+                            '/dashboard/settings/engine?ajax=1',
+                            'Engine Settings'
                         )
                     ]
                 ),
                 $this->admMenuLnk(
                     '/dashboard/logs',
-                    'System Logs', 
-                    '', 
-                    1, 
+                    'System Logs',
+                    '',
+                    1,
                     [
                         $this->admMenuLnk(
-                            '/dashboard/logs', 
+                            '/dashboard/logs',
                             'All Logs'
                         ),
                         $this->admMenuLnk(
-                            '/dashboard/logs/session-stuff', 
+                            '/dashboard/logs/session-stuff',
                             'Session Stuff'
                         )
                     ]
@@ -344,8 +340,8 @@ class AdminMenu
                     'System Check'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/systems-update',
-                    'System Updates'
+                    '/dashboard/systems-clean',
+                    'System Clean'
                 ),
                 $this->admMenuLnk(
                     '/dashboard/users',
@@ -355,24 +351,24 @@ class AdminMenu
         );
         return $treeOut;
     }
-    
+
     static public function admMenuLnk($url = '', $text = '', $ico = '', $opt = 1, $children = [])
     {
-        return [ 
-            $url, 
-            $text, 
-            $ico, 
-            $opt, 
-            $children 
+        return [
+            $url,
+            $text,
+            $ico,
+            $opt,
+            $children
         ];
     }
-    
+
     protected function admMenuLnkContact($icon = true)
     {
         $cnt = $this->admMenuLnkContactCnt();
-        $lnk = 'Contact Form' . (($cnt > 0) 
-            ? '<sup id="contactPush" class="red mL5">' 
-                . $cnt . '</sup> ' 
+        $lnk = 'Contact Form' . (($cnt > 0)
+            ? '<sup id="contactPush" class="red mL5">'
+                . $cnt . '</sup> '
             : '');
         $ico = '';
         if ($icon) {
@@ -380,32 +376,32 @@ class AdminMenu
                 . 'aria-hidden="true"></i> ';
         }
         $ret = [
-            '/dashboard/contact', 
-            $lnk, 
-            $ico, 
-            1, 
+            '/dashboard/contact',
+            $lnk,
+            $ico,
+            1,
             [
                 $this->admMenuLnk(
-                    '/dashboard/contact', 
+                    '/dashboard/contact',
                     'Unread'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/contact/hold', 
+                    '/dashboard/contact/hold',
                     'On Hold'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/contact/resolved', 
+                    '/dashboard/contact/resolved',
                     'Resolved'
                 ),
                 $this->admMenuLnk(
-                    '/dashboard/contact/trash', 
+                    '/dashboard/contact/trash',
                     'Trash'
                 )
             ]
         ];
         return $ret;
     }
-    
+
     public function admMenuLnkContactCnt()
     {
         $chk = SLContact::where('cont_flag', 'Unread')
@@ -413,7 +409,7 @@ class AdminMenu
             ->get();
         return $chk->count();
     }
-    
+
     protected function loadDbTreeShortNames()
     {
         $dbName = '';
@@ -423,8 +419,8 @@ class AdminMenu
         $prefix = str_replace('_', '', $GLOBALS["SL"]->dbRow->db_prefix);
         if (strlen($dbName) > 20 && isset($GLOBALS["SL"]->dbRow->db_name)) {
             $dbName = str_replace(
-                $GLOBALS["SL"]->dbRow->db_name, 
-                $prefix, 
+                $GLOBALS["SL"]->dbRow->db_name,
+                $prefix,
                 $dbName
             );
         }
@@ -445,5 +441,5 @@ class AdminMenu
         }
         return [ $treeID, $treeName, $dbName ];
     }
-    
+
 }

@@ -1,6 +1,6 @@
 <?php
 /**
-  * TreeSurvInputElements is a mid-level class using a standard branching tree, mostly for 
+  * TreeSurvInputElements is a mid-level class using a standard branching tree, mostly for
   * processing the input Survloop's surveys and pages.
   *
   * Survloop - All Our Data Are Belong
@@ -16,39 +16,39 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeSurvInputWidgets;
 class TreeSurvInputElements extends TreeSurvInputWidgets
 {
     public $nodeTypes = [
-        'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number', 
-        'Slider', 'Email', 'Password', 'Date', 'Date Picker', 'Date Time', 'Time', 
-        'Gender', 'Gender Not Sure', 'Feet Inches', 'U.S. States', 'Countries', 
-        'Uploads', 'Spreadsheet Table', 'User Sign Up', 'Hidden Field', 
-        'Spambot Honey Pot', 'Other/Custom' 
+        'Radio', 'Checkbox', 'Drop Down', 'Text', 'Long Text', 'Text:Number',
+        'Slider', 'Email', 'Password', 'Date', 'Date Picker', 'Date Time', 'Time',
+        'Gender', 'Gender Not Sure', 'Feet Inches', 'U.S. States', 'Countries',
+        'Uploads', 'Spreadsheet Table', 'User Sign Up', 'Hidden Field',
+        'Spambot Honey Pot', 'Other/Custom'
     ];
-    
+
     public $nodeSpecialTypes = [
-        'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root', 
-        'Loop Cycle', 'Loop Sort', 'Data Manip: New', 'Data Manip: Update', 
-        'Data Manip: Wrap', 'Data Manip: Close Sess', 'Big Button', 'Search', 
-        'Search Results', 'Search Featured', 'Member Profile Basics', 'Send Email', 
-        'Admin Form', 'Record Full', 'Record Full Public', 'Record Previews', 
-        'Incomplete Sess Check', 'Back Next Buttons', 'Data Print', 'Data Print Row', 
-        'Data Print Block', 'Data Print Columns', 'Print Vert Progress', 'Plot Graph', 
-        'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 'MFA Dialogue', 'Widget Custom', 
+        'Instructions', 'Instructions Raw', 'Page', 'Branch Title', 'Loop Root',
+        'Loop Cycle', 'Loop Sort', 'Data Manip: New', 'Data Manip: Update',
+        'Data Manip: Wrap', 'Data Manip: Close Sess', 'Big Button', 'Search',
+        'Search Results', 'Search Featured', 'Member Profile Basics', 'Send Email',
+        'Admin Form', 'Record Full', 'Record Full Public', 'Record Previews',
+        'Incomplete Sess Check', 'Back Next Buttons', 'Data Print', 'Data Print Row',
+        'Data Print Block', 'Data Print Columns', 'Print Vert Progress', 'Plot Graph',
+        'Line Graph', 'Bar Graph', 'Pie Chart', 'Map', 'MFA Dialogue', 'Widget Custom',
         'Page Block', 'Layout Row', 'Layout Column', 'Layout Sub-Response', 'Gallery Slider'
     ];
-    
+
     protected $pageHasUpload    = [];
     protected $pageHasReqs      = '';
     protected $pageFldList      = [];
     protected $page1stVisib     = '';
     protected $hideKidNodes     = [];
-    
+
     protected $nextBtnOverride  = '';
     protected $loopItemsCustBtn = '';
-    
+
     protected $pageCoreRow      = [];
     protected $pageCoreFlds     = [];
-    
+
     protected $tableDat         = [];
-    
+
     protected function postNodeTweakNewVal($curr, $newVal)
     {
         if ($curr->nodeType == 'U.S. States' && $curr->isDropdownTagger()) {
@@ -63,11 +63,11 @@ class TreeSurvInputElements extends TreeSurvInputWidgets
         }
         return $newVal;
     }
-    
+
     protected function getRawFormDate($nIDtxt)
     {
         $nIDtxt = 'n' . $nIDtxt;
-        if ($GLOBALS["SL"]->REQ->has($nIDtxt . 'fldMonth') 
+        if ($GLOBALS["SL"]->REQ->has($nIDtxt . 'fldMonth')
             && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldMonth')) != ''
             && $GLOBALS["SL"]->REQ->has($nIDtxt . 'fldDay')
             && trim($GLOBALS["SL"]->REQ->get($nIDtxt . 'fldDay')) != ''
@@ -80,7 +80,7 @@ class TreeSurvInputElements extends TreeSurvInputWidgets
         }
         return '';
     }
-    
+
     protected function checkLoopRootInput($nID)
     {
         // then we're at the page's root, so let's check this once
@@ -88,12 +88,12 @@ class TreeSurvInputElements extends TreeSurvInputWidgets
             $delID = intVal($GLOBALS["SL"]->REQ->get('delLoopItem'));
             if ($delID > 0) {
                 $loopTable = $GLOBALS["SL"]->closestLoop["obj"]->data_loop_table;
-                $this->sessData->deleteDataItem($nID, $loopTable, $delID);
+                $this->sessData->deleteDataItem($loopTable, $delID);
             }
         }
         return true;
     }
-    
+
     protected function postNodePublicLoopSort($curr)
     {
         $list = '';
@@ -109,7 +109,7 @@ class TreeSurvInputElements extends TreeSurvInputWidgets
         $this->closePostNodePublic($curr);
         return '';
     }
-    
+
     protected function postNodePublicLoopCycle($curr)
     {
         $ret = '';

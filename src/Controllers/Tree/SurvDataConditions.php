@@ -1,6 +1,6 @@
 <?php
 /**
-  * SurvDataConditions is holds the functions for SurvData's 
+  * SurvDataConditions is holds the functions for SurvData's
   * analysis of conditional logic.
   *
   * Survloop - All Our Data Are Belong
@@ -19,17 +19,17 @@ class SurvDataConditions extends SurvDataCheckbox
     {
 //if (isset($recObj->ps_area_type)) { echo '<pre>'; print_r($cond); print_r($recObj); echo '</pre>'; }
         $passed = true;
-        if ($cond 
-            && isset($cond->cond_database) 
+        if ($cond
+            && isset($cond->cond_database)
             && $cond->cond_operator != 'CUSTOM') {
             $cond->loadVals();
             $loopName = '';
-            if (intVal($cond->cond_loop) > 0 
+            if (intVal($cond->cond_loop) > 0
                 && isset($GLOBALS["SL"]->dataLoopNames[$cond->cond_loop])) {
                 $loopName = $GLOBALS["SL"]->dataLoopNames[$cond->cond_loop];
             }
-            if (intVal($cond->cond_table) <= 0 
-                && trim($loopName) != '' 
+            if (intVal($cond->cond_table) <= 0
+                && trim($loopName) != ''
                 && isset($GLOBALS["SL"]->dataLoops[$loopName])) {
                 $tblName = $GLOBALS["SL"]->dataLoops[$loopName]->data_loop_table;
             } else {
@@ -37,8 +37,8 @@ class SurvDataConditions extends SurvDataCheckbox
             }
 //if ($tbl != $setTbl) list($setTbl, $setSet, $loopItemID) = $this->getDataSetTblTranslate($set, $tbl, $loopItemID);
             if ($cond->cond_operator == 'EXISTS=') {
-                if (!isset($this->dataSets[$tblName]) 
-                    || (intVal($cond->cond_loop) > 0 
+                if (!isset($this->dataSets[$tblName])
+                    || (intVal($cond->cond_loop) > 0
                         && !isset($this->loopItemIDs[$loopName]))) {
                     if (intVal($cond->cond_oper_deet) == 0) {
                         $passed = true;
@@ -53,8 +53,8 @@ class SurvDataConditions extends SurvDataCheckbox
                     $passed = ($existCnt == intVal($cond->cond_oper_deet));
                 }
             } elseif ($cond->cond_operator == 'EXISTS>') {
-                if (!isset($this->dataSets[$tblName]) 
-                    || (intVal($cond->cond_loop) > 0 
+                if (!isset($this->dataSets[$tblName])
+                    || (intVal($cond->cond_loop) > 0
                         && !isset($this->loopItemIDs[$loopName]))) {
                     $passed = false;
                 } else {
@@ -75,11 +75,11 @@ class SurvDataConditions extends SurvDataCheckbox
                 if ($cond->cond_operator == '{{') {
                     // find any match in any row for this table
                     $passed = false;
-                    if (isset($this->dataSets[$tblName]) 
+                    if (isset($this->dataSets[$tblName])
                         && sizeof($this->dataSets[$tblName]) > 0) {
                         foreach ($this->dataSets[$tblName] as $ind => $row) {
-                            if (isset($row->{ $fldName }) 
-                                && trim($row->{ $fldName }) != '' 
+                            if (isset($row->{ $fldName })
+                                && trim($row->{ $fldName }) != ''
                                 && in_array($row->{ $fldName }, $cond->condVals)) {
                                 $passed = true;
                             }
@@ -95,11 +95,11 @@ class SurvDataConditions extends SurvDataCheckbox
 //if ($cond->cond_id == 107) { echo 'COND NID set sessData : <pre>'; print_r($currSessData); echo '</pre>'; }
                     }
                     // else not a node, but general filter of entire core record's data set
-                    if (trim($currSessData) == '') { 
-                        if (isset($this->dataSets[$tblName]) 
+                    if (trim($currSessData) == '') {
+                        if (isset($this->dataSets[$tblName])
                             && sizeof($this->dataSets[$tblName]) > 0) {
                             foreach ($this->dataSets[$tblName] as $ind => $row) {
-                                if (isset($row->{ $fldName }) 
+                                if (isset($row->{ $fldName })
                                     && trim($row->{ $fldName }) != '') {
                                     $currSessData = $row->{ $fldName };
 //if ($cond->cond_id == 107 && $recObj->getKey() == 200) { echo 'COND ROUND2 set sessData : <pre>'; print_r($currSessData); echo '</pre>'; }
@@ -133,7 +133,7 @@ class SurvDataConditions extends SurvDataCheckbox
     {
         $this->testsAB = new SurvDataTestsAB;
         $params = $abField = '';
-        if (isset($this->dataSets[$this->coreTbl]) 
+        if (isset($this->dataSets[$this->coreTbl])
             && sizeof($this->dataSets[$this->coreTbl]) > 0) {
             $abField = $GLOBALS["SL"]->tblAbbr[$this->coreTbl] . 'version_ab';
             if (isset($this->dataSets[$this->coreTbl][0]->{ $abField })) {
@@ -141,7 +141,7 @@ class SurvDataConditions extends SurvDataCheckbox
             }
         }
         $this->testsAB->addParamsAB($params);
-        if ($GLOBALS["SL"]->REQ->has('ab') 
+        if ($GLOBALS["SL"]->REQ->has('ab')
             && trim($GLOBALS["SL"]->REQ->get('ab') != '')) {
             $this->testsAB->addParamsAB(trim($GLOBALS["SL"]->REQ->get('ab')));
         }

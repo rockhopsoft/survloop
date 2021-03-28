@@ -22,7 +22,7 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeCoreSess;
 class TreeSurvAPI extends TreeCoreSess
 {
     protected $canEditTree = false;
-    
+
     protected function initExtra(Request $request)
     {
         if (!isset($this->v["uID"])) {
@@ -39,10 +39,10 @@ class TreeSurvAPI extends TreeCoreSess
         $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
         return true;
     }
-    
+
     public function checkTreeRoot()
     {
-        if ((!$this->rootID || intVal($this->rootID) <= 0) 
+        if ((!$this->rootID || intVal($this->rootID) <= 0)
             && isset($GLOBALS["SL"]->treeRow->tree_core_table)
             && intVal($GLOBALS["SL"]->treeRow->tree_core_table) > 0) {
             $chk = SLNode::where('node_tree', $this->treeID)
@@ -60,8 +60,8 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return true;
     }
-    
-    public function adminNodeEditXML(Request $request, $nodeIN) 
+
+    public function adminNodeEditXML(Request $request, $nodeIN)
     {
         $this->initExtra($request);
         $node = NULL;
@@ -80,9 +80,9 @@ class TreeSurvAPI extends TreeCoreSess
             $node->nodeRow->node_opts         = 1;
             $node->nodeRow->node_type         = 'XML';
         }
-        
+
         if ($GLOBALS["SL"]->REQ->has('sub')) {
-            if ($GLOBALS["SL"]->REQ->has('deleteNode') 
+            if ($GLOBALS["SL"]->REQ->has('deleteNode')
                 && intVal($GLOBALS["SL"]->REQ->input('deleteNode')) == 1) {
                 $this->treeAdminNodeDelete($node->nodeRow->node_id);
             } else {
@@ -98,7 +98,7 @@ class TreeSurvAPI extends TreeCoreSess
                 } else {
                     $opts = [ 5, 7, 11 ];
                     foreach ($opts as $o) {
-                        if ($GLOBALS["SL"]->REQ->has('opts'.$o.'') 
+                        if ($GLOBALS["SL"]->REQ->has('opts'.$o.'')
                             && intVal($GLOBALS["SL"]->REQ->input('opts'.$o.'')) == $o) {
                             if ($node->nodeRow->node_opts%$o > 0) {
                                 $node->nodeRow->node_opts *= $o;
@@ -114,30 +114,30 @@ class TreeSurvAPI extends TreeCoreSess
                 }
                 $node->nodeRow->save();
             }
-            $redir = '/dashboard/surv-' . $GLOBALS["SL"]->treeID 
+            $redir = '/dashboard/surv-' . $GLOBALS["SL"]->treeID
                 . '/xmlmap?all=1&refresh=1#n' . $node->nodeRow->node_id;
-            echo '<script type="text/javascript"> setTimeout("window.location=\'' 
+            echo '<script type="text/javascript"> setTimeout("window.location=\''
                 . $redir . '\'", 5); </script>';
             exit;
         }
-        $GLOBALS["SL"]->pageAJAX .= '$(".xmlDataChng").click(function(){ 
+        $GLOBALS["SL"]->pageAJAX .= '$(".xmlDataChng").click(function(){
             if (document.getElementById("xmlNodeTypeTbl").checked) {
-                $("#xmlDataTbl").slideDown("fast"); $("#xmlDataWrap").slideUp("fast"); 
+                $("#xmlDataTbl").slideDown("fast"); $("#xmlDataWrap").slideUp("fast");
             } else {
-                $("#xmlDataTbl").slideUp("fast"); $("#xmlDataWrap").slideDown("fast"); 
+                $("#xmlDataTbl").slideUp("fast"); $("#xmlDataWrap").slideDown("fast");
             }
         });';
         return view(
-            'vendor.survloop.admin.tree.node-edit-xmlmap', 
+            'vendor.survloop.admin.tree.node-edit-xmlmap',
             [
-                "canEditTree" => $this->canEditTree, 
-                "treeID"      => $this->treeID, 
-                "node"        => $node, 
+                "canEditTree" => $this->canEditTree,
+                "treeID"      => $this->treeID,
+                "node"        => $node,
                 "REQ"         => $GLOBALS["SL"]->REQ
             ]
         );
     }
-    
+
     protected function adminBasicPrintNode($tierNode = [], $tierDepth = 0)
     {
         $tierDepth++;
@@ -151,15 +151,15 @@ class TreeSurvAPI extends TreeCoreSess
                     }
                 }
                 return view(
-                    'vendor.survloop.admin.tree.node-print-core', 
+                    'vendor.survloop.admin.tree.node-print-core',
                     [
-                        "canEditTree"    => $this->canEditTree, 
-                        "REQ"            => $GLOBALS["SL"]->REQ, 
-                        "rootID"         => $this->rootID, 
-                        "nID"            => $tierNode[0], 
-                        "node"           => $this->allNodes[$tierNode[0]], 
-                        "tierNode"       => $tierNode, 
-                        "tierDepth"      => $tierDepth, 
+                        "canEditTree"    => $this->canEditTree,
+                        "REQ"            => $GLOBALS["SL"]->REQ,
+                        "rootID"         => $this->rootID,
+                        "nID"            => $tierNode[0],
+                        "node"           => $this->allNodes[$tierNode[0]],
+                        "tierNode"       => $tierNode,
+                        "tierDepth"      => $tierDepth,
                         "childrenPrints" => $childrenPrints
                     ]
                 )->render();
@@ -167,48 +167,48 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return '';
     }
-    
+
     public function adminPrintFullTree(Request $request)
     {
         $this->loadTree();
         $this->initExtra($request);
         $this->treeAdminNodeManip();
         $GLOBALS["SL"]->pageAJAX .= view(
-            'vendor.survloop.admin.tree.node-print-wrap-ajax', 
+            'vendor.survloop.admin.tree.node-print-wrap-ajax',
             [ "canEditTree" => $this->canEditTree ]
         )->render();
         return view(
-            'vendor.survloop.admin.tree.node-print-wrap', 
+            'vendor.survloop.admin.tree.node-print-wrap',
             [
-                "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1), 
+                "adminBasicPrint" => $this->adminBasicPrintNode($this->nodeTiers, -1),
                 "canEditTree"     => $this->canEditTree
             ]
         )->render();
     }
-    
+
     public function getNodeTblName($nID)
     {
-        if (isset($this->allNodes[$nID]) 
+        if (isset($this->allNodes[$nID])
             && isset($this->allNodes[$nID]->nodeRow->node_prompt_text)) {
             return trim($this->allNodes[$nID]->nodeRow->node_prompt_text);
         }
         return '';
     }
-    
+
     public function getNodeTblID($nID)
     {
-        if (isset($this->allNodes[$nID]) 
+        if (isset($this->allNodes[$nID])
             && isset($this->allNodes[$nID]->nodeRow->node_prompt_text)) {
             return intVal($this->allNodes[$nID]->nodeRow->node_prompt_notes);
         }
         return -3;
     }
-    
+
     protected function maxUserView()
     {
         return true;
     }
-    
+
     public function loadXmlMapTree(Request $request, $forceReload = false)
     {
         $this->survloopInit($request);
@@ -224,7 +224,7 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return true;
     }
-    
+
     private function copyXmlTreeCore()
     {
         $t = $GLOBALS["SL"]->treeRow;
@@ -236,7 +236,7 @@ class TreeSurvAPI extends TreeCoreSess
         $GLOBALS["SL"]->xmlTree["opts"] = intVal($t->tree_opts);
         return true;
     }
-    
+
     protected function getXmlTmpV($nID, $tblID = -3)
     {
         $v = [];
@@ -283,7 +283,7 @@ class TreeSurvAPI extends TreeCoreSess
                             $v["tblFldDefs"][$fld->fld_id][] = $def->def_value;
                         }
                     }
-                } elseif (trim($fld->fld_values) != '' 
+                } elseif (trim($fld->fld_values) != ''
                     && strpos($fld->fld_values, ';') !== false) {
                     $v["tblFldDefs"][$fld->fld_id] = explode(';', $fld->fld_values);
                 }
@@ -294,7 +294,7 @@ class TreeSurvAPI extends TreeCoreSess
         if ($v["tblID"] > 0 && sizeof($GLOBALS["SL"]->dataHelpers) > 0) {
             foreach ($GLOBALS["SL"]->dataHelpers as $helper) {
                 $hlpTbl = $GLOBALS["SL"]->tblI[$helper->data_help_table];
-                if ($v["tbl"] == $helper->data_help_parent_table 
+                if ($v["tbl"] == $helper->data_help_parent_table
                     && $helper->DataHelpValueField
                     && !in_array($hlpTbl, $v["tblHelp"])) {
                     $abbrLen = strlen($GLOBALS["SL"]->tblAbbr[$helper->data_help_table]);
@@ -313,7 +313,7 @@ class TreeSurvAPI extends TreeCoreSess
     {
         return true;
     }
-    
+
     public function genXmlSchema(Request $request)
     {
         $this->loadXmlMapTree($request);
@@ -324,7 +324,7 @@ class TreeSurvAPI extends TreeCoreSess
             return 'Sorry, access not permitted.';
         }
         $this->v["nestedNodes"] = $this->genXmlSchemaNode(
-            $this->xmlMapTree->rootID, 
+            $this->xmlMapTree->rootID,
             $this->xmlMapTree->nodeTiers
         );
         $view = view('vendor.survloop.admin.tree.xml-schema', $this->v)
@@ -332,7 +332,7 @@ class TreeSurvAPI extends TreeCoreSess
         return Response::make($view, '200')
             ->header('Content-Type', 'text/xml');
     }
-    
+
     public function genXmlSchemaNode($nID, $nodeTiers, $overV = [])
     {
         $v = [];
@@ -346,10 +346,10 @@ class TreeSurvAPI extends TreeCoreSess
             foreach ($v["tblHelp"] as $help) {
                 $nextV = $this->getXmlTmpV(-3, $help);
                 if (isset($v["tblHelpFld"][$help]->fld_name)) {
-                    $v["kids"] .= '<xs:element name="' 
+                    $v["kids"] .= '<xs:element name="'
                         . $nextV["tbl"] . '">
                         <xs:complexType mixed="true"><xs:sequence>
-                            <xs:element name="' 
+                            <xs:element name="'
                             . $v["tblHelpFld"][$help]->fld_name . '" />
                         </xs:sequence></xs:complexType>
                     </xs:element>' . "\n";
@@ -358,28 +358,28 @@ class TreeSurvAPI extends TreeCoreSess
         }
         for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
             $v["kids"] .= $this->genXmlSchemaNode(
-                $nodeTiers[1][$i][0], 
+                $nodeTiers[1][$i][0],
                 $nodeTiers[1][$i]
             );
         }
         return view(
-            'vendor.survloop.admin.tree.xml-schema-node', 
+            'vendor.survloop.admin.tree.xml-schema-node',
             $v
         )->render();
     }
-    
+
     public function genXmlReport(Request $request)
     {
         if (!isset($GLOBALS["SL"]->xmlTree["coreTbl"])) {
             return $this->redir('/xml-schema');
         }
-        if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]]) 
+        if (!isset($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])
             || empty($this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]])) {
             return $this->redir('/xml-schema');
         }
         $this->v["nestedNodes"] = $this->genXmlReportNode(
-            $this->xmlMapTree->rootID, 
-            $this->xmlMapTree->nodeTiers, 
+            $this->xmlMapTree->rootID,
+            $this->xmlMapTree->nodeTiers,
             $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]
         );
         if (trim($this->v["nestedNodes"]) == '') {
@@ -388,7 +388,7 @@ class TreeSurvAPI extends TreeCoreSess
         $view = view('vendor.survloop.admin.tree.xml-report', $this->v)->render();
         return Response::make($view, '200')->header('Content-Type', 'text/xml');
     }
-    
+
     public function genXmlReportNode($nID, $nodeTiers, $rec, $overV = [])
     {
         $v = [];
@@ -402,11 +402,11 @@ class TreeSurvAPI extends TreeCoreSess
         $v["recFlds"] = [];
         if (sizeof($v["tblFlds"]) > 0) {
             foreach ($v["tblFlds"] as $i => $fld) {
-                //if (!$this->checkValEmpty($fld->fld_type, 
+                //if (!$this->checkValEmpty($fld->fld_type,
                 //    $rec->{ $v["tblAbbr"] . $fld->fld_name })) {
                 $v["recFlds"][$fld->fld_id] = $this->genXmlFormatVal(
-                    $rec, 
-                    $fld, 
+                    $rec,
+                    $fld,
                     $v["tblAbbr"]
                 );
                 //}
@@ -421,8 +421,8 @@ class TreeSurvAPI extends TreeCoreSess
         for ($i = 0; $i < sizeof($nodeTiers[1]); $i++) {
             $tbl2 = $this->xmlMapTree->getNodeTblName($nodeTiers[1][$i][0]);
             $kidRows = $this->sessData->getChildRows(
-                $v["tbl"], 
-                $rec->getKey(), 
+                $v["tbl"],
+                $rec->getKey(),
                 $tbl2
             );
             if ($kidRows && sizeof($kidRows) > 0) {
@@ -432,8 +432,8 @@ class TreeSurvAPI extends TreeCoreSess
                 }
                 foreach ($kidRows as $j => $kid) {
                     $v["kids"] .= $this->genXmlReportNode(
-                        $nodeTiers[1][$i][0], 
-                        $nodeTiers[1][$i], 
+                        $nodeTiers[1][$i][0],
+                        $nodeTiers[1][$i],
                         $kid
                     );
                 }
@@ -444,32 +444,32 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return view('vendor.survloop.admin.tree.xml-report-node', $v)->render();
     }
-    
+
     protected function genXmlReportNodeAddKidTbls(&$v, $help)
     {
         $nextV = $this->getXmlTmpV(-3, $help);
         $kidRows = $this->sessData->getChildRows(
-            $v["tbl"], 
-            $rec->getKey(), 
+            $v["tbl"],
+            $rec->getKey(),
             $nextV["tbl"]
         );
         if ($kidRows && sizeof($kidRows) > 0) {
-            if (intVal($nextV["tblID"]) > 0 
+            if (intVal($nextV["tblID"]) > 0
                 && $nextV["tblOpts"]%5 > 0) {
                 $v["kids"] .= '<' . $nextV["tbl"] . '>' . "\n";
             }
             foreach ($kidRows as $j => $kid) {
                 if (isset($v["tblHelpFld"][$help]->fld_name)) {
-                    //if (!$this->checkValEmpty($kid, 
-                    //    $rec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]] 
+                    //if (!$this->checkValEmpty($kid,
+                    //    $rec->{ $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]]
                     //        . $v["tblHelpFld"][$help] })) {
                     $val = $this->genXmlFormatVal(
-                        $kid, 
-                        $v["tblHelpFld"][$help], 
+                        $kid,
+                        $v["tblHelpFld"][$help],
                         $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]]
                     );
-                    $v["kids"] .= '<' . $v["tblHelpFld"][$help]->fld_name 
-                        . '>' . $val . '</' 
+                    $v["kids"] .= '<' . $v["tblHelpFld"][$help]->fld_name
+                        . '>' . $val . '</'
                         . $v["tblHelpFld"][$help]->fld_name . '>' . "\n";
                     //}
                 }
@@ -480,15 +480,15 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return true;
     }
-    
+
     // FldOpts %1 XML Public Data; %7 XML Private Data; %11 XML Sensitive Data; %13 XML Internal Use Data
     public function checkViewDataPerms($fld)
     {
-        if ($fld 
-            && isset($fld->fld_opts) 
+        if ($fld
+            && isset($fld->fld_opts)
             && intVal($fld->fld_opts) > 0) {
-            if ($fld->fld_opts%7 > 0 
-                && $fld->fld_opts%11 > 0 
+            if ($fld->fld_opts%7 > 0
+                && $fld->fld_opts%11 > 0
                 && $fld->fld_opts%13 > 0) {
                 return true;
             }
@@ -504,12 +504,12 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return false;
     }
-    
+
     public function checkFldDataPerms($fld)
     {
         if ($fld && isset($fld->fld_opts) && intVal($fld->fld_opts) > 0) {
-            if ($fld->fld_opts%7 > 0 
-                && $fld->fld_opts%11 > 0 
+            if ($fld->fld_opts%7 > 0
+                && $fld->fld_opts%11 > 0
                 && $fld->fld_opts%13 > 0) {
                 return true;
             }
@@ -523,19 +523,19 @@ class TreeSurvAPI extends TreeCoreSess
             }
             if ($fld->fld_opts%7 == 0) {
                 return in_array(
-                    $GLOBALS["SL"]->dataPerms, 
+                    $GLOBALS["SL"]->dataPerms,
                     [ 'private', 'sensitive' ]
                 );
             }
         }
         return false;
     }
-    
+
     protected function genXmlFormatValCustomPerms($rec, $fld, $abbr)
     {
         return false;
     }
-    
+
     public function genXmlFormatVal($rec, $fld, $abbr)
     {
         $val = false;
@@ -543,13 +543,13 @@ class TreeSurvAPI extends TreeCoreSess
 //if ($apiFld->fld->fld_name == 'summary') { echo 'fld:table: ' . $apiFld->fld->fld_table . ', fldTbl: ' . $fldTbl . ', fldTblAbbr: ' . $fldTblAbbr . ', fldName: ' . $fldName . ', val: ' . $val . ', id: ' . $id . ',<pre>'; print_r($this->sessData->getChildRows($tbl, $id, $fldTbl)); print_r($rec); echo '</pre>'; }
         if (isset($rec->{ $abbr . $fld->fld_name })
             && ($this->genXmlFormatValCustomPerms($rec, $fld, $abbr)
-                || ($this->checkFldDataPerms($fld) 
+                || ($this->checkFldDataPerms($fld)
                     && $this->checkViewDataPerms($fld)))) {
             $val = $rec->{ $abbr . $fld->fld_name };
             if (strpos($fld->fld_values, 'Def::') !== false) {
                 if (intVal($val) > 0) {
                     $val = $GLOBALS["SL"]->def->getVal(
-                        str_replace('Def::', '', $fld->fld_values), 
+                        str_replace('Def::', '', $fld->fld_values),
                         $val
                     );
                 } else {
@@ -565,7 +565,7 @@ class TreeSurvAPI extends TreeCoreSess
                         $val = false;
                     }
                 } elseif ($fld->fld_type == 'DATETIME') {
-                    if ($val == '0000-00-00 00:00:00' 
+                    if ($val == '0000-00-00 00:00:00'
                         || $val == '1970-01-01 00:00:00') {
                         return '';
                     }
@@ -584,24 +584,24 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return $val;
     }
-    
+
     public function checkValEmpty($fldType, $val)
     {
         $val = trim($val);
-        if ($fldType == 'DATE' 
-            && ($val == '' 
-                || $val == '0000-00-00' 
+        if ($fldType == 'DATE'
+            && ($val == ''
+                || $val == '0000-00-00'
                 || $val == '1970-01-01')) {
             return true;
-        } elseif ($fldType == 'DATETIME' 
-            && ($val == '' 
-                || $val == '0000-00-00 00:00:00' 
+        } elseif ($fldType == 'DATETIME'
+            && ($val == ''
+                || $val == '0000-00-00 00:00:00'
                 || $val == '1970-01-01 00:00:00')) {
             return true;
         }
         return false;
     }
-    
+
     public function chkRecsPub(Request $request, $treeID = 1)
     {
         if ($treeID <= 0) {
@@ -641,14 +641,14 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return false;
     }
-    
+
     public function genRecDump($coreID, $loadTree = true)
     {
         $coreTbl = $GLOBALS["SL"]->coreTbl;
         if ($loadTree) {
             $this->loadXmlMapTree($GLOBALS["SL"]->REQ, true);
         }
-        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl 
+        if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl
             && $GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SEARCH > 0) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
         } else { // XML core table is different from main tree
@@ -661,8 +661,8 @@ class TreeSurvAPI extends TreeCoreSess
             return false;
         }
         $dump = $this->genRecDumpNode(
-                $this->xmlMapTree->rootID, 
-                $this->xmlMapTree->nodeTiers, 
+                $this->xmlMapTree->rootID,
+                $this->xmlMapTree->nodeTiers,
                 $this->sessData->dataSets[$GLOBALS["SL"]->xmlTree["coreTbl"]][0]
             ) . $this->genRecDumpXtra();
         $dump = str_replace('  ', ' ', trim($dump));
@@ -693,7 +693,7 @@ class TreeSurvAPI extends TreeCoreSess
         }
         return $dumpRec;
     }
-    
+
     public function genRecDumpNode($nID, $nodeTiers, $rec, $overV = [])
     {
         $ret = '';
@@ -711,8 +711,8 @@ class TreeSurvAPI extends TreeCoreSess
                     foreach ($kidRows as $j => $kid) {
                         $abbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->tbl[$help]];
                         $ret .= ' ' . $this->genXmlFormatVal(
-                                $kid, 
-                                $v["tblHelpFld"][$help], 
+                                $kid,
+                                $v["tblHelpFld"][$help],
                                 $abbr
                             );
                     }
@@ -727,8 +727,8 @@ class TreeSurvAPI extends TreeCoreSess
                 $nextV = $this->getXmlTmpV($nodeTiers[1][$i][0]);
                 foreach ($kidRows as $j => $kid) {
                     $ret .= ' ' . $this->genRecDumpNode(
-                            $nodeTiers[1][$i][0], 
-                            $nodeTiers[1][$i], 
+                            $nodeTiers[1][$i][0],
+                            $nodeTiers[1][$i],
                             $kid
                         );
                 }

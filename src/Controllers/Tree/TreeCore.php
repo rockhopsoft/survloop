@@ -21,20 +21,20 @@ class TreeCore extends SurvloopController
     public $treeSize           = 0;
     public $tree               = [];
     public $branches           = [];
-    
+
     public $rootID             = false;
     public $allNodes           = [];
     public $nodeTiers          = [];
     public $nodesRawOrder      = [];
     public $nodesRawIndex      = [];
     protected $currNodeSubTier = [];
-    
+
     public $sessData           = [];
     public $stats              = [];
-    
+
     protected $REQ             = [];
     protected $tmp             = [];
-    
+
     protected function loadNode($nodeRow = NULL)
     {
         if ($nodeRow && isset($nodeRow->node_id) && $nodeRow->node_id > 0) {
@@ -44,12 +44,12 @@ class TreeCore extends SurvloopController
         $newNode->nodeRow->node_tree = $this->treeID;
         return $newNode;
     }
-    
+
     protected function hasNode($nID = -3)
     {
         return ( $nID > 0 && isset($this->allNodes[$nID]) );
     }
-    
+
     /**
      * Override current page as represented in the admin menu.
      *
@@ -59,7 +59,7 @@ class TreeCore extends SurvloopController
     {
         return '';
     }
-    
+
     protected function loadTreeStart($treeIn = -3, Request $request = NULL)
     {
         if ($treeIn > 0) {
@@ -75,7 +75,7 @@ class TreeCore extends SurvloopController
         }
         return $this->treeID;
     }
-    
+
     public function loadTree($treeIn = -3, Request $request = NULL, $loadFull = false)
     {
         $this->loadTreeStart($treeIn, $request);
@@ -99,28 +99,28 @@ class TreeCore extends SurvloopController
         $this->loadAllSessData();
         return true;
     }
-    
+
     public function loadAllSessData($coreTbl = '', $coreID = -3)
     {
     }
-    
+
     public function loadNodeTiersCache()
     {
         $cache = '';
         $this->loadNodeTiers();
         if ($this->rootID > 0) {
-            $cache .= '$'.'this->nodesRawOrder = [' 
-                . implode(', ', $this->nodesRawOrder) 
+            $cache .= '$'.'this->nodesRawOrder = ['
+                . implode(', ', $this->nodesRawOrder)
                 . '];' . "\n" . '$'.'this->nodesRawIndex = [';
             foreach ($this->nodesRawIndex as $node => $ind) {
                 $cache .= $node . ' => ' . $ind . ', ';
             }
-            $cache .= '];' . "\n" . '$'.'this->nodeTiers = ' 
+            $cache .= '];' . "\n" . '$'.'this->nodeTiers = '
                 . $this->loadNodeTiersCacheInner($this->nodeTiers) . ';' . "\n";
         }
         return $cache;
     }
-    
+
     public function loadNodeTiersCacheInner($tier)
     {
         $cache = '[' . $tier[0] . ', [';
@@ -134,25 +134,25 @@ class TreeCore extends SurvloopController
         }
         return $cache . ']]';
     }
-    
+
     protected function loadNodeTiers()
     {
         $this->nodeTiers = $this->nodesRawOrder = $this->nodesRawIndex = [];
         if ($this->rootID > 0) {
             $this->nodeTiers = [
-                $this->rootID, 
+                $this->rootID,
                 $this->loadNodeTiersInner($this->rootID)
             ];
             $this->loadRawOrder($this->nodeTiers);
         }
         return true;
     }
-    
+
     protected function loadNodeTiersInner($nodeID = -3, $tierNest = [])
     {
-        
+
         /// THE XML TREE IS JUST BROKEN :( No parent id 755
-        
+
         $innerArr = $tmpArr = [];
         if ($nodeID > 0 && sizeof($this->allNodes) > 0) {
             foreach ($this->allNodes as $nID => $node) {
@@ -168,14 +168,14 @@ class TreeCore extends SurvloopController
                 $tmpTierNest[sizeof($tierNest)] = sizeof($innerArr);
                 $this->allNodes[$nID]->nodeTierPath = $tmpTierNest;
                 $innerArr[] = [
-                    $nID, 
+                    $nID,
                     $this->loadNodeTiersInner($nID, $tmpTierNest)
                 ];
             }
         }
         return $innerArr;
     }
-    
+
     protected function loadSubTierFromPath($nodeTierPath = [])
     {
         $subTier = $this->nodeTiers;
@@ -186,7 +186,7 @@ class TreeCore extends SurvloopController
         }
         return $subTier;
     }
-    
+
     protected function loadNodeSubTier($nID = -3)
     {
         if ($this->hasNode($nID)) {
@@ -194,7 +194,7 @@ class TreeCore extends SurvloopController
         }
         return [];
     }
-    
+
     // Cache tree's standard Pre-Order Traversal
     protected function loadRawOrder($tmpSubTier)
     {
@@ -226,7 +226,7 @@ class TreeCore extends SurvloopController
         $prevNodeID = $this->nodesRawOrder[$prevNodeInd];
         return $prevNodeID;
     }
-    
+
     // Locate next node in standard Pre-Order Traversal
     public function nextNode($nID)
     {
@@ -246,7 +246,7 @@ class TreeCore extends SurvloopController
         $nextNodeID = $this->nodesRawOrder[$nextNodeInd];
         return $nextNodeID;
     }
-    
+
     protected function runCurrNode($nID)
     {
         return true;
@@ -273,16 +273,16 @@ class TreeCore extends SurvloopController
         }
         return $this->nextNodeSibling($this->allNodes[$nID]->parentID);
     }
-    
+
     protected function treeAdminNodeManip()
     {
-        if ($GLOBALS["SL"]->REQ->has('manip') 
-            && $GLOBALS["SL"]->REQ->has('moveNode') 
-            && $GLOBALS["SL"]->REQ->has('moveToParent') 
+        if ($GLOBALS["SL"]->REQ->has('manip')
+            && $GLOBALS["SL"]->REQ->has('moveNode')
+            && $GLOBALS["SL"]->REQ->has('moveToParent')
             && $GLOBALS["SL"]->REQ->has('moveToOrder')
-            && $GLOBALS["SL"]->REQ->moveNode > 0 
-            && $GLOBALS["SL"]->REQ->moveToParent > 0 
-            && $GLOBALS["SL"]->REQ->moveToOrder >= 0 
+            && $GLOBALS["SL"]->REQ->moveNode > 0
+            && $GLOBALS["SL"]->REQ->moveToParent > 0
+            && $GLOBALS["SL"]->REQ->moveToOrder >= 0
             && isset($this->allNodes[$GLOBALS["SL"]->REQ->moveNode])) {
             $node = $this->allNodes[$GLOBALS["SL"]->REQ->moveNode];
             $node->fillNodeRow();
@@ -300,7 +300,7 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
+
     protected function treeAdminNodeNew($node)
     {
         $parentID = $GLOBALS["SL"]->REQ->input('nodeParentID');
@@ -314,7 +314,7 @@ class TreeCore extends SurvloopController
             if ($endNode) {
                 $node->nodeRow->node_parent_order = 1+$endNode->nodeParentOrder;
             }
-        } elseif ($GLOBALS["SL"]->REQ->input('orderBefore') > 0 
+        } elseif ($GLOBALS["SL"]->REQ->input('orderBefore') > 0
             || $GLOBALS["SL"]->REQ->input('orderAfter') > 0) {
             $foundSibling = false;
             $sibs = SLNode::where('node_parent_id', $parentID)
@@ -323,8 +323,8 @@ class TreeCore extends SurvloopController
                 ->get();
             if ($sibs->isNotEmpty()) {
                 foreach ($sibs as $sib) {
-                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->orderBefore)) { 
-                        $node->nodeRow->node_parent_order = $sib->node_parent_order; 
+                    if ($sib->node_id == intVal($GLOBALS["SL"]->REQ->orderBefore)) {
+                        $node->nodeRow->node_parent_order = $sib->node_parent_order;
                         $foundSibling = true;
                     }
                     if ($foundSibling) {
@@ -342,7 +342,7 @@ class TreeCore extends SurvloopController
         $node->nodeRow->save();
         return $node;
     }
-    
+
     protected function treeAdminNodeDelete($nID)
     {
         if (intVal($nID) > 0 && isset($this->allNodes[$nID])) {
@@ -354,7 +354,7 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
+
     public function rawOrderPercent($nID)
     {
         if (!isset($this->allNodes[$nID]) || sizeof($this->nodeTiers) < 2) {
@@ -378,7 +378,7 @@ class TreeCore extends SurvloopController
         $found = ($this->v["percCalc"]["nID"] <= 0);
         return $this->rawOrderPercentTweak($nID, $rawPerc, $found);
     }
-    
+
     // Locate next node in standard Pre-Order Traversal
     protected function rawOrderPercNextNode($nID, $tiers = [])
     {
@@ -400,14 +400,14 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
+
     public function getTreeNodeDropdownAll($preSel = 0)
     {
         $GLOBALS["SL"]->x["nodeDropdownOpts"] = '';
         if (sizeof($this->nodesRawOrder) > 0) {
             foreach ($this->nodesRawOrder as $ind => $nID) {
                 if (isset($this->allNodes[$nID])) {
-                    $GLOBALS["SL"]->x["nodeDropdownOpts"] .= '<option value="' 
+                    $GLOBALS["SL"]->x["nodeDropdownOpts"] .= '<option value="'
                         . $nID . '"' . (($preSel == $nID) ? 'SELECTED' : '') . '>'
                         . $nID . ((isset($this->allNodes[$nID]->dataStore))
                             ? ' ' . $this->allNodes[$nID]->dataStore
@@ -417,7 +417,7 @@ class TreeCore extends SurvloopController
         }
         return $GLOBALS["SL"]->x["nodeDropdownOpts"];
     }
-    
+
     public function getTreeNodeDropdown($nID, $tiers = [])
     {
         if ($this->v["percCalc"]["nID"] == $nID) {
@@ -435,8 +435,8 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
-    
+
+
     /*****************
     // to be overridden by extensions of this class...
     *****************/
@@ -454,17 +454,17 @@ class TreeCore extends SurvloopController
     {
         return true;
     }
-    
+
     protected function movePrevOverride($nID)
     {
         return -3;
     }
-    
+
     protected function moveNextOverride($nID)
     {
         return -3;
     }
-    
+
     protected function isDisplayableNode($nID)
     {
         if (!$this->hasNode($nID)) {
@@ -472,25 +472,25 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
+
     // Updates currNode after running checking if this is a branch node
     public function updateCurrNodeNB($newCurrNode = -3, $direction = 'next')
     {
         $new = $this->getNextNonBranch($newCurrNode, $direction);
-        /* if ($new == -37 
-            && $GLOBALS["SL"]->treeRow->tree_opts%5 == 0 
+        /* if ($new == -37
+            && $GLOBALS["SL"]->treeRow->tree_opts%5 == 0
             && $new == $this->currNode()) {
             $this->leavingTheLoop('', true);
             return $GLOBALS["SL"]->treeRow->tree_root;
         } */
         return $this->updateCurrNode($new);
     }
-    
+
     public function getNextNonBranch($nID, $direction = 'next')
     {
         return $nID;
     }
-    
+
     public function getPrevOfType($nID, $type = 'Page')
     {
         if (isset($this->nodesRawIndex[$nID]) && isset($this->allNodes[$nID])) {
@@ -509,12 +509,12 @@ class TreeCore extends SurvloopController
         }
         return -3;
     }
-    
+
     protected function leavingTheLoop($name = '', $justClearID = false)
     {
         return true;
     }
-    
+
     // Updates currNode without checking if this is a branch node
     public function updateCurrNode($nID = -3)
     {
@@ -526,7 +526,7 @@ class TreeCore extends SurvloopController
                 $this->sessInfo->sess_curr_node = $nID;
                 $this->sessInfo->save();
                 $coreTbl = $GLOBALS["SL"]->coreTbl;
-                if ($GLOBALS["SL"]->coreTblAbbr() != '' 
+                if ($GLOBALS["SL"]->coreTblAbbr() != ''
                     && isset($this->sessData->dataSets[$coreTbl])) {
                     $prog = $GLOBALS["SL"]->coreTblAbbr() . 'submission_progress';
                     $this->sessData->currSessDataTblFld($nID, $coreTbl, $prog, 'update', $nID);
@@ -537,12 +537,12 @@ class TreeCore extends SurvloopController
         }
         return true;
     }
-    
+
     protected function jumpToNodeCustom($nID)
     {
         return -3;
     }
-    
+
     protected function jumpToNode($nID)
     {
         $newID = $this->jumpToNodeCustom($nID);
@@ -553,44 +553,44 @@ class TreeCore extends SurvloopController
         }
         return $newID;
     }
-    
+
     protected function nodePrintJumpToCustom($nID = -3)
     {
         return -3;
     }
-    
+
     protected function nodePrintJumpTo($nID = -3)
     {
         $jumpID = $this->nodePrintJumpToCustom($nID);
         if ($jumpID <= 0) {
-            if ($this->hasREQ 
-                && $GLOBALS["SL"]->REQ->has('afterJumpTo') 
+            if ($this->hasREQ
+                && $GLOBALS["SL"]->REQ->has('afterJumpTo')
                 && intVal($GLOBALS["SL"]->REQ->afterJumpTo) > 0) {
                 $jumpID = intVal($GLOBALS["SL"]->REQ->afterJumpTo);
-            } elseif (isset($this->sessInfo->sess_after_jump_to) 
+            } elseif (isset($this->sessInfo->sess_after_jump_to)
                 && intVal($this->sessInfo->sess_after_jump_to) > 0) {
-                $jumpID = $this->sessInfo->sess_after_jump_to; 
+                $jumpID = $this->sessInfo->sess_after_jump_to;
                 $this->sessInfo->sess_after_jump_to = -3; // reset this after using it
                 $this->sessInfo->save();
             }
         }
         return $jumpID;
     }
-    
+
     public function currNodeURL($nID = -3)
     {
         return '';
     }
-    
+
     public function currNode()
     {
-        if (!isset($GLOBALS["SL"]->formTree->tree_id) 
+        if (!isset($GLOBALS["SL"]->formTree->tree_id)
             && isset($this->sessInfo->sess_curr_node)) {
             return intVal($this->sessInfo->sess_curr_node);
         }
         return $GLOBALS["SL"]->treeRow->tree_root;
     }
-    
+
     protected function getParentsAncestry($nID)
     {
         $this->v["ancestors"] = [];
@@ -604,16 +604,16 @@ class TreeCore extends SurvloopController
         }
         return $this->v["ancestors"];
     }
-    
+
     protected function loadAncestry($nID)
     {
         $this->getParentsAncestry($nID);
         return $this->loadAncestXtnd($nID);
     }
-    
+
     protected function loadAncestXtnd($nID)
     {
         return true;
     }
-    
+
 }

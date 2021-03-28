@@ -28,7 +28,7 @@ class GlobalsMicroTime
     public function printMicroLog()
     {
         return view(
-            'vendor.survloop.elements.inc-var-dump-microtime', 
+            'vendor.survloop.elements.inc-var-dump-microtime',
             [ "log" => $this->log ]
         )->render();
     }

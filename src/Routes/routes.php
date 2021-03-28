@@ -18,25 +18,20 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+
+// If running on a system with the Laravel Debugbar,
+// then un-commenting this line will [temporarily] disable it.
+//  \Debugbar::disable();
+
 use RockHopSoft\Survloop\Controllers\Globals\GlobalsMicroTime;
 $GLOBALS["SL-Micro"] = new GlobalsMicroTime;
 
-Route::group(['middleware' => ['web']], function () {
+Route::middleware(['web'])->group(function () {
 
-    $path = 'RockHopSoft\\Survloop\\Controllers\\';
-    
+    require_once('routes-auth.php');
+
     require_once('routes-core.php');
 
     require_once('routes-tree.php');
-
-    require_once('routes-admin.php');
-
-    require_once('routes-admin-db.php');
-
-    require_once('routes-admin-tree.php');
-
-    require_once('routes-admin-slug.php');
-
-    require_once('routes-slug.php');
 
 });

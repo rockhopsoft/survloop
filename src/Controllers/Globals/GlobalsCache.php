@@ -1,6 +1,6 @@
 <?php
 /**
-  * GlobalsCache is a mid-level class for optimizing content, 
+  * GlobalsCache is a mid-level class for optimizing content,
   * mostly HTML, JS, and CSS.
   *
   * Survloop - All Our Data Are Belong
@@ -18,15 +18,6 @@ use App\Models\SLTree;
 
 class GlobalsCache extends GlobalsBasic
 {
-
-    public function cleanCacheKey($key)
-    {
-        $key = str_replace('&refresh=1',  '',  $key);
-        $key = str_replace('?refresh=1&', '?', $key);
-        $key = str_replace('?refresh=1',  '',  $key);
-        $key = str_replace('&state=&states=',  '&states=',  $key);
-        return $key;
-    }
 
     public function getCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
@@ -64,8 +55,8 @@ class GlobalsCache extends GlobalsBasic
 
     public function chkCacheType($type = '')
     {
-        if ($type == '' 
-            && isset($this->treeRow) 
+        if ($type == ''
+            && isset($this->treeRow)
             && isset($this->treeRow->tree_type)) {
             $type = strtolower($this->treeRow->tree_type);
         }
@@ -89,6 +80,15 @@ class GlobalsCache extends GlobalsBasic
     public function chkCachePage($key = '', $treeID = 0, $coreID = 0)
     {
         return $this->chkCache($key, 'page', $treeID, $coreID);
+    }
+
+    public function cleanCacheKey($key)
+    {
+        $key = str_replace('&refresh=1',  '',  $key);
+        $key = str_replace('?refresh=1&', '?', $key);
+        $key = str_replace('?refresh=1',  '',  $key);
+        $key = str_replace('&state=&states=',  '&states=',  $key);
+        return $key;
     }
 
     public function forgetCache($key = '', $type = '', $treeID = 0, $coreID = 0)
@@ -200,12 +200,12 @@ class GlobalsCache extends GlobalsBasic
         } elseif ($treeID > 0) {
             $treeRow = SLTree::find($treeID);
         }
-        if (isset($treeRow->tree_type) 
-            && $treeRow->tree_type == 'Page' 
+        if (isset($treeRow->tree_type)
+            && $treeRow->tree_type == 'Page'
             && $treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0) {
             $file .= '-s' . session()->get('slSessID');
         }
-        $fileDeets = '-' . str_replace('.html', '', str_replace('?', '_', 
+        $fileDeets = '-' . str_replace('.html', '', str_replace('?', '_',
             str_replace('&', '_', str_replace('/', '_', $key))));
         if (strlen($fileDeets) > 60) {
             $fileDeets = substr($fileDeets, 0, 60);
@@ -277,28 +277,28 @@ class GlobalsCache extends GlobalsBasic
         $this->addAjaxKeySffx($sffx);
         return $this->putCache($GLOBALS["SL"]->v["cacheKey"], $content, 'ajax');
     }
-    
+
     public function opnAjax()
     {
         return '<script type="text/javascript"> $(document).ready(function(){ ';
     }
-    
+
     public function clsAjax()
     {
         return ' }); </script>';
     }
-    
+
     public function spinner($center = true)
     {
-        $ret = ((isset($this->sysOpts["spinner-code"])) 
+        $ret = ((isset($this->sysOpts["spinner-code"]))
             ? $this->sysOpts["spinner-code"] : '<b>...</b>');
         if ($center) {
-            return '<div class="w100 pT15 pB15"><center>' 
+            return '<div class="w100 pT15 pB15"><center>'
                 . $ret . '</center></div>';
         }
         return $ret;
     }
-    
+
     public function pausePageScriptCollection()
     {
         $this->x["pageSCRIPTS"] = $this->pageSCRIPTS;
@@ -320,7 +320,7 @@ class GlobalsCache extends GlobalsBasic
         unset($this->x["pageCSS"]);
         return true;
     }
-    
+
     public function extractJava($str = '', $nID = -3, $destroy = false)
     {
         if (trim($str) == '') {
@@ -335,17 +335,17 @@ class GlobalsCache extends GlobalsBasic
             $cnt++;
             $tagMeat = '';
             $tag1end = strpos($str, '>', $tag1start);
-            if ($tag1end !== false 
-                && substr($str, $tag1start, 21) 
+            if ($tag1end !== false
+                && substr($str, $tag1start, 21)
                     != '<script id="noExtract') {
                 $tag2 = strpos($str, '</script>', $tag1end);
                 if ($tag2 !== false) {
                     $tagMeat = substr(
-                        $str, 
-                        ($tag1end+1), 
+                        $str,
+                        ($tag1end+1),
                         ($tag2-$tag1end-1)
                     );
-                    $str = substr($str, 0, $tag1start) 
+                    $str = substr($str, 0, $tag1start)
                         . substr($str, ($tag2+9));
                 }
             }
@@ -362,7 +362,7 @@ class GlobalsCache extends GlobalsBasic
         }
         return $str;
     }
-    
+
     public function extractStyle($str = '', $nID = -3, $destroy = false)
     {
         if (trim($str) == '') {
@@ -375,17 +375,17 @@ class GlobalsCache extends GlobalsBasic
         while ($tag1start !== false) {
             $tagMeat = '';
             $tag1end = strpos($str, '>', $tag1start);
-            if ($tag1end !== false 
-                && substr($str, $tag1start, 20) 
+            if ($tag1end !== false
+                && substr($str, $tag1start, 20)
                     != '<style id="noExtract') {
                 $tag2 = strpos($str, '</style>', $tag1end);
                 if ($tag2 !== false) {
                     $tagMeat = substr(
-                        $str, 
-                        ($tag1end+1), 
+                        $str,
+                        ($tag1end+1),
                         ($tag2-$tag1end-1)
                     );
-                    $str = substr($str, 0, $tag1start) 
+                    $str = substr($str, 0, $tag1start)
                         . substr($str, ($tag2+8));
                 }
             }
@@ -404,29 +404,29 @@ class GlobalsCache extends GlobalsBasic
         }
         return $str;
     }
-    
+
     public function wrapScriptMeat($tagMeat = '', $nID = 0)
     {
         if (trim($tagMeat) != '') {
             if ($nID <= 0) {
                 return $tagMeat;
             }
-            return ' /* start extract from node ' . $nID . ': */ ' 
-                . $tagMeat 
-                . '/* end extract from node ' . $nID . ': */ ';
+            return ' /* start extract from node ' . $nID . ' ... */ '
+                . $tagMeat
+                . '/* ... end extract from node ' . $nID . ' */ ';
         }
         return '';
     }
-    
+
     public function pullPageJsCss($content = '', $coreID = 0)
     {
-        if (isset($this->x["pageCacheLoaded"]) 
+        if (isset($this->x["pageCacheLoaded"])
             && $this->x["pageCacheLoaded"]) {
             return $content;
         }
         $minPath = '../storage/app/' . $this->cachePath;
         $fileCss = date("Ymd") . '-t' . $this->treeID;
-        if ($this->treeRow->tree_type == 'Page' 
+        if ($this->treeRow->tree_type == 'Page'
             && $this->treeRow->tree_opts%Globals::TREEOPT_NOCACHE == 0) {
             $fileCss .= '-s' . session()->get('slSessID');
         }
@@ -445,18 +445,18 @@ class GlobalsCache extends GlobalsBasic
                 if ($this->REQ->has('ajax')) {
                     $scriptID .= 'Ajax';
                 }
-                $this->pageSCRIPTS .= '<link id="' . $scriptID 
-                    . '" rel="stylesheet" href="/sys/dyna/' 
+                $this->pageSCRIPTS .= '<link id="' . $scriptID
+                    . '" rel="stylesheet" href="/sys/dyna/'
                     . $fileMin . '">' . "\n";
             }
         }
-        
+
         $fileJs = str_replace('.css', '.js', $fileCss);
         $content = $this->extractJava($content, 0);
         $java = $this->pageJAVA . $this->getXtraJs();
-        if (trim($this->pageAJAX) != '' 
+        if (trim($this->pageAJAX) != ''
             && trim($this->pageAJAX) != '/* */') {
-            $java .= ' $(document).ready(function(){ ' 
+            $java .= ' $(document).ready(function(){ '
                 . $this->pageAJAX . ' }); ';
         }
         if (trim($java) != '' && trim($java) != '/* */') {
@@ -472,8 +472,8 @@ class GlobalsCache extends GlobalsBasic
                 if ($this->REQ->has('ajax')) {
                     $scriptID .= 'Ajax';
                 }
-                $this->pageSCRIPTS .= "\n" . '<script id="' . $scriptID 
-                    . '" type="text/javascript" src="/sys/dyna/' 
+                $this->pageSCRIPTS .= "\n" . '<script id="' . $scriptID
+                    . '" type="text/javascript" src="/sys/dyna/'
                     . $fileMin . '"></script>' . "\n";
             }
         }
@@ -485,7 +485,7 @@ class GlobalsCache extends GlobalsBasic
     public function getCachePageJs($filename = '')
     {
         if (!Storage::has($this->cachePath . '/js/' . $filename)) {
-            return '<!-- not found ' . $this->cachePath 
+            return '<!-- not found ' . $this->cachePath
                 . '/js/' . $filename . ' -->';
         }
         return trim(Storage::get($this->cachePath . '/js/' . $filename));
@@ -516,7 +516,7 @@ class GlobalsCache extends GlobalsBasic
                     if ($cnt < 5000) {
                         $delete = true;
                         $filenameParts = $this->mexplode('-', $file);
-                        if (isset($filenameParts[0]) 
+                        if (isset($filenameParts[0])
                             && in_array($filenameParts[0], $safeDates)) {
                             $delete = false;
                         }
@@ -556,9 +556,12 @@ class GlobalsCache extends GlobalsBasic
         if (isset($this->dataPerms) && $this->dataPerms != '') {
             $sffx .= '-p_' . $this->dataPerms;
         }
+        if ($this->isMobile()) {
+            $sffx .= '-mobile';
+        }
         return $sffx;
     }
-    
+
     public function deferStaticNodePrint($nID, $content = '', $coreID = 0, $js = '', $ajax = '', $css = '')
     {
         if (!isset($this->x["deferCnt"])) {
@@ -569,8 +572,8 @@ class GlobalsCache extends GlobalsBasic
         }
         $this->x["deferCnt"]++;
         $rand = rand(100000000, 1000000000);
-        $file = $this->cachePath . '/html/' . date("Ymd") 
-            . '-t' . $this->treeID . '-c' . $coreID . '-n' . $nID 
+        $file = $this->cachePath . '/html/' . date("Ymd")
+            . '-t' . $this->treeID . '-c' . $coreID . '-n' . $nID
             . '-r' . $rand . '.html';
         if (trim($js) != '' || trim($ajax) != '') {
             $content .= '<script type="text/javascript"> ' . $js . ' ';
@@ -583,7 +586,7 @@ class GlobalsCache extends GlobalsBasic
             $content .= '<style> ' . $css . ' </style>';
         }
         Storage::put($file, $content);
-        $loadUrl = '/defer/' . $this->treeID . '/' . $coreID 
+        $loadUrl = '/defer/' . $this->treeID . '/' . $coreID
             . '/' . $nID . '/' . date("Ymd") . '/' . $rand;
         $params = $this->getAnyReqParams();
         if ($params != '') {
@@ -634,7 +637,7 @@ class GlobalsCache extends GlobalsBasic
     public function getUserProfilePicExists($uID = 0)
     {
         if ($uID > 0) {
-            return file_exists('../storage/app/' 
+            return file_exists('../storage/app/'
                 . $this->getUserProfilePicFile($uID));
         }
         return false;
@@ -652,7 +655,7 @@ class GlobalsCache extends GlobalsBasic
         if (sizeof($files) > 0) {
             foreach ($files as $file) {
                 if (strpos($file, '-.jpg') !== false) {
-                    $file = str_replace('-.jpg', '', 
+                    $file = str_replace('-.jpg', '',
                         str_replace('up/avatar/', '', $file));
                     $ret[] = intVal($file);
                 }

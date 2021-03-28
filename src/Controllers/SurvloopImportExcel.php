@@ -73,7 +73,7 @@ class SurvloopImportExcel
         $upFold = '../storage/app/' . $this->folder;
         $ext = $GLOBALS["SL"]->REQ->file($fldName)
             ->getClientOriginalExtension();
-        $this->file = 'import-excel-' . date('ymj') 
+        $this->file = 'import-excel-' . date('ymj')
             . '-' . rand(10000000, 100000000) . '.' . $ext;
         if (file_exists($upFold . $this->file)) {
             unlink($upFold . $this->file);
@@ -102,7 +102,7 @@ class SurvloopImportExcel
 
     public function loadFldNames(Request $request)
     {
-        if ($request->has('import') 
+        if ($request->has('import')
             && trim($request->get('import')) == 'fldNames'
             && $request->has('file')
             && trim($request->get('file')) != ''
@@ -114,8 +114,8 @@ class SurvloopImportExcel
                 && sizeof($this->arr[0][0]) > 0) {
                 $this->loadFldNamesMakeTbl($request);
                 $this->dataRowsAdded = 0;
-                $this->dataFlds 
-                    = $this->row2heads 
+                $this->dataFlds
+                    = $this->row2heads
                     = [];
                 foreach ($this->arr[0][0] as $col => $colHeader) {
                     if (trim($colHeader) != ''
@@ -129,8 +129,8 @@ class SurvloopImportExcel
                 $GLOBALS["SL"]->createTableIfNotExists($this->tblObj);
             }
             echo '<script type="text/javascript"> '
-                . 'setTimeout("window.location=\'?import=dataRows&file=' 
-                . trim($request->get('file')) . '&tblID=' 
+                . 'setTimeout("window.location=\'?import=dataRows&file='
+                . trim($request->get('file')) . '&tblID='
                 . $this->tblObj->tbl_id . '\'", 1000); </script>';
             exit;
         }
@@ -139,7 +139,7 @@ class SurvloopImportExcel
 
     public function loadDataRows(Request $request)
     {
-        if ($request->has('import') 
+        if ($request->has('import')
             && trim($request->get('import')) == 'dataRows'
             && $request->has('file')
             && trim($request->get('file')) != ''
@@ -150,8 +150,8 @@ class SurvloopImportExcel
                 $this->tblEng  = $this->tblObj->tbl_eng;
                 $this->tblName = $this->tblObj->tbl_name;
                 $this->tblAbbr = $this->tblObj->tbl_abbr;
-                $this->dataFlds 
-                    = $this->row2heads 
+                $this->dataFlds
+                    = $this->row2heads
                     = [];
                 $this->loadFile($request->get('file'));
                 foreach ($this->arr[0][0] as $col => $colHeader) {
@@ -295,7 +295,7 @@ class SurvloopImportExcel
     private function loadFldNamesSaveRow($row)
     {
         $colCnt = 0;
-        eval("\$this->rowData[\$row] = new " 
+        eval("\$this->rowData[\$row] = new "
             . $GLOBALS["SL"]->modelPath($this->tblObj->tbl_name) . ";");
         foreach ($this->arr[0][0] as $col => $colHeader) {
             $val = trim($this->arr[0][$row][$col]);

@@ -1,6 +1,6 @@
 <?php
 /**
-  * AdminController is the main landing class routing to certain admin tools which 
+  * AdminController is the main landing class routing to certain admin tools which
   * requires a user to be logged in.
   *
   * Survloop - All Our Data Are Belong
@@ -26,20 +26,22 @@ use App\Models\SLSess;
 use App\Models\SLNodeSaves;
 use RockHopSoft\Survloop\Controllers\SystemDefinitions;
 use RockHopSoft\Survloop\Controllers\Globals\Globals;
-use RockHopSoft\Survloop\Controllers\Admin\NodeSaveSet;
 use RockHopSoft\Survloop\Controllers\Admin\AdminEmailController;
+use RockHopSoft\Survloop\Controllers\Admin\NodeSaveSet;
+use RockHopSoft\Survloop\Controllers\Admin\SurvLogAnalysis;
 
 class AdminController extends AdminEmailController
 {
-    
+
     protected function tmpDbSwitch($dbID = 3)
     {
         $this->v["tmpDbSwitchDb"]   = $GLOBALS["SL"]->dbID;
         $this->v["tmpDbSwitchTree"] = $GLOBALS["SL"]->treeID;
         $this->v["tmpDbSwitchREQ"]  = $GLOBALS["SL"]->REQ;
+
         $GLOBALS["SL"] = new Globals($this->v["tmpDbSwitchREQ"], $dbID);
-        $this->dbID   = $dbID;
-        $this->treeID = $GLOBALS["SL"]->treeID;
+        $this->dbID    = $dbID;
+        $this->treeID  = $GLOBALS["SL"]->treeID;
         return true;
     }
 
@@ -47,9 +49,9 @@ class AdminController extends AdminEmailController
     {
         if (isset($this->v["tmpDbSwitchDb"])) {
             $GLOBALS["SL"] = new Globals(
-                $this->v["tmpDbSwitchREQ"], 
-                $this->v["tmpDbSwitchDb"], 
-                $this->v["tmpDbSwitchTree"], 
+                $this->v["tmpDbSwitchREQ"],
+                $this->v["tmpDbSwitchDb"],
+                $this->v["tmpDbSwitchTree"],
                 $this->v["tmpDbSwitchTree"]
             );
             $this->dbID   = $GLOBALS["SL"]->dbID;
@@ -58,17 +60,17 @@ class AdminController extends AdminEmailController
         }
         return false;
     }
-    
+
     protected function cacheFlushOld()
     {
-        $old = mktime(date("H"), date("i"), date("s"), 
+        $old = mktime(date("H"), date("i"), date("s"),
             date("m"), date("d")-5, date("Y"));
         SLCaches::where('created_at', '<', date('Y-m-d H:i:s', $old))
             ->delete();
         Cache::flush();
         return true;
     }
-    
+
     protected function cacheFlush()
     {
         SLCaches::where('created_at', '>', '2000-01-01 00:00:00')
@@ -76,7 +78,7 @@ class AdminController extends AdminEmailController
         Cache::flush();
         return true;
     }
-    
+
     public function switchDB(Request $request, $dbID = -3)
     {
         $this->admControlInit($request, '/dashboard/db/switch');
@@ -89,12 +91,12 @@ class AdminController extends AdminEmailController
             ->get();
         return view('vendor.survloop.admin.db.switch', $this->v);
     }
-    
+
     public function switchTreeAdmin(Request $request, $treeID = -3)
     {
         $this->admControlInit($request, '/dashboard/tree/switch');
         if ($treeID > 0) {
-            $this->switchTree($treeID, '/dashboard/tree/switch', $request);
+            $this->switchTree($request, $treeID, '/dashboard/tree/switch');
             $redir = '/dashboard/surv-' . $treeID . '/map?all=1&alt=1&refresh=1';
             if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
                 $redir = '/dashboard/page/' . $treeID . '?all=1&alt=1&refresh=1';
@@ -118,50 +120,67 @@ class AdminController extends AdminEmailController
         }
         return view('vendor.survloop.admin.tree.switch', $this->v);
     }
-    
-    public function sysSettings(Request $request)
+
+    public function sysSettings(Request $request, $set = 'seo')
     {
-        $this->admControlInit($request, '/dashboard/settings#search', '', false);
-        if ($request->has('refresh') 
-            && intVal($request->get('refresh')) == 2) {
-            $this->initLoader();
-            $this->sysSettingsRefresh($request);
-            return $this->redir('/dashboard/settings?refresh=1', true);
-        } elseif ($request->has('refresh') 
-            && intVal($request->get('refresh')) == 3) {
-            $this->cacheFlush();
-        }
-        $GLOBALS["SL"]->addAdmMenuHshoos([
-            '/dashboard/settings#search',
-            '/dashboard/settings#general', 
-            '/dashboard/settings#logos',
-            '/dashboard/settings#color',
-            '/dashboard/settings#hardcode'
-        ]);
+        $this->v["sysSet"] = $set;
+        $pageUrl = '/dashboard/settings/' . $set . '?ajax=1';
+        $this->admControlInit($request, $pageUrl, '', false);
+        $this->sysSettingsCheckRefresh($request);
         $this->reloadAdmMenu();
-        $this->getCSS($request);
+        $this->getSysCssJs($request);
         $this->v["sysDef"] = new SystemDefinitions;
         if ($request->has('refresh')) {
             $GLOBALS["SL"]->clearAllSystemCaches();
             $this->v["sysDef"]->checkDefInstalls();
         }
         $this->v["sysDef"]->prepSysSettings($request);
+        if ($request->has('sub')) {
+            return $this->v["sysDef"]->submitSysSettings($request, $this->v["sysSet"]);
+        }
+        $this->sysSettingsLoadCurrMeta();
+        $blade = 'vendor.survloop.admin.system-settings-' . $this->v["sysSet"];
+        $this->v["content"] = view($blade, $this->v)->render();
+        if ($request->has('ajax')) {
+            echo $this->v["content"];
+            exit;
+        }
+        $this->v["content"] = $GLOBALS["SL"]->pullPageJsCss($this->v["content"]);
+        return view('vendor.survloop.master', $this->v);
+    }
+
+    private function sysSettingsLoadCurrMeta()
+    {
         $this->v["currMeta"] = [
-            "title" => ((isset($GLOBALS['SL']->sysOpts['meta-title'])) 
+            "title" => ((isset($GLOBALS['SL']->sysOpts['meta-title']))
                 ? $GLOBALS['SL']->sysOpts['meta-title'] : ''),
-            "desc"  => ((isset($GLOBALS['SL']->sysOpts['meta-desc'])) 
+            "desc"  => ((isset($GLOBALS['SL']->sysOpts['meta-desc']))
                 ? $GLOBALS['SL']->sysOpts['meta-desc'] : ''),
-            "wrds"  => ((isset($GLOBALS['SL']->sysOpts['meta-keywords'])) 
+            "wrds"  => ((isset($GLOBALS['SL']->sysOpts['meta-keywords']))
                 ? $GLOBALS['SL']->sysOpts['meta-keywords']:''),
-            "img"   => ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
+            "img"   => ((isset($GLOBALS['SL']->sysOpts['meta-img']))
                 ? $GLOBALS['SL']->sysOpts['meta-img'] : ''),
-            "slug"  => false, 
+            "slug"  => false,
             "base"  => ''
         ];
-        return view('vendor.survloop.admin.system-all-settings', $this->v);
+        return true;
     }
-    
-    protected function sysSettingsRefresh(Request $request)
+
+    private function sysSettingsCheckRefresh(Request $request)
+    {
+        if ($request->has('refresh')
+            && intVal($request->get('refresh')) == 2) {
+            $this->initLoader();
+            $this->sysSettingsRefresh($request);
+            return $this->redir('/dashboard/settings?refresh=1', true);
+        } elseif ($request->has('refresh')
+            && intVal($request->get('refresh')) == 3) {
+            $this->cacheFlush();
+        }
+        return true;
+    }
+
+    private function sysSettingsRefresh(Request $request)
     {
         $chk = SLTree::whereIn('tree_type', [ 'Page', 'Survey' ])
             ->where('tree_database', 1)
@@ -177,30 +196,13 @@ class AdminController extends AdminEmailController
                 if ($curr == 0) {
                     $curr = $tree->tree_id;
                 }
-                if ($found == 1 && $next <= 0) {
-                    $next = $tree->tree_id;
-                }
-                if ($tree->tree_id == $curr) {
-                    $found = 1;
-                    $this->loader->syncDataTrees(
-                        $request, 
-                        $tree->tree_database, 
-                        $tree->tree_id
-                    );
-                    $this->loadCustLoop(
-                        $request, 
-                        $tree->tree_id, 
-                        $tree->tree_database
-                    );
-                    $this->custReport->loadTree($tree->tree_id);
-                    $this->custReport->loadProgBar();
-                }
+                $this->sysSettingsRefreshTree($request, $curr, $next, $found, $tree);
             }
             $this->loader->syncDataTrees($request);
             if ($next > 0) {
                 echo '<center><div class="p20"><br /><br /><h2>'
-                    . 'Refreshing JavaScript Cache for Tree #' . $curr 
-                    . '</h2></div></center><div class="p20">' 
+                    . 'Refreshing JavaScript Cache for Tree #' . $curr
+                    . '</h2></div></center><div class="p20">'
                     . $GLOBALS["SL"]->spinner() . '</div>';
                 $redir = '/dashboard/settings?refresh=2&next=' . $next;
                 return $this->redir($redir, true);
@@ -208,19 +210,30 @@ class AdminController extends AdminEmailController
         }
         return true;
     }
-    
-    public function sysSettingsRaw(Request $request)
+
+    private function sysSettingsRefreshTree($request, &$curr, &$next, &$found, $tree)
     {
-        $this->admControlInit($request, '/dashboard/settings-raw');
-        $this->v["sysDef"] = new SystemDefinitions;
-        $this->v["sysDef"]->prepSysSettings($request);
-        return view(
-            'vendor.survloop.admin.systemsettings', 
-            $this->v["sysDef"]->v
-        );
+        if ($found == 1 && $next <= 0) {
+            $next = $tree->tree_id;
+        }
+        if ($tree->tree_id == $curr) {
+            $found = 1;
+            $this->loader->syncDataTrees(
+                $request,
+                $tree->tree_database,
+                $tree->tree_id
+            );
+            $this->loadCustLoop(
+                $request,
+                $tree->tree_id,
+                $tree->tree_database
+            );
+            $this->custReport->loadTree($tree->tree_id);
+            $this->custReport->loadProgBar();
+        }
+        return true;
     }
-    
-    
+
     protected function blurbLoad($blurbID)
     {
         return SLDefinitions::where('def_id', $blurbID)
@@ -228,23 +241,23 @@ class AdminController extends AdminEmailController
             ->where('def_set', 'Blurbs')
             ->first();
     }
-    
+
     public function blurbEdit(Request $request, $blurbID)
     {
         $this->admControlInit($request, '/dashboard/pages');
         $this->v["blurbRow"] = $this->blurbLoad($blurbID);
         $this->v["needsWsyiwyg"] = true;
-        if ($this->v["blurbRow"]->def_order <= 0 
+        if ($this->v["blurbRow"]->def_order <= 0
             || $this->v["blurbRow"]->def_order%3 > 0) {
             $GLOBALS["SL"]->pageAJAX .= ' $("#DefDescriptionID")'
                 . '.summernote({ height: 500 }); ';
         }
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
-    
+
     public function blurbNew(Request $request)
     {
-        if (isset($request->newBlurbName) 
+        if (isset($request->newBlurbName)
             && trim($request->newBlurbName) != '') {
             $blurb = new SLDefinitions;
             $blurb->def_database = $this->dbID;
@@ -255,7 +268,7 @@ class AdminController extends AdminEmailController
         }
         return -3;
     }
-    
+
     public function blurbEditSave(Request $request)
     {
         $blurb = $this->blurbLoad($request->DefID);
@@ -268,8 +281,8 @@ class AdminController extends AdminEmailController
         $blurb->save();
         return $this->redir('/dashboard/pages/snippets/' . $blurb->def_id);
     }
-    
-    public function getCSS(Request $request)
+
+    public function getSysCssJs(Request $request)
     {
         $this->survloopInit($request, '/dashboard/settings', false);
         if (!is_dir('../storage/app/sys')) {
@@ -278,8 +291,20 @@ class AdminController extends AdminEmailController
         $this->v["sysDef"] = new SystemDefinitions;
         $css = $this->v["sysDef"]->loadCss();
         $css["raw"] = $GLOBALS["SL"]->getSysCustCSS();
+        $this->getCssFile1($css);
+        $this->getCssFile2($css);
+        $this->getJsFile1();
+        $this->getJsFile2($css);
+        $log = SLDefinitions::where('def_set', 'System Settings')
+            ->where('def_subset', 'log-css-reload')
+            ->update([ 'def_description' => time() ]);
+        return ':) ';
+    }
+
+    private function getCssFile1($css)
+    {
         $syscss = view(
-            'vendor.survloop.css.styles-1', 
+            'vendor.survloop.css.styles-1',
             [ "css" => $css ]
         )->render();
         file_put_contents("../storage/app/sys/sys1.css", $syscss);
@@ -287,26 +312,32 @@ class AdminController extends AdminEmailController
         $minifier->add("../vendor/components/jqueryui/themes/base/jquery-ui.min.css");
         $minifier->add("../vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
         //$minifier->add("../vendor/forkawesome/fork-awesome/css/fork-awesome.min.css");
-        if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"]) 
+        if (isset($GLOBALS["SL"]->sysOpts["css-extra-files"])
             && trim($GLOBALS["SL"]->sysOpts["css-extra-files"]) != '') {
-            $files = $GLOBALS["SL"]->mexplode(
-                ',', 
-                $GLOBALS["SL"]->sysOpts["css-extra-files"]
-            );
+            $files = $GLOBALS["SL"]->sysOpts["css-extra-files"];
+            $files = $GLOBALS["SL"]->mexplode(',', $files);
             foreach ($files as $f) {
                 $minifier->add(trim($f));
             }
         }
         $minifier->minify("../storage/app/sys/sys1.min.css");
-        
+        return true;
+    }
+
+    private function getCssFile2($css)
+    {
         $syscss = view(
-            'vendor.survloop.css.styles-2', 
+            'vendor.survloop.css.styles-2',
             [ "css" => $css ]
         )->render();
         file_put_contents("../storage/app/sys/sys2.css", $syscss);
         $minifier = new Minify\CSS("../storage/app/sys/sys2.css");
         $minifier->minify("../storage/app/sys/sys2.min.css");
-        
+        return true;
+    }
+
+    private function getJsFile1()
+    {
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
         $minifier->add("../vendor/components/jqueryui/jquery-ui.min.js");
         $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/popper.min.js");
@@ -316,7 +347,11 @@ class AdminController extends AdminEmailController
         $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/copy-to-clipboard.js");
         //$minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/radialIndicator.min.js");
         $minifier->minify("../storage/app/sys/sys1.min.js");
-        
+        return true;
+    }
+
+    private function getJsFile2($css)
+    {
         $treeJs = '';
         $chk = SLTree::whereIn('tree_type', ['Page', 'Survey'])
             ->select('tree_id', 'tree_type')
@@ -327,7 +362,7 @@ class AdminController extends AdminEmailController
                 if (file_exists($treeFile)) {
                     $tmpJs = file_get_contents($treeFile);
                     $tmpJs = str_replace("\t", "", str_replace("\n", "\n", $tmpJs));
-                    $treeJs .= "\n" . 'function treeLoad' . $tree->tree_id . '() {' . "\n" 
+                    $treeJs .= "\n" . 'function treeLoad' . $tree->tree_id . '() {' . "\n"
                         . 'treeID = ' . $tree->tree_id . ';' . "\n"
                         . 'treeType = "' . $tree->tree_type . '";' . "\n"
                         . $tmpJs . "\n\treturn true;\n" . '}' . "\n";
@@ -336,33 +371,29 @@ class AdminController extends AdminEmailController
         }
         $GLOBALS["SL"]->loadStates();
         $scriptsjs = view(
-                'vendor.survloop.js.scripts', 
+                'vendor.survloop.js.scripts',
                 [
-                    "css" => $css, 
-                    "treeJs" => $treeJs 
+                    "css" => $css,
+                    "treeJs" => $treeJs
                 ]
             )->render() . view(
-                'vendor.survloop.js.scripts-ajax', 
-                [ 
-                    "css" => $css, 
-                    "treeJs" => $treeJs 
+                'vendor.survloop.js.scripts-ajax',
+                [
+                    "css" => $css,
+                    "treeJs" => $treeJs
                 ]
             )->render();
         file_put_contents("../storage/app/sys/sys2.js", $scriptsjs);
         $minifier = new Minify\JS("../storage/app/sys/sys2.js");
         $minifier->minify("../storage/app/sys/sys2.min.js");
-        
-        $log = SLDefinitions::where('def_set', 'System Settings')
-            ->where('def_subset', 'log-css-reload')
-            ->update([ 'def_description' => time() ]);
-        return ':) ';
+        return true;
     }
-    
+
     protected function eng2data($name)
     {
         return preg_replace("/[^a-z0-9]+/", "", strtolower($name));
     }
-    
+
     protected function eng2abbr($name)
     {
         $name = strtolower($name);
@@ -376,21 +407,22 @@ class AdminController extends AdminEmailController
         }
         return $abbr;
     }
-    
+
     protected function isCoreTbl($tblID)
     {
         $chkCore = SLTree::where('tree_core_table', '=', $tblID)
             ->get();
         return $chkCore->isNotEmpty();
     }
-    
+
     public function userManage(Request $request)
     {
+        set_time_limit(180);
         $this->admControlInit($request, '/dashboard/users', 'administrator|staff');
         $this->loadPrintUsers();
         return view('vendor.survloop.admin.user-manage', $this->v);
     }
-    
+
     protected function loadPrintUsers()
     {
         $this->v["printVoluns"] = [ [], [], [], [], [], [] ]; // voluns, staff, admin
@@ -419,25 +451,25 @@ class AdminController extends AdminEmailController
         }
         return true;
     }
-    
+
     public function postNodeURL(Request $request)
     {
-        if ($request->has('step') 
-            && $request->has('tree') 
+        if ($request->has('step')
+            && $request->has('tree')
             && intVal($request->tree) > 0) {
             $this->initLoader();
             $this->loader->loadTreeByID($request, $request->tree);
-            $url = '/dash/u/' . $GLOBALS["SL"]->treeRow->tree_slug 
+            $url = '/dash/u/' . $GLOBALS["SL"]->treeRow->tree_slug
                 . '/' . $request->nodeSlug;
             $this->admControlInit($request, $url);
             $this->loadCustLoop($request, $request->tree);
-            echo '<div class="pT20">' 
-                . $this->custReport->loadNodeURL($request, $request->nodeSlug) 
+            echo '<div class="pT20">'
+                . $this->custReport->loadNodeURL($request, $request->nodeSlug)
                 . '</div>';
         }
         exit;
     }
-    
+
     public function ajaxChecksAdmin(Request $request, $type = '')
     {
         $this->admControlInit($request, '/ajadm/' . $type);
@@ -466,9 +498,9 @@ class AdminController extends AdminEmailController
         if ($request->has('testEmail') && intVal($request->get('testEmail')) == 1) {
             return $this->systemsCheckTestEmail($request);
         }
-        if ($request->has('testCache') 
+        if ($request->has('testCache')
             && intVal($request->get('testCache')) == 1) {
-            if ($request->has('sendTest') 
+            if ($request->has('sendTest')
                 && intVal($request->get('sendTest')) == 1) {
                 Cache::put('testCache', trim($request->get('cacheVal')));
             }
@@ -477,7 +509,7 @@ class AdminController extends AdminEmailController
                 $testCache = Cache::get('testCache');
             }
             return view(
-                'vendor.survloop.admin.systems-check-cache', 
+                'vendor.survloop.admin.systems-check-cache',
                 [ "testCache" => $testCache ]
             );
         }
@@ -492,19 +524,19 @@ class AdminController extends AdminEmailController
         $this->v["sysChks"][] = ['XML-Schema',   '/' . $tree1->tree_slug . '-xml-schema'];
         return view('vendor.survloop.admin.systems-check', $this->v);
     }
-    
+
     protected function systemsCheckTestEmail(Request $request)
     {
         $this->v["testResults"] = '';
-        if ($request->has('sendTest') 
+        if ($request->has('sendTest')
             && intVal($request->get('sendTest')) == 1
-            && $request->has('emailTo') 
+            && $request->has('emailTo')
             && trim($request->emailTo) != '') {
             $to = trim($request->emailTo);
             $toArr = [ [ $to, 'Test Message' ] ];
-            $subj = 'Email Flight Test from ' 
+            $subj = 'Email Flight Test from '
                 . $GLOBALS["SL"]->sysOpts["site-name"];
-            $cont = '<p>Hi there friend,</p><p>This has been a flight test from ' 
+            $cont = '<p>Hi there friend,</p><p>This has been a flight test from '
                 . $GLOBALS["SL"]->sysOpts["site-name"] . '</p>';
             if (!$GLOBALS["SL"]->isHomestead()) {
                 $this->sendEmail($cont, $subj, $toArr);
@@ -519,15 +551,16 @@ class AdminController extends AdminEmailController
         }
         return view('vendor.survloop.admin.systems-check-email', $this->v);
     }
-    
+
     public function loadLogs()
     {
+        $logs = new SurvLogAnalysis;
         $this->v["logs"] = [
-            "session" => $this->logPreview('session-stuff')
+            "session" => $logs->logPreview('session-stuff')
         ];
         return true;
     }
-    
+
     public function logsOverview(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs');
@@ -535,7 +568,7 @@ class AdminController extends AdminEmailController
         $this->v["phpInfo"] = $request->has('phpinfo');
         return view('vendor.survloop.admin.logs-overview', $this->v);
     }
-    
+
     public function logsSessions(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs/session-stuff');
@@ -545,7 +578,7 @@ class AdminController extends AdminEmailController
         $this->loadLogs();
         return view('vendor.survloop.admin.logs-sessions', $this->v);
     }
-    
+
     public function navMenus(Request $request)
     {
         $this->admControlInit($request, '/dashboard/pages/menus');
@@ -585,18 +618,18 @@ class AdminController extends AdminEmailController
         $this->v["cnt"] = 0;
         return view('vendor.survloop.admin.manage-menus', $this->v);
     }
-    
-    
+
+
     public function imgGallery(Request $request)
     {
         $this->admControlInit($request, '/dashboard/images/gallery');
         if ($request->has('sub') && intVal($request->get('sub')) == 1) {
-            
+
         }
         $this->v["imgSelect"] = $GLOBALS["SL"]->getImgSelect('-3', $GLOBALS["SL"]->dbID);
         return view('vendor.survloop.admin.images-gallery', $this->v);
     }
-    
+
     public function printSubView(Request $request, $treeID = 1, $cid = -3)
     {
         if ($treeID > 0 && $cid > 0) {
@@ -607,7 +640,7 @@ class AdminController extends AdminEmailController
         }
         return 'Not found :(';
     }
-    
+
     public function debugNodeSaves(Request $request)
     {
         $this->admControlInit($request, '/dashboard/debug-node-saves');
@@ -622,10 +655,9 @@ class AdminController extends AdminEmailController
             }
         }
         $this->v["nodeSaveReport"] = new NodeSaveSet($coreID, $treeID);
-        $this->v["nodeLog"] = $this->logPreviewCore('session-stuff', $coreID);
+        $logs = new SurvLogAnalysis;
+        $this->v["nodeLog"] = $logs->logPreviewCore('session-stuff', $coreID);
         return view('vendor.survloop.admin.debug-node-saves', $this->v);
     }
-    
+
 }
-
-

@@ -12,7 +12,7 @@ namespace RockHopSoft\Survloop\Controllers\Globals;
 
 class GlobalsConvert
 {
-    
+
     public function mexplode($delim, $str)
     {
         $ret = [];
@@ -36,7 +36,7 @@ class GlobalsConvert
     {
         return sizeof($this->mexplode($delim, $str));
     }
-    
+
     public function charLimitDotDotDot($str, $charLimit = 20)
     {
         $str = trim($str);
@@ -45,7 +45,7 @@ class GlobalsConvert
         }
         return substr($str, 0, ($charLimit-3)) . '...';
     }
-    
+
     public function wordLimitDotDotDot($str, $wordLimit = 50)
     {
         $strs = $this->mexplode(' ', $str);
@@ -58,14 +58,22 @@ class GlobalsConvert
         }
         return trim($ret) . '...';
     }
-    
+
+    public function reportNumber($value)
+    {
+        if ($value < 10) {
+            return $this->sigFigs($value);
+        }
+        return number_format($value);
+    }
+
     public function sigFigs($value, $sigFigs = 2)
     {
         $exponent = floor(log10(abs($value))+1);
         if (pow(10, $exponent) == 0 || pow(10, $sigFigs) == 0) {
             return $value;
         }
-        $significand = round(($value / pow(10, $exponent)) 
+        $significand = round(($value / pow(10, $exponent))
             * pow(10, $sigFigs)) / pow(10, $sigFigs);
         $ret = $significand * pow(10, $exponent);
         if ($value > 999) {
@@ -73,7 +81,7 @@ class GlobalsConvert
         }
         return $ret;
     }
-    
+
     public function numKMBT($value, $sigFigs = 3)
     {
         if ($value < 1000) {
@@ -90,19 +98,19 @@ class GlobalsConvert
         }
         return $this->sigFigs(($value/1000000000000), $sigFigs) . 'T';
     }
-    
+
     public function leadZero($num, $sigFigs = 2)
     {
         if ($sigFigs == 2) {
             return (($num < 10) ? '0' : '') . $num;
         }
         if ($sigFigs == 3) {
-            return (($num < 10) ? '00' 
+            return (($num < 10) ? '00'
                 : (($num < 100) ? '0' : '')) . $num;
         }
         return $num;
     }
-    
+
     public function getFileExt($file)
     {
         $ext = '';
@@ -112,7 +120,7 @@ class GlobalsConvert
         }
         return $ext;
     }
-    
+
     public function sortArrByKey($arr, $key, $ord = 'asc')
     {
         if (sizeof($arr) < 2) {
@@ -144,21 +152,21 @@ class GlobalsConvert
         }
         return $arr;
     }
-    
+
     public function stdizeChars($txt)
     {
-        return str_replace('“', '"', str_replace('”', '"', 
+        return str_replace('“', '"', str_replace('”', '"',
             str_replace("’", "'", $txt)));
     }
 
-    public function humanFilesize($bytes, $decimals = 2) 
+    public function humanFilesize($bytes, $decimals = 2)
     {
         $sz = 'BKMGTP';
         $factor = floor((strlen($bytes) - 1) / 3);
-        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) 
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor))
             . @$sz[$factor];
     }
-    
+
     // Prints inches in feet and inches
     public function printHeight($val)
     {
@@ -167,7 +175,7 @@ class GlobalsConvert
         }
         return (floor($val/12)) . "' " . floor($val%12) . '"';
     }
-    
+
     public function getColsWidth($sizeof)
     {
         $colW = 12;
@@ -184,25 +192,25 @@ class GlobalsConvert
         }
         return $colW;
     }
-    
+
     public function monthsArray()
     {
         return [
-            1  => 'Jan', 
-            2  => 'Feb', 
-            3  => 'Mar', 
-            4  => 'Apr', 
-            5  => 'May', 
-            6  => 'Jun', 
-            7  => 'Jul', 
-            8  => 'Aug', 
-            9  => 'Sep', 
-            10 => 'Oct', 
-            11 => 'Nov', 
-            12 => 'Dec' 
+            1  => 'Jan',
+            2  => 'Feb',
+            3  => 'Mar',
+            4  => 'Apr',
+            5  => 'May',
+            6  => 'Jun',
+            7  => 'Jul',
+            8  => 'Aug',
+            9  => 'Sep',
+            10 => 'Oct',
+            11 => 'Nov',
+            12 => 'Dec'
         ];
     }
-    
+
     public function num2Month3($num = 0)
     {
         $arr = $this->monthsArray();
@@ -211,7 +219,7 @@ class GlobalsConvert
         }
         return '';
     }
-    
+
     public function dateToTime($dateStr = '')
     {
         list($month, $day, $year) = ['', '', ''];
@@ -227,21 +235,21 @@ class GlobalsConvert
         }
         return 0;
     }
-    
+
     public function printTimeZoneShift($timeStr = '', $hourShift = -5, $format = 'n/j g:ia')
     {
         $time = strtotime($timeStr);
         return $this->printTimeZoneShiftStamp($time, $hourShift, $format);
     }
-    
+
     public function printTimeZoneShiftStamp($time = 0, $hourShift = -5, $format = 'n/j g:ia')
     {
-        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time), 
-            date('s', $time), date('m', $time), 
+        $newTime = mktime(date('H', $time)+$hourShift, date('i', $time),
+            date('s', $time), date('m', $time),
             date('d', $time), date('Y', $time));
         return date($format, $newTime);
     }
-    
+
     public function printTimeAgo($str)
     {
         $date = new \DateTime($str);
@@ -256,11 +264,11 @@ class GlobalsConvert
         }
         $period = [" second", " minute", " hour", " day", " month", " year" ];
         $periodValue= [
-            $timeDifference->format('%s'), 
-            $timeDifference->format('%i'), 
-            $timeDifference->format('%h'), 
-            $timeDifference->format('%d'), 
-            $timeDifference->format('%m'), 
+            $timeDifference->format('%s'),
+            $timeDifference->format('%i'),
+            $timeDifference->format('%h'),
+            $timeDifference->format('%d'),
+            $timeDifference->format('%m'),
             $timeDifference->format('%y')
             ];
         for ($i = 0; $i < count($periodValue); $i++) {
@@ -276,13 +284,13 @@ class GlobalsConvert
         }
         return "0 seconds" . $tense;
     }
-    
+
     public function str2arr($str)
     {
         $arr = [];
         if (!is_array($str) && strpos($str, "rray\n") === 1) {
             if (strpos($str, '=>') !== false) {
-                $split = explode('=>', str_replace("\n", "", 
+                $split = explode('=>', str_replace("\n", "",
                     str_replace("\n)\n", "", $str)));
                 for ($i = 1; $i < sizeof($split); $i++) {
                     $val = trim(str_replace('[' . $i . ']', '', $split[$i]));
@@ -294,23 +302,23 @@ class GlobalsConvert
         }
         return $arr;
     }
-    
+
     public function plainLineBreaks($str)
     {
         return str_replace("\n", "<br />", str_replace("\t", "    ", $str));
     }
-    
+
     public function sec2minSec($sec)
     {
         $s = ($sec%60);
         $min = floor($sec/60);
         $m = ($min%60);
         $h = floor($min/60);
-        return (($h > 0) ? $h . ':' : '') 
-            . (($h > 0 && $m < 10) ? '0' : '') 
+        return (($h > 0) ? $h . ':' : '')
+            . (($h > 0 && $m < 10) ? '0' : '')
             . $m . ':' . (($s < 10) ? '0' : '') . $s;
     }
-    
+
     public function numSupscript($num)
     {
         $numStr = trim($num);
@@ -326,7 +334,7 @@ class GlobalsConvert
         }
         return '<sup>th</sup>';
     }
-    
+
     public function calcGrade($num = 100)
     {
         if ($num >= 97) {
@@ -367,7 +375,7 @@ class GlobalsConvert
         }
         return 'F';
     }
-    
+
     public function calcGradeSmp($num = 100)
     {
         if ($num >= 90) {
@@ -384,7 +392,7 @@ class GlobalsConvert
         }
         return 'F';
     }
-    
+
     public function convertAllCallToUp1stChars($str)
     {
         if (strtoupper($str) == $str) {
@@ -392,7 +400,7 @@ class GlobalsConvert
         }
         return $str;
     }
-    
+
     public function allCapsToUp1stChars($str)
     {
         if (strtoupper($str) == $str) {
@@ -401,7 +409,7 @@ class GlobalsConvert
             if (sizeof($words) > 0) {
                 foreach ($words as $w) {
                     if (strlen($w) > 1) {
-                        $strOut .= substr($w, 0, 1) 
+                        $strOut .= substr($w, 0, 1)
                             . strtolower(substr($w, 1)) . ' ';
                     }
                 }
@@ -455,7 +463,7 @@ class GlobalsConvert
     {
         return $this->arrAvg($this->mexplode(',', $commas));
     }
-    
+
     public function arrStandardDeviation($dat = [])
     {
         $avg = $diffs = 0;
@@ -468,13 +476,13 @@ class GlobalsConvert
         }
         return 0;
     }
-    
+
     public function getArrPercentileStr($str, $val, $isGolf = false)
     {
         $arr = $this->mexplode(',', $str);
         return $this->getArrPercentile($arr, $val, $isGolf);
     }
-    
+
     public function getArrPercentile($arr, $val, $isGolf = false)
     {
         $ret = $pos = 0;
@@ -503,90 +511,90 @@ class GlobalsConvert
         }
         return $ret;
     }
-    
+
     public function textSaferHtml($strIN)
     {
-        return '<p>' . str_replace("\n", '</p><p>', 
-            str_replace("\n\n", "\n", str_replace("\n\n", "\n", 
+        return '<p>' . str_replace("\n", '</p><p>',
+            str_replace("\n\n", "\n", str_replace("\n\n", "\n",
             strip_tags($strIN, '<b><i><u>')))) . '</p>';
     }
-    
+
     public function makeXMLSafe($strIN)
     {
         //$strIN = htmlentities($strIN);
         $strIN = str_replace("�", "'", str_replace('�', '\'', $strIN));
         $strIN = str_replace("&#146;", "'", str_replace("&#145;", "'", $strIN));
         $strIN = str_replace("&#148;", "'", str_replace("&#147;", "'", $strIN));
-        //$strIN = str_replace('&amp;', '&', str_replace('&amp;', '&', 
+        //$strIN = str_replace('&amp;', '&', str_replace('&amp;', '&',
         //  str_replace('&amp;', '&', $strIN)));
         $strIN = str_replace("&#39;", "'", str_replace("&apos;", "'", $strIN));
         $strIN = str_replace('&quot;', '"', $strIN);
         $strIN = str_replace('&', '&amp;', $strIN);
-        $strIN = str_replace("'", "&apos;", str_replace("\'", "&apos;", 
+        $strIN = str_replace("'", "&apos;", str_replace("\'", "&apos;",
             str_replace("\\'", "&apos;", $strIN)));
-        $strIN = str_replace('"', '&quot;', str_replace('\"', '&quot;', 
+        $strIN = str_replace('"', '&quot;', str_replace('\"', '&quot;',
             str_replace('\\"', '&quot;', $strIN)));
         $strIN = str_replace('<', '&lt;', $strIN);
         $strIN = str_replace('>', '&gt;', $strIN);
         return htmlspecialchars(trim($strIN), ENT_XML1, 'UTF-8');
         //return trim($strIN);
     }
-    
+
     public function cnvrtSqFt2Acr($squareFeet = 0)
     {
         return $squareFeet*0.000022956841138659;
     }
-    
+
     public function cnvrtAcr2SqFt($acres = 0)
     {
         return $acres*43560;
     }
-    
+
     public function cnvrtLbs2Grm($lbs = 0)
     {
         return $lbs*453.59237;
     }
-    
+
     public function cnvrtLbs2Kg($lbs = 0)
     {
         return $lbs*0.45359237;
     }
-    
+
     public function cnvrtKwh2Mwh($kWh = 0)
     {
         return $kWh/1000;
     }
-    
+
     public function cnvrtKwh2Kbtu($kWh = 0)
     {
         return $kWh*3.412;
     }
-    
+
     public function cnvrtKwh2Btu($kWh = 0)
     {
         return $kWh*3412;
     }
-    
+
     public function cnvrtKbtu2Kwh($btu = 0)
     {
         return $btu/3.412;
     }
-    
+
     public function cnvrtLiter2Gal($liters = 0)
     {
         return $liters*0.2641729;
     }
-    
+
     public function cnvrtCF2Gal($cf = 0)
     {
         return $cf*7.4805194805195;
     }
-    
+
     public function cnvrtCCF2Gal($ccf = 0)
     {
         return $ccf*748.05194805195;
     }
-    
+
     public function cnvrtSqFt2SqMeters($sqft = 0)
     {
         return $sqft*10.76391;
@@ -596,7 +604,7 @@ class GlobalsConvert
     {
         return $this->cnvrtKgCarbonEq($this->cnvrtLbs2Kg($val), $type);
     }
-    
+
     // epa.gov/sites/production/files/2020-04/documents/ghg-emission-factors-hub.pdf
     // Table 11, Last Modified: 26 March 2020
     public function cnvrtKgCarbonEq($val = 0, $type = 'CH4')
@@ -668,5 +676,47 @@ class GlobalsConvert
         }
         return 0;
     }
+
+    /**
+     * Linear regression function. Based on:
+     * richardathome.wordpress.com/2006/01/25/a-php-linear-regression-function
+     *
+     * @param $x array x-coords
+     * @param $y array y-coords
+     * @returns array() m=>slope, b=>intercept
+     */
+    public function linearRegression($x, $y)
+    {
+        $slope = $intercept = 0;
+        // calculate number points
+        $n = count($x);
+        // ensure both arrays of points are the same size
+        if ($n != count($y)) {
+            $err = "linear_regression(): Number of elements in coordinate arrays do not match.";
+            trigger_error($err, E_USER_ERROR);
+        }
+        // calculate sums
+        $x_sum = array_sum($x);
+        $y_sum = array_sum($y);
+        $xx_sum = 0;
+        $xy_sum = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $xy_sum += ($x[$i]*$y[$i]);
+            $xx_sum += ($x[$i]*$x[$i]);
+        }
+        if ($n > 0) {
+            // calculate slope
+            $slope = (($n * $xy_sum) - ($x_sum * $y_sum))
+                / (($n * $xx_sum) - ($x_sum * $x_sum));
+            // calculate intercept
+            $intercept = ($y_sum - ($slope * $x_sum)) / $n;
+        }
+        // return result
+        return [
+            "slope"     => $slope,
+            "intercept" => $intercept
+        ];
+    }
+
 
 }

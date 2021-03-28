@@ -35,7 +35,16 @@ class PageLoadUtils extends Controller
     public $treeID         = 0;
     public $cacheKey       = '';
     public $pageContent    = '';
-    
+
+    // This is where the client installation's extension of TreeSurvForm is loaded
+    public $custLoop = null;
+
+    /**
+     * Initialize page loader and whether or not
+     * this page requires user authentication.
+     *
+     * @return void
+     */
     public function __construct($isAdminPage = false)
     {
         $this->isAdminPage = $isAdminPage;
@@ -43,7 +52,62 @@ class PageLoadUtils extends Controller
             $this->dashPrfx = '/dash';
         }
     }
-    
+
+    /**
+     * Load the extension package's
+     *
+     * @return void
+     */
+    public function loadLoop(Request $request, $skipSessLoad = false)
+    {
+        $this->loadAbbr();
+        $class = "RockHopSoft\\Survloop\\Controllers\\Tree\\TreeSurvForm";
+        $custLoopFile = '../vendor/' . $this->custPckg
+            . '/src/Controllers/' . $this->custAbbr . '.php';
+        if ($this->custAbbr != 'Survloop' && file_exists($custLoopFile)) {
+            $custClass = $this->custVend . "\\" . $this->custAbbr
+                . "\\Controllers\\" . $this->custAbbr . "";
+            if (class_exists($custClass)) {
+                $class = $custClass;
+            }
+        }
+        eval("\$this->custLoop = new " . $class . "("
+            . "\$request, "
+            . "-3, "
+            . $this->dbID . ", "
+            . $this->treeID . ", "
+            . (($skipSessLoad) ? "true" : "false")
+            . ");"
+        );
+    }
+
+    /**
+     * Load the extension package's GLOBALS.
+     * Similar to /Globals/Globals.php
+     *
+     * @return void
+     */
+    protected function loadCustomGlobals()
+    {
+        $this->loadAbbr();
+        $GLOBALS["CUST"] = null;
+        $custFile = '../vendor/' . $this->custPckg
+            . '/src/Controllers/' . $this->custAbbr . 'Globals.php';
+        if ($this->custAbbr != 'Survloop' && file_exists($custFile)) {
+            $custClass = $this->custVend . "\\"
+                . $this->custAbbr . "\\Controllers\\"
+                . $this->custAbbr . "Globals";
+            if (class_exists($custClass)) {
+                eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+            }
+        }
+    }
+
+    /**
+     * Load this system's root domain name or path.
+     *
+     * @return string
+     */
     public function loadDomain()
     {
         $appUrl = SLDefinitions::select('def_description')
@@ -56,24 +120,32 @@ class PageLoadUtils extends Controller
         }
         return $this->domainPath;
     }
-    
+
+    /**
+     *
+     *
+     * @return void
+     */
     public function checkHttpsDomain(Request $request)
     {
-        if (isset($this->domainPath) 
+        if (isset($this->domainPath)
             && strpos($request->fullUrl(), $this->domainPath) === false) {
             $pos1 = strpos($this->domainPath, 'https://');
-            $pos2 = strpos($request->fullUrl(), 
-                str_replace('https://', 'http://', $this->domainPath));
+            $http = str_replace('https://', 'http://', $this->domainPath);
+            $pos2 = strpos($request->fullUrl(), $http);
             if ($pos1 !== false && $pos2 !== false) {
-                header("Location: " 
-                    . str_replace('http://', 'https://', $request->fullUrl())
-                );
+                $redir = str_replace('http://', 'https://', $request->fullUrl());
+                header("Location: " . $redir);
                 exit;
             }
         }
-        return true;
     }
-    
+
+    /**
+     * Get the package's custom abbreviation used in the system.
+     *
+     * @return string
+     */
     public function loadAbbr()
     {
         $chk = SLDefinitions::select('def_description')
@@ -102,35 +174,57 @@ class PageLoadUtils extends Controller
         }
         return $this->custAbbr;
     }
-    
+
+    /**
+     * Check whether or not this user has permissions to open this tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $dbID
+     * @param  int  $treeID
+     * @return void
+     */
     public function syncDataTrees(Request $request, $dbID = 1, $treeID = 1)
     {
         $this->dbID = $dbID;
         $this->treeID = $treeID;
         $GLOBALS["SL"] = new Globals($request, $dbID, $treeID, $treeID);
         $GLOBALS["SL"]->microLog();
-        return true;
     }
-    
+
+    /**
+     * Check whether or not this user has permissions to open this tree.
+     *
+     * @param  int  $treeOpts
+     * @return boolean
+     */
     protected function userHasTreePerms($treeOpts = 1)
     {
         if ($treeOpts%Globals::TREEOPT_ADMIN == 0) {
             return $this->isUserAdmin();
         }
         if ($treeOpts%Globals::TREEOPT_STAFF == 0) {
-            return ($this->isUserStaff() || $this->isUserAdmin());
+            return ($this->isUserStaff()
+                || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_PARTNER == 0) {
-            return ($this->isUserPartn() 
-                || $this->isUserStaff() || $this->isUserAdmin());
+            return ($this->isUserPartn()
+                || $this->isUserStaff()
+                || $this->isUserAdmin());
         }
         if ($treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
-            return ($this->isUserVolun() || $this->isUserPartn() 
-                || $this->isUserStaff() || $this->isUserAdmin());
+            return ($this->isUserVolun()
+                || $this->isUserPartn()
+                || $this->isUserStaff()
+                || $this->isUserAdmin());
         }
         return true;
     }
-    
+
+    /**
+     * Get the tree options for the current user's highest permission.
+     *
+     * @return integer
+     */
     public function getMaxPermsPrime()
     {
         $ret = ((!Auth::user() || !isset(Auth::user()->id)) ? -1 : 0);
@@ -147,7 +241,12 @@ class PageLoadUtils extends Controller
         }
         return $ret;
     }
-    
+
+    /**
+     * Get an array of the tree options for the current user's permissions.
+     *
+     * @return array
+     */
     public function getPermOpts()
     {
         $ret = [];
@@ -171,29 +270,49 @@ class PageLoadUtils extends Controller
         }
         return $ret;
     }
-    
+
+    /**
+     * Get the URL prefix for this tree's full path.
+     *
+     * @param  int  $treeOpts
+     * @return string
+     */
     public function getPageDashPrefix($treeOpts = 1)
     {
-        if ($treeOpts%Globals::TREEOPT_ADMIN == 0 
+        if ($treeOpts%Globals::TREEOPT_ADMIN == 0
             || $treeOpts%Globals::TREEOPT_STAFF == 0
-            || $treeOpts%Globals::TREEOPT_PARTNER == 0 
+            || $treeOpts%Globals::TREEOPT_PARTNER == 0
             || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0) {
             return '/dash';
         }
         return '';
     }
-    
+
+    /**
+     * Check whether or not a tree has any user level permissions.
+     *
+     * @param  App\Models\SLTree  $tree
+     * @return boolean
+     */
     public function chkNoTreePerms($tree)
     {
         if (!$tree || !isset($tree->tree_opts)) {
             return false;
         }
-        return ($tree->tree_opts%Globals::TREEOPT_ADMIN > 0 
+        return ($tree->tree_opts%Globals::TREEOPT_ADMIN > 0
             && $tree->tree_opts%Globals::TREEOPT_STAFF > 0
-            && $tree->tree_opts%Globals::TREEOPT_PARTNER > 0 
+            && $tree->tree_opts%Globals::TREEOPT_PARTNER > 0
             && $tree->tree_opts%Globals::TREEOPT_VOLUNTEER > 0);
     }
-    
+
+    /**
+     * Check if we should load a branching tree from it's Tree ID.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $treeSlug
+     * @param  string  $type
+     * @return mixed
+     */
     public function loadTreeByID(Request $request, $treeID = -3)
     {
         if (intVal($treeID) > 0) {
@@ -201,8 +320,8 @@ class PageLoadUtils extends Controller
             if ($tree && isset($tree->tree_opts)) {
                 if ($this->okToLoadTree($tree->tree_opts)) {
                     $this->syncDataTrees(
-                        $request, 
-                        $tree->tree_database, 
+                        $request,
+                        $tree->tree_database,
                         $treeID
                     );
                     return true;
@@ -211,13 +330,28 @@ class PageLoadUtils extends Controller
         }
         return false;
     }
-    
+
+    /**
+     * Check whether or not the current page request
+     * desires to edit this page (as an Admin or Staff user).
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
     public function hasParamEdit(Request $request)
     {
-        return ($request->has('edit') 
+        return ($request->has('edit')
             && intVal($request->get('edit')) == 1);
     }
-    
+
+    /**
+     * Check if we should load a branching tree from it's URL slug.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $treeSlug
+     * @param  string  $type
+     * @return mixed
+     */
     public function loadTreeBySlug(Request $request, $treeSlug = '', $type = 'Survey')
     {
         if (trim($treeSlug) != '') {
@@ -227,15 +361,15 @@ class PageLoadUtils extends Controller
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t 
-                        && isset($t->tree_opts) 
+                    if ($t
+                        && isset($t->tree_opts)
                         && $this->okToLoadTree($t->tree_opts)
                         && (!isset($GLOBALS["SL"])
-                            || sizeof($GLOBALS["SL"]->REQ->all()) == 0 
+                            || sizeof($GLOBALS["SL"]->REQ->all()) == 0
                             || $GLOBALS["SL"]->treeID != $t->tree_id)) {
                         $this->syncDataTrees(
-                            $request, 
-                            $t->tree_database, 
+                            $request,
+                            $t->tree_database,
                             $t->tree_id
                         );
                         return true;
@@ -245,31 +379,18 @@ class PageLoadUtils extends Controller
         }
         return false;
     }
-    
+
+    /**
+     * Run the current search request.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return mixed
+     */
     public function searchRun(Request $request)
     {
-        $params = '?s=';
-        if ($request->has('s')) {
-            $params .= $request->get('s');
-        }
-        if ($request->has('sFilt') 
-            && trim($request->get('sFilt')) != '') {
-            $params .= '&sFilt=' . $request->get('sFilt');
-        }
-        if ($request->has('sSort') 
-            && trim($request->get('sSort')) != '') {
-            $params .= '&sSort=' . $request->get('sSort');
-        }
-        if ($request->has('sSortDir') 
-            && trim($request->get('sSortDir')) != '') {
-            $params .= '&sSortDir=' . $request->get('sSortDir');
-        }
-        if ($request->has('sView') 
-            && trim($request->get('sView')) != '') {
-            $params .= '&sView=' . $request->get('sView');
-        }
+        $params = $this->getSearchRunParams($request);
         $searchTree = null;
-        if ($request->has('sDataSet') 
+        if ($request->has('sDataSet')
             && intVal($request->get('sDataSet')) > 0) {
             $perms = $this->getPermOpts();
             $searchDataTbl = intVal($request->get('sDataSet'));
@@ -278,7 +399,6 @@ class PageLoadUtils extends Controller
                 ->where('tree_core_table', $searchDataTbl)
                 ->get();
             $searchTree = $this->chkSearchRunTrees($trees, $perms);
-//echo '<pre>searchTree: '; print_r($trees); echo '</pre>'; exit;
             if ($searchTree === null || !isset($searchTree->tree_opts)) {
                 $trees = SLTree::where('tree_type', 'Page')
                     ->where('tree_database', $this->dbID)
@@ -286,15 +406,52 @@ class PageLoadUtils extends Controller
                 $searchTree = $this->chkSearchRunTrees($trees, $perms);
             }
             if ($searchTree !== null && isset($searchTree->tree_opts)) {
-                $redir = $this->getPageDashPrefix($searchTree->tree_opts) 
+                $redir = $this->getPageDashPrefix($searchTree->tree_opts)
                     . '/' . $searchTree->tree_slug . $params;
-//echo '<br />redir: ' . $redir; exit;
-                return redirect($redir);
+                return redirect($redir, 302);
             }
         }
-        return redirect('/search' . $params);
+        return redirect('/search' . $params, 302);
     }
-    
+
+    /**
+     * Get the current request's search parameters.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return string
+     */
+    private function getSearchRunParams(Request $request)
+    {
+        $params = '?s=';
+        if ($request->has('s')) {
+            $params .= $request->get('s');
+        }
+        if ($request->has('sFilt')
+            && trim($request->get('sFilt')) != '') {
+            $params .= '&sFilt=' . $request->get('sFilt');
+        }
+        if ($request->has('sSort')
+            && trim($request->get('sSort')) != '') {
+            $params .= '&sSort=' . $request->get('sSort');
+        }
+        if ($request->has('sSortDir')
+            && trim($request->get('sSortDir')) != '') {
+            $params .= '&sSortDir=' . $request->get('sSortDir');
+        }
+        if ($request->has('sView')
+            && trim($request->get('sView')) != '') {
+            $params .= '&sView=' . $request->get('sView');
+        }
+        return $params;
+    }
+
+    /**
+     * Find a search page which lines up with these permissions.
+     *
+     * @param  string  $treeSlug
+     * @param  int  $perms
+     * @return App\Models\SLTree
+     */
     protected function chkSearchRunTrees($trees, $perms)
     {
         $searchTree = $searchTreeHome = null;
@@ -303,7 +460,7 @@ class PageLoadUtils extends Controller
                 foreach ($perms as $perm) {
                     if ($searchTree === null) {
                         foreach ($trees as $tree) {
-                            if ($searchTree === null 
+                            if ($searchTree === null
                                 && $tree->tree_opts%$perm == 0
                                 && $tree->tree_opts%Globals::TREEOPT_SEARCH == 0) {
                                 if ($tree->tree_opts%Globals::TREEOPT_HOMEPAGE == 0) {
@@ -318,7 +475,7 @@ class PageLoadUtils extends Controller
             }
             if ($searchTree === null) {
                 foreach ($trees as $tree) {
-                    if ($searchTree === null 
+                    if ($searchTree === null
                         && $tree->tree_opts%Globals::TREEOPT_SEARCH   == 0
                         && $tree->tree_opts%Globals::TREEOPT_ADMIN     > 0
                         && $tree->tree_opts%Globals::TREEOPT_STAFF     > 0
@@ -338,7 +495,13 @@ class PageLoadUtils extends Controller
         }
         return $searchTree;
     }
-    
+
+    /**
+     * Check if this tree slug matches any system redirects.
+     *
+     * @param  string  $treeSlug
+     * @return string
+     */
     protected function chkPageRedir($treeSlug = '')
     {
         if (trim($treeSlug) != '') {
@@ -346,12 +509,12 @@ class PageLoadUtils extends Controller
                 ->where('tree_type', 'Redirect')
                 ->orderBy('tree_id', 'asc')
                 ->first();
-            if ($redirTree && isset($redirTree->tree_desc) 
+            if ($redirTree && isset($redirTree->tree_desc)
                 && trim($redirTree->tree_desc) != '') {
                 $redirURL = $redirTree->tree_desc;
-                if (strpos($redirURL, $this->domainPath) === false 
+                if (strpos($redirURL, $this->domainPath) === false
                     && substr($redirURL, 0, 1)       != '/'
-                    && strpos($redirURL, 'http://')  === false 
+                    && strpos($redirURL, 'http://')  === false
                     && strpos($redirURL, 'https://') === false) {
                     $redirURL = '/' . $redirURL;
                 }
@@ -360,19 +523,50 @@ class PageLoadUtils extends Controller
         }
         return $treeSlug;
     }
-    
+
+    /**
+     * Load a survey tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $treeSlug
+     * @return mixed
+     */
     public function loadNodeTreeURL(Request $request, $treeSlug = '')
     {
         return $this->loadNodeTreeURLInner($request, $treeSlug);
     }
-    
+
+    /**
+     * Edit a specific core record in a survey tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $cid
+     * @param  string  $treeSlug
+     * @return mixed
+     */
     public function loadNodeTreeURLedit(Request $request, $cid = -3, $treeSlug = '')
     {
         return $this->loadNodeTreeURLInner($request, $treeSlug, $cid);
     }
-    
+
+    /**
+     * Find the survey tree to redirect within.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $treeSlug
+     * @param  int  $cid
+     * @return mixed
+     */
     public function loadNodeTreeURLInner(Request $request, $treeSlug = '', $cid = -3)
     {
+        $redir = $this->chkLoginRedir($request);
+        if ($redir != '') {
+            echo '<html><body><script type="text/javascript"> setTimeout("window.location=\''
+                . $redir . '\'", 10); </script></body></html>';
+            exit;
+            //return redirect($redir, 302)
+            //    ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+        }
         $this->loadDomain();
         $this->checkHttpsDomain($request);
         if (trim($treeSlug) != '') {
@@ -380,17 +574,17 @@ class PageLoadUtils extends Controller
                 ->get();
             if ($urlTrees->isNotEmpty()) {
                 foreach ($urlTrees as $t) {
-                    if ($t 
-                        && isset($t->tree_opts) 
+                    if ($t
+                        && isset($t->tree_opts)
                         && $this->okToLoadTree($t->tree_opts)) {
                         $rootNode = SLNode::find($t->tree_first_page);
-                        if ($rootNode 
-                            && isset($t->tree_slug) 
+                        if ($rootNode
+                            && isset($t->tree_slug)
                             && isset($rootNode->node_prompt_notes)) {
                             return $this->loadNodeTreeURLredir(
-                                $request, 
-                                $t, 
-                                $rootNode, 
+                                $request,
+                                $t,
+                                $rootNode,
                                 $cid
                             );
                         }
@@ -398,12 +592,21 @@ class PageLoadUtils extends Controller
                 }
             }
         }
-        return redirect($this->domainPath . '/');
+        return redirect($this->domainPath . '/', 302);
     }
-    
+
+    /**
+     * Redirect to a specific node within a survey tree.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  App\Models\SLTree  $tree
+     * @param  App\Models\SLNode  $rootNode
+     * @param  int  $cid
+     * @return mixed
+     */
     protected function loadNodeTreeURLredir(Request $request, $tree, $rootNode, $cid = -3)
     {
-        $redir = $this->dashPrfx . '/u/' . $tree->tree_slug 
+        $redir = $this->dashPrfx . '/u/' . $tree->tree_slug
             . '/' . $rootNode->node_prompt_notes;
         if ($cid > 0) {
             $redir .= '?cid=' . $cid;
@@ -413,8 +616,8 @@ class PageLoadUtils extends Controller
             session()->forget('coreID' . $tree->tree_id);
             session()->forget('sessID' . $tree->tree_id);
         }
-        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '', 
-            str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '', 
+        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '',
+            str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '',
             $request->fullUrl()));
         if (substr($paramTxt, 0, 1) == '/') {
             $paramTxt = substr($paramTxt, 1);
@@ -422,9 +625,11 @@ class PageLoadUtils extends Controller
         if (trim($paramTxt) != '' && substr($paramTxt, 0, 1) == '?') {
             $redir .= '&' . substr($paramTxt, 1);
         }
-        return redirect($this->domainPath . $redir);
+        $redir = str_replace('&new=1&', '&', $redir);
+        return redirect($this->domainPath . $redir, 302)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
-    
+
     /**
      * Loading a core record ID identifying a specific Page Tree.
      *
@@ -451,11 +656,19 @@ class PageLoadUtils extends Controller
         }
         return $cid;
     }
-    
+
+    /**
+     * Load a Survloop page's core record.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  App\Models\SLTree  $tree
+     * @param  int  $cid
+     * @return void
+     */
     public function loadPageCID(Request $request, $tree, $cid)
     {
-        if ($cid > 0 
-            && $tree 
+        if ($cid > 0
+            && $tree
             && isset($tree->tree_id)
             && Auth::user()
             && isset(Auth::user()->id)) {
@@ -473,7 +686,7 @@ class PageLoadUtils extends Controller
                 $sess->sess_is_active = 1;
                 $sess->save();
             }
-            if ($request->has("n") 
+            if ($request->has("n")
                 && intVal($request->get("n")) > 0) {
                 $sess->update([
                     'sess_curr_node' => intVal($request->get("n"))
@@ -488,14 +701,29 @@ class PageLoadUtils extends Controller
             session()->put('coreID' . $tree->tree_id . 'old' . $cid, time());
             session()->save();
         }
-        return true;
     }
-    
+
+    /**
+     * Load a Survloop page URL with a core record ID
+     * — the raw ID, not the pulbic ID.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $pageSlug
+     * @param  int  $cid
+     * @param  string  $view
+     * @return mixed
+     */
     public function loadPageURLrawID(Request $request, $pageSlug = '', $cid = -3, $view = '')
     {
         return $this->loadPageURL($request, $pageSlug, $cid, $view, true);
     }
-    
+
+    /**
+     * Get this page's top-level cache key.
+     *
+     * @param  string  $type
+     * @return string
+     */
     protected function chkGenCacheKey($type = 'page')
     {
         if (trim($this->cacheKey) == '') {
@@ -503,7 +731,13 @@ class PageLoadUtils extends Controller
         }
         return $this->cacheKey;
     }
-    
+
+    /**
+     * Generate a key for this page's top-level cache.
+     *
+     * @param  string  $type
+     * @return string
+     */
     protected function topGenCacheKey($type = 'page')
     {
         $sffx = '-visitor';
@@ -525,8 +759,8 @@ class PageLoadUtils extends Controller
 //echo 'topGenCacheKey ? ' . (($GLOBALS["SL"]->isOwner) ? 't' : 'f') . ''; exit;
 
         }
-        $uri = str_replace('?refresh=1', '', 
-                str_replace('?refresh=1&', '?', 
+        $uri = str_replace('?refresh=1', '',
+                str_replace('?refresh=1&', '?',
                     str_replace('&refresh=1', '', $_SERVER["REQUEST_URI"])
                 )
             );
@@ -534,7 +768,14 @@ class PageLoadUtils extends Controller
         $this->cacheKey = $type . '-' . $uri . $sffx . '.html';
         return $this->cacheKey;
     }
-    
+
+    /**
+     * Check for problems with a cache's JS and CSS dependencies.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $type
+     * @return boolean
+     */
     public function topCheckCache(Request $request, $type = 'page')
     {
         $this->topGenCacheKey($type);
@@ -550,7 +791,29 @@ class PageLoadUtils extends Controller
         }
         return false;
     }
-    
+
+    /**
+     * Store a cache of this page.
+     *
+     * @param  int  $treeID
+     * @param  string  $treeType
+     * @return void
+     */
+    protected function topSaveCache($treeID = 0, $treeType = '')
+    {
+        $this->chkGenCacheKey();
+        $cache = new GlobalsCache;
+        $cid = ((isset($GLOBALS["SL"]->coreID)) ? $GLOBALS["SL"]->coreID : 0);
+        $cache->putCache($this->cacheKey, $this->pageContent, $treeType, $treeID, $cid);
+    }
+
+    /**
+     * Check for problems with a cache's JS and CSS dependencies.
+     *
+     * @param  string  $content
+     * @param  string  $type
+     * @return boolean
+     */
     public function checkCacheProblem($content = '', $type = '')
     {
         if (trim(strip_tags($content)) == '') {
@@ -584,31 +847,34 @@ class PageLoadUtils extends Controller
         }
         return $problem;
     }
-    
-    protected function topSaveCache($treeID = 0, $treeType = '')
-    {
-        $this->chkGenCacheKey();
-        $cache = new GlobalsCache;
-        $cid = ((isset($GLOBALS["SL"]->coreID)) ? $GLOBALS["SL"]->coreID : 0);
-        $cache->putCache($this->cacheKey, $this->pageContent, $treeType, $treeID, $cid);
-        return true;
-    }
-    
+
+    /**
+     * Inject admin code into bottom of page content's <body>.
+     *
+     * @param  string  $pageContent
+     * @return string
+     */
     public function addAdmCodeToPage($pageContent)
     {
         $extra = '';
-        if (Auth::user() && isset(Auth::user()->id) 
+        if (Auth::user() && isset(Auth::user()->id)
             && Auth::user()->hasRole('administrator|staff|brancher')) {
-            $extra .= ' setTimeout(\'addSideNavItem('
-                . '"Edit Page", "?edit=1")\', 2000); ';
+            $extra .= ' setTimeout(\'addSideNavItem("Edit Page", "?edit=1")\', 2000); ';
         }
         if (trim($extra) != '') {
-            $extra = '<script async defer type="text/javascript"> ' 
+            $extra = '<script async defer type="text/javascript"> '
                 . $extra . ' </script>';
         }
         return str_replace("</body>", $extra . "\n</body>", $pageContent);
     }
-    
+
+    /**
+     * Inject session messages and admin code into page content.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $pageContent
+     * @return string
+     */
     public function addSessAdmCodeToPage(Request $request, $pageContent)
     {
         if (!isset($GLOBALS["SL"])) {
@@ -616,64 +882,139 @@ class PageLoadUtils extends Controller
         }
         return $this->addAdmCodeToPage($GLOBALS["SL"]->swapSessMsg($pageContent));
     }
-    
+
+    /**
+     * Checks whether or not it is OK to load this tree.
+     *
+     * @param  int  $treeOpts
+     * @return boolean
+     */
     protected function okToLoadTree($treeOpts = 1)
     {
-        return ($this->treeRightType($treeOpts) 
+        return ($this->treeRightType($treeOpts)
             && $this->userHasTreePerms($treeOpts));
     }
-    
+
+    /**
+     * Checks whether or not a tree is public-facing or not.
+     *
+     * @param  int  $treeOpts
+     * @return boolean
+     */
     protected function treeRightType($treeOpts = 1)
     {
         if ($this->isAdminPage) {
-            return ($treeOpts%Globals::TREEOPT_ADMIN    == 0 
+            return ($treeOpts%Globals::TREEOPT_ADMIN    == 0
                 || $treeOpts%Globals::TREEOPT_STAFF     == 0
-                || $treeOpts%Globals::TREEOPT_PARTNER   == 0 
+                || $treeOpts%Globals::TREEOPT_PARTNER   == 0
                 || $treeOpts%Globals::TREEOPT_VOLUNTEER == 0);
         }
-        return ($treeOpts%Globals::TREEOPT_ADMIN    > 0 
+        return ($treeOpts%Globals::TREEOPT_ADMIN    > 0
             && $treeOpts%Globals::TREEOPT_STAFF     > 0
-            && $treeOpts%Globals::TREEOPT_PARTNER   > 0 
+            && $treeOpts%Globals::TREEOPT_PARTNER   > 0
             && $treeOpts%Globals::TREEOPT_VOLUNTEER > 0);
     }
-    
-    public function isUserAdmin()
+
+    /**
+     * Checks whether or not this current user is has Admin permissions.
+     *
+     * @return boolean
+     */
+    protected function isAdmin()
     {
         return (Auth::user() && Auth::user()->hasRole('administrator'));
     }
-    
+
+    /**
+     * Checks whether or not this current user is has Admin permissions.
+     *
+     * @return boolean
+     */
+    public function isUserAdmin()
+    {
+        return $this->isAdmin();
+    }
+
+    /**
+     * Checks whether or not this current user is has Staff permissions.
+     *
+     * @return boolean
+     */
     protected function isUserStaff()
     {
         return (Auth::user() && Auth::user()->hasRole('staff'));
     }
-    
+
+    /**
+     * Checks whether or not this current user is has Staff or Admin permissions.
+     *
+     * @return boolean
+     */
     protected function isStaffOrAdmin()
     {
         return (Auth::user() && Auth::user()->hasRole('administrator|staff'));
     }
-    
+
+    /**
+     * Checks whether or not this current user is has Volunteer permissions.
+     *
+     * @return boolean
+     */
     protected function isUserVolun()
     {
         return (Auth::user() && Auth::user()->hasRole('volunteer'));
     }
-    
+
+    /**
+     * Checks whether or not this current user is has Partner permissions.
+     *
+     * @return boolean
+     */
     protected function isUserPartn()
     {
         return (Auth::user() && Auth::user()->hasRole('partner'));
     }
 
+    /**
+     * Check for basic post-login redirects passed into the login form.
+     *
+     * @param  string  $redir
+     * @return string
+     */
+    protected function isRealRedir($redir)
+    {
+        $nonRedirs = [
+            '',
+            '/',
+            '/home',
+            '/login',
+            '/register',
+            '/logout',
+            '/dashboard'
+        ];
+        $tmp = trim(str_replace($this->domainPath, '', $redir));
+        return (!in_array($tmp, $nonRedirs)) && $this->urlNotResourceFile($redir);
+    }
+
+    /**
+     * That that a url is not for some system resource file.
+     * This helps avoid some redirect fails.
+     *
+     * @param  string  $str
+     * @return boolean
+     */
     protected function urlNotResourceFile($str)
     {
         $types = [
-            'css', 
-            'js', 
-            'png', 
-            'jpg', 
-            'jpeg', 
-            'gif', 
-            'svg', 
-            'woff', 
-            'woff2' 
+            'css',
+            'js',
+            'png',
+            'jpg',
+            'jpeg',
+            'gif',
+            'svg',
+            'woff',
+            'woff2'
         ];
         $str = trim($str);
         if ($str == '') {
@@ -692,5 +1033,139 @@ class PageLoadUtils extends Controller
         }
         return true;
     }
-    
+
+    /**
+     * Determines where to redirect freshly logged in users.
+     * With the upgrades to Laravel 8 & Fortify, post-login redirection was
+     * moved to the top of the most popular page loads through this function.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return string
+     */
+    public function chkLoginRedir(Request $request)
+    {
+        if (!Auth::user()
+            || !isset(Auth::user()->id)
+            || intVal(Auth::user()->id) <= 0
+            || (session()->has('loginChk')
+                && intVal(session()->get('loginChk')) == Auth::user()->id)) {
+            return '';
+        }
+        $this->loadDomain();
+        $redir = $this->chkBasicSessRedir($request);
+        if (!$this->isRealRedir($redir)) {
+            $redir = '';
+        }
+        if ($redir != '') {
+            $this->clearSessRedirs();
+            session()->put('loginChk', Auth::user()->id);
+            return $redir;
+        }
+        $this->loadLoop($request);
+        $redir = $this->custLoop->afterLogin($request);
+        session()->put('loginChk', Auth::user()->id);
+        return $redir;
+    }
+
+    /**
+     * Clear all session memory for basic Survloop logins.
+     *
+     * @return void
+     */
+    protected function clearSessRedirs()
+    {
+        session()->forget('previousUrl');
+        session()->forget('redir2');
+        session()->forget('lastTree');
+        session()->forget('lastTreeTime');
+        session()->forget('loginRedir');
+        session()->forget('loginRedirTime');
+        session()->save();
+    }
+
+    /**
+     * Check for basic post-login redirects passed into the login form.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return string
+     */
+    private function chkBasicSessRedir(Request $request)
+    {
+        $redir = '';
+        if (session()->has('previousUrl')
+            && $this->isRealRedir(session()->get('previousUrl'))) {
+            $redir = trim(session()->get('previousUrl'));
+            $this->afterLoginSurveyRedir($redir, $request);
+        } elseif (session()->has('redir2')
+            && $this->isRealRedir(session()->get('redir2'))) {
+            $redir = trim(session()->get('redir2'));
+        }
+        if (session()->has('loginRedir')
+            && $this->isRealRedir(session()->get('loginRedir'))) {
+            if (session()->has('lastTreeTime')
+                && session()->has('loginRedirTime')) {
+                if (session()->get('lastTreeTime') < session()->get('loginRedirTime')) {
+                    $redir = trim(session()->get('loginRedir'));
+                }
+            } else {
+                $redir = trim(session()->get('loginRedir'));
+            }
+        }
+        return $redir;
+    }
+
+    /**
+     * Check if being redirected back to a survey session,
+     * which needs to be associated with new user ID
+     *
+     * @param  string  $redir
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function afterLoginSurveyRedir($redir, Request $request)
+    {
+        if (strpos($redir, '/u/') == 0) {
+            $treeSlug = substr($redir, 3);
+            $pos = strpos($treeSlug, '/');
+            if ($pos > 0) {
+                $treeSlug = substr($treeSlug, 0, $pos);
+                $chk = SLTree::where('tree_type', 'Survey')
+                    ->where('tree_slug', $treeSlug)
+                    ->get();
+                if ($chk->isNotEmpty()) {
+                    foreach ($chk as $tree) {
+                        if (session()->has('sessID' . $tree->tree_id)
+                            && session()->has('coreID' . $tree->tree_id)
+                            && intVal(session()->get('sessID' . $tree->tree_id)) > 0) {
+                            $this->afterLoginUpdateSess($tree, $request);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if being redirected back to a survey session,
+     * which needs to be associated with new user ID
+     *
+     * @param  string  $redir
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function afterLoginUpdateSess($tree, Request $request)
+    {
+        $sess = SLSess::find(session()->get('sessID' . $tree->tree_id));
+        if ($sess && isset($sess->sess_core_id) && intVal($sess->sess_core_id) > 0) {
+            $sess->sess_user_id = Auth::user()->id;
+            $sess->save();
+            $this->syncDataTrees($request, $tree->tree_database, $tree->tree_id);
+            eval($GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+                . "::find(" . $sess->sess_core_id . ")->update([ '"
+                . $GLOBALS["SL"]->getCoreTblUserFld()
+                . "' => " . Auth::user()->id . " ]);");
+        }
+    }
+
+
 }

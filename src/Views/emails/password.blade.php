@@ -7,8 +7,8 @@
 <p>
     But don't worry. Please click this 
     link to reset your password:<br />
-    <a href="{{ url('password/reset/' . $token) }}" target="_blank"
-        >{{ url('password/reset/' . $token) }}</a>
+    <a href="{{ url('reset-password/' . $token) }}" target="_blank"
+        >{{ url('reset-password/' . $token) }}</a>
 </p>
 <p>
     If you didn't mean to reset your password, please 

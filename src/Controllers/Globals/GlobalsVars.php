@@ -44,13 +44,14 @@ class GlobalsVars extends GlobalsStatic
     public $xmlTree        = [];
     public $reportTree     = [];
     public $formTree       = [];
-    
+    public $txtSwaps       = [];
+
     public $coreTbl        = '';
     public $coreTblUserFld = '';
     public $treeXmlID      = -3;
     public $treeOverride   = -3;
     public $currProTip     = 0;
-    
+
     public $tblModels      = [];
     public $tbls           = [];
     public $tbl            = [];
@@ -62,11 +63,11 @@ class GlobalsVars extends GlobalsStatic
     public $defValues      = [];
     public $condTags       = [];
     public $condABs        = [];
-    
+
     public $foreignKeysIn  = [];
     public $foreignKeysOut = [];
     public $fldAbouts      = [];
-    
+
     public $dataLoops      = [];
     public $dataLoopNames  = [];
     public $dataSubsets    = [];
@@ -77,14 +78,14 @@ class GlobalsVars extends GlobalsStatic
         "res" => ['', '', -3],
         "tbl" => ['', '', -3]
     ];
-        
+
     // User's position within potentially nested loops
     public $sessTree       = 0;
     public $sessLoops      = [];
     public $closestLoop    = [];
     public $tblLoops       = [];
     public $nodeCondInvert = [];
-    
+
     public $sysTree        = [
         "forms" => [
             "pub" => [],
@@ -101,12 +102,12 @@ class GlobalsVars extends GlobalsStatic
     public $allCoreTbls    = [];
     public $pubCoreTbls    = [];
     public $currSearchTbls = [];
-    
+
     public $currTabInd     = 0;
     public $debugOn        = false;
 
-    
-    // Trees (Surveys & Pages) are assigned an optional property 
+
+    // Trees (Surveys & Pages) are assigned an optional property
     // when ( SLTree->tree_opts%TREEOPT_PRIME == 0 )
 
     // Site Map Architecture and Permissions Flags
@@ -114,70 +115,70 @@ class GlobalsVars extends GlobalsStatic
     // Page Tree acts as home page for site area
     public const TREEOPT_HOMEPAGE   = 7;
 
-    // Tree acts as search results page for site area 
+    // Tree acts as search results page for site area
     public const TREEOPT_SEARCH     = 31;
 
     // This page acts as the default Member Profile for the system
     public const TREEOPT_PROFILE    = 23;
 
     // Page Tree is a Report for a survey, so they share data structures
-    public const TREEOPT_REPORT     = 13; 
-    
+    public const TREEOPT_REPORT     = 13;
+
 
     // Site Map Architecture and Permissions Flags
 
     // Access limited to admin users
-    public const TREEOPT_ADMIN      = 3;  
+    public const TREEOPT_ADMIN      = 3;
 
     // Access limited to staff users (and higher)
-    public const TREEOPT_STAFF      = 43; 
+    public const TREEOPT_STAFF      = 43;
 
     // Access limited to partner users (and higher)
-    public const TREEOPT_PARTNER    = 41; 
+    public const TREEOPT_PARTNER    = 41;
 
     // Access limited to volunteer users (and higher)
-    public const TREEOPT_VOLUNTEER  = 17; 
-    
+    public const TREEOPT_VOLUNTEER  = 17;
+
 
     // Other Tree Options
 
-    // Tree's contents are wrapped in the skinny page width 
-    public const TREEOPT_SKINNY     = 2;  
-    
+    // Tree's contents are wrapped in the skinny page width
+    public const TREEOPT_SKINNY     = 2;
+
     // Record edits not allowed after complete (except admins)
-    public const TREEOPT_NOEDITS    = 11; 
+    public const TREEOPT_NOEDITS    = 11;
 
     // Survey uses a separate unique Public ID for completed records
-    public const TREEOPT_PUBLICID   = 47; 
+    public const TREEOPT_PUBLICID   = 47;
 
     // A navigation menu is generated below each page of the survey
-    public const TREEOPT_SURVNAVBOT = 37; 
+    public const TREEOPT_SURVNAVBOT = 37;
 
     // A navigation menu is generated atop each page of the survey
-    public const TREEOPT_SURVNAVTOP = 59; 
+    public const TREEOPT_SURVNAVTOP = 59;
 
     // A thin progress bar is generated atop each page of the survey
-    public const TREEOPT_SURVNAVLIN = 61; 
+    public const TREEOPT_SURVNAVLIN = 61;
 
     // Survey is one big loop through editable records
-    public const TREEOPT_ONEBIGLOOP = 5;  
+    public const TREEOPT_ONEBIGLOOP = 5;
 
 
     // Page Tree Options
 
     // Page Tree is currently too complicated to cache
-    public const TREEOPT_NOCACHE    = 29; 
+    public const TREEOPT_NOCACHE    = 29;
 
     // This page's enclosing form is submittable
-    public const TREEOPT_PAGEFORM   = 53; 
+    public const TREEOPT_PAGEFORM   = 53;
 
-    // This page is a Survloop standard contact form 
-    public const TREEOPT_CONTACT    = 19; 
+    // This page is a Survloop standard contact form
+    public const TREEOPT_CONTACT    = 19;
 
     // This whole page has a background color (default: faint)
-    public const TREEOPT_BG         = 67; 
+    public const TREEOPT_BG         = 67;
 
     // This whole page fades in after load
-    public const TREEOPT_FADEIN     = 71; 
+    public const TREEOPT_FADEIN     = 71;
 
 }

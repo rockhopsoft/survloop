@@ -1,7 +1,7 @@
 <!-- resources/views/admin/tree-sessions-one.blade.php -->
 <div class="card">
     <div class="card-header">
-        <span class="float-right m0">{{ date("m/d/y g:ia", $session["date"]) }}</span>
+        <span class="float-right m0">{{ $GLOBALS["SL"]->printTimeZoneShiftStamp($session["date"]) }}</span>
         <h3>{{ $GLOBALS["SL"]->coreTbl }} #{{ $recID }}</h3>
     </div>
     <div class="card-body">

@@ -19,8 +19,8 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         $ret = '';
         if (sizeof($curr->tmpSubTier[1]) > 0) {
             $this->tableDat = $this->loadTableDat(
-                $curr, 
-                $curr->sessData, 
+                $curr,
+                $curr->sessData,
                 $curr->tmpSubTier
             );
             $GLOBALS["SL"]->currCyc["tbl"][0] = $this->tableDat["tbl"];
@@ -34,29 +34,38 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
             $java = '';
             foreach ($curr->tmpSubTier[1] as $k => $kidNode) {
                 $kid = $this->printNodePublic($kidNode[0], $kidNode, 1);
-                $this->tableDat["blnk"][$k] = str_replace('nFld', '', 
+                $this->tableDat["blnk"][$k] = str_replace('nFld', '',
                     str_replace('nFld mT0', '', $kid));
                 $java .= (($k > 0) ? ', ' : '') . $kidNode[0];
             }
-            $this->v["javaNodes"] .= 'nodeTblList[' . $curr->nID 
+            $this->v["javaNodes"] .= 'nodeTblList[' . $curr->nID
                 . '] = new Array(' . $java . '); ';
             if ($this->tableDat["req"][0]) {
                 $this->pageJSvalid .= "var cols = new Array(";
                 foreach ($curr->tmpSubTier[1] as $k => $kidNode) {
-                    $this->pageJSvalid .= (($k > 0) ? ", " : "") 
-                        . " new Array(" . $kidNode[0] . ", " 
-                        . (($this->tableDat["req"][2][$k]) ? 'true' : 'false') 
+                    $this->pageJSvalid .= (($k > 0) ? ", " : "")
+                        . " new Array(" . $kidNode[0] . ", "
+                        . (($this->tableDat["req"][2][$k]) ? 'true' : 'false')
                         . ") ";
                 }
-                $this->pageJSvalid .= ");\n" . "addReqNodeTbl(" 
-                    . $curr->nID . ", '" . $curr->nIDtxt . "', 'reqFormFldTbl', " 
-                    . $this->tableDat["maxRow"] . ", cols, " 
+                $this->pageJSvalid .= ");\n" . "addReqNodeTbl("
+                    . $curr->nID . ", '" . $curr->nIDtxt . "', 'reqFormFldTbl', "
+                    . $this->tableDat["maxRow"] . ", cols, "
                     . (($this->tableDat["req"][1]) ? 'true' : 'false') . ");\n";
             }
             $prompt = $this->swapLabels($curr, $curr->nodeRow->node_prompt_text);
 
+            $hasCol1 = false;
+            if (sizeof($this->tableDat["rows"]) > 0) {
+                foreach ($this->tableDat["rows"] as $row) {
+                    if (trim(strip_tags($row["leftTxt"])) != '') {
+                        $hasCol1 = true;
+                    }
+                }
+            }
+
             $GLOBALS["SL"]->pageAJAX .= view(
-                'vendor.survloop.forms.formtree-table-ajax', 
+                'vendor.survloop.forms.formtree-table-ajax',
                 [
                     "nIDtxt"          => $curr->nIDtxt,
                     "node"            => $curr,
@@ -64,12 +73,13 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                 ]
             )->render();
             $ret .= view(
-                'vendor.survloop.forms.formtree-table', 
+                'vendor.survloop.forms.formtree-table',
                 [
                     "nID"             => $curr->nID,
                     "nIDtxt"          => $curr->nIDtxt,
                     "node"            => $curr,
                     "nodePromptText"  => $prompt,
+                    "hasCol1"         => $hasCol1,
                     "tableDat"        => $this->tableDat
                 ]
             )->render();
@@ -82,11 +92,11 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
     protected function nodePrintSpreadsheetRow(&$curr, $i)
     {
         if (trim($this->tableDat["rowCol"]) != '') {
-            if ($this->tableDat["rows"][$i]["id"] <= 0 
+            if ($this->tableDat["rows"][$i]["id"] <= 0
                 && trim($this->tableDat["rowCol"]) != '') {
                 $recObj = $this->sessData->checkNewDataRecord(
-                    $this->tableDat["tbl"], 
-                    $this->tableDat["rowCol"], 
+                    $this->tableDat["tbl"],
+                    $this->tableDat["rowCol"],
                     $this->tableDat["rows"][$i]["leftVal"]
                 );
                 if ($recObj) {
@@ -97,8 +107,8 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         $GLOBALS["SL"]->currCyc["tbl"][1] = 'tbl' . $i;
         $GLOBALS["SL"]->currCyc["tbl"][2] = $this->tableDat["rows"][$i]["id"];
         $this->sessData->startTmpDataBranch(
-            $this->tableDat["tbl"], 
-            $this->tableDat["rows"][$i]["id"], 
+            $this->tableDat["tbl"],
+            $this->tableDat["rows"][$i]["id"],
             false
         );
         foreach ($curr->tmpSubTier[1] as $k => $kidNode) {
@@ -112,28 +122,28 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
         return true;
     }
-    
+
     public function loadTableDat($curr, $currNodeSessData = [], $tmpSubTier = [])
     {
         $req = [
-            $curr->isRequired(), 
-            false, 
-            [] 
+            $curr->isRequired(),
+            false,
+            []
         ];
         $this->tableDat = [
-            "tbl"    => '', 
-            "defSet" => '', 
-            "loop"   => '', 
-            "month"  => '', 
-            "rowCol" => $curr->getTblFldName(), 
-            "rows"   => [], 
-            "cols"   => [], 
-            "data"   => [], 
+            "tbl"    => '',
+            "defSet" => '',
+            "loop"   => '',
+            "month"  => '',
+            "rowCol" => $curr->getTblFldName(),
+            "rows"   => [],
+            "cols"   => [],
+            "data"   => [],
             "blnk"   => [],
-            "maxRow" => 10, 
+            "maxRow" => 10,
             "req"    => $req
         ];
-        if (isset($curr->nodeRow->node_data_branch) 
+        if (isset($curr->nodeRow->node_data_branch)
             && trim($curr->nodeRow->node_data_branch) != '') {
             $this->tableDat["tbl"] = $curr->nodeRow->node_data_branch;
         }
@@ -144,8 +154,8 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
             if (sizeof($defs) > 0) {
                 foreach ($defs as $i => $def) {
                     $this->tableDat["rows"][] = $this->addTableDatRow(
-                        -3, 
-                        $def->def_value, 
+                        -3,
+                        $def->def_value,
                         $def->def_id
                     );
                 }
@@ -158,19 +168,19 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                 foreach ($loopCycle as $i => $loopItem) {
                     $label = $this->getLoopItemLabel($rowSet["set"], $loopItem, $i);
                     $this->tableDat["rows"][] = $this->addTableDatRow(
-                        $loopItem->getKey(), 
+                        $loopItem->getKey(),
                         $label
                     );
                 }
             }
         } elseif ($rowSet["type"] == 'Table') {
             $this->tableDat["tbl"] = $rowSet["set"];
-            if (isset($this->sessData->dataSets[$this->tableDat["tbl"]]) 
+            if (isset($this->sessData->dataSets[$this->tableDat["tbl"]])
                 && sizeof($this->sessData->dataSets[$this->tableDat["tbl"]]) > 0) {
                 foreach ($this->sessData->dataSets[$this->tableDat["tbl"]] as $i => $tblItem) {
                     $label = $this->getTableRecLabel($rowSet["set"], $tblItem, $i);
                     $this->tableDat["rows"][] = $this->addTableDatRow(
-                        $tblItem->getKey(), 
+                        $tblItem->getKey(),
                         $label
                     );
                 }
@@ -178,7 +188,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         } elseif ($rowSet["type"] == 'Months' && $curr->isDynaMonthTbl()) {
             $this->tableDat["month"] = $curr->dynaMonthFld;
             $monthTblAbbr = $GLOBALS["SL"]->tblAbbr[$this->tableDat["tbl"]];
-            if (isset($this->sessData->dataSets[$this->tableDat["tbl"]]) 
+            if (isset($this->sessData->dataSets[$this->tableDat["tbl"]])
                 && sizeof($this->sessData->dataSets[$this->tableDat["tbl"]]) > 0) {
                 for ($m = 1; $m <= 12; $m++) {
                     $label = date("M", mktime(0, 0, 0, $m, 1, 2000));
@@ -186,7 +196,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                         if (isset($tblItem->{ $monthTblAbbr . 'month' })
                             && $m == intVal($tblItem->{ $monthTblAbbr . 'month' })) {
                             $this->tableDat["rows"][] = $this->addTableDatRow(
-                                $tblItem->getKey(), 
+                                $tblItem->getKey(),
                                 $label,
                                 intVal($tblItem->{ $monthTblAbbr . 'month' })
                             );
@@ -210,7 +220,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
             }
         }
         $this->tableDat["maxRow"] = sizeof($this->tableDat["rows"]);
-        if (isset($curr->nodeRow->node_char_limit) 
+        if (isset($curr->nodeRow->node_char_limit)
             && intVal($curr->nodeRow->node_char_limit) > 0) {
             $this->tableDat["maxRow"] = $curr->nodeRow->node_char_limit;
         }
@@ -228,7 +238,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
         }
         return $this->tableDat;
     }
-    
+
     public function addTableDatRow($id = -3, $leftTxt = '', $leftVal = '', $cols = [])
     {
         return [
@@ -271,27 +281,27 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                     $ret .= $this->postNodePublicSpreadTblMonths($curr, $i, $fldVals);
                 } else {
                     if (trim($this->tableDat["rowCol"]) != '') {
-                        if (isset($this->tableDat["rows"][$i]) 
-                            && isset($this->tableDat["rows"][$i]["leftVal"]) 
+                        if (isset($this->tableDat["rows"][$i])
+                            && isset($this->tableDat["rows"][$i]["leftVal"])
                             && trim($this->tableDat["rows"][$i]["leftVal"]) != '') {
                             $recObj = $this->sessData->checkNewDataRecord(
-                                $this->tableDat["tbl"], 
-                                $this->tableDat["rowCol"], 
+                                $this->tableDat["tbl"],
+                                $this->tableDat["rowCol"],
                                 $this->tableDat["rows"][$i]["leftVal"]
                             );
                             if ($hasRow) {
                                 if (!$recObj) {
                                     $recObj = $this->sessData->newDataRecord(
-                                        $this->tableDat["tbl"], 
-                                        $this->tableDat["rowCol"], 
-                                        $this->tableDat["rows"][$i]["leftVal"], 
+                                        $this->tableDat["tbl"],
+                                        $this->tableDat["rowCol"],
+                                        $this->tableDat["rows"][$i]["leftVal"],
                                         true
                                     );
                                 }
                             } else { // does not have this row
                                 if ($recObj && $curr->nodeRow->node_opts%73 > 0) {
                                     $this->sessData->deleteDataRecordByID(
-                                        $this->tableDat["tbl"], 
+                                        $this->tableDat["tbl"],
                                         $recObj->getKey()
                                     );
                                 }
@@ -305,8 +315,8 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                     } else { // user adds rows as they go
                         if ($hasRow) {
                             $matches = $this->sessData->getRowIDsByFldVal(
-                                $this->tableDat["tbl"], 
-                                $fldVals, 
+                                $this->tableDat["tbl"],
+                                $fldVals,
                                 true
                             );
                             if (empty($matches)) {
@@ -332,7 +342,7 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                             }
                         } elseif (isset($this->tableDat["rows"][$i])) {
                             $this->sessData->deleteDataRecordByID(
-                                $this->tableDat["tbl"], 
+                                $this->tableDat["tbl"],
                                 $this->tableDat["rows"][$i]["id"]
                             );
                         }
@@ -340,23 +350,23 @@ class TreeSurvSpreadsheet extends TreeSurvFormCheckboxes
                     if ($hasRow) {
                         $GLOBALS["SL"]->currCyc["tbl"][1] = 'tbl' . $i;
                         $GLOBALS["SL"]->currCyc["tbl"][2] = -3;
-                        if (isset($this->tableDat["rows"][$i]) 
+                        if (isset($this->tableDat["rows"][$i])
                             && intVal($this->tableDat["rows"][$i]["id"]) > 0) {
                             $GLOBALS["SL"]->currCyc["tbl"][2] = $this->tableDat["rows"][$i]["id"];
                             $this->sessData->startTmpDataBranch(
-                                $this->tableDat["tbl"], 
-                                $this->tableDat["rows"][$i]["id"], 
+                                $this->tableDat["tbl"],
+                                $this->tableDat["rows"][$i]["id"],
                                 false
                             );
                         }
                         foreach ($curr->tmpSubTier[1] as $k => $kidNode) {
                             $ret .= $this->postNodePublic(
-                                $kidNode[0], 
-                                $kidNode, 
+                                $kidNode[0],
+                                $kidNode,
                                 $curr->currVisib
                             );
                         }
-                        if (isset($this->tableDat["rows"][$i]) 
+                        if (isset($this->tableDat["rows"][$i])
                             && intVal($this->tableDat["rows"][$i]["id"]) > 0) {
                             $this->sessData->endTmpDataBranch($this->tableDat["tbl"]);
                         }

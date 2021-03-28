@@ -35,14 +35,14 @@ function runFormSubAjax() {
     }
     $.ajax({
         url: formActionUrl,
-        type: "POST", 
-        data: formData, 
+        type: "POST",
+        data: formData,
         contentType: false,
         processData: false,
         success: function(data) {
             $("#ajaxWrap").empty();
             $("#ajaxWrap").append(data);
-        }, 
+        },
         error: function(xhr, status, error) {
             $("#ajaxWrap").append("<div>(error - "+xhr.responseText+")</div>");
         }
@@ -138,11 +138,11 @@ function checkNodeForm() {
         return false;
     }
     clearFormErrs();
-    return true; 
+    return true;
 }
 
 /*
-// Client extension can include custom form 
+// Client extension can include custom form
 // validation scripts with a function like this...
 function reqFormFldCustom() {
     var nIDtxt = '701';
@@ -401,15 +401,15 @@ function logCngCnt() {
 }
 $(document).on("keyup", ".ntrStp", function(e) {
     if (e.keyCode == 13) {
-        if (e.preventDefault) e.preventDefault(); 
-        else e.returnValue = false; 
+        if (e.preventDefault) e.preventDefault();
+        else e.returnValue = false;
         nextTabFld($(this).attr("id"));
-        return false; 
+        return false;
     }
 });
 $(document).on("keydown", ".ntrStp", function(e) {
-    if (e.keyCode == 13) { 
-        if (e.preventDefault) e.preventDefault(); 
+    if (e.keyCode == 13) {
+        if (e.preventDefault) e.preventDefault();
         else e.returnValue = false;
         return false;
     } else { logCngCnt(); }
@@ -482,6 +482,54 @@ $(document).on("click", ".delSprdTblRow", function() {
     }
     return true;
 });
+
+
+/*
+var tableRowSpecs = new Array();
+function addTblRowAjax(nIDtxt) {
+    tableRowSpecs[tableRowSpecs.length] = new Array(nIDtxt);
+}
+function addTblRowCellAjax(nIDtxt, cell) {
+    var found = false;
+    for (var i = 0; i < tableRowSpecs.length; i++) {
+        if (tableRowSpecs[i][0] == nIDtxt) {
+            found = true;
+            var newCell = tableRowSpecs[i].length;
+            tableRowSpecs[i][newCell] = cell;
+        }
+    }
+    if (!found) {
+        addTblRowAjax(nIDtxt);
+        addTblRowCellAjax(nIDtxt, cell);
+    }
+}
+*/
+var holdAddTblRowAjax = false;
+function addTblRowAjax(nIDtxt) {
+    if (!holdAddTblRowAjax) {
+        var newRow = 0;
+        while (document.getElementById("n"+nIDtxt+"tbl"+newRow+"row")) {
+            newRow++;
+        }
+        if (document.getElementById("sprdTbl"+nIDtxt+"")) {
+            //var table = document.getElementById("sprdTbl"+nIDtxt+"");
+            //var row = table.insertRow(0);
+
+            document.getElementById("sprdTbl"+nIDtxt+"").innerHTML+="<tr id=\"n"+nIDtxt+"tbl"+newRow+"row\"></tr>";
+            var src = "/ajax/tbl-add-row?nIDtxt="+nIDtxt+"&newInd="+newRow+"";
+            console.log("#n"+nIDtxt+"tbl"+newRow+"row ... "+src);
+            $("#n"+nIDtxt+"tbl"+newRow+"row").load(src);
+            holdAddTblRowAjax = true;
+            setTimeout("holdAddTblRowAjax = false", 1500);
+        }
+    }
+}
+$(document).on("click", ".tblAddRowAjaxBtn", function() {
+    addTblRowAjax($(this).attr("data-nidtxt"));
+});
+
+
+
 
 function reqFormTxt(fldID, nIDtxt) {
     if (document.getElementById(fldID) && document.getElementById(fldID).value.trim() == "") {
@@ -665,7 +713,7 @@ function reqFormFldTbl(nID, nIDtxt, maxRow, cols, colsReq) {
             }
         }
     } else {
-        
+
     }
     if (foundTblFail) {
         setFormLabelRed(nIDtxt);
@@ -829,7 +877,7 @@ function chkSpecialNodeNYC(specialNode) {
                 } else if (city.indexOf("bronxny") >= 0 || city.indexOf("brooklynny") >= 0 || city.indexOf("manhattanny") >= 0 || city.indexOf("queensny") >= 0 || city.indexOf("statenislandny") >= 0 || city.indexOf("bronxny") >= 0) {
 
                     showNyc = true;
-                    
+
                 }
             }
         }
@@ -855,5 +903,33 @@ function toggleNodeSimple(node) {
     return false;
 }
 $(document).on("click", ".toglNodeSmpl", function() {
-    toggleNodeSimple($(this).attr("data-tog-node")); 
+    toggleNodeSimple($(this).attr("data-tog-node"));
 });
+
+
+function toggleSwitchBtn(rand) {
+    if (rand && document.getElementById('toggleSwitchBtn'+rand+'') && document.getElementById('toggleSwitchCircle'+rand+'') && document.getElementById('toggle'+rand+'')) {
+        if (document.getElementById('toggleSwitchBtn'+rand+'').className == 'toggleSwitchBtnOn') {
+            document.getElementById('toggle'+rand+'').value=0;
+            $('#toggleSwitchCircle'+rand+'').animate({ left: '29px' }, 150);
+            setTimeout(function() {
+                document.getElementById('toggleSwitchBtn'+rand+'').className='toggleSwitchBtn';
+            }, 5);
+        } else {
+            document.getElementById('toggle'+rand+'').value=1;
+            $('#toggleSwitchCircle'+rand+'').animate({ left: '3px' }, 150);
+            setTimeout(function() {
+                document.getElementById('toggleSwitchBtn'+rand+'').className='toggleSwitchBtnOn';
+            }, 5);
+        }
+        return true;
+    }
+    return false;
+}
+$(document).on("click", ".toggleSwitch", function() {
+    toggleSwitchBtn($(this).attr("data-rand"));
+});
+
+
+
+

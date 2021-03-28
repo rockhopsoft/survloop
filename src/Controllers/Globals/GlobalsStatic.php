@@ -1,8 +1,8 @@
 <?php
 /**
-  * GlobalsStatic is the mid-level core class for loading 
+  * GlobalsStatic is the mid-level core class for loading
   * and accessing system information from anywhere.
-  * This level contains mostly standalone functions 
+  * This level contains mostly standalone functions
   * which are not really Survloop-specific.
   *
   * Survloop - All Our Data Are Belong
@@ -19,12 +19,12 @@ class GlobalsStatic extends GlobalsConvert
 {
     public $uID = -3;
     public $REQ = [];
-    
+
     function __construct(Request $request = NULL)
     {
         $this->loadStatic($request);
     }
-    
+
     public function loadStatic(Request $request = NULL)
     {
         $this->uID = -3;
@@ -57,24 +57,42 @@ class GlobalsStatic extends GlobalsConvert
         return $ret;
     }
 
+    public function isAjaxOrEmbed()
+    {
+        return ($this->REQ->has('ajax') || $this->REQ->has('embed'));
+    }
+
+    public function isAjaxOrEmbedOrMobile()
+    {
+        return ($this->isAjaxOrEmbed() || $this->isMobile());
+    }
+
     public function getReqHiddenInputs()
     {
         $ret = '';
         $params = $this->getStdReqParams();
         foreach ($params as $param) {
             if ($this->REQ->has($param)) {
-                $ret .= '<input type="hidden" name="' . $param 
+                $ret .= '<input type="hidden" name="' . $param
                     . '" value="' . $this->REQ->get($param) . '">';
             }
         }
         return $ret;
     }
-    
+
+    public function reqExplode($delim, $param)
+    {
+        if ($this->REQ->has($param)) {
+            return $this->mexplode(',', $this->REQ->get($param));
+        }
+        return [];
+    }
+
     public function printThrottledHtml($str)
     {
         return strip_tags($str, '<p><br>');
     }
-    
+
     public function stripDoubleSpaces($str)
     {
         while (strpos($str, '  ') !== false) {
@@ -82,25 +100,25 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $str;
     }
-    
+
     public function stripTabs($str)
     {
         return trim(preg_replace('/[ ]{2,}|[\t]/', ' ', $str));
     }
-    
+
     public function stripDoubleLines($str)
     {
         return trim(preg_replace('/\s\s+/', ' ', $str));
     }
-    
+
     public function stripAllSpaces($str)
     {
         $str = $this->stripDoubleLines($str);
         $str = $this->stripTabs($str);
         return trim($this->stripDoubleSpaces($str));
     }
-    
-    
+
+
     public function stripCertainHtmlTags($str, $tagStart, $tagEnd)
     {
         if (trim($str) != '' && trim($tagStart) != '' && trim($tagEnd) != '') {
@@ -138,13 +156,13 @@ class GlobalsStatic extends GlobalsConvert
 
     public function addSlashLines($ret)
     {
-        return str_replace( 
-            array( "\n", "\r" ), 
-            array( "\\n", "\\r" ), 
+        return str_replace(
+            array( "\n", "\r" ),
+            array( "\\n", "\\r" ),
             addslashes($ret)
         );
     }
-    
+
     public function splitNumDash($str, $delim = '-')
     {
         $str = trim($str);
@@ -160,7 +178,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return [ 0, 0 ];
     }
-    
+
     public function swapURLwrap($url, $printHttp = true)
     {
         $urlPrint = str_replace('mailto:', '', $url);
@@ -168,14 +186,14 @@ class GlobalsStatic extends GlobalsConvert
             $urlPrint = $this->printURLdomain($urlPrint);
         }
         return '<a href="' . $url . '" target="_blank" class="dont-break-out">'
-            . $urlPrint . '</a>'; 
+            . $urlPrint . '</a>';
     }
-    
+
     public function printURLdomain($url)
     {
         if (trim($url) != '') {
-            $url = str_replace('http://', '', str_replace('https://', '', 
-                str_replace('http://www.', '', str_replace('https://www.', '', 
+            $url = str_replace('http://', '', str_replace('https://', '',
+                str_replace('http://www.', '', str_replace('https://www.', '',
                     $url))));
             if (substr($url, strlen($url)-1) == '/') {
                 $url = substr($url, 0, strlen($url)-1);
@@ -183,7 +201,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $url;
     }
-    
+
     public function searchDeeperDirs($file)
     {
         $newFile = $file;
@@ -197,7 +215,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $file;
     }
-    
+
     public function copyDirFiles($from, $to, $recurse = true)
     {
         if (trim($from) == '' || trim($to) == '' || !file_exists($from)) {
@@ -226,7 +244,7 @@ class GlobalsStatic extends GlobalsConvert
         closedir($dir);
         return $ret;
     }
-    
+
     public function getDirSize($dirPath = '', $type = '')
     {
         if (!file_exists($dirPath)) {
@@ -238,7 +256,7 @@ class GlobalsStatic extends GlobalsConvert
             if ($file != '.' && $file != '..') {
                 if (is_dir($dirPath . '/' . $file)) {
                     $size += $this->getDirSize($dirPath . '/' . $file, $type);
-                } elseif (($type == '' || strpos($file, $type) > 0) 
+                } elseif (($type == '' || strpos($file, $type) > 0)
                     && file_exists($dirPath . '/' . $file)) {
                     $size += filesize($dirPath . '/' . $file);
                 }
@@ -247,7 +265,7 @@ class GlobalsStatic extends GlobalsConvert
         closedir($dir);
         return $size;
     }
-    
+
     public function getDirLinesCount($dirPath = '', $type = '.php')
     {
         $lines = 0;
@@ -266,7 +284,7 @@ class GlobalsStatic extends GlobalsConvert
         closedir($dir);
         return $lines;
     }
-    
+
     public function getFileLineCount($file = '')
     {
         $lines = 0;
@@ -280,12 +298,12 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $lines;
     }
-    
+
     public function findDirFile($folder, $file)
     {
         return $this->findDirFileInner($folder, $file);
     }
-    
+
     public function findDirFileInner($folder, $file, $subFold = [])
     {
         if (!file_exists($folder) || !is_dir($folder)) {
@@ -311,7 +329,7 @@ class GlobalsStatic extends GlobalsConvert
         closedir($dir);
         return [];
     }
-    
+
     public function mapDirFiles($folder, $recurse = true)
     {
         $ret = [];
@@ -330,7 +348,7 @@ class GlobalsStatic extends GlobalsConvert
         closedir($dir);
         return $ret;
     }
-    
+
     public function mapDirSlimmer($map, $folder)
     {
         if ($map && sizeof($map) > 0 && trim($folder) != '') {
@@ -348,7 +366,7 @@ class GlobalsStatic extends GlobalsConvert
     {
         return $this->mapDirSlimmer($this->mapDirFiles($folder, $recurse), $folder);
     }
-    
+
     public function slugify($text, $delim = '-')
     {
         $text = preg_replace('~[^\pL\d]+~u', '-', $text);
@@ -365,7 +383,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $text;
     }
-    
+
     public function urlPreview($url)
     {
         $url = urlClean($url);
@@ -374,11 +392,11 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $url;
     }
-    
+
     public function urlClean($url)
     {
-        $url = str_replace('m.facebook.com/', 'facebook.com/', 
-            str_replace('http://', '', str_replace('https://', '', 
+        $url = str_replace('m.facebook.com/', 'facebook.com/',
+            str_replace('http://', '', str_replace('https://', '',
             str_replace('http://www.', '', str_replace('https://www.', '', $url)))));
         $pos = strrpos($url, '/');
         if ($pos !== false && $pos == strlen($url)-1) {
@@ -386,7 +404,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $url;
     }
-    
+
     public function urlCleanIfShort($url, $altLabel = 'Link', $max = 35)
     {
         $shrt = $this->urlClean($url);
@@ -395,19 +413,19 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $shrt;
     }
-    
+
     public function breakUpLongLinesPrint($str, $charLimit = 120)
     {
         $str = $this->breakUpLongWords($str, $charLimit);
         return wordwrap($str, $charLimit, "<br>\n");
     }
-    
+
     public function breakUpLongWordsPrint($str, $charLimit = 120)
     {
         $str = $this->breakUpLongWords($str, $charLimit);
         return str_replace("\n", '<br />', $str);
     }
-    
+
     public function breakUpLongWords($str, $charLimit = 120)
     {
         $lines = $this->mexplode("\n", $str);
@@ -428,7 +446,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $str;
     }
-    
+
     public function breakUpWord($word, $charLimit = 120)
     {
         if (strlen($word) > $charLimit) {
@@ -437,7 +455,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $word;
     }
-    
+
     // takes in and returns rows of [ Record ID, Ranked Value, Rank Order, Percentile ]
     public function calcPercentiles($arr = [])
     {
@@ -458,16 +476,22 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $sorted;
     }
-    
+
     function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
     {
-        header('Content-type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment; filename=' .$inFilename );
-        echo "<table border=1>" . $innerTable . "</table>";
+        header("Content-Type: application/vnd.ms-excel; charset=utf-8");
+        header('Content-Disposition: attachment; filename="' . $inFilename . '";');
+        echo '<table border="0" >' . $innerTable . '</table>';
         exit;
-        return true;
     }
-    
+
+    function downloadAsCSV($content, $filename = "export.csv") {
+        header('Content-Type: application/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '";');
+        echo $content;
+        exit;
+    }
+
     public function parseSearchWords($search = '')
     {
         $search = trim($search);
@@ -502,7 +526,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $ret;
     }
-    
+
     public function getCurrUrlBase()
     {
         $url = $_SERVER['REQUEST_URI'];
@@ -511,7 +535,7 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $url;
     }
-    
+
     public function get_content($URL)
     {
 		$ch = curl_init();
@@ -521,7 +545,7 @@ class GlobalsStatic extends GlobalsConvert
 		curl_close($ch);
 		return $data;
 	}
-    
+
     public function getIP()
     {
         $ip = $_SERVER["REMOTE_ADDR"];
@@ -532,12 +556,12 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $ip;
     }
-    
+
     public function hashIP($shorten = false)
     {
         $ip = hash('sha512', $this->getIP());
         if ($shorten) {
-            $ip = substr($ip, 0, 12) . '...' 
+            $ip = substr($ip, 0, 12) . '...'
                 . substr($ip, strlen($ip)-12);
         }
         return $ip;
@@ -545,7 +569,7 @@ class GlobalsStatic extends GlobalsConvert
 
     public function getPastDateTime($days = 3)
     {
-        return mktime(date("H"), date("i")-($days*24*60), date("s"), 
+        return mktime(date("H"), date("i")-($days*24*60), date("s"),
             date("n"), date("j"), date("Y"));
     }
 
@@ -556,7 +580,7 @@ class GlobalsStatic extends GlobalsConvert
 
     public function getPastDateArray($minAge = 0)
     {
-        if ($minAge <= 0 
+        if ($minAge <= 0
             || $minAge >= mktime(0, 0, 0, date("n"), date("j")+1, date("Y"))) {
             $minAge = $this->getPastDateTime();
         }
@@ -567,7 +591,16 @@ class GlobalsStatic extends GlobalsConvert
         }
         return $dates;
     }
-    
+
+    public function diffTimeArr($arr = [])
+    {
+        if (sizeof($arr) > 1) {
+            sort($arr);
+            return ($arr[sizeof($arr)-1]-$arr[0]);
+        }
+        return 0;
+    }
+
     public function isMobile()
     {
         if (!isset($_SERVER["HTTP_USER_AGENT"])) {
@@ -593,7 +626,7 @@ class GlobalsStatic extends GlobalsConvert
             . '|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01'
             . '|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)'
             . '|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61'
-            . '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i', 
+            . '|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',
             substr($_SERVER["HTTP_USER_AGENT"],0,4)));
     }
 
@@ -610,11 +643,11 @@ class GlobalsStatic extends GlobalsConvert
 
     public function fixAllUpOrLow($str = '')
     {
-        $str = str_replace('-', ' - ', 
-            str_replace('/', ' / ', 
-            str_replace('’', ' ’ ', 
-            str_replace('"', ' " ', 
-            str_replace("'", " ' ", 
+        $str = str_replace('-', ' - ',
+            str_replace('/', ' / ',
+            str_replace('’', ' ’ ',
+            str_replace('"', ' " ',
+            str_replace("'", " ' ",
             $str)))));
         $str = str_replace('  ', ' ', str_replace('  ', ' ', $str));
         $wordSplit = $this->mexplode(' ', $str);
@@ -630,11 +663,11 @@ class GlobalsStatic extends GlobalsConvert
                 $str .= $word;
             }
         }
-        $str = str_replace(' - ', '-', 
-            str_replace(' / ', '/', 
-            str_replace(' ’ ', '’', 
-            str_replace(' " ', '"', 
-            str_replace(" ' ", "'", 
+        $str = str_replace(' - ', '-',
+            str_replace(' / ', '/',
+            str_replace(' ’ ', '’',
+            str_replace(' " ', '"',
+            str_replace(" ' ", "'",
             $str)))));
         return $str;
     }
@@ -658,16 +691,37 @@ class GlobalsStatic extends GlobalsConvert
         if ($parenStart > 0) {
             $parenEnd = strpos($str, ')', $parenStart);
             if ($parenEnd > 0 && $parenEnd == (strlen($str)-1)) {
-                $str = substr($str, 0, $parenStart) 
+                $str = substr($str, 0, $parenStart)
                     . strtoupper(substr($str, ($parenStart-1)));
             }
         }
         return $str;
     }
 
+    public function cntArrayUnique($arr = [])
+    {
+        return sizeof($this->removeArrayDups($arr));
+    }
+
+    public function removeArrayDups($arr = [])
+    {
+        $ret = [];
+        if (sizeof($arr) > 0) {
+            foreach ($arr as $val) {
+                if (!in_array($val, $ret)) {
+                    $ret[] = $val;
+                }
+            }
+        }
+        return $ret;
+    }
+
     public function mergeArr($arr1 = [], $arr2 = [], $duplicates = false)
     {
         $ret = $arr1;
+        if (!$duplicates) {
+            $ret = $this->removeArrayDups($arr1);
+        }
         if (sizeof($arr2) > 0) {
             foreach ($arr2 as $val) {
                 if ($duplicates || !in_array($val, $ret)) {
@@ -680,13 +734,13 @@ class GlobalsStatic extends GlobalsConvert
 
     public function resultsToArrIds($results = null, $fld = '')
     {
-        if (!$results || $results->isEmpty() || $fld == '') {
+        if (!$results || sizeof($results) == 0 || $fld == '') {
             return [];
         }
         $arr = [];
         foreach ($results as $rec) {
             if ($rec
-                && isset($rec->{ $fld }) 
+                && isset($rec->{ $fld })
                 && intVal($rec->{ $fld }) > 0) {
                 $arr[] = intVal($rec->{ $fld });
             }

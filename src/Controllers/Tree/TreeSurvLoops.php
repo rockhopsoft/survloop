@@ -23,7 +23,7 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeSurvReport;
 
 class TreeSurvLoops extends TreeSurvReport
 {
-    
+
     protected function newLoopItem($nID = -3)
     {
         if (intVal($this->newLoopItemID) <= 0) {
@@ -41,7 +41,7 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return $this->newLoopItemID;
     }
-    
+
     /**
      * Look up the record linking fields which should be skipped
      * when auto-creating a new loop item's database record.
@@ -52,7 +52,7 @@ class TreeSurvLoops extends TreeSurvReport
     {
         return [];
     }
-    
+
     protected function checkLoopsPostProcessing($newNode, $prevNode)
     {
         $backToRoot = false;
@@ -67,11 +67,11 @@ class TreeSurvLoops extends TreeSurvReport
                 }
             }
         }
-        // If we haven't already tried to leave our loop, 
+        // If we haven't already tried to leave our loop,
         // nor returned back to its root node...
         if (!$backToRoot && sizeof($GLOBALS["SL"]->dataLoops) > 0) {
             foreach ($GLOBALS["SL"]->dataLoops as $loop) {
-                if (!isset($currLoops[$loop->data_loop_plural]) 
+                if (!isset($currLoops[$loop->data_loop_plural])
                     && isset($this->allNodes[$loop->data_loop_root])) {
                     // Then this is a new loop we weren't previously in
                     $this->checkEnteringLoop($newNode, $prevNode, $loop, $backToRoot);
@@ -85,7 +85,7 @@ class TreeSurvLoops extends TreeSurvReport
         */
         return true;
     }
-    
+
     protected function checkLoopsLeft($currNode)
     {
         if (sizeof($GLOBALS["SL"]->sessLoops) > 0) {
@@ -102,7 +102,7 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     protected function checkLeavingLoop(&$newNode, $prevNode, &$backToRoot, $sessLoop)
     {
         $currLoops[$sessLoop->sess_loop_name] = $sessLoop->sess_loop_item_id;
@@ -110,16 +110,16 @@ class TreeSurvLoops extends TreeSurvReport
         $loopTierPath = $this->allNodes[$loop->data_loop_root]->nodeTierPath;
         $plural = $loop->data_loop_plural;
         $root = $loop->data_loop_root;
-        if (isset($this->allNodes[$prevNode]) 
+        if (isset($this->allNodes[$prevNode])
             && isset($this->allNodes[$newNode])
             && isset($this->allNodes[$root])
             && $this->allNodes[$prevNode]->checkBranch($loopTierPath)
             && !$this->allNodes[$newNode]->checkBranch($loopTierPath)) {
             // Then we are now trying to leave this loop
-            if (in_array($this->REQstep, ['back', 'exitLoopBack'])) { 
+            if (in_array($this->REQstep, ['back', 'exitLoopBack'])) {
                 // Then leaving the loop backwards, always allowed
                 $this->leavingTheLoop($plural);
-            } elseif ($this->REQstep != 'save') { 
+            } elseif ($this->REQstep != 'save') {
                 // Check for conditions before moving leaving forward
                 $this->checkLeavingLoopMoveForward($backToRoot, $loop);
             }
@@ -138,17 +138,17 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     protected function checkLeavingLoopMoveForward(&$backToRoot, $loop)
     {
         if ($this->allNodes[$loop->data_loop_root]->isStepLoop()) {
             if (sizeof($this->sessData->loopItemIDs[$loop->data_loop_plural]) > 1) {
                 $backToRoot = true;
             }
-        } elseif (intVal($loop->data_loop_max_limit) == 0 
-            || sizeof($this->sessData->loopItemIDs[$loop->data_loop_plural]) 
+        } elseif (intVal($loop->data_loop_max_limit) == 0
+            || sizeof($this->sessData->loopItemIDs[$loop->data_loop_plural])
                 < $loop->data_loop_max_limit) {
-            // Then sure, we can add another item to this loop, 
+            // Then sure, we can add another item to this loop,
             // back at the root node
             $backToRoot = true;
         }
@@ -162,16 +162,16 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return $backToRoot;
     }
-    
+
     protected function checkEnteringLoop(&$newNode, $prevNode, $loop, $backToRoot)
     {
         $path = $this->allNodes[$loop->data_loop_root]->nodeTierPath;
-        if (isset($this->allNodes[$prevNode]) 
+        if (isset($this->allNodes[$prevNode])
             && !$this->allNodes[$prevNode]->checkBranch($path)
             && $this->allNodes[$newNode]->checkBranch($path)) {
             // Then we have just entered this loop from outside
-            if ($this->allNodes[$loop->data_loop_root]->isStepLoop() 
-                && (!isset($this->sessData->loopItemIDs[$loop->data_loop_plural]) 
+            if ($this->allNodes[$loop->data_loop_root]->isStepLoop()
+                && (!isset($this->sessData->loopItemIDs[$loop->data_loop_plural])
                     || empty($this->sessData->loopItemIDs[$loop->data_loop_plural]))) {
                 $this->checkEnteringLoopInactive($newNode, $loop);
             } else { // This loop is active
@@ -180,14 +180,14 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     protected function checkEnteringLoopInactive(&$newNode, $loop)
     {
         $this->leavingTheLoop($loop->data_loop_plural);
-        if (isset($this->REQstep) 
+        if (isset($this->REQstep)
             && in_array($this->REQstep, ['back', 'exitLoopBack'])) {
             $prevRoot = $this->getNextNonBranch(
-                $this->prevNode($loop->data_loop_root), 
+                $this->prevNode($loop->data_loop_root),
                 'prev'
             );
             $this->updateCurrNodeNB($prevRoot);
@@ -196,19 +196,19 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     protected function checkEnteringLoopActive(&$newNode, $loop)
     {
         $skipRoot = $this->skipCurrLoopRoot($loop);
         $this->settingTheLoop($loop->data_loop_plural);
         if ($newNode == $loop->data_loop_root) {
-            // Then we landed directly on the loop's root node from outside, 
+            // Then we landed directly on the loop's root node from outside,
             // so we must be going forward not back
             if ($skipRoot) {
                 $this->checkEnteringLoopActiveSkipForward($newNode, $loop);
             }
         } else {
-            // Must have landed at the loop's end node from outside, 
+            // Must have landed at the loop's end node from outside,
             // so we going back not forward
             if ($skipRoot) {
                 $this->checkEnteringLoopActiveSkipBackward($newNode, $loop);
@@ -218,7 +218,7 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     protected function checkEnteringLoopActiveSkipForward(&$newNode, $loop)
     {
         $this->pushCurrNodeVisit($newNode);
@@ -236,7 +236,7 @@ class TreeSurvLoops extends TreeSurvReport
         $GLOBALS["SL"]->loadSessLoops($this->sessID);
         return true;
     }
-    
+
     protected function checkEnteringLoopActiveSkipBackward(&$newNode, $loop)
     {
         $this->pushCurrNodeVisit($newNode);
@@ -246,12 +246,12 @@ class TreeSurvLoops extends TreeSurvReport
         }
         return true;
     }
-    
+
     public function activateCurrLoopRoot($loop)
     {
 
     }
-    
+
     protected function skipCurrLoopRoot($loop, $newNode = 0)
     {
         $skipRoot = false;
@@ -286,8 +286,8 @@ class TreeSurvLoops extends TreeSurvReport
                 foreach ($curr->tmpSubTier[1] as $c => $child) {
                     if (!$this->allNodes[$child[0]]->isPage()) {
                         $ret .= $this->printNodePublic(
-                            $child[0], 
-                            $child, 
+                            $child[0],
+                            $child,
                             $curr->currVisib
                         );
                     }
@@ -308,19 +308,19 @@ class TreeSurvLoops extends TreeSurvReport
         $loop = str_replace('LoopItems::', '', $curr->nodeRow->node_response_set);
         $loopCycle = $this->sessData->getLoopRows($loop);
         if (sizeof($loopCycle) > 0) {
-            $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({ 
+            $GLOBALS["SL"]->pageAJAX .= '$("#sortable").sortable({
                 axis: "y", update: function (event, ui) {
-                var url = "/sortLoop/?n=' . $curr->nID 
+                var url = "/sortLoop/?n=' . $curr->nID
                 . '&"+$(this).sortable("serialize")+"";
                 document.getElementById("hidFrameID").src=url;
             } }); $("#sortable").disableSelection();';
-            $ret .= '<div class="nFld">' . $this->sortableStart($curr->nID) 
+            $ret .= '<div class="nFld">' . $this->sortableStart($curr->nID)
                 . '<ul id="sortableN' . $curr->nID . '" class="slSortable">' . "\n";
             foreach ($loopCycle as $i => $loopItem) {
-                $ret .= '<li id="item-' . $loopItem->getKey() 
+                $ret .= '<li id="item-' . $loopItem->getKey()
                     . '" class="sortOff" onMouseOver="this.className=\'sortOn\';" '
                     . 'onMouseOut="this.className=\'sortOff\';">'
-                    . '<span><i class="fa fa-sort slBlueDark"></i></span> ' 
+                    . '<span><i class="fa fa-sort slBlueDark"></i></span> '
                     . $this->getLoopItemLabel($loop, $loopItem, $i) . '</li>' . "\n";
             }
             $ret .= '</ul>' . $this->sortableEnd($curr->nID) . '</div>' . "\n";

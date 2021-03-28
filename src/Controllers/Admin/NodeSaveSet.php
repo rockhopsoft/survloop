@@ -1,6 +1,6 @@
 <?php
 /**
-  * NodeSaveSet is a helper class which preps 
+  * NodeSaveSet is a helper class which preps
   * sets of node saves for debugging purposes.
   *
   * Survloop - All Our Data Are Belong

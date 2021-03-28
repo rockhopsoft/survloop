@@ -197,7 +197,7 @@ if (!$GLOBALS["SL"]->isPdfView()) {
         @if ($isDashLayout && isset($admMenuTabs))
             <div id="adminMenuTopTabs">{!! $admMenuTabs !!}</div>
         @endif
-        <div class="container-fluid">
+        <div id="mainContain" class="container-fluid">
             @if (isset($content)) {!! $content !!} @endif
             @yield('content')
             @if (isset($GLOBALS['SL']->sysOpts) 
@@ -209,8 +209,10 @@ if (!$GLOBALS["SL"]->isPdfView()) {
 
 @else
 
-    @if (isset($content)) {!! $content !!} @endif
-    @yield('content')
+    <div id="mainContain" class="w100">
+        @if (isset($content)) {!! $content !!} @endif
+        @yield('content')
+    </div>
     
 @endif
 

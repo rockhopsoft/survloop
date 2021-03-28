@@ -12,14 +12,14 @@ namespace RockHopSoft\Survloop\Controllers\Globals;
 use App\Models\SLDefinitions;
 
 class GlobalsDefinitions
-{   
+{
 	private $dbID = 1;
-	
+
     function __construct($dbID = 1)
     {
         $this->dbID = $dbID;
     }
-    
+
     public function loadDefs($subset)
     {
         if (!isset($this->defValues[$subset])) {
@@ -32,7 +32,7 @@ class GlobalsDefinitions
         }
         return true;
     }
-    
+
     public function getID($subset = '', $value = '')
     {
         $this->loadDefs($subset);
@@ -45,7 +45,7 @@ class GlobalsDefinitions
         }
         return -3;
     }
-    
+
     public function getValById($id = -3)
     {
         if ($id <= 0) {
@@ -57,7 +57,7 @@ class GlobalsDefinitions
         }
         return '';
     }
-    
+
     public function getVal($subset = '', $id = '')
     {
         if ($subset == 'Yes/No') {
@@ -82,7 +82,7 @@ class GlobalsDefinitions
         }
         return '';
     }
-    
+
     public function getSet($subset = '', $fullRecs = false)
     {
         if ($fullRecs) {
@@ -95,7 +95,19 @@ class GlobalsDefinitions
         $this->loadDefs($subset);
         return $this->defValues[$subset];
     }
-    
+
+    public function getSetIDs($subset = '')
+    {
+        $ret = [];
+        $this->loadDefs($subset);
+        if (sizeof($this->defValues[$subset]) > 0) {
+            foreach ($this->defValues[$subset] as $def) {
+                $ret[] = $def->def_id;
+            }
+        }
+        return $ret;
+    }
+
     public function getSetDrop($subset = '', $presel = -3, $skip = [])
     {
         $ret = '';
@@ -103,7 +115,7 @@ class GlobalsDefinitions
         if ($this->defValues[$subset]->isNotEmpty()) {
             foreach ($this->defValues[$subset] as $i => $val) {
                 if (sizeof($skip) == 0 || !in_array($val->def_id, $skip)) {
-                    $ret .= '<option value="' . $val->def_id . '" ' 
+                    $ret .= '<option value="' . $val->def_id . '" '
                         . (($presel == $val->def_id) ? 'SELECTED ' : '')
                         . '>' . $val->def_value . '</option>';
                 }
@@ -111,7 +123,7 @@ class GlobalsDefinitions
         }
         return $ret;
     }
-    
+
     public function getDesc($subset = '', $val = '')
     {
         $chk = SLDefinitions::where('def_database', $this->dbID)

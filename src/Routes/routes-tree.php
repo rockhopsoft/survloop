@@ -8,162 +8,125 @@
   * @since v0.2.5
   */
 
-// main survey process for primary database, primary tree
-Route::post(
-    '/u/{nodeSlug}',
-    $path . 'Survloop@loadNodeURL'
-);
-Route::get(
-    '/u/{nodeSlug}',
-    $path . 'Survloop@loadNodeURL'
-);
 
-// survey process for any database or tree
-Route::get(
-    '/start/{treeSlug}',
-    $path . 'Survloop@loadNodeTreeURL'
-);
-Route::get(
-    '/start-{cid}/{treeSlug}', [
-        'uses' => $path . 'Survloop@loadNodeTreeURLedit', 
-        'middleware' => ['auth']
-    ]
-);
-Route::post(
-    '/u/{treeSlug}/{nodeSlug}',
-    $path . 'Survloop@loadNodeURL'
-);
-Route::get(
-    '/u/{treeSlug}/{nodeSlug}',
-    $path . 'Survloop@loadNodeURL'
-);
+use RockHopSoft\Survloop\Controllers\Survloop;
+use RockHopSoft\Survloop\Controllers\Admin\AdminController;
+use RockHopSoft\Survloop\Controllers\Admin\AdminDBController;
+use RockHopSoft\Survloop\Controllers\Admin\AdminTreeController;
 
-Route::get(
-    '/switch/{treeID}/{cid}',
-    $path . 'Survloop@switchSess'
-);
-Route::get(
-    '/delSess/{treeID}/{cid}',
-    $path . 'Survloop@delSess'
-);
-Route::get(
-    '/cpySess/{treeID}/{cid}',
-    $path . 'Survloop@cpySess'
-);
+/**
+ * Survloop-Generated Survey Routes
+ */
+Route::post('/sub',      [Survloop::class, 'mainSub']);
+Route::get('/sortLoop',  [Survloop::class, 'sortLoop']);
 
-Route::post(
-    '/sub',
-    $path . 'Survloop@mainSub'
-);
+Route::get('/switch/{treeID}/{cid}',  [Survloop::class, 'switchSess']);
+Route::get('/delSess/{treeID}/{cid}', [Survloop::class, 'delSess']);
+Route::get('/cpySess/{treeID}/{cid}', [Survloop::class, 'cpySess']);
 
-Route::get(
-    '/sortLoop',
-    $path . 'Survloop@sortLoop'
-);
+Route::get('/start/{treeSlug}',       [Survloop::class, 'loadNodeTreeURL']);
+Route::get('/start-{cid}/{treeSlug}', [Survloop::class, 'loadNodeTreeURLedit'])
+    ->middleware('auth');
 
-Route::get(
-    '/defer/{treeID}/{cid}/{nID}/{date}/{rand}',
-    $path . 'Survloop@deferNode'
-);
+Route::post('/u/{treeSlug}/{nodeSlug}', [Survloop::class, 'loadNodeURL']);
+Route::get('/u/{treeSlug}/{nodeSlug}', [Survloop::class, 'loadNodeURL']);
+Route::post('/u/{nodeSlug}',            [Survloop::class, 'loadNodeURL']);
+Route::get('/u/{nodeSlug}',            [Survloop::class, 'loadNodeURL']);
 
-Route::get(
-    '/{abbr}/uploads/{file}',
-    $path . 'Survloop@getUploadFile'
-);
-Route::get(
-    '/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',
-    $path . 'Survloop@retrieveUploadFresh'
-);
-Route::get(
-    '/up/{treeSlug}/{cid}/{upID}',
-    $path . 'Survloop@retrieveUpload'
-);
-Route::get(
-    '/up-img-resize-all/{treeSlug}',
-    $path . 'Survloop@checkImgResizeAll'
-);
+Route::get('/defer/{treeID}/{cid}/{nID}/{date}/{rand}', [Survloop::class, 'deferNode']);
+Route::get('/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',  [Survloop::class, 'retrieveUploadFresh']);
+Route::get('/up/{treeSlug}/{cid}/{upID}',               [Survloop::class, 'retrieveUpload']);
+Route::get('/up-img-resize-all/{treeSlug}',             [Survloop::class, 'checkImgResizeAll']);
+Route::get('/{abbr}/uploads/{file}',                    [Survloop::class, 'getUploadFile']);
 
 
-Route::get(
-    '/records-full/{treeID}',
-    $path . 'Survloop@ajaxRecordFulls'
-);
-Route::get(
-    '/record-prevs/{treeID}',
-    $path . 'Survloop@ajaxRecordPreviews'
-);
-Route::get(
-    '/record-check/{treeID}',
-    $path . 'Survloop@ajaxMultiRecordCheck'
-);
-Route::get(
-    '/record-graph/{gType}/{treeID}/{nID}',
-    $path . 'Survloop@ajaxGraph'
-);
-Route::get(
-    '/widget-custom/{treeID}/{nID}',
-    $path . 'Survloop@widgetCust'
-);
+/**
+ * Survey & Page Components
+ */
+Route::get('/records-full/{treeID}',  [Survloop::class, 'ajaxRecordFulls']);
+Route::get('/record-prevs/{treeID}', [Survloop::class, 'ajaxRecordPreviews']);
+Route::get('/record-check/{treeID}',  [Survloop::class, 'ajaxMultiRecordCheck']);
 
-Route::get(
-    '/ajax-get-flds/{treeID}',
-    $path . 'Survloop@getSetFlds'
-);
-Route::get(
-    '/ajax-get-flds/{treeID}/{rSet}',
-    $path . 'Survloop@getSetFlds'
-);
-Route::get(
-    '/ajax-emoji-tag/{treeID}/{recID}/{defID}',
-    $path . 'Survloop@ajaxEmojiTag'
-);
+Route::get('/record-graph/{gType}/{treeID}/{nID}',     [Survloop::class, 'ajaxGraph']);
+Route::get('/widget-custom/{treeID}/{nID}',            [Survloop::class, 'widgetCust']);
+Route::get('/ajax-get-flds/{treeID}',                  [Survloop::class, 'getSetFlds']);
+Route::get('/ajax-get-flds/{treeID}/{rSet}',           [Survloop::class, 'getSetFlds']);
+Route::get('/ajax-emoji-tag/{treeID}/{recID}/{defID}', [Survloop::class, 'ajaxEmojiTag']);
 
-    
-Route::get(
-    '/api/all/{treeSlug}/xml',
-    $path . 'Survloop@xmlAll'
-);
-Route::get(
-    '/{treeSlug}-xml-all',
-    $path . 'Survloop@xmlAll'
-);
-Route::get(
-    '/{treeSlug}-xml-example',
-    $path . 'Survloop@getXmlExample'
-);
-Route::get(
-    '/{treeSlug}-xml-example.xml',
-    $path . 'Survloop@getXmlExample'
-);
-Route::get(
-    '/schema/{treeSlug}/xml',
-    $path . 'Survloop@genXmlSchema'
-);
-Route::get(
-    '/{treeSlug}-schema-xml',
-    $path . 'Survloop@genXmlSchema'
-);
-Route::get(
-    '/{treeSlug}-schema-xml.xsd',
-    $path . 'Survloop@genXmlSchema'
-);
-Route::get(
-    '/{treeSlug}-xml-schema',
-    $path . 'Survloop@genXmlSchema'
-);
-Route::get(
-    '/{treeSlug}-xml-schema.xsd',
-    $path . 'Survloop@genXmlSchema'
-);
-Route::get(
-    '/{treeSlug}-report-xml/{cid}',
-    $path . 'Survloop@xmlByID'
-);
-Route::get(
-    '/xml-example',
-    $path . 'Survloop@getXmlExample'
-);
-Route::get(
-    '/xml-schema',
-    $path . 'Survloop@genXmlSchema'
-);
+
+/**
+ * Survey Data Exports & API
+ */
+
+Route::get('/db/{database}',   [AdminDBController::class,   'adminPrintFullDBPublic']);
+Route::get('/tree/{treeSlug}', [AdminTreeController::class, 'adminPrintFullTreePublic']);
+
+Route::get('/api/all/{treeSlug}/xml',      [Survloop::class, 'xmlAll']);
+Route::get('/{treeSlug}-xml-all',          [Survloop::class, 'xmlAll']);
+Route::get('/{treeSlug}-xml-example',      [Survloop::class, 'getXmlExample']);
+Route::get('/{treeSlug}-xml-example.xml',  [Survloop::class, 'getXmlExample']);
+Route::get('/schema/{treeSlug}/xml',       [Survloop::class, 'genXmlSchema']);
+Route::get('/{treeSlug}-schema-xml',       [Survloop::class, 'genXmlSchema']);
+Route::get('/{treeSlug}-schema-xml.xsd',   [Survloop::class, 'genXmlSchema']);
+Route::get('/{treeSlug}-xml-schema',       [Survloop::class, 'genXmlSchema']);
+Route::get('/{treeSlug}-xml-schema.xsd',   [Survloop::class, 'genXmlSchema']);
+Route::get('/{treeSlug}-report-xml/{cid}', [Survloop::class, 'xmlByID']);
+Route::get('/{treeSlug}-report-xml/{cid}', [Survloop::class, 'xmlByID']);
+Route::get('/xml-example',                 [Survloop::class, 'getXmlExample']);
+Route::get('/xml-schema',                  [Survloop::class, 'genXmlSchema']);
+
+
+/**
+ * Survloop-Generated Survey Routes Requiring Authentication
+ */
+
+Route::middleware(['auth'])->group(function () {
+
+  Route::get('/dashboard/start/{treeSlug}',       [AdminController::class, 'loadNodeTreeURL']);
+  Route::get('/dashboard/start-{cid}/{treeSlug}', [AdminController::class, 'loadNodeTreeURLedit']);
+  Route::post('/dash/u/{treeSlug}/{nodeSlug}',    [AdminController::class, 'loadNodeURL']);
+  Route::get('/dash/u/{treeSlug}/{nodeSlug}',     [AdminController::class, 'loadNodeURL']);
+  Route::post('/dash-sub',                        [AdminController::class, 'postNodeURL']);
+
+});
+
+
+/**
+ * Survloop-Generated Page Routes Requiring Authentication
+ */
+
+Route::middleware(['auth'])->group(function () {
+
+  Route::post('/dash/{pageSlug}/read-{cid}',  [AdminController::class, 'loadPageURL']);
+  Route::get('/dash/{pageSlug}/read-{cid}',   [AdminController::class, 'loadPageURL']);
+  Route::post('/dash/{pageSlug}/readi-{cid}', [AdminController::class, 'loadPageURLrawID']);
+  Route::get('/dash/{pageSlug}/readi-{cid}',  [AdminController::class, 'loadPageURLrawID']);
+  Route::post('/dash/{pageSlug}',             [AdminController::class, 'loadPageURL']);
+  Route::get('/dash/{pageSlug}',              [AdminController::class, 'loadPageURL']);
+
+});
+
+
+/**
+ * Survloop-Generated Page Routes
+ */
+Route::post('/{pageSlug}/read-{cid}/full/t-{token}', [Survloop::class, 'tokenByID']);
+Route::get('/{pageSlug}/read-{cid}/full/t-{token}',  [Survloop::class, 'tokenByID']);
+Route::get('/{treeSlug}/read-{cid}/xml',             [Survloop::class, 'xmlByID']);
+Route::get('/{treeSlug}/read-{cid}/full-xml',        [Survloop::class, 'xmlFullByID']);
+//Route::get('/{treeSlug}/read-{cid}/json',          [Survloop::class, 'xmlByID']);
+
+Route::post('/{pageSlug}/read-{cid}/{view}',         [Survloop::class, 'loadPageURL']);
+Route::get('/{pageSlug}/read-{cid}/{view}',          [Survloop::class, 'loadPageURL']);
+Route::post('/{pageSlug}/read-{cid}',                [Survloop::class, 'loadPageURL']);
+Route::get('/{pageSlug}/read-{cid}',                 [Survloop::class, 'loadPageURL']);
+Route::post('/{pageSlug}/u-{cid}',                   [Survloop::class, 'loadPageURL']);
+Route::get('/{pageSlug}/u-{cid}',                    [Survloop::class, 'loadPageURL']);
+Route::post('/{pageSlug}/readi-{cid}/{view}',        [Survloop::class, 'loadPageURLrawID']);
+Route::get('/{pageSlug}/readi-{cid}/{view}',         [Survloop::class, 'loadPageURLrawID']);
+Route::post('/{pageSlug}/readi-{cid}',               [Survloop::class, 'loadPageURLrawID']);
+Route::get('/{pageSlug}/readi-{cid}',                [Survloop::class, 'loadPageURLrawID']);
+Route::post('/{pageSlug}',                           [Survloop::class, 'loadPageURL']);
+Route::get('/{pageSlug}',                            [Survloop::class, 'loadPageURL']);
+
+

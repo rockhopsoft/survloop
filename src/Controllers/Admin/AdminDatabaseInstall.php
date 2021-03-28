@@ -21,6 +21,7 @@ use App\Models\SLFields;
 use App\Models\SLNode;
 use App\Models\SLConditions;
 use RockHopSoft\Survloop\Controllers\SurvloopImportExcel;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 use RockHopSoft\Survloop\Controllers\Admin\AdminDBController;
 
 class AdminDatabaseInstall extends AdminDBController
@@ -29,13 +30,13 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $this->v["dateStmp"] = date("Y_m_d");
         $this->v["dateStamp"] = date("Y_m_d_His");
-        $this->v["zipFileMig"] = $this->v["exportDir"] . '/' 
+        $this->v["zipFileMig"] = $this->v["exportDir"] . '/'
             . $this->v["dateStmp"] . '_LaravelMigrations.zip';
-        $this->v["zipFileModel"] = $this->v["exportDir"] . '/' 
+        $this->v["zipFileModel"] = $this->v["exportDir"] . '/'
             . $this->v["dateStmp"] . '_LaravelModels.zip';
         return true;
     }
-    
+
     protected function exportMysql()
     {
         if (!isset($this->v["export"])) {
@@ -46,7 +47,7 @@ class AdminDatabaseInstall extends AdminDBController
             foreach ($tbls as $i => $tbl) {
                 $this->v["export"] .= $GLOBALS["SL"]->exportMysqlTbl($tbl);
             }
-            $this->v["export"] .= $GLOBALS["SL"]->x["indexesEnd"]; 
+            $this->v["export"] .= $GLOBALS["SL"]->x["indexesEnd"];
         }
         if ($this->v["asPackage"]) {
             $GLOBALS["SL"]->exportMysqlSl();
@@ -55,12 +56,12 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return true;
     }
-    
+
     public function printExportPackage(Request $request)
     {
         return $this->printExport($request, true);
     }
-    
+
     public function printExport(Request $request, $asPackage = false)
     {
         $asPack = $cacheName = '/dashboard/db/export';
@@ -73,15 +74,15 @@ class AdminDatabaseInstall extends AdminDBController
         if (!$this->checkCache()) {
             $this->exportMysql();
             $this->v["content"] = view(
-                'vendor.survloop.admin.db.export-mysql', 
+                'vendor.survloop.admin.db.export-mysql',
                 $this->v
             )->render();
             $this->saveCache();
         }
         return view('vendor.survloop.master', $this->v);
     }
-    
-    public function printExportPackageLaravel(Request $request) 
+
+    public function printExportPackageLaravel(Request $request)
     {
         $cacheName = '/dashboard/sl/export/laravel';
         $this->admControlInit($request, $cacheName);
@@ -94,7 +95,7 @@ class AdminDatabaseInstall extends AdminDBController
         $this->admControlInit($request, $cacheName);
         if (Auth::user()
             && Auth::user()->hasRole('administrator')
-            && $request->has('tbl') 
+            && $request->has('tbl')
             && trim($request->get('tbl')) != '') {
             $tbl = trim($request->get('tbl'));
             if (in_array(strtolower($tbl), ['user', 'users'])) {
@@ -109,14 +110,14 @@ class AdminDatabaseInstall extends AdminDBController
                 if ($this->v["rows"]->isNotEmpty()
                     && $this->v["flds"]->isNotEmpty()) {
                     $this->v["content"] = view(
-                        'vendor.survloop.admin.db.raw-tbl', 
+                        'vendor.survloop.admin.db.raw-tbl',
                         $this->v
                     )->render();
                     if ($request->has('ajax')) {
                         return $this->v["content"];
                     }
                     $GLOBALS["SL"]->pageAJAX = view(
-                        'vendor.survloop.admin.db.raw-tbl-ajax', 
+                        'vendor.survloop.admin.db.raw-tbl-ajax',
                         $this->v
                     )->render();
                     $GLOBALS["SL"]->setAdmMenuOnLoad(0);
@@ -144,23 +145,24 @@ class AdminDatabaseInstall extends AdminDBController
     private function printRawTableQry($tbl)
     {
         $sortFld = $this->v["tbl"]->tbl_abbr . $this->v["sortFld"];
-        eval("\$this->v['rowTotCnt'] = " 
-            . $GLOBALS["SL"]->modelPath($tbl) . "::select('" 
+        eval("\$this->v['rowTotCnt'] = "
+            . $GLOBALS["SL"]->modelPath($tbl) . "::select('"
             . $this->v["tbl"]->tbl_abbr . "id')->count();");
         eval("\$this->v['rows'] = " . $GLOBALS["SL"]->modelPath($tbl)
-            . "::orderBy('" . $sortFld . "', '" 
+            . "::orderBy('" . $sortFld . "', '"
             . $this->v["sortDir"] . "')->limit(2000)->get();");
         $this->v["flds"] = SLFields::where('fld_database', $GLOBALS["SL"]->dbID)
             ->where('fld_table', $this->v["tbl"]->tbl_id)
-            ->select('fld_name', 'fld_eng', 
+            ->select('fld_name', 'fld_eng',
                 'fld_id', 'fld_ord', 'fld_type')
             ->orderBy('fld_ord', 'asc')
             ->get();
         return true;
     }
-    
+
     public function printImport(Request $request)
     {
+        ini_set('max_execution_time', 360);
         $cacheName = '/dashboard/db/import';
         $this->admControlInit($request, $cacheName);
         $this->v["uploadImport"] = null;
@@ -168,8 +170,8 @@ class AdminDatabaseInstall extends AdminDBController
             if (trim($request->get('import')) == 'excel') {
                 $this->uploadImportStep1($request);
             } else {
-                if ($request->has('file') 
-                    && trim($request->get('file')) != '') { 
+                if ($request->has('file')
+                    && trim($request->get('file')) != '') {
                     $tblEng = '';
                     if ($request->has('tblEng')) {
                         $tblEng = trim($request->tblEng);
@@ -186,16 +188,16 @@ class AdminDatabaseInstall extends AdminDBController
             }
         }
         $GLOBALS["SL"]->pageAJAX = view(
-            'vendor.survloop.admin.db.import-ajax', 
+            'vendor.survloop.admin.db.import-ajax',
             $this->v
         )->render();
         $this->v["content"] = view(
-            'vendor.survloop.admin.db.import', 
+            'vendor.survloop.admin.db.import',
             $this->v
         )->render();
         return view('vendor.survloop.master', $this->v);
     }
-    
+
     private function uploadImportStep1(Request $request)
     {
         if ($GLOBALS["SL"]->REQ->hasFile('importExcel')) {
@@ -211,34 +213,34 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return true;
     }
-    
+
     protected function prepLaravelExport()
     {
         $this->v["dumpOut"] = [
-            "Models"     => '', 
-            "Migrations" => '', 
+            "Models"     => '',
+            "Migrations" => '',
             "Seeders"    => '',
             "Zip Files"  => ''
         ];
 		$this->v["fileListModel"] = [];
-		$this->v["migratFileUp"] 
-            = $this->v["migratFileDown"] 
-            = $this->v["tblClean"] 
+		$this->v["migratFileUp"]
+            = $this->v["migratFileDown"]
+            = $this->v["tblClean"]
             = '';
         if (!isset($this->v["modelFile"])) {
             $this->v["modelFile"] = "";
         }
         return true;
     }
-    
-    public function printExportLaravel(Request $request, $asPackage = false) 
+
+    public function printExportLaravel(Request $request, $asPackage = false)
     {
-        ini_set('max_execution_time', 180);
+        ini_set('max_execution_time', 360);
         $this->v["asPackage"] = $asPackage;
-        $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
-        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel' 
+        $currPage = (($asPackage) ? '/dashboard/sl/export/laravel'
             : '/dashboard/db/export');
         $this->admControlInit($request, $currPage);
+        $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
         if (!$this->checkCache($currPage) || $request->has('generate')) {
             $this->printExportLaravelRefresh($request);
         }
@@ -255,43 +257,43 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return view('vendor.survloop.master', $this->v);
     }
-    
-    public function printExportLaravelRefresh(Request $request) 
+
+    public function printExportLaravelRefresh(Request $request)
     {
         $this->v["generate"] = 1;
         if ($request->has('generate')) {
             $this->v["generate"] = intVal($request->get('generate'));
         }
-        $this->v["newMigFile"] = 'database/migrations/' 
-            . $this->v["dateStmp"] . '_000000_create_' 
+        $this->v["newMigFile"] = 'database/migrations/'
+            . $this->v["dateStmp"] . '_000000_create_'
             . strtolower($GLOBALS["SL"]->dbRow->db_name) . '_tables.php';
-        $this->v["seedFile"] = 'database/seeders/' 
+        $this->v["seedFile"] = 'database/seeders/'
             . $GLOBALS["SL"]->dbRow->db_name . 'Seeder.php';
         $this->v["tbls"] = $this->exportQryTbls();
-        
+
         if ($this->v["generate"] == 1) {
             // Phase 1) Create migration files
             $this->runExportLaravCreateMigrate();
-            
+
         } elseif ($this->v["generate"] == 2) {
             // Phase 2) Create seeder files for custom system's database
             $this->runExportLaravCreateSeeds($request);
-            
+
         } elseif ($this->v["generate"] == 3) {
             // Phase 3) Create seeder files for custom system's Survloop configurations
             $this->runExportLaravCreateSeedsConfig($request);
-            
+
         } elseif ($this->v["generate"] == 4) {
             // Phase 4) Merge all seeder files into one ready for package
             $this->runExportLaravMergeSeeds($request);
-            
+
         } elseif ($this->v["generate"] > 4) {
             // Phase 5) Display resulting exports
             $this->runExportLaravDisplayExports();
         }
 
         $this->v["content"] = view(
-            'vendor.survloop.admin.db.export-laravel-progress', 
+            'vendor.survloop.admin.db.export-laravel-progress',
             $this->v
         )->render();
         if ($this->v["generate"] > 4) {
@@ -306,108 +308,41 @@ class AdminDatabaseInstall extends AdminDBController
         $this->chkModelsFolder();
         if ($this->v["tbls"]->isNotEmpty()) {
             foreach ($this->v["tbls"] as $tbl) {
-                $indexes = "";
-                $this->loadTbl($tbl);
-                $this->v["migratFileUp"] .= "\t" . "Schema::create('" 
-                    . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name 
-                    . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
-                    . "$"."table->increments('" . $tbl->tbl_abbr . "id');";
-                $this->v["modelFile"] = ''; // also happens in Globals->chkTblModel($tbl)
+                $this->v["tbl"] = $tbl;
+                $this->v["tblName"] = $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name;
+                // some also happens in Globals->chkTblModel($tbl)...
+                $this->v["modelFile"] = '';
                 $flds = $GLOBALS["SL"]->getTableFields($tbl);
                 if ($flds->isNotEmpty()) {
                     foreach ($flds as $fld) {
-                        $fldName = trim($tbl->tbl_abbr . $fld->fld_name);
-                        $this->v["modelFile"] .= "\n\t\t'" . $fldName . "', ";
-                        $this->runExportLaravMigrateFld($fldName, $fld);
+                        $this->v["modelFile"] .= "\n\t\t'"
+                            . trim($tbl->tbl_abbr . $fld->fld_name) . "', ";
                     }
                 }
-                $this->v["migratFileUp"] .= "\n\t\t\t"
-                    . "$"."table->timestamps();" . "\n\t\t" . "});" . "\n\t";
+                $this->v["migratFileUp"] .= "\t"
+                    . $GLOBALS["SL"]->installTblByShema($tbl, $flds);
                 $this->v["migratFileDown"] .= "\t" . "Schema::drop('"
-                    . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name . "');"."\n\t";
+                    . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name
+                    . "');"."\n\t";
                 $this->saveModelFile();
             }
         }
-        if (isset($this->v["migrateEnd"]) && trim($this->v["migrateEnd"]) != '') {
+        if (isset($this->v["migrateEnd"])
+            && trim($this->v["migrateEnd"]) != '') {
             $this->v["migratFileUp"] .= $this->v["migrateEnd"];
         }
         Storage::put(
-            $this->v["newMigFile"], 
+            $this->v["newMigFile"],
             view(
-                'vendor.survloop.admin.db.export-laravel-gen-migration', 
+                'vendor.survloop.admin.db.export-laravel-gen-migration',
                 $this->v
             )->render()
         );
         $this->v["nextUrl"] = '?generate=2';
-        if ($this->v["tbls"]->isNotEmpty() && isset($this->v["tbls"][0]->tbl_name)) {
+        if ($this->v["tbls"]->isNotEmpty()
+            && isset($this->v["tbls"][0]->tbl_name)) {
             $this->v["nextUrl"] .= '&tbl=' . $this->v["tbls"][0]->tbl_name;
         }
-        return true;
-    }
-    
-    protected function runExportLaravMigrateFld($fldName = '', $fld = null)
-    {
-        $this->v["migratFileUp"] .=  "\n\t\t\t"."$"."table->";
-        if (strpos($fld->fld_values, 'Def::') !== false) {
-            $this->v["migratFileUp"] .=  "integer('" . $fldName . "')->unsigned()";
-        } elseif ($fld->fld_type == 'INT') {
-            if ($fld->fld_values == '0;1') {
-                $this->v["migratFileUp"] .=  "boolean('" . $fldName . "')";
-            } else {
-                $this->v["migratFileUp"] .=  "integer('" . $fldName . "')";
-            }
-            if (intVal($fld->fld_foreign_table) > 0 && intVal($fld->fld_default) >= 0) {
-                $this->v["migratFileUp"] .=  "->unsigned()";
-            }
-        } elseif ($fld->fld_type == 'DOUBLE') {
-            $this->v["migratFileUp"] .=  "double('" . $fldName . "')";
-        } elseif ($fld->fld_type == 'VARCHAR') {
-            if ($fld->fld_data_length == 1 
-                || $fld->fld_values == 'Y;N' || $fld->fld_values == 'M;F' 
-                || $fld->fld_values == 'Y;N;?' || $fld->fld_values == 'M;F;?') {
-                $this->v["migratFileUp"] .=  "char('" . $fldName . "', 1)";
-            } else {
-                $this->v["migratFileUp"] .=  "string('" . $fldName . "'" 
-                    . (($fld->fld_data_length > 0) ? ", " . $fld->fld_data_length : "") 
-                    . ")";
-            }
-        } elseif ($fld->fld_type == 'TEXT') {
-            $this->v["migratFileUp"] .=  "longText('" . $fldName . "')";
-        } elseif ($fld->fld_type == 'DATE') {
-            $this->v["migratFileUp"] .=  "date('" . $fldName . "')";
-        } elseif ($fld->fld_type == 'DATETIME') {
-            $this->v["migratFileUp"] .=  "dateTime('" . $fldName . "')";
-        }
-        if (trim($fld->fld_default) != '') {
-            $this->v["migratFileUp"] .=  "->default(";
-            if ($fld->fld_default == 'NULL') {
-                $this->v["migratFileUp"] .= "NULL";
-            } else {
-                if ($fld->fld_values == '0;1') {
-                    if (intVal($fld->fld_default) == 1) {
-                        $this->v["migratFileUp"] .= "1";
-                    } else {
-                        $this->v["migratFileUp"] .= "0";
-                    }
-                } else {
-                    $this->v["migratFileUp"] .= "'" . $fld->fld_default . "'";
-                }
-            }
-            $this->v["migratFileUp"] .= ")";
-        }
-        $this->v["migratFileUp"] .=  "->nullable();";
-        if ($fld->fld_is_index == 1) {
-            $this->v["migratFileUp"] .= "\n\t\t\t$"."table->index('" . $fldName . "');";
-        }
-        /* // This is throwing errors
-        if (intVal($fld->fld_foreign_table) > 0) {
-            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->fld_foreign_table);
-            $this->v["migrateEnd"] .= "\t"."Schema::table('" 
-                . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name 
-                . "', function($"."table) { $"."table->foreign('" . $fldName 
-                . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
-        }
-        */
         return true;
     }
 
@@ -415,7 +350,7 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $found = -1;
         $seedCnt = $finishedTable = 1;
-        $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+        $done = (($request->has('tbls') && trim($request->get('tbls')) != '')
             ? trim($request->get('tbls')) : ',');
         $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
         $limit = 1000;
@@ -425,7 +360,8 @@ class AdminDatabaseInstall extends AdminDBController
             }
             foreach ($this->v["tbls"] as $i => $tbl) {
                 $this->v["tblClean"] = $GLOBALS["SL"]->strFullTblModel($tbl->tbl_name);
-                if (in_array($tbl->tbl_name, $this->custReport->tblsInPackage())  
+                $this->v["tblName"] = $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name;
+                if (in_array($tbl->tbl_name, $this->custReport->tblsInPackage())
                     && strpos($done, ',' . $tbl->tbl_name . ',') === false && $found < 0) {
                     $this->loadTbl($tbl);
                     $tblSffx = '-' . $tbl->tbl_name . '.php';
@@ -434,9 +370,9 @@ class AdminDatabaseInstall extends AdminDBController
                     if ($GLOBALS["SL"]->chkTableSeedLimits($tblClean)) {
                         $tblSeeds = '';
                         list($seedCnt, $seedChk) = $GLOBALS["SL"]->getTableSeedDumpLimit(
-                            $tblClean, 
-                            '', 
-                            $limit, 
+                            $tblClean,
+                            '',
+                            $limit,
                             $page
                         );
                         if ($seedChk->isNotEmpty()) {
@@ -445,8 +381,8 @@ class AdminDatabaseInstall extends AdminDBController
                             }
                         }
                         $this->v["seedFile"] = str_replace(
-                            '.php', 
-                            '-' . $page . '.php', 
+                            '.php',
+                            '-' . $page . '.php',
                             $this->v["seedFile"]
                         );
                         //Storage::delete('file.jpg');
@@ -476,7 +412,7 @@ class AdminDatabaseInstall extends AdminDBController
         } else {
             if ($this->v["asPackage"]) {
                 $this->v["nextUrl"] .= '3';
-            } else { 
+            } else {
                 $this->v["nextUrl"] .= '4';
             }
         }
@@ -487,7 +423,7 @@ class AdminDatabaseInstall extends AdminDBController
     {
         $found = -1;
         $seedCnt = $finishedTable = 1;
-        $done = (($request->has('tbls') && trim($request->get('tbls')) != '') 
+        $done = (($request->has('tbls') && trim($request->get('tbls')) != '')
             ? trim($request->get('tbls')) : ',');
         $page = (($request->has('page')) ? intVal($request->get('page')) : 0);
         $limit = 1000;
@@ -500,6 +436,7 @@ class AdminDatabaseInstall extends AdminDBController
             if ($this->v["tbls"]->isNotEmpty()) {
                 foreach ($this->v["tbls"] as $i => $tbl) {
                     $this->v["tblClean"] = 'SL' . $GLOBALS["SL"]->strTblToModel($tbl->tbl_name);
+                    $this->v["tblName"] = 'sl_' . $tbl->tbl_name;
                     if ($found < 0 && strpos($done, ',' . $tbl->tbl_name . ',') === false) {
                         $this->loadTbl($tbl);
                         $tblSffx = '-' . $tbl->tbl_name . '.php';
@@ -528,9 +465,9 @@ class AdminDatabaseInstall extends AdminDBController
     protected function runExportLaravMergeSeeds(Request $request)
     {
         Storage::put(
-            $this->v["seedFile"], 
+            $this->v["seedFile"],
             view(
-                'vendor.survloop.admin.db.export-laravel-gen-seeder', 
+                'vendor.survloop.admin.db.export-laravel-gen-seeder',
                 [ "wholeSeed" => false ]
             )->render()
         );
@@ -563,7 +500,7 @@ class AdminDatabaseInstall extends AdminDBController
     }
 
     protected function runExportLaravDisplayExports()
-    {   
+    {
         /* NOT MVP!
         $zip = new ZipArchive();
         if (file_exists($this->v["zipFileMig"])) unlink($this->v["zipFileMig"]);
@@ -573,13 +510,13 @@ class AdminDatabaseInstall extends AdminDBController
         foreach ($this->v["fileListMig"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
         foreach ($this->v["fileListModel"] as $file) $zip->addFile($this->v["exportDir"]."/".$file, $file);
         $zip->addFile($this->v["exportDir"]."/Model-Namespaces.php", "Model-Namespaces.php");
-        $this->v["dumpOut"]["Zip Files"] .= "\n\n\n\n numfiles: " . $zip->numFiles 
+        $this->v["dumpOut"]["Zip Files"] .= "\n\n\n\n numfiles: " . $zip->numFiles
             . "\n status:" . $zip->status . "\n";
         $zip->close();
-        //$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__ . $this->v["exportDir"] 
+        //$filesystem = new Filesystem(new ZipArchiveAdapter(__DIR__ . $this->v["exportDir"]
             . "/Survloop2Laravel-Export-" . date("Y-m-d") . ".zip"));
         */
-        
+
         $this->v["dumpOut"]["Migrations"] = $this->v["newMigFile"];
         $this->v["dumpOut"]["Seeders"] = $this->v["seedFile"];
         $this->v["nextUrl"] = '/dashboard/db/export/laravel?done=1';
@@ -588,7 +525,7 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return true;
     }
-    
+
     protected function refreshTableModel(Request $request, $tbl = '')
     {
         $this->admControlInit($request, '/dashboard/db/export/laravel/table-model');
@@ -599,23 +536,23 @@ class AdminDatabaseInstall extends AdminDBController
         $flds = $GLOBALS["SL"]->getTableFields($tbl);
         if ($flds->isNotEmpty()) {
             foreach ($flds as $fld) {
-                $this->v["modelFile"] .= "\n\t\t'" 
+                $this->v["modelFile"] .= "\n\t\t'"
                     . trim($tbl->tbl_abbr . $fld->fld_name) . "', ";
             }
         }
         $this->saveModelFile();
-        return ':) ' . (($request->has('redir64')) 
-            ? '<script type="text/javascript"> setTimeout("window.location=\'' 
-                . base64_decode($request->get('redir64')) . '\'", 100); </script>' 
+        return ':) ' . (($request->has('redir64'))
+            ? '<script type="text/javascript"> setTimeout("window.location=\''
+                . base64_decode($request->get('redir64')) . '\'", 100); </script>'
             : '');
     }
-    
+
     protected function saveModelFile()
     {
         $newModelFilename = '../app/Models/' . $this->v["tblClean"] . '.php';
         $this->v["fileListModel"][] = $newModelFilename;
         $fullFileOut = view(
-            'vendor.survloop.admin.db.export-laravel-gen-model' , 
+            'vendor.survloop.admin.db.export-laravel-gen-model' ,
             $this->v
         );
         $this->v["dumpOut"]["Models"] .= $fullFileOut;
@@ -632,7 +569,7 @@ class AdminDatabaseInstall extends AdminDBController
         $abbr = strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"]);
         try {
             copy(
-                $newModelFilename, 
+                $newModelFilename,
                 str_replace(
                     '/app/models/' . $abbr . '/',
                     '/app/Models/', $newModelFilename
@@ -643,19 +580,16 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return true;
     }
-    
+
     protected function printSeedTbl($eval = '', $limit = 10000, $start = 0)
     {
     	$ret = '';
-//if ($tbl->tbl_name == 'Definitions') { echo 'eval: ' . $eval . '<br />'; exit; }
-//echo '<pre>'; print_r($eval); echo '</pre>';
         $seedChk = $GLOBALS["SL"]->getTableSeedDump(
-            $this->v["tblClean"], 
-            $eval, 
-            $limit, 
+            $this->v["tblClean"],
+            $eval,
+            $limit,
             $start
         );
-//echo '<pre>'; print_r($seedChk); echo '</pre>'; exit;
         if ($seedChk->isNotEmpty()) {
             foreach ($seedChk as $seed) {
                 $ret .= $this->printSeedTblRow($seed);
@@ -663,7 +597,7 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return $ret;
     }
-    
+
     protected function printSeedTblRow($seed)
     {
         $ret = '';
@@ -672,23 +606,23 @@ class AdminDatabaseInstall extends AdminDBController
         if ($flds->isNotEmpty()) {
             foreach ($flds as $i => $fld) {
                 $fldName = trim($this->v["tbl"]->tbl_abbr . $fld->fld_name);
-                if (isset($seed->{ $fldName }) 
+                if (isset($seed->{ $fldName })
                     && trim($seed->{ $fldName }) != trim($fld->fld_default)) {
-                    $fldData .= ",\n\t\t\t'" . $fldName . "' => '" 
+                    $fldData .= ",\n\t\t\t'" . $fldName . "' => '"
                         . str_replace("'", "\'", $seed->{ $fldName }) . "'";
                 }
             }
         }
         if (trim($fldData) != '') {
-            $ret .= "\tDB::table('" 
-                . (($this->v["tbl"]->tbl_database == 3) 
+            $ret .= "\tDB::table('"
+                . (($this->v["tbl"]->tbl_database == 3)
                     ? 'sl_' : $GLOBALS["SL"]->dbRow->db_prefix)
-                . $this->v["tbl"]->tbl_name . "')->insert([" 
+                . $this->v["tbl"]->tbl_name . "')->insert(["
                 . $fldData . "\n\t\t"."]);"."\n\t";
         }
         return $ret;
     }
-    
+
     protected function exportQryTbls()
     {
         return SLTables::where('tbl_database', $this->dbID)
@@ -697,7 +631,7 @@ class AdminDatabaseInstall extends AdminDBController
             ->orderBy('tbl_ord')
             ->get();
     }
-    
+
     protected function loadTbl($tbl = [])
     {
         $this->v["tbl"] = $tbl;
@@ -705,7 +639,7 @@ class AdminDatabaseInstall extends AdminDBController
         $this->v["tblClean"] = $GLOBALS["SL"]->strFullTblModel($tbl->tbl_name);
         return true;
     }
-    
+
     public function exportDump(Request $request)
     {
         $ret = '';
@@ -718,7 +652,7 @@ class AdminDatabaseInstall extends AdminDBController
                 if ($tbls->isNotEmpty()) {
                     foreach ($tbls as $tbl) {
                         $this->loadTbl($tbl);
-                        $newModelFilename = '../vendor/rockhopsoft/survloop-models/' 
+                        $newModelFilename = '../vendor/rockhopsoft/survloop-models/'
                             . strtolower($GLOBALS["SL"]->sysOpts["cust-abbr"])
                             . '/' . $this->v["tblClean"] . '.php';
                         if (file_exists($newModelFilename)) {
@@ -730,28 +664,28 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return $ret;
     }
-    
-    
-    public function autoInstallDatabase(Request $request) 
+
+
+    public function autoInstallDatabase(Request $request)
     {
         $this->admControlInit($request, '/dashboard/db/install');
-        
+
         $this->v["oldTables"] = [];
-        
+
         $this->v["DbPrefix"] = $GLOBALS["SL"]->dbRow->db_prefix;
         $this->v["tbls"] = $this->tblQryStd();
-        
+
         $this->v["log"] = '';
-        /* 
-        if ($this->v["dbAllowEdits"] && $GLOBALS["SL"]->REQ->has('dbConfirm') 
+        /*
+        if ($this->v["dbAllowEdits"] && $GLOBALS["SL"]->REQ->has('dbConfirm')
             && $GLOBALS["SL"]->REQ->input('dbConfirm') == 'install'
             && $GLOBALS["SL"]->REQ->has('createTable') && is_array($GLOBALS["SL"]->REQ->input('createTable'))
             && sizeof($GLOBALS["SL"]->REQ->input('createTable')) > 0) {
             $transferData = [];
-            if ($GLOBALS["SL"]->REQ->has('copyData') && is_array($GLOBALS["SL"]->REQ->input('copyData')) 
+            if ($GLOBALS["SL"]->REQ->has('copyData') && is_array($GLOBALS["SL"]->REQ->input('copyData'))
                 && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
                 foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
-                    if (file_exists('../vendor/rockhopsoft/survloop-models/' 
+                    if (file_exists('../vendor/rockhopsoft/survloop-models/'
                         . strtolower($GLOBALS["SL"]->tblModels[$GLOBALS["SL"]->tbl[$copyTbl]]))) {
                         eval("\$transferData[\$copyTbl] = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl])
                             . "::get();");
@@ -759,11 +693,11 @@ class AdminDatabaseInstall extends AdminDBController
                     }
                 }
             }
-        
+
             foreach ($GLOBALS["SL"]->REQ->input('createTable') as $createTbl) {
                 $tbl = SLTables::find($createTbl);
                 if (!in_array(strtolower($GLOBALS["SL"]->tbl[$createTbl]), ['users'])) {
-                    DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->db_prefix 
+                    DB::statement('DROP TABLE IF EXISTS `' . $GLOBALS["SL"]->dbRow->db_prefix
                         . $GLOBALS["SL"]->tbl[$createTbl] . '`');
                     $createQry = $GLOBALS["SL"]->exportMysqlTbl($tbl, true);
                     echo $createQry . '<br />';
@@ -771,13 +705,13 @@ class AdminDatabaseInstall extends AdminDBController
                     $this->v["log"] .= '<br />creating table!.. ' . $GLOBALS["SL"]->tbl[$createTbl]; // $createQry;
                 }
             }
-            
-            if ($GLOBALS["SL"]->REQ->has('copyData') && is_array($GLOBALS["SL"]->REQ->input('copyData')) 
+
+            if ($GLOBALS["SL"]->REQ->has('copyData') && is_array($GLOBALS["SL"]->REQ->input('copyData'))
                 && sizeof($GLOBALS["SL"]->REQ->input('copyData')) > 0) {
                 foreach ($GLOBALS["SL"]->REQ->input('copyData') as $copyTbl) {
                     if (!in_array($GLOBALS["SL"]->tbl[$createTbl], ['users', 'Users'])) {
                         $this->v["log"] .= '<br />pasting table data!.. ' . $GLOBALS["SL"]->tbl[$copyTbl];
-                        if (isset($transferData[$copyTbl]) && is_array($transferData[$copyTbl]) 
+                        if (isset($transferData[$copyTbl]) && is_array($transferData[$copyTbl])
                             && sizeof($transferData[$copyTbl]) > 0) {
                             $newFlds = [];
                             $flds = SLFields::where('fld_table', $copyTbl)
@@ -787,7 +721,7 @@ class AdminDatabaseInstall extends AdminDBController
                                 $tblAbbr = $GLOBALS["SL"]->tblAbbr[$GLOBALS['SL']->tbl[$copyTbl]];
                                 foreach ($flds as $fld) $newFlds[] = $fld->fld_name;
                                 foreach ($transferData[$copyTbl] as $oldRec) {
-                                    eval("\$newRec = new " 
+                                    eval("\$newRec = new "
                                         . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->tbl[$copyTbl]) . ";");
                                     $newRec->{$tblAbbr.'ID'} = $oldRec->{$tblAbbr.'ID'};
                                     $newRec->created_at = $oldRec->created_at;
@@ -798,7 +732,7 @@ class AdminDatabaseInstall extends AdminDBController
                                         }
                                     }
                                     $newRec->save();
-                                    $this->v["log"] .= '<br />transferring ' . $tblAbbr 
+                                    $this->v["log"] .= '<br />transferring ' . $tblAbbr
                                         . ' record: ' . $newRec->{$tblAbbr.'ID'};
                                 }
                             }
@@ -810,7 +744,7 @@ class AdminDatabaseInstall extends AdminDBController
         */
         return view('vendor.survloop.admin.db.install', $this->v);
     }
-    
+
     protected function chkModelsFolder()
     {
         if (!file_exists('../app/Models')) {
@@ -818,6 +752,6 @@ class AdminDatabaseInstall extends AdminDBController
         }
         return true;
     }
-    
-    
+
+
 }

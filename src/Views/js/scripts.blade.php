@@ -10,7 +10,7 @@ function debugTxt(txt) {
 var appUrl = "{{ $GLOBALS['SL']->sysOpts['app-url'] }}";
 var appUrlParams = new Array();
 var appUrlParamKeys = new Array('frame', 'widget', 'ajax', 'print', 'tree', 'tip', 'sub', 't2', 'resend', 'cid', 'core', 'new', 'start', 'redir', 'sView');
-var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img'])) 
+var defMetaImg = "{{ ((isset($GLOBALS['SL']->sysOpts['meta-img']))
     ? $GLOBALS['SL']->sysOpts['meta-img'] : '') }}";
 
 var loggedIn = false;
@@ -427,7 +427,7 @@ function addTopNavItem(navTxt, navLink) {
     }
     return true;
 }
-var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars'])) 
+var userAvatar = "{{ ((isset($GLOBALS['SL']->sysOpts['has-avatars']))
     ? trim($GLOBALS['SL']->sysOpts['has-avatars']) : '') }}";
 
 function tweakNavLink(posA, posB, posC, link) {
@@ -441,7 +441,7 @@ function tweakNavLink(posA, posB, posC, link) {
         }
     }
     return true;
-}        
+}
 
 function addTopUserBurger(username) {
     if (!document.getElementById("myNavBar") || document.getElementById("myNavBar").innerHTML.indexOf("userMenuBtn") >= 0) {
@@ -512,6 +512,15 @@ var specialNodes = new Array();
 function addSpecialNodeNYC(cityNID, stateNID, nycNID) {
     specialNodes[specialNodes.length] = new Array('nyc', cityNID, stateNID, nycNID);
     return true;
+}
+
+
+function copyInputClipboard(divID) {
+  var copyText = document.getElementById(divID);
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+  document.execCommand("copy");
+  console.log("Copied to clipboard: " + copyText.value);
 }
 
 

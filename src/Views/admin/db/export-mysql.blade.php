@@ -29,5 +29,5 @@
 </div></div>
 
 <script type="text/javascript">
-setTimeout("flexAreaAdjust(document.getElementById('mysqlDump'))", 100);
+//setTimeout("flexAreaAdjust(document.getElementById('mysqlDump'))", 100);
 </script>

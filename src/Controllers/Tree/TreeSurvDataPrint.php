@@ -20,15 +20,15 @@ class TreeSurvDataPrint extends TreeSurvFormElements
 
     protected function nodePrintData(&$curr)
     {
-        if (in_array($curr->nodeType, 
+        if (in_array($curr->nodeType,
             ['Data Print', 'Data Print Row'])) {
             return $this->nodePrintDataRow($curr);
 
-        } elseif (in_array($curr->nodeType, 
+        } elseif (in_array($curr->nodeType,
             ['Data Print Block', 'Data Print Columns'])) {
             return $this->nodePrintDataBlock($curr);
 
-        } elseif (in_array($curr->nodeType, 
+        } elseif (in_array($curr->nodeType,
             ['Print Vert Progress'])) {
             return $this->nodePrintVertProgress($curr);
 
@@ -38,15 +38,15 @@ class TreeSurvDataPrint extends TreeSurvFormElements
 
     protected function nodePrintDataRow(&$curr)
     {
-        if ($this->checkFldDataPerms($curr->getFldRow()) 
+        if ($this->checkFldDataPerms($curr->getFldRow())
             && $this->checkViewDataPerms($curr->getFldRow())) {
             if ($this->shouldPrintDataRow($curr)) {
                 list($deetLabel, $deetVal) = $this->nodePrintDataRowDeets($curr);
                 $deetLabel = $this->customLabels($curr, $deetLabel);
                 if ($curr->nodeType == 'Data Print') {
                     return [
-                        '<div id="nLabel' . $curr->nIDtxt 
-                            . '" class="nPrompt"><span class="slGrey mR10">' 
+                        '<div id="nLabel' . $curr->nIDtxt
+                            . '" class="nPrompt"><span class="slGrey mR10">'
                             . $deetLabel . '</span>' . $deetVal . '</div>'
                     ];
                 } elseif ($curr->nodeType == 'Data Print Row') {
@@ -66,11 +66,11 @@ class TreeSurvDataPrint extends TreeSurvFormElements
 
         $deetLabel = (($fldRow && isset($fldRow->fld_eng)) ? $fldRow->fld_eng : '');
         $deetLabel = $this->swapLabels($curr, $deetLabel);
-        
+
         $deetVal = $GLOBALS["SL"]->printResponse(
-            $curr->tbl, 
-            $curr->fld, 
-            $curr->sessData, 
+            $curr->tbl,
+            $curr->fld,
+            $curr->sessData,
             $fldRow
         );
         $deetVal = $this->printValCustom($curr->nID, $deetVal, $fldRow);
@@ -81,9 +81,9 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                 $lab = $this->swapLabels($curr, $lab);
                 if (strip_tags($deetLabel) != strip_tags($lab)
                     && !$GLOBALS["SL"]->isPrintView()) {
-                    $deetLabel = '<a id="hidivBtn' . $curr->nIDtxt 
-                        .'" class="hidivBtn slGrey" href="javascript:;">' 
-                        . $deetLabel . '</a><div id="hidiv' . $curr->nIDtxt 
+                    $deetLabel = '<a id="hidivBtn' . $curr->nIDtxt
+                        .'" class="hidivBtn slGrey" href="javascript:;">'
+                        . $deetLabel . '</a><div id="hidiv' . $curr->nIDtxt
                         . '" class="disNon">"' . $lab . '"</div>';
                 }
             }
@@ -93,7 +93,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
 
     protected function nodePrintDataRowCheckboxes($curr)
     {
-        if (isset($GLOBALS["SL"]->formTree->tree_id) 
+        if (isset($GLOBALS["SL"]->formTree->tree_id)
             && in_array($curr->nID, $this->checkboxNodes)) {
             $sessData = $this->sessData->currSessDataCheckbox($curr);
             $curr->sessData = $this->valListArr($sessData);
@@ -114,18 +114,18 @@ class TreeSurvDataPrint extends TreeSurvFormElements
     protected function shouldPrintDataRow($curr)
     {
         $printRow = true;
-        if ((!is_array($curr->sessData) 
+        if ((!is_array($curr->sessData)
                 && (!$curr->sessData || trim($curr->sessData) == ''))
             || (is_array($curr->sessData) && sizeof($curr->sessData) == 0)) {
             $printRow = false;
         } else {
-            $isDefaultNonArray = (!is_array($curr->sessData) 
-                && trim($curr->sessData) != '' 
+            $isDefaultNonArray = (!is_array($curr->sessData)
+                && trim($curr->sessData) != ''
                 && trim($curr->sessData) == trim($curr->nodeRow->node_default));
-            $isDefaultArray = (is_array($curr->sessData) 
+            $isDefaultArray = (is_array($curr->sessData)
                 && trim($curr->sessData[0]) == trim($curr->nodeRow->node_default));
-            if (isset($curr->nodeRow->node_default) 
-                && trim($curr->nodeRow->node_default) != '' 
+            if (isset($curr->nodeRow->node_default)
+                && trim($curr->nodeRow->node_default) != ''
                 && ($isDefaultNonArray || $isDefaultArray)) {
                 $printRow = false;
             }
@@ -166,9 +166,9 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                         }
                     } else { // default processing
                         $newDeet = $this->printNodePublic($kidID, $child, $curr->currVisib);
-                        if (is_array($newDeet) 
-                            && sizeof($newDeet) > 0 
-                            && trim($newDeet[0]) != '' 
+                        if (is_array($newDeet)
+                            && sizeof($newDeet) > 0
+                            && trim($newDeet[0]) != ''
                             && trim($newDeet[1]) != '') {
                             $deets[] = $newDeet;
                         }
@@ -186,8 +186,8 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                                 }
                             } else { // default processing
                                 $deet = $this->printNodePublic(
-                                    $gNode[0], 
-                                    $gNode, 
+                                    $gNode[0],
+                                    $gNode,
                                     $curr->currVisib
                                 );
                                 if ($deet && is_array($deet) && sizeof($deet) > 0) {
@@ -198,7 +198,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                     }
                     $this->closeManipBranch($kidID);
                 } elseif ($this->allNodes[$kidID]->isLoopCycle()) {
-                    foreach ($this->nodePrintDataBlockLoopCycle($curr, $kidID, $child) 
+                    foreach ($this->nodePrintDataBlockLoopCycle($curr, $kidID, $child)
                             as $deet) {
                         $deets[] = $deet;
                     }
@@ -217,13 +217,13 @@ class TreeSurvDataPrint extends TreeSurvFormElements
     {
         $deets = [];
         list($curr->tbl, $curr->fld, $newVal) = $this->nodeBranchInfo(
-            $curr->nID, 
+            $curr->nID,
             $this->allNodes[$kidID]
         );
         $loop = str_replace('LoopItems::', '', $this->allNodes[$kidID]->responseSet);
         $loopCycle = $this->sessData->getLoopRows($loop);
         // if this is a simple loop of a just a table's rows
-        if (trim($loop) == '' 
+        if (trim($loop) == ''
             && isset($this->allNodes[$kidID]->dataBranch)
             && trim($this->allNodes[$kidID]->dataBranch) != '') {
             $s = sizeof($this->sessData->dataBranches);
@@ -231,8 +231,8 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                 $branch = $this->sessData->dataBranches[($s-1)];
                 if (isset($branch["itemID"]) && intVal($branch["itemID"]) > 0) {
                     $loopCycle = $this->sessData->getChildRows(
-                        $branch["branch"], 
-                        $branch["itemID"], 
+                        $branch["branch"],
+                        $branch["itemID"],
                         $this->allNodes[$kidID]->dataBranch
                     );
                 }
@@ -255,8 +255,8 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                 foreach ($child[1] as $gNode) {
                     if ($this->allNodes[$gNode[0]]->nodeType == 'Data Print Row') {
                         $deet = $this->printNodePublic($gNode[0], $gNode, $curr->currVisib);
-                        if (isset($deet[0]) 
-                            && trim($deet[0]) != '' 
+                        if (isset($deet[0])
+                            && trim($deet[0]) != ''
                             && trim($deet[1]) != '') {
                             $deet[0] = $label . ' ' . $deet[0];
                             $deets[] = $deet;
@@ -284,13 +284,13 @@ class TreeSurvDataPrint extends TreeSurvFormElements
             if ($childNode->nodeType == 'Data Print Row') {
                 list($tbl, $fld) = $childNode->getTblFld();
                 $val = $this->printNodeSessDataOverride($childNode);
-                if (!$val 
-                    || (is_array($val) 
-                        && (sizeof($val) == 0 
+                if (!$val
+                    || (is_array($val)
+                        && (sizeof($val) == 0
                             || (sizeof($val) == 1 && $val[0] == '')))) {
                     list($itemInd, $itemID) = $this->sessData->currSessDataPos($tbl);
                     if ($itemID > 0 && isset($this->sessData->dataSets[$tbl])) {
-                        $tblSet = $this->sessData->dataSets[$tbl]; 
+                        $tblSet = $this->sessData->dataSets[$tbl];
                         if (isset($tblSet[$itemInd]) > 0) {
                             $dateTime = 0;
                             if (isset($tblSet[$itemInd]->{ $fld })
@@ -305,8 +305,8 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                     if (sizeof($deet) != 1 || $deet[0] != 'skip row') {
                         $deets[] = $deet;
                     }
-                } elseif ($val 
-                    && is_array($val) 
+                } elseif ($val
+                    && is_array($val)
                     && trim($val[0]) != '') { // && trim($val[0]) != '0000-00-00 00:00:00'
                     $dateTime = strtotime($val[0]);
                     if (!isset(
@@ -325,7 +325,7 @@ class TreeSurvDataPrint extends TreeSurvFormElements
     }
 
     /**
-     * Overrides primary Survloop printing of individual nodes from 
+     * Overrides primary Survloop printing of individual nodes from
      * surveys and site pages. This is one of the main routing hubs
      * for OpenPolice.org customizations beyond Survloop defaults.
      *

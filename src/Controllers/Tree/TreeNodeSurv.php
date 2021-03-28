@@ -18,7 +18,7 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurvVars;
 
 class TreeNodeSurv extends TreeNodeSurvVars
 {
-    
+
     // maybe initialize this way to lighten the tree's load?...
     public function loadNodeCache($nID = -3, $nCache = [])
     {
@@ -50,7 +50,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function loadNodeRow($nID = -3, $nRow = NULL)
     {
         $this->nodeRow = null;
@@ -63,8 +63,8 @@ class TreeNodeSurv extends TreeNodeSurvVars
             }
             if ($searchNode > 0) {
                 $this->nodeRow = SLNode::find($searchNode)
-                    ->select('node_id', 'node_parent_id', 'node_parent_order', 
-                        'node_opts', 'node_type', 'node_data_branch', 
+                    ->select('node_id', 'node_parent_id', 'node_parent_order',
+                        'node_opts', 'node_type', 'node_data_branch',
                         'node_data_store', 'node_response_set', 'node_default');
             }
         }
@@ -76,7 +76,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         //$this->fillNodeRow();
         return true;
     }
-    
+
     protected function copyFromRow()
     {
         if ($this->nodeRow && isset($this->nodeRow->node_parent_id)) {
@@ -91,7 +91,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function initiateNodeRow()
     {
         $this->copyFromRow();
@@ -136,13 +136,13 @@ class TreeNodeSurv extends TreeNodeSurvVars
         } elseif (in_array($this->nodeType, ['Plot Graph', 'Line Graph'])) {
             $this->initNodeRowExtraOptsGraph();
         } elseif (in_array($this->nodeType, ['Pie Chart'])) {
-            
+
         } elseif (in_array($this->nodeType, ['Bar Graph'])) {
             $this->initNodeRowExtraOptsBarGraph();
         } elseif (in_array($this->nodeType, ['Map'])) {
-            
+
         } elseif ($this->isSpreadTbl()) {
-            if (!isset($this->nodeRow->node_char_limit) 
+            if (!isset($this->nodeRow->node_char_limit)
                 || intVal($this->nodeRow->node_char_limit) == 0) {
                 $this->nodeRow->node_char_limit = 20;
             }
@@ -150,10 +150,10 @@ class TreeNodeSurv extends TreeNodeSurvVars
         $this->isPageBlock();
         return true;
     }
-    
+
     public function initNodeRowExtraOptsPage()
     {
-        $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"] 
+        $this->extraOpts["meta-title"] = $this->extraOpts["meta-desc"]
             = $this->extraOpts["meta-keywords"] = $this->extraOpts["meta-img"] = '';
         if (strpos($this->nodeRow->node_prompt_after, '::M::') !== false) {
             $meta = $GLOBALS["SL"]->mexplode('::M::', $this->nodeRow->node_prompt_after);
@@ -204,10 +204,10 @@ class TreeNodeSurv extends TreeNodeSurvVars
     protected function initNodeRowExtraOptsNumber()
     {
         // load min and max values
-        $this->extraOpts["minVal"] 
-            = $this->extraOpts["maxVal"] 
-            = $this->extraOpts["incr"] 
-            = $this->extraOpts["unit"] 
+        $this->extraOpts["minVal"]
+            = $this->extraOpts["maxVal"]
+            = $this->extraOpts["incr"]
+            = $this->extraOpts["unit"]
             = false;
         $chk = SLNodeResponses::where('node_res_node', $this->nodeID)
             ->get();
@@ -217,16 +217,16 @@ class TreeNodeSurv extends TreeNodeSurvVars
                     if (isset($res->node_res_value)) {
                         switch (intVal($res->node_res_ord)) {
                             case -1:
-                                $this->extraOpts["minVal"] 
-                                    = floatVal($res->node_res_value); 
+                                $this->extraOpts["minVal"]
+                                    = floatVal($res->node_res_value);
                                 break;
                             case 1:
-                                $this->extraOpts["maxVal"] 
-                                    = floatVal($res->node_res_value); 
+                                $this->extraOpts["maxVal"]
+                                    = floatVal($res->node_res_value);
                                 break;
-                            case 2:  
-                                $this->extraOpts["incr"]   
-                                    = floatVal($res->node_res_value); 
+                            case 2:
+                                $this->extraOpts["incr"]
+                                    = floatVal($res->node_res_value);
                                 break;
                         }
                     }
@@ -241,7 +241,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
 
     protected function initNodeRowExtraOptsEmail()
     {
-        $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"] 
+        $this->extraOpts["emailTo"] = $this->extraOpts["emailCC"]
             = $this->extraOpts["emailBCC"] = [];
         if (strpos($this->nodeRow->node_prompt_notes, '::CC::') !== false) {
             list($to, $ccs) = explode('::CC::', $this->nodeRow->node_prompt_notes);
@@ -257,11 +257,11 @@ class TreeNodeSurv extends TreeNodeSurvVars
     protected function initNodeRowExtraOptsGraph()
     {
         if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
-            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::',
                 str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
             list($this->extraOpts["y-axis-lab"], $xtras) = explode('::X::', $xtras);
             list($this->extraOpts["x-axis"], $xtras) = explode('::Xlab::', $xtras);
-            list($this->extraOpts["x-axis-lab"], $this->extraOpts["conds"]) 
+            list($this->extraOpts["x-axis-lab"], $this->extraOpts["conds"])
                 = explode('::Cnd::', $xtras);
             $this->extraOpts["data-conds"] = $GLOBALS["SL"]
                 ->mexplode('#', $this->extraOpts["conds"]);
@@ -272,7 +272,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
     protected function initNodeRowExtraOptsBarGraph()
     {
         if (strpos($this->nodeRow->node_prompt_notes, '::Ylab::') !== false) {
-            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::', 
+            list($this->extraOpts["y-axis"], $xtras) = explode('::Ylab::',
                 str_replace('::Y::', '', $this->nodeRow->node_prompt_notes));
             list($this->extraOpts["y-axis-lab"], $xtras) = explode('::Lab1::', $xtras);
             list($this->extraOpts["lab1"], $xtras) = explode('::Lab2::', $xtras);
@@ -281,14 +281,14 @@ class TreeNodeSurv extends TreeNodeSurvVars
             list($this->extraOpts["clr2"], $xtras) = explode('::Opc1::', $xtras);
             list($this->extraOpts["opc1"], $xtras) = explode('::Opc2::', $xtras);
             list($this->extraOpts["opc2"], $xtras) = explode('::Hgt::', $xtras);
-            list($this->extraOpts["hgt"], $this->extraOpts["conds"]) 
+            list($this->extraOpts["hgt"], $this->extraOpts["conds"])
                 = explode('::Cnd::', $xtras);
             $this->extraOpts["data-conds"] = $GLOBALS["SL"]
                 ->mexplode('#', $this->extraOpts["conds"]);
             $this->extraOpts['hgt-sty'] = $this->extraOpts['hgt'];
             if (trim($this->extraOpts['hgt']) != '') {
                 if (strpos($this->extraOpts['hgt'], '%') === false) {
-                    $this->extraOpts['hgt-sty'] .= $this->extraOpts['hgt-sty'] . 'px'; 
+                    $this->extraOpts['hgt-sty'] .= $this->extraOpts['hgt-sty'] . 'px';
                 }
             } else {
                 $this->extraOpts['hgt-sty'] = '420px';
@@ -296,7 +296,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function loadGenderResponses()
     {
         $this->addTmpResponse("F", "Female");
@@ -307,7 +307,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function chkFldOther()
     {
         $this->fldHasOther = [];
@@ -328,12 +328,12 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function detectFldNameOther($str)
     {
         return in_array(strtolower(trim(strip_tags($str))), ['other', 'other:']);
     }
-    
+
     public function valueShowsKid($responseVal = '')
     {
         if (sizeof($this->responses) > 0) {
@@ -348,29 +348,29 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return false;
     }
-    
+
     public function indexShowsKid($ind = '')
     {
         return ($this->indexShowsKidNode($ind) > 0);
     }
-    
+
     public function indexShowsKidNode($ind = '')
     {
-        if (empty($this->responses) 
+        if (empty($this->responses)
             || !isset($this->responses[$ind])
             || !isset($this->responses[$ind]->node_res_show_kids)) {
             return -3;
         }
         return intVal($this->responses[$ind]->node_res_show_kids);
     }
-    
+
     public function indexMutEx($ind = '')
     {
-        return (sizeof($this->responses) > 0 
-            && isset($this->responses[$ind]) 
+        return (sizeof($this->responses) > 0
+            && isset($this->responses[$ind])
             && intVal($this->responses[$ind]->node_res_mut_ex) == 1);
     }
-    
+
     public function addTmpResponse($val = '', $eng = '')
     {
         if (trim($eng) == '') {
@@ -385,7 +385,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         $this->responses[] = $newRes;
         return $newRes;
     }
-    
+
     public function addTmpResponses($responses = [])
     {
         if (sizeof($responses) > 0) {
@@ -398,7 +398,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
 
     public function printNodePublicResponses()
     {
-        if (sizeof($this->responses) == 3 
+        if (sizeof($this->responses) == 3
             && $this->responses[1]->node_res_value == '...') {
             $start = intVal($this->responses[0]->node_res_value);
             $finish = intVal($this->responses[2]->node_res_value);
@@ -416,7 +416,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function chkFill()
     {
         if ($this->nodeRow === null || !isset($this->nodeRow->node_id)) {
@@ -424,7 +424,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return true;
     }
-    
+
     public function getTblFld()
     {
         $this->chkFill();
@@ -433,19 +433,19 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return [ $this->tbl, $this->fld ];
     }
-    
+
     public function getTblFldID()
     {
         $this->chkFill();
         return $GLOBALS["SL"]->getTblFldID($this->dataStore);
     }
-    
+
     public function getFldRow()
     {
         $this->chkFill();
         return $GLOBALS["SL"]->getTblFldRow($this->dataStore);
     }
-    
+
     public function getTblFldName()
     {
         $this->chkFill();
@@ -455,21 +455,21 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return '';
     }
-    
+
     public function getTblFldLink($isPrint = true)
     {
         $fld = SLFields::find($this->getTblFldID());
         if ($fld && isset($fld->fld_table)) {
-            return '<a target="_blank" href="' 
+            return '<a target="_blank" href="'
                 . (($isPrint) ? '/db/1' : '/dashboard/db/all')
-                . '?fldID=' . $fld->fld_id . '#' 
-                . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->fld_table]] 
+                . '?fldID=' . $fld->fld_id . '#'
+                . $GLOBALS['SL']->tblAbbr[$GLOBALS['SL']->tbl[$fld->fld_table]]
                 . $fld->fld_name . '" class="slGreenDark">'
                 . $this->getTblFldName() . '</a>';
         }
         return '';
     }
-    
+
     public function hasDefSet()
     {
         if (isset($this->extraOpts["hasDefSet"])) {
@@ -479,22 +479,22 @@ class TreeNodeSurv extends TreeNodeSurvVars
         $this->extraOpts["hasDefSet"] = ($pos !== false);
         return $this->extraOpts["hasDefSet"];
     }
-    
+
     public function parseResponseSet()
     {
         $set = [ "type" => '', "set" => '' ];
-        if (trim($this->nodeRow->node_response_set) != '' 
+        if (trim($this->nodeRow->node_response_set) != ''
             && strpos($this->nodeRow->node_response_set, '::') !== false) {
             list($set["type"], $set["set"]) = explode('::', $this->nodeRow->node_response_set);
         }
         return $set;
     }
-    
+
     public function nodePreview()
     {
         return substr(strip_tags($this->nodeRow->node_prompt_text), 0, 20);
     }
-    
+
     public function tierPathStr($tierPathArr = [])
     {
         if (sizeof($tierPathArr) == 0) {
@@ -502,7 +502,7 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return implode('-', $tierPathArr) . '-';
     }
-    
+
     public function checkBranch($tierPathArr = [])
     {
         $tierPathStr = $this->tierPathStr($tierPathArr);
@@ -512,8 +512,8 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return 0;
     }
-    
-    
+
+
     public function getManipUpdate()
     {
         if (!$this->isDataManip()) {
@@ -526,11 +526,11 @@ class TreeNodeSurv extends TreeNodeSurvVars
         } else {
             list($tbl, $fld) = $GLOBALS["SL"]->splitTblFld($this->dataStore);
         }
-        $newVal = (intVal($this->responseSet) > 0) 
+        $newVal = (intVal($this->responseSet) > 0)
             ? intVal($this->responseSet) : trim($this->defaultVal);
         return [ $tbl, $fld, $newVal ];
     }
-    
+
     public function printManipUpdate()
     {
         if (!$this->isDataManip()) {
@@ -554,5 +554,5 @@ class TreeNodeSurv extends TreeNodeSurvVars
         }
         return $ret;
     }
-    
+
 }

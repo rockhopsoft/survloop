@@ -22,7 +22,7 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         return '';
     }
-    
+
     public function printPreviewReport($isAdmin = false)
     {
         $ret = $this->printPreviewReportCustom($isAdmin);
@@ -32,7 +32,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $fldNames = $found = [];
         if (sizeof($this->nodesRawOrder) > 0) {
             foreach ($this->nodesRawOrder as $i => $nID) {
-                if (isset($this->allNodes[$nID]) 
+                if (isset($this->allNodes[$nID])
                     && $this->allNodes[$nID]->isRequired()) {
                     $tblFld = $this->allNodes[$nID]->getTblFld();
                     $fldNames[] = [ $tblFld[0], $tblFld[1] ];
@@ -41,20 +41,20 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         if (sizeof($fldNames) > 0) {
             foreach ($fldNames as $i => $fld) {
-                if (isset($this->sessData->dataSets[$fld[0]]) 
+                if (isset($this->sessData->dataSets[$fld[0]])
                     && sizeof($this->sessData->dataSets[$fld[0]]) > 0
-                    && isset($this->sessData->dataSets[$fld[0]][0]->{ $fld[1] }) 
+                    && isset($this->sessData->dataSets[$fld[0]][0]->{ $fld[1] })
                     && sizeof($found) < 6) {
                     $found[] = $fld[1];
-                    $ret .= '<span class="mR20">' 
-                        . $this->sessData->dataSets[$fld[0]][0]->{ $fld[1] } 
+                    $ret .= '<span class="mR20">'
+                        . $this->sessData->dataSets[$fld[0]][0]->{ $fld[1] }
                         . '</span>';
                 }
             }
         }
         return $ret;
     }
-    
+
     public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
     {
         ini_set('max_execution_time', 90);
@@ -78,7 +78,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             && !$GLOBALS["SL"]->REQ->has('pdf-attached')) {
             if (sizeof($this->prevUploadsPDF()) > 0) {
                 return '<script type="text/javascript"> setTimeout("'
-                . 'window.location=\'?pdf=1&refresh=1&pdf-attached=1' 
+                . 'window.location=\'?pdf=1&refresh=1&pdf-attached=1'
                 . '\'", 10); </script>';
             }
         }
@@ -96,7 +96,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             view('vendor.survloop.master', $this->v)->render()
         );
     }
-    
+
     public function chkCachePdfByID($skipPDfViewCheck = false)
     {
         $isPdfView = $skipPDfViewCheck;
@@ -105,15 +105,15 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         $this->loadPdfByID();
         return ($isPdfView
-            && file_exists($this->v["pdf-file"]) 
+            && file_exists($this->v["pdf-file"])
             && !$GLOBALS["SL"]->REQ->has('refresh'));
     }
-    
+
     protected function loadPdfByID()
     {
         $this->v["pdf-gen"] = new SurvloopPDF($GLOBALS["SL"]->coreTbl);
-        $this->v["pdf-file"] = $GLOBALS["SL"]->coreTbl . '-' 
-            . $this->corePublicID . '-' . $GLOBALS["SL"]->pageView 
+        $this->v["pdf-file"] = $GLOBALS["SL"]->coreTbl . '-'
+            . $this->corePublicID . '-' . $GLOBALS["SL"]->pageView
             . '-' . $GLOBALS["SL"]->dataPerms . '.pdf';
         $this->v["pdf-file"] = $this->v["pdf-gen"]->getPdfFile($this->v["pdf-file"]);
         $fileDeliver = $this->loadPdfFilename();
@@ -123,23 +123,23 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->v["pdf-gen"]->setOutput($this->v["pdf-file"], $fileDeliver);
         return $this->v["pdf-file"];
     }
-    
+
     protected function loadPdfFilename()
     {
         return '';
     }
-    
+
     // Override PDF filename to be used for delivery to user.
     public function customPdfFilename()
     {
         $GLOBALS["SL"]->x["pdfFilename"] = '';
     }
-    
+
     public function getCachePdfByID()
     {
         return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
     }
-    
+
     public function prepPdfByID()
     {
         if (!isset($this->v["content"]) || trim($this->v["content"]) == '') {
@@ -147,11 +147,11 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->v["content"] = $this->index($GLOBALS["SL"]->REQ);
         }
         return $this->v["pdf-gen"]->storeHtml(
-            view('vendor.survloop.master', $this->v)->render(), 
+            view('vendor.survloop.master', $this->v)->render(),
             $this->v["pdf-file"]
         );
     }
-    
+
     public function genPdfByID()
     {
         $fileHtml = str_replace('.pdf', '.html', $this->v["pdf-file"]);
@@ -161,7 +161,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->v["pdf-gen"]->genCorePdf($this->v["pdf-file"]);
         return $this->v["pdf-gen"]->pdfResponse($this->v["pdf-file"]);
     }
-    
+
     public function ajaxEmojiTag(Request $request, $recID = -3, $defID = -3)
     {
         if ($recID <= 0) {
@@ -176,7 +176,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if (sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 && $recID > 0) {
             foreach ($GLOBALS["SL"]->treeSettings['emojis'] as $i => $emo) {
                 if ($emo["id"] == $defID) {
-                    if (isset($this->emojiTagUsrs[$emo["id"]]) 
+                    if (isset($this->emojiTagUsrs[$emo["id"]])
                         && in_array($this->v["uID"], $this->emojiTagUsrs[$emo["id"]])) {
                         SLSessEmojis::where('sess_emo_rec_id', $this->coreID)
                             ->where('sess_emo_def_id', $emo["id"])
@@ -203,7 +203,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             if (sizeof($emos) > 0) {
                 foreach ($emos as $emo) {
                     if ($emo["id"] == $defID) {
-                        if ($this->v["uID"] > 0 
+                        if ($this->v["uID"] > 0
                             && isset($this->emojiTagUsrs[$defID])
                             && in_array($this->v["uID"], $this->emojiTagUsrs[$defID])) {
                             $isActive = true;
@@ -211,10 +211,10 @@ class TreeSurvReport extends TreeSurvBasicNav
                         $spot = 't' . $this->treeID . 'r' . $this->coreID;
                         $cnt = sizeof($this->emojiTagUsrs[$defID]);
                         return view(
-                            'vendor.survloop.elements.inc-emoji-tag', 
+                            'vendor.survloop.elements.inc-emoji-tag',
                             [
-                                "spot"     => $spot, 
-                                "emo"      => $emo, 
+                                "spot"     => $spot,
+                                "emo"      => $emo,
                                 "cnt"      => $cnt,
                                 "isActive" => $isActive
                             ]
@@ -225,17 +225,17 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return '';
     }
-    
+
     public function emojiTagOn($defID = -3)
     {
         return true;
     }
-    
+
     public function emojiTagOff($defID = -3)
     {
         return true;
     }
-    
+
     protected function loadEmojiTags($defID = -3)
     {
         if ($this->coreID > 0 && isset($GLOBALS["SL"]->treeSettings["emojis"])) {
@@ -259,28 +259,28 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return true;
     }
-    
+
     protected function printEmojiTags()
     {
         $ret = '';
         $this->loadEmojiTags();
-        if (isset($GLOBALS["SL"]->treeSettings['emojis']) 
-            && sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0 
+        if (isset($GLOBALS["SL"]->treeSettings['emojis'])
+            && sizeof($GLOBALS["SL"]->treeSettings['emojis']) > 0
             && $this->coreID > 0) {
             $admPower = ($this->v["user"] && $this->isStaffOrAdmin());
             $spot = 't' . $this->treeID . 'r' . $this->coreID;
             foreach ($GLOBALS["SL"]->treeSettings['emojis'] as $emo) {
                 if (!$emo["admin"] || $admPower) {
-                    $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#' . $spot . 'e' . $emo["id"] 
-                        . '", function() { $("#' . $spot . 'e' . $emo["id"] . 'Tag").load("/ajax-emoji-tag/' 
+                    $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#' . $spot . 'e' . $emo["id"]
+                        . '", function() { $("#' . $spot . 'e' . $emo["id"] . 'Tag").load("/ajax-emoji-tag/'
                         . $this->treeID . '/' . $this->coreID . '/' . $emo["id"] . '"); });' . "\n";
                 }
             }
             $ret .= view(
-                'vendor.survloop.elements.inc-emoji-tags', 
+                'vendor.survloop.elements.inc-emoji-tags',
                 [
-                    "spot"     => $spot, 
-                    "emojis"   => $GLOBALS["SL"]->treeSettings["emojis"], 
+                    "spot"     => $spot,
+                    "emojis"   => $GLOBALS["SL"]->treeSettings["emojis"],
                     "users"    => $this->emojiTagUsrs,
                     "uID"      => (($this->v["uID"] > 0) ? $this->v["uID"] : -3),
                     "admPower" => $admPower
@@ -289,26 +289,26 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $ret;
     }
-    
+
     protected function fillGlossary()
     {
         $this->v["glossaryList"] = [];
         return true;
     }
-    
+
     protected function printGlossary()
     {
         if (!isset($this->v["glossaryList"]) || sizeof($this->v["glossaryList"]) == 0) {
             $this->fillGlossary();
         }
         return view(
-            'vendor.survloop.reports.inc-glossary', 
+            'vendor.survloop.reports.inc-glossary',
             [
                 "glossaryList" => $this->v["glossaryList"]
             ]
         )->render();
     }
-    
+
     protected function swapSeo($str)
     {
         $str = str_replace('#1111', '#' . $this->corePublicID, $str);
@@ -316,39 +316,39 @@ class TreeSurvReport extends TreeSurvBasicNav
         $str = str_replace('[coreID]', $this->corePublicID, $str);
         return $str;
     }
-    
+
     protected function runPageLoad($nID)
     {
         if (!$this->isPage && $GLOBALS["SL"]->treeRow->tree_opts%13 == 0) { // report
-            $GLOBALS["SL"]->sysOpts['meta-title'] 
+            $GLOBALS["SL"]->sysOpts['meta-title']
                 = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-title']);
-            $GLOBALS["SL"]->sysOpts['meta-desc'] 
+            $GLOBALS["SL"]->sysOpts['meta-desc']
                 = $this->swapSeo($GLOBALS["SL"]->sysOpts['meta-desc']);
         }
         return true;
     }
-    
+
     /**
      * Override the default behavior for wrapping a tree which has
      * been called through an ajax call.
      *
      * @return boolean
      */
-    protected function runPageExtra($nID) 
+    protected function runPageExtra($nID)
     {
-        return true; 
+        return true;
     }
-    
+
     protected function printNodePageFoot()
     {
-        return (isset($GLOBALS["SL"]->sysOpts["footer-master"]) 
+        return (isset($GLOBALS["SL"]->sysOpts["footer-master"])
             ? $GLOBALS["SL"]->sysOpts["footer-master"] : '');
     }
-    
+
     public function printCurrRecMgmt()
     {
         $recDesc = '';
-        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) 
+        if (isset($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl])
             && sizeof($this->sessData->dataSets[$GLOBALS["SL"]->coreTbl]) > 0) {
             $rec = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0];
             $recDesc = trim($this->getTableRecLabel($GLOBALS["SL"]->coreTbl, $rec));
@@ -356,7 +356,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $isUser = (isset($this->v["uID"]) && $this->v["uID"] > 0);
         $multiRecs = ((isset($this->v["multipleRecords"])) ? $this->v["multipleRecords"] : '');
         return view(
-            'vendor.survloop.forms.foot-record-mgmt', 
+            'vendor.survloop.forms.foot-record-mgmt',
             [
                 "coreID"          => $this->coreID,
                 "treeID"          => $this->treeID,
@@ -366,7 +366,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             ]
         )->render();
     }
-    
+
     public function chkDeets($deets)
     {
         $new = [];
@@ -379,12 +379,12 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $new;
     }
-    
+
     public function printReportDeetsBlock($deets, $blockName = '', $curr = null, $blockDesc = '')
     {
         $deets = $this->chkDeets($deets);
         return view(
-            'vendor.survloop.reports.inc-deets', 
+            'vendor.survloop.reports.inc-deets',
             [
                 "nID"       => $curr->nID,
                 "nIDtxt"    => $curr->nIDtxt,
@@ -394,7 +394,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             ]
         )->render();
     }
-    
+
     public function printReportDeetsBlockCols($deets, $blockName = '', $cols = 2, $curr = null, $blockDesc = '')
     {
         $deets = $this->chkDeets($deets);
@@ -433,8 +433,8 @@ class TreeSurvReport extends TreeSurvBasicNav
             foreach ($deets as $i => $deet) {
                 // Check if we should switch columns
                 $chk = 1+$c;
-                if ($chk < $cols 
-                    && $deetsTotCols[$chk]["ind"] < 0 
+                if ($chk < $cols
+                    && $deetsTotCols[$chk]["ind"] < 0
                     && $deetsTotCols[$chk]["cutoff"] < $deetsTots[$i]
                     && sizeof($deetCols[$c]) > 0) {
                     $deetsTotCols[$chk]["ind"] = $i;
@@ -445,7 +445,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             }
         }
         return view(
-            'vendor.survloop.reports.inc-deets-cols', 
+            'vendor.survloop.reports.inc-deets-cols',
             [
                 "nID"       => $curr->nID,
                 "nIDtxt"    => $curr->nIDtxt,
@@ -456,7 +456,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             ]
         )->render();
     }
-    
+
     public function printReportDeetsVertProg($deets, $blockName = '', $curr = null)
     {
         $last = 0;
@@ -468,7 +468,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             }
         }
         return view(
-            'vendor.survloop.reports.inc-deets-vert-prog', 
+            'vendor.survloop.reports.inc-deets-vert-prog',
             [
                 "nID"       => $curr->nID,
                 "nIDtxt"    => $curr->nIDtxt,
@@ -479,7 +479,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             ]
         )->render();
     }
-    
+
     public function printReports(Request $request, $full = true)
     {
         $this->survloopInit($request, '/reports-full/' . $this->treeID);
@@ -503,7 +503,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $ret;
     }
-    
+
     public function printReportsDefault($full = true)
     {
         $ret = '';
@@ -513,7 +513,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->searcher->processSearchFilts();
         if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
             foreach ($this->searcher->allPublicFiltIDs as $i => $coreID) {
-                if (!isset($this->searchOpts["limit"]) 
+                if (!isset($this->searchOpts["limit"])
                     || intVal($this->searchOpts["limit"]) == 0
                     || $i < $this->searchOpts["limit"]) {
                     if ($GLOBALS["SL"]->tblHasPublicID($GLOBALS["SL"]->coreTbl)) {
@@ -526,64 +526,64 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $ret;
     }
-    
+
     public function printReportsRecord($coreID = -3, $full = true)
     {
-        if (!$this->isPublished($GLOBALS["SL"]->coreTbl, $coreID) 
-            && !$this->isCoreOwner($coreID) 
+        if (!$this->isPublished($GLOBALS["SL"]->coreTbl, $coreID)
+            && !$this->isCoreOwner($coreID)
             && (!$this->v["user"] || !$this->isStaffOrAdmin())) {
             return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
         }
         if ($full) {
-            return '<div class="reportWrap">' 
+            return '<div class="reportWrap">'
                 . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true, true) . '</div>';
         }
         return $this->printReportsPrev($coreID);
     }
-    
+
     public function printReportsRecordPublic($coreID = -3, $full = true)
     {
-        if (!$this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $coreID) 
-            && !$this->isCoreOwnerPublic($coreID) 
+        if (!$this->isPublishedPublic($GLOBALS["SL"]->coreTbl, $coreID)
+            && !$this->isCoreOwnerPublic($coreID)
             && (!$this->v["user"] || !$this->isStaffOrAdmin())) {
             return $this->unpublishedMessage($GLOBALS["SL"]->coreTbl);
         }
         if ($full) {
-            return '<div class="reportWrap">' 
-                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true) 
+            return '<div class="reportWrap">'
+                . $this->byID($GLOBALS["SL"]->REQ, $coreID, '', true)
                 . '</div>';
         }
         return $this->printReportsPrev($coreID);
     }
-    
+
     public function printReportsPrev($coreID = -3)
     {
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
-        return '<div id="reportPreview' . $coreID . '" class="reportPreview">' 
+        return '<div id="reportPreview' . $coreID . '" class="reportPreview">'
             . $this->printPreviewReport() . '</div>';
     }
-    
+
     public function unpublishedMessage($coreTbl = '')
     {
         if ($this->corePublicID <= 0) {
             return '<!-- -->';
         }
-        return '<!-- <div class="well well-lg">#' . $this->corePublicID 
+        return '<!-- <div class="well well-lg">#' . $this->corePublicID
             . ' is no longer published.</div> -->';
     }
-    
+
     protected function xmlAllAccess()
     {
-        return true; 
+        return true;
     }
-    
+
     public function xmlAll(Request $request)
     {
         $xtras = '';
         if ($request->has('state') && trim($request->get('state')) != '') {
             $xtras .= '&state=' . trim($request->get('state'));
         }
-        $page 
+        $page
             = $pageBasic
             = '/api/all/' . $GLOBALS["SL"]->treeRow->tree_slug . '/xml';
         $this->survloopInit($request, $page);
@@ -599,7 +599,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             return Response::make($content, '200')
                 ->header('Content-Type', 'text/xml');
         }
-        $this->v["apiLoadLinks"] = 'Current: ' 
+        $this->v["apiLoadLinks"] = 'Current: '
             . $GLOBALS['SL']->sysOpts["app-url"] . $page;
 
         $this->loadXmlMapTree($request);
@@ -626,19 +626,19 @@ class TreeSurvReport extends TreeSurvBasicNav
             foreach ($allIDs as $i => $coreID) {
                 if ($i >= $start && $i < ($start+$limit)) {
                     $this->loadAllSessData($coreTbl, $coreID);
-                    if (isset($this->sessData->dataSets[$coreTbl]) 
+                    if (isset($this->sessData->dataSets[$coreTbl])
                         && sizeof($this->sessData->dataSets[$coreTbl]) > 0) {
                         $this->v["nestedNodes"] .= $this->genXmlReportNode(
-                            $this->xmlMapTree->rootID, 
-                            $this->xmlMapTree->nodeTiers, 
+                            $this->xmlMapTree->rootID,
+                            $this->xmlMapTree->nodeTiers,
                             $this->sessData->dataSets[$coreTbl][0]
                         );
                     }
                 }
             }
             if ($limit < sizeof($allIDs)) {
-                $this->v["nextPage"] = $GLOBALS["SL"]->sysOpts["app-url"] 
-                    . $pageBasic . '?limit=' . $limit . '&start=' 
+                $this->v["nextPage"] = $GLOBALS["SL"]->sysOpts["app-url"]
+                    . $pageBasic . '?limit=' . $limit . '&start='
                     . ($start+$limit) . $xtras;
                 $this->v["apiLoadLinks"] .= "\n" . 'Next: ' . $this->v["nextPage"];
             }
@@ -648,10 +648,10 @@ class TreeSurvReport extends TreeSurvBasicNav
         return Response::make($view, '200')
             ->header('Content-Type', 'text/xml');
     }
-    
+
     public function xmlByID(Request $request, $coreID, $coreSlug = '')
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug
             . '/readi-' . $coreID . '/xml';
         $this->survloopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'public';
@@ -671,17 +671,17 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $this->getXmlID($request, $coreID, $coreSlug);
     }
-    
+
     public function xmlFullByID(Request $request, $coreID, $coreSlug = '')
     {
-        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug 
+        $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug
             . '/readi-' . $coreID . '/full-xml';
         $this->survloopInit($request, $page);
         $GLOBALS["SL"]->pageView = 'full-xml';
         if (!$this->xmlAccess()) {
             return 'Sorry, access not permitted.';
         }
-        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID); 
+        $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);
         $this->loadXmlMapTree($request);
         if ($GLOBALS["SL"]->xmlTree["coreTbl"] == $GLOBALS["SL"]->coreTbl) {
             $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $coreID);
@@ -695,22 +695,22 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $this->getXmlID($request, $coreID, $coreSlug);
     }
-    
+
     public function getXmlID(Request $request, $coreID, $coreSlug = '')
     {
 //echo 'getXmlID( view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms;
         //$this->maxUserView();
 //echo 'getXmlID( view: ' . $GLOBALS["SL"]->pageView . ', perms: ' . $GLOBALS["SL"]->dataPerms; exit;
         $this->xmlMapTree->v["view"] = $GLOBALS["SL"]->pageView;
-        if (isset($GLOBALS["SL"]->x["fullAccess"]) 
-            && $GLOBALS["SL"]->x["fullAccess"] 
+        if (isset($GLOBALS["SL"]->x["fullAccess"])
+            && $GLOBALS["SL"]->x["fullAccess"]
             && !in_array($GLOBALS["SL"]->pageView, ['full', 'full-xml'])) {
             $this->v["content"] = $this->errorDeniedFullXml();
             return view('vendor.survloop.master', $this->v);
         }
         return $this->genXmlReport($request);
     }
-    
+
     public function getXmlExample(Request $request)
     {
         $page = '/' . $GLOBALS["SL"]->treeRow->tree_slug . '-xml-example';
@@ -720,7 +720,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         if ($coreID <= 0 && isset($GLOBALS["SL"]->sysOpts[$optTree])) {
             $coreID = intVal($GLOBALS["SL"]->sysOpts[$optTree]);
         }
-        if ($coreID <= 0 
+        if ($coreID <= 0
             && $optXmlTree != $optTree
             && isset($GLOBALS["SL"]->xmlTree["id"])) {
             $optXmlTree = "tree-" . $GLOBALS["SL"]->xmlTree["id"] . "-example";
@@ -750,7 +750,7 @@ class TreeSurvReport extends TreeSurvBasicNav
         }
         return $this->redir('/xml-schema');
     }
-    
+
     /**
      * Specify the example record for individual XML exports.
      *
@@ -760,12 +760,12 @@ class TreeSurvReport extends TreeSurvBasicNav
     {
         return -3;
     }
-    
+
     protected function reloadStats($coreIDs = [])
     {
         return true;
     }
-    
+
     public function retrieveUpload(Request $request, $cid = -3, $upID = '', $refresh = false)
     {
         if ($cid <= 0) {
@@ -776,45 +776,45 @@ class TreeSurvReport extends TreeSurvBasicNav
         $this->loadAllSessData($GLOBALS["SL"]->coreTbl, $cid);
         return $this->retrieveUploadFile($upID, $refresh);
     }
-    
+
     protected function errorDeniedFullPdf()
     {
         $url = $GLOBALS["SL"]->treeRow->tree_slug . '/read-' . $this->coreID;
         return view(
-            'vendor.survloop.reports.inc-error-denied-full-pdf', 
+            'vendor.survloop.reports.inc-error-denied-full-pdf',
             [ "url" => $url ]
         );
     }
-    
+
     protected function errorDeniedFullXml()
     {
         return $this->errorDeniedFullPdf();
     }
-    
+
     protected function hasAjaxWrapPrinting()
     {
-        return (!$this->hasREQ 
-            && (!$GLOBALS["SL"]->REQ->has('ajax') 
+        return (!$this->hasREQ
+            && (!$GLOBALS["SL"]->REQ->has('ajax')
                 || intVal($GLOBALS["SL"]->REQ->get('ajax')) == 0)
             && !$GLOBALS["SL"]->isPdfView());
     }
-    
+
     protected function hasFrameLoad()
     {
-        return ($GLOBALS["SL"]->REQ->has('frame') 
+        return ($GLOBALS["SL"]->REQ->has('frame')
             && intVal($GLOBALS["SL"]->REQ->get('frame')) == 1);
     }
 
 
 
-    
+
     public function ajaxGraph(Request $request, $gType = '', $nID = -3)
     {
         $this->survloopInit($request, '');
         $this->v["currNode"] = new TreeNodeSurv;
         $this->v["currNode"]->fillNodeRow($nID);
         $this->v["currGraphID"] = 'nGraph' . $nID;
-        if ($this->v["currNode"] 
+        if ($this->v["currNode"]
             && trim($gType) != ''
             && isset($this->v["currNode"]->nodeRow->node_id)) {
             $this->getAllPublicCoreIDs();
@@ -822,7 +822,7 @@ class TreeSurvReport extends TreeSurvBasicNav
             $this->searcher->processSearchFilts();
             $this->v["graphDataPts"] = $this->v["graphMath"] = $rows = $rowsFilt = [];
             if (sizeof($this->searcher->allPublicFiltIDs) > 0) {
-                if (isset($this->v["currNode"]->extraOpts["y-axis"]) 
+                if (isset($this->v["currNode"]->extraOpts["y-axis"])
                     && intVal($this->v["currNode"]->extraOpts["y-axis"]) > 0) {
                     $fldRec = SLFields::find($this->v["currNode"]->extraOpts["y-axis"]);
                     $lab1Rec = SLFields::find($this->v["currNode"]->extraOpts["lab1"]);
@@ -831,31 +831,31 @@ class TreeSurvReport extends TreeSurvBasicNav
                         $tbl = $GLOBALS["SL"]->tbl[$fldRec->fld_table];
                         $tblAbbr = $GLOBALS["SL"]->tblAbbr[$tbl];
                         $fldName = $tblAbbr . $fldRec->fld_name;
-                        $lab1Fld = (($lab1Rec && isset($lab1Rec->fld_name)) 
+                        $lab1Fld = (($lab1Rec && isset($lab1Rec->fld_name))
                             ? $tblAbbr . $lab1Rec->fld_name : '');
-                        $lab2Fld = (($lab2Rec && isset($lab2Rec->fld_name)) 
+                        $lab2Fld = (($lab2Rec && isset($lab2Rec->fld_name))
                             ? $tblAbbr . $lab2Rec->fld_name : '');
                         if ($tbl == $GLOBALS["SL"]->coreTbl) {
-                            eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) 
-                                . "::select('" . $tblAbbr . "ID', '" . $fldName . "'" 
-                                . ((trim($lab1Fld) != '') ? ", '" . $lab1Fld . "'" : "") 
+                            eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl)
+                                . "::select('" . $tblAbbr . "ID', '" . $fldName . "'"
+                                . ((trim($lab1Fld) != '') ? ", '" . $lab1Fld . "'" : "")
                                 . ((trim($lab2Fld) != '') ? ", '" . $lab2Fld . "'" : "")
                                 . ")->where('" . $fldName . "', 'NOT LIKE', '')->where('"
-                                . $fldName . "', 'NOT LIKE', 0)->whereIn('" . $tblAbbr 
-                                . "id', \$this->searcher->allPublicFiltIDs)->orderBy('" 
+                                . $fldName . "', 'NOT LIKE', 0)->whereIn('" . $tblAbbr
+                                . "id', \$this->searcher->allPublicFiltIDs)->orderBy('"
                                 . $fldName . "', 'asc')->get();");
                         } else {
-                            //eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl) 
-                            //    . "::orderBy('" . $isBigSurvloop[1] 
+                            //eval("\$rows = " . $GLOBALS["SL"]->modelPath($tbl)
+                            //    . "::orderBy('" . $isBigSurvloop[1]
                             //    . "', '" . $isBigSurvloop[2] . "')->get();");
                         }
                         if ($rows->isNotEmpty()) {
-                            if (isset($this->v["currNode"]->extraOpts["conds"]) 
+                            if (isset($this->v["currNode"]->extraOpts["conds"])
                                 && strpos('#', $this->v["currNode"]->extraOpts["conds"]) !== false) {
                                 $this->loadCustLoop($request);
                                 foreach ($rows as $i => $row) {
                                     $this->custReport->loadAllSessData(
-                                        $GLOBALS["SL"]->coreTbl, 
+                                        $GLOBALS["SL"]->coreTbl,
                                         $row->getKey()
                                     );
                                     if ($this->custReport->chkConds(
@@ -875,33 +875,33 @@ class TreeSurvReport extends TreeSurvBasicNav
                                         -$this->v["graphMath"]["absMin"];
                                 foreach ($rows as $i => $row) {
                                     $lab = '';
-                                    if (trim($lab1Fld) != '' 
-                                        && isset($row->{ $lab1Fld })) { 
-                                        $lab .= (($lab1Rec->fld_type == 'DOUBLE') 
-                                            ? $GLOBALS["SL"]->sigFigs($row->{ $lab1Fld }) 
+                                    if (trim($lab1Fld) != ''
+                                        && isset($row->{ $lab1Fld })) {
+                                        $lab .= (($lab1Rec->fld_type == 'DOUBLE')
+                                            ? $GLOBALS["SL"]->sigFigs($row->{ $lab1Fld })
                                             : $row->{ $lab1Fld }) . ' ';
-                                        if (trim($lab2Fld) != '' 
-                                            && isset($row->{ $lab2Fld })) { 
-                                            $lab .= (($lab2Rec->fld_type == 'DOUBLE') 
-                                               ? $GLOBALS["SL"]->sigFigs($row->{ $lab2Fld }) 
+                                        if (trim($lab2Fld) != ''
+                                            && isset($row->{ $lab2Fld })) {
+                                            $lab .= (($lab2Rec->fld_type == 'DOUBLE')
+                                               ? $GLOBALS["SL"]->sigFigs($row->{ $lab2Fld })
                                                : $row->{ $lab2Fld }) .' ';
                                         }
                                     }
                                     $perc = ((1+$i)/sizeof($rows));
                                     $this->v["graphDataPts"][] = [
                                         "id"  => $row->getKey(),
-                                        "val" => (($fldRec->fld_type == 'DOUBLE') 
-                                            ? $GLOBALS["SL"]->sigFigs($row->{ $fldName }, 4) 
-                                            : $row->{ $fldName }), 
+                                        "val" => (($fldRec->fld_type == 'DOUBLE')
+                                            ? $GLOBALS["SL"]->sigFigs($row->{ $fldName }, 4)
+                                            : $row->{ $fldName }),
                                         "lab" => trim($lab),
                                         "dsc" => '',
-                                        "bg"  => $GLOBALS["SL"]->printColorFade( $perc, 
-                                            $this->v["currNode"]->extraOpts["clr1"], 
-                                            $this->v["currNode"]->extraOpts["clr2"], 
-                                            $this->v["currNode"]->extraOpts["opc1"], 
-                                            $this->v["currNode"]->extraOpts["opc2"] ), 
-                                        "brd" => $GLOBALS["SL"]->printColorFade( $perc, 
-                                            $this->v["currNode"]->extraOpts["clr1"], 
+                                        "bg"  => $GLOBALS["SL"]->printColorFade( $perc,
+                                            $this->v["currNode"]->extraOpts["clr1"],
+                                            $this->v["currNode"]->extraOpts["clr2"],
+                                            $this->v["currNode"]->extraOpts["opc1"],
+                                            $this->v["currNode"]->extraOpts["opc2"] ),
+                                        "brd" => $GLOBALS["SL"]->printColorFade( $perc,
+                                            $this->v["currNode"]->extraOpts["clr1"],
                                             $this->v["currNode"]->extraOpts["clr2"] )
                                     ];
                                 }
@@ -910,10 +910,10 @@ class TreeSurvReport extends TreeSurvBasicNav
                     }
                 }
                 $this->v["graph"] = [
-                    "dat" => '', 
-                    "lab" => '', 
-                    "bg"  => '', 
-                    "brd" => '' 
+                    "dat" => '',
+                    "lab" => '',
+                    "bg"  => '',
+                    "brd" => ''
                 ];
                 if (sizeof($this->v["graphDataPts"]) > 0) {
                     foreach ($this->v["graphDataPts"] as $cnt => $dat) {
@@ -931,5 +931,5 @@ class TreeSurvReport extends TreeSurvBasicNav
         return view('vendor.survloop.reports.graph-bar', $this->v);
     }
 
-    
+
 }

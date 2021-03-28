@@ -50,38 +50,38 @@
     border: 0px none;
 }
 
-.tmbRound { 
-    width: 140px; 
-    height: 140px; 
-    -moz-border-radius: 70px; 
-    border-radius: 70px; 
+.tmbRound {
+    width: 140px;
+    height: 140px;
+    -moz-border-radius: 70px;
+    border-radius: 70px;
 }
 .bigTmbRound, .bigTmbRoundDiv {
     width: 125px;
-    height: 125px; 
-    -moz-border-radius: 62px; 
-    border-radius: 62px; 
-    overflow: hidden; 
+    height: 125px;
+    -moz-border-radius: 62px;
+    border-radius: 62px;
+    overflow: hidden;
 }
 .bigTmbRoundDiv img {
-    width: 125px; 
-    min-height: 125px; 
+    width: 125px;
+    min-height: 125px;
 }
 
-.hugTmbRound, .hugTmbRoundDiv { 
-    width: 175px; 
-    height: 175px; 
-    -moz-border-radius: 87px; 
-    border-radius: 87px; 
-    overflow: hidden; 
+.hugTmbRound, .hugTmbRoundDiv {
+    width: 175px;
+    height: 175px;
+    -moz-border-radius: 87px;
+    border-radius: 87px;
+    overflow: hidden;
 }
-.hugTmbRoundDiv img { 
-    width: 175px; 
-    min-height: 175px; 
+.hugTmbRoundDiv img {
+    width: 175px;
+    min-height: 175px;
 }
-.hugTmbRoundDiv { 
-    border: 2px {!! $css["color-main-bg"] !!} solid; 
-    box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!}; 
+.hugTmbRoundDiv {
+    border: 2px {!! $css["color-main-bg"] !!} solid;
+    box-shadow: 0px 0px 2px {!! $css["color-main-text"] !!};
 }
 
 .litRedDot, .litRedDottie {
@@ -103,14 +103,14 @@
     border: 1px {!! $css["color-danger-on"] !!} solid;
 }
 
-.icoBig, i.icoBig, .icoBig i { 
-    font-size: 54px; 
+.icoBig, i.icoBig, .icoBig i {
+    font-size: 54px;
 }
-.icoHuge, i.icoHuge, .icoHuge i { 
-    font-size: 82px; 
+.icoHuge, i.icoHuge, .icoHuge i {
+    font-size: 82px;
 }
-.icoMssv, i.icoMssv, .icoMssv i { 
-    font-size: 120px; 
+.icoMssv, i.icoMssv, .icoMssv i {
+    font-size: 120px;
 }
 
 .responsive-video, .nPrompt .responsive-video {
@@ -119,11 +119,11 @@
     padding-bottom: 56.25%;
     padding-top: 60px; overflow: hidden;
 }
-iframe.responsive-video, .responsive-video iframe, 
+iframe.responsive-video, .responsive-video iframe,
 .nPrompt .responsive-video iframe,
-object.responsive-video, .responsive-video object, 
+object.responsive-video, .responsive-video object,
 .nPrompt .responsive-video object,
-embed.responsive-video, .responsive-video embed, 
+embed.responsive-video, .responsive-video embed,
 .nPrompt .responsive-video embed {
     position: absolute;
     top: 0;
@@ -139,31 +139,31 @@ embed.responsive-video, .responsive-video embed,
 
 .sliGalSlide {
     width: 100%;
-    
+
 }
 .sliNavDiv {
     width: 100%;
     height: 30px;
     text-align: center;
 }
-a.sliNav, .sliNavDiv a.sliNav, 
-.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, 
+a.sliNav, .sliNavDiv a.sliNav,
+.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active,
 .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover,
-a.sliNavAct, .sliNavDiv a.sliNavAct, 
-.sliNavDiv a.sliNavAct:link, .sliNavDiv a.sliNavAct:active, 
+a.sliNavAct, .sliNavDiv a.sliNavAct,
+.sliNavDiv a.sliNavAct:link, .sliNavDiv a.sliNavAct:active,
 .sliNavDiv a.sliNavAct:visited, .sliNavDiv a.sliNavAct:hover {
     color: {!! $css["color-main-on"] !!};
     font-size: 12pt;
     margin: 5px;
 }
-a.sliNav, .sliNavDiv a.sliNav, 
-.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active, 
+a.sliNav, .sliNavDiv a.sliNav,
+.sliNavDiv a.sliNav:link, .sliNavDiv a.sliNav:active,
 .sliNavDiv a.sliNav:visited, .sliNavDiv a.sliNav:hover {
     opacity:0.33; filter:alpha(opacity=33);
 }
-.sliNavDiv a.sliLft:link, .sliNavDiv a.sliLft:active, 
-.sliNavDiv a.sliLft:visited, .sliNavDiv a.sliLft:hover, 
-.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, 
+.sliNavDiv a.sliLft:link, .sliNavDiv a.sliLft:active,
+.sliNavDiv a.sliLft:visited, .sliNavDiv a.sliLft:hover,
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active,
 .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
     width: 20%;
     height: 30px;
@@ -174,24 +174,24 @@ a.sliNav, .sliNavDiv a.sliNav,
     float: left;
     text-align: left;
 }
-.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active, 
+.sliNavDiv a.sliRgt:link, .sliNavDiv a.sliRgt:active,
 .sliNavDiv a.sliRgt:visited, .sliNavDiv a.sliRgt:hover {
     float: right;
     text-align: right;
 }
-.sliNavDiv a.sliLft i, 
-.sliNavDiv a.sliLft:link i, .sliNavDiv a.sliLft:active i, 
-.sliNavDiv a.sliLft:visited i, .sliNavDiv a.sliLft:hover i, 
-.sliNavDiv a.sliRgt i, 
-.sliNavDiv a.sliRgt:link i, .sliNavDiv a.sliRgt:active i, 
+.sliNavDiv a.sliLft i,
+.sliNavDiv a.sliLft:link i, .sliNavDiv a.sliLft:active i,
+.sliNavDiv a.sliLft:visited i, .sliNavDiv a.sliLft:hover i,
+.sliNavDiv a.sliRgt i,
+.sliNavDiv a.sliRgt:link i, .sliNavDiv a.sliRgt:active i,
 .sliNavDiv a.sliRgt:visited i, .sliNavDiv a.sliRgt:hover i {
     margin: 10px;
 }
-.sliNavDiv a.sliLft div, 
-.sliNavDiv a.sliLft:link div, .sliNavDiv a.sliLft:active div, 
-.sliNavDiv a.sliLft:visited div, .sliNavDiv a.sliLft:hover div, 
-.sliNavDiv a.sliRgt div, 
-.sliNavDiv a.sliRgt:link div, .sliNavDiv a.sliRgt:active div, 
+.sliNavDiv a.sliLft div,
+.sliNavDiv a.sliLft:link div, .sliNavDiv a.sliLft:active div,
+.sliNavDiv a.sliLft:visited div, .sliNavDiv a.sliLft:hover div,
+.sliNavDiv a.sliRgt div,
+.sliNavDiv a.sliRgt:link div, .sliNavDiv a.sliRgt:active div,
 .sliNavDiv a.sliRgt:visited div, .sliNavDiv a.sliRgt:hover div {
     display: block;
     width: 100%;
@@ -276,7 +276,7 @@ a.sliNav, .sliNavDiv a.sliNav,
     padding-top: 10px;
 }
 
-a.accordHeadBtn:link, a.accordHeadBtn:visited, 
+a.accordHeadBtn:link, a.accordHeadBtn:visited,
 a.accordHeadBtn:active, a.accordHeadBtn:hover {
     background: {!! $css["color-main-bg"] !!};
 }
@@ -290,6 +290,9 @@ a.accordHeadBtn:hover {
 .slAccordBig .accordHeadWrap, .slAccordBig div a div .accordHeadWrap {
     min-height: 35px;
 }
+.accordHeadPad, .slAccord .accordHeadPad {
+    padding: 20px 0px;
+}
 
 @for ($i = 0; $i < 20; $i++) @if ($i > 0) , @endif #fixHead{{ $i }} @endfor {
     width: 100%;
@@ -298,3 +301,57 @@ a.accordHeadBtn:hover {
     width: 100%;
 }
 
+
+.toggleSwitch {
+    display: block;
+    cursor: pointer;
+    padding: 0px;
+    margin: 0px;
+}
+.toggleSwitchBtn, .toggleSwitch div .toggleSwitchBtn,
+.toggleSwitchBtnOn, .toggleSwitch div .toggleSwitchBtnOn {
+    position: relative;
+    width: 60px;
+    height: 34px;
+    -moz-border-radius: 17px;
+    border-radius: 17px;
+    padding: 0px;
+    margin: 0px 15px;
+}
+.toggleSwitchBtn, .toggleSwitch div .toggleSwitchBtn {
+    background: {!! $css["color-main-bg"] !!};
+    border: 1px {!! $css["color-main-grey"] !!} solid;
+}
+.toggleSwitchBtnOn, .toggleSwitch div .toggleSwitchBtnOn {
+    background: {!! $css["color-main-on"] !!};
+    border: 1px {!! $css["color-main-bg"] !!} solid;
+}
+
+.toggleSwitchBtn div, .toggleSwitch div .toggleSwitchBtn div,
+.toggleSwitchBtnOn div, .toggleSwitch div .toggleSwitchBtnOn div {
+    width: 26px;
+    height: 26px;
+    -moz-border-radius: 13px;
+    border-radius: 13px;
+    position: absolute;
+    top: 3px;
+}
+.toggleSwitchBtn div, .toggleSwitch div .toggleSwitchBtn div {
+    background: {!! $css["color-main-grey"] !!};
+    left: 29px;
+}
+.toggleSwitchBtnOn div, .toggleSwitch div .toggleSwitchBtnOn div {
+    background: {!! $css["color-main-bg"] !!};
+    left: 3px;
+}
+
+.urlWrap, a.urlWrap:link, a.urlWrap:active, a.urlWrap:visited, a.urlWrap:hover {
+    white-space: pre;           /* CSS 2.0 */
+    white-space: pre-wrap;      /* CSS 2.1 */
+    white-space: pre-line;      /* CSS 3.0 */
+    white-space: -pre-wrap;     /* Opera 4-6 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    white-space: -moz-pre-wrap; /* Mozilla */
+    white-space: -hp-pre-wrap;  /* HP Printers */
+    word-wrap: break-word;      /* IE 5+ */
+}
