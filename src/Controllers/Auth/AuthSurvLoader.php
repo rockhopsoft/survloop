@@ -55,6 +55,9 @@ class AuthSurvLoader extends Controller
         $this->redirectAfterLogout = $this->domainPath . '/login';
         $this->middleware('guest', ['except' => 'getLogout']);
 
+        // SurvloopControllerUtils.php does not set this IF loaded with a
+        // frame parameter, but that is not allowed for authentication pages:
+        header('X-Frame-Options: SAMEORIGIN');
     }
 
     /**
@@ -74,7 +77,8 @@ class AuthSurvLoader extends Controller
             $this->surv->syncDataTrees($this->request, $this->dbID, $this->treeID);
             $this->surv->loadLoop($this->request);
             $this->surv->custLoop->v["sysDefs"] = new SystemDefinitions;
-            $this->surv->custLoop->v["css"] = $this->surv->custLoop->v["sysDefs"]->loadCss();
+            $this->surv->custLoop->v["css"]
+                = $this->surv->custLoop->v["sysDefs"]->loadCss();
 
             $this->surv->custLoop->v["midSurvRedir"] = $this->midSurvRedir;
             $this->surv->custLoop->v["midSurvBack"]  = $this->midSurvBack;

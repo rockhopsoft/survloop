@@ -64,6 +64,7 @@ class AdminDatabaseInstall extends AdminDBController
 
     public function printExport(Request $request, $asPackage = false)
     {
+        set_time_limit(300);
         $asPack = $cacheName = '/dashboard/db/export';
         $this->admControlInit($request, $asPack);
         $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;

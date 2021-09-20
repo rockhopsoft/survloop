@@ -17,13 +17,15 @@ use Maatwebsite\Excel\Facades\Excel;
 //use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\Importable;
+//use PhpOffice\PhpSpreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\SLFields;
 use App\Models\SLTables;
 
 class SurvloopImportExcel
 {
-    protected $folder     = 'api/excel/';
-    protected $file       = 'tmp.xls';
+    public $folder        = 'api/excel/';
+    public $file          = 'tmp.xls';
 
     public $arr           = null;
     public $tblEng        = 'Excel Import';
@@ -322,6 +324,35 @@ class SurvloopImportExcel
     public function getPathFile()
     {
         return '../storage/app/' . $this->folder . $this->file;
+    }
+
+    public function downloadExcel($innerTbl = '', $filename = 'excel-export', $type = 'xls')
+    {
+        $fileOut  = $filename . '.' . $type;
+        $upFold   = '../storage/app/tmp/';
+        if (!is_dir($upFold)) {
+            mkdir($upFold);
+        }
+        $table = trim($innerTbl);
+        if (strpos($table, '<table') === false) {
+            $table = '<table>' . $table . '</table>';
+        }
+
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html();
+        $spreadsheet = $reader->loadFromString($table);
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+        $writer->save($upFold . $fileOut);
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+            //application/x-www-form-urlencoded');
+        header('Content-Transfer-Encoding: Binary');
+        header("Content-disposition: attachment; filename=\"" . $fileOut . "\"");
+        readfile($upFold . $fileOut);
+        if (file_exists($fileOut)) {
+            unlink($fileOut);
+        }
+        if (file_exists($upFold . $fileOut)) {
+            unlink($upFold . $fileOut);
+        }
     }
 
 }

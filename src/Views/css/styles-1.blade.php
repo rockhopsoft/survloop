@@ -25,17 +25,17 @@ body, .slBg {
     background: {!! $css["color-main-bg"] !!};
 }
 
-body, p, div, input, select, textarea, 
+body, p, div, input, select, textarea,
 .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
     line-height: 1.42857143;
 }
 
-img { 
-    border: 0; 
+img {
+    border: 0;
 }
 
-a:link, a:visited, a:active, a:hover, 
-.clrLnk, a.clrLnk:link, a.clrLnk:visited, 
+a:link, a:visited, a:active, a:hover,
+.clrLnk, a.clrLnk:link, a.clrLnk:visited,
 a.clrLnk:active, a.clrLnk:hover {
     color: {!! $css["color-main-link"] !!};
 }
@@ -46,25 +46,31 @@ a.clrLnk:active, a.clrLnk:hover {
 .disNon {
     display: none;
 }
-.disBlo { 
-    display: block; 
+.disBlo {
+    display: block;
 }
-.disFlx { 
-    display: flex; 
+.disFlx {
+    display: flex;
 }
-.disRow { 
-    display: table-row; 
+.disRow {
+    display: table-row;
 }
-.ovrNo  { 
-    overflow: hidden; 
+.ovrNo  {
+    overflow: hidden;
 }
-.ovrSho { 
-    overflow: visible; 
+.ovrSho {
+    overflow: visible;
 }
-.ovrFlo { 
-    overflow: auto; 
+.ovrFlo {
+    overflow: auto;
 }
-.ovrFloY { 
-    overflow-y: auto; 
-    overflow-x: hidden; 
+.ovrFloY {
+    overflow-y: auto;
+    overflow-x: hidden;
 }
+
+@foreach ([45, 90, 135, 180, 270] as $r)
+.rotate{{ $r }} {
+    transform: rotate({{ $r }}deg); /* Equal to rotateZ({{ $r }}deg) */
+}
+@endforeach

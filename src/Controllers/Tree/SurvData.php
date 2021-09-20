@@ -1067,7 +1067,7 @@ class SurvData extends SurvDataConditions
             $extendFlds = $GLOBALS["SL"]->getTblFlds($tblFrom);
             if (sizeof($extendFlds) > 0) {
                 foreach ($extendFlds as $i => $fld) {
-                    if (isset($rowFrom->{ $fld })) {
+                    if ($rowFrom && isset($rowFrom->{ $fld })) {
                         $abbr = $GLOBALS["SL"]->tblAbbr[$tblTo];
                         $this->dataSets[$tblTo][$ind]->{ $abbr . $fld } = $rowFrom->{ $fld };
                     }

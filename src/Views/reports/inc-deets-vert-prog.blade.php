@@ -8,13 +8,21 @@
 @endif
     <table class="repDeetsBlock repDeetVert">
     @foreach ($deets as $j => $deet)
-        <?php $done = ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0); ?>
+        <?php
+        $done = ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0);
+        foreach ($deets as $j2 => $deet2) {
+            if (!$done
+                && $j < $j2
+                && ($j2 == $last || isset($deet2[1]) && intVal($deet2[1]) > 0)) {
+                $done = true;
+            }
+        }
+        ?>
         <tr>
             <td class="w50">
                 <div class="relDiv">
                     <div class="absDiv">
-                        @if ($j == $last || isset($deet[1]) && intVal($deet[1]) > 0)
-                            <div class="vertPrgDone">
+                        @if ($done) <div class="vertPrgDone">
                         @else <div class="vertPrgFutr">
                         @endif
                         <?php /* <img src="/survloop/uploads/spacer.gif" border=0 alt="" > */ ?>
@@ -30,8 +38,10 @@
             <td class="w50">
                 @if (trim($deet[1]) && intVal($deet[1]) > 0)
                     <nobr>{{ date($dateType, $deet[1]) }}</nobr>
-                @else
+                @elseif (!$done)
                     <span class="slGrey">pending</span>
+                @else
+                    <span class="slGrey">-</span>
                 @endif
             </td>
         </tr>

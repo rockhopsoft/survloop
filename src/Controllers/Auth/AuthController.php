@@ -74,7 +74,10 @@ class AuthController extends AuthSurvLoader
      */
     public function printRegisterView()
     {
-        return view('vendor.survloop.auth.register', $this->surv->custLoop->v);
+        return view(
+            'vendor.survloop.auth.register',
+            $this->surv->custLoop->v
+        );
     }
 
     /**
@@ -84,11 +87,53 @@ class AuthController extends AuthSurvLoader
      */
     public function printLoginView()
     {
+        $redir = $this->getLoginViewRedir();
         if (Auth::user() && isset(Auth::user()->id)) {
             //return redirect('/after-login'); // '/my-profile');
             return redirect($this->redirectPath());
         }
-        return view('vendor.survloop.auth.login', $this->surv->custLoop->v);
+        $this->surv->custLoop->v["content"] = view(
+            'vendor.survloop.auth.login',
+            $this->surv->custLoop->v
+        )->render();
+        if ($GLOBALS["SL"]->REQ->has('ajax')) {
+            return $this->surv->custLoop->v["content"];
+        }
+        $this->surv->custLoop->v["content"] = '<div id="ajaxWrap">'
+            . $this->surv->custLoop->v["content"] . '</div>';
+        header(
+            'Cache-Control',
+            'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
+        );
+        return view(
+            'vendor.survloop.master',
+            $this->surv->custLoop->v
+        );
+    }
+
+    /**
+     * Checks for best redirect link to provide with login page.
+     *
+     * @return string
+     */
+    private function getLoginViewRedir()
+    {
+        $redir = '/my-profile';
+        if (isset($midSurvRedir) && trim($midSurvRedir) != '') {
+            $redir = trim($midSurvRedir);
+        } elseif ($GLOBALS["SL"]->REQ->has('redir')
+            && trim($GLOBALS["SL"]->REQ->get('redir')) != '') {
+            $redir = trim($GLOBALS["SL"]->REQ->get('redir'));
+        } elseif ($GLOBALS["SL"]->REQ->has('previous')
+            && trim($GLOBALS["SL"]->REQ->get('previous')) != '') {
+            $redir = trim($GLOBALS["SL"]->REQ->get('previous'));
+        } elseif (session()->has('loginRedirLast')
+            && trim(session()->get('loginRedirLast')) != '') {
+            $redir = trim(session()->get('loginRedirLast'));
+        }
+        session()->put('loginRedirLast', $redir);
+        $this->surv->custLoop->v["loginRedir"] = $redir;
+        return $redir;
     }
 
     /**

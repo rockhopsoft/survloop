@@ -31,6 +31,20 @@ class TreeSurvFormLoops extends TreeSurvFormVarieties
         return $name;
     }
 
+    protected function getLoopItemLabelCol1Custom($nID, $loop, $itemRow = [], $itemInd = -3)
+    {
+        return '';
+    }
+
+    protected function getLoopItemLabelCol1($nID, $loop, $itemRow = [], $itemInd = -3)
+    {
+        $col1 = $this->getLoopItemLabelCol1Custom($nID, $loop, $itemRow, $itemInd);
+        if (trim($col1) != '') {
+            return $col1;
+        }
+        return '';
+    }
+
     protected function getTableRecLabelCustom($tbl, $rec = [], $ind = -3)
     {
         return '';

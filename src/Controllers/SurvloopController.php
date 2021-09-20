@@ -25,6 +25,7 @@ use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
 use App\Models\SLSess;
 use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Tree\SurvData;
 use RockHopSoft\Survloop\Controllers\Tree\TreeSurvForm;
 use RockHopSoft\Survloop\Controllers\SurvloopInstaller;
 use RockHopSoft\Survloop\Controllers\SurvloopControllerUtils;
@@ -44,22 +45,36 @@ class SurvloopController extends SurvloopControllerUtils
     {
         if (!$this->survInitRun || !isset($this->v["uID"])) {
             $this->survInitRun = true;
+            $this->sessData = new SurvData;
             $this->loadDbLookups($request);
             $this->loadSimpleVars($request);
             $this->loadUserVars();
             $this->loadCurrPage($currPage);
             $this->loadSlSess($request);
             $this->loadNavMenu();
-            if ($this->coreIDoverride > 0) {
+            //if ($this->coreIDoverride > 0) {
                 $this->loadAllSessData();
-            }
+            //}
             if ($runExtra) {
                 $this->initExtra($request);
                 $this->loadSysSettings();
                 $this->initCustViews($request);
             }
+//echo '? survloopInit running, coreIDoverride: ' . $this->coreIDoverride . '<br />';
+            $this->constructorExtra();
             $this->genCacheKey();
         }
+//else { echo '? survloopInit did not run , coreIDoverride: ' . $this->coreIDoverride . '<br />'; }
+        return true;
+    }
+
+    /**
+     * Initializing extra things for special admin pages.
+     *
+     * @return boolean
+     */
+    public function constructorExtra()
+    {
         return true;
     }
 
@@ -807,7 +822,7 @@ class SurvloopController extends SurvloopControllerUtils
             . str_replace("'", "\\'", $emaSubject) . "')";
         if (sizeof($emaTo) > 0) {
             foreach ($emaTo as $i => $eTo) {
-                $mail .= "->to('" . $eTo[0] . "'"
+                $mail .= "->to('" . str_replace("'", "\\'", $eTo[0]) . "'"
                     . ((trim($eTo[1]) != '')
                         ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'"
                         : "")
@@ -816,7 +831,7 @@ class SurvloopController extends SurvloopControllerUtils
         }
         if (sizeof($emaCC) > 0) {
             foreach ($emaCC as $eTo) {
-                $mail .= "->cc('" . $eTo[0] . "'"
+                $mail .= "->cc('" . str_replace("'", "\\'", $eTo[0]) . "'"
                     . ((trim($eTo[1]) != '')
                         ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'"
                         : "")
@@ -825,7 +840,7 @@ class SurvloopController extends SurvloopControllerUtils
         }
         if (sizeof($emaBCC) > 0) {
             foreach ($emaBCC as $eTo) {
-                $mail .= "->bcc('" . $eTo[0] . "'"
+                $mail .= "->bcc('" . str_replace("'", "\\'", $eTo[0]) . "'"
                     . ((trim($eTo[1]) != '')
                         ? ", '" . str_replace("'", "\\'", $eTo[1]) . "'"
                         : "")
@@ -838,7 +853,7 @@ class SurvloopController extends SurvloopControllerUtils
         if (!isset($repTo[1]) || is_array($repTo[1]) || trim($repTo[1]) == '') {
             $repTo[1] = $GLOBALS["SL"]->sysOpts["site-name"];
         }
-        $mail .= "->replyTo('" . $repTo[0] . "'"
+        $mail .= "->replyTo('" . str_replace("'", "\\'", $repTo[0]) . "'"
             . ((trim($repTo[1]) != '')
                 ? ", '" . str_replace("'", "\\'", $repTo[1]) . "'"
                 : "")
@@ -854,19 +869,20 @@ class SurvloopController extends SurvloopControllerUtils
                         $errMsg = 'Could not find file to attach (' . $att->fileDeliver . ')';
                         $this->setNotif($errMsg, 'danger');
                     }
-                    $mail .= "->attach('" . $att->fileStore . "', [
-                        'as' => '" . $att->fileDeliver . "',
+                    $mail .= "->attach('" . str_replace("'", "\\'", $att->fileStore) . "', [
+                        'as' => '" . str_replace("'", "\\'", $att->fileDeliver) . "',
                         'mime' => 'application/pdf',
                     ])";
                 } elseif (is_string($att)) {
-                    $mail .= "->attach('" . $att . "')";
+                    $mail .= "->attach('" . str_replace("'", "\\'", $att) . "')";
                 }
             }
         }
         $mail .= "; });";
         if ($GLOBALS["SL"]->isHomestead()) {
             echo '<br /><br /><br /><div class="container"><h2>'
-                . $emaSubject . '</h2>' . $emaContent
+                . 'The Live Server Would Send An Email Here:</h2><h4>'
+                . $emaSubject . '</h4>' . $emaContent
                 . '<hr><hr></div><pre>' . $mail . '</pre><hr><br />';
             return true;
         }

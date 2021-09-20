@@ -73,11 +73,23 @@ class UserProfile extends TreeSurvInput
     {
         if ($this->v["uID"] > 0) {
             // $GLOBALS["SL"]->user() returns an instance of the authenticated user...
-            if ($this->v["uID"] == $GLOBALS["SL"]->REQ->uID
+            if ($this->v["uID"] == intVal($GLOBALS["SL"]->REQ->uID)
                 || $this->v["user"]->hasRole('administrator|staff')) {
-                $user = User::find($GLOBALS["SL"]->REQ->uID);
-                $user->name = $GLOBALS["SL"]->REQ->name;
-                $user->email = $GLOBALS["SL"]->REQ->email;
+                $user = User::find(intVal($GLOBALS["SL"]->REQ->uID));
+                $name = strip_tags($GLOBALS["SL"]->REQ->name);
+                $chk = User::where('id', 'NOT LIKE', $this->v["uID"])
+                    ->where('name', $name)
+                    ->first();
+                if (!$chk && !isset($chk->name)) {
+                    $user->name = $name;
+                }
+                $email = strip_tags($GLOBALS["SL"]->REQ->email);
+                $chk = User::where('id', 'NOT LIKE', $this->v["uID"])
+                    ->where('email', $email)
+                    ->first();
+                if (!$chk && !isset($chk->email)) {
+                    $user->email = $email;
+                }
                 $user->save();
                 $user->loadRoles();
                 if ($this->v["user"]->hasRole('administrator')) {

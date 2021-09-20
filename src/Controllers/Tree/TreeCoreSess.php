@@ -490,7 +490,8 @@ class TreeCoreSess extends TreeCore
     public function afterLogin(Request $request)
     {
         $this->survloopInit($request, '');
-        $hasCoreTbl = (isset($GLOBALS["SL"]->coreTbl) && $GLOBALS["SL"]->coreTblAbbr() != '');
+        $hasCoreTbl = (isset($GLOBALS["SL"]->coreTbl)
+            && $GLOBALS["SL"]->coreTblAbbr() != '');
         $sessTree = $GLOBALS["SL"]->sessTree;
         if (session()->has('sessTreeReg')) {
             $sessTree = session()->get('sessTreeReg');
@@ -500,23 +501,27 @@ class TreeCoreSess extends TreeCore
         }
         $sessInfo = null;
         $coreAbbr = (($hasCoreTbl) ? $GLOBALS["SL"]->coreTblAbbr() : '');
-        $minute = mktime(date("H"), date("i")-1, date("s"), date('n'), date('j'), date('Y'));
+        $minute = mktime(date("H"), date("i")-1, date("s"),
+            date('n'), date('j'), date('Y'));
         if ($this->v["user"]
             && isset($this->v["user"]->created_at)
             && $minute < strtotime($this->v["user"]->created_at)) {
             // signed up in the past minute
             $this->logNewUser();
             if (session()->has('coreID' . $sessTree) && $hasCoreTbl) {
+                $usrFld = $GLOBALS["SL"]->coreTblUserFld;
                 eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
                     . "::find(" . session()->get('coreID' . $sessTree) . ");");
                 if ($chkRec
                     && isset($chkRec->{ $coreAbbr . 'ip_addy' })
-                    && $chkRec->{ $coreAbbr . 'ip_addy' } == $GLOBALS["SL"]->hashIP()
-                    && (!isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })
-                        || intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld }) <= 0)) {
-                    $chkRec->update([ $GLOBALS["SL"]->coreTblUserFld => $this->v["uID"] ]);
-                    $log = 'Assigning ' . $GLOBALS["SL"]->coreTbl . '#' . $chkRec->getKey()
-                        . ' to U#' . $this->v["uID"] . ' <i>(afterLogin)</i>';
+                    && $chkRec->{ $coreAbbr . 'ip_addy' }
+                        == $GLOBALS["SL"]->hashIP()
+                    && (!isset($chkRec->{ $usrFld })
+                        || intVal($chkRec->{ $usrFld }) <= 0)) {
+                    $chkRec->update([ $usrFld => $this->v["uID"] ]);
+                    $log = 'Assigning ' . $GLOBALS["SL"]->coreTbl
+                        . '#' . $chkRec->getKey() . ' to U#'
+                        . $this->v["uID"] . ' <i>(afterLogin)</i>';
                     $this->logAdd('session-stuff', $log);
                 }
             }
@@ -533,6 +538,7 @@ class TreeCoreSess extends TreeCore
                 }
             }
         }
+        $this->afterLoginChkOldCores();
         //$this->loadSessInfo($GLOBALS["SL"]->coreTbl);
         if (!session()->has('coreID' . $sessTree) || $this->coreID <= 0) {
             $this->findSessTreeCoreID($sessTree);
@@ -568,6 +574,48 @@ class TreeCoreSess extends TreeCore
             }
         }
         return '';
+    }
+
+    protected function afterLoginChkOldCores()
+    {
+        $surveys = SLTree::where('tree_type', 'Survey')
+            ->where('tree_core_table', '>', 0)
+            ->select('tree_id', 'tree_core_table')
+            ->get();
+        if ($surveys->isNotEmpty() && sizeof(session()->all()) > 0) {
+            foreach ($surveys as $tree) {
+                if (isset($GLOBALS["SL"]->tbl[$tree->tree_core_table])) {
+                    $coreTbl = $GLOBALS["SL"]->tbl[$tree->tree_core_table];
+                    foreach (session()->all() as $key => $val) {
+                        $sessPrefix = 'coreID' . $tree->tree_id . 'old';
+                        if (strpos($key, $sessPrefix) !== false) {
+                            $coreID = intVal(str_replace($sessPrefix, '', $key));
+                            $this->afterLoginChkOldCoreRec($coreID, $coreTbl);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private function afterLoginChkOldCoreRec($coreID = 0, $coreTbl = '')
+    {
+        if ($coreID > 0
+            && trim($coreTbl) != ''
+            && isset($GLOBALS["SL"]->tblAbbr[$coreTbl])) {
+            $coreMdl = $GLOBALS["SL"]->modelPath($coreTbl);
+            $abbr = $GLOBALS["SL"]->tblAbbr[$coreTbl];
+            eval("\$chk = " . $coreMdl . "::where('"
+                . $abbr . "id', " . $coreID . ")->where('"
+                . $abbr . "ip_addy', 'LIKE', '" . $GLOBALS["SL"]->hashIP()
+                . "')->first();");
+            if ($chk
+                && (!isset($chk->{ $abbr . 'user_id' })
+                    || intVal($chk->{ $abbr . 'user_id' }) == 0)) {
+                eval($coreMdl . "::find(" . $coreID . ")->update([ '"
+                    . $abbr . "user_id' => " . Auth::user()->id . " ]);");
+            }
+        }
     }
 
     private function findSessTreeCoreID($sessTree)
@@ -687,15 +735,11 @@ class TreeCoreSess extends TreeCore
         }
         $this->coreID = $GLOBALS["SL"]->coreID = $this->deepCopyCoreRec($cid);
         $this->createNewSess($this->coreID);
-        $msg = 'Creating Core Copy of #' . $cid . '. New Sess#' . $this->sessID . ', '
-            . $GLOBALS["SL"]->coreTbl . '#' . $this->coreID . ' <i>(cpySess)</i>';
+        $msg = 'Creating Core Copy of #' . $cid . '. New Sess#'
+            . $this->sessID . ', ' . $GLOBALS["SL"]->coreTbl
+            . '#' . $this->coreID . ' <i>(cpySess)</i>';
         $this->logAdd('session-stuff', $msg);
         return $this->finishSwitchSess($request, $this->coreID);
-    }
-
-    protected function deepCopyCoreRecCustom($cid)
-    {
-        return -3;
     }
 
     protected function deepCopyCoreRec($cid)
@@ -707,7 +751,8 @@ class TreeCoreSess extends TreeCore
             $this->v["sessDataCopy"]->loadCore($GLOBALS["SL"]->coreTbl, $cid);
             $this->sessData->loadCore($GLOBALS["SL"]->coreTbl);
             foreach ($this->v["sessDataCopy"]->dataSets as $tbl => $rows) {
-                if (sizeof($rows) > 0 && !in_array($tbl, $this->v["sessDataCopySkips"])) {
+                if (sizeof($rows) > 0
+                    && !in_array($tbl, $this->v["sessDataCopySkips"])) {
                     $newID = $this->sessData->getNextRecID($tbl);
                     $abbr = $GLOBALS["SL"]->tblAbbr[$tbl];
                     $this->sessData->dataSets[$tbl] = [];
@@ -720,11 +765,13 @@ class TreeCoreSess extends TreeCore
             }
             if (sizeof($this->v["sessDataCopy"]->kidMap) > 0) {
                 foreach ($this->v["sessDataCopy"]->kidMap as $tbl1 => $tbl2s) {
-                    if (sizeof($tbl2s) > 0 && !in_array($tbl1, $this->v["sessDataCopySkips"])) {
+                    if (sizeof($tbl2s) > 0
+                        && !in_array($tbl1, $this->v["sessDataCopySkips"])) {
                         foreach ($tbl2s as $tbl2 => $map) {
                             if (!in_array($tbl2, $this->v["sessDataCopySkips"])) {
                                 if (!isset($map["id1"])) {
-                                    if (is_array($map) && sizeof($map) > 0 && isset($map[0]["id1"])) {
+                                    if (is_array($map) && sizeof($map) > 0
+                                        && isset($map[0]["id1"])) {
                                         foreach ($map as $m) {
                                             $this->deepCopyCoreRecUpdate($tbl1, $tbl2, $m);
                                         }
@@ -756,11 +803,16 @@ class TreeCoreSess extends TreeCore
                         => $GLOBALS["SL"]->treeRow->tree_root
                 ]);
             }
-            $this->deepCopyFinalize($cid);
+            $this->deepCopyFinalize($newCID, $cid);
             $idFld = $GLOBALS["SL"]->tblAbbr[$GLOBALS["SL"]->coreTbl] . 'id';
             $newCID = $this->sessData->dataSets[$GLOBALS["SL"]->coreTbl][0]->{ $idFld };
         }
         return $newCID;
+    }
+
+    protected function deepCopyCoreRecCustom($cid)
+    {
+        return -3;
     }
 
     protected function deepCopyCoreSkips($cid)
@@ -791,7 +843,7 @@ class TreeCoreSess extends TreeCore
         return true;
     }
 
-    protected function deepCopyFinalize($cid)
+    protected function deepCopyFinalize($newCID, $cid)
     {
         return true;
     }
@@ -1009,22 +1061,18 @@ class TreeCoreSess extends TreeCore
                 $fldIP = $GLOBALS["SL"]->coreTblAbbr() . 'ip_addy';
                 if ($coreRec
                     && isset($coreRec->{ $abbr . 'ip_addy' })
-                    && trim($coreRec->{ $abbr . 'ip_addy' }) != '') {
+                    && trim($coreRec->{ $abbr . 'ip_addy' }) != ''
+                    && trim($coreRec->{ $abbr . 'ip_addy' })
+                        == $GLOBALS["SL"]->hashIP()) {
                     $sessID = intVal(session()->get($sess . 'old' . $coreID));
                     $chk = SLSess::where('sess_id', $sessID)
                         ->where('sess_ip', $GLOBALS["SL"]->hashIP())
                         ->whereIn('sess_tree', $trees)
                         ->where('sess_core_id', $coreID)
-                        ->where('sess_is_active', 1)
+                        //->where('sess_is_active', 1)
                         ->get();
                     if ($chk->isNotEmpty()) {
-                        foreach ($chk as $sess) {
-                            if (isset($sess->sess_ip)
-                                && trim($sess->sess_ip)
-                                    == trim($coreRec->{ $abbr . 'ip_addy' })) {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
                 }
             }
@@ -1032,12 +1080,11 @@ class TreeCoreSess extends TreeCore
         }
         // else user is already logged in
         if (trim($GLOBALS["SL"]->coreTblUserFld) != '') {
-            $eval = "\$chk = " . $model
-                . "::where('" . $GLOBALS["SL"]->coreTblIdFld()
-                    . "', " . intVal($coreID) . ")"
-                . "->where('" . $GLOBALS["SL"]->coreTblUserFld
-                    . "', " . $this->v["uID"] . ")"
-                . "->first();";
+            $eval = "\$chk = " . $model . "::where('"
+                . $GLOBALS["SL"]->coreTblIdFld() . "', "
+                . intVal($coreID) . ")->where('"
+                . $GLOBALS["SL"]->coreTblUserFld . "', "
+                . $this->v["uID"] . ")->first();";
             eval($eval);
             if ($chk) {
                 return true;

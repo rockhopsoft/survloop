@@ -499,8 +499,10 @@ class GlobalsImportExport extends GlobalsTables
             $this->genCsvStore();
             session()->put('sessMsg', '<h2 class="slBlueDark">Export Complete!</h2>');
             session()->save();
-            echo '<html><body><br /><br /><center>' . $this->spinner() . '<br /></center>'
-                . "\n" . $this->jsRedir($this->getCurrUrlBase(), 1000) . '</body></html>';
+            echo '<html><body><br /><br /><center>' . $this->spinner()
+                . '<br /></center>' . "\n"
+                . $this->jsRedir($this->getCurrUrlBase(), 1000)
+                . '</body></html>';
             exit;
         }
         return true;
@@ -977,7 +979,6 @@ class GlobalsImportExport extends GlobalsTables
     public function exportMysqlSl()
     {
         $this->loadSlParents();
-        //$this->tmpDbSwitch();
         if (!isset($this->x["export"])) {
             $this->x["export"] = '';
         }
@@ -1037,19 +1038,17 @@ class GlobalsImportExport extends GlobalsTables
                 $this->x["export"]
             );
         }
-        //$this->tmpDbSwitchBack();
         return true;
     }
 
     public function createTableIfNotExists($coreTbl, $userTbl = null)
     {
-        $this->modelPath($coreTbl->tbl_name, true);
+        $this->modelPath($coreTbl->tbl_name); // , true);
         if (!$this->chkTableExists($coreTbl, $userTbl)) {
             $eval = "Illuminate\\Support\\Facades\\"
                 . $this->installTblByShema($coreTbl);
             $blu = "(Illuminate\\Database\\Schema\\Blueprint";
             $eval = str_replace("(Blueprint ", $blu, $eval);
-//echo '<pre>' . $eval . '</pre>'; exit;
             eval($eval);
             return false;
         }
@@ -1178,6 +1177,88 @@ class GlobalsImportExport extends GlobalsTables
             return trim($custCSS->def_description);
         }
         return '';
+    }
+
+    public function splitImportCsvLine($line, $delim = ',', $quote = '"')
+    {
+        $currPos = strpos($line, $quote);
+        if ($currPos === false) {
+            return explode($delim, $line);
+        }
+        $row = [];
+        $lineLeft = $line;
+        while ($currPos !== false) {
+            $endPos = strpos($lineLeft, $quote, ($currPos+1));
+            if ($currPos === 0) {
+                $row[] = substr($lineLeft, 1, $endPos-1);
+                $lineLeft = substr($lineLeft, $endPos+2);
+            } elseif ($endPos !== false) {
+                $cells = explode($delim, substr($lineLeft, 0, $currPos-1));
+                if (sizeof($cells) > 0) {
+                    foreach ($cells as $cell) {
+                        $row[] = $cell;
+                    }
+                }
+                $row[] = substr($lineLeft, $currPos+1, ($endPos-$currPos-1));
+                $lineLeft = substr($lineLeft, $endPos+2);
+            }
+            $currPos = strpos($lineLeft, $quote);
+        }
+        if ($lineLeft != '') {
+            $cells = explode($delim, $lineLeft);
+            if (sizeof($cells) > 0) {
+                foreach ($cells as $cell) {
+                    $row[] = $cell;
+                }
+            }
+        }
+        return $row;
+    }
+
+    public function splitImportFile($readFile, $ext = '.csv', $splits = 30)
+    {
+        $splitInd = 0;
+        $downloadFile = str_replace($ext, '-new' . $ext, $readFile);
+        if ($this->REQ->has('refresh')
+            || $this->REQ->has('split')
+            || !file_exists($readFile)
+            || filesize($readFile) != filesize($downloadFile)) {
+            copy($downloadFile, $readFile);
+        }
+        if ($this->REQ->has('refresh')
+            || $this->REQ->has('split')
+            || !file_exists(str_replace($ext, '-split1' . $ext, $readFile))) {
+            $splitInds = [];
+            $fileLines = $this->mexplode("\n", file_get_contents($readFile));
+            for ($s = 1; $s <= $splits; $s++) {
+                $splitInds[] = round($s*(sizeof($fileLines)/$splits));
+            }
+            $fileBody  = '';
+            foreach ($fileLines as $l => $line) {
+                if ($l > 0) {
+                    $fileBody .= $line . "\n";
+                    if (in_array($l, $splitInds)) {
+                        $splitInd++;
+                        $splitFile = str_replace($ext, '-split' . $splitInd . $ext, $readFile);
+                        if (file_exists($splitFile)) {
+                            unlink($splitFile);
+                        }
+                        file_put_contents($splitFile, $fileBody);
+                        $fileBody = '';
+                    }
+                }
+            }
+            if ($fileBody != '') {
+                $splitInd++;
+                $splitFile = str_replace($ext, '-split' . $splitInd . $ext, $readFile);
+                if (file_exists($splitFile)) {
+                    unlink($splitFile);
+                }
+                file_put_contents($splitFile, $fileBody);
+            }
+            return $splitInd;
+        }
+        return 0;
     }
 
 }

@@ -62,14 +62,16 @@ class Globals extends GlobalsImportExport
      */
     public function loadCustomGlobals()
     {
-        $GLOBALS["CUST"] = null;
-        if (isset($this->sysOpts["cust-abbr"])
-            && $this->sysOpts["cust-abbr"] != 'Survloop') {
-            $custClass = $this->sysOpts["cust-vend"] . "\\"
-                . $this->sysOpts["cust-abbr"] . "\\Controllers\\"
-                . $this->sysOpts["cust-abbr"] . "Globals";
-            if (class_exists($custClass)) {
-                eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+        if (!isset($GLOBALS["CUST"])) {
+            $GLOBALS["CUST"] = null;
+            if (isset($this->sysOpts["cust-abbr"])
+                && $this->sysOpts["cust-abbr"] != 'Survloop') {
+                $custClass = $this->sysOpts["cust-vend"] . "\\"
+                    . $this->sysOpts["cust-abbr"] . "\\Controllers\\"
+                    . $this->sysOpts["cust-abbr"] . "Globals";
+                if (class_exists($custClass)) {
+                    eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+                }
             }
         }
         return true;
@@ -455,10 +457,16 @@ class Globals extends GlobalsImportExport
         return $this->imgs->saveImgDeet($imgID);
     }
 
+    public function uploadImgDir($nID = '', $path = '', $file = '')
+    {
+        $this->loadImgs($nID, 1);
+        return $this->imgs->uploadImgDir($nID, $path, $file);
+    }
+
     public function uploadImg($nID = '', $presel = '', $dbID = 1)
     {
         $this->loadImgs($nID, $dbID);
-        return $this->imgs->uploadImg($nID, $presel);
+        return $this->imgs->uploadImg($nID, $presel, $dbID);
     }
 
     public function addPreloadImg($src = '')

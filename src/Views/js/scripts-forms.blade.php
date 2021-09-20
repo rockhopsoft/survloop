@@ -114,6 +114,12 @@ function getNodeAndResFromFldID(nFldID) {
     return nodeAndRes;
 }
 
+function setFldVal(fld, val) {
+    if (document.getElementById(fld)) {
+        document.getElementById(fld).value=val;
+    }
+}
+
 function getReqNodeInd(nIDtxt) {
     var reqInd = -1;
     for (var i = 0; i < reqNodes.length; i++) {

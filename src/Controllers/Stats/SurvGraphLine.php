@@ -61,13 +61,16 @@ class SurvGraphLine extends SurvGraph
         foreach ($this->dataLines as $l => $line) {
             $this->dataTbl->addHeaderCell($line->title, 'brdLftGrey');
         }
-        if ($reverse) {
-            for ($i = 0; $i < sizeof($this->dataLines[0]->data); $i++) {
-                $this->printDataTableRow($i);
-            }
-        } else {
-            for ($i = (sizeof($this->dataLines[0]->data)-1); $i >= 0; $i--) {
-                $this->printDataTableRow($i);
+        if (sizeof($this->dataLines) > 0
+            && sizeof($this->dataLines[0]->data) > 0) {
+            if (!$reverse) {
+                for ($i = 0; $i < sizeof($this->dataLines[0]->data); $i++) {
+                    $this->printDataTableRow($i);
+                }
+            } else {
+                for ($i = (sizeof($this->dataLines[0]->data)-1); $i >= 0; $i--) {
+                    $this->printDataTableRow($i);
+                }
             }
         }
         return $this->dataTbl;
@@ -111,5 +114,3 @@ class SurvGraphLine extends SurvGraph
     }
 
 }
-
-

@@ -33,9 +33,14 @@ class GlobalsTables extends GlobalsElements
 {
     public function loadGlobalTables($dbID = 1, $treeID = 1, $treeOverride = -3)
     {
-        $this->isAdmin = (Auth::user() && Auth::user()->hasRole('administrator'));
-        $this->isStaff = (Auth::user() && Auth::user()->hasRole('staff'));
-        $this->isVolun = (Auth::user() && Auth::user()->hasRole('volunteer'));
+        $this->isAdmin = (Auth::user()
+            && Auth::user()->hasRole('administrator'));
+        $this->isStaff = (Auth::user()
+            && Auth::user()->hasRole('staff'));
+        $this->isAdminOrStaff = (Auth::user()
+            && Auth::user()->hasRole('administrator|staff'));
+        $this->isVolun = (Auth::user()
+            && Auth::user()->hasRole('volunteer'));
         if ($treeOverride > 0) {
             $this->treeOverride = $treeOverride;
         }
@@ -195,7 +200,7 @@ class GlobalsTables extends GlobalsElements
                 . "::find(" . $coreID . ");");
             if ($coreRow
                 && isset($coreRow->{ $tbl->tbl_abbr . 'unique_str' })) {
-                return '../storage/app/up/evidence/'
+                return $this->sysOpts["app-upload-path"] . '/'
                     . str_replace('-', '/', substr($coreRow->created_at, 0, 10))
                     . '/' . $coreRow->{ $tbl->tbl_abbr . 'unique_str' } . '/';
             }
@@ -246,7 +251,7 @@ class GlobalsTables extends GlobalsElements
             //if (is_writable($modelFilename)) {
             try {
                 if (file_exists($modelFilename)) {
-                    unlink($modelFilename);
+                    //unlink($modelFilename);
                 }
             } catch (Exception $e) {
                 //echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -695,7 +700,7 @@ class GlobalsTables extends GlobalsElements
             ->get();
     }
 
-    public function getLoopConditionLinks($loop)
+    public function getLoopCondLinks($loop)
     {
         $ret = [];
         if (isset($this->dataLoops[$loop])
@@ -1626,7 +1631,8 @@ class GlobalsTables extends GlobalsElements
 
     public function getCycSffx()
     {
-        return trim($this->currCyc["cyc"][1]) . trim($this->currCyc["res"][1])
+        return trim($this->currCyc["cyc"][1])
+            . trim($this->currCyc["res"][1])
             . trim($this->currCyc["tbl"][1]);
     }
 
@@ -1911,6 +1917,37 @@ class GlobalsTables extends GlobalsElements
         $this->createTableIfNotExists($coreTbl, $userTbl);
         $this->installNewModel($coreTbl, true);
         return true;
+    }
+
+    /**
+     * Convert incoming string to a data table safe format.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function eng2data($name)
+    {
+        return preg_replace("/[^a-z0-9]+/", "", strtolower($name));
+    }
+
+    /**
+     * Convert incoming string to a data table abbreviation.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function eng2abbr($name)
+    {
+        $name = strtolower($name);
+        $words = $GLOBALS["SL"]->mexplode(' ', $name);
+        $abbr = '';
+        if (sizeof($words) > 0) {
+            foreach ($words as $word) {
+                $word = preg_replace("/[^a-z0-9]+/", "", $word);
+                $abbr .= substr($word, 0, 3) . '_';
+            }
+        }
+        return $abbr;
     }
 
 }

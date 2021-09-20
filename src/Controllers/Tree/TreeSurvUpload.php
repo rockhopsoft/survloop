@@ -112,7 +112,8 @@ class TreeSurvUpload extends TreeSurv
     protected function checkBaseFolders()
     {
         $this->checkFolder('../storage/app/up/avatar');
-        $this->checkFolder('../storage/app/up/evidence/' . date("Y/m/d"));
+        $upPath = $GLOBALS["SL"]->sysOpts["app-upload-path"] . '/';
+        $this->checkFolder($upPath . date("Y/m/d"));
         return true;
     }
 
@@ -127,7 +128,7 @@ class TreeSurvUpload extends TreeSurv
         if (!isset($coreRow->created_at)) {
             return '';
         }
-        $fold = '../storage/app/up/evidence/'
+        $fold = $GLOBALS["SL"]->sysOpts["app-upload-path"] . '/'
             . str_replace('-', '/', substr($coreRow->created_at, 0, 10)) . '/'
             . $coreRow->{ $GLOBALS["SL"]->tblAbbr[$coreTbl] . 'unique_str' } . '/';
         return $fold;
@@ -212,9 +213,12 @@ class TreeSurvUpload extends TreeSurv
         }
         if ($chk->isNotEmpty()) {
             foreach ($chk as $i => $up) {
-                $hasUpload = (isset($up->up_upload_file) && trim($up->up_upload_file) != '');
-                $hasStored = (isset($up->up_stored_file) && trim($up->up_stored_file) != '');
-                $hasVidLnk = (isset($up->up_video_link)  && trim($up->up_video_link)  != '');
+                $hasUpload = (isset($up->up_upload_file)
+                    && trim($up->up_upload_file) != '');
+                $hasStored = (isset($up->up_stored_file)
+                    && trim($up->up_stored_file) != '');
+                $hasVidLnk = (isset($up->up_video_link)
+                    && trim($up->up_video_link)  != '');
                 if (($hasUpload && $hasStored) || $hasVidLnk) {
                     $ret[] = $up;
                 }
@@ -365,15 +369,13 @@ class TreeSurvUpload extends TreeSurv
             if ($GLOBALS["SL"]->REQ->has('orig')) {
                 $filename = $up["fileOG"];
             }
-            if ($GLOBALS["SL"]->REQ->has('refresh')) {
-                $refresh = true;
-            }
+            $refresh = $GLOBALS["SL"]->REQ->has('refresh');
             $lifetime = 0;
             if ($refresh) {
                 $lifetime = 10;
             }
-            $img = new DeliverImage($filename, 0, $refresh);
-            return $img->delivery();
+            $img = new DeliverImage($filename, $lifetime, $refresh);
+            return $img->delivery($up["fileOG"]);
         }
         return '';
     }
@@ -896,5 +898,3 @@ class TreeSurvUpload extends TreeSurv
     }
 
 }
-
-?>

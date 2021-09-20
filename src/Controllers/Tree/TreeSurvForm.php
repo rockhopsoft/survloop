@@ -13,6 +13,7 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeSurvSpreadsheet;
 
 class TreeSurvForm extends TreeSurvSpreadsheet
 {
+
     protected function customNodePrintWrap($nID, $bladeRender = '')
     {
         return $this->printNodePublicFormStart($nID) . $bladeRender
@@ -38,7 +39,8 @@ class TreeSurvForm extends TreeSurvSpreadsheet
     protected function printNodePublic($nID = -3, $tmpSubTier = [], $currVisib = -1)
     {
         $this->customStartPrintNodePublic($nID, $tmpSubTier, $currVisib);
-        if (!isset($this->allNodes[$nID]) || !$this->checkNodeConditions($nID)) {
+        if (!isset($this->allNodes[$nID])
+            || !$this->checkNodeConditions($nID)) {
             return '';
         }
         if ($this->allNodes[$nID]->nodeType == 'Send Email') {
@@ -82,7 +84,12 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         // else print standard node output...
         $ret = $visibilityField . $this->nodeSessDump($curr->nIDtxt, $curr->nID);
         $this->printNodePublicAddOns($curr);
-        $promptNotesSpecial = $this->printNodePublicPrompts($curr);
+
+        $promptNotesSpecial = '';
+        if (!isset($this->v["skipCurrNodeSessData"])
+            || !$this->v["skipCurrNodeSessData"]) {
+            $promptNotesSpecial = $this->printNodePublicPrompts($curr);
+        }
         if ($curr->isDataPrint()) {
             return $this->nodePrintData($curr);
         } // else not data printing...
@@ -108,7 +115,10 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         // which only happens once per page make sure
         // these are reset, in case of redirect
         $this->pageJSvalid = $this->pageHasReqs = '';
-        $this->pageHasUpload = $this->pageFldList = $this->hideKidNodes = [];
+        $this->pageHasUpload
+            = $this->pageFldList
+            = $this->hideKidNodes
+            = [];
         $this->runPageExtra($curr->nID);
         $this->runPageLoad($curr->nID);
         if ($GLOBALS["SL"]->treeRow->tree_type != 'Page') {
@@ -400,5 +410,14 @@ class TreeSurvForm extends TreeSurvSpreadsheet
         return $ret;
     }
 
+    public function chkUploadFileNotFound(&$filename)
+    {
+        return $filename;
+    }
 
-} // end of TreeSurvForm class
+    public function canGetUploadFile($abbr, $file, $filename)
+    {
+        return true;
+    }
+
+}

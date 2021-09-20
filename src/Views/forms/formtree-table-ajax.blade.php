@@ -3,6 +3,7 @@
 @if (isset($tableDat['month']) && intVal($tableDat['month']) > 0)
 
 var monthFld{{ $nIDtxt }} = "n{{ $tableDat['month'] }}FldID";
+var myearFld{{ $nIDtxt }} = "n{{ $tableDat['myear'] }}FldID";
 var monthFld{{ $nIDtxt }}StartMonth = {{ (date("n")+1) }};
 var monthFld{{ $nIDtxt }}StartYear = {{ (date("y")-1) }};
 
@@ -41,7 +42,8 @@ var idToRow{{ $nIDtxt }} = new Array();
 @endforelse
 
 function loadMonthFlds{{ $nIDtxt }}(first) {
-    if (document.getElementById(monthFld{{ $nIDtxt }}) && (first || (monthFld{{ $nIDtxt }}StartMonth != document.getElementById(monthFld{{ $nIDtxt }}).value))) {
+//console.log("loadMonthFlds{{ $nIDtxt }}");
+    if (document.getElementById(monthFld{{ $nIDtxt }}) && document.getElementById(myearFld{{ $nIDtxt }}) && (first || monthFld{{ $nIDtxt }}StartMonth != document.getElementById(monthFld{{ $nIDtxt }}).value || monthFld{{ $nIDtxt }}StartYear != document.getElementById(myearFld{{ $nIDtxt }}).value)) {
         if (!first) pullMonthUpdates{{ $nIDtxt }}();
         chkNewMonthForLayout{{ $nIDtxt }}();
         pushNewMonthLayout{{ $nIDtxt }}();
@@ -51,7 +53,10 @@ function loadMonthFlds{{ $nIDtxt }}(first) {
 setTimeout(function() { loadMonthFlds{{ $nIDtxt }}(true); }, 50);
 
 $(document).on("change", "#"+monthFld{{ $nIDtxt }}+"", function() {
-//console.log("loadMonthFlds{{ $nIDtxt }}");
+    loadMonthFlds{{ $nIDtxt }}(false);
+    return true;
+});
+$(document).on("change", "#"+myearFld{{ $nIDtxt }}+"", function() {
     loadMonthFlds{{ $nIDtxt }}(false);
     return true;
 });
@@ -59,10 +64,7 @@ $(document).on("change", "#"+monthFld{{ $nIDtxt }}+"", function() {
 
 function chkNewMonthForLayout{{ $nIDtxt }}() {
     monthFld{{ $nIDtxt }}StartMonth = parseInt(document.getElementById(monthFld{{ $nIDtxt }}).value)+1;
-    monthFld{{ $nIDtxt }}StartYear = {{ (date("y")-1) }};
-    if (monthFld{{ $nIDtxt }}StartMonth > {{ date("n") }}) {
-        monthFld{{ $nIDtxt }}StartYear--;
-    }
+    monthFld{{ $nIDtxt }}StartYear = parseInt(document.getElementById(myearFld{{ $nIDtxt }}).value)-1;
 }
 
 function pushNewMonthLayout{{ $nIDtxt }}() {

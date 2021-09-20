@@ -21,11 +21,6 @@ class SurvGraph
     public $currLine  = -1;
     public $linRegLin = null;
 
-    public $maxDataCnt = -1;
-    public $maxDataInd = -1;
-    public $minDataCnt = 1000000000;
-    public $minDataInd = -1;
-
     // Index of dataLines which define Y Axes
     public $axisX     = null;
     public $axisY     = null;
@@ -142,43 +137,97 @@ class SurvGraph
 
     public function checkDataRange()
     {
-        if ($this->minDataInd < 0 && sizeof($this->dataLines) > 0) {
-            foreach ($this->dataLines as $l => $line) {
-                if ($this->maxDataCnt < sizeof($line->data)) {
-                    $this->maxDataCnt = sizeof($line->data);
-                    $this->maxDataInd = $l;
+
+        if (sizeof($this->dataLines) > 0
+            && sizeof($this->dataLines[0]->data) > 0) {
+            $delInds = $this->findNullDataX();
+            $totOrig = sizeof($this->dataLines[0]->data);
+            if (sizeof($delInds) > 0
+                && sizeof($delInds) != sizeof($this->dataLines[0]->data)) {
+                $delUntilA = $delUntilB = -1;
+                if ($delInds[0] == 0) {
+                    $currInd = 0;
+                    while (isset($delInds[$currInd]) && $currInd == $delInds[$currInd]) {
+                        $currInd++;
+                    }
+                    $delUntilA = $currInd-1;
                 }
-                if ($this->minDataCnt > sizeof($line->data)) {
-                    $this->minDataCnt = sizeof($line->data);
-                    $this->minDataInd = $l;
+                $i = 0;
+                $lastInd = (sizeof($delInds)-1);
+                while (($lastInd+$i) >= 0
+                    && isset($delInds[($lastInd+$i)])
+                    && $delInds[($lastInd+$i)] == (sizeof($this->dataLines[0]->data)-1+$i)) {
+                    $i--;
+                }
+                if ($i < 0) {
+                    $delUntilB = $totOrig+$i;
+                }
+                if ($delUntilA >= 0 || $delUntilB >= 0) {
+                    $this->delDataRangeX($delUntilA, $delUntilB);
+                }
+//echo 'totOrig: ' . $totOrig . ', delUntilA: ' . $delUntilA . ', delUntilB: ' . $delUntilB . ', delInds: ' . print_r($delInds) . '<br />'; exit;
+//echo 'totNew: ' . sizeof($this->dataLines[0]->data) . ', dataLines[0] <pre>'; print_r($this->dataLines[0]->data); echo '</pre>'; exit;
+            }
+        }
+    }
+
+    private function findNullDataX()
+    {
+        $delInds = [];
+        foreach ($this->dataLines[0]->data as $d => $dat) {
+            $foundDat = false;
+            foreach ($this->dataLines as $l => $line) {
+                if (isset($line->data[$d]) && $line->data[$d] !== null) {
+                    $foundDat = true;
                 }
             }
+            if (!$foundDat) {
+                $delInds[] = $d;
+            }
+        }
+        return $delInds;
+    }
+
+    private function delDataRangeX($delUntilA = -1, $delUntilB = -1)
+    {
+        foreach ($this->dataLines as $l => $line) {
+            $data = $dataX = $dataLab = [];
+            foreach ($line->data as $d => $dat) {
+                if (($delUntilA == -1 || $d > $delUntilA)
+                    && ($delUntilB == -1 || $d < $delUntilB)) {
+                    $data[]    = $dat;
+                    $dataLab[] = $this->dataLines[$l]->dataLab[$d];
+                    if (isset($this->dataLines[$l]->dataX[$d])) {
+                        $dataX[] = $this->dataLines[$l]->dataX[$d];
+                    }
+                }
+            }
+            $this->dataLines[$l]->data    = $data;
+            $this->dataLines[$l]->dataX   = $dataX;
+            $this->dataLines[$l]->dataLab = $dataLab;
         }
     }
 
     public function listXaxis()
     {
-        $this->checkDataRange();
-        if ($this->minDataInd >= 0 && isset($this->dataLines[$this->minDataInd])) {
-            return $this->dataLines[$this->minDataInd]->printDataLabels();
+        if (sizeof($this->dataLines) > 0) {
+            return $this->dataLines[0]->printDataLabels();
         }
         return '';
     }
 
     public function getAxisMinX()
     {
-        $this->checkDataRange();
-        if (isset($this->dataLines[$this->minDataInd])) {
-            return $this->dataLines[$this->minDataInd]->getDataLabelMin();
+        if (sizeof($this->dataLines) > 0) {
+            return $this->dataLines[0]->getDataLabelMin();
         }
         return '';
     }
 
     public function getAxisMaxX()
     {
-        $this->checkDataRange();
-        if (isset($this->dataLines[$this->minDataInd])) {
-            return $this->dataLines[$this->minDataInd]->getDataLabelMax();
+        if (sizeof($this->dataLines) > 0) {
+            return $this->dataLines[0]->getDataLabelMax();
         }
         return '';
     }

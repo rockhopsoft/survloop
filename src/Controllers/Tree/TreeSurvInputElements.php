@@ -138,7 +138,4 @@ class TreeSurvInputElements extends TreeSurvInputWidgets
         return $ret;
     }
 
-
-
-
 }

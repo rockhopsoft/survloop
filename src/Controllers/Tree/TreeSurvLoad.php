@@ -37,7 +37,7 @@ class TreeSurvLoad extends TreeSurvConds
     protected $isReport      = false;
 
     // table name, and sort field, if this is tree one big loop
-    protected $isBigSurvloop = ['', '', ''];
+    protected $isBigSurvloop = [ '', '', '' ];
 
     public $xmlMapTree       = false;
 
@@ -72,12 +72,12 @@ class TreeSurvLoad extends TreeSurvConds
         return true;
     }
 
-    public function __construct(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
+    public function __construct(Request $request = null, $coreID = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
     {
-        return $this->constructor($request, $sessIn, $dbID, $treeID, $skipSessLoad, $slInit);
+        return $this->constructor($request, $coreID, $dbID, $treeID, $skipSessLoad, $slInit);
     }
 
-    public function constructor(Request $request = null, $sessIn = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
+    public function constructor(Request $request = null, $coreID = -3, $dbID = -3, $treeID = -3, $skipSessLoad = false, $slInit = true)
     {
         $this->dbID = $this->treeID = 1;
         if ($dbID > 0) {
@@ -91,10 +91,12 @@ class TreeSurvLoad extends TreeSurvConds
             $this->treeID = $GLOBALS["SL"]->treeID;
         }
         if ($slInit) {
+//echo 'constructor( running slInit - skipSessLoad? ' . (($skipSessLoad) ? 'true' : 'false') . '...<br />';
+            //$this->sessData = new SurvData;
             $this->survloopInit($request);
             $this->coreIDoverride = -3;
-            if ($sessIn > 0) {
-                $this->coreIDoverride = $sessIn;
+            if ($coreID > 0) {
+                $this->coreIDoverride = $coreID;
             }
             if (isset($GLOBALS["SL"])
                 && $GLOBALS["SL"]->REQ->has('step')
@@ -106,19 +108,17 @@ class TreeSurvLoad extends TreeSurvConds
             $this->loadLookups();
             $this->isPage = (isset($GLOBALS["SL"]->treeRow->tree_type)
                 && $GLOBALS["SL"]->treeRow->tree_type == 'Page');
-            $this->sessData = new SurvData;
         }
-        $this->constructorExtra();
+//else { echo 'constructor( not running slInit - skipSessLoad? ' . (($skipSessLoad) ? 'true' : 'false') . '...<br />'; }
         return true;
     }
 
     /**
-     * Initializing extra things for special admin pages.
+     * Initializing extra things after loading tree session data.
      *
-     * @param  Illuminate\Http\Request  $request
      * @return boolean
      */
-    protected function constructorExtra()
+    public function treeSessLoadExtra()
     {
         return true;
     }
@@ -137,7 +137,8 @@ class TreeSurvLoad extends TreeSurvConds
     {
         $cacheFile = '/cache/php/tree-load-'
             . $this->treeID . '.php';
-        if (!$GLOBALS["SL"]->REQ->has('refresh') && file_exists($cacheFile)) {
+        if (!$GLOBALS["SL"]->REQ->has('refresh')
+            && file_exists($cacheFile)) {
             $content = Storage::get($cacheFile);
             eval($content);
         } else {
@@ -228,15 +229,15 @@ class TreeSurvLoad extends TreeSurvConds
         if ($includeNode) {
             $cacheNode = '$'.'this->allNodes[' . $row->node_id . '] = '
                 . 'new RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv('
-                    . $row->node_id . ', [], ['
-                    . '"pID" => '      . intVal($row->node_parent_id)        . ', '
-                    . '"pOrd" => '     . intVal($row->node_parent_order)     . ', '
-                    . '"opts" => '     . intVal($row->node_opts)             . ', '
-                    . '"type" => "'    . addslashes($row->node_type)         . '", '
-                    . '"branch" => "'  . addslashes($row->node_data_branch)  . '", '
-                    . '"store" => "'   . addslashes($row->node_data_store)   . '", '
-                    . '"set" => "'     . addslashes(stripslashes($row->node_response_set)) . '", '
-                    . '"def" => "'     . addslashes(stripslashes($row->node_default))      . '"'
+                . $row->node_id . ', [], ['
+                . '"pID" => '     . intVal($row->node_parent_id)        . ', '
+                . '"pOrd" => '    . intVal($row->node_parent_order)     . ', '
+                . '"opts" => '    . intVal($row->node_opts)             . ', '
+                . '"type" => "'   . addslashes($row->node_type)         . '", '
+                . '"branch" => "' . addslashes($row->node_data_branch)  . '", '
+                . '"store" => "'  . addslashes($row->node_data_store)   . '", '
+                . '"set" => "'    . addslashes(stripslashes($row->node_response_set)) . '", '
+                . '"def" => "'    . addslashes(stripslashes($row->node_default))      . '"'
                 . ']);' . "\n";
             eval($cacheNode);
             $cache .= $cacheNode;
@@ -285,7 +286,8 @@ class TreeSurvLoad extends TreeSurvConds
         if ($this->rootID > 0 && sizeof($this->allNodes) > 0) {
             foreach ($this->allNodes as $nID => $node) {
                 if ($this->hasParentPage($nID)) {
-                    $cache .= '$'.'this->allNodes[' . $node->nodeID . ']->hasPageParent = true;' . "\n";
+                    $cache .= '$'.'this->allNodes[' . $node->nodeID
+                        . ']->hasPageParent = true;' . "\n";
                 }
             }
         }
@@ -294,6 +296,10 @@ class TreeSurvLoad extends TreeSurvConds
 
     public function loadTree($treeIn = -3, Request $request = NULL, $loadFull = false)
     {
+        if (isset($this->v["loadedTreeStart"]) && $this->v["loadedTreeStart"]) {
+            return true;
+        }
+        $this->v["loadedTreeStart"] = true;
         $GLOBALS["SL"]->microLog('Start TreeSurvLoad loadTree(');
         $this->loadTreeStart($treeIn, $request);
         $GLOBALS["SL"]->microLog('loadTree( after loadTreeStart(');
@@ -534,6 +540,7 @@ class TreeSurvLoad extends TreeSurvConds
         $this->loadExtra();
         $this->setPublicID();
         $this->v["isOwner"] = $this->isCoreOwner($this->coreID);
+        $this->treeSessLoadExtra();
         return true;
     }
 
@@ -606,7 +613,7 @@ class TreeSurvLoad extends TreeSurvConds
         return '';
     }
 
-    protected function printNodePublic($nID = -3, $tmpSubTier = [])
+    protected function printNodePublic($nID = -3, $tmpSubTier = [], $currVisib = -1)
     {
         return 'Node #' . $nID . '<br />';
     }

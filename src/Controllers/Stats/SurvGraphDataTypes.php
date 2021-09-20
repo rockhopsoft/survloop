@@ -14,47 +14,53 @@ use RockHopSoft\Survloop\Controllers\Stats\SurvGraphDataType;
 
 class SurvGraphDataTypes
 {
-    public $typeGroups = [];
-    public $g          = -1;
-    public $skips      = [];
+    public $collections = [];
+    public $c           = -1;
+    public $skips       = [];
+
+    public function addNewCollection($title = '')
+    {
+        $this->collections[] = new SurvGraphDataTypeCollections($title);
+        $this->c++;
+    }
 
     public function addNewGroup($title = '')
     {
-        $this->typeGroups[] = new SurvGraphDataTypeGroups($title);
-        $this->g++;
+        $this->collections[$this->c]->addNewGroup($title);
     }
 
     public function addType($slug = '', $title = '', $unit = '', $fields = [])
     {
-        $this->typeGroups[$this->g]->types[] = new SurvGraphDataType($slug, $title, $unit, $fields);
+        $this->collections[$this->c]->addType($slug, $title, $unit, $fields);
     }
 
     public function setAxisMaxY($axisMaxY = '100')
     {
-        $last = sizeof($this->typeGroups[$this->g]->types)-1;
-        $this->typeGroups[$this->g]->types[$last]->axisY->max = $axisMaxY;
+        $this->collections[$this->c]->setAxisMaxY($axisMaxY);
     }
 
     public function setAxisMinY($axisMinY = '0')
     {
-        $last = sizeof($this->typeGroups[$this->g]->types)-1;
-        $this->typeGroups[$this->g]->types[$last]->axisY->min = $axisMinY;
+        $this->collections[$this->c]->setAxisMinY($axisMinY);
     }
 
     public function clearTypeAxisMinY($axisMinY = '')
     {
-        $last = sizeof($this->typeGroups[$this->g]->types)-1;
-        $this->typeGroups[$this->g]->types[$last]->axisMinY = $axisMinY;
+        $this->collections[$this->c]->clearTypeAxisMinY($axisMinY);
     }
 
     public function getDataTypeObj($dataSlug)
     {
-        if (sizeof($this->typeGroups) > 0) {
-            foreach ($this->typeGroups as $group) {
-                if (sizeof($group->types) > 0) {
-                    foreach ($group->types as $type) {
-                        if ($type->slug == $dataSlug) {
-                            return $type;
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $type) {
+                                if ($type->slug == $dataSlug) {
+                                    return $type;
+                                }
+                            }
                         }
                     }
                 }
@@ -70,6 +76,26 @@ class SurvGraphDataTypes
             return $type->title;
         }
         return '';
+    }
+
+    public function getDataPointCat($dataSlug)
+    {
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $g => $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $type) {
+                                if ($type->slug == $dataSlug) {
+                                    return $c . 'g' . $g;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return 'g';
     }
 
     public function getDataPointUnit($dataSlug)
@@ -92,11 +118,16 @@ class SurvGraphDataTypes
 
     public function replaceInAllFieldNames($replace, $with)
     {
-        if (sizeof($this->typeGroups) > 0) {
-            foreach ($this->typeGroups as $g => $group) {
-                if (sizeof($group->types) > 0) {
-                    foreach ($group->types as $t => $type) {
-                        $this->typeGroups[$g]->types[$t]->replaceInFieldNames($replace, $with);
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $g => $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $t => $type) {
+                                $this->collections[$c]->groups[$g]->types[$t]
+                                    ->replaceInFieldNames($replace, $with);
+                            }
+                        }
                     }
                 }
             }
@@ -105,16 +136,43 @@ class SurvGraphDataTypes
 
     public function replaceInAllLabels($replace, $with)
     {
-        if (sizeof($this->typeGroups) > 0) {
-            foreach ($this->typeGroups as $g => $group) {
-                if (sizeof($group->types) > 0) {
-                    foreach ($group->types as $t => $type) {
-                        $this->typeGroups[$g]->types[$t]->replaceInAllLabels($replace, $with);
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $g => $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $t => $type) {
+                                $this->collections[$c]->groups[$g]->types[$t]
+                                    ->replaceInAllLabels($replace, $with);
+                            }
+                        }
                     }
                 }
             }
         }
     }
+
+    public function findSlugLocation($dataSlug)
+    {
+        $c = $g = 0;
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $g => $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $type) {
+                                if ($type->slug == $dataSlug) {
+                                    return [ $c, $g ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return [ 0, 0 ];
+    }
+
 
     public function skipDataType($type)
     {
@@ -123,16 +181,89 @@ class SurvGraphDataTypes
         }
     }
 
-    public function printDropOpts($presel = '')
+    public function printDropCatOpts($presel = '')
     {
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                $this->collections[$c]->skips = $this->skips;
+                foreach ($collection->groups as $g => $group) {
+                    $this->collections[$c]->groups[$g]->skips = $this->skips;
+                }
+            }
+        }
         return view(
-            'vendor.survloop.reports.graph-data-type-dropdown-opts',
+            'vendor.survloop.reports.graph-data-cats-dropdown-opts',
             [
-                "typeGroups" => $this->typeGroups,
-                "skips"      => $this->skips,
-                "presel"     => $presel
+                "collections"  => $this->collections,
+                "skips"        => $this->skips
             ]
         )->render();
+    }
+
+    public function addAllTagOptExtra($nID = '1', $reqDataSlugs = [])
+    {
+        $ret = '';
+        if (sizeof($this->collections) > 0) {
+            foreach ($this->collections as $c => $collection) {
+                if (sizeof($collection->groups) > 0) {
+                    foreach ($collection->groups as $g => $group) {
+                        if (sizeof($group->types) > 0) {
+                            foreach ($group->types as $t => $type) {
+                                $ret .= 'addTagOptExtra("' . $nID . '", "'
+                                    . $type->slug . '", ' . json_encode($type->title) . ', '
+                                    . ((in_array($type->slug, $reqDataSlugs)) ? 1 : 0)
+                                    . ', ""); ';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $ret;
+    }
+
+}
+
+
+class SurvGraphDataTypeCollections
+{
+    public $title  = '';
+    public $groups = [];
+    public $g      = -1;
+    public $skips  = [];
+
+    public function __construct($title = '')
+    {
+        $this->title = $title;
+    }
+
+    public function addNewGroup($title = '')
+    {
+        $this->groups[] = new SurvGraphDataTypeGroups($title);
+        $this->g++;
+    }
+
+    public function addType($slug = '', $title = '', $unit = '', $fields = [])
+    {
+        $this->groups[$this->g]->types[] = new SurvGraphDataType($slug, $title, $unit, $fields);
+    }
+
+    public function setAxisMaxY($axisMaxY = '100')
+    {
+        $last = sizeof($this->groups[$this->g]->types)-1;
+        $this->groups[$this->g]->types[$last]->axisY->max = $axisMaxY;
+    }
+
+    public function setAxisMinY($axisMinY = '0')
+    {
+        $last = sizeof($this->groups[$this->g]->types)-1;
+        $this->groups[$this->g]->types[$last]->axisY->min = $axisMinY;
+    }
+
+    public function clearTypeAxisMinY($axisMinY = '')
+    {
+        $last = sizeof($this->groups[$this->g]->types)-1;
+        $this->groups[$this->g]->types[$last]->axisMinY = $axisMinY;
     }
 
 }
@@ -142,10 +273,23 @@ class SurvGraphDataTypeGroups
 {
     public $title = '';
     public $types = [];
+    public $skips = [];
 
     public function __construct($title = '')
     {
         $this->title = $title;
+    }
+
+    public function printDropOpts($presel = '')
+    {
+        return view(
+            'vendor.survloop.reports.graph-data-type-dropdown-opts',
+            [
+                "types"  => $this->types,
+                "skips"  => $this->skips,
+                "presel" => $presel
+            ]
+        )->render();
     }
 
 }

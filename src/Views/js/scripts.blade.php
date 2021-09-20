@@ -22,6 +22,7 @@ var pageDynaLoaded = false;
 var pageFullLoaded = {};
 var pageFadeInDelay = 300;
 var pageFadeInSpeed = 1000;
+var hidivPause = false;
 
 var iOS = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
 var fixedHeaderOffset = 0;
@@ -125,6 +126,14 @@ function convertCheckboxArrToParams(flds) {
     return params;
 }
 
+function getCheckTF(checkID) {
+    var isChecked = 0;
+    if (document.getElementById(checkID) && document.getElementById(checkID).checked) {
+        isChecked = 1;
+    }
+    return isChecked;
+}
+
 var treeList = new Array();
 @forelse ($GLOBALS["SL"]->getTreeList() as $i => $t)
     treeList[{{ $i }}] = [ {{ $t[0] }}, "{{ str_replace('"', '\\"', $t[1]) }}", "{{ $t[2] }}", "{{ $t[3] }}" ];
@@ -200,6 +209,12 @@ function addResultAnimBase(setBase) {
 setTimeout("addResultAnimBase('dashResults')", 1);
 
 
+function getSpin() {
+    return {!! json_encode('<i class="fa-li fa fa-spinner fa-spin"></i>') !!};
+}
+function getSpinPadLeft() {
+    return '<div class="pL30">'+getSpin()+'</div>';
+}
 function getSpinner() {
     return {!! json_encode($GLOBALS["SL"]->spinner()) !!};
 }
@@ -505,6 +520,22 @@ function updateRightPane() {
         }
     }
     return true;
+}
+
+function getMonthName(mon) {
+    if (mon == 1) return 'January';
+    else if (mon == 2) return 'February';
+    else if (mon == 3) return 'March';
+    else if (mon == 4) return 'April';
+    else if (mon == 5) return 'May';
+    else if (mon == 6) return 'June';
+    else if (mon == 7) return 'July';
+    else if (mon == 8) return 'August';
+    else if (mon == 9) return 'September';
+    else if (mon == 10) return 'October';
+    else if (mon == 11) return 'November';
+    else if (mon == 12) return 'December';
+    return mon;
 }
 
 

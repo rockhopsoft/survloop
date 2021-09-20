@@ -20,17 +20,24 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input)
     {
-        Validator::make($input, [
-            'name' => ['string', 'max:255'], // 'required',
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
-            'password' => $this->passwordRules(),
-        ])->validate();
+/*
+        $user = User::find(intVal($GLOBALS["SL"]->REQ->uID));
+        $name = strip_tags($GLOBALS["SL"]->REQ->name);
+        $chk = User::where('id', 'NOT LIKE', $this->v["uID"])
+            ->where('name', $name)
+            ->first();
+        if (!$chk && !isset($chk->name)) {
+            $user->name = $name;
+        }
+        $email = strip_tags($GLOBALS["SL"]->REQ->email);
+        $chk = User::where('id', 'NOT LIKE', $this->v["uID"])
+            ->where('email', $email)
+            ->first();
+        if (!$chk && !isset($chk->email)) {
+            $user->email = $email;
+        }
+echo '<pre>'; print_r($input); echo '</pre>'; exit;
+*/
 
         // Generate unique unsername
         if (!isset($input['name']) || trim($input['name']) == '') {
@@ -44,6 +51,23 @@ class CreateNewUser implements CreatesNewUsers
                 }
             }
         }
+
+        Validator::make($input, [
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique(User::class)
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique(User::class)
+            ],
+            'password' => $this->passwordRules(),
+        ])->validate();
 
         return User::create([
             'name' => $input['name'],

@@ -31,7 +31,7 @@ though it will increasingly be a flexible tool
 to solve many web-based problems.
 
 It is currently in continued, heavy development, with
-much happening here in 2020, almost ready to go live.
+much happening here in 2021, almost ready to go live.
 I plan to provide more documentation in the coming weeks.
 Thank you for your interest and patience!
 

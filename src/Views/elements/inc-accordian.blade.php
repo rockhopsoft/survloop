@@ -3,12 +3,12 @@
 @if ($isCard)
 	<div class="mB15">
 		<div class="slCard">
+			<div class="mBn20">
 @endif
 <div id="accord{{ $accordID }}"
 	class="slAccord{{ (($big) ? 'Big' : (($isText) ? 'Txt' : '')) }}">
 	<div id="accordHead{{ $accordID }}" class="disBlo">
-		<a id="hidivBtn{{ $accordID }}" href="javascript:;"
-			class="hidivBtn accordHeadBtn">
+		<a id="hidivBtn{{ $accordID }}" href="javascript:;" class="hidivBtn accordHeadBtn">
 			<div class="disBlo @if (!$big) accordHeadPad @endif " style="background: none;">
 				<div class="accordHeadWrap" style="background: none;">
 				@if ($type == 'textL')
@@ -30,12 +30,12 @@
 			</div>
 		</a>
 	</div>
-	<div id="hidiv{{ $accordID }}"
-		style="display: @if ($open) block @else none @endif ;">
+	<div id="hidiv{{ $accordID }}" style="display: @if ($open) block @else none @endif ;">
 		{!! $body !!}
 	</div>
 </div>
 @if ($isCard)
+			</div>
 		</div>
 	</div>
 @endif

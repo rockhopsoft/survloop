@@ -91,9 +91,23 @@ class SurvGraphDataLine
         return $ret;
     }
 
-    public function printDataLabels()
+    public function printDataLabels($forJava = false)
     {
-        return "'" . implode("', '", $this->dataLab) . "'";
+        $ret = "";
+        if (sizeof($this->dataLab) > 0) {
+            foreach ($this->dataLab as $d => $lab) {
+                if ($forJava) {
+                    $lab = strip_tags($lab);
+                }
+                $ret .= (($d > 0) ? ", " : "") . json_encode($lab);
+            }
+        }
+        return $ret;
+    }
+
+    public function printDataLabelsJava()
+    {
+        return $this->printDataLabels(true);
     }
 
     public function getDataLabelMin()
@@ -110,16 +124,5 @@ class SurvGraphDataLine
             return $this->dataLab[(sizeof($this->dataLab)-1)];
         }
         return '';
-    }
-
-    public function printDataLabelsJava()
-    {
-        $ret = '';
-        if (sizeof($this->dataLab)) {
-            foreach ($this->dataLab as $i => $lab) {
-                $ret .= (($i > 0) ? ', ' : '') . json_encode($lab);
-            }
-        }
-        return $ret;
     }
 }

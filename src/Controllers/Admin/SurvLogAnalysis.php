@@ -84,6 +84,7 @@ class SurvLogAnalysis
         $ret = '';
         $chk = SLUsersActivity::where('user_act_user', $userID)
             ->orderBy('created_at', 'desc')
+            ->limit(1000)
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $log) {
@@ -215,4 +216,3 @@ class ActivityLogGroup
         return $GLOBALS["SL"]->sigFigs($diff) . ' hr';
     }
 }
-

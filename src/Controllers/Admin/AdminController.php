@@ -12,73 +12,31 @@ namespace RockHopSoft\Survloop\Controllers\Admin;
 
 use Auth;
 use Cache;
+use DB;
 use Storage;
 use Illuminate\Http\Request;
 use MatthiasMullie\Minify;
-use App\Models\User;
 use App\Models\SLDatabases;
 use App\Models\SLDefinitions;
-use App\Models\SLTree;
 use App\Models\SLNode;
-use App\Models\SLNodeResponses;
-use App\Models\SLCaches;
-use App\Models\SLSess;
-use App\Models\SLNodeSaves;
+use App\Models\SLTree;
+use App\Models\User;
 use RockHopSoft\Survloop\Controllers\SystemDefinitions;
-use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\SystemUpdate;
 use RockHopSoft\Survloop\Controllers\Admin\AdminEmailController;
 use RockHopSoft\Survloop\Controllers\Admin\NodeSaveSet;
 use RockHopSoft\Survloop\Controllers\Admin\SurvLogAnalysis;
 
 class AdminController extends AdminEmailController
 {
-
-    protected function tmpDbSwitch($dbID = 3)
-    {
-        $this->v["tmpDbSwitchDb"]   = $GLOBALS["SL"]->dbID;
-        $this->v["tmpDbSwitchTree"] = $GLOBALS["SL"]->treeID;
-        $this->v["tmpDbSwitchREQ"]  = $GLOBALS["SL"]->REQ;
-
-        $GLOBALS["SL"] = new Globals($this->v["tmpDbSwitchREQ"], $dbID);
-        $this->dbID    = $dbID;
-        $this->treeID  = $GLOBALS["SL"]->treeID;
-        return true;
-    }
-
-    protected function tmpDbSwitchBack()
-    {
-        if (isset($this->v["tmpDbSwitchDb"])) {
-            $GLOBALS["SL"] = new Globals(
-                $this->v["tmpDbSwitchREQ"],
-                $this->v["tmpDbSwitchDb"],
-                $this->v["tmpDbSwitchTree"],
-                $this->v["tmpDbSwitchTree"]
-            );
-            $this->dbID   = $GLOBALS["SL"]->dbID;
-            $this->treeID = $GLOBALS["SL"]->treeID;
-            return true;
-        }
-        return false;
-    }
-
-    protected function cacheFlushOld()
-    {
-        $old = mktime(date("H"), date("i"), date("s"),
-            date("m"), date("d")-5, date("Y"));
-        SLCaches::where('created_at', '<', date('Y-m-d H:i:s', $old))
-            ->delete();
-        Cache::flush();
-        return true;
-    }
-
-    protected function cacheFlush()
-    {
-        SLCaches::where('created_at', '>', '2000-01-01 00:00:00')
-            ->delete();
-        Cache::flush();
-        return true;
-    }
-
+    /**
+     * Load interface used to switch which database
+     * is being managed at the moment.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $dbID
+     * @return Illuminate\Support\Facades\Response
+     */
     public function switchDB(Request $request, $dbID = -3)
     {
         $this->admControlInit($request, '/dashboard/db/switch');
@@ -92,35 +50,13 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.db.switch', $this->v);
     }
 
-    public function switchTreeAdmin(Request $request, $treeID = -3)
-    {
-        $this->admControlInit($request, '/dashboard/tree/switch');
-        if ($treeID > 0) {
-            $this->switchTree($request, $treeID, '/dashboard/tree/switch');
-            $redir = '/dashboard/surv-' . $treeID . '/map?all=1&alt=1&refresh=1';
-            if ($GLOBALS["SL"]->treeRow->tree_type == 'Page') {
-                $redir = '/dashboard/page/' . $treeID . '?all=1&alt=1&refresh=1';
-            }
-            return $this->redir($redir);
-        }
-        $this->v["myTrees"] = SLTree::where('tree_database', $GLOBALS["SL"]->dbID)
-            ->where('tree_type', 'NOT LIKE', 'Survey XML')
-            ->where('tree_type', 'NOT LIKE', 'Other Public XML')
-            ->where('tree_type', 'NOT LIKE', 'Page')
-            ->orderBy('tree_name', 'asc')
-            ->get();
-        $this->v["myTreeNodes"] = [];
-        if ($this->v["myTrees"]->isNotEmpty()) {
-            foreach ($this->v["myTrees"] as $tree) {
-                $nodes = SLNode::where('node_tree', $tree->tree_id)
-                    ->select('node_id')
-                    ->get();
-                $this->v["myTreeNodes"][$tree->tree_id] = $nodes->count();
-            }
-        }
-        return view('vendor.survloop.admin.tree.switch', $this->v);
-    }
-
+    /**
+     * Load and process system settings interfaces for admin users.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $set
+     * @return Illuminate\Support\Facades\Response
+     */
     public function sysSettings(Request $request, $set = 'seo')
     {
         $this->v["sysSet"] = $set;
@@ -149,6 +85,12 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.master', $this->v);
     }
 
+    /**
+     * Load default meta data for a page load,
+     * based on the system settings.
+     *
+     * @return void
+     */
     private function sysSettingsLoadCurrMeta()
     {
         $this->v["currMeta"] = [
@@ -163,23 +105,34 @@ class AdminController extends AdminEmailController
             "slug"  => false,
             "base"  => ''
         ];
-        return true;
     }
 
+    /**
+     * Check for special admin refresh commands.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
     private function sysSettingsCheckRefresh(Request $request)
     {
-        if ($request->has('refresh')
-            && intVal($request->get('refresh')) == 2) {
-            $this->initLoader();
-            $this->sysSettingsRefresh($request);
-            return $this->redir('/dashboard/settings?refresh=1', true);
-        } elseif ($request->has('refresh')
-            && intVal($request->get('refresh')) == 3) {
-            $this->cacheFlush();
+        if ($request->has('refresh')) {
+            $ref = intVal($request->get('refresh'));
+            if ($ref == 2) {
+                $this->initLoader();
+                $this->sysSettingsRefresh($request);
+                return $this->redir('/dashboard/settings?refresh=1', true);
+            } elseif ($ref == 3) {
+                $this->cacheFlush();
+            }
         }
-        return true;
     }
 
+    /**
+     * Force a refresh of trees and their baseline javascript.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
     private function sysSettingsRefresh(Request $request)
     {
         $chk = SLTree::whereIn('tree_type', [ 'Page', 'Survey' ])
@@ -208,9 +161,18 @@ class AdminController extends AdminEmailController
                 return $this->redir($redir, true);
             }
         }
-        return true;
     }
 
+    /**
+     * Force a refresh of trees and their baseline javascript.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $curr
+     * @param  int  $next
+     * @param  boolean  $found
+     * @param  App\Models\SLTree  $tree
+     * @return void
+     */
     private function sysSettingsRefreshTree($request, &$curr, &$next, &$found, $tree)
     {
         if ($found == 1 && $next <= 0) {
@@ -229,11 +191,17 @@ class AdminController extends AdminEmailController
                 $tree->tree_database
             );
             $this->custReport->loadTree($tree->tree_id);
-            $this->custReport->loadProgBar();
+            $this->custReport->loadProgBarBot();
         }
         return true;
     }
 
+    /**
+     * Load system blurb record from its unique ID.
+     *
+     * @param  int  $blurbID
+     * @return App\Models\SLDefinitions
+     */
     protected function blurbLoad($blurbID)
     {
         return SLDefinitions::where('def_id', $blurbID)
@@ -242,6 +210,13 @@ class AdminController extends AdminEmailController
             ->first();
     }
 
+    /**
+     * Load interface to edit system blurb record from its unique ID.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $blurbID
+     * @return Illuminate\Support\Facades\Response
+     */
     public function blurbEdit(Request $request, $blurbID)
     {
         $this->admControlInit($request, '/dashboard/pages');
@@ -255,9 +230,16 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.blurb-edit', $this->v);
     }
 
+    /**
+     * Create new system blurb for some chunk of HTML/CSS/JS.
+     * Returns new blurb's unique ID.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return int
+     */
     public function blurbNew(Request $request)
     {
-        if (isset($request->newBlurbName)
+        if ($request->has('newBlurbName')
             && trim($request->newBlurbName) != '') {
             $blurb = new SLDefinitions;
             $blurb->def_database = $this->dbID;
@@ -269,19 +251,33 @@ class AdminController extends AdminEmailController
         return -3;
     }
 
+    /**
+     * Save edits to system blurb for some chunk of HTML/CSS/JS.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function blurbEditSave(Request $request)
     {
         $blurb = $this->blurbLoad($request->DefID);
         $blurb->def_subset      = $request->DefSubset;
         $blurb->def_description = $request->DefDescription;
         $blurb->def_order = 1;
-        if ($request->has('optHardCode') && intVal($request->optHardCode) == 3) {
+        if ($request->has('optHardCode')
+            && intVal($request->optHardCode) == 3) {
             $blurb->def_order *= 3;
         }
         $blurb->save();
-        return $this->redir('/dashboard/pages/snippets/' . $blurb->def_id);
+        $redir = '/dashboard/pages/snippets/' . $blurb->def_id;
+        return $this->redir($redir);
     }
 
+    /**
+     * Regenerate all system CSS and JS files.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return string
+     */
     public function getSysCssJs(Request $request)
     {
         $this->survloopInit($request, '/dashboard/settings', false);
@@ -301,6 +297,12 @@ class AdminController extends AdminEmailController
         return ':) ';
     }
 
+    /**
+     * Regenerate the first, basic system CSS file.
+     *
+     * @param  array  $css
+     * @return void
+     */
     private function getCssFile1($css)
     {
         $syscss = view(
@@ -321,9 +323,14 @@ class AdminController extends AdminEmailController
             }
         }
         $minifier->minify("../storage/app/sys/sys1.min.css");
-        return true;
     }
 
+    /**
+     * Regenerate the second system-specific CSS file.
+     *
+     * @param  array  $css
+     * @return void
+     */
     private function getCssFile2($css)
     {
         $syscss = view(
@@ -333,9 +340,13 @@ class AdminController extends AdminEmailController
         file_put_contents("../storage/app/sys/sys2.css", $syscss);
         $minifier = new Minify\CSS("../storage/app/sys/sys2.css");
         $minifier->minify("../storage/app/sys/sys2.min.css");
-        return true;
     }
 
+    /**
+     * Regenerate the first, basic system JS file.
+     *
+     * @return void
+     */
     private function getJsFile1()
     {
         $minifier = new Minify\JS("../vendor/components/jquery/jquery.min.js");
@@ -347,9 +358,14 @@ class AdminController extends AdminEmailController
         $minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/copy-to-clipboard.js");
         //$minifier->add("../vendor/rockhopsoft/survloop-libraries/src/js/radialIndicator.min.js");
         $minifier->minify("../storage/app/sys/sys1.min.js");
-        return true;
     }
 
+    /**
+     * Regenerate the second system-specific JS file.
+     *
+     * @param  array  $css
+     * @return void
+     */
     private function getJsFile2($css)
     {
         $treeJs = '';
@@ -358,11 +374,14 @@ class AdminController extends AdminEmailController
             ->get();
         if ($chk->isNotEmpty()) {
             foreach ($chk as $tree) {
-                $treeFile = '../storage/app/sys/tree-' . $tree->tree_id . '.js';
+                $treeFile = '../storage/app/sys/tree-'
+                    . $tree->tree_id . '.js';
                 if (file_exists($treeFile)) {
                     $tmpJs = file_get_contents($treeFile);
-                    $tmpJs = str_replace("\t", "", str_replace("\n", "\n", $tmpJs));
-                    $treeJs .= "\n" . 'function treeLoad' . $tree->tree_id . '() {' . "\n"
+                    $tmpJs = str_replace("\t", "",
+                        str_replace("\n", "\n", $tmpJs));
+                    $treeJs .= "\n" . 'function treeLoad'
+                        . $tree->tree_id . '() {' . "\n"
                         . 'treeID = ' . $tree->tree_id . ';' . "\n"
                         . 'treeType = "' . $tree->tree_type . '";' . "\n"
                         . $tmpJs . "\n\treturn true;\n" . '}' . "\n";
@@ -386,28 +405,14 @@ class AdminController extends AdminEmailController
         file_put_contents("../storage/app/sys/sys2.js", $scriptsjs);
         $minifier = new Minify\JS("../storage/app/sys/sys2.js");
         $minifier->minify("../storage/app/sys/sys2.min.js");
-        return true;
     }
 
-    protected function eng2data($name)
-    {
-        return preg_replace("/[^a-z0-9]+/", "", strtolower($name));
-    }
-
-    protected function eng2abbr($name)
-    {
-        $name = strtolower($name);
-        $words = $GLOBALS["SL"]->mexplode(' ', $name);
-        $abbr = '';
-        if (sizeof($words) > 0) {
-            foreach ($words as $word) {
-                $word = preg_replace("/[^a-z0-9]+/", "", $word);
-                $abbr .= substr($word, 0, 3) . '_';
-            }
-        }
-        return $abbr;
-    }
-
+    /**
+     * Check if the table ID is a core table for any system trees.
+     *
+     * @param  int  $tblID
+     * @return boolean
+     */
     protected function isCoreTbl($tblID)
     {
         $chkCore = SLTree::where('tree_core_table', '=', $tblID)
@@ -415,6 +420,12 @@ class AdminController extends AdminEmailController
         return $chkCore->isNotEmpty();
     }
 
+    /**
+     * Check if the table ID is a core table for any system trees.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function userManage(Request $request)
     {
         set_time_limit(180);
@@ -423,6 +434,11 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.user-manage', $this->v);
     }
 
+    /**
+     * Load all users organized by their highest permissions.
+     *
+     * @return void
+     */
     protected function loadPrintUsers()
     {
         $this->v["printVoluns"] = [ [], [], [], [], [], [] ]; // voluns, staff, admin
@@ -452,6 +468,12 @@ class AdminController extends AdminEmailController
         return true;
     }
 
+    /**
+     * Process posting of login-required survey.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
     public function postNodeURL(Request $request)
     {
         if ($request->has('step')
@@ -470,6 +492,13 @@ class AdminController extends AdminEmailController
         exit;
     }
 
+    /**
+     * Process login-required ajax/jquery requests.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  string  $type
+     * @return string
+     */
     public function ajaxChecksAdmin(Request $request, $type = '')
     {
         $this->admControlInit($request, '/ajadm/' . $type);
@@ -492,6 +521,12 @@ class AdminController extends AdminEmailController
         return $this->custReport->ajaxChecks($request, $type);
     }
 
+    /**
+     * Display page which checks several aspects of the Survloop systems.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function systemsCheck(Request $request)
     {
         $this->admControlInit($request, '/dashboard/systems-check');
@@ -525,6 +560,12 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.systems-check', $this->v);
     }
 
+    /**
+     * Display page to send test emails from this Survloop installation.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     protected function systemsCheckTestEmail(Request $request)
     {
         $this->v["testResults"] = '';
@@ -552,15 +593,25 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.systems-check-email', $this->v);
     }
 
+    /**
+     * Load system session logs for display or analysis.
+     *
+     * @return void
+     */
     public function loadLogs()
     {
         $logs = new SurvLogAnalysis;
         $this->v["logs"] = [
             "session" => $logs->logPreview('session-stuff')
         ];
-        return true;
     }
 
+    /**
+     * Load and print system overview logs.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function logsOverview(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs');
@@ -569,6 +620,12 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.logs-overview', $this->v);
     }
 
+    /**
+     * Load and print system session logs.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function logsSessions(Request $request)
     {
         $this->admControlInit($request, '/dashboard/logs/session-stuff');
@@ -579,47 +636,70 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.logs-sessions', $this->v);
     }
 
+    /**
+     * Generate interface to manage navigation menus.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function navMenus(Request $request)
     {
         $this->admControlInit($request, '/dashboard/pages/menus');
         $this->v["cntMax"] = 25;
         if ($request->has('sub') && intVal($request->get('sub')) == 1) {
-            for ($i = 0; $i < $this->v["cntMax"]; $i++) {
-                if ($i < sizeof($this->v["navMenu"])) {
-                    if ($request->has('mainNavTxt' . $i)) {
-                        SLDefinitions::where('def_set', 'Menu Settings')
-                            ->where('def_subset', 'main-navigation')
-                            ->where('def_database', 1)
-                            ->where('def_order', $i)
-                            ->update([
-                                'def_value'       => $request->get('mainNavTxt' . $i),
-                                'def_description' => $request->get('mainNavLnk' . $i)
-                            ]);
-                    } else {
-                        SLDefinitions::where('def_set', 'Menu Settings')
-                            ->where('def_subset', 'main-navigation')
-                            ->where('def_database', 1)
-                            ->where('def_order', $i)
-                            ->delete();
-                    }
-                } elseif ($request->has('mainNavTxt' . $i)) {
-                    $newLnk = new SLDefinitions;
-                    $newLnk->def_set         = 'Menu Settings';
-                    $newLnk->def_subset      = 'main-navigation';
-                    $newLnk->def_database    = 1;
-                    $newLnk->def_order       = $i;
-                    $newLnk->def_value       = $request->get('mainNavTxt' . $i);
-                    $newLnk->def_description = $request->get('mainNavLnk' . $i);
-                    $newLnk->save();
-                }
-            }
-            $this->loadNavMenu();
+            $this->saveNavMenus($request);
         }
         $this->v["cnt"] = 0;
         return view('vendor.survloop.admin.manage-menus', $this->v);
     }
 
+    /**
+     * Save changes to system navigation menus.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
+    public function saveNavMenus(Request $request)
+    {
+        for ($i = 0; $i < $this->v["cntMax"]; $i++) {
+            if ($i < sizeof($this->v["navMenu"])) {
+                if ($request->has('mainNavTxt' . $i)) {
+                    SLDefinitions::where('def_set', 'Menu Settings')
+                        ->where('def_subset', 'main-navigation')
+                        ->where('def_database', 1)
+                        ->where('def_order', $i)
+                        ->update([
+                            'def_value'       => $request->get('mainNavTxt' . $i),
+                            'def_description' => $request->get('mainNavLnk' . $i)
+                        ]);
+                } else {
+                    SLDefinitions::where('def_set', 'Menu Settings')
+                        ->where('def_subset', 'main-navigation')
+                        ->where('def_database', 1)
+                        ->where('def_order', $i)
+                        ->delete();
+                }
+            } elseif ($request->has('mainNavTxt' . $i)) {
+                $newLnk = new SLDefinitions;
+                $newLnk->def_set         = 'Menu Settings';
+                $newLnk->def_subset      = 'main-navigation';
+                $newLnk->def_database    = 1;
+                $newLnk->def_order       = $i;
+                $newLnk->def_value       = $request->get('mainNavTxt' . $i);
+                $newLnk->def_description = $request->get('mainNavLnk' . $i);
+                $newLnk->save();
+            }
+        }
+        $this->loadNavMenu();
+    }
 
+    /**
+     * Generate interface to manage the
+     * system gallery of uploaded images.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function imgGallery(Request $request)
     {
         $this->admControlInit($request, '/dashboard/images/gallery');
@@ -630,6 +710,14 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.images-gallery', $this->v);
     }
 
+    /**
+     * Generically print view of system's survey submission.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @param  int  $treeID
+     * @param  int  $cid
+     * @return Illuminate\Support\Facades\Response
+     */
     public function printSubView(Request $request, $treeID = 1, $cid = -3)
     {
         if ($treeID > 0 && $cid > 0) {
@@ -641,6 +729,12 @@ class AdminController extends AdminEmailController
         return 'Not found :(';
     }
 
+    /**
+     * Generate report of specific node saves within a survey experience.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
     public function debugNodeSaves(Request $request)
     {
         $this->admControlInit($request, '/dashboard/debug-node-saves');
@@ -660,4 +754,26 @@ class AdminController extends AdminEmailController
         return view('vendor.survloop.admin.debug-node-saves', $this->v);
     }
 
+    /**
+     * Run system cleanup processes.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return Illuminate\Support\Facades\Response
+     */
+    public function systemsClean(Request $request)
+    {
+        $sysUp = new SystemUpdate;
+        return $sysUp->index($request);
+    }
+
+    /**
+     * Totally flush the current cache.
+     *
+     * @return void
+     */
+    protected function cacheFlush()
+    {
+        DB::table('sl_caches')->truncate();
+        Cache::flush();
+    }
 }

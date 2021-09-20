@@ -58,7 +58,7 @@ class PageLoadUtils extends Controller
      *
      * @return void
      */
-    public function loadLoop(Request $request, $skipSessLoad = false)
+    public function loadLoop(Request $request, $skipSessLoad = false, $coreID = -3)
     {
         $this->loadAbbr();
         $class = "RockHopSoft\\Survloop\\Controllers\\Tree\\TreeSurvForm";
@@ -73,7 +73,7 @@ class PageLoadUtils extends Controller
         }
         eval("\$this->custLoop = new " . $class . "("
             . "\$request, "
-            . "-3, "
+            . $coreID . ", "
             . $this->dbID . ", "
             . $this->treeID . ", "
             . (($skipSessLoad) ? "true" : "false")
@@ -90,15 +90,17 @@ class PageLoadUtils extends Controller
     protected function loadCustomGlobals()
     {
         $this->loadAbbr();
-        $GLOBALS["CUST"] = null;
-        $custFile = '../vendor/' . $this->custPckg
-            . '/src/Controllers/' . $this->custAbbr . 'Globals.php';
-        if ($this->custAbbr != 'Survloop' && file_exists($custFile)) {
-            $custClass = $this->custVend . "\\"
-                . $this->custAbbr . "\\Controllers\\"
-                . $this->custAbbr . "Globals";
-            if (class_exists($custClass)) {
-                eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+        if (!isset($GLOBALS["CUST"])) {
+            $GLOBALS["CUST"] = null;
+            $custFile = '../vendor/' . $this->custPckg
+                . '/src/Controllers/' . $this->custAbbr . 'Globals.php';
+            if ($this->custAbbr != 'Survloop' && file_exists($custFile)) {
+                $custClass = $this->custVend . "\\"
+                    . $this->custAbbr . "\\Controllers\\"
+                    . $this->custAbbr . "Globals";
+                if (class_exists($custClass)) {
+                    eval("\$GLOBALS['CUST'] = new " . $custClass . ";");
+                }
             }
         }
     }
@@ -616,9 +618,11 @@ class PageLoadUtils extends Controller
             session()->forget('coreID' . $tree->tree_id);
             session()->forget('sessID' . $tree->tree_id);
         }
-        $paramTxt = str_replace($this->domainPath . '/start/' . $tree->tree_slug, '',
-            str_replace($this->domainPath . '/dashboard/start/' . $tree->tree_slug, '',
-            $request->fullUrl()));
+        $path = $this->domainPath;
+        $slug = $tree->tree_slug;
+        $paramTxt = str_replace($path . '/start/' . $slug, '',
+            str_replace($path . '/dashboard/start/' . $slug, '',
+                $request->fullUrl()));
         if (substr($paramTxt, 0, 1) == '/') {
             $paramTxt = substr($paramTxt, 1);
         }
@@ -626,8 +630,11 @@ class PageLoadUtils extends Controller
             $redir .= '&' . substr($paramTxt, 1);
         }
         $redir = str_replace('&new=1&', '&', $redir);
-        return redirect($this->domainPath . $redir, 302)
-            ->header('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return redirect($path . $redir, 302)
+            ->header(
+                'Cache-Control',
+                'no-store, no-cache, must-revalidate'
+            );
     }
 
     /**
@@ -952,7 +959,8 @@ class PageLoadUtils extends Controller
      */
     protected function isStaffOrAdmin()
     {
-        return (Auth::user() && Auth::user()->hasRole('administrator|staff'));
+        return (Auth::user()
+            && Auth::user()->hasRole('administrator|staff'));
     }
 
     /**

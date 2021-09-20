@@ -33,6 +33,8 @@ class GlobalsVars extends GlobalsStatic
 
     public $def            = null;
     public $isAdmin        = false;
+    public $isStaff        = false;
+    public $isAdminOrStaff = false;
     public $isVolun        = false;
     public $dbID           = 1;
     public $dbRow          = [];
@@ -159,6 +161,9 @@ class GlobalsVars extends GlobalsStatic
 
     // A thin progress bar is generated atop each page of the survey
     public const TREEOPT_SURVNAVLIN = 61;
+
+    // Survey allows users to jump further ahead than pages completed
+    public const TREEOPT_JUMPAHEAD  = 73;
 
     // Survey is one big loop through editable records
     public const TREEOPT_ONEBIGLOOP = 5;

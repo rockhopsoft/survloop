@@ -154,7 +154,7 @@ class SearcherFilter
                 ->where($fldMatch, 'LIKE', $this->selected)
                 ->select($fldID)
                 ->get();
-            $psids = $GLOBALS["SL"]->resultsToArrIds($chk, $fldID);
+            $psids = $GLOBALS["SL"]->resToArrIds($chk, $fldID);
             return "->whereIn('" . $coreTblFldID . "', ["
                 . ((sizeof($psids) > 0) ? implode(', ', $psids) : 0)
                 . "])";
@@ -195,10 +195,12 @@ class SearcherFilter
 
     public function printDropdownColWrap($class = '', $cols = 4, $defID = '', $defLabel = '', $wrap1 = '', $wrap2 = '')
     {
-        return '<div id="' . $this->abbr . 'Wrap" class="col-md-' . intVal($cols) . ' pB10"'
-            . (($this->hideIfEmpty && $this->isEmpty()) ? ' style="display: none;" ' : '')
-            . ' >' . $wrap1 . $this->printDropdown($class, $defID, $defLabel) . $wrap2
-            . '</div>';
+        return '<div id="' . $this->abbr . 'Wrap" class="col-md-'
+            . intVal($cols) . ' pB10"'
+            . (($this->hideIfEmpty && $this->isEmpty())
+                ? ' style="display: none;" ' : '')
+            . ' >' . $wrap1 . $this->printDropdown($class, $defID, $defLabel)
+            . $wrap2 . '</div>';
     }
 
     public function printDropdownColWraps($class = '', $wrap1 = '', $wrap2 = '')

@@ -67,6 +67,9 @@ img {
     display: block;
     max-width: 100%;
 }
+#mainContain {
+    position: relative;
+}
 
 {!! view(
     'vendor.survloop.css.styles-2-debug',

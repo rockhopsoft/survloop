@@ -55,6 +55,7 @@ class TreeSurvInput extends TreeSurvInputElements
             $this->closePostNodePublic($curr);
             return '';
         }
+
         $this->postNodePublicInit($curr);
         $ret .= $this->processSpecialPageForms($curr);
         if ($curr->isLoopSort()) { // actual storage happens with with each change /loopSort/
@@ -67,20 +68,21 @@ class TreeSurvInput extends TreeSurvInputElements
         if ($curr->isDataManip()) {
             $this->loadManipBranch($nID, $curr->currVisib);
         }
-        if ($curr->isLoopCycle()) {
-            $ret .= $this->postNodePublicLoopCycle($curr);
-        } elseif ($curr->isSpreadTbl()) {
-            $ret .= $this->postNodePublicSpreadTbl($curr);
-        } elseif (!$curr->isDataPrint()) {
-            if (!$this->postNodePublicCustom($curr)) {
-                // then run standard post, move all this code in here:
+        if (!$this->postNodePublicCustom($curr)) {
+            // then run standard post, move all this code in here:
+            if ($curr->isLoopCycle()) {
+                $ret .= $this->postNodePublicLoopCycle($curr);
+            } elseif ($curr->isSpreadTbl()) {
+                $ret .= $this->postNodeSpreadTbl($curr);
+            } elseif (!$curr->isDataPrint()) {
                 $this->postNodePublicStandards($curr);
-            }
-            if (sizeof($tmpSubTier[1]) > 0) {
-                foreach ($tmpSubTier[1] as $childNode) {
-                    if (!$this->allNodes[$childNode[0]]->isPage()
-                        && $this->allNodes[$childNode[0]]->nodeType != 'Layout Sub-Response') {
-                        $ret .= $this->postNodePublic($childNode[0], $childNode);
+                if (sizeof($tmpSubTier[1]) > 0) {
+                    foreach ($tmpSubTier[1] as $childNode) {
+                        if (!$this->allNodes[$childNode[0]]->isPage()
+                            && $this->allNodes[$childNode[0]]->nodeType
+                                != 'Layout Sub-Response') {
+                            $ret .= $this->postNodePublic($childNode[0], $childNode);
+                        }
                     }
                 }
             }
@@ -391,6 +393,5 @@ class TreeSurvInput extends TreeSurvInputElements
         }
         return $extraData;
     }
-
 
 }

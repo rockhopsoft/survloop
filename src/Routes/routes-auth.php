@@ -9,7 +9,6 @@
   */
 
 use RockHopSoft\Survloop\Controllers\Survloop;
-use RockHopSoft\Survloop\Controllers\SystemUpdate;
 use RockHopSoft\Survloop\Controllers\Admin\AdminController;
 use RockHopSoft\Survloop\Controllers\Admin\AdminDBController;
 use RockHopSoft\Survloop\Controllers\Admin\AdminTreeController;
@@ -49,10 +48,26 @@ Route::middleware(['auth'])->group(function () {
         /**
          * System Logs
          */
-        Route::get('/logs',               [AdminController::class, 'logsOverview']);
-        Route::get('/logs/session-stuff', [AdminController::class, 'logsSessions']);
-        Route::get('/systems-check',      [AdminController::class, 'systemsCheck']);
-        Route::get('/debug-node-saves',   [AdminController::class, 'debugNodeSaves']);
+        Route::get(
+            '/logs',
+            [ AdminController::class, 'logsOverview' ]
+        );
+        Route::get(
+            '/logs/session-stuff',
+            [ AdminController::class, 'logsSessions' ]
+        );
+        Route::get(
+            '/systems-check',
+            [ AdminController::class, 'systemsCheck' ]
+        );
+        Route::get(
+            '/debug-node-saves',
+            [ AdminController::class, 'debugNodeSaves' ]
+        );
+        Route::get(
+            '/systems-clean',
+            [ AdminController::class, 'systemsClean' ]
+        );
 
 
         /**
@@ -65,7 +80,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pages/menus',     [AdminController::class, 'navMenus']);
         Route::post('/images/gallery', [AdminTreeController::class, 'imgGallery']);
         Route::get('/images/gallery',  [AdminTreeController::class, 'imgGallery']);
-        Route::get('/systems-clean',   [SystemUpdate::class, 'index']);
 
 
         /**
@@ -99,8 +113,6 @@ Route::middleware(['auth'])->group(function () {
 
         });
 
-        Route::get('/surveys/switch/{treeID}', [AdminTreeController::class, 'switchTreeAdmin']);
-        Route::get('/surveys/switch',          [AdminTreeController::class, 'switchTreeAdmin']);
         Route::post('/surveys/new',            [AdminTreeController::class, 'newTree']);
         Route::get('/surveys/new',             [AdminTreeController::class, 'newTree']);
 
@@ -207,6 +219,8 @@ Route::middleware(['auth'])->group(function () {
          */
         Route::get('/db/export',         [AdminDatabaseInstall::class, 'printExport']);
         Route::get('/db/export/laravel', [AdminDatabaseInstall::class, 'printExportLaravel']);
+        Route::get('/db/export/dump',    [AdminDatabaseInstall::class, 'exportDump']);
+        Route::get('/sl/export/laravel', [AdminDatabaseInstall::class, 'printExportPackageLaravel']);
 
         Route::get(
             '/dashboard/db/export/laravel/table-model/{tbl}',
@@ -215,9 +229,6 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/db/install',       [AdminDatabaseInstall::class, 'autoInstallDatabase']);
         Route::get('/db/install',        [AdminDatabaseInstall::class, 'autoInstallDatabase']);
-        Route::get('/db/export/dump',    [AdminDatabaseInstall::class, 'exportDump']);
-        Route::get('/db/export',         [AdminDatabaseInstall::class, 'printExportPackage']);
-        Route::get('/sl/export/laravel', [AdminDatabaseInstall::class, 'printExportPackageLaravel']);
         Route::post('/db/import',        [AdminDatabaseInstall::class, 'printImport']);
         Route::get('/db/import',         [AdminDatabaseInstall::class, 'printImport']);
 

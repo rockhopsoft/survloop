@@ -167,7 +167,7 @@ class GlobalsBasic extends GlobalsVars
         }
         $pubIdFld = $this->tblAbbr[$tbl] . 'public_id';
         $fullTbl = $this->dbRow->db_prefix . $tbl;
-        DB::table($fullTbl)
+        $idChk = DB::table($fullTbl)
             ->where($pubIdFld, intVal($pubID))
             ->first();
         //$eval = "\$idChk = " . $this->modelPath($tbl) . "::where('"
@@ -606,12 +606,15 @@ class GlobalsBasic extends GlobalsVars
 
     public function isHomestead()
     {
-        return (strpos($this->sysOpts["app-url"], '.test')     !== false
-            ||  strpos($this->sysOpts["app-url"], '.app')      !== false
-            ||  strpos($this->sysOpts["app-url"], '.dev')      !== false
-            ||  strpos($this->sysOpts["app-url"], '.local')    !== false
-            ||  strpos($this->sysOpts["app-url"], 'localhost') !== false
-            ||  strpos($this->sysOpts["app-url"], 'homestead') !== false);
+        return (strpos($this->sysOpts["app-url"], '.test')        !== false
+            ||  strpos($this->sysOpts["app-url"], '.app')         !== false
+            ||  strpos($this->sysOpts["app-url"], '.dev')         !== false
+            ||  strpos($this->sysOpts["app-url"], '.local')       !== false
+            ||  strpos($this->sysOpts["app-url"], 'localhost')    !== false
+            ||  strpos($this->sysOpts["app-url"], 'homestead')    !== false
+            ||  strpos($this->sysOpts["app-url"], 'https://dev.') === 0
+            || (isset($_SERVER["APP_IS_DEV"])
+                && trim($_SERVER["APP_IS_DEV"]) == 'true'));
     }
 
     public function getParentDomain()

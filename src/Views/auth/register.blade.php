@@ -213,7 +213,7 @@
 @endif
     {!! view('vendor.survloop.auth.register-ajax-zxcvbn', [])->render() !!}
 
-    setTimeout(function() { window.location='/register'; }, (59*60000));
+    setTimeout(function() { window.location='/register'; }, (45*60000));
 
 }); </script>
 

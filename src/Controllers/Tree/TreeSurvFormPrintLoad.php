@@ -45,6 +45,11 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
 
     protected function printNodePublicCurrData(&$curr)
     {
+        if (isset($this->v["skipCurrNodeSessData"])
+            && $this->v["skipCurrNodeSessData"]) {
+            $this->v["currNodeSessData"] = $curr->sessData = '';
+            return false;
+        }
         $this->printNodePublicCurrDataGetItem($curr);
         $curr->sessData = $this->sessData->currSessData($curr, 'get', '');
         //if ($itemID <= 0) $curr->sessData = ''; // override false profit ;-P
@@ -667,8 +672,5 @@ class TreeSurvFormPrintLoad extends TreeSurvFormWidgets
         }
         return $ret;
     }
-
-
-
 
 }

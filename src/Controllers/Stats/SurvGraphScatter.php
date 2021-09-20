@@ -69,5 +69,3 @@ class SurvGraphScatter extends SurvGraph
 
 
 }
-
-

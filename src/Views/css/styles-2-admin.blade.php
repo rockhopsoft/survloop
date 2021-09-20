@@ -211,6 +211,8 @@ table tr td.leftSideCollapse #leftSideWrap #leftAdmMenu div #admMenu .sublinks .
 #leftSideWrap, .leftSide #leftSideWrap {
     position: fixed;
     width: 240px;
+    height: 100%;
+    overflow-y: auto;
 	z-index: 0;
 }
 #leftAdmMenu {

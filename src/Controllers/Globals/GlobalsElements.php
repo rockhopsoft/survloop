@@ -28,12 +28,15 @@ class GlobalsElements extends GlobalsCache
         )->render();
     }
 
-    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'chevron')
+    public function printAccordian($title, $body = '', $open = false, $big = false, $type = '', $ico = 'chevron', $accordID = '')
     {
+        if ($accordID == '') {
+            $accordID = rand(100000, 1000000);
+        }
       	return view(
             'vendor.survloop.elements.inc-accordian',
             [
-        		"accordID" => rand(100000, 1000000),
+        		"accordID" => $accordID,
         		"title"    => $title,
         		"body"     => $body,
         		"big"      => $big,
@@ -60,24 +63,24 @@ class GlobalsElements extends GlobalsCache
         )->render();
     }
 
-    public function printAccard($title, $body = '', $open = false)
+    public function printAccard($title, $body = '', $open = false, $accordID = '')
     {
-        return $this->printAccordian($title, $body, $open, true, 'card');
+        return $this->printAccordian($title, $body, $open, true, 'card', 'chevron', $accordID);
     }
 
-    public function printAccordTxt($title, $body = '', $open = false, $ico = 'chevron')
+    public function printAccordTxt($title, $body = '', $open = false, $ico = 'chevron', $accordID = '')
     {
-        return $this->printAccordian($title, $body, $open, false, 'text', $ico);
+        return $this->printAccordian($title, $body, $open, false, 'text', $ico, $accordID);
     }
 
-    public function printAccordTxtLeft($title, $body = '', $open = false, $ico = 'chevron')
+    public function printAccordTxtLeft($title, $body = '', $open = false, $ico = 'chevron', $accordID = '')
     {
-        return $this->printAccordian($title, $body, $open, false, 'textL', $ico);
+        return $this->printAccordian($title, $body, $open, false, 'textL', $ico, $accordID);
     }
 
-    public function printAccordTxtLeftCaret($title, $body = '', $ico = 'chevron')
+    public function printAccordTxtLeftCaret($title, $body = '', $ico = 'chevron', $accordID = '')
     {
-        return $this->printAccordian($title, $body, false, false, 'textL', 'caret');
+        return $this->printAccordian($title, $body, false, false, 'textL', 'caret', $accordID);
     }
 
     public function setAdmMenuOnLoad($open = 1)
@@ -519,27 +522,19 @@ class GlobalsElements extends GlobalsCache
             "endYear"    => (intVal(date("Y"))-1),
             "endMonth"   => (intVal(date("n"))+1)
         ];
-        if ($rec !== null) {
-            if (isset($rec->{ $monthFld })
-                && intVal($rec->{ $monthFld }) > 0
-                && isset($rec->{ $yearFld })
-                && intVal($rec->{ $yearFld }) > 0
-                && isset($rec->created_at)) {
-                $ret["has"] = true;
-                $startYear    = intVal($rec->{ $yearFld });
-                $startMonth   = intVal($rec->{ $monthFld });
-                $createdMonth = intVal(date("n", strtotime($rec->created_at)));
-                if ($createdMonth < $startMonth) {
-                    $startYear--;
-                }
-                $ret["startYear"]  = $startYear;
-                $ret["startMonth"] = $startMonth;
-                $ret["endYear"]    = $startYear-1;
-                $ret["endMonth"]   = $startMonth+1;
-                if ($ret["endMonth"] > 12) {
-                    $ret["endMonth"] = 1;
-                    $ret["endYear"]++;
-                }
+        if ($rec
+            && isset($rec->{ $monthFld })
+            && intVal($rec->{ $monthFld }) > 0
+            && isset($rec->{ $yearFld })
+            && intVal($rec->{ $yearFld }) > 0) {
+            $ret["has"]        = true;
+            $ret["startYear"]  = intVal($rec->{ $yearFld });
+            $ret["startMonth"] = intVal($rec->{ $monthFld });
+            $ret["endYear"]    = $ret["startYear"]-1;
+            $ret["endMonth"]   = $ret["startMonth"]+1;
+            if ($ret["endMonth"] > 12) {
+                $ret["endMonth"] = 1;
+                $ret["endYear"]++;
             }
         }
         return $ret;

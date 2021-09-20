@@ -1,20 +1,9 @@
-@extends('vendor.survloop.master')
-@section('content')
-<div id="ajaxWrap">
 <!-- resources/views/auth/login.blade.php -->
 
 <form name="mainPageForm" method="POST" action="/login">
 <input type="hidden" id="isLoginID" name="isLogin" value="1">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
-<input type="hidden" name="previous" 
-    @if (isset($midSurvRedir) && trim($midSurvRedir) != '') 
-        value="{{ $midSurvRedir }}"
-    @elseif ($GLOBALS['SL']->REQ->has('redir')) 
-        value="{{ $GLOBALS['SL']->REQ->get('redir') }}"
-    @elseif ($GLOBALS['SL']->REQ->has('previous')) 
-        value="{{ $GLOBALS['SL']->REQ->get('previous') }}"
-    @else value="{{ URL::previous() }}"
-    @endif >
+<input type="hidden" name="previous" value="{{ $loginRedir }}">
 
 <div class="w100 row2" style="padding: 30px 0px 60px 0px;"><center>
     <div id="treeWrap" class="treeWrapForm">
@@ -135,8 +124,22 @@
 #main, body { background: {{ $css["color-main-faint"] }}; }
 </style>
 <script type="text/javascript"> $(document).ready(function(){
-    setTimeout(function() { window.location='/login'; }, (59*60000));
+
+function loginFocus() {
+    if (document.getElementById("emailID")) {
+        document.getElementById("emailID").focus();
+    }
+}
+setTimeout(function() { loginFocus(); }, 10);
+
+function reloadLogin() {
+    var redir = '/login?ajax=1';
+    console.log(redir);
+    $("#ajaxWrap").load(redir);
+
+}
+setTimeout(function() { reloadLogin(); }, (30*60000));
+
 }); </script>
 
 </div>
-@endsection

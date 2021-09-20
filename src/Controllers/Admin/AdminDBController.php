@@ -302,7 +302,7 @@ class AdminDBController extends AdminController
             //$this->v["innerTable"] = str_replace('&lt;', '<', str_replace('&gt;', '>',
             //    str_replace('"&quot;', '"', str_replace('&quot;"', '"', $this->v["innerTable"]))));
             if ($this->v["isExcel"]) {
-                $GLOBALS["SL"]->exportExcelOldSchool(
+                $GLOBALS["SL"]->exportExcel(
                     '<tr><td colspan=5 ><b>Complete Database Table Field Listings'
                         . '</b></td></tr>' . $this->v["innerTable"],
                     'FullTableListings'.date("ymd").'.xls'
@@ -1550,7 +1550,7 @@ class AdminDBController extends AdminController
                 }
                 $filename = 'OPC-DB-Field_Matrix-' . (($this->v["isAlt"]) ? 'English' : 'Geek')
                     . '-' . date("ymd");
-                $GLOBALS["SL"]->exportExcelOldSchool($tblInner, $filename.'.xls');
+                $GLOBALS["SL"]->exportExcel($tblInner, $filename.'.xls');
                 exit;
             }
             $this->v["content"] = view('vendor.survloop.admin.db.field-matrix', $this->v)->render();

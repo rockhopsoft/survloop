@@ -41,18 +41,20 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             return '';
         }
         $ret = '';
-        $GLOBALS["SL"]->pageJAVA .= view(
-            'vendor.survloop.js.formtree',
-            [
-                "currPage"    => $this->v["currPage"],
-                "pageJSvalid" => $this->pageJSvalid,
-                "pageFldList" => $this->pageFldList
-            ]
-        )->render();
-        $GLOBALS["SL"]->pageAJAX .= view(
-            'vendor.survloop.js.formtree-ajax',
-            [ "hasFixedHeader" => $this->v["hasFixedHeader"] ]
-        )->render();
+        if (!$GLOBALS["SL"]->REQ->has('ajax')) {
+            $GLOBALS["SL"]->pageJAVA .= view(
+                'vendor.survloop.js.formtree',
+                [
+                    "currPage"    => $this->v["currPage"],
+                    "pageJSvalid" => $this->pageJSvalid,
+                    "pageFldList" => $this->pageFldList
+                ]
+            )->render();
+            $GLOBALS["SL"]->pageAJAX .= view(
+                'vendor.survloop.js.formtree-ajax',
+                [ "hasFixedHeader" => $this->v["hasFixedHeader"] ]
+            )->render();
+        }
         $loopRootJustLeft = -3;
         if (isset($this->sessInfo->sess_loop_root_just_left)
             && intVal($this->sessInfo->sess_loop_root_just_left) > 0) {

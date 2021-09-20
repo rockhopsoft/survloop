@@ -251,12 +251,23 @@ function postNodeAutoSave(repeat) {
     if (document.getElementById('postNodeForm') && document.getElementById('stepID') && document.getElementById('stepID')) {
         if (!document.getElementById('emailBlockID') && !document.getElementById('noAutoSaveID')) {
             var origStep = document.getElementById('stepID').value;
-            var origTarget = document.postNode.target;
             document.getElementById('stepID').value = "autoSave";
-            document.postNode.target = "hidFrame";
-            document.postNode.submit();
+            var formData = new FormData(document.getElementById("postNodeForm"));
+            $.ajax({
+                url: "/sub",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    $("#hidDivAutoSave").empty();
+                    $("#hidDivAutoSave").append(data);
+                },
+                error: function(xhr, status, error) {
+                    $("#hidDivAutoSave").append("<div>(error - "+xhr.responseText+")</div>");
+                }
+            });
             document.getElementById('stepID').value = origStep;
-            document.postNode.target = origTarget;
             if (repeat) {
                 setTimeout(function() { postNodeAutoSave(true) }, autoSaveDelay);
             }
@@ -454,31 +465,44 @@ $(document).on("click", ".addSprdTblRow", function() {
     var dataRowMax = $(this).attr("data-row-max");
     var currMax = 0;
     for (var j = 0; j < dataRowMax; j++) {
-        if (document.getElementById('n'+nIDtxt+'tbl'+j+'row') && document.getElementById('n'+nIDtxt+'tbl'+j+'row').style.display == 'table-row' && currMax < j) {
-            currMax = j;
+        var rowTrID = 'n'+nIDtxt+'tbl'+j+'row';
+        if (document.getElementById(rowTrID)) {
+            if (document.getElementById(rowTrID).style.display == 'table-row' && currMax < j) {
+                currMax = j;
+            }
         }
     }
     currMax++;
-    if (document.getElementById('n'+nIDtxt+'tbl'+currMax+'row')) {
-        document.getElementById('n'+nIDtxt+'tbl'+currMax+'row').style.display = 'table-row';
+    var rowTrID = 'n'+nIDtxt+'tbl'+currMax+'row';
+    if (document.getElementById(rowTrID)) {
+        document.getElementById(rowTrID).style.display = 'table-row';
+        if (nodeTblList[nID] && nodeTblList[nID].length > 0) {
+            for (var i = 0; i < nodeTblList[nID].length; i++) {
+                setNodeVisibTxt(nodeTblList[nID][i]+'tbl'+currMax, true);
+            }
+        }
     }
     if (dataRowMax < currMax && document.getElementById('addSprdTbl'+nIDtxt+'Btn')) {
         document.getElementById('addSprdTbl'+nIDtxt+'Btn').style.display = 'none';
     }
 });
+
 $(document).on("click", ".delSprdTblRow", function() {
-    var nID = $(this).attr("data-nid");
+    var nID    = $(this).attr("data-nid");
     var nIDtxt = $(this).attr("data-nidtxt");
-    var rowind = $(this).attr("data-row-ind");
+    var rowInd = $(this).attr("data-row-ind");
     if (nodeTblList[nID] && nodeTblList[nID].length > 0) {
         for (var i = 0; i < nodeTblList[nID].length; i++) {
-            if (document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID")) {
-                document.getElementById("n"+nodeTblList[nID][i]+"tbl"+rowind+"FldID").value="";
+            var fldID = "n"+nodeTblList[nID][i]+"tbl"+rowInd+"FldID";
+            if (document.getElementById(fldID)) {
+                document.getElementById(fldID).value="";
+                setNodeVisibTxt(nodeTblList[nID][i]+"tbl"+rowInd, false);
             }
         }
     }
-    if (document.getElementById("n"+nIDtxt+"tbl"+rowind+"row")) {
-        document.getElementById("n"+nIDtxt+"tbl"+rowind+"row").style.display="none";
+    var rowTrID = "n"+nIDtxt+"tbl"+rowInd+"row";
+    if (document.getElementById(rowTrID)) {
+        document.getElementById(rowTrID).style.display="none";
     }
     return true;
 });
@@ -504,6 +528,7 @@ function addTblRowCellAjax(nIDtxt, cell) {
     }
 }
 */
+
 var holdAddTblRowAjax = false;
 function addTblRowAjax(nIDtxt) {
     if (!holdAddTblRowAjax) {

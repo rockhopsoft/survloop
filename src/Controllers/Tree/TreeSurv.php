@@ -23,7 +23,10 @@ use App\Models\SLNodeSavesPage;
 use App\Models\SLFields;
 use App\Models\SLTokens;
 use App\Models\SLUsersActivity;
+use App\Models\SLZips;
+use App\Models\SLZipAshrae;
 use RockHopSoft\Survloop\Controllers\Globals\Globals;
+use RockHopSoft\Survloop\Controllers\Globals\Geographs;
 use RockHopSoft\Survloop\Controllers\Tree\TreeNodeSurv;
 use RockHopSoft\Survloop\Controllers\Tree\TreeSurvLoops;
 
@@ -41,10 +44,12 @@ class TreeSurv extends TreeSurvLoops
         $GLOBALS["SL"]->microLog('Start printTreePublic(');
         $this->loadTree();
         $GLOBALS["SL"]->microLog('printTreePublic( after loadTree()');
-        if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey' && $this->coreID <= 0) {
+        if ($GLOBALS["SL"]->treeRow->tree_type == 'Survey'
+            && $this->coreID <= 0) {
             return $this->redir($GLOBALS["SL"]->getCurrTreeUrl(), true);
         }
-        $ret .= $this->printTreePublicPageWrapOpen() . $this->printTreeGetCurrNode();
+        $ret .= $this->printTreePublicPageWrapOpen()
+            . $this->printTreeGetCurrNode();
         $this->multiRecordCheck();
         $GLOBALS["SL"]->microLog('printTreePublic( after multiRecordCheck(');
 
@@ -80,13 +85,14 @@ class TreeSurv extends TreeSurvLoops
         $fadeIn = $this->printTreeLoadFadeIn();
         $goSkinny = ($GLOBALS["SL"]->treeRow->tree_opts%Globals::TREEOPT_SKINNY == 0);
         $goSkinny = (!$this->hasFrameLoad() && $goSkinny);
-        return $this->printTreePublicAnimWrapOpen($fadeIn, $goSkinny)
+        return $this->loadProgTopTabs() . "\n"
+            . $this->printTreePublicAnimWrapOpen($fadeIn, $goSkinny)
             . ((trim($GLOBALS["errors"]) != '') ? $GLOBALS["errors"] : '')
             . $this->nodeSessDump('pageStart')
             . $this->printNodePublic($this->currNode(), $this->currNodeSubTier) . "\n"
-            . $this->loadProgBar() . "\n"
+            . $this->loadProgBarBot() . "\n"
             // (($this->allNodes[$this->currNode()]->nodeOpts%29 > 0)
-                // ? $this->loadProgBar() : '') // not exit page?
+                // ? $this->loadProgBarBot() : '') // not exit page?
             . $this->printCurrRecMgmt() . $this->sessDump($lastNode) . "\n"
             . $this->printTreePublicAnimWrapClose($goSkinny);
     }
@@ -300,7 +306,8 @@ class TreeSurv extends TreeSurvLoops
         } else {
             if (trim($this->urlSlug) != '') {
                 $this->pullNewNodeURL();
-                if ($this->currNode() == $GLOBALS["SL"]->treeRow->tree_first_page
+                if ($this->currNode()
+                        == $GLOBALS["SL"]->treeRow->tree_first_page
                     && $GLOBALS["SL"]->REQ->has('start')
                     && intVal($GLOBALS["SL"]->REQ->get('start')) == 1) {
                     $this->runDataManip($GLOBALS["SL"]->treeRow->tree_root);
@@ -327,6 +334,7 @@ class TreeSurv extends TreeSurvLoops
             || trim($GLOBALS["SL"]->REQ->popStateUrl) == '') {
             $this->pushCurrNodeURL($this->currNode());
         }
+        $GLOBALS["SL"]->x["pageLoadCurrNode"] = $this->currNode();
         return $ret;
     }
 
@@ -443,6 +451,7 @@ class TreeSurv extends TreeSurvLoops
     public function index(Request $request, $type = '', $val = '')
     {
         $GLOBALS["SL"]->microLog('TreeSurv index(' . $type);
+        //$this->loadTree($this->treeID, $request);
         $this->survloopInit($request, '');
         $GLOBALS["SL"]->microLog('TreeSurv index( after survLoopInit');
         $chk = $this->checkSystemInit();
@@ -798,6 +807,8 @@ class TreeSurv extends TreeSurvLoops
             $this->ajaxLogLastProTip($request);
         } elseif ($type == 'tbl-add-row') {
             $this->ajaxTblAddRow($request);
+        } elseif ($type == 'get-zip-state-climate') {
+            $this->ajaxGetZipStateClimate($request);
 
 
         }
@@ -949,6 +960,57 @@ class TreeSurv extends TreeSurvLoops
             $tok->save();
         }
         exit;
+    }
+
+    protected function ajaxGetZipStateClimate(Request $request)
+    {
+        $ret = ' ';
+        if ($request->has('zip')
+            && strlen(trim($request->get('zip'))) >= 5) {
+            $GLOBALS["SL"]->loadStates();
+            $zipIn = trim($request->get('zip'));
+            $zipRow = $GLOBALS["SL"]->states->getZipRow($zipIn);
+            if ($zipRow && isset($zipRow->zip_zip)) {
+                $ashRow = null;
+                if (isset($zipRow->zip_state) && isset($zipRow->zip_county)) {
+                    $ashRow = SLZipAshrae::where('ashr_state', $zipRow->zip_state)
+                        ->where('ashr_county', 'LIKE', $zipRow->zip_county)
+                        ->first();
+                }
+                $ret = $this->printZipStateClimateDesc($zipRow, $ashRow);
+            } else {
+                $ret = ' ? ';
+            }
+        }
+        echo $ret;
+        exit;
+    }
+
+    protected function printZipStateClimateDesc($zipRow, $ashRow)
+    {
+        $ret = '';
+        if ($ashRow && isset($ashRow->ashr_zone)) {
+            $ret = $zipRow->zip_state . ', Climate Zone '
+                . $ashRow->ashr_zone;
+            $states = new Geographs(true);
+            $zone = $states->getAshraeZoneLabel($ashRow->ashr_zone);
+            if ($zone != '') {
+                $ret .= ', ' . $zone;
+            }
+        } else {
+            if (isset($zipRow->zip_county)
+                && trim($zipRow->zip_county) != '') {
+                $ret = $zipRow->zip_county;
+            } elseif (isset($zipRow->zip_state)
+                && trim($zipRow->zip_state) != '') {
+                $ret = $zipRow->zip_state;
+            }
+            if (isset($zipRow->zip_country)
+                && trim($zipRow->zip_country) == 'Canada') {
+                $ret .= ', Canada';
+            }
+        }
+        return $ret;
     }
 
     protected function ajaxTblAddRow(Request $request)

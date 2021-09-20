@@ -35,7 +35,7 @@ class NodeSaveSet
             $sess = SLSess::where('sess_tree', $this->treeID)
                 ->where('sess_core_id', $this->coreID)
                 ->get();
-            $sessIDs = $GLOBALS["SL"]->resultsToArrIds($sess, 'sess_id');
+            $sessIDs = $GLOBALS["SL"]->resToArrIds($sess, 'sess_id');
             if (sizeof($sessIDs) > 0) {
                 if (isset($sess[0]->sess_user_id)) {
                     $uID = intVal($sess[0]->sess_user_id);
@@ -50,7 +50,7 @@ class NodeSaveSet
                             ->where('sess_core_id', 'NOT LIKE', $this->coreID)
                             ->where('sess_user_id', $uID)
                             ->get();
-                        $sessIDs = $GLOBALS["SL"]->resultsToArrIds($sess, 'sess_id');
+                        $sessIDs = $GLOBALS["SL"]->resToArrIds($sess, 'sess_id');
                         $this->userSaves[$uID] = new NodeSaveSetGroup($sessIDs);
                     }
                 }

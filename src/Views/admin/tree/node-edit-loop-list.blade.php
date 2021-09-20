@@ -106,6 +106,12 @@
                 {!! $GLOBALS['SL']->fieldsDropdown($currMonthFld) !!}
                 */ ?>
             </select>
+            <select name="{{ $fld }}YearFld" id="{{ $fld }}YearFldID"
+                class="form-control form-control-lg" autocomplete="off">
+                <option value="" @if ($currYearFld == '') SELECTED @endif
+                    > Select field for year of starting month... </option>
+                {!! $yearNodeOpts !!}
+            </select>
         @endif
         </div>
     </div>

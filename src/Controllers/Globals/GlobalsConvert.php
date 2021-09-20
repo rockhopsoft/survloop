@@ -228,12 +228,27 @@ class GlobalsConvert
                 return strtotime(substr($dateStr, 0, 10));
             } elseif (strpos($dateStr, '/') > 0) {
                 list($month, $day, $year) = explode('/', $dateStr);
-                if (intVal($month) > 0 && intVal($day) > 0 && intVal($year) > 0) {
-                    return strtotime($year . '-' . $month . '-' . $day . ' 00:00:00');
+                if (intVal($month) > 0
+                    && intVal($day) > 0
+                    && intVal($year) > 0) {
+                    if ($year < 100) {
+                        if (intVal('20' . $year) > intVal(date("Y"))) {
+                            $year = intVal('19' . $year);
+                        } else {
+                            $year = intVal('20' . $year);
+                        }
+                    }
+                    $date = $year . '-' . $month . '-' . $day . ' 00:00:00';
+                    return strtotime($date);
                 }
             }
         }
         return 0;
+    }
+
+    public function slashDateToDate($dateStr = '')
+    {
+        return date("Y-m-d", $this->dateToTime($dateStr));
     }
 
     public function printTimeZoneShift($timeStr = '', $hourShift = -5, $format = 'n/j g:ia')
@@ -283,6 +298,29 @@ class GlobalsConvert
             return $interval;
         }
         return "0 seconds" . $tense;
+    }
+
+    public function getDaysInYear($year = 0)
+    {
+        if ($this->isLeapYear($year)) {
+            return 366;
+        }
+        return 365;
+    }
+
+    public function isLeapYear($year = 0)
+    {
+        if ($year == 0) {
+            $year = intVal(date("Y"));
+        }
+        if ($year%4 == 0) {
+            if ($year%100 == 0 && $year%400 > 0) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function str2arr($str)

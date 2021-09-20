@@ -62,6 +62,9 @@ class SurvloopControllerUtils extends Controller
      */
     protected function loadSimpleVars(Request $request)
     {
+        if (!$request->has('frame')) {
+            header('X-Frame-Options: SAMEORIGIN');
+        }
         $this->v["isAll"]     = $request->has('all');
         $this->v["isAlt"]     = $request->has('alt');
         $this->v["isPrint"]   = $request->has('print');
@@ -132,6 +135,16 @@ class SurvloopControllerUtils extends Controller
     protected function initExtra(Request $request)
     {
         return true;
+    }
+
+    /**
+     * Load session data tables into PHP.
+     *
+     * @param   string  $coreTbl
+     * @param   int     $coreID
+     */
+    public function loadAllSessData($coreTbl = '', $coreID = -3)
+    {
     }
 
     /**
@@ -231,6 +244,9 @@ class SurvloopControllerUtils extends Controller
 
     protected function checkFolder($fold)
     {
+        if (substr($fold, 0, 3) == 's3:') {
+            return false;
+        }
         $currFold = '';
         $limit = 0;
         while (!is_dir($currFold . 'storage/app') && $limit < 9) {

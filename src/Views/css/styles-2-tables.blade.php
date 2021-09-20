@@ -17,12 +17,14 @@ table.slSpreadTbl tr td.sprdRowLab {
 }
 table.slSpreadTbl tr td.sprdRowLab, 
 table.slSpreadTbl tr th.sprdRowLab {
+    position: relative;
     border-right: 1px {!! $css["color-main-on"] !!} solid;
 }
 table.slSpreadTbl tr td.sprdRowLab, 
 table.slSpreadTbl tr th.sprdRowLab, 
 table.slSpreadTbl tr th {
     font-size: 16px;
+    padding-top: 13px;
 }
 table.slSpreadTbl tr.rw2 td {
     background: {!! $css["color-main-faint"] !!};

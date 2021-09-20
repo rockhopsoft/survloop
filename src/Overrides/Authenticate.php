@@ -43,12 +43,18 @@ class Authenticate extends Middleware
     {
         $badRedir = false;
         $bads = [
+            '/ajadm',
+            '/ajax',
             '/api/pdf/',
             '/css/',
             '/font/',
             '/gen-kml/',
             '/sys/dyna/',
-            '/survloop/uploads/'
+            '/survloop/uploads/',
+            '?frame=1',
+            '&frame=1',
+            '?ajax=1',
+            '&ajax=1'
         ];
         foreach ($bads as $fold) {
             if (strpos($redir, $fold) !== false) {

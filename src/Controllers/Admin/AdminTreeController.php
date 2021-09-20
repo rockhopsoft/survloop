@@ -38,7 +38,8 @@ class AdminTreeController extends AdminTreeStats
     protected function initExtra(Request $request)
     {
     	if ($this->v["uID"] > 0) {
-    		$this->v["allowEdits"] = $this->v["user"]->hasRole('administrator|databaser');
+    		$this->v["allowEdits"]
+                = $this->v["user"]->hasRole('administrator|databaser');
         }
         $this->v["adminOverOpts"] = ((session()->has('adminOverOpts'))
             ? session()->get('adminOverOpts') : '');
@@ -80,15 +81,16 @@ class AdminTreeController extends AdminTreeStats
             $coreTbl = $GLOBALS["SL"]->tbl[$treeRow->tree_core_table];
         }
         if ($treeRow->tree_type == 'Page') {
+            $name = $treeRow->tree_name;
             $newRoot->node_type = 'Page';
             $newRoot->node_data_branch = $coreTbl;
             if (!isset($treeRow->tree_slug)
                 || trim($treeRow->tree_slug) == '') {
-                $treeRow->tree_slug = $GLOBALS["SL"]->slugify($treeRow->tree_name);
+                $treeRow->tree_slug = $GLOBALS["SL"]->slugify($name);
                 $treeRow->save();
             }
             $newRoot->node_prompt_notes = $treeRow->tree_slug;
-            $newRoot->node_prompt_after = $treeRow->tree_name . '::M::::M::::M::';
+            $newRoot->node_prompt_after = $name . '::M::::M::::M::';
             $newRoot->node_char_limit = -1;
         } else {
             $newRoot->node_type = 'Data Manip: New';
@@ -97,7 +99,9 @@ class AdminTreeController extends AdminTreeStats
         $newRoot->save();
         $treeRow->tree_root = $newRoot->node_id;
         if ($treeRow->tree_type == 'Page') {
-            $treeRow->tree_first_page = $treeRow->tree_last_page = $newRoot->node_id;
+            $treeRow->tree_first_page
+                = $treeRow->tree_last_page
+                = $newRoot->node_id;
         }
         $treeRow->save();
         if ($treeRow->tree_type == 'Page') {
@@ -105,8 +109,9 @@ class AdminTreeController extends AdminTreeStats
             $firstReal->node_tree        = $treeRow->tree_id;
             $firstReal->node_parent_id   = $newRoot->node_id;
             $firstReal->node_type        = 'Instructions';
-            $firstReal->node_prompt_text = '<h2>' . $treeRow->tree_name . '</h2>'
-                . "\n" . '<p>Edit this node to start filling out this page!</p>';
+            $firstReal->node_prompt_text = '<h2>'
+                . $treeRow->tree_name . '</h2>' . "\n"
+                . '<p>Edit this node to start filling out this page!</p>';
             $firstReal->save();
         }
         return $newRoot;
@@ -146,7 +151,8 @@ class AdminTreeController extends AdminTreeStats
         $this->admControlInit($request, $page);
         if (!$this->checkCache()) {
             $this->chkAllCoreTbls();
-            $this->v["printTree"] = $this->v["treeAdmin"]->adminPrintFullTree($request);
+            $this->v["printTree"]
+                = $this->v["treeAdmin"]->adminPrintFullTree($request);
             $this->v["ipLegal"] = view(
                 'vendor.survloop.elements.dbdesign-legal',
                 [ "sysOpts" => $GLOBALS["SL"]->sysOpts ]
@@ -164,8 +170,9 @@ class AdminTreeController extends AdminTreeStats
         $this->v["content"] = $treeAbout . $this->v["content"];
         if ($request->has('refresh')) {
             $this->v["treeAdmin"]->createProgBarJs();
-            $GLOBALS["SL"]->pageJAVA .= 'setTimeout("document.'
-                . 'getElementById(\'hidFrameID\').src=\'/css-reload\'", 2000);';
+            $GLOBALS["SL"]->pageJAVA .= 'setTimeout("'
+                . 'document.getElementById(\'hidFrameID\').src=\'/css-reload\''
+                . '", 2000);';
         }
         return view('vendor.survloop.master', $this->v);
     }
@@ -281,16 +288,20 @@ class AdminTreeController extends AdminTreeStats
                 $tree->tree_slug = $GLOBALS["SL"]->slugify($request->newTreeName);
             }
             $tree->tree_opts = 1;
-            if ($request->has('pageAdmOnly') && intVal($request->pageAdmOnly) == 1) {
+            if ($request->has('pageAdmOnly')
+                && intVal($request->pageAdmOnly) == 1) {
                 $tree->tree_opts *= 3;
             }
-            if ($request->has('pageStfOnly') && intVal($request->pageStfOnly) == 1) {
+            if ($request->has('pageStfOnly')
+                && intVal($request->pageStfOnly) == 1) {
                 $tree->tree_opts *= Globals::TREEOPT_STAFF;
             }
-            if ($request->has('pagePrtOnly') && intVal($request->pagePrtOnly) == 1) {
+            if ($request->has('pagePrtOnly')
+                && intVal($request->pagePrtOnly) == 1) {
                 $tree->tree_opts *= Globals::TREEOPT_PARTNER;
             }
-            if ($request->has('pageVolOnly') && intVal($request->pageVolOnly) == 1) {
+            if ($request->has('pageVolOnly')
+                && intVal($request->pageVolOnly) == 1) {
                 $tree->tree_opts *= Globals::TREEOPT_VOLUNTEER;
             }
             $tree->save();
@@ -861,7 +872,6 @@ class AdminTreeController extends AdminTreeStats
         }
         $this->loader->syncDataTrees($request, -3, $origTree);
 //echo 'xmlmap(' . $treeID . ', orig: ' . $origTree . '<pre>'; print_r($xmlTree); echo '</pre>'; exit;
-        //$this->switchTree($request, $origTree, '/dashboard/tree/switch');
         if ($origTree != $treeID && $xmlTree && isset($xmlTree->tree_opts)) {
             $GLOBALS["SL"]->xmlTree["id"] = $xmlTree->tree_id;
             $GLOBALS["SL"]->xmlTree["coreTbl"]
@@ -904,7 +914,6 @@ class AdminTreeController extends AdminTreeStats
         $this->initLoader();
         $origTree = $treeID;
         $this->loader->syncDataTrees($request, -3, $treeID);
-        //$this->switchTree($request, $treeID, '/dashboard/tree/switch');
         $this->admControlInit($request, '/dashboard/surv-' . $origTree . '/xmlmap');
         $xmlmap = new TreeSurvAPI;
         $xmlmap->loadTree($treeID, $request, true);
@@ -1046,8 +1055,8 @@ class AdminTreeController extends AdminTreeStats
             $coreTbl = new SLTables;
             $coreTbl->tbl_database = $GLOBALS["SL"]->dbID;
             $coreTbl->tbl_eng      = $tableName;
-            $coreTbl->tbl_name     = $this->eng2data($tableName);
-            $coreTbl->tbl_abbr     = $this->eng2abbr($tableName);
+            $coreTbl->tbl_name     = $GLOBALS["SL"]->eng2data($tableName);
+            $coreTbl->tbl_abbr     = $GLOBALS["SL"]->eng2abbr($tableName);
             $coreTbl->tbl_desc     = trim($request->TreeDesc);
             $coreTbl->save();
         }

@@ -177,5 +177,3 @@ class SurvStatsPieData
         $this->color = $color;
     }
 }
-
-

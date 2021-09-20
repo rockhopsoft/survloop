@@ -269,7 +269,7 @@ a.sliNav, .sliNavDiv a.sliNav,
 }
 .slAccordTxt {
     min-height: 32px;
-    margin-bottom: -20px;
+    margin-bottom: 0px;
 }
 .slAccordTxt div fL, .slAccordTxt div fR {
     height: 32px;
@@ -291,7 +291,7 @@ a.accordHeadBtn:hover {
     min-height: 35px;
 }
 .accordHeadPad, .slAccord .accordHeadPad {
-    padding: 20px 0px;
+    padding: 20px 0 0 0;
 }
 
 @for ($i = 0; $i < 20; $i++) @if ($i > 0) , @endif #fixHead{{ $i }} @endfor {
@@ -354,4 +354,14 @@ a.accordHeadBtn:hover {
     white-space: -moz-pre-wrap; /* Mozilla */
     white-space: -hp-pre-wrap;  /* HP Printers */
     word-wrap: break-word;      /* IE 5+ */
+}
+
+.verifSaveLeft {
+    top: 18px;
+    left: 7px;
+    z-index: 99;
+    color: {!! $css["color-info-on"] !!};
+}
+.verifSaveIcoWrap {
+    margin-left: -23px;
 }

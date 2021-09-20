@@ -14,6 +14,7 @@ use DB;
 use App\Models\SLNode;
 use App\Models\SLNodeSavesPage;
 use App\Models\SLSessLoops;
+use RockHopSoft\Survloop\Controllers\Globals\Globals;
 use RockHopSoft\Survloop\Controllers\Tree\TreeSurvProgBar;
 
 class TreeSurvBasicNav extends TreeSurvProgBar
@@ -351,14 +352,17 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                 })
                 ->first();
             if ($loadNode && isset($loadNode->node_id)) {
-                if (!$GLOBALS["SL"]->REQ->has('preview')
+                $jumpTreeOpt = Globals::TREEOPT_JUMPAHEAD;
+                if ($GLOBALS["SL"]->treeRow->tree_opts%$jumpTreeOpt > 0
+                    && !$GLOBALS["SL"]->REQ->has('preview')
                     && !$GLOBALS["SL"]->REQ->has('popStateUrl')) {
                     $loadNodeChk = DB::table('sl_node_saves_page')
                         ->join('sl_sess', 'sl_node_saves_page.page_save_session',
                             '=', 'sl_sess.sess_id')
                         ->where('sl_sess.sess_tree', '=', $this->treeID)
                         ->where('sl_sess.sess_core_id', '=', $this->coreID)
-                        ->where('sl_node_saves_page.page_save_node', $loadNode->node_id)
+                        ->where('sl_node_saves_page.page_save_node',
+                            $loadNode->node_id)
                         ->get();
                     if ($loadNodeChk->isEmpty()) {
                         return false;
@@ -368,6 +372,7 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                 //$this->leavingTheLoop();
                 $prevNode = $this->currNode();
                 $this->updateCurrNode($loadNode->node_id);
+                $currNode = $this->currNode();
                 if (sizeof($GLOBALS["SL"]->dataLoops) > 0
                     && sizeof($GLOBALS["SL"]->sessLoops) > 0) {
                     foreach ($GLOBALS["SL"]->sessLoops as $sessLoop) {
@@ -377,7 +382,7 @@ class TreeSurvBasicNav extends TreeSurvProgBar
                                 $path = $this->allNodes[$loop->data_loop_root]->nodeTierPath;
                                 if (isset($this->allNodes[$prevNode])
                                     && $this->allNodes[$prevNode]->checkBranch($path)
-                                    && !$this->allNodes[$this->currNode()]->checkBranch($path)) {
+                                    && !$this->allNodes[$currNode]->checkBranch($path)) {
                                     $this->leavingTheLoop($loop->data_loop_plural);
                                 }
                             }

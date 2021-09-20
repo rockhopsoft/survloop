@@ -217,5 +217,4 @@ class TreeSurvFormWidgets extends TreeSurvDataPrint
             . $this->uploadTool($curr->nID, $curr->nIDtxt) . '</div>';
     }
 
-
 }

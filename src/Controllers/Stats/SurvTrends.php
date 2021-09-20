@@ -138,7 +138,7 @@ class SurvTrends extends SurvStatsCore
         )->render();
     }
 
-    public function printDailyGraphLines($height = 500, $title = '')
+    public function printDailyGraphLines($height = 500, $title = '', $increment = null)
     {
         $GLOBALS["SL"]->x["needsCharts"] = true;
         $this->loadAxisPastDayLabels();
@@ -152,6 +152,7 @@ class SurvTrends extends SurvStatsCore
                 "dataDays"   => $this->dataDays,
                 "height"     => $height,
                 "title"      => $title,
+                "increment"  => $increment,
                 "css"        => $sysDef->loadCss()
             ]
         )->render();

@@ -6,7 +6,7 @@ var options = {
     @if ($printTitle) title: {
         display: true,
         position: "top",
-        text: "{!! $title !!}",
+        text: {!! json_encode(strip_tags($title)) !!},
         fontSize: @if ($GLOBALS["SL"]->isMobile()) 18, @else 26, @endif
         fontColor: "{{ $colorTxt }}"
     }, @endif
@@ -39,7 +39,7 @@ var options = {
             },
             scaleLabel: {
                 display: true,
-                labelString: {!! json_encode($axisX->label) !!}
+                labelString: {!! json_encode(strip_tags($axisX->label)) !!}
             }
         }],
     @endif
@@ -50,7 +50,7 @@ var options = {
             @if ($axisY->label != '')
                 scaleLabel: {
                     display: true,
-                    labelString: {!! json_encode($axisY->label) !!}
+                    labelString: {!! json_encode(strip_tags($axisY->label)) !!}
                 },
             @endif
                 type: "{{ $axisY->scale }}",
@@ -72,7 +72,7 @@ var options = {
                 display: true,
                 scaleLabel: {
                     display: true,
-                    labelString: {!! json_encode($axisY2->label) !!}
+                    labelString: {!! json_encode(strip_tags($axisY2->label)) !!}
                 },
                 type: "{{ $axisY2->scale }}",
                 ticks: {

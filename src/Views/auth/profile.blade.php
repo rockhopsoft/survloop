@@ -44,7 +44,7 @@
         </p>
 
     </div>
-@if (!$isEditPage)
+@if (!$isEditPage && Auth::user())
     <div class="col-lg-4">
         <a class="btn btn-secondary btn-sm btn-block taL mB5"
             @if ($profileUser->id == Auth::user()->id)
@@ -53,7 +53,7 @@
                 href="/user/{{ urlencode($profileUser->name) }}/manage"
             @endif
             ><i class="fa fa-pencil mR3" aria-hidden="true"></i> Edit Settings</a>
-    @if (Auth::user() && Auth::user()->hasRole('administrator|staff') && !$isEditPage)
+    @if (Auth::user()->hasRole('administrator|staff') && !$isEditPage)
         <a href="/user/{{ urlencode($profileUser->name) }}/stats"
             class="btn btn-secondary btn-sm btn-block taL mB5"
             ><nobr><i class="fa fa-line-chart mR3" aria-hidden="true"></i>

@@ -5,6 +5,7 @@
 @endif
 <script type="text/javascript"> $(document).ready(function(){
 setTimeout(function() { 
+	console.log("/dashboard/systems-clean?run=clean");
     $("#cleaningDiv").load("/dashboard/systems-clean?run=clean");
 }, 2000);
 }); </script>

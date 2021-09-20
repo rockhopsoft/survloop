@@ -124,13 +124,15 @@
             <div id="spreadTblOpts" class="p20 
                 @if ($node->isSpreadTbl()) disBlo @else disNon @endif ">
                 <label class="finger">
-                    <input type="radio" name="spreadTblTyp" id="spreadTblTypA" value="open"
+                    <input type="radio" name="spreadTblTyp"
+                        id="spreadTblTypA" value="open"
                         @if (!isset($node->nodeRow->node_data_store) || trim($node->nodeRow->node_data_store) == '') 
                             CHECKED @endif class="sprdTblType" >
                         User Adds Rows As Needed
                 </label>
                 <label class="finger">
-                    <input type="radio" name="spreadTblTyp" id="spreadTblTypB" value="defs"
+                    <input type="radio" name="spreadTblTyp"
+                        id="spreadTblTypB" value="defs"
                         @if (isset($node->nodeRow->node_data_store) 
                             && trim($node->nodeRow->node_data_store) != '') 
                             CHECKED @endif class="sprdTblType" >

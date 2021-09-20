@@ -256,8 +256,14 @@ class TreeSurvNodeEdit extends TreeSurvForm
 
     public function printLoopsDropdowns($preSel = '', $fld = 'loopList', $manualOpt = true)
     {
-        $currDefinition = $currLoopItems = $currTblRecs = $currTblAll = $currMonthFld = '';
         $currTblAllCond = 0;
+        $currDefinition
+            = $currLoopItems
+            = $currTblRecs
+            = $currTblAll
+            = $currMonthFld
+            = $currYearFld
+            = '';
         if (isset($preSel)) {
             if (strpos($preSel, 'Definition::') !== false) {
                 $currDefinition = str_replace('Definition::', '', $preSel);
@@ -267,14 +273,19 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 $currTblRecs = str_replace('Table::', '', $preSel);
             } elseif (strpos($preSel, 'TableAll::') !== false) {
                 $explode = str_replace('TableAll::', '', $preSel);
-                list($currTblAll, $currTblAllCond) = $GLOBALS["SL"]
-                    ->mexplode('::', $explode);
+                list($currTblAll, $currTblAllCond)
+                    = $GLOBALS["SL"]->mexplode('::', $explode);
                 $currTblAllCond = intVal($currTblAllCond);
             } elseif (strpos($preSel, 'Months::') !== false) {
-                $currMonthFld = intVal(str_replace('Months::', '', $preSel));
+                $parts = $GLOBALS["SL"]->mexplode('---', $preSel);
+                $currMonthFld = intVal(str_replace('Months::', '', $parts[0]));
+                if (sizeof($parts) > 1) {
+                    $currYearFld = intVal(str_replace('Years::', '', $parts[1]));
+                }
             }
         }
         $monthNodeOpts = $this->getTreeNodeDropdownAll($currMonthFld);
+        $yearNodeOpts = $this->getTreeNodeDropdownAll($currYearFld);
         return view(
             'vendor.survloop.admin.tree.node-edit-loop-list',
             [
@@ -287,7 +298,9 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 "currTblAll"     => $currTblAll,
                 "currTblAllCond" => $currTblAllCond,
                 "currMonthFld"   => $currMonthFld,
-                "monthNodeOpts"  => $monthNodeOpts
+                "currYearFld"    => $currYearFld,
+                "monthNodeOpts"  => $monthNodeOpts,
+                "yearNodeOpts"   => $yearNodeOpts
             ]
         )->render();
     }
@@ -318,6 +331,11 @@ class TreeSurvNodeEdit extends TreeSurvForm
                 && $GLOBALS["SL"]->REQ->has($fld . 'MonthFld')
                 && trim($GLOBALS["SL"]->REQ->input($fld . 'MonthFld')) != '') {
                 $ret = 'Months::' . intVal($GLOBALS["SL"]->REQ->input($fld . 'MonthFld'));
+                if ($GLOBALS["SL"]->REQ->has($fld . 'YearFld')
+                    && trim($GLOBALS["SL"]->REQ->input($fld . 'YearFld')) != '') {
+                    $ret .= '---Years::'
+                        . intVal($GLOBALS["SL"]->REQ->input($fld . 'YearFld'));
+                }
             }
         }
         return $ret;
@@ -758,8 +776,14 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     && trim($GLOBALS["SL"]->REQ->responseListMonthFld) != '') {
                     $node->nodeRow->node_response_set = 'Months::'
                         . trim($GLOBALS["SL"]->REQ->responseListMonthFld);
+                    if ($GLOBALS["SL"]->REQ->has('responseListYearFld')
+                        && trim($GLOBALS["SL"]->REQ->responseListYearFld) != '') {
+                        $node->nodeRow->node_response_set .= '---Years::'
+                            . intVal($GLOBALS["SL"]->REQ->responseListYearFld);
+                    }
                 }
-                if (in_array($GLOBALS["SL"]->REQ->nodeTypeQ, ['Date', 'Date Picker', 'Date Time'])) {
+                if (in_array($GLOBALS["SL"]->REQ->nodeTypeQ,
+                    ['Date', 'Date Picker', 'Date Time'])) {
                     $node->nodeRow->node_char_limit = intVal($GLOBALS["SL"]->REQ->get('dateOptRestrict'));
                 }
                 $node->nodeRow->save();

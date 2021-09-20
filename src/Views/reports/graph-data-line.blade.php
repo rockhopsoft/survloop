@@ -44,7 +44,11 @@ var options = {
     },
     scales: {
         yAxes: [{
-            
+        <?php /* @if ($increment !== null && $increment > 0)
+            scaleOverride:true,
+            scaleStartValue:0,
+            scaleStepWidth:{{ $increment }}
+        @endif */ ?>
         }]
     }
 };

@@ -94,6 +94,10 @@ class SystemDefinitionsInit
                 'Absolute Path To App Root',
                 '/var/www/laravel'
             ],
+            'app-upload-path' => [
+                'Relative Path To App Uploads',
+                '../storage/app/up/evidence'
+            ],
 
             // SEO Meta Data Settings
             'meta-title' => [

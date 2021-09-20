@@ -168,11 +168,13 @@ class GeographyLookups extends GeographyLists
         if (trim($zip) == '') {
             return null;
         }
+        $zipQry = $zip;
         if (strlen($zip) > 7) {
-            $zip = substr($zip, 0, 5);
+            $zipQry = substr($zip, 0, 5);
         }
-        return SLZips::where('zip_zip', $zip)
+        $zipRow = SLZips::where('zip_zip', 'LIKE', $zipQry)
             ->first();
+        return $zipRow;
     }
 
     public function getZipProperty($zip = '', $fld = 'city')

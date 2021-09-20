@@ -166,8 +166,18 @@ class SurvloopSpecialLoads extends PageLoadUtils
     public function getUploadFile(Request $request, $abbr, $file)
     {
         $filename = '../storage/app/up/' . $abbr . '/' . $file;
-        $img = new DeliverImage($filename, 0, $request->has('refresh'));
-        return $img->delivery();
+        $this->loadLoop($request);
+        if (!file_exists($filename)) {
+            $this->custLoop->chkUploadFileNotFound($filename);
+        }
+        if (!file_exists($filename)) {
+            // deliver not found image?
+        }
+        if ($this->custLoop->canGetUploadFile($abbr, $file, $filename)) {
+            $img = new DeliverImage($filename, 0, $request->has('refresh'));
+            return $img->delivery($file);
+        }
+        return '';
     }
 
     public function checkImgResizeAll(Request $request, $treeSlug = '')

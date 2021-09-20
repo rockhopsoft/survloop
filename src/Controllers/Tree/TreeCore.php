@@ -285,18 +285,19 @@ class TreeCore extends SurvloopController
             && $GLOBALS["SL"]->REQ->moveToOrder >= 0
             && isset($this->allNodes[$GLOBALS["SL"]->REQ->moveNode])) {
             $node = $this->allNodes[$GLOBALS["SL"]->REQ->moveNode];
+            $moveToParent = intVal($GLOBALS["SL"]->REQ->moveToParent);
             $node->fillNodeRow();
             SLNode::where('node_parent_id', $node->parentID)
                 ->where('node_parent_order', '>', $node->parentOrd)
                 ->decrement('node_parent_order');
-            SLNode::where('node_parent_id', $GLOBALS["SL"]->REQ->moveToParent)
+            SLNode::where('node_parent_id', $moveToParent)
                 ->where('node_parent_order', '>=', $GLOBALS["SL"]->REQ->moveToOrder)
                 ->increment('node_parent_order');
-            $node->nodeRow->node_parent_id = $GLOBALS["SL"]->REQ->moveToParent;
+            $node->nodeRow->node_parent_id = $moveToParent;
             $node->nodeRow->node_parent_order = $GLOBALS["SL"]->REQ->moveToOrder;
             $node->nodeRow->save();
-            $this->loadTree();
-            $this->initExtra($GLOBALS["SL"]->REQ);
+            $redir = '?all=1&alt=1&refresh=1#n' . $moveToParent;
+            $this->redir($redir, true);
         }
         return true;
     }

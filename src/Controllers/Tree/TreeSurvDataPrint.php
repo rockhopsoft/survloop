@@ -166,11 +166,14 @@ class TreeSurvDataPrint extends TreeSurvFormElements
                         }
                     } else { // default processing
                         $newDeet = $this->printNodePublic($kidID, $child, $curr->currVisib);
-                        if (is_array($newDeet)
-                            && sizeof($newDeet) > 0
-                            && trim($newDeet[0]) != ''
-                            && trim($newDeet[1]) != '') {
-                            $deets[] = $newDeet;
+                        if (is_array($newDeet) && sizeof($newDeet) > 0) {
+                            if (is_array($newDeet[0])) {
+                                foreach ($newDeet as $deet) {
+                                    $deets[] = $deet;
+                                }
+                            } elseif (trim($newDeet[0]) != '' && trim($newDeet[1]) != '') {
+                                $deets[] = $newDeet;
+                            }
                         }
                     }
                 } elseif ($this->allNodes[$kidID]->isDataManip()) {

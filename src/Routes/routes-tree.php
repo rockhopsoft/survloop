@@ -29,37 +29,82 @@ Route::get('/start-{cid}/{treeSlug}', [Survloop::class, 'loadNodeTreeURLedit'])
     ->middleware('auth');
 
 Route::post('/u/{treeSlug}/{nodeSlug}', [Survloop::class, 'loadNodeURL']);
-Route::get('/u/{treeSlug}/{nodeSlug}', [Survloop::class, 'loadNodeURL']);
+Route::get('/u/{treeSlug}/{nodeSlug}',  [Survloop::class, 'loadNodeURL']);
 Route::post('/u/{nodeSlug}',            [Survloop::class, 'loadNodeURL']);
-Route::get('/u/{nodeSlug}',            [Survloop::class, 'loadNodeURL']);
+Route::get('/u/{nodeSlug}',             [Survloop::class, 'loadNodeURL']);
 
-Route::get('/defer/{treeID}/{cid}/{nID}/{date}/{rand}', [Survloop::class, 'deferNode']);
-Route::get('/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',  [Survloop::class, 'retrieveUploadFresh']);
-Route::get('/up/{treeSlug}/{cid}/{upID}',               [Survloop::class, 'retrieveUpload']);
-Route::get('/up-img-resize-all/{treeSlug}',             [Survloop::class, 'checkImgResizeAll']);
-Route::get('/{abbr}/uploads/{file}',                    [Survloop::class, 'getUploadFile']);
+Route::get(
+    '/defer/{treeID}/{cid}/{nID}/{date}/{rand}',
+    [Survloop::class, 'deferNode']
+);
+Route::get(
+    '/up-fresh-{rand}/{treeSlug}/{cid}/{upID}',
+    [Survloop::class, 'retrieveUploadFresh']
+);
+Route::get(
+    '/up/{treeSlug}/{cid}/{upID}',
+    [Survloop::class, 'retrieveUpload']
+);
+Route::get(
+    '/up-img-resize-all/{treeSlug}',
+    [Survloop::class, 'checkImgResizeAll']
+);
+Route::get(
+    '/{abbr}/uploads/{file}',
+    [Survloop::class, 'getUploadFile']
+);
 
 
 /**
  * Survey & Page Components
  */
-Route::get('/records-full/{treeID}',  [Survloop::class, 'ajaxRecordFulls']);
-Route::get('/record-prevs/{treeID}', [Survloop::class, 'ajaxRecordPreviews']);
-Route::get('/record-check/{treeID}',  [Survloop::class, 'ajaxMultiRecordCheck']);
+Route::get(
+    '/records-full/{treeID}',
+    [Survloop::class, 'ajaxRecordFulls']
+);
+Route::get(
+    '/record-prevs/{treeID}',
+    [Survloop::class, 'ajaxRecordPreviews']
+);
+Route::get(
+    '/record-check/{treeID}',
+    [Survloop::class, 'ajaxMultiRecordCheck']
+);
 
-Route::get('/record-graph/{gType}/{treeID}/{nID}',     [Survloop::class, 'ajaxGraph']);
-Route::get('/widget-custom/{treeID}/{nID}',            [Survloop::class, 'widgetCust']);
-Route::get('/ajax-get-flds/{treeID}',                  [Survloop::class, 'getSetFlds']);
-Route::get('/ajax-get-flds/{treeID}/{rSet}',           [Survloop::class, 'getSetFlds']);
-Route::get('/ajax-emoji-tag/{treeID}/{recID}/{defID}', [Survloop::class, 'ajaxEmojiTag']);
+Route::get(
+    '/record-graph/{gType}/{treeID}/{nID}',
+    [Survloop::class, 'ajaxGraph']
+);
+Route::get(
+    '/widget-custom/{treeID}/{nID}',
+    [Survloop::class, 'widgetCust']
+);
+Route::get(
+    '/ajax-get-flds/{treeID}',
+    [Survloop::class, 'getSetFlds']
+);
+Route::get(
+    '/ajax-get-flds/{treeID}/{rSet}',
+    [Survloop::class, 'getSetFlds']
+);
+Route::get(
+    '/ajax-emoji-tag/{treeID}/{recID}/{defID}',
+    [Survloop::class, 'ajaxEmojiTag']
+);
 
 
 /**
  * Survey Data Exports & API
  */
 
-Route::get('/db/{database}',   [AdminDBController::class,   'adminPrintFullDBPublic']);
-Route::get('/tree/{treeSlug}', [AdminTreeController::class, 'adminPrintFullTreePublic']);
+Route::get(
+    '/db/{database}',
+    [AdminDBController::class,   'adminPrintFullDBPublic']
+);
+Route::get(
+    '/tree/{treeSlug}',
+    [AdminTreeController::class, 'adminPrintFullTreePublic']
+);
 
 Route::get('/api/all/{treeSlug}/xml',      [Survloop::class, 'xmlAll']);
 Route::get('/{treeSlug}-xml-all',          [Survloop::class, 'xmlAll']);
@@ -82,11 +127,26 @@ Route::get('/xml-schema',                  [Survloop::class, 'genXmlSchema']);
 
 Route::middleware(['auth'])->group(function () {
 
-  Route::get('/dashboard/start/{treeSlug}',       [AdminController::class, 'loadNodeTreeURL']);
-  Route::get('/dashboard/start-{cid}/{treeSlug}', [AdminController::class, 'loadNodeTreeURLedit']);
-  Route::post('/dash/u/{treeSlug}/{nodeSlug}',    [AdminController::class, 'loadNodeURL']);
-  Route::get('/dash/u/{treeSlug}/{nodeSlug}',     [AdminController::class, 'loadNodeURL']);
-  Route::post('/dash-sub',                        [AdminController::class, 'postNodeURL']);
+    Route::get(
+        '/dashboard/start/{treeSlug}',
+        [AdminController::class, 'loadNodeTreeURL']
+    );
+    Route::get(
+        '/dashboard/start-{cid}/{treeSlug}',
+        [AdminController::class, 'loadNodeTreeURLedit']
+    );
+    Route::post(
+        '/dash/u/{treeSlug}/{nodeSlug}',
+        [AdminController::class, 'loadNodeURL']
+    );
+    Route::get(
+        '/dash/u/{treeSlug}/{nodeSlug}',
+        [AdminController::class, 'loadNodeURL']
+    );
+    Route::post(
+        '/dash-sub',
+        [AdminController::class, 'postNodeURL']
+    );
 
 });
 
@@ -97,12 +157,30 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
 
-  Route::post('/dash/{pageSlug}/read-{cid}',  [AdminController::class, 'loadPageURL']);
-  Route::get('/dash/{pageSlug}/read-{cid}',   [AdminController::class, 'loadPageURL']);
-  Route::post('/dash/{pageSlug}/readi-{cid}', [AdminController::class, 'loadPageURLrawID']);
-  Route::get('/dash/{pageSlug}/readi-{cid}',  [AdminController::class, 'loadPageURLrawID']);
-  Route::post('/dash/{pageSlug}',             [AdminController::class, 'loadPageURL']);
-  Route::get('/dash/{pageSlug}',              [AdminController::class, 'loadPageURL']);
+    Route::post(
+        '/dash/{pageSlug}/read-{cid}',
+        [AdminController::class, 'loadPageURL']
+    );
+    Route::get(
+        '/dash/{pageSlug}/read-{cid}',
+        [AdminController::class, 'loadPageURL']
+    );
+    Route::post(
+        '/dash/{pageSlug}/readi-{cid}',
+        [AdminController::class, 'loadPageURLrawID']
+    );
+    Route::get(
+        '/dash/{pageSlug}/readi-{cid}',
+        [AdminController::class, 'loadPageURLrawID']
+    );
+    Route::post(
+        '/dash/{pageSlug}',
+        [AdminController::class, 'loadPageURL']
+    );
+    Route::get(
+        '/dash/{pageSlug}',
+        [AdminController::class, 'loadPageURL']
+    );
 
 });
 

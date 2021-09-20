@@ -56,6 +56,7 @@ class TreeNodeSurvVars extends TreeNodeCore
     public $dateStr          = '00/00/0000';
     public $timeStr          = '00:00:00';
     public $dynaMonthFld     = '';
+    public $dynaYearFld      = '';
 
 
     // Tree Nodes are assigned an optional property when ( SLNode->node_opts%OPT_PRIME == 0 )
@@ -203,6 +204,11 @@ class TreeNodeSurvVars extends TreeNodeCore
         if ($this->isSpreadTbl() && strpos($this->responseSet, 'Months::') == 0) {
             if (trim($this->dynaMonthFld) == '') {
                 $this->dynaMonthFld = str_replace('Months::', '', $this->responseSet);
+                if (strpos($this->dynaMonthFld, '---') !== false) {
+                    list($this->dynaMonthFld, $this->dynaYearFld)
+                        = $GLOBALS["SL"]->mexplode('---', $this->dynaMonthFld);
+                    $this->dynaYearFld = str_replace('Years::', '', $this->dynaYearFld);
+                }
             }
             return true;
         }

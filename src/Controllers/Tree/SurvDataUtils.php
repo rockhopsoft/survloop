@@ -82,7 +82,7 @@ class SurvDataUtils
         return $setInd;
     }
 
-    protected function dataFind($tbl, $rowID)
+    public function dataFind($tbl, $rowID)
     {
         if ($rowID <= 0) {
             return [];
@@ -120,10 +120,11 @@ class SurvDataUtils
                 ->first();
         }
         */
-        eval("\$recObj = " . $model . "::where('" . $where
+        $eval = "\$recObj = " . $model . "::where('" . $where
                 . "', '" . $operator . "', '" . $whereVal . "')"
             . "->orderBy('" . $GLOBALS["SL"]->tblAbbr[$tbl] . "id', 'asc')"
-            . "->" . $getFirst . "();");
+            . "->" . $getFirst . "();";
+        eval($eval);
         return $recObj;
     }
 
@@ -185,22 +186,20 @@ class SurvDataUtils
 
     public function getRowInd($tbl, $rowID)
     {
-        if ($rowID > 0
-            && isset($this->id2ind[$tbl])
-            && isset($this->id2ind[$tbl][$rowID])) {
-            if (intVal($this->id2ind[$tbl][$rowID]) >= 0) {
+//if ($tbl == 'ps_growing_rooms') { echo 'getRowInd(' . $rowID . ' - '; if (isset($this->id2ind["ps_growing_rooms"])) { print_r($this->id2ind["ps_growing_rooms"]); echo '<br />'; } else { echo 'id2ind[ps_growing_rooms] not found<br />'; } }
+        if ($rowID > 0) {
+            if (isset($this->id2ind[$tbl])
+                && isset($this->id2ind[$tbl][$rowID])
+                && intVal($this->id2ind[$tbl][$rowID]) >= 0) {
                 return $this->id2ind[$tbl][$rowID];
-            }
-        }
-        // else double-check
-        if ($rowID > 0
-            && isset($this->dataSets[$tbl])
-            && sizeof($this->dataSets[$tbl]) > 0) {
-            foreach ($this->dataSets[$tbl] as $ind => $d) {
-                if ($d->getKey() == $rowID) {
-                    $this->initDataSet($tbl);
-                    $this->id2ind[$tbl][$rowID] = $ind;
-                    return $ind;
+            } elseif (isset($this->dataSets[$tbl])
+                && sizeof($this->dataSets[$tbl]) > 0) {
+                foreach ($this->dataSets[$tbl] as $ind => $d) {
+                    if ($d->getKey() == $rowID) {
+                        $this->initDataSet($tbl);
+                        $this->id2ind[$tbl][$rowID] = $ind;
+                        return $ind;
+                    }
                 }
             }
         }
@@ -210,13 +209,13 @@ class SurvDataUtils
     public function getRowById($tbl, $rowID)
     {
         if ($rowID <= 0) {
-            return [];
+            return null;
         }
         $rowInd = $this->getRowInd($tbl, $rowID);
         if ($rowInd >= 0) {
             return $this->dataSets[$tbl][$rowInd];
         }
-        return [];
+        return null;
     }
 
     public function getRowIDsByFldVal($tbl, $fldVals = [], $getRow = false)
@@ -607,9 +606,16 @@ class SurvDataUtils
         if ($zipRow && isset($zipRow->zip_zip)
             && isset($this->dataSets[$tbl])) {
             if (trim($fldState) != '' && isset($zipRow->zip_state)) {
-                $this->dataSets[$tbl][$setInd]->update([
-                    $fldState  => $zipRow->zip_state
-                ]);
+                if (strpos($zipRow->zip_zip, $zipRow->zip_state) !== false) {
+                    // until the CA postal code database is upgraded...
+                    $this->dataSets[$tbl][$setInd]->update([
+                        $fldCountry => 'Canada'
+                    ]);
+                } else {
+                    $this->dataSets[$tbl][$setInd]->update([
+                        $fldState  => $zipRow->zip_state
+                    ]);
+                }
             }
             if (trim($fldCounty) != '' && isset($zipRow->zip_county)) {
                 $this->dataSets[$tbl][$setInd]->update([

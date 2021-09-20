@@ -4,6 +4,7 @@
     <div class="disNon">
         <iframe id="hidFrameID" name="hidFrame" src="" height=1 width=1 ></iframe>
     </div>
+    <div id="hidDivAutoSave" class="disNon"></div>
     <div id="imgPreloadID" class="imgPreload">
     @forelse ($GLOBALS["SL"]->listPreloadImgs() as $src)
         <img src="{{ $src }}" border=0 alt="" >

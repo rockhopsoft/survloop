@@ -14,6 +14,7 @@ namespace RockHopSoft\Survloop\Controllers\Globals;
 
 use Auth;
 use Illuminate\Http\Request;
+use RockHopSoft\Survloop\Controllers\SurvloopImportExcel;
 
 class GlobalsStatic extends GlobalsConvert
 {
@@ -157,8 +158,8 @@ class GlobalsStatic extends GlobalsConvert
     public function addSlashLines($ret)
     {
         return str_replace(
-            array( "\n", "\r" ),
-            array( "\\n", "\\r" ),
+            [ "\n", "\r" ],
+            [ "\\n", "\\r" ],
             addslashes($ret)
         );
     }
@@ -456,6 +457,11 @@ class GlobalsStatic extends GlobalsConvert
         return $word;
     }
 
+    public function getLetForNum($char)
+    {
+        return chr(65+$char);
+    }
+
     // takes in and returns rows of [ Record ID, Ranked Value, Rank Order, Percentile ]
     public function calcPercentiles($arr = [])
     {
@@ -477,7 +483,22 @@ class GlobalsStatic extends GlobalsConvert
         return $sorted;
     }
 
-    function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
+    public function exportExcel($innerTable, $inFilename = "export.xls")
+    {
+        $inFilename = strip_tags($inFilename);
+        $filename = $inFilename;
+        $type = 'xls';
+        $period = strrpos($inFilename, '.');
+        if ($period > 0) {
+            $filename = substr($inFilename, 0, $period);
+            $type = substr($inFilename, (1+$period));
+        }
+        $excel = new SurvloopImportExcel;
+        $excel->downloadExcel($innerTable, $filename, $type);
+        exit;
+    }
+
+    public function exportExcelOldSchool($innerTable, $inFilename = "export.xls")
     {
         header("Content-Type: application/vnd.ms-excel; charset=utf-8");
         header('Content-Disposition: attachment; filename="' . $inFilename . '";');
@@ -485,7 +506,7 @@ class GlobalsStatic extends GlobalsConvert
         exit;
     }
 
-    function downloadAsCSV($content, $filename = "export.csv") {
+    public function downloadAsCSV($content, $filename = "export.csv") {
         header('Content-Type: application/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '";');
         echo $content;
@@ -732,7 +753,7 @@ class GlobalsStatic extends GlobalsConvert
         return $ret;
     }
 
-    public function resultsToArrIds($results = null, $fld = '')
+    public function resToArrIds($results = null, $fld = '')
     {
         if (!$results || sizeof($results) == 0 || $fld == '') {
             return [];
@@ -750,8 +771,16 @@ class GlobalsStatic extends GlobalsConvert
 
     public function mergeResultIds(&$arr1, $results = null, $fld = '')
     {
-        $arr1 = $this->mergeArr($arr1, $this->resultsToArrIds($results, $fld));
+        $arr1 = $this->mergeArr($arr1, $this->resToArrIds($results, $fld));
         return $arr1;
+    }
+
+    public function splitFromLast($haystack, $needle)
+    {
+        $pos = strrpos($haystack, $needle);
+        $ret1 = substr($haystack, 0, $pos);
+        $ret2 = substr($haystack, (1+$pos));
+        return [$ret1, $ret2];
     }
 
 }

@@ -16,7 +16,8 @@ class SurvStats extends SurvStatsCache
 {
     public function addRecDat($datAbbr = '', $datRaw = '', $recID = -3, $row = [], $tags = [])
     {
-        return $this->addRecDatLet($this->dAbr($datAbbr), $datRaw, $recID, $row, $tags);
+        $datLet = $this->dAbr($datAbbr);
+        return $this->addRecDatLet($datLet, $datRaw, $recID, $row, $tags);
     }
 
     public function addRecDatLet($datLet = '', $datRaw = '', $recID = -3, $row = [], $tags = [])

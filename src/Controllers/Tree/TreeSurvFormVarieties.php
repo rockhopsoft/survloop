@@ -224,24 +224,25 @@ class TreeSurvFormVarieties extends UserProfile
         return $newVal;
     }
 
-    public function addPromptTextRequired($currNode = NULL, $nodePromptText = '', $nIDtxt = 'noNID')
+    public function addPromptTextRequired($curr = null, $nodePromptText = '', $nIDtxt = 'noNID')
     {
-        if (!$currNode || !isset($currNode->nodeRow->node_opts)) {
+        if (!$curr || !isset($curr->nodeRow->node_opts)) {
             return '';
         }
         $txt = '*required';
         /* This needs to be limited in the form, before any validation
-        if ($this->nodeHasDateRestriction($currNode->nodeRow)) {
-            if ($currNode->nodeRow->node_char_limit < 0) {
+        if ($this->nodeHasDateRestriction($curr->nodeRow)) {
+            if ($curr->nodeRow->node_char_limit < 0) {
                 $txt = '*past date required';
-            } elseif ($currNode->nodeRow->node_char_limit > 0) {
+            } elseif ($curr->nodeRow->node_char_limit > 0) {
                 $txt = '*future date required';
             }
         }
         */
         $txt = '<nobr>' . $txt . '</nobr>';
-        if ($currNode->nodeRow->node_opts%13 == 0) {
-            return $nodePromptText . '<p id="req' . $nIDtxt . '" class="rqd">' . $txt . '</p>';
+        if ($curr->nodeRow->node_opts%13 == 0) {
+            return $nodePromptText . '<p id="req' . $nIDtxt
+                . '" class="rqd">' . $txt . '</p>';
         } else {
             $swapPos = -1;
             $lastP = strrpos($nodePromptText, '</p>');
@@ -252,7 +253,8 @@ class TreeSurvFormVarieties extends UserProfile
                 $swapPos = $lastDiv;
             }
             if ($swapPos > 0) {
-                return substr($nodePromptText, 0, $swapPos) . ' <span id="req' . $nIDtxt . '" class="rqd">'
+                return substr($nodePromptText, 0, $swapPos)
+                    . ' <span id="req' . $nIDtxt . '" class="rqd">'
                     . $txt . '</span>' . substr($nodePromptText, $swapPos);
             } else {
                 $lastH3 = strrpos($nodePromptText, '</h3>');
@@ -266,11 +268,13 @@ class TreeSurvFormVarieties extends UserProfile
                     $swapPos = $lastH1;
                 }
                 if ($swapPos > 0) {
-                    return substr($nodePromptText, 0, $swapPos) . ' <small id="req' . $nIDtxt
-                        . '" class="rqd">' . $txt . '</small>' . substr($nodePromptText, $swapPos);
+                    return substr($nodePromptText, 0, $swapPos)
+                        . ' <small id="req' . $nIDtxt . '" class="rqd">'
+                        . $txt . '</small>' . substr($nodePromptText, $swapPos);
                 }
             }
-            return $nodePromptText . ' <span id="req' . $nIDtxt . '" class="rqd">' . $txt . '</span>';
+            return $nodePromptText . ' <span id="req' . $nIDtxt
+                . '" class="rqd">' . $txt . '</span>';
         }
         return '';
     }

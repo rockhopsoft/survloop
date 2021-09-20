@@ -26,27 +26,50 @@ class SystemUpdate extends AdminController
 
     public function index(Request $request)
     {
+        ini_set('max_execution_time', 180);
         $GLOBALS["slRunUpdates"] = true;
         $this->admControlInit($request, '/dashboard/systems-clean');
         $this->loadCustLoop($request);
         $step = $this->getCoreDef('System Checks', 'system-clean');
+        if ($request->has('refresh')) {
+            $step->def_description = 1;
+            $step->save();
+        }
         $this->v["step"] = intVal($step->def_description);
         if ($this->v["step"] < 1) {
             $this->v["step"] = 1;
         }
         $this->v["currStep"] = $this->v["step"];
-        if ($request->has('run') && trim($request->get('run')) == 'clean') {
+        if ($request->has('run')
+            && trim($request->get('run')) == 'clean') {
             if ($this->v["step"] < 4) {
-                $this->sysClean();
+                $chk = SLSess::select('sess_id')
+                    ->get();
+                $sessIDs = $GLOBALS["SL"]->resToArrIds($chk, 'sess_id');
+                unset($chk);
+                if ($this->v["step"] == 1) {
+                    $this->sysClean1($sessIDs);
+                } elseif ($this->v["step"] == 2) {
+                    $this->sysClean2($sessIDs);
+                } elseif ($this->v["step"] == 3) {
+                    $this->sysClean3($sessIDs);
+                }
                 $this->v["step"]++;
             } else {
-                $this->v["step"] = $this->custReport->customSysClean($this->v["step"]);
+                $this->v["step"]
+                    = $this->custReport->customSysClean($this->v["step"]);
             }
             $this->updateSysCleanStep();
-            echo view('vendor.survloop.admin.systems-clean-ajax', $this->v)->render();
+            echo view(
+                'vendor.survloop.admin.systems-clean-ajax',
+                $this->v
+            )->render();
             exit;
         }
-        return view('vendor.survloop.admin.systems-clean', $this->v)->render();
+        return view(
+            'vendor.survloop.admin.systems-clean',
+            $this->v
+        )->render();
     }
 
     private function updateSysCleanStep()
@@ -57,61 +80,43 @@ class SystemUpdate extends AdminController
             ->update([ 'def_description' => $this->v["step"] ]);
     }
 
-    protected function sysClean()
+    protected function sysClean1($sessIDs)
     {
-        $chk = SLSess::select('sess_id')
+        $chk = SLSessLoops::whereNotIn('sess_loop_sess_id', $sessIDs)
+            ->limit(1000)
             ->get();
-        $sessIDs = $GLOBALS["SL"]->resultsToArrIds($chk, 'sess_id');
-        unset($chk);
-
-        if ($this->v["step"] == 1) {
-
-            $chk = SLSessLoops::select('sess_loop_sess_id')
-                ->where('sess_loop_sess_id', '>', 0)
-                ->limit(10000)
-                ->inRandomOrder()
-                ->get();
-            if ($chk->isNotEmpty()) {
-                foreach ($chk as $s) {
-                    if (!in_array($s->sess_loop_sess_id, $sessIDs)) {
-                        $s->delete();
-                    }
-                }
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $s) {
+                echo 'SLSessLoops ' . $s->getKey() . '<br />';
+                $s->delete();
             }
-
-        } elseif ($this->v["step"] == 2) {
-
-            $chk = SLNodeSaves::select('node_save_session')
-                ->where('node_save_session', '>', 0)
-                ->limit(10000)
-                ->inRandomOrder()
-                ->get();
-            if ($chk->isNotEmpty()) {
-                foreach ($chk as $s) {
-                    if (!in_array($s->node_save_session, $sessIDs)) {
-                        $s->delete();
-                    }
-                }
-            }
-
-        } elseif ($this->v["step"] == 3) {
-
-            $chk = SLNodeSavesPage::select('page_save_session')
-                ->where('page_save_session', '>', 0)
-                ->limit(10000)
-                ->inRandomOrder()
-                ->get();
-            if ($chk->isNotEmpty()) {
-                foreach ($chk as $s) {
-                    if (!in_array($s->page_save_session, $sessIDs)) {
-                        $s->delete();
-                    }
-                }
-            }
-
         }
-        return true;
+    }
+
+    protected function sysClean2($sessIDs)
+    {
+        $chk = SLNodeSaves::whereNotIn('node_save_session', $sessIDs)
+            ->limit(1000)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $s) {
+                echo 'SLNodeSaves ' . $s->getKey() . '<br />';
+                $s->delete();
+            }
+        }
+    }
+
+    protected function sysClean3($sessIDs)
+    {
+        $chk = SLNodeSavesPage::whereNotIn('page_save_session', $sessIDs)
+            ->limit(1000)
+            ->get();
+        if ($chk->isNotEmpty()) {
+            foreach ($chk as $s) {
+                echo 'SLNodeSavesPage ' . $s->getKey() . '<br />';
+                $s->delete();
+            }
+        }
     }
 
 }
-

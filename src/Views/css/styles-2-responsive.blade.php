@@ -100,6 +100,7 @@
     table.slSpreadTbl tr td.sprdRowLab, table.slSpreadTbl tr th.sprdRowLab, 
         table.slSpreadTbl tr th, .nFld table.slSpreadTbl tr th { 
         font-size: 14px; 
+        padding-top: 11px;
     }
     input.otherFld, input.form-control.otherFld, 
     label input.otherFld, label input.form-control.otherFld {

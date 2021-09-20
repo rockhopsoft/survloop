@@ -1,6 +1,6 @@
 <!-- resources/views/vendor/survloop/reports/graph-data-line-standalone.blade.php -->
 
-<canvas id="popGraphPlot{{ $rand }}" height="{{ $height }}" width="100%"></canvas>
+<canvas id="lineGraphPlot{{ $rand }}" height="{{ $height }}" width="100%"></canvas>
 
 @if (isset($axisListY) && sizeof($axisListY) > 2)
     <div class="alert alert-danger fade in alert-dismissible show" style="padding: 10px 15px;">
@@ -20,7 +20,7 @@ var data = {
     datasets: [
     @foreach ($dataLines as $l => $line)
         {
-            label: {!! json_encode($line->title) !!},
+            label: {!! json_encode(strip_tags($line->title)) !!},
             yAxisID: @if ($axisY2->label != '' && $axisY2->label == $line->unit) 'unitRight', @else 'unitLeft', @endif
             data: [ {!! $line->printData() !!} ],
             backgroundColor: {!! json_encode($line->color) !!},
@@ -36,7 +36,7 @@ var data = {
 {!! view(
     'vendor.survloop.reports.graph-data-options',
     [
-        "title"      => $title,
+        "title"      => strip_tags($title),
         "axisX"      => $axisX,
         "axisY"      => $axisY,
         "axisY2"     => $axisY2,
@@ -46,7 +46,7 @@ var data = {
     ]
 )->render() !!}
 
-var ctx = $("#popGraphPlot{{ $rand }}");
+var ctx = $("#lineGraphPlot{{ $rand }}");
 
 var myLineChart{{ $rand }} = new Chart(ctx, {
     type: 'line',
@@ -58,7 +58,7 @@ var myLineChart{{ $rand }} = new Chart(ctx, {
 </script>
 
 <style>
-#popGraphPlot{{ $rand }} {
+#lineGraphPlot{{ $rand }} {
     width: 100%;
     height: {{ $height }}px;
     max-height: {{ $height }}px;

@@ -175,7 +175,7 @@ class SurvStatsTbl
     public function excel($filename = 'export.xls')
     {
         $innerTbl = $this->printTblView(true, true);
-        $GLOBALS["SL"]->exportExcelOldSchool($innerTbl, $filename);
+        $GLOBALS["SL"]->exportExcel($innerTbl, $filename);
     }
 
     /**

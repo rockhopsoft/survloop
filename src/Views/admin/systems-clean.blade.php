@@ -3,15 +3,20 @@
 @section('content')
 
 <div class="container">
-    <h2><i class="fa fa-heartbeat"></i> System Cleanup</h2>
-    <div class="slCard nodeWrap taC">
+    <div class="slCard nodeWrap">
+    	<a href="?refresh=1" class="btn btn-secondary pull-right"
+    		>Force Cleanup</a>
+    	<h2>
+    		<i class="fa fa-bath" aria-hidden="true"></i>
+    		System Cleanup
+    	</h2>
 		<div id="cleaningDiv" class="pT30">
 	        {!! view(
 	            'vendor.survloop.admin.systems-clean-ajax',
 	            [ "currStep" => $currStep ]
 	        )->render() !!}
 	    </div>
-	    <div class="pB30">
+	    <div class="pB30 taC">
 	    	{!! $GLOBALS["SL"]->spinner() !!}
 	    </div>
     </div>

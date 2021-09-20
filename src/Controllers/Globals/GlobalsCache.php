@@ -299,6 +299,29 @@ class GlobalsCache extends GlobalsBasic
         return $ret;
     }
 
+    public function saveIcon($center = false, $id = '')
+    {
+        $ret = '<i' . ((trim($id) != '') ? ' id="' . $id . '"' : '')
+            . ' class="fa fa-floppy-o" aria-hidden="true"></i>';
+        if ($center) {
+            return '<div class="w100 pT15 pB15"><center>'
+                . $ret . '</center></div>';
+        }
+        return $ret;
+    }
+
+    public function saveIconFades($center = false, $id = '')
+    {
+        if (trim($id) == '') {
+            $id = 'save' . rand(1000000, 10000000);
+        }
+        return $this->saveIcon($center, $id) . $this->opnAjax()
+            . ' setTimeout(function() { '
+            . 'if (document.getElementById("' . $id . '")) { '
+            . '$("#' . $id . '").fadeOut(3000); } }, 1000); '
+            . $this->clsAjax();
+    }
+
     public function pausePageScriptCollection()
     {
         $this->x["pageSCRIPTS"] = $this->pageSCRIPTS;

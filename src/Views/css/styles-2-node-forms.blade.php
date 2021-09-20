@@ -184,8 +184,11 @@ ul li, ol li, .nPrompt ul li, .nPrompt ol li {
 .nFld select.tinyDrop, .nFld select.form-control.tinyDrop {
 	width: 60px;
 }
+.timeWrap {
+    min-height: 48px;
+}
 .timeWrap input {
-	width: 60px;
+    width: 60px;
 }
 
 .flexarea, textarea.flexarea, textarea.form-control.flexarea {

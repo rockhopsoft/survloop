@@ -12,12 +12,12 @@ $css = $sysDefs->loadCss();
 <form name="mainPageForm" method="POST" action="{{ url('/two-factor-challenge') }}">
 <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" id="isLoginID" name="isLogin" value="1">
-<input type="hidden" name="previous" 
-    @if (isset($midSurvRedir) && trim($midSurvRedir) != '') 
+<input type="hidden" name="previous"
+    @if (isset($midSurvRedir) && trim($midSurvRedir) != '')
         value="{{ $midSurvRedir }}"
-    @elseif ($GLOBALS['SL']->REQ->has('redir')) 
+    @elseif ($GLOBALS['SL']->REQ->has('redir'))
         value="{{ $GLOBALS['SL']->REQ->get('redir') }}"
-    @elseif ($GLOBALS['SL']->REQ->has('previous')) 
+    @elseif ($GLOBALS['SL']->REQ->has('previous'))
         value="{{ $GLOBALS['SL']->REQ->get('previous') }}"
     @else value="{{ URL::previous() }}"
     @endif >
@@ -26,8 +26,8 @@ $css = $sysDefs->loadCss();
     <div id="treeWrap" class="treeWrapForm">
         <div class="slCard">
 
-            <a href="/login{{ (($GLOBALS['SL']->REQ->has('nd')) 
-                ? '?nd=' . $GLOBALS['SL']->REQ->get('nd') : '') 
+            <a href="/login{{ (($GLOBALS['SL']->REQ->has('nd'))
+                ? '?nd=' . $GLOBALS['SL']->REQ->get('nd') : '')
                 }}" class="btn btn-secondary pull-right mL20"
                 >Login</a>
             <div class="nodeAnchor"><a id="n004" name="n004"></a></div>
@@ -40,13 +40,13 @@ $css = $sysDefs->loadCss();
                     <div class="nodeHalfGap"></div>
                     <div id="nLabel003" class="nPrompt">
                         <label for="password">
-                            Please enter the <b>temporary code from your 
+                            Please enter the <b>temporary code from your
                             phone's authentication app</b> to login.
                             <span class="red">*required</span>
                         </label>
                     </div>
                     <div class="nFld">
-                        <input type="text" id="code" name="code" value="" 
+                        <input type="text" id="code" name="code" value=""
                             class="form-control" autocomplete="off">
                     </div>
                     <div class="nodeHalfGap"></div>
@@ -66,7 +66,7 @@ $css = $sysDefs->loadCss();
                         </label>
                     </div>
                     <div class="nFld">
-                        <input type="text" id="recovery_code" name="recovery_code" 
+                        <input type="text" id="recovery_code" name="recovery_code"
                             value="" class="form-control" autocomplete="off">
                     </div>
                     <div class="nodeHalfGap"></div>
@@ -78,8 +78,8 @@ $css = $sysDefs->loadCss();
             <div id="pageBtns">
                 <div id="formErrorMsg"></div>
                 <div id="nodeSubBtns" class="nodeSub">
-                    <input type="submit" value="Enter Code" 
-                        class="fR btn btn-primary btn-lg" 
+                    <input type="submit" value="Enter Code"
+                        class="fR btn btn-primary btn-lg"
                         id="twoFactorConfirmBtn">
                 </div>
             </div>
@@ -106,6 +106,13 @@ $(document).on("click", "#hideRecoveryCodes", function() {
     $("#recoveryCodes").fadeOut(300);
     setTimeout(function() { $("#authAppCodes").fadeIn(300); }, 301);
 });
+
+function focusOnCode() {
+    if (document.getElementById("code")) {
+        document.getElementById("code").focus();
+    }
+}
+setTimeout(function() { focusOnCode(); }, 10);
 
 }); </script>
 

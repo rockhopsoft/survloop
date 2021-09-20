@@ -186,8 +186,18 @@ function animRevealDashResultRow(setBase, cnt, limit, delay) {
         if (cnt < limit) {
             divID = setBase+"Anim"+cnt+"";
             delay *= 0.7;
-            if (delay < 10) delay = 10;
-            setTimeout(function() { animRevealDashResultRow(setBase, cnt, limit, delay); }, (1+delay));
+            if (delay > 5) {
+                setTimeout(function() { animRevealDashResultRow(setBase, cnt, limit, delay); }, (1+delay));
+            } else {
+                cnt++;
+                divID = setBase+"Anim"+cnt+"";
+                while (cnt < 5000 && document.getElementById(divID)) {
+                    document.getElementById(divID).style.display="block";
+                    cnt++;
+                    divID = setBase+"Anim"+cnt+"";
+                }
+                animRevealDashResultsClose(setBase);
+            }
         } else {
             animRevealDashResultsClose(setBase);
         }
@@ -201,7 +211,7 @@ function animRevealDashResults(setBase) {
         return false;
     }
     if (document.getElementById(setBase+"Anim0") && document.getElementById(setBase+"Anim0").style.display.localeCompare("none") == 0) {
-        var limit = 1000;
+        var limit = 100;
         var delay = 300;
         if (document.getElementById(setBase+"Head") && document.getElementById(setBase+"Head").style.display.localeCompare("none") == 0) {
             $("#"+setBase+"Head").fadeIn(300);

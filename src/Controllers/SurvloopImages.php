@@ -24,8 +24,9 @@ class SurvloopImages
     function __construct($nID = '', $dbID = 1)
     {
         $this->setImgSet($nID, $dbID);
-        $this->fold = '../vendor/'
-            . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Uploads';
+        $this->fold = '../storage/app/up/' . $GLOBALS["SL"]->getPckgProj();
+        //$this->fold = '../vendor/'
+        //    . $GLOBALS["SL"]->sysOpts["cust-package"] . '/src/Uploads';
         return true;
     }
 
@@ -110,7 +111,7 @@ class SurvloopImages
                 if (is_array($file)) {
                     $this->scanNewUpInner($fileMap[$i], $folder, (1+$depth));
                 } else {
-                    $img = SLImages::where('ImgFileLoc', $file)
+                    $img = SLImages::where('img_file_loc', $file)
                         ->first();
                     if (!$img || !isset($img->img_file_loc)) {
                         $fileName = '/' . $GLOBALS["SL"]->getPckgProj()
@@ -133,22 +134,19 @@ class SurvloopImages
     {
         if (!isset($img->img_full_filename)
             || trim($img->img_full_filename) == '') {
-            $img->img_full_filename = '/'
-                . $GLOBALS["SL"]->getPckgProj()
+            $img->img_full_filename = '/' . $GLOBALS["SL"]->getPckgProj()
                 . '/uploads/' . $img->img_file_loc;
         }
-        $file = $this->fold . '/' . $img->img_file_loc;
-        $img->img_type = substr(
-            $img->img_file_loc,
-            (strrpos($img->img_file_loc, '.')+1)
-        );
+        //$file = $this->fold . '/' . $img->img_file_loc;
+        $pos = strrpos($img->img_file_loc, '.');
+        $img->img_type = substr($img->img_file_loc, ($pos+1));
         $img->img_type = strtolower($img->img_type);
-        switch($img->img_type) {
-            case 'jpeg'; $img->img_type = 'jpg'; break;
+        if ($img->img_type == 'jpeg') {
+            $img->img_type = 'jpg';
         }
-        $img->img_file_size = filesize($file);
+        $img->img_file_size = filesize($img->img_full_filename);
         if (in_array($img->img_type, ['jpg', 'png', 'gif'])) {
-            $size = getimagesize($file);
+            $size = getimagesize($img->img_full_filename);
             $img->img_width  = $size[0];
             $img->img_height = $size[1];
         }
@@ -243,49 +241,44 @@ class SurvloopImages
         return '<i class="fa fa-check" aria-hidden="true"></i> Saved';
     }
 
-    public function uploadImg($nID = '', $presel = '', $dbID = 1)
+    public function uploadImgDir($nID = '', $path = '', $file = '', $title = '')
     {
-        $exts = [
-            "gif",
-            "jpeg",
-            "jpg",
-            "png"
-        ];
-        $mimes = [
-            "image/gif",
-            "image/jpeg",
-            "image/jpg",
-            "image/pjpeg",
-            "image/x-png",
-            "image/png"
-        ];
+        return $this->uploadImg($nID, '', 1, $path, $file, $title);
+    }
+
+    public function uploadImg($nID = '', $presel = '', $dbID = 1, $path = '', $file = '', $title = '')
+    {
+        $exts  = $this->allowedExts();
+        $mimes = $this->allowedMimes();
         $this->chkImgSet($nID, $dbID);
-        if ($GLOBALS["SL"]->REQ->hasFile('imgFile' . $nID . '')) { // file upload
+        if ($GLOBALS["SL"]->REQ->hasFile('imgFile' . $nID . '')) {
             $fileObj = $GLOBALS["SL"]->REQ->file('imgFile' . $nID . '');
+            $extension = $fileObj->getClientOriginalExtension();
             $origName = $fileObj->getClientOriginalName();
             $origName = str_replace(' ', '_', $origName);
-            $img = SLImages::where('img_database_id', $this->dbID)
-                ->where('img_node_id', $nID)
-                ->where('img_file_loc', $origName)
-                ->first();
-            if (!$img || !isset($img->img_database_id)) {
-                $img = new SLImages;
-                $img->img_database_id = $this->dbID;
-                $img->img_node_id = $nID;
+            $storeName = $origName;
+            if ($file != '') {
+                $storeName = $file . '.' . $extension;
             }
-            $img->img_file_loc = $origName;
-            $img->img_user_id = ((Auth::user()) ? Auth::user()->id : 0);
-            $extension = $fileObj->getClientOriginalExtension();
+            $img = $this->createImgRec($nID, $storeName, $dbID);
+            $img->img_file_orig = $origName;
+            $img->img_user_id   = 0;
+            if (Auth::user()) {
+                $img->img_user_id = Auth::user()->id;
+            }
+            if ($title != '') {
+                $img->img_title = $title;
+            }
             $mimetype = $fileObj->getMimeType();
             $size = $fileObj->getSize();
             if (in_array($extension, $exts) && in_array($mimetype, $mimes)) {
                 if (!$fileObj->isValid()) {
                     return '<div class="txtDanger p10">Upload Error.'
-                        . /* $_FILES["up" . $nID . "File"]["error"] . */ '</div>';
+                        . /* $_FILES["up" . $nID . "File"]["error"]
+                        . */ '</div>';
                 } elseif ($size > 4000000 || $size === false) {
-                    return '<div class="txtDanger p10">'
-                        . 'File size too large. Please compress to less than 4MB.'
-                        . '</div>';
+                    return '<div class="txtDanger p10">File size too large. '
+                        . 'Please compress to less than 4MB.</div>';
                 } else {
                     //$upFold = '../vendor/' . $GLOBALS["SL"]->sysOpts["cust-package"]
                     //    . '/src/Uploads/';
@@ -294,16 +287,22 @@ class SurvloopImages
                     //    Storage::delete($upFold . $img->img_file_loc);
                     //}
                     //$fileObj->move($upFold, $img->img_file_loc);
-                    $storageFold = '../storage/app/up/'
-                        . $GLOBALS["SL"]->getPckgProj() . '/';
-                    if (file_exists($storageFold . $img->img_file_loc)) {
-                        Storage::delete($storageFold . $img->img_file_loc);
+                    $fold = '../storage/app/up/' . $GLOBALS["SL"]->getPckgProj();
+                    if ($path != '') {
+                        $fold = $path;
                     }
-                    $fileObj->move($storageFold, $img->img_file_loc);
+                    $fullFile = $fold . '/' . $img->img_file_loc;
+                    if (file_exists($fullFile)) {
+                        unlink($fullFile);
+                        //Storage::delete($fold . '/' . $img->img_file_loc);
+                    }
+                    $fileObj->move($fold, $img->img_file_loc);
                     //copy(
                     //    $upFold . $img->img_file_loc,
-                    //    $storageFold . $img->img_file_loc
+                    //    $fold . $img->img_file_loc
                     //);
+                    $img->img_full_filename = $fullFile;
+//echo 'fileObj->move(' . $fold . '<br />' . $img->img_file_loc . '<br />' . $img->img_full_filename . '<br /><br />';
                 }
                 $img->save();
             } else {
@@ -312,15 +311,61 @@ class SurvloopImages
             }
             $this->analizeImg($img);
             if (isset($img->img_id) && intVal($img->img_id) > 0) {
-                return view('vendor.survloop.forms.inc-image-uploaded', [
-                    "nID"    => $this->nID,
-                    "presel" => $presel,
-                    "imgID"  => $img->img_id
-                ])->render();
+                $GLOBALS["SL"]->x["lastUpImgID"] = $img->img_id;
+                return view(
+                    'vendor.survloop.forms.inc-image-uploaded',
+                    [
+                        "nID"    => $this->nID,
+                        "presel" => $presel,
+                        "imgID"  => $img->img_id
+                    ]
+                )->render();
             }
         }
         return '<i class="fa fa-times" aria-hidden="true"></i> '
             . 'Something went wrong with your upload.';
+    }
+
+    private function createImgRec($nID = '', $storeName = '', $dbID = 1)
+    {
+        $img = SLImages::where('img_node_id', $nID)
+            ->where('img_database_id', $dbID)
+            ->where('img_file_loc', $storeName)
+            ->first();
+        if (!$img || !isset($img->img_database_id)) {
+            $img = new SLImages;
+            $img->img_database_id = $dbID;
+            $img->img_node_id     = $nID;
+            $img->img_file_loc    = $storeName;
+            //$img->save();
+        }
+        return $img;
+    }
+
+    public function allowedExts()
+    {
+        return [
+            "gif",
+            "jpeg",
+            "jpg",
+            "png",
+            "pdf",
+            "ods" // OpenOffice document
+        ];
+    }
+
+    public function allowedMimes()
+    {
+        return [
+            "image/gif",
+            "image/jpeg",
+            "image/jpg",
+            "image/pjpeg",
+            "image/x-png",
+            "image/png",
+            "application/pdf",
+            "application/vnd.oasis.opendocument.spreadsheet"
+        ];
     }
 
 }

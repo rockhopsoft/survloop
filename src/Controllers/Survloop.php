@@ -82,7 +82,7 @@ class Survloop extends SurvloopSpecialLoads
                     if ($cid > 0) {
                         $GLOBALS["SL"]->isOwner = $this->custLoop->isCoreOwner($cid);
                         $GLOBALS["SL"]->initPageReadSffx($cid);
-                        $this->custLoop->loadSessionData($cid);
+                        $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
                     }
                     return $this->custLoop->printTreeNodePublic($nID);
                 }
@@ -120,7 +120,7 @@ class Survloop extends SurvloopSpecialLoads
                 exit;
             }
             $hasAjax = ($request->has('ajax') && intVal($request->ajax) == 1);
-            $this->loadLoop($request);
+            $this->loadLoop($request, false, $cid);
             $view = $this->chkPageView($view);
             $cid = $this->chkPageCID($request, $cid, $skipPublic);
             if ($cid > 0) {
@@ -135,7 +135,6 @@ class Survloop extends SurvloopSpecialLoads
             if ($this->topCheckCache($request, 'page') && $allowCache) {
                 return $this->addSessAdmCodeToPage($request, $this->pageContent);
             }
-            //$this->custLoop->loadSessionData($cid);
             $this->chkPageHideDisclaim($request, $cid);
             if (in_array($view, ['xml', 'json'])) {
                 $GLOBALS["SL"]->pageView = 'public';
@@ -145,6 +144,7 @@ class Survloop extends SurvloopSpecialLoads
             if ($cid > 0) {
                 $this->loadPageCID($request, $GLOBALS["SL"]->treeRow, intVal($cid));
                 $this->custLoop->loadSessionData($GLOBALS["SL"]->coreTbl, $cid);
+                $this->custLoop->treeSessLoadExtra();
             }
             $this->pageContent = $this->custLoop->index($request);
             if ($allowCache) {
