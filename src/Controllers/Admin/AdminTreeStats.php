@@ -37,7 +37,7 @@ class AdminTreeStats extends AdminController
 
     public function treeSessions(Request $request, $treeID = 1, $refresh = false, $height = 720)
     {
-        set_time_limit(360);
+        ini_set('max_execution_time', 300);
         $this->initLoader();
         $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/sessions');

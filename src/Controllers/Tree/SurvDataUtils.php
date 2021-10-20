@@ -101,6 +101,64 @@ class SurvDataUtils
         return $recObj;
     }
 
+    public function hasSet($tbl)
+    {
+        return (isset($this->dataSets[$tbl])
+            && sizeof($this->dataSets[$tbl]) > 0);
+    }
+
+    public function setCnt($tbl)
+    {
+        if (isset($this->dataSets[$tbl])) {
+            return sizeof($this->dataSets[$tbl]);
+        }
+        return 0;
+    }
+
+    public function setsWhere($tbl, $fld, $val)
+    {
+        if ($this->hasSet($tbl)) {
+            foreach ($this->dataSets[$tbl] as $i => $rec) {
+                if ($rec->{ $fld } == $val) {
+                    return $rec;
+                }
+            }
+        }
+        return null;
+    }
+
+    public function setsWheres($tbl, $fld, $val)
+    {
+        $ret = [];
+        if (isset($this->dataSets[$tbl])
+            && sizeof($this->dataSets[$tbl]) > 0) {
+            foreach ($this->dataSets[$tbl] as $i => $rec) {
+                if (isset($rec->{ $fld })
+                    && $rec->{ $fld } == $val) {
+                    $ret[] = $rec;
+                }
+            }
+        }
+        return $ret;
+    }
+
+    public function setsWheres2($tbl, $fld, $val, $fld2, $val2)
+    {
+        $ret = [];
+        if (isset($this->dataSets[$tbl])
+            && sizeof($this->dataSets[$tbl]) > 0) {
+            foreach ($this->dataSets[$tbl] as $i => $rec) {
+                if (isset($rec->{ $fld })
+                    && isset($rec->{ $fld2 })
+                    && $rec->{ $fld } == $val
+                    && $rec->{ $fld2 } == $val2) {
+                    $ret[] = $rec;
+                }
+            }
+        }
+        return $ret;
+    }
+
     protected function dataWhere($tbl, $where, $whereVal, $operator = '=', $getFirst = 'get')
     {
         $model = trim($GLOBALS["SL"]->modelPath($tbl));

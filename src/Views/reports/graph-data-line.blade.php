@@ -12,7 +12,7 @@ var data = {
     datasets: [ @forelse ($datMap as $dLet => $dat) @if ($dLet != 'a') , @endif
         {
             label: "{{ $dat['lab'] }}",
-            data: [ @forelse ($dataDays[$dLet] as $i => $val) @if ($i > 0) , @endif {{ $val }} @empty @endforelse ],
+            data: [ @forelse ($dataPts[$dLet] as $i => $val) @if ($i > 0) , @endif {{ $val }} @empty @endforelse ],
 
             backgroundColor: "{{ $GLOBALS['SL']->printHex2Rgba($dat['dotClr']) }}",
             borderColor: "{{ $GLOBALS['SL']->printHex2Rgba($dat['dotClr']) }}",

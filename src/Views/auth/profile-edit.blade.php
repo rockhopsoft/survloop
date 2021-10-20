@@ -141,7 +141,9 @@
         <div class="col-4">
             <div class="nPrompt">Roles:</div>
             <div class="nFldRadio">
-            @foreach ($profileUser->roles as $i => $role)
+        @foreach ($profileUser->roles as $i => $role)
+            @if (isset($role->def_is_active)
+                && intVal($role->def_is_active) == 1)
                 <input name="roles[]" id="role{{ $i }}"
                     type="checkbox" value="{{ $role->def_id }}"
                     @if ($profileUser->hasRole($role->def_subset))
@@ -151,14 +153,16 @@
                 <label for="role{{ $i }}">
                     {{ $role->def_value }}
                 </label><br />
-            @endforeach
+            @endif
+        @endforeach
             </div>
             <div class="nodeHalfGap"></div>
     @endif
         </div>
     </div>
 
-    <input type="submit" value="Save Changes" class="btn btn-primary">
+    <input type="submit" class="btn btn-primary"
+        value="Save Changes">
     <div class="nodeHalfGap"></div>
 
     </form>

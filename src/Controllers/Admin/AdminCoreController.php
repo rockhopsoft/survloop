@@ -60,7 +60,9 @@ class AdminCoreController extends SurvloopController
             $this->checkCurrPage();
             $this->reloadAdmMenu();
             $this->loadSearchSuggestions();
-            $this->initExtra($request);
+//echo 'admControlInit - A'; exit;
+            $this->initMore($request);
+//echo 'admControlInit - A'; exit;
             if ($initCust) {
                 $this->initCustViews($request);
             }
@@ -406,6 +408,7 @@ class AdminCoreController extends SurvloopController
     {
         $this->initLoader();
         $redir = $this->loader->chkLoginRedir($request);
+//echo 'loadPageURL - A ?'; exit;
         if ($redir != '') {
             return redirect($redir);
         }

@@ -40,6 +40,7 @@ class SurvloopControllerUtils extends Controller
     protected $sessID            = 0;
     protected $sessInfo          = [];
     protected $sessLoops         = [];
+    protected $canEditTree       = false;
 
     public $v                    = [];
     // contains data to be shares with views,
@@ -124,6 +125,38 @@ class SurvloopControllerUtils extends Controller
         }
         return $ret;
     }
+
+    /**
+     * Initializing a bunch of things which are not [yet] automatically
+     * set by the Survloop and its GUIs.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return boolean
+     */
+    protected function initMore(Request $request)
+    {
+        if (!isset($this->v["uID"])) {
+            $this->loadUserVars();
+        }
+        $this->initMoreTree();
+        $this->initMoreAdmin($request);
+        return $this->initExtra($request);
+    }
+
+    /**
+     * Initializing more tree tools needed in different areas.
+     *
+     * @return void
+     */
+    protected function initMoreTree() { }
+
+    /**
+     * Initializing more admin tools needed in different areas.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return void
+     */
+    protected function initMoreAdmin(Request $request) { }
 
     /**
      * Initializing a bunch of things which are not [yet] automatically

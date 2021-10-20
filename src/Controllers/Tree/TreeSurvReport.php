@@ -57,7 +57,7 @@ class TreeSurvReport extends TreeSurvBasicNav
 
     public function byID(Request $request, $coreID, $coreSlug = '', $skipWrap = false, $skipPublic = false)
     {
-        ini_set('max_execution_time', 90);
+        ini_set('max_execution_time', 120);
         $this->survloopInit($request, '/report/' . $coreID);
         if (!$skipPublic) {
             $coreID = $GLOBALS["SL"]->chkInPublicID($coreID);

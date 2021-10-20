@@ -14,8 +14,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Routing\Controller;
 use Intervention\Image\ImageManagerStatic as Image;
-use App\Models\User;
 use App\Models\SLDefinitions;
+use App\Models\SLZips;
+use App\Models\User;
 use RockHopSoft\Survloop\Controllers\Globals\GlobalsCache;
 
 class SurvRoutes extends Controller
@@ -245,6 +246,30 @@ class SurvRoutes extends Controller
     public function testRouteCall(Request $request)
     {
         echo 'Survloop Route Function Calls are Working!';
+    }
+
+    public function testModelCache(Request $request)
+    {
+        if ($request->has('addDel')) {
+            $zip = new SLZips;
+            $zip->zip_zip = '00000';
+            $zip->save();
+            SLZips::where('zip_zip', '00000')
+                ->delete();
+            exit;
+        }
+        foreach ([235, 215, 832] as $zipper) {
+            $zipLike = $zipper . '%';
+            $zipChk = SLZips::where('zip_zip', 'LIKE', $zipLike)
+                ->orderBy('zip_zip', 'asc')
+                ->get();
+            if ($zipChk->isNotEmpty()) {
+                foreach ($zipChk as $zip) {
+                    echo $zip->zip_zip . ', ';
+                }
+            }
+        }
+        echo '<br /><br />Model Cache Test Done!';
     }
 
 }

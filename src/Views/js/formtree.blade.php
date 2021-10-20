@@ -1,4 +1,7 @@
 /* resources/views/vendor/survloop/js/formtree.blade.php */
+
+coreID = {{ $coreID }};
+
 function checkFullPage() {
     if ((!document.getElementById('main') || !document.getElementById('sysJs')) && !document.getElementById('isPrint')) {
 @if (isset($currPage) && isset($currPage[0]) && trim($currPage[0]) != '')

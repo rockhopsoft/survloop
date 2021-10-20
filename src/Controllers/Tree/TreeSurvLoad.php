@@ -91,13 +91,13 @@ class TreeSurvLoad extends TreeSurvConds
             $this->treeID = $GLOBALS["SL"]->treeID;
         }
         if ($slInit) {
-//echo 'constructor( running slInit - skipSessLoad? ' . (($skipSessLoad) ? 'true' : 'false') . '...<br />';
             //$this->sessData = new SurvData;
             $this->survloopInit($request);
             $this->coreIDoverride = -3;
             if ($coreID > 0) {
                 $this->coreIDoverride = $coreID;
             }
+//echo 'constructor(' . $coreID . ', ' . $this->dbID . ', ' . $this->treeID . '<br />'; exit;
             if (isset($GLOBALS["SL"])
                 && $GLOBALS["SL"]->REQ->has('step')
                 && $GLOBALS["SL"]->REQ->has('tree')
@@ -320,8 +320,10 @@ class TreeSurvLoad extends TreeSurvConds
         }
         $GLOBALS["SL"]->microLog('Start loadAllSessData(');
         $this->loadSessionClear($coreTbl, $coreID);
+//echo 'loadAllSessData A (' . $coreTbl . ', ' . $coreID . '<br />';
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessionClear(');
         $this->loadSessInfo($coreTbl);
+//echo 'loadAllSessData B (' . $coreTbl . ', ' . $coreID . '<br /><pre>'; print_r(session()->all()); echo '</pre>';
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessInfo(');
         $this->loadSessionData($coreTbl, $coreID);
         $GLOBALS["SL"]->microLog('loadAllSessData( after loadSessionData(');
@@ -525,6 +527,7 @@ class TreeSurvLoad extends TreeSurvConds
 
     public function loadSessionData($coreTbl, $coreID = -3)
     {
+//echo 'loadSessionData(' . $coreTbl . ', ' . $coreID . '<br />';
         if ($coreID > 0) {
             $this->coreID
                 = $GLOBALS["SL"]->coreID

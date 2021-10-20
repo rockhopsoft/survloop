@@ -168,13 +168,17 @@ class SurvStatsTbl
 
     /**
      * Export this entire table for spreadsheet software.
+     * Pass in empty string to skip Excel download delivery.
      *
-     * @param  boolean $innerOnly
+     * @param  string $filename
      * @return string
      */
     public function excel($filename = 'export.xls')
     {
         $innerTbl = $this->printTblView(true, true);
+        if (trim($filename) == '') {
+            return $innerTbl;
+        }
         $GLOBALS["SL"]->exportExcel($innerTbl, $filename);
     }
 
@@ -409,10 +413,12 @@ class SurvStatTd
     public function toExcel($i = 0, $j = 0)
     {
         if ($this->val === null) {
-            return '<td style="color: #777;"' . $this->printColSpan() . '> </td>';
+            return '<td' . $this->printColSpan() . '> </td>';
+            //  style="color: #777;"
         }
-        return '<td' . $this->convertClassToExcel() . $this->printColSpan() . '>'
-            . $this->val . $this->printUnit() . '</td>';
+        return '<td' . $this->convertClassToExcel()
+            . $this->printColSpan() . '>' . $this->val
+            . $this->printUnit() . '</td>';
     }
 
     /**
@@ -423,7 +429,7 @@ class SurvStatTd
     protected function convertClassToExcel()
     {
         if (strpos($this->cls, 'brdLftGrey') !== false) {
-            return ' style="border-left: 1px #777 solid;" ';
+            // return ' style="border-left: 1px #777 solid;" ';
         }
         return '';
     }

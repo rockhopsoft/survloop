@@ -229,16 +229,21 @@ class TreeCoreSess extends TreeCore
                 && $cid > 0
                 && $cid != $this->sessInfo->sess_core_id) {
                 $this->sessInfo = new SLSess;
-                $this->sessInfo->sess_user_id   = $this->v["uID"];
-                $this->sessInfo->sess_tree      = $GLOBALS["SL"]->sessTree;
-                $this->sessInfo->sess_core_id   = $this->coreID = $GLOBALS["SL"]->coreID = $cid;
+                $this->sessInfo->sess_user_id = $this->v["uID"];
+                $this->sessInfo->sess_tree    = $GLOBALS["SL"]->sessTree;
+                $this->sessInfo->sess_core_id
+                    = $this->coreID
+                    = $GLOBALS["SL"]->coreID
+                    = $cid;
                 $this->sessInfo->sess_is_active = 1;
                 $this->sessInfo->save();
                 $this->sessID = $this->sessInfo->sess_id;
             } elseif ($this->isStaffOrAdmin()
                 || $this->recordIsEditable($coreTbl, $this->sessInfo->sess_core_id)) {
                 $this->sessID = $this->sessInfo->sess_id;
-                $this->coreID = $GLOBALS["SL"]->coreID = $this->sessInfo->sess_core_id;
+                $this->coreID
+                    = $GLOBALS["SL"]->coreID
+                    = $this->sessInfo->sess_core_id;
             } else {
                 $this->sessInfo = [];
             }
@@ -252,7 +257,9 @@ class TreeCoreSess extends TreeCore
             $this->sessID = intVal(session()->get('sessID' . $treeID));
         }
         if (session()->has('coreID' . $treeID)) {
-            $this->coreID = $GLOBALS["SL"]->coreID = intVal(session()->get('coreID' . $treeID));
+            $this->coreID
+                = $GLOBALS["SL"]->coreID
+                = intVal(session()->get('coreID' . $treeID));
         }
         if ($this->sessID > 0) {
             $this->sessInfo = SLSess::where('sess_id', $this->sessID)
@@ -264,7 +271,8 @@ class TreeCoreSess extends TreeCore
                 && isset($this->v)
                 && isset($this->v["uID"])
                 && intVal($this->v["uID"]) > 0
-                && intVal($this->sessInfo->sess_user_id) != intVal($this->v["uID"])) {
+                && intVal($this->sessInfo->sess_user_id)
+                    != intVal($this->v["uID"])) {
                 // Reject User Mismatch
                 $this->sessInfo = null;
                 $this->sessID = $this->coreID = $GLOBALS["SL"]->coreID = 0;
@@ -436,6 +444,10 @@ class TreeCoreSess extends TreeCore
                 $this->restartTreeSess($tree->tree_id);
             }
         }
+        if (Auth::user() && isset(Auth::user()->id)) {
+            SLSess::where('sess_user_id', Auth::user()->id)
+                ->update([ 'sess_is_active' => 0 ]);
+        }
         session()->forget('sessIDPage');
         session()->forget('coreIDPage');
         session()->flush();
@@ -547,7 +559,7 @@ class TreeCoreSess extends TreeCore
             && isset($sessInfo->sess_curr_node)
             && intVal($sessInfo->sess_curr_node) > 0) {
             $this->loadTree();
-            $nodeURL = $this->currNodeURL($this->sessInfo->sess_curr_node);
+            $nodeURL = $this->currNodeURL($sessInfo->sess_curr_node);
             if (trim($nodeURL) != '') {
                 return $nodeURL;
             }
@@ -721,19 +733,24 @@ class TreeCoreSess extends TreeCore
         if (!$cid || intVal($cid) <= 0) {
             return $this->redir('/my-profile');
         }
+        $coreTbl = $GLOBALS["SL"]->coreTbl;
+        $uFld    = $GLOBALS["SL"]->coreTblUserFld;
         $ownerUser = -3;
-        eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
+        eval("\$chkRec = " . $GLOBALS["SL"]->modelPath($coreTbl)
             . "::find(" . intVal($cid) . ");");
         if (!$chkRec) {
             return $this->redir('/my-profile');
         }
-        if (isset($chkRec->{ $GLOBALS["SL"]->coreTblUserFld })) {
-            $ownerUser = intVal($chkRec->{ $GLOBALS["SL"]->coreTblUserFld });
-            if ($ownerUser != $this->v["uID"] && !$this->isStaffOrAdmin()) {
+        if (isset($chkRec->{ $uFld })) {
+            $ownerUser = intVal($chkRec->{ $uFld });
+            if ($ownerUser != $this->v["uID"]
+                && !$this->isStaffOrAdmin()) {
                 return $this->redir('/my-profile');
             }
         }
-        $this->coreID = $GLOBALS["SL"]->coreID = $this->deepCopyCoreRec($cid);
+        $this->coreID
+            = $GLOBALS["SL"]->coreID
+            = $this->deepCopyCoreRec($cid);
         $this->createNewSess($this->coreID);
         $msg = 'Creating Core Copy of #' . $cid . '. New Sess#'
             . $this->sessID . ', ' . $GLOBALS["SL"]->coreTbl

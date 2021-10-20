@@ -21,13 +21,9 @@ use RockHopSoft\Survloop\Controllers\Tree\TreeCoreSess;
 
 class TreeSurvAPI extends TreeCoreSess
 {
-    protected $canEditTree = false;
 
-    protected function initExtra(Request $request)
+    protected function initMoreTree()
     {
-        if (!isset($this->v["uID"])) {
-            $this->loadUserVars();
-        }
         foreach ($this->allNodes as $nID => $nodeObj) {
             $this->allNodes[$nID]->fillNodeRow();
             if ($this->allNodes[$nID]->nodeRow->node_parent_id == -3
@@ -36,8 +32,6 @@ class TreeSurvAPI extends TreeCoreSess
             }
         }
         $this->checkTreeRoot();
-        $this->canEditTree = ($this->v["uID"] > 0 && $this->v["user"]->hasRole('administrator|databaser'));
-        return true;
     }
 
     public function checkTreeRoot()

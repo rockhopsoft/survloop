@@ -41,8 +41,9 @@ class AdminDBController extends AdminController
 
     protected $dbPrivs    = [];
 
-    protected function initExtra(Request $request)
+    protected function initMoreAdmin(Request $request)
     {
+        ini_set('max_execution_time', 300);
         $this->v["DbID"] = $this->dbID = $GLOBALS["SL"]->dbID;
         $this->dbTitle = '<h1 class="disIn red">'
             . $GLOBALS["SL"]->dbRow->db_name . '&nbsp;</h1>';
@@ -59,8 +60,6 @@ class AdminDBController extends AdminController
         }
         $this->v["help"] = '<span class="fPerc80 slGrey">?</span>&nbsp;&nbsp;&nbsp;';
         $this->loadLookups();
-        set_time_limit(180);
-        return true;
     }
 
     protected function loadBelowAdmMenu()
@@ -917,7 +916,9 @@ class AdminDBController extends AdminController
     public function defSort(Request $request, $subset = '')
     {
         $this->admControlInit($request, '/dashboard/db/definitions');
-        if (!$this->v["dbAllowEdits"]) return $this->printOverview();
+        if (!$this->v["dbAllowEdits"]) {
+            return $this->printOverview();
+        }
         $this->v["subset"] = urldecode($subset);
         if ($GLOBALS["SL"]->REQ->has('saveOrder')) {
             $this->cacheFlush();
@@ -933,9 +934,11 @@ class AdminDBController extends AdminController
             exit;
         }
 
-        $sortTitle = '<a href="/dashboard/db/definitions/sort/' . $subset
-            . '" style="font-size: 26px;"><b>' . $this->v["subset"] . '</b></a>';
-        $submitURL = '/dashboard/db/definitions/sort/' . $subset . '?saveOrder=1';
+        $sortTitle = '<a href="/dashboard/db/definitions/sort/'
+            . $subset . '" style="font-size: 26px;"><b>'
+            . $this->v["subset"] . '</b></a>';
+        $submitURL = '/dashboard/db/definitions/sort/'
+            . $subset . '?saveOrder=1';
         $defs = SLDefinitions::where('def_subset', $this->v["subset"])
             ->where('def_set', 'Value Ranges')
             ->where('def_database', $this->dbID)
@@ -944,7 +947,7 @@ class AdminDBController extends AdminController
         $sorts = [];
         if ($defs->isNotEmpty()) {
             foreach ($defs as $def) {
-                $sorts[] = array($def->def_id, $def->def_value);
+                $sorts[] = [ $def->def_id, $def->def_value ];
             }
         }
         $this->v["sortable"] = view(
@@ -952,7 +955,6 @@ class AdminDBController extends AdminController
             [
                 'submitURL' => $submitURL,
                 'sortID'    => 'definitions',
-                'sortTitle' => $sortTitle,
                 'sorts'     => $sorts
             ]
         );

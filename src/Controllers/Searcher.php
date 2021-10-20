@@ -378,10 +378,13 @@ class Searcher extends PageLoadUtils
             foreach ($this->searchFilts as $key => $val) {
                 if ($key == 'user' && intVal($val) > 0) {
                     $coreIdFld = $GLOBALS["SL"]->coreTblIdFldOrPublicId(); /* test more */
+                    $userIdFld = $GLOBALS["SL"]->getCoreTblUserFld();
                     $eval = "\$chk = " . $GLOBALS["SL"]->modelPath($GLOBALS["SL"]->coreTbl)
-                        . "::whereIn('" . $coreIdFld . "', \$this->allPublicFiltIDs)->where('"
-                        . $GLOBALS["SL"]->getCoreTblUserFld() . "', " . $val . ")"
-                        . "->select('" . $coreIdFld . "')->get();";
+                        . "::whereIn('" . $coreIdFld . "', \$this->allPublicFiltIDs)";
+                    if ($userIdFld != '') {
+                        $eval .= "->where('" . $userIdFld . "', " . $val . ")";
+                    }
+                    $eval .= "->select('" . $coreIdFld . "')->get();";
                     eval($eval);
                     $this->allPublicFiltIDs = [];
                     if ($chk->isNotEmpty()) {

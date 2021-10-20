@@ -21,10 +21,13 @@ class SurvData extends SurvDataConditions
 
     public function loadCore($coreTbl, $coreID = -3, $checkboxNodes = [], $isBigSurvloop = [], $dataBranches = [])
     {
+//echo 'loadCore A (' . $coreTbl . ', ' . $coreID . '<br />';
         $this->setCoreID($coreTbl, $coreID);
+//echo 'loadCore B (' . $coreTbl . ', ' . $coreID . '<br />';
         if (sizeof($dataBranches) > 0) {
             $this->dataBranches = $dataBranches;
         }
+//echo 'loadCore C (' . $coreTbl . ', ' . $coreID . '<br />';
         $this->checkboxNodes = $checkboxNodes;
         $this->refreshDataSets($isBigSurvloop);
         $this->loadSessTestsAB();
@@ -58,6 +61,9 @@ class SurvData extends SurvDataConditions
 
     public function loadData($tbl, $rowID, $recObj = NULL)
     {
+        if ($rowID < 0) {
+            return false;
+        }
         if (isset($this->dataSetsSubbed[$tbl . $rowID])
             && $this->dataSetsSubbed[$tbl . $rowID]) {
             return false; // no double-loading is worth it

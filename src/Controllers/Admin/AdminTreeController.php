@@ -20,6 +20,7 @@ use App\Models\SLNode;
 use App\Models\SLDataSubsets;
 use App\Models\SLDataHelpers;
 use App\Models\SLDataLinks;
+use App\Models\SLDataLoop;
 use App\Models\SLConditions;
 use App\Models\SLConditionsVals;
 use App\Models\SLConditionsArticles;
@@ -35,8 +36,9 @@ use RockHopSoft\Survloop\Controllers\Admin\AdminTreeStats;
 class AdminTreeController extends AdminTreeStats
 {
 
-    protected function initExtra(Request $request)
+    protected function initMoreAdmin(Request $request)
     {
+        ini_set('max_execution_time', 300);
     	if ($this->v["uID"] > 0) {
     		$this->v["allowEdits"]
                 = $this->v["user"]->hasRole('administrator|databaser');
@@ -46,19 +48,25 @@ class AdminTreeController extends AdminTreeStats
         if (trim($this->v["currPage"][0]) == '') {
             $this->v["currPage"][0] = '/dashboard/tree';
         }
-
+//echo 'AdminTreeController initMore( this->coreID: ' . $this->coreID . '<br />'; exit;
         if (!isset($this->v["treeAdmin"])) {
-            $this->v["treeAdmin"] = new TreeSurvAdmin($request);
+            $this->v["treeAdmin"] = new TreeSurvAdmin(
+                $request,
+                -3,
+                $GLOBALS["SL"]->dbID,
+                $GLOBALS["SL"]->treeID,
+                false,
+                false
+            );
         }
         $this->v["treeAdmin"]->loadTree($GLOBALS["SL"]->treeID, $request);
+//echo 'AdminTreeController initMore( ? ' . $GLOBALS["SL"]->treeID . ', this->coreID: ' . $this->coreID . ', treeAdmin->coreID: ' . $this->v["treeAdmin"]->coreID . '<br />'; exit;
         $this->initExtraCust();
         $this->chkCoreTbls();
         if (!isset($GLOBALS["SL"]->treeRow->tree_root)
             || $GLOBALS["SL"]->treeRow->tree_root <= 0) {
             $this->createRootNode($GLOBALS["SL"]->treeRow);
         }
-        set_time_limit(180);
-        return true;
     }
 
     protected function createRootNode($treeRow)
@@ -278,41 +286,7 @@ class AdminTreeController extends AdminTreeStats
     {
         $this->admControlInit($request, '/dashboard/surveys/list');
         if ($request->has('sub') && $request->has('newTreeName')) {
-            $tree = new SLTree;
-            $tree->tree_database = $GLOBALS["SL"]->dbID;
-            $tree->tree_user = $this->v["uID"];
-            $tree->tree_type = 'Survey';
-            $tree->tree_name = trim($request->newTreeName);
-            $tree->tree_slug = trim($request->newTreeSlug);
-            if ($tree->tree_slug == '') {
-                $tree->tree_slug = $GLOBALS["SL"]->slugify($request->newTreeName);
-            }
-            $tree->tree_opts = 1;
-            if ($request->has('pageAdmOnly')
-                && intVal($request->pageAdmOnly) == 1) {
-                $tree->tree_opts *= 3;
-            }
-            if ($request->has('pageStfOnly')
-                && intVal($request->pageStfOnly) == 1) {
-                $tree->tree_opts *= Globals::TREEOPT_STAFF;
-            }
-            if ($request->has('pagePrtOnly')
-                && intVal($request->pagePrtOnly) == 1) {
-                $tree->tree_opts *= Globals::TREEOPT_PARTNER;
-            }
-            if ($request->has('pageVolOnly')
-                && intVal($request->pageVolOnly) == 1) {
-                $tree->tree_opts *= Globals::TREEOPT_VOLUNTEER;
-            }
-            $tree->save();
-            $treeXML = new SLTree;
-            $treeXML->tree_database = $tree->tree_database;
-            $treeXML->tree_user = $tree->tree_user;
-            $treeXML->tree_type = 'Survey XML';
-            $treeXML->tree_name = $tree->tree_name;
-            $treeXML->tree_slug = $tree->tree_slug;
-            $treeXML->tree_opts = $tree->tree_opts;
-            $treeXML->save();
+            $tree = $this->treesListSave($request);
             $redir = '/dashboard/surv-' . $tree->tree_id . '/map?all=1&alt=1&refresh=1';
             return $this->redir($redir);
         }
@@ -323,6 +297,46 @@ class AdminTreeController extends AdminTreeStats
         $GLOBALS["SL"]->pageAJAX .= '$(document).on("click", "#newTree", function() { '
             . '$("#newTreeForm").slideToggle("fast"); });';
         return view('vendor.survloop.admin.tree.trees', $this->v);
+    }
+
+    private function treesListSave(Request $request)
+    {
+        $tree = new SLTree;
+        $tree->tree_database = $GLOBALS["SL"]->dbID;
+        $tree->tree_user = $this->v["uID"];
+        $tree->tree_type = 'Survey';
+        $tree->tree_name = trim($request->newTreeName);
+        $tree->tree_slug = trim($request->newTreeSlug);
+        if ($tree->tree_slug == '') {
+            $tree->tree_slug = $GLOBALS["SL"]->slugify($request->newTreeName);
+        }
+        $tree->tree_opts = 1;
+        if ($request->has('pageAdmOnly')
+            && intVal($request->pageAdmOnly) == 1) {
+            $tree->tree_opts *= 3;
+        }
+        if ($request->has('pageStfOnly')
+            && intVal($request->pageStfOnly) == 1) {
+            $tree->tree_opts *= Globals::TREEOPT_STAFF;
+        }
+        if ($request->has('pagePrtOnly')
+            && intVal($request->pagePrtOnly) == 1) {
+            $tree->tree_opts *= Globals::TREEOPT_PARTNER;
+        }
+        if ($request->has('pageVolOnly')
+            && intVal($request->pageVolOnly) == 1) {
+            $tree->tree_opts *= Globals::TREEOPT_VOLUNTEER;
+        }
+        $tree->save();
+        $treeXML = new SLTree;
+        $treeXML->tree_database = $tree->tree_database;
+        $treeXML->tree_user = $tree->tree_user;
+        $treeXML->tree_type = 'Survey XML';
+        $treeXML->tree_name = $tree->tree_name;
+        $treeXML->tree_slug = $tree->tree_slug;
+        $treeXML->tree_opts = $tree->tree_opts;
+        $treeXML->save();
+        return $tree;
     }
 
     public function reportsList(Request $request)
@@ -626,29 +640,47 @@ class AdminTreeController extends AdminTreeStats
         $this->loader->syncDataTrees($request, -3, $treeID);
         $this->admControlInit($request, '/dashboard/surv-' . $treeID . '/data');
         if ($request->has('dataStruct')) {
-            if ($request->has('delSub') && intVal($request->input('delSub')) > 0) {
-                $found = SLDataSubsets::find($request->input('delSub'));
+            if ($request->has('delSub')
+                && intVal($request->get('delSub')) > 0) {
+                $found = SLDataSubsets::find($request->get('delSub'));
                 if ($found && isset($found->data_sub_tree)) {
                     $found->delete();
                 }
-            } elseif ($request->has('newSub') && $request->has('newSubset')) {
-                $splits = explode(':', $request->input('newSubset'));
+            } elseif ($request->has('newLoop')
+                && $request->has('newLoopTbl')) {
+                $loopTbl = explode(':', $request->get('newLoopTbl'));
+                $newLoop = new SLDataLoop;
+                $newLoop->data_loop_tree  = $GLOBALS["SL"]->treeID;
+                $newLoop->data_loop_table = $request->get('newLoopTbl');
+                if ($request->has('newLoopPlural')) {
+                    $newLoop->data_loop_plural = $request->get('newLoopPlural');
+                }
+                if ($request->has('newLoopSing')) {
+                    $newLoop->data_loop_singular = $request->get('newLoopSing');
+                }
+                $newLoop->data_loop_is_step  = 1; // for now
+                $newLoop->data_loop_auto_gen = 0; // for now
+                $newLoop->save();
+            } elseif ($request->has('newSub')
+                && $request->has('newSubset')) {
+                $splits = explode(':', $request->get('newSubset'));
                 $newSubset = new SLDataSubsets;
                 $newSubset->data_sub_tree     = $GLOBALS["SL"]->treeID;
                 $newSubset->data_sub_tbl      = $splits[0];
                 $newSubset->data_sub_tbl_lnk  = $splits[1];
                 $newSubset->data_sub_sub_tbl  = $splits[2];
                 $newSubset->data_sub_sub_lnk  = $splits[3];
-                $newSubset->data_sub_auto_gen = $request->input('newSubAuto');
+                $newSubset->data_sub_auto_gen = $request->get('newSubAuto');
                 $newSubset->save();
             } elseif ($request->has('delHelper')) {
-                $found = SLDataHelpers::find($request->input('delHelper'));
+                $found = SLDataHelpers::find($request->get('delHelper'));
                 if ($found && isset($found->data_help_tree)) {
                     $found->delete();
                 }
             } elseif ($request->has('newHelper')) {
                 $splits = explode(':', $request->input('newHelper'));
-                $valFld = str_replace($splits[2].':', '', $request->input('newHelperValue'));
+                $valFld = $request->input('newHelperValue');
+                $valFld = str_replace($splits[2] . ':', '', $valFld);
                 if (isset($splits[2])) {
                     $newHelp = new SLDataHelpers;
                     $newHelp->data_help_tree         = $GLOBALS["SL"]->treeID;
@@ -660,20 +692,20 @@ class AdminTreeController extends AdminTreeStats
                 }
             } elseif ($request->has('delLinkage')) {
                 $found = SLDataLinks::where('data_link_tree', $GLOBALS["SL"]->treeID)
-                    ->where('data_link_table', $request->input('delLinkage'))
+                    ->where('data_link_table', $request->get('delLinkage'))
                     ->first();
                 if ($found && isset($found->data_link_tree)) {
                     $found->delete();
                     unset($GLOBALS["SL"]->dataLinksOn[$found->data_link_table]);
                 }
             } elseif ($request->has('newLinkage')
-                && intVal($request->input('newLinkage')) > 0) {
-                $linkTbl = intVal($request->input('newLinkage'));
+                && intVal($request->get('newLinkage')) > 0) {
+                $linkTbl = intVal($request->get('newLinkage'));
                 $newLink = new SLDataLinks;
                 $newLink->data_link_tree = intVal($GLOBALS["SL"]->treeID);
                 $newLink->data_link_table = $linkTbl;
                 $newLink->save();
-                $GLOBALS["SL"]->dataLinksOn[$request->input('newLinkage')]
+                $GLOBALS["SL"]->dataLinksOn[$request->get('newLinkage')]
                     = $GLOBALS["SL"]->getLinkTblMap($linkTbl);
             }
         }

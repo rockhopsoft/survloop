@@ -45,6 +45,7 @@ class TreeSurvFormUtils extends TreeSurvFormLoops
             $GLOBALS["SL"]->pageJAVA .= view(
                 'vendor.survloop.js.formtree',
                 [
+                    "coreID"      => $this->coreID,
                     "currPage"    => $this->v["currPage"],
                     "pageJSvalid" => $this->pageJSvalid,
                     "pageFldList" => $this->pageFldList

@@ -33,14 +33,17 @@ class GlobalsTables extends GlobalsElements
 {
     public function loadGlobalTables($dbID = 1, $treeID = 1, $treeOverride = -3)
     {
-        $this->isAdmin = (Auth::user()
-            && Auth::user()->hasRole('administrator'));
-        $this->isStaff = (Auth::user()
-            && Auth::user()->hasRole('staff'));
-        $this->isAdminOrStaff = (Auth::user()
-            && Auth::user()->hasRole('administrator|staff'));
-        $this->isVolun = (Auth::user()
-            && Auth::user()->hasRole('volunteer'));
+        $this->isAdmin
+            = $this->isStaff
+            = $this->isAdminOrStaff
+            = $this->isVolun
+            = false;
+        if (Auth::user()) {
+            $this->isAdmin = Auth::user()->hasRole('administrator');
+            $this->isStaff = Auth::user()->hasRole('staff');
+            $this->isVolun = Auth::user()->hasRole('volunteer');
+            $this->isAdminOrStaff = ($this->isAdmin || $this->isStaff);
+        }
         if ($treeOverride > 0) {
             $this->treeOverride = $treeOverride;
         }

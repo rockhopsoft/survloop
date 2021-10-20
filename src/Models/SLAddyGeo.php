@@ -1,10 +1,13 @@
 <?php namespace App\Models;
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-model-gen.blade.php
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 class SLAddyGeo extends Model
 {
+    use Cachable;
+
     protected $table         = 'sl_addy_geo';
     protected $primaryKey     = 'ady_geo_id';
     public $timestamps         = true;

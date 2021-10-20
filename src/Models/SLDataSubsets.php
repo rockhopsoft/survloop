@@ -1,10 +1,13 @@
 <?php namespace App\Models;
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-model-gen.blade.php
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 class SLDataSubsets extends Model
 {
+    use Cachable;
+
     protected $table         = 'sl_data_subsets';
     protected $primaryKey     = 'data_sub_id';
     public $timestamps         = true;

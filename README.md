@@ -66,7 +66,7 @@ The installation used for Survloop.org is currently the best example of a bare-b
 
 # <a name="requirements"></a>Requirements
 
-* php: >=7.4
+* php: >=8.0
 * <a href="https://packagist.org/packages/laravel/laravel" target="_blank">laravel/laravel</a>: 8.5.*
 * <a href="https://packagist.org/packages/laravel/fortify" target="_blank">laravel/fortify</a>: 1.7.*
 * <a href="https://packagist.org/packages/rockhopsoft/survloop-libraries" target="_blank">rockhopsoft/survloop-libraries</a>: 0.*
@@ -115,6 +115,7 @@ From your Laravel installation's root directory, update `composer.json` to requi
     "psr-4": {
         ...
         "RockHopSoft\\Survloop\\": "vendor/rockhopsoft/survloop/src/",
+        "Predis\\": "vendor/predis/predis/src/",
     }
     ...
 }, ...

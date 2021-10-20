@@ -17,6 +17,7 @@
 </div>
 </div>
 
+
 <div class="slCard nodeWrap">
 <h2>Survloops</h2>
 <p>
@@ -70,7 +71,43 @@ New loops can be added by editing any node in the
     <tr><td colspan="6"><i>none</i></td></tr>
 @endforelse
 </table>
+
+<table class="table table-striped">
+    <form name="addNewLoop" method="post"
+        action="?all=1&refresh=1&dataStruct=1&newLoop=1">
+    <input type="hidden" id="csrfTok"
+        name="_token" value="{{ csrf_token() }}">
+    <tr>
+        <td>Looped Data Table</td>
+        <td>Plural</td>
+        <td>Singular</td>
+        <td>Save</td>
+    </tr>
+    <tr>
+        <td>
+            <select name="newLoopTbl" class="form-control">
+            {!! view(
+                'vendor.survloop.admin.db.inc-getTblDropOpts',
+                [ "presel" => '' ]
+            ) !!}
+            </select>
+        </td>
+        <td>
+            <input type="text" name="newLoopPlural" class="form-control">
+        </td>
+        <td>
+            <input type="text" name="newLoopSing" class="form-control">
+        </td>
+        <td>
+            <a href="javascript:;" class="btn btn-primary"
+                onClick="document.addNewLoop.submit();"
+                ><i class="fa fa-plus"></i></a>
+        </td>
+    </tr>
+    </form>
+</table>
 </div>
+
 
 <div class="slCard nodeWrap">
 <h2>Data Subsets</h2>
@@ -120,14 +157,19 @@ New loops can be added by editing any node in the
             @endif
         </td>
         <td class="taC">
-            <a href="?refresh=1&all=1&dataStruct=1&delSub={{ $link->data_sub_id }}" 
-            class="fPerc80 txtDanger"><i class="fa fa-trash-o"></i></a></td>
+            <a href="?refresh=1&all=1&dataStruct=1&delSub={{
+                    $link->data_sub_id }}"
+                class="fPerc80 txtDanger"
+                ><i class="fa fa-trash-o"></i></a>
+        </td>
     </tr>
 @empty
     <tr><td colspan="4" ><i>none</i></td></tr>
 @endforelse
-    <form name="addNewSubset" method="post" action="?all=1&refresh=1&dataStruct=1&newSub=1">
-    <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
+    <form name="addNewSubset" method="post"
+        action="?all=1&refresh=1&dataStruct=1&newSub=1">
+    <input type="hidden" id="csrfTok"
+        name="_token" value="{{ csrf_token() }}">
     <tr>
         <td colspan=3 >
             <select name="newSubset" class="form-control">
@@ -141,12 +183,16 @@ New loops can be added by editing any node in the
                 <option value="0" CHECKED >Manual</option>
             </select>
         </td>
-        <td><a href="javascript:;" class="btn btn-primary" 
-            onClick="document.addNewSubset.submit();"><i class="fa fa-plus"></i></a></td>
+        <td>
+            <a href="javascript:;" class="btn btn-primary"
+                onClick="document.addNewSubset.submit();"
+                ><i class="fa fa-plus"></i></a>
+        </td>
     </tr>
     </form>
 </table>
 </div>
+
 
 <div class="slCard nodeWrap">
 <h2>Data Helpers</h2>

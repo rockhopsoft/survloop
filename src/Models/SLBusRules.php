@@ -1,10 +1,13 @@
 <?php namespace App\Models;
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-model-gen.blade.php
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 class SLBusRules extends Model
 {
+    use Cachable;
+
     protected $table         = 'sl_bus_rules';
     protected $primaryKey     = 'rule_id';
     public $timestamps         = true;

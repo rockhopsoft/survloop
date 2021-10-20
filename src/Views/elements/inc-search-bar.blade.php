@@ -15,7 +15,8 @@
 @if (isset($advanced) && trim($advanced) != '')
     <div class="fR pT15"><a id="searchAdvBtn{{ $nID }}t{{ $treeID }}" 
         class="searchAdvBtn" href="javascript:;"
-        >Advanced filters <i class="fa fa-cogs" aria-hidden="true"></i></a></div>
+        >Advanced filters
+        <i class="fa fa-cogs" aria-hidden="true"></i></a></div>
 @endif
 <div class="fC"></div>
 @if (isset($advanced) && trim($advanced) != '')

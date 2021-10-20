@@ -138,23 +138,48 @@ Route::get('/css/fork-awesome.min.css.map', [SurvRoutes::class, 'getFontAwesomeM
 
 Route::get(
     '/survloop-libraries/state-flags/{stateFile}.{ext}',
-    [SurvRoutes::class, 'getStateFlag']
+    [ SurvRoutes::class, 'getStateFlag' ]
 );
 
 Route::get(
     '/vendor/rockhopsoft/survloop/src/Public/jquery-ui-1.12.1/images/{file}',
-    [SurvRoutes::class, 'catchJqueryUiMappingError']
+    [ SurvRoutes::class, 'catchJqueryUiMappingError' ]
 );
 
-Route::get('/summernote.min.js',   [SurvRoutes::class, 'getSummernoteJs']);
-Route::get('/summernote.css',      [SurvRoutes::class, 'getSummernoteCss']);
-Route::get('/font/summernote.eot', [SurvRoutes::class, 'getSummernoteEot']);
-Route::get('/Chart.bundle.min.js', [SurvRoutes::class, 'getChartJs']);
-Route::get('/plotly.min.js',       [SurvRoutes::class, 'getPlotlyJs']);
+Route::get(
+    '/summernote.min.js',
+    [ SurvRoutes::class, 'getSummernoteJs' ]
+);
+Route::get(
+    '/summernote.css',
+    [ SurvRoutes::class, 'getSummernoteCss' ]
+);
+Route::get(
+    '/font/summernote.eot',
+    [ SurvRoutes::class, 'getSummernoteEot' ]
+);
+Route::get(
+    '/Chart.bundle.min.js',
+    [ SurvRoutes::class, 'getChartJs' ]
+);
+Route::get(
+    '/plotly.min.js',
+    [ SurvRoutes::class, 'getPlotlyJs' ]
+);
 
 
 /**
  * System Services
  */
-Route::get('/survloop-stats.json', [Survloop::class, 'getJsonSurvStats']);
-Route::get('test-route-call',      [Survloop::class, 'testRouteCall']);
+Route::get(
+    '/survloop-stats.json',
+    [ Survloop::class, 'getJsonSurvStats' ]
+);
+Route::get(
+    'test-model-cache',
+    [ SurvRoutes::class, 'testModelCache' ]
+);
+Route::get(
+    'test-route-call',
+    [ SurvRoutes::class, 'testRouteCall' ]
+);

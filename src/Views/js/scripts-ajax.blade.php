@@ -178,8 +178,9 @@ $(document).ready(function(){
     $(".slSortable").sortable({
         axis: "y",
         update: function (event, ui) {
-            var submitURL = $(this).attr("data-url");
-            document.getElementById("hidFrameID").src=submitURL+"&"+$(this).sortable("serialize");
+            var submitURL = $(this).attr("data-url")+"&"+$(this).sortable("serialize");
+            //console.log(submitURL);
+            document.getElementById("hidFrameID").src=submitURL;
         }
     });
     $(".slSortable").disableSelection();
@@ -366,8 +367,8 @@ $(document).ready(function(){
 	        $("#headClear").load(redirUrl);
 	    }
 	}
-    setTimeout(function() { chkMenuLoad(); }, 500);
-    setTimeout(function() { chkMenuLoad(true); }, 2000);
+    setTimeout(function() { chkMenuLoad(); }, 1000);
+    setTimeout(function() { chkMenuLoad(true); }, 6000);
 
     $(document).on("click", ".adminAboutTog", function() {
         if (document.getElementById('adminAbout')) {

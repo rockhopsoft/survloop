@@ -10,17 +10,56 @@
   */
 namespace RockHopSoft\Survloop\Controllers\Globals;
 
-use Illuminate\Support\Facades\Storage;
-use MatthiasMullie\Minify;
 use App\Models\SLCaches;
 use App\Models\SLSearchRecDump;
 use App\Models\SLTree;
+use Illuminate\Support\Facades\Storage;
+use MatthiasMullie\Minify;
+use Predis\Autoloader;
+use Predis\Client;
 
 class GlobalsCache extends GlobalsBasic
 {
+    private $redis = null;
+
+    private function loadRedis()
+    {
+        if ($this->redis === null) {
+            Autoloader::register();
+            $opts = [];
+            $env = env('REDIS_SCHEME', 'tcp');
+            if ($env != '') {
+                $opts["scheme"] = $env;
+            }
+            $env = env('REDIS_HOST', '');
+            if ($env != '') {
+                $opts["host"] = $env;
+            }
+            $env = env('REDIS_PORT', '');
+            if ($env != '') {
+                $opts["port"] = $env;
+            }
+            $env = env('REDIS_PASSWORD', '');
+            if ($env != '') {
+                $opts["password"] = $env;
+            }
+            try {
+                $this->redis = new Client($opts);
+            } catch (Exception $e) {
+                echo "Couldn't connect to Redis" . $e->getMessage();
+            }
+        }
+    }
+
+    public function flushRedis()
+    {
+        $this->loadRedis();
+        $this->redis->flushAll();
+    }
 
     public function getCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = null;
@@ -29,7 +68,7 @@ class GlobalsCache extends GlobalsBasic
                 $chk = SLCaches::where('cach_type', $type)
                     ->where('cach_tree_id', $treeID)
                     ->where('cach_rec_id', $coreID)
-                    ->where('cach_Key', $key)
+                    ->where('cach_key', $key)
                     ->first();
             } else {
                 $chk = SLCaches::where('cach_type', $type)
@@ -47,6 +86,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function hasCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
@@ -55,6 +95,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function chkCacheType($type = '')
     {
+        $this->loadRedis();
         if ($type == ''
             && isset($this->treeRow)
             && isset($this->treeRow->tree_type)) {
@@ -65,15 +106,25 @@ class GlobalsCache extends GlobalsBasic
 
     public function chkCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $chk = $this->getCache($key, $type, $treeID, $coreID);
-        if ($chk && isset($chk->cach_value) && trim($chk->cach_value) != '') {
+        if ($chk
+            && isset($chk->cach_key)
+            && trim($chk->cach_key) != '') {
+            return $this->redis->get("string:" . $chk->cach_key);
+        }
+        /*
+        if ($chk
+            && isset($chk->cach_value)
+            && trim($chk->cach_value) != '') {
             $file = $this->cachePath . '/html/' . $chk->cach_value;
             if (Storage::exists($file)) {
                 return trim(Storage::get($file));
             }
         }
+        */
         return '';
     }
 
@@ -93,6 +144,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetCache($key = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
         $type = $this->chkCacheType($type);
         $cache = $this->getCache($key, $type, $treeID, $coreID);
@@ -101,6 +153,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllCachesOfType($type = 'search')
     {
+        $this->loadRedis();
         $chk = SLCaches::where('cach_type', $type)
             ->get();
         if ($chk->isNotEmpty()) {
@@ -113,6 +166,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllCachesOfTree($treeID = 0)
     {
+        $this->loadRedis();
         $key = ".%.db%.tree" . $treeID . ".%";
         $chk = SLCaches::where('cach_tree_id', intVal($treeID))
             ->orWhere('cach_key', 'LIKE', $key)
@@ -127,6 +181,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllCachesOfTrees($trees = [])
     {
+        $this->loadRedis();
         if (sizeof($trees) > 0) {
             foreach ($trees as $treeID) {
                 $this->forgetAllCachesOfTree(intVal($treeID));
@@ -137,6 +192,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllCachesTypeTree($type = 'search', $treeID = 0)
     {
+        $this->loadRedis();
         $chk = SLCaches::where('cach_type', $type)
             ->where('cach_tree_id', $treeID)
             ->get();
@@ -159,6 +215,7 @@ class GlobalsCache extends GlobalsBasic
 
     public function forgetAllItemCaches($treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $chk = SLCaches::where('cach_tree_id', $treeID)
             ->where('cach_rec_id', $coreID)
             ->get();
@@ -181,10 +238,16 @@ class GlobalsCache extends GlobalsBasic
 
     public function deleteCacheFile($cache)
     {
-        if ($cache && isset($cache->cach_id)) {
-            $file = $this->cachePath . '/html/' . $cache->CachValue;
+        $this->loadRedis();
+        if ($cache
+            && isset($cache->cach_key)
+            && trim($cache->cach_key) != '') {
+            $this->redis->del("string:" . $cache->cach_key);
+            /*
+            $file = $this->cachePath . '/html/' . $cache->cach_value;
             Storage::delete($file);
             $cache->delete();
+            */
             return true;
         }
         return false;
@@ -192,7 +255,9 @@ class GlobalsCache extends GlobalsBasic
 
     public function putCache($key = '', $content = '', $type = '', $treeID = 0, $coreID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
+        /*
         $file = date("Ymd") . '-t' . $treeID . (($coreID > 0) ? '-c' . $coreID : '');
         $treeRow = false;
         if (isset($this->treeRow->tree_type)) {
@@ -212,6 +277,7 @@ class GlobalsCache extends GlobalsBasic
         }
         $file .= $fileDeets . '-r' . rand(10000000, 100000000) . '.html';
         Storage::put($this->cachePath . '/html/' . $file, $content);
+        */
 
         $type = $this->chkCacheType($type);
         $this->forgetCache($key, $type, $treeID, $coreID);
@@ -220,19 +286,24 @@ class GlobalsCache extends GlobalsBasic
         $cache->cach_tree_id = $treeID;
         $cache->cach_rec_id  = $coreID;
         $cache->cach_key     = $key;
-        $cache->cach_value   = $file;
+        //$cache->cach_value   = $file;
         $cache->save();
+
+        $this->redis->set("string:" . $key, $content);
+
         return $cache->cach_id;
     }
 
     public function hasCacheSearch($key = '', $treeID = 0)
     {
+        $this->loadRedis();
         $chk = $this->getCache($key, 'search', $treeID);
         return ($chk && isset($chk->cach_id));
     }
 
     public function putCacheSearch($key = '', $ids = '', $treeID = 0)
     {
+        $this->loadRedis();
         $key = $this->cleanCacheKey($key);
         $cache = new SLCaches;
         $cache->cach_type    = 'search';

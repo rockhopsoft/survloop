@@ -1,5 +1,5 @@
 @if ((!isset($isPrint) || !$isPrint))
-    @if ($canEditTree)
+    @if ($canEditTree && isset($node->nodeRow->node_tree))
         <div class="disIn mL10">
             <a  @if ($GLOBALS['SL']->treeRow->tree_type == 'Survey XML'
                     || (isset($GLOBALS["SL"]->x["isXmlMap"]) && $GLOBALS["SL"]->x["isXmlMap"]))

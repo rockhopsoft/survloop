@@ -1,11 +1,14 @@
 <?php namespace App\Models;
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Models\SLConditionsVals;
 
 class SLConditions extends Model
 {
+    use Cachable;
+
     protected $table         = 'sl_conditions';
     protected $primaryKey     = 'cond_id';
     public $timestamps         = true;

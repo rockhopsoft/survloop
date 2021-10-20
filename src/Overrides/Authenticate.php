@@ -21,7 +21,7 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string
      */
-    protected function redirectTo(Request $request)
+    protected function redirectTo($request)
     {
         if (!$this->redirectIsBad($_SERVER["REQUEST_URI"])) {
             session()->put('loginRedir', $_SERVER["REQUEST_URI"]);

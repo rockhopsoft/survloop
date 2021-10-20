@@ -64,7 +64,7 @@ class AdminDatabaseInstall extends AdminDBController
 
     public function printExport(Request $request, $asPackage = false)
     {
-        set_time_limit(300);
+        ini_set('max_execution_time', 300);
         $asPack = $cacheName = '/dashboard/db/export';
         $this->admControlInit($request, $asPack);
         $this->v["asPackage"] = $GLOBALS["SL"]->x["exportAsPackage"] = $asPackage;
@@ -163,7 +163,7 @@ class AdminDatabaseInstall extends AdminDBController
 
     public function printImport(Request $request)
     {
-        ini_set('max_execution_time', 360);
+        ini_set('max_execution_time', 300);
         $cacheName = '/dashboard/db/import';
         $this->admControlInit($request, $cacheName);
         $this->v["uploadImport"] = null;
@@ -236,7 +236,7 @@ class AdminDatabaseInstall extends AdminDBController
 
     public function printExportLaravel(Request $request, $asPackage = false)
     {
-        ini_set('max_execution_time', 360);
+        ini_set('max_execution_time', 300);
         $this->v["asPackage"] = $asPackage;
         $currPage = (($asPackage) ? '/dashboard/sl/export/laravel'
             : '/dashboard/db/export');

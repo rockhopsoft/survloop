@@ -1,9 +1,12 @@
 <?php namespace App\Models;
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 class SLDataLoop extends Model
 {
+    use Cachable;
+
     protected $table      = 'sl_data_loop';
     protected $primaryKey = 'data_loop_id';
     public $timestamps    = true;

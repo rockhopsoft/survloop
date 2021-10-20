@@ -55,12 +55,12 @@ class SurvloopController extends SurvloopControllerUtils
             //if ($this->coreIDoverride > 0) {
                 $this->loadAllSessData();
             //}
+//echo '? survloopInit running, coreIDoverride: ' . $this->coreIDoverride . '<br />';
             if ($runExtra) {
                 $this->initExtra($request);
                 $this->loadSysSettings();
                 $this->initCustViews($request);
             }
-//echo '? survloopInit running, coreIDoverride: ' . $this->coreIDoverride . '<br />';
             $this->constructorExtra();
             $this->genCacheKey();
         }
@@ -163,6 +163,7 @@ class SurvloopController extends SurvloopControllerUtils
             $this->v["isStaff"]   = $this->v["user"]->hasRole('staff');
             $this->v["isPartner"] = $this->v["user"]->hasRole('partner');
             $this->v["isVolun"]   = $this->v["user"]->hasRole('volunteer');
+            $this->canEditTree    = $this->v["user"]->hasRole('administrator|databaser');
         }
         $this->loadUserVarsJava();
         $this->initPowerUser();
@@ -324,11 +325,13 @@ class SurvloopController extends SurvloopControllerUtils
             if (!$this->treeFromURL) {
                 if (!isset($this->v["user"])) {
                     $this->v["user"] = Auth::user();
-                    $this->v["uID"]  = (($this->v["user"] && isset($this->v["user"]->id))
-                        ? $this->v["user"]->id : 0);
+                    $this->v["uID"]  = 0;
+                    if ($this->v["user"] && isset($this->v["user"]->id)) {
+                        $this->v["uID"] = $this->v["user"]->id;
+                    }
                 }
                 if ($this->v["uID"] > 0) {
-                    $last = SLUsersActivity::where('user_act_user', '=', $this->v["uID"])
+                    $last = SLUsersActivity::where('user_act_user', $this->v["uID"])
                         ->where('user_act_val', 'LIKE', '%;%')
                         ->where(function ($query) {
                             $query->where('user_act_curr_page', 'LIKE', '/fresh/database%')

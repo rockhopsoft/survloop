@@ -719,7 +719,7 @@ class TreeSurvNodeEdit extends TreeSurvForm
                     || trim($GLOBALS["SL"]->REQ->spreadTblLoop) == '') {
                     $node->nodeRow->node_response_set = $this->postLoopsDropdowns('responseList');
                     if ($node->nodeRow->node_response_set == '') {
-                        for ($i=0; $i < 20; $i++) {
+                        for ($i=0; $i < 100; $i++) {
                             if ($GLOBALS["SL"]->REQ->has('response' . $i . '')
                                 && trim($GLOBALS["SL"]->REQ->get('response' . $i . '')) != '') {
                                 $val = trim($GLOBALS["SL"]->REQ->get('response' . $i . ''));

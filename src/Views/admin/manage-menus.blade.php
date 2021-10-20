@@ -5,36 +5,57 @@
 <div class="row">
     <div class="col-6">
         <div class="slCard nodeWrap">
-            <h2><i class="fa fa-eye"></i> Admin Navigation Menu</h2>
-            <span class="slGrey">...soon...</span>
-            <div class="p20"></div>
-        </div>
-    </div>
-    <div class="col-6">
-        <div class="slCard nodeWrap">
-            <h2 class="fL"><i class="fa fa-bars mR5" aria-hidden="true"></i> Burger Navigation Menu</h2>
-            <h2 class="fR slBlueDark mR10"><i class="fa fa-level-up" aria-hidden="true"></i></h2>
-            <div class="fC"></div>
+            <h2 class="fR slBlueDark mR10"
+                ><i class="fa fa-level-up" aria-hidden="true"></i></h2>
+            <h2><i class="fa fa-bars mR5" aria-hidden="true"></i>
+                Burger Navigation Menu</h2>
             
-            <form name="mainPageForm" action="/dashboard/pages/menus?sub=1" method="post" >
+            <form name="mainPageForm" method="post"
+                action="/dashboard/pages/menus?sub=1" >
             <input type="hidden" id="csrfTok" name="_token" value="{{ csrf_token() }}">
             <div class="row slGrey">
                 <div class="col-6">Menu Link Text</div>
                 <div class="col-6">Link To URL</div>
             </div>
             @for ($i=0; $i < $cntMax; $i++)
-                <div id="navMenuTr{{ $i }}" class="row mT5 mB10 
-                    @if ($i < (1+sizeof($navMenu))) disBlo @else disNon @endif ">
-                    <div class="col-6"><input type="text" id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}" 
-                        @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][0] !!}" @else value="" @endif 
-                        onKeyUp="checkMainNav();" class="form-control" autocomplete="off" ></div>
-                    <div class="col-6"><input type="text" id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}" 
-                        @if ($i < sizeof($navMenu)) value="{!! $navMenu[$i][1] !!}" @else value="" @endif 
-                        onKeyUp="checkMainNav();" class="form-control" autocomplete="off" ></div>
+                <div id="navMenuTr{{ $i }}"
+                    class=" @if ($i < (1+sizeof($navMenu))) disBlo @else disNon @endif ">
+                    <div class="row mT5 mB10">
+                        <div class="col-6">
+                            <input id="txt{{ $cnt }}ID" name="mainNavTxt{{ $cnt }}"
+                                type="text" class="form-control"
+                                onKeyUp="checkMainNav();" autocomplete="off"
+                                @if ($i < sizeof($navMenu))
+                                    value="{!! $navMenu[$i][0] !!}"
+                                @else
+                                    value=""
+                                @endif >
+                        </div>
+                        <div class="col-6">
+                            <input id="lnk{{ $cnt }}ID" name="mainNavLnk{{ $cnt++ }}"
+                                type="text" class="form-control"
+                                onKeyUp="checkMainNav();" autocomplete="off"
+                                @if ($i < sizeof($navMenu))
+                                    value="{!! $navMenu[$i][1] !!}"
+                                @else
+                                    value=""
+                                @endif >
+                        </div>
+                    </div>
                 </div>
             @endfor
-            <center><input type="submit" class="btn btn-primary btn-lg" value="Save Menu Changes"></center>
+            <center><input class="btn btn-primary btn-lg"
+                type="submit" value="Save Menu Changes"></center>
             </form>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="slCard nodeWrap">
+            <h2><i class="fa fa-eye"></i> Admin Navigation Menu</h2>
+            <p class="slGrey">
+                Currently managed in { CustomPackage }AdminMenu.php
+            </p>
+            <div class="p20"></div>
         </div>
     </div>
 </div>

@@ -188,7 +188,8 @@ class UserProfile extends TreeSurvInput
             $this->v["picInstruct"] = $this->profilePhotoUploadInstruct();
             $this->v["content"] = '<div id="ajaxWrap" class="w100"><center>'
                 . '<div id="skinnySurv" class="treeWrapForm">' . $ret
-                . view('vendor.survloop.auth.profile-edit', $this->v)->render()
+                . view('vendor.survloop.auth.profile-edit', $this->v)
+                    ->render()
                 . '</div></center></div>';
             return $this->indexResponse();
         }
@@ -203,13 +204,19 @@ class UserProfile extends TreeSurvInput
             && $this->isStaffOrAdmin()) {
             $uID = $this->v["profileUser"]->id;
             $this->v["logs"] = new SurvLogAnalysis;
-            $this->v["allSessionLogs"] = $this->v["allSessionsGrouped"] = [];
-            $this->v["userSess"]     = $this->v["logs"]->logPreviewUser('session-stuff', $uID);
-            $this->v["userActivity"] = $this->v["logs"]->activityPreviewUser($uID);
-            $this->v["customStats"]  = $this->printProfileStatsCustom();
+            $this->v["allSessionLogs"]
+                = $this->v["allSessionsGrouped"]
+                = [];
+            $this->v["userSess"]
+                = $this->v["logs"]->logPreviewUser('session-stuff', $uID);
+            $this->v["userActivity"]
+                = $this->v["logs"]->activityPreviewUser($uID);
+            $this->v["customStats"]
+                = $this->printProfileStatsCustom();
             $this->v["content"] = '<div id="ajaxWrap" class="w100">'
                 . '<div id="wideSurv" class="container-fluid">'
-                . view('vendor.survloop.auth.profile-stats', $this->v)->render()
+                . view('vendor.survloop.auth.profile-stats', $this->v)
+                    ->render()
                 . '</div></div>';
             return $this->indexResponse();
         }

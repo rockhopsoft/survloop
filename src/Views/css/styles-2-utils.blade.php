@@ -144,7 +144,7 @@ a.overUnd:hover {
 a.wAuto:link, a.wAuto:visited, a.wAuto:active, a.wAuto:hover {
     width: auto;
 }
-@foreach ([100, 95, 90, 85, 80, 75, 66, 60, 50, 48, 45, 
+@foreach ([100, 98, 95, 90, 85, 80, 75, 66, 60, 50, 48, 45,
     40, 35, 33, 31, 30, 25, 23, 20, 15, 10, 5, 1] as $width)
 .w{{ $width }}, table.w{{ $width }}, table tr td.w{{ $width }}, 
 input.w{{ $width }}, select.w{{ $width }}, textarea.w{{ $width }} { 
@@ -152,12 +152,12 @@ input.w{{ $width }}, select.w{{ $width }}, textarea.w{{ $width }} {
 }
 @endforeach
 
-.zind0 { 
-    z-index: 0; 
+@foreach ([100, 98, 95, 90, 85, 80, 75, 66, 60, 50, 48, 45,
+    40, 35, 33, 31, 30, 25, 23, 20, 15, 10, 5, 1, 0] as $zindex)
+.zind{{ $zindex }} {
+    z-index: {{ $zindex }};
 }
-.zind100 { 
-    z-index: 100; 
-}
+@endforeach
 
 .vaT, table tr td.vaT { 
     vertical-align: top; 
@@ -271,11 +271,20 @@ h1.m0, h2.m0, h3.m0 {
     margin-right: 2%; 
 }
 
-@foreach ([0, 5, 10, 15, 20, 30] as $px)
+@foreach ([0, 5, 10, 15, 20, 30, 60] as $px)
     .round{{ $px }} {
         -moz-border-radius: {{ $px }}px;
         border-radius: {{ $px }}px; 
     }
+@endforeach
+
+@foreach ([5, 10, 15, 20, 30, 60, 100, 150, 200] as $px)
+.circle{{ $px }} {
+    width: {{ $px }}px;
+    height: {{ $px }}px;
+    -moz-border-radius: {{ ceil($px/2) }}px;
+    border-radius: {{ ceil($px/2) }}px;
+}
 @endforeach
 
 .opac1 {

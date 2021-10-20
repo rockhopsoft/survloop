@@ -117,7 +117,7 @@ class SurvloopSpecialLoads extends PageLoadUtils
 
     public function restartSess(Request $request)
     {
-        $this->loadLoop($request);
+        $this->loadLoop($request, true, -3, false);
         return $this->custLoop->restartSess($request);
     }
 

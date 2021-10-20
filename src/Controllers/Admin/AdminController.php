@@ -72,10 +72,14 @@ class AdminController extends AdminEmailController
         }
         $this->v["sysDef"]->prepSysSettings($request);
         if ($request->has('sub')) {
-            return $this->v["sysDef"]->submitSysSettings($request, $this->v["sysSet"]);
+            return $this->v["sysDef"]->submitSysSettings(
+                $request,
+                $this->v["sysSet"]
+            );
         }
         $this->sysSettingsLoadCurrMeta();
-        $blade = 'vendor.survloop.admin.system-settings-' . $this->v["sysSet"];
+        $blade = 'vendor.survloop.admin.system-settings-'
+            . $this->v["sysSet"];
         $this->v["content"] = view($blade, $this->v)->render();
         if ($request->has('ajax')) {
             echo $this->v["content"];
@@ -116,13 +120,12 @@ class AdminController extends AdminEmailController
     private function sysSettingsCheckRefresh(Request $request)
     {
         if ($request->has('refresh')) {
+            $this->cacheFlush();
             $ref = intVal($request->get('refresh'));
             if ($ref == 2) {
                 $this->initLoader();
                 $this->sysSettingsRefresh($request);
                 return $this->redir('/dashboard/settings?refresh=1', true);
-            } elseif ($ref == 3) {
-                $this->cacheFlush();
             }
         }
     }
@@ -428,7 +431,7 @@ class AdminController extends AdminEmailController
      */
     public function userManage(Request $request)
     {
-        set_time_limit(180);
+        ini_set('max_execution_time', 300);
         $this->admControlInit($request, '/dashboard/users', 'administrator|staff');
         $this->loadPrintUsers();
         return view('vendor.survloop.admin.user-manage', $this->v);
@@ -775,5 +778,6 @@ class AdminController extends AdminEmailController
     {
         DB::table('sl_caches')->truncate();
         Cache::flush();
+        $GLOBALS["SL"]->flushRedis();
     }
 }

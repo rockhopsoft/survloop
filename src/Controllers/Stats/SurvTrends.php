@@ -15,9 +15,11 @@ use RockHopSoft\Survloop\Controllers\Stats\SurvStatsCore;
 class SurvTrends extends SurvStatsCore
 {
     private $nIDtxt       = '0';
-    public $pastDays      = 60;
     public $axisLabels    = [];
-    public $dataDays     = [];
+
+    public $pastDays      = 60;
+    public $pastMonths    = 36;
+    public $dataDays      = [];
 
     public $datFldDate    = '';
     public $datRawResults = null;
@@ -45,25 +47,27 @@ class SurvTrends extends SurvStatsCore
         return true;
     }
 
+    // Takes Eloquent database search results
+    public function addRawDataResults($res = null)
+    {
+        $this->rawDataRes = $res;
+        return true;
+    }
+
     public function getPastStartDate()
     {
-        return date("Y-m-d", mktime(0, 0, 0, date("n"), date("j")-$this->pastDays, date("Y")));
+        $day = date("j")-$this->pastDays;
+        return date("Y-m-d", mktime(0, 0, 0, date("n"), $day, date("Y")));
     }
 
     public function loadAxisPastDayLabels()
     {
         $this->axisLabels = [];
         for ($cnt = $this->pastDays; $cnt >= 0; $cnt--) {
-            $this->axisLabels[] = date("n/j", mktime(0, 0, 0, date("n"), date("j")-$cnt, date("Y")));
+            $time = mktime(0, 0, 0,  date("n"), date("j")-$cnt, date("Y"));
+            $this->axisLabels[] = date("n/j", $time);
         }
         return $this->axisLabels;
-    }
-
-    // Takes Eloquent database search results
-    public function addRawDataResults($res = null)
-    {
-        $this->rawDataRes = $res;
-        return true;
     }
 
     private function getDateIndex($date = '')
@@ -80,7 +84,9 @@ class SurvTrends extends SurvStatsCore
 
     private function getRawResultDateIndex($row = null)
     {
-        if ($row && trim($this->datFldDate) != '' && isset($row->{ $this->datFldDate })) {
+        if ($row
+            && trim($this->datFldDate) != ''
+            && isset($row->{ $this->datFldDate })) {
             return $this->getDateIndex($row->{ $this->datFldDate });
         }
         return -1;
@@ -91,7 +97,9 @@ class SurvTrends extends SurvStatsCore
         if ($res !== null) {
             $this->addRawDataResults($res);
         }
-        if (sizeof($this->datMap) > 0 && $this->rawDataRes && $this->rawDataRes->isNotEmpty()) {
+        if (sizeof($this->datMap) > 0
+            && $this->rawDataRes
+            && $this->rawDataRes->isNotEmpty()) {
             foreach ($this->rawDataRes as $statRec) {
                 $dateIndex = $this->getRawResultDateIndex($statRec);
                 if ($dateIndex >= 0) {
@@ -100,7 +108,8 @@ class SurvTrends extends SurvStatsCore
                             && trim($datMap["rowFld"]) != ''
                             && isset($statRec->{ $datMap["rowFld"] })
                             && $statRec->{ $datMap["rowFld"] } !== null) {
-                            $this->dataDays[$dLet][$dateIndex] = $statRec->{ $datMap["rowFld"] };
+                            $this->dataDays[$dLet][$dateIndex]
+                                = $statRec->{ $datMap["rowFld"] };
                         }
                     }
                 }
@@ -113,7 +122,8 @@ class SurvTrends extends SurvStatsCore
     {
         $dLet = $this->dAbr($abbr);
         $ind = $this->getDateIndex($date);
-        if (isset($this->dataDays[$dLet]) && isset($this->dataDays[$dLet][$ind])) {
+        if (isset($this->dataDays[$dLet])
+            && isset($this->dataDays[$dLet][$ind])) {
             $this->dataDays[$dLet][$ind] += $tally;
         }
         return true;
@@ -149,7 +159,65 @@ class SurvTrends extends SurvStatsCore
                 "nIDtxt"     => $this->nIDtxt,
                 "datMap"     => $this->datMap,
                 "axisLabels" => $this->axisLabels,
-                "dataDays"   => $this->dataDays,
+                "dataPts"    => $this->dataDays,
+                "height"     => $height,
+                "title"      => $title,
+                "increment"  => $increment,
+                "css"        => $sysDef->loadCss()
+            ]
+        )->render();
+    }
+
+    public function loadAxisPastMonthLabels()
+    {
+        if (sizeof($this->axisLabels) == 0) {
+            for ($cnt = $this->pastMonths; $cnt >= 0; $cnt--) {
+                $time = mktime(0, 0, 0,  date("n")-$cnt, 1, date("Y"));
+                $this->axisLabels[] = date("M y", $time);
+            }
+        }
+        return $this->axisLabels;
+    }
+
+    private function getLabelIndex($label = '')
+    {
+        if (sizeof($this->axisLabels) > 0 && trim($label) != '') {
+            foreach ($this->axisLabels as $ind => $lab) {
+                if ($label == $lab) {
+                    return $ind;
+                }
+            }
+        }
+        return -1;
+    }
+
+    public function addLabelTally($abbr, $label, $tally = 1)
+    {
+        $dLet = $this->dAbr($abbr);
+        if (isset($this->dataDays[$dLet])) {
+            $ind = $this->getLabelIndex($label);
+            if (!isset($this->dataDays[$dLet][$ind])) {
+                $this->dataDays[$dLet][$ind] = 0;
+            }
+            $this->dataDays[$dLet][$ind] += $tally;
+//echo 'addLabelTally(' . $abbr . ' - ' . $dLet . ' -- ' . $ind . ' = ' . $this->dataDays[$dLet][$ind] . '<br />';
+        }
+        return true;
+    }
+
+    public function printMonthlyGraphLines($height = 500, $title = '', $increment = null)
+    {
+        $GLOBALS["SL"]->x["needsCharts"] = true;
+        $this->loadAxisPastMonthLabels();
+        $sysDef = new SystemDefinitions;
+//echo '<pre>'; print_r($this->dataDays); echo '</pre>';
+        return view(
+            'vendor.survloop.reports.graph-data-line',
+            [
+                "nIDtxt"     => $this->nIDtxt,
+                "datMap"     => $this->datMap,
+                "axisLabels" => $this->axisLabels,
+                "dataPts"    => $this->dataDays,
                 "height"     => $height,
                 "title"      => $title,
                 "increment"  => $increment,

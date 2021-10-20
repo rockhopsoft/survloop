@@ -684,7 +684,7 @@ class GlobalsImportExport extends GlobalsTables
             $flds = $this->getTableFields($tbl);
         }
         $ret = "Schema::create('"
-            . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name
+            . $this->dbRow->db_prefix . $tbl->tbl_name
             . "', function(Blueprint $"."table)\n\t\t{\n\t\t\t"
             . "$"."table->increments('" . $tbl->tbl_abbr . "id');";
         if ($flds->isNotEmpty()) {
@@ -759,9 +759,9 @@ class GlobalsImportExport extends GlobalsTables
         }
         /* // This is throwing errors
         if (intVal($fld->fld_foreign_table) > 0) {
-            list($forTbl, $forID) = $GLOBALS["SL"]->chkForeignKey($fld->fld_foreign_table);
+            list($forTbl, $forID) = $this->chkForeignKey($fld->fld_foreign_table);
             $this->v["migrateEnd"] .= "\t"."Schema::table('"
-                . $GLOBALS["SL"]->dbRow->db_prefix . $tbl->tbl_name
+                . $this->dbRow->db_prefix . $tbl->tbl_name
                 . "', function($"."table) { $"."table->foreign('" . $fldName
                 . "')->references('" . $forID . "')->on('" . $forTbl . "'); });\n";
         }
@@ -1215,31 +1215,51 @@ class GlobalsImportExport extends GlobalsTables
         return $row;
     }
 
-    public function splitImportFile($readFile, $ext = '.csv', $splits = 30)
+    public function splitImportFile($readFile, $ext = '.csv', $splits = 30, $refresh = 1)
     {
         $splitInd = 0;
         $downloadFile = str_replace($ext, '-new' . $ext, $readFile);
-        if ($this->REQ->has('refresh')
+        if ($refresh
+            || $this->REQ->has('refresh')
+            || $this->REQ->has('redownload')
             || $this->REQ->has('split')
             || !file_exists($readFile)
             || filesize($readFile) != filesize($downloadFile)) {
             copy($downloadFile, $readFile);
+            for ($split = 1; $split <= $splits; $split++) {
+                $splitTxt = '-split' . $split . '.csv';
+                $fileSplit = str_replace('.csv', $splitTxt, $readFile);
+                if (file_exists($fileSplit)) {
+                    unlink($fileSplit);
+                }
+            }
         }
         if ($this->REQ->has('refresh')
             || $this->REQ->has('split')
             || !file_exists(str_replace($ext, '-split1' . $ext, $readFile))) {
-            $splitInds = [];
-            $fileLines = $this->mexplode("\n", file_get_contents($readFile));
-            for ($s = 1; $s <= $splits; $s++) {
-                $splitInds[] = round($s*(sizeof($fileLines)/$splits));
+            $lineTot = 0;
+            $handle = fopen($readFile, "r");
+            while(!feof($handle)){
+                $line = fgets($handle);
+                $lineTot++;
             }
-            $fileBody  = '';
-            foreach ($fileLines as $l => $line) {
-                if ($l > 0) {
-                    $fileBody .= $line . "\n";
-                    if (in_array($l, $splitInds)) {
+            fclose($handle);
+            $splitInds = [];
+            for ($s = 1; $s <= $splits; $s++) {
+                $splitInds[] = round($s*($lineTot/$splits));
+            }
+            $currLine = 0;
+            $fileBody = '';
+            $handle = fopen($readFile, "r");
+            while(!feof($handle)){
+                $currLine++;
+                $line = fgets($handle);
+                if ($currLine > 0) {
+                    $fileBody .= $line;
+                    if (in_array($currLine, $splitInds)) {
                         $splitInd++;
-                        $splitFile = str_replace($ext, '-split' . $splitInd . $ext, $readFile);
+                        $ext2 = '-split' . $splitInd . $ext;
+                        $splitFile = str_replace($ext, $ext2, $readFile);
                         if (file_exists($splitFile)) {
                             unlink($splitFile);
                         }
@@ -1248,6 +1268,7 @@ class GlobalsImportExport extends GlobalsTables
                     }
                 }
             }
+            fclose($handle);
             if ($fileBody != '') {
                 $splitInd++;
                 $splitFile = str_replace($ext, '-split' . $splitInd . $ext, $readFile);

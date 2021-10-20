@@ -1,10 +1,13 @@
 <?php namespace App\Models;
 // generated from /resources/views/vendor/survloop/admin/db/export-laravel-model-gen.blade.php
 
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 class SLNodeResponses extends Model
 {
+    use Cachable;
+
     protected $table         = 'sl_node_responses';
     protected $primaryKey     = 'node_res_id';
     public $timestamps         = true;

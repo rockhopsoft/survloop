@@ -2,6 +2,7 @@
 
 var treeID = 0;
 var treeType = "";
+var coreID = 0;
 
 var foundForm = true;
 var formActionUrl = "/sub";

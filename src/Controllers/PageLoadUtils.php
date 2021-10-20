@@ -58,7 +58,7 @@ class PageLoadUtils extends Controller
      *
      * @return void
      */
-    public function loadLoop(Request $request, $skipSessLoad = false, $coreID = -3)
+    public function loadLoop(Request $request, $skipSessLoad = false, $coreID = -3, $slInit = true)
     {
         $this->loadAbbr();
         $class = "RockHopSoft\\Survloop\\Controllers\\Tree\\TreeSurvForm";
@@ -71,14 +71,15 @@ class PageLoadUtils extends Controller
                 $class = $custClass;
             }
         }
-        eval("\$this->custLoop = new " . $class . "("
+        $eval = "\$this->custLoop = new " . $class . "("
             . "\$request, "
             . $coreID . ", "
             . $this->dbID . ", "
             . $this->treeID . ", "
-            . (($skipSessLoad) ? "true" : "false")
-            . ");"
-        );
+            . (($skipSessLoad) ? "true" : "false") . ", "
+            . (($slInit) ? "true" : "false")
+            . ");";
+        eval($eval);
     }
 
     /**
@@ -1056,7 +1057,8 @@ class PageLoadUtils extends Controller
             || !isset(Auth::user()->id)
             || intVal(Auth::user()->id) <= 0
             || (session()->has('loginChk')
-                && intVal(session()->get('loginChk')) == Auth::user()->id)) {
+                && intVal(session()->get('loginChk'))
+                    == Auth::user()->id)) {
             return '';
         }
         $this->loadDomain();

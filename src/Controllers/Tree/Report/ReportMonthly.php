@@ -22,6 +22,7 @@ class ReportMonthly
 
     public $monthFld   = '';
     public $startMonth = 1;
+    public $startMYear = 2021;
     public $months     = [];
     public $years      = [];
 
@@ -46,9 +47,10 @@ class ReportMonthly
         $this->monthFld = $monthFld;
     }
 
-    public function setStartMonth($startMonth = 1)
+    public function setStartMonth($startMonth = 1, $startMYear = 2021)
     {
         $this->startMonth = $startMonth;
+        $this->startMYear = $startMYear;
     }
 
     public function printTables($wrapEachSetInCard = true)
@@ -91,10 +93,7 @@ class ReportMonthly
         $sorted = $this->years = [];
         for ($cnt = 0; $cnt < 12; $cnt++) {
             $m = $this->startMonth-$cnt;
-            $year = intVal(date("y"));
-            if (intVal(date("n")) < $this->startMonth) {
-                $year--;
-            }
+            $year = $this->startMYear;
             if ($m < 1) {
                 $m += 12;
                 $year--;

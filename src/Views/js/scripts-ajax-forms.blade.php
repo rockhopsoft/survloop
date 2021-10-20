@@ -204,10 +204,14 @@ function setFormLabelRed(nIDtxt) {
 $(document).on("click", ".nFormNext", function() {
     if (document.getElementById("stepID")) {
         pressedSubmit = true;
-        if (document.getElementById("isLoopNav")) return exitLoop("");
+        if (document.getElementById("isLoopNav")) {
+            return exitLoop("");
+        }
         if (checkNodeForm()) {
-            document.getElementById("stepID").value="next";
-            return runFormSub();
+            setTimeout(function() {
+                document.getElementById("stepID").value="next";
+                return runFormSub();
+            }, 30);
         }
         pressedSubmit = false;
     }
