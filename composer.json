@@ -42,8 +42,8 @@
         "paragonie/random_compat": "v9.99.100",
         "plotly/plotly.js": "^1.55.0",
         "predis/predis": "^1.1.7",
-        "rockhopsoft/survloop-images": "0.3.*",
-        "rockhopsoft/survloop-libraries": "0.3.*",
+        "rockhopsoft/survloop-images": "dev-main",
+        "rockhopsoft/survloop-libraries": "dev-main",
         "summernote/summernote": "v0.8.8",
         "twbs/bootstrap": "^4.5.2"
     },
